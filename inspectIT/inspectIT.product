@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.4"?>
+
+<product name="inspectIT" id="info.novatec.novaspy.rcp.product" application="info.novatec.novaspy.rcp.application" version="1.0.0" useFeatures="false">
+
+   <aboutInfo>
+      <text>
+         %aboutText
+      </text>
+   </aboutInfo>
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+      <vmArgs>-Xmx512M -Xms128m</vmArgs>
+   </launcherArgs>
+
+   <windowImages i16="/NovaSpy/icons/16x16.png" i32="/NovaSpy/icons/32x32.png" i48="/NovaSpy/icons/48x48.png" i64="/NovaSpy/icons/64x64.png" i128="/NovaSpy/icons/128x128.png"/>
+
+   <splash
+      location="info.novatec.novaspy.rcp"
+      startupMessageRect="5,10,560,20"
+      startupForegroundColor="FFFFFF" />
+   <launcher name="inspectIT">
+      <solaris/>
+      <win useIco="false">
+         <bmp
+            winSmallHigh="/NovaSpy/icons/16x16_32bit.bmp"
+            winMediumHigh="/NovaSpy/icons/32x32_32bit.bmp"
+            winLargeHigh="/NovaSpy/icons/48x48_32bit.bmp"/>
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
+   <plugins>
+      <plugin id="com.ibm.icu"/>
+      <plugin id="info.novatec.novaspy.commons"/>
+      <plugin id="info.novatec.novaspy.rcp"/>
+      <plugin id="org.eclipse.ant.core"/>
+      <plugin id="org.eclipse.core.commands"/>
+      <plugin id="org.eclipse.core.contenttype"/>
+      <plugin id="org.eclipse.core.databinding"/>
+      <plugin id="org.eclipse.core.expressions"/>
+      <plugin id="org.eclipse.core.filesystem"/>
+      <plugin id="org.eclipse.core.filesystem.hpux.ia64_32"/>
+      <plugin id="org.eclipse.core.filesystem.linux.ppc"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86_64"/>
+      <plugin id="org.eclipse.core.filesystem.macosx"/>
+      <plugin id="org.eclipse.core.filesystem.solaris.sparc"/>
+      <plugin id="org.eclipse.core.filesystem.win32.x86"/>
+      <plugin id="org.eclipse.core.jobs"/>
+      <plugin id="org.eclipse.core.resources"/>
+      <plugin id="org.eclipse.core.resources.compatibility" fragment="true"/>
+      <plugin id="org.eclipse.core.resources.win32.x86"/>
+      <plugin id="org.eclipse.core.runtime"/>
+      <plugin id="org.eclipse.core.runtime.compatibility"/>
+      <plugin id="org.eclipse.core.runtime.compatibility.auth"/>
+      <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
+      <plugin id="org.eclipse.core.variables"/>
+      <plugin id="org.eclipse.equinox.app"/>
+      <plugin id="org.eclipse.equinox.common"/>
+      <plugin id="org.eclipse.equinox.preferences"/>
+      <plugin id="org.eclipse.equinox.registry"/>
+      <plugin id="org.eclipse.help"/>
+      <plugin id="org.eclipse.jface"/>
+      <plugin id="org.eclipse.jface.databinding"/>
+      <plugin id="org.eclipse.osgi"/>
+      <plugin id="org.eclipse.swt"/>
+      <plugin id="org.eclipse.swt.carbon.macosx"/>
+      <plugin id="org.eclipse.swt.gtk.linux.ppc"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86_64"/>
+      <plugin id="org.eclipse.swt.gtk.solaris.sparc"/>
+      <plugin id="org.eclipse.swt.motif.aix.ppc"/>
+      <plugin id="org.eclipse.swt.motif.hpux.ia64_32"/>
+      <plugin id="org.eclipse.swt.win32.win32.x86"/>
+      <plugin id="org.eclipse.swt.win32.win32.x86_64"/>
+      <plugin id="org.eclipse.swt.wpf.win32.x86"/>
+      <plugin id="org.eclipse.ui"/>
+      <plugin id="org.eclipse.ui.carbon"/>
+      <plugin id="org.eclipse.ui.forms"/>
+      <plugin id="org.eclipse.ui.workbench"/>
+      <plugin id="org.eclipse.update.configurator"/>
+   </plugins>
+
+</product>

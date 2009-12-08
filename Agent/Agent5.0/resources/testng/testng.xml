@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+<suite name="Agent5.0">
+	<test name="Timer Hook">
+		<classes>
+			<class
+				name="info.novatec.novaspy.agent.sensor.method.timer.test.TimerHookTest" />
+		</classes>
+	</test>
+</suite>

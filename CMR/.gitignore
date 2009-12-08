@@ -1,0 +1,10 @@
+bin/
+dist/
+lib/
+build/
+generatedsrc/
+test-output/
+logs/
+invocations/
+db/
+temp-testng-customsuite.xml

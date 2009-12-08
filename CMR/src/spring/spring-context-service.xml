@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"
+	default-autowire="autodetect">
+
+	<bean id="internRegistrationService"
+		class="info.novatec.novaspy.cmr.service.InternRegistrationService" />
+
+	<bean id="registrationService" class="info.novatec.novaspy.cmr.service.RegistrationService" />
+
+	<bean id="agentStorageService" class="info.novatec.novaspy.cmr.service.AgentStorageService" />
+
+	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
+		<property name="serviceName" value="NovaSpyRegistrationService" />
+		<property name="service" ref="registrationService" />
+		<property name="serviceInterface"
+			value="info.novatec.novaspy.cmr.service.IRegistrationService" />
+		<property name="registryPort" value="1099" />
+	</bean>
+
+	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
+		<property name="serviceName" value="NovaSpyAgentStorageService" />
+		<property name="service" ref="agentStorageService" />
+		<property name="serviceInterface"
+			value="info.novatec.novaspy.cmr.service.IAgentStorageService" />
+		<property name="registryPort" value="1099" />
+	</bean>
+
+</beans>

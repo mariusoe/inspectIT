@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="info.novatec.novaspy.communication.data">
+	<union-subclass name="ExceptionSensorData"
+		extends="info.novatec.novaspy.communication.MethodSensorData" table="exception_sensor_data">
+		<property name="errorMessage" column="error_message" />
+		<property name="cause" column="cause" />
+		<property name="exceptionEventString" column="exception_event_string" />
+		<property name="throwableType" column="throwable_type" />
+		<property name="throwableIdentityHashCode" column="throwable_identity_hashcode" />
+		<property name="stackTrace" column="stack_trace" length="10000" />
+		<many-to-one name="child" column="child" class="ExceptionSensorData"
+			unique="true" cascade="all" lazy="false" />
+	</union-subclass>
+</hibernate-mapping>

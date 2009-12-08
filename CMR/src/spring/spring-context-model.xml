@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"
+	default-autowire="autodetect">
+
+	<bean id="methodIdentDao"
+		class="info.novatec.novaspy.cmr.dao.impl.MethodIdentDaoImpl" />
+	<bean id="methodSensorTypeIdentDao"
+		class="info.novatec.novaspy.cmr.dao.impl.MethodSensorTypeIdentDaoImpl" />
+	<bean id="platformIdentDao"
+		class="info.novatec.novaspy.cmr.dao.impl.PlatformIdentDaoImpl" />
+	<bean id="platformSensorTypeIdentDao"
+		class="info.novatec.novaspy.cmr.dao.impl.PlatformSensorTypeIdentDaoImpl" />
+
+	<bean id="defaultDataDao"
+		class="info.novatec.novaspy.cmr.dao.impl.DefaultDataDaoImpl" />
+	<bean id="invocationDataDao"
+		class="info.novatec.novaspy.cmr.dao.impl.InvocationDataDaoImpl" />
+	<bean id="sqlDataDao"
+		class="info.novatec.novaspy.cmr.dao.impl.SqlDataDaoImpl" />
+	<bean id="exceptionSensorDataDao"
+		class="info.novatec.novaspy.cmr.dao.impl.ExceptionSensorDataDaoImpl" />
+	<bean id="combinedMetricsDataDao"
+		class="info.novatec.novaspy.cmr.dao.impl.CombinedMetricsDataDaoImpl" />
+
+</beans>

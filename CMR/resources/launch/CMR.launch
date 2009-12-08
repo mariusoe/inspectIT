@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<booleanAttribute key="com.mountainminds.eclemma.core.INPLACE_INSTRUMENTATION" value="false"/>
+<listAttribute key="com.mountainminds.eclemma.core.INSTRUMENTATION_PATHS">
+<listEntry value="/Commons/bin"/>
+<listEntry value="/CMR/bin"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/CMR/src/info/novatec/novaspy/cmr/CMR.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="info.novatec.novaspy.cmr.CMR"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="CMR"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:MaxNewSize=24m -XX:NewSize=24m -XX:SurvivorRatio=128 -XX:TargetSurvivorRatio=90 -XX:ParallelGCThreads=6 -Xms768m -Xmx768m -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking"/>
+</launchConfiguration>

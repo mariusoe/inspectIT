@@ -1,0 +1,84 @@
+package info.novatec.novaspy.agent.sensor.exception;
+
+import info.novatec.novaspy.communication.data.ExceptionSensorData;
+
+/**
+ * This class maps the identity hashcode of a {@link Throwable} object to the
+ * {@link ExceptionSensorData} object.
+ * 
+ * @author Eduard Tudenhoefner
+ * 
+ */
+public class IdentityHashToDataObject {
+	/**
+	 * The identity hashcode of the {@link Throwable} object.
+	 */
+	private Integer identityHash;
+
+	/**
+	 * The {@link ExceptionSensorData} object containing all information.
+	 */
+	private ExceptionSensorData exceptionSensorData;
+
+	/**
+	 * Default no-arg constructor.
+	 */
+	public IdentityHashToDataObject() {
+	}
+
+	/**
+	 * Constructor taking the identity hashcode and the
+	 * {@link ExceptionSensorData} object for initialization.
+	 * 
+	 * @param identityHash
+	 *            The identity hashcode of the {@link Throwable} object.
+	 * @param exceptionSensorData
+	 *            The {@link ExceptionSensorData} object containing the
+	 *            information.
+	 */
+	public IdentityHashToDataObject(Integer identityHash, ExceptionSensorData exceptionSensorData) {
+		this.identityHash = identityHash;
+		this.exceptionSensorData = exceptionSensorData;
+	}
+
+	/**
+	 * Returns the identity hashcode of the {@link Throwable} object.
+	 * 
+	 * @return The identity hashcode of the {@link Throwable} object.
+	 */
+	public Integer getIdentityHash() {
+		return identityHash;
+	}
+
+	/**
+	 * Sets the identity hashcode of the {@link Throwable} object.
+	 * 
+	 * @param identityHash
+	 *            The identity hashcode of the {@link Throwable} object.
+	 */
+	public void setIdentityHash(Integer identityHash) {
+		this.identityHash = identityHash;
+	}
+
+	/**
+	 * Returns the {@link ExceptionSensorData} object containing the
+	 * information.
+	 * 
+	 * @return The {@link ExceptionSensorData} object containing the
+	 *         information.
+	 */
+	public ExceptionSensorData getExceptionSensorData() {
+		return exceptionSensorData;
+	}
+
+	/**
+	 * Sets the {@link ExceptionSensorData} object.
+	 * 
+	 * @param exceptionSensorData
+	 *            The {@link ExceptionSensorData} object containing the
+	 *            information.
+	 */
+	public void setExceptionSensorData(ExceptionSensorData exceptionSensorData) {
+		this.exceptionSensorData = exceptionSensorData;
+	}
+}

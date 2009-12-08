@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="info.novatec.novaspy.communication.data">
+	<union-subclass name="InvocationSequenceData"
+		extends="info.novatec.novaspy.communication.MethodSensorData" table="invocation_sequence_data">
+		<list name="nestedSequences" lazy="false" cascade="all" fetch="join">
+			<key column="parent_sequence_id" />
+			<list-index column="position" />
+			<one-to-many class="InvocationSequenceData" />
+		</list>
+
+		<property name="position" column="position" />
+		<property name="duration" column="duration" />
+		<property name="childCount" column="childCount" />
+
+		<many-to-one name="parentSequence" column="parent_sequence_id"
+			class="InvocationSequenceData" not-null="false" />
+
+		<many-to-one name="timerData" column="timer_data_id"
+			unique="true" cascade="all" lazy="false"/>
+		<many-to-one name="sqlStatementData" column="sql_statement_data_id"
+			cascade="all" lazy="false" />
+	</union-subclass>
+</hibernate-mapping>

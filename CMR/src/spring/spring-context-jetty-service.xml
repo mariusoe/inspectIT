@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"
+	default-autowire="autodetect">
+
+	<bean id="globalDataAccessService"
+		class="info.novatec.novaspy.cmr.service.GlobalDataAccessService" />
+		
+	<bean id="sqlDataAccessService"
+		class="info.novatec.novaspy.cmr.service.SqlDataAccessService" />
+		
+	<bean id="invocationDataAccessService"
+		class="info.novatec.novaspy.cmr.service.InvocationDataAccessService" />
+	
+	<bean id="exceptionDataAccessService" 
+		class="info.novatec.novaspy.cmr.service.ExceptionDataAccessService"/>
+		
+	<bean id="serverStatusService"
+		class="info.novatec.novaspy.cmr.service.ServerStatusService" />
+
+	<bean id="licenseService" class="info.novatec.novaspy.cmr.service.LicenseService" />
+	
+	<bean id="combinedMetricsDataAccessService" 
+		class="info.novatec.novaspy.cmr.service.CombinedMetricsDataAccessService"/>
+
+	<bean name="globalDataAccessExporter"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
+		<property name="service" ref="globalDataAccessService" />
+		<property name="serviceInterface"
+			value="info.novatec.novaspy.cmr.service.IGlobalDataAccessService" />
+	</bean>
+	
+	<bean name="sqlDataAccessExporter"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
+		<property name="service" ref="sqlDataAccessService" />
+		<property name="serviceInterface"
+			value="info.novatec.novaspy.cmr.service.ISqlDataAccessService" />
+	</bean>
+	
+	<bean name="invocationDataAccessExporter"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
+		<property name="service" ref="invocationDataAccessService" />
+		<property name="serviceInterface"
+			value="info.novatec.novaspy.cmr.service.IInvocationDataAccessService" />
+	</bean>
+	
+	<bean name="exceptionDataAccessExporter"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
+		<property name="service" ref="exceptionDataAccessService" />
+		<property name="serviceInterface"
+			value="info.novatec.novaspy.cmr.service.IExceptionDataAccessService" />
+	</bean>
+	
+	<bean name="serverStatusExporter"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
+		<property name="service" ref="serverStatusService" />
+		<property name="serviceInterface"
+			value="info.novatec.novaspy.cmr.service.IServerStatusService" />
+	</bean>
+
+	<bean name="licenseExporter"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
+		<property name="service" ref="licenseService" />
+		<property name="serviceInterface"
+			value="info.novatec.novaspy.cmr.service.ILicenseService" />
+	</bean>
+	
+	<bean name="combinedMetricsDataAccessExporter"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
+		<property name="service" ref="combinedMetricsDataAccessService" />
+		<property name="serviceInterface"
+			value="info.novatec.novaspy.cmr.service.ICombinedMetricsDataAccessService" />
+	</bean>
+
+</beans>

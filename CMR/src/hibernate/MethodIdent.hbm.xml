@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="info.novatec.novaspy.cmr.model">
+	<class name="MethodIdent" table="method_ident">
+		<id name="id" type="java.lang.Long" column="id">
+			<generator class="seqhilo" />
+		</id>
+		<property name="timeStamp">
+			<column name="time_stamp" />
+		</property>
+
+		<set name="methodSensorTypeIdents" table="method_sensor_type"
+			lazy="false">
+			<key column="method_id" />
+			<many-to-many column="sensor_type_id"
+				class="MethodSensorTypeIdent" />
+		</set>
+		<many-to-one name="platformIdent" column="platform_id"
+			class="PlatformIdent" not-null="true" />
+
+		<property name="parameters" 
+			type="info.novatec.novaspy.cmr.util.ListStringType">
+			<column name="parameters" length="2000"/>
+		</property>
+		<property name="packageName">
+			<column name="package_name" />
+		</property>
+		<property name="className">
+			<column name="class_name" />
+		</property>
+		<property name="methodName">
+			<column name="method_name" />
+		</property>
+		<property name="returnType">
+			<column name="return_type" />
+		</property>
+		<property name="modifiers">
+			<column name="modifiers" />
+		</property>
+	</class>
+</hibernate-mapping>

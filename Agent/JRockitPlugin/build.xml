@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!-- ====================================================================== 
+     20.02.2008 11:33                                                        
+
+     NovaSpy - JRockit Plugin
+     Sophisticated Monitoring tool by NovaTec GmbH
+                   
+     ss                                                                
+     ====================================================================== -->
+<project name="NovaSpy - JRockit Plugin" default="publish-local" basedir=".">
+	<description>
+            Sophisticated Monitoring tool by NovaTec GmbH
+    </description>
+
+	<property file="${basedir}/build.properties"/>
+	<import file="${basedir}/../NovaspyServer/base.xml" />
+
+	<target name="clean" description="--> Cleans the project">
+		<delete dir="${build.root}" />
+		<delete dir="${dist.root}" />
+	</target>
+
+	<target name="init" description="--> Creates necessary folder structure">
+		<mkdir dir="${build.root}" />
+		<mkdir dir="${build.classes}" />
+		<mkdir dir="${dist.root}" />
+	</target>
+
+	<target name="compile" depends="init" description="--> Compiles the sources">
+		<javac source="1.4" target="1.4" debug="true" fork="yes" executable="${jrockit.javac}"
+			destdir="${build.classes}" srcdir="${src.root}" classpathref="${classpath_ref}">
+		</javac>
+	</target>
+
+	<target name="dist" depends="clean, compile" description="--> Creates the distribution jar">
+		<jar destfile="${dist.root}/${dist.jar.name}">
+			<fileset dir="${build.classes}" includes="**/*.class" />
+			<fileset dir="${dependencies.root}" includes="**/*.*" />
+		</jar>
+	</target>
+
+    <target name="ffloop-deps" description="calls ffloop on all projects, current project depends upon">
+        <ant dir="../Agent" antfile="build.xml" target="ffloop" inheritall="false" inheritrefs="false" />
+        <copy todir="${lib.root}/ffloop">
+            <fileset dir="../Agent/dist" includes="**/*.jar"/>
+        </copy>
+    </target>
+
+    <target name="publish-deps-if-they-changed" description="method which needs to be overriden. it publishes project it depends upon, if there is a change since last release" >
+        <ant dir="${basedir}/../Agent" antfile="build.xml" target="publish-if-changed" inheritall="false" inheritrefs="false" />
+    </target>
+
+</project>

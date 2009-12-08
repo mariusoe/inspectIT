@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: NovaSpy Commons
+Bundle-SymbolicName: info.novatec.novaspy.commons
+Bundle-Version: 0.0.2
+Export-Package: info.novatec.novaspy.cmr.model,
+ info.novatec.novaspy.cmr.service,
+ info.novatec.novaspy.communication,
+ info.novatec.novaspy.communication.data,
+ info.novatec.novaspy.communication.valueobject
+Bundle-Vendor: NovaTec GmbH
+Bundle-RequiredExecutionEnvironment: J2SE-1.4
