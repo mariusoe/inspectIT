@@ -75,7 +75,7 @@ public class PicoAgent {
 	 * {@link #inspectByteCode(byte[], String, ClassLoader)} method to ignore
 	 * them.
 	 */
-	private static final String[] IGNORE_START_PATTERNS = new String[] { "info.novatec.inspectit.agent.", "sun.misc.reflect", "$Proxy" };
+	private static final String[] IGNORE_START_PATTERNS = new String[] { "info.novatec.inspectit.", "sun.misc.reflect", "$Proxy" };
 
 	/**
 	 * The pico container.
