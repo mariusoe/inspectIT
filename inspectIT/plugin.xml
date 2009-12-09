@@ -12,7 +12,7 @@
             thread="main"
             visible="true">
          <run
-               class="info.novatec.novaspy.rcp.Application">
+               class="info.novatec.inspectit.rcp.Application">
          </run>
       </application>
    </extension>
@@ -20,7 +20,7 @@
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
-            application="info.novatec.novaspy.rcp.application"
+            application="info.novatec.inspectit.rcp.application"
             name="inspectIT">
          <property
                name="aboutText"
@@ -51,14 +51,14 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="info.novatec.novaspy.rcp.preferences.NovaSpyPreferenceInitializer">
+            class="info.novatec.inspectit.rcp.preferences.InspectITPreferenceInitializer">
       </initializer>
    </extension>
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="info.novatec.novaspy.communication.data.InvocationSequenceData"
-            class="info.novatec.novaspy.rcp.editor.tree.input.DeferredInvocAdapterFactory">
+            adaptableType="info.novatec.inspectit.communication.data.InvocationSequenceData"
+            class="info.novatec.inspectit.rcp.editor.tree.input.DeferredInvocAdapterFactory">
          <adapter
                type="org.eclipse.ui.progress.IDeferredWorkbenchAdapter">
          </adapter>
@@ -67,10 +67,10 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="info.novatec.novaspy.rcp.Perspective"
+            class="info.novatec.inspectit.rcp.Perspective"
             fixed="true"
-            id="novaspy.perspective"
-            name="NovaSpy Perspective">
+            id="inspectit.perspective"
+            name="inspectIT Perspective">
       </perspective>
    </extension>
    <extension
@@ -78,45 +78,45 @@
       <view
             name="Server View"
             icon="icons/sample.gif"
-            class="info.novatec.novaspy.rcp.view.server.ServerView"
-            id="novaspy.serverview">
+            class="info.novatec.inspectit.rcp.view.server.ServerView"
+            id="inspectit.serverview">
       </view>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="info.novatec.novaspy.rcp.editor.root.FormRootEditor"
+            class="info.novatec.inspectit.rcp.editor.root.FormRootEditor"
             default="false"
-            id="novaspy.editor.formrooteditor"
+            id="inspectit.editor.formrooteditor"
             name="Form Root Editor">
       </editor>
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
-            id="de.novatec.novaspy.rcp.actionSet"
+            id="info.novatec.inspectit.rcp.actionSet"
             label="Repository Action Set"
             visible="true">
          <action
-               class="info.novatec.novaspy.rcp.action.UpdateRepositoryAction"
+               class="info.novatec.inspectit.rcp.action.UpdateRepositoryAction"
                icon="icons/server_refresh.png"
-               id="de.novatec.novaspy.rcp.action.UpdateRepositoryAction"
+               id="info.novatec.inspectit.rcp.action.UpdateRepositoryAction"
                label="&amp;Refresh Repository"
                toolbarPath="repository"
                tooltip="Refresh Repository">
          </action>
          <action
-               class="info.novatec.novaspy.rcp.action.RemoveRepositoryAction"
+               class="info.novatec.inspectit.rcp.action.RemoveRepositoryAction"
                icon="icons/server_remove.png"
-               id="e.novatec.novaspy.rcp.action.RemoveRepositoryAction"
+               id="info.novatec.inspectit.rcp.action.RemoveRepositoryAction"
                label="&amp;Delete Repository Definition"
                toolbarPath="repository"
                tooltip="Delete Repository Definition">
          </action>
          <action
-               class="info.novatec.novaspy.rcp.action.CreateRepositoryAction"
+               class="info.novatec.inspectit.rcp.action.CreateRepositoryAction"
                icon="icons/server_add.png"
-               id="de.novatec.novaspy.rcp.action.CreateRepositoryAction"
+               id="info.novatec.inspectit.rcp.action.CreateRepositoryAction"
                label="&amp;Add Repository Definition"
                toolbarPath="repository"
                tooltip="Add Repository Definition">
@@ -126,40 +126,40 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
-            class="info.novatec.novaspy.rcp.wizard.NewRepositoryDefinitionWizard"
+            class="info.novatec.inspectit.rcp.wizard.NewRepositoryDefinitionWizard"
             icon="icons/server_add.png"
-            id="novaspy.repositorywizard"
+            id="inspectit.repositorywizard"
             name="New Repository Definition">
       </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
       <command
-            id="info.novatec.novaspy.rcp.commands.openView"
+            id="info.novatec.inspectit.rcp.commands.openView"
             name="Open View">
       </command>
       <command
-            id="info.novatec.novaspy.rcp.commands.expandAll"
+            id="info.novatec.inspectit.rcp.commands.expandAll"
             name="Expand All">
       </command>
       <command
-            id="info.novatec.novaspy.rcp.commands.expandThis"
+            id="info.novatec.inspectit.rcp.commands.expandThis"
             name="Expand This">
       </command>
       <command
-            defaultHandler="info.novatec.novaspy.rcp.handlers.ImportLicenseHandler"
-            id="info.novatec.novaspy.rcp.commands.importLicense"
+            defaultHandler="info.novatec.inspectit.rcp.handlers.ImportLicenseHandler"
+            id="info.novatec.inspectit.rcp.commands.importLicense"
             name="Import License">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="info.novatec.novaspy.rcp.handlers.OpenViewHandler"
-            commandId="info.novatec.novaspy.rcp.commands.openView">
+            class="info.novatec.inspectit.rcp.handlers.OpenViewHandler"
+            commandId="info.novatec.inspectit.rcp.commands.openView">
       </handler>
       <handler
-            class="info.novatec.novaspy.rcp.handlers.TreeCopyHandler"
+            class="info.novatec.inspectit.rcp.handlers.TreeCopyHandler"
             commandId="org.eclipse.ui.edit.copy">
          <activeWhen>
             <and>
@@ -168,16 +168,16 @@
                </count>
                <iterate>
                   <instanceof
-                        value="info.novatec.novaspy.communication.DefaultData">
+                        value="info.novatec.inspectit.communication.DefaultData">
                   </instanceof>
                </iterate>
                <with
                      variable="activeEditor">
                   <instanceof
-                        value="info.novatec.novaspy.rcp.editor.root.AbstractRootEditor">
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
                   </instanceof>
                   <test
-                        property="info.novatec.novaspy.activeSubView"
+                        property="info.novatec.inspectit.activeSubView"
                         value="treeSubView">
                   </test>
                </with>
@@ -185,7 +185,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="info.novatec.novaspy.rcp.handlers.TableCopyHandler"
+            class="info.novatec.inspectit.rcp.handlers.TableCopyHandler"
             commandId="org.eclipse.ui.edit.copy">
          <activeWhen>
             <and>
@@ -194,16 +194,16 @@
                </count>
                <iterate>
                   <instanceof
-                        value="info.novatec.novaspy.communication.DefaultData">
+                        value="info.novatec.inspectit.communication.DefaultData">
                   </instanceof>
                </iterate>
                <with
                      variable="activeEditor">
                   <instanceof
-                        value="info.novatec.novaspy.rcp.editor.root.AbstractRootEditor">
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
                   </instanceof>
                   <test
-                        property="info.novatec.novaspy.activeSubView"
+                        property="info.novatec.inspectit.activeSubView"
                         value="tableSubView">
                   </test>
                </with>
@@ -211,8 +211,8 @@
          </activeWhen>
       </handler>
       <handler
-            class="info.novatec.novaspy.rcp.handlers.TreeExpandAllHandler"
-            commandId="info.novatec.novaspy.rcp.commands.expandAll">
+            class="info.novatec.inspectit.rcp.handlers.TreeExpandAllHandler"
+            commandId="info.novatec.inspectit.rcp.commands.expandAll">
          <activeWhen>
             <and>
                <count
@@ -221,10 +221,10 @@
                <with
                      variable="activeEditor">
                   <instanceof
-                        value="info.novatec.novaspy.rcp.editor.root.AbstractRootEditor">
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
                   </instanceof>
                   <test
-                        property="info.novatec.novaspy.activeSubView"
+                        property="info.novatec.inspectit.activeSubView"
                         value="treeSubView">
                   </test>
                </with>
@@ -232,8 +232,8 @@
          </activeWhen>
       </handler>
       <handler
-            class="info.novatec.novaspy.rcp.handlers.TreeExpandThisHandler"
-            commandId="info.novatec.novaspy.rcp.commands.expandThis">
+            class="info.novatec.inspectit.rcp.handlers.TreeExpandThisHandler"
+            commandId="info.novatec.inspectit.rcp.commands.expandThis">
          <activeWhen>
             <and>
                <count
@@ -242,10 +242,10 @@
                <with
                      variable="activeEditor">
                   <instanceof
-                        value="info.novatec.novaspy.rcp.editor.root.AbstractRootEditor">
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
                   </instanceof>
                   <test
-                        property="info.novatec.novaspy.activeSubView"
+                        property="info.novatec.inspectit.activeSubView"
                         value="treeSubView">
                   </test>
                </with>
@@ -256,9 +256,9 @@
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="info.novatec.novaspy.rcp.editor.testers.ActiveSubViewTester"
-            id="info.novatec.novaspy.ActiveSubViewTester"
-            namespace="info.novatec.novaspy"
+            class="info.novatec.inspectit.rcp.editor.testers.ActiveSubViewTester"
+            id="info.novatec.inspectit.ActiveSubViewTester"
+            namespace="info.novatec.inspectit"
             properties="activeSubView"
             type="java.lang.Object">
       </propertyTester>
@@ -266,26 +266,26 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="popup:novaspy.editor.formrooteditor.treesubview">
+            locationURI="popup:inspectit.editor.formrooteditor.treesubview">
          <command
                commandId="org.eclipse.ui.edit.copy"
                style="push">
          </command>
          <separator
-               name="novaspy.editor.formrooteditor.treesubview.separator1"
+               name="inspectit.editor.formrooteditor.treesubview.separator1"
                visible="true">
          </separator>
          <command
-               commandId="info.novatec.novaspy.rcp.commands.expandAll"
+               commandId="info.novatec.inspectit.rcp.commands.expandAll"
                style="push">
          </command>
          <command
-               commandId="info.novatec.novaspy.rcp.commands.expandThis"
+               commandId="info.novatec.inspectit.rcp.commands.expandThis"
                style="push">
          </command>
       </menuContribution>
       <menuContribution
-            locationURI="popup:novaspy.editor.formrooteditor.tablesubview">
+            locationURI="popup:inspectit.editor.formrooteditor.tablesubview">
          <command
                commandId="org.eclipse.ui.edit.copy"
                style="push">
@@ -297,7 +297,7 @@
                id="licenseMenu"
                label="License">
             <command
-                  commandId="info.novatec.novaspy.rcp.commands.importLicense"
+                  commandId="info.novatec.inspectit.rcp.commands.importLicense"
                   label="Import License"
                   style="push"
                   tooltip="Imports the License into the Server">
@@ -308,8 +308,8 @@
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="info.novatec.novaspy.communication.data.ExceptionSensorData"
-            class="info.novatec.novaspy.rcp.editor.exception.DeferredExceptionTreeAdapterFactory">
+            adaptableType="info.novatec.inspectit.communication.data.ExceptionSensorData"
+            class="info.novatec.inspectit.rcp.editor.exception.DeferredExceptionTreeAdapterFactory">
          <adapter
                type="org.eclipse.ui.progress.IDeferredWorkbenchAdapter">
          </adapter>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<hibernate-mapping package="info.novatec.novaspy.communication.data">
+<hibernate-mapping package="info.novatec.inspectit.communication.data">
 	<union-subclass name="ThreadInformationData"
-		extends="info.novatec.novaspy.communication.SystemSensorData"
+		extends="info.novatec.inspectit.communication.SystemSensorData"
 		table="thread_information_data">
 		<property name="count" column="count" />
 		<property name="minDaemonThreadCount"

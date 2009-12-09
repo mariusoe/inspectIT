@@ -3,11 +3,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-	<bean id="licenseUtil" class="info.novatec.novaspy.cmr.util.LicenseUtil" />
+	<bean id="licenseUtil" class="info.novatec.inspectit.cmr.util.LicenseUtil" />
 
-	<bean id="healthStatus" class="info.novatec.novaspy.cmr.util.HealthStatus" />
+	<bean id="healthStatus" class="info.novatec.inspectit.cmr.util.HealthStatus" />
 
-	<bean id="configuration" class="info.novatec.novaspy.cmr.util.Configuration">
+	<bean id="configuration" class="info.novatec.inspectit.cmr.util.Configuration">
 		<property name="enhancedInvocationStorageMode" value="true" />
 	</bean>
 

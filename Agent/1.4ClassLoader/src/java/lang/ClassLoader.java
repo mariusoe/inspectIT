@@ -6,7 +6,7 @@
  */
 package java.lang;
 
-import info.novatec.novaspy.agent.PicoAgent;
+import info.novatec.inspectit.agent.PicoAgent;
 
 import java.io.File;
 import java.io.IOException;

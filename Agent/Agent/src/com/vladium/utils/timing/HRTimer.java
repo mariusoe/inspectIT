@@ -92,9 +92,9 @@ final class HRTimer implements ITimer, ITimerConstants {
 
 	static {
 		String[] possibleLocations = {
-				System.getProperty("novaspy.config") + File.separator + System.mapLibraryName(HRTIMER_LIB), // novaspy/config folder.
-				System.getProperty("novaspy.config")+"/../lib" + File.separator + System.mapLibraryName(HRTIMER_LIB), // novaspy/lib folder.
-				System.getProperty("user.dir") + File.separator + "novaspy" + File.separator + System.mapLibraryName(HRTIMER_LIB)
+				System.getProperty("inspectit.config") + File.separator + System.mapLibraryName(HRTIMER_LIB), // inspectit/config folder.
+				System.getProperty("inspectit.config")+"/../lib" + File.separator + System.mapLibraryName(HRTIMER_LIB), // inspectit/lib folder.
+				System.getProperty("user.dir") + File.separator + "inspectit" + File.separator + System.mapLibraryName(HRTIMER_LIB)
 		};
 		
 		for (int i = 0; i < possibleLocations.length; i++) {
@@ -104,7 +104,7 @@ final class HRTimer implements ITimer, ITimerConstants {
 				try {
 					System.load(libPath);
 				} catch (UnsatisfiedLinkError e) {
-					System.out.println("native lib '" + HRTIMER_LIB + "' not found in " + System.getProperty("user.dir") + "\\novaspy\\" + System.mapLibraryName(HRTIMER_LIB));
+					System.out.println("native lib '" + HRTIMER_LIB + "' not found in " + System.getProperty("user.dir") + "\\inspectit\\" + System.mapLibraryName(HRTIMER_LIB));
 					throw e;
 				}
 				break;

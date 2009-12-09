@@ -5,25 +5,25 @@
 	default-autowire="autodetect">
 
 	<bean id="internRegistrationService"
-		class="info.novatec.novaspy.cmr.service.InternRegistrationService" />
+		class="info.novatec.inspectit.cmr.service.InternRegistrationService" />
 
-	<bean id="registrationService" class="info.novatec.novaspy.cmr.service.RegistrationService" />
+	<bean id="registrationService" class="info.novatec.inspectit.cmr.service.RegistrationService" />
 
-	<bean id="agentStorageService" class="info.novatec.novaspy.cmr.service.AgentStorageService" />
+	<bean id="agentStorageService" class="info.novatec.inspectit.cmr.service.AgentStorageService" />
 
 	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
-		<property name="serviceName" value="NovaSpyRegistrationService" />
+		<property name="serviceName" value="inspectITRegistrationService" />
 		<property name="service" ref="registrationService" />
 		<property name="serviceInterface"
-			value="info.novatec.novaspy.cmr.service.IRegistrationService" />
+			value="info.novatec.inspectit.cmr.service.IRegistrationService" />
 		<property name="registryPort" value="1099" />
 	</bean>
 
 	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
-		<property name="serviceName" value="NovaSpyAgentStorageService" />
+		<property name="serviceName" value="inspectITAgentStorageService" />
 		<property name="service" ref="agentStorageService" />
 		<property name="serviceInterface"
-			value="info.novatec.novaspy.cmr.service.IAgentStorageService" />
+			value="info.novatec.inspectit.cmr.service.IAgentStorageService" />
 		<property name="registryPort" value="1099" />
 	</bean>
 
