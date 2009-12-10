@@ -1,11 +1,11 @@
-package info.novatec.novaspy.agent.sensor.method.jdbc.test;
+package info.novatec.inspectit.agent.sensor.method.jdbc.test;
 
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import info.novatec.novaspy.agent.config.IPropertyAccessor;
-import info.novatec.novaspy.agent.core.IIdManager;
-import info.novatec.novaspy.agent.sensor.method.jdbc.StatementSensor;
-import info.novatec.novaspy.agent.test.AbstractLogSupport;
-import info.novatec.novaspy.util.Timer;
+import info.novatec.inspectit.agent.config.IPropertyAccessor;
+import info.novatec.inspectit.agent.core.IIdManager;
+import info.novatec.inspectit.agent.sensor.method.jdbc.StatementSensor;
+import info.novatec.inspectit.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.util.Timer;
 
 import java.util.HashMap;
 import java.util.Map;

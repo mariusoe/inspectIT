@@ -1,12 +1,12 @@
-package info.novatec.novaspy.agent.sending.test;
+package info.novatec.inspectit.agent.sending.test;
 
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import info.novatec.novaspy.agent.core.ICoreService;
-import info.novatec.novaspy.agent.sending.ISendingStrategy;
-import info.novatec.novaspy.agent.sending.impl.TimeStrategy;
-import info.novatec.novaspy.agent.test.MockInit;
+import info.novatec.inspectit.agent.core.ICoreService;
+import info.novatec.inspectit.agent.sending.ISendingStrategy;
+import info.novatec.inspectit.agent.sending.impl.TimeStrategy;
+import info.novatec.inspectit.agent.test.MockInit;
 
 import java.util.HashMap;
 import java.util.Map;

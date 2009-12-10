@@ -1,7 +1,7 @@
-package info.novatec.novaspy.agent.analyzer.test;
+package info.novatec.inspectit.agent.analyzer.test;
 
 import static org.testng.Assert.assertEquals;
-import info.novatec.novaspy.agent.analyzer.impl.SimpleMatchPattern;
+import info.novatec.inspectit.agent.analyzer.impl.SimpleMatchPattern;
 
 import org.testng.annotations.Test;
 

@@ -1,4 +1,4 @@
-package info.novatec.novaspy.agent.analyzer.test.classes;
+package info.novatec.inspectit.agent.analyzer.test.classes;
 
 /**
  * DO NOT MODIFY UNLESS YOU ARE SURE WHAT YOU ARE DOING!

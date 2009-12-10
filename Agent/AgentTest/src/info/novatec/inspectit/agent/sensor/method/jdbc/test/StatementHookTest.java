@@ -1,4 +1,4 @@
-package info.novatec.novaspy.agent.sensor.method.jdbc.test;
+package info.novatec.inspectit.agent.sensor.method.jdbc.test;
 
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -12,17 +12,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import info.novatec.novaspy.agent.config.IPropertyAccessor;
-import info.novatec.novaspy.agent.config.impl.RegisteredSensorConfig;
-import info.novatec.novaspy.agent.core.ICoreService;
-import info.novatec.novaspy.agent.core.IObjectStorage;
-import info.novatec.novaspy.agent.core.IdNotAvailableException;
-import info.novatec.novaspy.agent.core.impl.IdManager;
-import info.novatec.novaspy.agent.sensor.method.jdbc.StatementHook;
-import info.novatec.novaspy.agent.test.AbstractLogSupport;
-import info.novatec.novaspy.communication.MethodSensorData;
-import info.novatec.novaspy.communication.data.SqlStatementData;
-import info.novatec.novaspy.util.Timer;
+import info.novatec.inspectit.agent.config.IPropertyAccessor;
+import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
+import info.novatec.inspectit.agent.core.ICoreService;
+import info.novatec.inspectit.agent.core.IObjectStorage;
+import info.novatec.inspectit.agent.core.IdNotAvailableException;
+import info.novatec.inspectit.agent.core.impl.IdManager;
+import info.novatec.inspectit.agent.sensor.method.jdbc.StatementHook;
+import info.novatec.inspectit.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.communication.MethodSensorData;
+import info.novatec.inspectit.communication.data.SqlStatementData;
+import info.novatec.inspectit.util.Timer;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;

@@ -1,14 +1,13 @@
-package info.novatec.novaspy.agent.analyzer.test;
+package info.novatec.inspectit.agent.analyzer.test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
-
-import info.novatec.novaspy.agent.analyzer.IClassPoolAnalyzer;
-import info.novatec.novaspy.agent.analyzer.impl.ClassPoolAnalyzer;
-import info.novatec.novaspy.agent.analyzer.test.classes.TestClass;
-import info.novatec.novaspy.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
+import info.novatec.inspectit.agent.analyzer.impl.ClassPoolAnalyzer;
+import info.novatec.inspectit.agent.analyzer.test.classes.TestClass;
+import info.novatec.inspectit.agent.test.AbstractLogSupport;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;

@@ -1,4 +1,4 @@
-package info.novatec.novaspy.agent.core.test;
+package info.novatec.inspectit.agent.core.test;
 
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -11,18 +11,18 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import info.novatec.novaspy.agent.config.IConfigurationStorage;
-import info.novatec.novaspy.agent.config.impl.MethodSensorTypeConfig;
-import info.novatec.novaspy.agent.config.impl.PlatformSensorTypeConfig;
-import info.novatec.novaspy.agent.config.impl.RegisteredSensorConfig;
-import info.novatec.novaspy.agent.config.impl.RepositoryConfig;
-import info.novatec.novaspy.agent.connection.IConnection;
-import info.novatec.novaspy.agent.connection.RegistrationException;
-import info.novatec.novaspy.agent.connection.ServerUnavailableException;
-import info.novatec.novaspy.agent.core.IIdManager;
-import info.novatec.novaspy.agent.core.IdNotAvailableException;
-import info.novatec.novaspy.agent.core.impl.IdManager;
-import info.novatec.novaspy.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.agent.config.IConfigurationStorage;
+import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
+import info.novatec.inspectit.agent.config.impl.PlatformSensorTypeConfig;
+import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
+import info.novatec.inspectit.agent.config.impl.RepositoryConfig;
+import info.novatec.inspectit.agent.connection.IConnection;
+import info.novatec.inspectit.agent.connection.RegistrationException;
+import info.novatec.inspectit.agent.connection.ServerUnavailableException;
+import info.novatec.inspectit.agent.core.IIdManager;
+import info.novatec.inspectit.agent.core.IdNotAvailableException;
+import info.novatec.inspectit.agent.core.impl.IdManager;
+import info.novatec.inspectit.agent.test.AbstractLogSupport;
 
 import java.net.ConnectException;
 import java.util.ArrayList;

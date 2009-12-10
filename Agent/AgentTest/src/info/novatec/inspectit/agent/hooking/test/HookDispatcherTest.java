@@ -1,4 +1,4 @@
-package info.novatec.novaspy.agent.hooking.test;
+package info.novatec.inspectit.agent.hooking.test;
 
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
@@ -9,19 +9,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import info.novatec.novaspy.agent.analyzer.test.classes.MyTestException;
-import info.novatec.novaspy.agent.config.impl.MethodSensorTypeConfig;
-import info.novatec.novaspy.agent.config.impl.RegisteredSensorConfig;
-import info.novatec.novaspy.agent.core.ICoreService;
-import info.novatec.novaspy.agent.hooking.IConstructorHook;
-import info.novatec.novaspy.agent.hooking.IHook;
-import info.novatec.novaspy.agent.hooking.IHookDispatcher;
-import info.novatec.novaspy.agent.hooking.IMethodHook;
-import info.novatec.novaspy.agent.hooking.impl.HookDispatcher;
-import info.novatec.novaspy.agent.sensor.exception.ExceptionTracingHook;
-import info.novatec.novaspy.agent.sensor.method.IMethodSensor;
-import info.novatec.novaspy.agent.sensor.method.invocationsequence.InvocationSequenceHook;
-import info.novatec.novaspy.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.agent.analyzer.test.classes.MyTestException;
+import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
+import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
+import info.novatec.inspectit.agent.core.ICoreService;
+import info.novatec.inspectit.agent.hooking.IConstructorHook;
+import info.novatec.inspectit.agent.hooking.IHook;
+import info.novatec.inspectit.agent.hooking.IHookDispatcher;
+import info.novatec.inspectit.agent.hooking.IMethodHook;
+import info.novatec.inspectit.agent.hooking.impl.HookDispatcher;
+import info.novatec.inspectit.agent.sensor.exception.ExceptionTracingHook;
+import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
+import info.novatec.inspectit.agent.sensor.method.invocationsequence.InvocationSequenceHook;
+import info.novatec.inspectit.agent.test.AbstractLogSupport;
 
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
@@ -486,7 +486,7 @@ public class HookDispatcherTest extends AbstractLogSupport {
 
 		// the exception sensor type config
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
 		when(sensorTypeConfig.getId()).thenReturn(exceptionSensorTypeId);
 		when(registeredSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
 		when(registeredConstructorSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
@@ -560,7 +560,7 @@ public class HookDispatcherTest extends AbstractLogSupport {
 
 		// the exception sensor type config
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
 		when(sensorTypeConfig.getId()).thenReturn(exceptionSensorTypeId);
 		when(registeredSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
 		when(registeredConstructorSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
@@ -644,7 +644,7 @@ public class HookDispatcherTest extends AbstractLogSupport {
 
 		// the exception sensor type config
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
 		when(sensorTypeConfig.getId()).thenReturn(exceptionSensorTypeId);
 		when(registeredSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
 		when(registeredConstructorSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);

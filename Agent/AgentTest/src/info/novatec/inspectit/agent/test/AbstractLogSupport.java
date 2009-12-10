@@ -1,4 +1,4 @@
-package info.novatec.novaspy.agent.test;
+package info.novatec.inspectit.agent.test;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -40,7 +40,7 @@ public abstract class AbstractLogSupport extends MockInit {
 		}
 		writer.println(".level= " + level);
 		writer.println("java.util.logging.ConsoleHandler.level = ALL");
-		writer.println("java.util.logging.ConsoleHandler.formatter = info.novatec.novaspy.util.MessageFormatFormatter");
+		writer.println("java.util.logging.ConsoleHandler.formatter = info.novatec.inspectit.util.MessageFormatFormatter");
 		writer.flush();
 		writer.close();
 

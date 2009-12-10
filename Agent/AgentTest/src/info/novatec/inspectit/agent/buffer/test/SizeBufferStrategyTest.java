@@ -1,11 +1,11 @@
-package info.novatec.novaspy.agent.buffer.test;
+package info.novatec.inspectit.agent.buffer.test;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
-import info.novatec.novaspy.agent.buffer.IBufferStrategy;
-import info.novatec.novaspy.agent.buffer.impl.SizeBufferStrategy;
+import info.novatec.inspectit.agent.buffer.IBufferStrategy;
+import info.novatec.inspectit.agent.buffer.impl.SizeBufferStrategy;
 
 import java.util.ArrayList;
 import java.util.Collections;

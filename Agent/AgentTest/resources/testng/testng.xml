@@ -3,140 +3,140 @@
 	<test name="Byte Code Analyzer">
 		<classes>
 			<class
-				name="info.novatec.novaspy.agent.analyzer.test.ByteCodeAnalyzerTest" />
+				name="info.novatec.inspectit.agent.analyzer.test.ByteCodeAnalyzerTest" />
 		</classes>
 	</test>
 	<test name="Class Pool Analyzer">
 		<classes>
 			<class
-				name="info.novatec.novaspy.agent.analyzer.test.ClassPoolAnalyzerTest" />
+				name="info.novatec.inspectit.agent.analyzer.test.ClassPoolAnalyzerTest" />
 		</classes>
 	</test>
 	<test name="Direct Matcher">
 		<classes>
-			<class name="info.novatec.novaspy.agent.analyzer.test.DirectMatcherTest" />
+			<class name="info.novatec.inspectit.agent.analyzer.test.DirectMatcherTest" />
 		</classes>
 	</test>
 	<test name="Indirect Matcher">
 		<classes>
-			<class name="info.novatec.novaspy.agent.analyzer.test.IndirectMatcherTest" />
+			<class name="info.novatec.inspectit.agent.analyzer.test.IndirectMatcherTest" />
 		</classes>
 	</test>
 	<test name="Inheritance Analyzer">
 		<classes>
 			<class
-				name="info.novatec.novaspy.agent.analyzer.test.InheritanceAnalyzerTest" />
+				name="info.novatec.inspectit.agent.analyzer.test.InheritanceAnalyzerTest" />
 		</classes>
 	</test>
 	<test name="Interface Matcher">
 		<classes>
 			<class
-				name="info.novatec.novaspy.agent.analyzer.test.InterfaceMatcherTest" />
+				name="info.novatec.inspectit.agent.analyzer.test.InterfaceMatcherTest" />
 		</classes>
 	</test>
 	<test name="Simple Match Pattern">
 		<classes>
 			<class
-				name="info.novatec.novaspy.agent.analyzer.test.SimpleMatchPatternTest" />
+				name="info.novatec.inspectit.agent.analyzer.test.SimpleMatchPatternTest" />
 		</classes>
 	</test>
 	<test name="Superclass Matcher">
 		<classes>
 			<class
-				name="info.novatec.novaspy.agent.analyzer.test.SuperclassMatcherTest" />
+				name="info.novatec.inspectit.agent.analyzer.test.SuperclassMatcherTest" />
 		</classes>
 	</test>
 	<test name="Simple Buffer Strategy">
 		<classes>
 			<class
-				name="info.novatec.novaspy.agent.buffer.test.SimpleBufferStrategyTest" />
+				name="info.novatec.inspectit.agent.buffer.test.SimpleBufferStrategyTest" />
 		</classes>
 	</test>
 	<test name="Size Buffer Strategy">
 		<classes>
 			<class
-				name="info.novatec.novaspy.agent.buffer.test.SizeBufferStrategyTest" />
+				name="info.novatec.inspectit.agent.buffer.test.SizeBufferStrategyTest" />
 		</classes>
 	</test>
 	<test name="Configuration Storage">
 		<classes>
 			<class
-				name="info.novatec.novaspy.agent.config.test.ConfigurationStorageTest" />
+				name="info.novatec.inspectit.agent.config.test.ConfigurationStorageTest" />
 		</classes>
 	</test>
 	<test name="File Configuration Reader">
 		<classes>
 			<class
-				name="info.novatec.novaspy.agent.config.test.FileConfigurationReaderTest" />
+				name="info.novatec.inspectit.agent.config.test.FileConfigurationReaderTest" />
 		</classes>
 	</test>
 	<test name="Property Accessor">
 		<classes>
-			<class name="info.novatec.novaspy.agent.config.test.PropertyAccessorTest" />
+			<class name="info.novatec.inspectit.agent.config.test.PropertyAccessorTest" />
 		</classes>
 	</test>
 	<test name="Core Service">
 		<classes>
-			<class name="info.novatec.novaspy.agent.core.test.CoreServiceTest" />
+			<class name="info.novatec.inspectit.agent.core.test.CoreServiceTest" />
 		</classes>
 	</test>
 	<test name="ID Manager">
 		<classes>
-			<class name="info.novatec.novaspy.agent.core.test.IdManagerTest" />
+			<class name="info.novatec.inspectit.agent.core.test.IdManagerTest" />
 		</classes>
 	</test>
 	<test name="Hook Dispatcher">
 		<classes>
-			<class name="info.novatec.novaspy.agent.hooking.test.HookDispatcherTest" />
+			<class name="info.novatec.inspectit.agent.hooking.test.HookDispatcherTest" />
 		</classes>
 	</test>
 	<test name="Hook Instrumenter">
 		<classes>
-			<class name="info.novatec.novaspy.agent.hooking.test.HookInstrumenterTest" />
+			<class name="info.novatec.inspectit.agent.hooking.test.HookInstrumenterTest" />
 		</classes>
 	</test>
 	<test name="List Size Strategy">
 		<classes>
-			<class name="info.novatec.novaspy.agent.sending.test.ListSizeStrategyTest" />
+			<class name="info.novatec.inspectit.agent.sending.test.ListSizeStrategyTest" />
 		</classes>
 	</test>
 	<test name="Time Strategy">
 		<classes>
-			<class name="info.novatec.novaspy.agent.sending.test.TimeStrategyTest" />
+			<class name="info.novatec.inspectit.agent.sending.test.TimeStrategyTest" />
 		</classes>
 	</test>
 	<test name="Average Timer Hook">
 		<classes>
 			<class
-				name="info.novatec.novaspy.agent.sensor.method.averagetimer.test.AverageTimerHookTest" />
+				name="info.novatec.inspectit.agent.sensor.method.averagetimer.test.AverageTimerHookTest" />
 		</classes>
 	</test>
 	<test name="SQL Hook Hook">
 		<classes>
 			<class
-				name="info.novatec.novaspy.agent.sensor.method.jdbc.test.StatementHookTest" />
+				name="info.novatec.inspectit.agent.sensor.method.jdbc.test.StatementHookTest" />
 		</classes>
 	</test>
 	<test name="SQL Sensor Hook">
 		<classes>
 			<class
-				name="info.novatec.novaspy.agent.sensor.method.jdbc.test.StatementSensorTest" />
+				name="info.novatec.inspectit.agent.sensor.method.jdbc.test.StatementSensorTest" />
 		</classes>
 	</test>
 	<test name="Timer Hook">
 		<classes>
 			<class
-				name="info.novatec.novaspy.agent.sensor.method.timer.test.TimerHookTest" />
+				name="info.novatec.inspectit.agent.sensor.method.timer.test.TimerHookTest" />
 		</classes>
 	</test>
 	<test name="Thread Local Stack">
 		<classes>
-			<class name="info.novatec.novaspy.agent.util.test.ThreadLocalStackTest" />
+			<class name="info.novatec.inspectit.agent.util.test.ThreadLocalStackTest" />
 		</classes>
 	</test>
 	<test name="Weak List">
 		<classes>
-			<class name="info.novatec.novaspy.agent.util.test.WeakListTest" />
+			<class name="info.novatec.inspectit.agent.util.test.WeakListTest" />
 		</classes>
 	</test>
 </suite>

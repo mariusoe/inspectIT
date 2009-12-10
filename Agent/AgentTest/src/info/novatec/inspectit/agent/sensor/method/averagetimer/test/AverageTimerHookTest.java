@@ -1,4 +1,4 @@
-package info.novatec.novaspy.agent.sensor.method.averagetimer.test;
+package info.novatec.inspectit.agent.sensor.method.averagetimer.test;
 
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -14,16 +14,16 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
-import info.novatec.novaspy.agent.config.IPropertyAccessor;
-import info.novatec.novaspy.agent.config.impl.RegisteredSensorConfig;
-import info.novatec.novaspy.agent.core.ICoreService;
-import info.novatec.novaspy.agent.core.IIdManager;
-import info.novatec.novaspy.agent.core.IdNotAvailableException;
-import info.novatec.novaspy.agent.sensor.method.averagetimer.AverageTimerHook;
-import info.novatec.novaspy.agent.test.AbstractLogSupport;
-import info.novatec.novaspy.communication.MethodSensorData;
-import info.novatec.novaspy.communication.data.TimerData;
-import info.novatec.novaspy.util.Timer;
+import info.novatec.inspectit.agent.config.IPropertyAccessor;
+import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
+import info.novatec.inspectit.agent.core.ICoreService;
+import info.novatec.inspectit.agent.core.IIdManager;
+import info.novatec.inspectit.agent.core.IdNotAvailableException;
+import info.novatec.inspectit.agent.sensor.method.averagetimer.AverageTimerHook;
+import info.novatec.inspectit.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.communication.MethodSensorData;
+import info.novatec.inspectit.communication.data.TimerData;
+import info.novatec.inspectit.util.Timer;
 
 import java.util.logging.Level;
 

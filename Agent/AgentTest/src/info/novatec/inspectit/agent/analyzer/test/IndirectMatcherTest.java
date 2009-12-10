@@ -1,4 +1,4 @@
-package info.novatec.novaspy.agent.analyzer.test;
+package info.novatec.inspectit.agent.analyzer.test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -10,12 +10,12 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
-import info.novatec.novaspy.agent.analyzer.IClassPoolAnalyzer;
-import info.novatec.novaspy.agent.analyzer.IInheritanceAnalyzer;
-import info.novatec.novaspy.agent.analyzer.IMatcher;
-import info.novatec.novaspy.agent.analyzer.impl.IndirectMatcher;
-import info.novatec.novaspy.agent.config.impl.UnregisteredSensorConfig;
-import info.novatec.novaspy.agent.test.MockInit;
+import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
+import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
+import info.novatec.inspectit.agent.analyzer.IMatcher;
+import info.novatec.inspectit.agent.analyzer.impl.IndirectMatcher;
+import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
+import info.novatec.inspectit.agent.test.MockInit;
 
 import java.util.ArrayList;
 import java.util.Collections;

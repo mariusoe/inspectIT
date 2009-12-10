@@ -1,4 +1,4 @@
-package info.novatec.novaspy.agent.analyzer.test;
+package info.novatec.inspectit.agent.analyzer.test;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -8,17 +8,17 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
-import info.novatec.novaspy.agent.analyzer.IClassPoolAnalyzer;
-import info.novatec.novaspy.agent.analyzer.impl.InheritanceAnalyzer;
-import info.novatec.novaspy.agent.analyzer.test.classes.AbstractSubTest;
-import info.novatec.novaspy.agent.analyzer.test.classes.AbstractTest;
-import info.novatec.novaspy.agent.analyzer.test.classes.ISubTest;
-import info.novatec.novaspy.agent.analyzer.test.classes.ITest;
-import info.novatec.novaspy.agent.analyzer.test.classes.ITestTwo;
-import info.novatec.novaspy.agent.analyzer.test.classes.MyTestError;
-import info.novatec.novaspy.agent.analyzer.test.classes.MyTestException;
-import info.novatec.novaspy.agent.analyzer.test.classes.TestClass;
-import info.novatec.novaspy.agent.test.MockInit;
+import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
+import info.novatec.inspectit.agent.analyzer.impl.InheritanceAnalyzer;
+import info.novatec.inspectit.agent.analyzer.test.classes.AbstractSubTest;
+import info.novatec.inspectit.agent.analyzer.test.classes.AbstractTest;
+import info.novatec.inspectit.agent.analyzer.test.classes.ISubTest;
+import info.novatec.inspectit.agent.analyzer.test.classes.ITest;
+import info.novatec.inspectit.agent.analyzer.test.classes.ITestTwo;
+import info.novatec.inspectit.agent.analyzer.test.classes.MyTestError;
+import info.novatec.inspectit.agent.analyzer.test.classes.MyTestException;
+import info.novatec.inspectit.agent.analyzer.test.classes.TestClass;
+import info.novatec.inspectit.agent.test.MockInit;
 
 import java.util.ArrayList;
 import java.util.Iterator;

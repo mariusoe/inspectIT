@@ -1,4 +1,4 @@
-package info.novatec.novaspy.agent.test;
+package info.novatec.inspectit.agent.test;
 
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;

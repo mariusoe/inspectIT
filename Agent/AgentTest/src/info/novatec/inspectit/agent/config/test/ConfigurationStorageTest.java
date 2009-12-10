@@ -1,4 +1,4 @@
-package info.novatec.novaspy.agent.config.test;
+package info.novatec.inspectit.agent.config.test;
 
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.testng.Assert.assertEquals;
@@ -6,23 +6,23 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
-import info.novatec.novaspy.agent.analyzer.IClassPoolAnalyzer;
-import info.novatec.novaspy.agent.analyzer.IInheritanceAnalyzer;
-import info.novatec.novaspy.agent.analyzer.impl.DirectMatcher;
-import info.novatec.novaspy.agent.analyzer.impl.IndirectMatcher;
-import info.novatec.novaspy.agent.analyzer.impl.InterfaceMatcher;
-import info.novatec.novaspy.agent.analyzer.impl.SuperclassMatcher;
-import info.novatec.novaspy.agent.config.IConfigurationStorage;
-import info.novatec.novaspy.agent.config.PriorityEnum;
-import info.novatec.novaspy.agent.config.StorageException;
-import info.novatec.novaspy.agent.config.impl.ConfigurationStorage;
-import info.novatec.novaspy.agent.config.impl.MethodSensorTypeConfig;
-import info.novatec.novaspy.agent.config.impl.PlatformSensorTypeConfig;
-import info.novatec.novaspy.agent.config.impl.StrategyConfig;
-import info.novatec.novaspy.agent.config.impl.UnregisteredSensorConfig;
-import info.novatec.novaspy.agent.config.impl.PropertyAccessor.PropertyPath;
-import info.novatec.novaspy.agent.config.impl.PropertyAccessor.PropertyPathStart;
-import info.novatec.novaspy.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
+import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
+import info.novatec.inspectit.agent.analyzer.impl.DirectMatcher;
+import info.novatec.inspectit.agent.analyzer.impl.IndirectMatcher;
+import info.novatec.inspectit.agent.analyzer.impl.InterfaceMatcher;
+import info.novatec.inspectit.agent.analyzer.impl.SuperclassMatcher;
+import info.novatec.inspectit.agent.config.IConfigurationStorage;
+import info.novatec.inspectit.agent.config.PriorityEnum;
+import info.novatec.inspectit.agent.config.StorageException;
+import info.novatec.inspectit.agent.config.impl.ConfigurationStorage;
+import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
+import info.novatec.inspectit.agent.config.impl.PlatformSensorTypeConfig;
+import info.novatec.inspectit.agent.config.impl.StrategyConfig;
+import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
+import info.novatec.inspectit.agent.config.impl.PropertyAccessor.PropertyPath;
+import info.novatec.inspectit.agent.config.impl.PropertyAccessor.PropertyPathStart;
+import info.novatec.inspectit.agent.test.AbstractLogSupport;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,52 +66,56 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		// method sensor types
 		Map<String, String> settings = new HashMap<String, String>(1);
 		settings.put("mode", "optimized");
-		configurationStorage.addMethodSensorType("timer", "info.novatec.novaspy.agent.sensor.method.timer.TimerSensor", PriorityEnum.MAX, settings);
-		configurationStorage.addMethodSensorType("isequence", "info.novatec.novaspy.agent.sensor.method.invocationsequence.InvocationSequenceSensor", PriorityEnum.INVOC, null);
+		configurationStorage.addMethodSensorType("timer", "info.novatec.inspectit.agent.sensor.method.timer.TimerSensor", PriorityEnum.MAX, settings);
+		configurationStorage.addMethodSensorType("isequence", "info.novatec.inspectit.agent.sensor.method.invocationsequence.InvocationSequenceSensor",
+				PriorityEnum.INVOC, null);
 
 		// platform sensor types
-		configurationStorage.addPlatformSensorType("info.novatec.novaspy.agent.sensor.platform.ClassLoadingInformation", null);
-		configurationStorage.addPlatformSensorType("info.novatec.novaspy.agent.sensor.platform.CompilationInformation", null);
-		configurationStorage.addPlatformSensorType("info.novatec.novaspy.agent.sensor.platform.RuntimeInformation", null);
+		configurationStorage.addPlatformSensorType("info.novatec.inspectit.agent.sensor.platform.ClassLoadingInformation", null);
+		configurationStorage.addPlatformSensorType("info.novatec.inspectit.agent.sensor.platform.CompilationInformation", null);
+		configurationStorage.addPlatformSensorType("info.novatec.inspectit.agent.sensor.platform.RuntimeInformation", null);
 
 		// exception sensor
-		configurationStorage.addExceptionSensorType("info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor", null);
+		configurationStorage.addExceptionSensorType("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor", null);
 
 		// exception sensor parameters
 		settings = new HashMap<String, String>();
 		settings.put("superclass", "true");
-		configurationStorage.addExceptionSensorTypeParameter("info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor", "java.lang.Throwable", false, settings);
+		configurationStorage.addExceptionSensorTypeParameter("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor", "java.lang.Throwable",
+				false, settings);
 
 		settings = new HashMap<String, String>();
 		settings.put("interface", "true");
-		configurationStorage.addExceptionSensorTypeParameter("info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor", "info.novatec.novaspy.agent.analyzer.test.classes.IException",
-				false, settings);
+		configurationStorage.addExceptionSensorTypeParameter("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor",
+				"info.novatec.inspectit.agent.analyzer.test.classes.IException", false, settings);
 
-		configurationStorage.addExceptionSensorTypeParameter("info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor", "info.novatec.novaspy.agent.analyzer.test.classes.My*Exception",
-				true, Collections.EMPTY_MAP);
-		configurationStorage.addExceptionSensorTypeParameter("info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor", "info.novatec.novaspy.agent.analyzer.test.classes.MyException",
-				false, Collections.EMPTY_MAP);
+		configurationStorage.addExceptionSensorTypeParameter("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor",
+				"info.novatec.inspectit.agent.analyzer.test.classes.My*Exception", true, Collections.EMPTY_MAP);
+		configurationStorage.addExceptionSensorTypeParameter("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor",
+				"info.novatec.inspectit.agent.analyzer.test.classes.MyException", false, Collections.EMPTY_MAP);
 
 		// sending strategies
 		settings = new HashMap<String, String>(1);
 		settings.put("time", "5000");
-		configurationStorage.addSendingStrategy("info.novatec.novaspy.agent.sending.impl.TimeStrategy", settings);
+		configurationStorage.addSendingStrategy("info.novatec.inspectit.agent.sending.impl.TimeStrategy", settings);
 
 		settings = new HashMap<String, String>(1);
 		settings.put("size", "10");
-		configurationStorage.addSendingStrategy("info.novatec.novaspy.agent.sending.impl.ListSizeStrategy", settings);
+		configurationStorage.addSendingStrategy("info.novatec.inspectit.agent.sending.impl.ListSizeStrategy", settings);
 
 		// buffer strategy
-		configurationStorage.setBufferStrategy("info.novatec.novaspy.agent.buffer.impl.SimpleBufferStrategy", null);
+		configurationStorage.setBufferStrategy("info.novatec.inspectit.agent.buffer.impl.SimpleBufferStrategy", null);
 
 		// sensor definitions
 		configurationStorage.addSensor("TimerSensorTest", "timer", "*", "*", null, true, null);
 
-		configurationStorage.addSensor("InvocSensorTest", "isequence", "info.novatec.novaspysamples.calculator.Calculator", "actionPerformed", null, true, null);
+		configurationStorage
+				.addSensor("InvocSensorTest", "isequence", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", null, true, null);
 
 		List<String> parameterList = new ArrayList<String>();
 		parameterList.add("java.lang.String");
-		configurationStorage.addSensor("ParameterTest", "timer", "info.novatec.novaspysamples.calculator.Calculator", "actionPerformed", parameterList, false, null);
+		configurationStorage.addSensor("ParameterTest", "timer", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", parameterList, false,
+				null);
 
 		settings = new HashMap<String, String>();
 		settings.put("interface", "true");
@@ -119,7 +123,8 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 		settings = new HashMap<String, String>();
 		settings.put("superclass", "true");
-		configurationStorage.addSensor("SuperclassTest", "isequence", "info.novatec.novaspysamples.calculator.Calculator", "actionPerformed", null, true, settings);
+		configurationStorage.addSensor("SuperclassTest", "isequence", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", null, true,
+				settings);
 
 		Map<String, List<String>> fieldSettings = new HashMap<String, List<String>>();
 		List<String> list = new ArrayList<String>();
@@ -186,7 +191,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 		// first
 		MethodSensorTypeConfig config = configs.get(0);
-		assertEquals(config.getClassName(), "info.novatec.novaspy.agent.sensor.method.timer.TimerSensor");
+		assertEquals(config.getClassName(), "info.novatec.inspectit.agent.sensor.method.timer.TimerSensor");
 		assertEquals(config.getName(), "timer");
 		assertNotNull(config.getParameters());
 		Map<String, String> settings = config.getParameters();
@@ -198,7 +203,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 		// second
 		config = configs.get(1);
-		assertEquals(config.getClassName(), "info.novatec.novaspy.agent.sensor.method.invocationsequence.InvocationSequenceSensor");
+		assertEquals(config.getClassName(), "info.novatec.inspectit.agent.sensor.method.invocationsequence.InvocationSequenceSensor");
 		assertEquals(config.getName(), "isequence");
 		assertNotNull(config.getParameters());
 		assertEquals(config.getParameters().size(), 0);
@@ -252,21 +257,21 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 		// first
 		PlatformSensorTypeConfig config = configs.get(0);
-		assertEquals(config.getClassName(), "info.novatec.novaspy.agent.sensor.platform.ClassLoadingInformation");
+		assertEquals(config.getClassName(), "info.novatec.inspectit.agent.sensor.platform.ClassLoadingInformation");
 		assertNotNull(config.getParameters());
 		assertEquals(config.getParameters().size(), 0);
 		assertNull(config.getSensorType());
 
 		// second
 		config = configs.get(1);
-		assertEquals(config.getClassName(), "info.novatec.novaspy.agent.sensor.platform.CompilationInformation");
+		assertEquals(config.getClassName(), "info.novatec.inspectit.agent.sensor.platform.CompilationInformation");
 		assertNotNull(config.getParameters());
 		assertEquals(config.getParameters().size(), 0);
 		assertNull(config.getSensorType());
 
 		// third
 		config = configs.get(2);
-		assertEquals(config.getClassName(), "info.novatec.novaspy.agent.sensor.platform.RuntimeInformation");
+		assertEquals(config.getClassName(), "info.novatec.inspectit.agent.sensor.platform.RuntimeInformation");
 		assertNotNull(config.getParameters());
 		assertEquals(config.getParameters().size(), 0);
 		assertNull(config.getSensorType());
@@ -296,7 +301,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		assertEquals(configs.size(), 1);
 
 		MethodSensorTypeConfig config = configs.get(0);
-		assertEquals(config.getClassName(), "info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor");
+		assertEquals(config.getClassName(), "info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
 		assertNotNull(config.getParameters());
 		assertEquals(config.getParameters().size(), 0);
 		assertNull(config.getSensorType());
@@ -337,7 +342,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 		// second
 		config = configs.get(1);
-		assertEquals(config.getTargetClassName(), "info.novatec.novaspy.agent.analyzer.test.classes.IException");
+		assertEquals(config.getTargetClassName(), "info.novatec.inspectit.agent.analyzer.test.classes.IException");
 		assertEquals(config.getTargetMethodName(), "");
 		assertNull(config.getTargetPackageName());
 		assertEquals(config.isConstructor(), false);
@@ -353,7 +358,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 		// third
 		config = configs.get(2);
-		assertEquals(config.getTargetClassName(), "info.novatec.novaspy.agent.analyzer.test.classes.My*Exception");
+		assertEquals(config.getTargetClassName(), "info.novatec.inspectit.agent.analyzer.test.classes.My*Exception");
 		assertEquals(config.getTargetMethodName(), "");
 		assertNull(config.getTargetPackageName());
 		assertEquals(config.isConstructor(), false);
@@ -369,7 +374,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 		// fourth
 		config = configs.get(3);
-		assertEquals(config.getTargetClassName(), "info.novatec.novaspy.agent.analyzer.test.classes.MyException");
+		assertEquals(config.getTargetClassName(), "info.novatec.inspectit.agent.analyzer.test.classes.MyException");
 		assertEquals(config.getTargetMethodName(), "");
 		assertNull(config.getTargetPackageName());
 		assertEquals(config.isConstructor(), false);
@@ -404,7 +409,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 		// first
 		StrategyConfig config = strategies.get(0);
-		assertEquals(config.getClazzName(), "info.novatec.novaspy.agent.sending.impl.TimeStrategy");
+		assertEquals(config.getClazzName(), "info.novatec.inspectit.agent.sending.impl.TimeStrategy");
 		assertNotNull(config.getSettings());
 		Map<String, String> settings = config.getSettings();
 		assertEquals(settings.size(), 1);
@@ -413,7 +418,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 		// second
 		config = strategies.get(1);
-		assertEquals(config.getClazzName(), "info.novatec.novaspy.agent.sending.impl.ListSizeStrategy");
+		assertEquals(config.getClazzName(), "info.novatec.inspectit.agent.sending.impl.ListSizeStrategy");
 		assertNotNull(config.getSettings());
 		settings = config.getSettings();
 		assertEquals(settings.size(), 1);
@@ -442,7 +447,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		StrategyConfig config = configurationStorage.getBufferStrategyConfig();
 		assertNotNull(config);
 
-		assertEquals(config.getClazzName(), "info.novatec.novaspy.agent.buffer.impl.SimpleBufferStrategy");
+		assertEquals(config.getClazzName(), "info.novatec.inspectit.agent.buffer.impl.SimpleBufferStrategy");
 		assertNotNull(config.getSettings());
 		assertEquals(config.getSettings().size(), 0);
 
@@ -490,7 +495,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		assertEquals(config.getSensorName(), "InvocSensorTest");
 		assertEquals(config.getSensorTypeConfig().getName(), "isequence");
 		assertNull(config.getTargetPackageName());
-		assertEquals(config.getTargetClassName(), "info.novatec.novaspysamples.calculator.Calculator");
+		assertEquals(config.getTargetClassName(), "info.novatec.inspectitsamples.calculator.Calculator");
 		assertEquals(config.getTargetMethodName(), "actionPerformed");
 		assertNotNull(config.getParameterTypes());
 		assertEquals(config.getParameterTypes().size(), 0);
@@ -505,7 +510,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		assertEquals(config.getSensorName(), "ParameterTest");
 		assertEquals(config.getSensorTypeConfig().getName(), "timer");
 		assertNull(config.getTargetPackageName());
-		assertEquals(config.getTargetClassName(), "info.novatec.novaspysamples.calculator.Calculator");
+		assertEquals(config.getTargetClassName(), "info.novatec.inspectitsamples.calculator.Calculator");
 		assertEquals(config.getTargetMethodName(), "actionPerformed");
 		assertNotNull(config.getParameterTypes());
 		assertEquals(config.getParameterTypes().size(), 1);
@@ -538,7 +543,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		assertEquals(config.getSensorName(), "SuperclassTest");
 		assertEquals(config.getSensorTypeConfig().getName(), "isequence");
 		assertNull(config.getTargetPackageName());
-		assertEquals(config.getTargetClassName(), "info.novatec.novaspysamples.calculator.Calculator");
+		assertEquals(config.getTargetClassName(), "info.novatec.inspectitsamples.calculator.Calculator");
 		assertEquals(config.getTargetMethodName(), "actionPerformed");
 		assertNotNull(config.getParameterTypes());
 		assertEquals(config.getParameterTypes().size(), 0);

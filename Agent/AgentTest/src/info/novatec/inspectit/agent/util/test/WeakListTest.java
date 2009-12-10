@@ -1,11 +1,11 @@
-package info.novatec.novaspy.agent.util.test;
+package info.novatec.inspectit.agent.util.test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
-import info.novatec.novaspy.util.WeakList;
+import info.novatec.inspectit.util.WeakList;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package info.novatec.novaspy.agent.analyzer.test.classes;
+package info.novatec.inspectit.agent.analyzer.test.classes;
 
 public interface ISubTest extends ITest {
 

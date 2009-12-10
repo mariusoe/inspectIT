@@ -1,14 +1,14 @@
-package info.novatec.novaspy.agent.config.test;
+package info.novatec.inspectit.agent.config.test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
-import info.novatec.novaspy.agent.config.IPropertyAccessor;
-import info.novatec.novaspy.agent.config.PropertyAccessException;
-import info.novatec.novaspy.agent.config.impl.PropertyAccessor;
-import info.novatec.novaspy.agent.config.impl.PropertyAccessor.PropertyPath;
-import info.novatec.novaspy.agent.config.impl.PropertyAccessor.PropertyPathStart;
-import info.novatec.novaspy.agent.test.AbstractLogSupport;
-import info.novatec.novaspy.communication.data.ParameterContentData;
+import info.novatec.inspectit.agent.config.IPropertyAccessor;
+import info.novatec.inspectit.agent.config.PropertyAccessException;
+import info.novatec.inspectit.agent.config.impl.PropertyAccessor;
+import info.novatec.inspectit.agent.config.impl.PropertyAccessor.PropertyPath;
+import info.novatec.inspectit.agent.config.impl.PropertyAccessor.PropertyPathStart;
+import info.novatec.inspectit.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.communication.data.ParameterContentData;
 
 import java.util.ArrayList;
 import java.util.List;

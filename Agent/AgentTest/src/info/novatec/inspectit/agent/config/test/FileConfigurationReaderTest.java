@@ -1,14 +1,14 @@
-package info.novatec.novaspy.agent.config.test;
+package info.novatec.inspectit.agent.config.test;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import info.novatec.novaspy.agent.config.IConfigurationStorage;
-import info.novatec.novaspy.agent.config.ParserException;
-import info.novatec.novaspy.agent.config.PriorityEnum;
-import info.novatec.novaspy.agent.config.StorageException;
-import info.novatec.novaspy.agent.config.impl.FileConfigurationReader;
-import info.novatec.novaspy.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.agent.config.IConfigurationStorage;
+import info.novatec.inspectit.agent.config.ParserException;
+import info.novatec.inspectit.agent.config.PriorityEnum;
+import info.novatec.inspectit.agent.config.StorageException;
+import info.novatec.inspectit.agent.config.impl.FileConfigurationReader;
+import info.novatec.inspectit.agent.test.AbstractLogSupport;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -83,7 +83,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 	@Test
 	public void loadAndVerifyMethodSensorType() throws ParserException, StorageException {
 		String name = "average-timer";
-		String clazz = "info.novatec.novaspy.agent.sensor.method.averagetimer.AverageTimerSensor";
+		String clazz = "info.novatec.inspectit.agent.sensor.method.averagetimer.AverageTimerSensor";
 		PriorityEnum priority = PriorityEnum.HIGH;
 		String priorityString = (String) PriorityEnum.names().get(new Integer(priority.getValue()));
 
@@ -98,7 +98,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 	@Test
 	public void loadAndVerifyPlatformSensorType() throws ParserException, StorageException {
-		String clazz = "info.novatec.novaspy.agent.sensor.platform.ClassLoadingInformation";
+		String clazz = "info.novatec.inspectit.agent.sensor.platform.ClassLoadingInformation";
 
 		writer.println("platform-sensor-type " + clazz);
 		writer.close();
@@ -111,7 +111,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 	@Test
 	public void loadAndVerifyExceptionSensorNoParameter() throws ParserException, StorageException {
-		String clazz = "info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor";
+		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor";
 		String name = "exception-sensor";
 		String targetClass = "java.lang.Throwable";
 		writer.println(name + " " + targetClass);
@@ -126,7 +126,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 	@Test
 	public void loadAndVerifyExceptionSensorOneParameter() throws ParserException, StorageException {
-		String clazz = "info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor";
+		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor";
 		String name = "exception-sensor";
 		String targetClass = "java.lang.Throwable superclass=true";
 		writer.println(name + " " + targetClass);
@@ -144,7 +144,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 	@Test
 	public void loadAndVerifyExceptionSensorWildcardParameter() throws ParserException, StorageException {
-		String clazz = "info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor";
+		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor";
 		String name = "exception-sensor";
 		String targetClass = "java.lang.*";
 		writer.println(name + " " + targetClass);
@@ -159,7 +159,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 	@Test
 	public void loadAndVerifyBufferStrategy() throws ParserException, StorageException {
-		String clazz = "info.novatec.novaspy.agent.buffer.impl.SimpleBufferStrategy";
+		String clazz = "info.novatec.inspectit.agent.buffer.impl.SimpleBufferStrategy";
 
 		writer.println("buffer-strategy " + clazz);
 		writer.close();
@@ -172,7 +172,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 	@Test
 	public void loadAndVerifySendingStrategy() throws ParserException, StorageException {
-		String clazz = "info.novatec.novaspy.agent.sending.impl.TimeStrategy";
+		String clazz = "info.novatec.inspectit.agent.sending.impl.TimeStrategy";
 		String time = "time=5000";
 
 		writer.println("send-strategy " + clazz + " " + time);
@@ -190,7 +190,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 	@Test
 	public void loadAndVerifyStandardSensor() throws ParserException, StorageException {
 		String sensorTypeName = "isequence";
-		String className = "info.novatec.novaspysamples.calculator.Calculator";
+		String className = "info.novatec.inspectitsamples.calculator.Calculator";
 		String methodName = "actionPerformed";
 		String sensorName = "test";
 
@@ -222,7 +222,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 	@Test
 	public void loadAndVerifySensorIgnoreSignature() throws ParserException, StorageException {
 		String sensorTypeName = "isequence";
-		String className = "info.novatec.novaspysamples.calculator.Calculator";
+		String className = "info.novatec.inspectitsamples.calculator.Calculator";
 		String methodName = "actionPerformed";
 		String sensorName = "test";
 
@@ -238,7 +238,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 	@Test
 	public void loadAndVerifySensorWithOneParameter() throws ParserException, StorageException {
 		String sensorTypeName = "isequence";
-		String className = "info.novatec.novaspysamples.calculator.Calculator";
+		String className = "info.novatec.inspectitsamples.calculator.Calculator";
 		String methodName = "actionPerformed";
 		String parameter = "java.lang.String";
 		String sensorName = "test";
@@ -258,7 +258,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 	@Test
 	public void loadAndVerifySensorWithManyParameter() throws ParserException, StorageException {
 		String sensorTypeName = "isequence";
-		String className = "info.novatec.novaspysamples.calculator.Calculator";
+		String className = "info.novatec.inspectitsamples.calculator.Calculator";
 		String methodName = "actionPerformed";
 		String parameterOne = "java.lang.String";
 		String parameterTwo = "java.lang.Object";
@@ -282,7 +282,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 	@Test
 	public void loadAndVerifySensorWithParameterRecord() throws ParserException, StorageException {
 		String sensorTypeName = "isequence";
-		String className = "info.novatec.novaspysamples.calculator.Calculator";
+		String className = "info.novatec.inspectitsamples.calculator.Calculator";
 		String methodName = "actionPerformed";
 		String sensorName = "test";
 		String parameterRecord = "0;Source;text";
@@ -304,7 +304,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 	@Test
 	public void loadAndVerifySensorWithFieldRecord() throws ParserException, StorageException {
 		String sensorTypeName = "isequence";
-		String className = "info.novatec.novaspysamples.calculator.Calculator";
+		String className = "info.novatec.inspectitsamples.calculator.Calculator";
 		String methodName = "actionPerformed";
 		String sensorName = "test";
 		String fieldRecord = "LastOutput;jlbOutput.text";
@@ -326,7 +326,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 	@Test
 	public void loadAndVerifyInvocSensorWithMinDuration() throws ParserException, StorageException {
 		String sensorTypeName = "isequence";
-		String className = "info.novatec.novaspysamples.calculator.Calculator";
+		String className = "info.novatec.inspectitsamples.calculator.Calculator";
 		String methodName = "actionPerformed";
 		String sensorName = "test";
 		String minDuration = "100.0";

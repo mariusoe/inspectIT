@@ -1,11 +1,11 @@
-package info.novatec.novaspy.agent.util.test;
+package info.novatec.inspectit.agent.util.test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
-import info.novatec.novaspy.util.ThreadLocalStack;
+import info.novatec.inspectit.util.ThreadLocalStack;
 
 import java.util.LinkedList;
 import java.util.NoSuchElementException;

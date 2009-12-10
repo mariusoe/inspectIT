@@ -1,4 +1,4 @@
-package info.novatec.novaspy.agent.hooking.test;
+package info.novatec.inspectit.agent.hooking.test;
 
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.argThat;
@@ -8,19 +8,19 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import info.novatec.novaspy.agent.analyzer.test.classes.ExceptionTestClass;
-import info.novatec.novaspy.agent.analyzer.test.classes.ExceptionalTestClass;
-import info.novatec.novaspy.agent.analyzer.test.classes.ITest;
-import info.novatec.novaspy.agent.analyzer.test.classes.MyTestException;
-import info.novatec.novaspy.agent.analyzer.test.classes.TestClass;
-import info.novatec.novaspy.agent.config.IConfigurationStorage;
-import info.novatec.novaspy.agent.config.impl.MethodSensorTypeConfig;
-import info.novatec.novaspy.agent.config.impl.RegisteredSensorConfig;
-import info.novatec.novaspy.agent.core.IIdManager;
-import info.novatec.novaspy.agent.hooking.IHookDispatcher;
-import info.novatec.novaspy.agent.hooking.impl.HookException;
-import info.novatec.novaspy.agent.hooking.impl.HookInstrumenter;
-import info.novatec.novaspy.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.agent.analyzer.test.classes.ExceptionTestClass;
+import info.novatec.inspectit.agent.analyzer.test.classes.ExceptionalTestClass;
+import info.novatec.inspectit.agent.analyzer.test.classes.ITest;
+import info.novatec.inspectit.agent.analyzer.test.classes.MyTestException;
+import info.novatec.inspectit.agent.analyzer.test.classes.TestClass;
+import info.novatec.inspectit.agent.config.IConfigurationStorage;
+import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
+import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
+import info.novatec.inspectit.agent.core.IIdManager;
+import info.novatec.inspectit.agent.hooking.IHookDispatcher;
+import info.novatec.inspectit.agent.hooking.impl.HookException;
+import info.novatec.inspectit.agent.hooking.impl.HookInstrumenter;
+import info.novatec.inspectit.agent.test.AbstractLogSupport;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -68,7 +68,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		hookInstrumenter = new HookInstrumenter(hookDispatcher, idManager, configurationStorage);
 		Field field = hookInstrumenter.getClass().getDeclaredField("hookDispatcherTarget");
 		field.setAccessible(true);
-		field.set(hookInstrumenter, "info.novatec.novaspy.agent.hooking.test.HookInstrumenterTest#getHookDispatcher()");
+		field.set(hookInstrumenter, "info.novatec.inspectit.agent.hooking.test.HookInstrumenterTest#getHookDispatcher()");
 	}
 
 	public static IHookDispatcher getHookDispatcher() {
@@ -655,7 +655,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(registeredSensorConfig.getTargetMethodName()).thenReturn(exceptionClazz.getSimpleName());
 		when(registeredSensorConfig.getModifiers()).thenReturn(exceptionClazz.getModifiers());
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
 		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
 		when(registeredSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
 		when(registeredSensorConfig.getId()).thenReturn(sensorTypeId);
@@ -696,7 +696,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(registeredSensorConfig.getTargetMethodName()).thenReturn(exceptionClazz.getSimpleName());
 		when(registeredSensorConfig.getModifiers()).thenReturn(exceptionClazz.getModifiers());
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
 		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
 		when(idManager.registerMethod(registeredSensorConfig)).thenReturn(constructorId);
 		List<MethodSensorTypeConfig> sensorTypeConfigs = new ArrayList<MethodSensorTypeConfig>();
@@ -735,7 +735,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(configurationStorage.isExceptionSensorActivated()).thenReturn(true);
 
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
 		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
 		List<MethodSensorTypeConfig> sensorTypeConfigs = new ArrayList<MethodSensorTypeConfig>();
 		sensorTypeConfigs.add(sensorTypeConfig);
@@ -776,7 +776,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 
 		// sensor type settings
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
 		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
 		List<MethodSensorTypeConfig> sensorTypeConfigs = new ArrayList<MethodSensorTypeConfig>();
 		sensorTypeConfigs.add(sensorTypeConfig);
@@ -844,7 +844,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(configurationStorage.isExceptionSensorActivated()).thenReturn(true);
 
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
 		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
 		List<MethodSensorTypeConfig> sensorTypeConfigs = new ArrayList<MethodSensorTypeConfig>();
 		sensorTypeConfigs.add(sensorTypeConfig);
@@ -919,7 +919,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(configurationStorage.isExceptionSensorActivated()).thenReturn(true);
 
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
 		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
 		List<MethodSensorTypeConfig> sensorTypeConfigs = new ArrayList<MethodSensorTypeConfig>();
 		sensorTypeConfigs.add(sensorTypeConfig);
@@ -1002,7 +1002,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(configurationStorage.isExceptionSensorActivated()).thenReturn(true);
 
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.novaspy.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
 		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
 		List<MethodSensorTypeConfig> sensorTypeConfigs = new ArrayList<MethodSensorTypeConfig>();
 		sensorTypeConfigs.add(sensorTypeConfig);
