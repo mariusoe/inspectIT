@@ -40,12 +40,12 @@ public class RMIConnection implements IConnection {
 	/**
 	 * The name of the repository service.
 	 */
-	private String agentStorageName = "InspectITAgentStorageService";
+	private String agentStorageName = "inspectITAgentStorageService";
 
 	/**
 	 * The name of the registration service.
 	 */
-	private String registrationName = "InspectITRegistrationService";
+	private String registrationName = "inspectITRegistrationService";
 
 	/**
 	 * The RMI registry.
