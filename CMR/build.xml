@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<!-- ====================================================================== 
+     inspectIT - CMR    
+     Sophisticated Monitoring tool by NovaTec GmbH
+     ====================================================================== -->
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="inspectIT - CMR" default="release" basedir=".">
+	<description>
+            Sophisticated Monitoring tool by NovaTec GmbH
+    </description>
+
+	<property file="${basedir}/build.properties" />
+
+	<!-- classpath settings -->
+	<path id="compile.classpath">
+		<fileset dir="${lib.dir}" includes="**/*.jar" />
+		<pathelement location="${build.commons.classes}"/>
+	</path>
+
+	<path id="complete.classpath">
+		<!--path refid="${classpath_ref}" /-->
+		<pathelement location="${build.cmr.classes}" />
+		<pathelement location="${build.commons.classes}"/>
+		<fileset dir="${lib.dir}" includes="**/*.jar" />
+	</path>
+	
+	<!-- will be available after all dependencies are retrieved by the init target -->
+	<path id="path.libs">
+		<fileset dir="${lib.dir}" includes="**/*.jar" />
+	</path>
+
+	<target name="clean" description="--> Cleans the project">
+		<delete dir="${build.root}" />
+		<delete dir="${dist.root}" />
+		<delete dir="${src.generated.root}" />
+	</target>
+
+	<target name="init" description="--> Creates necessary folder structure">
+		<mkdir dir="${build.root}" />
+		<mkdir dir="${src.generated.root}" />
+		
+		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+		<ivy:resolve file="${ivy.file}" />
+		<ivy:retrieve pattern="${lib.dir}/[conf]/[artifact].[ext]" />
+		
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.libs"/>
+		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs"/>
+	 	<taskdef resource="checkstyletask.properties" classpathref="path.libs"/>
+	</target>
+	
+	
+
+	<!-- *************************************************************** -->
+	<!--                   B U I L D    T A R G E T S                    -->
+	<!-- *************************************************************** -->
+	<!-- These targets are used to build the projects that are used      -->
+	<!-- to create the CMR component.                                    -->
+	<!-- *************************************************************** -->
+	
+	<target name="build-commons" description="--> builds a clean distribution of the commons project and copies the classes to the local build folder">
+		<mkdir dir="${build.commons.classes}"/>
+		
+		<javac source="1.4" target="1.4" debug="true" fork="true" destdir="${build.commons.classes}" srcdir="${src.commons}" />
+	</target>
+
+	<target name="build" depends="init, build-commons" description="--> Compiles the sources">
+		<mkdir dir="${build.cmr.generated.classes}"/>
+		<mkdir dir="${build.cmr.classes}"/>
+		
+		<javac source="1.5" target="1.5" destdir="${build.cmr.generated.classes}" srcdir="${src.generated.root}" classpathref="compile.classpath" />
+		<javac source="1.5" target="1.5" destdir="${build.cmr.classes}" srcdir="${src.root}" classpathref="compile.classpath" />
+		
+		<rmic stubversion="1.2" base="${build.cmr.generated.classes}" classpathref="complete.classpath" classname="info.novatec.inspectit.cmr.service.AgentStorageService" sourcebase="${src.generated.root}" />
+		<rmic stubversion="1.2" base="${build.cmr.generated.classes}" classpathref="complete.classpath" classname="info.novatec.inspectit.cmr.service.RegistrationService" sourcebase="${src.generated.root}" />
+	</target>
+
+	
+	<!-- *************************************************************** -->
+	<!--                Q U A L I T Y     T A R G E T S                  -->
+	<!-- *************************************************************** -->
+	<!-- These targets are used to ensure the quality of the agent       --> 
+	<!-- component.                                                      -->
+	<!-- *************************************************************** -->
+
+	
+	
+	<target name="static-analysis" depends="init">
+		<mkdir dir="${build.qa.analysis}"/>
+		<mkdir dir="${build.qa.analysis.pmd}"/>
+		<mkdir dir="${build.qa.analysis.checkstyle}"/>
+		<mkdir dir="${build.qa.analysis.findbugs}"/>
+		
+		<pmd maxRuleViolations="${pmd.maximum.violations}">
+			<ruleset>${pmd.rules.file}</ruleset>
+	        <formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true"/>
+			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true"/>
+			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml"/>
+			<fileset dir="${src.root}">
+	            <include name="info/novatec/inspectit/**/*.java"/>
+				<exclude name="**/*_Stub.java" />
+	        </fileset>
+			<fileset dir="${src.commons}">
+	            <include name="info/novatec/inspectit/**/*.java"/>
+				<exclude name="**/*_Stub.java" />
+	        </fileset>
+		</pmd>
+		<xslt in="${build.qa.analysis.pmd}/pmd_results.xml" style="${pmd.config.root}/pmd-report.xslt" out="${build.qa.analysis.pmd}/sortable_report.html" />
+		<copy todir="${build.qa.analysis.pmd}" file="${pmd.config.root}/sorttable.js" /> <!-- this js is used for the sortable report -->
+		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >"></echo>
+		
+		<checkstyle config="${checkstyle.config.file}"
+		              failureProperty="checkstyle.failure"
+		              failOnViolation="false">
+			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml"/>
+			<fileset dir="src" includes="**/*.java"/>
+		</checkstyle>
+
+		<style in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl"/>
+		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >"></echo>
+		
+		<!-- Currently not active as findbugs task needs findbugs to be installed. stupid home dir setting also only works if complete findbugs is installed 
+		<findbugs home="${lib.dir}/test"
+	              output="xml"
+	              outputFile="bcel-fb.xml" >
+	      <sourcePath path="${src.root}" />
+		  <class location="${build.agent.classes}" />
+	    </findbugs> -->
+
+	</target>
+	
+	
+	
+	
+	<!-- *************************************************************** -->
+	<!--                R E L E A S E     T A R G E T S                  -->
+	<!-- *************************************************************** -->
+	
+	<target name="release" depends="build" description="--> Creates the distribution jar">
+		<mkdir dir="${release.root}"/>
+		<mkdir dir="${build.release.root}"/>
+		
+		<jar destfile="${build.release.root}/${dist.jar.name}" manifest="${basedir}/resources/META-INF/MANIFEST.MF">
+			<fileset dir="${build.cmr.generated.classes}" includes="**/*.class" />
+			<fileset dir="${build.cmr.classes}" includes="**/*.class" />
+			<fileset dir="${src.root}" includes="**/*.xml" />
+			<fileset dir="${src.root}" includes="**/*.properties" />
+		</jar>
+		
+		<copy todir="${build.release.root}/lib">
+			<fileset dir="${lib.dir}/prod" includes="**/*.jar" />
+		</copy>
+		
+		<jar destfile="${build.release.root}/lib/inspectit-commons.jar" basedir="${build.commons.classes}" />
+		
+		<echo  file="${build.release.root}/startup.sh"
+			message="java -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:MaxNewSize=24m -XX:NewSize=24m -XX:SurvivorRatio=128 -XX:TargetSurvivorRatio=90 -XX:ParallelGCThreads=6 -Xms768m -Xmx768m -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -jar ${dist.jar.name}" />
+		
+		<echo  file="${build.release.root}/startup.bat"
+			message="java -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:MaxNewSize=24m -XX:NewSize=24m -XX:SurvivorRatio=128 -XX:TargetSurvivorRatio=90 -XX:ParallelGCThreads=6 -Xms768m -Xmx768m -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -jar ${dist.jar.name}" />
+		
+		<mkdir dir="${build.release.root}/license"/>
+		<copy todir="${build.release.root}/license" file="${basedir}/license/publicCerts.store" />
+		
+		<zip destfile="${release.root}/inspectit-cmr.zip" basedir="${build.release.root}" />
+	</target>
+</project>

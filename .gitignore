@@ -1,1 +1,4 @@
-.metadata/
+*~
+Agent/Agent/test
+Agent/Agent/release
+*.svn

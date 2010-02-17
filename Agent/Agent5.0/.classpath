@@ -10,5 +10,29 @@
 	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?ivyXmlPath=resources%2Fivy%2Fivy.xml&amp;confs=*"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Agent"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Commons"/>
+	<classpathentry kind="lib" path="/Agent/lib/prod/findbugs-ant.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/prod/javassist.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/prod/picocontainer.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/antlr.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/asm-tree.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/asm.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/bcel.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/checkstyle.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/cobertura.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/commons-beanutils.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/commons-cli.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/commons-logging.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/dom4j.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/findbugs-ant.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/findbugs.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/google-collections.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/jakarta-oro.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/javassist.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/jaxen.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/log4j.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/mockito-all.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/picocontainer.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/pmd.jar"/>
+	<classpathentry kind="lib" path="/Agent/lib/test/testng.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

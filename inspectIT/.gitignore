@@ -1,3 +1,8 @@
 bin/
 test-output
 temp-testng-customsuite.xml
+lib/inspectit-commons.jar
+release/build/
+release/dist/
+release/pdebuild/
+release/eclipseLocation/eclipse3.4RCP/configuration/.settings
