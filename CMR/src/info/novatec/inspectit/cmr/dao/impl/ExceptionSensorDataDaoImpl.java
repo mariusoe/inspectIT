@@ -47,9 +47,10 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 		while ((resultList.size() < limit) && (counter < exceptionSensorDataList.size())) {
 			ExceptionSensorData data = exceptionSensorDataList.get(counter);
 
+			// we are always adding the data object that is marked with CREATED
 			if (counter == 0) {
 				resultList.add(exceptionSensorDataList.get(counter));
-			} else if ((counter - 1) > 0) {
+			} else if ((counter - 1) >= 0) {
 				if (data.getThrowableIdentityHashCode() != exceptionSensorDataList.get(counter - 1).getThrowableIdentityHashCode()) {
 					resultList.add(data);
 				}
@@ -82,9 +83,10 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 		while (counter < exceptionSensorDataList.size()) {
 			ExceptionSensorData data = exceptionSensorDataList.get(counter);
 
+			// we are always adding the data object that is marked with CREATED
 			if (counter == 0) {
 				resultList.add(exceptionSensorDataList.get(counter));
-			} else if ((counter - 1) > 0) {
+			} else if ((counter - 1) >= 0) {
 				if (data.getThrowableIdentityHashCode() != exceptionSensorDataList.get(counter - 1).getThrowableIdentityHashCode()) {
 					resultList.add(data);
 				}
