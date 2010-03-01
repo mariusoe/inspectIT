@@ -9,3 +9,5 @@ invocations/
 db/
 temp-testng-customsuite.xml
 release/
+resources/ivy/install/
+license/license.lic

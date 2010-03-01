@@ -2,7 +2,13 @@ bin/
 test-output
 temp-testng-customsuite.xml
 lib/inspectit-commons.jar
+lib/prod/
+lib/test/
 release/build/
 release/dist/
 release/pdebuild/
-release/eclipseLocation/eclipse3.4RCP/configuration/.settings
+release/eclipseLocation/eclipse3.4RCP/configuration/.settings/
+release/runtime/eclipse3.4RCP/configuration/org.eclipse.osgi/bundles/
+release/resources/ivy/install/
+release/runtime/eclipse3.4RCP/configuration/.settings/
+release/runtime/eclipse3.4RCP/configuration/*/.manager/

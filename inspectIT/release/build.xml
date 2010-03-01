@@ -1,9 +1,28 @@
-<project name="inspectit release" default="release" 
-	 xmlns:ivy="antlib:org.apache.ivy.ant">
-	
+<project name="inspectit release" default="release" xmlns:ivy="antlib:org.apache.ivy.ant">
+
 	<property name="release.basedir" value="${basedir}" />
 	<property file="build.properties" />
-	
+
+	<path id="path.libs">
+		<fileset dir="${lib.root}" includes="**/*.jar" />
+	</path>
+
+	<path id="path.test.class">
+		<pathelement location="${build.test.classes}" />
+	</path>
+
+	<path id="path.commons.classes">
+		<pathelement location="${build.common.classes}" />
+	</path>
+
+	<path id="path.rcp">
+		<pathelement location="${build.rcp.classes}" />
+	</path>
+
+	<!-- classpath for findbugs is needed because it enables to run findbugs without having a local installation-->
+	<path id="findbugs.classpath">
+		<fileset dir="${lib.root}" includes="**/*.jar" />
+	</path>
 
 	<!--
         PDE Build expects that the build directory contains a "plugins"
@@ -35,69 +54,245 @@
         
         Please see the inspectit Wiki for a more thourough documentation!
     -->
-	
+
+
+	<!-- *************************************************************** -->
+	<!--                        T A R G E T S                            -->
+	<!-- *************************************************************** -->
+
 	<target name="clean">
 		<delete file="../lib/inspectit-commons.jar" />
 		<delete dir="${basedir}/build" />
 		<delete dir="${basedir}/dist" />
-		
+
 		<!-- clean the PDE build environment -->
 		<delete dir="${buildDirectory}" />
 	</target>
-	
+
 	<target name="dist-commons">
 		<mkdir dir="${basedir}/build" />
-		<javac source="1.4" target="1.4" debug="true" fork="true" destdir="${basedir}/build" srcdir="../../Commons" />
+		<mkdir dir="${build.common.classes}" />
+		<javac source="1.4" target="1.4" debug="true" fork="true" destdir="${build.common.classes}" srcdir="../../Commons" />
 		<jar destfile="${basedir}/build/inspectit-commons.jar">
-			<fileset dir="${basedir}/build" includes="**/*.class" />
+			<fileset dir="${build.common.classes}" includes="**/*.class" />
 		</jar>
 		<copy file="${basedir}/build/inspectit-commons.jar" tofile="../lib/inspectit-commons.jar" failonerror="true" />
 	</target>
-	
+
 	<target name="init" depends="dist-commons">
 		<mkdir dir="${buildDirectory}" />
 		<mkdir dir="${buildDirectory}/plugins/info.novatec.inspectit.commons" />
 		<mkdir dir="${buildDirectory}/features" />
-		
+		<antcall target="init-ivy" />
+
 		<!-- Commons plugin -->
 		<!-- Currently I would say this is not even necessary! as the lib is integrated with the RCP product -->
-		
 		<copy todir="${buildDirectory}/plugins/info.novatec.inspectit.commons">
 			<fileset dir="../../Commons/">
 				<include name="**" />
 			</fileset>
 		</copy>
-		
-		
+
 		<copy todir="${buildDirectory}/plugins/${topLevelElementId}">
 			<fileset dir="${basedir}/..">
 				<exclude name="**/release/**" />
-				<include name="**"/>
+				<include name="**" />
 			</fileset>
 		</copy>
+
+		<!-- ivy properties -->
+		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+		<ivy:resolve file="${ivy.file}" />
+		<ivy:retrieve pattern="${basedir}/../lib/[conf]/[artifact].[ext]" />
+
+		<!-- Task Definitions -->
+		<taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="path.libs" />
+		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="path.libs" />
+		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.libs" />
+		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.libs" />
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.libs" />
+		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs" />
+		<taskdef resource="checkstyletask.properties" classpathref="path.libs" />
 	</target>
-		
-    <!--
-        This target actually executes the PDE Build process by launching the
-        Eclipse antRunner application.
-    -->
-    <target name="release" depends="clean, init">
-    	<mkdir dir="${basedir}/dist"/>
-        <echo message="Executing ${eclipseLocation}/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar"/>
-    	<java  classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
-            <arg value="-application" />
-            <arg value="org.eclipse.ant.core.antRunner" />
-            <arg value="-buildfile" />
-            <arg value="${eclipseLocation}/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/productBuild/productBuild.xml" />
-            <arg value="-Dtimestamp=${timestamp}" />
-    		<arg value="-Drelease.basedir=${basedir}" />
-            <classpath>
-                <pathelement location="${eclipseLocation}/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
-            </classpath>
-        </java>
-    	
-    	<copy todir="${basedir}/dist">
-    		<fileset dir="${buildDirectory}/I.inspectit" includes="*.zip" />
-    	</copy> 
-    </target>
-  </project>
+
+
+
+	<!-- *************************************************************** -->
+	<!--                Q U A L I T Y     T A R G E T S                  -->
+	<!-- *************************************************************** -->
+	<!-- These targets are used to ensure the quality of the User        -->
+	<!-- Interface.                                                      -->
+	<!-- *************************************************************** -->
+
+	<!--  It depends on the release target, because we need the compiled class files from the PDE Build-->
+	<target name="functional-tests" depends="release">
+		<mkdir dir="${build.qa.test.testdata}" />
+		<mkdir dir="${build.test.classes}" />
+
+
+		<javac source="1.6" target="1.6" debug="true" nowarn="off" destdir="${build.test.classes}" srcdir="${test.root}">
+			<classpath refid="path.libs" />
+			<classpath refid="path.rcp" />
+			<classpath refid="path.commons.classes" />
+		</javac>
+
+		<!-- instrument the classes that should be included in test coverage -->
+		<mkdir dir="${build.instrumented.classes}" />
+
+		<!-- ensure that the original class files are not touched as we do not want to -->
+		<!-- ship classes that are instrumented with cobertura to the customer -->
+		<copy todir="${build.instrumented.classes}">
+			<fileset dir="${build.rcp.classes}" includes="**/*.class" />
+		</copy>
+
+		<cobertura-instrument datafile="${build.qa.test.coveragedata}/cobertura.ser">
+			<includeClasses regex="info.novatec.inspectit.*" />
+			<excludeClasses regex="info.novatec.inspectit.*\.test.*" />
+			<excludeClasses regex="info.novatec.inspectit.cmr.*" />
+			<excludeClasses regex="info.novatec.inspectit.communication.*" />
+			<instrumentationClasspath>
+				<path location="${build.instrumented.classes}" />
+			</instrumentationClasspath>
+			<classpath refid="path.libs" />
+			<classpath location="${build.instrumented.classes}" />
+		</cobertura-instrument>
+
+		<testng annotations="JDK" outputdir="${build.qa.test.testdata}" haltonfailure="${testng.haltonfailure}">
+			<classpath refid="path.libs" />
+			<classpath refid="path.commons.classes" />
+			<classpath refid="path.test.class" />
+			<classpath location="${build.instrumented.classes}" />
+			<classpath location="${test.root}" />
+			<classpath refid="path.rcp" />
+
+			<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${build.qa.test.coveragedata}/cobertura.ser" />
+
+			<sourcedir location="${test.root}" />
+			<xmlfileset file="${resources.testng}/testng.xml" />
+		</testng>
+
+		<cobertura-report format="html" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
+			<fileset dir="${src.root}" includes="**/*.java" />
+			<fileset dir="${test.root}" includes="**/*.java" />
+		</cobertura-report>
+
+		<!-- create html pages that link to the interesting parts -->
+		<echo file="${build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >">
+		</echo>
+		<echo file="${build.qa.test}/testresults.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/index.html&quot; >">
+		</echo>
+		<echo file="${build.qa.test}/testreport.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/emailable-report.html&quot; >">
+		</echo>
+
+		<!-- generates a JUnit report from the TestNG xml format, because Hudson cant handle the TestNG format -->
+		<junitreport todir="${build.qa.test}/testdata">
+			<fileset dir="${build.qa.test}/testdata">
+				<include name="*/*.xml" />
+			</fileset>
+
+			<report format="noframes" todir="${build.qa.test}/testdata" />
+		</junitreport>
+	</target>
+
+
+	<!--  It depends on the release target, because we need the compiled class files from the PDE Build-->
+	<target name="static-analysis" depends="release">
+		<mkdir dir="${build.qa.analysis}" />
+		<mkdir dir="${build.qa.analysis.pmd}" />
+		<mkdir dir="${build.qa.analysis.checkstyle}" />
+		<mkdir dir="${build.qa.analysis.findbugs}" />
+
+		<pmd maxRuleViolations="${pmd.maximum.violations}">
+			<ruleset>${pmd.rules.file}</ruleset>
+			<formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true" />
+			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true" />
+			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml" />
+			<fileset dir="${src.root}">
+				<include name="info/novatec/inspectit/**/*.java" />
+			</fileset>
+		</pmd>
+		<xslt in="${build.qa.analysis.pmd}/pmd_results.xml" style="${pmd.config.root}/pmd-report.xslt" out="${build.qa.analysis.pmd}/sortable_report.html" />
+		<copy todir="${build.qa.analysis.pmd}" file="${pmd.config.root}/sorttable.js" />
+		<!-- this js is used for the sortable report -->
+		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >">
+		</echo>
+
+		<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
+			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
+			<fileset dir="${src.root}" includes="**/*.java" />
+		</checkstyle>
+
+		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl" />
+		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >">
+		</echo>
+
+		<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
+		<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
+		<pathconvert property="findbugs.classpath">
+			<path refid="findbugs.classpath" />
+		</pathconvert>
+
+		<findbugs output="html" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis}/findbugs.html" stylesheet="fancy-hist.xsl" pluginlist="${lib.root}/test/findbugs.jar">
+			<sourcePath path="${src.root}" />
+			<class location="${buildDirectory}/plugins/info.novatec.inspectit.rcp/bin" />
+			<auxClasspath>
+				<pathelement path="${build.common.classes}" />
+				<fileset dir="${lib.root}" includes="**/*.jar" />
+			</auxClasspath>
+		</findbugs>
+	</target>
+
+
+	<!-- *************************************************************** -->
+	<!--                R E L E A S E     T A R G E T                    -->
+	<!-- *************************************************************** -->
+	<!-- This target actually executes the PDE Build process by  		 -->
+	<!-- launching the Eclipse antRunner application.     				 -->
+	<!-- *************************************************************** -->
+	<target name="release" depends="clean, init">
+		<mkdir dir="${basedir}/dist" />
+		<echo message="Executing ${eclipseLocation}/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+			<arg value="-application" />
+			<arg value="org.eclipse.ant.core.antRunner" />
+			<arg value="-buildfile" />
+			<arg value="${eclipseLocation}/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/productBuild/productBuild.xml" />
+			<arg value="-Dtimestamp=${timestamp}" />
+			<arg value="-Drelease.basedir=${basedir}" />
+			<classpath>
+				<pathelement location="${eclipseLocation}/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+			</classpath>
+		</java>
+
+		<copy todir="${basedir}/dist">
+			<fileset dir="${buildDirectory}/${buildLabel}" includes="*.zip" />
+		</copy>
+
+		<!--  Need to copy the compiled class files in order to later be used by the functional-tests and static-analysis targets -->
+		<copy todir="${build.rcp.classes}">
+			<fileset dir="${buildDirectory}/plugins/info.novatec.inspectit.rcp/bin" includes="**/*.class" />
+		</copy>
+	</target>
+
+
+	<!-- *************************************************************** -->
+	<!--                I V Y     T A R G E T S   		                 -->
+	<!-- *************************************************************** -->
+	<target name="init-ivy" unless="skip.download">
+		<mkdir dir="${ivy.jar.dir}" />
+		<!-- download Ivy from web site so that it can be used even without any special installation -->
+		<echo message="Installing ivy version: ${ivy.install.version}" />
+		<get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true" />
+
+		<path id="ivy.lib.path">
+			<fileset dir="${ivy.jar.dir}" includes="*.jar" />
+		</path>
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
+	</target>
+
+	<target name="clean-ivy" depends="init-ivy" description="--> clean the ivy installation and the ivy cache">
+		<!--  The ivy cache is cleaned and the install directory is deleted -->
+		<ivy:cleancache />
+		<delete dir="${ivy.jar.dir}" />
+	</target>
+</project>

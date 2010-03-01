@@ -12,20 +12,25 @@
 
 	<!-- classpath settings -->
 	<path id="compile.classpath">
-		<fileset dir="${lib.dir}" includes="**/*.jar" />
-		<pathelement location="${build.commons.classes}"/>
+		<fileset dir="${lib.root}" includes="**/*.jar" />
+		<pathelement location="${build.commons.classes}" />
 	</path>
 
 	<path id="complete.classpath">
 		<!--path refid="${classpath_ref}" /-->
 		<pathelement location="${build.cmr.classes}" />
-		<pathelement location="${build.commons.classes}"/>
-		<fileset dir="${lib.dir}" includes="**/*.jar" />
+		<pathelement location="${build.commons.classes}" />
+		<fileset dir="${lib.root}" includes="**/*.jar" />
 	</path>
-	
+
+	<!-- classpath for findbugs is needed because it enables to run findbugs without having a local installation -->
+	<path id="findbugs.classpath">
+		<fileset dir="${lib.root}" includes="**/*.jar" />
+	</path>
+
 	<!-- will be available after all dependencies are retrieved by the init target -->
 	<path id="path.libs">
-		<fileset dir="${lib.dir}" includes="**/*.jar" />
+		<fileset dir="${lib.root}" includes="**/*.jar" />
 	</path>
 
 	<target name="clean" description="--> Cleans the project">
@@ -37,17 +42,18 @@
 	<target name="init" description="--> Creates necessary folder structure">
 		<mkdir dir="${build.root}" />
 		<mkdir dir="${src.generated.root}" />
-		
+		<antcall target="init-ivy" />
+
 		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
 		<ivy:resolve file="${ivy.file}" />
-		<ivy:retrieve pattern="${lib.dir}/[conf]/[artifact].[ext]" />
-		
-		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.libs"/>
-		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs"/>
-	 	<taskdef resource="checkstyletask.properties" classpathref="path.libs"/>
+		<ivy:retrieve pattern="${lib.root}/[conf]/[artifact].[ext]" />
+
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.libs" />
+		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs" />
+		<taskdef resource="checkstyletask.properties" classpathref="path.libs" />
 	</target>
-	
-	
+
+
 
 	<!-- *************************************************************** -->
 	<!--                   B U I L D    T A R G E T S                    -->
@@ -55,111 +61,135 @@
 	<!-- These targets are used to build the projects that are used      -->
 	<!-- to create the CMR component.                                    -->
 	<!-- *************************************************************** -->
-	
+
 	<target name="build-commons" description="--> builds a clean distribution of the commons project and copies the classes to the local build folder">
-		<mkdir dir="${build.commons.classes}"/>
-		
+		<mkdir dir="${build.commons.classes}" />
+
 		<javac source="1.4" target="1.4" debug="true" fork="true" destdir="${build.commons.classes}" srcdir="${src.commons}" />
 	</target>
 
 	<target name="build" depends="init, build-commons" description="--> Compiles the sources">
-		<mkdir dir="${build.cmr.generated.classes}"/>
-		<mkdir dir="${build.cmr.classes}"/>
-		
+		<mkdir dir="${build.cmr.generated.classes}" />
+		<mkdir dir="${build.cmr.classes}" />
+
 		<javac source="1.5" target="1.5" destdir="${build.cmr.generated.classes}" srcdir="${src.generated.root}" classpathref="compile.classpath" />
 		<javac source="1.5" target="1.5" destdir="${build.cmr.classes}" srcdir="${src.root}" classpathref="compile.classpath" />
-		
+
 		<rmic stubversion="1.2" base="${build.cmr.generated.classes}" classpathref="complete.classpath" classname="info.novatec.inspectit.cmr.service.AgentStorageService" sourcebase="${src.generated.root}" />
 		<rmic stubversion="1.2" base="${build.cmr.generated.classes}" classpathref="complete.classpath" classname="info.novatec.inspectit.cmr.service.RegistrationService" sourcebase="${src.generated.root}" />
 	</target>
 
-	
+
 	<!-- *************************************************************** -->
 	<!--                Q U A L I T Y     T A R G E T S                  -->
 	<!-- *************************************************************** -->
-	<!-- These targets are used to ensure the quality of the agent       --> 
+	<!-- These targets are used to ensure the quality of the agent       -->
 	<!-- component.                                                      -->
 	<!-- *************************************************************** -->
 
-	
-	
-	<target name="static-analysis" depends="init">
-		<mkdir dir="${build.qa.analysis}"/>
-		<mkdir dir="${build.qa.analysis.pmd}"/>
-		<mkdir dir="${build.qa.analysis.checkstyle}"/>
-		<mkdir dir="${build.qa.analysis.findbugs}"/>
-		
+	<!-- Depends on release, because the compiled classes are needed for the analysis -->
+	<target name="static-analysis" depends="release">
+		<mkdir dir="${build.qa.analysis}" />
+		<mkdir dir="${build.qa.analysis.pmd}" />
+		<mkdir dir="${build.qa.analysis.checkstyle}" />
+		<mkdir dir="${build.qa.analysis.findbugs}" />
+
 		<pmd maxRuleViolations="${pmd.maximum.violations}">
 			<ruleset>${pmd.rules.file}</ruleset>
-	        <formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true"/>
-			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true"/>
-			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml"/>
+			<formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true" />
+			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true" />
+			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml" />
 			<fileset dir="${src.root}">
-	            <include name="info/novatec/inspectit/**/*.java"/>
+				<include name="info/novatec/inspectit/**/*.java" />
 				<exclude name="**/*_Stub.java" />
-	        </fileset>
+			</fileset>
 			<fileset dir="${src.commons}">
-	            <include name="info/novatec/inspectit/**/*.java"/>
+				<include name="info/novatec/inspectit/**/*.java" />
 				<exclude name="**/*_Stub.java" />
-	        </fileset>
+			</fileset>
 		</pmd>
 		<xslt in="${build.qa.analysis.pmd}/pmd_results.xml" style="${pmd.config.root}/pmd-report.xslt" out="${build.qa.analysis.pmd}/sortable_report.html" />
-		<copy todir="${build.qa.analysis.pmd}" file="${pmd.config.root}/sorttable.js" /> <!-- this js is used for the sortable report -->
-		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >"></echo>
-		
-		<checkstyle config="${checkstyle.config.file}"
-		              failureProperty="checkstyle.failure"
-		              failOnViolation="false">
-			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml"/>
-			<fileset dir="src" includes="**/*.java"/>
+		<copy todir="${build.qa.analysis.pmd}" file="${pmd.config.root}/sorttable.js" />
+		<!-- this js is used for the sortable report -->
+		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >">
+		</echo>
+
+		<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
+			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
+			<fileset dir="src" includes="**/*.java" />
 		</checkstyle>
 
-		<style in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl"/>
-		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >"></echo>
-		
-		<!-- Currently not active as findbugs task needs findbugs to be installed. stupid home dir setting also only works if complete findbugs is installed 
-		<findbugs home="${lib.dir}/test"
-	              output="xml"
-	              outputFile="bcel-fb.xml" >
-	      <sourcePath path="${src.root}" />
-		  <class location="${build.agent.classes}" />
-	    </findbugs> -->
+		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl" />
+		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >">
+		</echo>
 
+		<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
+		<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
+		<pathconvert property="findbugs.classpath">
+			<path refid="findbugs.classpath" />
+		</pathconvert>
+
+		<findbugs output="html" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis}/findbugs.html" stylesheet="fancy-hist.xsl" pluginlist="${lib.root}/test/findbugs.jar">
+			<sourcePath path="${src.root}" />
+			<class location="${build.cmr.classes}" />
+			<auxClasspath>
+				<pathelement path="${build.commons.classes}" />
+				<fileset dir="${lib.root}" includes="**/*.jar" />
+			</auxClasspath>
+		</findbugs>
 	</target>
-	
-	
-	
-	
+
+
 	<!-- *************************************************************** -->
 	<!--                R E L E A S E     T A R G E T S                  -->
 	<!-- *************************************************************** -->
-	
+
 	<target name="release" depends="build" description="--> Creates the distribution jar">
-		<mkdir dir="${release.root}"/>
-		<mkdir dir="${build.release.root}"/>
-		
+		<mkdir dir="${release.root}" />
+		<mkdir dir="${build.release.root}" />
+
 		<jar destfile="${build.release.root}/${dist.jar.name}" manifest="${basedir}/resources/META-INF/MANIFEST.MF">
 			<fileset dir="${build.cmr.generated.classes}" includes="**/*.class" />
 			<fileset dir="${build.cmr.classes}" includes="**/*.class" />
 			<fileset dir="${src.root}" includes="**/*.xml" />
 			<fileset dir="${src.root}" includes="**/*.properties" />
 		</jar>
-		
+
 		<copy todir="${build.release.root}/lib">
-			<fileset dir="${lib.dir}/prod" includes="**/*.jar" />
+			<fileset dir="${lib.root}/prod" includes="**/*.jar" />
 		</copy>
-		
+
 		<jar destfile="${build.release.root}/lib/inspectit-commons.jar" basedir="${build.commons.classes}" />
-		
-		<echo  file="${build.release.root}/startup.sh"
-			message="java -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:MaxNewSize=24m -XX:NewSize=24m -XX:SurvivorRatio=128 -XX:TargetSurvivorRatio=90 -XX:ParallelGCThreads=6 -Xms768m -Xmx768m -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -jar ${dist.jar.name}" />
-		
-		<echo  file="${build.release.root}/startup.bat"
-			message="java -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:MaxNewSize=24m -XX:NewSize=24m -XX:SurvivorRatio=128 -XX:TargetSurvivorRatio=90 -XX:ParallelGCThreads=6 -Xms768m -Xmx768m -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -jar ${dist.jar.name}" />
-		
-		<mkdir dir="${build.release.root}/license"/>
+
+		<echo file="${build.release.root}/startup.sh" message="java -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:MaxNewSize=24m -XX:NewSize=24m -XX:SurvivorRatio=128 -XX:TargetSurvivorRatio=90 -XX:ParallelGCThreads=6 -Xms768m -Xmx768m -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -jar ${dist.jar.name}" />
+
+		<echo file="${build.release.root}/startup.bat" message="java -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:MaxNewSize=24m -XX:NewSize=24m -XX:SurvivorRatio=128 -XX:TargetSurvivorRatio=90 -XX:ParallelGCThreads=6 -Xms768m -Xmx768m -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -jar ${dist.jar.name}" />
+
+		<mkdir dir="${build.release.root}/license" />
 		<copy todir="${build.release.root}/license" file="${basedir}/license/publicCerts.store" />
-		
+
 		<zip destfile="${release.root}/inspectit-cmr.zip" basedir="${build.release.root}" />
+	</target>
+
+
+	<!-- *************************************************************** -->
+	<!--                I V Y     T A R G E T S   		                 -->
+	<!-- *************************************************************** -->
+	<target name="init-ivy" unless="skip.download">
+		<mkdir dir="${ivy.jar.dir}" />
+		<!-- download Ivy from web site so that it can be used even without any special installation -->
+		<echo message="Installing ivy version: ${ivy.install.version}" />
+		<get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true" />
+
+		<path id="ivy.lib.path">
+			<fileset dir="${ivy.jar.dir}" includes="*.jar" />
+		</path>
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
+	</target>
+
+	<target name="clean-ivy" depends="init-ivy" description="--> clean the ivy installation and the ivy cache">
+		<!--  The ivy cache is cleaned and the install directory is deleted -->
+		<ivy:cleancache />
+		<delete dir="${ivy.jar.dir}" />
 	</target>
 </project>

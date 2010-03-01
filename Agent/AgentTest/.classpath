@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
-	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?ivyXmlPath=resources%2Fivy%2Fivy.xml&amp;confs=*"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.5.0_15"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Agent"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Commons"/>
-	<classpathentry kind="lib" path="/Agent/lib/prod/findbugs-ant.jar"/>
 	<classpathentry kind="lib" path="/Agent/lib/prod/javassist.jar"/>
 	<classpathentry kind="lib" path="/Agent/lib/prod/picocontainer.jar"/>
 	<classpathentry kind="lib" path="/Agent/lib/test/antlr.jar"/>

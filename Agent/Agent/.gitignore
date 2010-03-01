@@ -3,3 +3,5 @@ dist/
 lib/
 build/
 java-exec.properties
+resources/ivy/install/
+version.properties

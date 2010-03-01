@@ -17,41 +17,46 @@
 		to be merged into the resulting component. For Java 1.4 the projects
 		Agent and 1.4Classloader needs to be merged.
 	</description>
-	
-		
+
+
 	<!-- *************************************************************** -->
 	<!--                      S E T T I N G S                            -->
 	<!-- *************************************************************** -->
-	
+
 	<property file="${basedir}/build.properties" />
 	<property name="lib.dir" value="${basedir}/lib" />
 
 	<path id="path.agent.classes">
 		<pathelement location="${build.agent.classes}" />
 	</path>
-	
+
 	<path id="path.agent50.classes">
 		<pathelement location="${build.agent50.classes}" />
 	</path>
-		
+
 	<path id="path.common.classes">
 		<pathelement location="${build.commons.classes}" />
 	</path>
-	
+
 	<path id="path.agent.test.classes">
 		<pathelement location="${build.agent.test.classes}" />
 	</path>
-	
+
+	<!-- classpath for findbugs is needed because it enables to run findbugs without having a local installation-->
+	<path id="findbugs.classpath">
+		<fileset dir="${lib.root}" includes="**/*.jar" />
+	</path>
+
 	<!-- will be available after all dependencies are retrieved by the init target -->
 	<path id="path.libs">
 		<fileset dir="${lib.root}" includes="**/*.jar" />
 	</path>
-	
-	
+
+
 	<!-- *************************************************************** -->
 	<!--                        T A R G E T S                            -->
 	<!-- *************************************************************** -->
-	
+
 
 	<target name="clean" description="--> Cleans the project">
 		<delete dir="${build.root}" />
@@ -62,37 +67,38 @@
 	<target name="init" description="--> Creates necessary folder structure">
 		<mkdir dir="${build.root}" />
 		<mkdir dir="${release.root}" />
-		
+		<antcall target="init-ivy" />
+
 		<!-- ivy properties used for the agent -->
 		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
 		<ivy:resolve file="${ivy.file}" />
 		<ivy:retrieve pattern="${lib.root}/[conf]/[artifact].[ext]" />
-						
+
 		<taskdef name="testng" classpathref="path.libs" classname="org.testng.TestNGAntTask" />
 		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="path.libs" />
 		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.libs" />
 		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.libs" />
-		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.libs"/>
-		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs"/>
-	 	<taskdef resource="checkstyletask.properties" classpathref="path.libs"/>
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.libs" />
+		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs" />
+		<taskdef resource="checkstyletask.properties" classpathref="path.libs" />
 
-		<available file="java-exec.properties" property="java-exec.present"/>
+		<available file="java-exec.properties" property="java-exec.present" />
 		<property file="java-exec.properties" />
 	</target>
-	
-	
+
+
 	<!-- *************************************************************** -->
 	<!--                   B U I L D    T A R G E T S                    -->
 	<!-- *************************************************************** -->
 	<!-- These targets are used to build the projects that are used      -->
 	<!-- to create the agent component. Note that the agent components   -->
-	<!-- may be built from different projects depending on the           --> 
+	<!-- may be built from different projects depending on the           -->
 	<!-- environment in which the agent should be applied                -->
 	<!-- *************************************************************** -->
 
 	<target name="build-agent" depends="init, build-commons" description="--> Compiles the sources of the agent itself">
 		<mkdir dir="${build.agent.classes}" />
-		
+
 		<!-- we are using the compiler for java 1.4 as this project contains all features of the agent that can be achieved -->
 		<!-- with any Java version starting from 1.4 upwards. Thus we must ensure that we use the 1.4 compiler here! -->
 		<javac compiler="javac1.4" source="1.4" target="1.4" debug="true" destdir="${build.agent.classes}" srcdir="${src.root}">
@@ -100,75 +106,73 @@
 			<classpath refid="path.common.classes" />
 		</javac>
 	</target>
-	
+
 
 	<target name="build-commons" description="--> builds a clean distribution of the commons project and copies the classes to the local build folder">
-		<mkdir dir="${build.commons.classes}"/>
-		
+		<mkdir dir="${build.commons.classes}" />
+
 		<javac source="1.4" target="1.4" debug="true" fork="true" destdir="${build.commons.classes}" srcdir="${commons.src}" />
-		
+
 		<jar destfile="${build.commons.classes}/commons.jar">
 			<fileset dir="${build.commons.classes}" includes="**/*.class" />
 		</jar>
 	</target>
-	
+
 	<target name="build-javaagent" depends="build-agent">
-		<mkdir dir="${build.javaagent.classes}"/>
-				
+		<mkdir dir="${build.javaagent.classes}" />
+
 		<javac target="1.5" source="1.5" debug="true" destdir="${build.javaagent.classes}" srcdir="${javaagent.src}" classpathref="path.agent.classes">
 			<compilerarg compiler="org.eclipse.jdt.core.JDTCompilerAdapter" line="-warn:${list.warning.options}" />
 		</javac>
 	</target>
 
 	<target name="build-14classloader" if="java-exec.present" depends="build-agent">
-		<mkdir dir="${build.classloader.classes}"/>
+		<mkdir dir="${build.classloader.classes}" />
 
-		<javac target="1.4" source="1.4" fork="true" debug="true" destdir="${build.classloader.classes}" 
-			srcdir="${classloader.src}" classpathref="path.agent.classes"
-			executable="${java14.javac.exec}">
+		<javac target="1.4" source="1.4" fork="true" debug="true" destdir="${build.classloader.classes}" srcdir="${classloader.src}" classpathref="path.agent.classes" executable="${java14.javac.exec}">
 		</javac>
 	</target>
 
 	<target name="build-agent5.0" depends="build-agent">
-		<mkdir dir="${build.agent50.classes}"/>
-		
+		<mkdir dir="${build.agent50.classes}" />
+
 		<javac source="1.5" target="1.5" debug="true" nowarn="off" destdir="${build.agent50.classes}" srcdir="${agent50.src}">
 			<classpath refid="path.agent.classes" />
 			<classpath refid="path.common.classes" />
 			<compilerarg compiler="org.eclipse.jdt.core.JDTCompilerAdapter" line="-warn:${list.warning.options},+unused -Xemacs" />
 		</javac>
 	</target>
-	
+
 	<!-- *************************************************************** -->
 	<!--                Q U A L I T Y     T A R G E T S                  -->
 	<!-- *************************************************************** -->
-	<!-- These targets are used to ensure the quality of the agent       --> 
+	<!-- These targets are used to ensure the quality of the agent       -->
 	<!-- component.                                                      -->
 	<!-- *************************************************************** -->
-	
+
 	<target name="functional-tests" depends="build-agent, build-agent5.0">
-		<mkdir dir="${build.agent.test.classes}"/>
-		<mkdir dir="${build.agent50.test.classes}"/>
-		<mkdir dir="${build.qa.test.testdata}"/>
-		<mkdir dir="${build.qa.test.coveragedata}"/>
-				
+		<mkdir dir="${build.agent.test.classes}" />
+		<mkdir dir="${build.agent50.test.classes}" />
+		<mkdir dir="${build.qa.test.testdata}" />
+		<mkdir dir="${build.qa.test.coveragedata}" />
+
 		<javac compiler="javac1.4" debug="true" destdir="${build.agent.test.classes}" srcdir="${agenttest.src}">
 			<classpath refid="path.libs" />
 			<classpath refid="path.agent.classes" />
 			<classpath refid="path.common.classes" />
 		</javac>
-		
+
 		<javac source="1.5" target="1.5" debug="true" nowarn="off" destdir="${build.agent50.test.classes}" srcdir="${agent50test.src}">
-		 	<classpath refid="path.libs" />
+			<classpath refid="path.libs" />
 			<classpath refid="path.agent50.classes" />
 			<classpath refid="path.agent.classes" />
 			<classpath refid="path.common.classes" />
 		</javac>
-				
+
 		<!-- instrument the classes that should be included in test coverage -->
-		<mkdir dir="${build.agent.instrumented.classes}"/>
-		<mkdir dir="${build.agent50.instrumented.classes}"/>
-				
+		<mkdir dir="${build.agent.instrumented.classes}" />
+		<mkdir dir="${build.agent50.instrumented.classes}" />
+
 		<!-- ensure that the original class files are not touched as we do not want to -->
 		<!-- ship classes that are instrumented with cobertura to the customer -->
 		<copy todir="${build.agent.instrumented.classes}">
@@ -177,7 +181,7 @@
 		<copy todir="${build.agent50.instrumented.classes}">
 			<fileset dir="${build.agent50.classes}" />
 		</copy>
-		
+
 		<cobertura-instrument datafile="${build.qa.test.coveragedata}/cobertura.ser">
 			<includeClasses regex="info.novatec.inspectit.*" />
 			<excludeClasses regex="info.novatec.inspectit.*\.test.*" />
@@ -192,94 +196,110 @@
 			<classpath location="${build.agent.instrumented.classes}" />
 			<classpath location="${build.agent50.instrumented.classes}" />
 		</cobertura-instrument>
-		
-		<testng annotations="JDK" failureproperty="error.test.agent" outputdir="${build.qa.test.testdata}">
+
+		<testng annotations="JDK" failureproperty="error.test.agent" outputdir="${build.qa.test.testdata}" haltonfailure="${testng.haltonfailure}">
 			<classpath refid="path.agent.test.classes" />
 			<classpath refid="path.libs" />
 			<classpath refid="path.common.classes" />
 			<classpath location="${build.agent.instrumented.classes}" />
-			
+
 			<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${build.qa.test.coveragedata}/cobertura.ser" />
-			
+
 			<sourcedir location="${agenttest.src}" />
 			<xmlfileset file="${agenttest.ressources.testng}/testng.xml" />
 			<xmlfileset file="${agent50test.ressources.testng}/testng.xml" />
 		</testng>
-		
+
 		<cobertura-report format="html" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
+			<fileset dir="${src.root}" includes="**/*.java" />
+			<fileset dir="${agenttest.src}" includes="**/*.java" />
+		</cobertura-report>
+		<cobertura-report format="xml" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
 			<fileset dir="${src.root}" includes="**/*.java" />
 			<fileset dir="${agent50.src}" includes="**/*.java" />
 		</cobertura-report>
-        <cobertura-report format="xml" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
-        	<fileset dir="${src.root}" includes="**/*.java" />
-        	<fileset dir="${agent50.src}" includes="**/*.java" />
-        </cobertura-report>
-		
+
 		<!-- create html pages that link to the interesting parts -->
-		<echo file="${build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >"></echo>
-		<echo file="${build.qa.test}/testresults.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/index.html&quot; >"></echo>
-		<echo file="${build.qa.test}/testreport.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/emailable-report.html&quot; >"></echo>
+		<echo file="${build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >">
+		</echo>
+		<echo file="${build.qa.test}/testresults.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/index.html&quot; >">
+		</echo>
+		<echo file="${build.qa.test}/testreport.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/emailable-report.html&quot; >">
+		</echo>
+
+		<!-- generates a JUnit report from the TestNG xml format, because Hudson cant handle the TestNG format -->
+		<junitreport todir="${build.qa.test}/testdata">
+			<fileset dir="${build.qa.test}/testdata">
+				<include name="*/*.xml" />
+			</fileset>
+
+			<report format="noframes" todir="${build.qa.test}/testdata" />
+		</junitreport>
 	</target>
-	
-	
+
+
 	<target name="static-analysis" depends="init">
-		<mkdir dir="${build.qa.analysis}"/>
-		<mkdir dir="${build.qa.analysis.pmd}"/>
-		<mkdir dir="${build.qa.analysis.checkstyle}"/>
-		<mkdir dir="${build.qa.analysis.findbugs}"/>
-		
+		<mkdir dir="${build.qa.analysis}" />
+		<mkdir dir="${build.qa.analysis.pmd}" />
+		<mkdir dir="${build.qa.analysis.checkstyle}" />
+		<mkdir dir="${build.qa.analysis.findbugs}" />
+
 		<pmd maxRuleViolations="${pmd.maximum.violations}">
 			<ruleset>${pmd.rules.file}</ruleset>
-	        <formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true"/>
-			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true"/>
-			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml"/>
+			<formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true" />
+			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true" />
+			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml" />
 			<fileset dir="${src.root}">
-	            <include name="info/novatec/inspectit/**/*.java"/>
-	        </fileset>
+				<include name="info/novatec/inspectit/**/*.java" />
+			</fileset>
 			<fileset dir="${agenttest.src}">
-	            <include name="info/novatec/inspectit/**/*.java"/>
-	        </fileset>
+				<include name="info/novatec/inspectit/**/*.java" />
+			</fileset>
 			<fileset dir="${commons.src}">
-	            <include name="info/novatec/inspectit/**/*.java"/>
-	        </fileset>
+				<include name="info/novatec/inspectit/**/*.java" />
+			</fileset>
 		</pmd>
 		<xslt in="${build.qa.analysis.pmd}/pmd_results.xml" style="${pmd.config.root}/pmd-report.xslt" out="${build.qa.analysis.pmd}/sortable_report.html" />
-		<copy todir="${build.qa.analysis.pmd}" file="${pmd.config.root}/sorttable.js" /> <!-- this js is used for the sortable report -->
-		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >"></echo>
-		
-		<checkstyle config="${checkstyle.config.file}"
-		              failureProperty="checkstyle.failure"
-		              failOnViolation="false">
-			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml"/>
-			<fileset dir="src" includes="**/*.java"/>
+		<copy todir="${build.qa.analysis.pmd}" file="${pmd.config.root}/sorttable.js" />
+		<!-- this js is used for the sortable report -->
+		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >">
+		</echo>
+
+		<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
+			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
+			<fileset dir="src" includes="**/*.java" />
 		</checkstyle>
 
-		<style in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl"/>
-		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >"></echo>
-		
-		<!-- Currently not active as findbugs task needs findbugs to be installed. stupid home dir setting also only works if complete findbugs is installed 
-		<findbugs home="${lib.dir}/test"
-	              output="xml"
-	              outputFile="bcel-fb.xml" >
-	      <sourcePath path="${src.root}" />
-		  <class location="${build.agent.classes}" />
-	    </findbugs> -->
+		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl" />
+		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >">
+		</echo>
 
+		<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
+		<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
+		<pathconvert property="findbugs.classpath">
+			<path refid="findbugs.classpath" />
+		</pathconvert>
+
+		<findbugs output="html" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis}/findbugs.html" stylesheet="fancy-hist.xsl" pluginlist="${lib.root}/test/findbugs.jar">
+			<sourcePath path="${src.root}" />
+			<class location="${build.agent.classes}" />
+			<auxClasspath>
+				<fileset dir="${lib.root}" includes="**/*.jar" />
+				<pathelement path="${build.commons.classes}" />
+			</auxClasspath>
+		</findbugs>
 	</target>
-	
-	
-	
-	
+
+
 	<!-- *************************************************************** -->
 	<!--                R E L E A S E     T A R G E T S                  -->
 	<!-- *************************************************************** -->
-					
-				
+
 	<!-- dependencies are unpacked and added to the agent release -->
 	<!-- as this makes it easier to package the agent -->
 	<target name="unpack-dependencies" depends="init" description="unpacks all dependencies">
-		<mkdir dir="${build.extract.root}"/>
-		
+		<mkdir dir="${build.extract.root}" />
+
 		<unzip dest="${build.extract.root}">
 			<fileset dir="${lib.root}/prod" includes="*.jar" />
 			<patternset>
@@ -289,14 +309,14 @@
 	</target>
 
 	<target name="release-sun1.5" depends="build-agent, build-agent5.0, build-javaagent, unpack-dependencies" description="--> make a jar file for the whole project containing all dependencies">
-		<mkdir dir="${build.release}"/>
+		<mkdir dir="${build.release}" />
 		<delete dir="${build.release}/sun1.5-data" />
 		<mkdir dir="${build.release}/sun1.5-data" />
 		<mkdir dir="${build.release}/sun1.5-data" />
 		<mkdir dir="${build.release}/sun1.5-data/config" />
-		
+
 		<copy todir="${build.release}/sun1.5-data/config">
-			<fileset dir="${config.root}" includes="**/*.cfg" />
+			<fileset dir="${config.root}" includes="**/*.*" />
 		</copy>
 
 		<jar destfile="${build.release}/sun1.5-data/${dist.jar.name}" manifest="${javaagent.basedir}/META-INF/MANIFEST.MF">
@@ -306,49 +326,69 @@
 			<fileset dir="${build.javaagent.classes}" includes="**/*.class" />
 			<fileset dir="${build.extract.root}" includes="**/*.class" />
 		</jar>
-			
+
 		<zip destfile="${release.root}/${release.name.sun15}" basedir="${build.release}/sun1.5-data" />
 	</target>
-	
-	
-	
+
 	<target name="release-sun1.4" depends="release-sun1.4-execute, release-sun1.4-missing-java-exec" />
-	
+
 	<target name="release-sun1.4-missing-java-exec" unless="java-exec.present" depends="release-sun1.4-execute">
 		<echo message="-------------------------------------------------------------" />
 		<echo message="WARNING: No release for java 1.4 is built!" />
 		<echo message="--------------------------------------------------------------" />
-		<echo message="Cause: You did not specify the file 'java-exec.properties' within "/>
-		<echo message="the Agent project. This file is necessary as it defines the "/>
-		<echo message="location of the java 1.4 executable. The definition of this location "/>
-		<echo message="is essential to the build of the project classloader 1.4! Please "/>
-		<echo message="ensure that this file is created. You can use the template file within "/>
-		<echo message="the Agent folder 'java-exec.properties.template' as a start, rename it "/>
-		<echo message="to 'java-exec.properties' and adapt the file to your system."/>
+		<echo message="Cause: You did not specify the file 'java-exec.properties' within " />
+		<echo message="the Agent project. This file is necessary as it defines the " />
+		<echo message="location of the java 1.4 executable. The definition of this location " />
+		<echo message="is essential to the build of the project classloader 1.4! Please " />
+		<echo message="ensure that this file is created. You can use the template file within " />
+		<echo message="the Agent folder 'java-exec.properties.template' as a start, rename it " />
+		<echo message="to 'java-exec.properties' and adapt the file to your system." />
 	</target>
-	
+
 	<target name="release-sun1.4-execute" if="java-exec.present" depends="build-agent, build-14classloader, unpack-dependencies" description="--> make a jar file for the whole project containing all dependencies">
-		<mkdir dir="${build.release}"/>
+		<mkdir dir="${build.release}" />
 		<delete dir="${build.release}/sun1.4-data" />
 		<mkdir dir="${build.release}/sun1.4-data" />
 		<mkdir dir="${build.release}/sun1.4-data" />
 		<mkdir dir="${build.release}/sun1.4-data/config" />
-		
+
 		<copy todir="${build.release}/sun1.4-data/config">
 			<fileset dir="${config.root}" includes="**/*.cfg" />
 			<fileset dir="${config.root}" includes="**/*.dll" />
 			<fileset dir="${config.root}" includes="**/*.so" />
 		</copy>
 
-		<jar destfile="${build.release}/sun1.4-data/${dist.jar.name}" manifest="${javaagent.basedir}/META-INF/MANIFEST.MF">
+		<jar destfile="${build.release}/sun1.4-data/${dist.jar.name}">
 			<fileset dir="${build.agent.classes}" includes="**/*.class" />
 			<fileset dir="${build.commons.classes}" includes="**/*.class" />
 			<fileset dir="${build.classloader.classes}" includes="**/*.class" />
 			<fileset dir="${build.extract.root}" includes="**/*.class" />
 		</jar>
-			
+
 		<zip destfile="${release.root}/${release.name.sun14}" basedir="${build.release}/sun1.4-data" />
 	</target>
-	
+
 	<target name="release-all" depends="release-sun1.4, release-sun1.5" description="--> releases the agent for all versions" />
+
+
+	<!-- *************************************************************** -->
+	<!--                I V Y     T A R G E T S   		                 -->
+	<!-- *************************************************************** -->
+	<target name="init-ivy" unless="skip.download">
+		<mkdir dir="${ivy.jar.dir}" />
+		<!-- download Ivy from web site so that it can be used even without any special installation -->
+		<echo message="Installing ivy version: ${ivy.install.version}" />
+		<get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true" />
+
+		<path id="ivy.lib.path">
+			<fileset dir="${ivy.jar.dir}" includes="*.jar" />
+		</path>
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
+	</target>
+
+	<target name="clean-ivy" depends="init-ivy" description="--> clean the ivy installation and the ivy cache">
+		<!--  The ivy cache is cleaned and the install directory is deleted -->
+		<ivy:cleancache />
+		<delete dir="${ivy.jar.dir}" />
+	</target>
 </project>
