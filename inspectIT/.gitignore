@@ -14,4 +14,4 @@ release/runtime/eclipse3.4RCP/configuration/.settings/
 release/runtime/eclipse3.4RCP/configuration/*/.manager/
 release/runtime/eclipse3.4RCP/configuration/org.eclipse.core.runtime/.*
 release/runtime/eclipse3.4RCP/configuration/org.eclipse.osgi/.*
-release/runtime/eclipse3.4RCP/p2/org.eclipse.equinox.p2.engine/profileRegistry/PlatformProfile.profile/
+release/runtime/eclipse3.4RCP/p2/
