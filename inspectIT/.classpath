@@ -2,22 +2,23 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
-	<classpathentry exported="true" kind="lib" path="lib/rmiio-2.0.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jettison-1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xstream-1.3.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jcommon-1.0.13.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jfreechart-1.0.10.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jfreechart-1.0.10-experimental.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jfreechart-1.0.10-swt.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/nebula_cdatetime_0.9.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="lib/swtgraphics2d.jar"/>
-	<classpathentry kind="lib" path="lib/spring.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.nebula.widgets.pshelf_1.0.0.jar"/>
 	<classpathentry kind="con" path="org.testng.TESTNG_CONTAINER"/>
 	<classpathentry kind="lib" path="/Agent/lib/test/testng.jar"/>
+	<classpathentry kind="lib" path="lib/prod/commons-logging.jar"/>
+	<classpathentry kind="lib" path="lib/prod/hibernate.jar"/>
+	<classpathentry kind="lib" path="lib/prod/inspectit-commons.jar"/>
+	<classpathentry kind="lib" path="lib/prod/jcommon.jar"/>
+	<classpathentry kind="lib" path="lib/prod/jettison.jar"/>
+	<classpathentry kind="lib" path="lib/prod/jfreechart-1.0.10-experimental.jar"/>
+	<classpathentry kind="lib" path="lib/prod/jfreechart-1.0.10-swt.jar"/>
+	<classpathentry kind="lib" path="lib/prod/jfreechart-1.0.10.jar"/>
+	<classpathentry kind="lib" path="lib/prod/nebula_cdatetime_0.9.0.jar"/>
+	<classpathentry kind="lib" path="lib/prod/org.eclipse.nebula.widgets.pshelf_1.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/prod/rmiio.jar"/>
+	<classpathentry kind="lib" path="lib/prod/spring.jar"/>
+	<classpathentry kind="lib" path="lib/prod/swtgraphics2d.jar"/>
+	<classpathentry kind="lib" path="lib/prod/xstream.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

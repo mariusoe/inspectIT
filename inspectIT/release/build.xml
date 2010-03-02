@@ -82,16 +82,19 @@
 	<target name="init" depends="dist-commons">
 		<mkdir dir="${buildDirectory}" />
 		<mkdir dir="${buildDirectory}/plugins/info.novatec.inspectit.commons" />
+		<mkdir dir="${buildDirectory}/plugins/info.novatec.inspectit.commons/META-INF" />
 		<mkdir dir="${buildDirectory}/features" />
 		<antcall target="init-ivy" />
 
 		<!-- Commons plugin -->
 		<!-- Currently I would say this is not even necessary! as the lib is integrated with the RCP product -->
+		<copy file="../../Commons/META-INF/MANIFEST.MF" todir="${buildDirectory}/plugins/info.novatec.inspectit.commons/META-INF" />
 		<copy todir="${buildDirectory}/plugins/info.novatec.inspectit.commons">
-			<fileset dir="../../Commons/">
-				<include name="**" />
+			<fileset dir="${build.common.classes}">
+				<include name="**/*.*" />
 			</fileset>
 		</copy>
+
 
 		<copy todir="${buildDirectory}/plugins/${topLevelElementId}">
 			<fileset dir="${basedir}/..">
@@ -113,6 +116,19 @@
 		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.libs" />
 		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs" />
 		<taskdef resource="checkstyletask.properties" classpathref="path.libs" />
+
+		<!--copy libraries to lib/test -->
+		<copy todir="${lib.root}/prod" failonerror="true">
+			<fileset dir="${lib.root}">
+				<include name="jfreechart-1.0.10-experimental.jar" />
+				<include name="jfreechart-1.0.10-swt.jar" />
+				<include name="jfreechart-1.0.10.jar" />
+				<include name="nebula_cdatetime_0.9.0.jar" />
+				<include name="org.eclipse.nebula.widgets.pshelf_1.0.0.jar" />
+				<include name="swtgraphics2d.jar" />
+				<include name="inspectit-commons.jar" />
+			</fileset>
+		</copy>
 	</target>
 
 
