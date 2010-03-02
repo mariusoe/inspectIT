@@ -250,7 +250,7 @@
 
 		<findbugs output="html" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis}/findbugs.html" stylesheet="fancy-hist.xsl" pluginlist="${lib.root}/test/findbugs.jar">
 			<sourcePath path="${src.root}" />
-			<class location="${buildDirectory}/plugins/info.novatec.inspectit.rcp/bin" />
+			<class location="${buildDirectory}/plugins/info.novatec.inspectit.rcp/@dot" />
 			<auxClasspath>
 				<pathelement path="${build.common.classes}" />
 				<fileset dir="${lib.root}" includes="**/*.jar" />
@@ -286,7 +286,7 @@
 
 		<!--  Need to copy the compiled class files in order to later be used by the functional-tests and static-analysis targets -->
 		<copy todir="${build.rcp.classes}">
-			<fileset dir="${buildDirectory}/plugins/info.novatec.inspectit.rcp/bin" includes="**/*.class" />
+			<fileset dir="${buildDirectory}/plugins/info.novatec.inspectit.rcp/@dot" includes="**/*.class" />
 		</copy>
 	</target>
 
