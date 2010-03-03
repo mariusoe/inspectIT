@@ -34,6 +34,11 @@ public class SystemInformation implements IPlatformSensor {
 	private static Logger logger = Logger.getLogger(SystemInformation.class.getName());
 
 	/**
+	 * The maximum length of the fields saved into the database.
+	 */
+	private static final int MAX_LENGTH = 10000;
+
+	/**
 	 * The ID Manager used to get the correct IDs.
 	 */
 	private final IIdManager idManager;
@@ -316,9 +321,9 @@ public class SystemInformation implements IPlatformSensor {
 			String osName = this.getOsName();
 			String osVersion = this.getOsVersion();
 			String jitCompilerName = this.getJitCompilerName();
-			String classPath = this.getClassPath();
-			String bootClassPath = this.getBootClassPath();
-			String libraryPath = this.getLibraryPath();
+			String classPath = crop(this.getClassPath());
+			String bootClassPath = crop(this.getBootClassPath());
+			String libraryPath = crop(this.getLibraryPath());
 			String vmVendor = this.getVmVendor();
 			String vmVersion = this.getVmVersion();
 			String vmName = this.getVmName();
@@ -376,4 +381,17 @@ public class SystemInformation implements IPlatformSensor {
 		return updateRequested;
 	}
 
+	/**
+	 * Crops a string if it is longer than the specified MAX_LENGTH.
+	 * 
+	 * @param value
+	 *            The value to crop.
+	 * @return A cropped string which length is smaller than the MAX_LENGTH.
+	 */
+	private String crop(String value) {
+		if (null != value && value.length() >= MAX_LENGTH) {
+			return value.substring(0, MAX_LENGTH - 1);
+		}
+		return value;
+	}
 }

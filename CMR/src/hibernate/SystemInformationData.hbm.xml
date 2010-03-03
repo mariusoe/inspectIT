@@ -18,7 +18,7 @@
 		<property name="architecture" column="architecture" />
 		<property name="osName" column="os_name" />
 		<property name="osVersion" column="os_version" />
-		<property name="classPath" column="class_path" length="20000" />
+		<property name="classPath" column="class_path" length="10000" />
 		<property name="bootClassPath" column="boot_class_path"
 			length="10000" />
 		<property name="libraryPath" column="library_path"
