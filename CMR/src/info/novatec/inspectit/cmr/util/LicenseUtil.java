@@ -122,7 +122,7 @@ public class LicenseUtil {
 			// this is the subject which MUST be exactly the same than in the
 			// license file - if not the license file is not valid. This subject
 			// is also obfuscated
-			return new ObfuscatedString(new long[] { 0xBA49874675FC14C8L, 0xA6BDA6006D310635L, 0x5C7BACB8AA64AF7DL, 0x662B194E3564D558L, 0xD6A26363ED722864L, 0xBE0C8FBD3A7398E1L }).toString();
+			return new ObfuscatedString(new long[] {0x7BE0D7A91744BA11L, 0x8EE7897329DAD231L, 0xB882D9CD8679FBC0L, 0xE3EDA6F30961559FL, 0xC86442D44DD50199L, 0xD0B0285B561195C5L}).toString() ;
 		}
 
 		public Preferences getPreferences() {
