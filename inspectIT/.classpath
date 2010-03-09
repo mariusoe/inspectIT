@@ -2,23 +2,15 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
+	<classpathentry exported="true" kind="lib" path="lib/jfreechart-1.0.10-experimental.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jfreechart-1.0.10-swt.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jfreechart-1.0.10.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/nebula_cdatetime_0.9.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.nebula.widgets.pshelf_1.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/swtgraphics2d.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="con" path="org.testng.TESTNG_CONTAINER"/>
-	<classpathentry kind="lib" path="/lib/test/testng.jar"/>
-	<classpathentry kind="lib" path="lib/prod/commons-logging.jar"/>
-	<classpathentry kind="lib" path="lib/prod/hibernate.jar"/>
-	<classpathentry kind="lib" path="lib/prod/inspectit-commons.jar"/>
-	<classpathentry kind="lib" path="lib/prod/jcommon.jar"/>
-	<classpathentry kind="lib" path="lib/prod/jettison.jar"/>
-	<classpathentry kind="lib" path="lib/prod/jfreechart-1.0.10-experimental.jar"/>
-	<classpathentry kind="lib" path="lib/prod/jfreechart-1.0.10-swt.jar"/>
-	<classpathentry kind="lib" path="lib/prod/jfreechart-1.0.10.jar"/>
-	<classpathentry kind="lib" path="lib/prod/nebula_cdatetime_0.9.0.jar"/>
-	<classpathentry kind="lib" path="lib/prod/org.eclipse.nebula.widgets.pshelf_1.0.0.jar"/>
-	<classpathentry kind="lib" path="lib/prod/rmiio.jar"/>
-	<classpathentry kind="lib" path="lib/prod/spring.jar"/>
-	<classpathentry kind="lib" path="lib/prod/swtgraphics2d.jar"/>
-	<classpathentry kind="lib" path="lib/prod/xstream.jar"/>
+	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?ivyXmlPath=release%2Fresources%2Fivy%2Fivy.xml&amp;confs=*&amp;ivySettingsPath=project%3A%2F%2FinspectIT%2Frelease%2Fresources%2Fivy%2Fivysettings.xml&amp;loadSettingsOnDemand=false&amp;propertyFiles=&amp;doRetrieve=true&amp;retrievePattern=lib%2F%5Bconf%5D%2F%5Bartifact%5D.%5Bext%5D&amp;retrieveSync=false&amp;retrieveConfs=*&amp;retrieveTypes=*"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

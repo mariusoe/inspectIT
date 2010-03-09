@@ -2,49 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.4"/>
-	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?ivyXmlPath=resources%2Fivy%2Fivy.xml&amp;confs=*"/>
+	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?ivyXmlPath=resources%2Fivy%2Fivy.xml&amp;confs=*&amp;ivySettingsPath=project%3A%2F%2FAgent%2Fresources%2Fivy%2Fivysettings.xml&amp;loadSettingsOnDemand=false&amp;propertyFiles="/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Commons"/>
-	<classpathentry kind="lib" path="lib/test/annotations.jar"/>
-	<classpathentry kind="lib" path="lib/test/ant-launcher.jar"/>
-	<classpathentry kind="lib" path="lib/test/ant.jar"/>
-	<classpathentry kind="lib" path="lib/test/antlr.jar"/>
-	<classpathentry kind="lib" path="lib/test/asm-analysis.jar"/>
-	<classpathentry kind="lib" path="lib/test/asm-commons.jar"/>
-	<classpathentry kind="lib" path="lib/test/asm-tree.jar"/>
-	<classpathentry kind="lib" path="lib/test/asm-util.jar"/>
-	<classpathentry kind="lib" path="lib/test/asm-xml.jar"/>
-	<classpathentry kind="lib" path="lib/test/asm.jar"/>
-	<classpathentry kind="lib" path="lib/test/bcel.jar"/>
-	<classpathentry kind="lib" path="lib/test/checkstyle.jar"/>
-	<classpathentry kind="lib" path="lib/test/cobertura.jar"/>
-	<classpathentry kind="lib" path="lib/test/commons-beanutils-core.jar"/>
-	<classpathentry kind="lib" path="lib/test/commons-beanutils.jar"/>
-	<classpathentry kind="lib" path="lib/test/commons-cli.jar"/>
-	<classpathentry kind="lib" path="lib/test/commons-collections.jar"/>
-	<classpathentry kind="lib" path="lib/test/commons-lang.jar"/>
-	<classpathentry kind="lib" path="lib/test/commons-logging.jar"/>
-	<classpathentry kind="lib" path="lib/test/dom4j.jar"/>
-	<classpathentry kind="lib" path="lib/test/findbugs-ant.jar"/>
-	<classpathentry kind="lib" path="lib/test/findbugs.jar"/>
-	<classpathentry kind="lib" path="lib/test/google-collections.jar"/>
-	<classpathentry kind="lib" path="lib/test/icu4j.jar"/>
-	<classpathentry kind="lib" path="lib/test/jakarta-oro.jar"/>
-	<classpathentry kind="lib" path="lib/test/javassist.jar"/>
-	<classpathentry kind="lib" path="lib/test/jaxen.jar"/>
-	<classpathentry kind="lib" path="lib/test/jdom.jar"/>
-	<classpathentry kind="lib" path="lib/test/jFormatString.jar"/>
-	<classpathentry kind="lib" path="lib/test/jsr305.jar"/>
-	<classpathentry kind="lib" path="lib/test/junit.jar"/>
-	<classpathentry kind="lib" path="lib/test/log4j.jar"/>
-	<classpathentry kind="lib" path="lib/test/mockito-all.jar"/>
-	<classpathentry kind="lib" path="lib/test/oro.jar"/>
-	<classpathentry kind="lib" path="lib/test/picocontainer.jar"/>
-	<classpathentry kind="lib" path="lib/test/pmd.jar"/>
-	<classpathentry kind="lib" path="lib/test/testng.jar"/>
-	<classpathentry kind="lib" path="lib/test/xalan.jar"/>
-	<classpathentry kind="lib" path="lib/test/xercesImpl.jar"/>
-	<classpathentry kind="lib" path="lib/test/xml-apis.jar"/>
-	<classpathentry kind="lib" path="lib/test/xmlParserAPIs.jar"/>
-	<classpathentry kind="lib" path="lib/test/xom.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

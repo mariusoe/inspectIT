@@ -86,6 +86,11 @@
 		<mkdir dir="${buildDirectory}/features" />
 		<antcall target="init-ivy" />
 
+		<!-- ivy properties -->
+		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+		<ivy:resolve file="${ivy.file}" />
+		<ivy:retrieve pattern="${basedir}/../lib/[conf]/[artifact].[ext]" />
+
 		<!-- Commons plugin -->
 		<!-- Currently I would say this is not even necessary! as the lib is integrated with the RCP product -->
 		<copy file="../../Commons/META-INF/MANIFEST.MF" todir="${buildDirectory}/plugins/info.novatec.inspectit.commons/META-INF" />
@@ -95,27 +100,12 @@
 			</fileset>
 		</copy>
 
-
 		<copy todir="${buildDirectory}/plugins/${topLevelElementId}">
 			<fileset dir="${basedir}/..">
 				<exclude name="**/release/**" />
 				<include name="**" />
 			</fileset>
 		</copy>
-
-		<!-- ivy properties -->
-		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
-		<ivy:resolve file="${ivy.file}" />
-		<ivy:retrieve pattern="${basedir}/../lib/[conf]/[artifact].[ext]" />
-
-		<!-- Task Definitions -->
-		<taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="path.libs" />
-		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="path.libs" />
-		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.libs" />
-		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.libs" />
-		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.libs" />
-		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs" />
-		<taskdef resource="checkstyletask.properties" classpathref="path.libs" />
 
 		<!--copy libraries to lib/test -->
 		<copy todir="${lib.root}/prod" failonerror="true">
@@ -129,6 +119,15 @@
 				<include name="inspectit-commons.jar" />
 			</fileset>
 		</copy>
+
+		<!-- Task Definitions -->
+		<taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="path.libs" />
+		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="path.libs" />
+		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.libs" />
+		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.libs" />
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.libs" />
+		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs" />
+		<taskdef resource="checkstyletask.properties" classpathref="path.libs" />
 	</target>
 
 
@@ -265,7 +264,7 @@
 	<!-- This target actually executes the PDE Build process by  		 -->
 	<!-- launching the Eclipse antRunner application.     				 -->
 	<!-- *************************************************************** -->
-	<target name="release" depends="clean, init">
+	<target name="release" depends="init">
 		<mkdir dir="${basedir}/dist" />
 		<echo message="Executing ${eclipseLocation}/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
