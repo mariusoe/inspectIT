@@ -210,22 +210,16 @@
 			<xmlfileset file="${agent50test.ressources.testng}/testng.xml" />
 		</testng>
 
+		<!-- create cobertura html and xml reports and link to the interesting parts -->
 		<cobertura-report format="html" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
 			<fileset dir="${src.root}" includes="**/*.java" />
-			<fileset dir="${agenttest.src}" includes="**/*.java" />
+			<fileset dir="${agent50.src}" includes="**/*.java" />
 		</cobertura-report>
 		<cobertura-report format="xml" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
 			<fileset dir="${src.root}" includes="**/*.java" />
 			<fileset dir="${agent50.src}" includes="**/*.java" />
 		</cobertura-report>
-
-		<!-- create html pages that link to the interesting parts -->
-		<echo file="${build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >">
-		</echo>
-		<echo file="${build.qa.test}/testresults.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/index.html&quot; >">
-		</echo>
-		<echo file="${build.qa.test}/testreport.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/emailable-report.html&quot; >">
-		</echo>
+		<echo file="${build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >" />
 
 		<!-- generates a JUnit report from the TestNG xml format, because Hudson cant handle the TestNG format -->
 		<junitreport todir="${build.qa.test}/testdata">
@@ -235,10 +229,14 @@
 
 			<report format="noframes" todir="${build.qa.test}/testdata" />
 		</junitreport>
+
+		<!-- create html pages that link to the interesting parts -->
+		<echo file="${build.qa.test}/testresults.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/index.html&quot; >" />
+		<echo file="${build.qa.test}/testreport.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/emailable-report.html&quot; >" />
 	</target>
 
 
-	<target name="static-analysis" depends="init">
+	<target name="static-analysis" depends="init, build-agent, build-agent5.0">
 		<mkdir dir="${build.qa.analysis}" />
 		<mkdir dir="${build.qa.analysis.pmd}" />
 		<mkdir dir="${build.qa.analysis.checkstyle}" />
@@ -262,8 +260,7 @@
 		<xslt in="${build.qa.analysis.pmd}/pmd_results.xml" style="${pmd.config.root}/pmd-report.xslt" out="${build.qa.analysis.pmd}/sortable_report.html" />
 		<copy todir="${build.qa.analysis.pmd}" file="${pmd.config.root}/sorttable.js" />
 		<!-- this js is used for the sortable report -->
-		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >">
-		</echo>
+		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >"/>
 
 		<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
 			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
@@ -271,16 +268,16 @@
 		</checkstyle>
 
 		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl" />
-		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >">
-		</echo>
+		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >"/>
 
+		
 		<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
 		<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
 		<pathconvert property="findbugs.classpath">
 			<path refid="findbugs.classpath" />
 		</pathconvert>
 
-		<findbugs output="html" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis}/findbugs.html" stylesheet="fancy-hist.xsl" pluginlist="${lib.root}/test/findbugs.jar">
+		<findbugs output="xml" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis}/findbugs/findbugs.xml" pluginlist="${lib.root}/test/findbugs.jar">
 			<sourcePath path="${src.root}" />
 			<class location="${build.agent.classes}" />
 			<auxClasspath>
@@ -288,6 +285,7 @@
 				<pathelement path="${build.commons.classes}" />
 			</auxClasspath>
 		</findbugs>
+		<xslt in="${build.qa.analysis}/findbugs/findbugs.xml" style="${basedir}/resources/findbugs/fancy-hist.xsl" out="${build.qa.analysis}/findbugs.html" />
 	</target>
 
 

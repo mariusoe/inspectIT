@@ -1,4 +1,4 @@
-<project name="inspectit release" default="release" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="inspectIT RCP" default="release" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<property name="release.basedir" value="${basedir}" />
 	<property file="build.properties" />
@@ -107,7 +107,7 @@
 			</fileset>
 		</copy>
 
-		<!--copy libraries to lib/test -->
+		<!-- copy the libraries that cannot be resolved through ivy -->
 		<copy todir="${lib.root}/prod" failonerror="true">
 			<fileset dir="${lib.root}">
 				<include name="jfreechart-1.0.10-experimental.jar" />
@@ -143,7 +143,6 @@
 	<target name="functional-tests" depends="release">
 		<mkdir dir="${build.qa.test.testdata}" />
 		<mkdir dir="${build.test.classes}" />
-
 
 		<javac source="1.6" target="1.6" debug="true" nowarn="off" destdir="${build.test.classes}" srcdir="${test.root}">
 			<classpath refid="path.libs" />
@@ -186,18 +185,16 @@
 			<xmlfileset file="${resources.testng}/testng.xml" />
 		</testng>
 
+		<!-- create cobertura html and xml reports and link to the interesting parts -->
 		<cobertura-report format="html" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
 			<fileset dir="${src.root}" includes="**/*.java" />
 			<fileset dir="${test.root}" includes="**/*.java" />
 		</cobertura-report>
-
-		<!-- create html pages that link to the interesting parts -->
-		<echo file="${build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >">
-		</echo>
-		<echo file="${build.qa.test}/testresults.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/index.html&quot; >">
-		</echo>
-		<echo file="${build.qa.test}/testreport.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/emailable-report.html&quot; >">
-		</echo>
+		<cobertura-report format="xml" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
+			<fileset dir="${src.root}" includes="**/*.java" />
+			<fileset dir="${test.root}" includes="**/*.java" />
+		</cobertura-report>
+		<echo file="${build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >" />
 
 		<!-- generates a JUnit report from the TestNG xml format, because Hudson cant handle the TestNG format -->
 		<junitreport todir="${build.qa.test}/testdata">
@@ -207,6 +204,10 @@
 
 			<report format="noframes" todir="${build.qa.test}/testdata" />
 		</junitreport>
+
+		<!-- create html pages that link to the interesting parts -->
+		<echo file="${build.qa.test}/testresults.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/index.html&quot; >" />
+		<echo file="${build.qa.test}/testreport.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/emailable-report.html&quot; >" />
 	</target>
 
 
@@ -229,8 +230,7 @@
 		<xslt in="${build.qa.analysis.pmd}/pmd_results.xml" style="${pmd.config.root}/pmd-report.xslt" out="${build.qa.analysis.pmd}/sortable_report.html" />
 		<copy todir="${build.qa.analysis.pmd}" file="${pmd.config.root}/sorttable.js" />
 		<!-- this js is used for the sortable report -->
-		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >">
-		</echo>
+		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >" />
 
 		<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
 			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
@@ -238,8 +238,8 @@
 		</checkstyle>
 
 		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl" />
-		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >">
-		</echo>
+		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >" />
+
 
 		<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
 		<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
@@ -247,7 +247,7 @@
 			<path refid="findbugs.classpath" />
 		</pathconvert>
 
-		<findbugs output="html" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis}/findbugs.html" stylesheet="fancy-hist.xsl" pluginlist="${lib.root}/test/findbugs.jar">
+		<findbugs output="xml" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis}/findbugs/findbugs.xml" pluginlist="${lib.root}/test/findbugs.jar">
 			<sourcePath path="${src.root}" />
 			<class location="${buildDirectory}/plugins/info.novatec.inspectit.rcp/@dot" />
 			<auxClasspath>
@@ -255,16 +255,17 @@
 				<fileset dir="${lib.root}" includes="**/*.jar" />
 			</auxClasspath>
 		</findbugs>
+		<xslt in="${build.qa.analysis}/findbugs/findbugs.xml" style="${release.basedir}/resources/findbugs/fancy-hist.xsl" out="${build.qa.analysis}/findbugs.html" />
 	</target>
 
 
 	<!-- *************************************************************** -->
-	<!--                R E L E A S E     T A R G E T                    -->
+	<!--                R E L E A S E     T A R G E T S                  -->
 	<!-- *************************************************************** -->
 	<!-- This target actually executes the PDE Build process by  		 -->
 	<!-- launching the Eclipse antRunner application.     				 -->
 	<!-- *************************************************************** -->
-	<target name="release" depends="init">
+	<target name="release" depends="init" unless="release.run">
 		<mkdir dir="${basedir}/dist" />
 		<echo message="Executing ${eclipseLocation}/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
@@ -287,6 +288,16 @@
 		<copy todir="${build.rcp.classes}">
 			<fileset dir="${buildDirectory}/plugins/info.novatec.inspectit.rcp/@dot" includes="**/*.class" />
 		</copy>
+	</target>
+
+	<!-- Calls the release target and then the analysis targets -->
+	<target name="release-and-analyze" description="--> Calls the release target and then executes the static analysis with the functional tests">
+		<antcall target="static-analysis" />
+
+		<!-- Need to set the property so that the release target wont be called again -->
+		<property name="release.run" value="true" />
+
+		<antcall target="functional-tests" />
 	</target>
 
 

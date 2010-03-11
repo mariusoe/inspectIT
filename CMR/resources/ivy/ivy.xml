@@ -4,7 +4,7 @@
 	
 	<configurations>
     	<conf name="prod" visibility="private" transitive="false"/>
-    	<conf name="test" visibility="private" extends="prod" transitive="true"/>
+    	<conf name="test" visibility="private" extends="prod" transitive="false"/>
     </configurations>
     
     <!-- note that the manifest file stored in the resource sections needs to be updated to reflect
@@ -67,5 +67,10 @@
 		
 		<dependency org="asm" name="asm" rev="3.0" conf="test->default"/>
 		<dependency org="asm" name="asm-tree" rev="3.0" conf="test->default"/>
+		
+		<dependency org="com.google.code.findbugs" name="jFormatString" rev="1.3.9" conf="test->default"/>
+		<dependency org="com.google.code.findbugs" name="jsr305" rev="1.3.9" conf="test->default"/>
+		<dependency org="asm" name="asm-all" rev="3.0" conf="test->default"/>
+		<dependency org="commons-lang" name="commons-lang" rev="2.4" conf="test->default"/>
 	</dependencies>
 </ivy-module>
