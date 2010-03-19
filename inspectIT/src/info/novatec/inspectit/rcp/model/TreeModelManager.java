@@ -30,7 +30,7 @@ import org.eclipse.core.runtime.Assert;
  * 
  * @author Patrice Bouillet
  * @author Eduard Tudenhöfner
- * 
+ * @author Stefan Siegl
  */
 public class TreeModelManager {
 
@@ -68,11 +68,14 @@ public class TreeModelManager {
 
 		for (PlatformIdent platformIdent : repositoryDefinition.getGlobalDataAccessService().getConnectedAgents()) {
 			Composite agentTree = new Composite();
-			agentTree.setName(platformIdent.getAgentName());
+			agentTree.setName(platformIdent.getAgentName() + " [v. " + platformIdent.getVersion() + "]");
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.append("Name: ");
 			stringBuilder.append(platformIdent.getAgentName());
 			stringBuilder.append("\n");
+			stringBuilder.append("[v. ");
+			stringBuilder.append(platformIdent.getVersion());
+			stringBuilder.append("]");
 			stringBuilder.append("\n");
 			Collections.sort(platformIdent.getDefinedIPs());
 			for (String ip : (List<String>) platformIdent.getDefinedIPs()) {

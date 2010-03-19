@@ -23,7 +23,10 @@ import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.core.impl.IdManager;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.versioning.FileBasedVersioningServiceImpl;
+import info.novatec.inspectit.versioning.IVersioningService;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +43,9 @@ public class IdManagerTest extends AbstractLogSupport {
 
 	@Mock
 	private IConnection connection;
+	
+	@Mock
+	private IVersioningService versioning;
 
 	private IIdManager idManager;
 
@@ -53,7 +59,7 @@ public class IdManagerTest extends AbstractLogSupport {
 
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {
-		idManager = new IdManager(configurationStorage, connection);
+		idManager = new IdManager(configurationStorage, connection, versioning);
 	}
 
 	/**
@@ -109,14 +115,17 @@ public class IdManagerTest extends AbstractLogSupport {
 	}
 
 	@Test
-	public void connectAndRetrievePlatformId() throws ServerUnavailableException, RegistrationException, IdNotAvailableException {
+	public void connectAndRetrievePlatformId() throws ServerUnavailableException, RegistrationException, IdNotAvailableException, IOException {
 		RepositoryConfig repositoryConfig = mock(RepositoryConfig.class);
 		when(configurationStorage.getRepositoryConfig()).thenReturn(repositoryConfig);
 		when(configurationStorage.getAgentName()).thenReturn("testAgent");
-
+		when(versioning.getVersion()).thenReturn("dummyVersion");
+		
 		long fakePlatformId = 7L;
 		when(connection.isConnected()).thenReturn(false);
-		when(connection.registerPlatform("testAgent")).thenReturn(fakePlatformId);
+		when(connection.registerPlatform("testAgent", "dummyVersion")).thenReturn(fakePlatformId);
+		
+		
 
 		idManager.start();
 		long platformId = idManager.getPlatformId();
@@ -126,11 +135,12 @@ public class IdManagerTest extends AbstractLogSupport {
 	}
 
 	@Test
-	public void retrievePlatformId() throws IdNotAvailableException, ServerUnavailableException, RegistrationException, InterruptedException {
+	public void retrievePlatformId() throws IdNotAvailableException, ServerUnavailableException, RegistrationException, InterruptedException, IOException {
 		long fakePlatformId = 3L;
 		when(connection.isConnected()).thenReturn(true);
-		when(connection.registerPlatform("testAgent")).thenReturn(fakePlatformId);
+		when(connection.registerPlatform("testAgent", "dummyVersion")).thenReturn(fakePlatformId);
 		when(configurationStorage.getAgentName()).thenReturn("testAgent");
+		when(versioning.getVersion()).thenReturn("dummyVersion");
 
 		idManager.start();
 		long platformId = idManager.getPlatformId();

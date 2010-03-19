@@ -153,6 +153,7 @@
 			<fileset dir="${build.cmr.classes}" includes="**/*.class" />
 			<fileset dir="${src.root}" includes="**/*.xml" />
 			<fileset dir="${src.root}" includes="**/*.properties" />
+			<fileset dir="${src.commons}" includes="version.log" />
 		</jar>
 
 		<copy todir="${build.release.root}/lib">

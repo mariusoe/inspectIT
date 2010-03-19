@@ -50,6 +50,11 @@ public class PlatformIdent implements Serializable {
 	 * The self-defined name of the inspectIT Agent.
 	 */
 	private String agentName = "Agent";
+	
+	/**
+	 * the current version of the agent
+	 */
+	private String version = "n/a";
 
 	public PlatformIdent() {
 	}
@@ -102,4 +107,11 @@ public class PlatformIdent implements Serializable {
 		this.agentName = agentName;
 	}
 
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
 }

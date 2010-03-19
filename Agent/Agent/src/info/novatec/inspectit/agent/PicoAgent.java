@@ -34,8 +34,12 @@ import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 import info.novatec.inspectit.agent.sensor.method.jdbc.StatementStorage;
 import info.novatec.inspectit.agent.sensor.platform.IPlatformSensor;
 import info.novatec.inspectit.util.Timer;
+import info.novatec.inspectit.versioning.FileBasedVersioningServiceImpl;
+import info.novatec.inspectit.versioning.IVersioningService;
 
+import java.io.IOException;
 import java.util.Iterator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.picocontainer.MutablePicoContainer;
@@ -107,12 +111,13 @@ public class PicoAgent {
 	public static PicoAgent getInstance() {
 		return instance;
 	}
-
+	
 	/**
 	 * Initialize this class, more specific the Pico container. It will register
 	 * every needed component.
 	 */
 	private void init() {
+		
 		try {
 			// Use the caching mechanism. This is where a component has a single
 			// instance in the container rather that a new one created each time
@@ -127,7 +132,8 @@ public class PicoAgent {
 			pico.registerComponentImplementation(IConfigurationReader.class, FileConfigurationReader.class);
 			pico.registerComponentImplementation(IIdManager.class, IdManager.class);
 			pico.registerComponentImplementation(IConnection.class, RMIConnection.class);
-
+			pico.registerComponentImplementation(IVersioningService.class, FileBasedVersioningServiceImpl.class);
+			
 			// we have to load the configuration before we register everything
 			// else, otherwise some classes won't be available (buffer and
 			// sending strategies for example).
@@ -173,6 +179,19 @@ public class PicoAgent {
 			pico.registerComponentImplementation(IHookDispatcher.class, HookDispatcher.class);
 
 			pico.start();
+			
+			// Provide the version number output during the startup of the agent
+			if (LOGGER.isLoggable(Level.INFO)) {
+				String currentVersion = "n/a";
+				try {
+					currentVersion = ((IVersioningService)pico.getComponentInstance(IVersioningService.class)).getVersion();
+				} catch (IOException e) {
+					if (LOGGER.isLoggable(Level.FINE)) {
+						LOGGER.log(Level.FINE, "Versioning information could not be read", e);
+					}
+				}
+				LOGGER.info("Using agent version "+currentVersion);
+			}
 
 			hookDispatcher = (IHookDispatcher) pico.getComponentInstance(IHookDispatcher.class);
 		} catch (ParserException parserException) {

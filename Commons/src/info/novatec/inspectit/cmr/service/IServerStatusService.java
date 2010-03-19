@@ -22,5 +22,12 @@ public interface IServerStatusService {
 	 * @return The server status.
 	 */
 	int getServerStatus();
+	
+	/**
+	 * Returns the current version of the server.
+	 * 
+	 * @return the current version of the server.
+	 */
+	String getVersion();
 
 }

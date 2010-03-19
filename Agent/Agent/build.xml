@@ -323,6 +323,7 @@
 			<fileset dir="${build.commons.classes}" includes="**/*.class" />
 			<fileset dir="${build.javaagent.classes}" includes="**/*.class" />
 			<fileset dir="${build.extract.root}" includes="**/*.class" />
+			<fileset dir="${commons.src}" includes="version.log" />
 		</jar>
 
 		<zip destfile="${release.root}/${release.name.sun15}" basedir="${build.release}/sun1.5-data" />
@@ -361,6 +362,7 @@
 			<fileset dir="${build.commons.classes}" includes="**/*.class" />
 			<fileset dir="${build.classloader.classes}" includes="**/*.class" />
 			<fileset dir="${build.extract.root}" includes="**/*.class" />
+			<fileset dir="${commons.src}/version.log" />
 		</jar>
 
 		<zip destfile="${release.root}/${release.name.sun14}" basedir="${build.release}/sun1.4-data" />

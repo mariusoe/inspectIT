@@ -54,11 +54,15 @@ public class InternRegistrationService {
 	 */
 	@SuppressWarnings("unchecked")
 	@Transactional
-	public long registerPlatformIdent(List definedIPs, String agentName) {
+	public long registerPlatformIdent(List definedIPs, String agentName, String version) {
 		PlatformIdent platformIdent = new PlatformIdent();
 		platformIdent.setDefinedIPs(definedIPs);
 		platformIdent.setAgentName(agentName);
 
+		// we will not set the version for the platformIdent object here as we use this
+		// object for a QBE (Query by example) and this query should not be performed
+		// based on the version information.
+		
 		List<PlatformIdent> platformIdentResults = platformIdentDao.findByExample(platformIdent);
 		if (1 == platformIdentResults.size()) {
 			platformIdent = platformIdentResults.get(0);
@@ -67,6 +71,9 @@ public class InternRegistrationService {
 		// always update the time stamp, no matter if this is an old or new
 		// record.
 		platformIdent.setTimeStamp(new Timestamp(GregorianCalendar.getInstance().getTimeInMillis()));
+		
+		// also always update the version information of the agent
+		platformIdent.setVersion(version);
 
 		platformIdentDao.saveOrUpdate(platformIdent);
 

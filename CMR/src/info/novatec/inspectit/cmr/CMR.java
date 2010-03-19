@@ -1,8 +1,11 @@
 package info.novatec.inspectit.cmr;
 
 import info.novatec.inspectit.cmr.util.Converter;
+import info.novatec.inspectit.versioning.FileBasedVersioningServiceImpl;
+import info.novatec.inspectit.versioning.IVersioningService;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 import org.apache.log4j.Logger;
@@ -40,6 +43,8 @@ public final class CMR {
 	 * This class will start the Repository.
 	 */
 	private CMR() {
+		
+		
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("Initializing Spring...");
 		}
@@ -54,6 +59,19 @@ public final class CMR {
 
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("Spring WebApplicationContext successfully initialized");
+		}
+		
+		if (LOGGER.isInfoEnabled()) {
+			IVersioningService versioning = (IVersioningService) getBeanFactory().getBean("versioning");
+			String currentVersion = "n/a";
+			try {
+				currentVersion = versioning.getVersion();
+			} catch (IOException e) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Versioning information could not be read", e);
+				}
+			}
+			LOGGER.info("Starting CMR in version "+currentVersion);
 		}
 	}
 

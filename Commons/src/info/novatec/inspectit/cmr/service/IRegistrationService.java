@@ -25,10 +25,16 @@ public interface IRegistrationService extends Remote {
 	 * A unique platform identifier is generated out of the network interfaces
 	 * from the target server and by specifying a self-defined Agent name.
 	 * 
+	 * Note: the version String of the agent is not used to match existing
+	 * platform identifications, that is even if the version String changes
+	 * the platform identification will still be the same.
+	 * 
 	 * @param definedIPs
 	 *            The list of all network interfaces.
 	 * @param agentName
 	 *            The self-defined name of the inspectIT Agent.
+	 * @param version
+	 * 			  The version the agent is currently running with. 
 	 * @return Returns the unique platform identifier.
 	 * @throws RemoteException
 	 *             Throws a RemoteException if an error occurs in the
@@ -37,7 +43,7 @@ public interface IRegistrationService extends Remote {
 	 *             Throws a {@link LicenseException} to indicate some problems
 	 *             with the licensing process.
 	 */
-	long registerPlatformIdent(List definedIPs, String agentName) throws RemoteException;
+	long registerPlatformIdent(List definedIPs, String agentName, String version) throws RemoteException;
 
 	/**
 	 * Every instrumented method has to be registered from every Agent. This

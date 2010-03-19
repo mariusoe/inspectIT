@@ -147,7 +147,11 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	 */
 	private void createServerItem(PShelf pShelf, RepositoryDefinition repositoryDefinition) {
 		PShelfItem item = new PShelfItem(pShelf, SWT.NONE);
-		item.setText(repositoryDefinition.getIp() + " : " + repositoryDefinition.getPort());
+		
+		// Check the version of the CMR
+		String cmrVersion = repositoryDefinition.getServerStatusService().getVersion();
+		
+		item.setText(repositoryDefinition.getIp() + " : " + repositoryDefinition.getPort() + " [v. "+cmrVersion+"]");
 		item.getBody().setLayout(new FillLayout());
 		item.setData(repositoryDefinition);
 
@@ -166,6 +170,8 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	private void updateServerItem(PShelfItem item, RepositoryDefinition repositoryDefinition) {
 		if (repositoryDefinition.getServerStatusService().isOnline()) {
 			item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_ONLINE));
+			
+			
 
 			Tree tree = toolkit.createTree(item.getBody(), SWT.V_SCROLL | SWT.H_SCROLL);
 			TreeViewer treeViewer = new TreeViewer(tree);

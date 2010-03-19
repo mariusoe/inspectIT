@@ -43,17 +43,17 @@ public class RegistrationService implements IRegistrationService, InitializingBe
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public long registerPlatformIdent(List definedIPs, String agentName) throws RemoteException {
+	public long registerPlatformIdent(List definedIPs, String agentName, String version) throws RemoteException {
 		try {
 			if (LOGGER.isInfoEnabled()) {
 				LOGGER.info("Trying to register Agent '" + agentName + "'");
 			}
 
 			licenseUtil.validateLicense(definedIPs, agentName);
-			long id = internRegistrationService.registerPlatformIdent(definedIPs, agentName);
+			long id = internRegistrationService.registerPlatformIdent(definedIPs, agentName, version);
 
 			if (LOGGER.isInfoEnabled()) {
-				LOGGER.info("Successfully registered Agent '" + agentName + "' with id: " + id);
+				LOGGER.info("Successfully registered Agent '" + agentName + "' with id: " + id + " and version "+version);
 			}
 
 			return id;

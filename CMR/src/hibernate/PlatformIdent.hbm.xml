@@ -28,5 +28,8 @@
 		<property name="agentName">
 			<column name="agent_name" />
 		</property>
+		<property name="version">
+			<column name="version" />
+		</property>
 	</class>
 </hibernate-mapping>

@@ -59,6 +59,8 @@ public interface IConnection {
 	 * 
 	 * @param agentName
 	 *            The name of the agent.
+	 * @param version
+	 *            The version of the agent.
 	 * @return The unique id for this platform.
 	 * @throws ServerUnavailableException
 	 *             If the sending wasn't successful in any way, a
@@ -67,7 +69,7 @@ public interface IConnection {
 	 *             This exception is thrown when a problem with the registration
 	 *             process appears.
 	 */
-	long registerPlatform(String agentName) throws ServerUnavailableException, RegistrationException;
+	long registerPlatform(String agentName, String version) throws ServerUnavailableException, RegistrationException;
 
 	/**
 	 * Registers the specified parameters at the server and returns a unique

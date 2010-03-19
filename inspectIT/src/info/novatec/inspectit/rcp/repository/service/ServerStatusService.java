@@ -72,4 +72,9 @@ public class ServerStatusService implements IServerStatusService {
 		}
 	}
 
+	@Override
+	public String getVersion() {
+		return serverStatusService.getVersion();
+	}
+
 }

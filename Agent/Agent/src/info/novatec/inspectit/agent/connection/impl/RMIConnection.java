@@ -112,7 +112,7 @@ public class RMIConnection implements IConnection {
 	/**
 	 * {@inheritDoc}
 	 */
-	public long registerPlatform(String agentName) throws ServerUnavailableException, RegistrationException {
+	public long registerPlatform(String agentName, String version) throws ServerUnavailableException, RegistrationException {
 		if (!connected) {
 			throw new ServerUnavailableException();
 		}
@@ -132,7 +132,7 @@ public class RMIConnection implements IConnection {
 				}
 			}
 
-			return registrationService.registerPlatformIdent(networkInterfaces, agentName);
+			return registrationService.registerPlatformIdent(networkInterfaces, agentName, version);
 		} catch (RemoteException remoteException) {
 			LOGGER.throwing(RMIConnection.class.getName(), "registerPlatform(String)", remoteException);
 			if (remoteException.getCause() instanceof LicenseException) {

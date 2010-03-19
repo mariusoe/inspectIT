@@ -11,7 +11,10 @@ import info.novatec.inspectit.agent.connection.RegistrationException;
 import info.novatec.inspectit.agent.connection.ServerUnavailableException;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
+import info.novatec.inspectit.versioning.FileBasedVersioningServiceImpl;
+import info.novatec.inspectit.versioning.IVersioningService;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,6 +44,11 @@ public class IdManager implements IIdManager, Startable {
 	 * be registered at the server.
 	 */
 	private final IConfigurationStorage configurationStorage;
+	
+	/**
+	 * The versioning service.
+	 */
+	private final IVersioningService versioningService;
 
 	/**
 	 * The connection to the Central Measurement Repository.
@@ -99,9 +107,10 @@ public class IdManager implements IIdManager, Startable {
 	 * @param connection
 	 *            The connection to the server.
 	 */
-	public IdManager(IConfigurationStorage configurationStorage, IConnection connection) {
+	public IdManager(IConfigurationStorage configurationStorage, IConnection connection, IVersioningService versioning) {
 		this.configurationStorage = configurationStorage;
 		this.connection = connection;
+		this.versioningService = versioning;
 	}
 
 	/**
@@ -529,10 +538,26 @@ public class IdManager implements IIdManager, Startable {
 		 *             registration process appears.
 		 */
 		private void registerPlatform() throws ServerUnavailableException, RegistrationException {
-			platformId = connection.registerPlatform(configurationStorage.getAgentName());
+									
+			platformId = connection.registerPlatform(configurationStorage.getAgentName(), getVersion());
 
 			if (LOGGER.isLoggable(Level.INFO)) {
 				LOGGER.info("Received platform ID: " + platformId);
+			}
+		}
+		
+		/**
+		 * Returns the formatted version.
+		 * @return the formatted version.
+		 */
+		private String getVersion(){
+			try {
+				return versioningService.getVersion();
+			} catch (IOException e) {
+				if (LOGGER.isLoggable(Level.FINE)) {
+					LOGGER.log(Level.FINE, "Versioning information could not be read", e);
+				}
+				return "n/a";
 			}
 		}
 
