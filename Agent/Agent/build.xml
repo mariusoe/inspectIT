@@ -40,6 +40,7 @@
 
 	<path id="path.agent.test.classes">
 		<pathelement location="${build.agent.test.classes}" />
+		<pathelement location="${build.agent50.test.classes}"/>
 	</path>
 
 	<!-- classpath for findbugs is needed because it enables to run findbugs without having a local installation-->
@@ -202,10 +203,12 @@
 			<classpath refid="path.libs" />
 			<classpath refid="path.common.classes" />
 			<classpath location="${build.agent.instrumented.classes}" />
+			<classpath location="${build.agent50.instrumented.classes}" />
 
 			<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${build.qa.test.coveragedata}/cobertura.ser" />
 
 			<sourcedir location="${agenttest.src}" />
+			<sourcedir location="${agent50.src}"/>
 			<xmlfileset file="${agenttest.ressources.testng}/testng.xml" />
 			<xmlfileset file="${agent50test.ressources.testng}/testng.xml" />
 		</testng>
