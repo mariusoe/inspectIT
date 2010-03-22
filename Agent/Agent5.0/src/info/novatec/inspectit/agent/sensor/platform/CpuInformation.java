@@ -76,18 +76,6 @@ public class CpuInformation implements IPlatformSensor {
 	}
 	
 	/**
-	 * The default constructor which needs one parameter.
-	 * 
-	 * @param idManager
-	 *            The ID Manager.
-	 */
-	public CpuInformation(IIdManager idManager, RuntimeMXBean runtimeObj, OperatingSystemMXBean osObj) {
-		this.idManager = idManager;
-		this.runtimeObj = runtimeObj;
-		this.osObj = osObj;
-	}
-
-	/**
 	 * Returns the process cpu time.
 	 * 
 	 * @return the process cpu time.
