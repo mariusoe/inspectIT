@@ -74,6 +74,18 @@ public class CpuInformation implements IPlatformSensor {
 	public CpuInformation(IIdManager idManager) {
 		this.idManager = idManager;
 	}
+	
+	/**
+	 * The default constructor which needs one parameter.
+	 * 
+	 * @param idManager
+	 *            The ID Manager.
+	 */
+	public CpuInformation(IIdManager idManager, RuntimeMXBean runtimeObj, OperatingSystemMXBean osObj) {
+		this.idManager = idManager;
+		this.runtimeObj = runtimeObj;
+		this.osObj = osObj;
+	}
 
 	/**
 	 * Returns the process cpu time.
@@ -121,7 +133,7 @@ public class CpuInformation implements IPlatformSensor {
 				osData = new CpuInformationData(timestamp, platformId, registeredSensorTypeId);
 				osData.incrementCount();
 
-				osData.addProcessCpuTime(processCpuTime);
+				osData.updateTotalProcessCpuTime(processCpuTime);
 				osData.setMinProcessCpuTime(processCpuTime);
 				osData.setMaxProcessCpuTime(processCpuTime);
 
@@ -137,7 +149,7 @@ public class CpuInformation implements IPlatformSensor {
 			}
 		} else {
 			osData.incrementCount();
-			osData.addProcessCpuTime(processCpuTime);
+			osData.updateTotalProcessCpuTime(processCpuTime);
 			osData.addCpuUsage(cpuUsage);
 
 			if (processCpuTime < osData.getMinProcessCpuTime()) {

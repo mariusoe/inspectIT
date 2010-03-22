@@ -88,10 +88,12 @@ public class CpuInformationData extends SystemSensorData {
 		this.count++;
 	}
 
-	public void addProcessCpuTime(long processCpuTime) {
-		this.totalProcessCpuTime += processCpuTime;
+	public void updateTotalProcessCpuTime (long totalTime) {
+		if (totalTime > totalProcessCpuTime) {
+			totalProcessCpuTime = totalTime;
+		}
 	}
-
+	
 	public long getMinProcessCpuTime() {
 		return minProcessCpuTime;
 	}
