@@ -6,4 +6,10 @@
 				name="info.novatec.inspectit.agent.sensor.method.timer.test.TimerHookTest" />
 		</classes>
 	</test>
+	<test name="CPU Sensor Test">
+		<classes>
+			<class
+				name="info.novatec.inspectit.agent.sensor.platform.test.CpuSensorTest" />
+		</classes>
+	</test>
 </suite>

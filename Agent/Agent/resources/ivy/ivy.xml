@@ -17,7 +17,7 @@
 		<dependency org="org.testng" name="testng" rev="5.8" transitive="false" conf="test->default">
         	<artifact name="testng" type="jar" ext="jar" e:classifier="jdk15" />
       	</dependency>
-		<dependency org="org.mockito" name="mockito-all" rev="1.7" conf="test->default"/>
+		<dependency org="org.mockito" name="mockito-all" rev="1.8.2" conf="test->default"/>
 		<dependency org="net.sourceforge.cobertura" name="cobertura" rev="1.9.3" conf="test->default"/>
 		<dependency org="log4j" name="log4j" rev="1.2.9" conf="test->default"/>
 		<dependency org="apache-oro" name="jakarta-oro" rev="2.0.8" conf="test->default"/>
