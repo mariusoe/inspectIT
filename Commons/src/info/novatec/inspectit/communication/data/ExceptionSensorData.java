@@ -25,11 +25,11 @@ public class ExceptionSensorData extends MethodSensorData {
 	private String errorMessage;
 
 	/**
-	 * The throwable that caused this throwable to get thrown, or null if this
+	 * The name of the throwable that caused this throwable to get thrown, or null if this
 	 * throwable was not caused by another throwable, or if the causative
 	 * throwable is unknown.
 	 */
-	private Throwable cause;
+	private String cause;
 
 	/**
 	 * The stack trace stored as a string.
@@ -97,11 +97,11 @@ public class ExceptionSensorData extends MethodSensorData {
 		this.exceptionEventString = exceptionEventString;
 	}
 
-	public Throwable getCause() {
+	public String getCause() {
 		return cause;
 	}
 
-	public void setCause(Throwable cause) {
+	public void setCause(String cause) {
 		this.cause = cause;
 	}
 

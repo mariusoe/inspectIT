@@ -235,7 +235,10 @@ public class ExceptionTracingHook implements IExceptionTracingHook {
 	 *            information.
 	 */
 	private void setStaticInformation(ExceptionSensorData exceptionSensorData, Throwable throwable) {
-		exceptionSensorData.setCause(throwable.getCause());
+		Throwable cause = throwable.getCause();
+		if (null != cause) {
+			exceptionSensorData.setCause(crop(cause.getClass().getName(), 1000));
+		}
 		exceptionSensorData.setErrorMessage(throwable.getMessage());
 		exceptionSensorData.setStackTrace(stackTraceToString(throwable));
 		// exceptionSensorData.setStackTrace(getStackTrace(throwable));
@@ -279,5 +282,22 @@ public class ExceptionTracingHook implements IExceptionTracingHook {
 		PrintWriter writer = new PrintWriter(result);
 		throwable.printStackTrace(writer);
 		return result.toString();
+	}
+
+	/**
+	 * Crops a string if it is longer than the specified maxLength.
+	 * 
+	 * @param value
+	 *            The value to crop.
+	 * @param maxLength
+	 *            The maximum length of the string. All characters above
+	 *            maxLength will be cropped.
+	 * @return A cropped string which length is smaller than the maxLength.
+	 */
+	private String crop(String value, int maxLength) {
+		if (null != value && value.length() >= maxLength) {
+			return value.substring(0, maxLength - 1);
+		}
+		return value;
 	}
 }

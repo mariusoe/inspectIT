@@ -4,7 +4,7 @@
 	<union-subclass name="ExceptionSensorData"
 		extends="info.novatec.inspectit.communication.MethodSensorData" table="exception_sensor_data">
 		<property name="errorMessage" column="error_message" />
-		<property name="cause" column="cause" />
+		<property name="cause" column="cause" length="1000"/>
 		<property name="exceptionEventString" column="exception_event_string" />
 		<property name="throwableType" column="throwable_type" />
 		<property name="throwableIdentityHashCode" column="throwable_identity_hashcode" />
