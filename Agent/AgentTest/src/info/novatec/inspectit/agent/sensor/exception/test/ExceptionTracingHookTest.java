@@ -22,6 +22,7 @@ import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.ExceptionEventEnum;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 
+import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.util.logging.Level;
 
@@ -29,6 +30,7 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
 
 public class ExceptionTracingHookTest extends AbstractLogSupport {
 	@Mock
@@ -96,7 +98,6 @@ public class ExceptionTracingHookTest extends AbstractLogSupport {
 
 		ExceptionSensorData exceptionSensorData = new ExceptionSensorData(new Timestamp(System.currentTimeMillis()), platformId, registeredSensorTypeId, registeredMethodIdTwo);
 		exceptionSensorData.setErrorMessage(exceptionObject.getMessage());
-		exceptionSensorData.setCause(exceptionObject.getCause());
 		exceptionSensorData.setThrowableIdentityHashCode(System.identityHashCode(exceptionObject));
 
 		when(idManager.getRegisteredMethodId(methodId)).thenReturn(registeredMethodId);
@@ -166,6 +167,73 @@ public class ExceptionTracingHookTest extends AbstractLogSupport {
 		verify(idManager, times(2)).getPlatformId();
 
 		verifyNoMoreInteractions(idManager);
+	}
+
+	@Test
+	public void throwableHasCause() throws InstantiationException, IllegalAccessException, IdNotAvailableException, SecurityException, NoSuchFieldException {
+		long methodId = 5L;
+		long constructorId = 4L;
+		long sensorTypeId = 3L;
+		long platformId = 1L;
+		long registeredMethodId = 15L;
+		long registeredSensorTypeId = 13L;
+		long registeredConstructorId = 14L;
+		long methodIdTwo = 20L;
+		long registeredMethodIdTwo = 22L;
+
+		Object[] parameters = new Object[0];
+		Object object = mock(Object.class);
+		MyTestException exceptionObject = MyTestException.class.newInstance();
+		Throwable cause = Throwable.class.newInstance();
+
+		// setting the cause at the exceptionObject
+		// we can only access the cause field from the overall superclass
+		// Throwable
+		Field causeField = exceptionObject.getClass().getSuperclass().getSuperclass().getDeclaredField("cause");
+		causeField.setAccessible(true);
+		causeField.set(exceptionObject, cause);
+
+		ExceptionSensorData exceptionSensorData = new ExceptionSensorData(new Timestamp(System.currentTimeMillis()), platformId, registeredSensorTypeId, registeredMethodIdTwo);
+		exceptionSensorData.setErrorMessage(exceptionObject.getMessage());
+		exceptionSensorData.setCause(exceptionObject.getCause().getClass().getName());
+		exceptionSensorData.setThrowableIdentityHashCode(System.identityHashCode(exceptionObject));
+
+		when(idManager.getRegisteredMethodId(methodId)).thenReturn(registeredMethodId);
+		when(idManager.getRegisteredMethodId(methodIdTwo)).thenReturn(registeredMethodIdTwo);
+		when(idManager.getRegisteredMethodId(constructorId)).thenReturn(registeredConstructorId);
+		when(idManager.getRegisteredSensorTypeId(sensorTypeId)).thenReturn(registeredSensorTypeId);
+		when(idManager.getPlatformId()).thenReturn(platformId);
+
+		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.CREATED);
+		exceptionHook.dispatchConstructorOfThrowable(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
+		verify(idManager, times(1)).getRegisteredMethodId(constructorId);
+		verify(idManager, times(1)).getRegisteredSensorTypeId(sensorTypeId);
+		verify(idManager, times(1)).getPlatformId();
+		verify(coreService, times(1)).addExceptionSensorData(eq(registeredSensorTypeId), eq(exceptionSensorData.getThrowableIdentityHashCode()),
+				argThat(new ExceptionSensorDataVerifier(exceptionSensorData)));
+		assertEquals(exceptionSensorData.getCause(), cause.getClass().getName());
+
+		// resetting the cause to null as we need the cause only in the first
+		// data object
+		exceptionSensorData.setCause(null);
+
+		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.PASSED);
+		exceptionHook.dispatchOnThrowInBody(coreService, methodId, sensorTypeId, object, exceptionObject, parameters, registeredSensorConfig);
+		verify(idManager, times(1)).getRegisteredMethodId(methodId);
+		verify(idManager, times(2)).getRegisteredSensorTypeId(sensorTypeId);
+		verify(idManager, times(2)).getPlatformId();
+		verify(coreService, times(1)).addExceptionSensorData(eq(registeredSensorTypeId), eq(exceptionSensorData.getThrowableIdentityHashCode()),
+				argThat(new ExceptionSensorDataVerifier(exceptionSensorData)));
+
+		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.HANDLED);
+		exceptionHook.dispatchBeforeCatchBody(coreService, methodIdTwo, sensorTypeId, exceptionObject, registeredSensorConfig);
+		verify(idManager, times(1)).getRegisteredMethodId(methodIdTwo);
+		verify(idManager, times(3)).getRegisteredSensorTypeId(sensorTypeId);
+		verify(idManager, times(3)).getPlatformId();
+		verify(coreService, times(1)).addExceptionSensorData(eq(registeredSensorTypeId), eq(exceptionSensorData.getThrowableIdentityHashCode()),
+				argThat(new ExceptionSensorDataVerifier(exceptionSensorData)));
+
+		verifyNoMoreInteractions(idManager, coreService);
 	}
 
 	@Test
