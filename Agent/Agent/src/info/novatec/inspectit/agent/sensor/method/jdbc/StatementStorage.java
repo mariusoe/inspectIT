@@ -128,6 +128,12 @@ public class StatementStorage {
 	protected void addParameter(Object preparedStatement, int index, Object value) {
 		String[] parameters = (String[]) parameterMap.get(preparedStatement);
 		if (null != parameters) {
+			if (null != value) { 
+				parameters[index] = value.toString(); 
+			} else { 
+				parameters[index] = "[null]";
+			} 
+			
 			parameters[index] = value.toString();
 			if (LOGGER.isLoggable(Level.FINE)) {
 				LOGGER.finer("Prepared Statement :: Added value:" + value.toString() + " with index:" + index + " to prepared statement:" + preparedStatement);
