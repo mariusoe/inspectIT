@@ -105,6 +105,12 @@
 			<class name="info.novatec.inspectit.agent.sending.test.TimeStrategyTest" />
 		</classes>
 	</test>
+	<test name="Exception Tracing Hook">
+		<classes>
+			<class
+				name="info.novatec.inspectit.agent.sensor.exception.test.ExceptionTracingHookTest" />
+		</classes>
+	</test>
 	<test name="Average Timer Hook">
 		<classes>
 			<class
