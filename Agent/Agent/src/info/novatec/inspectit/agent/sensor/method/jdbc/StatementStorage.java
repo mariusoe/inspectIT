@@ -133,8 +133,7 @@ public class StatementStorage {
 			} else { 
 				parameters[index] = "[null]";
 			} 
-			
-			parameters[index] = value.toString();
+
 			if (LOGGER.isLoggable(Level.FINE)) {
 				LOGGER.finer("Prepared Statement :: Added value:" + value.toString() + " with index:" + index + " to prepared statement:" + preparedStatement);
 			}
