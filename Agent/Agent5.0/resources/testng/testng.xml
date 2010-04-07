@@ -6,10 +6,46 @@
 				name="info.novatec.inspectit.agent.sensor.method.timer.test.TimerHookTest" />
 		</classes>
 	</test>
+	<test name="ClassLoading Sensor Test">
+		<classes>
+			<class
+				name="info.novatec.inspectit.agent.sensor.platform.test.ClassLoadingInformationTest" />
+		</classes>
+	</test>
+	<test name="Compilation Sensor Test">
+		<classes>
+			<class
+				name="info.novatec.inspectit.agent.sensor.platform.test.CompilationInformationTest" />
+		</classes>
+	</test>
 	<test name="CPU Sensor Test">
 		<classes>
 			<class
-				name="info.novatec.inspectit.agent.sensor.platform.test.CpuSensorTest" />
+				name="info.novatec.inspectit.agent.sensor.platform.test.CpuInformationTest" />
+		</classes>
+	</test>
+	<test name="Memory Sensor Test">
+		<classes>
+			<class
+				name="info.novatec.inspectit.agent.sensor.platform.test.MemoryInformationTest" />
+		</classes>
+	</test>
+	<test name="Runtime Sensor Test">
+		<classes>
+			<class
+				name="info.novatec.inspectit.agent.sensor.platform.test.RuntimeInformationTest" />
+		</classes>
+	</test>
+	<test name="System Sensor Test">
+		<classes>
+			<class
+				name="info.novatec.inspectit.agent.sensor.platform.test.SystemInformationTest" />
+		</classes>
+	</test>
+	<test name="Thread Sensor Test">
+		<classes>
+			<class
+				name="info.novatec.inspectit.agent.sensor.platform.test.ThreadInformationTest" />
 		</classes>
 	</test>
 </suite>
