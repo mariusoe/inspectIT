@@ -58,6 +58,9 @@ public class InternRegistrationService {
 		PlatformIdent platformIdent = new PlatformIdent();
 		platformIdent.setDefinedIPs(definedIPs);
 		platformIdent.setAgentName(agentName);
+		
+		// need to reset the version number, otherwise it will be used for the query
+		platformIdent.setVersion(null);
 
 		// we will not set the version for the platformIdent object here as we use this
 		// object for a QBE (Query by example) and this query should not be performed
