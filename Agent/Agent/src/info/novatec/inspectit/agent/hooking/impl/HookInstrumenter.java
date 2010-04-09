@@ -352,9 +352,11 @@ public class HookInstrumenter implements IHookInstrumenter {
 		/**
 		 * {@inheritDoc}
 		 */
-		public void edit(Handler h) throws CannotCompileException {
-			// $1 is the exception object
-			h.insertBefore(hookDispatcherTarget + ".dispatchBeforeCatch(" + id + "l, $1);");
+		public void edit(Handler handler) throws CannotCompileException {
+			if (!handler.isFinally()) {
+				// $1 is the exception object
+				handler.insertBefore(hookDispatcherTarget + ".dispatchBeforeCatch(" + id + "l, $1);");
+			}
 		}
 	}
 
@@ -400,9 +402,11 @@ public class HookInstrumenter implements IHookInstrumenter {
 		/**
 		 * {@inheritDoc}
 		 */
-		public void edit(Handler h) throws CannotCompileException {
-			// $1 is the exception object
-			h.insertBefore(hookDispatcherTarget + ".dispatchConstructorBeforeCatch(" + id + "l, $1);");
+		public void edit(Handler handler) throws CannotCompileException {
+			if (!handler.isFinally()) {
+				// $1 is the exception object
+				handler.insertBefore(hookDispatcherTarget + ".dispatchConstructorBeforeCatch(" + id + "l, $1);");
+			}
 		}
 	}
 
