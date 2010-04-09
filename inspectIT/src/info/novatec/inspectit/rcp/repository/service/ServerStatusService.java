@@ -72,9 +72,18 @@ public class ServerStatusService implements IServerStatusService {
 		}
 	}
 
+	/**
+	 * Returns the version of the CMR.
+	 * 
+	 * @return the version.
+	 */
 	@Override
 	public String getVersion() {
-		return serverStatusService.getVersion();
+		try {
+			return serverStatusService.getVersion();
+		} catch (Exception e) {
+			return "n/a";
+		}
 	}
 
 }
