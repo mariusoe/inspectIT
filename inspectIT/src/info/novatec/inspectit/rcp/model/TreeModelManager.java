@@ -166,10 +166,18 @@ public class TreeModelManager {
 			long invocationSensorTypeId = checkSensorTypeExistence(SensorTypeEnum.INVOCATION_SEQUENCE, methodIdent);
 			if (invocationSensorTypeId != -1) {
 				// first sort and filter the method ident list
-				if (!filteredMap.containsKey(methodIdent.getPackageName())) {
-					filteredMap.put(methodIdent.getPackageName(), new ArrayList<MethodIdent>());
+				String packageName = methodIdent.getPackageName();
+				if (null == packageName || "".equals(packageName)) {
+					if (!filteredMap.containsKey("(default)")) {
+						filteredMap.put("(default)", new ArrayList<MethodIdent>());
+					}
+					filteredMap.get("(default)").add(methodIdent);
+				} else {
+					if (!filteredMap.containsKey(packageName)) {
+						filteredMap.put(packageName, new ArrayList<MethodIdent>());
+					}
+					filteredMap.get(packageName).add(methodIdent);
 				}
-				filteredMap.get(methodIdent.getPackageName()).add(methodIdent);
 			}
 		}
 
