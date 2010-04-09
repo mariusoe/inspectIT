@@ -3,7 +3,7 @@
 <hibernate-mapping package="info.novatec.inspectit.communication.data">
 	<union-subclass name="ExceptionSensorData"
 		extends="info.novatec.inspectit.communication.MethodSensorData" table="exception_sensor_data">
-		<property name="errorMessage" column="error_message" />
+		<property name="errorMessage" column="error_message" length="1000"/>
 		<property name="cause" column="cause" length="1000"/>
 		<property name="exceptionEventString" column="exception_event_string" />
 		<property name="throwableType" column="throwable_type" />

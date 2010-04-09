@@ -48,6 +48,11 @@ public class ExceptionTracingHook implements IExceptionTracingHook {
 	private ThreadLocal exceptionHandlerId = new ThreadLocal();
 
 	/**
+	 * The maximum length a value should have.
+	 */
+	private static final int MAX_VALUE_LENGTH = 1000;
+
+	/**
 	 * The default constructor which needs one parameter for initialization.
 	 * 
 	 * 
@@ -237,9 +242,9 @@ public class ExceptionTracingHook implements IExceptionTracingHook {
 	private void setStaticInformation(ExceptionSensorData exceptionSensorData, Throwable throwable) {
 		Throwable cause = throwable.getCause();
 		if (null != cause) {
-			exceptionSensorData.setCause(crop(cause.getClass().getName(), 1000));
+			exceptionSensorData.setCause(crop(cause.getClass().getName(), MAX_VALUE_LENGTH));
 		}
-		exceptionSensorData.setErrorMessage(throwable.getMessage());
+		exceptionSensorData.setErrorMessage(crop(throwable.getMessage(), MAX_VALUE_LENGTH));
 		exceptionSensorData.setStackTrace(stackTraceToString(throwable));
 		// exceptionSensorData.setStackTrace(getStackTrace(throwable));
 	}
