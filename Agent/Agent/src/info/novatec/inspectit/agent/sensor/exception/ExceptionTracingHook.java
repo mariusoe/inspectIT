@@ -300,7 +300,7 @@ public class ExceptionTracingHook implements IExceptionTracingHook {
 	 * @return A cropped string which length is smaller than the maxLength.
 	 */
 	private String crop(String value, int maxLength) {
-		if (null != value && value.length() >= maxLength) {
+		if (null != value && value.length() > maxLength) {
 			return value.substring(0, maxLength - 1);
 		}
 		return value;
