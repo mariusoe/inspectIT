@@ -365,7 +365,7 @@
 			<fileset dir="${build.commons.classes}" includes="**/*.class" />
 			<fileset dir="${build.classloader.classes}" includes="**/*.class" />
 			<fileset dir="${build.extract.root}" includes="**/*.class" />
-			<fileset dir="${commons.src}/version.log" />
+			<fileset dir="${commons.src}" includes="version.log" />
 		</jar>
 
 		<zip destfile="${release.root}/${release.name.sun14}" basedir="${build.release}/sun1.4-data" />
