@@ -251,14 +251,6 @@ public class InvocDetailInputController implements TreeInputController {
 			 * {@inheritDoc}
 			 */
 			@Override
-			protected Point getInitialSize() {
-				return new Point(400, 200);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
 			protected Control createDialogArea(Composite parent) {
 				FormToolkit toolkit = new FormToolkit(parent.getDisplay());
 
