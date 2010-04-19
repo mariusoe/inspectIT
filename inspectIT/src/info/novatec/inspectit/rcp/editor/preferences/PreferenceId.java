@@ -16,7 +16,7 @@ public enum PreferenceId {
 	/**
 	 * The identifiers of the different control groups.
 	 */
-	TIMELINE, SAMPLINGRATE, LIVEMODE, UPDATE, ITEMCOUNT;
+	TIMELINE, SAMPLINGRATE, LIVEMODE, UPDATE, ITEMCOUNT, FILTERSENSORTYPE;
 
 	/**
 	 * Inner enumeration for TIMELINE.
@@ -68,6 +68,19 @@ public enum PreferenceId {
 		 * The identifier for the item count.
 		 */
 		COUNT_SELECTION_ID;
+	}
+
+	/**
+	 * Inner enumeration for the SENSORTYPESELECTION.
+	 * 
+	 * @author Patrice Bouillet
+	 * 
+	 */
+	public enum SensorTypeSelection implements IPreferenceGroup {
+		/**
+		 * The identifier for the sensor type selections.-
+		 */
+		SENSOR_TYPE_SELECTION_ID;
 	}
 
 }

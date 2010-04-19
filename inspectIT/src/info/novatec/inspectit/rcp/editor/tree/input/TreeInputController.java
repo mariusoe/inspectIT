@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 
 /**
  * The interface for all tree input controller.
@@ -132,6 +133,13 @@ public interface TreeInputController {
 	 * @return The created human readable string.
 	 */
 	String getReadableString(Object object);
+
+	/**
+	 * Returns an optional filter for this tree.
+	 * 
+	 * @return the filter array.
+	 */
+	ViewerFilter[] getFilters();
 
 	/**
 	 * Disposes the tree input.

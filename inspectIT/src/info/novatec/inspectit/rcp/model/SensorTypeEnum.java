@@ -1,11 +1,13 @@
 package info.novatec.inspectit.rcp.model;
 
+import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 
@@ -110,6 +112,22 @@ public enum SensorTypeEnum {
 	 */
 	public static SensorTypeEnum get(String fqn) {
 		return LOOKUP.get(fqn);
+	}
+
+	/**
+	 * Returns all elements of the enumeration for the given list of sensor type
+	 * ident objects.
+	 * 
+	 * @param sensorTypes
+	 *            The passed sensor type ident objects.
+	 * @return A set of SensorTypeEnum objects.
+	 */
+	public static Set<SensorTypeEnum> getAllOf(Set<? extends SensorTypeIdent> sensorTypes) {
+		Set<SensorTypeEnum> sensorTypeSet = EnumSet.noneOf(SensorTypeEnum.class);
+		for (SensorTypeIdent sensorType : sensorTypes) {
+			sensorTypeSet.add(get(sensorType.getFullyQualifiedClassName()));
+		}
+		return sensorTypeSet;
 	}
 
 	/**

@@ -4,6 +4,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.control.IPreferenceControl;
+import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,12 +19,14 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
@@ -222,6 +225,18 @@ public class FormPreferencePanel implements IPreferencePanel {
 			countMenuManager.add(new SetItemCountAction("All...", -1));
 			menuAction.addContributionItem(countMenuManager);
 		}
+		if (preferenceSet.contains(PreferenceId.FILTERSENSORTYPE)) {
+			MenuManager sensorTypeMenuManager = new MenuManager("Filter by SensorType");
+			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Timer", SensorTypeEnum.TIMER));
+			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Invocation Seq", SensorTypeEnum.INVOCATION_SEQUENCE));
+			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Exception", SensorTypeEnum.EXCEPTION_TRACER));
+			sensorTypeMenuManager.add(new Separator());
+			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Statement", SensorTypeEnum.JDBC_STATEMENT));
+			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Prep Statement", SensorTypeEnum.JDBC_PREPARED_STATEMENT));
+			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Connection", SensorTypeEnum.JDBC_CONNECTION, false));
+			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Prep Parameter", SensorTypeEnum.JDBC_PREPARED_STATEMENT_PARAMETER, false));
+			menuAction.addContributionItem(sensorTypeMenuManager);
+		}
 
 		// only add if there is really something in the menu
 		if (menuAction.getSize() > 0) {
@@ -412,6 +427,32 @@ public class FormPreferencePanel implements IPreferencePanel {
 				event.setPreferenceMap(countPreference);
 				fireEvent(event);
 			}
+		}
+	}
+
+	private final class FilterBySensorTypeAction extends Action {
+		private SensorTypeEnum sensorType;
+
+		public FilterBySensorTypeAction(String text, SensorTypeEnum sensorType) {
+			this(text, sensorType, true);
+		}
+
+		public FilterBySensorTypeAction(String text, SensorTypeEnum sensorType, boolean isChecked) {
+			super(text, Action.AS_CHECK_BOX);
+			this.sensorType = sensorType;
+			setChecked(isChecked);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void run() {
+			Map<IPreferenceGroup, Object> sensorTypePreference = new HashMap<IPreferenceGroup, Object>();
+			sensorTypePreference.put(PreferenceId.SensorTypeSelection.SENSOR_TYPE_SELECTION_ID, sensorType);
+			PreferenceEvent event = new PreferenceEvent(PreferenceId.FILTERSENSORTYPE);
+			event.setPreferenceMap(sensorTypePreference);
+			fireEvent(event);
 		}
 	}
 

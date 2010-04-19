@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.ParameterContentData;
@@ -16,9 +17,10 @@ import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
+import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 import info.novatec.inspectit.rcp.repository.service.GlobalDataAccessService;
 
-import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -75,6 +78,12 @@ public class InvocDetailInputController implements TreeInputController {
 	 * The cache holding the color objects which are disposed at the end.
 	 */
 	private Map<Integer, Color> colorCache = new HashMap<Integer, Color>();
+
+	/**
+	 * The default value of the selected sensor types.
+	 */
+	private Set<SensorTypeEnum> selectedSensorTypes = EnumSet.of(SensorTypeEnum.TIMER, SensorTypeEnum.INVOCATION_SEQUENCE, SensorTypeEnum.EXCEPTION_TRACER, SensorTypeEnum.JDBC_STATEMENT,
+			SensorTypeEnum.JDBC_PREPARED_STATEMENT);
 
 	/**
 	 * The private inner enumeration used to define the used IDs which are
@@ -197,13 +206,24 @@ public class InvocDetailInputController implements TreeInputController {
 	 * {@inheritDoc}
 	 */
 	public Set<PreferenceId> getPreferenceIds() {
-		return Collections.emptySet();
+		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
+		preferences.add(PreferenceId.FILTERSENSORTYPE);
+		return preferences;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
+		if (PreferenceId.FILTERSENSORTYPE.equals(preferenceEvent.getPreferenceId())) {
+			SensorTypeEnum sensorType = (SensorTypeEnum) preferenceEvent.getPreferenceMap().get(PreferenceId.SensorTypeSelection.SENSOR_TYPE_SELECTION_ID);
+			// add or remove the sensor type from the selected set
+			if (selectedSensorTypes.contains(sensorType)) {
+				selectedSensorTypes.remove(sensorType);
+			} else {
+				selectedSensorTypes.add(sensorType);
+			}
+		}
 	}
 
 	/**
@@ -620,6 +640,28 @@ public class InvocDetailInputController implements TreeInputController {
 		public void dispose() {
 		}
 
+	}
+
+	@Override
+	public ViewerFilter[] getFilters() {
+		ViewerFilter filter = new ViewerFilter() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public boolean select(Viewer viewer, Object parentElement, Object element) {
+				if (element instanceof InvocationSequenceData) {
+					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) element;
+					MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(invocationSequenceData.getMethodIdent());
+					Set<MethodSensorTypeIdent> methodSensorTypes = methodIdent.getMethodSensorTypeIdents();
+					Set<SensorTypeEnum> sensorTypes = SensorTypeEnum.getAllOf(methodSensorTypes);
+					sensorTypes.retainAll(selectedSensorTypes);
+					if (sensorTypes.isEmpty()) {
+						return false;
+					}
+				}
+				return true;
+			}
+		};
+		return new ViewerFilter[] { filter };
 	}
 
 	/**

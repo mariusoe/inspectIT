@@ -88,6 +88,9 @@ public class TreeSubView extends AbstractSubView {
 				});
 			}
 		}
+		if (null != treeInputController.getFilters()) {
+			treeViewer.setFilters(treeInputController.getFilters());
+		}
 
 		MenuManager menuManager = new MenuManager();
 		menuManager.setRemoveAllWhenShown(true);
@@ -144,6 +147,13 @@ public class TreeSubView extends AbstractSubView {
 	 */
 	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
 		treeInputController.preferenceEventFired(preferenceEvent);
+		
+		if (PreferenceId.FILTERSENSORTYPE.equals(preferenceEvent.getPreferenceId())) {
+			// we have to reapply the filter if there is one
+			if (null != treeInputController.getFilters()) {
+				treeViewer.setFilters(treeInputController.getFilters());
+			}
+		}
 	}
 
 	/**
