@@ -80,6 +80,13 @@ public class PicoAgent {
 	 * them.
 	 */
 	private static final String[] IGNORE_START_PATTERNS = new String[] { "info.novatec.inspectit.", "sun.misc.reflect", "$Proxy" };
+	
+	/**
+	 * These patterns are checked in the
+	 * {@link #inspectByteCode(byte[], String, ClassLoader)} method to ignore
+	 * them.
+	 */
+	private static final String[] IGNORE_END_PATTERNS = new String[] { "_WLStub" };
 
 	/**
 	 * The pico container.
@@ -341,6 +348,14 @@ public class PicoAgent {
 		for (int i = 0; i < IGNORE_START_PATTERNS.length; i++) {
 			String ignorePattern = IGNORE_START_PATTERNS[i];
 			if (className.startsWith(ignorePattern)) {
+				return null;
+			}
+		}
+		
+		// ignore all classes which fit to these patterns
+		for (int i = 0; i < IGNORE_END_PATTERNS.length; i++) {
+			String ignorePattern = IGNORE_END_PATTERNS[i];
+			if (className.endsWith(ignorePattern)) {
 				return null;
 			}
 		}
