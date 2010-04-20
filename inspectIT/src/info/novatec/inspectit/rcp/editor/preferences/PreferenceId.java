@@ -16,7 +16,7 @@ public enum PreferenceId {
 	/**
 	 * The identifiers of the different control groups.
 	 */
-	TIMELINE, SAMPLINGRATE, LIVEMODE, UPDATE, ITEMCOUNT, FILTERSENSORTYPE;
+	TIMELINE, SAMPLINGRATE, LIVEMODE, UPDATE, ITEMCOUNT, FILTERSENSORTYPE, INVOCFILTERTIME;
 
 	/**
 	 * Inner enumeration for TIMELINE.
@@ -81,6 +81,19 @@ public enum PreferenceId {
 		 * The identifier for the sensor type selections.-
 		 */
 		SENSOR_TYPE_SELECTION_ID;
+	}
+	
+	/**
+	 * Inner enumeration for the INVOCTIMESELECTION.
+	 * 
+	 * @author Patrice Bouillet
+	 * 
+	 */
+	public enum InvocTimeSelection implements IPreferenceGroup {
+		/**
+		 * The identifier for the time selection.
+		 */
+		TIME_SELECTION_ID;
 	}
 
 }

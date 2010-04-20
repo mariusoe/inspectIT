@@ -147,12 +147,17 @@ public class TreeSubView extends AbstractSubView {
 	 */
 	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
 		treeInputController.preferenceEventFired(preferenceEvent);
-		
-		if (PreferenceId.FILTERSENSORTYPE.equals(preferenceEvent.getPreferenceId())) {
+
+		switch (preferenceEvent.getPreferenceId()) {
+		case FILTERSENSORTYPE:
+		case INVOCFILTERTIME:
 			// we have to reapply the filter if there is one
 			if (null != treeInputController.getFilters()) {
 				treeViewer.setFilters(treeInputController.getFilters());
 			}
+			break;
+		default:
+			break;
 		}
 	}
 

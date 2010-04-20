@@ -20,6 +20,8 @@ import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 import info.novatec.inspectit.rcp.repository.service.GlobalDataAccessService;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -84,6 +86,12 @@ public class InvocDetailInputController implements TreeInputController {
 	 */
 	private Set<SensorTypeEnum> selectedSensorTypes = EnumSet.of(SensorTypeEnum.TIMER, SensorTypeEnum.INVOCATION_SEQUENCE, SensorTypeEnum.EXCEPTION_TRACER, SensorTypeEnum.JDBC_STATEMENT,
 			SensorTypeEnum.JDBC_PREPARED_STATEMENT);
+
+	/**
+	 * There is no default value for the time filter, it has to be selected by
+	 * the user.
+	 */
+	private double defaultFilterTime = Double.NaN;
 
 	/**
 	 * The private inner enumeration used to define the used IDs which are
@@ -208,6 +216,7 @@ public class InvocDetailInputController implements TreeInputController {
 	public Set<PreferenceId> getPreferenceIds() {
 		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
 		preferences.add(PreferenceId.FILTERSENSORTYPE);
+		preferences.add(PreferenceId.INVOCFILTERTIME);
 		return preferences;
 	}
 
@@ -215,7 +224,8 @@ public class InvocDetailInputController implements TreeInputController {
 	 * {@inheritDoc}
 	 */
 	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
-		if (PreferenceId.FILTERSENSORTYPE.equals(preferenceEvent.getPreferenceId())) {
+		switch (preferenceEvent.getPreferenceId()) {
+		case FILTERSENSORTYPE:
 			SensorTypeEnum sensorType = (SensorTypeEnum) preferenceEvent.getPreferenceMap().get(PreferenceId.SensorTypeSelection.SENSOR_TYPE_SELECTION_ID);
 			// add or remove the sensor type from the selected set
 			if (selectedSensorTypes.contains(sensorType)) {
@@ -223,6 +233,13 @@ public class InvocDetailInputController implements TreeInputController {
 			} else {
 				selectedSensorTypes.add(sensorType);
 			}
+			break;
+		case INVOCFILTERTIME:
+			defaultFilterTime = (Double) preferenceEvent.getPreferenceMap().get(PreferenceId.InvocTimeSelection.TIME_SELECTION_ID);
+			break;
+		default:
+			// nothing to do by default
+			break;
 		}
 	}
 
@@ -644,7 +661,7 @@ public class InvocDetailInputController implements TreeInputController {
 
 	@Override
 	public ViewerFilter[] getFilters() {
-		ViewerFilter filter = new ViewerFilter() {
+		ViewerFilter sensorTypeFilter = new InvocationViewerFilter() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
@@ -661,7 +678,86 @@ public class InvocDetailInputController implements TreeInputController {
 				return true;
 			}
 		};
-		return new ViewerFilter[] { filter };
+		ViewerFilter timeFilter = new InvocationViewerFilter() {
+			@Override
+			public boolean select(Viewer viewer, Object parentElement, Object element) {
+				if (Double.NaN == defaultFilterTime) {
+					return true;
+				}
+
+				if (element instanceof InvocationSequenceData) {
+					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) element;
+					// db statements are skipped by purpose, they will not be
+					// filtered by this filter
+					if (null != invocationSequenceData.getSqlStatementData() && 1 == invocationSequenceData.getSqlStatementData().getCount()) {
+						return true;
+					}
+
+					// now filter by the exclusive duration
+					double duration = Double.NaN;
+					if (null == invocationSequenceData.getParentSequence()) {
+						duration = invocationSequenceData.getDuration() - (computeNestedDuration(invocationSequenceData));
+					} else if (null != invocationSequenceData.getTimerData()) {
+						double totalDuration = invocationSequenceData.getTimerData().getDuration();
+						duration = totalDuration - (computeNestedDuration(invocationSequenceData));
+					}
+
+					if (Double.NaN != duration && duration <= defaultFilterTime) {
+						return false;
+					}
+				}
+				return true;
+			}
+		};
+		return new ViewerFilter[] { sensorTypeFilter, timeFilter };
+	}
+
+	/**
+	 * This class is needed to modify the filter method which behaves a little
+	 * bit differently than the original one: Instead of filtering out a
+	 * specific element _and_ all its sub-elements, it only filters out the
+	 * specific elements and pushes up the elements which are child-elements of
+	 * that one.
+	 * 
+	 * @author Patrice Bouillet
+	 * 
+	 */
+	private abstract class InvocationViewerFilter extends ViewerFilter {
+		/**
+		 * The filtering method which tries to push up the child elements if a
+		 * parent element has to be filtered out.
+		 * 
+		 * @param viewer
+		 *            The viewer
+		 * @param parent
+		 *            The parent object
+		 * @param elements
+		 *            The elements to check if they should be filtered
+		 * @return Returns a set of elements which could be now even more than
+		 *         the initial elements
+		 */
+		@Override
+		public Object[] filter(Viewer viewer, Object parent, Object[] elements) {
+			List<Object> out = new ArrayList<Object>();
+			for (Object element : elements) {
+				if (select(viewer, parent, element)) {
+					out.add(element);
+				} else {
+					// This else branch has to be added to not filter out
+					// child elements which would pass the filter.
+					if (element instanceof InvocationSequenceData) {
+						InvocationSequenceData data = (InvocationSequenceData) element;
+						if (data.getChildCount() > 0) {
+							// the parent object stays the same as this is the
+							// graphical representation and not the underlying
+							// model
+							out.addAll(Arrays.asList(filter(viewer, parent, data.getNestedSequences().toArray())));
+						}
+					}
+				}
+			}
+			return out.toArray();
+		}
 	}
 
 	/**

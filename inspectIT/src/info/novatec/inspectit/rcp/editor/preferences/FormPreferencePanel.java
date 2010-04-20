@@ -26,7 +26,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
@@ -236,6 +235,30 @@ public class FormPreferencePanel implements IPreferencePanel {
 			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Connection", SensorTypeEnum.JDBC_CONNECTION, false));
 			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Prep Parameter", SensorTypeEnum.JDBC_PREPARED_STATEMENT_PARAMETER, false));
 			menuAction.addContributionItem(sensorTypeMenuManager);
+		}
+		if (preferenceSet.contains(PreferenceId.INVOCFILTERTIME)) {
+			MenuManager timeMenuManager = new MenuManager("Filter Details by Time");
+			timeMenuManager.add(new FilterByTimeAction("No filter", Double.NaN, true));
+//			timeMenuManager.add(new Separator());
+			timeMenuManager.add(new FilterByTimeAction("0.1 ms", 0.1));
+			timeMenuManager.add(new FilterByTimeAction("0.2 ms", 0.2));
+			timeMenuManager.add(new FilterByTimeAction("0.5 ms", 0.5));
+//			timeMenuManager.add(new Separator());
+			timeMenuManager.add(new FilterByTimeAction("1 ms", 1.0));
+			timeMenuManager.add(new FilterByTimeAction("2 ms", 2.0));
+			timeMenuManager.add(new FilterByTimeAction("5 ms", 5.0));
+			timeMenuManager.add(new FilterByTimeAction("10 ms", 10.0));
+//			timeMenuManager.add(new Separator());
+			timeMenuManager.add(new FilterByTimeAction("50 ms", 50.0));
+			timeMenuManager.add(new FilterByTimeAction("100 ms", 100.0));
+			timeMenuManager.add(new FilterByTimeAction("200 ms", 200.0));
+			timeMenuManager.add(new FilterByTimeAction("500 ms", 500.0));
+//			timeMenuManager.add(new Separator());
+			timeMenuManager.add(new FilterByTimeAction("1 s", 1000.0));
+			timeMenuManager.add(new FilterByTimeAction("1.5 s", 1500.0));
+			timeMenuManager.add(new FilterByTimeAction("2 s", 2000.0));
+			timeMenuManager.add(new FilterByTimeAction("5 s", 5000.0));
+			menuAction.addContributionItem(timeMenuManager);
 		}
 
 		// only add if there is really something in the menu
@@ -453,6 +476,34 @@ public class FormPreferencePanel implements IPreferencePanel {
 			PreferenceEvent event = new PreferenceEvent(PreferenceId.FILTERSENSORTYPE);
 			event.setPreferenceMap(sensorTypePreference);
 			fireEvent(event);
+		}
+	}
+
+	private final class FilterByTimeAction extends Action {
+		private double time;
+
+		public FilterByTimeAction(String text, double time) {
+			this(text, time, false);
+		}
+
+		public FilterByTimeAction(String text, double time, boolean isChecked) {
+			super(text, Action.AS_RADIO_BUTTON);
+			this.time = time;
+			setChecked(isChecked);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void run() {
+			if (isChecked()) {
+				Map<IPreferenceGroup, Object> sensorTypePreference = new HashMap<IPreferenceGroup, Object>();
+				sensorTypePreference.put(PreferenceId.InvocTimeSelection.TIME_SELECTION_ID, new Double(time));
+				PreferenceEvent event = new PreferenceEvent(PreferenceId.INVOCFILTERTIME);
+				event.setPreferenceMap(sensorTypePreference);
+				fireEvent(event);
+			}
 		}
 	}
 

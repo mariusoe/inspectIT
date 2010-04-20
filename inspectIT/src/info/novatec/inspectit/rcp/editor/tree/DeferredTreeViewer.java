@@ -1,10 +1,13 @@
 package info.novatec.inspectit.rcp.editor.tree;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Tree;
@@ -72,6 +75,15 @@ public class DeferredTreeViewer extends TreeViewer {
 	 */
 	@Override
 	protected void internalAdd(Widget widget, Object parentElement, Object[] childElements) {
+		// we have to activate our own filters first, stupid eclipse
+		// implementation which has got two different paths of applying filters
+		// ...
+		ViewerFilter[] filters = getFilters();
+		for (int i = 0; i < filters.length; i++) {
+			ViewerFilter filter = filters[i];
+			childElements = filter.filter(this, parentElement, childElements);
+		}
+		
 		super.internalAdd(widget, parentElement, childElements);
 
 		// check if we are currently in the process of expanding the child
