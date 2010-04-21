@@ -7,6 +7,8 @@ Export-Package: info.novatec.inspectit.cmr.model,
  info.novatec.inspectit.cmr.service,
  info.novatec.inspectit.communication,
  info.novatec.inspectit.communication.data,
+ info.novatec.inspectit.communication.data.ci,
+ info.novatec.inspectit.communication.exception,
  info.novatec.inspectit.communication.valueobject
 Bundle-Vendor: NovaTec GmbH
 Bundle-RequiredExecutionEnvironment: J2SE-1.4
