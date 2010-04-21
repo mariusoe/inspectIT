@@ -139,7 +139,7 @@ public class CpuInputController implements TextInputController {
 		if (null != data) {
 			int count = data.getCount();
 			cpuUsage.setText(NumberFormatter.formatCpuPercent(data.getTotalCpuUsage() / count));
-			processCpuTime.setText(NumberFormatter.formatNanosToSeconds((data.getTotalProcessCpuTime() / count)));
+			processCpuTime.setText(NumberFormatter.formatNanosToSeconds(data.getProcessCpuTime()));
 		}
 	}
 

@@ -26,10 +26,6 @@ public class CpuDataAggregator implements IDataAggregator {
 			float maxCpuUsage = 0;
 			float totalCpuUsage = 0;
 
-			long minProcessCpuTime = Long.MAX_VALUE;
-			long maxProcessCpuTime = 0;
-			long totalProcessCpuTime = 0;
-
 			int totalCount = 0;
 
 			for (int i = fromIndex; i <= toIndex; i++) {
@@ -40,20 +36,12 @@ public class CpuDataAggregator implements IDataAggregator {
 				minCpuUsage = Math.min(dataObject.getMinCpuUsage(), minCpuUsage);
 				maxCpuUsage = Math.max(dataObject.getMaxCpuUsage(), maxCpuUsage);
 				totalCpuUsage += dataObject.getTotalCpuUsage();
-
-				minProcessCpuTime = Math.min(dataObject.getMinProcessCpuTime(), minProcessCpuTime);
-				maxProcessCpuTime = Math.max(dataObject.getMaxProcessCpuTime(), maxProcessCpuTime);
-				totalProcessCpuTime += dataObject.getTotalProcessCpuTime();
 			}
 
 			CpuInformationData data = new CpuInformationData(null, platformIdent, sensorTypeIdent);
 			data.setMinCpuUsage(minCpuUsage);
 			data.setMaxCpuUsage(maxCpuUsage);
 			data.setTotalCpuUsage(totalCpuUsage);
-
-			data.setMinProcessCpuTime(minProcessCpuTime);
-			data.setMaxProcessCpuTime(maxProcessCpuTime);
-			data.setTotalProcessCpuTime(totalProcessCpuTime);
 
 			data.setCount(totalCount);
 

@@ -5,12 +5,7 @@
 		extends="info.novatec.inspectit.communication.SystemSensorData"
 		table="cpu_information_data">
 		<property name="count" column="count" />
-		<property name="minProcessCpuTime"
-			column="min_process_cpu_time" />
-		<property name="maxProcessCpuTime"
-			column="max_process_cpu_time" />
-		<property name="totalProcessCpuTime"
-			column="total_process_cpu_time" />
+		<property name="processCpuTime" column="process_cpu_time" />
 		<property name="minCpuUsage" column="min_cpu_usage" />
 		<property name="maxCpuUsage" column="max_cpu_usage" />
 		<property name="totalCpuUsage" column="total_cpu_usage" />

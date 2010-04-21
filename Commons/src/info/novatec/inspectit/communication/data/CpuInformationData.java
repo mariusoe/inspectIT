@@ -24,22 +24,9 @@ public class CpuInformationData extends SystemSensorData {
 	private int count = 0;
 
 	/**
-	 * The minimum cpu time used by the process on which the virtual machine is
-	 * running.
+	 * The cpu time used by the process on which the virtual machine is running.
 	 */
-	private long minProcessCpuTime = Long.MAX_VALUE;
-
-	/**
-	 * The maximum cpu time used by the process on which the virtual machine is
-	 * running.
-	 */
-	private long maxProcessCpuTime = 0;
-
-	/**
-	 * The total cpu time used by the process on which the virtual machine is
-	 * running.
-	 */
-	private long totalProcessCpuTime = 0;
+	private long processCpuTime = 0;
 
 	/**
 	 * The minimum cpu usage in percent.
@@ -88,34 +75,18 @@ public class CpuInformationData extends SystemSensorData {
 		this.count++;
 	}
 
-	public void updateTotalProcessCpuTime (long totalTime) {
-		if (totalTime > totalProcessCpuTime) {
-			totalProcessCpuTime = totalTime;
+	public void updateProcessCpuTime(long actualProcessCpuTime) {
+		if (actualProcessCpuTime > processCpuTime) {
+			processCpuTime = actualProcessCpuTime;
 		}
 	}
-	
-	public long getMinProcessCpuTime() {
-		return minProcessCpuTime;
+
+	public long getProcessCpuTime() {
+		return processCpuTime;
 	}
 
-	public void setMinProcessCpuTime(long minProcessCpuTime) {
-		this.minProcessCpuTime = minProcessCpuTime;
-	}
-
-	public long getMaxProcessCpuTime() {
-		return maxProcessCpuTime;
-	}
-
-	public void setMaxProcessCpuTime(long maxProcessCpuTime) {
-		this.maxProcessCpuTime = maxProcessCpuTime;
-	}
-
-	public long getTotalProcessCpuTime() {
-		return totalProcessCpuTime;
-	}
-
-	public void setTotalProcessCpuTime(long totalProcessCpuTime) {
-		this.totalProcessCpuTime = totalProcessCpuTime;
+	public void setProcessCpuTime(long processCpuTime) {
+		this.processCpuTime = processCpuTime;
 	}
 
 	public void addCpuUsage(float cpuUsage) {
@@ -146,25 +117,17 @@ public class CpuInformationData extends SystemSensorData {
 		this.totalCpuUsage = totalCpuUsage;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + count;
 		result = prime * result + Float.floatToIntBits(maxCpuUsage);
-		result = prime * result + (int) (maxProcessCpuTime ^ (maxProcessCpuTime >>> 32));
 		result = prime * result + Float.floatToIntBits(minCpuUsage);
-		result = prime * result + (int) (minProcessCpuTime ^ (minProcessCpuTime >>> 32));
+		result = prime * result + (int) (processCpuTime ^ (processCpuTime >>> 32));
 		result = prime * result + Float.floatToIntBits(totalCpuUsage);
-		result = prime * result + (int) (totalProcessCpuTime ^ (totalProcessCpuTime >>> 32));
 		return result;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -182,22 +145,15 @@ public class CpuInformationData extends SystemSensorData {
 		if (Float.floatToIntBits(maxCpuUsage) != Float.floatToIntBits(other.maxCpuUsage)) {
 			return false;
 		}
-		if (maxProcessCpuTime != other.maxProcessCpuTime) {
-			return false;
-		}
 		if (Float.floatToIntBits(minCpuUsage) != Float.floatToIntBits(other.minCpuUsage)) {
 			return false;
 		}
-		if (minProcessCpuTime != other.minProcessCpuTime) {
+		if (processCpuTime != other.processCpuTime) {
 			return false;
 		}
 		if (Float.floatToIntBits(totalCpuUsage) != Float.floatToIntBits(other.totalCpuUsage)) {
 			return false;
 		}
-		if (totalProcessCpuTime != other.totalProcessCpuTime) {
-			return false;
-		}
 		return true;
 	}
-
 }

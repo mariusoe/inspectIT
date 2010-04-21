@@ -74,7 +74,7 @@ public class CpuInformation implements IPlatformSensor {
 	public CpuInformation(IIdManager idManager) {
 		this.idManager = idManager;
 	}
-	
+
 	/**
 	 * Returns the process cpu time.
 	 * 
@@ -121,9 +121,7 @@ public class CpuInformation implements IPlatformSensor {
 				osData = new CpuInformationData(timestamp, platformId, registeredSensorTypeId);
 				osData.incrementCount();
 
-				osData.updateTotalProcessCpuTime(processCpuTime);
-				osData.setMinProcessCpuTime(processCpuTime);
-				osData.setMaxProcessCpuTime(processCpuTime);
+				osData.updateProcessCpuTime(processCpuTime);
 
 				osData.addCpuUsage(cpuUsage);
 				osData.setMinCpuUsage(cpuUsage);
@@ -137,14 +135,8 @@ public class CpuInformation implements IPlatformSensor {
 			}
 		} else {
 			osData.incrementCount();
-			osData.updateTotalProcessCpuTime(processCpuTime);
+			osData.updateProcessCpuTime(processCpuTime);
 			osData.addCpuUsage(cpuUsage);
-
-			if (processCpuTime < osData.getMinProcessCpuTime()) {
-				osData.setMinProcessCpuTime(processCpuTime);
-			} else if (processCpuTime > osData.getMaxProcessCpuTime()) {
-				osData.setMaxProcessCpuTime(processCpuTime);
-			}
 
 			if (cpuUsage < osData.getMinCpuUsage()) {
 				osData.setMinCpuUsage(cpuUsage);

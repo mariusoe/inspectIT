@@ -655,7 +655,7 @@ public class VmSummaryInputController implements TextInputController {
 		}
 
 		if (cpuData != null) {
-			processCpuTime.setText(NumberFormatter.formatNanosToSeconds(cpuData.getTotalProcessCpuTime() / cpuData.getCount()));
+			processCpuTime.setText(NumberFormatter.formatNanosToSeconds(cpuData.getProcessCpuTime()));
 		}
 
 		if (compilationData != null) {
