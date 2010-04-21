@@ -53,6 +53,11 @@ public class ExceptionTracingHook implements IExceptionTracingHook {
 	private static final int MAX_VALUE_LENGTH = 1000;
 
 	/**
+	 * The maximum length of the stacktrace.
+	 */
+	private static final int MAX_STACKTRACE_LENGTH = 10000;
+
+	/**
 	 * The default constructor which needs one parameter for initialization.
 	 * 
 	 * 
@@ -245,7 +250,7 @@ public class ExceptionTracingHook implements IExceptionTracingHook {
 			exceptionSensorData.setCause(crop(cause.getClass().getName(), MAX_VALUE_LENGTH));
 		}
 		exceptionSensorData.setErrorMessage(crop(throwable.getMessage(), MAX_VALUE_LENGTH));
-		exceptionSensorData.setStackTrace(stackTraceToString(throwable));
+		exceptionSensorData.setStackTrace(crop(stackTraceToString(throwable), MAX_STACKTRACE_LENGTH));
 		// exceptionSensorData.setStackTrace(getStackTrace(throwable));
 	}
 
