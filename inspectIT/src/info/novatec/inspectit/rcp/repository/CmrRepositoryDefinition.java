@@ -1,10 +1,12 @@
 package info.novatec.inspectit.rcp.repository;
 
 import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
+import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.ConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.cmr.CombinedMetricsDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.cmr.ExceptionDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.cmr.GlobalDataAccessService;
@@ -19,6 +21,7 @@ import info.novatec.inspectit.rcp.repository.service.cmr.SqlDataAccessService;
  * @author Patrice Bouillet
  * @author Dirk Maucher
  * @author Eduard Tudenhoefner
+ * @author Matthias Huber
  * 
  */
 public class CmrRepositoryDefinition implements RepositoryDefinition {
@@ -59,6 +62,11 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	private final ICombinedMetricsDataAccessService combinedMetricsDataAccessService;
 
 	/**
+	 * The configuration interface data access service
+	 */
+	private final IConfigurationInterfaceDataAccessService configurationInterfaceDataAccessService;
+
+	/**
 	 * The server status service exposed by the CMR and initialized by Spring.
 	 */
 	private final ServerStatusService serverStatusService;
@@ -68,6 +76,7 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	 */
 	private final ILicenseService licenseService;
 
+	
 	/**
 	 * The only constructor of this class. The ip and port is mandatory to
 	 * create the connection.
@@ -88,6 +97,7 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 		licenseService = new LicenseService(ip, port);
 		exceptionDataAccessService = new ExceptionDataAccessService(ip, port);
 		combinedMetricsDataAccessService = new CombinedMetricsDataAccessService(ip, port);
+		configurationInterfaceDataAccessService = new ConfigurationInterfaceDataAccessService(ip, port);
 	}
 
 	/**
@@ -128,6 +138,11 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	@Override
 	public ICombinedMetricsDataAccessService getCombinedMetricsDataAccessService() {
 		return combinedMetricsDataAccessService;
+	}
+
+	@Override
+	public IConfigurationInterfaceDataAccessService getConfigurationInterfaceDataAccessService() {
+		return configurationInterfaceDataAccessService;
 	}
 
 	/**

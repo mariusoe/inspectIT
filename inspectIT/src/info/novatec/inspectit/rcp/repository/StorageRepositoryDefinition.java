@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.repository;
 
 import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
+import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
@@ -121,8 +122,17 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	 * Not supported.
 	 */
 	@Override
+	public IConfigurationInterfaceDataAccessService getConfigurationInterfaceDataAccessService() {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Not supported.
+	 */
+	@Override
 	public String toString() {
 		return "StorageRepositoryDefinition :: " + path;
 	}
+
 
 }
