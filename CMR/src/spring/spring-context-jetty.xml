@@ -135,6 +135,24 @@
 	</bean>
 	<!-- END -->
 
+	<!-- Configuration Interface Data Access Service -->
+	<bean name="configurationInterfaceDataAccessRequestHandlerServlet"
+		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
+	</bean>
+
+	<bean id="configurationInterfaceDataAccessServletHolder"
+		class="org.mortbay.jetty.servlet.ServletHolder">
+		<property name="name" value="configurationInterfaceDataAccessExporter" />
+		<property name="servlet" ref="configurationInterfaceDataAccessRequestHandlerServlet" />
+	</bean>
+
+	<bean id="configurationInterfaceDataAccessServiceMapping"
+		class="org.mortbay.jetty.servlet.ServletMapping">
+		<property name="servletName" value="configurationInterfaceDataAccessExporter" />
+		<property name="pathSpec" value="/remoting/ConfigurationInterfaceDataAccessService" />
+	</bean>
+	<!-- END -->
+
 	<bean id="servletHandler"
 		class="org.mortbay.jetty.servlet.ServletHandler">
 		<property name="servlets">
@@ -146,6 +164,7 @@
 				<ref bean="combinedMetricsDataAccessServletHolder" />
 				<ref bean="serverStatusServletHolder" />
 				<ref bean="licenseServletHolder" />
+				<ref bean="configurationInterfaceDataAccessServletHolder" />
 			</list>
 		</property>
 		<property name="servletMappings">
@@ -157,6 +176,7 @@
 				<ref bean="combinedMetricsDataAccessServiceMapping" />
 				<ref bean="serverStatusServiceMapping" />
 				<ref bean="licenseServiceMapping" />
+				<ref bean="configurationInterfaceDataAccessServiceMapping" />
 			</list>
 		</property>
 	</bean>

@@ -20,9 +20,12 @@
 		class="info.novatec.inspectit.cmr.service.ServerStatusService" />
 
 	<bean id="licenseService" class="info.novatec.inspectit.cmr.service.LicenseService" />
-	
+			
 	<bean id="combinedMetricsDataAccessService" 
 		class="info.novatec.inspectit.cmr.service.CombinedMetricsDataAccessService"/>
+
+	<bean id="configurationInterfaceDataAccessService" 
+		class="info.novatec.inspectit.cmr.service.ConfigurationInterfaceDataAccessService"/>
 
 	<bean name="globalDataAccessExporter"
 		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
@@ -71,6 +74,13 @@
 		<property name="service" ref="combinedMetricsDataAccessService" />
 		<property name="serviceInterface"
 			value="info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService" />
+	</bean>
+
+	<bean name="configurationInterfaceDataAccessExporter"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
+		<property name="service" ref="configurationInterfaceDataAccessService" />
+		<property name="serviceInterface"
+			value="info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService" />
 	</bean>
 
 </beans>

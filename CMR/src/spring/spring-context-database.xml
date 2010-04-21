@@ -35,19 +35,19 @@
 				<value>hibernate/PlatformIdent.hbm.xml</value>
 				<value>hibernate/MethodIdent.hbm.xml</value>
 				<value>hibernate/SensorTypeIdent.hbm.xml</value>
-				
+
 				<!-- Abstract Data classes -->
 				<value>hibernate/DefaultData.hbm.xml</value>
 				<value>hibernate/ParameterContentData.hbm.xml</value>
 				<value>hibernate/MethodSensorData.hbm.xml</value>
 				<value>hibernate/SystemSensorData.hbm.xml</value>
-				
+
 				<!-- Method Data Objects -->
 				<value>hibernate/TimerData.hbm.xml</value>
 				<value>hibernate/InvocationSequenceData.hbm.xml</value>
 				<value>hibernate/SqlStatementData.hbm.xml</value>
 				<value>hibernate/ExceptionSensorData.hbm.xml</value>
-				
+
 				<!-- Platform Data Objects -->
 				<value>hibernate/ClassLoadingInformationData.hbm.xml</value>
 				<value>hibernate/CompilationInformationData.hbm.xml</value>
@@ -57,6 +57,14 @@
 				<value>hibernate/VMArgumentData.hbm.xml</value>
 				<value>hibernate/SystemInformationData.hbm.xml</value>
 				<value>hibernate/ThreadInformationData.hbm.xml</value>
+
+				<!-- Configuration Interface Data Objects -->
+				<value>hibernate/EnvironmentData.hbm.xml</value>
+				<value>hibernate/ProfileData.hbm.xml</value>
+				<value>hibernate/SensorTypeData.hbm.xml</value>
+				<value>hibernate/MethodSensorDefinitionData.hbm.xml</value>
+				<value>hibernate/PlatformSensorDefinitionData.hbm.xml</value>
+				<value>hibernate/ExceptionSensorDefinitionData.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">

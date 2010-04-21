@@ -4,8 +4,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"
 	default-autowire="autodetect">
 
-	<bean id="methodIdentDao"
-		class="info.novatec.inspectit.cmr.dao.impl.MethodIdentDaoImpl" />
+	<bean id="methodIdentDao" class="info.novatec.inspectit.cmr.dao.impl.MethodIdentDaoImpl" />
 	<bean id="methodSensorTypeIdentDao"
 		class="info.novatec.inspectit.cmr.dao.impl.MethodSensorTypeIdentDaoImpl" />
 	<bean id="platformIdentDao"
@@ -13,15 +12,25 @@
 	<bean id="platformSensorTypeIdentDao"
 		class="info.novatec.inspectit.cmr.dao.impl.PlatformSensorTypeIdentDaoImpl" />
 
-	<bean id="defaultDataDao"
-		class="info.novatec.inspectit.cmr.dao.impl.DefaultDataDaoImpl" />
+	<bean id="defaultDataDao" class="info.novatec.inspectit.cmr.dao.impl.DefaultDataDaoImpl" />
 	<bean id="invocationDataDao"
 		class="info.novatec.inspectit.cmr.dao.impl.InvocationDataDaoImpl" />
-	<bean id="sqlDataDao"
-		class="info.novatec.inspectit.cmr.dao.impl.SqlDataDaoImpl" />
+	<bean id="sqlDataDao" class="info.novatec.inspectit.cmr.dao.impl.SqlDataDaoImpl" />
 	<bean id="exceptionSensorDataDao"
 		class="info.novatec.inspectit.cmr.dao.impl.ExceptionSensorDataDaoImpl" />
 	<bean id="combinedMetricsDataDao"
 		class="info.novatec.inspectit.cmr.dao.impl.CombinedMetricsDataDaoImpl" />
 
+	<bean id="environmentDataDao"
+		class="info.novatec.inspectit.cmr.dao.ci.impl.EnvironmentDataDaoImpl" />
+	<bean id="profileDataDao"
+		class="info.novatec.inspectit.cmr.dao.ci.impl.ProfileDataDaoImpl" />
+	<bean id="sensorTypeDataDao"
+		class="info.novatec.inspectit.cmr.dao.ci.impl.SensorTypeDataDaoImpl" />
+	<bean id="exceptionSensorDefinitionDataDao"
+		class="info.novatec.inspectit.cmr.dao.ci.impl.ExceptionSensorDefinitionDataDaoImpl" />
+	<bean id="methodSensorDefinitionDataDao"
+		class="info.novatec.inspectit.cmr.dao.ci.impl.MethodSensorDefinitionDataDaoImpl" />
+	<bean id="platformSensorDefinitionDataDao"
+		class="info.novatec.inspectit.cmr.dao.ci.impl.PlatformSensorDefinitionDataDaoImpl" />
 </beans>
