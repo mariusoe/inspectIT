@@ -306,7 +306,7 @@ public class ExceptionTracingHook implements IExceptionTracingHook {
 	 */
 	private String crop(String value, int maxLength) {
 		if (null != value && value.length() > maxLength) {
-			return value.substring(0, maxLength - 1);
+			return value.substring(0, maxLength);
 		}
 		return value;
 	}

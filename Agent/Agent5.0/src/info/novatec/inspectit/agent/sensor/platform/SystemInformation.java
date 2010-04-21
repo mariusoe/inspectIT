@@ -390,7 +390,7 @@ public class SystemInformation implements IPlatformSensor {
 	 */
 	private String crop(String value) {
 		if (null != value && value.length() > MAX_LENGTH) {
-			return value.substring(0, MAX_LENGTH - 1);
+			return value.substring(0, MAX_LENGTH);
 		}
 		return value;
 	}
