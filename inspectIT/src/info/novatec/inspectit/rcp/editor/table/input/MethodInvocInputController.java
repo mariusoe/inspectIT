@@ -365,8 +365,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 						timerData.setMinExclusiveTime(exclusiveTime);
 						timerData.setMaxExclusiveTime(exclusiveTime);
 						timerData.addTotalExclusiveTime(exclusiveTime);
-
-						if (-1 != invocationSequenceData.getTimerData().getCpuMin()) {
+						if (null != invocationSequenceData.getTimerData() && -1 != invocationSequenceData.getTimerData().getCpuMin()) {
 							timerData.setCpuMin(invocationSequenceData.getTimerData().getCpuMin());
 							timerData.setCpuMax(invocationSequenceData.getTimerData().getCpuMax());
 							timerData.setCpuDuration(invocationSequenceData.getTimerData().getCpuDuration());
