@@ -237,6 +237,40 @@ public class ExceptionTracingHookTest extends AbstractLogSupport {
 	}
 
 	@Test
+	public void valueTooLong() throws InstantiationException, IllegalAccessException, IdNotAvailableException {
+		long constructorId = 5L;
+		long sensorTypeId = 3L;
+		long platformId = 1L;
+		long registeredConstructorId = 15L;
+		long registeredSensorTypeId = 13L;
+
+		Object[] parameters = new Object[0];
+		
+		// the actual error message is too long, so it should be cropped later on
+		MyTestException exceptionObject = new MyTestException(fillString('x', 1001));
+		
+		ExceptionSensorData exceptionSensorData = new ExceptionSensorData(new Timestamp(System.currentTimeMillis()), platformId, registeredSensorTypeId, registeredConstructorId);
+		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.CREATED);
+		exceptionSensorData.setThrowableIdentityHashCode(System.identityHashCode(exceptionObject));
+		
+		// the actual error message to be verified against
+		exceptionSensorData.setErrorMessage(fillString('x', 1000));
+		
+		when(idManager.getRegisteredMethodId(constructorId)).thenReturn(registeredConstructorId);
+		when(idManager.getRegisteredSensorTypeId(sensorTypeId)).thenReturn(registeredSensorTypeId);
+		when(idManager.getPlatformId()).thenReturn(platformId);
+
+		exceptionHook.dispatchConstructorOfThrowable(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
+		verify(idManager, times(1)).getRegisteredMethodId(constructorId);
+		verify(idManager, times(1)).getRegisteredSensorTypeId(sensorTypeId);
+		verify(idManager, times(1)).getPlatformId();
+		verify(coreService, times(1)).addExceptionSensorData(eq(registeredSensorTypeId), eq(exceptionSensorData.getThrowableIdentityHashCode()),
+				argThat(new ExceptionSensorDataVerifier(exceptionSensorData)));
+
+		verifyNoMoreInteractions(idManager);
+	}
+
+	@Test
 	public void platformIdNotAvailable() throws IdNotAvailableException {
 		// set up data
 		long methodId = 3L;
@@ -334,4 +368,12 @@ public class ExceptionTracingHookTest extends AbstractLogSupport {
 
 	}
 
+	public String fillString(char character, int count) {
+		// creates a string of 'x' repeating characters
+		char[] chars = new char[count];
+		while (count > 0) {
+			chars[--count] = character;
+		}
+		return new String(chars);
+	}
 }
