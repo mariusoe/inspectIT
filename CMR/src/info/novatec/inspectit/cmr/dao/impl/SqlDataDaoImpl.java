@@ -22,7 +22,7 @@ public class SqlDataDaoImpl extends HibernateDaoSupport implements SqlDataDao {
 	 * The query string used to aggregate the sql information in the db
 	 * directly.
 	 */
-	private static final String AGGREGATED_SQL_STATEMENTS = "select distinct sqlData.sql as sql, sqlData.platformIdent as platformIdent, sqlData.sensorTypeIdent as sensorTypeIdent, sqlData.methodIdent as methodIdent, sqlData.preparedStatement as preparedStatement, sum(sqlData.count) as count, min(sqlData.min) as min, max(sqlData.max) as max, sum(sqlData.duration) as duration, (sum(sqlData.duration) / sum(sqlData.count)) as average from SqlStatementData sqlData where sqlData.platformIdent=? group by sqlData.sql order by sqlData.sql";
+	private static final String AGGREGATED_SQL_STATEMENTS = "select distinct sqlData.sql as sql, sqlData.platformIdent as platformIdent, sqlData.methodIdent as methodIdent, sqlData.preparedStatement as preparedStatement, sum(sqlData.count) as count, min(sqlData.min) as min, max(sqlData.max) as max, sum(sqlData.duration) as duration, (sum(sqlData.duration) / sum(sqlData.count)) as average from SqlStatementData sqlData where sqlData.platformIdent=? group by sqlData.sql, sqlData.methodIdent order by sqlData.sql";
 
 	/**
 	 * {@inheritDoc}
