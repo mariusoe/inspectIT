@@ -88,10 +88,16 @@ public class InvocDetailInputController implements TreeInputController {
 			SensorTypeEnum.JDBC_PREPARED_STATEMENT);
 
 	/**
-	 * There is no default value for the time filter, it has to be selected by
-	 * the user.
+	 * There is no default value for the exclusive time filter, it has to be
+	 * selected by the user.
 	 */
-	private double defaultFilterTime = Double.NaN;
+	private double defaultExclusiveFilterTime = Double.NaN;
+
+	/**
+	 * There is no default value for the total time filter, it has to be
+	 * selected by the user.
+	 */
+	private double defaultTotalFilterTime = Double.NaN;
 
 	/**
 	 * The private inner enumeration used to define the used IDs which are
@@ -216,7 +222,8 @@ public class InvocDetailInputController implements TreeInputController {
 	public Set<PreferenceId> getPreferenceIds() {
 		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
 		preferences.add(PreferenceId.FILTERSENSORTYPE);
-		preferences.add(PreferenceId.INVOCFILTERTIME);
+		preferences.add(PreferenceId.INVOCFILTEREXCLUSIVETIME);
+		preferences.add(PreferenceId.INVOCFILTERTOTALTIME);
 		return preferences;
 	}
 
@@ -234,8 +241,11 @@ public class InvocDetailInputController implements TreeInputController {
 				selectedSensorTypes.add(sensorType);
 			}
 			break;
-		case INVOCFILTERTIME:
-			defaultFilterTime = (Double) preferenceEvent.getPreferenceMap().get(PreferenceId.InvocTimeSelection.TIME_SELECTION_ID);
+		case INVOCFILTEREXCLUSIVETIME:
+			defaultExclusiveFilterTime = (Double) preferenceEvent.getPreferenceMap().get(PreferenceId.InvocExclusiveTimeSelection.TIME_SELECTION_ID);
+			break;
+		case INVOCFILTERTOTALTIME:
+			defaultTotalFilterTime = (Double) preferenceEvent.getPreferenceMap().get(PreferenceId.InvocTotalTimeSelection.TIME_SELECTION_ID);
 			break;
 		default:
 			// nothing to do by default
@@ -678,10 +688,10 @@ public class InvocDetailInputController implements TreeInputController {
 				return true;
 			}
 		};
-		ViewerFilter timeFilter = new InvocationViewerFilter() {
+		ViewerFilter exclusiveTimeFilter = new InvocationViewerFilter() {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				if (Double.NaN == defaultFilterTime) {
+				if (Double.NaN == defaultExclusiveFilterTime) {
 					return true;
 				}
 
@@ -702,14 +712,48 @@ public class InvocDetailInputController implements TreeInputController {
 						duration = totalDuration - (computeNestedDuration(invocationSequenceData));
 					}
 
-					if (Double.NaN != duration && duration <= defaultFilterTime) {
+					if (Double.NaN != duration && duration <= defaultExclusiveFilterTime) {
 						return false;
 					}
 				}
 				return true;
 			}
 		};
-		return new ViewerFilter[] { sensorTypeFilter, timeFilter };
+		ViewerFilter totalTimeFilter = new InvocationViewerFilter() {
+			@Override
+			public boolean select(Viewer viewer, Object parentElement, Object element) {
+				if (Double.NaN == defaultTotalFilterTime) {
+					return true;
+				}
+
+				if (element instanceof InvocationSequenceData) {
+					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) element;
+					// db statements are skipped by purpose, they will not be
+					// filtered by this filter
+					if (null != invocationSequenceData.getSqlStatementData() && 1 == invocationSequenceData.getSqlStatementData().getCount()) {
+						return true;
+					}
+
+					// now filter by the exclusive duration
+					double duration = Double.NaN;
+					if (null == invocationSequenceData.getParentSequence()) {
+						if (invocationSequenceData.getDuration() <= defaultTotalFilterTime) {
+							return false;
+						}
+					} else if (null != invocationSequenceData.getTimerData()) {
+						if (invocationSequenceData.getTimerData().getDuration() <= defaultTotalFilterTime) {
+							return false;
+						}
+					}
+
+					if (Double.NaN != duration && duration <= defaultExclusiveFilterTime) {
+						return false;
+					}
+				}
+				return true;
+			}
+		};
+		return new ViewerFilter[] { sensorTypeFilter, exclusiveTimeFilter, totalTimeFilter };
 	}
 
 	/**

@@ -150,7 +150,8 @@ public class TreeSubView extends AbstractSubView {
 
 		switch (preferenceEvent.getPreferenceId()) {
 		case FILTERSENSORTYPE:
-		case INVOCFILTERTIME:
+		case INVOCFILTEREXCLUSIVETIME:
+		case INVOCFILTERTOTALTIME:
 			// we have to reapply the filter if there is one
 			if (null != treeInputController.getFilters()) {
 				treeViewer.setFilters(treeInputController.getFilters());

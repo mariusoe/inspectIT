@@ -236,28 +236,52 @@ public class FormPreferencePanel implements IPreferencePanel {
 			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Prep Parameter", SensorTypeEnum.JDBC_PREPARED_STATEMENT_PARAMETER, false));
 			menuAction.addContributionItem(sensorTypeMenuManager);
 		}
-		if (preferenceSet.contains(PreferenceId.INVOCFILTERTIME)) {
-			MenuManager timeMenuManager = new MenuManager("Filter Details by Time");
-			timeMenuManager.add(new FilterByTimeAction("No filter", Double.NaN, true));
+		if (preferenceSet.contains(PreferenceId.INVOCFILTEREXCLUSIVETIME)) {
+			MenuManager timeMenuManager = new MenuManager("Filter Details by Exclusive Time");
+			timeMenuManager.add(new FilterByExclusiveTimeAction("No filter", Double.NaN, true));
 //			timeMenuManager.add(new Separator());
-			timeMenuManager.add(new FilterByTimeAction("0.1 ms", 0.1));
-			timeMenuManager.add(new FilterByTimeAction("0.2 ms", 0.2));
-			timeMenuManager.add(new FilterByTimeAction("0.5 ms", 0.5));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("0.1 ms", 0.1));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("0.2 ms", 0.2));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("0.5 ms", 0.5));
 //			timeMenuManager.add(new Separator());
-			timeMenuManager.add(new FilterByTimeAction("1 ms", 1.0));
-			timeMenuManager.add(new FilterByTimeAction("2 ms", 2.0));
-			timeMenuManager.add(new FilterByTimeAction("5 ms", 5.0));
-			timeMenuManager.add(new FilterByTimeAction("10 ms", 10.0));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("1 ms", 1.0));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("2 ms", 2.0));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("5 ms", 5.0));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("10 ms", 10.0));
 //			timeMenuManager.add(new Separator());
-			timeMenuManager.add(new FilterByTimeAction("50 ms", 50.0));
-			timeMenuManager.add(new FilterByTimeAction("100 ms", 100.0));
-			timeMenuManager.add(new FilterByTimeAction("200 ms", 200.0));
-			timeMenuManager.add(new FilterByTimeAction("500 ms", 500.0));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("50 ms", 50.0));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("100 ms", 100.0));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("200 ms", 200.0));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("500 ms", 500.0));
 //			timeMenuManager.add(new Separator());
-			timeMenuManager.add(new FilterByTimeAction("1 s", 1000.0));
-			timeMenuManager.add(new FilterByTimeAction("1.5 s", 1500.0));
-			timeMenuManager.add(new FilterByTimeAction("2 s", 2000.0));
-			timeMenuManager.add(new FilterByTimeAction("5 s", 5000.0));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("1 s", 1000.0));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("1.5 s", 1500.0));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("2 s", 2000.0));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("5 s", 5000.0));
+			menuAction.addContributionItem(timeMenuManager);
+		}
+		if (preferenceSet.contains(PreferenceId.INVOCFILTERTOTALTIME)) {
+			MenuManager timeMenuManager = new MenuManager("Filter Details by Total Time");
+			timeMenuManager.add(new FilterByTotalTimeAction("No filter", Double.NaN, true));
+//			timeMenuManager.add(new Separator());
+			timeMenuManager.add(new FilterByTotalTimeAction("0.1 ms", 0.1));
+			timeMenuManager.add(new FilterByTotalTimeAction("0.2 ms", 0.2));
+			timeMenuManager.add(new FilterByTotalTimeAction("0.5 ms", 0.5));
+//			timeMenuManager.add(new Separator());
+			timeMenuManager.add(new FilterByTotalTimeAction("1 ms", 1.0));
+			timeMenuManager.add(new FilterByTotalTimeAction("2 ms", 2.0));
+			timeMenuManager.add(new FilterByTotalTimeAction("5 ms", 5.0));
+			timeMenuManager.add(new FilterByTotalTimeAction("10 ms", 10.0));
+//			timeMenuManager.add(new Separator());
+			timeMenuManager.add(new FilterByTotalTimeAction("50 ms", 50.0));
+			timeMenuManager.add(new FilterByTotalTimeAction("100 ms", 100.0));
+			timeMenuManager.add(new FilterByTotalTimeAction("200 ms", 200.0));
+			timeMenuManager.add(new FilterByTotalTimeAction("500 ms", 500.0));
+//			timeMenuManager.add(new Separator());
+			timeMenuManager.add(new FilterByTotalTimeAction("1 s", 1000.0));
+			timeMenuManager.add(new FilterByTotalTimeAction("1.5 s", 1500.0));
+			timeMenuManager.add(new FilterByTotalTimeAction("2 s", 2000.0));
+			timeMenuManager.add(new FilterByTotalTimeAction("5 s", 5000.0));
 			menuAction.addContributionItem(timeMenuManager);
 		}
 
@@ -479,14 +503,14 @@ public class FormPreferencePanel implements IPreferencePanel {
 		}
 	}
 
-	private final class FilterByTimeAction extends Action {
+	private final class FilterByExclusiveTimeAction extends Action {
 		private double time;
 
-		public FilterByTimeAction(String text, double time) {
+		public FilterByExclusiveTimeAction(String text, double time) {
 			this(text, time, false);
 		}
 
-		public FilterByTimeAction(String text, double time, boolean isChecked) {
+		public FilterByExclusiveTimeAction(String text, double time, boolean isChecked) {
 			super(text, Action.AS_RADIO_BUTTON);
 			this.time = time;
 			setChecked(isChecked);
@@ -499,8 +523,36 @@ public class FormPreferencePanel implements IPreferencePanel {
 		public void run() {
 			if (isChecked()) {
 				Map<IPreferenceGroup, Object> sensorTypePreference = new HashMap<IPreferenceGroup, Object>();
-				sensorTypePreference.put(PreferenceId.InvocTimeSelection.TIME_SELECTION_ID, new Double(time));
-				PreferenceEvent event = new PreferenceEvent(PreferenceId.INVOCFILTERTIME);
+				sensorTypePreference.put(PreferenceId.InvocExclusiveTimeSelection.TIME_SELECTION_ID, new Double(time));
+				PreferenceEvent event = new PreferenceEvent(PreferenceId.INVOCFILTEREXCLUSIVETIME);
+				event.setPreferenceMap(sensorTypePreference);
+				fireEvent(event);
+			}
+		}
+	}
+	
+	private final class FilterByTotalTimeAction extends Action {
+		private double time;
+
+		public FilterByTotalTimeAction(String text, double time) {
+			this(text, time, false);
+		}
+
+		public FilterByTotalTimeAction(String text, double time, boolean isChecked) {
+			super(text, Action.AS_RADIO_BUTTON);
+			this.time = time;
+			setChecked(isChecked);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void run() {
+			if (isChecked()) {
+				Map<IPreferenceGroup, Object> sensorTypePreference = new HashMap<IPreferenceGroup, Object>();
+				sensorTypePreference.put(PreferenceId.InvocTotalTimeSelection.TIME_SELECTION_ID, new Double(time));
+				PreferenceEvent event = new PreferenceEvent(PreferenceId.INVOCFILTERTOTALTIME);
 				event.setPreferenceMap(sensorTypePreference);
 				fireEvent(event);
 			}

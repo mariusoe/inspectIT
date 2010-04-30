@@ -16,7 +16,7 @@ public enum PreferenceId {
 	/**
 	 * The identifiers of the different control groups.
 	 */
-	TIMELINE, SAMPLINGRATE, LIVEMODE, UPDATE, ITEMCOUNT, FILTERSENSORTYPE, INVOCFILTERTIME;
+	TIMELINE, SAMPLINGRATE, LIVEMODE, UPDATE, ITEMCOUNT, FILTERSENSORTYPE, INVOCFILTEREXCLUSIVETIME, INVOCFILTERTOTALTIME;
 
 	/**
 	 * Inner enumeration for TIMELINE.
@@ -84,12 +84,25 @@ public enum PreferenceId {
 	}
 	
 	/**
-	 * Inner enumeration for the INVOCTIMESELECTION.
+	 * Inner enumeration for the INVOCEXCLUSIVETIMESELECTION.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	public enum InvocTimeSelection implements IPreferenceGroup {
+	public enum InvocExclusiveTimeSelection implements IPreferenceGroup {
+		/**
+		 * The identifier for the time selection.
+		 */
+		TIME_SELECTION_ID;
+	}
+	
+	/**
+	 * Inner enumeration for the INVOCTOTALTIMESELECTION.
+	 * 
+	 * @author Patrice Bouillet
+	 * 
+	 */
+	public enum InvocTotalTimeSelection implements IPreferenceGroup {
 		/**
 		 * The identifier for the time selection.
 		 */
