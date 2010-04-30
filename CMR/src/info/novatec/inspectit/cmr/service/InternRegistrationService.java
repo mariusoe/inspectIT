@@ -18,6 +18,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -28,6 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
  * 
  */
 public class InternRegistrationService {
+
+	/**
+	 * The logger of this class.
+	 */
+	private static final Logger LOGGER = Logger.getLogger(InternRegistrationService.class);
 
 	/**
 	 * The platform ident DAO.
@@ -54,27 +60,34 @@ public class InternRegistrationService {
 	 */
 	@SuppressWarnings("unchecked")
 	@Transactional
-	public long registerPlatformIdent(List definedIPs, String agentName, String version) {
+	public synchronized long registerPlatformIdent(List definedIPs, String agentName, String version) {
 		PlatformIdent platformIdent = new PlatformIdent();
 		platformIdent.setDefinedIPs(definedIPs);
 		platformIdent.setAgentName(agentName);
-		
-		// need to reset the version number, otherwise it will be used for the query
+
+		// need to reset the version number, otherwise it will be used for the
+		// query
 		platformIdent.setVersion(null);
 
-		// we will not set the version for the platformIdent object here as we use this
-		// object for a QBE (Query by example) and this query should not be performed
+		// we will not set the version for the platformIdent object here as we
+		// use this
+		// object for a QBE (Query by example) and this query should not be
+		// performed
 		// based on the version information.
-		
+
 		List<PlatformIdent> platformIdentResults = platformIdentDao.findByExample(platformIdent);
 		if (1 == platformIdentResults.size()) {
 			platformIdent = platformIdentResults.get(0);
+		} else if (platformIdentResults.size() > 1) {
+			// this cannot occur anymore, if it occurs, then there is something
+			// totally wrong!
+			LOGGER.fatal("More than one platform ident has been retrieved! Please send your Database to the NovaTec inspectIT support!");
 		}
 
 		// always update the time stamp, no matter if this is an old or new
 		// record.
 		platformIdent.setTimeStamp(new Timestamp(GregorianCalendar.getInstance().getTimeInMillis()));
-		
+
 		// also always update the version information of the agent
 		platformIdent.setVersion(version);
 
