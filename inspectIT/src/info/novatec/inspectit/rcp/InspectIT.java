@@ -6,6 +6,7 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -216,8 +217,7 @@ public class InspectIT extends AbstractUIPlugin {
 	 *            to be added later.
 	 */
 	public void createInfoDialog(String message, int code) {
-		IStatus status = new Status(IStatus.OK, ID, message);
-		StatusManager.getManager().handle(status, StatusManager.SHOW);
+		MessageDialog.openInformation(null, "Information", message);
 	}
 
 }
