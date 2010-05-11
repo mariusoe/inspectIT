@@ -697,16 +697,13 @@ public class InvocDetailInputController implements TreeInputController {
 
 				if (element instanceof InvocationSequenceData) {
 					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) element;
-					// db statements are skipped by purpose, they will not be
-					// filtered by this filter
-					if (null != invocationSequenceData.getSqlStatementData() && 1 == invocationSequenceData.getSqlStatementData().getCount()) {
-						return true;
-					}
 
-					// now filter by the exclusive duration
+					// filter by the exclusive duration
 					double duration = Double.NaN;
 					if (null == invocationSequenceData.getParentSequence()) {
 						duration = invocationSequenceData.getDuration() - (computeNestedDuration(invocationSequenceData));
+					} else if (null != invocationSequenceData.getSqlStatementData() && 1 == invocationSequenceData.getSqlStatementData().getCount()) {
+						duration = invocationSequenceData.getSqlStatementData().getDuration();
 					} else if (null != invocationSequenceData.getTimerData()) {
 						double totalDuration = invocationSequenceData.getTimerData().getDuration();
 						duration = totalDuration - (computeNestedDuration(invocationSequenceData));
@@ -728,16 +725,15 @@ public class InvocDetailInputController implements TreeInputController {
 
 				if (element instanceof InvocationSequenceData) {
 					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) element;
-					// db statements are skipped by purpose, they will not be
-					// filtered by this filter
-					if (null != invocationSequenceData.getSqlStatementData() && 1 == invocationSequenceData.getSqlStatementData().getCount()) {
-						return true;
-					}
 
-					// now filter by the exclusive duration
+					// filter by the exclusive duration
 					double duration = Double.NaN;
 					if (null == invocationSequenceData.getParentSequence()) {
 						if (invocationSequenceData.getDuration() <= defaultTotalFilterTime) {
+							return false;
+						}
+					} else if (null != invocationSequenceData.getSqlStatementData() && 1 == invocationSequenceData.getSqlStatementData().getCount()) {
+						if (invocationSequenceData.getSqlStatementData().getDuration() <= defaultTotalFilterTime) {
 							return false;
 						}
 					} else if (null != invocationSequenceData.getTimerData()) {
