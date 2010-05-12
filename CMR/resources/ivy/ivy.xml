@@ -20,6 +20,7 @@
 	
 		<dependency org="org.springframework" name="spring" rev="2.5.5" transitive="false" conf="prod->default"/>
 		<dependency org="org.springframework" name="spring-web" rev="2.5.5" transitive="false" conf="prod->default"/>
+		<dependency org="org.springframework" name="spring-test" rev="2.5.5" transitive="false" conf="prod->default"/>
 		
 		<dependency org="com.caucho" name="hessian" rev="3.1.5" transitive="false" conf="prod->default"/>
 		<dependency org="javax.servlet" name="servlet-api" rev="2.5" transitive="false" conf="prod->default"/>

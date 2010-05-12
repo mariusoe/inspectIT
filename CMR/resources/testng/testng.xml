@@ -1,0 +1,43 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+<suite name="CMRTest">
+	<test name="Environment Data Dao">
+		<classes>
+			<class
+				name="info.novatec.inspectit.cmr.dao.ci.test.EnvironmentDataDaoTest" />
+		</classes>
+	</test>
+	<test name="Profile Data Dao">
+		<classes>
+			<class name="info.novatec.inspectit.cmr.dao.ci.test.ProfileDataDaoTest" />
+		</classes>
+	</test>
+	<test name="Sensor Type Data Dao">
+		<classes>
+			<class name="info.novatec.inspectit.cmr.dao.ci.test.SensorTypeDataDaoTest" />
+		</classes>
+	</test>
+	<test name="Exception Sensor Definition Dao">
+		<classes>
+			<class
+				name="info.novatec.inspectit.cmr.dao.ci.test.ExceptionSensorDefinitionDataDaoTest" />
+		</classes>
+	</test>
+	<test name="Method Sensor Definition Dao">
+		<classes>
+			<class
+				name="info.novatec.inspectit.cmr.dao.ci.test.MethodSensorDefinitionDataDaoTest" />
+		</classes>
+	</test>
+	<test name="Platform Sensor Definition Dao">
+		<classes>
+			<class
+				name="info.novatec.inspectit.cmr.dao.ci.test.PlatformSensorDefinitionDataDaoTest" />
+		</classes>
+	</test>
+	<test name="Lazy Initilization">
+		<classes>
+			<class
+				name="info.novatec.inspectit.cmr.dao.ci.test.LazyInitializationTest" />
+		</classes>
+	</test>
+</suite>
