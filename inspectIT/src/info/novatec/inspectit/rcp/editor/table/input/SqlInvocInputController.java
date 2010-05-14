@@ -37,7 +37,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.hibernate.pretty.Formatter;
+import org.hibernate.jdbc.util.FormatStyle;
+import org.hibernate.jdbc.util.Formatter;
 
 /**
  * This input controller displays the contents of {@link SqlStatementData}
@@ -226,9 +227,9 @@ public class SqlInvocInputController extends AbstractTableInputController {
 				content += "\n";
 				content += "Is Prepared Statement: " + data.isPreparedStatement() + "\n";
 
-				Formatter sqlFormatter = new Formatter(data.getSql());
+				Formatter sqlFormatter = FormatStyle.BASIC.getFormatter();
 				content += "\n";
-				content += "SQL: " + sqlFormatter.format() + "\n";
+				content += "SQL: " + sqlFormatter.format(data.getSql()) + "\n";
 
 				text.setText(content);
 			}

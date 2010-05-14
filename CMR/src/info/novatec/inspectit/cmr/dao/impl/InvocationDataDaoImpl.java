@@ -56,23 +56,21 @@ public class InvocationDataDaoImpl extends HibernateDaoSupport implements Invoca
 	@SuppressWarnings("unchecked")
 	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit) {
 		DetachedCriteria invocCriteria = DetachedCriteria.forClass(InvocationSequenceData.class);
-		invocCriteria.add(Restrictions.eq("platformIdent", platformId));
-		invocCriteria.add(Restrictions.eq("methodIdent", methodId));
-		invocCriteria.add(Restrictions.isNull("parentSequence"));
+		invocCriteria.add(Restrictions.eq("this.platformIdent", platformId));
+		invocCriteria.add(Restrictions.eq("this.methodIdent", methodId));
+		invocCriteria.add(Restrictions.isNull("this.parentSequence"));
 
-		// TODO Bug anyone?
-		// http://opensource.atlassian.com/projects/hibernate/browse/HHH-817
 		ProjectionList proList = Projections.projectionList();
-		proList.add(new CustomPropertyAliasProjection("id", "id"));
-		proList.add(new CustomPropertyAliasProjection("platformIdent", "platformIdent"));
-		proList.add(new CustomPropertyAliasProjection("methodIdent", "methodIdent"));
-		proList.add(new CustomPropertyAliasProjection("sensorTypeIdent", "sensorTypeIdent"));
-		proList.add(new CustomPropertyAliasProjection("timeStamp", "timeStamp"));
-		proList.add(new CustomPropertyAliasProjection("position", "position"));
-		proList.add(new CustomPropertyAliasProjection("duration", "duration"));
-		proList.add(new CustomPropertyAliasProjection("childCount", "childCount"));
+		proList.add(Projections.property("id"), "id");
+		proList.add(Projections.property("platformIdent"), "platformIdent");
+		proList.add(Projections.property("methodIdent"), "methodIdent");
+		proList.add(Projections.property("sensorTypeIdent"), "sensorTypeIdent");
+		proList.add(Projections.property("timeStamp"), "timeStamp");
+		proList.add(Projections.property("position"), "position");
+		proList.add(Projections.property("duration"), "duration");
+		proList.add(Projections.property("childCount"), "childCount");
 		invocCriteria.setProjection(proList);
-		invocCriteria.addOrder(Order.desc("timeStamp"));
+		invocCriteria.addOrder(Order.desc("this.timeStamp"));
 		invocCriteria.setResultTransformer(Transformers.aliasToBean(InvocationSequenceData.class));
 
 		List<InvocationSequenceData> result = getHibernateTemplate().findByCriteria(invocCriteria, -1, limit);
@@ -86,22 +84,20 @@ public class InvocationDataDaoImpl extends HibernateDaoSupport implements Invoca
 	@SuppressWarnings("unchecked")
 	public List<InvocationSequenceData> getInvocationSequenceOverview(final long platformId, int limit) {
 		DetachedCriteria invocCriteria = DetachedCriteria.forClass(InvocationSequenceData.class);
-		invocCriteria.add(Restrictions.eq("platformIdent", platformId));
-		invocCriteria.add(Restrictions.isNull("parentSequence"));
+		invocCriteria.add(Restrictions.eq("this.platformIdent", platformId));
+		invocCriteria.add(Restrictions.isNull("this.parentSequence"));
 
-		// TODO Bug anyone?
-		// http://opensource.atlassian.com/projects/hibernate/browse/HHH-817
 		ProjectionList proList = Projections.projectionList();
-		proList.add(new CustomPropertyAliasProjection("id", "id"));
-		proList.add(new CustomPropertyAliasProjection("platformIdent", "platformIdent"));
-		proList.add(new CustomPropertyAliasProjection("methodIdent", "methodIdent"));
-		proList.add(new CustomPropertyAliasProjection("sensorTypeIdent", "sensorTypeIdent"));
-		proList.add(new CustomPropertyAliasProjection("timeStamp", "timeStamp"));
-		proList.add(new CustomPropertyAliasProjection("position", "position"));
-		proList.add(new CustomPropertyAliasProjection("duration", "duration"));
-		proList.add(new CustomPropertyAliasProjection("childCount", "childCount"));
+		proList.add(Projections.property("id"), "id");
+		proList.add(Projections.property("platformIdent"), "platformIdent");
+		proList.add(Projections.property("methodIdent"), "methodIdent");
+		proList.add(Projections.property("sensorTypeIdent"), "sensorTypeIdent");
+		proList.add(Projections.property("timeStamp"), "timeStamp");
+		proList.add(Projections.property("position"), "position");
+		proList.add(Projections.property("duration"), "duration");
+		proList.add(Projections.property("childCount"), "childCount");
 		invocCriteria.setProjection(proList);
-		invocCriteria.addOrder(Order.desc("timeStamp"));
+		invocCriteria.addOrder(Order.desc("this.timeStamp"));
 		invocCriteria.setResultTransformer(Transformers.aliasToBean(InvocationSequenceData.class));
 
 		List<InvocationSequenceData> result = getHibernateTemplate().findByCriteria(invocCriteria, -1, limit);

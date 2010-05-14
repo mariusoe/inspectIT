@@ -55,7 +55,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.progress.DeferredTreeContentManager;
-import org.hibernate.pretty.Formatter;
+import org.hibernate.jdbc.util.FormatStyle;
+import org.hibernate.jdbc.util.Formatter;
 
 /**
  * This input controller displays the detail contents of
@@ -331,9 +332,9 @@ public class InvocDetailInputController implements TreeInputController {
 
 				if (null != data.getSqlStatementData()) {
 					SqlStatementData sql = data.getSqlStatementData();
-					Formatter sqlFormatter = new Formatter(sql.getSql());
+					Formatter sqlFormatter = FormatStyle.BASIC.getFormatter();
 					content += "\n";
-					content += "SQL: " + sqlFormatter.format() + "\n";
+					content += "SQL: " + sqlFormatter.format(sql.getSql()) + "\n";
 				}
 
 				if (null != data.getParameterContentData() && !data.getParameterContentData().isEmpty()) {

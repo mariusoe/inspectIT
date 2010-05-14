@@ -32,9 +32,9 @@
 		<dependency org="org.mortbay.jetty" name="jetty" rev="6.1.16" transitive="false" conf="prod->default"/>
 		<dependency org="org.mortbay.jetty" name="jetty-util" rev="6.1.16" transitive="false" conf="prod->default"/>
 		
-		<dependency org="org.hibernate" name="hibernate-core" rev="3.3.1.GA" transitive="false" conf="prod->default"/>
+		<dependency org="org.hibernate" name="hibernate-core" rev="3.5.1-Final" transitive="false" conf="prod->default"/>
 		<dependency org="javassist" name="javassist" rev="3.11.0.GA" transitive="false" conf="prod->default"/>
-		<dependency org="antlr" name="antlr" rev="2.7.2" transitive="false" conf="prod->default"/>
+		<dependency org="antlr" name="antlr" rev="2.7.7" transitive="false" conf="prod->default"/>
 		<dependency org="com.h2database" name="h2" rev="1.2.135" transitive="false" conf="prod->default"/> 
 		<dependency org="c3p0" name="c3p0" rev="0.9.1.2" transitive="false" conf="prod->default"/>
 		
