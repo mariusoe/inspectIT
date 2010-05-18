@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * The interface for all table input controller.
@@ -141,6 +142,18 @@ public interface TableInputController {
 	 * @return The created human readable string.
 	 */
 	Object getReadableString(Object object);
+
+	/**
+	 * Show some details in a pop-up to the user about the selected element.
+	 */
+	void showDetails(Shell parent, Object element);
+
+	/**
+	 * Defines if a selection can show some details or not.
+	 * 
+	 * @return <code>true</code> if shome details can be shown.
+	 */
+	boolean canShowDetails();
 
 	/**
 	 * Disposes the table input.

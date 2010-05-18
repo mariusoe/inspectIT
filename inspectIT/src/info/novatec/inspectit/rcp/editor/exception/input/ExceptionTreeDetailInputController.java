@@ -209,13 +209,10 @@ public class ExceptionTreeDetailInputController implements TreeInputController {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void doubleClick(final DoubleClickEvent event) {
-		TreeViewer treeViewer = (TreeViewer) event.getSource();
-		IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-		final ExceptionSensorData data = (ExceptionSensorData) selection.getFirstElement();
+	public void showDetails(Shell parent, Object element) {
+		final ExceptionSensorData data = (ExceptionSensorData) element;
 		final MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
 
-		Shell parent = treeViewer.getTree().getShell();
 		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
 		boolean takeFocusOnOpen = true;
 		boolean persistSize = true;

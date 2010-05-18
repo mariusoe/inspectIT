@@ -15,6 +15,8 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -73,7 +75,16 @@ public class TreeSubView extends AbstractSubView {
 		treeViewer.setLabelProvider(treeInputController.getLabelProvider());
 		treeViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
-				treeInputController.doubleClick(event);
+				TreeSelection selection = (TreeSelection) event.getSelection();
+				TreePath path = selection.getPaths()[0];
+				if (null != path) {
+					boolean expanded = treeViewer.getExpandedState(path);
+					if (expanded) {
+						treeViewer.collapseToLevel(path, 1);
+					} else {
+						treeViewer.expandToLevel(path, 1);
+					}
+				}
 			}
 		});
 		treeViewer.setComparator(treeInputController.getComparator());
@@ -149,7 +160,6 @@ public class TreeSubView extends AbstractSubView {
 	 */
 	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
 		treeInputController.preferenceEventFired(preferenceEvent);
-
 		switch (preferenceEvent.getPreferenceId()) {
 		case FILTERSENSORTYPE:
 		case INVOCFILTEREXCLUSIVETIME:

@@ -150,12 +150,21 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
+		// double click on an sql item will open a details window
 		TableViewer tableViewer = (TableViewer) event.getSource();
 		IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-		final SqlStatementData data = (SqlStatementData) selection.getFirstElement();
+		Shell parent = tableViewer.getTable().getShell();
+		showDetails(parent, selection.getFirstElement());
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void showDetails(Shell parent, Object element) {
+		final SqlStatementData data = (SqlStatementData) element;
 		final MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
 
-		Shell parent = tableViewer.getTable().getShell();
 		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
 		boolean takeFocusOnOpen = true;
 		boolean persistSize = true;
@@ -235,6 +244,11 @@ public class SqlInvocInputController extends AbstractTableInputController {
 			}
 		};
 		dialog.open();
+	}
+	
+	@Override
+	public boolean canShowDetails() {
+		return true;
 	}
 
 	/**
