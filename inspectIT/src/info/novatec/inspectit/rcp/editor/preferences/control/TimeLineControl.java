@@ -10,13 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.nebula.widgets.cdatetime.CDT;
+import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.nebula.widgets.cdatetime.CDT;
-import org.eclipse.swt.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
@@ -199,6 +199,7 @@ public class TimeLineControl implements IPreferenceControl {
 		cDateTime = new CDateTime(timeLineRow, CDT.BORDER | CDT.DROP_DOWN | SWT.RIGHT);
 		toolkit.adapt(cDateTime, false, true);
 		cDateTime.setFormat(CDT.DATE_SHORT | CDT.TIME_SHORT);
+		cDateTime.setSelection(toDate.getTime());
 		GridData cdtGrid = new GridData(150, 30);
 		cdtGrid.grabExcessHorizontalSpace = true;
 		cdtGrid.grabExcessVerticalSpace = true;
