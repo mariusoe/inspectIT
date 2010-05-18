@@ -2,8 +2,8 @@ package info.novatec.inspectit.rcp.editor.tree;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.AbstractSubView;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.FormRootEditor;
 import info.novatec.inspectit.rcp.editor.tree.input.TreeInputController;
 
@@ -117,7 +117,9 @@ public class TreeSubView extends AbstractSubView {
 		if (treeInputController.canOpenInput(data)) {
 			treeViewer.setInput(data);
 			treeViewer.expandToLevel(2);
-			treeViewer.refresh();
+			if (treeViewer.getControl().isVisible()) {
+				treeViewer.refresh();
+			}
 		}
 	}
 

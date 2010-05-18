@@ -1,8 +1,10 @@
 package info.novatec.inspectit.rcp.editor.composite;
 
+import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.ISubView;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -111,6 +113,26 @@ public class TabbedCompositeSubView extends AbstractCompositeSubView {
 	 */
 	public Control getControl() {
 		return tabFolder;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setDataInput(List<? extends DefaultData> data) {
+		super.setDataInput(data);
+
+		// The following is needed for Bug INSPECTIT-184
+		// The problem is that the visible attribute for windows seems not be
+		// correct under some circumstances.
+		CTabItem[] items = tabFolder.getItems();
+		for (CTabItem cTabItem : items) {
+			if (cTabItem.equals(tabFolder.getSelection())) {
+				cTabItem.getControl().setVisible(true);
+			} else {
+				cTabItem.getControl().setVisible(false);
+			}
+		}
 	}
 
 }

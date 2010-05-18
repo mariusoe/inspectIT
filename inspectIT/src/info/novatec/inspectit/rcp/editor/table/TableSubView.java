@@ -126,7 +126,9 @@ public class TableSubView extends AbstractSubView {
 						tableInputController.doRefresh(monitor);
 						Display.getDefault().asyncExec(new Runnable() {
 							public void run() {
-								tableViewer.refresh();
+								if (tableViewer.getTable().isVisible()) {
+									tableViewer.refresh();
+								}
 							}
 						});
 					} catch (Throwable throwable) {
