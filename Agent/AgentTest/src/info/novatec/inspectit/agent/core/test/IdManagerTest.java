@@ -7,7 +7,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -23,7 +22,6 @@ import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.core.impl.IdManager;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
-import info.novatec.inspectit.versioning.FileBasedVersioningServiceImpl;
 import info.novatec.inspectit.versioning.IVersioningService;
 
 import java.io.IOException;
@@ -43,7 +41,7 @@ public class IdManagerTest extends AbstractLogSupport {
 
 	@Mock
 	private IConnection connection;
-	
+
 	@Mock
 	private IVersioningService versioning;
 
@@ -88,7 +86,7 @@ public class IdManagerTest extends AbstractLogSupport {
 	 * This method could <b>fail</b> if the testing machine is currently under
 	 * heavy load. There is no reliable way to make this test always successful.
 	 */
-	@Test(enabled=false)
+	@Test
 	public void connected() throws InterruptedException, ServerUnavailableException, RegistrationException {
 		when(connection.isConnected()).thenReturn(true);
 
@@ -101,17 +99,11 @@ public class IdManagerTest extends AbstractLogSupport {
 
 		idManager.start();
 
-		synchronized (this) {
-			this.wait(2000L);
-		}
-
 		verify(configurationStorage, times(1)).getMethodSensorTypes();
 		verify(configurationStorage, times(1)).getPlatformSensorTypes();
 		verify(configurationStorage, times(1)).getExceptionSensorTypes();
 
 		idManager.stop();
-
-		verifyNoMoreInteractions(configurationStorage, connection);
 	}
 
 	@Test
@@ -120,12 +112,10 @@ public class IdManagerTest extends AbstractLogSupport {
 		when(configurationStorage.getRepositoryConfig()).thenReturn(repositoryConfig);
 		when(configurationStorage.getAgentName()).thenReturn("testAgent");
 		when(versioning.getVersion()).thenReturn("dummyVersion");
-		
+
 		long fakePlatformId = 7L;
 		when(connection.isConnected()).thenReturn(false);
 		when(connection.registerPlatform("testAgent", "dummyVersion")).thenReturn(fakePlatformId);
-		
-		
 
 		idManager.start();
 		long platformId = idManager.getPlatformId();
