@@ -25,6 +25,8 @@ public class JavaAgent implements ClassFileTransformer {
 	 */
 	private static final Logger LOGGER = Logger.getLogger(JavaAgent.class.getName());
 
+	private static final String[] IGNORE_START_PATTERNS = new String[] { "java/", "javax/", "sun/" };
+
 	/**
 	 * In case that multiple classes are loaded at the same time, which happens
 	 * in some cases, even though the JVM specification prohibits that (the case
@@ -50,6 +52,15 @@ public class JavaAgent implements ClassFileTransformer {
 	 */
 	public byte[] transform(final ClassLoader classLoader, final String className, final Class<?> clazz, final ProtectionDomain pd, final byte[] data) throws IllegalClassFormatException {
 		try {
+			// ignore all classes which fit to these patterns, prevents the
+			// early loading of the inspectit agent.
+			for (int i = 0; i < IGNORE_START_PATTERNS.length; i++) {
+				String ignorePattern = IGNORE_START_PATTERNS[i];
+				if (className.startsWith(ignorePattern)) {
+					return data;
+				}
+			}
+
 			if (!operationInProgress) {
 				operationInProgress = true;
 				String modifiedClassName = className.replaceAll("/", ".");

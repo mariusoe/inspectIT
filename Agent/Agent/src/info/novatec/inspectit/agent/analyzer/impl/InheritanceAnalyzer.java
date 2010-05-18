@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.logging.Logger;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -20,6 +21,11 @@ import javassist.NotFoundException;
  * 
  */
 public class InheritanceAnalyzer implements IInheritanceAnalyzer {
+
+	/**
+	 * The logger of this class.
+	 */
+	private static final Logger LOGGER = Logger.getLogger(InheritanceAnalyzer.class.getName());
 
 	/**
 	 * The class pool analyzer is used by the
@@ -143,11 +149,23 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 	 *             Javassist.
 	 */
 	private void addInterfaceExtends(List interfaces, CtClass ctClass) throws NotFoundException {
-		CtClass[] ctClasses = ctClass.getInterfaces();
+		String[] ifs = ctClass.getClassFile2().getInterfaces();
+		int num = ifs.length;
+		CtClass[] ctClasses = new CtClass[num];
+		for (int i = 0; i < num; ++i) {
+			try {
+				ctClasses[i] = ctClass.getClassPool().get(ifs[i]);
+			} catch (NotFoundException e) {
+//				LOGGER.severe("Interface not found: " + ifs[i] + " (of class: " + ctClass.getName() + ")");
+			}
+		}
+
 		for (int i = 0; i < ctClasses.length; i++) {
-			CtClass interfaceCtClass = ctClasses[i];
-			interfaces.add(interfaceCtClass);
-			addInterfaceExtends(interfaces, interfaceCtClass);
+			if (null != ctClasses[i]) {
+				CtClass interfaceCtClass = ctClasses[i];
+				interfaces.add(interfaceCtClass);
+				addInterfaceExtends(interfaces, interfaceCtClass);
+			}
 		}
 	}
 
