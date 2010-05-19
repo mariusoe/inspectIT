@@ -196,7 +196,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	}
 
 	/**
-	 * Saves the {@link ExceptionSensorData} object into the databse.
+	 * Saves the {@link ExceptionSensorData} object into the database.
 	 * 
 	 * @param session
 	 *            The session used for db storage.
@@ -204,8 +204,14 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	 *            The {@link ExceptionSensorData} object to persist.
 	 */
 	private void saveExceptionSensorData(StatelessSession session, ExceptionSensorData data) {
-		if (null != data.getChild()) {
-			saveExceptionSensorData(session, data.getChild());
+		ExceptionSensorData child = data.getChild();
+		if (null != child) {
+			// we store in each object the error message from the root data object that has the CREATED event
+			if(data.getErrorMessage() != child.getErrorMessage()) {
+				child.setErrorMessage(data.getErrorMessage());
+			}
+			// first save the lowermost child
+			saveExceptionSensorData(session, child);
 		}
 		session.insert(data);
 	}
