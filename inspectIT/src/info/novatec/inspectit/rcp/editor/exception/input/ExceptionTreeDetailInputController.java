@@ -26,7 +26,6 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -48,7 +47,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.progress.DeferredTreeContentManager;
 
 /**
  * This input controller displays the detail contents of
@@ -426,25 +424,14 @@ public class ExceptionTreeDetailInputController implements TreeInputController {
 	private static final class ExceptionTreeDetailContentProvider implements ITreeContentProvider {
 
 		/**
-		 * The deferred manager is used here to update the tree in a concurrent
-		 * thread so the UI responds much better if many items are displayed.
-		 */
-		private DeferredTreeContentManager manager;
-
-		/**
 		 * {@inheritDoc}
 		 */
 		public Object[] getChildren(Object parent) {
-			if (manager.isDeferredAdapter(parent)) {
-				Object[] children = manager.getChildren(parent);
+			ExceptionSensorData exceptionSensorData = (ExceptionSensorData) parent;
+			List<ExceptionSensorData> exceptionSensorDataList = new ArrayList<ExceptionSensorData>();
+			exceptionSensorDataList.add(exceptionSensorData.getChild());
 
-				if (null == children) {
-					children = new Object[0];
-				}
-				return children;
-			}
-
-			return null;
+			return exceptionSensorDataList.toArray();
 		}
 
 		/**
@@ -489,7 +476,6 @@ public class ExceptionTreeDetailInputController implements TreeInputController {
 		 * {@inheritDoc}
 		 */
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-			manager = new DeferredTreeContentManager((AbstractTreeViewer) viewer);
 		}
 
 		/**
