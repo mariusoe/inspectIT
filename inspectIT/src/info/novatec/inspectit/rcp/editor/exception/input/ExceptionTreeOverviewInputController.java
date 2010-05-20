@@ -13,7 +13,7 @@ import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.table.input.AbstractTableInputController;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
-import info.novatec.inspectit.rcp.repository.service.GlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -120,7 +120,7 @@ public class ExceptionTreeOverviewInputController extends AbstractTableInputCont
 	/**
 	 * This data access service is needed because of the ID mappings.
 	 */
-	private GlobalDataAccessService globalDataAccessService;
+	private CachedGlobalDataAccessService globalDataAccessService;
 
 	/**
 	 * The data access service to access the data on the CMR.

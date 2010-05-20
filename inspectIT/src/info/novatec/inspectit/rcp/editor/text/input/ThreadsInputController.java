@@ -3,7 +3,7 @@ package info.novatec.inspectit.rcp.editor.text.input;
 import info.novatec.inspectit.communication.data.ThreadInformationData;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
-import info.novatec.inspectit.rcp.repository.service.GlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +68,7 @@ public class ThreadsInputController implements TextInputController {
 	/**
 	 * The global data access service.
 	 */
-	private GlobalDataAccessService dataAccessService;
+	private CachedGlobalDataAccessService dataAccessService;
 
 	/**
 	 * {@inheritDoc}

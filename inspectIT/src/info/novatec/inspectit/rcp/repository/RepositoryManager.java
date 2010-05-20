@@ -37,7 +37,7 @@ public class RepositoryManager {
 			String ip = preferences.getString("server_host_" + i);
 			int port = preferences.getInt("server_port_" + i);
 			if (!"".equals(ip)) {
-				addRepositoryDefinition(new RepositoryDefinition(ip, port));
+				addRepositoryDefinition(new CmrRepositoryDefinition(ip, port));
 			} else {
 				break;
 			}
@@ -82,6 +82,15 @@ public class RepositoryManager {
 	public void updateRepositoryDefinition(RepositoryDefinition repositoryDefinition) {
 		for (RepositoryChangeListener repositoryChangeListener : repositoryChangeListeners) {
 			repositoryChangeListener.updateRepository(repositoryDefinition);
+		}
+	}
+
+	/**
+	 * Notifies all listeners that the storage repository has been updated.
+	 */
+	public void updateStorageRepository() {
+		for (RepositoryChangeListener repositoryChangeListener : repositoryChangeListeners) {
+			repositoryChangeListener.updateStorageRepository();
 		}
 	}
 

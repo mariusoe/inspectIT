@@ -2,14 +2,18 @@ package info.novatec.inspectit.rcp.view.server;
 
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.model.StorageTreeModelManager;
 import info.novatec.inspectit.rcp.model.TreeModelManager;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.RepositoryChangeListener;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.RepositoryManager;
+import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -25,6 +29,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.handlers.IHandlerService;
@@ -75,6 +80,8 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	 */
 	private List<TreeViewer> treeViewers = new ArrayList<TreeViewer>();
 
+	private SelectionProviderIntermediate selectionProviderIntermediate = new SelectionProviderIntermediate();
+
 	/**
 	 * This is a callback that will allow us to create the viewer and initialize
 	 * it.
@@ -84,6 +91,8 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	@Override
 	public void createPartControl(Composite parent) {
 		toolkit = new FormToolkit(parent.getDisplay());
+
+		getSite().setSelectionProvider(selectionProviderIntermediate);
 
 		pShelf = new PShelf(parent, SWT.NONE);
 
@@ -100,6 +109,9 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 			createServerItem(pShelf, repositoryDefinition);
 		}
 
+		// create the storage area
+		createStorageArea(pShelf);
+
 		// add a selection listener so we can set the correct selection provider
 		pShelf.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -110,9 +122,9 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 				if (item.getBody().getChildren().length > 0) {
 					Tree tree = (Tree) item.getBody().getChildren()[0];
 					TreeViewer treeViewer = findTreeViewer(tree);
-					getSite().setSelectionProvider(treeViewer);
+					selectionProviderIntermediate.setSelectionProviderDelegate(treeViewer);
 				} else {
-					getSite().setSelectionProvider(null);
+					selectionProviderIntermediate.setSelectionProviderDelegate(null);
 				}
 			}
 		});
@@ -147,11 +159,11 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	 */
 	private void createServerItem(PShelf pShelf, RepositoryDefinition repositoryDefinition) {
 		PShelfItem item = new PShelfItem(pShelf, SWT.NONE);
-		
+
 		// Check the version of the CMR
 		String cmrVersion = repositoryDefinition.getServerStatusService().getVersion();
-		
-		item.setText(repositoryDefinition.getIp() + " : " + repositoryDefinition.getPort() + " [v. "+cmrVersion+"]");
+
+		item.setText(repositoryDefinition.getIp() + " : " + repositoryDefinition.getPort() + " [v. " + cmrVersion + "]");
 		item.getBody().setLayout(new FillLayout());
 		item.setData(repositoryDefinition);
 
@@ -170,11 +182,9 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	private void updateServerItem(PShelfItem item, RepositoryDefinition repositoryDefinition) {
 		if (repositoryDefinition.getServerStatusService().isOnline()) {
 			item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_ONLINE));
-			
-			
 
 			Tree tree = toolkit.createTree(item.getBody(), SWT.V_SCROLL | SWT.H_SCROLL);
-			TreeViewer treeViewer = new TreeViewer(tree);
+			final TreeViewer treeViewer = new TreeViewer(tree);
 			treeViewer.setContentProvider(new ServerViewContentProvider());
 			treeViewer.setLabelProvider(serverViewLabelProvider);
 			treeViewer.setComparator(serverViewSorter);
@@ -186,8 +196,8 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 
 			treeViewers.add(treeViewer);
 
-			if (null == getSite().getSelectionProvider()) {
-				getSite().setSelectionProvider(treeViewer);
+			if (null == selectionProviderIntermediate.getSelectionProviderDelegate()) {
+				selectionProviderIntermediate.setSelectionProviderDelegate(treeViewer);
 			}
 		} else {
 			item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_OFFLINE));
@@ -217,7 +227,7 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 					Tree tree = (Tree) shelfItem.getBody().getChildren()[0];
 					TreeViewer treeViewer = findTreeViewer(tree);
 					treeViewers.remove(treeViewer);
-					getSite().setSelectionProvider(null);
+					selectionProviderIntermediate.setSelectionProviderDelegate(null);
 				}
 				break;
 			}
@@ -233,7 +243,7 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	}
 
 	/**
-	 *The double click listener of the server view.
+	 * The double click listener of the server view.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -284,14 +294,46 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 						TreeViewer viewer = findTreeViewer((Tree) control);
 						if (null != viewer) {
 							treeViewers.remove(viewer);
-							if (viewer.equals(getSite().getSelectionProvider())) {
-								getSite().setSelectionProvider(null);
+							if (viewer.equals(selectionProviderIntermediate.getSelectionProviderDelegate())) {
+								selectionProviderIntermediate.setSelectionProviderDelegate(null);
 							}
 						}
 					}
 					control.dispose();
 				}
-				updateServerItem(shelfItem, repositoryDefinition);
+				if (repositoryDefinition instanceof CmrRepositoryDefinition) {
+					updateServerItem(shelfItem, repositoryDefinition);
+				} else if (repositoryDefinition instanceof StorageRepositoryDefinition) {
+					updateStorageArea(shelfItem, repositoryDefinition);
+				}
+				shelfItem.getBody().layout();
+				break;
+			}
+		}
+	}
+
+	@Override
+	public void updateStorageRepository() {
+		PShelfItem[] items = pShelf.getItems();
+
+		// search for the corresponding item which holds this repository
+		// definition.
+		for (PShelfItem shelfItem : items) {
+			if (shelfItem.getData() instanceof StorageRepositoryDefinition) {
+				Control[] controls = shelfItem.getBody().getChildren();
+				for (Control control : controls) {
+					if (control instanceof Tree) {
+						TreeViewer viewer = findTreeViewer((Tree) control);
+						if (null != viewer) {
+							treeViewers.remove(viewer);
+							if (viewer.equals(selectionProviderIntermediate.getSelectionProviderDelegate())) {
+								selectionProviderIntermediate.setSelectionProviderDelegate(null);
+							}
+						}
+					}
+					control.dispose();
+				}
+				updateStorageArea(shelfItem, (StorageRepositoryDefinition) shelfItem.getData());
 				shelfItem.getBody().layout();
 				break;
 			}
@@ -306,6 +348,46 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	 */
 	public RepositoryDefinition getActiveRepositoryDefinition() {
 		return (RepositoryDefinition) pShelf.getSelection().getData();
+	}
+
+	private void createStorageArea(PShelf pShelf) {
+		PShelfItem item = new PShelfItem(pShelf, SWT.NONE);
+
+		RepositoryDefinition repositoryDefinition = new StorageRepositoryDefinition();
+
+		// Check the version of the CMR
+		item.setText("Storage Area");
+		item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_DATABASE));
+		item.getBody().setLayout(new FillLayout());
+		item.setData(repositoryDefinition);
+
+		updateStorageArea(item, repositoryDefinition);
+	}
+
+	private void updateStorageArea(PShelfItem item, RepositoryDefinition repositoryDefinition) {
+		Tree tree = toolkit.createTree(item.getBody(), SWT.V_SCROLL | SWT.H_SCROLL);
+		final TreeViewer treeViewer = new TreeViewer(tree);
+		treeViewer.setContentProvider(new ServerViewContentProvider());
+		treeViewer.setLabelProvider(serverViewLabelProvider);
+		treeViewer.setComparator(serverViewSorter);
+		treeViewer.addDoubleClickListener(treeViewDoubleClickListener);
+		treeViewer.setInput(new StorageTreeModelManager(repositoryDefinition));
+
+		ColumnViewerToolTipSupport.enableFor(treeViewer, ToolTip.NO_RECREATE);
+
+		MenuManager menuManager = new MenuManager();
+		menuManager.setRemoveAllWhenShown(true);
+		getSite().registerContextMenu(ID + ".storagetree", menuManager, treeViewer);
+
+		Control control = treeViewer.getControl();
+		Menu menu = menuManager.createContextMenu(control);
+		control.setMenu(menu);
+
+		treeViewers.add(treeViewer);
+
+		if (null == selectionProviderIntermediate.getSelectionProviderDelegate()) {
+			selectionProviderIntermediate.setSelectionProviderDelegate(treeViewer);
+		}
 	}
 
 	/**

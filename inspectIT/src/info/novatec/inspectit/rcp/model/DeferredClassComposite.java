@@ -84,11 +84,19 @@ public class DeferredClassComposite extends DeferredComposite {
 	}
 
 	/**
-	 * @param repositoryDefinition
-	 *            the repositoryDefinition to set
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setRepositoryDefinition(RepositoryDefinition repositoryDefinition) {
 		this.repositoryDefinition = repositoryDefinition;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public RepositoryDefinition getRepositoryDefinition() {
+		return repositoryDefinition;
 	}
 
 	/**

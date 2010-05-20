@@ -1,5 +1,7 @@
 package info.novatec.inspectit.rcp.model;
 
+import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -61,5 +63,20 @@ public abstract class DeferredComposite extends Composite implements IDeferredWo
 	public ISchedulingRule getRule(Object object) {
 		return null;
 	}
+
+	/**
+	 * Sets the repository definition.
+	 * 
+	 * @param repositoryDefinition
+	 *            the repository definition.
+	 */
+	public abstract void setRepositoryDefinition(RepositoryDefinition repositoryDefinition);
+
+	/**
+	 * Returns the repository definition.
+	 * 
+	 * @return the repository definition.
+	 */
+	public abstract RepositoryDefinition getRepositoryDefinition();
 
 }

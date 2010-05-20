@@ -9,7 +9,7 @@ import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.table.input.AbstractTableInputController;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
-import info.novatec.inspectit.rcp.repository.service.GlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -101,7 +101,7 @@ public class ExceptionTreeStackTraceInputController extends AbstractTableInputCo
 	/**
 	 * This data access service is needed because of the ID mappings.
 	 */
-	private GlobalDataAccessService globalDataAccessService;
+	private CachedGlobalDataAccessService globalDataAccessService;
 
 	/**
 	 * {@inheritDoc}

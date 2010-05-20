@@ -25,7 +25,6 @@ public class CreateRepositoryAction implements IWorkbenchWindowActionDelegate {
 	 */
 	public void run(IAction action) {
 		NewRepositoryDefinitionWizard wizard = new NewRepositoryDefinitionWizard();
-		wizard.init(window.getWorkbench(), null);
 		WizardDialog dialog = new WizardDialog(window.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();

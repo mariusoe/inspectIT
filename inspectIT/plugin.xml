@@ -151,6 +151,14 @@
             id="info.novatec.inspectit.rcp.commands.importLicense"
             name="Import License">
       </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.exportInvocations"
+            name="Export">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.saveInvocations"
+            name="Save">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -252,6 +260,69 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.ExportInvocationsHandler"
+            commandId="info.novatec.inspectit.rcp.commands.exportInvocations">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                  </instanceof>
+               </iterate>
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.activeSubView"
+                        value="tableSubView">
+                  </test>
+               </with>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.SaveInvocationsHandler"
+            commandId="info.novatec.inspectit.rcp.commands.saveInvocations">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                  </instanceof>
+               </iterate>
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.activeSubView"
+                        value="tableSubView">
+                  </test>
+               </with>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.DeleteStorageDataHandler"
+            commandId="org.eclipse.ui.edit.delete">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -290,12 +361,40 @@
                commandId="org.eclipse.ui.edit.copy"
                style="push">
          </command>
+         <separator
+               name="inspectit.editor.formrooteditor.tablesubview.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.saveInvocations"
+               style="push">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.exportInvocations"
+               style="push">
+         </command>
       </menuContribution>
       <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu?after=File">
+            locationURI="menu:org.eclipse.ui.main.menu">
+         <menu
+               id="fileMenu"
+               label="&amp;File">
+            <command
+                  commandId="org.eclipse.ui.file.import"
+                  style="push">
+            </command>
+            <separator
+                  name="menu.file.separator1"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.ui.file.exit"
+                  style="push">
+            </command>
+         </menu>
          <menu
                id="licenseMenu"
-               label="License">
+               label="&amp;License">
             <command
                   commandId="info.novatec.inspectit.rcp.commands.importLicense"
                   label="Import License"
@@ -303,6 +402,29 @@
                   tooltip="Imports the License into the Server">
             </command>
          </menu>
+         <menu
+               id="helpMenu"
+               label="&amp;Help">
+            <command
+                  commandId="org.eclipse.ui.help.aboutAction"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:inspectit.serverview.storagetree">
+         <command
+               commandId="org.eclipse.ui.file.import"
+               style="push">
+         </command>
+         <separator
+               name="menu.storagetree.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               style="push">
+         </command>
       </menuContribution>
    </extension>
    <extension
@@ -314,6 +436,18 @@
                type="org.eclipse.ui.progress.IDeferredWorkbenchAdapter">
          </adapter>
       </factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <wizard
+            class="info.novatec.inspectit.rcp.wizard.ImportDataWizard"
+            icon="icons/16x16.png"
+            id="inspectit.importinvocationwizard"
+            name="inspectIT Data (*.itd)">
+         <description>
+            Import inspectIT Data (*.itd) into your current Storage Area.
+         </description>
+      </wizard>
    </extension>
 
 </plugin>

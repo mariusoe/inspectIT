@@ -37,7 +37,7 @@ public class TreeModelManager {
 	/**
 	 * The repository definition used by this tree.
 	 */
-	private RepositoryDefinition repositoryDefinition;
+	protected RepositoryDefinition repositoryDefinition;
 
 	/**
 	 * The format string of the output.
@@ -66,7 +66,7 @@ public class TreeModelManager {
 	public Object[] getRootElements() {
 		List<Component> agents = new ArrayList<Component>();
 
-		for (PlatformIdent platformIdent : repositoryDefinition.getGlobalDataAccessService().getConnectedAgents()) {
+		for (PlatformIdent platformIdent : (List<PlatformIdent>) repositoryDefinition.getGlobalDataAccessService().getConnectedAgents()) {
 			Composite agentTree = new Composite();
 			agentTree.setName(platformIdent.getAgentName() + " [v. " + platformIdent.getVersion() + "]");
 			StringBuilder stringBuilder = new StringBuilder();
@@ -88,12 +88,12 @@ public class TreeModelManager {
 			agentTree.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_AGENT));
 
 			// Add all sub-trees to this Agent
-			agentTree.addChild(getInstrumentedMethodsTree(platformIdent));
-			agentTree.addChild(getInvocationSequenceTree(platformIdent));
-			agentTree.addChild(getSqlTree(platformIdent));
-			agentTree.addChild(getSystemOverviewTree(platformIdent));
-			agentTree.addChild(getExceptionTracerTree(platformIdent));
-			agentTree.addChild(getCombinedMetricsTree(platformIdent));
+			agentTree.addChild(getInstrumentedMethodsTree(platformIdent, repositoryDefinition));
+			agentTree.addChild(getInvocationSequenceTree(platformIdent, repositoryDefinition));
+			agentTree.addChild(getSqlTree(platformIdent, repositoryDefinition));
+			agentTree.addChild(getSystemOverviewTree(platformIdent, repositoryDefinition));
+			agentTree.addChild(getExceptionTracerTree(platformIdent, repositoryDefinition));
+			agentTree.addChild(getCombinedMetricsTree(platformIdent, repositoryDefinition));
 
 			// add it to the list of the agents
 			agents.add(agentTree);
@@ -107,15 +107,17 @@ public class TreeModelManager {
 	 * 
 	 * @param platformIdent
 	 *            The platform ID used to create the sub-tree.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return a list containing the root and all children representing the
 	 *         instrumented methods in the target VM.
 	 */
-	private Component getInstrumentedMethodsTree(PlatformIdent platformIdent) {
+	protected Component getInstrumentedMethodsTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		DeferredInstrumentationBrowserComposite instrumentedMethods = new DeferredInstrumentationBrowserComposite();
 		instrumentedMethods.setName("Instrumentation Browser");
 		instrumentedMethods.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_INSTRUMENTATION_BROWSER));
 		instrumentedMethods.setPlatformIdent(platformIdent);
-		instrumentedMethods.setRepositoryDefinition(repositoryDefinition);
+		instrumentedMethods.setRepositoryDefinition(definition);
 
 		return instrumentedMethods;
 	}
@@ -125,10 +127,12 @@ public class TreeModelManager {
 	 * 
 	 * @param platformIdent
 	 *            The platform ident used to create the tree.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return The invocation sequence tree.
 	 */
 	@SuppressWarnings("unchecked")
-	private Component getInvocationSequenceTree(PlatformIdent platformIdent) {
+	protected Component getInvocationSequenceTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Composite invocationSequence = new Composite();
 		invocationSequence.setName("Invocation Sequences");
 		invocationSequence.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_INVOCATION));
@@ -138,7 +142,7 @@ public class TreeModelManager {
 		showAll.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_SHOW_ALL));
 
 		InputDefinition inputDefinition = new InputDefinition();
-		inputDefinition.setRepositoryDefinition(repositoryDefinition);
+		inputDefinition.setRepositoryDefinition(definition);
 		inputDefinition.setId(SensorTypeEnum.INVOCATION_SEQUENCE);
 		inputDefinition.setPartName("Invocation Sequences (Show All)");
 		inputDefinition.setPartTooltip("Invocation Sequences (Show All)");
@@ -182,7 +186,7 @@ public class TreeModelManager {
 		}
 
 		for (Map.Entry<String, List<MethodIdent>> entry : filteredMap.entrySet()) {
-			browser.addChild(getInvocationPackageTree(entry.getValue()));
+			browser.addChild(getInvocationPackageTree(entry.getValue(), definition));
 		}
 
 		invocationSequence.addChild(showAll);
@@ -197,9 +201,11 @@ public class TreeModelManager {
 	 * 
 	 * @param methodIdents
 	 *            The {@link MethodIdent} objects to create this sub-tree.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return The invocation package sub-tree.
 	 */
-	private Component getInvocationPackageTree(List<MethodIdent> methodIdents) {
+	private Component getInvocationPackageTree(List<MethodIdent> methodIdents, RepositoryDefinition definition) {
 		Composite targetPackage = new Composite();
 		targetPackage.setName(methodIdents.get(0).getPackageName());
 		targetPackage.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_PACKAGE));
@@ -214,7 +220,7 @@ public class TreeModelManager {
 		}
 
 		for (Map.Entry<String, List<MethodIdent>> entry : filter.entrySet()) {
-			targetPackage.addChild(getInvocationClassTree(entry.getValue()));
+			targetPackage.addChild(getInvocationClassTree(entry.getValue(), definition));
 		}
 
 		return targetPackage;
@@ -225,15 +231,17 @@ public class TreeModelManager {
 	 * 
 	 * @param methodIdents
 	 *            The {@link MethodIdent} objects to create this sub-tree.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return The invocation class sub-tree.
 	 */
-	private Component getInvocationClassTree(List<MethodIdent> methodIdents) {
+	private Component getInvocationClassTree(List<MethodIdent> methodIdents, RepositoryDefinition definition) {
 		Composite targetClass = new Composite();
 		targetClass.setName(methodIdents.get(0).getClassName());
 		targetClass.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CLASS));
 
 		for (MethodIdent methodIdent : methodIdents) {
-			targetClass.addChild(getInvocationMethodTree(methodIdent));
+			targetClass.addChild(getInvocationMethodTree(methodIdent, definition));
 		}
 
 		Collections.sort(targetClass.getChildren(), new Comparator<Component>() {
@@ -250,9 +258,11 @@ public class TreeModelManager {
 	 * 
 	 * @param methodIdent
 	 *            The {@link MethodIdent} object to create this sub-tree.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return The invocation method sub-tree.
 	 */
-	private Component getInvocationMethodTree(MethodIdent methodIdent) {
+	private Component getInvocationMethodTree(MethodIdent methodIdent, RepositoryDefinition definition) {
 		Component targetMethod = new Leaf();
 		if (null != methodIdent.getParameters()) {
 			String parameters = methodIdent.getParameters().toString();
@@ -265,7 +275,7 @@ public class TreeModelManager {
 		targetMethod.setImageDescriptor(ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers()));
 
 		InputDefinition inputDefinition = new InputDefinition();
-		inputDefinition.setRepositoryDefinition(repositoryDefinition);
+		inputDefinition.setRepositoryDefinition(definition);
 		inputDefinition.setId(SensorTypeEnum.INVOCATION_SEQUENCE);
 		inputDefinition.setPartName("Invocation Sequence");
 		inputDefinition.setPartTooltip("Invocation Sequence");
@@ -311,9 +321,11 @@ public class TreeModelManager {
 	 * 
 	 * @param platformIdent
 	 *            The platform ident used to create the tree.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return The sql tree.
 	 */
-	private Component getSqlTree(PlatformIdent platformIdent) {
+	private Component getSqlTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Composite invocationSequence = new Composite();
 		invocationSequence.setName("SQL Statements");
 		invocationSequence.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_DATABASE));
@@ -323,7 +335,7 @@ public class TreeModelManager {
 		showAll.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_SHOW_ALL));
 
 		InputDefinition inputDefinition = new InputDefinition();
-		inputDefinition.setRepositoryDefinition(repositoryDefinition);
+		inputDefinition.setRepositoryDefinition(definition);
 		inputDefinition.setId(SensorTypeEnum.SQL);
 		inputDefinition.setPartName("SQL Statements (Show All)");
 		inputDefinition.setPartTooltip("SQL Statements (Show All)");
@@ -373,10 +385,12 @@ public class TreeModelManager {
 	 * 
 	 * @param platformIdent
 	 *            The platform ident.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return An instance of {@link Component}.
 	 */
 	@SuppressWarnings("unchecked")
-	private Component getSystemOverviewTree(PlatformIdent platformIdent) {
+	private Component getSystemOverviewTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Composite systemOverview = new Composite();
 		systemOverview.setName("System Overview");
 		systemOverview.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_SYSTEM_OVERVIEW));
@@ -400,11 +414,11 @@ public class TreeModelManager {
 		});
 
 		// add the tree elements
-		systemOverview.addChild(getPlatformSensorClassesLeaf(platformIdent, platformSensorTypeIdentList));
-		systemOverview.addChild(getPlatformSensorCpuLeaf(platformIdent, platformSensorTypeIdentList));
-		systemOverview.addChild(getPlatformSensorMemoryLeaf(platformIdent, platformSensorTypeIdentList));
-		systemOverview.addChild(getPlatformSensorThreadLeaf(platformIdent, platformSensorTypeIdentList));
-		systemOverview.addChild(getPlatformSensorVMSummaryLeaf(platformIdent, platformSensorTypeIdentList));
+		systemOverview.addChild(getPlatformSensorClassesLeaf(platformIdent, platformSensorTypeIdentList, definition));
+		systemOverview.addChild(getPlatformSensorCpuLeaf(platformIdent, platformSensorTypeIdentList, definition));
+		systemOverview.addChild(getPlatformSensorMemoryLeaf(platformIdent, platformSensorTypeIdentList, definition));
+		systemOverview.addChild(getPlatformSensorThreadLeaf(platformIdent, platformSensorTypeIdentList, definition));
+		systemOverview.addChild(getPlatformSensorVMSummaryLeaf(platformIdent, platformSensorTypeIdentList, definition));
 
 		// sort the tree elements
 		Collections.sort(systemOverview.getChildren(), new Comparator<Component>() {
@@ -424,9 +438,11 @@ public class TreeModelManager {
 	 * 
 	 * @param platformSensorTypeIdents
 	 *            The list of {@link PlatformSensorTypeIdent}.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return An instance of {@link Component}.
 	 */
-	private Component getPlatformSensorCpuLeaf(PlatformIdent platformIdent, List<PlatformSensorTypeIdent> platformSensorTypeIdents) {
+	private Component getPlatformSensorCpuLeaf(PlatformIdent platformIdent, List<PlatformSensorTypeIdent> platformSensorTypeIdents, RepositoryDefinition definition) {
 		Component cpuOverview = new Leaf();
 		boolean sensorTypeAvailable = false;
 		cpuOverview.setName("CPU");
@@ -437,7 +453,7 @@ public class TreeModelManager {
 				sensorTypeAvailable = true;
 
 				InputDefinition inputDefinition = new InputDefinition();
-				inputDefinition.setRepositoryDefinition(repositoryDefinition);
+				inputDefinition.setRepositoryDefinition(definition);
 				inputDefinition.setId(SensorTypeEnum.CPU_INFORMATION);
 				inputDefinition.setPartName("CPU");
 				inputDefinition.setPartTooltip("CPU");
@@ -471,9 +487,11 @@ public class TreeModelManager {
 	 * 
 	 * @param platformSensorTypeIdents
 	 *            The list of {@link PlatformSensorTypeIdent}.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return An instance of {@link Component}.
 	 */
-	private Component getPlatformSensorClassesLeaf(PlatformIdent platformIdent, List<PlatformSensorTypeIdent> platformSensorTypeIdents) {
+	private Component getPlatformSensorClassesLeaf(PlatformIdent platformIdent, List<PlatformSensorTypeIdent> platformSensorTypeIdents, RepositoryDefinition definition) {
 		Component classesOverview = new Leaf();
 		boolean sensorTypeAvailable = false;
 		classesOverview.setName("Classes");
@@ -484,7 +502,7 @@ public class TreeModelManager {
 				sensorTypeAvailable = true;
 
 				InputDefinition inputDefinition = new InputDefinition();
-				inputDefinition.setRepositoryDefinition(repositoryDefinition);
+				inputDefinition.setRepositoryDefinition(definition);
 				inputDefinition.setId(SensorTypeEnum.CLASSLOADING_INFORMATION);
 				inputDefinition.setPartName("Class Loading");
 				inputDefinition.setPartTooltip("Class Loading");
@@ -518,9 +536,11 @@ public class TreeModelManager {
 	 * 
 	 * @param platformSensorTypeIdents
 	 *            The list of {@link PlatformSensorTypeIdent}.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return An instance of {@link Component}.
 	 */
-	private Component getPlatformSensorMemoryLeaf(PlatformIdent platformIdent, List<PlatformSensorTypeIdent> platformSensorTypeIdents) {
+	private Component getPlatformSensorMemoryLeaf(PlatformIdent platformIdent, List<PlatformSensorTypeIdent> platformSensorTypeIdents, RepositoryDefinition definition) {
 		Component memoryOverview = new Leaf();
 		boolean sensorTypeAvailable = false;
 		memoryOverview.setName("Memory");
@@ -539,7 +559,7 @@ public class TreeModelManager {
 				}
 
 				InputDefinition inputDefinition = new InputDefinition();
-				inputDefinition.setRepositoryDefinition(repositoryDefinition);
+				inputDefinition.setRepositoryDefinition(definition);
 				inputDefinition.setId(SensorTypeEnum.MEMORY_INFORMATION);
 				inputDefinition.setPartName("Memory");
 				inputDefinition.setPartTooltip("Memory");
@@ -573,9 +593,11 @@ public class TreeModelManager {
 	 * 
 	 * @param platformSensorTypeIdents
 	 *            The list of {@link PlatformSensorTypeIdent}.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return An instance of {@link Component}.
 	 */
-	private Component getPlatformSensorThreadLeaf(PlatformIdent platformIdent, List<PlatformSensorTypeIdent> platformSensorTypeIdents) {
+	private Component getPlatformSensorThreadLeaf(PlatformIdent platformIdent, List<PlatformSensorTypeIdent> platformSensorTypeIdents, RepositoryDefinition definition) {
 		Component threadsOverview = new Leaf();
 		boolean sensorTypeAvailable = false;
 		threadsOverview.setName("Threads");
@@ -586,7 +608,7 @@ public class TreeModelManager {
 				sensorTypeAvailable = true;
 
 				InputDefinition inputDefinition = new InputDefinition();
-				inputDefinition.setRepositoryDefinition(repositoryDefinition);
+				inputDefinition.setRepositoryDefinition(definition);
 				inputDefinition.setId(SensorTypeEnum.THREAD_INFORMATION);
 				inputDefinition.setPartName("Threads");
 				inputDefinition.setPartTooltip("Threads");
@@ -620,9 +642,11 @@ public class TreeModelManager {
 	 * 
 	 * @param platformSensorTypeIdents
 	 *            The list of {@link PlatformSensorTypeIdent}.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return An instance of {@link Component}.
 	 */
-	private Component getPlatformSensorVMSummaryLeaf(PlatformIdent platformIdent, List<PlatformSensorTypeIdent> platformSensorTypeIdents) {
+	private Component getPlatformSensorVMSummaryLeaf(PlatformIdent platformIdent, List<PlatformSensorTypeIdent> platformSensorTypeIdents, RepositoryDefinition definition) {
 		Component vmSummary = new Leaf();
 		boolean sensorTypeAvailable = false;
 		vmSummary.setName("VM Summary");
@@ -632,7 +656,7 @@ public class TreeModelManager {
 			sensorTypeAvailable = true;
 
 			InputDefinition inputDefinition = new InputDefinition();
-			inputDefinition.setRepositoryDefinition(repositoryDefinition);
+			inputDefinition.setRepositoryDefinition(definition);
 			inputDefinition.setId(SensorTypeEnum.SYSTEM_INFORMATION);
 			inputDefinition.setPartName("System Information");
 			inputDefinition.setPartTooltip("System Information");
@@ -660,15 +684,17 @@ public class TreeModelManager {
 	 * 
 	 * @param platformIdent
 	 *            The {@link PlatformIdent} object used to create the tree.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return The exception tracer tree.
 	 */
-	private Component getExceptionTracerTree(PlatformIdent platformIdent) {
+	private Component getExceptionTracerTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Composite exceptionTracer = new Composite();
 		exceptionTracer.setName("Exception Tracer");
 		exceptionTracer.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_EXCEPTION_TRACER));
 
-		exceptionTracer.addChild(getExceptionTree(platformIdent));
-		exceptionTracer.addChild(getExceptionOverview(platformIdent));
+		exceptionTracer.addChild(getExceptionTree(platformIdent, definition));
+		exceptionTracer.addChild(getExceptionOverview(platformIdent, definition));
 
 		return exceptionTracer;
 	}
@@ -678,15 +704,17 @@ public class TreeModelManager {
 	 * 
 	 * @param platformIdent
 	 *            The {@link PlatformIdent} object.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return The Exception Tree.
 	 */
-	private Component getExceptionTree(PlatformIdent platformIdent) {
+	private Component getExceptionTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Component exceptionTree = new Leaf();
 		exceptionTree.setName("Exception Tree");
 		exceptionTree.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_EXCEPTION_TREE));
 
 		InputDefinition exceptionTreeInputDefinition = new InputDefinition();
-		exceptionTreeInputDefinition.setRepositoryDefinition(repositoryDefinition);
+		exceptionTreeInputDefinition.setRepositoryDefinition(definition);
 		exceptionTreeInputDefinition.setId(SensorTypeEnum.EXCEPTION_TRACER);
 		exceptionTreeInputDefinition.setPartName("Exception Tracer (Exception Tree)");
 		exceptionTreeInputDefinition.setPartTooltip("Exception Tracer (Exception Tree)");
@@ -708,15 +736,17 @@ public class TreeModelManager {
 	 * 
 	 * @param platformIdent
 	 *            The {@link PlatformIdent} object.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return The Exception Tracer overview.
 	 */
-	private Component getExceptionOverview(PlatformIdent platformIdent) {
+	private Component getExceptionOverview(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Component exceptionOverview = new Leaf();
 		exceptionOverview.setName("Exception Overview");
 		exceptionOverview.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CLASS_OVERVIEW));
 
 		InputDefinition exceptionOverviewInputDefinition = new InputDefinition();
-		exceptionOverviewInputDefinition.setRepositoryDefinition(repositoryDefinition);
+		exceptionOverviewInputDefinition.setRepositoryDefinition(definition);
 		exceptionOverviewInputDefinition.setId(SensorTypeEnum.EXCEPTION_TRACER_OVERVIEW);
 		exceptionOverviewInputDefinition.setPartName("Exception Tracer (Exception Overview)");
 		exceptionOverviewInputDefinition.setPartTooltip("Exception Tracer (Exception Overview)");
@@ -737,14 +767,16 @@ public class TreeModelManager {
 	 * 
 	 * @param platformIdent
 	 *            The {@link PlatformIdent} object.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
 	 * @return The combined metrics tree.
 	 */
-	private Component getCombinedMetricsTree(PlatformIdent platformIdent) {
+	private Component getCombinedMetricsTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		DeferredCombinedMetricsComposite combinedMetrics = new DeferredCombinedMetricsComposite();
 		combinedMetrics.setName("Combined Metrics");
 		combinedMetrics.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_TIMER));
 		combinedMetrics.setPlatformIdent(platformIdent);
-		combinedMetrics.setRepositoryDefinition(repositoryDefinition);
+		combinedMetrics.setRepositoryDefinition(definition);
 
 		return combinedMetrics;
 	}

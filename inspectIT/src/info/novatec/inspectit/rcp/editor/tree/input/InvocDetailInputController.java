@@ -10,15 +10,15 @@ import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
-import info.novatec.inspectit.rcp.repository.service.GlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,8 +26,8 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
@@ -163,7 +163,7 @@ public class InvocDetailInputController implements TreeInputController {
 	/**
 	 * This data access service is needed because of the ID mappings.
 	 */
-	private GlobalDataAccessService globalDataAccessService;
+	private CachedGlobalDataAccessService globalDataAccessService;
 
 	/**
 	 * {@inheritDoc}

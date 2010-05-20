@@ -10,7 +10,7 @@ import info.novatec.inspectit.communication.data.ThreadInformationData;
 import info.novatec.inspectit.communication.data.VmArgumentData;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
-import info.novatec.inspectit.rcp.repository.service.GlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -215,7 +215,7 @@ public class VmSummaryInputController implements TextInputController {
 	/**
 	 * The global data access service.
 	 */
-	private GlobalDataAccessService dataAccessService;
+	private CachedGlobalDataAccessService dataAccessService;
 
 	/**
 	 * {@inheritDoc}

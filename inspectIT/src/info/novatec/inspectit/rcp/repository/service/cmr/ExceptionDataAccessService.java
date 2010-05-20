@@ -1,4 +1,4 @@
-package info.novatec.inspectit.rcp.repository.service;
+package info.novatec.inspectit.rcp.repository.service.cmr;
 
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;

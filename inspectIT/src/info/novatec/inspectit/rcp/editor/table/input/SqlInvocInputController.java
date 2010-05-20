@@ -11,7 +11,7 @@ import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
-import info.novatec.inspectit.rcp.repository.service.GlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,7 +115,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	/**
 	 * This data access service is needed because of the ID mappings.
 	 */
-	private GlobalDataAccessService globalDataAccessService;
+	private CachedGlobalDataAccessService globalDataAccessService;
 
 	/**
 	 * {@inheritDoc}

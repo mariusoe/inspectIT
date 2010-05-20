@@ -5,127 +5,45 @@ import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
-import info.novatec.inspectit.rcp.repository.service.CombinedMetricsDataAccessService;
-import info.novatec.inspectit.rcp.repository.service.ExceptionDataAccessService;
-import info.novatec.inspectit.rcp.repository.service.GlobalDataAccessService;
-import info.novatec.inspectit.rcp.repository.service.InvocationDataAccessService;
-import info.novatec.inspectit.rcp.repository.service.LicenseService;
-import info.novatec.inspectit.rcp.repository.service.ServerStatusService;
-import info.novatec.inspectit.rcp.repository.service.SqlDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.cmr.ServerStatusService;
 
 /**
- * Every repository definition initializes the services exposed by the CMR.
+ * The interface to the repository definition. A repository can be anywhere and
+ * anything, the implementation will provide the details on how to access the
+ * information.
  * 
  * @author Patrice Bouillet
- * @author Dirk Maucher
- * @author Eduard Tudenhoefner
- * 
  */
-public class RepositoryDefinition {
+public interface RepositoryDefinition {
 
 	/**
-	 * The ip of the CMR.
-	 */
-	private final String ip;
-
-	/**
-	 * The port used by the CMR.
-	 */
-	private final int port;
-
-	/**
-	 * The global data access service.
-	 */
-	private final GlobalDataAccessService globalDataAccessService;
-
-	/**
-	 * The sql data access service.
-	 */
-	private final ISqlDataAccessService sqlDataAccessService;
-
-	/**
-	 * The invocation data access service.
-	 */
-	private final IInvocationDataAccessService invocationDataAccessService;
-
-	/**
-	 * The exception data access service.
-	 */
-	private final IExceptionDataAccessService exceptionDataAccessService;
-
-	/**
-	 * The combined metrics data access service.
-	 */
-	private final ICombinedMetricsDataAccessService combinedMetricsDataAccessService;
-
-	/**
-	 * The server status service exposed by the CMR and initialized by Spring.
-	 */
-	private final ServerStatusService serverStatusService;
-
-	/**
-	 * The license service.
-	 */
-	private final ILicenseService licenseService;
-
-	/**
-	 * The only constructor of this class. The ip and port is mandatory to
-	 * create the connection.
+	 * Returns the IP of the definition.
 	 * 
-	 * @param ip
-	 *            The ip of the CMR.
-	 * @param port
-	 *            The port used by the CMR.
+	 * @return The IP.
 	 */
-	public RepositoryDefinition(String ip, int port) {
-		this.ip = ip;
-		this.port = port;
-
-		globalDataAccessService = new GlobalDataAccessService(ip, port);
-		sqlDataAccessService = new SqlDataAccessService(ip, port);
-		serverStatusService = new ServerStatusService(ip, port);
-		invocationDataAccessService = new InvocationDataAccessService(ip, port);
-		licenseService = new LicenseService(ip, port);
-		exceptionDataAccessService = new ExceptionDataAccessService(ip, port);
-		combinedMetricsDataAccessService = new CombinedMetricsDataAccessService(ip, port);
-	}
+	String getIp();
 
 	/**
-	 * Returns the global data access service for this repository definition.
+	 * Returns the port of the definition.
 	 * 
-	 * @return The global data access service.
+	 * @return The port.
 	 */
-	public GlobalDataAccessService getGlobalDataAccessService() {
-		return globalDataAccessService;
-	}
+	int getPort();
 
 	/**
-	 * Returns the exception data access service for this repository definition.
+	 * Returns the license service for this repository definition.
 	 * 
-	 * @return The exception data access service.
+	 * @return The license service.
 	 */
-	public IExceptionDataAccessService getExceptionDataAccessService() {
-		return exceptionDataAccessService;
-	}
+	ILicenseService getLicenseService();
 
 	/**
-	 * Returns the sql data access service for this repository definition.
+	 * Returns the server status service for this repository definition.
 	 * 
-	 * @return The sql data access service.
+	 * @return The server status service.
 	 */
-	public ISqlDataAccessService getSqlDataAccessService() {
-		return sqlDataAccessService;
-	}
-
-	/**
-	 * Returns the invocation data access service for this repository
-	 * definition.
-	 * 
-	 * @return The invocation data access servie.
-	 */
-	public IInvocationDataAccessService getInvocationDataAccessService() {
-		return invocationDataAccessService;
-	}
+	ServerStatusService getServerStatusService();
 
 	/**
 	 * Returns the combined metrics data access service for this repository
@@ -133,52 +51,35 @@ public class RepositoryDefinition {
 	 * 
 	 * @return The combined metrics data access service.
 	 */
-	public ICombinedMetricsDataAccessService getCombinedMetricsDataAccessService() {
-		return combinedMetricsDataAccessService;
-	}
+	ICombinedMetricsDataAccessService getCombinedMetricsDataAccessService();
 
 	/**
-	 * Returns the server status service for this repository definition.
+	 * Returns the invocation data access service for this repository
+	 * definition.
 	 * 
-	 * @return The server status service.
+	 * @return The invocation data access servie.
 	 */
-	public ServerStatusService getServerStatusService() {
-		return serverStatusService;
-	}
+	IInvocationDataAccessService getInvocationDataAccessService();
 
 	/**
-	 * Returns the license service for this repository definition.
+	 * Returns the sql data access service for this repository definition.
 	 * 
-	 * @return The license service.
+	 * @return The sql data access service.
 	 */
-	public ILicenseService getLicenseService() {
-		return licenseService;
-	}
+	ISqlDataAccessService getSqlDataAccessService();
 
 	/**
-	 * Returns the IP of the definition.
+	 * Returns the exception data access service for this repository definition.
 	 * 
-	 * @return The IP.
+	 * @return The exception data access service.
 	 */
-	public String getIp() {
-		return ip;
-	}
+	IExceptionDataAccessService getExceptionDataAccessService();
 
 	/**
-	 * Returns the port of the definition.
+	 * Returns the global data access service for this repository definition.
 	 * 
-	 * @return The port.
+	 * @return The global data access service.
 	 */
-	public int getPort() {
-		return port;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return "Repository definition :: IP=" + ip + " Port=" + port;
-	}
+	CachedGlobalDataAccessService getGlobalDataAccessService();
 
 }

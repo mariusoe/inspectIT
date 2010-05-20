@@ -2,12 +2,11 @@ package info.novatec.inspectit.rcp.wizard;
 
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.IWorkbench;
 
 public class NewRepositoryDefinitionWizard extends Wizard {
 
@@ -15,12 +14,6 @@ public class NewRepositoryDefinitionWizard extends Wizard {
 
 	public NewRepositoryDefinitionWizard() {
 		this.setWindowTitle("New Repository Definition Wizard");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void init(IWorkbench workbench, IStructuredSelection selection) {
 	}
 
 	/**
@@ -40,7 +33,7 @@ public class NewRepositoryDefinitionWizard extends Wizard {
 		String ip = newRepositoryDefinitionPage.getIp();
 		int port = Integer.parseInt(newRepositoryDefinitionPage.getPort());
 
-		RepositoryDefinition repositoryDefinition = new RepositoryDefinition(ip, port);
+		RepositoryDefinition repositoryDefinition = new CmrRepositoryDefinition(ip, port);
 		InspectIT.getDefault().getRepositoryManager().addRepositoryDefinition(repositoryDefinition);
 
 		return true;

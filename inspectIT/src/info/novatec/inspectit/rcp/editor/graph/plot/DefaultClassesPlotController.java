@@ -3,7 +3,7 @@ package info.novatec.inspectit.rcp.editor.graph.plot;
 import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
-import info.novatec.inspectit.rcp.repository.service.GlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -76,7 +76,7 @@ public class DefaultClassesPlotController extends AbstractPlotController {
 	/**
 	 * The data access service to access the data on the CMR.
 	 */
-	private GlobalDataAccessService dataAccessService;
+	private CachedGlobalDataAccessService dataAccessService;
 
 	/**
 	 * Old list containing some data objects which could be reused.

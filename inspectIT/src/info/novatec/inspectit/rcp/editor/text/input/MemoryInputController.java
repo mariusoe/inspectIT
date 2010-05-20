@@ -4,7 +4,7 @@ import info.novatec.inspectit.communication.data.MemoryInformationData;
 import info.novatec.inspectit.communication.data.SystemInformationData;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
-import info.novatec.inspectit.rcp.repository.service.GlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -84,7 +84,7 @@ public class MemoryInputController implements TextInputController {
 	/**
 	 * The global data access service.
 	 */
-	private GlobalDataAccessService dataAccessService;
+	private CachedGlobalDataAccessService dataAccessService;
 
 	/**
 	 * {@inheritDoc}

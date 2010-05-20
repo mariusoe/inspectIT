@@ -14,8 +14,8 @@ import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
-import info.novatec.inspectit.rcp.repository.service.GlobalDataAccessService;
-import info.novatec.inspectit.rcp.repository.service.InvocationDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.cmr.InvocationDataAccessService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -139,7 +139,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	/**
 	 * This data access service is needed because of the ID mappings.
 	 */
-	private GlobalDataAccessService globalDataAccessService;
+	private CachedGlobalDataAccessService globalDataAccessService;
 
 	/**
 	 * {@inheritDoc}
@@ -266,7 +266,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 					public void run(final IProgressMonitor monitor) {
 						monitor.beginTask("Retrieving Invocation detail data from CMR", IProgressMonitor.UNKNOWN);
 						InvocationSequenceData invocationSequenceData = (InvocationSequenceData) selection.getFirstElement();
-						InvocationSequenceData data = ((InvocationDataAccessService) dataAccessService).getInvocationSequence(invocationSequenceData);
+						InvocationSequenceData data = (InvocationSequenceData) dataAccessService.getInvocationSequenceDetail(invocationSequenceData);
 						final List<InvocationSequenceData> invocationSequenceDataList = new ArrayList<InvocationSequenceData>();
 						invocationSequenceDataList.add(data);
 						Display.getDefault().asyncExec(new Runnable() {
