@@ -89,4 +89,30 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	public List<ExceptionSensorData> getExceptionOverview(ExceptionSensorData template) {
+		try {
+			return exceptionDataAccessService.getExceptionOverview(template);
+		} catch (Exception e) {
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the exception overview from the CMR!", e, -1);
+			return Collections.EMPTY_LIST;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	public List<ExceptionSensorData> getStackTracesForErrorMessage(ExceptionSensorData template) {
+		try {
+			return exceptionDataAccessService.getStackTracesForErrorMessage(template);
+		} catch (Exception e) {
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the stack traces from the CMR!", e, -1);
+			return Collections.EMPTY_LIST;
+		}
+	}
+
 }

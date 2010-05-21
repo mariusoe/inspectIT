@@ -3,12 +3,15 @@ package info.novatec.inspectit.cmr.dao.impl;
 import info.novatec.inspectit.cmr.dao.ExceptionSensorDataDao;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -24,41 +27,18 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 	 */
 	@SuppressWarnings("unchecked")
 	public List<ExceptionSensorData> getExceptionTreeOverview(ExceptionSensorData template, int limit) {
-		// TODO ET: refactor this method
-
 		// checks whether limit is set to show all elements
 		if (limit == -1) {
 			return getExceptionTreeOverview(template);
 		}
 
-		DetachedCriteria defaultDataCriteria = DetachedCriteria.forClass(template.getClass());
-		defaultDataCriteria.add(Restrictions.gt("id", template.getId()));
-		defaultDataCriteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
-		defaultDataCriteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
-
-		List<ExceptionSensorData> resultList = new ArrayList<ExceptionSensorData>();
-		List<ExceptionSensorData> exceptionSensorDataList = getHibernateTemplate().findByCriteria(defaultDataCriteria);
-
-		// the exception sensor data objects are persisted in reverse order in
-		// the db, so we need to reverse the result
-		Collections.reverse(exceptionSensorDataList);
-
-		int counter = 0;
-		while ((resultList.size() < limit) && (counter < exceptionSensorDataList.size())) {
-			ExceptionSensorData data = exceptionSensorDataList.get(counter);
-
-			// we are always adding the data object that is marked with CREATED
-			if (counter == 0) {
-				resultList.add(exceptionSensorDataList.get(counter));
-			} else if ((counter - 1) >= 0) {
-				if (data.getThrowableIdentityHashCode() != exceptionSensorDataList.get(counter - 1).getThrowableIdentityHashCode()) {
-					resultList.add(data);
-				}
-			}
-			counter++;
-		}
-
-		return resultList;
+		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
+		criteria.add(Restrictions.gt("id", template.getId()));
+		criteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
+		criteria.add(Restrictions.eq("exceptionEventString", "CREATED"));
+		criteria.addOrder(Order.desc("timeStamp"));
+		criteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
+		return getHibernateTemplate().findByCriteria(criteria, -1, limit);
 	}
 
 	/**
@@ -66,35 +46,13 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 	 */
 	@SuppressWarnings("unchecked")
 	public List<ExceptionSensorData> getExceptionTreeOverview(ExceptionSensorData template) {
-		// TODO ET: refactor this method
-		DetachedCriteria defaultDataCriteria = DetachedCriteria.forClass(template.getClass());
-		defaultDataCriteria.add(Restrictions.gt("id", template.getId()));
-		defaultDataCriteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
-		defaultDataCriteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
-
-		List<ExceptionSensorData> resultList = new ArrayList<ExceptionSensorData>();
-		List<ExceptionSensorData> exceptionSensorDataList = getHibernateTemplate().findByCriteria(defaultDataCriteria);
-
-		// the exception sensor data objects are persisted in reverse order in
-		// the db, so we need to reverse the result
-		Collections.reverse(exceptionSensorDataList);
-
-		int counter = 0;
-		while (counter < exceptionSensorDataList.size()) {
-			ExceptionSensorData data = exceptionSensorDataList.get(counter);
-
-			// we are always adding the data object that is marked with CREATED
-			if (counter == 0) {
-				resultList.add(exceptionSensorDataList.get(counter));
-			} else if ((counter - 1) >= 0) {
-				if (data.getThrowableIdentityHashCode() != exceptionSensorDataList.get(counter - 1).getThrowableIdentityHashCode()) {
-					resultList.add(data);
-				}
-			}
-			counter++;
-		}
-
-		return resultList;
+		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
+		criteria.add(Restrictions.gt("id", template.getId()));
+		criteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
+		criteria.add(Restrictions.eq("exceptionEventString", "CREATED"));
+		criteria.addOrder(Order.desc("timeStamp"));
+		criteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
+		return getHibernateTemplate().findByCriteria(criteria);
 	}
 
 	/**
@@ -102,11 +60,11 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 	 */
 	@SuppressWarnings("unchecked")
 	public List<ExceptionSensorData> getExceptionTreeDetails(ExceptionSensorData template) {
-		DetachedCriteria defaultDataCriteria = DetachedCriteria.forClass(template.getClass());
-		defaultDataCriteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
-		defaultDataCriteria.add(Restrictions.eq("throwableIdentityHashCode", template.getThrowableIdentityHashCode()));
-		defaultDataCriteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
-		List<ExceptionSensorData> resultList = getHibernateTemplate().findByCriteria(defaultDataCriteria);
+		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
+		criteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
+		criteria.add(Restrictions.eq("throwableIdentityHashCode", template.getThrowableIdentityHashCode()));
+		criteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
+		List<ExceptionSensorData> resultList = getHibernateTemplate().findByCriteria(criteria);
 
 		// the exception sensor data objects are persisted in reverse order in
 		// the db, so we need to reverse the result
@@ -115,4 +73,46 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 		return resultList;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	public List<ExceptionSensorData> getExceptionOverview(ExceptionSensorData template) {
+		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
+		criteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
+		ProjectionList projectionList = Projections.projectionList();
+		projectionList.add(new CustomPropertyAliasProjection("throwableType", "throwableType"));
+		projectionList.add(new CustomPropertyAliasProjection("exceptionEventString", "exceptionEventString"));
+		projectionList.add(new CustomPropertyAliasProjection("errorMessage", "errorMessage"));
+		projectionList.add(new CustomPropertyAliasProjection("stackTrace", "stackTrace"));
+		projectionList.add(new CustomPropertyAliasProjection("cause", "cause"));
+		projectionList.add(Projections.count("exceptionEventString"), "throwableIdentityHashCode");
+		projectionList.add(Projections.groupProperty("throwableType"));
+		projectionList.add(Projections.groupProperty("exceptionEventString"));
+		projectionList.add(Projections.groupProperty("errorMessage"));
+		projectionList.add(Projections.groupProperty("stackTrace"));
+		projectionList.add(Projections.groupProperty("cause"));
+		criteria.setProjection(projectionList);
+		criteria.addOrder(Order.asc("exceptionEventString"));
+		criteria.setResultTransformer(Transformers.aliasToBean(ExceptionSensorData.class));
+		return getHibernateTemplate().findByCriteria(criteria);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	public List<ExceptionSensorData> getStackTracesForErrorMessage(ExceptionSensorData template) {
+		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
+		criteria.add(Restrictions.gt("id", template.getId()));
+		criteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
+		criteria.add(Restrictions.eq("errorMessage", template.getErrorMessage()));
+		criteria.add(Restrictions.isNotNull("stackTrace"));
+		ProjectionList projections = Projections.projectionList();
+		projections.add(Projections.distinct(Projections.property("stackTrace")));
+		projections.add(new CustomPropertyAliasProjection("stackTrace", "stackTrace"));
+		criteria.setProjection(projections);
+		criteria.setResultTransformer(Transformers.aliasToBean(ExceptionSensorData.class));
+		return getHibernateTemplate().findByCriteria(criteria);
+	}
 }

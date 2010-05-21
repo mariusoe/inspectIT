@@ -1,7 +1,6 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.ExceptionSensorDataDao;
-import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.util.Converter;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 
@@ -97,11 +96,63 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 		List<ExceptionSensorData> result = exceptionSensorDataDao.getExceptionTreeDetails(template);
 
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Get exception tree overview duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+			LOGGER.debug("Get exception tree details duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
 		}
 
 		if (LOGGER.isTraceEnabled()) {
 			LOGGER.trace("<-- ExceptionDataAccessService.getExceptionTreeDetails()");
+		}
+
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<ExceptionSensorData> getExceptionOverview(ExceptionSensorData template) {
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("--> ExceptionDataAccessService.getExceptionOverview()");
+		}
+
+		long time = 0;
+		if (LOGGER.isDebugEnabled()) {
+			time = System.nanoTime();
+		}
+
+		List<ExceptionSensorData> result = exceptionSensorDataDao.getExceptionOverview(template);
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Get exception overview duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+		}
+
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("<-- ExceptionDataAccessService.getExceptionOverview()");
+		}
+
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<ExceptionSensorData> getStackTracesForErrorMessage(ExceptionSensorData template) {
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("--> ExceptionDataAccessService.getStackTracesForErrorMessage()");
+		}
+
+		long time = 0;
+		if (LOGGER.isDebugEnabled()) {
+			time = System.nanoTime();
+		}
+
+		List<ExceptionSensorData> result = exceptionSensorDataDao.getStackTracesForErrorMessage(template);
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Get stack traces for error message duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+		}
+
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("<-- ExceptionDataAccessService.getStackTracesForErrorMessage()");
 		}
 
 		return result;

@@ -50,4 +50,27 @@ public interface IExceptionDataAccessService {
 	 */
 	List getExceptionTreeDetails(ExceptionSensorData template);
 
+	/**
+	 * Returns a list of {@link ExceptionSensorData} objects that is used to
+	 * show an overview over Exceptions with specific information about the
+	 * number of caused event types.
+	 * 
+	 * @param template
+	 *            The template object to be used for the query.
+	 * @return A list of {@link ExceptionSensorData} objects with additional
+	 *         information about how often a specific eventType was caused.
+	 */
+	List getExceptionOverview(ExceptionSensorData template);
+
+	/**
+	 * Returns a list of {@link ExceptionSensorData} object where all fields are
+	 * <code>null</code>, except the stack trace.
+	 * 
+	 * @param template
+	 *            The template object to be used for the query.
+	 * @return A list of {@link ExceptionSensorData} object where all fields are
+	 *         <code>null</code>, except the stack trace.
+	 */
+	List getStackTracesForErrorMessage(ExceptionSensorData template);
+
 }
