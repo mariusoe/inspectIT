@@ -62,6 +62,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	private static final String CONFIG_PLATFORM_SENSOR_TYPE = "platform-sensor-type";
 	private static final String CONFIG_SENSOR = "sensor";
 	private static final String CONFIG_EXCEPTION_SENSOR = "exception-sensor";
+	private static final String CONFIG_INCLUDE_FILE = "$include";
 
 	/**
 	 * Regular expression pattern to find the signatures of the method
@@ -76,6 +77,11 @@ public class FileConfigurationReader implements IConfigurationReader {
 	private final Pattern emptyMethodSignature = Pattern.compile(".*\\(\\)");
 
 	private boolean firstCreationOfExceptionSensor = true;
+
+	/**
+	 * The configuration file.
+	 */
+	private static File configFile;
 
 	/**
 	 * Default constructor which accepts one parameter.
@@ -104,9 +110,9 @@ public class FileConfigurationReader implements IConfigurationReader {
 
 		// Load and parse the file
 		try {
-			File f = new File(pathToConfig);
-			InputStream is = new FileInputStream(f);
-			LOGGER.finer("Agent Configuration file found at: " + f.getAbsolutePath());
+			configFile = new File(pathToConfig);
+			InputStream is = new FileInputStream(configFile);
+			LOGGER.finer("Agent Configuration file found at: " + configFile.getAbsolutePath());
 			InputStreamReader reader = new InputStreamReader(is);
 			this.parse(reader);
 		} catch (FileNotFoundException e) {
@@ -186,6 +192,11 @@ public class FileConfigurationReader implements IConfigurationReader {
 					continue;
 				}
 
+				// check for a file include
+				if (discriminator.equalsIgnoreCase(CONFIG_INCLUDE_FILE)) {
+					processIncludeFileLine(tokenizer);
+					continue;
+				}
 			}
 		} catch (Throwable throwable) {
 			LOGGER.severe("Error reading config on line : " + line);
@@ -437,6 +448,41 @@ public class FileConfigurationReader implements IConfigurationReader {
 			configurationStorage.setBufferStrategy(bufferStrategyClass, settings);
 		} catch (StorageException e) {
 			throw new ParserException("Could not set the buffer strategy in the storage", e);
+		}
+	}
+
+	/**
+	 * Process an additional configuration file.
+	 * 
+	 * @param tokenizer
+	 *            The tokenizer which contains the path to an additional
+	 *            configuration file.
+	 * @throws ParserException
+	 *             Thrown if there was an exception caught by parsing the config
+	 *             file.
+	 */
+	private void processIncludeFileLine(StringTokenizer tokenizer) throws ParserException {
+		String fileName = tokenizer.nextToken();
+
+		File file = new File(fileName);
+		if (!file.isAbsolute()) {
+			// if the file does not denote an absolute file, we have to prepend
+			// the folder in which the current configuration is loaded.
+			file = new File(configFile.getParent() + File.separator + fileName);
+		}
+		if (file.isDirectory()) {
+			LOGGER.info("Specified additional configuration is a folder: " + file.getAbsolutePath() + ", aborting!");
+			throw new ParserException("Specified additional configuration is a folder: " + file.getAbsolutePath());
+		}
+
+		try {
+			InputStream is = new FileInputStream(file);
+			LOGGER.info("Additional agent configuration file found at: " + file.getAbsolutePath());
+			InputStreamReader reader = new InputStreamReader(is);
+			this.parse(reader);
+		} catch (FileNotFoundException e) {
+			LOGGER.info("Additional agent configuration file not found at " + file.getAbsolutePath() + ", aborting!");
+			throw new ParserException("Additional agent Configuration file not found at " + file.getAbsolutePath());
 		}
 	}
 
