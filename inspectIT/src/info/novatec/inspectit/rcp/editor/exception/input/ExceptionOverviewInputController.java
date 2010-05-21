@@ -1,6 +1,5 @@
 package info.novatec.inspectit.rcp.editor.exception.input;
 
-import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.ExceptionEventEnum;
@@ -9,11 +8,12 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.table.input.AbstractTableInputController;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
-import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,16 +24,29 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
+/**
+ * 
+ * @author Eduard Tudenhoefner
+ * 
+ */
 public class ExceptionOverviewInputController extends AbstractTableInputController {
 
 	/**
@@ -51,16 +64,16 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 	 */
 	private static enum Column {
 		/** The class column. */
-		CLASS("Class", 250, InspectITConstants.IMG_CLASS),
-		/** The package column. */
-		PACKAGE("Package", 400, InspectITConstants.IMG_PACKAGE),
+		FQN("Fully-Qualified Name", 450, InspectITConstants.IMG_CLASS),
 		/** The CREATED column. */
-		CREATED("Created", 80, null),
+		CREATED("Created", 70, null),
 		/** The RETHROWN column. */
-		RETHROWN("Rethrown", 80, null),
+		RETHROWN("Rethrown", 70, null),
 		/** The HANDLED column. */
-		HANDLED("Handled", 80, null);
+		HANDLED("Handled", 70, null);
 
+		/** The real viewer column. */
+		private TableViewerColumn column;
 		/** The name. */
 		private String name;
 		/** The width of the column. */
@@ -106,19 +119,16 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 	private ExceptionSensorData template;
 
 	/**
-	 * The list of invocation sequence data objects which is displayed.
+	 * The list of {@link ExceptionSensorData} objects which is displayed.
 	 */
-	private List<ExtendedExceptionSensorData> exceptionSensorData = new ArrayList<ExtendedExceptionSensorData>();
+	private List<ExtendedExceptionSensorData> exceptionSensorDataList = new ArrayList<ExtendedExceptionSensorData>();
 
 	/**
-	 * The limit of the result set.
+	 * This map holds all objects that are needed to be represented in this
+	 * view. It uses the fqn of an exception as the key. It contains as value
+	 * the objects that are belonging to a specific exception class.
 	 */
-	private int limit = 10;
-
-	/**
-	 * This data access service is needed because of the ID mappings.
-	 */
-	private CachedGlobalDataAccessService globalDataAccessService;
+	private Map<String, List<ExtendedExceptionSensorData>> overviewMap;
 
 	/**
 	 * The data access service to access the data on the CMR.
@@ -128,7 +138,6 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void setInputDefinition(InputDefinition inputDefinition) {
 		super.setInputDefinition(inputDefinition);
 
@@ -137,7 +146,6 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 		template.setSensorTypeIdent(inputDefinition.getIdDefinition().getSensorTypeId());
 		template.setMethodIdent(inputDefinition.getIdDefinition().getMethodId());
 
-		globalDataAccessService = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService();
 		dataAccessService = inputDefinition.getRepositoryDefinition().getExceptionDataAccessService();
 	}
 
@@ -154,6 +162,7 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 			if (null != column.imageDescriptor) {
 				viewerColumn.getColumn().setImage(column.imageDescriptor.createImage());
 			}
+			column.column = viewerColumn;
 		}
 	}
 
@@ -163,7 +172,7 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 	@Override
 	public Object getTableInput() {
 		// this list will be filled with data
-		return exceptionSensorData;
+		return exceptionSensorDataList;
 	}
 
 	/**
@@ -184,7 +193,12 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 	 * {@inheritDoc}
 	 */
 	public TableViewerComparator<? extends DefaultData> getComparator() {
-		return null;
+		ExceptionOverviewViewerComparator exceptionOverviewViewerComparator = new ExceptionOverviewViewerComparator();
+		for (Column column : Column.values()) {
+			exceptionOverviewViewerComparator.addColumn(column.column.getColumn(), column);
+		}
+
+		return exceptionOverviewViewerComparator;
 	}
 
 	/**
@@ -195,16 +209,7 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
 		preferences.add(PreferenceId.LIVEMODE);
 		preferences.add(PreferenceId.UPDATE);
-		preferences.add(PreferenceId.ITEMCOUNT);
 		return preferences;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setLimit(int limit) {
-		this.limit = limit;
 	}
 
 	/**
@@ -215,83 +220,144 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Updating Exception Overview", IProgressMonitor.UNKNOWN);
 		monitor.subTask("Retrieving the Exception Overview from the CMR");
-		List<ExceptionSensorData> exceptionData = dataAccessService.getExceptionTreeOverview(template);
-		List<ExceptionSensorData> exceptionDataDetails = Collections.EMPTY_LIST;
-		List<ExtendedExceptionSensorData> extendedExceptionData = new ArrayList<ExtendedExceptionSensorData>();
-		List<ExtendedExceptionSensorData> result = new ArrayList<ExtendedExceptionSensorData>();
-		Map<String, ExtendedExceptionSensorData> resultMap = new HashMap<String, ExtendedExceptionSensorData>();
+		List<ExceptionSensorData> ungroupedList = dataAccessService.getExceptionOverview(template);
+		List<ExtendedExceptionSensorData> groupedOverviewList = new ArrayList<ExtendedExceptionSensorData>();
+		overviewMap = new HashMap<String, List<ExtendedExceptionSensorData>>();
 
-		// TODO ET: check whether this can be implemented with Hibernate
-		// Projections
-		for (ExceptionSensorData data : exceptionData) {
-			exceptionDataDetails = dataAccessService.getExceptionTreeDetails(data);
-			ExtendedExceptionSensorData resultObject = new ExtendedExceptionSensorData();
+		for (ExceptionSensorData ungroupedObject : ungroupedList) {
+			List<ExtendedExceptionSensorData> groupedObjects = Collections.EMPTY_LIST;
+			ExtendedExceptionSensorData data = copyInformation(ungroupedObject);
 
-			for (ExceptionSensorData exObject : exceptionDataDetails) {
-				String eventType = exObject.getExceptionEventString();
-				if (eventType.equalsIgnoreCase(ExceptionEventEnum.CREATED.toString())) {
-					fillWithInformation(resultObject, exObject);
-					resultObject.setCreatedCounter(resultObject.getCreatedCounter() + 1);
-				} else if (eventType.equals(ExceptionEventEnum.RETHROWN.toString())) {
-					resultObject.setRethrownCounter(resultObject.getRethrownCounter() + 1);
-				} else if (eventType.equals(ExceptionEventEnum.HANDLED.toString())) {
-					resultObject.setHandledCounter(resultObject.getHandledCounter() + 1);
-				}
-			}
-			extendedExceptionData.add(resultObject);
-		}
+			if (!overviewMap.containsKey(ungroupedObject.getThrowableType())) {
+				// map doesn't contain the actual exception class, so we create
+				// and add a new list for exception classes of the same type
+				groupedObjects = new ArrayList<ExtendedExceptionSensorData>();
 
-		// now summarize the exception classes
-		if ((null != extendedExceptionData) && !extendedExceptionData.isEmpty()) {
-			for (ExtendedExceptionSensorData extendedExceptionSensorData : extendedExceptionData) {
-				if (resultMap.containsKey(extendedExceptionSensorData.getThrowableType())) {
-					ExtendedExceptionSensorData data = resultMap.get(extendedExceptionSensorData.getThrowableType());
-					data.setCreatedCounter(data.getCreatedCounter() + extendedExceptionSensorData.getCreatedCounter());
-					data.setRethrownCounter(data.getRethrownCounter() + extendedExceptionSensorData.getRethrownCounter());
-					data.setHandledCounter(data.getHandledCounter() + extendedExceptionSensorData.getHandledCounter());
+				// updating the counter values of newly created object based on
+				// its event type and adding it to the list
+				data.updateCounterForEventType(data.getExceptionEventString(), data.getThrowableIdentityHashCode());
+				groupedObjects.add(data);
+				overviewMap.put(ungroupedObject.getThrowableType(), groupedObjects);
+			} else {
+				// map contains the actual exception class, so we get the list
+				// and search for the object within the list where the counter
+				// values must be updated
+				groupedObjects = overviewMap.get(ungroupedObject.getThrowableType());
+
+				if (groupedObjects.contains(data)) {
+					// updating the counter values of already saved object
+					// based on the actual event type
+					ExtendedExceptionSensorData nestedData = groupedObjects.get(groupedObjects.indexOf(data));
+					nestedData.updateCounterForEventType(data.getExceptionEventString(), data.getThrowableIdentityHashCode());
 				} else {
-					resultMap.put(extendedExceptionSensorData.getThrowableType(), extendedExceptionSensorData);
+					// updating the counter values of newly created object based
+					// on its event type and adding it to the list
+					data.updateCounterForEventType(data.getExceptionEventString(), data.getThrowableIdentityHashCode());
+					groupedObjects.add(data);
 				}
-			}
-
-			// list is reused for copying the values of the resultMap into it
-			extendedExceptionData.clear();
-			extendedExceptionData.addAll(resultMap.values());
-
-			// result contains limit elements.
-			int limitCounter = 0;
-			while ((limitCounter < extendedExceptionData.size()) && (limitCounter < limit)) {
-				result.add(extendedExceptionData.get(limitCounter));
-				limitCounter++;
 			}
 		}
 
-		if ((null != result) && !result.isEmpty()) {
-			exceptionSensorData.clear();
+		// we are creating the list that contains all object to be shown in the
+		// overview
+		for (Map.Entry<String, List<ExtendedExceptionSensorData>> entry : overviewMap.entrySet()) {
+			String throwableType = entry.getKey();
+			ExtendedExceptionSensorData data = createObjectForOverview(throwableType, overviewMap.get(throwableType));
+			groupedOverviewList.add(data);
+		}
+
+		if ((null != groupedOverviewList) && !groupedOverviewList.isEmpty()) {
+			exceptionSensorDataList.clear();
 			monitor.subTask("Displaying the Exception Overview");
-			exceptionSensorData.addAll(result);
+			exceptionSensorDataList.addAll(groupedOverviewList);
 		}
 
 		monitor.done();
 	}
 
 	/**
-	 * This method simply gets information from the exObject and sets it on the
-	 * resultObject.
+	 * Method is used to create {@link ExtendedExceptionSensorData} object that
+	 * are used for the overview of this view. The overview basically shows the
+	 * type of the exception (class name) and the additional information about
+	 * how often an exceptional event was caused.
 	 * 
-	 * @param resultObject
-	 *            The resulting object where to set the information.
-	 * @param exObject
+	 * @param throwableType
+	 *            The fqn of the exception class.
+	 * @param dataList
+	 *            The list containing {@link ExtendedExceptionSensorData} object
+	 *            of the same throwableType.
+	 * @return An instance of {@link ExtendedExceptionSensorData} that is used
+	 *         for the overview of this view and contains simply the fqn with
+	 *         additional information about exceptional events.
+	 */
+	private ExtendedExceptionSensorData createObjectForOverview(String throwableType, List<ExtendedExceptionSensorData> dataList) {
+		ExtendedExceptionSensorData data = new ExtendedExceptionSensorData();
+		data.setThrowableType(throwableType);
+
+		for (ExtendedExceptionSensorData object : dataList) {
+			data.setCreatedCounter(data.getCreatedCounter() + object.getCreatedCounter());
+			data.setRethrownCounter(data.getRethrownCounter() + object.getRethrownCounter());
+			data.setHandledCounter(data.getHandledCounter() + object.getHandledCounter());
+		}
+
+		return data;
+	}
+
+	/**
+	 * This method simply gets information from the {@link ExceptionSensorData}
+	 * object and creates a new object of type
+	 * {@link ExtendedExceptionSensorData} with the same data.
+	 * 
+	 * @param data
 	 *            The object where the information is copied from.
 	 */
-	private void fillWithInformation(ExtendedExceptionSensorData resultObject, ExceptionSensorData exObject) {
-		resultObject.setExceptionEventString(exObject.getExceptionEventString());
-		resultObject.setId(exObject.getId());
-		resultObject.setMethodIdent(exObject.getMethodIdent());
-		resultObject.setPlatformIdent(exObject.getPlatformIdent());
-		resultObject.setSensorTypeIdent(exObject.getSensorTypeIdent());
-		resultObject.setThrowableType(exObject.getThrowableType());
-		resultObject.setTimeStamp(exObject.getTimeStamp());
+	private ExtendedExceptionSensorData copyInformation(ExceptionSensorData data) {
+		ExtendedExceptionSensorData resultObject = new ExtendedExceptionSensorData();
+		resultObject.setId(data.getId());
+		resultObject.setPlatformIdent(data.getPlatformIdent());
+		resultObject.setSensorTypeIdent(data.getSensorTypeIdent());
+		resultObject.setErrorMessage(data.getErrorMessage());
+		resultObject.setExceptionEventString(data.getExceptionEventString());
+		resultObject.setMethodIdent(data.getMethodIdent());
+		resultObject.setThrowableIdentityHashCode(data.getThrowableIdentityHashCode());
+		resultObject.setThrowableType(data.getThrowableType());
+		resultObject.setStackTrace(data.getStackTrace());
+		resultObject.setCause(data.getCause());
+
+		return resultObject;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void doubleClick(DoubleClickEvent event) {
+		final StructuredSelection selection = (StructuredSelection) event.getSelection();
+		if (!selection.isEmpty()) {
+			try {
+				PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
+					public void run(final IProgressMonitor monitor) {
+						monitor.beginTask("Retrieving Exception Messages", IProgressMonitor.UNKNOWN);
+						ExtendedExceptionSensorData data = (ExtendedExceptionSensorData) selection.getFirstElement();
+						final List<ExtendedExceptionSensorData> dataList = (List<ExtendedExceptionSensorData>) overviewMap.get(data.getThrowableType());
+
+						Display.getDefault().asyncExec(new Runnable() {
+							public void run() {
+								IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+								IWorkbenchPage page = window.getActivePage();
+								IRootEditor rootEditor = (IRootEditor) page.getActiveEditor();
+								rootEditor.setDataInput(dataList);
+							}
+						});
+						monitor.done();
+					}
+				});
+			} catch (InvocationTargetException e) {
+				MessageDialog.openError(Display.getDefault().getActiveShell().getShell(), "Error", e.getCause().toString());
+			} catch (InterruptedException e) {
+				MessageDialog.openInformation(Display.getDefault().getActiveShell().getShell(), "Cancelled", e.getCause().toString());
+			}
+		}
 	}
 
 	/**
@@ -308,10 +374,9 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 		@Override
 		protected StyledString getStyledText(Object element, int index) {
 			ExtendedExceptionSensorData data = (ExtendedExceptionSensorData) element;
-			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
 			Column enumId = Column.fromOrd(index);
 
-			return getStyledTextForColumn(data, methodIdent, enumId);
+			return getStyledTextForColumn(data, enumId);
 		}
 
 	}
@@ -359,12 +424,10 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 	 * @return The styled string containing the information from the data
 	 *         object.
 	 */
-	private StyledString getStyledTextForColumn(ExtendedExceptionSensorData data, MethodIdent methodIdent, Column enumId) {
+	private StyledString getStyledTextForColumn(ExtendedExceptionSensorData data, Column enumId) {
 		switch (enumId) {
-		case PACKAGE:
-			return new StyledString(methodIdent.getPackageName());
-		case CLASS:
-			return new StyledString(methodIdent.getClassName());
+		case FQN:
+			return new StyledString(data.getThrowableType());
 		case CREATED:
 			return new StyledString("" + data.getCreatedCounter());
 		case RETHROWN:
@@ -383,9 +446,8 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 		if (object instanceof ExtendedExceptionSensorData) {
 			ExtendedExceptionSensorData data = (ExtendedExceptionSensorData) object;
 			StringBuilder sb = new StringBuilder();
-			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
 			for (Column column : Column.values()) {
-				sb.append(getStyledTextForColumn(data, methodIdent, column).toString());
+				sb.append(getStyledTextForColumn(data, column).toString());
 				sb.append("\t");
 			}
 			return sb.toString();
@@ -394,13 +456,19 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 	}
 
 	/**
-	 * Data object only for this class which counts exception events.
+	 * Data object that contains exceptional events and should be used only for
+	 * this view.
 	 * 
 	 * @author Eduard Tudenhoefner
 	 * 
 	 */
 	@SuppressWarnings("serial")
-	private class ExtendedExceptionSensorData extends ExceptionSensorData {
+	public static class ExtendedExceptionSensorData extends ExceptionSensorData {
+
+		/**
+		 * The inputDefinition.
+		 */
+		private InputDefinition inputDefinition;
 
 		/**
 		 * The created counter.
@@ -425,16 +493,7 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 		}
 
 		/**
-		 * The three arg constructor.
-		 * 
-		 * @param timeStamp
-		 *            The timestamp to set.
-		 * @param platformIdent
-		 *            The platformIdent to set.
-		 * @param sensorTypeIdent
-		 *            The sensorTypeIdent to set.
-		 * @param methodIdent
-		 *            The methodIdent to set.
+		 * {@inheritDoc}
 		 */
 		public ExtendedExceptionSensorData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent) {
 			super(timeStamp, platformIdent, sensorTypeIdent, methodIdent);
@@ -464,6 +523,109 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 			this.handledCounter = handledCounter;
 		}
 
+		public InputDefinition getInputDefinition() {
+			return inputDefinition;
+		}
+
+		public void setInputDefinition(InputDefinition inputDefinition) {
+			this.inputDefinition = inputDefinition;
+		}
+
+		/**
+		 * The respective counter is updated based on the eventType.
+		 * 
+		 * @param eventType
+		 *            The event type of the exception.
+		 * @param value
+		 *            The value to be added to the respective counter.
+		 */
+		public void updateCounterForEventType(String eventType, int value) {
+			// all other event types are ignored as we are only interested in
+			// these event types
+			if (eventType.equalsIgnoreCase(ExceptionEventEnum.CREATED.toString())) {
+				setCreatedCounter(getCreatedCounter() + value);
+			} else if (eventType.equals(ExceptionEventEnum.RETHROWN.toString())) {
+				setRethrownCounter(getRethrownCounter() + value);
+			} else if (eventType.equals(ExceptionEventEnum.HANDLED.toString())) {
+				setHandledCounter(getHandledCounter() + value);
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = super.hashCode();
+			result = prime * result + createdCounter;
+			result = prime * result + handledCounter;
+			result = prime * result + rethrownCounter;
+			return result;
+		}
+
+		/**
+		 * Be very careful, as only {@link #getErrorMessage()} and the
+		 * {@link #getThrowableType()} are used for equality in this context.
+		 */
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			ExtendedExceptionSensorData other = (ExtendedExceptionSensorData) obj;
+
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+
+			if (super.getErrorMessage() == null) {
+				if (other.getErrorMessage() != null) {
+					return false;
+				}
+			} else if (!super.getErrorMessage().equals(other.getErrorMessage())) {
+				return false;
+			}
+			if (super.getThrowableType() == null) {
+				if (other.getThrowableType() != null) {
+					return false;
+				}
+			} else if (!super.getThrowableType().equals(other.getThrowableType())) {
+				return false;
+			}
+			return true;
+		}
+
+	}
+
+	/**
+	 * Viewer Comparator used by this input controller to display the contents.
+	 * 
+	 * @author Eduard Tudenhoefner
+	 * 
+	 */
+	private final class ExceptionOverviewViewerComparator extends TableViewerComparator<ExtendedExceptionSensorData> {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected int compareElements(Viewer viewer, ExtendedExceptionSensorData data1, ExtendedExceptionSensorData data2) {
+			switch ((Column) getEnumSortColumn()) {
+			case FQN:
+				return data1.getThrowableType().compareTo(data2.getThrowableType());
+			case CREATED:
+				return Integer.valueOf(data1.getCreatedCounter()).compareTo(Integer.valueOf(data2.getCreatedCounter()));
+			case RETHROWN:
+				return Integer.valueOf(data1.getRethrownCounter()).compareTo(Integer.valueOf(data2.getRethrownCounter()));
+			case HANDLED:
+				return Integer.valueOf(data1.getHandledCounter()).compareTo(Integer.valueOf(data2.getHandledCounter()));
+			default:
+				return 0;
+			}
+		}
 	}
 
 }

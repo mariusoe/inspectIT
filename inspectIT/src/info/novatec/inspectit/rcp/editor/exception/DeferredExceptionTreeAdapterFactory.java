@@ -21,7 +21,7 @@ public class DeferredExceptionTreeAdapterFactory implements IAdapterFactory {
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (IDeferredWorkbenchAdapter.class == adapterType) {
 			if (adaptableObject instanceof ExceptionSensorData) {
-				return new DeferredExceptionTree();
+				return new DeferredStackTraces();
 			}
 		}
 		return null;

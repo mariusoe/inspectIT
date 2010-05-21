@@ -5,6 +5,7 @@ import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.composite.GridCompositeSubView;
 import info.novatec.inspectit.rcp.editor.composite.SashCompositeSubView;
 import info.novatec.inspectit.rcp.editor.composite.TabbedCompositeSubView;
+import info.novatec.inspectit.rcp.editor.exception.input.ExceptionMessagesTreeInputController;
 import info.novatec.inspectit.rcp.editor.exception.input.ExceptionOverviewInputController;
 import info.novatec.inspectit.rcp.editor.exception.input.ExceptionTreeDetailInputController;
 import info.novatec.inspectit.rcp.editor.exception.input.ExceptionTreeOverviewInputController;
@@ -125,8 +126,10 @@ public final class SubViewFactory {
 		case EXCEPTION_TRACER_OVERVIEW:
 			SashCompositeSubView exceptionTracerOverviewSubView = new SashCompositeSubView();
 			ISubView exceptionOverview = new TableSubView(new ExceptionOverviewInputController());
+			ISubView exceptionMessagesTree = new TreeSubView(new ExceptionMessagesTreeInputController());
 
 			exceptionTracerOverviewSubView.addSubView(exceptionOverview, 1);
+			exceptionTracerOverviewSubView.addSubView(exceptionMessagesTree, 2);
 			return exceptionTracerOverviewSubView;
 		case MARVIN_WORKFLOW:
 			GridCompositeSubView combinedMetricsSubView = new GridCompositeSubView();
