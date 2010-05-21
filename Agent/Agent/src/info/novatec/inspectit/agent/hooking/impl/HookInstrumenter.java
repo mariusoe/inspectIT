@@ -6,6 +6,15 @@ import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.hooking.IHookDispatcher;
 import info.novatec.inspectit.agent.hooking.IHookInstrumenter;
+import info.novatec.inspectit.javassist.CannotCompileException;
+import info.novatec.inspectit.javassist.ClassPool;
+import info.novatec.inspectit.javassist.CtClass;
+import info.novatec.inspectit.javassist.CtConstructor;
+import info.novatec.inspectit.javassist.CtMethod;
+import info.novatec.inspectit.javassist.Modifier;
+import info.novatec.inspectit.javassist.NotFoundException;
+import info.novatec.inspectit.javassist.expr.ExprEditor;
+import info.novatec.inspectit.javassist.expr.Handler;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,15 +22,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtConstructor;
-import javassist.CtMethod;
-import javassist.Modifier;
-import javassist.NotFoundException;
-import javassist.expr.ExprEditor;
-import javassist.expr.Handler;
 
 /**
  * The byte code instrumenter class. Used to instrument the additional
@@ -86,7 +86,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 		// This will set the useContextClassLoader parameter to true to resolve
 		// the current class of static methods. The standard method of looking
 		// for a class via Class.forName(...) does not work!
-		javassist.runtime.Desc.useContextClassLoader = true;
+		info.novatec.inspectit.javassist.runtime.Desc.useContextClassLoader = true;
 
 		this.hookDispatcher = hookDispatcher;
 		this.idManager = idManager;
@@ -243,7 +243,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 * <code>try-catch</code> block to get an event when an exception is thrown
 	 * in a method body.
 	 * 
-	 * @see javassist.CtMethod#addCatch(String, CtClass)
+	 * @see info.novatec.inspectit.javassist.CtMethod#addCatch(String, CtClass)
 	 * 
 	 * @param method
 	 *            The {@link CtMethod} where additional instructions are added.
@@ -284,7 +284,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 * <code>try-catch</code> block to get an event when an exception is thrown
 	 * in a constructor body.
 	 * 
-	 * @see javassist.CtConstructor#addCatch(String, CtClass)
+	 * @see info.novatec.inspectit.javassist.CtConstructor#addCatch(String, CtClass)
 	 * 
 	 * @param constructor
 	 *            The {@link CtConstructor} where additional instructions are
@@ -321,7 +321,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 * <code>edit()</code> does nothing, the original method body is not
 	 * changed.
 	 * 
-	 * @see javassist.expr.ExprEditor
+	 * @see info.novatec.inspectit.javassist.expr.ExprEditor
 	 * 
 	 * @author Eduard Tudenhoefner
 	 * 
@@ -370,7 +370,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 * <code>edit()</code> does nothing, the original constructor body is not
 	 * changed.
 	 * 
-	 * @see javassist.expr.ExprEditor
+	 * @see info.novatec.inspectit.javassist.expr.ExprEditor
 	 * 
 	 * @author Eduard Tudenhoefner
 	 * 

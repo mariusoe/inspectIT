@@ -19,6 +19,11 @@ import info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor;
 import info.novatec.inspectit.agent.sensor.exception.IExceptionTracingSensor;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.javassist.CannotCompileException;
+import info.novatec.inspectit.javassist.ClassPool;
+import info.novatec.inspectit.javassist.CtClass;
+import info.novatec.inspectit.javassist.CtMethod;
+import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,11 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.NotFoundException;
 
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;

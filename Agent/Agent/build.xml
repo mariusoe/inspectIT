@@ -40,7 +40,7 @@
 
 	<path id="path.agent.test.classes">
 		<pathelement location="${build.agent.test.classes}" />
-		<pathelement location="${build.agent50.test.classes}"/>
+		<pathelement location="${build.agent50.test.classes}" />
 	</path>
 
 	<!-- classpath for findbugs is needed because it enables to run findbugs without having a local installation-->
@@ -186,6 +186,7 @@
 		<cobertura-instrument datafile="${build.qa.test.coveragedata}/cobertura.ser">
 			<includeClasses regex="info.novatec.inspectit.*" />
 			<excludeClasses regex="info.novatec.inspectit.*\.test.*" />
+			<excludeClasses regex="info.novatec.inspectit.javassist.*" />
 			<excludeClasses regex="info.novatec.inspectit.cmr.*" />
 			<excludeClasses regex="info.novatec.inspectit.communication.*" />
 			<instrumentationClasspath>
@@ -208,18 +209,18 @@
 			<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${build.qa.test.coveragedata}/cobertura.ser" />
 
 			<sourcedir location="${agenttest.src}" />
-			<sourcedir location="${agent50.src}"/>
+			<sourcedir location="${agent50.src}" />
 			<xmlfileset file="${agenttest.ressources.testng}/testng.xml" />
 			<xmlfileset file="${agent50test.ressources.testng}/testng.xml" />
 		</testng>
 
 		<!-- create cobertura html and xml reports and link to the interesting parts -->
 		<cobertura-report format="html" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
-			<fileset dir="${src.root}" includes="**/*.java" />
+			<fileset dir="${src.root}" includes="**/*.java" excludes="**/javassist/**" />
 			<fileset dir="${agent50.src}" includes="**/*.java" />
 		</cobertura-report>
 		<cobertura-report format="xml" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
-			<fileset dir="${src.root}" includes="**/*.java" />
+			<fileset dir="${src.root}" includes="**/*.java" excludes="**/javassist/**" />
 			<fileset dir="${agent50.src}" includes="**/*.java" />
 		</cobertura-report>
 		<echo file="${build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >" />
@@ -252,6 +253,7 @@
 			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml" />
 			<fileset dir="${src.root}">
 				<include name="info/novatec/inspectit/**/*.java" />
+				<exclude name="**/javassist/**" />
 			</fileset>
 			<fileset dir="${agenttest.src}">
 				<include name="info/novatec/inspectit/**/*.java" />
@@ -263,24 +265,24 @@
 		<xslt in="${build.qa.analysis.pmd}/pmd_results.xml" style="${pmd.config.root}/pmd-report.xslt" out="${build.qa.analysis.pmd}/sortable_report.html" />
 		<copy todir="${build.qa.analysis.pmd}" file="${pmd.config.root}/sorttable.js" />
 		<!-- this js is used for the sortable report -->
-		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >"/>
+		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >" />
 
 		<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
 			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
-			<fileset dir="src" includes="**/*.java" />
+			<fileset dir="src" includes="**/*.java" excludes="**/javassist/**" />
 		</checkstyle>
 
 		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl" />
-		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >"/>
+		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >" />
 
-		
+
 		<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
 		<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
 		<pathconvert property="findbugs.classpath">
 			<path refid="findbugs.classpath" />
 		</pathconvert>
 
-		<findbugs output="xml" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis}/findbugs/findbugs.xml" pluginlist="${lib.root}/test/findbugs.jar">
+		<findbugs output="xml" classpath="${findbugs.classpath}" excludefilter="${basedir}/resources/findbugs/excludeFilter.xml" outputFile="${build.qa.analysis}/findbugs/findbugs.xml" pluginlist="${lib.root}/test/findbugs.jar" >
 			<sourcePath path="${src.root}" />
 			<class location="${build.agent.classes}" />
 			<auxClasspath>

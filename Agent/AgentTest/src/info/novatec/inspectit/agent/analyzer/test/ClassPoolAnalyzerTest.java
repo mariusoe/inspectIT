@@ -8,13 +8,13 @@ import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.impl.ClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.test.classes.TestClass;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.javassist.ClassPool;
+import info.novatec.inspectit.javassist.CtMethod;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 
-import javassist.ClassPool;
-import javassist.CtMethod;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

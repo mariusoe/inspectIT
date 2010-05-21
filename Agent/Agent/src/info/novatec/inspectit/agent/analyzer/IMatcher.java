@@ -1,10 +1,11 @@
 package info.novatec.inspectit.agent.analyzer;
 
+import info.novatec.inspectit.javassist.CtConstructor;
+import info.novatec.inspectit.javassist.CtMethod;
+import info.novatec.inspectit.javassist.NotFoundException;
+
 import java.util.List;
 
-import javassist.CtConstructor;
-import javassist.CtMethod;
-import javassist.NotFoundException;
 
 /**
  * This interface is used for all implementations of the configuration matching

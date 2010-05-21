@@ -2,6 +2,9 @@ package info.novatec.inspectit.agent.analyzer.impl;
 
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
+import info.novatec.inspectit.javassist.ClassPool;
+import info.novatec.inspectit.javassist.CtClass;
+import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -9,9 +12,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.NotFoundException;
 
 /**
  * The default implementation of the {@link IInheritanceAnalyzer} interface.

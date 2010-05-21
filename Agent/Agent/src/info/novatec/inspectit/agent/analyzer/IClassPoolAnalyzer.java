@@ -1,8 +1,8 @@
 package info.novatec.inspectit.agent.analyzer;
 
-import javassist.ClassPool;
-import javassist.CtConstructor;
-import javassist.CtMethod;
+import info.novatec.inspectit.javassist.ClassPool;
+import info.novatec.inspectit.javassist.CtConstructor;
+import info.novatec.inspectit.javassist.CtMethod;
 
 /**
  * This interface defines methods to help with the usage of the javassist class

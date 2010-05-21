@@ -12,6 +12,14 @@ import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
 import info.novatec.inspectit.agent.hooking.IHookInstrumenter;
 import info.novatec.inspectit.agent.hooking.impl.HookException;
 import info.novatec.inspectit.agent.hooking.impl.HookInstrumenter;
+import info.novatec.inspectit.javassist.ByteArrayClassPath;
+import info.novatec.inspectit.javassist.CannotCompileException;
+import info.novatec.inspectit.javassist.ClassPool;
+import info.novatec.inspectit.javassist.CtBehavior;
+import info.novatec.inspectit.javassist.CtClass;
+import info.novatec.inspectit.javassist.CtConstructor;
+import info.novatec.inspectit.javassist.CtMethod;
+import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,14 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javassist.ByteArrayClassPath;
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtBehavior;
-import javassist.CtClass;
-import javassist.CtConstructor;
-import javassist.CtMethod;
-import javassist.NotFoundException;
 
 /**
  * The default implementation of the {@link IByteCodeAnalyzer} interface. First

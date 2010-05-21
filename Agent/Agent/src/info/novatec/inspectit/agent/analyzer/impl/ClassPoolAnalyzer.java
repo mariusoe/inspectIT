@@ -1,6 +1,13 @@
 package info.novatec.inspectit.agent.analyzer.impl;
 
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
+import info.novatec.inspectit.javassist.ClassPool;
+import info.novatec.inspectit.javassist.CtClass;
+import info.novatec.inspectit.javassist.CtConstructor;
+import info.novatec.inspectit.javassist.CtMethod;
+import info.novatec.inspectit.javassist.LoaderClassPath;
+import info.novatec.inspectit.javassist.Modifier;
+import info.novatec.inspectit.javassist.NotFoundException;
 import info.novatec.inspectit.util.WeakList;
 
 import java.util.ArrayList;
@@ -9,13 +16,6 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtConstructor;
-import javassist.CtMethod;
-import javassist.LoaderClassPath;
-import javassist.Modifier;
-import javassist.NotFoundException;
 
 /**
  * This class provides some methods to help to work with the {@link ClassPool}.

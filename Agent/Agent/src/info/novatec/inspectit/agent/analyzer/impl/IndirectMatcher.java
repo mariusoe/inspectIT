@@ -3,6 +3,11 @@ package info.novatec.inspectit.agent.analyzer.impl;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatchPattern;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
+import info.novatec.inspectit.javassist.CtBehavior;
+import info.novatec.inspectit.javassist.CtClass;
+import info.novatec.inspectit.javassist.CtMethod;
+import info.novatec.inspectit.javassist.Modifier;
+import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,11 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javassist.CtBehavior;
-import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.Modifier;
-import javassist.NotFoundException;
 
 /**
  * The indirect matcher is used for a sensor configuration which contains a

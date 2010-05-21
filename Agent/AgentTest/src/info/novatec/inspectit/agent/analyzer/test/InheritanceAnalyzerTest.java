@@ -19,14 +19,14 @@ import info.novatec.inspectit.agent.analyzer.test.classes.MyTestError;
 import info.novatec.inspectit.agent.analyzer.test.classes.MyTestException;
 import info.novatec.inspectit.agent.analyzer.test.classes.TestClass;
 import info.novatec.inspectit.agent.test.MockInit;
+import info.novatec.inspectit.javassist.ClassPool;
+import info.novatec.inspectit.javassist.CtClass;
+import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.NotFoundException;
 
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;

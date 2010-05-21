@@ -1,9 +1,10 @@
 package info.novatec.inspectit.agent.analyzer;
 
+import info.novatec.inspectit.javassist.ClassPool;
+import info.novatec.inspectit.javassist.NotFoundException;
+
 import java.util.Iterator;
 
-import javassist.ClassPool;
-import javassist.NotFoundException;
 
 /**
  * The inheritance analyzer is a used to identify classes which have to be

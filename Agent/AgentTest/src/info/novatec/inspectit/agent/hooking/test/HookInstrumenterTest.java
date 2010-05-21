@@ -21,6 +21,13 @@ import info.novatec.inspectit.agent.hooking.IHookDispatcher;
 import info.novatec.inspectit.agent.hooking.impl.HookException;
 import info.novatec.inspectit.agent.hooking.impl.HookInstrumenter;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.javassist.ClassPool;
+import info.novatec.inspectit.javassist.CtClass;
+import info.novatec.inspectit.javassist.CtConstructor;
+import info.novatec.inspectit.javassist.CtMethod;
+import info.novatec.inspectit.javassist.Loader;
+import info.novatec.inspectit.javassist.LoaderClassPath;
+import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -29,13 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtConstructor;
-import javassist.CtMethod;
-import javassist.Loader;
-import javassist.LoaderClassPath;
-import javassist.NotFoundException;
 
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
