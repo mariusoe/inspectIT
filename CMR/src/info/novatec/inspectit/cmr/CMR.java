@@ -1,12 +1,10 @@
 package info.novatec.inspectit.cmr;
 
 import info.novatec.inspectit.cmr.util.Converter;
-import info.novatec.inspectit.versioning.FileBasedVersioningServiceImpl;
 import info.novatec.inspectit.versioning.IVersioningService;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -30,9 +28,9 @@ public final class CMR {
 	private static final Logger LOGGER = Logger.getLogger(CMR.class);
 
 	/**
-	 * Name of the log4j configuration file.
+	 * Name and path of the log4j configuration file.
 	 */
-	private static final String LOG4J_FILE = "log4j.properties";
+	private static final String LOG4J_FILE = "/config/log4j.properties";
 
 	/**
 	 * The spring bean factory to get the registered beans.
@@ -43,8 +41,7 @@ public final class CMR {
 	 * This class will start the Repository.
 	 */
 	private CMR() {
-		
-		
+
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("Initializing Spring...");
 		}
@@ -60,7 +57,7 @@ public final class CMR {
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("Spring WebApplicationContext successfully initialized");
 		}
-		
+
 		if (LOGGER.isInfoEnabled()) {
 			IVersioningService versioning = (IVersioningService) getBeanFactory().getBean("versioning");
 			String currentVersion = "n/a";
@@ -71,7 +68,7 @@ public final class CMR {
 					LOGGER.debug("Versioning information could not be read", e);
 				}
 			}
-			LOGGER.info("Starting CMR in version "+currentVersion);
+			LOGGER.info("Starting CMR in version " + currentVersion);
 		}
 	}
 
@@ -83,22 +80,15 @@ public final class CMR {
 	 */
 	public static void main(String[] args) {
 		// Initialize log4j system
-		URL url = ClassLoader.getSystemResource("config" + File.separator + LOG4J_FILE);
-		if (null != url) {
-			PropertyConfigurator.configure(url);
-		} else {
-			String inspectitConfig = System.getProperty("inspectit.config");
-			String pathToLog4jConfig;
-			if (null != inspectitConfig && !"".equals(inspectitConfig.trim())) {
-				pathToLog4jConfig = inspectitConfig + File.separator + LOG4J_FILE;
-			} else {
-				pathToLog4jConfig = "config" + File.separator + LOG4J_FILE;
-			}
-			PropertyConfigurator.configureAndWatch(pathToLog4jConfig);
+		try {
+			Properties p = new Properties();
+			p.load(CMR.class.getResourceAsStream(LOG4J_FILE));
+			PropertyConfigurator.configure(p);
+		} catch (IOException e) {
+			LOGGER.error("Could not load log4j.properties file: " + e.getMessage());
 		}
 
 		long start = System.nanoTime();
-
 		LOGGER.info("Central Measurement Repository is starting up!");
 		LOGGER.info("==============================================");
 
