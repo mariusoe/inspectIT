@@ -121,7 +121,7 @@
 		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl" />
 		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >" />
 
-		
+
 		<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
 		<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
 		<pathconvert property="findbugs.classpath">
@@ -147,8 +147,9 @@
 	<target name="release" depends="build" description="--> Creates the distribution jar">
 		<mkdir dir="${release.root}" />
 		<mkdir dir="${build.release.root}" />
+		<mkdir dir="${build.release.root.cmr}" />
 
-		<jar destfile="${build.release.root}/${dist.jar.name}" manifest="${basedir}/resources/META-INF/MANIFEST.MF">
+		<jar destfile="${build.release.root.cmr}/${dist.jar.name}" manifest="${basedir}/resources/META-INF/MANIFEST.MF">
 			<fileset dir="${build.cmr.generated.classes}" includes="**/*.class" />
 			<fileset dir="${build.cmr.classes}" includes="**/*.class" />
 			<fileset dir="${src.root}" includes="**/*.xml" />
@@ -156,20 +157,32 @@
 			<fileset dir="${src.commons}" includes="version.log" />
 		</jar>
 
-		<copy todir="${build.release.root}/lib">
+		<copy todir="${build.release.root.cmr}/lib">
 			<fileset dir="${lib.root}/prod" includes="**/*.jar" />
 		</copy>
 
-		<jar destfile="${build.release.root}/lib/inspectit-commons.jar" basedir="${build.commons.classes}" />
+		<jar destfile="${build.release.root.cmr}/lib/inspectit-commons.jar" basedir="${build.commons.classes}" />
 
-		<echo file="${build.release.root}/startup.sh" message="java -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:MaxNewSize=24m -XX:NewSize=24m -XX:SurvivorRatio=128 -XX:TargetSurvivorRatio=90 -XX:ParallelGCThreads=6 -Xms768m -Xmx768m -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -jar ${dist.jar.name}" />
+		<echo file="${build.release.root.cmr}/startup.sh" message="./jre/bin/java -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:MaxNewSize=24m -XX:NewSize=24m -XX:SurvivorRatio=128 -XX:TargetSurvivorRatio=90 -XX:ParallelGCThreads=6 -Xms768m -Xmx768m -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -jar ${dist.jar.name}" />
 
-		<echo file="${build.release.root}/startup.bat" message="java -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:MaxNewSize=24m -XX:NewSize=24m -XX:SurvivorRatio=128 -XX:TargetSurvivorRatio=90 -XX:ParallelGCThreads=6 -Xms768m -Xmx768m -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -jar ${dist.jar.name}" />
+		<echo file="${build.release.root.cmr}/startup.bat" message="jre\bin\java.exe -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:MaxNewSize=24m -XX:NewSize=24m -XX:SurvivorRatio=128 -XX:TargetSurvivorRatio=90 -XX:ParallelGCThreads=6 -Xms768m -Xmx768m -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -jar ${dist.jar.name}" />
 
-		<mkdir dir="${build.release.root}/license" />
-		<copy todir="${build.release.root}/license" file="${basedir}/license/publicCerts.store" />
+		<mkdir dir="${build.release.root.cmr}/license" />
+		<copy todir="${build.release.root.cmr}/license" file="${basedir}/license/publicCerts.store" />
 
-		<zip destfile="${release.root}/inspectit-cmr.zip" basedir="${build.release.root}" />
+		<!-- create the release files for the different operating systems and architectures-->
+		<!-- Linux - x86 -->
+		<tar destfile="${release.root}/inspectit-cmr.linux.x86.tar.gz" compression="gzip">
+			<fileset dir="${build.release.root}" excludes="CMR/startup.*" />
+			<tarfileset file="${build.release.root}/CMR/startup.sh" prefix="CMR" filemode="755" />
+			<zipfileset src="${basedir}/resources/jvm/linux/x86/jre.zip" prefix="CMR/jre" filemode="755" />
+		</tar>
+
+		<!-- Windows - x86 -->
+		<zip destfile="${release.root}/inspectit-cmr.windows.x86.zip">
+			<fileset dir="${build.release.root}" excludes="CMR/startup.sh" />
+			<zipfileset src="${basedir}/resources/jvm/windows/x86/jre.zip" prefix="CMR/jre" />
+		</zip>
 	</target>
 
 
@@ -181,7 +194,7 @@
 		<!-- download Ivy from web site so that it can be used even without any special installation -->
 		<echo message="Installing ivy version: ${ivy.install.version}" />
 		<get src="${ivy.download.url}" dest="${ivy.jar.file}" usetimestamp="true" />
-		
+
 		<path id="ivy.lib.path">
 			<fileset dir="${ivy.jar.dir}" includes="*.jar" />
 		</path>
