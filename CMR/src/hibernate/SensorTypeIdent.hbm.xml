@@ -4,7 +4,7 @@
 	<class name="SensorTypeIdent" table="sensor_type_ident"
 		polymorphism="implicit">
 		<id name="id" type="java.lang.Long" column="id">
-			<generator class="seqhilo" />
+			<generator class="hilo" />
 		</id>
 		<discriminator>
 			<column name="discriminator" />
