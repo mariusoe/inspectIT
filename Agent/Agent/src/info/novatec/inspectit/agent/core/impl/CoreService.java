@@ -425,7 +425,7 @@ public class CoreService implements ICoreService, Startable {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addExceptionSensorData(long sensorTypeIdent, int throwableIdentityHashCode, ExceptionSensorData exceptionSensorData) {
+	public void addExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode, ExceptionSensorData exceptionSensorData) {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(sensorTypeIdent);
 		buffer.append("::");
@@ -440,7 +440,7 @@ public class CoreService implements ICoreService, Startable {
 	/**
 	 * {@inheritDoc}
 	 */
-	public ExceptionSensorData getExceptionSensorData(long sensorTypeIdent, int throwableIdentityHashCode) {
+	public ExceptionSensorData getExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode) {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(sensorTypeIdent);
 		buffer.append("::");

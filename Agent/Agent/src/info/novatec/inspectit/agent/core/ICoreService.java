@@ -59,7 +59,7 @@ public interface ICoreService {
 	 * @param exceptionSensorData
 	 *            The exception sensor data.
 	 */
-	void addExceptionSensorData(long sensorTypeIdent, int throwableIdentityHashCode, ExceptionSensorData exceptionSensorData);
+	void addExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode, ExceptionSensorData exceptionSensorData);
 
 	/**
 	 * Adds a new object storage to the value storage. An object storage
@@ -114,7 +114,7 @@ public interface ICoreService {
 	 *            The identityHashCode of the data object to retrieve.
 	 * @return Returns a {@link ExceptionSensorData}
 	 */
-	ExceptionSensorData getExceptionSensorData(long sensorTypeIdent, int throwableIdentityHashCode);
+	ExceptionSensorData getExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode);
 
 	/**
 	 * Returns a saved object storage for further processing.

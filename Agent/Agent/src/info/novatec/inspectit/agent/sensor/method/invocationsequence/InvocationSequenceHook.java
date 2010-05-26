@@ -403,11 +403,11 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 		throw new UnsupportedMethodException();
 	}
 
-	public void addExceptionSensorData(long sensorTypeIdent, int throwableIdentityHashCode, ExceptionSensorData exceptionSensorData) {
+	public void addExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode, ExceptionSensorData exceptionSensorData) {
 		throw new UnsupportedMethodException();
 	}
 
-	public ExceptionSensorData getExceptionSensorData(long sensorTypeIdent, int throwableIdentityHashCode) {
+	public ExceptionSensorData getExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode) {
 		throw new UnsupportedMethodException();
 	}
 

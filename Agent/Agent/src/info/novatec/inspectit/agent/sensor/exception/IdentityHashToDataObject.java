@@ -13,7 +13,7 @@ public class IdentityHashToDataObject {
 	/**
 	 * The identity hashcode of the {@link Throwable} object.
 	 */
-	private Integer identityHash;
+	private Long identityHash;
 
 	/**
 	 * The {@link ExceptionSensorData} object containing all information.
@@ -36,7 +36,7 @@ public class IdentityHashToDataObject {
 	 *            The {@link ExceptionSensorData} object containing the
 	 *            information.
 	 */
-	public IdentityHashToDataObject(Integer identityHash, ExceptionSensorData exceptionSensorData) {
+	public IdentityHashToDataObject(Long identityHash, ExceptionSensorData exceptionSensorData) {
 		this.identityHash = identityHash;
 		this.exceptionSensorData = exceptionSensorData;
 	}
@@ -46,7 +46,7 @@ public class IdentityHashToDataObject {
 	 * 
 	 * @return The identity hashcode of the {@link Throwable} object.
 	 */
-	public Integer getIdentityHash() {
+	public Long getIdentityHash() {
 		return identityHash;
 	}
 
@@ -56,7 +56,7 @@ public class IdentityHashToDataObject {
 	 * @param identityHash
 	 *            The identity hashcode of the {@link Throwable} object.
 	 */
-	public void setIdentityHash(Integer identityHash) {
+	public void setIdentityHash(Long identityHash) {
 		this.identityHash = identityHash;
 	}
 

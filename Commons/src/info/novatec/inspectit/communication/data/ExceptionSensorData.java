@@ -61,7 +61,7 @@ public class ExceptionSensorData extends MethodSensorData {
 	/**
 	 * The identity hash code of the thrown {@link Throwable} object.
 	 */
-	private int throwableIdentityHashCode;
+	private long throwableIdentityHashCode;
 
 	/**
 	 * Default no-args constructor.
@@ -130,11 +130,11 @@ public class ExceptionSensorData extends MethodSensorData {
 		this.throwableType = throwableType;
 	}
 
-	public int getThrowableIdentityHashCode() {
+	public long getThrowableIdentityHashCode() {
 		return throwableIdentityHashCode;
 	}
 
-	public void setThrowableIdentityHashCode(int throwableIdentityHashCode) {
+	public void setThrowableIdentityHashCode(long throwableIdentityHashCode) {
 		this.throwableIdentityHashCode = throwableIdentityHashCode;
 	}
 
@@ -142,26 +142,20 @@ public class ExceptionSensorData extends MethodSensorData {
 		return throwableType + "@" + throwableIdentityHashCode + " :: " + exceptionEventString;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((cause == null) ? 0 : cause.hashCode());
+		result = prime * result + ((child == null) ? 0 : child.hashCode());
 		result = prime * result + ((errorMessage == null) ? 0 : errorMessage.hashCode());
 		result = prime * result + ((exceptionEvent == null) ? 0 : exceptionEvent.hashCode());
 		result = prime * result + ((exceptionEventString == null) ? 0 : exceptionEventString.hashCode());
-		result = prime * result + ((child == null) ? 0 : child.hashCode());
 		result = prime * result + ((stackTrace == null) ? 0 : stackTrace.hashCode());
-		result = prime * result + throwableIdentityHashCode;
+		result = prime * result + (int) (throwableIdentityHashCode ^ (throwableIdentityHashCode >>> 32));
 		result = prime * result + ((throwableType == null) ? 0 : throwableType.hashCode());
 		return result;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -178,6 +172,13 @@ public class ExceptionSensorData extends MethodSensorData {
 				return false;
 			}
 		} else if (!cause.equals(other.cause)) {
+			return false;
+		}
+		if (child == null) {
+			if (other.child != null) {
+				return false;
+			}
+		} else if (!child.equals(other.child)) {
 			return false;
 		}
 		if (errorMessage == null) {
@@ -199,13 +200,6 @@ public class ExceptionSensorData extends MethodSensorData {
 				return false;
 			}
 		} else if (!exceptionEventString.equals(other.exceptionEventString)) {
-			return false;
-		}
-		if (child == null) {
-			if (other.child != null) {
-				return false;
-			}
-		} else if (!child.equals(other.child)) {
 			return false;
 		}
 		if (stackTrace == null) {

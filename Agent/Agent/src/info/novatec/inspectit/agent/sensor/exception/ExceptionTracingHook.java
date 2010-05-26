@@ -80,7 +80,7 @@ public class ExceptionTracingHook implements IExceptionTracingHook {
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			long registeredConstructorId = idManager.getRegisteredMethodId(id);
 			long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
-			Integer identityHash = new Integer(System.identityHashCode(exceptionObject));
+			Long identityHash = new Long(System.identityHashCode(exceptionObject));
 
 			// need to reset the exception handler id
 			exceptionHandlerId.set(null);
@@ -90,7 +90,7 @@ public class ExceptionTracingHook implements IExceptionTracingHook {
 
 			// creating the data object
 			ExceptionSensorData data = new ExceptionSensorData(timestamp, platformId, registeredSensorTypeId, registeredConstructorId);
-			data.setThrowableIdentityHashCode(identityHash.intValue());
+			data.setThrowableIdentityHashCode(identityHash.longValue());
 			data.setExceptionEvent(ExceptionEventEnum.CREATED);
 			data.setThrowableType(throwable.getClass().getName());
 
@@ -123,14 +123,14 @@ public class ExceptionTracingHook implements IExceptionTracingHook {
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 				long registeredMethodId = idManager.getRegisteredMethodId(id);
 				long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
-				Integer identityHash = new Integer(System.identityHashCode(exceptionObject));
+				Long identityHash = new Long(System.identityHashCode(exceptionObject));
 
 				// getting the actual object with information
 				Throwable throwable = (Throwable) exceptionObject;
 
 				// creating the data object
 				ExceptionSensorData data = new ExceptionSensorData(timestamp, platformId, registeredSensorTypeId, registeredMethodId);
-				data.setThrowableIdentityHashCode(identityHash.intValue());
+				data.setThrowableIdentityHashCode(identityHash.longValue());
 				data.setThrowableType(throwable.getClass().getName());
 
 				// check whether it's the same Throwable object as before
@@ -188,7 +188,7 @@ public class ExceptionTracingHook implements IExceptionTracingHook {
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 				long registeredMethodId = idManager.getRegisteredMethodId(id);
 				long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
-				Integer identityHash = new Integer(System.identityHashCode(exceptionObject));
+				Long identityHash = new Long(System.identityHashCode(exceptionObject));
 
 				// save id of the method where the exception is catched
 				exceptionHandlerId.set(new Long(registeredMethodId));
@@ -198,7 +198,7 @@ public class ExceptionTracingHook implements IExceptionTracingHook {
 
 				// creating the data object
 				ExceptionSensorData data = new ExceptionSensorData(timestamp, platformId, registeredSensorTypeId, registeredMethodId);
-				data.setThrowableIdentityHashCode(identityHash.intValue());
+				data.setThrowableIdentityHashCode(identityHash.longValue());
 				data.setThrowableType(throwable.getClass().getName());
 				data.setExceptionEvent(ExceptionEventEnum.HANDLED);
 

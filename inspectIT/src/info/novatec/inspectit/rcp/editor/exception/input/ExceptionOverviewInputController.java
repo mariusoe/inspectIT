@@ -235,7 +235,7 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 
 				// updating the counter values of newly created object based on
 				// its event type and adding it to the list
-				data.updateCounterForEventType(data.getExceptionEventString(), data.getThrowableIdentityHashCode());
+				data.updateCounterForEventType(data.getExceptionEventString(), (int) data.getThrowableIdentityHashCode());
 				groupedObjects.add(data);
 				overviewMap.put(ungroupedObject.getThrowableType(), groupedObjects);
 			} else {
@@ -248,11 +248,11 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 					// updating the counter values of already saved object
 					// based on the actual event type
 					ExtendedExceptionSensorData nestedData = groupedObjects.get(groupedObjects.indexOf(data));
-					nestedData.updateCounterForEventType(data.getExceptionEventString(), data.getThrowableIdentityHashCode());
+					nestedData.updateCounterForEventType(data.getExceptionEventString(), (int) data.getThrowableIdentityHashCode());
 				} else {
 					// updating the counter values of newly created object based
 					// on its event type and adding it to the list
-					data.updateCounterForEventType(data.getExceptionEventString(), data.getThrowableIdentityHashCode());
+					data.updateCounterForEventType(data.getExceptionEventString(), (int) data.getThrowableIdentityHashCode());
 					groupedObjects.add(data);
 				}
 			}

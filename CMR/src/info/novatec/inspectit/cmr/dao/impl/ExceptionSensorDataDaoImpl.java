@@ -109,8 +109,8 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 		criteria.add(Restrictions.eq("errorMessage", template.getErrorMessage()));
 		criteria.add(Restrictions.isNotNull("stackTrace"));
 		ProjectionList projections = Projections.projectionList();
-		projections.add(Projections.distinct(Projections.property("stackTrace")));
-		projections.add(Projections.property("stackTrace"), "stackTrace");
+		projections.add(Projections.distinct(Projections.property("stackTrace").as("stackTrace")));
+//		projections.add(Projections.property("stackTrace"), "stackTrace");
 		criteria.setProjection(projections);
 		criteria.setResultTransformer(Transformers.aliasToBean(ExceptionSensorData.class));
 		return getHibernateTemplate().findByCriteria(criteria);
