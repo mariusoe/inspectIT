@@ -33,9 +33,9 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 		}
 
 		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
-		criteria.add(Restrictions.gt("id", template.getId()));
-		criteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
-		criteria.add(Restrictions.eq("exceptionEventString", "CREATED"));
+		criteria.add(Restrictions.gt("this.id", template.getId()));
+		criteria.add(Restrictions.eq("this.platformIdent", template.getPlatformIdent()));
+		criteria.add(Restrictions.eq("this.exceptionEventString", "CREATED"));
 		criteria.addOrder(Order.desc("timeStamp"));
 		criteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
 		return getHibernateTemplate().findByCriteria(criteria, -1, limit);
@@ -47,9 +47,9 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 	@SuppressWarnings("unchecked")
 	public List<ExceptionSensorData> getExceptionTreeOverview(ExceptionSensorData template) {
 		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
-		criteria.add(Restrictions.gt("id", template.getId()));
-		criteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
-		criteria.add(Restrictions.eq("exceptionEventString", "CREATED"));
+		criteria.add(Restrictions.gt("this.id", template.getId()));
+		criteria.add(Restrictions.eq("this.platformIdent", template.getPlatformIdent()));
+		criteria.add(Restrictions.eq("this.exceptionEventString", "CREATED"));
 		criteria.addOrder(Order.desc("timeStamp"));
 		criteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
 		return getHibernateTemplate().findByCriteria(criteria);
@@ -61,8 +61,8 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 	@SuppressWarnings("unchecked")
 	public List<ExceptionSensorData> getExceptionTreeDetails(ExceptionSensorData template) {
 		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
-		criteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
-		criteria.add(Restrictions.eq("throwableIdentityHashCode", template.getThrowableIdentityHashCode()));
+		criteria.add(Restrictions.eq("this.platformIdent", template.getPlatformIdent()));
+		criteria.add(Restrictions.eq("this.throwableIdentityHashCode", template.getThrowableIdentityHashCode()));
 		criteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
 		List<ExceptionSensorData> resultList = getHibernateTemplate().findByCriteria(criteria);
 
@@ -79,7 +79,7 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 	@SuppressWarnings("unchecked")
 	public List<ExceptionSensorData> getExceptionOverview(ExceptionSensorData template) {
 		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
-		criteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
+		criteria.add(Restrictions.eq("this.platformIdent", template.getPlatformIdent()));
 		ProjectionList projectionList = Projections.projectionList();
 		projectionList.add(Projections.property("throwableType"), "throwableType");
 		projectionList.add(Projections.property("exceptionEventString"), "exceptionEventString");
@@ -104,13 +104,13 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 	@SuppressWarnings("unchecked")
 	public List<ExceptionSensorData> getStackTracesForErrorMessage(ExceptionSensorData template) {
 		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
-		criteria.add(Restrictions.gt("id", template.getId()));
-		criteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
-		criteria.add(Restrictions.eq("errorMessage", template.getErrorMessage()));
-		criteria.add(Restrictions.isNotNull("stackTrace"));
+		criteria.add(Restrictions.gt("this.id", template.getId()));
+		criteria.add(Restrictions.eq("this.platformIdent", template.getPlatformIdent()));
+		criteria.add(Restrictions.eq("this.errorMessage", template.getErrorMessage()));
+		criteria.add(Restrictions.isNotNull("this.stackTrace"));
 		ProjectionList projections = Projections.projectionList();
-		projections.add(Projections.distinct(Projections.property("stackTrace").as("stackTrace")));
-//		projections.add(Projections.property("stackTrace"), "stackTrace");
+		projections.add(Projections.distinct(Projections.property("stackTrace")));
+		projections.add(Projections.property("stackTrace"), "stackTrace");
 		criteria.setProjection(projections);
 		criteria.setResultTransformer(Transformers.aliasToBean(ExceptionSensorData.class));
 		return getHibernateTemplate().findByCriteria(criteria);
