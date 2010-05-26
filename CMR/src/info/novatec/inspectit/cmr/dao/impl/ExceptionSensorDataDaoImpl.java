@@ -81,11 +81,11 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
 		criteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
 		ProjectionList projectionList = Projections.projectionList();
-		projectionList.add(new CustomPropertyAliasProjection("throwableType", "throwableType"));
-		projectionList.add(new CustomPropertyAliasProjection("exceptionEventString", "exceptionEventString"));
-		projectionList.add(new CustomPropertyAliasProjection("errorMessage", "errorMessage"));
-		projectionList.add(new CustomPropertyAliasProjection("stackTrace", "stackTrace"));
-		projectionList.add(new CustomPropertyAliasProjection("cause", "cause"));
+		projectionList.add(Projections.property("throwableType"), "throwableType");
+		projectionList.add(Projections.property("exceptionEventString"), "exceptionEventString");
+		projectionList.add(Projections.property("errorMessage"), "errorMessage");
+		projectionList.add(Projections.property("stackTrace"), "stackTrace");
+		projectionList.add(Projections.property("cause"), "cause");
 		projectionList.add(Projections.count("exceptionEventString"), "throwableIdentityHashCode");
 		projectionList.add(Projections.groupProperty("throwableType"));
 		projectionList.add(Projections.groupProperty("exceptionEventString"));
@@ -110,7 +110,7 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 		criteria.add(Restrictions.isNotNull("stackTrace"));
 		ProjectionList projections = Projections.projectionList();
 		projections.add(Projections.distinct(Projections.property("stackTrace")));
-		projections.add(new CustomPropertyAliasProjection("stackTrace", "stackTrace"));
+		projections.add(Projections.property("stackTrace"), "stackTrace");
 		criteria.setProjection(projections);
 		criteria.setResultTransformer(Transformers.aliasToBean(ExceptionSensorData.class));
 		return getHibernateTemplate().findByCriteria(criteria);
