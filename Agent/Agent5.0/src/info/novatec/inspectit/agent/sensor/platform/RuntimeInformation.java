@@ -15,7 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class provide dynamic informations about runtime through MXBeans.
+ * This class provides dynamic information about the runtime of the Virtual
+ * Machine through MXBeans.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -33,7 +34,8 @@ public class RuntimeInformation implements IPlatformSensor {
 	private final IIdManager idManager;
 
 	/**
-	 * The MXBean for runtime informations.
+	 * The MXBean used to retrieve information from the runtime system of the
+	 * underlying Virtual Machine.
 	 */
 	private RuntimeMXBean runtimeObj = ManagementFactory.getRuntimeMXBean();
 

@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 import com.sun.management.OperatingSystemMXBean;
 
 /**
- * This class provide dynamic informations about the underlying operating system
+ * This class provides dynamic information about the underlying operating system
  * through MXBeans.
  * 
  * @author Eduard Tudenhoefner
@@ -41,7 +41,7 @@ public class CpuInformation implements IPlatformSensor {
 	private CpuCalculation cpuCalc = new CpuCalculation();
 
 	/**
-	 * The previous uptime of the virtual machine.
+	 * The previous uptime of the Virtual Machine.
 	 */
 	private long prevUptime = 0;
 
@@ -56,12 +56,12 @@ public class CpuInformation implements IPlatformSensor {
 	private float cpuUsage = 0;
 
 	/**
-	 * The MXBean for the operating system informations.
+	 * The MXBean used to retrieve information from the operating system.
 	 */
 	private OperatingSystemMXBean osObj = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 
 	/**
-	 * The MXBean for runtime informations.
+	 * The MXBean for runtime information.
 	 */
 	private RuntimeMXBean runtimeObj = ManagementFactory.getRuntimeMXBean();
 
@@ -94,7 +94,7 @@ public class CpuInformation implements IPlatformSensor {
 	}
 
 	/**
-	 * Updates all dynamic cpu informations.
+	 * Updates all dynamic cpu information.
 	 * 
 	 * @param coreService
 	 *            The {@link ICoreService}.
@@ -162,7 +162,8 @@ public class CpuInformation implements IPlatformSensor {
 	}
 
 	/**
-	 * Inner Class for cpuUsage calculation stuff
+	 * Inner Class used to calculate the cpu usage of the underlying Virtual
+	 * Machine.
 	 * 
 	 * @author Eduard Tudenhoefner
 	 */
@@ -191,8 +192,10 @@ public class CpuInformation implements IPlatformSensor {
 	 * simultaneously. Limit to 99% to avoid showing a scale from 0% to 200%.
 	 * 
 	 * @param cpuCalc
+	 *            The object holding the needed information to calculate the cpu
+	 *            usage.
 	 */
-	public void updateCpuInfo(CpuCalculation cpuCalc) {
+	private void updateCpuInfo(CpuCalculation cpuCalc) {
 		if (prevUptime > 0L && cpuCalc.uptime > prevUptime) {
 
 			long elapsedCpu = cpuCalc.processCpuTime - prevProcessCpuTime;

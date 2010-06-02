@@ -15,7 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class provide dynamic informations about compilation through MXBeans.
+ * This class provides dynamic information about the compilation system through
+ * MXBeans.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -33,7 +34,7 @@ public class CompilationInformation implements IPlatformSensor {
 	private final IIdManager idManager;
 
 	/**
-	 * The MXBean for compilation informations.
+	 * The MXBean used to retrieve information from the compilation system.
 	 */
 	private CompilationMXBean compilationObj = ManagementFactory.getCompilationMXBean();
 
@@ -51,7 +52,7 @@ public class CompilationInformation implements IPlatformSensor {
 	 * Returns the approximate accumulated elapsed time (milliseconds) spent in
 	 * compilation.
 	 * 
-	 * @return the compilation time in milliseconds.
+	 * @return The compilation time in milliseconds.
 	 */
 	public long getTotalCompilationTime() {
 		try {
@@ -62,7 +63,7 @@ public class CompilationInformation implements IPlatformSensor {
 	}
 
 	/**
-	 * Updates all dynamic compilation informations.
+	 * Updates all dynamic compilation information.
 	 * 
 	 * @param coreService
 	 *            The {@link ICoreService}.

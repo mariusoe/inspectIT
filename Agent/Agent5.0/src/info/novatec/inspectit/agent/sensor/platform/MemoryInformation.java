@@ -17,7 +17,8 @@ import java.util.logging.Logger;
 import com.sun.management.OperatingSystemMXBean;
 
 /**
- * This class provide dynamic informations about memory through MXBeans.
+ * This class provides dynamic information about the memory system through
+ * MXBeans.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -35,12 +36,12 @@ public class MemoryInformation implements IPlatformSensor {
 	private final IIdManager idManager;
 
 	/**
-	 * The MXBean for heap memory informations.
+	 * The MXBean used to retrieve heap memory information.
 	 */
 	private MemoryMXBean memoryObj = ManagementFactory.getMemoryMXBean();
 
 	/**
-	 * The MXBean for os memory informations.
+	 * The MXBean used to retrieve physical memory information.
 	 */
 	private OperatingSystemMXBean osObj = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 

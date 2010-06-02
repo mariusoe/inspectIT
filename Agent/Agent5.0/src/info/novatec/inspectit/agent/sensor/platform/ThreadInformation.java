@@ -15,7 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class provide dynamic informations about threads through MXBeans.
+ * This class provides dynamic information about the thread system through
+ * MXBeans.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -33,7 +34,7 @@ public class ThreadInformation implements IPlatformSensor {
 	private final IIdManager idManager;
 
 	/**
-	 * The MXBean for thread informations.
+	 * The MXBean used to retrieve information from the thread system.
 	 */
 	private ThreadMXBean threadObj = ManagementFactory.getThreadMXBean();
 
@@ -84,7 +85,7 @@ public class ThreadInformation implements IPlatformSensor {
 	}
 
 	/**
-	 * Updates all dynamic thread informations.
+	 * Updates all dynamic thread information.
 	 * 
 	 * @param coreService
 	 *            The {@link ICoreService}.

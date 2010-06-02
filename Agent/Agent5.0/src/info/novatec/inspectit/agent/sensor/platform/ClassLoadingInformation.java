@@ -15,7 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class provide dynamic informations about class loading through MXBeans.
+ * This class provides dynamic information about the class loading system
+ * through MXBeans.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -33,7 +34,7 @@ public class ClassLoadingInformation implements IPlatformSensor {
 	private final IIdManager idManager;
 
 	/**
-	 * The MXBean for class loading informations.
+	 * The MXBean used to retrieve information from the class loading system.
 	 */
 	private ClassLoadingMXBean classLoadingObj = ManagementFactory.getClassLoadingMXBean();
 
@@ -50,7 +51,7 @@ public class ClassLoadingInformation implements IPlatformSensor {
 	/**
 	 * Returns the number of loaded classes in the virtual machine.
 	 * 
-	 * @return the number of loaded classes.
+	 * @return The number of loaded classes.
 	 */
 	public int getLoadedClassCount() {
 		return classLoadingObj.getLoadedClassCount();
@@ -60,7 +61,7 @@ public class ClassLoadingInformation implements IPlatformSensor {
 	 * Returns the total number of loaded classes since the virtual machine
 	 * started.
 	 * 
-	 * @return the total number of loaded classes.
+	 * @return The total number of loaded classes.
 	 */
 	public long getTotalLoadedClassCount() {
 		return classLoadingObj.getTotalLoadedClassCount();
@@ -69,14 +70,14 @@ public class ClassLoadingInformation implements IPlatformSensor {
 	/**
 	 * Returns the number of unloaded classes since the virtual machine started.
 	 * 
-	 * @return the number of unloaded classes.
+	 * @return The number of unloaded classes.
 	 */
 	public long getUnloadedClassCount() {
 		return classLoadingObj.getUnloadedClassCount();
 	}
 
 	/**
-	 * Updates all dynamic class loading informations.
+	 * Updates all dynamic class loading information.
 	 * 
 	 * @param coreService
 	 *            The {@link ICoreService}.

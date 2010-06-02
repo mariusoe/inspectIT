@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 import com.sun.management.OperatingSystemMXBean;
 
 /**
- * This class provide static informations about heap memory/operating
+ * This class provides static information about heap memory/operating
  * system/runtime through MXBeans.
  * 
  * @author Eduard Tudenhoefner
@@ -44,28 +44,29 @@ public class SystemInformation implements IPlatformSensor {
 	private final IIdManager idManager;
 
 	/**
-	 * After the first update()-call the static informations will only be
-	 * updated when the update is requested by the user.
+	 * After the first update()-call the static information will only be updated
+	 * when the update is requested by the user.
 	 */
 	private boolean updateRequested = true;
 
 	/**
-	 * The MXBean for operating system informations.
+	 * The MXBean used to retrieve information from the operating system.
 	 */
 	private OperatingSystemMXBean osObj = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 
 	/**
-	 * The MXBean for heap memory informations.
+	 * The MXBean used to retrieve heap memory information.
 	 */
 	private MemoryMXBean memoryObj = ManagementFactory.getMemoryMXBean();
 
 	/**
-	 * The MXBean for runtime informations.
+	 * The MXBean used to retrieve information from the runtime system of the
+	 * underlying Virtual Machine.
 	 */
 	private RuntimeMXBean runtimeObj = ManagementFactory.getRuntimeMXBean();
 
 	/**
-	 * The MXBean for the compilation informations.
+	 * The MXBean used to retrieve information from the compilation system.
 	 */
 	private CompilationMXBean compilationObj = ManagementFactory.getCompilationMXBean();
 
@@ -295,7 +296,7 @@ public class SystemInformation implements IPlatformSensor {
 	}
 
 	/**
-	 * Updates all static informations.
+	 * Updates all static information.
 	 * 
 	 * @param coreService
 	 *            The {@link ICoreService}.
