@@ -115,7 +115,7 @@
 
 		<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
 			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
-			<fileset dir="src" includes="**/*.java" />
+			<fileset dir="src" includes="**/*.java" excludes="**/*_Stub.java" />
 		</checkstyle>
 
 		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl" />

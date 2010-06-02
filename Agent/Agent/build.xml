@@ -255,11 +255,12 @@
 				<include name="info/novatec/inspectit/**/*.java" />
 				<exclude name="**/javassist/**" />
 			</fileset>
-			<fileset dir="${agenttest.src}">
+			<fileset dir="${agent50.src}">
 				<include name="info/novatec/inspectit/**/*.java" />
 			</fileset>
 			<fileset dir="${commons.src}">
 				<include name="info/novatec/inspectit/**/*.java" />
+				<exclude name="**/*_Stub.java" />
 			</fileset>
 		</pmd>
 		<xslt in="${build.qa.analysis.pmd}/pmd_results.xml" style="${pmd.config.root}/pmd-report.xslt" out="${build.qa.analysis.pmd}/sortable_report.html" />
@@ -269,7 +270,13 @@
 
 		<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
 			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
-			<fileset dir="src" includes="**/*.java" excludes="**/javassist/**" />
+			<fileset dir="${src.root}">
+				<include name="info/novatec/inspectit/**/*.java" />
+				<exclude name="**/javassist/**" />
+			</fileset>
+			<fileset dir="${agent50.src}">
+				<include name="info/novatec/inspectit/**/*.java" />
+			</fileset>
 		</checkstyle>
 
 		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl" />
@@ -282,7 +289,7 @@
 			<path refid="findbugs.classpath" />
 		</pathconvert>
 
-		<findbugs output="xml" classpath="${findbugs.classpath}" excludefilter="${basedir}/resources/findbugs/excludeFilter.xml" outputFile="${build.qa.analysis}/findbugs/findbugs.xml" pluginlist="${lib.root}/test/findbugs.jar" >
+		<findbugs output="xml" classpath="${findbugs.classpath}" excludefilter="${basedir}/resources/findbugs/excludeFilter.xml" outputFile="${build.qa.analysis}/findbugs/findbugs.xml" pluginlist="${lib.root}/test/findbugs.jar">
 			<sourcePath path="${src.root}" />
 			<class location="${build.agent.classes}" />
 			<auxClasspath>
