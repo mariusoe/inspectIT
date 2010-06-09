@@ -92,20 +92,18 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 	public Object getInvocationSequenceDetail(InvocationSequenceData template) {
 		try {
 			Object object = invocationDataAccessService.getInvocationSequenceDetail(template);
-			
+
 			if (object instanceof InvocationSequenceData) {
 				// directly return the object
 				return (InvocationSequenceData) object;
-			} else if (object instanceof RemoteInputStream) {
+			} else if (object instanceof InputStream) {
 				// read from the remote stream
-				RemoteInputStream stream = (RemoteInputStream) object;
+				InputStream stream = (InputStream) object;
 
-				InputStream istream = null;
 				InputStream bis = null;
 				InputStream input = null;
 				try {
-					istream = RemoteInputStreamClient.wrap(stream);
-					bis = new BufferedInputStream(istream);
+					bis = new BufferedInputStream(stream);
 					input = new GZIPInputStream(bis);
 
 					InvocationSequenceData invocation = (InvocationSequenceData) xstream.fromXML(input);
@@ -115,9 +113,6 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 					return null;
 				} finally {
 					try {
-						if (null != istream) {
-							istream.close();
-						}
 						if (null != bis) {
 							bis.close();
 						}

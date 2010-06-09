@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.List;
 
 import org.hibernate.FetchMode;
@@ -22,9 +21,8 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-import com.healthmarketscience.rmiio.RemoteInputStream;
-import com.healthmarketscience.rmiio.RemoteInputStreamServer;
-import com.healthmarketscience.rmiio.SimpleRemoteInputStream;
+import com.healthmarketscience.rmiio.DirectRemoteInputStream;
+import com.healthmarketscience.rmiio.SerializableInputStream;
 
 /**
  * Default implementation of the {@link InvocationDataDao} interface.
@@ -132,32 +130,10 @@ public class InvocationDataDaoImpl extends HibernateDaoSupport implements Invoca
 			}
 
 			try {
-				// create a RemoteStreamServer (note the finally block which
-				// only releases the RMI resources if the method fails before
-				// returning.)
-				RemoteInputStreamServer istream = null;
-				try {
-					istream = new SimpleRemoteInputStream(new BufferedInputStream(new FileInputStream(files[0])));
-					// export the final stream for returning to the client
-					RemoteInputStream result = istream.export();
-					// after all the hard work, discard the local reference (we
-					// are passing responsibility to the client)
-					istream = null;
-					return result;
-				} finally {
-					// we will only close the stream here if the server fails
-					// before
-					// returning an exported stream
-					if (istream != null) {
-						istream.close();
-					}
-				}
+				return new SerializableInputStream(new DirectRemoteInputStream(new BufferedInputStream(new FileInputStream(files[0]))));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				throw new RuntimeException("File not found exception!");
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("IOException");
 			}
 		} else {
 			// old mode via database
