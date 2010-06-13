@@ -315,14 +315,14 @@
 		<mkdir dir="${build.release}" />
 		<delete dir="${build.release}/sun1.5-data" />
 		<mkdir dir="${build.release}/sun1.5-data" />
-		<mkdir dir="${build.release}/sun1.5-data" />
-		<mkdir dir="${build.release}/sun1.5-data/config" />
+		<mkdir dir="${build.release}/sun1.5-data/agent" />
+		<mkdir dir="${build.release}/sun1.5-data/agent/config" />
 
-		<copy todir="${build.release}/sun1.5-data/config">
+		<copy todir="${build.release}/sun1.5-data/agent/config">
 			<fileset dir="${config.root}" includes="**/*.*" />
 		</copy>
 
-		<jar destfile="${build.release}/sun1.5-data/${dist.jar.name}" manifest="${javaagent.basedir}/META-INF/MANIFEST.MF">
+		<jar destfile="${build.release}/sun1.5-data/agent/${dist.jar.name}" manifest="${javaagent.basedir}/META-INF/MANIFEST.MF">
 			<fileset dir="${build.agent.classes}" includes="**/*.class" />
 			<fileset dir="${build.agent50.classes}" includes="**/*.class" />
 			<fileset dir="${build.commons.classes}" includes="**/*.class" />
@@ -353,16 +353,16 @@
 		<mkdir dir="${build.release}" />
 		<delete dir="${build.release}/sun1.4-data" />
 		<mkdir dir="${build.release}/sun1.4-data" />
-		<mkdir dir="${build.release}/sun1.4-data" />
-		<mkdir dir="${build.release}/sun1.4-data/config" />
+		<mkdir dir="${build.release}/sun1.4-data/agent" />
+		<mkdir dir="${build.release}/sun1.4-data/agent/config" />
 
-		<copy todir="${build.release}/sun1.4-data/config">
+		<copy todir="${build.release}/sun1.4-data/agent/config">
 			<fileset dir="${config.root}" includes="**/*.cfg" />
 			<fileset dir="${config.root}" includes="**/*.dll" />
 			<fileset dir="${config.root}" includes="**/*.so" />
 		</copy>
 
-		<jar destfile="${build.release}/sun1.4-data/${dist.jar.name}">
+		<jar destfile="${build.release}/sun1.4-data/agent/${dist.jar.name}">
 			<fileset dir="${build.agent.classes}" includes="**/*.class" />
 			<fileset dir="${build.commons.classes}" includes="**/*.class" />
 			<fileset dir="${build.classloader.classes}" includes="**/*.class" />
