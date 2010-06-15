@@ -23,7 +23,16 @@ public class FileBasedVersioningServiceImpl implements IVersioningService {
 	 * {@inheritDoc}
 	 */
 	public String getVersion () throws IOException {
-		InputStream s = FileBasedVersioningServiceImpl.class.getClassLoader().getResourceAsStream(VERSION_LOG_NAME);
+		
+		// Get a classloader to find the version file
+		ClassLoader classLoader = FileBasedVersioningServiceImpl.class.getClassLoader();
+		if (null == classLoader) {
+			// this means inspectIT was started using the XBootclasspath option and thus all classes are in fact
+			// loaded by the system classloader, so we need to use the system classloader
+			classLoader = ClassLoader.getSystemClassLoader();
+		}
+		
+		InputStream s = classLoader.getResourceAsStream(VERSION_LOG_NAME);
 		
 		if (null == s){
 			throw new FileNotFoundException("The version information file \""+VERSION_LOG_NAME+"\" cannot be found in the classpath");
