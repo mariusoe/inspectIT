@@ -106,7 +106,7 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 		// create all items
 		RepositoryManager repositoryManager = InspectIT.getDefault().getRepositoryManager();
 		for (RepositoryDefinition repositoryDefinition : repositoryManager.getRepositoryDefinitions()) {
-			createServerItem(pShelf, repositoryDefinition);
+			createServerItem(pShelf, repositoryDefinition, pShelf.getItems().length);
 		}
 
 		// create the storage area
@@ -157,8 +157,8 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	 * @param repositoryDefinition
 	 *            The repository definition for this item.
 	 */
-	private void createServerItem(PShelf pShelf, RepositoryDefinition repositoryDefinition) {
-		PShelfItem item = new PShelfItem(pShelf, SWT.NONE);
+	private void createServerItem(PShelf pShelf, RepositoryDefinition repositoryDefinition, int index) {
+		PShelfItem item = new PShelfItem(pShelf, SWT.NONE, index);
 
 		// Check the version of the CMR
 		String cmrVersion = repositoryDefinition.getServerStatusService().getVersion();
@@ -268,7 +268,7 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	 * {@inheritDoc}
 	 */
 	public void repositoryAdded(RepositoryDefinition repositoryDefinition) {
-		createServerItem(pShelf, repositoryDefinition);
+		createServerItem(pShelf, repositoryDefinition, pShelf.getItems().length - 1);
 	}
 
 	/**
