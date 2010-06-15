@@ -191,10 +191,10 @@ public class InputDefinition {
 	private String headerDescription;
 
 	/**
-	 * If the view should be updated automatically. Default is <code>true</code>
-	 * .
+	 * If the view should be updated automatically. Default is
+	 * <code>false</code> .
 	 */
-	private boolean automaticUpdate = true;
+	private boolean automaticUpdate = false;
 
 	/**
 	 * The default update rate of the automatic update mechanism.

@@ -184,6 +184,10 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 		// start the update timer if it is requested.
 		if (getInputDefinition().isAutomaticUpdate()) {
 			startUpdateTimer();
+		} else {
+			// do an update one time
+			Timer timer = new Timer();
+			timer.schedule(new UpdateTimerTask(), 0L);
 		}
 
 		if (null != preferencePanel) {

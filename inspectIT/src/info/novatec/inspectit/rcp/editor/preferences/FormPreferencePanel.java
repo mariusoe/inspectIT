@@ -239,21 +239,21 @@ public class FormPreferencePanel implements IPreferencePanel {
 		if (preferenceSet.contains(PreferenceId.INVOCFILTEREXCLUSIVETIME)) {
 			MenuManager timeMenuManager = new MenuManager("Filter Details by Exclusive Time");
 			timeMenuManager.add(new FilterByExclusiveTimeAction("No filter", Double.NaN, true));
-//			timeMenuManager.add(new Separator());
+			// timeMenuManager.add(new Separator());
 			timeMenuManager.add(new FilterByExclusiveTimeAction("0.1 ms", 0.1));
 			timeMenuManager.add(new FilterByExclusiveTimeAction("0.2 ms", 0.2));
 			timeMenuManager.add(new FilterByExclusiveTimeAction("0.5 ms", 0.5));
-//			timeMenuManager.add(new Separator());
+			// timeMenuManager.add(new Separator());
 			timeMenuManager.add(new FilterByExclusiveTimeAction("1 ms", 1.0));
 			timeMenuManager.add(new FilterByExclusiveTimeAction("2 ms", 2.0));
 			timeMenuManager.add(new FilterByExclusiveTimeAction("5 ms", 5.0));
 			timeMenuManager.add(new FilterByExclusiveTimeAction("10 ms", 10.0));
-//			timeMenuManager.add(new Separator());
+			// timeMenuManager.add(new Separator());
 			timeMenuManager.add(new FilterByExclusiveTimeAction("50 ms", 50.0));
 			timeMenuManager.add(new FilterByExclusiveTimeAction("100 ms", 100.0));
 			timeMenuManager.add(new FilterByExclusiveTimeAction("200 ms", 200.0));
 			timeMenuManager.add(new FilterByExclusiveTimeAction("500 ms", 500.0));
-//			timeMenuManager.add(new Separator());
+			// timeMenuManager.add(new Separator());
 			timeMenuManager.add(new FilterByExclusiveTimeAction("1 s", 1000.0));
 			timeMenuManager.add(new FilterByExclusiveTimeAction("1.5 s", 1500.0));
 			timeMenuManager.add(new FilterByExclusiveTimeAction("2 s", 2000.0));
@@ -263,21 +263,21 @@ public class FormPreferencePanel implements IPreferencePanel {
 		if (preferenceSet.contains(PreferenceId.INVOCFILTERTOTALTIME)) {
 			MenuManager timeMenuManager = new MenuManager("Filter Details by Total Time");
 			timeMenuManager.add(new FilterByTotalTimeAction("No filter", Double.NaN, true));
-//			timeMenuManager.add(new Separator());
+			// timeMenuManager.add(new Separator());
 			timeMenuManager.add(new FilterByTotalTimeAction("0.1 ms", 0.1));
 			timeMenuManager.add(new FilterByTotalTimeAction("0.2 ms", 0.2));
 			timeMenuManager.add(new FilterByTotalTimeAction("0.5 ms", 0.5));
-//			timeMenuManager.add(new Separator());
+			// timeMenuManager.add(new Separator());
 			timeMenuManager.add(new FilterByTotalTimeAction("1 ms", 1.0));
 			timeMenuManager.add(new FilterByTotalTimeAction("2 ms", 2.0));
 			timeMenuManager.add(new FilterByTotalTimeAction("5 ms", 5.0));
 			timeMenuManager.add(new FilterByTotalTimeAction("10 ms", 10.0));
-//			timeMenuManager.add(new Separator());
+			// timeMenuManager.add(new Separator());
 			timeMenuManager.add(new FilterByTotalTimeAction("50 ms", 50.0));
 			timeMenuManager.add(new FilterByTotalTimeAction("100 ms", 100.0));
 			timeMenuManager.add(new FilterByTotalTimeAction("200 ms", 200.0));
 			timeMenuManager.add(new FilterByTotalTimeAction("500 ms", 500.0));
-//			timeMenuManager.add(new Separator());
+			// timeMenuManager.add(new Separator());
 			timeMenuManager.add(new FilterByTotalTimeAction("1 s", 1000.0));
 			timeMenuManager.add(new FilterByTotalTimeAction("1.5 s", 1500.0));
 			timeMenuManager.add(new FilterByTotalTimeAction("2 s", 2000.0));
@@ -364,7 +364,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		public SwitchLiveMode(String text) {
 			super(text);
 			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_LIVE_MODE));
-			setChecked(true);
+			setChecked(false);
 		}
 
 		/**
@@ -530,7 +530,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 			}
 		}
 	}
-	
+
 	private final class FilterByTotalTimeAction extends Action {
 		private double time;
 
