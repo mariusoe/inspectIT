@@ -2,8 +2,8 @@ package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.tree.TreeSubView;
 import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
 
@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * The interface for all tree input controller.
@@ -89,14 +89,6 @@ public interface TreeInputController {
 	void doRefresh(IProgressMonitor monitor);
 
 	/**
-	 * This method will be called when a double click event is executed.
-	 * 
-	 * @param event
-	 *            The event object.
-	 */
-	void doubleClick(DoubleClickEvent event);
-
-	/**
 	 * Returns <code>true</code> if the controller can open the input which
 	 * consists of one or several {@link DefaultData} objects.
 	 * 
@@ -140,6 +132,11 @@ public interface TreeInputController {
 	 * @return the filter array.
 	 */
 	ViewerFilter[] getFilters();
+
+	/**
+	 * Show some details in a pop-up to the user about the selected element.
+	 */
+	void showDetails(Shell parent, Object element);
 
 	/**
 	 * Disposes the tree input.

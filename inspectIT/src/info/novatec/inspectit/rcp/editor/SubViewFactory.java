@@ -108,8 +108,9 @@ public final class SubViewFactory {
 
 			return invocSubView;
 		case SQL:
-			ISubView sqlSubView = new TableSubView(new SqlInputController());
-			return sqlSubView;
+			SashCompositeSubView sqlSashSubView = new SashCompositeSubView();
+			sqlSashSubView.addSubView(new TableSubView(new SqlInputController()));
+			return sqlSashSubView;
 		case EXCEPTION_TRACER:
 			SashCompositeSubView exceptionTracerSubView = new SashCompositeSubView();
 			ISubView exceptionTreeOverview = new TableSubView(new ExceptionTreeOverviewInputController());

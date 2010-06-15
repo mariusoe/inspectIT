@@ -7,8 +7,8 @@ import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.exception.DeferredStackTraces;
 import info.novatec.inspectit.rcp.editor.exception.input.ExceptionOverviewInputController.ExtendedExceptionSensorData;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
 import info.novatec.inspectit.rcp.editor.tree.input.TreeInputController;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
@@ -22,10 +22,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -162,10 +160,8 @@ public class ExceptionMessagesTreeInputController implements TreeInputController
 	/**
 	 * {@inheritDoc}
 	 */
-	public void doubleClick(DoubleClickEvent event) {
-		TreeViewer treeViewer = (TreeViewer) event.getSource();
-		IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-		final ExceptionSensorData data = (ExceptionSensorData) selection.getFirstElement();
+	public void showDetails(Shell parent, Object element) {
+		final ExceptionSensorData data = (ExceptionSensorData) element;
 		String trace = "You selected the error message. Please select a stack trace from the subsequent tree.";
 
 		if (null == data.getThrowableType()) {
@@ -176,7 +172,6 @@ public class ExceptionMessagesTreeInputController implements TreeInputController
 
 		final String stackTrace = trace;
 
-		Shell parent = treeViewer.getTree().getShell();
 		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
 		boolean takeFocusOnOpen = true;
 		boolean persistSize = true;

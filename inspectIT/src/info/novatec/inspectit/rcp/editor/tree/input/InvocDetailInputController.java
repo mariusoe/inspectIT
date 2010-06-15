@@ -33,10 +33,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -263,13 +261,10 @@ public class InvocDetailInputController implements TreeInputController {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void doubleClick(final DoubleClickEvent event) {
-		TreeViewer treeViewer = (TreeViewer) event.getSource();
-		IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-		final InvocationSequenceData data = (InvocationSequenceData) selection.getFirstElement();
+	public void showDetails(Shell parent, Object element) {
+		final InvocationSequenceData data = (InvocationSequenceData) element;
 		final MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
 
-		Shell parent = treeViewer.getTree().getShell();
 		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
 		boolean takeFocusOnOpen = true;
 		boolean persistSize = true;
