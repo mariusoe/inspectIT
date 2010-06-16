@@ -71,6 +71,11 @@ public class ExceptionTreeDetailInputController implements TreeInputController {
 	private Map<Integer, Color> colorCache = new HashMap<Integer, Color>();
 
 	/**
+	 * The cache holding the image object which are disposed at the end.
+	 */
+	private Map<Integer, Image> modifiersImageCache = new HashMap<Integer, Image>();
+
+	/**
 	 * The private inner enumeration used to define the used IDs which are
 	 * mapped into the columns. The order in this enumeration represents the
 	 * order of the columns. If it is reordered, nothing else has to be changed.
@@ -342,9 +347,20 @@ public class ExceptionTreeDetailInputController implements TreeInputController {
 			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
 			Column enumId = Column.fromOrd(index);
 
+			// first look for the image in the cache
+			Integer modifier = new Integer(methodIdent.getModifiers());
+			Image image = null;
+			if (modifiersImageCache.containsKey(modifier)) {
+				image = modifiersImageCache.get(modifier);
+			}
+
 			switch (enumId) {
 			case METHOD_CONSTRUCTOR:
-				return ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers()).createImage();
+				if (null == image) {
+					image = ModifiersImageFactory.getImageDescriptor(modifier.intValue()).createImage();
+					modifiersImageCache.put(modifier, image);
+				}
+				return image;
 			case EVENT_TYPE:
 				return null;
 			case ERROR_MESSAGE:
@@ -515,6 +531,11 @@ public class ExceptionTreeDetailInputController implements TreeInputController {
 			entry.getValue().dispose();
 		}
 		colorCache.clear();
+
+		for (Entry<Integer, Image> entry : modifiersImageCache.entrySet()) {
+			entry.getValue().dispose();
+		}
+		modifiersImageCache.clear();
 	}
 
 }

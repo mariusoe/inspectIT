@@ -81,6 +81,11 @@ public class InvocDetailInputController implements TreeInputController {
 	private Map<Integer, Color> colorCache = new HashMap<Integer, Color>();
 
 	/**
+	 * The cache holding the image object which are disposed at the end.
+	 */
+	private Map<Integer, Image> modifiersImageCache = new HashMap<Integer, Image>();
+
+	/**
 	 * The default value of the selected sensor types.
 	 */
 	private Set<SensorTypeEnum> selectedSensorTypes = EnumSet.of(SensorTypeEnum.TIMER, SensorTypeEnum.INVOCATION_SEQUENCE, SensorTypeEnum.EXCEPTION_TRACER, SensorTypeEnum.JDBC_STATEMENT,
@@ -414,9 +419,20 @@ public class InvocDetailInputController implements TreeInputController {
 			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
 			Column enumId = Column.fromOrd(index);
 
+			// first look for the image in the cache
+			Integer modifier = new Integer(methodIdent.getModifiers());
+			Image image = null;
+			if (modifiersImageCache.containsKey(modifier)) {
+				image = modifiersImageCache.get(modifier);
+			}
+
 			switch (enumId) {
 			case METHOD:
-				return ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers()).createImage();
+				if (null == image) {
+					image = ModifiersImageFactory.getImageDescriptor(modifier.intValue()).createImage();
+					modifiersImageCache.put(modifier, image);
+				}
+				return image;
 			case DURATION:
 				return null;
 			case CPUDURATION:
@@ -822,6 +838,11 @@ public class InvocDetailInputController implements TreeInputController {
 			entry.getValue().dispose();
 		}
 		colorCache.clear();
+
+		for (Entry<Integer, Image> entry : modifiersImageCache.entrySet()) {
+			entry.getValue().dispose();
+		}
+		modifiersImageCache.clear();
 	}
 
 }
