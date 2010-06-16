@@ -6,8 +6,8 @@ import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
 import info.novatec.inspectit.rcp.editor.tree.input.TreeInputController;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
@@ -20,8 +20,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
@@ -73,7 +73,7 @@ public class ExceptionTreeDetailInputController implements TreeInputController {
 	/**
 	 * The cache holding the image object which are disposed at the end.
 	 */
-	private Map<Integer, Image> modifiersImageCache = new HashMap<Integer, Image>();
+	private Map<ImageDescriptor, Image> modifiersImageCache = new HashMap<ImageDescriptor, Image>();
 
 	/**
 	 * The private inner enumeration used to define the used IDs which are
@@ -347,18 +347,17 @@ public class ExceptionTreeDetailInputController implements TreeInputController {
 			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
 			Column enumId = Column.fromOrd(index);
 
-			// first look for the image in the cache
-			Integer modifier = new Integer(methodIdent.getModifiers());
-			Image image = null;
-			if (modifiersImageCache.containsKey(modifier)) {
-				image = modifiersImageCache.get(modifier);
-			}
-
 			switch (enumId) {
 			case METHOD_CONSTRUCTOR:
-				if (null == image) {
-					image = ModifiersImageFactory.getImageDescriptor(modifier.intValue()).createImage();
-					modifiersImageCache.put(modifier, image);
+				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers());
+				Image image = null;
+				
+				// first look for the image in the cache
+				if (modifiersImageCache.containsKey(imageDescriptor)) {
+					image = modifiersImageCache.get(imageDescriptor);
+				} else {
+					image = imageDescriptor.createImage();
+					modifiersImageCache.put(imageDescriptor, image);
 				}
 				return image;
 			case EVENT_TYPE:
@@ -532,7 +531,7 @@ public class ExceptionTreeDetailInputController implements TreeInputController {
 		}
 		colorCache.clear();
 
-		for (Entry<Integer, Image> entry : modifiersImageCache.entrySet()) {
+		for (Entry<ImageDescriptor, Image> entry : modifiersImageCache.entrySet()) {
 			entry.getValue().dispose();
 		}
 		modifiersImageCache.clear();
