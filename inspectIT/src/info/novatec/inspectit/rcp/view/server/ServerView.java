@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.view.server;
 
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.model.Component;
 import info.novatec.inspectit.rcp.model.StorageTreeModelManager;
 import info.novatec.inspectit.rcp.model.TreeModelManager;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
@@ -17,6 +18,8 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.nebula.widgets.pshelf.PShelf;
@@ -254,14 +257,30 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 		 * {@inheritDoc}
 		 */
 		public void doubleClick(DoubleClickEvent event) {
-			IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
-			try {
-				handlerService.executeCommand("info.novatec.inspectit.rcp.commands.openView", null);
-			} catch (Exception ex) {
-				throw new RuntimeException(ex);
+			TreeSelection selection = (TreeSelection) event.getSelection();
+			Object element = selection.getFirstElement();
+			if (null != element) {
+				if (((Component) element).getInputDefinition() == null) {
+					TreeViewer treeViewer = (TreeViewer) event.getViewer();
+					TreePath path = selection.getPaths()[0];
+					if (null != path) {
+						boolean expanded = treeViewer.getExpandedState(path);
+						if (expanded) {
+							treeViewer.collapseToLevel(path, 1);
+						} else {
+							treeViewer.expandToLevel(path, 1);
+						}
+					}
+				} else {
+					IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
+					try {
+						handlerService.executeCommand("info.novatec.inspectit.rcp.commands.openView", null);
+					} catch (Exception ex) {
+						throw new RuntimeException(ex);
+					}
+				}
 			}
 		}
-
 	}
 
 	/**
