@@ -432,7 +432,6 @@ public class InvocDetailInputController implements TreeInputController {
 					image = imageDescriptor.createImage();
 					modifiersImageCache.put(imageDescriptor, image);
 				}
-				System.out.println(modifiersImageCache.size());
 				return image;
 			case DURATION:
 				return null;
