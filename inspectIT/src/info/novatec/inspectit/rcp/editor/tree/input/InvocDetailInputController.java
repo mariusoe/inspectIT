@@ -419,12 +419,11 @@ public class InvocDetailInputController implements TreeInputController {
 			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
 			Column enumId = Column.fromOrd(index);
 
-
 			switch (enumId) {
 			case METHOD:
 				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers());
 				Image image = null;
-				
+
 				// first look for the image in the cache
 				if (modifiersImageCache.containsKey(imageDescriptor)) {
 					image = modifiersImageCache.get(imageDescriptor);
@@ -761,7 +760,26 @@ public class InvocDetailInputController implements TreeInputController {
 				return true;
 			}
 		};
-		return new ViewerFilter[] { sensorTypeFilter, exclusiveTimeFilter, totalTimeFilter };
+		// TODO this filter must be removed in the future!
+		ViewerFilter wrapperFilter = new InvocationViewerFilter() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public boolean select(Viewer viewer, Object parentElement, Object element) {
+				if (element instanceof InvocationSequenceData) {
+					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) element;
+					MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(invocationSequenceData.getMethodIdent());
+					Set<MethodSensorTypeIdent> methodSensorTypes = methodIdent.getMethodSensorTypeIdents();
+					Set<SensorTypeEnum> sensorTypes = SensorTypeEnum.getAllOf(methodSensorTypes);
+					if (sensorTypes.contains(SensorTypeEnum.JDBC_PREPARED_STATEMENT)) {
+						if (null == invocationSequenceData.getSqlStatementData() || 0 == invocationSequenceData.getSqlStatementData().getCount()) {
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+		};
+		return new ViewerFilter[] { sensorTypeFilter, exclusiveTimeFilter, totalTimeFilter, wrapperFilter };
 	}
 
 	/**
