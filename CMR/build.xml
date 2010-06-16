@@ -148,6 +148,7 @@
 		<mkdir dir="${release.root}" />
 		<mkdir dir="${build.release.root}" />
 		<mkdir dir="${build.release.root.cmr}" />
+		<mkdir dir="${build.scripts}" />
 
 		<jar destfile="${build.release.root.cmr}/${dist.jar.name}" manifest="${basedir}/resources/META-INF/MANIFEST.MF">
 			<fileset dir="${build.cmr.generated.classes}" includes="**/*.class" />
@@ -163,26 +164,58 @@
 
 		<jar destfile="${build.release.root.cmr}/lib/inspectit-commons.jar" basedir="${build.commons.classes}" />
 
-		<echo file="${build.release.root.cmr}/startup.sh" message="./jre/bin/java -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:MaxNewSize=24m -XX:NewSize=24m -XX:SurvivorRatio=128 -XX:TargetSurvivorRatio=90 -XX:ParallelGCThreads=6 -Xms768m -Xmx768m -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -jar ${dist.jar.name}" />
-
-		<echo file="${build.release.root.cmr}/startup.bat" message="jre\bin\java.exe -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:MaxNewSize=24m -XX:NewSize=24m -XX:SurvivorRatio=128 -XX:TargetSurvivorRatio=90 -XX:ParallelGCThreads=6 -Xms768m -Xmx768m -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -jar ${dist.jar.name}" />
-
 		<mkdir dir="${build.release.root.cmr}/license" />
 		<copy todir="${build.release.root.cmr}/license" file="${basedir}/license/publicCerts.store" />
 
-		<!-- create the release files for the different operating systems and architectures-->
-		<!-- Linux - x86 -->
+		<!-- Create the different distributions -->
+		<antcall target="-linux-x86" />
+		<antcall target="-linux-x64" />
+		<antcall target="-windows-x86" />
+		<antcall target="-windows-x64" />
+
+	</target>
+
+	<!-- *************************************************************** -->
+	<!--           P R I V A T E    B U I L D     T A R G E T S          -->
+	<!-- *************************************************************** -->
+	<target name="-linux-x86">
+		<echo file="${build.scripts}/startup.sh" message="./jre/bin/java -Xms1024m -Xmx1024m -Xmn512M -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:SurvivorRatio=4 -XX:TargetSurvivorRatio=90 -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -XX:+HeapDumpOnOutOfMemoryError -jar ${dist.jar.name}" />
+
 		<tar destfile="${release.root}/inspectit-cmr.linux.x86.tar.gz" compression="gzip">
-			<fileset dir="${build.release.root}" excludes="CMR/startup.*" />
-			<tarfileset file="${build.release.root}/CMR/startup.sh" prefix="CMR" filemode="755" />
+			<fileset dir="${build.release.root}" />
+			<tarfileset file="${build.scripts}/startup.sh" prefix="CMR" filemode="755" />
 			<zipfileset src="${basedir}/resources/jvm/linux/x86/jre.zip" prefix="CMR/jre" filemode="755" />
 		</tar>
 
-		<!-- Windows - x86 -->
+		<delete file="${build.scripts}/startup.sh" />
+	</target>
+
+	<target name="-linux-x64">
+		<echo file="${build.scripts}/startup.sh" message="./jre/bin/java -Xms2048m -Xmx2048m -Xmn1024M -XX:MaxPermSize=192m -XX:PermSize=128m -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:SurvivorRatio=5 -XX:TargetSurvivorRatio=90 -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -XX:+UseCompressedOops -XX:+HeapDumpOnOutOfMemoryError -jar ${dist.jar.name}" />
+
+		<tar destfile="${release.root}/inspectit-cmr.linux.x64.tar.gz" compression="gzip">
+			<fileset dir="${build.release.root}" />
+			<tarfileset file="${build.scripts}/startup.sh" prefix="CMR" filemode="755" />
+			<zipfileset src="${basedir}/resources/jvm/linux/x64/jre.zip" prefix="CMR/jre" filemode="755" />
+		</tar>
+
+		<delete file="${build.scripts}/startup.sh" />
+	</target>
+
+	<target name="-windows-x86">
+		<echo file="${build.scripts}/startup.bat" message="jre\bin\java.exe -Xms1024m -Xmx1024m -Xmn512M -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:SurvivorRatio=4 -XX:TargetSurvivorRatio=90 -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -XX:+HeapDumpOnOutOfMemoryError -jar ${dist.jar.name}" />
+
 		<zip destfile="${release.root}/inspectit-cmr.windows.x86.zip">
-			<fileset dir="${build.release.root}" excludes="CMR/startup.sh" />
+			<fileset dir="${build.release.root}" />
+			<zipfileset file="${build.scripts}/startup.bat" prefix="CMR" />
 			<zipfileset src="${basedir}/resources/jvm/windows/x86/jre.zip" prefix="CMR/jre" />
 		</zip>
+
+		<delete file="${build.scripts}/startup.bat" />
+	</target>
+
+	<target name="-windows-x64">
+		<!-- T O D O -->
 	</target>
 
 
