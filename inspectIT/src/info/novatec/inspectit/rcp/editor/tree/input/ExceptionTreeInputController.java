@@ -90,9 +90,7 @@ public class ExceptionTreeInputController implements TreeInputController {
 		/** the error message column */
 		ERROR_MESSAGE("Error Message", 250, null),
 		/** The cause column */
-		CAUSE("Cause", 120, null),
-		/** the identity hash column */
-		IDENTITY_HASH("Identity Hash", 90, null);
+		CAUSE("Cause", 120, null);
 
 		/** The name. */
 		private String name;
@@ -278,7 +276,6 @@ public class ExceptionTreeInputController implements TreeInputController {
 				content += "Throwable Class: " + data.getThrowableType() + "\n";
 				content += "Error Message: " + data.getErrorMessage() + "\n";
 				content += "Cause: " + data.getCause() + "\n";
-				content += "Identity Hash: " + data.getThrowableIdentityHashCode();
 
 				text.setText(content);
 			}
@@ -363,8 +360,6 @@ public class ExceptionTreeInputController implements TreeInputController {
 				return null;
 			case ERROR_MESSAGE:
 				return null;
-			case IDENTITY_HASH:
-				return null;
 			case CAUSE:
 				return null;
 			default:
@@ -408,10 +403,6 @@ public class ExceptionTreeInputController implements TreeInputController {
 			if (null != data.getErrorMessage()) {
 				styledString.append(data.getErrorMessage());
 			}
-			return styledString;
-		case IDENTITY_HASH:
-			styledString = new StyledString();
-			styledString.append("" + data.getThrowableIdentityHashCode());
 			return styledString;
 		case CAUSE:
 			styledString = new StyledString();
