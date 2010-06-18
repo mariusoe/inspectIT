@@ -13,8 +13,6 @@ import java.util.zip.GZIPInputStream;
 
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
 
-import com.healthmarketscience.rmiio.RemoteInputStream;
-import com.healthmarketscience.rmiio.RemoteInputStreamClient;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
@@ -96,15 +94,12 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 			if (object instanceof InvocationSequenceData) {
 				// directly return the object
 				return (InvocationSequenceData) object;
-			} else if (object instanceof InputStream) {
-				// read from the remote stream
-				InputStream stream = (InputStream) object;
-
-				InputStream bis = null;
+			} else {
+				InputStream stream = getStreamForInvocationSequence(template);
 				InputStream input = null;
+
 				try {
-					bis = new BufferedInputStream(stream);
-					input = new GZIPInputStream(bis);
+					input = new GZIPInputStream(stream);
 
 					InvocationSequenceData invocation = (InvocationSequenceData) xstream.fromXML(input);
 					return invocation;
@@ -113,19 +108,16 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 					return null;
 				} finally {
 					try {
-						if (null != bis) {
-							bis.close();
-						}
 						if (null != input) {
 							input.close();
+						}
+						if (null != stream) {
+							stream.close();
 						}
 					} catch (IOException e) {
 						// we do not care about that one
 					}
 				}
-			} else {
-				InspectIT.getDefault().createErrorDialog("There was an error retrieving the invocation sequence detail from the CMR!", null, -1);
-				return null;
 			}
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog("There was an error retrieving the invocation sequence detail from the CMR!", e, -1);
@@ -144,21 +136,11 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 	public InputStream getStreamForInvocationSequence(InvocationSequenceData template) {
 		Object object = invocationDataAccessService.getInvocationSequenceDetail(template);
 
-		if (object instanceof RemoteInputStream) {
+		if (object instanceof InputStream) {
 			// read from the remote stream
-			RemoteInputStream stream = (RemoteInputStream) object;
+			InputStream stream = (InputStream) object;
 
-			InputStream istream = null;
-			InputStream bis = null;
-			try {
-				istream = RemoteInputStreamClient.wrap(stream);
-				bis = new BufferedInputStream(istream);
-
-				return bis;
-			} catch (IOException e) {
-				InspectIT.getDefault().createErrorDialog("IO Exception while trying to get the invocation stream from the server!", e, -1);
-				throw new RuntimeException(e);
-			}
+			return new BufferedInputStream(stream);
 		} else {
 			InspectIT.getDefault().createErrorDialog("Unexpected object retrieved, expected RemoteInputStream but was: " + object.getClass(), null, -1);
 			throw new RuntimeException("Unexpected object retrieved, expected RemoteInputStream but was: " + object.getClass());
