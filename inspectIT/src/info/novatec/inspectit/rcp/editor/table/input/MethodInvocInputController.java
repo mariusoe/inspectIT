@@ -600,14 +600,24 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		}
 
 		double nestedDuration = 0d;
+		boolean added = false;
 		for (InvocationSequenceData nestedData : (List<InvocationSequenceData>) data.getNestedSequences()) {
 			if (null == nestedData.getParentSequence()) {
 				nestedDuration = nestedDuration + nestedData.getDuration();
+				added = true;
 			} else if (null != nestedData.getTimerData()) {
 				nestedDuration = nestedDuration + nestedData.getTimerData().getDuration();
+				added = true;
 			} else if (null != nestedData.getSqlStatementData() && 1 == nestedData.getSqlStatementData().getCount()) {
 				nestedDuration = nestedDuration + nestedData.getSqlStatementData().getDuration();
+				added = true;
 			}
+			if (!added && !nestedData.getNestedSequences().isEmpty()) {
+				// nothing was added, but there could be child elements with
+				// time measurements
+				nestedDuration = nestedDuration + computeNestedDuration(nestedData);
+			}
+			added = false;
 		}
 
 		return nestedDuration;
