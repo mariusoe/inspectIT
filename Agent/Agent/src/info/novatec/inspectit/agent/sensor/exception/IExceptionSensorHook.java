@@ -12,7 +12,7 @@ import info.novatec.inspectit.agent.core.ICoreService;
  * @author Eduard Tudenhoefner
  * 
  */
-public interface IExceptionTracingHook {
+public interface IExceptionSensorHook {
 
 	/**
 	 * This method is called when an object of type {@link Throwable} is created
@@ -24,7 +24,7 @@ public interface IExceptionTracingHook {
 	 *            The id of the constructor that constructed the
 	 *            {@link Throwable} object.
 	 * @param sensorTypeId
-	 *            The sensor type id of the {@link IExceptionTracingSensor}.
+	 *            The sensor type id of the {@link IExceptionSensor}.
 	 * @param exceptionObject
 	 *            The {@link Throwable} object itself.
 	 * @param parameters
@@ -47,7 +47,7 @@ public interface IExceptionTracingHook {
 	 * @param id
 	 *            The method id where the {@link Throwable} object was thrown.
 	 * @param sensorTypeId
-	 *            The sensor type id of the {@link IExceptionTracingSensor}.
+	 *            The sensor type id of the {@link IExceptionSensor}.
 	 * @param object
 	 *            The class itself which contains the hook.
 	 * @param exceptionObject
@@ -70,7 +70,7 @@ public interface IExceptionTracingHook {
 	 * @param id
 	 *            The method id where the {@link Throwable} object was handled.
 	 * @param sensorTypeId
-	 *            The sensor type id of the {@link IExceptionTracingSensor}.
+	 *            The sensor type id of the {@link IExceptionSensor}.
 	 * @param exceptionObject
 	 *            The {@link Throwable} object itself.
 	 * @param rsc

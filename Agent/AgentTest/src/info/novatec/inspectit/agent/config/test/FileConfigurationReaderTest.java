@@ -111,7 +111,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 	@Test
 	public void loadAndVerifyExceptionSensorNoParameter() throws ParserException, StorageException {
-		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor";
+		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionSensor";
 		String name = "exception-sensor";
 		String targetClass = "java.lang.Throwable";
 		writer.println(name + " " + targetClass);
@@ -126,7 +126,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 	@Test
 	public void loadAndVerifyExceptionSensorOneParameter() throws ParserException, StorageException {
-		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor";
+		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionSensor";
 		String name = "exception-sensor";
 		String targetClass = "java.lang.Throwable superclass=true";
 		writer.println(name + " " + targetClass);
@@ -144,7 +144,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 	@Test
 	public void loadAndVerifyExceptionSensorWildcardParameter() throws ParserException, StorageException {
-		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor";
+		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionSensor";
 		String name = "exception-sensor";
 		String targetClass = "java.lang.*";
 		writer.println(name + " " + targetClass);

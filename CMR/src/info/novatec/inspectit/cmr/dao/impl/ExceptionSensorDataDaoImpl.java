@@ -26,10 +26,10 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public List<ExceptionSensorData> getExceptionTreeOverview(ExceptionSensorData template, int limit) {
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit) {
 		// checks whether limit is set to show all elements
 		if (limit == -1) {
-			return getExceptionTreeOverview(template);
+			return getUngroupedExceptionOverview(template);
 		}
 
 		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
@@ -45,7 +45,7 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public List<ExceptionSensorData> getExceptionTreeOverview(ExceptionSensorData template) {
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template) {
 		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
 		criteria.add(Restrictions.gt("this.id", template.getId()));
 		criteria.add(Restrictions.eq("this.platformIdent", template.getPlatformIdent()));
@@ -59,7 +59,7 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public List<ExceptionSensorData> getExceptionTreeDetails(ExceptionSensorData template) {
+	public List<ExceptionSensorData> getExceptionTree(ExceptionSensorData template) {
 		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
 		criteria.add(Restrictions.eq("this.platformIdent", template.getPlatformIdent()));
 		criteria.add(Restrictions.eq("this.throwableIdentityHashCode", template.getThrowableIdentityHashCode()));
@@ -77,7 +77,7 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public List<ExceptionSensorData> getExceptionOverview(ExceptionSensorData template) {
+	public List<ExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template) {
 		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
 		criteria.add(Restrictions.eq("this.platformIdent", template.getPlatformIdent()));
 		ProjectionList projectionList = Projections.projectionList();

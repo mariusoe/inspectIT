@@ -1,9 +1,7 @@
 package info.novatec.inspectit.rcp.editor.tree;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -83,7 +81,7 @@ public class DeferredTreeViewer extends TreeViewer {
 			ViewerFilter filter = filters[i];
 			childElements = filter.filter(this, parentElement, childElements);
 		}
-		
+
 		super.internalAdd(widget, parentElement, childElements);
 
 		// check if we are currently in the process of expanding the child

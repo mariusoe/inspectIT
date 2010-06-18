@@ -67,8 +67,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		Map<String, String> settings = new HashMap<String, String>(1);
 		settings.put("mode", "optimized");
 		configurationStorage.addMethodSensorType("timer", "info.novatec.inspectit.agent.sensor.method.timer.TimerSensor", PriorityEnum.MAX, settings);
-		configurationStorage.addMethodSensorType("isequence", "info.novatec.inspectit.agent.sensor.method.invocationsequence.InvocationSequenceSensor",
-				PriorityEnum.INVOC, null);
+		configurationStorage.addMethodSensorType("isequence", "info.novatec.inspectit.agent.sensor.method.invocationsequence.InvocationSequenceSensor", PriorityEnum.INVOC, null);
 
 		// platform sensor types
 		configurationStorage.addPlatformSensorType("info.novatec.inspectit.agent.sensor.platform.ClassLoadingInformation", null);
@@ -76,23 +75,22 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		configurationStorage.addPlatformSensorType("info.novatec.inspectit.agent.sensor.platform.RuntimeInformation", null);
 
 		// exception sensor
-		configurationStorage.addExceptionSensorType("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor", null);
+		configurationStorage.addExceptionSensorType("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor", null);
 
 		// exception sensor parameters
 		settings = new HashMap<String, String>();
 		settings.put("superclass", "true");
-		configurationStorage.addExceptionSensorTypeParameter("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor", "java.lang.Throwable",
-				false, settings);
+		configurationStorage.addExceptionSensorTypeParameter("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor", "java.lang.Throwable", false, settings);
 
 		settings = new HashMap<String, String>();
 		settings.put("interface", "true");
-		configurationStorage.addExceptionSensorTypeParameter("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor",
-				"info.novatec.inspectit.agent.analyzer.test.classes.IException", false, settings);
+		configurationStorage.addExceptionSensorTypeParameter("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor", "info.novatec.inspectit.agent.analyzer.test.classes.IException", false,
+				settings);
 
-		configurationStorage.addExceptionSensorTypeParameter("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor",
-				"info.novatec.inspectit.agent.analyzer.test.classes.My*Exception", true, Collections.EMPTY_MAP);
-		configurationStorage.addExceptionSensorTypeParameter("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor",
-				"info.novatec.inspectit.agent.analyzer.test.classes.MyException", false, Collections.EMPTY_MAP);
+		configurationStorage.addExceptionSensorTypeParameter("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor", "info.novatec.inspectit.agent.analyzer.test.classes.My*Exception", true,
+				Collections.EMPTY_MAP);
+		configurationStorage.addExceptionSensorTypeParameter("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor", "info.novatec.inspectit.agent.analyzer.test.classes.MyException", false,
+				Collections.EMPTY_MAP);
 
 		// sending strategies
 		settings = new HashMap<String, String>(1);
@@ -109,13 +107,11 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		// sensor definitions
 		configurationStorage.addSensor("TimerSensorTest", "timer", "*", "*", null, true, null);
 
-		configurationStorage
-				.addSensor("InvocSensorTest", "isequence", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", null, true, null);
+		configurationStorage.addSensor("InvocSensorTest", "isequence", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", null, true, null);
 
 		List<String> parameterList = new ArrayList<String>();
 		parameterList.add("java.lang.String");
-		configurationStorage.addSensor("ParameterTest", "timer", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", parameterList, false,
-				null);
+		configurationStorage.addSensor("ParameterTest", "timer", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", parameterList, false, null);
 
 		settings = new HashMap<String, String>();
 		settings.put("interface", "true");
@@ -123,8 +119,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 		settings = new HashMap<String, String>();
 		settings.put("superclass", "true");
-		configurationStorage.addSensor("SuperclassTest", "isequence", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", null, true,
-				settings);
+		configurationStorage.addSensor("SuperclassTest", "isequence", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", null, true, settings);
 
 		Map<String, List<String>> fieldSettings = new HashMap<String, List<String>>();
 		List<String> list = new ArrayList<String>();
@@ -301,7 +296,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		assertEquals(configs.size(), 1);
 
 		MethodSensorTypeConfig config = configs.get(0);
-		assertEquals(config.getClassName(), "info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
+		assertEquals(config.getClassName(), "info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
 		assertNotNull(config.getParameters());
 		assertEquals(config.getParameters().size(), 0);
 		assertNull(config.getSensorType());

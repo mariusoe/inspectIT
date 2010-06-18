@@ -28,8 +28,8 @@ import info.novatec.inspectit.agent.hooking.IHookInstrumenter;
 import info.novatec.inspectit.agent.hooking.impl.HookDispatcher;
 import info.novatec.inspectit.agent.hooking.impl.HookInstrumenter;
 import info.novatec.inspectit.agent.sending.ISendingStrategy;
-import info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor;
-import info.novatec.inspectit.agent.sensor.exception.IExceptionTracingSensor;
+import info.novatec.inspectit.agent.sensor.exception.ExceptionSensor;
+import info.novatec.inspectit.agent.sensor.exception.IExceptionSensor;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 import info.novatec.inspectit.agent.sensor.method.jdbc.StatementStorage;
 import info.novatec.inspectit.agent.sensor.platform.IPlatformSensor;
@@ -80,7 +80,7 @@ public class PicoAgent {
 	 * them.
 	 */
 	private static final String[] IGNORE_START_PATTERNS = new String[] { "info.novatec.inspectit.", "sun.misc.reflect", "$Proxy" };
-	
+
 	/**
 	 * These patterns are checked in the
 	 * {@link #inspectByteCode(byte[], String, ClassLoader)} method to ignore
@@ -118,13 +118,13 @@ public class PicoAgent {
 	public static PicoAgent getInstance() {
 		return instance;
 	}
-	
+
 	/**
 	 * Initialize this class, more specific the Pico container. It will register
 	 * every needed component.
 	 */
 	private void init() {
-		
+
 		try {
 			// Use the caching mechanism. This is where a component has a single
 			// instance in the container rather that a new one created each time
@@ -140,7 +140,7 @@ public class PicoAgent {
 			pico.registerComponentImplementation(IIdManager.class, IdManager.class);
 			pico.registerComponentImplementation(IConnection.class, RMIConnection.class);
 			pico.registerComponentImplementation(IVersioningService.class, FileBasedVersioningServiceImpl.class);
-			
+
 			// we have to load the configuration before we register everything
 			// else, otherwise some classes won't be available (buffer and
 			// sending strategies for example).
@@ -168,7 +168,7 @@ public class PicoAgent {
 
 			for (Iterator iterator = configurationStorage.getExceptionSensorTypes().iterator(); iterator.hasNext();) {
 				MethodSensorTypeConfig config = (MethodSensorTypeConfig) iterator.next();
-				IExceptionTracingSensor exceptionSensor = this.initExceptionTracingSensor(config);
+				IExceptionSensor exceptionSensor = this.initExceptionSensor(config);
 				config.setSensorType(exceptionSensor);
 			}
 
@@ -186,18 +186,18 @@ public class PicoAgent {
 			pico.registerComponentImplementation(IHookDispatcher.class, HookDispatcher.class);
 
 			pico.start();
-			
+
 			// Provide the version number output during the startup of the agent
 			if (LOGGER.isLoggable(Level.INFO)) {
 				String currentVersion = "n/a";
 				try {
-					currentVersion = ((IVersioningService)pico.getComponentInstance(IVersioningService.class)).getVersion();
+					currentVersion = ((IVersioningService) pico.getComponentInstance(IVersioningService.class)).getVersion();
 				} catch (IOException e) {
 					if (LOGGER.isLoggable(Level.FINE)) {
 						LOGGER.log(Level.FINE, "Versioning information could not be read", e);
 					}
 				}
-				LOGGER.info("Using agent version "+currentVersion);
+				LOGGER.info("Using agent version " + currentVersion);
 			}
 
 			hookDispatcher = (IHookDispatcher) pico.getComponentInstance(IHookDispatcher.class);
@@ -273,22 +273,22 @@ public class PicoAgent {
 	}
 
 	/**
-	 * Initializes the {@link ExceptionTracingSensor} saved in the configuration
+	 * Initializes the {@link ExceptionSensor} saved in the configuration
 	 * storage.
 	 * 
 	 * @param config
 	 *            The exception sensor configuration
-	 * @return The instantiated {@link ExceptionTracingSensor}.
+	 * @return The instantiated {@link ExceptionSensor}.
 	 * @throws Exception
 	 *             Root exception thrown if something happens while trying to
 	 *             instantiate the exception sensor type.
 	 */
-	private IExceptionTracingSensor initExceptionTracingSensor(MethodSensorTypeConfig config) throws Exception {
+	private IExceptionSensor initExceptionSensor(MethodSensorTypeConfig config) throws Exception {
 		Class exceptionSensorClass = Class.forName(config.getClassName());
 
 		// Workaround to instantiate the class with the correct parameters
 		pico.registerComponentImplementation(exceptionSensorClass);
-		IExceptionTracingSensor exceptionSensor = (IExceptionTracingSensor) pico.getComponentInstance(exceptionSensorClass);
+		IExceptionSensor exceptionSensor = (IExceptionSensor) pico.getComponentInstance(exceptionSensorClass);
 		exceptionSensor.init(config.getParameters());
 
 		return exceptionSensor;
@@ -351,7 +351,7 @@ public class PicoAgent {
 				return null;
 			}
 		}
-		
+
 		// ignore all classes which fit to these patterns
 		for (int i = 0; i < IGNORE_END_PATTERNS.length; i++) {
 			String ignorePattern = IGNORE_END_PATTERNS[i];

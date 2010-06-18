@@ -1,4 +1,4 @@
-package info.novatec.inspectit.rcp.editor.exception;
+package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 
@@ -6,7 +6,7 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ui.progress.IDeferredWorkbenchAdapter;
 
 /**
- * Adapter Factory which is used to create the {@link DeferredExceptionTree}
+ * Adapter Factory which is used to create the {@link DeferredStackTracesForErrorMessage}
  * objects if the adaptable object is of type {@link ExceptionSensorData}.
  * 
  * @author Eduard Tudenhoefner
@@ -21,7 +21,7 @@ public class DeferredExceptionTreeAdapterFactory implements IAdapterFactory {
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (IDeferredWorkbenchAdapter.class == adapterType) {
 			if (adaptableObject instanceof ExceptionSensorData) {
-				return new DeferredStackTraces();
+				return new DeferredStackTracesForErrorMessage();
 			}
 		}
 		return null;

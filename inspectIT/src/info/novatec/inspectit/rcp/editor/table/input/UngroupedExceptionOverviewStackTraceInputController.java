@@ -1,4 +1,4 @@
-package info.novatec.inspectit.rcp.editor.exception.input;
+package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.DefaultData;
@@ -7,7 +7,6 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
-import info.novatec.inspectit.rcp.editor.table.input.AbstractTableInputController;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
@@ -29,18 +28,18 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * This input controller shows the details of the stack trace of a selection
- * exception class.
+ * This input controller shows the details of the stack trace of a selected
+ * exception class in the {@link UngroupedExceptionOverviewInputController}.
  * 
  * @author Eduard Tudenhoefner
  * 
  */
-public class ExceptionTreeStackTraceInputController extends AbstractTableInputController {
+public class UngroupedExceptionOverviewStackTraceInputController extends AbstractTableInputController {
 
 	/**
 	 * The ID of this subview / controller.
 	 */
-	public static final String ID = "inspectit.subview.tree.exceptiontreestacktrace";
+	public static final String ID = "inspectit.subview.table.ungroupedexceptionoverviewstacktrace";
 
 	/**
 	 * The cache holding the color objects which are disposed at the end.
@@ -133,14 +132,14 @@ public class ExceptionTreeStackTraceInputController extends AbstractTableInputCo
 	 * {@inheritDoc}
 	 */
 	public IContentProvider getContentProvider() {
-		return new ExceptionTreeStackTraceContentProvider();
+		return new UngroupedExceptionOverviewStackTraceContentProvider();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public IBaseLabelProvider getLabelProvider() {
-		return new ExceptionTreeStackTraceLabelProvider();
+		return new UngroupedExceptionOverviewStackTraceLabelProvider();
 	}
 
 	/**
@@ -171,12 +170,12 @@ public class ExceptionTreeStackTraceInputController extends AbstractTableInputCo
 	}
 
 	/**
-	 * The exception tree detail label provider for this view.
+	 * The ungrouped exception overview stack trace label provider for this view.
 	 * 
 	 * @author Eduard Tudenhoefner
 	 * 
 	 */
-	private final class ExceptionTreeStackTraceLabelProvider extends StyledCellIndexLabelProvider {
+	private final class UngroupedExceptionOverviewStackTraceLabelProvider extends StyledCellIndexLabelProvider {
 
 		/**
 		 * Creates the styled text.
@@ -257,7 +256,7 @@ public class ExceptionTreeStackTraceInputController extends AbstractTableInputCo
 	 * @author Eduard Tudenhoefner
 	 * 
 	 */
-	private static final class ExceptionTreeStackTraceContentProvider implements IStructuredContentProvider {
+	private static final class UngroupedExceptionOverviewStackTraceContentProvider implements IStructuredContentProvider {
 
 		/**
 		 * {@inheritDoc}

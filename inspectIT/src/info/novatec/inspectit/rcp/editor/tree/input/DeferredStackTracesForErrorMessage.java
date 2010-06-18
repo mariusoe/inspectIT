@@ -1,10 +1,9 @@
-package info.novatec.inspectit.rcp.editor.exception;
+package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.exception.input.ExceptionMessagesTreeInputController;
-import info.novatec.inspectit.rcp.editor.exception.input.ExceptionOverviewInputController.ExtendedExceptionSensorData;
+import info.novatec.inspectit.rcp.editor.table.input.GroupedExceptionOverviewInputController.ExtendedExceptionSensorData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +19,7 @@ import org.eclipse.ui.progress.IElementCollector;
  * @author Eduard Tudenhoefner
  * 
  */
-public class DeferredStackTraces implements IDeferredWorkbenchAdapter {
+public class DeferredStackTracesForErrorMessage implements IDeferredWorkbenchAdapter {
 
 	/**
 	 * {@inheritDoc}

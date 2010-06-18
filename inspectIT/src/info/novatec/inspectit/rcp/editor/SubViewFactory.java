@@ -5,19 +5,17 @@ import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.composite.GridCompositeSubView;
 import info.novatec.inspectit.rcp.editor.composite.SashCompositeSubView;
 import info.novatec.inspectit.rcp.editor.composite.TabbedCompositeSubView;
-import info.novatec.inspectit.rcp.editor.exception.input.ExceptionMessagesTreeInputController;
-import info.novatec.inspectit.rcp.editor.exception.input.ExceptionOverviewInputController;
-import info.novatec.inspectit.rcp.editor.exception.input.ExceptionTreeDetailInputController;
-import info.novatec.inspectit.rcp.editor.exception.input.ExceptionTreeOverviewInputController;
-import info.novatec.inspectit.rcp.editor.exception.input.ExceptionTreeStackTraceInputController;
 import info.novatec.inspectit.rcp.editor.graph.GraphSubView;
 import info.novatec.inspectit.rcp.editor.table.TableSubView;
 import info.novatec.inspectit.rcp.editor.table.input.AggregatedTimerSummaryInputController;
 import info.novatec.inspectit.rcp.editor.table.input.CombinedMetricsInputController;
+import info.novatec.inspectit.rcp.editor.table.input.GroupedExceptionOverviewInputController;
 import info.novatec.inspectit.rcp.editor.table.input.InvocOverviewInputController;
 import info.novatec.inspectit.rcp.editor.table.input.MethodInvocInputController;
 import info.novatec.inspectit.rcp.editor.table.input.SqlInputController;
 import info.novatec.inspectit.rcp.editor.table.input.SqlInvocInputController;
+import info.novatec.inspectit.rcp.editor.table.input.UngroupedExceptionOverviewInputController;
+import info.novatec.inspectit.rcp.editor.table.input.UngroupedExceptionOverviewStackTraceInputController;
 import info.novatec.inspectit.rcp.editor.text.TextSubView;
 import info.novatec.inspectit.rcp.editor.text.input.ClassesInputController;
 import info.novatec.inspectit.rcp.editor.text.input.CpuInputController;
@@ -26,6 +24,8 @@ import info.novatec.inspectit.rcp.editor.text.input.ThreadsInputController;
 import info.novatec.inspectit.rcp.editor.text.input.VmSummaryInputController;
 import info.novatec.inspectit.rcp.editor.traceinspector.TraceInspectorSubView;
 import info.novatec.inspectit.rcp.editor.tree.TreeSubView;
+import info.novatec.inspectit.rcp.editor.tree.input.ExceptionMessagesTreeInputController;
+import info.novatec.inspectit.rcp.editor.tree.input.ExceptionTreeInputController;
 import info.novatec.inspectit.rcp.editor.tree.input.InvocDetailInputController;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 
@@ -111,27 +111,27 @@ public final class SubViewFactory {
 			SashCompositeSubView sqlSashSubView = new SashCompositeSubView();
 			sqlSashSubView.addSubView(new TableSubView(new SqlInputController()));
 			return sqlSashSubView;
-		case EXCEPTION_TRACER:
-			SashCompositeSubView exceptionTracerSubView = new SashCompositeSubView();
-			ISubView exceptionTreeOverview = new TableSubView(new ExceptionTreeOverviewInputController());
+		case EXCEPTION_SENSOR:
+			SashCompositeSubView ungroupedExceptionSensorSubView = new SashCompositeSubView();
+			ISubView ungroupedExceptionOverview = new TableSubView(new UngroupedExceptionOverviewInputController());
 			TabbedCompositeSubView exceptionTreeTabbedSubView = new TabbedCompositeSubView();
-			ISubView exceptionTreeDetails = new TreeSubView(new ExceptionTreeDetailInputController());
-			ISubView stackTraceInput = new TableSubView(new ExceptionTreeStackTraceInputController());
+			ISubView exceptionTree = new TreeSubView(new ExceptionTreeInputController());
+			ISubView stackTraceInput = new TableSubView(new UngroupedExceptionOverviewStackTraceInputController());
 
-			exceptionTreeTabbedSubView.addSubView(exceptionTreeDetails, "Details", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CALL_HIERARCHY));
+			exceptionTreeTabbedSubView.addSubView(exceptionTree, "Exception Tree", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_EXCEPTION_TREE));
 			exceptionTreeTabbedSubView.addSubView(stackTraceInput, "Stack Trace", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_STACKTRACE));
 
-			exceptionTracerSubView.addSubView(exceptionTreeOverview, 1);
-			exceptionTracerSubView.addSubView(exceptionTreeTabbedSubView, 2);
-			return exceptionTracerSubView;
-		case EXCEPTION_TRACER_OVERVIEW:
-			SashCompositeSubView exceptionTracerOverviewSubView = new SashCompositeSubView();
-			ISubView exceptionOverview = new TableSubView(new ExceptionOverviewInputController());
+			ungroupedExceptionSensorSubView.addSubView(ungroupedExceptionOverview, 1);
+			ungroupedExceptionSensorSubView.addSubView(exceptionTreeTabbedSubView, 2);
+			return ungroupedExceptionSensorSubView;
+		case EXCEPTION_SENSOR_GROUPED:
+			SashCompositeSubView groupedExceptionSensorSubView = new SashCompositeSubView();
+			ISubView groupedExceptionOverview = new TableSubView(new GroupedExceptionOverviewInputController());
 			ISubView exceptionMessagesTree = new TreeSubView(new ExceptionMessagesTreeInputController());
 
-			exceptionTracerOverviewSubView.addSubView(exceptionOverview, 1);
-			exceptionTracerOverviewSubView.addSubView(exceptionMessagesTree, 2);
-			return exceptionTracerOverviewSubView;
+			groupedExceptionSensorSubView.addSubView(groupedExceptionOverview, 1);
+			groupedExceptionSensorSubView.addSubView(exceptionMessagesTree, 2);
+			return groupedExceptionSensorSubView;
 		case MARVIN_WORKFLOW:
 			GridCompositeSubView combinedMetricsSubView = new GridCompositeSubView();
 			ISubView combinedMetricsSummarySubView = new TableSubView(new CombinedMetricsInputController());

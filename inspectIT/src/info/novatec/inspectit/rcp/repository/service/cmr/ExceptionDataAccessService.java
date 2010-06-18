@@ -54,11 +54,11 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public List<ExceptionSensorData> getExceptionTreeDetails(ExceptionSensorData template) {
+	public List<ExceptionSensorData> getExceptionTree(ExceptionSensorData template) {
 		try {
-			return exceptionDataAccessService.getExceptionTreeDetails(template);
+			return exceptionDataAccessService.getExceptionTree(template);
 		} catch (Exception e) {
-			InspectIT.getDefault().createErrorDialog("There was an error retrieving the exception tree details from the CMR!", e, -1);
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the exception tree from the CMR!", e, -1);
 			return Collections.EMPTY_LIST;
 		}
 	}
@@ -67,11 +67,11 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public List<ExceptionSensorData> getExceptionTreeOverview(ExceptionSensorData template, int limit) {
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit) {
 		try {
-			return exceptionDataAccessService.getExceptionTreeOverview(template, limit);
+			return exceptionDataAccessService.getUngroupedExceptionOverview(template, limit);
 		} catch (Exception e) {
-			InspectIT.getDefault().createErrorDialog("There was an error retrieving the exception tree overview from the CMR!", e, -1);
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the ungrouped exception overview from the CMR!", e, -1);
 			return Collections.EMPTY_LIST;
 		}
 	}
@@ -80,11 +80,11 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public List<ExceptionSensorData> getExceptionTreeOverview(ExceptionSensorData template) {
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template) {
 		try {
-			return exceptionDataAccessService.getExceptionTreeOverview(template);
+			return exceptionDataAccessService.getUngroupedExceptionOverview(template);
 		} catch (Exception e) {
-			InspectIT.getDefault().createErrorDialog("There was an error retrieving the exception tree overview from the CMR!", e, -1);
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the ungrouped exception overview from the CMR!", e, -1);
 			return Collections.EMPTY_LIST;
 		}
 	}
@@ -93,11 +93,11 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public List<ExceptionSensorData> getExceptionOverview(ExceptionSensorData template) {
+	public List<ExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template) {
 		try {
-			return exceptionDataAccessService.getExceptionOverview(template);
+			return exceptionDataAccessService.getDataForGroupedExceptionOverview(template);
 		} catch (Exception e) {
-			InspectIT.getDefault().createErrorDialog("There was an error retrieving the exception overview from the CMR!", e, -1);
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the data for the grouped exception overview from the CMR!", e, -1);
 			return Collections.EMPTY_LIST;
 		}
 	}

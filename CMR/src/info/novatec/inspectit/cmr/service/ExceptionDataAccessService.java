@@ -31,9 +31,9 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<ExceptionSensorData> getExceptionTreeOverview(ExceptionSensorData template, int limit) {
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit) {
 		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("--> ExceptionDataAccessService.getExceptionTreeOverview()");
+			LOGGER.trace("--> ExceptionDataAccessService.getUngroupedExceptionOverview()");
 		}
 
 		long time = 0;
@@ -41,14 +41,14 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 			time = System.nanoTime();
 		}
 
-		List<ExceptionSensorData> result = exceptionSensorDataDao.getExceptionTreeOverview(template, limit);
+		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template, limit);
 
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Get exception tree overview duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+			LOGGER.debug("Get ungrouped exception overview duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
 		}
 
 		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("<-- ExceptionDataAccessService.getExceptionTreeOverview()");
+			LOGGER.trace("<-- ExceptionDataAccessService.getUngroupedExceptionOverview()");
 		}
 
 		return result;
@@ -57,9 +57,9 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<ExceptionSensorData> getExceptionTreeOverview(ExceptionSensorData template) {
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template) {
 		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("--> ExceptionDataAccessService.getExceptionTreeOverview()");
+			LOGGER.trace("--> ExceptionDataAccessService.getUngroupedExceptionOverview()");
 		}
 
 		long time = 0;
@@ -67,14 +67,14 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 			time = System.nanoTime();
 		}
 
-		List<ExceptionSensorData> result = exceptionSensorDataDao.getExceptionTreeOverview(template);
+		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template);
 
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Get exception tree overview duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+			LOGGER.debug("Get ungrouped exception overview duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
 		}
 
 		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("<-- ExceptionDataAccessService.getExceptionTreeOverview()");
+			LOGGER.trace("<-- ExceptionDataAccessService.getUngroupedExceptionOverview()");
 		}
 
 		return result;
@@ -83,9 +83,9 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<ExceptionSensorData> getExceptionTreeDetails(ExceptionSensorData template) {
+	public List<ExceptionSensorData> getExceptionTree(ExceptionSensorData template) {
 		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("--> ExceptionDataAccessService.getExceptionTreeDetails()");
+			LOGGER.trace("--> ExceptionDataAccessService.getExceptionTree()");
 		}
 
 		long time = 0;
@@ -93,14 +93,14 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 			time = System.nanoTime();
 		}
 
-		List<ExceptionSensorData> result = exceptionSensorDataDao.getExceptionTreeDetails(template);
+		List<ExceptionSensorData> result = exceptionSensorDataDao.getExceptionTree(template);
 
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Get exception tree details duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+			LOGGER.debug("Get exception tree duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
 		}
 
 		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("<-- ExceptionDataAccessService.getExceptionTreeDetails()");
+			LOGGER.trace("<-- ExceptionDataAccessService.getExceptionTree()");
 		}
 
 		return result;
@@ -109,9 +109,9 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<ExceptionSensorData> getExceptionOverview(ExceptionSensorData template) {
+	public List<ExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template) {
 		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("--> ExceptionDataAccessService.getExceptionOverview()");
+			LOGGER.trace("--> ExceptionDataAccessService.getDataForGroupedExceptionOverview()");
 		}
 
 		long time = 0;
@@ -119,14 +119,14 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 			time = System.nanoTime();
 		}
 
-		List<ExceptionSensorData> result = exceptionSensorDataDao.getExceptionOverview(template);
+		List<ExceptionSensorData> result = exceptionSensorDataDao.getDataForGroupedExceptionOverview(template);
 
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Get exception overview duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+			LOGGER.debug("Get data for grouped exception overview duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
 		}
 
 		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("<-- ExceptionDataAccessService.getExceptionOverview()");
+			LOGGER.trace("<-- ExceptionDataAccessService.getDataForGroupedExceptionOverview()");
 		}
 
 		return result;

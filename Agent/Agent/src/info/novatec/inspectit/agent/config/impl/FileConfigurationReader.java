@@ -217,7 +217,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	private void processExceptionSensorLine(StringTokenizer tokenizer) throws ParserException {
 		// the sensor name is hardcoded here, because we don't define the
 		// fully-qualified name of the exception sensor in the config file.
-		String sensorTypeClass = "info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor";
+		String sensorTypeClass = "info.novatec.inspectit.agent.sensor.exception.ExceptionSensor";
 		String targetClassName = tokenizer.nextToken();
 		boolean isVirtual = false;
 

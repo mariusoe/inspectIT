@@ -5,7 +5,7 @@ import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import java.util.List;
 
 /**
- * This layer is used to access the exception tracer information.
+ * This layer is used to access the exception sensor information.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -23,7 +23,7 @@ public interface ExceptionSensorDataDao {
 	 * @return List of {@link ExceptionSensorData} objects to get an overview of
 	 *         recorded Exceptions.
 	 */
-	List<ExceptionSensorData> getExceptionTreeOverview(ExceptionSensorData template, int limit);
+	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects. This list can be
@@ -34,7 +34,7 @@ public interface ExceptionSensorDataDao {
 	 * @return List of {@link ExceptionSensorData} objects to get an overview of
 	 *         recorded Exceptions.
 	 */
-	List<ExceptionSensorData> getExceptionTreeOverview(ExceptionSensorData template);
+	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects containing all
@@ -45,7 +45,7 @@ public interface ExceptionSensorDataDao {
 	 * @return List of {@link ExceptionSensorData} objects containing all
 	 *         details of a specific Exception class.
 	 */
-	List<ExceptionSensorData> getExceptionTreeDetails(ExceptionSensorData template);
+	List<ExceptionSensorData> getExceptionTree(ExceptionSensorData template);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects that is used to
@@ -57,7 +57,7 @@ public interface ExceptionSensorDataDao {
 	 * @return A list of {@link ExceptionSensorData} objects with additional
 	 *         information about how often a specific eventType was caused.
 	 */
-	List<ExceptionSensorData> getExceptionOverview(ExceptionSensorData template);
+	List<ExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} object where all fields are

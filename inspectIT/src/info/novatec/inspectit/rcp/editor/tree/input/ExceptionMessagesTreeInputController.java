@@ -1,16 +1,14 @@
-package info.novatec.inspectit.rcp.editor.exception.input;
+package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.exception.DeferredStackTraces;
-import info.novatec.inspectit.rcp.editor.exception.input.ExceptionOverviewInputController.ExtendedExceptionSensorData;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.table.input.GroupedExceptionOverviewInputController.ExtendedExceptionSensorData;
 import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
-import info.novatec.inspectit.rcp.editor.tree.input.TreeInputController;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 
 import java.util.ArrayList;
@@ -50,7 +48,7 @@ public class ExceptionMessagesTreeInputController implements TreeInputController
 	/**
 	 * The ID of this subview / controller.
 	 */
-	public static final String ID = "inspectit.subview.table.exceptionmessagestree";
+	public static final String ID = "inspectit.subview.tree.exceptionmessagestree";
 
 	/**
 	 * The list of invocation sequence data objects which is displayed.
@@ -335,7 +333,7 @@ public class ExceptionMessagesTreeInputController implements TreeInputController
 		private DeferredTreeContentManager manager;
 
 		/**
-		 * The inputDefinition that is needed in {@link DeferredStackTraces}.
+		 * The inputDefinition that is needed in {@link DeferredStackTracesForErrorMessage}.
 		 * 
 		 */
 		private InputDefinition inputDefinition;

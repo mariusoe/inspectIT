@@ -15,8 +15,8 @@ import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
 import info.novatec.inspectit.agent.hooking.IHookInstrumenter;
-import info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor;
-import info.novatec.inspectit.agent.sensor.exception.IExceptionTracingSensor;
+import info.novatec.inspectit.agent.sensor.exception.ExceptionSensor;
+import info.novatec.inspectit.agent.sensor.exception.IExceptionSensor;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.javassist.CannotCompileException;
@@ -189,7 +189,7 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 		ClassPool classPool = ClassPool.getDefault();
 		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(classPool);
 		when(inheritanceAnalyzer.subclassOf(className, "java.lang.Throwable", classPool)).thenReturn(true);
-		IExceptionTracingSensor exceptionSensor = mock(ExceptionTracingSensor.class);
+		IExceptionSensor exceptionSensor = mock(ExceptionSensor.class);
 
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
 		when(sensorTypeConfig.getName()).thenReturn(exceptionSensor.getClass().getName());

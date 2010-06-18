@@ -1,4 +1,4 @@
-package info.novatec.inspectit.rcp.editor.exception.input;
+package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.DefaultData;
@@ -9,7 +9,6 @@ import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
-import info.novatec.inspectit.rcp.editor.tree.input.TreeInputController;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
@@ -53,12 +52,12 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  * @author Eduard Tudenhoefner
  * 
  */
-public class ExceptionTreeDetailInputController implements TreeInputController {
+public class ExceptionTreeInputController implements TreeInputController {
 
 	/**
 	 * The ID of this subview / controller.
 	 */
-	public static final String ID = "inspectit.subview.tree.exceptiontreedetail";
+	public static final String ID = "inspectit.subview.tree.exceptiontree";
 
 	/**
 	 * The list of {@link ExceptionSensorData} objects which is displayed.
@@ -173,14 +172,14 @@ public class ExceptionTreeDetailInputController implements TreeInputController {
 	 * {@inheritDoc}
 	 */
 	public IContentProvider getContentProvider() {
-		return new ExceptionTreeDetailContentProvider();
+		return new ExceptionTreeContentProvider();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public IBaseLabelProvider getLabelProvider() {
-		return new ExceptionTreeDetailLabelProvider();
+		return new ExceptionTreeLabelProvider();
 	}
 
 	/**
@@ -223,7 +222,7 @@ public class ExceptionTreeDetailInputController implements TreeInputController {
 		boolean showDialogMenu = false;
 		boolean showPersistActions = true;
 		String titleText = TextFormatter.getMethodString(methodIdent);
-		String infoText = "Exception Tree Details";
+		String infoText = "Exception Tree";
 
 		PopupDialog dialog = new PopupDialog(parent, shellStyle, takeFocusOnOpen, persistSize, persistLocation, showDialogMenu, showPersistActions, titleText, infoText) {
 			private static final int CURSOR_SIZE = 15;
@@ -307,12 +306,12 @@ public class ExceptionTreeDetailInputController implements TreeInputController {
 	}
 
 	/**
-	 * The exception tree detail label provider for this view.
+	 * The exception tree details label provider for this view.
 	 * 
 	 * @author Eduard Tudenhoefner
 	 * 
 	 */
-	private final class ExceptionTreeDetailLabelProvider extends StyledCellIndexLabelProvider {
+	private final class ExceptionTreeLabelProvider extends StyledCellIndexLabelProvider {
 
 		/**
 		 * Creates the styled text.
@@ -351,7 +350,7 @@ public class ExceptionTreeDetailInputController implements TreeInputController {
 			case METHOD_CONSTRUCTOR:
 				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers());
 				Image image = null;
-				
+
 				// first look for the image in the cache
 				if (modifiersImageCache.containsKey(imageDescriptor)) {
 					image = modifiersImageCache.get(imageDescriptor);
@@ -426,12 +425,12 @@ public class ExceptionTreeDetailInputController implements TreeInputController {
 	}
 
 	/**
-	 * The exception tree detail content provider for this view.
+	 * The exception tree details content provider for this view.
 	 * 
 	 * @author Eduard Tudenhoefner
 	 * 
 	 */
-	private static final class ExceptionTreeDetailContentProvider implements ITreeContentProvider {
+	private static final class ExceptionTreeContentProvider implements ITreeContentProvider {
 
 		/**
 		 * {@inheritDoc}

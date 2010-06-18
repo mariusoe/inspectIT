@@ -17,7 +17,7 @@ import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
-import info.novatec.inspectit.agent.sensor.exception.ExceptionTracingHook;
+import info.novatec.inspectit.agent.sensor.exception.ExceptionSensorHook;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.ExceptionEventEnum;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
@@ -32,7 +32,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 
-public class ExceptionTracingHookTest extends AbstractLogSupport {
+public class ExceptionSensorHookTest extends AbstractLogSupport {
 	@Mock
 	private IIdManager idManager;
 
@@ -42,7 +42,7 @@ public class ExceptionTracingHookTest extends AbstractLogSupport {
 	@Mock
 	private RegisteredSensorConfig registeredSensorConfig;
 
-	private ExceptionTracingHook exceptionHook;
+	private ExceptionSensorHook exceptionHook;
 
 	/**
 	 * {@inheritDoc}
@@ -54,7 +54,7 @@ public class ExceptionTracingHookTest extends AbstractLogSupport {
 
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {
-		exceptionHook = new ExceptionTracingHook(idManager);
+		exceptionHook = new ExceptionSensorHook(idManager);
 	}
 
 	@Test
@@ -245,17 +245,18 @@ public class ExceptionTracingHookTest extends AbstractLogSupport {
 		long registeredSensorTypeId = 13L;
 
 		Object[] parameters = new Object[0];
-		
-		// the actual error message is too long, so it should be cropped later on
+
+		// the actual error message is too long, so it should be cropped later
+		// on
 		MyTestException exceptionObject = new MyTestException(fillString('x', 1001));
-		
+
 		ExceptionSensorData exceptionSensorData = new ExceptionSensorData(new Timestamp(System.currentTimeMillis()), platformId, registeredSensorTypeId, registeredConstructorId);
 		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.CREATED);
 		exceptionSensorData.setThrowableIdentityHashCode(System.identityHashCode(exceptionObject));
-		
+
 		// the actual error message to be verified against
 		exceptionSensorData.setErrorMessage(fillString('x', 1000));
-		
+
 		when(idManager.getRegisteredMethodId(constructorId)).thenReturn(registeredConstructorId);
 		when(idManager.getRegisteredSensorTypeId(sensorTypeId)).thenReturn(registeredSensorTypeId);
 		when(idManager.getPlatformId()).thenReturn(platformId);

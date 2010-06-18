@@ -1,4 +1,4 @@
-package info.novatec.inspectit.rcp.editor.exception.input;
+package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.communication.DefaultData;
@@ -10,7 +10,6 @@ import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
-import info.novatec.inspectit.rcp.editor.table.input.AbstractTableInputController;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 
 import java.lang.reflect.InvocationTargetException;
@@ -47,12 +46,12 @@ import org.eclipse.ui.PlatformUI;
  * @author Eduard Tudenhoefner
  * 
  */
-public class ExceptionOverviewInputController extends AbstractTableInputController {
+public class GroupedExceptionOverviewInputController extends AbstractTableInputController {
 
 	/**
 	 * The ID of this subview / controller.
 	 */
-	public static final String ID = "inspectit.subview.table.exceptionoverview";
+	public static final String ID = "inspectit.subview.table.groupedexceptionoverview";
 
 	/**
 	 * The private inner enumeration used to define the used IDs which are
@@ -179,21 +178,21 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 	 * {@inheritDoc}
 	 */
 	public IContentProvider getContentProvider() {
-		return new ExceptionOverviewContentProvider();
+		return new GroupedExceptionOverviewContentProvider();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public IBaseLabelProvider getLabelProvider() {
-		return new ExceptionOverviewLabelProvider();
+		return new GroupedExceptionOverviewLabelProvider();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public TableViewerComparator<? extends DefaultData> getComparator() {
-		ExceptionOverviewViewerComparator exceptionOverviewViewerComparator = new ExceptionOverviewViewerComparator();
+		GroupedExceptionOverviewViewerComparator exceptionOverviewViewerComparator = new GroupedExceptionOverviewViewerComparator();
 		for (Column column : Column.values()) {
 			exceptionOverviewViewerComparator.addColumn(column.column.getColumn(), column);
 		}
@@ -218,9 +217,9 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 	@Override
 	@SuppressWarnings("unchecked")
 	public void doRefresh(IProgressMonitor monitor) {
-		monitor.beginTask("Updating Exception Overview", IProgressMonitor.UNKNOWN);
-		monitor.subTask("Retrieving the Exception Overview from the CMR");
-		List<ExceptionSensorData> ungroupedList = dataAccessService.getExceptionOverview(template);
+		monitor.beginTask("Updating Grouped Exception Overview", IProgressMonitor.UNKNOWN);
+		monitor.subTask("Retrieving the Grouped Exception Overview data from the CMR");
+		List<ExceptionSensorData> ungroupedList = dataAccessService.getDataForGroupedExceptionOverview(template);
 		List<ExtendedExceptionSensorData> groupedOverviewList = new ArrayList<ExtendedExceptionSensorData>();
 		overviewMap = new HashMap<String, List<ExtendedExceptionSensorData>>();
 
@@ -366,7 +365,7 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 	 * @author Eduard Tudenhoefner
 	 * 
 	 */
-	private final class ExceptionOverviewLabelProvider extends StyledCellIndexLabelProvider {
+	private final class GroupedExceptionOverviewLabelProvider extends StyledCellIndexLabelProvider {
 
 		/**
 		 * {@inheritDoc}
@@ -387,7 +386,7 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 	 * @author Eduard Tudenhoefner
 	 * 
 	 */
-	private static final class ExceptionOverviewContentProvider implements IStructuredContentProvider {
+	private static final class GroupedExceptionOverviewContentProvider implements IStructuredContentProvider {
 
 		/**
 		 * {@inheritDoc}
@@ -606,7 +605,7 @@ public class ExceptionOverviewInputController extends AbstractTableInputControll
 	 * @author Eduard Tudenhoefner
 	 * 
 	 */
-	private final class ExceptionOverviewViewerComparator extends TableViewerComparator<ExtendedExceptionSensorData> {
+	private final class GroupedExceptionOverviewViewerComparator extends TableViewerComparator<ExtendedExceptionSensorData> {
 
 		/**
 		 * {@inheritDoc}

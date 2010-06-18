@@ -48,7 +48,7 @@ public interface InspectITConstants {
 	String IMG_WORKFLOW = "workflow_icon.gif"; //$NON-NLS-1$
 	String IMG_ACTIVITY = "activity_icon.gif"; //$NON-NLS-1$
 	String IMG_EXCEPTION_TREE = "exceptiontree.gif"; //$NON-NLS-1$
-	String IMG_EXCEPTION_TRACER = "exceptiontracer.gif"; //$NON-NLS-1$
+	String IMG_EXCEPTION_SENSOR = "exceptiontracer.gif"; //$NON-NLS-1$
 	String IMG_STACKTRACE = "stacktrace.gif"; //$NON-NLS-1$
 	String IMG_ZOOMIN = "zoomin.png";
 	String IMG_ZOOMOUT = "zoomout.png";

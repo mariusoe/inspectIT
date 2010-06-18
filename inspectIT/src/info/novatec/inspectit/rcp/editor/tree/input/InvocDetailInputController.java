@@ -88,7 +88,7 @@ public class InvocDetailInputController implements TreeInputController {
 	/**
 	 * The default value of the selected sensor types.
 	 */
-	private Set<SensorTypeEnum> selectedSensorTypes = EnumSet.of(SensorTypeEnum.TIMER, SensorTypeEnum.INVOCATION_SEQUENCE, SensorTypeEnum.EXCEPTION_TRACER, SensorTypeEnum.JDBC_STATEMENT,
+	private Set<SensorTypeEnum> selectedSensorTypes = EnumSet.of(SensorTypeEnum.TIMER, SensorTypeEnum.INVOCATION_SEQUENCE, SensorTypeEnum.EXCEPTION_SENSOR, SensorTypeEnum.JDBC_STATEMENT,
 			SensorTypeEnum.JDBC_PREPARED_STATEMENT);
 
 	/**

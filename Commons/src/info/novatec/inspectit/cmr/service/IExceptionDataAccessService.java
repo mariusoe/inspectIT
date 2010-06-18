@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Service interface which defines the methods to retrieve data objects based on
- * the exception tracer recordings.
+ * the exception sensor recordings.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -15,7 +15,8 @@ public interface IExceptionDataAccessService {
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects. This list can be
-	 * used to get an overview over recorded Exceptions in a target application.
+	 * used to get an ungrouped overview over recorded Exceptions in a target
+	 * application.
 	 * 
 	 * @param template
 	 *            The template data object.
@@ -25,11 +26,12 @@ public interface IExceptionDataAccessService {
 	 *         used to get an overview over recorded Exceptions in a target
 	 *         application.
 	 */
-	List getExceptionTreeOverview(ExceptionSensorData template, int limit);
+	List getUngroupedExceptionOverview(ExceptionSensorData template, int limit);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects. This list can be
-	 * used to get an overview over recorded Exceptions in a target application.
+	 * used to get an ungrouped overview over recorded Exceptions in a target
+	 * application.
 	 * 
 	 * @param template
 	 *            The template data object.
@@ -37,7 +39,7 @@ public interface IExceptionDataAccessService {
 	 *         used to get an overview over recorded Exceptions in a target
 	 *         application.
 	 */
-	List getExceptionTreeOverview(ExceptionSensorData template);
+	List getUngroupedExceptionOverview(ExceptionSensorData template);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects containing all
@@ -48,7 +50,7 @@ public interface IExceptionDataAccessService {
 	 * @return List of {@link ExceptionSensorData} objects containing all
 	 *         details of a specific Exception class.
 	 */
-	List getExceptionTreeDetails(ExceptionSensorData template);
+	List getExceptionTree(ExceptionSensorData template);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects that is used to
@@ -60,7 +62,7 @@ public interface IExceptionDataAccessService {
 	 * @return A list of {@link ExceptionSensorData} objects with additional
 	 *         information about how often a specific eventType was caused.
 	 */
-	List getExceptionOverview(ExceptionSensorData template);
+	List getDataForGroupedExceptionOverview(ExceptionSensorData template);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} object where all fields are

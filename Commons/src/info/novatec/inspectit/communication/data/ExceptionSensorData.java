@@ -6,7 +6,7 @@ import info.novatec.inspectit.communication.MethodSensorData;
 import java.sql.Timestamp;
 
 /**
- * The exception tracer data object used to store all information collected on
+ * The exception sensor data object used to store all information collected on
  * an instrumented exception path.
  * 
  * @author Eduard Tudenhoefner

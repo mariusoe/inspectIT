@@ -92,7 +92,7 @@ public class TreeModelManager {
 			agentTree.addChild(getInvocationSequenceTree(platformIdent, repositoryDefinition));
 			agentTree.addChild(getSqlTree(platformIdent, repositoryDefinition));
 			agentTree.addChild(getSystemOverviewTree(platformIdent, repositoryDefinition));
-			agentTree.addChild(getExceptionTracerTree(platformIdent, repositoryDefinition));
+			agentTree.addChild(getExceptionSensorTree(platformIdent, repositoryDefinition));
 			agentTree.addChild(getCombinedMetricsTree(platformIdent, repositoryDefinition));
 
 			// add it to the list of the agents
@@ -680,27 +680,27 @@ public class TreeModelManager {
 	}
 
 	/**
-	 * Returns the exception tracer tree.
+	 * Returns the exception sensor tree.
 	 * 
 	 * @param platformIdent
 	 *            The {@link PlatformIdent} object used to create the tree.
 	 * @param definition
 	 *            The {@link RepositoryDefinition} object.
-	 * @return The exception tracer tree.
+	 * @return The exception sensor tree.
 	 */
-	private Component getExceptionTracerTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
-		Composite exceptionTracer = new Composite();
-		exceptionTracer.setName("Exception Tracer");
-		exceptionTracer.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_EXCEPTION_TRACER));
+	private Component getExceptionSensorTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
+		Composite exceptionSensor = new Composite();
+		exceptionSensor.setName("Exceptions");
+		exceptionSensor.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_EXCEPTION_SENSOR));
 
-		exceptionTracer.addChild(getExceptionTree(platformIdent, definition));
-		exceptionTracer.addChild(getExceptionOverview(platformIdent, definition));
+		exceptionSensor.addChild(getUngroupedExceptionOverview(platformIdent, definition));
+		exceptionSensor.addChild(getGroupedExceptionOverview(platformIdent, definition));
 
-		return exceptionTracer;
+		return exceptionSensor;
 	}
 
 	/**
-	 * Returns the Exception Tree.
+	 * Returns the ungrouped Exception Overview.
 	 * 
 	 * @param platformIdent
 	 *            The {@link PlatformIdent} object.
@@ -708,58 +708,58 @@ public class TreeModelManager {
 	 *            The {@link RepositoryDefinition} object.
 	 * @return The Exception Tree.
 	 */
-	private Component getExceptionTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
-		Component exceptionTree = new Leaf();
-		exceptionTree.setName("Exception Tree");
-		exceptionTree.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_EXCEPTION_TREE));
+	private Component getUngroupedExceptionOverview(PlatformIdent platformIdent, RepositoryDefinition definition) {
+		Component ungroupedExceptionOverview = new Leaf();
+		ungroupedExceptionOverview.setName("Show All");
+		ungroupedExceptionOverview.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_SHOW_ALL));
 
-		InputDefinition exceptionTreeInputDefinition = new InputDefinition();
-		exceptionTreeInputDefinition.setRepositoryDefinition(definition);
-		exceptionTreeInputDefinition.setId(SensorTypeEnum.EXCEPTION_TRACER);
-		exceptionTreeInputDefinition.setPartName("Exception Tracer (Exception Tree)");
-		exceptionTreeInputDefinition.setPartTooltip("Exception Tracer (Exception Tree)");
-		exceptionTreeInputDefinition.setImageDescriptor(SensorTypeEnum.EXCEPTION_TRACER.getImageDescriptor());
-		exceptionTreeInputDefinition.setHeaderText("Exception Tracer");
-		exceptionTreeInputDefinition.setHeaderDescription("Exception Tracer (" + platformIdent.getAgentName() + ")");
+		InputDefinition ungroupedExceptionOverviewInputDefinition = new InputDefinition();
+		ungroupedExceptionOverviewInputDefinition.setRepositoryDefinition(definition);
+		ungroupedExceptionOverviewInputDefinition.setId(SensorTypeEnum.EXCEPTION_SENSOR);
+		ungroupedExceptionOverviewInputDefinition.setPartName("Exceptions (Show All)");
+		ungroupedExceptionOverviewInputDefinition.setPartTooltip("Exceptions (Show All)");
+		ungroupedExceptionOverviewInputDefinition.setImageDescriptor(SensorTypeEnum.EXCEPTION_SENSOR.getImageDescriptor());
+		ungroupedExceptionOverviewInputDefinition.setHeaderText("Exceptions");
+		ungroupedExceptionOverviewInputDefinition.setHeaderDescription("Exceptions (" + platformIdent.getAgentName() + ")");
 
 		IdDefinition idDefinition = new IdDefinition();
 		idDefinition.setPlatformId(platformIdent.getId());
 
-		exceptionTreeInputDefinition.setIdDefinition(idDefinition);
-		exceptionTree.setInputDefinition(exceptionTreeInputDefinition);
+		ungroupedExceptionOverviewInputDefinition.setIdDefinition(idDefinition);
+		ungroupedExceptionOverview.setInputDefinition(ungroupedExceptionOverviewInputDefinition);
 
-		return exceptionTree;
+		return ungroupedExceptionOverview;
 	}
 
 	/**
-	 * Returns the Exception Tracer overview.
+	 * Returns the grouped Exception Overview.
 	 * 
 	 * @param platformIdent
 	 *            The {@link PlatformIdent} object.
 	 * @param definition
 	 *            The {@link RepositoryDefinition} object.
-	 * @return The Exception Tracer overview.
+	 * @return The Exception Sensor overview.
 	 */
-	private Component getExceptionOverview(PlatformIdent platformIdent, RepositoryDefinition definition) {
-		Component exceptionOverview = new Leaf();
-		exceptionOverview.setName("Exception Overview");
-		exceptionOverview.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CLASS_OVERVIEW));
+	private Component getGroupedExceptionOverview(PlatformIdent platformIdent, RepositoryDefinition definition) {
+		Component groupedExceptionOverview = new Leaf();
+		groupedExceptionOverview.setName("Grouped");
+		groupedExceptionOverview.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_FILTER));
 
-		InputDefinition exceptionOverviewInputDefinition = new InputDefinition();
-		exceptionOverviewInputDefinition.setRepositoryDefinition(definition);
-		exceptionOverviewInputDefinition.setId(SensorTypeEnum.EXCEPTION_TRACER_OVERVIEW);
-		exceptionOverviewInputDefinition.setPartName("Exception Tracer (Exception Overview)");
-		exceptionOverviewInputDefinition.setPartTooltip("Exception Tracer (Exception Overview)");
-		exceptionOverviewInputDefinition.setImageDescriptor(SensorTypeEnum.EXCEPTION_TRACER_OVERVIEW.getImageDescriptor());
-		exceptionOverviewInputDefinition.setHeaderText("Exception Tracer");
-		exceptionOverviewInputDefinition.setHeaderDescription("Exception Tracer (" + platformIdent.getAgentName() + ")");
+		InputDefinition groupedExceptionOverviewInputDefinition = new InputDefinition();
+		groupedExceptionOverviewInputDefinition.setRepositoryDefinition(definition);
+		groupedExceptionOverviewInputDefinition.setId(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED);
+		groupedExceptionOverviewInputDefinition.setPartName("Exceptions (Grouped)");
+		groupedExceptionOverviewInputDefinition.setPartTooltip("Exceptions (Grouped)");
+		groupedExceptionOverviewInputDefinition.setImageDescriptor(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED.getImageDescriptor());
+		groupedExceptionOverviewInputDefinition.setHeaderText("Exceptions");
+		groupedExceptionOverviewInputDefinition.setHeaderDescription("Exceptions (" + platformIdent.getAgentName() + ")");
 
 		IdDefinition idDefinition = new IdDefinition();
 		idDefinition.setPlatformId(platformIdent.getId());
-		exceptionOverviewInputDefinition.setIdDefinition(idDefinition);
-		exceptionOverview.setInputDefinition(exceptionOverviewInputDefinition);
+		groupedExceptionOverviewInputDefinition.setIdDefinition(idDefinition);
+		groupedExceptionOverview.setInputDefinition(groupedExceptionOverviewInputDefinition);
 
-		return exceptionOverview;
+		return groupedExceptionOverview;
 	}
 
 	/**

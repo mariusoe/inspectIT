@@ -21,15 +21,15 @@ import java.util.logging.Logger;
  * catching type {@link Throwable}.
  * 
  * @author Eduard Tudenhoefner
- * @see IExceptionTracingHook
+ * @see IExceptionSensorHook
  * 
  */
-public class ExceptionTracingHook implements IExceptionTracingHook {
+public class ExceptionSensorHook implements IExceptionSensorHook {
 
 	/**
 	 * The logger of this class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(ExceptionTracingHook.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(ExceptionSensorHook.class.getName());
 
 	/**
 	 * The ID manager.
@@ -64,7 +64,7 @@ public class ExceptionTracingHook implements IExceptionTracingHook {
 	 * @param idManager
 	 *            The ID manager.
 	 */
-	public ExceptionTracingHook(IIdManager idManager) {
+	public ExceptionSensorHook(IIdManager idManager) {
 		this.idManager = idManager;
 	}
 

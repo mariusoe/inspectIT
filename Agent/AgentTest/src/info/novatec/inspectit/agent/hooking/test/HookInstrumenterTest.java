@@ -655,7 +655,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(registeredSensorConfig.getTargetMethodName()).thenReturn(exceptionClazz.getSimpleName());
 		when(registeredSensorConfig.getModifiers()).thenReturn(exceptionClazz.getModifiers());
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
 		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
 		when(registeredSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
 		when(registeredSensorConfig.getId()).thenReturn(sensorTypeId);
@@ -696,7 +696,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(registeredSensorConfig.getTargetMethodName()).thenReturn(exceptionClazz.getSimpleName());
 		when(registeredSensorConfig.getModifiers()).thenReturn(exceptionClazz.getModifiers());
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
 		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
 		when(idManager.registerMethod(registeredSensorConfig)).thenReturn(constructorId);
 		List<MethodSensorTypeConfig> sensorTypeConfigs = new ArrayList<MethodSensorTypeConfig>();
@@ -735,7 +735,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(configurationStorage.isExceptionSensorActivated()).thenReturn(true);
 
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
 		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
 		List<MethodSensorTypeConfig> sensorTypeConfigs = new ArrayList<MethodSensorTypeConfig>();
 		sensorTypeConfigs.add(sensorTypeConfig);
@@ -776,7 +776,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 
 		// sensor type settings
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
 		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
 		List<MethodSensorTypeConfig> sensorTypeConfigs = new ArrayList<MethodSensorTypeConfig>();
 		sensorTypeConfigs.add(sensorTypeConfig);
@@ -844,7 +844,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(configurationStorage.isExceptionSensorActivated()).thenReturn(true);
 
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
 		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
 		List<MethodSensorTypeConfig> sensorTypeConfigs = new ArrayList<MethodSensorTypeConfig>();
 		sensorTypeConfigs.add(sensorTypeConfig);
@@ -880,7 +880,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 	}
 
 	@Test
-	public void everythingInstrumentedByExceptionTracer() throws Exception {
+	public void everythingInstrumentedByExceptionSensor() throws Exception {
 		String methodName = "callsMethodWithException";
 		String innerMethodName = "throwsAnException";
 		// we need to create an new loader with a new classPool
@@ -919,7 +919,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(configurationStorage.isExceptionSensorActivated()).thenReturn(true);
 
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
 		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
 		List<MethodSensorTypeConfig> sensorTypeConfigs = new ArrayList<MethodSensorTypeConfig>();
 		sensorTypeConfigs.add(sensorTypeConfig);
@@ -963,7 +963,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 	}
 
 	@Test
-	public void everythingInstrumentedByExceptionTracerWithStaticMethods() throws Exception {
+	public void everythingInstrumentedByExceptionSensorWithStaticMethods() throws Exception {
 		String methodName = "callsStaticMethodWithException";
 		String innerMethodName = "staticThrowsAnException";
 		// we need to create an new loader with a new classPool
@@ -1002,7 +1002,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(configurationStorage.isExceptionSensorActivated()).thenReturn(true);
 
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
 		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
 		List<MethodSensorTypeConfig> sensorTypeConfigs = new ArrayList<MethodSensorTypeConfig>();
 		sensorTypeConfigs.add(sensorTypeConfig);

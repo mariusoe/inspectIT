@@ -1,4 +1,4 @@
-package info.novatec.inspectit.rcp.editor.exception.input;
+package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
@@ -10,7 +10,6 @@ import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
-import info.novatec.inspectit.rcp.editor.table.input.AbstractTableInputController;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
@@ -40,12 +39,17 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
-public class ExceptionTreeOverviewInputController extends AbstractTableInputController {
+/**
+ * 
+ * @author Eduard Tudenhoefner
+ * 
+ */
+public class UngroupedExceptionOverviewInputController extends AbstractTableInputController {
 
 	/**
 	 * The ID of this subview / controller.
 	 */
-	public static final String ID = "inspectit.subview.table.exceptiontreeoverview";
+	public static final String ID = "inspectit.subview.table.ungroupedexceptionoverview";
 
 	/**
 	 * The private inner enumeration used to define the used IDs which are
@@ -172,14 +176,14 @@ public class ExceptionTreeOverviewInputController extends AbstractTableInputCont
 	 * {@inheritDoc}
 	 */
 	public IContentProvider getContentProvider() {
-		return new ExceptionTreeOverviewContentProvider();
+		return new UngroupedExceptionOverviewContentProvider();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public IBaseLabelProvider getLabelProvider() {
-		return new ExceptionTreeOverviewLabelProvider();
+		return new UngroupedExceptionOverviewLabelProvider();
 	}
 
 	/**
@@ -215,9 +219,9 @@ public class ExceptionTreeOverviewInputController extends AbstractTableInputCont
 	@Override
 	@SuppressWarnings("unchecked")
 	public void doRefresh(IProgressMonitor monitor) {
-		monitor.beginTask("Updating Exception Tree Overview", IProgressMonitor.UNKNOWN);
-		monitor.subTask("Retrieving the Exception Tree Overview from the CMR");
-		List<ExceptionSensorData> exData = dataAccessService.getExceptionTreeOverview(template, limit);
+		monitor.beginTask("Updating the Ungrouped Exception Overview", IProgressMonitor.UNKNOWN);
+		monitor.subTask("Retrieving the Ungrouped Exception Overview from the CMR");
+		List<ExceptionSensorData> exData = dataAccessService.getUngroupedExceptionOverview(template, limit);
 
 		if ((null != exData) && !exData.isEmpty()) {
 			exceptionSensorData.clear();
@@ -239,9 +243,9 @@ public class ExceptionTreeOverviewInputController extends AbstractTableInputCont
 				PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
 					@SuppressWarnings("unchecked")
 					public void run(final IProgressMonitor monitor) {
-						monitor.beginTask("Retrieving Exception Tree detail data from CMR", IProgressMonitor.UNKNOWN);
+						monitor.beginTask("Retrieving Exception Tree data from CMR", IProgressMonitor.UNKNOWN);
 						ExceptionSensorData data = (ExceptionSensorData) selection.getFirstElement();
-						List<ExceptionSensorData> exceptionSensorDataList = dataAccessService.getExceptionTreeDetails(data);
+						List<ExceptionSensorData> exceptionSensorDataList = dataAccessService.getExceptionTree(data);
 						final List<ExceptionSensorData> finalSensorDataList = new ArrayList<ExceptionSensorData>();
 
 						finalSensorDataList.add(exceptionSensorDataList.get(0));
@@ -271,7 +275,7 @@ public class ExceptionTreeOverviewInputController extends AbstractTableInputCont
 	 * @author Eduard Tudenhoefner
 	 * 
 	 */
-	private final class ExceptionTreeOverviewLabelProvider extends StyledCellIndexLabelProvider {
+	private final class UngroupedExceptionOverviewLabelProvider extends StyledCellIndexLabelProvider {
 
 		/**
 		 * {@inheritDoc}
@@ -293,7 +297,7 @@ public class ExceptionTreeOverviewInputController extends AbstractTableInputCont
 	 * @author Eduard Tudenhoefner
 	 * 
 	 */
-	private static final class ExceptionTreeOverviewContentProvider implements IStructuredContentProvider {
+	private static final class UngroupedExceptionOverviewContentProvider implements IStructuredContentProvider {
 
 		/**
 		 * {@inheritDoc}

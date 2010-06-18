@@ -5,7 +5,7 @@ import info.novatec.inspectit.agent.config.impl.PlatformSensorTypeConfig;
 import info.novatec.inspectit.agent.config.impl.RepositoryConfig;
 import info.novatec.inspectit.agent.config.impl.StrategyConfig;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
-import info.novatec.inspectit.agent.sensor.exception.IExceptionTracingSensor;
+import info.novatec.inspectit.agent.sensor.exception.IExceptionSensor;
 
 import java.util.List;
 import java.util.Map;
@@ -224,9 +224,9 @@ public interface IConfigurationStorage {
 	List getUnregisteredSensorConfigs();
 
 	/**
-	 * Returns whether the {@link IExceptionTracingSensor} is activated.
+	 * Returns whether the {@link IExceptionSensor} is activated.
 	 * 
-	 * @return Whether the {@link IExceptionTracingSensor} is activated.
+	 * @return Whether the {@link IExceptionSensor} is activated.
 	 */
 	boolean isExceptionSensorActivated();
 

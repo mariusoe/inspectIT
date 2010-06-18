@@ -18,7 +18,7 @@ import info.novatec.inspectit.agent.hooking.IHook;
 import info.novatec.inspectit.agent.hooking.IHookDispatcher;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
 import info.novatec.inspectit.agent.hooking.impl.HookDispatcher;
-import info.novatec.inspectit.agent.sensor.exception.ExceptionTracingHook;
+import info.novatec.inspectit.agent.sensor.exception.ExceptionSensorHook;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 import info.novatec.inspectit.agent.sensor.method.invocationsequence.InvocationSequenceHook;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
@@ -39,7 +39,7 @@ public class HookDispatcherTest extends AbstractLogSupport {
 	private ICoreService coreService;
 
 	@Mock
-	private ExceptionTracingHook exceptionHook;
+	private ExceptionSensorHook exceptionHook;
 
 	private IHookDispatcher hookDispatcher;
 
@@ -486,7 +486,7 @@ public class HookDispatcherTest extends AbstractLogSupport {
 
 		// the exception sensor type config
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
 		when(sensorTypeConfig.getId()).thenReturn(exceptionSensorTypeId);
 		when(registeredSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
 		when(registeredConstructorSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
@@ -560,7 +560,7 @@ public class HookDispatcherTest extends AbstractLogSupport {
 
 		// the exception sensor type config
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
 		when(sensorTypeConfig.getId()).thenReturn(exceptionSensorTypeId);
 		when(registeredSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
 		when(registeredConstructorSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
@@ -644,7 +644,7 @@ public class HookDispatcherTest extends AbstractLogSupport {
 
 		// the exception sensor type config
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor");
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
 		when(sensorTypeConfig.getId()).thenReturn(exceptionSensorTypeId);
 		when(registeredSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
 		when(registeredConstructorSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);

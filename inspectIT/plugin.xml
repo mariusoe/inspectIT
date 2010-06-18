@@ -513,7 +513,7 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="info.novatec.inspectit.communication.data.ExceptionSensorData"
-            class="info.novatec.inspectit.rcp.editor.exception.DeferredExceptionTreeAdapterFactory">
+            class="info.novatec.inspectit.rcp.editor.tree.input.DeferredExceptionTreeAdapterFactory">
          <adapter
                type="org.eclipse.ui.progress.IDeferredWorkbenchAdapter">
          </adapter>

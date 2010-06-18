@@ -5,8 +5,8 @@ import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.hooking.IConstructorHook;
 import info.novatec.inspectit.agent.hooking.IHookDispatcher;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
-import info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor;
-import info.novatec.inspectit.agent.sensor.exception.IExceptionTracingHook;
+import info.novatec.inspectit.agent.sensor.exception.ExceptionSensor;
+import info.novatec.inspectit.agent.sensor.exception.IExceptionSensorHook;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 
 import java.util.Hashtable;
@@ -57,9 +57,9 @@ public class HookDispatcher implements IHookDispatcher {
 	private ThreadLocal invocationSequenceHolder = new ThreadLocal();
 
 	/**
-	 * The link to the exception tracing hook.
+	 * The link to the exception sensor hook.
 	 */
-	private IExceptionTracingHook exceptionHook = ExceptionTracingSensor.getHook();
+	private IExceptionSensorHook exceptionHook = ExceptionSensor.getHook();
 
 	/**
 	 * Default constructor which needs a reference to the core service. This is

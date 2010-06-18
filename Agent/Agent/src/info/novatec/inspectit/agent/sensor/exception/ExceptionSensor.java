@@ -7,13 +7,13 @@ import info.novatec.inspectit.util.Timer;
 import java.util.Map;
 
 /**
- * The {@link ExceptionTracingSensor} which initializes and returns the
- * {@link ExceptionTracingHook} class.
+ * The {@link ExceptionSensor} which initializes and returns the
+ * {@link ExceptionSensorHook} class.
  * 
  * @author Eduard Tudenhoefner
  * 
  */
-public class ExceptionTracingSensor implements IExceptionTracingSensor {
+public class ExceptionSensor implements IExceptionSensor {
 
 	/**
 	 * The timer used for accurate measuring.
@@ -31,9 +31,9 @@ public class ExceptionTracingSensor implements IExceptionTracingSensor {
 	private final IPropertyAccessor propertyAccessor;
 
 	/**
-	 * The used exception tracing hook.
+	 * The used exception sensor hook.
 	 */
-	private static ExceptionTracingHook exceptionTracingHook = null;
+	private static ExceptionSensorHook exceptionSensorHook = null;
 
 	/**
 	 * The default constructor which needs 3 parameter for initialization.
@@ -45,7 +45,7 @@ public class ExceptionTracingSensor implements IExceptionTracingSensor {
 	 * @param propertyAccessor
 	 *            The property accessor.
 	 */
-	public ExceptionTracingSensor(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor) {
+	public ExceptionSensor(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor) {
 		this.timer = timer;
 		this.idManager = idManager;
 		this.propertyAccessor = propertyAccessor;
@@ -54,9 +54,9 @@ public class ExceptionTracingSensor implements IExceptionTracingSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public static IExceptionTracingHook getHook() {
+	public static IExceptionSensorHook getHook() {
 		// TODO ET: move this method into interface
-		return exceptionTracingHook;
+		return exceptionSensorHook;
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class ExceptionTracingSensor implements IExceptionTracingSensor {
 	 */
 	public void init(Map parameter) {
 		// currently we need only the idManager.
-		exceptionTracingHook = new ExceptionTracingHook(idManager);
+		exceptionSensorHook = new ExceptionSensorHook(idManager);
 	}
 
 }

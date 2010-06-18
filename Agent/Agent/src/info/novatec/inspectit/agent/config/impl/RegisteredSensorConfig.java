@@ -55,7 +55,7 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	private MethodSensorTypeConfig invocationSequenceSensorTypeConfig = null;
 
 	/**
-	 * The sensor type configuration object of the exception tracing sensor.
+	 * The sensor type configuration object of the exception sensor.
 	 */
 	private MethodSensorTypeConfig exceptionSensorTypeConfig = null;
 	
@@ -171,7 +171,7 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 			invocationSequenceSensorTypeConfig = sensorTypeConfig;
 		}
 		
-		if (sensorTypeConfig.getClassName().endsWith("ExceptionTracingSensor")) {
+		if (sensorTypeConfig.getClassName().endsWith("ExceptionSensor")) {
 			exceptionSensorTypeConfig = sensorTypeConfig;
 		}
 		

@@ -35,10 +35,10 @@ public enum SensorTypeEnum {
 	JDBC_PREPARED_STATEMENT("info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementSensor", InspectITConstants.IMG_DATABASE),
 	/** The jdbc prepared statement parameter sensor type. */
 	JDBC_PREPARED_STATEMENT_PARAMETER("info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementParameterSensor", InspectITConstants.IMG_DATABASE),
-	/** The exception tracer */
-	EXCEPTION_TRACER("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensor", InspectITConstants.IMG_INVOCATION),
-	/** The exception tracer overview */
-	EXCEPTION_TRACER_OVERVIEW("info.novatec.inspectit.agent.sensor.exception.ExceptionTracingSensorOverview", InspectITConstants.IMG_CLASS_OVERVIEW),
+	/** The exception sensor */
+	EXCEPTION_SENSOR("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor", InspectITConstants.IMG_SHOW_ALL),
+	/** The exception sensor overview */
+	EXCEPTION_SENSOR_GROUPED("info.novatec.inspectit.agent.sensor.exception.ExceptionSensorOverview", InspectITConstants.IMG_FILTER),
 	/** The combined metrics sensor type */
 	MARVIN_WORKFLOW("info.novatec.inspectit.agent.sensor.method.marvintimer.MarvinWorkflowSensor", InspectITConstants.IMG_INVOCATION),
 

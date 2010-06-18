@@ -228,7 +228,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 			MenuManager sensorTypeMenuManager = new MenuManager("Filter by SensorType");
 			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Timer", SensorTypeEnum.TIMER));
 			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Invocation Seq", SensorTypeEnum.INVOCATION_SEQUENCE));
-			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Exception", SensorTypeEnum.EXCEPTION_TRACER));
+			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Exception", SensorTypeEnum.EXCEPTION_SENSOR));
 			sensorTypeMenuManager.add(new Separator());
 			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Statement", SensorTypeEnum.JDBC_STATEMENT));
 			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Prep Statement", SensorTypeEnum.JDBC_PREPARED_STATEMENT));
