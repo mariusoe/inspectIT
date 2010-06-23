@@ -5,18 +5,12 @@ import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.table.input.GroupedExceptionOverviewInputController.ExtendedExceptionSensorData;
-import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
@@ -27,7 +21,6 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -44,7 +37,7 @@ import org.eclipse.ui.progress.DeferredTreeContentManager;
  * @author Eduard Tudenhoefner
  * 
  */
-public class ExceptionMessagesTreeInputController implements TreeInputController {
+public class ExceptionMessagesTreeInputController extends AbstractTreeInputController {
 	/**
 	 * The ID of this subview / controller.
 	 */
@@ -54,12 +47,6 @@ public class ExceptionMessagesTreeInputController implements TreeInputController
 	 * The list of invocation sequence data objects which is displayed.
 	 */
 	private List<ExtendedExceptionSensorData> exceptionSensorDataList = new ArrayList<ExtendedExceptionSensorData>();
-
-	/**
-	 * The inputDefinition of this view that is passed to the
-	 * {@link ExceptionMessagesTreeContentProvider}.
-	 */
-	private InputDefinition inputDefinition;
 
 	/**
 	 * The private inner enumeration used to define the used IDs which are
@@ -121,13 +108,6 @@ public class ExceptionMessagesTreeInputController implements TreeInputController
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setInputDefinition(InputDefinition inputDefinition) {
-		this.inputDefinition = inputDefinition;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public Object getTreeInput() {
 		return exceptionSensorDataList;
 	}
@@ -146,13 +126,13 @@ public class ExceptionMessagesTreeInputController implements TreeInputController
 				viewerColumn.getColumn().setImage(column.imageDescriptor.createImage());
 			}
 		}
-
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void dispose() {
+	public int getExpandLevel() {
+		return 0;
 	}
 
 	/**
@@ -235,29 +215,8 @@ public class ExceptionMessagesTreeInputController implements TreeInputController
 	/**
 	 * {@inheritDoc}
 	 */
-	public ViewerFilter[] getFilters() {
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
-
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public TreeViewerComparator<? extends DefaultData> getComparator() {
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public IContentProvider getContentProvider() {
-		return new ExceptionMessagesTreeContentProvider(inputDefinition);
+		return new ExceptionMessagesTreeContentProvider(this.getInputDefinition());
 	}
 
 	/**
@@ -265,19 +224,6 @@ public class ExceptionMessagesTreeInputController implements TreeInputController
 	 */
 	public IBaseLabelProvider getLabelProvider() {
 		return new ExceptionMessagesTreeLabelProvider();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Set<PreferenceId> getPreferenceIds() {
-		return Collections.emptySet();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void doRefresh(IProgressMonitor monitor) {
 	}
 
 	/**
@@ -316,7 +262,6 @@ public class ExceptionMessagesTreeInputController implements TreeInputController
 
 			return getStyledTextForColumn(data, enumId);
 		}
-
 	}
 
 	/**
@@ -333,7 +278,8 @@ public class ExceptionMessagesTreeInputController implements TreeInputController
 		private DeferredTreeContentManager manager;
 
 		/**
-		 * The inputDefinition that is needed in {@link DeferredStackTracesForErrorMessage}.
+		 * The inputDefinition that is needed in
+		 * {@link DeferredStackTracesForErrorMessage}.
 		 * 
 		 */
 		private InputDefinition inputDefinition;
@@ -363,12 +309,6 @@ public class ExceptionMessagesTreeInputController implements TreeInputController
 		 */
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			manager = new DeferredTreeContentManager((AbstractTreeViewer) viewer);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		public void dispose() {
 		}
 
 		/**
@@ -407,6 +347,11 @@ public class ExceptionMessagesTreeInputController implements TreeInputController
 			return false;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		public void dispose() {
+		}
 	}
 
 	/**
@@ -493,5 +438,4 @@ public class ExceptionMessagesTreeInputController implements TreeInputController
 		}
 		return value;
 	}
-
 }

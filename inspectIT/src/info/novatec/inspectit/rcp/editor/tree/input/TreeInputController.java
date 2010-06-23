@@ -139,8 +139,14 @@ public interface TreeInputController {
 	void showDetails(Shell parent, Object element);
 
 	/**
+	 * Returns the level to which the viewer's tree should be expanded.
+	 * 
+	 * @return The level to which the viewer's tree should be expanded.
+	 */
+	int getExpandLevel();
+
+	/**
 	 * Disposes the tree input.
 	 */
 	void dispose();
-
 }

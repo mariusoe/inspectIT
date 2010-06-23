@@ -127,7 +127,7 @@ public class TreeSubView extends AbstractSubView {
 	public void setDataInput(List<? extends DefaultData> data) {
 		if (treeInputController.canOpenInput(data)) {
 			treeViewer.setInput(data);
-			treeViewer.expandToLevel(2);
+			treeViewer.expandToLevel(treeInputController.getExpandLevel());
 			if (treeViewer.getControl().isVisible()) {
 				treeViewer.refresh();
 			}

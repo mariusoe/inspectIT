@@ -10,9 +10,8 @@ import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
-import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
@@ -26,10 +25,9 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
@@ -63,7 +61,7 @@ import org.hibernate.jdbc.util.Formatter;
  * @author Patrice Bouillet
  * 
  */
-public class InvocDetailInputController implements TreeInputController {
+public class InvocDetailInputController extends AbstractTreeInputController {
 
 	/**
 	 * The ID of this subview / controller.
@@ -173,6 +171,7 @@ public class InvocDetailInputController implements TreeInputController {
 	 * {@inheritDoc}
 	 */
 	public void setInputDefinition(InputDefinition inputDefinition) {
+		super.setInputDefinition(inputDefinition);
 		globalDataAccessService = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService();
 	}
 
@@ -195,13 +194,6 @@ public class InvocDetailInputController implements TreeInputController {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object getTreeInput() {
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public IContentProvider getContentProvider() {
 		return new InvocDetailContentProvider();
 	}
@@ -211,13 +203,6 @@ public class InvocDetailInputController implements TreeInputController {
 	 */
 	public IBaseLabelProvider getLabelProvider() {
 		return new InvocDetailLabelProvider();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public TreeViewerComparator<? extends DefaultData> getComparator() {
-		return null;
 	}
 
 	/**
@@ -255,12 +240,6 @@ public class InvocDetailInputController implements TreeInputController {
 			// nothing to do by default
 			break;
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void doRefresh(IProgressMonitor monitor) {
 	}
 
 	/**
@@ -872,5 +851,4 @@ public class InvocDetailInputController implements TreeInputController {
 		}
 		modifiersImageCache.clear();
 	}
-
 }

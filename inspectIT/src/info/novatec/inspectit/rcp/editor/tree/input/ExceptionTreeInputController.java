@@ -6,23 +6,17 @@ import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
-import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
@@ -32,7 +26,6 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -52,7 +45,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  * @author Eduard Tudenhoefner
  * 
  */
-public class ExceptionTreeInputController implements TreeInputController {
+public class ExceptionTreeInputController extends AbstractTreeInputController {
 
 	/**
 	 * The ID of this subview / controller.
@@ -140,7 +133,15 @@ public class ExceptionTreeInputController implements TreeInputController {
 	 * {@inheritDoc}
 	 */
 	public void setInputDefinition(InputDefinition inputDefinition) {
+		super.setInputDefinition(inputDefinition);
 		globalDataAccessService = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public int getExpandLevel() {
+		return TreeViewer.ALL_LEVELS;
 	}
 
 	/**
@@ -178,32 +179,6 @@ public class ExceptionTreeInputController implements TreeInputController {
 	 */
 	public IBaseLabelProvider getLabelProvider() {
 		return new ExceptionTreeLabelProvider();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public TreeViewerComparator<? extends DefaultData> getComparator() {
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Set<PreferenceId> getPreferenceIds() {
-		return Collections.emptySet();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void doRefresh(IProgressMonitor monitor) {
 	}
 
 	/**
@@ -374,7 +349,6 @@ public class ExceptionTreeInputController implements TreeInputController {
 		protected Color getBackground(Object element, int index) {
 			return null;
 		}
-
 	}
 
 	/**
@@ -483,15 +457,6 @@ public class ExceptionTreeInputController implements TreeInputController {
 		 */
 		public void dispose() {
 		}
-
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ViewerFilter[] getFilters() {
-		return null;
 	}
 
 	/**
@@ -526,5 +491,4 @@ public class ExceptionTreeInputController implements TreeInputController {
 		}
 		modifiersImageCache.clear();
 	}
-
 }
