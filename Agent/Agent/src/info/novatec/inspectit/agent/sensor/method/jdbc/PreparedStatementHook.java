@@ -163,9 +163,6 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 			// calling first a method on the connection (prepareStatement...)
 			LOGGER.info("Could not add prepared statement, no sql available! Method ID(local): " + methodId);
 			LOGGER.info("This is not an inspectIT issue, please consult the management of inspectIT and send the following stacktrace!");
-			// Furthermore, we will print the stack trace as it can indicate if
-			// there is something wrong with the instrumentation or not. This is
-			// because a prepareStatement(...) call must be seen in this stack!
 			e.printStackTrace();
 		}
 	}

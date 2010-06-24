@@ -48,8 +48,7 @@ public class CoreService implements ICoreService, Startable {
 	private final IConnection connection;
 
 	/**
-	 * Already used data objects which can be used directly on the CMR to
-	 * persist.
+	 * Already used data objects which can be used directly on the CMR to persist.
 	 */
 	private Map sensorDataObjects = new Hashtable();
 
@@ -59,20 +58,17 @@ public class CoreService implements ICoreService, Startable {
 	private Map objectStorages = new Hashtable();
 
 	/**
-	 * Used as second hash table for the measurements when processed before
-	 * sending.
+	 * Used as second hash table for the measurements when processed before sending.
 	 */
 	private Map measurementsProcessing = new Hashtable();
 
 	/**
-	 * Used as second hash table for the object storages when processed before
-	 * sending.
+	 * Used as second hash table for the object storages when processed before sending.
 	 */
 	private Map objectStoragesProcessing = new Hashtable();
 
 	/**
-	 * Temporary Map to switch the references of the active hash table with the
-	 * processed one.
+	 * Temporary Map to switch the references of the active hash table with the processed one.
 	 */
 	private Map temp;
 
@@ -102,14 +98,14 @@ public class CoreService implements ICoreService, Startable {
 	private long platformSensorRefreshTime = DEFAULT_REFRESH_TIME;
 
 	/**
-	 * The platformSensorRefresher is a thread which updates the platform
-	 * informations after the specified platformSensorRefreshTime.
+	 * The platformSensorRefresher is a thread which updates the platform informations after the
+	 * specified platformSensorRefreshTime.
 	 */
 	private volatile PlatformSensorRefresher platformSensorRefresher;
 
 	/**
-	 * The sending thread used to execute the sending process of the measurement
-	 * in a separate process.
+	 * The sending thread used to execute the sending process of the measurement in a separate
+	 * process.
 	 */
 	private volatile SendingThread sendingThread;
 
@@ -322,7 +318,7 @@ public class CoreService implements ICoreService, Startable {
 						wait(platformSensorRefreshTime);
 					}
 				} catch (InterruptedException e) {
-					LOGGER.info("Platform sensor refresher was interrupted!");
+					LOGGER.severe("Platform sensor refresher was interrupted!");
 				}
 
 				// iterate the platformSensors and update the information
@@ -357,8 +353,8 @@ public class CoreService implements ICoreService, Startable {
 	}
 
 	/**
-	 * This implementation of a {@link Thread} is used to start the sending of
-	 * the data and value objects to the CMR.
+	 * This implementation of a {@link Thread} is used to start the sending of the data and value
+	 * objects to the CMR.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -374,7 +370,7 @@ public class CoreService implements ICoreService, Startable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						LOGGER.info("Sending thread interrupted!");
+						LOGGER.severe("Sending thread interrupted!");
 					}
 				}
 

@@ -92,8 +92,8 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 * {@inheritDoc}
 	 */
 	public void addMethodHook(CtMethod method, RegisteredSensorConfig rsc) throws HookException {
-		if (LOGGER.isLoggable(Level.INFO)) {
-			LOGGER.info("Match found! Class: " + rsc.getTargetClassName() + " Method: " + rsc.getTargetMethodName() + " Parameter: " + rsc.getParameterTypes() + " id: " + rsc.getId());
+		if (LOGGER.isLoggable(Level.FINE)) {
+			LOGGER.fine("Match found! Class: " + rsc.getTargetClassName() + " Method: " + rsc.getTargetMethodName() + " Parameter: " + rsc.getParameterTypes() + " id: " + rsc.getId());
 		}
 
 		if (method.getDeclaringClass().isFrozen()) {
@@ -149,8 +149,8 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 * {@inheritDoc}
 	 */
 	public void addConstructorHook(CtConstructor constructor, RegisteredSensorConfig rsc) throws HookException {
-		if (LOGGER.isLoggable(Level.INFO)) {
-			LOGGER.info("Constructor match found! Class: " + rsc.getTargetClassName() + " Parameter: " + rsc.getParameterTypes() + " id: " + rsc.getId());
+		if (LOGGER.isLoggable(Level.FINE)) {
+			LOGGER.fine("Constructor match found! Class: " + rsc.getTargetClassName() + " Parameter: " + rsc.getParameterTypes() + " id: " + rsc.getId());
 		}
 
 		if (constructor.getDeclaringClass().isFrozen()) {

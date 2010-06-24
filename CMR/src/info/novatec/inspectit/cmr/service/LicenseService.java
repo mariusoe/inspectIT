@@ -64,12 +64,10 @@ public class LicenseService implements ILicenseService, InitializingBean {
 				LOGGER.info("|-License Service active...");
 			}
 		} catch (Exception exception) {
-			if (LOGGER.isInfoEnabled()) {
-				LOGGER.info("||-Licensing module could not be started, reason: " + exception.getMessage());
-				LOGGER.info("||-Please make sure that a license is properly imported");
-				LOGGER.info("||-A license can be imported through the User Interface");
-				LOGGER.info("||-Contact NovaTec Support for further help!");
-			}
+			LOGGER.error("||-Licensing module could not be started, reason: " + exception.getMessage());
+			LOGGER.error("||-Please make sure that a license is properly imported");
+			LOGGER.error("||-A license can be imported through the User Interface");
+			LOGGER.error("||-Contact NovaTec Support for further help!");
 		}
 	}
 

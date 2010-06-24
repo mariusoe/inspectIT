@@ -177,7 +177,7 @@ public class IdManager implements IIdManager, Startable {
 					registrationThread.registerPlatform();
 				} catch (Throwable throwable) {
 					serverErrorOccured = true;
-					LOGGER.info("Could not register the platform even though the connection seems to be established, will try later!");
+					LOGGER.warning("Could not register the platform even though the connection seems to be established, will try later!");
 					throw new IdNotAvailableException("Could not register the platform even though the connection seems to be established, will try later!", throwable);
 				}
 			} else {
@@ -496,8 +496,8 @@ public class IdManager implements IIdManager, Startable {
 
 			platformId = connection.registerPlatform(configurationStorage.getAgentName(), getVersion());
 
-			if (LOGGER.isLoggable(Level.INFO)) {
-				LOGGER.info("Received platform ID: " + platformId);
+			if (LOGGER.isLoggable(Level.FINE)) {
+				LOGGER.fine("Received platform ID: " + platformId);
 			}
 		}
 
@@ -568,8 +568,8 @@ public class IdManager implements IIdManager, Startable {
 
 			connection.addSensorTypeToMethod(serverSensorTypeId.longValue(), serverMethodId.longValue());
 
-			if (LOGGER.isLoggable(Level.INFO)) {
-				LOGGER.info("Mapping registered (method -> sensor type) :: local:" + methodId + "->" + sensorTypeId + " global:" + serverMethodId + "->" + serverSensorTypeId);
+			if (LOGGER.isLoggable(Level.FINE)) {
+				LOGGER.fine("Mapping registered (method -> sensor type) :: local:" + methodId + "->" + sensorTypeId + " global:" + serverMethodId + "->" + serverSensorTypeId);
 			}
 		}
 
@@ -620,8 +620,8 @@ public class IdManager implements IIdManager, Startable {
 				Long localId = new Long(sensorTypeIdMap.size());
 				sensorTypeIdMap.put(localId, new Long(registeredId));
 
-				if (LOGGER.isLoggable(Level.INFO)) {
-					LOGGER.info("Sensor type " + astc.toString() + " registered. ID (local/global): " + localId + "/" + registeredId);
+				if (LOGGER.isLoggable(Level.FINE)) {
+					LOGGER.fine("Sensor type " + astc.toString() + " registered. ID (local/global): " + localId + "/" + registeredId);
 				}
 			}
 		}
@@ -663,8 +663,8 @@ public class IdManager implements IIdManager, Startable {
 				Long localId = new Long(methodIdMap.size());
 				methodIdMap.put(localId, new Long(registeredId));
 
-				if (LOGGER.isLoggable(Level.INFO)) {
-					LOGGER.info("Method " + rsc.toString() + " registered. ID (local/global): " + localId + "/" + registeredId);
+				if (LOGGER.isLoggable(Level.FINE)) {
+					LOGGER.fine("Method " + rsc.toString() + " registered. ID (local/global): " + localId + "/" + registeredId);
 				}
 			}
 		}

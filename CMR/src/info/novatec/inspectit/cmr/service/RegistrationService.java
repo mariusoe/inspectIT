@@ -13,10 +13,9 @@ import org.springframework.beans.factory.InitializingBean;
 import de.schlichtherle.license.LicenseContentException;
 
 /**
- * This class is used as a delegator to the real registration service. It is
- * needed because Spring weaves a proxy around the real registration service
- * which cannot be used in an RMI context with Java 1.4 (as no pre-generated
- * stub is available).
+ * This class is used as a delegator to the real registration service. It is needed because Spring
+ * weaves a proxy around the real registration service which cannot be used in an RMI context with
+ * Java 1.4 (as no pre-generated stub is available).
  * 
  * @author Patrice Bouillet
  * 
@@ -34,8 +33,8 @@ public class RegistrationService implements IRegistrationService, InitializingBe
 	private InternRegistrationService internRegistrationService;
 
 	/**
-	 * The license utility to check for a valid license and abort the
-	 * registration of the agent if necessary.
+	 * The license utility to check for a valid license and abort the registration of the agent if
+	 * necessary.
 	 */
 	private LicenseUtil licenseUtil;
 
@@ -53,12 +52,12 @@ public class RegistrationService implements IRegistrationService, InitializingBe
 			long id = internRegistrationService.registerPlatformIdent(definedIPs, agentName, version);
 
 			if (LOGGER.isInfoEnabled()) {
-				LOGGER.info("Successfully registered Agent '" + agentName + "' with id: " + id + " and version "+version);
+				LOGGER.info("Successfully registered Agent '" + agentName + "' with id: " + id + " and version " + version);
 			}
 
 			return id;
 		} catch (LicenseContentException e) {
-			LOGGER.info("Could not register the Agent, cause: " + e.getMessage());
+			LOGGER.error("Could not register the Agent, due to a license problem: " + e.getMessage());
 			throw new LicenseException(e.getMessage());
 		}
 	}

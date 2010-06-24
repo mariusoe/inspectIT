@@ -15,8 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class is used to programatically build the path to access a specific
- * method parameter or a field of a class.
+ * This class is used to programatically build the path to access a specific method parameter or a
+ * field of a class.
  * 
  * @author Patrice Bouillet
  * @author Stefan Siegl
@@ -30,8 +30,8 @@ public class PropertyAccessor implements IPropertyAccessor {
 	private static final Logger LOGGER = Logger.getLogger(PropertyAccessor.class.getName());
 
 	/**
-	 * An array containing the names of all methods that might be called by the
-	 * PropertyAccessor. Names should not include the brackets.
+	 * An array containing the names of all methods that might be called by the PropertyAccessor.
+	 * Names should not include the brackets.
 	 */
 	private static final String[] ALLOWED_METHODS = new String[] { "size", "length" };
 
@@ -63,8 +63,7 @@ public class PropertyAccessor implements IPropertyAccessor {
 	}
 
 	/**
-	 * Checks whether or not the method may be called within the parameter
-	 * storage algorithm.
+	 * Checks whether or not the method may be called within the parameter storage algorithm.
 	 * 
 	 * @param method
 	 *            The method name to check for.
@@ -89,11 +88,10 @@ public class PropertyAccessor implements IPropertyAccessor {
 	 *            The path to follow.
 	 * @param object
 	 *            The object to analyze.
-	 * @return The {@link String} representation of the field or parameter
-	 *         followed by the path.
+	 * @return The {@link String} representation of the field or parameter followed by the path.
 	 * @throws PropertyAccessException
-	 *             This exception is thrown whenever something unexpectedly
-	 *             happens while accessing a property.
+	 *             This exception is thrown whenever something unexpectedly happens while accessing
+	 *             a property.
 	 */
 	private String getPropertyContent(PropertyPath propertyPath, Object object) throws PropertyAccessException {
 		if (null == object) {
@@ -156,7 +154,9 @@ public class PropertyAccessor implements IPropertyAccessor {
 						// We are only calling methods that do not take an
 						// argument
 						if (method.getParameterTypes().length != 0) {
-							LOGGER.info("Skipping matching method " + method.getName() + " as it is not a no argument method");
+							if (LOGGER.isLoggable(Level.FINE)) {
+								LOGGER.fine("Skipping matching method " + method.getName() + " as it is not a no argument method");
+							}
 							continue;
 						}
 
@@ -238,8 +238,8 @@ public class PropertyAccessor implements IPropertyAccessor {
 	}
 
 	/**
-	 * Every path can have another follower path. These classes are used to
-	 * describe the way to find a specific property in an object.
+	 * Every path can have another follower path. These classes are used to describe the way to find
+	 * a specific property in an object.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -305,15 +305,13 @@ public class PropertyAccessor implements IPropertyAccessor {
 	public static class PropertyPathStart extends PropertyPath {
 
 		/**
-		 * Defines if we are starting in the class where the method etc. is
-		 * executed currently.
+		 * Defines if we are starting in the class where the method etc. is executed currently.
 		 */
 		private boolean classOfExecutedMethod = false;
 
 		/**
-		 * The position of the parameter in the signature if the
-		 * <code>classOfExecutedMethod</code> value is set to <code>false</code>
-		 * .
+		 * The position of the parameter in the signature if the <code>classOfExecutedMethod</code>
+		 * value is set to <code>false</code> .
 		 */
 		private int signaturePosition = -1;
 

@@ -311,7 +311,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 */
 	public void addMethodSensorData(long sensorTypeId, long methodId, String prefix, MethodSensorData methodSensorData) {
 		if (null == threadLocalInvocationData.get()) {
-			LOGGER.info("thread data NULL!!!!");
+			LOGGER.severe("thread data NULL!!!!");
 			return;
 		}
 		saveDataObject(methodSensorData.finalizeData());
@@ -322,7 +322,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 */
 	public void addObjectStorage(long sensorTypeId, long methodId, String prefix, IObjectStorage objectStorage) {
 		if (null == threadLocalInvocationData.get()) {
-			LOGGER.info("thread data NULL!!!!");
+			LOGGER.severe("thread data NULL!!!!");
 			return;
 		}
 		DefaultData defaultData = objectStorage.finalizeDataObject();

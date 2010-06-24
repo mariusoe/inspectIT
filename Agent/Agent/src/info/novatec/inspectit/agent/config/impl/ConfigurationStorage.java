@@ -168,8 +168,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 
 		this.bufferStrategy = new StrategyConfig(clazzName, settings);
 
-		if (LOGGER.isLoggable(Level.INFO)) {
-			LOGGER.info("Buffer strategy set to: " + clazzName);
+		if (LOGGER.isLoggable(Level.FINE)) {
+			LOGGER.fine("Buffer strategy set to: " + clazzName);
 		}
 	}
 
@@ -201,8 +201,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 
 		sendingStrategies.add(new StrategyConfig(clazzName, settings));
 
-		if (LOGGER.isLoggable(Level.INFO)) {
-			LOGGER.info("Sending strategy added: " + clazzName);
+		if (LOGGER.isLoggable(Level.FINE)) {
+			LOGGER.fine("Sending strategy added: " + clazzName);
 		}
 	}
 
@@ -241,8 +241,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 
 		methodSensorTypes.add(sensorTypeConfig);
 
-		if (LOGGER.isLoggable(Level.INFO)) {
-			LOGGER.info("Method sensor type added: " + sensorTypeName + " prio: " + priority.getValue());
+		if (LOGGER.isLoggable(Level.FINE)) {
+			LOGGER.fine("Method sensor type added: " + sensorTypeName + " prio: " + priority.getValue());
 		}
 	}
 
@@ -394,8 +394,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 
 		unregisteredSensorConfigs.add(sensorConfig);
 
-		if (LOGGER.isLoggable(Level.INFO)) {
-			LOGGER.info("Sensor configuration added: " + sensorConfig.toString());
+		if (LOGGER.isLoggable(Level.FINE)) {
+			LOGGER.fine("Sensor configuration added: " + sensorConfig.toString());
 		}
 	}
 
@@ -485,8 +485,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 
 		methodSensorTypes.add(sensorTypeConfig);
 
-		if (LOGGER.isLoggable(Level.INFO)) {
-			LOGGER.info("Exception sensor type added: " + sensorTypeClass);
+		if (LOGGER.isLoggable(Level.FINE)) {
+			LOGGER.fine("Exception sensor type added: " + sensorTypeClass);
 		}
 	}
 
