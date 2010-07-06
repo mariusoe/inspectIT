@@ -41,8 +41,8 @@ import org.hibernate.jdbc.util.FormatStyle;
 import org.hibernate.jdbc.util.Formatter;
 
 /**
- * This input controller displays the contents of {@link SqlStatementData}
- * objects in an invocation sequence.
+ * This input controller displays the contents of {@link SqlStatementData} objects in an invocation
+ * sequence.
  * 
  * @author Patrice Bouillet
  * 
@@ -55,9 +55,9 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	public static final String ID = "inspectit.subview.table.sqlinvoc";
 
 	/**
-	 * The private inner enumeration used to define the used IDs which are
-	 * mapped into the columns. The order in this enumeration represents the
-	 * order of the columns. If it is reordered, nothing else has to be changed.
+	 * The private inner enumeration used to define the used IDs which are mapped into the columns.
+	 * The order in this enumeration represents the order of the columns. If it is reordered,
+	 * nothing else has to be changed.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -89,8 +89,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in
-		 *            {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITConstants}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;
@@ -156,7 +155,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		Shell parent = tableViewer.getTable().getShell();
 		showDetails(parent, selection.getFirstElement());
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -245,7 +244,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		};
 		dialog.open();
 	}
-	
+
 	@Override
 	public boolean canShowDetails() {
 		return true;
@@ -384,8 +383,8 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	}
 
 	/**
-	 * Viewer Comparator used by this input controller to display the contents
-	 * of {@link BasicSQLData}.
+	 * Viewer Comparator used by this input controller to display the contents of
+	 * {@link BasicSQLData}.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -420,8 +419,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	 *            The data object to extract the information from.
 	 * @param enumId
 	 *            The enumeration ID.
-	 * @return The styled string containing the information from the data
-	 *         object.
+	 * @return The styled string containing the information from the data object.
 	 */
 	private StyledString getStyledTextForColumn(SqlStatementData data, Column enumId) {
 		switch (enumId) {
@@ -436,7 +434,8 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		case PREPARED:
 			return new StyledString(Boolean.toString(data.isPreparedStatement()));
 		case STATEMENT:
-			return new StyledString(data.getSql());
+			String sql = data.getSql().replaceAll("[\r\n]+", " ");
+			return new StyledString(sql);
 		default:
 			return new StyledString("error");
 		}

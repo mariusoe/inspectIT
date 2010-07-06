@@ -467,7 +467,8 @@ public class SqlInputController extends AbstractTableInputController {
 	private StyledString getStyledTextForColumn(SqlStatementData data, Column enumId) {
 		switch (enumId) {
 		case STATEMENT:
-			return new StyledString(data.getSql());
+			String sql = data.getSql().replaceAll("[\r\n]+", " ");
+			return new StyledString(sql);
 		case COUNT:
 			return new StyledString(Long.toString(data.getCount()));
 		case AVERAGE:
