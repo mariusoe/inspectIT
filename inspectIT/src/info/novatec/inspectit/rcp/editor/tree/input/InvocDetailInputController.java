@@ -55,8 +55,7 @@ import org.hibernate.jdbc.util.FormatStyle;
 import org.hibernate.jdbc.util.Formatter;
 
 /**
- * This input controller displays the detail contents of
- * {@link InvocationSequenceData} objects.
+ * This input controller displays the detail contents of {@link InvocationSequenceData} objects.
  * 
  * @author Patrice Bouillet
  * 
@@ -90,21 +89,19 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			SensorTypeEnum.JDBC_PREPARED_STATEMENT);
 
 	/**
-	 * There is no default value for the exclusive time filter, it has to be
-	 * selected by the user.
+	 * There is no default value for the exclusive time filter, it has to be selected by the user.
 	 */
 	private double defaultExclusiveFilterTime = Double.NaN;
 
 	/**
-	 * There is no default value for the total time filter, it has to be
-	 * selected by the user.
+	 * There is no default value for the total time filter, it has to be selected by the user.
 	 */
 	private double defaultTotalFilterTime = Double.NaN;
 
 	/**
-	 * The private inner enumeration used to define the used IDs which are
-	 * mapped into the columns. The order in this enumeration represents the
-	 * order of the columns. If it is reordered, nothing else has to be changed.
+	 * The private inner enumeration used to define the used IDs which are mapped into the columns.
+	 * The order in this enumeration represents the order of the columns. If it is reordered,
+	 * nothing else has to be changed.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -138,8 +135,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in
-		 *            {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITConstants}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;
@@ -477,8 +473,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	 *            The method ident object.
 	 * @param enumId
 	 *            The enumeration ID.
-	 * @return The styled string containing the information from the data
-	 *         object.
+	 * @return The styled string containing the information from the data object.
 	 */
 	private static StyledString getStyledTextForColumn(InvocationSequenceData data, MethodIdent methodIdent, Column enumId) {
 		StyledString styledString = null;
@@ -522,7 +517,8 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		case SQL:
 			styledString = new StyledString();
 			if (null != data.getSqlStatementData()) {
-				styledString.append(data.getSqlStatementData().getSql());
+				String sql = data.getSqlStatementData().getSql().replaceAll("[\r\n]+", " ");
+				styledString.append(sql);
 			}
 			return styledString;
 		case PARAMETER:
@@ -555,8 +551,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	 * 
 	 * @param data
 	 *            The data objects which is inspected for its nested elements.
-	 * @return The duration of all nested sequences (with their nested sequences
-	 *         as well).
+	 * @return The duration of all nested sequences (with their nested sequences as well).
 	 */
 	@SuppressWarnings("unchecked")
 	private static double computeNestedDuration(InvocationSequenceData data) {
@@ -597,8 +592,8 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	private static final class InvocDetailContentProvider implements ITreeContentProvider {
 
 		/**
-		 * The deferred manager is used here to update the tree in a concurrent
-		 * thread so the UI responds much better if many items are displayed.
+		 * The deferred manager is used here to update the tree in a concurrent thread so the UI
+		 * responds much better if many items are displayed.
 		 */
 		private DeferredTreeContentManager manager;
 
@@ -772,10 +767,9 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	}
 
 	/**
-	 * This class is needed to modify the filter method which behaves a little
-	 * bit differently than the original one: Instead of filtering out a
-	 * specific element _and_ all its sub-elements, it only filters out the
-	 * specific elements and pushes up the elements which are child-elements of
+	 * This class is needed to modify the filter method which behaves a little bit differently than
+	 * the original one: Instead of filtering out a specific element _and_ all its sub-elements, it
+	 * only filters out the specific elements and pushes up the elements which are child-elements of
 	 * that one.
 	 * 
 	 * @author Patrice Bouillet
@@ -783,8 +777,8 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	 */
 	private abstract class InvocationViewerFilter extends ViewerFilter {
 		/**
-		 * The filtering method which tries to push up the child elements if a
-		 * parent element has to be filtered out.
+		 * The filtering method which tries to push up the child elements if a parent element has to
+		 * be filtered out.
 		 * 
 		 * @param viewer
 		 *            The viewer
@@ -792,8 +786,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		 *            The parent object
 		 * @param elements
 		 *            The elements to check if they should be filtered
-		 * @return Returns a set of elements which could be now even more than
-		 *         the initial elements
+		 * @return Returns a set of elements which could be now even more than the initial elements
 		 */
 		@Override
 		public Object[] filter(Viewer viewer, Object parent, Object[] elements) {
