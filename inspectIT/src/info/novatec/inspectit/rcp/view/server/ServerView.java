@@ -39,9 +39,8 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
 /**
- * This view displays the available servers / CMRs in a so called {@link PShelf}
- * widget. Every server contains a separate tree view which displays the
- * information of this specific server.
+ * This view displays the available servers / CMRs in a so called {@link PShelf} widget. Every
+ * server contains a separate tree view which displays the information of this specific server.
  * 
  * @author Patrice Bouillet
  * 
@@ -86,8 +85,7 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	private SelectionProviderIntermediate selectionProviderIntermediate = new SelectionProviderIntermediate();
 
 	/**
-	 * This is a callback that will allow us to create the viewer and initialize
-	 * it.
+	 * This is a callback that will allow us to create the viewer and initialize it.
 	 * <p>
 	 * {@inheritDoc}
 	 */
@@ -123,11 +121,14 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 			public void widgetSelected(SelectionEvent e) {
 				PShelfItem item = (PShelfItem) e.item;
 				if (item.getBody().getChildren().length > 0) {
-					Tree tree = (Tree) item.getBody().getChildren()[0];
-					TreeViewer treeViewer = findTreeViewer(tree);
-					selectionProviderIntermediate.setSelectionProviderDelegate(treeViewer);
-				} else {
-					selectionProviderIntermediate.setSelectionProviderDelegate(null);
+					Object child = item.getBody().getChildren()[0];
+					if (child instanceof Tree) {
+						Tree tree = (Tree) child;
+						TreeViewer treeViewer = findTreeViewer(tree);
+						selectionProviderIntermediate.setSelectionProviderDelegate(treeViewer);
+					} else {
+						selectionProviderIntermediate.setSelectionProviderDelegate(null);
+					}
 				}
 			}
 		});
@@ -179,8 +180,7 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	 * @param item
 	 *            The item to update.
 	 * @param repositoryDefinition
-	 *            The repository definition which is needed to update the
-	 *            information
+	 *            The repository definition which is needed to update the information
 	 */
 	private void updateServerItem(PShelfItem item, RepositoryDefinition repositoryDefinition) {
 		if (repositoryDefinition.getServerStatusService().isOnline()) {
@@ -216,8 +216,7 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	 * @param shelf
 	 *            The container for the item.
 	 * @param repositoryDefinition
-	 *            The repository definition which is contained in one of the
-	 *            items.
+	 *            The repository definition which is contained in one of the items.
 	 */
 	private void deleteServerItem(PShelf shelf, RepositoryDefinition repositoryDefinition) {
 		PShelfItem[] items = shelf.getItems();
@@ -360,8 +359,8 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	}
 
 	/**
-	 * Returns the active repository definition, that is the active
-	 * {@link PShelfItem} with the data.
+	 * Returns the active repository definition, that is the active {@link PShelfItem} with the
+	 * data.
 	 * 
 	 * @return The active repository definition.
 	 */
