@@ -1,8 +1,10 @@
 package info.novatec.inspectit.rcp.handlers;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
+import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.rcp.repository.service.cmr.InvocationDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.storage.StorageInvocationDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.storage.StorageNamingConstants;
 
 import java.io.BufferedOutputStream;
@@ -24,8 +26,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
 /**
- * Abstract storage handler class which provides some common methods to store
- * data into files.
+ * Abstract storage handler class which provides some common methods to store data into files.
  * 
  * @author Patrice Bouillet
  * 
@@ -33,8 +34,7 @@ import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 public abstract class AbstractStorageHandler extends AbstractHandler {
 
 	/**
-	 * The xstream object which is used to transform the objects into a saveable
-	 * state.
+	 * The xstream object which is used to transform the objects into a saveable state.
 	 */
 	private XStream xstream = new XStream(new JettisonMappedXmlDriver());
 
@@ -42,8 +42,7 @@ public abstract class AbstractStorageHandler extends AbstractHandler {
 	 * Save invocation sequences into a specific directory.
 	 * 
 	 * @param dataAccessService
-	 *            the service which is used to get the details of these
-	 *            invocation sequences.
+	 *            the service which is used to get the details of these invocation sequences.
 	 * @param dir
 	 *            the directory to save the invocation sequences to.
 	 * @param iterator
@@ -51,7 +50,7 @@ public abstract class AbstractStorageHandler extends AbstractHandler {
 	 * @throws ExecutionException
 	 *             if an exception occurred during execution.
 	 */
-	protected void saveInvocationSequences(InvocationDataAccessService dataAccessService, File dir, Iterator<InvocationSequenceData> iterator) throws ExecutionException {
+	protected void saveInvocationSequences(IInvocationDataAccessService dataAccessService, File dir, Iterator<InvocationSequenceData> iterator) throws ExecutionException {
 		List<InvocationSequenceData> invocations = new ArrayList<InvocationSequenceData>();
 		for (; iterator.hasNext();) {
 			InvocationSequenceData invocationSequenceData = iterator.next();
@@ -59,6 +58,8 @@ public abstract class AbstractStorageHandler extends AbstractHandler {
 
 			OutputStream fos = null;
 			OutputStream bos = null;
+
+			InputStream input = null;
 
 			// create path
 			StringBuilder path = new StringBuilder();
@@ -71,7 +72,14 @@ public abstract class AbstractStorageHandler extends AbstractHandler {
 			File file = new File(path.toString());
 
 			// Now load the whole tree for each one and save it
-			InputStream input = dataAccessService.getStreamForInvocationSequence(invocationSequenceData);
+			if (dataAccessService instanceof InvocationDataAccessService) {
+				InvocationDataAccessService service = (InvocationDataAccessService) dataAccessService;
+				input = service.getStreamForInvocationSequence(invocationSequenceData);
+			} else if (dataAccessService instanceof StorageInvocationDataAccessService) {
+				StorageInvocationDataAccessService service = (StorageInvocationDataAccessService) dataAccessService;
+				input = service.getStreamForInvocationSequence(invocationSequenceData);
+			}
+
 			try {
 				fos = new FileOutputStream(file);
 				bos = new BufferedOutputStream(fos);
@@ -104,6 +112,7 @@ public abstract class AbstractStorageHandler extends AbstractHandler {
 					// we do not care about this
 				}
 			}
+
 		}
 
 		saveInvocationOverview(dir, invocations);

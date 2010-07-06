@@ -79,7 +79,15 @@ public class StorageGlobalDataAcessService extends AbstractCachedGlobalDataAcces
 					platformIdent = loadPlatformIdent(fileObject);
 					String folder = fileObject.getParentFile().getAbsolutePath();
 					String folderName = fileObject.getParentFile().getName();
-					platformIdents.add(new StoragePlatformIdent(platformIdent, folder, folderName));
+					if (platformIdent instanceof StoragePlatformIdent) {
+						// was stored before, thus we modify the metadata
+						StoragePlatformIdent platform = (StoragePlatformIdent) platformIdent;
+						platform.setPath(folder);
+						platform.setFolderName(folderName);
+					} else if (platformIdent instanceof PlatformIdent) {
+						platformIdent = new StoragePlatformIdent(platformIdent, folder, folderName);
+					}
+					platformIdents.add(platformIdent);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -94,8 +102,7 @@ public class StorageGlobalDataAcessService extends AbstractCachedGlobalDataAcces
 	 *            The file object.
 	 * @return the platform ident object
 	 * @throws IOException
-	 *             throws IOException in case of something goes wrong while
-	 *             readin
+	 *             throws IOException in case of something goes wrong while readin
 	 */
 	private PlatformIdent loadPlatformIdent(File fileObject) throws IOException {
 		InputStream fis = null;

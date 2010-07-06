@@ -2,11 +2,13 @@ package info.novatec.inspectit.rcp.repository.service.storage;
 
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
+import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -150,6 +152,23 @@ public class StorageInvocationDataAccessService implements IInvocationDataAccess
 			} catch (IOException e) {
 				// ignore the exception
 			}
+		}
+	}
+
+	/**
+	 * Returns a stream for an invocation sequence object.
+	 * 
+	 * @param template
+	 *            The template to search for.
+	 * @return the stream.
+	 */
+	public InputStream getStreamForInvocationSequence(InvocationSequenceData template) {
+		File file = new File(storageRepositoryDefinition.getPath() + File.separator + template.getTimeStamp().getTime() + StorageNamingConstants.FILE_ENDING_INVOCATIONS);
+		try {
+			return new FileInputStream(file);
+		} catch (FileNotFoundException e) {
+			InspectIT.getDefault().createErrorDialog("Could not load stored invocation file!", e, -1);
+			throw new RuntimeException(e);
 		}
 	}
 

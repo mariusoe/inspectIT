@@ -6,7 +6,6 @@ import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
-import info.novatec.inspectit.rcp.repository.service.cmr.InvocationDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.storage.StorageNamingConstants;
 import info.novatec.inspectit.rcp.util.ZipUtil;
 import info.novatec.inspectit.rcp.wizard.ExportDataWizard;
@@ -59,7 +58,7 @@ public class ExportInvocationsHandler extends AbstractStorageHandler {
 			}
 
 			// save the invocation sequences
-			saveInvocationSequences((InvocationDataAccessService) dataAccessService, dir, selection.iterator());
+			saveInvocationSequences(dataAccessService, dir, selection.iterator());
 
 			// inefficient, should be replaced by just getting the correct
 			// PlatformIdent object to save

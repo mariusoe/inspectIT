@@ -89,8 +89,16 @@ public class StoragePlatformIdent extends PlatformIdent {
 		return platformIdent.toString();
 	}
 
+	public void setPath(String path) {
+		this.path = path;
+	}
+
 	public String getPath() {
 		return path;
+	}
+
+	public void setFolderName(String folderName) {
+		this.folderName = folderName;
 	}
 
 	public String getFolderName() {
