@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * The repository manager stores all the repository definitions.
@@ -16,6 +18,16 @@ import org.eclipse.core.runtime.Preferences;
  * 
  */
 public class RepositoryManager {
+
+	/**
+	 * The preference value for the host.
+	 */
+	private static final String HOST = "server_host_";
+
+	/**
+	 * The preference value for the port.
+	 */
+	private static final String PORT = "server_port_";
 
 	/**
 	 * The list containing the available {@link RepositoryDefinition} objects.
@@ -28,16 +40,23 @@ public class RepositoryManager {
 	private ListenerList<RepositoryChangeListener> repositoryChangeListeners = new ListenerList<RepositoryChangeListener>();
 
 	/**
+	 * The configuration scope
+	 */
+	private ConfigurationScope scope;
+
+	/**
 	 * Starts the repository manager (e.g. loads all the saved data).
 	 */
 	public void startup() {
-		Preferences preferences = InspectIT.getDefault().getPluginPreferences();
+		scope = new ConfigurationScope();
+		IEclipsePreferences node = scope.getNode(InspectIT.ID);
 
+		// load existing definitions
 		for (int i = 1; i < Integer.MAX_VALUE; i++) {
-			String ip = preferences.getString("server_host_" + i);
-			int port = preferences.getInt("server_port_" + i);
-			if (!"".equals(ip)) {
-				addRepositoryDefinition(new CmrRepositoryDefinition(ip, port));
+			String ip = node.get(HOST + i, null);
+			int port = node.getInt(PORT + i, 8080);
+			if (null != ip) {
+				repositoryDefinitions.add(new CmrRepositoryDefinition(ip, port));
 			} else {
 				break;
 			}
@@ -53,6 +72,8 @@ public class RepositoryManager {
 	public void addRepositoryDefinition(RepositoryDefinition repositoryDefinition) {
 		repositoryDefinitions.add(repositoryDefinition);
 
+		savePreference();
+
 		for (RepositoryChangeListener repositoryChangeListener : repositoryChangeListeners) {
 			repositoryChangeListener.repositoryAdded(repositoryDefinition);
 		}
@@ -67,19 +88,22 @@ public class RepositoryManager {
 	public void removeRepositoryDefinition(RepositoryDefinition repositoryDefinition) {
 		repositoryDefinitions.remove(repositoryDefinition);
 
+		savePreference();
+
 		for (RepositoryChangeListener repositoryChangeListener : repositoryChangeListeners) {
 			repositoryChangeListener.repositoryRemoved(repositoryDefinition);
 		}
 	}
 
 	/**
-	 * Notifies all listeners that a certain repository definition has been
-	 * updated.
+	 * Notifies all listeners that a certain repository definition has been updated.
 	 * 
 	 * @param repositoryDefinition
 	 *            The definition which was updated.
 	 */
 	public void updateRepositoryDefinition(RepositoryDefinition repositoryDefinition) {
+		savePreference();
+
 		for (RepositoryChangeListener repositoryChangeListener : repositoryChangeListeners) {
 			repositoryChangeListener.updateRepository(repositoryDefinition);
 		}
@@ -95,8 +119,8 @@ public class RepositoryManager {
 	}
 
 	/**
-	 * Returns all registered repository definitions handled by this manager.
-	 * The list is unmodifiable.
+	 * Returns all registered repository definitions handled by this manager. The list is
+	 * unmodifiable.
 	 * 
 	 * @return The list of repository definitions.
 	 */
@@ -125,27 +149,32 @@ public class RepositoryManager {
 	}
 
 	/**
-	 * Persist the repository list.
+	 * Save the preferences to the backend store.
 	 */
-	public void shutdown() {
-		Preferences preferences = InspectIT.getDefault().getPluginPreferences();
-
-		// remove all old saved server definitions
+	private void savePreference() {
+		IEclipsePreferences node = scope.getNode(InspectIT.ID);
+		// first, remove all existing preferences
 		for (int i = 1; i < Integer.MAX_VALUE; i++) {
-			String ip = preferences.getString("server_host_" + i);
-			if (!"".equals(ip)) {
-				preferences.setValue("server_host_" + i, "");
-				preferences.setValue("server_port_" + i, 0);
+			String ip = node.get(HOST + i, null);
+			if (null != ip) {
+				node.remove(HOST + i);
+				node.remove(PORT + i);
 			} else {
 				break;
 			}
 		}
-
-		int i = 1;
+		// second, add the details again
+		int id = 1;
 		for (RepositoryDefinition repositoryDefinition : repositoryDefinitions) {
-			preferences.setValue("server_host_" + i, repositoryDefinition.getIp());
-			preferences.setValue("server_port_" + i, repositoryDefinition.getPort());
-			i++;
+			node.put(HOST + id, repositoryDefinition.getIp());
+			node.putInt(PORT + id, repositoryDefinition.getPort());
+			id++;
+		}
+		// last, flush/save the settings
+		try {
+			node.flush();
+		} catch (BackingStoreException e) {
+			InspectIT.getDefault().createErrorDialog("Could not save the preferences to the backing store!", e, -1);
 		}
 	}
 

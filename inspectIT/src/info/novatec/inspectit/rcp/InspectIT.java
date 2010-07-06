@@ -39,8 +39,8 @@ public class InspectIT extends AbstractUIPlugin {
 	private ApplicationContext applicationContext;
 
 	/**
-	 * The global repository management tool. It is used to create and save the
-	 * connection to the CMR.
+	 * The global repository management tool. It is used to create and save the connection to the
+	 * CMR.
 	 */
 	private RepositoryManager repositoryManager;
 
@@ -64,7 +64,6 @@ public class InspectIT extends AbstractUIPlugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		if (repositoryManager != null) {
-			repositoryManager.shutdown();
 			repositoryManager = null;
 		}
 
@@ -80,8 +79,8 @@ public class InspectIT extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Helper method to add one of the IMG_ keys in {@link InspectITConstants} to
-	 * the image registry.
+	 * Helper method to add one of the IMG_ keys in {@link InspectITConstants} to the image
+	 * registry.
 	 * 
 	 * @param registry
 	 *            The image registry.
@@ -146,8 +145,7 @@ public class InspectIT extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns an image from the image registry by resolving the passed image
-	 * key.
+	 * Returns an image from the image registry by resolving the passed image key.
 	 * 
 	 * @param imageKey
 	 *            The key of the image to look for in the registry.
@@ -158,8 +156,8 @@ public class InspectIT extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns the image descriptor for the given key. The key can be one of the
-	 * IMG_ definitions in {@link InspectITConstants}.
+	 * Returns the image descriptor for the given key. The key can be one of the IMG_ definitions in
+	 * {@link InspectITConstants}.
 	 * 
 	 * @param imageKey
 	 *            The image key.
@@ -199,8 +197,7 @@ public class InspectIT extends AbstractUIPlugin {
 	 * @param throwable
 	 *            The exception to display
 	 * @param code
-	 *            The code of the error. <b>-1</b> is a marker that the code has
-	 *            to be added later.
+	 *            The code of the error. <b>-1</b> is a marker that the code has to be added later.
 	 */
 	public void createErrorDialog(String message, Throwable throwable, int code) {
 		IStatus status = new Status(IStatus.ERROR, ID, code, message, throwable);
@@ -213,8 +210,7 @@ public class InspectIT extends AbstractUIPlugin {
 	 * @param message
 	 *            The message of the dialog.
 	 * @param code
-	 *            The code of the error. <b>-1</b> is a marker that the code has
-	 *            to be added later.
+	 *            The code of the error. <b>-1</b> is a marker that the code has to be added later.
 	 */
 	public void createInfoDialog(String message, int code) {
 		MessageDialog.openInformation(null, "Information", message);
