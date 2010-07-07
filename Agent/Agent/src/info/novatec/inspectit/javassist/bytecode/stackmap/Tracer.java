@@ -1,16 +1,11 @@
 /*
- * Javassist, a Java-bytecode translator toolkit.
- * Copyright (C) 1999-2007 Shigeru Chiba. All Rights Reserved.
- *
- * The contents of this file are subject to the Mozilla Public License Version
- * 1.1 (the "License"); you may not use this file except in compliance with
- * the License.  Alternatively, the contents of this file may be used under
- * the terms of the GNU Lesser General Public License Version 2.1 or later.
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
- * for the specific language governing rights and limitations under the
- * License.
+ * Javassist, a Java-bytecode translator toolkit. Copyright (C) 1999-2007 Shigeru Chiba. All Rights
+ * Reserved. The contents of this file are subject to the Mozilla Public License Version 1.1 (the
+ * "License"); you may not use this file except in compliance with the License. Alternatively, the
+ * contents of this file may be used under the terms of the GNU Lesser General Public License
+ * Version 2.1 or later. Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for the specific
+ * language governing rights and limitations under the License.
  */
 
 package info.novatec.inspectit.javassist.bytecode.stackmap;
@@ -25,14 +20,13 @@ import info.novatec.inspectit.javassist.bytecode.Opcode;
 import java.util.logging.Logger;
 
 /*
- * A class for performing abstract interpretation.
- * See also MapMaker class. 
+ * A class for performing abstract interpretation. See also MapMaker class.
  */
 
 public abstract class Tracer implements TypeTag {
 	/**
-	 * Logger added by inspectIT to print information about the 'jsr' and 'ret'
-	 * invalid instructions.
+	 * Logger added by inspectIT to print information about the 'jsr' and 'ret' invalid
+	 * instructions.
 	 */
 	private static final Logger LOGGER = Logger.getLogger(Tracer.class.getName());
 
@@ -85,10 +79,9 @@ public abstract class Tracer implements TypeTag {
 	}
 
 	/**
-	 * Does abstract interpretation on the given bytecode instruction. It
-	 * records whether or not a local variable (i.e. register) is accessed. If
-	 * the instruction requires that a local variable or a stack element has a
-	 * more specific type, this method updates the type of it.
+	 * Does abstract interpretation on the given bytecode instruction. It records whether or not a
+	 * local variable (i.e. register) is accessed. If the instruction requires that a local variable
+	 * or a stack element has a more specific type, this method updates the type of it.
 	 * 
 	 * @param pos
 	 *            the position of the instruction.
@@ -142,8 +135,7 @@ public abstract class Tracer implements TypeTag {
 	 * @param n
 	 *            the number of case labels
 	 * @param offsetPos
-	 *            the position of the table of pairs of a value and a branch
-	 *            target.
+	 *            the position of the table of pairs of a value and a branch target.
 	 * @param defaultOffset
 	 *            the offset to the default branch target.
 	 */
@@ -167,7 +159,7 @@ public abstract class Tracer implements TypeTag {
 		// temporary fix to overcome the problem that the bytecode for java 6 is
 		// invalid but the old verifier can use it anyway.
 		// throwBadBytecode(pos, "ret");
-		LOGGER.warning("Found 'jsr' at pos: " + pos + ". New Java 6 bytecode verifier cannot be used for this class...");
+		LOGGER.warning("Found 'ret' at pos: " + pos + ". New Java 6 bytecode verifier cannot be used for this class...");
 	}
 
 	private void throwBadBytecode(int pos, String name) throws BadBytecode {
