@@ -17,13 +17,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This hook is intended to intercept the created prepared statement calls to
- * the database. To not create duplicate calls, a {@link ThreadLocal} attribute
- * is used to check if this specific statement is already 'sent'.
+ * This hook is intended to intercept the created prepared statement calls to the database. To not
+ * create duplicate calls, a {@link ThreadLocal} attribute is used to check if this specific
+ * statement is already 'sent'.
  * <p>
- * Furthermore, a {@link StatementStorage} is used which saves all the created
- * prepared statements and if the parameter hook for the sqls is installed and
- * activated, the parameters are replaced.
+ * Furthermore, a {@link StatementStorage} is used which saves all the created prepared statements
+ * and if the parameter hook for the sqls is installed and activated, the parameters are replaced.
  * 
  * @author Patrice Bouillet
  * 
@@ -56,8 +55,8 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 	private final StatementStorage statementStorage;
 
 	/**
-	 * The ThreadLocal for a boolean value so only the last before and first
-	 * after hook of an invocation is measured.
+	 * The ThreadLocal for a boolean value so only the last before and first after hook of an
+	 * invocation is measured.
 	 */
 	private ThreadLocal threadLast = new ThreadLocal();
 
@@ -163,6 +162,7 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 			// as everyone could instantiate a prepared statement object without
 			// calling first a method on the connection (prepareStatement...)
 			LOGGER.info("Could not add prepared statement, no sql available! Method ID(local): " + methodId);
+			LOGGER.info("This is not an inspectIT issue, please consult the management of inspectIT and send the following stacktrace!");
 			// Furthermore, we will print the stack trace as it can indicate if
 			// there is something wrong with the instrumentation or not. This is
 			// because a prepareStatement(...) call must be seen in this stack!
