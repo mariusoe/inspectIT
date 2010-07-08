@@ -119,15 +119,8 @@ public class StorageInvocationDataAccessService implements IInvocationDataAccess
 	 */
 	@Override
 	public Object getInvocationSequenceDetail(InvocationSequenceData template) {
-		// create path
-		StringBuilder path = new StringBuilder();
-		path.append(storageRepositoryDefinition.getPath());
-		path.append(File.separator);
-		path.append(template.getTimeStamp().getTime());
-		path.append("_");
-		path.append(Double.valueOf(template.getDuration() * 1000).longValue());
-		path.append(StorageNamingConstants.FILE_ENDING_INVOCATIONS);
-		File file = new File(path.toString());
+		String path = getFilenameForInvocation(template);
+		File file = new File(path);
 		try {
 			InvocationSequenceData data = (InvocationSequenceData) loadInvocationSequenceData(file);
 			return data;
@@ -171,13 +164,33 @@ public class StorageInvocationDataAccessService implements IInvocationDataAccess
 	 * @return the stream.
 	 */
 	public InputStream getStreamForInvocationSequence(InvocationSequenceData template) {
-		File file = new File(storageRepositoryDefinition.getPath() + File.separator + template.getTimeStamp().getTime() + StorageNamingConstants.FILE_ENDING_INVOCATIONS);
+		String path = getFilenameForInvocation(template);
+		File file = new File(path);
 		try {
 			return new FileInputStream(file);
 		} catch (FileNotFoundException e) {
 			InspectIT.getDefault().createErrorDialog("Could not load stored invocation file!", e, -1);
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Creates the path to the invocation sequence file.
+	 * 
+	 * @param template
+	 *            the template which contains the storage repository path.
+	 * @return the complete path
+	 */
+	private String getFilenameForInvocation(InvocationSequenceData template) {
+		// create path
+		StringBuilder path = new StringBuilder();
+		path.append(storageRepositoryDefinition.getPath());
+		path.append(File.separator);
+		path.append(template.getTimeStamp().getTime());
+		path.append("_");
+		path.append(Double.valueOf(template.getDuration() * 1000).longValue());
+		path.append(StorageNamingConstants.FILE_ENDING_INVOCATIONS);
+		return path.toString();
 	}
 
 }
