@@ -3,7 +3,6 @@ package info.novatec.inspectit.cmr.dao.impl;
 import info.novatec.inspectit.cmr.dao.DefaultDataDao;
 import info.novatec.inspectit.cmr.dao.InvocationDataDao;
 import info.novatec.inspectit.cmr.util.Configuration;
-import info.novatec.inspectit.cmr.util.Converter;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
@@ -14,19 +13,12 @@ import info.novatec.inspectit.communication.data.SystemInformationData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.communication.data.VmArgumentData;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.GZIPOutputStream;
 
-import org.apache.log4j.Logger;
 import org.hibernate.FetchMode;
 import org.hibernate.Query;
 import org.hibernate.StatelessSession;
@@ -38,15 +30,12 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
-
 /**
- * The default implementation of the {@link DefaultDataDao} interface by using
- * the {@link HibernateDaoSupport} from Spring.
+ * The default implementation of the {@link DefaultDataDao} interface by using the
+ * {@link HibernateDaoSupport} from Spring.
  * <p>
- * Delegates many calls to the {@link HibernateTemplate} returned by the
- * {@link HibernateDaoSupport} class.
+ * Delegates many calls to the {@link HibernateTemplate} returned by the {@link HibernateDaoSupport}
+ * class.
  * 
  * @author Patrice Bouillet
  * 
@@ -54,19 +43,14 @@ import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDataDao {
 
 	/**
-	 * The logger of this class.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(DefaultDataDaoImpl.class);
-
-	/**
-	 * The xstream used to write JSON files.
-	 */
-	private XStream xstream = new XStream(new JettisonMappedXmlDriver());
-
-	/**
 	 * The configuration bean.
 	 */
 	private Configuration configuration;
+
+	/**
+	 * The invocation data dao to persist the invocations.
+	 */
+	private InvocationDataDao invocationDataDao;
 
 	/**
 	 * {@inheritDoc}
@@ -86,7 +70,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 			if (element instanceof InvocationSequenceData) {
 				InvocationSequenceData invoc = (InvocationSequenceData) element;
 				if (configuration.isEnhancedInvocationStorageMode()) {
-					saveInvocationAsJson(invoc);
+					invocationDataDao.saveInvocation(invoc);
 					saveStrippedInvocationInDatabase(invoc, session, true);
 				} else {
 					saveInvocationInDatabase(invoc, session, 0);
@@ -138,64 +122,6 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	}
 
 	/**
-	 * Saves the passed invocation as a compressed JSON file.
-	 * 
-	 * @param invocation
-	 *            The invocation object.
-	 */
-	private void saveInvocationAsJson(InvocationSequenceData invocation) {
-		OutputStream fos = null;
-		OutputStream bos = null;
-		OutputStream output = null;
-
-		try {
-			// create path
-			StringBuilder path = new StringBuilder();
-			path.append(InvocationDataDao.INVOCATION_STORAGE_DIRECTORY);
-			path.append(invocation.getPlatformIdent());
-			path.append("_");
-			path.append(invocation.getTimeStamp().getTime());
-			path.append(".inv");
-
-			// create file
-			File file = new File(path.toString());
-
-			// create streams
-			fos = new FileOutputStream(file);
-			bos = new BufferedOutputStream(fos);
-			output = new GZIPOutputStream(bos);
-
-			long time = 0;
-			if (LOGGER.isDebugEnabled()) {
-				time = System.nanoTime();
-			}
-
-			// store into json file
-			xstream.toXML(invocation, output);
-
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Invocation Conversion: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (null != output) {
-					output.close();
-				}
-				if (null != bos) {
-					bos.close();
-				}
-				if (null != fos) {
-					fos.close();
-				}
-			} catch (IOException e) {
-				// ignore the exception
-			}
-		}
-	}
-
-	/**
 	 * Saves the {@link ExceptionSensorData} object into the database.
 	 * 
 	 * @param session
@@ -206,8 +132,9 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	private void saveExceptionSensorData(StatelessSession session, ExceptionSensorData data) {
 		ExceptionSensorData child = data.getChild();
 		if (null != child) {
-			// we store in each object the error message from the root data object that has the CREATED event
-			if(data.getErrorMessage() != child.getErrorMessage()) {
+			// we store in each object the error message from the root data object that has the
+			// CREATED event
+			if (data.getErrorMessage() != child.getErrorMessage()) {
 				child.setErrorMessage(data.getErrorMessage());
 			}
 			// first save the lowermost child
@@ -426,4 +353,13 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	public void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
 	}
+
+	/**
+	 * @param invocationDataDao
+	 *            the invocationDataDao to set
+	 */
+	public void setInvocationDataDao(InvocationDataDao invocationDataDao) {
+		this.invocationDataDao = invocationDataDao;
+	}
+
 }

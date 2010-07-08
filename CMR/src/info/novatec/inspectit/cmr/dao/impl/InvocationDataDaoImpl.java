@@ -2,15 +2,21 @@ package info.novatec.inspectit.cmr.dao.impl;
 
 import info.novatec.inspectit.cmr.dao.InvocationDataDao;
 import info.novatec.inspectit.cmr.util.Configuration;
+import info.novatec.inspectit.cmr.util.Converter;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
+import org.apache.log4j.Logger;
 import org.hibernate.FetchMode;
 import org.hibernate.NonUniqueResultException;
 import org.hibernate.criterion.DetachedCriteria;
@@ -23,6 +29,8 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import com.healthmarketscience.rmiio.DirectRemoteInputStream;
 import com.healthmarketscience.rmiio.SerializableInputStream;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
 /**
  * Default implementation of the {@link InvocationDataDao} interface.
@@ -31,6 +39,16 @@ import com.healthmarketscience.rmiio.SerializableInputStream;
  * 
  */
 public class InvocationDataDaoImpl extends HibernateDaoSupport implements InvocationDataDao {
+
+	/**
+	 * The logger of this class.
+	 */
+	private static final Logger LOGGER = Logger.getLogger(DefaultDataDaoImpl.class);
+
+	/**
+	 * The xstream used to write JSON files.
+	 */
+	private XStream xstream = new XStream(new JettisonMappedXmlDriver());
 
 	/**
 	 * The directory of the stored invocations.
@@ -112,25 +130,15 @@ public class InvocationDataDaoImpl extends HibernateDaoSupport implements Invoca
 			// new mode with stored invocations as files, we are returning a
 			// stream of the compressed content back to the client.
 
-			// filter all files which match the template
-			final StringBuilder compareString = new StringBuilder();
-			compareString.append(template.getPlatformIdent());
-			compareString.append("_");
-			compareString.append(template.getTimeStamp().getTime());
-			compareString.append(".inv");
+			String path = getFilenameForInvocation(template);
+			File file = new File(path);
 
-			File[] files = dir.listFiles(new FilenameFilter() {
-				public boolean accept(File dir, String name) {
-					return name.equals(compareString.toString());
-				}
-			});
-
-			if (files.length != 1) {
-				throw new RuntimeException("Invocation could not be found!");
+			if (!file.exists()) {
+				throw new RuntimeException("Invocation " + path + " could not be found!");
 			}
 
 			try {
-				return new SerializableInputStream(new DirectRemoteInputStream(new BufferedInputStream(new FileInputStream(files[0]))));
+				return new SerializableInputStream(new DirectRemoteInputStream(new BufferedInputStream(new FileInputStream(file))));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				throw new RuntimeException("File not found exception!");
@@ -157,8 +165,7 @@ public class InvocationDataDaoImpl extends HibernateDaoSupport implements Invoca
 	 *            The list to check for a unique element
 	 * @return Returns the unique element.
 	 * @throws NonUniqueResultException
-	 *             If this list does not contain a unique result, this exception
-	 *             is thrown.
+	 *             If this list does not contain a unique result, this exception is thrown.
 	 */
 	private static <T> T uniqueElement(List<T> list) throws NonUniqueResultException {
 		int size = list.size();
@@ -172,6 +179,76 @@ public class InvocationDataDaoImpl extends HibernateDaoSupport implements Invoca
 			}
 		}
 		return first;
+	}
+
+	/**
+	 * Saves the passed invocation as a compressed JSON file.
+	 * 
+	 * @param invocation
+	 *            The invocation object.
+	 */
+	@Override
+	public void saveInvocation(InvocationSequenceData invocation) {
+		OutputStream fos = null;
+		OutputStream bos = null;
+		OutputStream output = null;
+
+		try {
+			// create path
+			String path = getFilenameForInvocation(invocation);
+
+			// create file
+			File file = new File(path);
+
+			// create streams
+			fos = new FileOutputStream(file);
+			bos = new BufferedOutputStream(fos);
+			output = new GZIPOutputStream(bos);
+
+			long time = 0;
+			if (LOGGER.isDebugEnabled()) {
+				time = System.nanoTime();
+			}
+
+			// store into json file
+			xstream.toXML(invocation, output);
+
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Invocation Conversion: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (null != output) {
+					output.close();
+				}
+				if (null != bos) {
+					bos.close();
+				}
+				if (null != fos) {
+					fos.close();
+				}
+			} catch (IOException e) {
+				// ignore the exception
+			}
+		}
+	}
+
+	/**
+	 * @param invocation
+	 * @return
+	 */
+	private String getFilenameForInvocation(InvocationSequenceData invocation) {
+		StringBuilder path = new StringBuilder();
+		path.append(InvocationDataDao.INVOCATION_STORAGE_DIRECTORY);
+		path.append(invocation.getPlatformIdent());
+		path.append("_");
+		path.append(invocation.getTimeStamp().getTime());
+		path.append("_");
+		path.append(Double.valueOf(invocation.getDuration() * 1000).longValue());
+		path.append(INVOCATION_FILE_ENDING);
+		return path.toString();
 	}
 
 	/**
