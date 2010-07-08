@@ -119,7 +119,15 @@ public class StorageInvocationDataAccessService implements IInvocationDataAccess
 	 */
 	@Override
 	public Object getInvocationSequenceDetail(InvocationSequenceData template) {
-		File file = new File(storageRepositoryDefinition.getPath() + File.separator + template.getTimeStamp().getTime() + StorageNamingConstants.FILE_ENDING_INVOCATIONS);
+		// create path
+		StringBuilder path = new StringBuilder();
+		path.append(storageRepositoryDefinition.getPath());
+		path.append(File.separator);
+		path.append(template.getTimeStamp().getTime());
+		path.append("_");
+		path.append(Double.valueOf(template.getDuration() * 1000).longValue());
+		path.append(StorageNamingConstants.FILE_ENDING_INVOCATIONS);
+		File file = new File(path.toString());
 		try {
 			InvocationSequenceData data = (InvocationSequenceData) loadInvocationSequenceData(file);
 			return data;

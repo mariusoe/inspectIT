@@ -66,6 +66,8 @@ public abstract class AbstractStorageHandler extends AbstractHandler {
 			path.append(dir.getAbsolutePath());
 			path.append(File.separator);
 			path.append(invocationSequenceData.getTimeStamp().getTime());
+			path.append("_");
+			path.append(Double.valueOf(invocationSequenceData.getDuration() * 1000).longValue());
 			path.append(StorageNamingConstants.FILE_ENDING_INVOCATIONS);
 
 			// create file
