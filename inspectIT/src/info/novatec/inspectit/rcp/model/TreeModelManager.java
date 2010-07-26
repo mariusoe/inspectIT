@@ -688,13 +688,28 @@ public class TreeModelManager {
 	 *            The {@link RepositoryDefinition} object.
 	 * @return The exception sensor tree.
 	 */
+	@SuppressWarnings("unchecked")
 	private Component getExceptionSensorTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Composite exceptionSensor = new Composite();
 		exceptionSensor.setName("Exceptions");
-		exceptionSensor.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_EXCEPTION_SENSOR));
+		boolean sensorTypeAvailable = false;
 
-		exceptionSensor.addChild(getUngroupedExceptionOverview(platformIdent, definition));
-		exceptionSensor.addChild(getGroupedExceptionOverview(platformIdent, definition));
+		Set<SensorTypeIdent> sensorTypeIdents = platformIdent.getSensorTypeIdents();
+		for (SensorTypeIdent sensorTypeIdent : sensorTypeIdents) {
+			if (SensorTypeEnum.EXCEPTION_SENSOR.getFqn().equals(sensorTypeIdent.getFullyQualifiedClassName())) {
+				sensorTypeAvailable = true;
+				break;
+			}
+		}
+
+		if (sensorTypeAvailable) {
+			exceptionSensor.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_EXCEPTION_SENSOR));
+			exceptionSensor.addChild(getUngroupedExceptionOverview(platformIdent, definition));
+			exceptionSensor.addChild(getGroupedExceptionOverview(platformIdent, definition));
+		} else {
+			exceptionSensor.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_ITEM_NA_GREY));
+			exceptionSensor.setTooltip(SensorTypeAvailabilityEnum.SENSOR_NA.getMessage());
+		}
 
 		return exceptionSensor;
 	}
