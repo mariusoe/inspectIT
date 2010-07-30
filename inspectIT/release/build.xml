@@ -130,6 +130,44 @@
 		<taskdef resource="checkstyletask.properties" classpathref="path.libs" />
 	</target>
 
+	<target name="init-ftp-task">
+		<get src="${ftp.commonsnet.url}" dest="${ivy.jar.dir}/${ftp.commonsnet.jar}" usetimestamp="true" />
+		<get src="${ftp.jakartaoro.url}" dest="${ivy.jar.dir}/${ftp.jakartaoro.jar}" usetimestamp="true" />
+
+		<!-- This is a workaround to fix the problem that the FTP task is loaded by a different classloader. -->
+		<!-- This must not be changed, unless you know what you are doing. -->
+		<path id="wptg.classpath">
+			<fileset dir="${user.home}/.ant/lib" includes="${ftp.commonsnet.jar}" />
+			<fileset dir="${user.home}/.ant/lib" includes="${ftp.jakartaoro.jar}" />
+			<fileset dir="${ant.library.dir}" includes="ant-commons-net.jar" />
+		</path>
+		<classloader classpathref="wptg.classpath" parentFirst="false" />
+		<taskdef name="wptg-ftp" classname="org.apache.tools.ant.taskdefs.optional.net.FTP" loaderref="ant.coreLoader" />
+
+	</target>
+
+
+	<!-- *************************************************************** -->
+	<!--                E C L I P S E     T A R G E T S                  -->
+	<!-- *************************************************************** -->
+	<!-- These targets actually download the needed Eclipse versions from-->
+	<!-- the FTP and unpack them in order to be used by the PDE Build.   -->
+	<!-- *************************************************************** -->
+	<target name="checkForEclipse" depends="init, init-ftp-task" description="Checks whether Eclipse is already present.">
+		<condition property="isEclipsePresent">
+			<available file="${release.basedir}/runtime/${eclipse.zip}" property="isEclipsePresent" />
+		</condition>
+	</target>
+
+	<target name="retrieve-eclipse" depends="checkForEclipse" unless="isEclipsePresent" description="Downloads Eclipse from the FTP and unpacks it.">
+		<echo message="Downloading Eclipse from ${ftp.server}" />
+		<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true">
+			<fileset dir="${release.basedir}/runtime">
+				<include name="${eclipse.zip}" />
+			</fileset>
+		</wptg-ftp>
+		<unzip src="${release.basedir}/runtime/${eclipse.zip}" dest="${release.basedir}/runtime" />
+	</target>
 
 
 	<!-- *************************************************************** -->
@@ -265,7 +303,7 @@
 	<!-- This target actually executes the PDE Build process by  		 -->
 	<!-- launching the Eclipse antRunner application.     				 -->
 	<!-- *************************************************************** -->
-	<target name="release" depends="init" unless="release.run">
+	<target name="release" depends="retrieve-eclipse" unless="release.run">
 		<mkdir dir="${basedir}/dist" />
 		<echo message="Executing ${eclipseLocation}/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">

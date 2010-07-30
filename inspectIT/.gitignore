@@ -7,11 +7,5 @@ lib/test/
 release/build/
 release/dist/
 release/pdebuild/
-release/eclipseLocation/eclipse3.4RCP/configuration/.settings/
+release/runtime/
 release/resources/ivy/install/
-release/runtime/eclipse3.4RCP/configuration/org.eclipse.osgi/bundles/
-release/runtime/eclipse3.4RCP/configuration/.settings/
-release/runtime/eclipse3.4RCP/configuration/*/.manager/
-release/runtime/eclipse3.4RCP/configuration/org.eclipse.core.runtime/.*
-release/runtime/eclipse3.4RCP/configuration/org.eclipse.osgi/.*
-release/runtime/eclipse3.4RCP/p2/

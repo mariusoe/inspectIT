@@ -3,3 +3,4 @@ Agent/Agent/test
 Agent/Agent/release
 *.svn
 version.log
+.metadata/
