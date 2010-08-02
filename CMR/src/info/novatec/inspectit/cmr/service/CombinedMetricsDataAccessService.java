@@ -1,8 +1,7 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.CombinedMetricsDataDao;
-import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
-import info.novatec.inspectit.cmr.util.Converter;
+import info.novatec.inspectit.cmr.util.aop.Log;
 import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.TimerData;
 
@@ -33,49 +32,18 @@ public class CombinedMetricsDataAccessService implements ICombinedMetricsDataAcc
 	/**
 	 * {@inheritDoc}
 	 */
+	@Log
 	public List<TimerData> getCombinedMetrics(TimerData template, String workflowName, String activityName) {
-		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("--> CombinedMetricsDataAccessService.getCombinedMetrics()");
-		}
-
-		long time = 0;
-		if (LOGGER.isDebugEnabled()) {
-			time = System.nanoTime();
-		}
-
 		List<TimerData> result = combinedMetricsDataDao.getCombinedMetrics(template);
-
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Get combined metrics duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
-		}
-
-		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("<-- CombinedMetricsDataAccessService.getCombinedMetrics()");
-		}
-
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Log
 	public List<TimerData> getCombinedMetricsIgnoreMethodId(TimerData template, String workflowName, String activityName) {
-		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("--> CombinedMetricsDataAccessService.getCombinedMetricsIgnoreMethodId()");
-		}
-
-		long time = 0;
-		if (LOGGER.isDebugEnabled()) {
-			time = System.nanoTime();
-		}
-
 		List<TimerData> result = combinedMetricsDataDao.getCombinedMetricsIgnoreMethodId(template);
-
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Get combined metrics duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
-		}
-
-		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("<-- CombinedMetricsDataAccessService.getCombinedMetricsIgnoreMethodId()");
-		}
-
 		return result;
 	}
 
@@ -83,30 +51,13 @@ public class CombinedMetricsDataAccessService implements ICombinedMetricsDataAcc
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
+	@Log
 	public List<TimerData> getCombinedMetricsFromToDate(TimerData template, Date fromDate, Date toDate, String workflowName, String activityName) {
-		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("--> CombinedMetricsDataAccessService.getCombinedMetricsFromToDate()");
-		}
-
-		long time = 0;
-		if (LOGGER.isDebugEnabled()) {
-			time = System.nanoTime();
-		}
-
 		if (fromDate.after(toDate)) {
 			return Collections.emptyList();
 		}
 
 		List<TimerData> result = combinedMetricsDataDao.getCombinedMetricsFromToDate(template, workflowName, activityName, fromDate, toDate);
-
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Get combined metrics from to date duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
-		}
-
-		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("<-- CombinedMetricsDataAccessService.getCombinedMetricsFromToDate()");
-		}
-
 		return result;
 	}
 
@@ -114,26 +65,9 @@ public class CombinedMetricsDataAccessService implements ICombinedMetricsDataAcc
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
+	@Log
 	public List<ParameterContentData> getWorkflows(TimerData template) {
-		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("--> CombinedMetricsDataAccessService.getWorkflows()");
-		}
-
-		long time = 0;
-		if (LOGGER.isDebugEnabled()) {
-			time = System.nanoTime();
-		}
-
 		List<ParameterContentData> result = combinedMetricsDataDao.getWorkflows(template);
-
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Get combined metrics from to date duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
-		}
-
-		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("<-- CombinedMetricsDataAccessService.getWorkflows()");
-		}
-
 		return result;
 	}
 
@@ -141,26 +75,9 @@ public class CombinedMetricsDataAccessService implements ICombinedMetricsDataAcc
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
+	@Log
 	public List<ParameterContentData> getActivities(TimerData template, String workflow) {
-		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("--> CombinedMetricsDataAccessService.getActivities()");
-		}
-
-		long time = 0;
-		if (LOGGER.isDebugEnabled()) {
-			time = System.nanoTime();
-		}
-
 		List<ParameterContentData> result = combinedMetricsDataDao.getActivities(template, workflow);
-
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Get combined metrics from to date duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
-		}
-
-		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("<-- CombinedMetricsDataAccessService.getActivities()");
-		}
-
 		return result;
 	}
 
@@ -171,9 +88,13 @@ public class CombinedMetricsDataAccessService implements ICombinedMetricsDataAcc
 		this.combinedMetricsDataDao = combinedMetricsDataDao;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void afterPropertiesSet() throws Exception {
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("|-Combined Metrics Data Access Service active...");
 		}
 	}
+
 }

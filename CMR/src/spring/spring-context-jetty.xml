@@ -198,7 +198,7 @@
 		<property name="initParams">
 			<map>
 				<entry key="contextConfigLocation"
-					value="classpath:spring/spring-context-jetty-service.xml" />
+					value="classpath:spring/spring-context-jetty-service.xml classpath:spring/spring-context-aop.xml" />
 				<entry key="parentContextKey" value="ctx" />
 			</map>
 		</property>

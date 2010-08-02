@@ -1,7 +1,7 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.SqlDataDao;
-import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
+import info.novatec.inspectit.cmr.util.aop.Log;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 
 import java.util.List;
@@ -28,26 +28,9 @@ public class SqlDataAccessService implements ISqlDataAccessService, Initializing
 	/**
 	 * {@inheritDoc}
 	 */
+	@Log
 	public List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData sqlStatementData) {
-		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("--> SqlDataAccessService.getAggregatedSqlStatements()");
-		}
-
-		long time = 0;
-		if (LOGGER.isDebugEnabled()) {
-			time = System.nanoTime();
-		}
-
 		List<SqlStatementData> result = sqlDataDao.getAggregatedSqlStatements(sqlStatementData);
-
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Get aggregated sql statements duration: " + ((System.nanoTime() - time) / 1000000));
-		}
-
-		if (LOGGER.isTraceEnabled()) {
-			LOGGER.trace("<-- SqlDataAccessService.getAggregatedSqlStatements()");
-		}
-
 		return result;
 	}
 
