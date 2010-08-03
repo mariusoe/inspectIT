@@ -161,7 +161,7 @@
 
 	<target name="retrieve-eclipse" depends="checkForEclipse" unless="isEclipsePresent" description="Downloads Eclipse from the FTP and unpacks it.">
 		<echo message="Downloading Eclipse from ${ftp.server}" />
-		<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true">
+		<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5">
 			<fileset dir="${release.basedir}/runtime">
 				<include name="${eclipse.zip}" />
 			</fileset>
