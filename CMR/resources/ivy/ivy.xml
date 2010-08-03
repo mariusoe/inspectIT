@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<ivy-module version="2.0">
+<ivy-module version="2.0" xmlns:e="http://ant.apache.org/ivy/extra">
 	<info organisation="info.novatec.inspectit" module="CMR"/>
 	
 	<configurations>
@@ -52,8 +52,14 @@
 		<dependency org="pmd" name="pmd" rev="4.2.5" conf="test->default"/>
 		<!-- necessary for pmd -->
 		<dependency org="jaxen" name="jaxen" rev="1.1.1" conf="test->default"/>
-		
-		
+
+		<dependency org="org.testng" name="testng" rev="5.8" transitive="false" conf="test->default">
+			<artifact name="testng" type="jar" ext="jar" e:classifier="jdk15" />
+		</dependency>
+		<dependency org="org.mockito" name="mockito-all" rev="1.7" conf="test->default" />
+		<dependency org="net.sourceforge.cobertura" name="cobertura" rev="1.9.3" conf="test->default" />
+		<dependency org="apache-oro" name="jakarta-oro" rev="2.0.8" conf="test->default" />
+				
 		<dependency org="checkstyle" name="checkstyle" rev="5.0" conf="test->default"/>
 		<dependency org="antlr" name="antlr" rev="2.7.6" conf="test->default"/>
 		<dependency org="commons-beanutils" name="commons-beanutils" rev="1.7.0" conf="test->default"/>

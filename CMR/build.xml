@@ -23,6 +23,14 @@
 		<fileset dir="${lib.root}" includes="**/*.jar" />
 	</path>
 
+	<path id="cmr.classpath">
+		<fileset dir="${build.release.root.cmr}" includes="**/*.jar" />
+	</path>
+
+	<path id="path.test.class">
+		<pathelement location="${build.test.classes}" />
+	</path>
+
 	<!-- classpath for findbugs is needed because it enables to run findbugs without having a local installation -->
 	<path id="findbugs.classpath">
 		<fileset dir="${lib.root}" includes="**/*.jar" />
@@ -48,6 +56,10 @@
 		<ivy:resolve file="${ivy.file}" />
 		<ivy:retrieve pattern="${lib.root}/[conf]/[artifact].[ext]" />
 
+		<taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="path.libs" />
+		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="path.libs" />
+		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.libs" />
+		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.libs" />
 		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.libs" />
 		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs" />
 		<taskdef resource="checkstyletask.properties" classpathref="path.libs" />
@@ -72,8 +84,8 @@
 		<mkdir dir="${build.cmr.generated.classes}" />
 		<mkdir dir="${build.cmr.classes}" />
 
-		<javac source="1.5" target="1.5" destdir="${build.cmr.generated.classes}" srcdir="${src.generated.root}" classpathref="compile.classpath" />
-		<javac source="1.5" target="1.5" destdir="${build.cmr.classes}" srcdir="${src.root}" classpathref="compile.classpath" />
+		<javac source="1.5" target="1.5" debug="true" debuglevel="lines,vars,source" destdir="${build.cmr.generated.classes}" srcdir="${src.generated.root}" classpathref="compile.classpath" />
+		<javac source="1.5" target="1.5" debug="true" debuglevel="lines,vars,source" destdir="${build.cmr.classes}" srcdir="${src.root}" classpathref="compile.classpath" />
 
 		<rmic stubversion="1.2" base="${build.cmr.generated.classes}" classpathref="complete.classpath" classname="info.novatec.inspectit.cmr.service.AgentStorageService" sourcebase="${src.generated.root}" />
 		<rmic stubversion="1.2" base="${build.cmr.generated.classes}" classpathref="complete.classpath" classname="info.novatec.inspectit.cmr.service.RegistrationService" sourcebase="${src.generated.root}" />
@@ -86,6 +98,75 @@
 	<!-- These targets are used to ensure the quality of the agent       -->
 	<!-- component.                                                      -->
 	<!-- *************************************************************** -->
+
+	<!--  It depends on the release target, because we need the compiled classes -->
+	<target name="functional-tests" depends="release">
+		<mkdir dir="${build.qa.test.testdata}" />
+		<mkdir dir="${build.qa.test.coveragedata}" />
+		<mkdir dir="${build.test.classes}" />
+
+		<javac source="1.6" target="1.6" debug="true" debuglevel="lines,vars,source" nowarn="off" destdir="${build.test.classes}" srcdir="${test.root}">
+			<classpath refid="complete.classpath" />
+		</javac>
+
+		<!-- instrument the classes that should be included in test coverage -->
+		<mkdir dir="${build.instrumented.classes}" />
+
+		<!-- ensure that the original class files are not touched as we do not want to -->
+		<!-- ship classes that are instrumented with cobertura to the customer -->
+		<copy todir="${build.instrumented.classes}">
+			<fileset dir="${build.cmr.classes}" includes="**/*.class" />
+		</copy>
+
+		<cobertura-instrument datafile="${build.qa.test.coveragedata}/cobertura.ser">
+			<includeClasses regex="info.novatec.inspectit.*" />
+			<excludeClasses regex="info.novatec.inspectit.*\.test.*" />
+			<excludeClasses regex="info.novatec.inspectit.*\.*_Stub.*" />
+			<instrumentationClasspath>
+				<path location="${build.instrumented.classes}" />
+			</instrumentationClasspath>
+			<classpath refid="compile.classpath" />
+			<classpath location="${build.instrumented.classes}" />
+		</cobertura-instrument>
+
+		<testng annotations="JDK" outputdir="${build.qa.test.testdata}" haltonfailure="${testng.haltonfailure}">
+			<classpath refid="complete.classpath" />
+			<classpath refid="path.test.class" />
+			<classpath refid="cmr.classpath" />
+			<classpath location="${build.instrumented.classes}" />
+			<classpath location="${test.root}" />
+
+			<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${build.qa.test.coveragedata}/cobertura.ser" />
+
+			<sourcedir location="${test.root}" />
+			<xmlfileset file="${resources.testng}/testng.xml" />
+		</testng>
+
+		<!-- create cobertura html and xml reports and link to the interesting parts -->
+		<cobertura-report format="html" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
+			<fileset dir="${src.root}" includes="**/*.java" />
+			<fileset dir="${test.root}" includes="**/*.java" />
+		</cobertura-report>
+		<cobertura-report format="xml" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
+			<fileset dir="${src.root}" includes="**/*.java" />
+			<fileset dir="${test.root}" includes="**/*.java" />
+		</cobertura-report>
+		<echo file="${build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >" />
+
+		<!-- generates a JUnit report from the TestNG xml format, because Hudson cant handle the TestNG format -->
+		<junitreport todir="${build.qa.test}/testdata">
+			<fileset dir="${build.qa.test}/testdata">
+				<include name="*/*.xml" />
+			</fileset>
+
+			<report format="noframes" todir="${build.qa.test}/testdata" />
+		</junitreport>
+
+		<!-- create html pages that link to the interesting parts -->
+		<echo file="${build.qa.test}/testresults.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/index.html&quot; >" />
+		<echo file="${build.qa.test}/testreport.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/emailable-report.html&quot; >" />
+	</target>
+
 
 	<!-- Depends on release, because the compiled classes are needed for the analysis -->
 	<target name="static-analysis" depends="release">
@@ -144,7 +225,7 @@
 	<!--                R E L E A S E     T A R G E T S                  -->
 	<!-- *************************************************************** -->
 
-	<target name="release" depends="build" description="--> Creates the distribution jar">
+	<target name="release" depends="build" unless="release.run" description="--> Creates the distribution jar">
 		<mkdir dir="${release.root}" />
 		<mkdir dir="${build.release.root}" />
 		<mkdir dir="${build.release.root.cmr}" />
@@ -172,7 +253,16 @@
 		<antcall target="-linux-x64" />
 		<antcall target="-windows-x86" />
 		<antcall target="-windows-x64" />
+	</target>
 
+	<!-- Calls the release target and then the analysis targets -->
+	<target name="release-and-analyze" description="--> Calls the release target and then executes the static analysis with the functional tests">
+		<antcall target="static-analysis" />
+
+		<!-- Need to set the property so that the release target wont be called again -->
+		<property name="release.run" value="true" />
+
+		<antcall target="functional-tests" />
 	</target>
 
 	<!-- *************************************************************** -->
