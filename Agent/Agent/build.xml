@@ -386,7 +386,13 @@
 	<!-- *************************************************************** -->
 	<!--                I V Y     T A R G E T S   		                 -->
 	<!-- *************************************************************** -->
-	<target name="init-ivy" unless="skip.download">
+	<target name="checkForIvy">
+		<condition property="skipIvyDownload">
+			<available file="${ivy.jar.file}" property="skipIvyDownload" />
+		</condition>
+	</target>
+
+	<target name="init-ivy" depends="checkForIvy" unless="skipIvyDownload">
 		<mkdir dir="${ivy.jar.dir}" />
 		<!-- download Ivy from web site so that it can be used even without any special installation -->
 		<echo message="Installing ivy version: ${ivy.install.version}" />
