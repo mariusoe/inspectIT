@@ -3,7 +3,6 @@ package info.novatec.inspectit.cmr.dao.ci.test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
-import info.novatec.inspectit.cmr.CMR;
 import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.cmr.dao.ci.SensorTypeDataDao;
 import info.novatec.inspectit.communication.data.ci.EnvironmentData;
@@ -16,7 +15,6 @@ import java.util.Set;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -28,9 +26,8 @@ import org.testng.annotations.Test;
  * @author Matthias Huber
  * 
  */
-@ContextConfiguration(locations = { "classpath:spring/spring-context-database.xml",
-		"classpath:spring/spring-context-model.xml" })
-public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGSpringContextTests {
+@ContextConfiguration(locations = { "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
+public class SensorTypeDataDaoTest extends AbstractLogSupport {
 
 	/**
 	 * The {@link SensorTypeDataDao} to test.
@@ -54,14 +51,6 @@ public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGSpringCont
 	private EnvironmentData environmentData;
 
 	/**
-	 * Starts the Central Measurement Repository.
-	 */
-	@BeforeTest
-	public void initCMR() {
-		CMR.main(null);
-	}
-
-	/**
 	 * This method prepares the database so that all needed data for the test is
 	 * already stored.
 	 * 
@@ -83,8 +72,8 @@ public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGSpringCont
 	}
 
 	/**
-	 * Stores a single {@link SensorTypeData} object into the database. Storing is
-	 * successful if the assigned id of the object is greater than 0.
+	 * Stores a single {@link SensorTypeData} object into the database. Storing
+	 * is successful if the assigned id of the object is greater than 0.
 	 */
 	@Test
 	public void addSensorType() {
@@ -93,17 +82,17 @@ public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGSpringCont
 		sensorTypeData.setFullyQualifiedName("fullyQualifiedName");
 		sensorTypeData.setName("name");
 		sensorTypeData.setPriority(SensorTypeData.LOW);
-		sensorTypeData.setTypeOption(SensorTypeData.NO_TYPE_OPTION);	
+		sensorTypeData.setTypeOption(SensorTypeData.NO_TYPE_OPTION);
 		sensorTypeData.setEnvironmentData(environmentData);
-		
+
 		sensorTypeDataDao.addSensorType(sensorTypeData);
 		assertTrue(sensorTypeData.getId() > 0);
 	}
 
 	/**
-	 * Stores a single {@link SensorTypeData} object into the database. Afterwards
-	 * the {@link SensorTypeData} object is retrieved and the values are compared
-	 * to those of the original object.
+	 * Stores a single {@link SensorTypeData} object into the database.
+	 * Afterwards the {@link SensorTypeData} object is retrieved and the values
+	 * are compared to those of the original object.
 	 */
 	@Test(dependsOnMethods = { "addSensorType" })
 	public void getSensorType() {
@@ -112,11 +101,11 @@ public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGSpringCont
 		sensorTypeData.setFullyQualifiedName("fullyQualifiedName");
 		sensorTypeData.setName("name");
 		sensorTypeData.setPriority(SensorTypeData.LOW);
-		sensorTypeData.setTypeOption(SensorTypeData.NO_TYPE_OPTION);	
+		sensorTypeData.setTypeOption(SensorTypeData.NO_TYPE_OPTION);
 		sensorTypeData.setEnvironmentData(environmentData);
-		
+
 		sensorTypeDataDao.addSensorType(sensorTypeData);
-		
+
 		// flush session. this is needed to establish the association between
 		// the profile and the sensor type. Otherwise the
 		// sensor type is not related to the profile.
@@ -128,10 +117,10 @@ public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGSpringCont
 		assertTrue(!sensorTypes.isEmpty());
 
 		SensorTypeData receivedSensorTypeData = null;
-		for(SensorTypeData sensorType : sensorTypes) {
+		for (SensorTypeData sensorType : sensorTypes) {
 			receivedSensorTypeData = sensorType;
 		}
-		
+
 		assertNotNull(receivedSensorTypeData);
 		assertEquals(receivedSensorTypeData.getDescription(), sensorTypeData.getDescription());
 		assertEquals(receivedSensorTypeData.getEnvironmentData(), sensorTypeData.getEnvironmentData());
@@ -139,14 +128,15 @@ public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGSpringCont
 		assertEquals(receivedSensorTypeData.getId(), sensorTypeData.getId());
 		assertEquals(receivedSensorTypeData.getName(), sensorTypeData.getName());
 		assertEquals(receivedSensorTypeData.getPriority(), SensorTypeData.LOW);
-		assertEquals(receivedSensorTypeData.getTypeOption(), SensorTypeData.NO_TYPE_OPTION);		
+		assertEquals(receivedSensorTypeData.getTypeOption(), SensorTypeData.NO_TYPE_OPTION);
 	}
 
 	/**
 	 * Stores a single {@link SensorTypeData} object into the database. Then the
 	 * {@link SensorTypeData} object is changed and an update is performed.
-	 * Afterwards the {@link SensorTypeData} object is retrieved and the values are
-	 * compared to those of the first stored version and the updated version.
+	 * Afterwards the {@link SensorTypeData} object is retrieved and the values
+	 * are compared to those of the first stored version and the updated
+	 * version.
 	 */
 	@Test(dependsOnMethods = { "getSensorType" })
 	public void updateSensorType() {
@@ -155,16 +145,16 @@ public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGSpringCont
 		sensorTypeData.setFullyQualifiedName("fullyQualifiedName");
 		sensorTypeData.setName("name");
 		sensorTypeData.setPriority(SensorTypeData.LOW);
-		sensorTypeData.setTypeOption(SensorTypeData.NO_TYPE_OPTION);	
+		sensorTypeData.setTypeOption(SensorTypeData.NO_TYPE_OPTION);
 		sensorTypeData.setEnvironmentData(environmentData);
-		
+
 		sensorTypeDataDao.addSensorType(sensorTypeData);
 
 		sensorTypeData.setDescription("modified description");
 		sensorTypeData.setFullyQualifiedName("modified fullyQualifiedName");
 		sensorTypeData.setName("modified name");
 		sensorTypeData.setPriority(SensorTypeData.MAX);
-		sensorTypeData.setTypeOption(SensorTypeData.AGGREGATE);	
+		sensorTypeData.setTypeOption(SensorTypeData.AGGREGATE);
 
 		sensorTypeDataDao.updateSensorType(sensorTypeData);
 
@@ -179,10 +169,10 @@ public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGSpringCont
 		assertTrue(!sensorTypes.isEmpty());
 
 		SensorTypeData receivedSensorTypeData = null;
-		for(SensorTypeData sensorType : sensorTypes) {
+		for (SensorTypeData sensorType : sensorTypes) {
 			receivedSensorTypeData = sensorType;
 		}
-		
+
 		assertNotNull(receivedSensorTypeData);
 		// check values against updated version
 		assertEquals(receivedSensorTypeData.getDescription(), sensorTypeData.getDescription());
@@ -191,7 +181,7 @@ public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGSpringCont
 		assertEquals(receivedSensorTypeData.getId(), sensorTypeData.getId());
 		assertEquals(receivedSensorTypeData.getName(), sensorTypeData.getName());
 		assertEquals(receivedSensorTypeData.getPriority(), SensorTypeData.MAX);
-		assertEquals(receivedSensorTypeData.getTypeOption(), SensorTypeData.AGGREGATE);	
+		assertEquals(receivedSensorTypeData.getTypeOption(), SensorTypeData.AGGREGATE);
 		// check values against initial version
 		assertTrue(!"description".equals(receivedSensorTypeData.getDescription()));
 		assertTrue(!"fullyQualifiedName".equals(receivedSensorTypeData.getFullyQualifiedName()));
@@ -201,11 +191,10 @@ public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGSpringCont
 	}
 
 	/**
-	 * Stores a single {@link SensorTypeData} object into the
-	 * database. Then the associated {@link EnvironmentData} object is deleted.
-	 * During the deletion the {@link SensorTypeData} object
-	 * should also be deleted. The deletion afterwards of the
-	 * {@link SensorTypeData} object should cause an
+	 * Stores a single {@link SensorTypeData} object into the database. Then the
+	 * associated {@link EnvironmentData} object is deleted. During the deletion
+	 * the {@link SensorTypeData} object should also be deleted. The deletion
+	 * afterwards of the {@link SensorTypeData} object should cause an
 	 * {@link EntityNotFoundException}.
 	 * 
 	 * @throws EntityNotFoundException
@@ -218,9 +207,9 @@ public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGSpringCont
 		sensorTypeData.setFullyQualifiedName("fullyQualifiedName");
 		sensorTypeData.setName("name");
 		sensorTypeData.setPriority(SensorTypeData.LOW);
-		sensorTypeData.setTypeOption(SensorTypeData.NO_TYPE_OPTION);	
+		sensorTypeData.setTypeOption(SensorTypeData.NO_TYPE_OPTION);
 		sensorTypeData.setEnvironmentData(environmentData);
-		
+
 		sensorTypeDataDao.addSensorType(sensorTypeData);
 
 		// flush session. this is needed to establish the association between
@@ -233,7 +222,6 @@ public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGSpringCont
 		sensorTypeDataDao.deleteSensorType(sensorTypeData.getId());
 	}
 
-	
 	/**
 	 * This method deletes the initial created {@link EnvironmentData} object.
 	 * 

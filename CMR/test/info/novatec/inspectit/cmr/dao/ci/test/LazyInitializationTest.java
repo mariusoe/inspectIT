@@ -3,7 +3,6 @@ package info.novatec.inspectit.cmr.dao.ci.test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
-import info.novatec.inspectit.cmr.CMR;
 import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.cmr.dao.ci.ProfileDataDao;
 import info.novatec.inspectit.communication.data.ci.EnvironmentData;
@@ -15,11 +14,11 @@ import info.novatec.inspectit.communication.data.ci.SensorTypeData;
 import info.novatec.inspectit.communication.exception.EntityNotFoundException;
 
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.hibernate.LazyInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -32,7 +31,7 @@ import org.testng.annotations.Test;
  * 
  */
 @ContextConfiguration(locations = { "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
-public class LazyInitializationTest extends AbstractTransactionalTestNGSpringContextTests {
+public class LazyInitializationTest extends AbstractLogSupport {
 
 	/**
 	 * The {@link EnvironmentDataDao} to test.
@@ -65,14 +64,6 @@ public class LazyInitializationTest extends AbstractTransactionalTestNGSpringCon
 	private ProfileData profileWithSensorDefinitions;
 
 	private long environmentId;
-
-	/**
-	 * Starts the Central Measurement Repository.
-	 */
-	@BeforeTest
-	public void initCMR() {
-		CMR.main(null);
-	}
 
 	/**
 	 * This method prepares the database so that all needed data for the test is

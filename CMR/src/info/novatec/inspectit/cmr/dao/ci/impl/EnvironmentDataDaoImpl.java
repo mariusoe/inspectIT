@@ -14,7 +14,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 /**
  * 
  * @author Matthias Huber
- *
+ * 
  */
 public class EnvironmentDataDaoImpl extends HibernateDaoSupport implements EnvironmentDataDao {
 
@@ -23,7 +23,7 @@ public class EnvironmentDataDaoImpl extends HibernateDaoSupport implements Envir
 	 */
 	public long addEnvironment(EnvironmentData environmentData) {
 		getHibernateTemplate().save(environmentData);
-		
+
 		return environmentData.getId();
 	}
 
@@ -31,17 +31,16 @@ public class EnvironmentDataDaoImpl extends HibernateDaoSupport implements Envir
 	 * @see EnvironmentDataDao#deleteEnvironment(long)
 	 */
 	public void deleteEnvironment(long environmentId) throws EntityNotFoundException {
-		HibernateTemplate hibernateTemplate = getHibernateTemplate();	
+		HibernateTemplate hibernateTemplate = getHibernateTemplate();
 		Object environment = hibernateTemplate.get(EnvironmentData.class, environmentId);
-	
-		if (null != environment) {			
+
+		if (null != environment) {
 			hibernateTemplate.delete(environment);
 		} else {
-			throw new EntityNotFoundException("Environment could not be found!"); 
+			throw new EntityNotFoundException("Environment could not be found!");
 		}
 	}
-	
-	
+
 	/**
 	 * @see EnvironmentDataDao#getEnvironments()
 	 */

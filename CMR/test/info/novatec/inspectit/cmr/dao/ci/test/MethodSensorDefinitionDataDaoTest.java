@@ -4,7 +4,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
-import info.novatec.inspectit.cmr.CMR;
 import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.cmr.dao.ci.MethodSensorDefinitionDataDao;
 import info.novatec.inspectit.cmr.dao.ci.ProfileDataDao;
@@ -21,7 +20,6 @@ import java.util.Set;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -34,7 +32,7 @@ import org.testng.annotations.Test;
  * 
  */
 @ContextConfiguration(locations = { "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
-public class MethodSensorDefinitionDataDaoTest extends AbstractTransactionalTestNGSpringContextTests {
+public class MethodSensorDefinitionDataDaoTest extends AbstractLogSupport {
 
 	/**
 	 * The {@link MethodSensorDefinitionDataDao} to test.
@@ -72,14 +70,6 @@ public class MethodSensorDefinitionDataDaoTest extends AbstractTransactionalTest
 	private EnvironmentData environmentData;
 
 	private ProfileData profileData;
-
-	/**
-	 * Starts the Central Measurement Repository.
-	 */
-	@BeforeTest
-	public void initCMR() {
-		CMR.main(null);
-	}
 
 	/**
 	 * This method prepares the database so that all needed data for the test is

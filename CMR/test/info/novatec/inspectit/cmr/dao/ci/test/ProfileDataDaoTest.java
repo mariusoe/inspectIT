@@ -6,7 +6,6 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
-import info.novatec.inspectit.cmr.CMR;
 import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.cmr.dao.ci.ProfileDataDao;
 import info.novatec.inspectit.communication.data.ci.EnvironmentData;
@@ -17,7 +16,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -30,7 +28,7 @@ import org.testng.annotations.Test;
  * 
  */
 @ContextConfiguration(locations = { "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
-public class ProfileDataDaoTest extends AbstractTransactionalTestNGSpringContextTests {
+public class ProfileDataDaoTest extends AbstractLogSupport {
 
 	/**
 	 * The {@link ProfileDataDao} to test.
@@ -46,14 +44,6 @@ public class ProfileDataDaoTest extends AbstractTransactionalTestNGSpringContext
 	private EnvironmentDataDao environmentDataDao;
 
 	private EnvironmentData environmentData;
-
-	/**
-	 * Starts the Central Measurement Repository.
-	 */
-	@BeforeTest
-	public void initCMR() {
-		CMR.main(null);
-	}
 
 	/**
 	 * This method prepares the database so that all needed data for the test is

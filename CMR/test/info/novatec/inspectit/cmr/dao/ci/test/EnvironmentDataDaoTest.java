@@ -3,7 +3,6 @@ package info.novatec.inspectit.cmr.dao.ci.test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
-import info.novatec.inspectit.cmr.CMR;
 import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.communication.data.ci.EnvironmentData;
 import info.novatec.inspectit.communication.exception.EntityNotFoundException;
@@ -12,8 +11,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 /**
@@ -23,23 +20,14 @@ import org.testng.annotations.Test;
  * @author Matthias Huber
  * 
  */
-@ContextConfiguration(locations = { "classpath:spring/spring-context-database.xml",
-		"classpath:spring/spring-context-model.xml" })
-public class EnvironmentDataDaoTest extends AbstractTransactionalTestNGSpringContextTests {
+@ContextConfiguration(locations = { "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
+public class EnvironmentDataDaoTest extends AbstractLogSupport {
 
 	/**
 	 * The {@link EnvironmentDataDao} to test.
 	 */
 	@Autowired
 	private EnvironmentDataDao environmentDataDao;
-	
-	/**
-	 * Starts the Central Measurement Repository.
-	 */
-	@BeforeTest
-	public void initCMR() {
-		CMR.main(null);
-	}
 
 	/**
 	 * Stores a single {@link EnvironmentData} object into the database. Storing
@@ -109,7 +97,7 @@ public class EnvironmentDataDaoTest extends AbstractTransactionalTestNGSpringCon
 		environmentData.setSendStrategy("updated sendstrategy");
 
 		environmentDataDao.updateEnvironmentSettings(environmentData);
-		
+
 		List<EnvironmentData> environments = environmentDataDao.getEnvironments();
 		assertEquals(environments.size(), 1);
 
@@ -155,5 +143,4 @@ public class EnvironmentDataDaoTest extends AbstractTransactionalTestNGSpringCon
 		// second deletion
 		environmentDataDao.deleteEnvironment(environmentData.getId());
 	}
-
 }
