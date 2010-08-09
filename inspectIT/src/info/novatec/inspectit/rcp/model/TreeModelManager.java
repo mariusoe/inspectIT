@@ -708,7 +708,7 @@ public class TreeModelManager {
 			exceptionSensor.addChild(getGroupedExceptionOverview(platformIdent, definition));
 		} else {
 			exceptionSensor.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_ITEM_NA_GREY));
-			exceptionSensor.setTooltip(SensorTypeAvailabilityEnum.SENSOR_NA.getMessage());
+			exceptionSensor.setTooltip(SensorTypeAvailabilityEnum.EXCEPTION_SENSOR_NA.getMessage());
 		}
 
 		return exceptionSensor;
