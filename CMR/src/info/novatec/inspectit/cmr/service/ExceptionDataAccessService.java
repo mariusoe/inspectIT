@@ -4,6 +4,7 @@ import info.novatec.inspectit.cmr.dao.ExceptionSensorDataDao;
 import info.novatec.inspectit.cmr.util.Converter;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -57,6 +58,32 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 	/**
 	 * {@inheritDoc}
 	 */
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate) {
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("--> ExceptionDataAccessService.getUngroupedExceptionOverview()");
+		}
+
+		long time = 0;
+		if (LOGGER.isDebugEnabled()) {
+			time = System.nanoTime();
+		}
+
+		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template, limit, fromDate, toDate);
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Get ungrouped exception overview duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+		}
+
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("<-- ExceptionDataAccessService.getUngroupedExceptionOverview()");
+		}
+
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template) {
 		if (LOGGER.isTraceEnabled()) {
 			LOGGER.trace("--> ExceptionDataAccessService.getUngroupedExceptionOverview()");
@@ -68,6 +95,32 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 		}
 
 		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template);
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Get ungrouped exception overview duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+		}
+
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("<-- ExceptionDataAccessService.getUngroupedExceptionOverview()");
+		}
+
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("--> ExceptionDataAccessService.getUngroupedExceptionOverview()");
+		}
+
+		long time = 0;
+		if (LOGGER.isDebugEnabled()) {
+			time = System.nanoTime();
+		}
+
+		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template, fromDate, toDate);
 
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Get ungrouped exception overview duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
@@ -135,6 +188,32 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 	/**
 	 * {@inheritDoc}
 	 */
+	public List<ExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("--> ExceptionDataAccessService.getDataForGroupedExceptionOverview()");
+		}
+
+		long time = 0;
+		if (LOGGER.isDebugEnabled()) {
+			time = System.nanoTime();
+		}
+
+		List<ExceptionSensorData> result = exceptionSensorDataDao.getDataForGroupedExceptionOverview(template, fromDate, toDate);
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Get data for grouped exception overview duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+		}
+
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("<-- ExceptionDataAccessService.getDataForGroupedExceptionOverview()");
+		}
+
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public List<ExceptionSensorData> getStackTracesForErrorMessage(ExceptionSensorData template) {
 		if (LOGGER.isTraceEnabled()) {
 			LOGGER.trace("--> ExceptionDataAccessService.getStackTracesForErrorMessage()");
@@ -175,5 +254,4 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 	public void setExceptionSensorDataDao(ExceptionSensorDataDao exceptionSensorDataDao) {
 		this.exceptionSensorDataDao = exceptionSensorDataDao;
 	}
-
 }

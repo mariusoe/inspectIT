@@ -185,6 +185,8 @@ public class TableSubView extends AbstractSubView {
 			tableInputController.setLimit(limit);
 			this.doRefresh();
 		}
+		
+		tableInputController.preferenceEventFired(preferenceEvent);
 	}
 
 	/**

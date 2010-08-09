@@ -7,6 +7,8 @@ import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
@@ -16,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -118,6 +121,16 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	private ExceptionSensorData template;
 
 	/**
+	 * Indicates from which point in time data should be shown.
+	 */
+	private Date fromDate;
+
+	/**
+	 * Indicates until which point in time data should be shown.
+	 */
+	private Date toDate;
+
+	/**
 	 * The list of {@link ExceptionSensorData} objects which is displayed.
 	 */
 	private List<ExtendedExceptionSensorData> exceptionSensorDataList = new ArrayList<ExtendedExceptionSensorData>();
@@ -208,7 +221,28 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
 		preferences.add(PreferenceId.LIVEMODE);
 		preferences.add(PreferenceId.UPDATE);
+		preferences.add(PreferenceId.TIMELINE);
 		return preferences;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
+		switch (preferenceEvent.getPreferenceId()) {
+		case TIMELINE:
+			Map<IPreferenceGroup, Object> preferenceMap = preferenceEvent.getPreferenceMap();
+			if (preferenceMap.containsKey(PreferenceId.TimeLine.FROM_DATE_ID)) {
+				fromDate = (Date) preferenceMap.get(PreferenceId.TimeLine.FROM_DATE_ID);
+			}
+			if (preferenceMap.containsKey(PreferenceId.TimeLine.TO_DATE_ID)) {
+				toDate = (Date) preferenceMap.get(PreferenceId.TimeLine.TO_DATE_ID);
+			}
+			break;
+		default:
+			break;
+		}
 	}
 
 	/**
@@ -219,7 +253,16 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Updating Grouped Exception Overview", IProgressMonitor.UNKNOWN);
 		monitor.subTask("Retrieving the Grouped Exception Overview data from the CMR");
-		List<ExceptionSensorData> ungroupedList = dataAccessService.getDataForGroupedExceptionOverview(template);
+		List<ExceptionSensorData> ungroupedList = null;
+
+		// if fromDate and toDate are set, then we retrieve only the data for
+		// this time interval
+		if (null != fromDate && null != toDate) {
+			ungroupedList = dataAccessService.getDataForGroupedExceptionOverview(template, fromDate, toDate);
+		} else {
+			ungroupedList = dataAccessService.getDataForGroupedExceptionOverview(template);
+		}
+
 		List<ExtendedExceptionSensorData> groupedOverviewList = new ArrayList<ExtendedExceptionSensorData>();
 		overviewMap = new HashMap<String, List<ExtendedExceptionSensorData>>();
 
@@ -265,7 +308,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 			groupedOverviewList.add(data);
 		}
 
-		if ((null != groupedOverviewList) && !groupedOverviewList.isEmpty()) {
+		if ((null != groupedOverviewList)) {
 			exceptionSensorDataList.clear();
 			monitor.subTask("Displaying the Exception Overview");
 			exceptionSensorDataList.addAll(groupedOverviewList);

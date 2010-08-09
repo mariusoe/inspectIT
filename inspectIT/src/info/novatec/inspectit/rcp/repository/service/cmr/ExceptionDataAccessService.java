@@ -5,6 +5,7 @@ import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
@@ -80,9 +81,35 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate) {
+		try {
+			return exceptionDataAccessService.getUngroupedExceptionOverview(template, limit, fromDate, toDate);
+		} catch (Exception e) {
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the ungrouped exception overview from the CMR!", e, -1);
+			return Collections.EMPTY_LIST;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
 	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template) {
 		try {
 			return exceptionDataAccessService.getUngroupedExceptionOverview(template);
+		} catch (Exception e) {
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the ungrouped exception overview from the CMR!", e, -1);
+			return Collections.EMPTY_LIST;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
+		try {
+			return exceptionDataAccessService.getUngroupedExceptionOverview(template, fromDate, toDate);
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog("There was an error retrieving the ungrouped exception overview from the CMR!", e, -1);
 			return Collections.EMPTY_LIST;
@@ -106,6 +133,19 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
+	public List<ExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
+		try {
+			return exceptionDataAccessService.getDataForGroupedExceptionOverview(template, fromDate, toDate);
+		} catch (Exception e) {
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the data for the grouped exception overview from the CMR!", e, -1);
+			return Collections.EMPTY_LIST;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
 	public List<ExceptionSensorData> getStackTracesForErrorMessage(ExceptionSensorData template) {
 		try {
 			return exceptionDataAccessService.getStackTracesForErrorMessage(template);
@@ -114,5 +154,4 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 			return Collections.EMPTY_LIST;
 		}
 	}
-
 }

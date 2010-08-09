@@ -7,6 +7,8 @@ import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
@@ -16,8 +18,10 @@ import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessServi
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -122,6 +126,16 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	private int limit = 10;
 
 	/**
+	 * Indicates from which point in time data should be shown.
+	 */
+	private Date fromDate;
+
+	/**
+	 * Indicates until which point in time data should be shown.
+	 */
+	private Date toDate;
+
+	/**
 	 * This data access service is needed because of the ID mappings.
 	 */
 	private CachedGlobalDataAccessService globalDataAccessService;
@@ -202,6 +216,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 		preferences.add(PreferenceId.LIVEMODE);
 		preferences.add(PreferenceId.UPDATE);
 		preferences.add(PreferenceId.ITEMCOUNT);
+		preferences.add(PreferenceId.TIMELINE);
 		return preferences;
 	}
 
@@ -217,13 +232,41 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	 * {@inheritDoc}
 	 */
 	@Override
+	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
+		switch (preferenceEvent.getPreferenceId()) {
+		case TIMELINE:
+			Map<IPreferenceGroup, Object> preferenceMap = preferenceEvent.getPreferenceMap();
+			if (preferenceMap.containsKey(PreferenceId.TimeLine.FROM_DATE_ID)) {
+				fromDate = (Date) preferenceMap.get(PreferenceId.TimeLine.FROM_DATE_ID);
+			}
+			if (preferenceMap.containsKey(PreferenceId.TimeLine.TO_DATE_ID)) {
+				toDate = (Date) preferenceMap.get(PreferenceId.TimeLine.TO_DATE_ID);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Updating the Ungrouped Exception Overview", IProgressMonitor.UNKNOWN);
 		monitor.subTask("Retrieving the Ungrouped Exception Overview from the CMR");
-		List<ExceptionSensorData> exData = dataAccessService.getUngroupedExceptionOverview(template, limit);
+		List<ExceptionSensorData> exData = null;
 
-		if ((null != exData) && !exData.isEmpty()) {
+		// if fromDate and toDate are set, then we retrieve only the data for
+		// this time interval
+		if (null != fromDate && null != toDate) {
+			exData = dataAccessService.getUngroupedExceptionOverview(template, limit, fromDate, toDate);
+		} else {
+			exData = dataAccessService.getUngroupedExceptionOverview(template, limit);
+		}
+
+		if ((null != exData)) {
 			exceptionSensorData.clear();
 			monitor.subTask("Displaying the Exception Tree Overview");
 			exceptionSensorData.addAll(exData);
