@@ -11,7 +11,6 @@ import info.novatec.inspectit.agent.connection.RegistrationException;
 import info.novatec.inspectit.agent.connection.ServerUnavailableException;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
-import info.novatec.inspectit.versioning.FileBasedVersioningServiceImpl;
 import info.novatec.inspectit.versioning.IVersioningService;
 
 import java.io.IOException;
@@ -40,11 +39,11 @@ public class IdManager implements IIdManager, Startable {
 	private static final Logger LOGGER = Logger.getLogger(IdManager.class.getName());
 
 	/**
-	 * The configuration storage used to access some information which needs to
-	 * be registered at the server.
+	 * The configuration storage used to access some information which needs to be registered at the
+	 * server.
 	 */
 	private final IConfigurationStorage configurationStorage;
-	
+
 	/**
 	 * The versioning service.
 	 */
@@ -71,8 +70,7 @@ public class IdManager implements IIdManager, Startable {
 	private Map sensorTypeIdMap = new HashMap();
 
 	/**
-	 * The {@link Thread} used to register the outstanding methods, sensor types
-	 * etc.
+	 * The {@link Thread} used to register the outstanding methods, sensor types etc.
 	 */
 	private volatile RegistrationThread registrationThread;
 
@@ -87,20 +85,18 @@ public class IdManager implements IIdManager, Startable {
 	private LinkedList sensorTypesToRegister = new LinkedList();
 
 	/**
-	 * The mapping between the sensor types and methods to register at the
-	 * server.
+	 * The mapping between the sensor types and methods to register at the server.
 	 */
 	private LinkedList sensorTypeToMethodRegister = new LinkedList();
 
 	/**
-	 * If set to <code>true</code>, the connection to server created an
-	 * exception.
+	 * If set to <code>true</code>, the connection to server created an exception.
 	 */
 	private volatile boolean serverErrorOccured = false;
 
 	/**
-	 * Default constructor. Needs an implementation of the {@link IConnection}
-	 * interface to establish the connection to the server.
+	 * Default constructor. Needs an implementation of the {@link IConnection} interface to
+	 * establish the connection to the server.
 	 * 
 	 * @param configurationStorage
 	 *            The configuration storage.
@@ -132,12 +128,6 @@ public class IdManager implements IIdManager, Startable {
 		for (Iterator iterator = configurationStorage.getPlatformSensorTypes().iterator(); iterator.hasNext();) {
 			PlatformSensorTypeConfig config = (PlatformSensorTypeConfig) iterator.next();
 			this.registerPlatformSensorType(config);
-		}
-		
-		// register exception sensor type saved in the configuration storage
-		for (Iterator iterator = configurationStorage.getExceptionSensorTypes().iterator(); iterator.hasNext();) {
-			MethodSensorTypeConfig config = (MethodSensorTypeConfig) iterator.next();
-			this.registerExceptionSensorType(config);
 		}
 	}
 
@@ -369,44 +359,10 @@ public class IdManager implements IIdManager, Startable {
 
 		return id;
 	}
-	
-	public long registerExceptionSensorType(MethodSensorTypeConfig exceptionSensorTypeConfig) {
-		// same procedure here as in #registerMethod(...)
-		long id;
-		synchronized (sensorTypesToRegister) {
-			id = sensorTypeIdMap.size() + sensorTypesToRegister.size();
-		}
-		exceptionSensorTypeConfig.setId(id);
-
-		if (!serverErrorOccured) {
-			try {
-				if (!isPlatformRegistered()) {
-					getPlatformId();
-				}
-
-				registrationThread.registerSensorType(exceptionSensorTypeConfig);
-			} catch (Throwable throwable) {
-				synchronized (sensorTypesToRegister) {
-					sensorTypesToRegister.addLast(exceptionSensorTypeConfig);
-
-					// start the thread to retry the registration
-					synchronized (registrationThread) {
-						registrationThread.notifyAll();
-					}
-				}
-			}
-		} else {
-			synchronized (sensorTypesToRegister) {
-				sensorTypesToRegister.addLast(exceptionSensorTypeConfig);
-			}
-		}
-
-		return id;
-	}
 
 	/**
-	 * Private inner class used to store the mapping between the sensor type IDs
-	 * and the method IDs. Only used if they are not yet registered.
+	 * Private inner class used to store the mapping between the sensor type IDs and the method IDs.
+	 * Only used if they are not yet registered.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -439,8 +395,7 @@ public class IdManager implements IIdManager, Startable {
 	}
 
 	/**
-	 * The {@link Thread} used to register the outstanding methods, sensor types
-	 * etc.
+	 * The {@link Thread} used to register the outstanding methods, sensor types etc.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -519,8 +474,8 @@ public class IdManager implements IIdManager, Startable {
 		 * Establish the connection to the server.
 		 * 
 		 * @exception ConnectException
-		 *                Throws a ConnectException if there was a problem
-		 *                connecting to the repository.
+		 *                Throws a ConnectException if there was a problem connecting to the
+		 *                repository.
 		 */
 		private void connect() throws ConnectException {
 			RepositoryConfig repositoryConfig = configurationStorage.getRepositoryConfig();
@@ -534,23 +489,24 @@ public class IdManager implements IIdManager, Startable {
 		 *             If the sending wasn't successful in any way, a
 		 *             {@link ServerUnavailableException} exception is thrown.
 		 * @throws RegistrationException
-		 *             This exception is thrown when a problem with the
-		 *             registration process appears.
+		 *             This exception is thrown when a problem with the registration process
+		 *             appears.
 		 */
 		private void registerPlatform() throws ServerUnavailableException, RegistrationException {
-									
+
 			platformId = connection.registerPlatform(configurationStorage.getAgentName(), getVersion());
 
 			if (LOGGER.isLoggable(Level.INFO)) {
 				LOGGER.info("Received platform ID: " + platformId);
 			}
 		}
-		
+
 		/**
 		 * Returns the formatted version.
+		 * 
 		 * @return the formatted version.
 		 */
-		private String getVersion(){
+		private String getVersion() {
 			try {
 				return versioningService.getVersion();
 			} catch (IOException e) {
@@ -567,8 +523,8 @@ public class IdManager implements IIdManager, Startable {
 		 * @throws ServerUnavailableException
 		 *             Thrown if a server error occurred.
 		 * @throws RegistrationException
-		 *             Thrown if something happened while trying to register the
-		 *             mapping on the server.
+		 *             Thrown if something happened while trying to register the mapping on the
+		 *             server.
 		 */
 		private void registerSensorTypeToMethodMapping() throws ServerUnavailableException, RegistrationException {
 			while (!sensorTypeToMethodRegister.isEmpty()) {
@@ -595,8 +551,8 @@ public class IdManager implements IIdManager, Startable {
 		 * @throws ServerUnavailableException
 		 *             Thrown if a server error occurred.
 		 * @throws RegistrationException
-		 *             Thrown if something happened while trying to register the
-		 *             mapping on the server.
+		 *             Thrown if something happened while trying to register the mapping on the
+		 *             server.
 		 */
 		private void addSensorTypeToMethod(Long sensorTypeId, Long methodId) throws ServerUnavailableException, RegistrationException {
 			if (!sensorTypeIdMap.containsKey(sensorTypeId)) {
@@ -623,8 +579,8 @@ public class IdManager implements IIdManager, Startable {
 		 * @throws ServerUnavailableException
 		 *             Thrown if a server error occured.
 		 * @throws RegistrationException
-		 *             Thrown if something happened while trying to register the
-		 *             sensor types on the server.
+		 *             Thrown if something happened while trying to register the sensor types on the
+		 *             server.
 		 */
 		private void registerSensorTypes() throws ServerUnavailableException, RegistrationException {
 			while (!sensorTypesToRegister.isEmpty()) {
@@ -640,16 +596,15 @@ public class IdManager implements IIdManager, Startable {
 
 		/**
 		 * Registers a sensor type configuration at the server. Accepts
-		 * {@link MethodSensorTypeConfig} and {@link PlatformSensorTypeConfig}
-		 * objects.
+		 * {@link MethodSensorTypeConfig} and {@link PlatformSensorTypeConfig} objects.
 		 * 
 		 * @param astc
 		 *            The sensor type configuration.
 		 * @throws ServerUnavailableException
 		 *             Thrown if a server error occurred.
 		 * @throws RegistrationException
-		 *             Thrown if something happened while trying to register the
-		 *             sensor types on the server.
+		 *             Thrown if something happened while trying to register the sensor types on the
+		 *             server.
 		 */
 		private void registerSensorType(AbstractSensorTypeConfig astc) throws ServerUnavailableException, RegistrationException {
 			long registeredId;
@@ -677,8 +632,8 @@ public class IdManager implements IIdManager, Startable {
 		 * @throws ServerUnavailableException
 		 *             Thrown if a server error occurred.
 		 * @throws RegistrationException
-		 *             Thrown if something happened while trying to register the
-		 *             sensor types on the server.
+		 *             Thrown if something happened while trying to register the sensor types on the
+		 *             server.
 		 */
 		private void registerMethods() throws ServerUnavailableException, RegistrationException {
 			while (!methodsToRegister.isEmpty()) {
@@ -695,13 +650,12 @@ public class IdManager implements IIdManager, Startable {
 		 * Registers a method on the server and maps the local and global id.
 		 * 
 		 * @param rsc
-		 *            The {@link RegisteredSensorConfig} to be registered at the
-		 *            server.
+		 *            The {@link RegisteredSensorConfig} to be registered at the server.
 		 * @throws ServerUnavailableException
 		 *             Thrown if a server error occurred.
 		 * @throws RegistrationException
-		 *             Thrown if something happened while trying to register the
-		 *             sensor types on the server.
+		 *             Thrown if something happened while trying to register the sensor types on the
+		 *             server.
 		 */
 		private void registerMethod(RegisteredSensorConfig rsc) throws ServerUnavailableException, RegistrationException {
 			long registeredId = connection.registerMethod(platformId, rsc);

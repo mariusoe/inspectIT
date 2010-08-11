@@ -71,7 +71,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		when(idManager.getRegisteredSensorTypeId(sensorTypeId)).thenReturn(registeredSensorTypeId);
 		when(idManager.getPlatformId()).thenReturn(platformId);
 
-		exceptionHook.dispatchConstructorOfThrowable(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
+		exceptionHook.afterConstructor(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
 		verify(idManager, times(1)).getRegisteredMethodId(constructorId);
 		verify(idManager, times(1)).getRegisteredSensorTypeId(sensorTypeId);
 		verify(idManager, times(1)).getPlatformId();
@@ -107,7 +107,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		when(idManager.getPlatformId()).thenReturn(platformId);
 
 		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.CREATED);
-		exceptionHook.dispatchConstructorOfThrowable(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
+		exceptionHook.afterConstructor(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
 		verify(idManager, times(1)).getRegisteredMethodId(constructorId);
 		verify(idManager, times(1)).getRegisteredSensorTypeId(sensorTypeId);
 		verify(idManager, times(1)).getPlatformId();
@@ -153,7 +153,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		when(idManager.getRegisteredSensorTypeId(sensorTypeId)).thenReturn(registeredSensorTypeId);
 		when(idManager.getPlatformId()).thenReturn(platformId);
 
-		exceptionHook.dispatchConstructorOfThrowable(coreService, constructorId, sensorTypeId, firstExceptionObject, parameters, registeredSensorConfig);
+		exceptionHook.afterConstructor(coreService, constructorId, sensorTypeId, firstExceptionObject, parameters, registeredSensorConfig);
 		verify(idManager, times(1)).getRegisteredMethodId(constructorId);
 		verify(idManager, times(1)).getRegisteredSensorTypeId(sensorTypeId);
 		verify(idManager, times(1)).getPlatformId();
@@ -205,7 +205,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		when(idManager.getPlatformId()).thenReturn(platformId);
 
 		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.CREATED);
-		exceptionHook.dispatchConstructorOfThrowable(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
+		exceptionHook.afterConstructor(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
 		verify(idManager, times(1)).getRegisteredMethodId(constructorId);
 		verify(idManager, times(1)).getRegisteredSensorTypeId(sensorTypeId);
 		verify(idManager, times(1)).getPlatformId();
@@ -261,7 +261,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		when(idManager.getRegisteredSensorTypeId(sensorTypeId)).thenReturn(registeredSensorTypeId);
 		when(idManager.getPlatformId()).thenReturn(platformId);
 
-		exceptionHook.dispatchConstructorOfThrowable(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
+		exceptionHook.afterConstructor(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
 		verify(idManager, times(1)).getRegisteredMethodId(constructorId);
 		verify(idManager, times(1)).getRegisteredSensorTypeId(sensorTypeId);
 		verify(idManager, times(1)).getPlatformId();
@@ -283,7 +283,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 
 		doThrow(new IdNotAvailableException("")).when(idManager).getPlatformId();
 
-		exceptionHook.dispatchConstructorOfThrowable(coreService, constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredSensorConfig);
+		exceptionHook.afterConstructor(coreService, constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredSensorConfig);
 		exceptionHook.dispatchOnThrowInBody(coreService, methodId, exceptionSensorTypeId, object, exceptionObject, parameters, registeredSensorConfig);
 		exceptionHook.dispatchBeforeCatchBody(coreService, methodId, exceptionSensorTypeId, exceptionObject, registeredSensorConfig);
 
@@ -304,7 +304,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		when(idManager.getPlatformId()).thenReturn(platformId);
 		doThrow(new IdNotAvailableException("")).when(idManager).getRegisteredMethodId(methodId);
 
-		exceptionHook.dispatchConstructorOfThrowable(coreService, constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredSensorConfig);
+		exceptionHook.afterConstructor(coreService, constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredSensorConfig);
 		exceptionHook.dispatchOnThrowInBody(coreService, methodId, exceptionSensorTypeId, object, exceptionObject, parameters, registeredSensorConfig);
 		exceptionHook.dispatchBeforeCatchBody(coreService, methodId, exceptionSensorTypeId, exceptionObject, registeredSensorConfig);
 
@@ -327,7 +327,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		when(idManager.getRegisteredMethodId(methodId)).thenReturn(registeredMethodId);
 		doThrow(new IdNotAvailableException("")).when(idManager).getRegisteredSensorTypeId(exceptionSensorTypeId);
 
-		exceptionHook.dispatchConstructorOfThrowable(coreService, constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredSensorConfig);
+		exceptionHook.afterConstructor(coreService, constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredSensorConfig);
 		exceptionHook.dispatchOnThrowInBody(coreService, methodId, exceptionSensorTypeId, object, exceptionObject, parameters, registeredSensorConfig);
 		exceptionHook.dispatchBeforeCatchBody(coreService, methodId, exceptionSensorTypeId, exceptionObject, registeredSensorConfig);
 

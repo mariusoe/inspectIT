@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
@@ -96,8 +95,8 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 	}
 
 	/**
-	 * As it is not possible to modify the java byte code on the fly, we have to
-	 * get it from the class pool.
+	 * As it is not possible to modify the java byte code on the fly, we have to get it from the
+	 * class pool.
 	 */
 	private Object createInstance(Loader loader, CtMethod ctMethod) throws Exception {
 		Class<?> clazz = ctMethod.getDeclaringClass().toClass(loader, null);
@@ -654,18 +653,24 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(registeredSensorConfig.getTargetClassName()).thenReturn(exceptionClazz.getSimpleName());
 		when(registeredSensorConfig.getTargetMethodName()).thenReturn(exceptionClazz.getSimpleName());
 		when(registeredSensorConfig.getModifiers()).thenReturn(exceptionClazz.getModifiers());
+
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
 		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
 		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
+		when(registeredSensorConfig.isConstructor()).thenReturn(true);
 		when(registeredSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
 		when(registeredSensorConfig.getId()).thenReturn(sensorTypeId);
+
 		when(idManager.registerMethod(registeredSensorConfig)).thenReturn(constructorId);
 		List<MethodSensorTypeConfig> sensorTypeConfigs = new ArrayList<MethodSensorTypeConfig>();
 		sensorTypeConfigs.add(sensorTypeConfig);
 		when(registeredSensorConfig.getSensorTypeConfigs()).thenReturn(sensorTypeConfigs);
 
 		// instrumenting and verifying that constructors are instrumented
-		hookInstrumenter.instrumentConstructorOfThrowable(exceptionClazz.getConstructors(), exceptionClazz, registeredSensorConfig);
+		CtConstructor[] constructors = exceptionClazz.getConstructors();
+		for (int i = 0; i < constructors.length; i++) {
+			hookInstrumenter.addConstructorHook(constructors[i], registeredSensorConfig);
+		}
 		verify(idManager, times(3)).addSensorTypeToMethod(sensorTypeId, constructorId);
 		verify(hookDispatcher, times(3)).addConstructorMapping(constructorId, registeredSensorConfig);
 	}
@@ -704,14 +709,18 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(registeredSensorConfig.getSensorTypeConfigs()).thenReturn(sensorTypeConfigs);
 
 		// instrumenting the constructor
-		hookInstrumenter.instrumentConstructorOfThrowable(exceptionClazz.getConstructors(), exceptionClazz, registeredSensorConfig);
+		CtConstructor[] constructors = exceptionClazz.getConstructors();
+		for (int i = 0; i < constructors.length; i++) {
+			hookInstrumenter.addConstructorHook(constructors[i], registeredSensorConfig);
+		}
 		verify(idManager, times(3)).addSensorTypeToMethod(sensorTypeId, constructorId);
 		verify(hookDispatcher, times(3)).addConstructorMapping(constructorId, registeredSensorConfig);
 
 		Object testClass = this.createInstance(loader, ctMethod);
 		this.callMethod(testClass, methodName, null);
 
-		verify(hookDispatcher).dispatchConstructorOfThrowable(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
+		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
+		verify(hookDispatcher).dispatchConstructorAfterBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
 		verifyNoMoreInteractions(hookDispatcher);
 	}
 
@@ -939,7 +948,11 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		verify(hookDispatcher, times(1)).addMethodMapping(innerMethodId, innerRegisteredSensorConfig);
 
 		// instrumenting the constructors
-		hookInstrumenter.instrumentConstructorOfThrowable(exceptionClazz.getConstructors(), exceptionClazz, registeredConstructorSensorConfig);
+		CtConstructor[] constructors = exceptionClazz.getConstructors();
+		for (int i = 0; i < constructors.length; i++) {
+			hookInstrumenter.addConstructorHook(constructors[i], registeredConstructorSensorConfig);
+		}
+
 		verify(idManager, times(3)).addSensorTypeToMethod(sensorTypeId, constructorId);
 		verify(hookDispatcher, times(3)).addConstructorMapping(constructorId, registeredConstructorSensorConfig);
 
@@ -956,7 +969,8 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		verify(hookDispatcher).dispatchFirstMethodAfterBody(innerMethodId, testClass, new Object[0], null);
 		verify(hookDispatcher).dispatchSecondMethodAfterBody(innerMethodId, testClass, new Object[0], null);
 
-		verify(hookDispatcher).dispatchConstructorOfThrowable(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
+		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
+		verify(hookDispatcher).dispatchConstructorAfterBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
 		verify(hookDispatcher).dispatchOnThrowInBody(eq(innerMethodId), eq(testClass), (Object[]) anyObject(), argThat(new MyTestExceptionVerifier(exceptionObject)));
 		verify(hookDispatcher).dispatchBeforeCatch(eq(methodId), argThat(new MyTestExceptionVerifier(exceptionObject)));
 		verifyNoMoreInteractions(hookDispatcher);
@@ -1022,7 +1036,10 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		verify(hookDispatcher, times(1)).addMethodMapping(innerMethodId, innerRegisteredSensorConfig);
 
 		// instrumenting the constructors
-		hookInstrumenter.instrumentConstructorOfThrowable(exceptionClazz.getConstructors(), exceptionClazz, registeredConstructorSensorConfig);
+		CtConstructor[] constructors = exceptionClazz.getConstructors();
+		for (int i = 0; i < constructors.length; i++) {
+			hookInstrumenter.addConstructorHook(constructors[i], registeredConstructorSensorConfig);
+		}
 		verify(idManager, times(3)).addSensorTypeToMethod(sensorTypeId, constructorId);
 		verify(hookDispatcher, times(3)).addConstructorMapping(constructorId, registeredConstructorSensorConfig);
 
@@ -1039,7 +1056,8 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		verify(hookDispatcher).dispatchFirstMethodAfterBody(innerMethodId, testClass.getClass(), new Object[0], null);
 		verify(hookDispatcher).dispatchSecondMethodAfterBody(innerMethodId, testClass.getClass(), new Object[0], null);
 
-		verify(hookDispatcher).dispatchConstructorOfThrowable(eq(constructorId), argThat(new ThrowableVerifier(exceptionObject)), (Object[]) anyObject());
+		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
+		verify(hookDispatcher).dispatchConstructorAfterBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
 		verify(hookDispatcher).dispatchOnThrowInBody(eq(innerMethodId), eq(testClass.getClass()), (Object[]) anyObject(), argThat(new ThrowableVerifier(exceptionObject)));
 		verify(hookDispatcher).dispatchBeforeCatch(eq(methodId), argThat(new ThrowableVerifier(exceptionObject)));
 		verifyNoMoreInteractions(hookDispatcher);

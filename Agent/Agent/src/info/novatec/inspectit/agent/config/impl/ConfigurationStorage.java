@@ -15,11 +15,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * The default configuration storage implementation which stores everything in
- * the memory.
+ * The default configuration storage implementation which stores everything in the memory.
  * <p>
- * TODO: Event mechanism is needed so that new definitions can be added and
- * other components are notified that something has been added.
+ * TODO: Event mechanism is needed so that new definitions can be added and other components are
+ * notified that something has been added.
  * 
  * @author Patrice Bouillet
  * @author Eduard Tudenhoefner
@@ -43,8 +42,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	private final IInheritanceAnalyzer inheritanceAnalyzer;
 
 	/**
-	 * The repository configuration is used to store the needed information to
-	 * connect to a remote CMR.
+	 * The repository configuration is used to store the needed information to connect to a remote
+	 * CMR.
 	 */
 	private RepositoryConfig repository;
 
@@ -59,8 +58,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	private StrategyConfig bufferStrategy;
 
 	/**
-	 * The list of sending strategies. Default size is set to 1 as it's unlikely
-	 * that more than one is defined.
+	 * The list of sending strategies. Default size is set to 1 as it's unlikely that more than one
+	 * is defined.
 	 */
 	private List sendingStrategies = new ArrayList(1);
 
@@ -70,8 +69,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	private static final int METHOD_LIST_SIZE = 10;
 
 	/**
-	 * The list of method sensor types. Contains objects of type
-	 * {@link MethodSensorTypeConfig}.
+	 * The list of method sensor types. Contains objects of type {@link MethodSensorTypeConfig}.
 	 */
 	private List methodSensorTypes = new ArrayList(METHOD_LIST_SIZE);
 
@@ -81,8 +79,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	private static final int PLATFORM_LIST_SIZE = 10;
 
 	/**
-	 * The list of platform sensor types. Contains objects of type
-	 * {@link PlatformSensorTypeConfig}.
+	 * The list of platform sensor types. Contains objects of type {@link PlatformSensorTypeConfig}.
 	 */
 	private List platformSensorTypes = new ArrayList(PLATFORM_LIST_SIZE);
 
@@ -92,18 +89,9 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	private List unregisteredSensorConfigs = new ArrayList();
 
 	/**
-	 * A list containing all exception sensor types. Currently there is only one
-	 * exception sensor type.
+	 * Indicates whether the exception sensor is activated or not.
 	 */
-	private List exceptionSensorTypes = new ArrayList();
-
-	/**
-	 * A list containing all the sensor definitions from the configuration of
-	 * the Exception Sensor.
-	 */
-	private List exceptionSensorConfigs = new ArrayList();
-
-	private boolean exceptionSensorActivated;
+	private boolean exceptionSensorActivated = false;
 
 	/**
 	 * Default constructor which takes 2 parameter.
@@ -416,11 +404,10 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 * 
 	 * @param sensorTypeName
 	 *            The name to look for.
-	 * @return The {@link MethodSensorTypeConfig} which name is equal to the
-	 *         passed sensor type name in the method parameter.
+	 * @return The {@link MethodSensorTypeConfig} which name is equal to the passed sensor type name
+	 *         in the method parameter.
 	 * @throws StorageException
-	 *             Throws the storage exception if no method sensor type
-	 *             configuration can be found.
+	 *             Throws the storage exception if no method sensor type configuration can be found.
 	 */
 	private MethodSensorTypeConfig getMethodSensorTypeConfigForName(String sensorTypeName) throws StorageException {
 		for (Iterator iterator = methodSensorTypes.iterator(); iterator.hasNext();) {
@@ -434,19 +421,18 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	}
 
 	/**
-	 * Returns the matching {@link MethodSensorTypeConfig} of the Exception
-	 * Sensor for the passed name.
+	 * Returns the matching {@link MethodSensorTypeConfig} of the Exception Sensor for the passed
+	 * name.
 	 * 
 	 * @param sensorTypeName
 	 *            The name to look for.
-	 * @return The {@link MethodSensorTypeConfig} which name is equal to the
-	 *         passed sensor type name in the method parameter.
+	 * @return The {@link MethodSensorTypeConfig} which name is equal to the passed sensor type name
+	 *         in the method parameter.
 	 * @throws StorageException
-	 *             Throws the storage exception if no method sensor type
-	 *             configuration can be found.
+	 *             Throws the storage exception if no method sensor type configuration can be found.
 	 */
 	private MethodSensorTypeConfig getExceptionSensorTypeConfigForName(String sensorTypeName) throws StorageException {
-		for (Iterator iterator = exceptionSensorTypes.iterator(); iterator.hasNext();) {
+		for (Iterator iterator = methodSensorTypes.iterator(); iterator.hasNext();) {
 			MethodSensorTypeConfig config = (MethodSensorTypeConfig) iterator.next();
 			if (config.getName().equals(sensorTypeName)) {
 				return config;
@@ -467,14 +453,17 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 * {@inheritDoc}
 	 */
 	public List getExceptionSensorTypes() {
-		return Collections.unmodifiableList(exceptionSensorTypes);
-	}
+		// TODO ET: could also be improved by adding the configs directly to exceptionSensorTypes
+		// when they are added to the methodSensorTypes
+		List exceptionSensorTypes = new ArrayList();
+		for (Iterator iterator = methodSensorTypes.iterator(); iterator.hasNext();) {
+			MethodSensorTypeConfig config = (MethodSensorTypeConfig) iterator.next();
+			if (config.getName().equals("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor")) {
+				exceptionSensorTypes.add(config);
+			}
+		}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public List getExceptionSensorConfigs() {
-		return Collections.unmodifiableList(exceptionSensorConfigs);
+		return Collections.unmodifiableList(exceptionSensorTypes);
 	}
 
 	/**
@@ -494,7 +483,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		sensorTypeConfig.setClassName(sensorTypeClass);
 		sensorTypeConfig.setParameters(settings);
 
-		exceptionSensorTypes.add(sensorTypeConfig);
+		methodSensorTypes.add(sensorTypeConfig);
 
 		if (LOGGER.isLoggable(Level.INFO)) {
 			LOGGER.info("Exception sensor type added: " + sensorTypeClass);
@@ -536,15 +525,21 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		sensorConfig.setSettings(settings);
 		sensorConfig.setSensorTypeConfig(getExceptionSensorTypeConfigForName(sensorTypeName));
 		sensorConfig.setTargetMethodName("");
+		sensorConfig.setConstructor(true);
+		sensorConfig.setSensorName(sensorTypeName);
+		sensorConfig.setSettings(settings);
+		sensorConfig.setExceptionSensorActivated(true);
+		sensorConfig.setIgnoreSignature(true);
 		sensorConfig.completeConfiguration();
 
-		exceptionSensorConfigs.add(sensorConfig);
+		unregisteredSensorConfigs.add(sensorConfig);
+		exceptionSensorActivated = true;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public boolean isExceptionSensorActivated() {
-		return exceptionSensorConfigs.size() > 0;
+		return exceptionSensorActivated;
 	}
 }

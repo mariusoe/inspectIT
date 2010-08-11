@@ -8,14 +8,15 @@ import info.novatec.inspectit.agent.analyzer.impl.IndirectMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.InterfaceMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.SimpleMatchPattern;
 import info.novatec.inspectit.agent.analyzer.impl.SuperclassMatcher;
+import info.novatec.inspectit.agent.analyzer.impl.ThrowableMatcher;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 
 /**
- * Container for the values of a sensor configuration. It stores all the values
- * defined in a config file for later access.
+ * Container for the values of a sensor configuration. It stores all the values defined in a config
+ * file for later access.
  * 
  * @author Patrice Bouillet
  */
@@ -47,14 +48,18 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 	private boolean virtual = false;
 
 	/**
-	 * Defines if all methods with the given sensorName are instrumented
-	 * regardless of the signatures.
+	 * Defines if all methods with the given sensorName are instrumented regardless of the
+	 * signatures.
 	 */
 	private boolean ignoreSignature = false;
 
 	/**
-	 * The matcher used to compare class name / method name and all method
-	 * parameters.
+	 * Determines whether the exception sensor is activated.
+	 */
+	private boolean exceptionSensorActivated = false;
+
+	/**
+	 * The matcher used to compare class name / method name and all method parameters.
 	 */
 	private IMatcher matcher;
 
@@ -64,8 +69,8 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 	private String sensorName;
 
 	/**
-	 * The sensor type of this configuration. As there can be only one, this is
-	 * just a direct reference.
+	 * The sensor type of this configuration. As there can be only one, this is just a direct
+	 * reference.
 	 */
 	private MethodSensorTypeConfig sensorTypeConfig;
 
@@ -160,8 +165,8 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
-	 * Is this configuration just virtual, as the method name or the names of
-	 * the parameters contain symbols for pattern matching.
+	 * Is this configuration just virtual, as the method name or the names of the parameters contain
+	 * symbols for pattern matching.
 	 * 
 	 * @return Returns if this configuration is virtual.
 	 */
@@ -180,8 +185,7 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
-	 * Returns if this sensor config ignores the signatures of the methods that
-	 * fit to the name.
+	 * Returns if this sensor config ignores the signatures of the methods that fit to the name.
 	 * 
 	 * @return If this config ignores the method signature.
 	 */
@@ -238,6 +242,16 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
+	 * Defines whether exception sensor is activated.
+	 * 
+	 * @param exceptionSensorActivated
+	 *            The flag indicating whether exception sensor is activated or not.
+	 */
+	public void setExceptionSensorActivated(boolean exceptionSensorActivated) {
+		this.exceptionSensorActivated = exceptionSensorActivated;
+	}
+
+	/**
 	 * Returns the matcher which is used by this sensor configuration.
 	 * 
 	 * @return The {@link Matcher}.
@@ -247,8 +261,7 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
-	 * Completes the whole configuration. Has to be called after all settings
-	 * are set.
+	 * Completes the whole configuration. Has to be called after all settings are set.
 	 */
 	public void completeConfiguration() {
 		if (!virtual && !superclass && !interf) {
@@ -259,6 +272,10 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 			matcher = new InterfaceMatcher(inheritanceAnalyzer, classPoolAnalyzer, this);
 		} else if (virtual && !superclass && !interf) {
 			matcher = new IndirectMatcher(classPoolAnalyzer, this);
+		}
+
+		if (exceptionSensorActivated) {
+			matcher = new ThrowableMatcher(inheritanceAnalyzer, classPoolAnalyzer, this, matcher);
 		}
 	}
 

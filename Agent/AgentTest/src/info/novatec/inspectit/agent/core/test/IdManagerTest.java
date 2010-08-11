@@ -61,8 +61,8 @@ public class IdManagerTest extends AbstractLogSupport {
 	}
 
 	/**
-	 * This method could <b>fail</b> if the testing machine is currently under
-	 * heavy load. There is no reliable way to make this test always successful.
+	 * This method could <b>fail</b> if the testing machine is currently under heavy load. There is
+	 * no reliable way to make this test always successful.
 	 */
 	@Test
 	public void startStop() throws ConnectException, InterruptedException, ServerUnavailableException, RegistrationException {
@@ -77,14 +77,13 @@ public class IdManagerTest extends AbstractLogSupport {
 
 		verify(configurationStorage, times(1)).getMethodSensorTypes();
 		verify(configurationStorage, times(1)).getPlatformSensorTypes();
-		verify(configurationStorage, times(1)).getExceptionSensorTypes();
 
 		idManager.stop();
 	}
 
 	/**
-	 * This method could <b>fail</b> if the testing machine is currently under
-	 * heavy load. There is no reliable way to make this test always successful.
+	 * This method could <b>fail</b> if the testing machine is currently under heavy load. There is
+	 * no reliable way to make this test always successful.
 	 */
 	@Test
 	public void connected() throws InterruptedException, ServerUnavailableException, RegistrationException {
@@ -101,7 +100,6 @@ public class IdManagerTest extends AbstractLogSupport {
 
 		verify(configurationStorage, times(1)).getMethodSensorTypes();
 		verify(configurationStorage, times(1)).getPlatformSensorTypes();
-		verify(configurationStorage, times(1)).getExceptionSensorTypes();
 
 		idManager.stop();
 	}
@@ -151,8 +149,8 @@ public class IdManagerTest extends AbstractLogSupport {
 	}
 
 	/**
-	 * This method could <b>fail</b> if the testing machine is currently under
-	 * heavy load. There is no reliable way to make this test always successful.
+	 * This method could <b>fail</b> if the testing machine is currently under heavy load. There is
+	 * no reliable way to make this test always successful.
 	 */
 	@Test
 	public void registerMethodSensorTypes() throws InterruptedException, IdNotAvailableException {
@@ -179,8 +177,8 @@ public class IdManagerTest extends AbstractLogSupport {
 	}
 
 	/**
-	 * This method could <b>fail</b> if the testing machine is currently under
-	 * heavy load. There is no reliable way to make this test always successful.
+	 * This method could <b>fail</b> if the testing machine is currently under heavy load. There is
+	 * no reliable way to make this test always successful.
 	 */
 	@Test
 	public void registerPlatformSensorTypes() throws InterruptedException, IdNotAvailableException {
@@ -202,34 +200,6 @@ public class IdManagerTest extends AbstractLogSupport {
 		}
 
 		assertEquals(idManager.getRegisteredSensorTypeId(platformSensorType.getId()), 0);
-
-		idManager.stop();
-	}
-
-	/**
-	 * This method could <b>fail</b> if the testing machine is currently under
-	 * heavy load. There is no reliable way to make this test always successful.
-	 */
-	@Test
-	public void registerExceptionSensorTypes() throws InterruptedException, IdNotAvailableException {
-		RepositoryConfig repositoryConfig = mock(RepositoryConfig.class);
-		when(configurationStorage.getRepositoryConfig()).thenReturn(repositoryConfig);
-		when(configurationStorage.getAgentName()).thenReturn("testAgent");
-		when(connection.isConnected()).thenReturn(true);
-
-		MethodSensorTypeConfig exceptionSensorType = mock(MethodSensorTypeConfig.class);
-		List<MethodSensorTypeConfig> exceptionSensorTypes = new ArrayList<MethodSensorTypeConfig>();
-		exceptionSensorTypes.add(exceptionSensorType);
-		when(configurationStorage.getExceptionSensorTypes()).thenReturn(exceptionSensorTypes);
-
-		idManager.start();
-		assertEquals(exceptionSensorType.getId(), 0);
-
-		synchronized (this) {
-			this.wait(2000L);
-		}
-
-		assertEquals(idManager.getRegisteredSensorTypeId(exceptionSensorType.getId()), 0);
 
 		idManager.stop();
 	}

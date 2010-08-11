@@ -12,16 +12,17 @@ import info.novatec.inspectit.agent.analyzer.impl.DirectMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.IndirectMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.InterfaceMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.SuperclassMatcher;
+import info.novatec.inspectit.agent.analyzer.impl.ThrowableMatcher;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.PriorityEnum;
 import info.novatec.inspectit.agent.config.StorageException;
 import info.novatec.inspectit.agent.config.impl.ConfigurationStorage;
 import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
 import info.novatec.inspectit.agent.config.impl.PlatformSensorTypeConfig;
-import info.novatec.inspectit.agent.config.impl.StrategyConfig;
-import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
 import info.novatec.inspectit.agent.config.impl.PropertyAccessor.PropertyPath;
 import info.novatec.inspectit.agent.config.impl.PropertyAccessor.PropertyPathStart;
+import info.novatec.inspectit.agent.config.impl.StrategyConfig;
+import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 
 import java.util.ArrayList;
@@ -182,7 +183,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	public void methodSensorTypesCheck() {
 		List<MethodSensorTypeConfig> configs = configurationStorage.getMethodSensorTypes();
 		assertNotNull(configs);
-		assertEquals(configs.size(), 2);
+		assertEquals(configs.size(), 3);
 
 		// first
 		MethodSensorTypeConfig config = configs.get(0);
@@ -315,21 +316,21 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void exceptionSensorParameterCheck() {
-		List<UnregisteredSensorConfig> configs = configurationStorage.getExceptionSensorConfigs();
+		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
 		assertNotNull(configs);
-		assertEquals(configs.size(), 4);
+		assertEquals(configs.size(), 11);
 
 		// first
 		UnregisteredSensorConfig config = configs.get(0);
 		assertEquals(config.getTargetClassName(), "java.lang.Throwable");
 		assertEquals(config.getTargetMethodName(), "");
 		assertNull(config.getTargetPackageName());
-		assertEquals(config.isConstructor(), false);
-		assertEquals(config.isIgnoreSignature(), false);
+		assertEquals(config.isConstructor(), true);
+		assertEquals(config.isIgnoreSignature(), true);
 		assertEquals(config.isInterface(), false);
 		assertEquals(config.isVirtual(), false);
 		assertEquals(config.isSuperclass(), true);
-		assertSame(config.getMatcher().getClass(), SuperclassMatcher.class);
+		assertSame(config.getMatcher().getClass(), ThrowableMatcher.class);
 		assertNotNull(config.getParameterTypes());
 		assertEquals(config.getParameterTypes().size(), 0);
 		assertNotNull(config.getSettings());
@@ -340,12 +341,12 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		assertEquals(config.getTargetClassName(), "info.novatec.inspectit.agent.analyzer.test.classes.IException");
 		assertEquals(config.getTargetMethodName(), "");
 		assertNull(config.getTargetPackageName());
-		assertEquals(config.isConstructor(), false);
-		assertEquals(config.isIgnoreSignature(), false);
+		assertEquals(config.isConstructor(), true);
+		assertEquals(config.isIgnoreSignature(), true);
 		assertEquals(config.isInterface(), true);
 		assertEquals(config.isVirtual(), false);
 		assertEquals(config.isSuperclass(), false);
-		assertSame(config.getMatcher().getClass(), InterfaceMatcher.class);
+		assertSame(config.getMatcher().getClass(), ThrowableMatcher.class);
 		assertNotNull(config.getParameterTypes());
 		assertEquals(config.getParameterTypes().size(), 0);
 		assertNotNull(config.getSettings());
@@ -356,12 +357,12 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		assertEquals(config.getTargetClassName(), "info.novatec.inspectit.agent.analyzer.test.classes.My*Exception");
 		assertEquals(config.getTargetMethodName(), "");
 		assertNull(config.getTargetPackageName());
-		assertEquals(config.isConstructor(), false);
-		assertEquals(config.isIgnoreSignature(), false);
+		assertEquals(config.isConstructor(), true);
+		assertEquals(config.isIgnoreSignature(), true);
 		assertEquals(config.isInterface(), false);
 		assertEquals(config.isVirtual(), true);
 		assertEquals(config.isSuperclass(), false);
-		assertSame(config.getMatcher().getClass(), IndirectMatcher.class);
+		assertSame(config.getMatcher().getClass(), ThrowableMatcher.class);
 		assertNotNull(config.getParameterTypes());
 		assertEquals(config.getParameterTypes().size(), 0);
 		assertNotNull(config.getSettings());
@@ -372,12 +373,12 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		assertEquals(config.getTargetClassName(), "info.novatec.inspectit.agent.analyzer.test.classes.MyException");
 		assertEquals(config.getTargetMethodName(), "");
 		assertNull(config.getTargetPackageName());
-		assertEquals(config.isConstructor(), false);
-		assertEquals(config.isIgnoreSignature(), false);
+		assertEquals(config.isConstructor(), true);
+		assertEquals(config.isIgnoreSignature(), true);
 		assertEquals(config.isInterface(), false);
 		assertEquals(config.isVirtual(), false);
 		assertEquals(config.isSuperclass(), false);
-		assertSame(config.getMatcher().getClass(), DirectMatcher.class);
+		assertSame(config.getMatcher().getClass(), ThrowableMatcher.class);
 		assertNotNull(config.getParameterTypes());
 		assertEquals(config.getParameterTypes().size(), 0);
 		assertNotNull(config.getSettings());
@@ -468,10 +469,11 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	public void sensorCheck() {
 		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
 		assertNotNull(configs);
-		assertEquals(configs.size(), 7);
-
+		assertEquals(configs.size(), 11);
+		
+		// the first 4 configs are the ones from the exception sensor
 		// first
-		UnregisteredSensorConfig config = configs.get(0);
+		UnregisteredSensorConfig config = configs.get(4);
 		assertEquals(config.getSensorName(), "TimerSensorTest");
 		assertEquals(config.getSensorTypeConfig().getName(), "timer");
 		assertNull(config.getTargetPackageName());
@@ -486,7 +488,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		assertSame(config.getMatcher().getClass(), IndirectMatcher.class);
 
 		// second
-		config = configs.get(1);
+		config = configs.get(5);
 		assertEquals(config.getSensorName(), "InvocSensorTest");
 		assertEquals(config.getSensorTypeConfig().getName(), "isequence");
 		assertNull(config.getTargetPackageName());
@@ -501,7 +503,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		assertSame(config.getMatcher().getClass(), IndirectMatcher.class);
 
 		// third
-		config = configs.get(2);
+		config = configs.get(6);
 		assertEquals(config.getSensorName(), "ParameterTest");
 		assertEquals(config.getSensorTypeConfig().getName(), "timer");
 		assertNull(config.getTargetPackageName());
@@ -517,7 +519,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		assertSame(config.getMatcher().getClass(), DirectMatcher.class);
 
 		// fourth
-		config = configs.get(3);
+		config = configs.get(7);
 		assertEquals(config.getSensorName(), "InterfaceTest");
 		assertEquals(config.getSensorTypeConfig().getName(), "timer");
 		assertNull(config.getTargetPackageName());
@@ -534,7 +536,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		assertSame(config.getMatcher().getClass(), InterfaceMatcher.class);
 
 		// fifth
-		config = configs.get(4);
+		config = configs.get(8);
 		assertEquals(config.getSensorName(), "SuperclassTest");
 		assertEquals(config.getSensorTypeConfig().getName(), "isequence");
 		assertNull(config.getTargetPackageName());
@@ -551,7 +553,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		assertSame(config.getMatcher().getClass(), SuperclassMatcher.class);
 
 		// sixth
-		config = configs.get(5);
+		config = configs.get(9);
 		assertEquals(config.getPropertyAccessorList().size(), 1);
 		assertSame(config.getPropertyAccessorList().get(0).getClass(), PropertyPathStart.class);
 		PropertyPathStart start = (PropertyPathStart) config.getPropertyAccessorList().get(0);
@@ -564,7 +566,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		assertNull(start.getPathToContinue().getPathToContinue().getPathToContinue());
 
 		// seventh
-		config = configs.get(6);
+		config = configs.get(10);
 		assertEquals(config.getPropertyAccessorList().size(), 1);
 		assertSame(config.getPropertyAccessorList().get(0).getClass(), PropertyPathStart.class);
 		start = (PropertyPathStart) config.getPropertyAccessorList().get(0);

@@ -16,16 +16,13 @@ import info.novatec.inspectit.javassist.NotFoundException;
 import info.novatec.inspectit.javassist.expr.ExprEditor;
 import info.novatec.inspectit.javassist.expr.Handler;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 /**
- * The byte code instrumenter class. Used to instrument the additional
- * instructions into the target byte code.
+ * The byte code instrumenter class. Used to instrument the additional instructions into the target
+ * byte code.
  * 
  * @author Patrice Bouillet
  * @author Eduard Tudenhoefner
@@ -39,8 +36,8 @@ public class HookInstrumenter implements IHookInstrumenter {
 	private static final Logger LOGGER = Logger.getLogger(HookInstrumenter.class.getName());
 
 	/**
-	 * The hook dispatcher. This string shouldn't be touched. For changing the
-	 * dispatcher, alter the hook dispatcher instance in the Agent class.
+	 * The hook dispatcher. This string shouldn't be touched. For changing the dispatcher, alter the
+	 * hook dispatcher instance in the Agent class.
 	 */
 	private static String hookDispatcherTarget = "info.novatec.inspectit.agent.PicoAgent#getInstance().getHookDispatcher()";
 
@@ -50,8 +47,8 @@ public class HookInstrumenter implements IHookInstrumenter {
 	private final IHookDispatcher hookDispatcher;
 
 	/**
-	 * The ID manager used to register the methods and the mapping between the
-	 * method sensor type id and the method id.
+	 * The ID manager used to register the methods and the mapping between the method sensor type id
+	 * and the method id.
 	 */
 	private final IIdManager idManager;
 
@@ -66,8 +63,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 	private ConstructorExprEditor constructorExprEditor = new ConstructorExprEditor();
 
 	/**
-	 * The implementation of the configuration storage where all definitions of
-	 * the user are stored.
+	 * The implementation of the configuration storage where all definitions of the user are stored.
 	 */
 	private IConfigurationStorage configurationStorage;
 
@@ -79,8 +75,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 * @param idManager
 	 *            The ID manager.
 	 * @param configurationStorage
-	 *            The configuration storage where all definitions of the user
-	 *            are stored.
+	 *            The configuration storage where all definitions of the user are stored.
 	 */
 	public HookInstrumenter(IHookDispatcher hookDispatcher, IIdManager idManager, IConfigurationStorage configurationStorage) {
 		// This will set the useContextClassLoader parameter to true to resolve
@@ -190,58 +185,8 @@ public class HookInstrumenter implements IHookInstrumenter {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	public void instrumentConstructorOfThrowable(CtConstructor[] constructors, CtClass throwable, RegisteredSensorConfig rsc) throws HookException, NotFoundException {
-		if (throwable.isFrozen()) {
-			// defrost before we are adding any instructions
-			throwable.defrost();
-		}
-
-		for (int i = 0; i < constructors.length; i++) {
-			long constructorId = idManager.registerMethod(rsc);
-			rsc.setId(constructorId);
-			rsc.setTargetMethodName(constructors[i].getName());
-
-			// iterate over all sensor type configs. Currently there is only one
-			// ExceptionSensorTypeConfig.
-			for (Iterator iterator = rsc.getSensorTypeConfigs().iterator(); iterator.hasNext();) {
-				MethodSensorTypeConfig config = (MethodSensorTypeConfig) iterator.next();
-				long sensorTypeId = config.getId();
-				idManager.addSensorTypeToMethod(sensorTypeId, constructorId);
-			}
-
-			// we are getting the parameters of the current constructor
-			List parameters = new ArrayList();
-			CtClass[] parameterTypes = constructors[i].getParameterTypes();
-			for (int pos = 0; pos < parameterTypes.length; pos++) {
-				parameters.add(parameterTypes[pos].getName());
-			}
-			rsc.setParameterTypes(parameters);
-
-			if (LOGGER.isLoggable(Level.INFO)) {
-				LOGGER.info("Throwable Constructor match found! Class: " + rsc.getTargetClassName() + " Parameter: " + rsc.getParameterTypes() + " id: " + rsc.getId());
-			}
-
-			try {
-				// we use the insertAfter here, because after the Throwable
-				// constructor is executed we can guarantee that there were no
-				// errors and can now add our instructions.
-				constructors[i].insertAfter(hookDispatcherTarget + ".dispatchConstructorOfThrowable(" + constructorId + "l, $0, $args);");
-
-				// Add the information to the dispatching service
-				hookDispatcher.addConstructorMapping(constructorId, rsc);
-			} catch (CannotCompileException cannotCompileException) {
-				throw new HookException("Could not insert the bytecode into the throwable constructor/class", cannotCompileException);
-			}
-		}
-
-	}
-
-	/**
-	 * The passed {@link CtMethod} is instrumented with an internal
-	 * <code>try-catch</code> block to get an event when an exception is thrown
-	 * in a method body.
+	 * The passed {@link CtMethod} is instrumented with an internal <code>try-catch</code> block to
+	 * get an event when an exception is thrown in a method body.
 	 * 
 	 * @see info.novatec.inspectit.javassist.CtMethod#addCatch(String, CtClass)
 	 * 
@@ -252,11 +197,9 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 * @param isStatic
 	 *            Defines whether the current method is a static method.
 	 * @throws CannotCompileException
-	 *             When the additional instructions could not be compiled by
-	 *             Javassist.
+	 *             When the additional instructions could not be compiled by Javassist.
 	 * @throws NotFoundException
-	 *             When {@link Throwable} cannot be found in the default
-	 *             {@link ClassPool}.
+	 *             When {@link Throwable} cannot be found in the default {@link ClassPool}.
 	 */
 	private void instrumentMethodWithTryCatch(CtMethod method, long methodId, boolean isStatic) throws CannotCompileException, NotFoundException {
 		if (configurationStorage.isExceptionSensorActivated()) {
@@ -280,23 +223,19 @@ public class HookInstrumenter implements IHookInstrumenter {
 	}
 
 	/**
-	 * The passed {@link CtConstructor} is instrumented with an internal
-	 * <code>try-catch</code> block to get an event when an exception is thrown
-	 * in a constructor body.
+	 * The passed {@link CtConstructor} is instrumented with an internal <code>try-catch</code>
+	 * block to get an event when an exception is thrown in a constructor body.
 	 * 
 	 * @see info.novatec.inspectit.javassist.CtConstructor#addCatch(String, CtClass)
 	 * 
 	 * @param constructor
-	 *            The {@link CtConstructor} where additional instructions are
-	 *            added.
+	 *            The {@link CtConstructor} where additional instructions are added.
 	 * @param constructorId
 	 *            The constructor id of the passed constructor.
 	 * @throws CannotCompileException
-	 *             When the additional instructions could not be compiled by
-	 *             Javassist.
+	 *             When the additional instructions could not be compiled by Javassist.
 	 * @throws NotFoundException
-	 *             When {@link Throwable} cannot be found in the default
-	 *             {@link ClassPool}.
+	 *             When {@link Throwable} cannot be found in the default {@link ClassPool}.
 	 */
 	private void instrumentConstructorWithTryCatch(CtConstructor constructor, long constructorId) throws CannotCompileException, NotFoundException {
 		if (configurationStorage.isExceptionSensorActivated()) {
@@ -312,14 +251,11 @@ public class HookInstrumenter implements IHookInstrumenter {
 	}
 
 	/**
-	 * If <code>instrument()</code> is called in <code>CtMethod</code>, the
-	 * method body is scanned from the beginning to the end. Whenever an
-	 * expression, such as a Handler of an Exception is found,
-	 * <code>edit()</code> is called in <code>ExprEditor</code>.
-	 * <code>edit()</code> can inspect and modify the given expression. The
-	 * modification is reflected on the original method body. If
-	 * <code>edit()</code> does nothing, the original method body is not
-	 * changed.
+	 * If <code>instrument()</code> is called in <code>CtMethod</code>, the method body is scanned
+	 * from the beginning to the end. Whenever an expression, such as a Handler of an Exception is
+	 * found, <code>edit()</code> is called in <code>ExprEditor</code>. <code>edit()</code> can
+	 * inspect and modify the given expression. The modification is reflected on the original method
+	 * body. If <code>edit()</code> does nothing, the original method body is not changed.
 	 * 
 	 * @see info.novatec.inspectit.javassist.expr.ExprEditor
 	 * 
@@ -361,14 +297,12 @@ public class HookInstrumenter implements IHookInstrumenter {
 	}
 
 	/**
-	 * If <code>instrument()</code> is called in <code>CtConstructor</code>, the
-	 * constructor body is scanned from the beginning to the end. Whenever an
-	 * expression, such as a Handler of an Exception is found,
-	 * <code>edit()</code> is called in <code>ExprEditor</code>.
-	 * <code>edit()</code> can inspect and modify the given expression. The
-	 * modification is reflected on the original constructor body. If
-	 * <code>edit()</code> does nothing, the original constructor body is not
-	 * changed.
+	 * If <code>instrument()</code> is called in <code>CtConstructor</code>, the constructor body is
+	 * scanned from the beginning to the end. Whenever an expression, such as a Handler of an
+	 * Exception is found, <code>edit()</code> is called in <code>ExprEditor</code>.
+	 * <code>edit()</code> can inspect and modify the given expression. The modification is
+	 * reflected on the original constructor body. If <code>edit()</code> does nothing, the original
+	 * constructor body is not changed.
 	 * 
 	 * @see info.novatec.inspectit.javassist.expr.ExprEditor
 	 * 
@@ -378,8 +312,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 	public class ConstructorExprEditor extends ExprEditor {
 
 		/**
-		 * The id of the constructor which is instrumented with the
-		 * ExpressionEditor.
+		 * The id of the constructor which is instrumented with the ExpressionEditor.
 		 */
 		private long id = 0;
 

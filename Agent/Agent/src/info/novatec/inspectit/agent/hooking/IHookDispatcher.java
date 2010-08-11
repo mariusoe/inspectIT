@@ -3,9 +3,8 @@ package info.novatec.inspectit.agent.hooking;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 
 /**
- * The hook dispatcher interface defines methods to add method and constructor
- * mappings and methods to dispatch the calls from the instrumented methods in
- * the target application.
+ * The hook dispatcher interface defines methods to add method and constructor mappings and methods
+ * to dispatch the calls from the instrumented methods in the target application.
  * 
  * @author Patrice Bouillet
  * @author Eduard Tudenhoefner
@@ -74,19 +73,6 @@ public interface IHookDispatcher {
 	void dispatchSecondMethodAfterBody(long id, Object object, Object[] parameters, Object returnValue);
 
 	/**
-	 * Dispatches the constructor of a {@link Throwable} class.
-	 * 
-	 * @param id
-	 *            The id of the constructor creating the {@link Throwable}
-	 *            object.
-	 * @param exceptionObject
-	 *            The instance of the {@link Throwable} object.
-	 * @param parameters
-	 *            The parameters of the constructor.
-	 */
-	void dispatchConstructorOfThrowable(long id, Object exceptionObject, Object[] parameters);
-
-	/**
 	 * Dispatches the 'addCatch' statement of a method.
 	 * 
 	 * @param id
@@ -128,8 +114,7 @@ public interface IHookDispatcher {
 	 * Dispatches the handler of a {@link Throwable}.
 	 * 
 	 * @param id
-	 *            The id of the constructor where the {@link Throwable} is
-	 *            handled.
+	 *            The id of the constructor where the {@link Throwable} is handled.
 	 * @param exceptionObject
 	 *            The instance of the {@link Throwable} object.
 	 */

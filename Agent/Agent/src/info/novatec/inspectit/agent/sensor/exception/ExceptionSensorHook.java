@@ -16,9 +16,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class adds additional code to a constructor of type {@link Throwable},
- * to the <code>throw</code> statement and to the <code>catch</code> block
- * catching type {@link Throwable}.
+ * This class adds additional code to a constructor of type {@link Throwable}, to the
+ * <code>throw</code> statement and to the <code>catch</code> block catching type {@link Throwable}.
  * 
  * @author Eduard Tudenhoefner
  * @see IExceptionSensorHook
@@ -42,8 +41,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	private ThreadLocal exceptionDataHolder = new ThreadLocal();
 
 	/**
-	 * The thread local containing the id of the method where the exception was
-	 * handled.
+	 * The thread local containing the id of the method where the exception was handled.
 	 */
 	private ThreadLocal exceptionHandlerId = new ThreadLocal();
 
@@ -71,22 +69,29 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void dispatchConstructorOfThrowable(ICoreService coreService, long id, long sensorTypeId, Object exceptionObject, Object[] parameters, RegisteredSensorConfig rsc) {
+	public void beforeConstructor(long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc) {
+		// nothing to do here
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void afterConstructor(ICoreService coreService, long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc) {
 		// TODO ET: this method is called twice when the constructor of a
 		// Throwable calls another constructor with this(). The first created
 		// data object is then discarded.
 		try {
 			long platformId = idManager.getPlatformId();
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			long registeredConstructorId = idManager.getRegisteredMethodId(id);
+			long registeredConstructorId = idManager.getRegisteredMethodId(methodId);
 			long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
-			Long identityHash = new Long(System.identityHashCode(exceptionObject));
+			Long identityHash = new Long(System.identityHashCode(object));
 
 			// need to reset the exception handler id
 			exceptionHandlerId.set(null);
 
 			// getting the actual object with information
-			Throwable throwable = (Throwable) exceptionObject;
+			Throwable throwable = (Throwable) object;
 
 			// creating the data object
 			ExceptionSensorData data = new ExceptionSensorData(timestamp, platformId, registeredSensorTypeId, registeredConstructorId);
@@ -234,15 +239,13 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	}
 
 	/**
-	 * Gets static information (class name, stackTrace, cause) from the
-	 * {@link Throwable} object and sets them on the passed data object.
+	 * Gets static information (class name, stackTrace, cause) from the {@link Throwable} object and
+	 * sets them on the passed data object.
 	 * 
 	 * @param exceptionSensorData
-	 *            The {@link ExceptionSensorData} object where to set the
-	 *            information.
+	 *            The {@link ExceptionSensorData} object where to set the information.
 	 * @param throwable
-	 *            The current {@link Throwable} object where to get the
-	 *            information.
+	 *            The current {@link Throwable} object where to get the information.
 	 */
 	private void setStaticInformation(ExceptionSensorData exceptionSensorData, Throwable throwable) {
 		Throwable cause = throwable.getCause();
@@ -255,11 +258,10 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	}
 
 	/**
-	 * This method is called to retrieve the stack trace of a {@link Throwable}.
-	 * The stack trace is gathered by accessing the private method
-	 * {@link Throwable#getOurStackTrace()} with reflection. If this method is
-	 * not available or cannot be accessed, then the stack trace is gathered
-	 * using {@link Throwable#getStackTrace()}.
+	 * This method is called to retrieve the stack trace of a {@link Throwable}. The stack trace is
+	 * gathered by accessing the private method {@link Throwable#getOurStackTrace()} with
+	 * reflection. If this method is not available or cannot be accessed, then the stack trace is
+	 * gathered using {@link Throwable#getStackTrace()}.
 	 * 
 	 * @param throwable
 	 *            The {@link Throwable} object where to get the stack trace.
@@ -279,12 +281,10 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	}
 
 	/**
-	 * Gets the stack trace from the {@link Throwable} object and returns it as
-	 * a string.
+	 * Gets the stack trace from the {@link Throwable} object and returns it as a string.
 	 * 
 	 * @param throwable
-	 *            The {@link Throwable} object where to get the stack trace
-	 *            from.
+	 *            The {@link Throwable} object where to get the stack trace from.
 	 * @return A string representation of a stack trace.
 	 */
 	private String stackTraceToString(Throwable throwable) {
@@ -300,8 +300,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	 * @param value
 	 *            The value to crop.
 	 * @param maxLength
-	 *            The maximum length of the string. All characters above
-	 *            maxLength will be cropped.
+	 *            The maximum length of the string. All characters above maxLength will be cropped.
 	 * @return A cropped string which length is smaller than the maxLength.
 	 */
 	private String crop(String value, int maxLength) {

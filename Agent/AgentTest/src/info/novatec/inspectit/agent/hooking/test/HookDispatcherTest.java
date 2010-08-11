@@ -23,7 +23,6 @@ import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 import info.novatec.inspectit.agent.sensor.method.invocationsequence.InvocationSequenceHook;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 
-import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -38,9 +37,6 @@ public class HookDispatcherTest extends AbstractLogSupport {
 	@Mock
 	private ICoreService coreService;
 
-	@Mock
-	private ExceptionSensorHook exceptionHook;
-
 	private IHookDispatcher hookDispatcher;
 
 	/**
@@ -54,9 +50,6 @@ public class HookDispatcherTest extends AbstractLogSupport {
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		hookDispatcher = new HookDispatcher(coreService);
-		Field field = hookDispatcher.getClass().getDeclaredField("exceptionHook");
-		field.setAccessible(true);
-		field.set(hookDispatcher, exceptionHook);
 	}
 
 	@Test
@@ -473,23 +466,31 @@ public class HookDispatcherTest extends AbstractLogSupport {
 		long methodId = 3L;
 		long constructorId = 7L;
 
+		// the exception sensor type config
+		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
+		when(sensorTypeConfig.getId()).thenReturn(exceptionSensorTypeId);
+
+		// the exception sensor hook
+		IMethodSensor exceptionSensor = mock(IMethodSensor.class);
+		when(sensorTypeConfig.getSensorType()).thenReturn(exceptionSensor);
+		ExceptionSensorHook exceptionHook = mock(ExceptionSensorHook.class);
+		when(exceptionSensor.getHook()).thenReturn(exceptionHook);
+
 		// the map for the method hooks
 		Map<Long, IMethodHook> methodHooks = new LinkedHashMap<Long, IMethodHook>();
 		IMethodHook methodHook = mock(IMethodHook.class);
 		// the map for the constructor hooks
 		Map<Long, IConstructorHook> constructorHooks = new LinkedHashMap<Long, IConstructorHook>();
-		IConstructorHook constructorHook = mock(IConstructorHook.class);
 		methodHooks.put(sensorTypeId, methodHook);
-		constructorHooks.put(exceptionSensorTypeId, constructorHook);
+		constructorHooks.put(exceptionSensorTypeId, exceptionHook);
 		when(registeredSensorConfig.getReverseMethodHooks()).thenReturn(methodHooks);
 		when(registeredSensorConfig.getMethodHooks()).thenReturn(methodHooks);
 
-		// the exception sensor type config
-		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
-		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
-		when(sensorTypeConfig.getId()).thenReturn(exceptionSensorTypeId);
 		when(registeredSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
 		when(registeredConstructorSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
+		when(registeredConstructorSensorConfig.getReverseMethodHooks()).thenReturn(constructorHooks);
+		when(registeredConstructorSensorConfig.getMethodHooks()).thenReturn(constructorHooks);
 
 		Object object = mock(Object.class);
 		Object[] parameters = new Object[0];
@@ -504,15 +505,15 @@ public class HookDispatcherTest extends AbstractLogSupport {
 		verify(registeredSensorConfig, times(1)).getReverseMethodHooks();
 		verify(methodHook, times(1)).beforeBody(methodId, sensorTypeId, object, parameters, registeredSensorConfig);
 
+		hookDispatcher.dispatchConstructorBeforeBody(constructorId, exceptionObject, parameters);
+		verify(exceptionHook, times(1)).beforeConstructor(constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredConstructorSensorConfig);
+
 		// first method of exception sensor
-		hookDispatcher.dispatchConstructorOfThrowable(constructorId, exceptionObject, parameters);
-		verify(registeredConstructorSensorConfig.getExceptionSensorTypeConfig(), times(1)).getId();
-		verify(registeredConstructorSensorConfig, times(2)).getExceptionSensorTypeConfig();
-		verify(exceptionHook, times(1)).dispatchConstructorOfThrowable(coreService, constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredConstructorSensorConfig);
+		hookDispatcher.dispatchConstructorAfterBody(constructorId, exceptionObject, parameters);
+		verify(exceptionHook, times(1)).afterConstructor(coreService, constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredConstructorSensorConfig);
 
 		// second method of exception sensor
 		hookDispatcher.dispatchOnThrowInBody(methodId, object, parameters, exceptionObject);
-		verify(registeredSensorConfig.getExceptionSensorTypeConfig(), times(2)).getId();
 		verify(registeredSensorConfig, times(2)).getExceptionSensorTypeConfig();
 		verify(exceptionHook, times(1)).dispatchOnThrowInBody(coreService, methodId, exceptionSensorTypeId, object, exceptionObject, parameters, registeredSensorConfig);
 
@@ -527,12 +528,11 @@ public class HookDispatcherTest extends AbstractLogSupport {
 
 		// third method of exception sensor
 		hookDispatcher.dispatchBeforeCatch(methodId, exceptionObject);
-		verify(registeredSensorConfig.getExceptionSensorTypeConfig(), times(3)).getId();
 		verify(registeredSensorConfig, times(4)).getExceptionSensorTypeConfig();
 		verify(exceptionHook, times(1)).dispatchBeforeCatchBody(coreService, methodId, exceptionSensorTypeId, exceptionObject, registeredSensorConfig);
 
 		verifyZeroInteractions(object, coreService, returnValue);
-		verifyNoMoreInteractions(methodHook, constructorHook, exceptionHook, registeredConstructorSensorConfig, registeredSensorConfig);
+		verifyNoMoreInteractions(methodHook, exceptionHook, registeredSensorConfig);
 	}
 
 	@Test
@@ -549,7 +549,6 @@ public class HookDispatcherTest extends AbstractLogSupport {
 
 		// the map for the constructor hooks
 		Map<Long, IConstructorHook> constructorHooks = new LinkedHashMap<Long, IConstructorHook>();
-		IConstructorHook constructorHook = mock(IConstructorHook.class);
 
 		long sensorTypeIdOne = 7L;
 		long sensorTypeIdTwo = 13L;
@@ -565,8 +564,14 @@ public class HookDispatcherTest extends AbstractLogSupport {
 		when(registeredSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
 		when(registeredConstructorSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
 
+		// the exception sensor hook
+		IMethodSensor exceptionSensor = mock(IMethodSensor.class);
+		when(sensorTypeConfig.getSensorType()).thenReturn(exceptionSensor);
+		ExceptionSensorHook exceptionHook = mock(ExceptionSensorHook.class);
+		when(exceptionSensor.getHook()).thenReturn(exceptionHook);
+
 		// putting the hooks into the maps
-		constructorHooks.put(exceptionSensorTypeId, constructorHook);
+		constructorHooks.put(exceptionSensorTypeId, exceptionHook);
 		methodHooks.put(sensorTypeIdOne, methodHookOne);
 		methodHooks.put(sensorTypeIdTwo, methodHookTwo);
 		methodHooks.put(sensorTypeIdThree, methodHookThree);
@@ -576,6 +581,8 @@ public class HookDispatcherTest extends AbstractLogSupport {
 
 		when(registeredSensorConfig.getReverseMethodHooks()).thenReturn(reverseMethodHooks);
 		when(registeredSensorConfig.getMethodHooks()).thenReturn(methodHooks);
+		when(registeredConstructorSensorConfig.getReverseMethodHooks()).thenReturn(constructorHooks);
+		when(registeredConstructorSensorConfig.getMethodHooks()).thenReturn(constructorHooks);
 
 		Object object = mock(Object.class);
 		Object[] parameters = new Object[0];
@@ -593,15 +600,15 @@ public class HookDispatcherTest extends AbstractLogSupport {
 		inOrder.verify(methodHookTwo, times(1)).beforeBody(methodId, sensorTypeIdTwo, object, parameters, registeredSensorConfig);
 		inOrder.verify(methodHookOne, times(1)).beforeBody(methodId, sensorTypeIdOne, object, parameters, registeredSensorConfig);
 
+		hookDispatcher.dispatchConstructorBeforeBody(constructorId, exceptionObject, parameters);
+		verify(exceptionHook, times(1)).beforeConstructor(constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredConstructorSensorConfig);
+
 		// first method of exception sensor
-		hookDispatcher.dispatchConstructorOfThrowable(constructorId, exceptionObject, parameters);
-		verify(registeredConstructorSensorConfig.getExceptionSensorTypeConfig(), times(1)).getId();
-		verify(registeredConstructorSensorConfig, times(2)).getExceptionSensorTypeConfig();
-		verify(exceptionHook, times(1)).dispatchConstructorOfThrowable(coreService, constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredConstructorSensorConfig);
+		hookDispatcher.dispatchConstructorAfterBody(constructorId, exceptionObject, parameters);
+		verify(exceptionHook, times(1)).afterConstructor(coreService, constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredConstructorSensorConfig);
 
 		// second method of exception sensor
 		hookDispatcher.dispatchOnThrowInBody(methodId, object, parameters, exceptionObject);
-		verify(registeredSensorConfig.getExceptionSensorTypeConfig(), times(2)).getId();
 		verify(registeredSensorConfig, times(2)).getExceptionSensorTypeConfig();
 		verify(exceptionHook, times(1)).dispatchOnThrowInBody(coreService, methodId, exceptionSensorTypeId, object, exceptionObject, parameters, registeredSensorConfig);
 
@@ -622,12 +629,11 @@ public class HookDispatcherTest extends AbstractLogSupport {
 
 		// third method of exception sensor
 		hookDispatcher.dispatchBeforeCatch(methodId, exceptionObject);
-		verify(registeredSensorConfig.getExceptionSensorTypeConfig(), times(3)).getId();
 		verify(registeredSensorConfig, times(4)).getExceptionSensorTypeConfig();
 		verify(exceptionHook, times(1)).dispatchBeforeCatchBody(coreService, methodId, exceptionSensorTypeId, exceptionObject, registeredSensorConfig);
 
 		verifyZeroInteractions(object, coreService, returnValue);
-		verifyNoMoreInteractions(methodHookOne, methodHookTwo, methodHookThree, exceptionHook, registeredSensorConfig, registeredConstructorSensorConfig);
+		verifyNoMoreInteractions(methodHookOne, methodHookTwo, methodHookThree, exceptionHook, registeredSensorConfig);
 	}
 
 	@Test
@@ -649,6 +655,12 @@ public class HookDispatcherTest extends AbstractLogSupport {
 		when(registeredSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
 		when(registeredConstructorSensorConfig.getExceptionSensorTypeConfig()).thenReturn(sensorTypeConfig);
 
+		// the exception sensor hook
+		IMethodSensor exceptionSensor = mock(IMethodSensor.class);
+		when(sensorTypeConfig.getSensorType()).thenReturn(exceptionSensor);
+		ExceptionSensorHook exceptionHook = mock(ExceptionSensorHook.class);
+		when(exceptionSensor.getHook()).thenReturn(exceptionHook);
+
 		// the invocation sequence sensor type config
 		MethodSensorTypeConfig invocSensorType = mock(MethodSensorTypeConfig.class);
 
@@ -662,12 +674,13 @@ public class HookDispatcherTest extends AbstractLogSupport {
 		IMethodHook methodHook = mock(IMethodHook.class);
 		// the map for the constructor hooks
 		Map<Long, IConstructorHook> constructorHooks = new LinkedHashMap<Long, IConstructorHook>();
-		IConstructorHook constructorHook = mock(IConstructorHook.class);
 		methodHooks.put(methodSensorTypeId, methodHook);
 		methodHooks.put(invocSensorTypeId, invocHook);
-		constructorHooks.put(exceptionSensorTypeId, constructorHook);
+		constructorHooks.put(exceptionSensorTypeId, exceptionHook);
 		when(registeredSensorConfig.getReverseMethodHooks()).thenReturn(methodHooks);
 		when(registeredSensorConfig.getMethodHooks()).thenReturn(methodHooks);
+		when(registeredConstructorSensorConfig.getReverseMethodHooks()).thenReturn(constructorHooks);
+		when(registeredConstructorSensorConfig.getMethodHooks()).thenReturn(constructorHooks);
 		when(registeredSensorConfig.startsInvocationSequence()).thenReturn(true);
 		when(registeredSensorConfig.getInvocationSequenceSensorTypeConfig()).thenReturn(invocSensorType);
 
@@ -712,18 +725,18 @@ public class HookDispatcherTest extends AbstractLogSupport {
 		verify(invocHook, times(1)).beforeBody(eq(methodIdTwo), anyLong(), eq(object), eq(parameters), eq(registeredSensorConfigTwo));
 		verify(invocSensorType, times(1)).getSensorType();
 
+		hookDispatcher.dispatchConstructorBeforeBody(constructorId, exceptionObject, parameters);
+		verify(exceptionHook, times(1)).beforeConstructor(constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredConstructorSensorConfig);
+
 		// /////////////////////////////////////////////////////////
 		// ///////////// EXCEPTION SENSOR STARTS HERE
 
 		// first method of exception sensor
-		hookDispatcher.dispatchConstructorOfThrowable(constructorId, exceptionObject, parameters);
-		verify(registeredConstructorSensorConfig.getExceptionSensorTypeConfig(), times(1)).getId();
-		verify(registeredConstructorSensorConfig, times(2)).getExceptionSensorTypeConfig();
-		verify(exceptionHook, times(1)).dispatchConstructorOfThrowable(coreService, constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredConstructorSensorConfig);
+		hookDispatcher.dispatchConstructorAfterBody(constructorId, exceptionObject, parameters);
+		verify(exceptionHook, times(1)).afterConstructor(coreService, constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredConstructorSensorConfig);
 
 		// second method of exception sensor
 		hookDispatcher.dispatchOnThrowInBody(methodId, object, parameters, exceptionObject);
-		verify(registeredSensorConfig.getExceptionSensorTypeConfig(), times(2)).getId();
 		verify(registeredSensorConfig, times(2)).getExceptionSensorTypeConfig();
 		verify(exceptionHook, times(1)).dispatchOnThrowInBody(coreService, methodId, exceptionSensorTypeId, object, exceptionObject, parameters, registeredSensorConfig);
 		// ///////////// EXCEPTION SENSOR SECOND METHOD ENDS HERE
@@ -745,7 +758,6 @@ public class HookDispatcherTest extends AbstractLogSupport {
 
 		// third method of exception sensor
 		hookDispatcher.dispatchBeforeCatch(methodId, exceptionObject);
-		verify(registeredSensorConfig.getExceptionSensorTypeConfig(), times(3)).getId();
 		verify(registeredSensorConfig, times(4)).getExceptionSensorTypeConfig();
 		verify(exceptionHook, times(1)).dispatchBeforeCatchBody(coreService, methodId, exceptionSensorTypeId, exceptionObject, registeredSensorConfig);
 
@@ -766,7 +778,7 @@ public class HookDispatcherTest extends AbstractLogSupport {
 		// ////////////////////////////////////////////////////////
 
 		verifyZeroInteractions(object, coreService, returnValue);
-		verifyNoMoreInteractions(methodHook, constructorHook, exceptionHook, registeredSensorConfig, registeredConstructorSensorConfig);
+		verifyNoMoreInteractions(methodHook, exceptionHook, registeredSensorConfig);
 	}
 
 }

@@ -2,13 +2,13 @@ package info.novatec.inspectit.agent.sensor.exception;
 
 import info.novatec.inspectit.agent.config.IPropertyAccessor;
 import info.novatec.inspectit.agent.core.IIdManager;
+import info.novatec.inspectit.agent.hooking.IHook;
 import info.novatec.inspectit.util.Timer;
 
 import java.util.Map;
 
 /**
- * The {@link ExceptionSensor} which initializes and returns the
- * {@link ExceptionSensorHook} class.
+ * The {@link ExceptionSensor} which initializes and returns the {@link ExceptionSensorHook} class.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -54,8 +54,7 @@ public class ExceptionSensor implements IExceptionSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public static IExceptionSensorHook getHook() {
-		// TODO ET: move this method into interface
+	public IHook getHook() {
 		return exceptionSensorHook;
 	}
 

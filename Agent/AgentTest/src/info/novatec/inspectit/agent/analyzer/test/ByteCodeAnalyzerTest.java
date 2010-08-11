@@ -9,6 +9,7 @@ import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.ByteCodeAnalyzer;
+import info.novatec.inspectit.agent.analyzer.impl.ThrowableMatcher;
 import info.novatec.inspectit.agent.analyzer.test.classes.MyTestException;
 import info.novatec.inspectit.agent.analyzer.test.classes.TestClass;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
@@ -32,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -48,10 +48,10 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 	@Mock
 	private IClassPoolAnalyzer classPoolAnalyzer;
 
-	private ByteCodeAnalyzer byteCodeAnalyzer;
-
 	@Mock
 	private IInheritanceAnalyzer inheritanceAnalyzer;
+
+	private ByteCodeAnalyzer byteCodeAnalyzer;
 
 	/**
 	 * {@inheritDoc}
@@ -63,7 +63,7 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {
-		byteCodeAnalyzer = new ByteCodeAnalyzer(configurationStorage, hookInstrumenter, classPoolAnalyzer, inheritanceAnalyzer);
+		byteCodeAnalyzer = new ByteCodeAnalyzer(configurationStorage, hookInstrumenter, classPoolAnalyzer);
 	}
 
 	private byte[] getByteCode(String className) throws NotFoundException, IOException, CannotCompileException {
@@ -168,11 +168,9 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 		ClassLoader classLoader = MyTestException.class.getClassLoader();
 		byte[] byteCode = getByteCode(className);
 
-		// when(configurationStorage.isExceptionSensorActivated()).thenReturn(
-		// false);
+		when(configurationStorage.isExceptionSensorActivated()).thenReturn(false);
 		ClassPool classPool = ClassPool.getDefault();
 		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(classPool);
-		when(inheritanceAnalyzer.subclassOf(className, "java.lang.Throwable", classPool)).thenReturn(false);
 
 		// actual class was not a subclass of Throwable, so nothing to
 		// instrument
@@ -194,31 +192,36 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
 		when(sensorTypeConfig.getName()).thenReturn(exceptionSensor.getClass().getName());
 		when(sensorTypeConfig.getClassName()).thenReturn(exceptionSensor.getClass().getName());
+		when(sensorTypeConfig.getSensorType()).thenReturn(exceptionSensor);
 		List<MethodSensorTypeConfig> exceptionSensorTypes = new ArrayList<MethodSensorTypeConfig>();
 		exceptionSensorTypes.add(sensorTypeConfig);
+		when(configurationStorage.getMethodSensorTypes()).thenReturn(exceptionSensorTypes);
 		when(configurationStorage.getExceptionSensorTypes()).thenReturn(exceptionSensorTypes);
-		IMatcher matcher = mock(IMatcher.class);
+		IMatcher superclassMatcher = mock(IMatcher.class);
+		when(superclassMatcher.compareClassName(classLoader, className)).thenReturn(true);
 
 		Map<String, String> settings = new HashMap<String, String>();
 		settings.put("superclass", "true");
 
 		List<UnregisteredSensorConfig> exceptionSensorConfigs = new ArrayList<UnregisteredSensorConfig>();
 		UnregisteredSensorConfig config = mock(UnregisteredSensorConfig.class);
-		when(config.isConstructor()).thenReturn(false);
+		when(config.isConstructor()).thenReturn(true);
 		when(config.isInterface()).thenReturn(false);
 		when(config.isSuperclass()).thenReturn(true);
 		when(config.isVirtual()).thenReturn(false);
+		when(config.isIgnoreSignature()).thenReturn(true);
 		when(config.getSensorTypeConfig()).thenReturn(sensorTypeConfig);
+		when(config.getSensorName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
+		when(config.getSettings()).thenReturn(settings);
+		ThrowableMatcher matcher = new ThrowableMatcher(inheritanceAnalyzer, classPoolAnalyzer, config, superclassMatcher);
 		when(config.getMatcher()).thenReturn(matcher);
-		when(matcher.compareClassName(classLoader, className)).thenReturn(true);
-
 		exceptionSensorConfigs.add(config);
-		when(configurationStorage.getExceptionSensorConfigs()).thenReturn(exceptionSensorConfigs);
+
+		when(configurationStorage.getUnregisteredSensorConfigs()).thenReturn(exceptionSensorConfigs);
 
 		// exception sensor was activated, so the current Throwable class was
 		// instrumented
 		byte[] instrumentedByteCode = byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
 		assertNotNull(instrumentedByteCode);
 	}
-
 }

@@ -1,6 +1,6 @@
 package info.novatec.inspectit.agent.sensor.exception;
 
-import info.novatec.inspectit.agent.sensor.ISensor;
+import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 
 /**
  * The main interface for all exception sensors.
@@ -8,6 +8,6 @@ import info.novatec.inspectit.agent.sensor.ISensor;
  * @author Eduard Tudenhoefner
  * 
  */
-public interface IExceptionSensor extends ISensor {
+public interface IExceptionSensor extends IMethodSensor {
 
 }

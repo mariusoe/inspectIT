@@ -5,7 +5,6 @@ import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.hooking.IConstructorHook;
 import info.novatec.inspectit.agent.hooking.IHookDispatcher;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
-import info.novatec.inspectit.agent.sensor.exception.ExceptionSensor;
 import info.novatec.inspectit.agent.sensor.exception.IExceptionSensorHook;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 
@@ -15,8 +14,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * The hook dispatching service which is called by all the hooks throughout the
- * instrumented target application.
+ * The hook dispatching service which is called by all the hooks throughout the instrumented target
+ * application.
  * 
  * @author Patrice Bouillet
  * @author Eduard Tudenhoefner
@@ -45,25 +44,18 @@ public class HookDispatcher implements IHookDispatcher {
 	private Map constructorHooks = new Hashtable();
 
 	/**
-	 * Stores the current Status of the invocation sequence tracer in a
-	 * {@link ThreadLocal} object.
+	 * Stores the current Status of the invocation sequence tracer in a {@link ThreadLocal} object.
 	 */
 	private InvocationSequenceCount invocationSequenceCount = new InvocationSequenceCount();
 
 	/**
-	 * A thread local holder object to save the current started invocation
-	 * sequence.
+	 * A thread local holder object to save the current started invocation sequence.
 	 */
 	private ThreadLocal invocationSequenceHolder = new ThreadLocal();
 
 	/**
-	 * The link to the exception sensor hook.
-	 */
-	private IExceptionSensorHook exceptionHook = ExceptionSensor.getHook();
-
-	/**
-	 * Default constructor which needs a reference to the core service. This is
-	 * needed for the invocation sensor.
+	 * Default constructor which needs a reference to the core service. This is needed for the
+	 * invocation sensor.
 	 * 
 	 * @param coreService
 	 *            The core service.
@@ -200,22 +192,13 @@ public class HookDispatcher implements IHookDispatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void dispatchConstructorOfThrowable(long id, Object exceptionObject, Object[] parameters) {
-		RegisteredSensorConfig rsc = (RegisteredSensorConfig) constructorHooks.get(new Long(id));
-		long sensorTypeId = rsc.getExceptionSensorTypeConfig().getId();
-
-		exceptionHook.dispatchConstructorOfThrowable(coreService, id, sensorTypeId, exceptionObject, parameters, rsc);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public void dispatchOnThrowInBody(long id, Object object, Object[] parameters, Object exceptionObject) {
 		// rsc contains the settings for the actual method where the exception
 		// was thrown.
 		RegisteredSensorConfig rsc = (RegisteredSensorConfig) methodHooks.get(new Long(id));
 		long sensorTypeId = rsc.getExceptionSensorTypeConfig().getId();
 
+		IExceptionSensorHook exceptionHook = (IExceptionSensorHook) ((IMethodSensor) rsc.getExceptionSensorTypeConfig().getSensorType()).getHook();
 		exceptionHook.dispatchOnThrowInBody(coreService, id, sensorTypeId, object, exceptionObject, parameters, rsc);
 	}
 
@@ -228,6 +211,7 @@ public class HookDispatcher implements IHookDispatcher {
 		RegisteredSensorConfig rsc = (RegisteredSensorConfig) methodHooks.get(new Long(id));
 		long sensorTypeId = rsc.getExceptionSensorTypeConfig().getId();
 
+		IExceptionSensorHook exceptionHook = (IExceptionSensorHook) ((IMethodSensor) rsc.getExceptionSensorTypeConfig().getSensorType()).getHook();
 		exceptionHook.dispatchBeforeCatchBody(coreService, id, sensorTypeId, exceptionObject, rsc);
 	}
 
@@ -240,6 +224,7 @@ public class HookDispatcher implements IHookDispatcher {
 		RegisteredSensorConfig rsc = (RegisteredSensorConfig) constructorHooks.get(new Long(id));
 		long sensorTypeId = rsc.getExceptionSensorTypeConfig().getId();
 
+		IExceptionSensorHook exceptionHook = (IExceptionSensorHook) ((IMethodSensor) rsc.getExceptionSensorTypeConfig().getSensorType()).getHook();
 		exceptionHook.dispatchOnThrowInBody(coreService, id, sensorTypeId, object, exceptionObject, parameters, rsc);
 	}
 
@@ -252,6 +237,7 @@ public class HookDispatcher implements IHookDispatcher {
 		RegisteredSensorConfig rsc = (RegisteredSensorConfig) constructorHooks.get(new Long(id));
 		long sensorTypeId = rsc.getExceptionSensorTypeConfig().getId();
 
+		IExceptionSensorHook exceptionHook = (IExceptionSensorHook) ((IMethodSensor) rsc.getExceptionSensorTypeConfig().getSensorType()).getHook();
 		exceptionHook.dispatchBeforeCatchBody(coreService, id, sensorTypeId, exceptionObject, rsc);
 	}
 
@@ -311,9 +297,9 @@ public class HookDispatcher implements IHookDispatcher {
 				for (Iterator i = rsc.getMethodHooks().entrySet().iterator(); i.hasNext();) {
 					Map.Entry entry = (Map.Entry) i.next();
 					IConstructorHook constructorHook = (IConstructorHook) entry.getValue();
-					// the invocation sequence sensor needs the original core
-					// service!
-					if (invocCoreService == constructorHook) {
+					// the invocation sequence sensor and the exception sensor need the original
+					// core service!
+					if (invocCoreService == constructorHook || constructorHook instanceof IExceptionSensorHook) {
 						constructorHook.afterConstructor(coreService, id, ((Long) entry.getKey()).longValue(), object, parameters, rsc);
 					} else {
 						constructorHook.afterConstructor(invocCoreService, id, ((Long) entry.getKey()).longValue(), object, parameters, rsc);
@@ -349,9 +335,8 @@ public class HookDispatcher implements IHookDispatcher {
 	}
 
 	/**
-	 * Private inner class used to track the count of the started invocation
-	 * sequences in one thread. Thus it extends {@link ThreadLocal} to provide a
-	 * unique number for every Thread.
+	 * Private inner class used to track the count of the started invocation sequences in one
+	 * thread. Thus it extends {@link ThreadLocal} to provide a unique number for every Thread.
 	 * 
 	 * @author Patrice Bouillet
 	 * 

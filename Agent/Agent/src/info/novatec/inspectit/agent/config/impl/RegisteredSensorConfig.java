@@ -15,12 +15,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-
 /**
- * After a sensor is registered at the CMR, this class is used to store all the
- * information as the {@link UnregisteredSensorConfig} contains information
- * which is not needed anymore. Every {@link RegisteredSensorConfig} class maps
- * directly to one specific class and method with its parameters.
+ * After a sensor is registered at the CMR, this class is used to store all the information as the
+ * {@link UnregisteredSensorConfig} contains information which is not needed anymore. Every
+ * {@link RegisteredSensorConfig} class maps directly to one specific class and method with its
+ * parameters.
  * 
  * @author Patrice Bouillet
  * @author Eduard Tudenhoefner
@@ -44,8 +43,7 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	private String returnType = "";
 
 	/**
-	 * This list contains all configurations of the sensor types for this sensor
-	 * configuration.
+	 * This list contains all configurations of the sensor types for this sensor configuration.
 	 */
 	private List sensorTypeConfigs = new ArrayList();
 
@@ -58,16 +56,15 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	 * The sensor type configuration object of the exception sensor.
 	 */
 	private MethodSensorTypeConfig exceptionSensorTypeConfig = null;
-	
+
 	/**
-	 * The map used by the hooks in the source code to execute the after
-	 * methods.
+	 * The map used by the hooks in the source code to execute the after methods.
 	 */
 	private Map methodHookMap = new LinkedHashMap();
 
 	/**
-	 * The map used by the hooks in the source code to execute the before
-	 * method. For that hook, it has to be reversed.
+	 * The map used by the hooks in the source code to execute the before method. For that hook, it
+	 * has to be reversed.
 	 */
 	private Map reverseMethodHookMap = new LinkedHashMap();
 
@@ -148,8 +145,8 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
-	 * Returns an unmodifiable {@link Map} implementation of the sensor types as
-	 * the keys and the sensor names as the values.
+	 * Returns an unmodifiable {@link Map} implementation of the sensor types as the keys and the
+	 * sensor names as the values.
 	 * 
 	 * @return The sensor type to name map.
 	 */
@@ -170,11 +167,11 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 		if (sensorTypeConfig.getClassName().endsWith("InvocationSequenceSensor")) {
 			invocationSequenceSensorTypeConfig = sensorTypeConfig;
 		}
-		
+
 		if (sensorTypeConfig.getClassName().endsWith("ExceptionSensor")) {
 			exceptionSensorTypeConfig = sensorTypeConfig;
 		}
-		
+
 		if (!sensorTypeConfigs.contains(sensorTypeConfig)) {
 			sensorTypeConfigs.add(sensorTypeConfig);
 			sensorTypeToName.put(sensorTypeConfig, sensorName);
@@ -206,8 +203,8 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
-	 * The sensor comparator is used to sort the sensor type configurations
-	 * according to their priority.
+	 * The sensor comparator is used to sort the sensor type configurations according to their
+	 * priority.
 	 */
 	private Comparator sensorTypeConfigComparator = new SensorTypeConfigComparator();
 
@@ -221,12 +218,11 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
-	 * Returns the sorted method hooks as a {@link Map} with the hash value of
-	 * the corresponding sensor type as the key and the {@link IMethodHook}
-	 * implementation as the value.
+	 * Returns the sorted method hooks as a {@link Map} with the hash value of the corresponding
+	 * sensor type as the key and the {@link IMethodHook} implementation as the value.
 	 * <p>
-	 * The returned {@link Map} of this method is not locked for modification
-	 * because of performance reasons.
+	 * The returned {@link Map} of this method is not locked for modification because of performance
+	 * reasons.
 	 * <p>
 	 * This map is always generated along calling
 	 * {@link #addSensorTypeConfig(MethodSensorTypeConfig)} and
@@ -239,8 +235,7 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
-	 * Returns the same map as returned by {@link #getMethodHooks()} but in
-	 * reverse order.
+	 * Returns the same map as returned by {@link #getMethodHooks()} but in reverse order.
 	 * 
 	 * @return The reverse sorted map of method hooks.
 	 */
@@ -249,8 +244,7 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
-	 * Initialized the method hooks map by iterating over the list containing
-	 * the sensorTypeConfigs.
+	 * Initialized the method hooks map by iterating over the list containing the sensorTypeConfigs.
 	 */
 	private void sortMethodHooks() {
 		methodHookMap.clear();
@@ -297,18 +291,17 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
-	 * Checks if this sensor configuration starts an invocation sequence tracer.
-	 * This has to be checked separately.
+	 * Checks if this sensor configuration starts an invocation sequence tracer. This has to be
+	 * checked separately.
 	 * 
 	 * @return If this config starts an invocation sequence tracer.
 	 */
 	public boolean startsInvocationSequence() {
 		return null != invocationSequenceSensorTypeConfig;
 	}
-	
+
 	/**
-	 * Returns the exception sensor type configuration object. Can be
-	 * <code>null</code>.
+	 * Returns the exception sensor type configuration object. Can be <code>null</code>.
 	 * 
 	 * @return The exception sensor type configuration.
 	 */
@@ -319,11 +312,11 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	/**
 	 * Sets the exception sensor type configuration.
 	 * 
-	 * @param exceptionsensorSensorTypeConfig
+	 * @param exceptionSensorTypeConfig
 	 *            The exception sensor type configuration.
 	 */
-	public void setExceptionSensorTypeConfig(MethodSensorTypeConfig exceptionsensorSensorTypeConfig) {
-		this.exceptionSensorTypeConfig = exceptionsensorSensorTypeConfig;
+	public void setExceptionSensorTypeConfig(MethodSensorTypeConfig exceptionSensorTypeConfig) {
+		this.exceptionSensorTypeConfig = exceptionSensorTypeConfig;
 
 		// we need to add the sensor type config separately to the list, because
 		// calling sortMethodHooks causes a ClassCastException
@@ -334,8 +327,7 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
-	 * Returns the invocation sequence sensor type configuration object. Can be
-	 * <code>null</code>.
+	 * Returns the invocation sequence sensor type configuration object. Can be <code>null</code>.
 	 * 
 	 * @return The invocation sequence sensor type configuration.
 	 */

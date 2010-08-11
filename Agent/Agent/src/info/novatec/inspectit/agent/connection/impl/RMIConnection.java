@@ -53,14 +53,12 @@ public class RMIConnection implements IConnection {
 	private Registry registry;
 
 	/**
-	 * The agent storage rmi object which will be used to send the measurements
-	 * to.
+	 * The agent storage rmi object which will be used to send the measurements to.
 	 */
 	private IAgentStorageService agentStorageService;
 
 	/**
-	 * The registration rmi object which will be used for the registration of
-	 * the sensors.
+	 * The registration rmi object which will be used for the registration of the sensors.
 	 */
 	private IRegistrationService registrationService;
 
@@ -245,28 +243,4 @@ public class RMIConnection implements IConnection {
 	public boolean isConnected() {
 		return connected;
 	}
-	
-	// public long registerExceptionSensorType(long platformId,
-	// MethodSensorTypeConfig exceptionSensorTypeConfig) throws
-	// ServerUnavailableException, RegistrationException {
-	// if (!connected) {
-	// throw new ServerUnavailableException();
-	// }
-	//
-	// RegisterExceptionSensorType register = new
-	// RegisterExceptionSensorType(registrationService,
-	// exceptionSensorTypeConfig, platformId);
-	// try {
-	// Long id = (Long) register.makeCall();
-	// return id.longValue();
-	// } catch (ServerUnavailableException serverUnavailableException) {
-	// LOGGER.throwing(RMIConnection.class.getName(),
-	// "registerExceptionSensorType(MethodSensorTypeConfig)",
-	// serverUnavailableException);
-	// throw new
-	// RegistrationException("Could not register the exception sensor type",
-	// serverUnavailableException);
-	// }
-	// }
-
 }

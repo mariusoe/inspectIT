@@ -28,8 +28,6 @@ import info.novatec.inspectit.agent.hooking.IHookInstrumenter;
 import info.novatec.inspectit.agent.hooking.impl.HookDispatcher;
 import info.novatec.inspectit.agent.hooking.impl.HookInstrumenter;
 import info.novatec.inspectit.agent.sending.ISendingStrategy;
-import info.novatec.inspectit.agent.sensor.exception.ExceptionSensor;
-import info.novatec.inspectit.agent.sensor.exception.IExceptionSensor;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 import info.novatec.inspectit.agent.sensor.method.jdbc.StatementStorage;
 import info.novatec.inspectit.agent.sensor.platform.IPlatformSensor;
@@ -48,16 +46,15 @@ import org.picocontainer.alternatives.CachingPicoContainer;
 import org.picocontainer.defaults.ComponentParameter;
 
 /**
- * The {@link PicoAgent} is used by the javaagent to analyze the passed bytecode
- * if its needed to be instrumented. The {@link #getInstance()} method returns
- * the singleton instance of this class.
+ * The {@link PicoAgent} is used by the javaagent to analyze the passed bytecode if its needed to be
+ * instrumented. The {@link #getInstance()} method returns the singleton instance of this class.
  * <p>
- * The {@link #inspectByteCode(byte[], String, ClassLoader)} is the method which
- * should be called by the javaagent. The method returns null if nothing has to
- * be changed or something happened unexpectedly.
+ * The {@link #inspectByteCode(byte[], String, ClassLoader)} is the method which should be called by
+ * the javaagent. The method returns null if nothing has to be changed or something happened
+ * unexpectedly.
  * <p>
- * This class is named <b>Pico</b>Agent as its using the Pico Container to
- * handle the different components in the Agent.
+ * This class is named <b>Pico</b>Agent as its using the Pico Container to handle the different
+ * components in the Agent.
  * 
  * @author Patrice Bouillet
  * 
@@ -75,16 +72,14 @@ public class PicoAgent {
 	private static PicoAgent instance = null;
 
 	/**
-	 * These patterns are checked in the
-	 * {@link #inspectByteCode(byte[], String, ClassLoader)} method to ignore
-	 * them.
+	 * These patterns are checked in the {@link #inspectByteCode(byte[], String, ClassLoader)}
+	 * method to ignore them.
 	 */
 	private static final String[] IGNORE_START_PATTERNS = new String[] { "info.novatec.inspectit.", "sun.misc.reflect", "$Proxy" };
 
 	/**
-	 * These patterns are checked in the
-	 * {@link #inspectByteCode(byte[], String, ClassLoader)} method to ignore
-	 * them.
+	 * These patterns are checked in the {@link #inspectByteCode(byte[], String, ClassLoader)}
+	 * method to ignore them.
 	 */
 	private static final String[] IGNORE_END_PATTERNS = new String[] { "_WLStub" };
 
@@ -99,8 +94,7 @@ public class PicoAgent {
 	private IHookDispatcher hookDispatcher;
 
 	/**
-	 * Set to <code>true</code> if something happened while trying to initialize
-	 * the pico container.
+	 * Set to <code>true</code> if something happened while trying to initialize the pico container.
 	 */
 	private boolean initializationError = false;
 
@@ -110,8 +104,7 @@ public class PicoAgent {
 	}
 
 	/**
-	 * The singleton access to this class. New instances of this class aren't
-	 * allowed.
+	 * The singleton access to this class. New instances of this class aren't allowed.
 	 * 
 	 * @return The singleton instance
 	 */
@@ -120,8 +113,8 @@ public class PicoAgent {
 	}
 
 	/**
-	 * Initialize this class, more specific the Pico container. It will register
-	 * every needed component.
+	 * Initialize this class, more specific the Pico container. It will register every needed
+	 * component.
 	 */
 	private void init() {
 
@@ -164,12 +157,6 @@ public class PicoAgent {
 				PlatformSensorTypeConfig config = (PlatformSensorTypeConfig) iterator.next();
 				IPlatformSensor platformSensor = this.initPlatformSensor(config);
 				config.setSensorType(platformSensor);
-			}
-
-			for (Iterator iterator = configurationStorage.getExceptionSensorTypes().iterator(); iterator.hasNext();) {
-				MethodSensorTypeConfig config = (MethodSensorTypeConfig) iterator.next();
-				IExceptionSensor exceptionSensor = this.initExceptionSensor(config);
-				config.setSensorType(exceptionSensor);
 			}
 
 			for (Iterator iterator = configurationStorage.getMethodSensorTypes().iterator(); iterator.hasNext();) {
@@ -222,8 +209,8 @@ public class PicoAgent {
 	 *            The buffer strategy configuration.
 	 * @return The instantiated buffer strategy.
 	 * @throws Exception
-	 *             Root exception thrown if something happens while trying to
-	 *             instantiate the buffer strategy.
+	 *             Root exception thrown if something happens while trying to instantiate the buffer
+	 *             strategy.
 	 */
 	private IBufferStrategy initBufferStrategy(StrategyConfig bufferStrategyConfig) throws Exception {
 		Class clazz = Class.forName(bufferStrategyConfig.getClazzName());
@@ -240,8 +227,8 @@ public class PicoAgent {
 	 *            The sending strategy configuration.
 	 * @return The instantiated sending strategy.
 	 * @throws Exception
-	 *             Root exception thrown if something happens while trying to
-	 *             instantiate the sending strategy.
+	 *             Root exception thrown if something happens while trying to instantiate the
+	 *             sending strategy.
 	 */
 	private ISendingStrategy initSendingStrategy(StrategyConfig sendingStrategyConfig) throws Exception {
 		Class clazz = Class.forName(sendingStrategyConfig.getClazzName());
@@ -258,8 +245,8 @@ public class PicoAgent {
 	 *            The platform sensor type configuration.
 	 * @return The instantiated buffer strategy.
 	 * @throws Exception
-	 *             Root exception thrown if something happens while trying to
-	 *             instantiate the platform sensor type.
+	 *             Root exception thrown if something happens while trying to instantiate the
+	 *             platform sensor type.
 	 */
 	private IPlatformSensor initPlatformSensor(PlatformSensorTypeConfig config) throws Exception {
 		Class platformSensorClass = Class.forName(config.getClassName());
@@ -273,36 +260,14 @@ public class PicoAgent {
 	}
 
 	/**
-	 * Initializes the {@link ExceptionSensor} saved in the configuration
-	 * storage.
-	 * 
-	 * @param config
-	 *            The exception sensor configuration
-	 * @return The instantiated {@link ExceptionSensor}.
-	 * @throws Exception
-	 *             Root exception thrown if something happens while trying to
-	 *             instantiate the exception sensor type.
-	 */
-	private IExceptionSensor initExceptionSensor(MethodSensorTypeConfig config) throws Exception {
-		Class exceptionSensorClass = Class.forName(config.getClassName());
-
-		// Workaround to instantiate the class with the correct parameters
-		pico.registerComponentImplementation(exceptionSensorClass);
-		IExceptionSensor exceptionSensor = (IExceptionSensor) pico.getComponentInstance(exceptionSensorClass);
-		exceptionSensor.init(config.getParameters());
-
-		return exceptionSensor;
-	}
-
-	/**
 	 * Initializes the method sensor saved in the configuration storage.
 	 * 
 	 * @param config
 	 *            The method sensor type configuration.
 	 * @return The instantiated buffer strategy.
 	 * @throws Exception
-	 *             Root exception thrown if something happens while trying to
-	 *             instantiate the method sensor type.
+	 *             Root exception thrown if something happens while trying to instantiate the method
+	 *             sensor type.
 	 */
 	private IMethodSensor initMethodSensor(MethodSensorTypeConfig config) throws Exception {
 		Class methodSensorClass = Class.forName(config.getClassName());
@@ -316,9 +281,9 @@ public class PicoAgent {
 	}
 
 	/**
-	 * This method will inspect the given byte code and class name to check if
-	 * it needs to be instrumented by the Agent. The class loader is needed as
-	 * different versions of the same class can be loaded.
+	 * This method will inspect the given byte code and class name to check if it needs to be
+	 * instrumented by the Agent. The class loader is needed as different versions of the same class
+	 * can be loaded.
 	 * 
 	 * @param byteCode
 	 *            The byte code.
@@ -326,8 +291,8 @@ public class PicoAgent {
 	 *            The name of the class
 	 * @param classLoader
 	 *            The class loader of the passed class.
-	 * @return Returns the instrumented byte code if something has been changed,
-	 *         otherwise <code>null</code>.
+	 * @return Returns the instrumented byte code if something has been changed, otherwise
+	 *         <code>null</code>.
 	 */
 	public byte[] inspectByteCode(byte[] byteCode, String className, ClassLoader classLoader) {
 		// if an error in the init method was caught, we'll do nothing here.
@@ -372,9 +337,8 @@ public class PicoAgent {
 	}
 
 	/**
-	 * Returns the hook dispatcher. This is needed for the instrumented methods
-	 * in the target application! Otherwise the entry point for them would be
-	 * missing.
+	 * Returns the hook dispatcher. This is needed for the instrumented methods in the target
+	 * application! Otherwise the entry point for them would be missing.
 	 * 
 	 * @return The hook dispatcher
 	 */

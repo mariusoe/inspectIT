@@ -2,7 +2,6 @@ package info.novatec.inspectit.agent.analyzer.impl;
 
 import info.novatec.inspectit.agent.analyzer.IByteCodeAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
-import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatcher;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.StorageException;
@@ -11,7 +10,6 @@ import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
 import info.novatec.inspectit.agent.hooking.IHookInstrumenter;
 import info.novatec.inspectit.agent.hooking.impl.HookException;
-import info.novatec.inspectit.agent.hooking.impl.HookInstrumenter;
 import info.novatec.inspectit.javassist.ByteArrayClassPath;
 import info.novatec.inspectit.javassist.CannotCompileException;
 import info.novatec.inspectit.javassist.ClassPool;
@@ -28,14 +26,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-
 /**
- * The default implementation of the {@link IByteCodeAnalyzer} interface. First
- * it tries to analyze the given byte code and collects all the methods which
- * need to be instrumented in a Map. This is done in the
- * {@link #analyze(byte[], String, ClassLoader)} method. Afterwards, the Map is
- * passed to the {@link #instrument(Map)} method which will do the
- * instrumentation.
+ * The default implementation of the {@link IByteCodeAnalyzer} interface. First it tries to analyze
+ * the given byte code and collects all the methods which need to be instrumented in a Map. This is
+ * done in the {@link #analyze(byte[], String, ClassLoader)} method. Afterwards, the Map is passed
+ * to the {@link #instrument(Map)} method which will do the instrumentation.
  * 
  * @author Patrice Bouillet
  * @author Eduard Tudenhoefner
@@ -49,22 +44,15 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 	private final IHookInstrumenter hookInstrumenter;
 
 	/**
-	 * The implementation of the configuration storage where all definitions of
-	 * the user are stored.
+	 * The implementation of the configuration storage where all definitions of the user are stored.
 	 */
 	private final IConfigurationStorage configurationStorage;
 
 	/**
-	 * The class pool analyzer is used here to add the passed byte code to the
-	 * class pool which is responsible for the class loader.
+	 * The class pool analyzer is used here to add the passed byte code to the class pool which is
+	 * responsible for the class loader.
 	 */
 	private final IClassPoolAnalyzer classPoolAnalyzer;
-
-	/**
-	 * The inheritance analyzer is used here to add additional instructions to a
-	 * constructor of a specified type.
-	 */
-	private final IInheritanceAnalyzer inheritanceAnalyzer;
 
 	/**
 	 * The default constructor which accepts two parameters which are needed.
@@ -78,7 +66,7 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 	 * @param inheritanceAnalyzer
 	 *            The inheritance analyzer reference.
 	 */
-	public ByteCodeAnalyzer(IConfigurationStorage configurationStorage, IHookInstrumenter hookInstrumenter, IClassPoolAnalyzer classPoolAnalyzer, IInheritanceAnalyzer inheritanceAnalyzer) {
+	public ByteCodeAnalyzer(IConfigurationStorage configurationStorage, IHookInstrumenter hookInstrumenter, IClassPoolAnalyzer classPoolAnalyzer) {
 		if (null == configurationStorage) {
 			throw new IllegalArgumentException("Configuration storage cannot be null!");
 		}
@@ -88,13 +76,9 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 		if (null == classPoolAnalyzer) {
 			throw new IllegalArgumentException("Class pool analyzer cannot be null!");
 		}
-		if (null == inheritanceAnalyzer) {
-			throw new IllegalArgumentException("Inheritance analyzer cannot be null!");
-		}
 		this.configurationStorage = configurationStorage;
 		this.hookInstrumenter = hookInstrumenter;
 		this.classPoolAnalyzer = classPoolAnalyzer;
-		this.inheritanceAnalyzer = inheritanceAnalyzer;
 	}
 
 	/**
@@ -111,29 +95,6 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 
 		try {
 			byte[] instrumentedByteCode = null;
-
-			// determines whether actual class is of type Throwable
-			boolean isThrowable = inheritanceAnalyzer.subclassOf(className, "java.lang.Throwable", classPool);
-
-			if (isThrowable) {
-				for (Iterator iterator = configurationStorage.getExceptionSensorConfigs().iterator(); iterator.hasNext();) {
-					UnregisteredSensorConfig exceptionSensorConfig = (UnregisteredSensorConfig) iterator.next();
-					IMatcher matcher = exceptionSensorConfig.getMatcher();
-
-					if (matcher.compareClassName(classLoader, className)) {
-						// save the modified byte code
-						instrumentedByteCode = instrumentThrowableConstructors(className, classPool);
-
-						// remove the classpath and add the instrumented
-						// bytecode of Throwable to the new classpath
-						classPool.removeClassPath(classPath);
-						ByteArrayClassPath cp = new ByteArrayClassPath(className, instrumentedByteCode);
-						classPool.insertClassPath(cp);
-						break;
-					}
-				}
-			}
-
 			Map behaviorToConfigMap = analyze(className, classLoader);
 
 			if (!behaviorToConfigMap.isEmpty()) {
@@ -165,59 +126,15 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 	}
 
 	/**
-	 * This method is mainly used to instrument all constructors of a class of
-	 * type {@link Throwable}. The constructors of the class are passed to the
-	 * {@link HookInstrumenter} and additional instructions are added. After the
-	 * instrumentation the modified byte code is returned.
-	 * 
-	 * @param className
-	 *            The {@link CtClass} of type {@link Throwable}.
-	 * @param classPool
-	 *            The class pool where to search for.
-	 * @return The modified byte code.
-	 * @throws NotFoundException
-	 *             Something could not be found.
-	 * @throws HookException
-	 *             The {@link IHookInstrumenter} generated an exception.
-	 * @throws IOException
-	 *             The byte code could not be generated.
-	 * @throws CannotCompileException
-	 *             The byte code could not be generated.
-	 */
-	private byte[] instrumentThrowableConstructors(String className, ClassPool classPool) throws NotFoundException, HookException, IOException, CannotCompileException {
-		CtClass clazz = classPool.get(className);
-
-		RegisteredSensorConfig rsc = new RegisteredSensorConfig();
-		rsc.setConstructor(true);
-		rsc.setTargetClassName(clazz.getSimpleName());
-		rsc.setTargetPackageName(clazz.getPackageName());
-		rsc.setModifiers(clazz.getModifiers());
-
-		// iterate over the exception sensor types - currently there is only one
-		for (Iterator configsIterator = configurationStorage.getExceptionSensorTypes().iterator(); configsIterator.hasNext();) {
-			MethodSensorTypeConfig config = (MethodSensorTypeConfig) configsIterator.next();
-
-			// TODO ET: sortMethodHooks throws a ClassCastException
-			// rsc.addSensorTypeConfig(config, config.getName());
-			rsc.setExceptionSensorTypeConfig(config);
-		}
-
-		hookInstrumenter.instrumentConstructorOfThrowable(clazz.getConstructors(), clazz, rsc);
-		return clazz.toBytecode();
-	}
-
-	/**
-	 * The analyze method will analyze the passed byte code, class name and
-	 * class loader and returns a {@link Map} with all matching methods to be
-	 * instrumented.
+	 * The analyze method will analyze the passed byte code, class name and class loader and returns
+	 * a {@link Map} with all matching methods to be instrumented.
 	 * 
 	 * @param className
 	 *            The name of the class.
 	 * @param classLoader
 	 *            The class loader of the passed class.
-	 * @return Returns a {@link Map} with all found methods ({@link CtBehavior})
-	 *         as the Key and a {@link List} of {@link UnregisteredSensorConfig}
-	 *         as the value.
+	 * @return Returns a {@link Map} with all found methods ({@link CtBehavior}) as the Key and a
+	 *         {@link List} of {@link UnregisteredSensorConfig} as the value.
 	 * @throws NotFoundException
 	 *             Something could not be found.
 	 * @throws StorageException
@@ -321,12 +238,14 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 			}
 
 			// only when there is an Exception Sensor defined
-			if (configurationStorage.getExceptionSensorTypes().size() > 0) {
+			if (configurationStorage.isExceptionSensorActivated()) {
 				// iterate over the exception sensor types - currently there is
 				// only one
 				for (Iterator configsIterator = configurationStorage.getExceptionSensorTypes().iterator(); configsIterator.hasNext();) {
 					MethodSensorTypeConfig config = (MethodSensorTypeConfig) configsIterator.next();
-					// TODO ET: sortMethodHooks throws a ClassCastException
+					// need to add the exception sensor config separately, because otherwise it
+					// would be added to the other method hooks, but the exception sensor is a
+					// constructor hook
 					// rsc.addSensorTypeConfig(config, config.getName());
 					rsc.setExceptionSensorTypeConfig(config);
 				}
@@ -347,12 +266,11 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 	}
 
 	/**
-	 * Replace all the place holders of the string which was set by the user in
-	 * the configuration file.
+	 * Replace all the place holders of the string which was set by the user in the configuration
+	 * file.
 	 * 
 	 * @param sensorName
-	 *            The name of the sensor where all reserved keywords will be
-	 *            replaced.
+	 *            The name of the sensor where all reserved keywords will be replaced.
 	 * @param className
 	 *            The name of the class.
 	 * @param methodName
