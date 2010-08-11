@@ -15,7 +15,6 @@ import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
-import info.novatec.inspectit.rcp.repository.service.cmr.InvocationDataAccessService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -44,8 +43,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * This input controller displays an overview of {@link InvocationSequenceData}
- * objects.
+ * This input controller displays an overview of {@link InvocationSequenceData} objects.
  * 
  * @author Patrice Bouillet
  * 
@@ -58,9 +56,9 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	public static final String ID = "inspectit.subview.table.invocoverview";
 
 	/**
-	 * The private inner enumeration used to define the used IDs which are
-	 * mapped into the columns. The order in this enumeration represents the
-	 * order of the columns. If it is reordered, nothing else has to be changed.
+	 * The private inner enumeration used to define the used IDs which are mapped into the columns.
+	 * The order in this enumeration represents the order of the columns. If it is reordered,
+	 * nothing else has to be changed.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -92,8 +90,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in
-		 *            {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITConstants}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;
@@ -218,7 +215,6 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		preferences.add(PreferenceId.LIVEMODE);
 		preferences.add(PreferenceId.UPDATE);
 		preferences.add(PreferenceId.ITEMCOUNT);
-		preferences.add(PreferenceId.TIMELINE);
 		return preferences;
 	}
 
@@ -342,8 +338,8 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	}
 
 	/**
-	 * Viewer Comparator used by this input controller to display the contents
-	 * of {@link BasicSQLData}.
+	 * Viewer Comparator used by this input controller to display the contents of
+	 * {@link BasicSQLData}.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -388,8 +384,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 *            The method ident object.
 	 * @param enumId
 	 *            The enumeration ID.
-	 * @return The styled string containing the information from the data
-	 *         object.
+	 * @return The styled string containing the information from the data object.
 	 */
 	private StyledString getStyledTextForColumn(InvocationSequenceData data, MethodIdent methodIdent, Column enumId) {
 		switch (enumId) {
