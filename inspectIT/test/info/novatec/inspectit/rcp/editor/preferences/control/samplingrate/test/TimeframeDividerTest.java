@@ -7,6 +7,8 @@ import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
+import info.novatec.inspectit.rcp.editor.preferences.control.SamplingRateControl;
+import info.novatec.inspectit.rcp.editor.preferences.control.SamplingRateControl.Sensitivity;
 import info.novatec.inspectit.rcp.editor.preferences.control.samplingrate.SamplingRateMode;
 
 import java.sql.Timestamp;
@@ -75,13 +77,12 @@ public class TimeframeDividerTest {
 	}
 
 	/**
-	 * When the passed data object list isn't empty, then the result list
-	 * shouldn't be empty too.
+	 * When the passed data object list isn't empty, then the result list shouldn't be empty too.
 	 */
 	@Test
 	public void resultValuesExist() {
 		List<? extends DefaultData> resultList = null;
-		int samplingRate = 20;
+		Sensitivity sensitivity = SamplingRateControl.Sensitivity.VERY_COARSE;
 
 		// from time is Mon Sep 15 10:50:12 CEST 2008
 		Date fromDate = new Date(1221468612000L);
@@ -89,20 +90,20 @@ public class TimeframeDividerTest {
 		// to time is Mon Sep 15 12:00:00 CEST 2008
 		Date toDate = new Date(1221472800000L);
 
-		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, samplingRate);
+		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue());
 
 		assertNotNull(resultList);
 	}
 
 	/**
-	 * When nine values are in one timeframe and one value is in another
-	 * timeframe, then the result is 2.
+	 * When nine values are in one timeframe and one value is in another timeframe, then the result
+	 * is 2.
 	 */
-	@Test(enabled=false)
+	@Test()
 	public void nineValuesInOneTimeframe() {
 		List<ClassLoadingInformationData> tempList = new ArrayList<ClassLoadingInformationData>();
 		List<? extends DefaultData> resultList = null;
-		int samplingRate = 5;
+		Sensitivity sensitivity = SamplingRateControl.Sensitivity.VERY_COARSE;
 
 		// from time is Mon Sep 15 11:00:00 CEST 2008
 		Date fromDate = new Date(1221469200000L);
@@ -135,10 +136,9 @@ public class TimeframeDividerTest {
 
 		tempList.add(data);
 
-		resultList = mode.adjustSamplingRate(tempList, fromDate, toDate, samplingRate);
+		resultList = mode.adjustSamplingRate(tempList, fromDate, toDate, sensitivity.getValue());
 
 		assertSame(resultList.size(), 2);
-
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class TimeframeDividerTest {
 	@Test
 	public void emptyListAsParameter() {
 		List<? extends DefaultData> resultList = null;
-		int samplingRate = 20;
+		Sensitivity sensitivity = SamplingRateControl.Sensitivity.VERY_COARSE;
 
 		// from time is Mon Sep 15 10:50:12 CEST 2008
 		Date fromDate = new Date(1221468612000L);
@@ -155,20 +155,19 @@ public class TimeframeDividerTest {
 		// to time is Mon Sep 15 12:00:00 CEST 2008
 		Date toDate = new Date(1221472800000L);
 
-		resultList = mode.adjustSamplingRate(null, fromDate, toDate, samplingRate);
+		resultList = mode.adjustSamplingRate(null, fromDate, toDate, sensitivity.getValue());
 
 		assertNull(resultList);
 	}
 
 	/**
-	 * No data to aggregate when sampling rate is bigger than the count of data
-	 * objects.
+	 * No data to aggregate when sampling rate is bigger than the count of data objects.
 	 */
 	@Test
 	public void noDataToAggregateWithLessObjectsThanSamplingRate() {
 		List<? extends DefaultData> resultList = null;
 		List<ClassLoadingInformationData> tempList = createDataObjects(30);
-		int samplingRate = 50;
+		Sensitivity sensitivity = SamplingRateControl.Sensitivity.MEDIUM;
 
 		// from time is Mon Sep 15 10:50:12 CEST 2008
 		Date fromDate = new Date(1221468612000L);
@@ -176,9 +175,9 @@ public class TimeframeDividerTest {
 		// to time is Mon Sep 15 12:00:00 CEST 2008
 		Date toDate = new Date(1221472800000L);
 
-		resultList = mode.adjustSamplingRate(tempList, fromDate, toDate, samplingRate);
+		resultList = mode.adjustSamplingRate(tempList, fromDate, toDate, sensitivity.getValue());
 
-		assertTrue(resultList.size() < samplingRate);
+		assertTrue(resultList.size() < sensitivity.getValue());
 	}
 
 	/**
@@ -205,7 +204,7 @@ public class TimeframeDividerTest {
 	@Test
 	public void aggregatedValuesBetweenFromTo() {
 		List<? extends DefaultData> resultList = null;
-		int samplingRate = 20;
+		Sensitivity sensitivity = SamplingRateControl.Sensitivity.VERY_COARSE;
 
 		// from time is Mon Sep 15 10:50:12 CEST 2008
 		Date fromDate = new Date(1221468612000L);
@@ -213,7 +212,7 @@ public class TimeframeDividerTest {
 		// to time is Mon Sep 15 12:00:00 CEST 2008
 		Date toDate = new Date(1221472800000L);
 
-		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, samplingRate);
+		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue());
 
 		for (DefaultData defaultData : resultList) {
 			long dataTime = defaultData.getTimeStamp().getTime();
@@ -227,7 +226,7 @@ public class TimeframeDividerTest {
 	@Test
 	public void samplingRateIsSet() {
 		List<? extends DefaultData> resultList = null;
-		int samplingRate = 20;
+		Sensitivity sensitivity = SamplingRateControl.Sensitivity.VERY_COARSE;
 
 		// from time is Mon Sep 15 10:50:12 CEST 2008
 		Date fromDate = new Date(1221468612000L);
@@ -235,19 +234,19 @@ public class TimeframeDividerTest {
 		// to time is Mon Sep 15 12:00:00 CEST 2008
 		Date toDate = new Date(1221472800000L);
 
-		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, samplingRate);
+		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue());
 
-		assertTrue(resultList.size() <= samplingRate);
+		assertTrue(resultList.size() <= sensitivity.getValue());
 	}
 
 	/**
-	 * If the from and to time are smaller then the time of the first data
-	 * object, then no data should be aggregated.
+	 * If the from and to time are smaller then the time of the first data object, then no data
+	 * should be aggregated.
 	 */
 	@Test
 	public void fromAndToBeforeDataExists() {
 		List<? extends DefaultData> resultList = null;
-		int samplingRate = 20;
+		Sensitivity sensitivity = SamplingRateControl.Sensitivity.VERY_COARSE;
 
 		// the fromDate is Mon Sep 15 10:00:00 CEST 2008
 		Date fromDate = new Date(1221465600000L);
@@ -255,7 +254,7 @@ public class TimeframeDividerTest {
 		// the toDate is Mon Sep 15 10:30:00 CEST 2008
 		Date toDate = new Date(1221467400000L);
 
-		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, samplingRate);
+		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue());
 
 		assertSame(resultList.size(), 0);
 	}
@@ -266,7 +265,7 @@ public class TimeframeDividerTest {
 	@Test
 	public void allValuesInOneTimeframe() {
 		List<? extends DefaultData> resultList = null;
-		int samplingRate = 20;
+		Sensitivity sensitivity = SamplingRateControl.Sensitivity.VERY_COARSE;
 
 		// from time is Sun Sep 14 06:00:00 CEST 2008
 		Date fromDate = new Date(1221364800000L);
@@ -274,7 +273,7 @@ public class TimeframeDividerTest {
 		// to time is Mon Sep 15 12:00:00 CEST 2008
 		Date toDate = new Date(1221472800000L);
 
-		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, samplingRate);
+		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue());
 
 		assertSame(resultList.size(), 1);
 	}
