@@ -45,8 +45,7 @@ import org.hibernate.jdbc.util.FormatStyle;
 import org.hibernate.jdbc.util.Formatter;
 
 /**
- * This input controller displays the contents of {@link SqlStatementData}
- * objects.
+ * This input controller displays the contents of {@link SqlStatementData} objects.
  * 
  * @author Patrice Bouillet
  * 
@@ -59,9 +58,9 @@ public class SqlInputController extends AbstractTableInputController {
 	public static final String ID = "inspectit.subview.table.sql";
 
 	/**
-	 * The private inner enumeration used to define the used IDs which are
-	 * mapped into the columns. The order in this enumeration represents the
-	 * order of the columns. If it is reordered, nothing else has to be changed.
+	 * The private inner enumeration used to define the used IDs which are mapped into the columns.
+	 * The order in this enumeration represents the order of the columns. If it is reordered,
+	 * nothing else has to be changed.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -99,8 +98,7 @@ public class SqlInputController extends AbstractTableInputController {
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in
-		 *            {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITConstants}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;
@@ -309,8 +307,8 @@ public class SqlInputController extends AbstractTableInputController {
 	}
 
 	/**
-	 * Viewer Comparator used by this input controller to display the contents
-	 * of {@link BasicSQLData}.
+	 * Viewer Comparator used by this input controller to display the contents of
+	 * {@link BasicSQLData}.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -359,7 +357,7 @@ public class SqlInputController extends AbstractTableInputController {
 		Shell parent = tableViewer.getTable().getShell();
 		showDetails(parent, selection.getFirstElement());
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -430,6 +428,7 @@ public class SqlInputController extends AbstractTableInputController {
 				content += "Parameters: " + methodIdent.getParameters() + "\n";
 
 				content += "\n";
+				content += "Count: " + data.getCount() + "\n";
 				content += "Avg (ms): " + data.getAverage() + "\n";
 				content += "Min (ms): " + data.getMin() + "\n";
 				content += "Max (ms): " + data.getMax() + "\n";
@@ -447,7 +446,7 @@ public class SqlInputController extends AbstractTableInputController {
 		};
 		dialog.open();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -463,8 +462,7 @@ public class SqlInputController extends AbstractTableInputController {
 	 *            The data object to extract the information from.
 	 * @param enumId
 	 *            The enumeration ID.
-	 * @return The styled string containing the information from the data
-	 *         object.
+	 * @return The styled string containing the information from the data object.
 	 */
 	private StyledString getStyledTextForColumn(SqlStatementData data, Column enumId) {
 		switch (enumId) {
