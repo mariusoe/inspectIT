@@ -32,14 +32,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * The invocation sequence hook stores the record of the invocation sequences in
- * a {@link ThreadLocal} object.
+ * The invocation sequence hook stores the record of the invocation sequences in a
+ * {@link ThreadLocal} object.
  * <p>
- * This hook implements the {@link ICoreService} interface which simulates the
- * core service to all other hooks which are called during the execution of this
- * invocation. The <code>defaultCoreService</code> field is used to delegate
- * some calls directly to the original core service and later sending of the
- * data to the server.
+ * This hook implements the {@link ICoreService} interface which simulates the core service to all
+ * other hooks which are called during the execution of this invocation. The
+ * <code>defaultCoreService</code> field is used to delegate some calls directly to the original
+ * core service and later sending of the data to the server.
  * 
  * @author Patrice Bouillet
  * 
@@ -62,20 +61,20 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	private final IPropertyAccessor propertyAccessor;
 
 	/**
-	 * The {@link ThreadLocal} object which holds an
-	 * {@link InvocationSequenceData} object if an invocation record is started.
+	 * The {@link ThreadLocal} object which holds an {@link InvocationSequenceData} object if an
+	 * invocation record is started.
 	 */
 	private final ThreadLocal threadLocalInvocationData = new ThreadLocal();
 
 	/**
-	 * Stores the value of the method ID in the {@link ThreadLocal} object. Used
-	 * to identify the correct start and end of the record.
+	 * Stores the value of the method ID in the {@link ThreadLocal} object. Used to identify the
+	 * correct start and end of the record.
 	 */
 	private final ThreadLocal invocationStartId = new ThreadLocal();
 
 	/**
-	 * Stores the count of the of the starting method being called in the same
-	 * invocation sequence so that closing is done on the right end.
+	 * Stores the count of the of the starting method being called in the same invocation sequence
+	 * so that closing is done on the right end.
 	 */
 	private final ThreadLocal invocationStartIdCount = new ThreadLocal();
 
@@ -95,9 +94,8 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	private Map minDurationMap = new HashMap();
 
 	/**
-	 * The default constructor is initialized with a reference to the original
-	 * {@link ICoreService} implementation to delegate all calls to if the data
-	 * needs to be sent.
+	 * The default constructor is initialized with a reference to the original {@link ICoreService}
+	 * implementation to delegate all calls to if the data needs to be sent.
 	 * 
 	 * @param timer
 	 *            The timer.
@@ -221,7 +219,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 				// count
 				InvocationSequenceData parentSequence = invocationSequenceData.getParentSequence();
 				invocationSequenceData.setEnd(timer.getCurrentTime());
-				invocationSequenceData.setDuration(invocationSequenceData.getEnd()-invocationSequenceData.getStart());
+				invocationSequenceData.setDuration(invocationSequenceData.getEnd() - invocationSequenceData.getStart());
 				parentSequence.setChildCount(parentSequence.getChildCount() + invocationSequenceData.getChildCount());
 				threadLocalInvocationData.set(parentSequence);
 			}
@@ -229,25 +227,25 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	}
 
 	/**
-	 * This checks if the invocation has to be saved or not (like the
-	 * minduration is set and the invocation is faster than the specified time).
+	 * This checks if the invocation has to be saved or not (like the minduration is set and the
+	 * invocation is faster than the specified time).
 	 * 
 	 * @param coreService
-	 *            The reference to the core service which holds the data objects
-	 *            etc.
+	 *            The reference to the core service which holds the data objects etc.
 	 * @param methodId
 	 *            The unique method id.
 	 * @param sensorTypeId
 	 *            The unique sensor type id.
 	 * @param rsc
-	 *            The {@link RegisteredSensorConfig} object which holds all the
-	 *            information of the executed method.
+	 *            The {@link RegisteredSensorConfig} object which holds all the information of the
+	 *            executed method.
 	 * @param invocationSequenceData
 	 *            The invocation sequence data object.
 	 * @param duration
 	 *            The actual duration.
 	 */
-	private void checkForSavingOrNot(ICoreService coreService, long methodId, long sensorTypeId, RegisteredSensorConfig rsc, InvocationSequenceData invocationSequenceData, double startTime, double endTime, double duration) {
+	private void checkForSavingOrNot(ICoreService coreService, long methodId, long sensorTypeId, RegisteredSensorConfig rsc, InvocationSequenceData invocationSequenceData, double startTime,
+			double endTime, double duration) {
 		double minduration = ((Double) minDurationMap.get(invocationStartId.get())).doubleValue();
 		if (duration >= minduration) {
 			if (LOGGER.isLoggable(Level.FINE)) {
@@ -280,8 +278,8 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	}
 
 	/**
-	 * Save the data objects which are coming from all the different sensor
-	 * types in the current invocation tracer context.
+	 * Save the data objects which are coming from all the different sensor types in the current
+	 * invocation tracer context.
 	 * 
 	 * @param dataObject
 	 *            The data object to save.
@@ -289,14 +287,14 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	private void saveDataObject(DefaultData dataObject) {
 		InvocationSequenceData invocationSequenceData = (InvocationSequenceData) threadLocalInvocationData.get();
 
-		if (dataObject instanceof SqlStatementData) {
+		if (dataObject.getClass().equals(SqlStatementData.class)) {
 			// don't overwrite an already existing sql statement data object.
 			if (null == invocationSequenceData.getSqlStatementData()) {
 				invocationSequenceData.setSqlStatementData((SqlStatementData) dataObject);
 			}
 		}
 
-		if (dataObject instanceof TimerData) {
+		if (dataObject.getClass().equals(TimerData.class)) {
 			// don't overwrite an already existing timerdata object
 			if (null == invocationSequenceData.getTimerData()) {
 				invocationSequenceData.setTimerData((TimerData) dataObject);
