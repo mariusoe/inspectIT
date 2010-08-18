@@ -170,7 +170,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		start.setName("this");
 		start.setClassOfExecutedMethod(true);
 		pathOne = new PropertyPath("notValid");
-		start.setPathToContinue(start);
+		start.setPathToContinue(pathOne);
 		propertyAccessorList.add(start);
 
 		// not valid as the second parameter will be null
@@ -178,7 +178,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		start.setName("name");
 		start.setSignaturePosition(1);
 		pathOne = new PropertyPath("child");
-		start.setPathToContinue(start);
+		start.setPathToContinue(pathOne);
 		propertyAccessorList.add(start);
 
 		assertEquals(propertyAccessorList.size(), 3);
