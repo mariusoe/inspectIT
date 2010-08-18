@@ -77,9 +77,8 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	 * {@inheritDoc}
 	 */
 	public void afterConstructor(ICoreService coreService, long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc) {
-		// TODO ET: this method is called twice when the constructor of a
-		// Throwable calls another constructor with this(). The first created
-		// data object is then discarded.
+		// TODO ET: this method is called twice when the constructor of a Throwable calls another
+		// constructor with this(). The first created data object is then discarded.
 		try {
 			long platformId = idManager.getPlatformId();
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -102,8 +101,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 			// set the static information of the current object
 			setStaticInformation(data, throwable);
 
-			// creating the mapping object and setting it on the thread
-			// local
+			// creating the mapping object and setting it on the thread local
 			exceptionDataHolder.set(new IdentityHashToDataObject(identityHash, data));
 
 			// adding the data object to the core service
@@ -140,14 +138,14 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 
 				// check whether it's the same Throwable object as before
 				if (mappingObject.getIdentityHash().equals(identityHash)) {
-					// we have to check whether the Throwable object is just
-					// passed or explicitly rethrown
+					// we have to check whether the Throwable object is just passed or explicitly
+					// rethrown
 					if ((null != exceptionHandlerId.get()) && (registeredMethodId == ((Long) exceptionHandlerId.get()).longValue())) {
 						// the Throwable object is explicitly rethrown
 						data.setExceptionEvent(ExceptionEventEnum.RETHROWN);
 					} else {
-						// the Throwable object is thrown the first time or just
-						// passed by the JVM, so it's a PASSED event
+						// the Throwable object is thrown the first time or just passed by the JVM,
+						// so it's a PASSED event
 						data.setExceptionEvent(ExceptionEventEnum.PASSED);
 					}
 
@@ -155,18 +153,15 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 					ExceptionSensorData parent = mappingObject.getExceptionSensorData();
 					parent.setChild(data);
 
-					// we are just exchanging the data object and setting it on
-					// the mapping object
+					// we are just exchanging the data object and setting it on the mapping object
 					mappingObject.setExceptionSensorData(data);
 					exceptionDataHolder.set(mappingObject);
 				} else {
-					// it's a new Throwable object, that we didn't recognize
-					// earlier
+					// it's a new Throwable object, that we didn't recognize earlier
 					data.setExceptionEvent(ExceptionEventEnum.UNREGISTERED_PASSED);
 					setStaticInformation(data, throwable);
 
-					// we are creating a new mapping object and setting it on
-					// the thread local
+					// we are creating a new mapping object and setting it on the thread local
 					exceptionDataHolder.set(new IdentityHashToDataObject(identityHash, data));
 				}
 
@@ -213,18 +208,15 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 					ExceptionSensorData parent = mappingObject.getExceptionSensorData();
 					parent.setChild(data);
 
-					// we are just exchanging the data object and setting it on
-					// the mapping object
+					// we are just exchanging the data object and setting it on the mapping object
 					mappingObject.setExceptionSensorData(data);
 					exceptionDataHolder.set(mappingObject);
 				} else {
-					// it's a Throwable object, that we didn't recognize
-					// earlier
+					// it's a Throwable object, that we didn't recognize earlier
 					data.setExceptionEvent(ExceptionEventEnum.UNREGISTERED_PASSED);
 					setStaticInformation(data, throwable);
 
-					// we are creating a new mapping object and setting it on
-					// the thread local
+					// we are creating a new mapping object and setting it on the thread local
 					exceptionDataHolder.set(new IdentityHashToDataObject(identityHash, data));
 				}
 

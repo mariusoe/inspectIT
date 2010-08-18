@@ -48,4 +48,11 @@ public class ExceptionTestClass {
 		}
 	}
 
+	public void callsMethodWithExceptionAndTryCatchFinally() {
+		try {
+			throwsAnException();
+		} catch (MyTestException e) {
+		} finally {
+		}
+	}
 }
