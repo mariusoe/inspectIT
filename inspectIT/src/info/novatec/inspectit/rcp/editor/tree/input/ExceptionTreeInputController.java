@@ -39,8 +39,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
- * This input controller displays the detail contents of
- * {@link ExceptionSensorData} objects.
+ * This input controller displays the detail contents of {@link ExceptionSensorData} objects.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -63,14 +62,14 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 	private Map<Integer, Color> colorCache = new HashMap<Integer, Color>();
 
 	/**
-	 * The cache holding the image object which are disposed at the end.
+	 * The cache holding the image objects which are disposed at the end.
 	 */
 	private Map<ImageDescriptor, Image> modifiersImageCache = new HashMap<ImageDescriptor, Image>();
 
 	/**
-	 * The private inner enumeration used to define the used IDs which are
-	 * mapped into the columns. The order in this enumeration represents the
-	 * order of the columns. If it is reordered, nothing else has to be changed.
+	 * The private inner enumeration used to define the used IDs which are mapped into the columns.
+	 * The order in this enumeration represents the order of the columns. If it is reordered,
+	 * nothing else has to be changed.
 	 * 
 	 * @author Eduard Tudenhoefner
 	 * 
@@ -79,7 +78,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 		/** the event type column */
 		EVENT_TYPE("Event Type", 280, null),
 		/** The method column. */
-		METHOD_CONSTRUCTOR("Method / Constructor", 500, InspectITConstants.IMG_CALL_HIERARCHY),
+		METHOD_CONSTRUCTOR("Method / Constructor", 500, InspectITConstants.IMG_METHOD_PUBLIC),
 		/** the error message column */
 		ERROR_MESSAGE("Error Message", 250, null),
 		/** The cause column */
@@ -100,8 +99,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in
-		 *            {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITConstants}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;
@@ -320,7 +318,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 
 			switch (enumId) {
 			case METHOD_CONSTRUCTOR:
-				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers());
+				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers(), data);
 				Image image = null;
 
 				// first look for the image in the cache
@@ -360,17 +358,15 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 	 *            The method ident object.
 	 * @param enumId
 	 *            The enumeration ID.
-	 * @return The styled string containing the information from the data
-	 *         object.
+	 * @return The styled string containing the information from the data object.
 	 */
 	private static StyledString getStyledTextForColumn(ExceptionSensorData data, MethodIdent methodIdent, Column enumId) {
 		StyledString styledString = null;
 		switch (enumId) {
 		case METHOD_CONSTRUCTOR:
-			return TextFormatter.getStyledMethodString(methodIdent);
+			return new StyledString(TextFormatter.getMethodWithParameters(methodIdent));
 		case EVENT_TYPE:
-			styledString = new StyledString();
-			styledString.append(data.getExceptionEventString());
+			styledString = new StyledString(data.getExceptionEventString());
 			return styledString;
 		case ERROR_MESSAGE:
 			styledString = new StyledString();

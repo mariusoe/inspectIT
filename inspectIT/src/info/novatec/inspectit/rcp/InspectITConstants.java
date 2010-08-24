@@ -50,12 +50,20 @@ public interface InspectITConstants {
 	String IMG_EXCEPTION_TREE = "exceptiontree.gif"; //$NON-NLS-1$
 	String IMG_EXCEPTION_SENSOR = "exceptiontracer.gif"; //$NON-NLS-1$
 	String IMG_STACKTRACE = "stacktrace.gif"; //$NON-NLS-1$
-	String IMG_ZOOMIN = "zoomin.png";
-	String IMG_ZOOMOUT = "zoomout.png";
-	String IMG_ZOOMFIT = "zoomfit.png";
-	String IMG_HEAT = "heat.png";
-	String IMG_DRILLDOWN = "drilldown.png";
-	String IMG_DRILLUP = "drillup.png";
-	String VSA_LOGO = "vsalogo.png";
-
+	String IMG_ZOOMIN = "zoomin.png"; //$NON-NLS-1$
+	String IMG_ZOOMOUT = "zoomout.png"; //$NON-NLS-1$
+	String IMG_ZOOMFIT = "zoomfit.png"; //$NON-NLS-1$
+	String IMG_HEAT = "heat.png"; //$NON-NLS-1$
+	String IMG_DRILLDOWN = "drilldown.png"; //$NON-NLS-1$
+	String IMG_DRILLUP = "drillup.png"; //$NON-NLS-1$
+	String VSA_LOGO = "vsalogo.png"; //$NON-NLS-1$
+	String IMG_CREATED_EXCEPTION = "created_exception.gif"; //$NON-NLS-1$
+	String IMG_METHODPUB_PASSED_EX = "methpub_passed_ex.gif"; //$NON-NLS-1$
+	String IMG_METHODPRO_PASSED_EX = "methpro_passed_ex.gif"; //$NON-NLS-1$
+	String IMG_METHODPRI_PASSED_EX = "methpri_passed_ex.gif"; //$NON-NLS-1$
+	String IMG_METHODDEF_PASSED_EX = "methdef_passed_ex.gif"; //$NON-NLS-1$
+	String IMG_METHODPUB_CATCHED_EX = "methpub_catched_ex.gif"; //$NON-NLS-1$
+	String IMG_METHODPRO_CATCHED_EX = "methpro_catched_ex.gif"; //$NON-NLS-1$
+	String IMG_METHODPRI_CATCHED_EX = "methpri_catched_ex.gif"; //$NON-NLS-1$
+	String IMG_METHODDEF_CATCHED_EX = "methdef_catched_ex.gif"; //$NON-NLS-1$
 }

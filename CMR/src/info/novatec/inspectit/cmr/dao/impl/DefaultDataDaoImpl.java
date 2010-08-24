@@ -5,6 +5,7 @@ import info.novatec.inspectit.cmr.cache.impl.BufferElement;
 import info.novatec.inspectit.cmr.dao.DefaultDataDao;
 import info.novatec.inspectit.cmr.util.Configuration;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.ExceptionEventEnum;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
@@ -39,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
  * class.
  * 
  * @author Patrice Bouillet
+ * @author Eduard Tudenhoefner
  * 
  */
 public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDataDao {
@@ -68,6 +70,8 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 		StatelessSession session = getHibernateTemplate().getSessionFactory().openStatelessSession();
 		Transaction tx = session.beginTransaction();
 		for (DefaultData element : defaultDataCollection) {
+			// TODO ET: constructor delegation filtering must be done here instead of in the
+			// InvocationHook
 			if (element instanceof InvocationSequenceData) {
 				InvocationSequenceData invoc = (InvocationSequenceData) element;
 				if (configuration.isEnhancedInvocationStorageMode()) {
@@ -190,6 +194,15 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 
 		if (null != invoc.getSqlStatementData()) {
 			session.insert(invoc.getSqlStatementData());
+		}
+
+		if (null != invoc.getExceptionSensorDataObjects() && !invoc.getExceptionSensorDataObjects().isEmpty()) {
+			for (Object object : invoc.getExceptionSensorDataObjects()) {
+				ExceptionSensorData exceptionSensorData = (ExceptionSensorData) object;
+				if (exceptionSensorData.getExceptionEvent().equals(ExceptionEventEnum.CREATED)) {
+					saveExceptionSensorData(session, exceptionSensorData);
+				}
+			}
 		}
 
 		List<InvocationSequenceData> nestedInvocs = invoc.getNestedSequences();

@@ -9,8 +9,8 @@ import java.util.List;
 import org.eclipse.jface.viewers.StyledString;
 
 /**
- * This class provides some static methods to create some common {@link String}
- * and {@link StyledString} objects.
+ * This class provides some static methods to create some common {@link String} and
+ * {@link StyledString} objects.
  * 
  * @author Patrice Bouillet
  * 
@@ -24,13 +24,12 @@ public final class TextFormatter {
 	}
 
 	/**
-	 * Returns a Styled String out of the {@link MethodIdent} objects which
-	 * looks like: 'name'('parameter') - 'package'.'class'. Additionally, as
-	 * this returns a {@link StyledString}, the last part is colored.
+	 * Returns a Styled String out of the {@link MethodIdent} objects which looks like:
+	 * 'name'('parameter') - 'package'.'class'. Additionally, as this returns a {@link StyledString}
+	 * , the last part is colored.
 	 * 
 	 * @param methodIdent
-	 *            The object which contains the information to create the styled
-	 *            method string.
+	 *            The object which contains the information to create the styled method string.
 	 * @return The created styled method string.
 	 */
 	public static StyledString getStyledMethodString(MethodIdent methodIdent) {
@@ -48,8 +47,7 @@ public final class TextFormatter {
 	 * Returns a method string which is appended by the parameters.
 	 * 
 	 * @param methodIdent
-	 *            The object which contains the information to create the styled
-	 *            method string.
+	 *            The object which contains the information to create the styled method string.
 	 * @return The created method + parameters string.
 	 */
 	@SuppressWarnings("unchecked")
@@ -76,12 +74,11 @@ public final class TextFormatter {
 	}
 
 	/**
-	 * Returns a String out of the {@link MethodIdent} objects which looks like:
-	 * 'name'('parameter') - 'package'.'class'.
+	 * Returns a String out of the {@link MethodIdent} objects which looks like: 'name'('parameter')
+	 * - 'package'.'class'.
 	 * 
 	 * @param methodIdent
-	 *            The object which contains the information to create the method
-	 *            string.
+	 *            The object which contains the information to create the method string.
 	 * @return The created method string.
 	 */
 	public static String getMethodString(MethodIdent methodIdent) {

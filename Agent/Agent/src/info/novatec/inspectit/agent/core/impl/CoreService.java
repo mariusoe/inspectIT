@@ -240,6 +240,43 @@ public class CoreService implements ICoreService, Startable {
 	/**
 	 * {@inheritDoc}
 	 */
+	public void addExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode, ExceptionSensorData exceptionSensorData) {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append(sensorTypeIdent);
+		buffer.append("::");
+		buffer.append(throwableIdentityHashCode);
+		String key = buffer.toString();
+
+		// we always only save the first data object, because this object contains the nested
+		// objects to create the whole exception tree
+		if (exceptionSensorData.getExceptionEvent().equals(ExceptionEventEnum.CREATED)) {
+			// if a data object with the same hash code was already created, then it has to be
+			// removed, because it was created from a constructor delegation. For us only the
+			// last-most data object is relevant
+			if (sensorDataObjects.containsKey(key)) {
+				sensorDataObjects.remove(key);
+			}
+
+			sensorDataObjects.put(key, exceptionSensorData);
+			notifyListListeners();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public ExceptionSensorData getExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode) {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append(sensorTypeIdent);
+		buffer.append("::");
+		buffer.append(throwableIdentityHashCode);
+
+		return (ExceptionSensorData) sensorDataObjects.get(buffer.toString());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public void addObjectStorage(long sensorTypeIdent, long methodIdent, String prefix, IObjectStorage objectStorage) {
 		StringBuffer buffer = new StringBuffer();
 		if (null != prefix) {
@@ -416,33 +453,6 @@ public class CoreService implements ICoreService, Startable {
 				}
 			}
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void addExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode, ExceptionSensorData exceptionSensorData) {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(sensorTypeIdent);
-		buffer.append("::");
-		buffer.append(throwableIdentityHashCode);
-
-		if (!sensorDataObjects.containsKey(buffer.toString()) && exceptionSensorData.getExceptionEvent().equals(ExceptionEventEnum.CREATED)) {
-			sensorDataObjects.put(buffer.toString(), exceptionSensorData);
-			notifyListListeners();
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public ExceptionSensorData getExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode) {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(sensorTypeIdent);
-		buffer.append("::");
-		buffer.append(throwableIdentityHashCode);
-
-		return (ExceptionSensorData) sensorDataObjects.get(buffer.toString());
 	}
 
 }

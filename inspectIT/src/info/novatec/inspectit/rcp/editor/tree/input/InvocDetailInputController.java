@@ -3,6 +3,7 @@ package info.novatec.inspectit.rcp.editor.tree.input;
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
@@ -325,6 +326,14 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 					}
 				}
 
+				if (null != data.getExceptionSensorDataObjects() && !data.getExceptionSensorDataObjects().isEmpty()) {
+					for (Object object : data.getExceptionSensorDataObjects()) {
+						ExceptionSensorData exceptionSensorData = (ExceptionSensorData) object;
+						content += "\n";
+						content += exceptionSensorData.getExceptionEventString() + " " + exceptionSensorData.getThrowableType() + "\n";
+					}
+				}
+
 				text.setText(content);
 			}
 		};
@@ -400,7 +409,12 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 
 			switch (enumId) {
 			case METHOD:
-				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers());
+				ExceptionSensorData exceptionSensorData = null;
+				if (null != data.getExceptionSensorDataObjects() && !data.getExceptionSensorDataObjects().isEmpty()) {
+					exceptionSensorData = (ExceptionSensorData) data.getExceptionSensorDataObjects().get(data.getExceptionSensorDataObjects().size() - 1);
+				}
+
+				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers(), exceptionSensorData);
 				Image image = null;
 
 				// first look for the image in the cache
@@ -545,6 +559,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 					styledString.append(", ");
 				}
 			}
+			return styledString;
 		default:
 			return styledString;
 		}
@@ -805,8 +820,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 						InvocationSequenceData data = (InvocationSequenceData) element;
 						if (data.getChildCount() > 0) {
 							// the parent object stays the same as this is the
-							// graphical representation and not the underlying
-							// model
+							// graphical representation and not the underlying model
 							out.addAll(Arrays.asList(filter(viewer, parent, data.getNestedSequences().toArray())));
 						}
 					}

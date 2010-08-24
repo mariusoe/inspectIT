@@ -13,6 +13,7 @@ import info.novatec.inspectit.agent.hooking.IConstructorHook;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
 import info.novatec.inspectit.agent.sending.ISendingStrategy;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.ExceptionEventEnum;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.SystemSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
@@ -92,6 +93,12 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * Saves the min duration for faster access of the values.
 	 */
 	private Map minDurationMap = new HashMap();
+
+	/**
+	 * Is needed to detect data objects that were created due to constructor delegation but which
+	 * are not relevant for later analysis.
+	 */
+	private Map exceptionSensorInvocationMap = new HashMap();
 
 	/**
 	 * The default constructor is initialized with a reference to the original {@link ICoreService}
@@ -295,10 +302,29 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 		}
 
 		if (dataObject.getClass().equals(TimerData.class)) {
-			// don't overwrite an already existing timerdata object
+			// don't overwrite an already existing timerdata object.
 			if (null == invocationSequenceData.getTimerData()) {
 				invocationSequenceData.setTimerData((TimerData) dataObject);
 			}
+		}
+
+		if (dataObject.getClass().equals(ExceptionSensorData.class)) {
+			ExceptionSensorData exceptionSensorData = (ExceptionSensorData) dataObject;
+			String key = exceptionSensorData.getExceptionEventString() + exceptionSensorData.getThrowableIdentityHashCode();
+
+			// if a data object with the same hash code was already created, then it has to be
+			// removed, because it was created from a constructor delegation. For us only the
+			// last-most data object is relevant
+			if (exceptionSensorInvocationMap.containsKey(key) && exceptionSensorData.getExceptionEvent().equals(ExceptionEventEnum.CREATED)) {
+				InvocationSequenceData invoc = (InvocationSequenceData) exceptionSensorInvocationMap.get(key);
+				invoc.setExceptionSensorDataObjects(null);
+				exceptionSensorInvocationMap.remove(invoc);
+				invoc.getParentSequence().getNestedSequences().remove(invoc);
+				invoc = null;
+			}
+
+			invocationSequenceData.addExceptionSensorData(exceptionSensorData);
+			exceptionSensorInvocationMap.put(key, invocationSequenceData);
 		}
 	}
 
@@ -334,6 +360,24 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 */
 	public void addPlatformSensorData(long sensorTypeIdent, SystemSensorData systemSensorData) {
 		saveDataObject(systemSensorData.finalizeData());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode, ExceptionSensorData exceptionSensorData) {
+		if (null == threadLocalInvocationData.get()) {
+			LOGGER.info("thread data NULL!!!!");
+			return;
+		}
+		saveDataObject(exceptionSensorData.finalizeData());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public ExceptionSensorData getExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode) {
+		return null;
 	}
 
 	/**
@@ -400,13 +444,4 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	public void stop() {
 		throw new UnsupportedMethodException();
 	}
-
-	public void addExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode, ExceptionSensorData exceptionSensorData) {
-		throw new UnsupportedMethodException();
-	}
-
-	public ExceptionSensorData getExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode) {
-		throw new UnsupportedMethodException();
-	}
-
 }

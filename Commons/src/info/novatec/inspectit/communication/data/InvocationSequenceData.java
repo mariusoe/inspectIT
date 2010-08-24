@@ -9,8 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * The invocation sequence data object which is used to store the path of method
- * invocations from instrumented methods.
+ * The invocation sequence data object which is used to store the path of method invocations from
+ * instrumented methods.
  * 
  * @author Patrice Bouillet
  * 
@@ -43,6 +43,11 @@ public class InvocationSequenceData extends MethodSensorData {
 	private SqlStatementData sqlStatementData;
 
 	/**
+	 * The associated exception sensor data object. Can be <code>null</code>.
+	 */
+	private List exceptionSensorDataObjects;
+
+	/**
 	 * The position if parent sequence is not <code>null</code>.
 	 */
 	private long position;
@@ -51,12 +56,12 @@ public class InvocationSequenceData extends MethodSensorData {
 	 * The duration of this invocation sequence.
 	 */
 	private double duration;
-	
+
 	/**
 	 * The starttime of this invocation sequence
 	 */
 	private double start;
-	
+
 	/**
 	 * The endtime of this invocation sequence
 	 */
@@ -138,21 +143,21 @@ public class InvocationSequenceData extends MethodSensorData {
 	public double getDuration() {
 		return duration;
 	}
-	
-	
-        /**
-         * @return the start time of the invocation sequence
-         */
+
+	/**
+	 * @return the start time of the invocation sequence
+	 */
 	public double getStart() {
-	    return start;
+		return start;
 	}
 
 	/**
 	 * 
-	 * @param start the start time of the invocation sequence
+	 * @param start
+	 *            the start time of the invocation sequence
 	 */
 	public void setStart(double start) {
-	    this.start = start;
+		this.start = start;
 	}
 
 	/**
@@ -160,15 +165,31 @@ public class InvocationSequenceData extends MethodSensorData {
 	 * @return the end time of the invocation sequence
 	 */
 	public double getEnd() {
-	    return end;
+		return end;
+	}
+
+	public List getExceptionSensorDataObjects() {
+		return exceptionSensorDataObjects;
+	}
+
+	public void setExceptionSensorDataObjects(List exceptionSensorDataObjects) {
+		this.exceptionSensorDataObjects = exceptionSensorDataObjects;
+	}
+
+	public void addExceptionSensorData(ExceptionSensorData data) {
+		if (null == exceptionSensorDataObjects) {
+			exceptionSensorDataObjects = new ArrayList();
+		}
+		exceptionSensorDataObjects.add(data);
 	}
 
 	/**
 	 * 
-	 * @param end the end time of the invocation sequence
+	 * @param end
+	 *            the end time of the invocation sequence
 	 */
 	public void setEnd(double end) {
-	    this.end = end;
+		this.end = end;
 	}
 
 	/**
@@ -186,20 +207,15 @@ public class InvocationSequenceData extends MethodSensorData {
 		return childCount;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
+		result = prime * result + ((exceptionSensorDataObjects == null) ? 0 : exceptionSensorDataObjects.hashCode());
 		result = prime * result + ((sqlStatementData == null) ? 0 : sqlStatementData.hashCode());
 		result = prime * result + ((timerData == null) ? 0 : timerData.hashCode());
 		return result;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -211,6 +227,13 @@ public class InvocationSequenceData extends MethodSensorData {
 			return false;
 		}
 		InvocationSequenceData other = (InvocationSequenceData) obj;
+		if (exceptionSensorDataObjects == null) {
+			if (other.exceptionSensorDataObjects != null) {
+				return false;
+			}
+		} else if (!exceptionSensorDataObjects.equals(other.exceptionSensorDataObjects)) {
+			return false;
+		}
 		if (sqlStatementData == null) {
 			if (other.sqlStatementData != null) {
 				return false;
@@ -227,12 +250,12 @@ public class InvocationSequenceData extends MethodSensorData {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
-		long size =  super.getObjectSize(objectSizes);
+		long size = super.getObjectSize(objectSizes);
 		size += objectSizes.getPrimitiveTypesSize(4, 0, 0, 0, 3, 2);
 		if (null != timerData) {
 			size += timerData.getObjectSize(objectSizes);
@@ -241,14 +264,25 @@ public class InvocationSequenceData extends MethodSensorData {
 			size += sqlStatementData.getObjectSize(objectSizes);
 		}
 		if (null != nestedSequences && nestedSequences instanceof ArrayList) {
-			size += objectSizes.getSizeOf((ArrayList)nestedSequences);
+			size += objectSizes.getSizeOf((ArrayList) nestedSequences);
 			Iterator iterator = nestedSequences.iterator();
 			while (iterator.hasNext()) {
 				try {
 					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) iterator.next();
 					size += invocationSequenceData.getObjectSize(objectSizes);
+				} catch (Exception exception) {
+					exception.printStackTrace();
 				}
-				catch (Exception exception) {
+			}
+		}
+		if (null != exceptionSensorDataObjects) {
+			size += objectSizes.getSizeOf(exceptionSensorDataObjects);
+			Iterator iterator = exceptionSensorDataObjects.iterator();
+			while (iterator.hasNext()) {
+				try {
+					ExceptionSensorData exceptionSensorData = (ExceptionSensorData) iterator.next();
+					size += exceptionSensorData.getObjectSize(objectSizes);
+				} catch (Exception exception) {
 					exception.printStackTrace();
 				}
 			}

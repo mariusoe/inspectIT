@@ -733,12 +733,12 @@ public class HookDispatcherTest extends AbstractLogSupport {
 
 		// first method of exception sensor
 		hookDispatcher.dispatchConstructorAfterBody(constructorId, exceptionObject, parameters);
-		verify(exceptionHook, times(1)).afterConstructor(coreService, constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredConstructorSensorConfig);
+		verify(exceptionHook, times(1)).afterConstructor(invocHook, constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredConstructorSensorConfig);
 
 		// second method of exception sensor
 		hookDispatcher.dispatchOnThrowInBody(methodId, object, parameters, exceptionObject);
 		verify(registeredSensorConfig, times(2)).getExceptionSensorTypeConfig();
-		verify(exceptionHook, times(1)).dispatchOnThrowInBody(coreService, methodId, exceptionSensorTypeId, object, exceptionObject, parameters, registeredSensorConfig);
+		verify(exceptionHook, times(1)).dispatchOnThrowInBody(invocHook, methodId, exceptionSensorTypeId, object, exceptionObject, parameters, registeredSensorConfig);
 		// ///////////// EXCEPTION SENSOR SECOND METHOD ENDS HERE
 		// /////////////////////////////////////////////////////////
 
@@ -759,7 +759,7 @@ public class HookDispatcherTest extends AbstractLogSupport {
 		// third method of exception sensor
 		hookDispatcher.dispatchBeforeCatch(methodId, exceptionObject);
 		verify(registeredSensorConfig, times(4)).getExceptionSensorTypeConfig();
-		verify(exceptionHook, times(1)).dispatchBeforeCatchBody(coreService, methodId, exceptionSensorTypeId, exceptionObject, registeredSensorConfig);
+		verify(exceptionHook, times(1)).dispatchBeforeCatchBody(invocHook, methodId, exceptionSensorTypeId, exceptionObject, registeredSensorConfig);
 
 		// dispatch the first method - first after body
 		hookDispatcher.dispatchFirstMethodAfterBody(methodId, object, parameters, returnValue);

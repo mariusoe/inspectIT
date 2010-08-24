@@ -17,7 +17,7 @@
 			class="InvocationSequenceData" not-null="false" />
 
 		<many-to-one name="timerData" column="timer_data_id"
-			unique="true" cascade="all" lazy="false"/>
+			unique="true" cascade="all" lazy="false" />
 		<many-to-one name="sqlStatementData" column="sql_statement_data_id"
 			cascade="all" lazy="false" />
 	</union-subclass>

@@ -142,6 +142,15 @@ public class InspectIT extends AbstractUIPlugin {
 		addImageToRegistry(reg, InspectITConstants.IMG_STACKTRACE);
 		addImageToRegistry(reg, InspectITConstants.IMG_EXCEPTION_SENSOR);
 		addImageToRegistry(reg, InspectITConstants.VSA_LOGO);
+		addImageToRegistry(reg, InspectITConstants.IMG_CREATED_EXCEPTION);
+		addImageToRegistry(reg, InspectITConstants.IMG_METHODPUB_PASSED_EX);
+		addImageToRegistry(reg, InspectITConstants.IMG_METHODPRO_PASSED_EX);
+		addImageToRegistry(reg, InspectITConstants.IMG_METHODPRI_PASSED_EX);
+		addImageToRegistry(reg, InspectITConstants.IMG_METHODDEF_PASSED_EX);
+		addImageToRegistry(reg, InspectITConstants.IMG_METHODPUB_CATCHED_EX);
+		addImageToRegistry(reg, InspectITConstants.IMG_METHODPRO_CATCHED_EX);
+		addImageToRegistry(reg, InspectITConstants.IMG_METHODPRI_CATCHED_EX);
+		addImageToRegistry(reg, InspectITConstants.IMG_METHODDEF_CATCHED_EX);
 	}
 
 	/**

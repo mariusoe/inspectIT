@@ -22,8 +22,8 @@ import org.apache.log4j.Logger;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The default implementation of the {@link IRegistrationService} interface.
- * Uses different DAO's to save the objects to the database.
+ * The default implementation of the {@link IRegistrationService} interface. Uses different DAO's to
+ * save the objects to the database.
  * 
  * @author Patrice Bouillet
  * 
@@ -58,7 +58,6 @@ public class InternRegistrationService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Transactional
 	public synchronized long registerPlatformIdent(List definedIPs, String agentName, String version) {
 		PlatformIdent platformIdent = new PlatformIdent();
@@ -69,11 +68,9 @@ public class InternRegistrationService {
 		// query
 		platformIdent.setVersion(null);
 
-		// we will not set the version for the platformIdent object here as we
-		// use this
-		// object for a QBE (Query by example) and this query should not be
-		// performed
-		// based on the version information.
+		// we will not set the version for the platformIdent object here as we use this object for a
+		// QBE (Query by example) and this query should not be performed based on the version
+		// information.
 
 		List<PlatformIdent> platformIdentResults = platformIdentDao.findByExample(platformIdent);
 		if (1 == platformIdentResults.size()) {
@@ -99,7 +96,6 @@ public class InternRegistrationService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Transactional
 	public long registerMethodIdent(long platformId, String packageName, String className, String methodName, List parameterTypes, String returnType, int modifiers) {
 		PlatformIdent platformIdent = platformIdentDao.load(platformId);

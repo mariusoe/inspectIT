@@ -9,6 +9,7 @@ import info.novatec.inspectit.rcp.editor.graph.GraphSubView;
 import info.novatec.inspectit.rcp.editor.table.TableSubView;
 import info.novatec.inspectit.rcp.editor.table.input.AggregatedTimerSummaryInputController;
 import info.novatec.inspectit.rcp.editor.table.input.CombinedMetricsInputController;
+import info.novatec.inspectit.rcp.editor.table.input.ExceptionSensorInvocInputController;
 import info.novatec.inspectit.rcp.editor.table.input.GroupedExceptionOverviewInputController;
 import info.novatec.inspectit.rcp.editor.table.input.InvocOverviewInputController;
 import info.novatec.inspectit.rcp.editor.table.input.MethodInvocInputController;
@@ -95,11 +96,13 @@ public final class SubViewFactory {
 			ISubView invocDetails = new TreeSubView(new InvocDetailInputController());
 			ISubView invocSql = new TableSubView(new SqlInvocInputController());
 			ISubView invocMethods = new TableSubView(new MethodInvocInputController());
-			ISubView traceInspector = new TraceInspectorSubView();
+			ISubView invocExceptions = new TableSubView(new ExceptionSensorInvocInputController());
+//			ISubView traceInspector = new TraceInspectorSubView();
 
 			invocTabbedSubView.addSubView(invocDetails, "Call Hierarchy", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CALL_HIERARCHY));
 			invocTabbedSubView.addSubView(invocSql, "SQL", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_DATABASE));
 			invocTabbedSubView.addSubView(invocMethods, "Methods", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_METHOD_PUBLIC));
+			invocTabbedSubView.addSubView(invocExceptions, "Exceptions", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_EXCEPTION_SENSOR));
 			// invocTabbedSubView.addSubView(traceInspector, "Trace Inspector",
 			// InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CALL_HIERARCHY));
 
