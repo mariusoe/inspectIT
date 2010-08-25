@@ -63,8 +63,23 @@
 		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.libs" />
 		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs" />
 		<taskdef resource="checkstyletask.properties" classpathref="path.libs" />
+		<taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="path.libs" />
 	</target>
 
+	<target name="init-ftp-task">
+		<get src="${ftp.commonsnet.url}" dest="${ivy.jar.dir}/${ftp.commonsnet.jar}" usetimestamp="true" />
+		<get src="${ftp.jakartaoro.url}" dest="${ivy.jar.dir}/${ftp.jakartaoro.jar}" usetimestamp="true" />
+
+		<!-- This is a workaround to fix the problem that the FTP task is loaded by a different classloader. -->
+		<!-- This must not be changed, unless you know what you are doing. -->
+		<path id="wptg.classpath">
+			<fileset dir="${user.home}/.ant/lib" includes="${ftp.commonsnet.jar}" />
+			<fileset dir="${user.home}/.ant/lib" includes="${ftp.jakartaoro.jar}" />
+			<fileset dir="${ant.library.dir}" includes="ant-commons-net.jar" />
+		</path>
+		<classloader classpathref="wptg.classpath" parentFirst="false" />
+		<taskdef name="wptg-ftp" classname="org.apache.tools.ant.taskdefs.optional.net.FTP" loaderref="ant.coreLoader" />
+	</target>
 
 
 	<!-- *************************************************************** -->
@@ -249,6 +264,7 @@
 		<copy todir="${build.release.root.cmr}/license" file="${basedir}/license/publicCerts.store" />
 
 		<!-- Create the different distributions -->
+		<antcall target="-retrieve-jre-installations" />
 		<antcall target="-linux-x86" />
 		<antcall target="-linux-x64" />
 		<antcall target="-windows-x86" />
@@ -268,39 +284,155 @@
 	<!-- *************************************************************** -->
 	<!--           P R I V A T E    B U I L D     T A R G E T S          -->
 	<!-- *************************************************************** -->
+	<target name="-retrieve-jre-installations" depends="init-ftp-task" unless="skip.jre.download">
+		<foreach list="${jvm.list}" param="file" target="checkFile" />
+
+		<!-- delete tmp folder -->
+		<delete dir="${jvm.root}/tmp" />
+	</target>
+
+	<target name="checkFile" depends="check.download,check.md5" if="file" />
+
+	<target name="check.download" unless="download-ok" depends="check.init">
+		<echo message="Downloading ${md5.file}" />
+		<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5">
+			<fileset dir="${jvm.root}/tmp">
+				<include name="${md5.file}" />
+			</fileset>
+		</wptg-ftp>
+
+		<!-- download the JRE only if it is not already locally available -->
+		<available file="${jvm.root}/${zip.file}" property="download-jre" value="true" />
+		<if>
+			<isfalse value="${download-jre}" />
+			<then>
+				<echo message="Downloading ${zip.file}" />
+				<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5">
+					<fileset dir="${jvm.root}/tmp">
+						<include name="${zip.file}" />
+					</fileset>
+				</wptg-ftp>
+			</then>
+			<else>
+				<echo message="${zip.file} already locally available, so skipping download." />
+			</else>
+		</if>
+	</target>
+
+	<target name="check.init">
+		<property name="zip.file" value="${file}.zip" />
+		<property name="md5.file" value="${file}.md5" />
+		<condition property="md5-ok">
+			<isset property="${zip.file}.isValid" />
+		</condition>
+		<condition property="download-ok">
+			<and>
+				<available file="${jvm.root}/${zip.file}" />
+				<available file="${jvm.root}/${md5.file}" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="check.md5" unless="md5-ok" depends="check.init">
+		<trycatch>
+			<try>
+				<!-- the valid md5 value specified in the md5 file -->
+				<loadfile srcFile="${jvm.root}/tmp/${md5.file}" property="md5.valid">
+					<!-- need to filter whitespace in the md5sum -->
+					<filterchain>
+						<striplinebreaks />
+						<tokenfilter>
+							<stringtokenizer />
+							<replaceregex pattern="${zip.file}" replace="" />
+						</tokenfilter>
+						<tokenfilter>
+							<trim />
+						</tokenfilter>
+					</filterchain>
+				</loadfile>
+
+				<!-- the actual md5 value -->
+				<checksum file="${jvm.root}/${zip.file}" property="md5.actual" />
+				<!-- compare them -->
+				<condition property="md5.isValid">
+					<equals arg1="${md5.valid}" arg2="${md5.actual}" />
+				</condition>
+
+				<if>
+					<istrue value="${md5.isValid}" />
+					<then />
+					<else>
+						<!-- updates where found, so notify the user -->
+						<echo message="${zip.file}: Different MD5 checksum !!!" />
+						<echo message="-> expected: ${md5.valid}" />
+						<echo message="-> actual  : ${md5.actual}" />
+						<!-- rename the file to indicate that it is a newer version -->
+						<antcall target="-notify-about-jre-update" />
+						<echo message="Downloading ${zip.file}" />
+						<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5">
+							<fileset dir="${jvm.root}/tmp">
+								<include name="${zip.file}" />
+							</fileset>
+						</wptg-ftp>
+						<move file="${jvm.root}/tmp/${zip.file}" tofile="${jvm.root}/tmp/${file}.newer-version.zip" overwrite="true" failonerror="true" />
+						<delete dir="${jvm.root}/${zip.file}" />
+						<move file="${jvm.root}/tmp/${file}.newer-version.zip" tofile="${jvm.root}/${zip.file}" failonerror="true" />
+					</else>
+				</if>
+			</try>
+			<catch>
+				<!-- the file was not there in the first place, so just put it into the correct folder -->
+				<echo message="${zip.file} was not available, so moving it to the correct location." />
+				<move file="${jvm.root}/tmp/${zip.file}" tofile="${jvm.root}/${zip.file}" overwrite="true" failonerror="true" />
+			</catch>
+		</trycatch>
+		<!-- now just delete the MD5 file -->
+		<delete dir="${jvm.root}/tmp/${md5.file}" />
+	</target>
+
+	<target name="-notify-about-jre-update">
+		<echo message="-------------------------------------------------------------" />
+		<echo message="INFO: A newer JRE Version was found than currently available." />
+		<echo message="--------------------------------------------------------------" />
+		<echo message="The old version is going to be deleted and updated with the " />
+		<echo message="newer version found on the FTP server." />
+		<echo message="In case you don't want to update the JRE, you can skip " />
+		<echo message="the whole update process by starting the Build again with the " />
+		<echo message="option: -Dskip.jre.download=true" />
+		<echo message="-------------------------------------------------------------" />
+		<input>Press Return key to continue and to overwrite the JRE: ${file}</input>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+		          Targets for creating the final distributon containing the JRE.                     
+		         - - - - - - - - - - - - - - - - - -->
 	<target name="-linux-x86">
 		<echo file="${build.scripts}/startup.sh" message="./jre/bin/java -Xms1024m -Xmx1024m -Xmn512M -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:SurvivorRatio=4 -XX:TargetSurvivorRatio=90 -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -XX:+HeapDumpOnOutOfMemoryError -jar ${dist.jar.name}" />
-
 		<tar destfile="${release.root}/inspectit-cmr.linux.x86.tar.gz" compression="gzip">
 			<fileset dir="${build.release.root}" />
 			<tarfileset file="${build.scripts}/startup.sh" prefix="CMR" filemode="755" />
-			<zipfileset src="${basedir}/resources/jvm/linux/x86/jre.zip" prefix="CMR/jre" filemode="755" />
+			<zipfileset src="${jvm.root}/jre-linux-x86.zip" prefix="CMR/jre" filemode="755" />
 		</tar>
-
 		<delete file="${build.scripts}/startup.sh" />
 	</target>
 
 	<target name="-linux-x64">
 		<echo file="${build.scripts}/startup.sh" message="./jre/bin/java -Xms2048m -Xmx2048m -Xmn1024M -XX:MaxPermSize=192m -XX:PermSize=128m -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:SurvivorRatio=5 -XX:TargetSurvivorRatio=90 -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -XX:+UseCompressedOops -XX:+HeapDumpOnOutOfMemoryError -jar ${dist.jar.name}" />
-
 		<tar destfile="${release.root}/inspectit-cmr.linux.x64.tar.gz" compression="gzip">
 			<fileset dir="${build.release.root}" />
 			<tarfileset file="${build.scripts}/startup.sh" prefix="CMR" filemode="755" />
-			<zipfileset src="${basedir}/resources/jvm/linux/x64/jre.zip" prefix="CMR/jre" filemode="755" />
+			<zipfileset src="${jvm.root}/jre-linux-x64.zip" prefix="CMR/jre" filemode="755" />
 		</tar>
-
 		<delete file="${build.scripts}/startup.sh" />
 	</target>
 
 	<target name="-windows-x86">
 		<echo file="${build.scripts}/startup.bat" message="jre\bin\java.exe -Xms1024m -Xmx1024m -Xmn512M -XX:MaxPermSize=128m -XX:PermSize=128m -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:SurvivorRatio=4 -XX:TargetSurvivorRatio=90 -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -XX:+HeapDumpOnOutOfMemoryError -jar ${dist.jar.name}" />
-
 		<zip destfile="${release.root}/inspectit-cmr.windows.x86.zip">
 			<fileset dir="${build.release.root}" />
 			<zipfileset file="${build.scripts}/startup.bat" prefix="CMR" />
-			<zipfileset src="${basedir}/resources/jvm/windows/x86/jre.zip" prefix="CMR/jre" />
+			<zipfileset src="${jvm.root}/jre-windows-x86.zip" prefix="CMR/jre" />
 		</zip>
-
 		<delete file="${build.scripts}/startup.bat" />
 	</target>
 
