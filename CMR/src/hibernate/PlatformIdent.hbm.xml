@@ -23,7 +23,7 @@
 
 		<property name="definedIPs"
 			type="info.novatec.inspectit.cmr.util.ListStringType">
-			<column name="defined_ips" />
+			<column name="defined_ips" length="1024"/>
 		</property>
 		<property name="agentName">
 			<column name="agent_name" />

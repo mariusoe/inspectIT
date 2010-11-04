@@ -2,7 +2,7 @@ package info.novatec.inspectit.cmr.dao.impl;
 
 import info.novatec.inspectit.cmr.dao.PlatformIdentDao;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -64,6 +64,29 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 	 * {@inheritDoc}
 	 */
 	public void saveOrUpdate(PlatformIdent platformIdent) {
+		final int maxDefIPsSize = 1024;
+		
+		if (null != platformIdent.getDefinedIPs()) {
+			int charNum = 0;
+			List<Object> newDefinedIPs = new ArrayList<Object>();
+			for (Object item : platformIdent.getDefinedIPs()) {
+				//if it is too long, we stop adding
+				if (charNum + item.toString().length() <= maxDefIPsSize) {
+					newDefinedIPs.add(item);
+					//we add 1 also for the white space
+					charNum += item.toString().length() + 1;
+				}
+				else {
+					break;
+				}
+			}
+			
+			//change only if we really cut the list
+			if (newDefinedIPs.size() != platformIdent.getDefinedIPs().size()) {
+				platformIdent.setDefinedIPs(newDefinedIPs);
+	 		}
+		}
+		
 		getHibernateTemplate().saveOrUpdate(platformIdent);
 	}
 
