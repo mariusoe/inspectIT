@@ -24,7 +24,7 @@ public interface IBranchIndexer<E> {
 	 * @param query 
 	 * @return Keys or null if no keys are associated with query.
 	 */
-	Object[] getKeys(IndexQuery query);
+	Object[] getKeys(IIndexQuery query);
 
 	/**
 	 * Returns the {@link IBranchIndexer} for next {@link ITreeComponent} in the tree.

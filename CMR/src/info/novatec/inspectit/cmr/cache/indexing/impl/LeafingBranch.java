@@ -2,7 +2,7 @@ package info.novatec.inspectit.cmr.cache.indexing.impl;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.cmr.cache.indexing.IBranchIndexer;
-import info.novatec.inspectit.cmr.cache.indexing.IndexQuery;
+import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
 import info.novatec.inspectit.communication.DefaultData;
 
 import java.util.ArrayList;
@@ -71,7 +71,7 @@ public class LeafingBranch<E extends DefaultData> extends Branch<E> {
 	 * below this branch. If this is the case, it just returns the elements from its own leaf.
 	 */
 	@Override
-	public List<E> query(IndexQuery query) {
+	public List<E> query(IIndexQuery query) {
 		Object[] keys = getBranchIndexer().getKeys(query);
 		if (null == keys) {
 			if (isQueryIndexedUnder(query)) {
@@ -134,7 +134,7 @@ public class LeafingBranch<E extends DefaultData> extends Branch<E> {
 	 * @return Returns true if passed query object data will be indexed somewhere under this leafing
 	 *         branch, otherwise false.
 	 */
-	private boolean isQueryIndexedUnder(IndexQuery query) {
+	private boolean isQueryIndexedUnder(IIndexQuery query) {
 		IBranchIndexer<E> branchIndexer = getBranchIndexer().getChildIndexer();
 		while (null != branchIndexer) {
 			if (null != branchIndexer.getKeys(query)) {

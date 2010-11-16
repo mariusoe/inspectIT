@@ -213,11 +213,23 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	@Override
 	public Set<PreferenceId> getPreferenceIds() {
 		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
+		preferences.add(PreferenceId.CLEAR_BUFFER);
 		preferences.add(PreferenceId.LIVEMODE);
 		preferences.add(PreferenceId.UPDATE);
 		preferences.add(PreferenceId.ITEMCOUNT);
 		preferences.add(PreferenceId.TIMELINE);
 		return preferences;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean canOpenInput(List<? extends DefaultData> data) {
+		if (data.isEmpty()) {
+			return true;
+		}
+		return false;
 	}
 
 	/**

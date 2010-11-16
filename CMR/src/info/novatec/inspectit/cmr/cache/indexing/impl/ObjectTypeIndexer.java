@@ -2,8 +2,8 @@ package info.novatec.inspectit.cmr.cache.indexing.impl;
 
 import info.novatec.inspectit.cmr.cache.indexing.AbstractIndexer;
 import info.novatec.inspectit.cmr.cache.indexing.IBranchIndexer;
+import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
 import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
-import info.novatec.inspectit.cmr.cache.indexing.IndexQuery;
 import info.novatec.inspectit.communication.DefaultData;
 
 /**
@@ -27,11 +27,11 @@ public class ObjectTypeIndexer<E extends DefaultData> extends AbstractIndexer<E>
 	 * Constructor that defines child indexer and child branch type. See
 	 * {@link AbstractIndexer#AbstractIndexer(ChildBranchType, IBranchIndexer)}
 	 * 
-	 * @param childBrunchType 
+	 * @param childBranchType 
 	 * @param branchIndexer 
 	 */
-	public ObjectTypeIndexer(ChildBranchType childBrunchType, IBranchIndexer<E> branchIndexer) {
-		super(childBrunchType, branchIndexer);
+	public ObjectTypeIndexer(ChildBranchType childBranchType, IBranchIndexer<E> branchIndexer) {
+		super(childBranchType, branchIndexer);
 	}
 
 	/**
@@ -44,7 +44,8 @@ public class ObjectTypeIndexer<E extends DefaultData> extends AbstractIndexer<E>
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object[] getKeys(IndexQuery query) {
+
+	public Object[] getKeys(IIndexQuery query) {
 		if (null == query.getObjectClass()) {
 			return null;
 		}

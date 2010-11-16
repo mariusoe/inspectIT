@@ -1,7 +1,11 @@
 package info.novatec.inspectit.cmr.cache.indexing.impl;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import info.novatec.inspectit.cmr.cache.indexing.AbstractIndexer.ChildBranchType;
+import info.novatec.inspectit.cmr.cache.indexing.IBranchIndexer;
 import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
+import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.MethodSensorData;
 
 import org.springframework.beans.factory.FactoryBean;
@@ -20,10 +24,10 @@ public class RootBranchFactory implements FactoryBean {
 	 */
 	@Override
 	public Object getObject() throws Exception {
-		return new Branch<MethodSensorData>(
-				new PlatformIdentIndexer<MethodSensorData>(ChildBranchType.NORMAL_BRANCH, 
-						new MethodIdentIndexer<MethodSensorData>(ChildBranchType.LEAFING_BRANCH,
-								new TimestampIndexer<MethodSensorData>())));
+		return new RootBranch<MethodSensorData>(new PlatformIdentIndexer<MethodSensorData>(ChildBranchType.NORMAL_BRANCH, 
+				new ObjectTypeIndexer<MethodSensorData>(ChildBranchType.LEAFING_BRANCH,
+						new MethodIdentIndexer<MethodSensorData>(ChildBranchType.LEAFING_BRANCH, 
+								new TimestampIndexer<MethodSensorData>()))));
 	}
 
 	/**
@@ -40,6 +44,45 @@ public class RootBranchFactory implements FactoryBean {
 	@Override
 	public boolean isSingleton() {
 		return true;
+	}
+
+	/**
+	 * Root branch. It has additional functionality of generating IDs for the elements that
+	 * need to be put into the indexing tree.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private static class RootBranch<E extends DefaultData> extends Branch<E> {
+
+		/**
+		 * ID generator.
+		 */
+		private AtomicLong nextId = new AtomicLong(Long.MAX_VALUE / 2);
+
+		/**
+		 * Default constructor.
+		 * 
+		 * @param branchIndexer
+		 *            Branch indexer for root branch.
+		 */
+		public RootBranch(IBranchIndexer<E> branchIndexer) {
+			super(branchIndexer);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * <p>
+		 * This method also sets the ID of the element that is put into the indexing tree.
+		 */
+		@Override
+		public void put(E element) throws IndexingException {
+			if (null == element) {
+				throw new IndexingException("Null object can not be indexed.");
+			}
+			element.setId(nextId.incrementAndGet());
+			super.put(element);
+		}
 	}
 
 }

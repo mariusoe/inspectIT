@@ -51,7 +51,7 @@ public interface ITreeComponent<E> {
 	 * @param query 
 	 * @return List of elements, or empty list if nothing is found.
 	 */
-	List<E> query(IndexQuery query);
+	List<E> query(IIndexQuery query);
 
 	/**
 	 * Cleans the tree component and its "children" from any weak references whose referenced

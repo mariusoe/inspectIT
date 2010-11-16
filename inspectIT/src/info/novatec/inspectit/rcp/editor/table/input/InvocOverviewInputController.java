@@ -221,6 +221,14 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		preferences.add(PreferenceId.ITEMCOUNT);
 		return preferences;
 	}
+	
+	@Override
+	public boolean canOpenInput(List<? extends DefaultData> data) {
+		if (data.isEmpty()) {
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -434,22 +442,4 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		throw new RuntimeException("Could not create the human readable string!");
 	}
 
-	@Override
-	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
-		switch (preferenceEvent.getPreferenceId()) {
-		case CLEAR_BUFFER:
-			if (this.getInputDefinition().getRepositoryDefinition() instanceof CmrRepositoryDefinition) {
-				invocationSequenceData.clear();
-				Display.getDefault().asyncExec(new Runnable() {
-					@SuppressWarnings("unchecked")
-					public void run() {
-						IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-						IWorkbenchPage page = window.getActivePage();
-						IRootEditor rootEditor = (IRootEditor) page.getActiveEditor();
-						rootEditor.setDataInput(Collections.EMPTY_LIST);
-					}
-				});
-			}
-		}
-	}
 }

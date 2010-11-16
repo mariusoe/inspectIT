@@ -1,7 +1,7 @@
 package info.novatec.inspectit.communication;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
-import info.novatec.inspectit.cmr.cache.indexing.IndexQuery;
+import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -174,15 +174,15 @@ public abstract class DefaultData implements Serializable {
 	}
 
 	/**
-	 * Returns if the object is complied with passed {@link IndexQuery}. This method will only
+	 * Returns if the object is complied with passed {@link IIndexQuery}. This method will only
 	 * return true if the object data correspond to the searching parameters set in
-	 * {@link IndexQuery}.
+	 * {@link IIndexQuery}.
 	 * 
 	 * @param query
 	 *            Query to be check against.
 	 * @return True if the object is complied with query, otherwise false.
 	 */
-	public boolean isQueryComplied(IndexQuery query) {
+	public boolean isQueryComplied(IIndexQuery query) {
 		if (query.getObjectClass() != null && !query.getObjectClass().equals(this.getClass())) {
 			return false;
 		}
@@ -198,7 +198,10 @@ public abstract class DefaultData implements Serializable {
 		if (!query.isInInterval(timeStamp)) {
 			return false;
 		}
+		if (!query.areAllRestrictionsFulfilled(this)) {
+			return false;
+		}
+		
 		return true;
 	}
-
 }

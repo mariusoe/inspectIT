@@ -260,7 +260,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 		}
 
 		if (data.size() == 0) {
-			return false;
+			return true;
 		}
 
 		if (!(data.get(0) instanceof ExceptionSensorData)) {

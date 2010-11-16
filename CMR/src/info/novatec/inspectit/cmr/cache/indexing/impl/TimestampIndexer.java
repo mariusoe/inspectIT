@@ -2,7 +2,7 @@ package info.novatec.inspectit.cmr.cache.indexing.impl;
 
 import info.novatec.inspectit.cmr.cache.indexing.AbstractIndexer;
 import info.novatec.inspectit.cmr.cache.indexing.IBranchIndexer;
-import info.novatec.inspectit.cmr.cache.indexing.IndexQuery;
+import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
 import info.novatec.inspectit.communication.DefaultData;
 
 import java.sql.Timestamp;
@@ -41,12 +41,12 @@ public class TimestampIndexer<E extends DefaultData> extends AbstractIndexer<E> 
 	 * Constructor that defines child indexer and child branch type. See
 	 * {@link AbstractIndexer#AbstractIndexer(ChildBranchType, IBranchIndexer)}
 	 * 
-	 * @param childBrunchType 
+	 * @param childBranchType 
 	 * @param branchIndexer 
 	 * 
 	 */
-	public TimestampIndexer(ChildBranchType childBrunchType, IBranchIndexer<E> branchIndexer) {
-		super(childBrunchType, branchIndexer);
+	public TimestampIndexer(ChildBranchType childBranchType, IBranchIndexer<E> branchIndexer) {
+		super(childBranchType, branchIndexer);
 	}
 
 	/**
@@ -64,7 +64,8 @@ public class TimestampIndexer<E extends DefaultData> extends AbstractIndexer<E> 
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object[] getKeys(IndexQuery query) {
+
+	public Object[] getKeys(IIndexQuery query) {
 		if (!query.isIntervalSet()) {
 			return null;
 		}

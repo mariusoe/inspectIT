@@ -80,7 +80,25 @@
 		<property name="pathSpec" value="/remoting/InvocationDataAccessService" />
 	</bean>
 	<!-- END -->
+	
+	<!-- Buffer  Service -->
+	<bean name="bufferServiceRequestHandlerServlet"
+		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
+	</bean>
 
+	<bean id="bufferServiceServletHolder"
+		class="org.mortbay.jetty.servlet.ServletHolder">
+		<property name="name" value="bufferServiceExporter" />
+		<property name="servlet" ref="bufferServiceRequestHandlerServlet" />
+	</bean>
+
+	<bean id="bufferServiceServiceMapping"
+		class="org.mortbay.jetty.servlet.ServletMapping">
+		<property name="servletName" value="bufferServiceExporter" />
+		<property name="pathSpec" value="/remoting/BufferService" />
+	</bean>
+	<!-- END -->
+	
 	<!-- Exception Data Access Service -->
 	<bean name="exceptionDataAccessRequestHandlerServlet"
 		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
@@ -161,22 +179,6 @@
 		<property name="servletName" value="configurationInterfaceDataAccessExporter" />
 		<property name="pathSpec"
 			value="/remoting/ConfigurationInterfaceDataAccessService" />
-	</bean>
-	<!-- END -->
-
-	<!-- Buffer Service -->
-	<bean name="bufferServiceRequestHandlerServlet"
-		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
-	</bean>
-
-	<bean id="bufferServiceServletHolder" class="org.mortbay.jetty.servlet.ServletHolder">
-		<property name="name" value="bufferServiceExporter" />
-		<property name="servlet" ref="bufferServiceRequestHandlerServlet" />
-	</bean>
-
-	<bean id="bufferServiceServiceMapping" class="org.mortbay.jetty.servlet.ServletMapping">
-		<property name="servletName" value="bufferServiceExporter" />
-		<property name="pathSpec" value="/remoting/BufferService" />
 	</bean>
 	<!-- END -->
 

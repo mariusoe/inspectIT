@@ -159,7 +159,7 @@ public class UngroupedExceptionOverviewStackTraceInputController extends Abstrac
 		}
 
 		if (data.size() == 0) {
-			return false;
+			return true;
 		}
 
 		if (!(data.get(0) instanceof ExceptionSensorData)) {

@@ -2,7 +2,7 @@ package info.novatec.inspectit.cmr.cache.indexing.impl;
 
 import info.novatec.inspectit.cmr.cache.indexing.AbstractIndexer;
 import info.novatec.inspectit.cmr.cache.indexing.IBranchIndexer;
-import info.novatec.inspectit.cmr.cache.indexing.IndexQuery;
+import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
 import info.novatec.inspectit.communication.DefaultData;
 
 /**
@@ -25,11 +25,11 @@ public class SensorTypeIdentIndexer<E extends DefaultData> extends AbstractIndex
 	 * Constructor that defines child indexer and child branch type. See
 	 * {@link AbstractIndexer#AbstractIndexer(ChildBranchType, IBranchIndexer)}
 	 * 
-	 * @param childBrunchType 
+	 * @param childBranchType 
 	 * @param branchIndexer 
 	 */
-	public SensorTypeIdentIndexer(ChildBranchType childBrunchType, IBranchIndexer<E> branchIndexer) {
-		super(childBrunchType, branchIndexer);
+	public SensorTypeIdentIndexer(ChildBranchType childBranchType, IBranchIndexer<E> branchIndexer) {
+		super(childBranchType, branchIndexer);
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class SensorTypeIdentIndexer<E extends DefaultData> extends AbstractIndex
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object[] getKeys(IndexQuery query) {
+	public Object[] getKeys(IIndexQuery query) {
 		if (0 == query.getSensorTypeIdent()) {
 			return null;
 		}

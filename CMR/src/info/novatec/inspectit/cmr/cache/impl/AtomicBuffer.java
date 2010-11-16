@@ -149,11 +149,6 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	private IObjectSizes objectSizes;
 
 	/**
-	 * Id generator for the objects in the buffer.
-	 */
-	private AtomicLong nextId = new AtomicLong(Long.MAX_VALUE / 2);
-
-	/**
 	 * Marker for empty buffer element.
 	 */
 	private EmptyBufferElement emptyBufferElement = new EmptyBufferElement();
@@ -182,8 +177,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 			// only thread that successfully execute compare and set will be able to perform changes
 			if (first.compareAndSet(currenltyFirst, element)) {
 
-				// set the id of the object and increment number of elements
-				element.getObject().setId(nextId.incrementAndGet());
+				// increment number of added elements
 				elementsAdded.incrementAndGet();
 
 				// the element that is now first has to have a empty buffer element as next one

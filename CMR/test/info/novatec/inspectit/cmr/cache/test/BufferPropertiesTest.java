@@ -18,6 +18,9 @@ import org.testng.annotations.Test;
 @ContextConfiguration(locations = { "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
 public class BufferPropertiesTest extends AbstractLogSupport {
 
+	/**
+	 * Buffer properties to test.
+	 */
 	@Autowired
 	private BufferProperties bufferProperties;
 
@@ -26,6 +29,7 @@ public class BufferPropertiesTest extends AbstractLogSupport {
 	 * between min and max.
 	 * 
 	 * @param bufferSize
+	 *            Buffer size.
 	 */
 	@Test(dataProvider = "Buffer-Size-Provider")
 	public void parametrizedExpansionRateTest(long bufferSize) {
@@ -49,19 +53,26 @@ public class BufferPropertiesTest extends AbstractLogSupport {
 	}
 
 	/**
-	 * Parameters generation for {@link #parametrizedExpansionRateTest(long)}. 
-	 * @return
+	 * Parameters generation for {@link #parametrizedExpansionRateTest(long)}.
+	 * 
+	 * @return Buffer size.
 	 */
 	@DataProvider(name = "Buffer-Size-Provider")
 	public Object[][] bufferSizeParameterProvider() {
 		int size = 1000;
 		Object[][] parameters = new Object[size][1];
 		for (int i = 0; i < size; i++) {
-			parameters[i][0] = getRandomLong(2000000000l);
+			parameters[i][0] = getRandomLong(2000000000L);
 		}
 		return parameters;
 	}
-	
+
+	/**
+	 * Returns random positive long number smaller than given max value.
+	 * 
+	 * @param max Max value.
+	 * @return Long.
+	 */
 	private long getRandomLong(long max) {
 		long value = (long) (Math.random() * max);
 		return value - value % 10 + 10;

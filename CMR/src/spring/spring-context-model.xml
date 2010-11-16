@@ -16,10 +16,11 @@
 
 	<bean id="invocationDataDao"
 		class="info.novatec.inspectit.cmr.dao.impl.BufferInvocationDataDaoImpl" />
-		
-	<bean id="sqlDataDao" class="info.novatec.inspectit.cmr.dao.impl.SqlDataDaoImpl" />
+
+	<bean id="sqlDataDao"
+		class="info.novatec.inspectit.cmr.dao.impl.BufferSqlDataDaoImpl" />
 	<bean id="exceptionSensorDataDao"
-		class="info.novatec.inspectit.cmr.dao.impl.ExceptionSensorDataDaoImpl" />
+		class="info.novatec.inspectit.cmr.dao.impl.BufferExceptionSensorDataDaoImpl" />
 
 	<bean id="combinedMetricsDataDao"
 		class="info.novatec.inspectit.cmr.dao.impl.CombinedMetricsDataDaoImpl" />
@@ -59,6 +60,16 @@
 	<bean id="objectSizesFactory"
 		class="info.novatec.inspectit.cmr.cache.impl.ObjectSizesFactory" />
 	<bean id="rootBranchFactory"
-		class="info.novatec.inspectit.cmr.cache.indexing.impl.RootBranchFactory"/>
+		class="info.novatec.inspectit.cmr.cache.indexing.impl.RootBranchFactory" />
+		
+	<bean id="indexQueryProvider" class="info.novatec.inspectit.cmr.util.IndexQueryProvider">
+		<lookup-method name="createNewIndexQuery" bean="indexQuery"/>
+	</bean>
+	<bean id="indexQuery"
+		class="info.novatec.inspectit.cmr.cache.indexing.impl.IndexQuery"
+		scope="prototype" lazy-init="true" />
+	<bean id="restrictionProcessor"
+		class="info.novatec.inspectit.cmr.cache.indexing.restriction.impl.CachingIndexQueryRestrictionProcessor" />
+
 
 </beans>

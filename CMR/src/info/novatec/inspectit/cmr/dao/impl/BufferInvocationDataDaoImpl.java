@@ -1,15 +1,16 @@
 package info.novatec.inspectit.cmr.dao.impl;
 
+import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
+import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
+import info.novatec.inspectit.cmr.dao.InvocationDataDao;
+import info.novatec.inspectit.cmr.util.IndexQueryProvider;
+import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.InvocationSequenceData;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
-import info.novatec.inspectit.cmr.cache.indexing.IndexQuery;
-import info.novatec.inspectit.cmr.dao.InvocationDataDao;
-import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.communication.data.InvocationSequenceData;
 
 /**
  * Implementation of {@link InvocationDataDao} that works with the data from the buffer indexing
@@ -26,10 +27,15 @@ public class BufferInvocationDataDaoImpl implements InvocationDataDao {
 	private ITreeComponent<InvocationSequenceData> indexingTree;
 
 	/**
+	 * Index query provider.
+	 */
+	private IndexQueryProvider indexQueryProvider;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit) {
-		IndexQuery query = new IndexQuery();
+		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
 		query.setPlatformIdent(platformId);
 		query.setMethodIdent(methodId);
 		query.setObjectClass(InvocationSequenceData.class);
@@ -98,12 +104,21 @@ public class BufferInvocationDataDaoImpl implements InvocationDataDao {
 	}
 
 	/**
-	 * Sets the root branch of indexing tree to query.
 	 * 
-	 * @param indexingTree 
+	 * @param indexingTree
+	 *            Root branch of indexing tree to query.
 	 */
 	public void setIndexingTree(ITreeComponent<InvocationSequenceData> indexingTree) {
 		this.indexingTree = indexingTree;
+	}
+
+	/**
+	 * 
+	 * @param indexQueryProvider
+	 *            Index query provider.
+	 */
+	public void setIndexQueryProvider(IndexQueryProvider indexQueryProvider) {
+		this.indexQueryProvider = indexQueryProvider;
 	}
 
 }

@@ -1,5 +1,10 @@
 package info.novatec.inspectit.rcp.action;
 
+import java.util.Collection;
+import java.util.Collections;
+
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
@@ -50,7 +55,9 @@ public class ClearRepositoryBufferAction implements IWorkbenchWindowActionDelega
 					for (IEditorReference editor : editors) {
 						IRootEditor rootEditor = (IRootEditor) editor.getEditor(false);
 						if (null != rootEditor.getPreferencePanel()) {
-							rootEditor.getPreferencePanel().bufferCleared();
+							if (rootEditor.getSubView().getPreferenceIds().contains(PreferenceId.CLEAR_BUFFER)) {
+								rootEditor.getSubView().setDataInput(Collections.EMPTY_LIST);
+							}
 						}
 					}
 				}

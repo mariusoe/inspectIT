@@ -1,7 +1,7 @@
 package info.novatec.inspectit.communication;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
-import info.novatec.inspectit.cmr.cache.indexing.IndexQuery;
+import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
 import info.novatec.inspectit.communication.data.ParameterContentData;
 
 import java.sql.Timestamp;
@@ -163,7 +163,7 @@ public abstract class MethodSensorData extends DefaultData {
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean isQueryComplied(IndexQuery query) {
+	public boolean isQueryComplied(IIndexQuery query) {
 		if (query.getMethodIdent() != 0 && query.getMethodIdent() != methodIdent) {
 			return false;
 		}

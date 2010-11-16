@@ -2,6 +2,8 @@ package info.novatec.inspectit.cmr.dao.impl;
 
 import info.novatec.inspectit.cmr.cache.IBuffer;
 import info.novatec.inspectit.cmr.cache.impl.BufferElement;
+import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
+import info.novatec.inspectit.cmr.cache.indexing.impl.IndexingException;
 import info.novatec.inspectit.cmr.dao.DefaultDataDao;
 import info.novatec.inspectit.cmr.util.Configuration;
 import info.novatec.inspectit.communication.DefaultData;
@@ -21,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.hibernate.FetchMode;
 import org.hibernate.Query;
 import org.hibernate.StatelessSession;
@@ -41,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
  * 
  * @author Patrice Bouillet
  * @author Eduard Tudenhoefner
+ * @author Ivan Senic
  * 
  */
 public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDataDao {
@@ -53,7 +57,17 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	/**
 	 * The buffer to put invocation sequences in.
 	 */
-	private IBuffer<InvocationSequenceData> buffer;
+	private IBuffer<MethodSensorData> buffer;
+
+	/**
+	 * The indexing tree for direct object indexing.
+	 */
+	private ITreeComponent<MethodSensorData> indexingTree;
+
+	/**
+	 * Logger for default data DAO.
+	 */
+	private static final Logger LOGGER = Logger.getLogger(DefaultDataDaoImpl.class);
 
 	/**
 	 * {@inheritDoc}
@@ -75,7 +89,8 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 			if (element instanceof InvocationSequenceData) {
 				InvocationSequenceData invoc = (InvocationSequenceData) element;
 				if (configuration.isEnhancedInvocationStorageMode()) {
-					buffer.put(new BufferElement<InvocationSequenceData>(invoc));
+					buffer.put(new BufferElement<MethodSensorData>(invoc));
+					extractDataFromInvocation(session, invoc);
 					// commented out because we don't save anything anymore to the database!
 					// saveStrippedInvocationInDatabase(invoc, session, true);
 				} else {
@@ -83,7 +98,8 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 				}
 			} else if (element instanceof SqlStatementData) {
 				// saveSqlStatementData(session, (SqlStatementData) element);
-				session.insert(element);
+				// session.insert(element);
+				buffer.put(new BufferElement<MethodSensorData>((SqlStatementData) element));
 			} else if (element instanceof SystemInformationData) {
 				SystemInformationData info = (SystemInformationData) element;
 				long systemInformationId = ((Long) session.insert(info)).longValue();
@@ -94,7 +110,9 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 				}
 			} else if (element instanceof ExceptionSensorData) {
 				ExceptionSensorData exData = (ExceptionSensorData) element;
-				saveExceptionSensorData(session, exData);
+				// saveExceptionSensorData(session, exData);
+				connectErrorMessagesInExceptionData(exData);
+				buffer.put(new BufferElement<MethodSensorData>(exData));
 			} else if (element instanceof TimerData) {
 				TimerData timerData = (TimerData) element;
 				saveTimerData(session, timerData);
@@ -104,6 +122,60 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 		}
 		tx.commit();
 		session.close();
+	}
+
+	/**
+	 * Extract data from the invocation in the way that timer data is saved to the Db, while SQL
+	 * statements and Exceptions are indexed into the root branch.
+	 * 
+	 * @param session
+	 *            Session needed for DB persistance.
+	 * @param invData
+	 *            Invocation data to be extracted.
+	 */
+	@SuppressWarnings("unchecked")
+	private void extractDataFromInvocation(StatelessSession session, InvocationSequenceData invData) {
+		for (InvocationSequenceData child : (List<InvocationSequenceData>) invData.getNestedSequences()) {
+			if (null != child.getTimerData()) {
+				saveTimerData(session, child.getTimerData());
+			} else if (null != child.getSqlStatementData()) {
+				try {
+					indexingTree.put(child.getSqlStatementData());
+				} catch (IndexingException e) {
+					// indexing exception should not happen
+					LOGGER.error(e.getMessage(), e);
+				}
+			}
+			if (null != child.getExceptionSensorDataObjects()) {
+				for (Object data : child.getExceptionSensorDataObjects()) {
+					ExceptionSensorData exceptionData = (ExceptionSensorData) data;
+					if (exceptionData.getExceptionEvent() == ExceptionEventEnum.CREATED) {
+						connectErrorMessagesInExceptionData(exceptionData);
+						try {
+							indexingTree.put(exceptionData);
+						} catch (IndexingException e) {
+							// indexing exception should not happen
+							LOGGER.error(e.getMessage(), e);
+						}
+					}
+				}
+			}
+			extractDataFromInvocation(session, child);
+		}
+	}
+
+	/**
+	 * Connects exception message between linked exception data.
+	 * 
+	 * @param exceptionSensorData
+	 *            Parent exception data, thus the one that has exception event CREATED.
+	 */
+	private void connectErrorMessagesInExceptionData(ExceptionSensorData exceptionSensorData) {
+		ExceptionSensorData child = exceptionSensorData.getChild();
+		if (null != child) {
+			child.setErrorMessage(exceptionSensorData.getErrorMessage());
+			connectErrorMessagesInExceptionData(child);
+		}
 	}
 
 	/**
@@ -374,8 +446,17 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	 * @param buffer
 	 *            buffer to set
 	 */
-	public void setBuffer(IBuffer<InvocationSequenceData> buffer) {
+	public void setBuffer(IBuffer<MethodSensorData> buffer) {
 		this.buffer = buffer;
+	}
+
+	/**
+	 * 
+	 * @param indexingTree
+	 *            indexing tree to see
+	 */
+	public void setIndexingTree(ITreeComponent<MethodSensorData> indexingTree) {
+		this.indexingTree = indexingTree;
 	}
 
 }

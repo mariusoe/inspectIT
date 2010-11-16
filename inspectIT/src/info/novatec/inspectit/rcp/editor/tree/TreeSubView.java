@@ -127,9 +127,11 @@ public class TreeSubView extends AbstractSubView {
 		if (treeInputController.canOpenInput(data)) {
 			treeViewer.setInput(data);
 			treeViewer.expandToLevel(treeInputController.getExpandLevel());
-			if (treeViewer.getControl().isVisible()) {
-				treeViewer.refresh();
-			}
+			// i will comment this out because tree viewer is not refereshing if it is not visible,
+			// meaning when i clear buffer only tree views that are visible are cleared.
+			// if (treeViewer.getControl().isVisible()) {
+			treeViewer.refresh();
+			// }
 		}
 	}
 

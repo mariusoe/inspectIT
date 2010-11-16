@@ -1,8 +1,8 @@
 package info.novatec.inspectit.cmr.cache.indexing.impl;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
+import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
 import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
-import info.novatec.inspectit.cmr.cache.indexing.IndexQuery;
 import info.novatec.inspectit.communication.DefaultData;
 
 import java.lang.ref.WeakReference;
@@ -83,7 +83,7 @@ public class Leaf<E extends DefaultData> implements ITreeComponent<E> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<E> query(IndexQuery query) {
+	public List<E> query(IIndexQuery query) {
 		List<E> results = new ArrayList<E>();
 		Iterator<WeakReference<E>> iterator = map.values().iterator();
 		while (iterator.hasNext()) {

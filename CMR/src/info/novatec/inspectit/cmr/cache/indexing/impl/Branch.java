@@ -2,8 +2,8 @@ package info.novatec.inspectit.cmr.cache.indexing.impl;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.cmr.cache.indexing.IBranchIndexer;
+import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
 import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
-import info.novatec.inspectit.cmr.cache.indexing.IndexQuery;
 import info.novatec.inspectit.communication.DefaultData;
 
 import java.util.ArrayList;
@@ -115,7 +115,7 @@ public class Branch<E extends DefaultData> implements ITreeComponent<E> {
 	 */
 	public E getAndRemove(E template) {
 		// get key for template
-		Object key = branchIndexer.getKey(template);
+		Object key = getBranchIndexer().getKey(template);
 		// get the tree component for key
 		ITreeComponent<E> treeComponent = map.get(key);
 		if (null != treeComponent) {
@@ -143,9 +143,9 @@ public class Branch<E extends DefaultData> implements ITreeComponent<E> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<E> query(IndexQuery query) {
+	public List<E> query(IIndexQuery query) {
 		// get all keys for query
-		Object[] keys = branchIndexer.getKeys(query);
+		Object[] keys = getBranchIndexer().getKeys(query);
 		if (null == keys) {
 			// if key can not be created search in next level
 			return queryAllTreeComponents(query);
@@ -176,7 +176,7 @@ public class Branch<E extends DefaultData> implements ITreeComponent<E> {
 	 * @return Result from queried {@link ITreeComponent} or empty list if key is null or none of
 	 *         {@link ITreeComponent} is mapped with given key.
 	 */
-	protected List<E> querySingleKey(IndexQuery query, Object key) {
+	protected List<E> querySingleKey(IIndexQuery query, Object key) {
 		// get tree component for key
 		ITreeComponent<E> treeComponent = map.get(key);
 		if (null != treeComponent) {
@@ -195,7 +195,7 @@ public class Branch<E extends DefaultData> implements ITreeComponent<E> {
 	 *            Query to process.
 	 * @return Combined result from all {@link ITreeComponent}s that are mapped in this branch.
 	 */
-	protected List<E> queryAllTreeComponents(IndexQuery query) {
+	protected List<E> queryAllTreeComponents(IIndexQuery query) {
 		List<E> results = new ArrayList<E>();
 		Iterator<ITreeComponent<E>> iterator = map.values().iterator();
 		while (iterator.hasNext()) {

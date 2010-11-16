@@ -153,6 +153,7 @@ public class TableSubView extends AbstractSubView {
 	public void setDataInput(List<? extends DefaultData> data) {
 		if (tableInputController.canOpenInput(data)) {
 			tableViewer.setInput(data);
+			tableViewer.refresh();
 		}
 	}
 
