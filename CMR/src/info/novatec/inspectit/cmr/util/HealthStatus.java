@@ -1,5 +1,7 @@
 package info.novatec.inspectit.cmr.util;
 
+import info.novatec.inspectit.cmr.cache.IBuffer;
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
@@ -10,8 +12,8 @@ import java.lang.management.ThreadMXBean;
 import org.apache.log4j.Logger;
 
 /**
- * This service is used to check the health of the CMR in terms of cpu, memory,
- * some overall statistics etc.
+ * This service is used to check the health of the CMR in terms of cpu, memory, some overall
+ * statistics etc.
  * 
  * @author Patrice Bouillet
  * 
@@ -24,8 +26,7 @@ public class HealthStatus {
 	private static final Logger LOGGER = Logger.getLogger(HealthStatus.class);
 
 	/**
-	 * The memory mx bean used to extract information about the memory of the
-	 * system.
+	 * The memory mx bean used to extract information about the memory of the system.
 	 */
 	private MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 
@@ -45,9 +46,8 @@ public class HealthStatus {
 	private RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
 
 	/**
-	 * For the visualization of the memory and load average, a graphical
-	 * visualization is put into the log for easier analysis. This char is used
-	 * as the start and the end of the printed lines.
+	 * For the visualization of the memory and load average, a graphical visualization is put into
+	 * the log for easier analysis. This char is used as the start and the end of the printed lines.
 	 */
 	private static final char START_END_CHAR = '+';
 
@@ -55,6 +55,11 @@ public class HealthStatus {
 	 * The width of the visualization of the memory and load average.
 	 */
 	private static final int WIDTH = 30;
+
+	/**
+	 * Buffer that reports status.
+	 */
+	private IBuffer<?> buffer;
 
 	/**
 	 * Log all the statistics.
@@ -65,6 +70,7 @@ public class HealthStatus {
 			logRuntimeStatistics();
 			logMemoryStatistics();
 			logThreadStatistics();
+			logBufferStatistics();
 			LOGGER.info("\n");
 		}
 	}
@@ -111,11 +117,14 @@ public class HealthStatus {
 		}
 		double value = (WIDTH + 2.0d) / availCpus;
 		long load = Math.round(loadAverage * value);
+		String title = "CPU load";
 
 		// print first line
 		StringBuilder sb = new StringBuilder();
 		sb.append(START_END_CHAR);
-		for (int i = 0; i < WIDTH; i++) {
+		sb.append("-");
+		sb.append(title);
+		for (int i = title.length() + 1; i < WIDTH; i++) {
 			sb.append("-");
 		}
 		sb.append(START_END_CHAR);
@@ -177,9 +186,9 @@ public class HealthStatus {
 		MemoryUsage nonHeapMemoryUsage = memoryMXBean.getNonHeapMemoryUsage();
 
 		LOGGER.info("Heap: " + heapMemoryUsage);
-		logGraphicalMemoryUsage(heapMemoryUsage);
+		logGraphicalMemoryUsage(heapMemoryUsage, "Heap");
 		LOGGER.info("Non Heap: " + nonHeapMemoryUsage);
-		logGraphicalMemoryUsage(nonHeapMemoryUsage);
+		logGraphicalMemoryUsage(nonHeapMemoryUsage, "Non-Heap");
 		LOGGER.info("Pending finalizations: " + memoryMXBean.getObjectPendingFinalizationCount());
 	}
 
@@ -191,7 +200,7 @@ public class HealthStatus {
 	 * 
 	 * @see MemoryUsage
 	 */
-	private void logGraphicalMemoryUsage(MemoryUsage memoryUsage) {
+	private void logGraphicalMemoryUsage(MemoryUsage memoryUsage, String title) {
 		double value = (WIDTH + 2.0d) / memoryUsage.getMax();
 		long used = Math.round(memoryUsage.getUsed() * value);
 		long committed = Math.round(memoryUsage.getCommitted() * value);
@@ -199,9 +208,12 @@ public class HealthStatus {
 		// print first line
 		StringBuilder sb = new StringBuilder();
 		sb.append(START_END_CHAR);
-		for (int i = 0; i < WIDTH; i++) {
+		sb.append("-");
+		sb.append(title);
+		for (int i = title.length() + 1; i < WIDTH; i++) {
 			sb.append("-");
 		}
+
 		sb.append(START_END_CHAR);
 		LOGGER.info(sb.toString());
 
@@ -254,12 +266,75 @@ public class HealthStatus {
 	}
 
 	/**
+	 * Log buffer statistic.
+	 */
+	private void logBufferStatistics() {
+		String[] lines = buffer.toString().split("\n");
+		for (String str : lines) {
+			LOGGER.info(str);
+		}
+		logGraphicalBufferOccupancy(buffer.getOccupancyPercentage());
+	}
+
+	/**
+	 * Log a graphical version of buffer occupancy.
+	 * 
+	 * @param bufferOccupancy
+	 *            Current buffer occupancy in percentages.
+	 */
+	private void logGraphicalBufferOccupancy(float bufferOccupancy) {
+		String title = "Buffer";
+		int used = (int) (bufferOccupancy * WIDTH);
+
+		// print first line
+		StringBuilder sb = new StringBuilder();
+		sb.append(START_END_CHAR);
+		sb.append("-");
+		sb.append(title);
+		for (int i = title.length() + 1; i < WIDTH; i++) {
+			sb.append("-");
+		}
+		sb.append(START_END_CHAR);
+		LOGGER.info(sb.toString());
+
+		// now create the middle line with the status.
+		sb = new StringBuilder();
+		sb.append(START_END_CHAR);
+		for (int i = 0; i < used; i++) {
+			sb.append("/");
+		}
+		for (int j = used; j < WIDTH; j++) {
+			sb.append(" ");
+		}
+		sb.append(START_END_CHAR);
+		LOGGER.info(sb.toString());
+
+		// print last line
+		sb = new StringBuilder();
+		sb.append(START_END_CHAR);
+		for (int i = 0; i < WIDTH; i++) {
+			sb.append("-");
+		}
+		sb.append(START_END_CHAR);
+		LOGGER.info(sb.toString());
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public void afterPropertiesSet() throws Exception {
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("Health Service active...");
 		}
+	}
+
+	/**
+	 * 
+	 * @param buffer
+	 *            buffer to be set
+	 */
+	public void setBuffer(IBuffer<?> buffer) {
+		this.buffer = buffer;
 	}
 
 }

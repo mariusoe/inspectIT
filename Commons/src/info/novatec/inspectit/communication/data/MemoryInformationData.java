@@ -1,5 +1,6 @@
 package info.novatec.inspectit.communication.data;
 
+import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.communication.SystemSensorData;
 
 import java.sql.Timestamp;
@@ -483,6 +484,15 @@ public class MemoryInformationData extends SystemSensorData {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public long getObjectSize(IObjectSizes objectSizes) {
+		long size =  super.getObjectSize(objectSizes);
+		size += objectSizes.getPrimitiveTypesSize(0, 0, 1, 0, 21, 0);
+		return objectSizes.alignTo8Bytes(size);
 	}
 
 }

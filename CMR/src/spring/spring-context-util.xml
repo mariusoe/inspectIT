@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"
+	default-autowire="autodetect">
 
 	<bean id="licenseUtil" class="info.novatec.inspectit.cmr.util.LicenseUtil" />
 
@@ -10,7 +11,8 @@
 	<bean id="configuration" class="info.novatec.inspectit.cmr.util.Configuration">
 		<property name="enhancedInvocationStorageMode" value="true" />
 	</bean>
-	
-	<bean id="versioning" class="info.novatec.inspectit.versioning.FileBasedVersioningServiceImpl" />
-	
+
+	<bean id="versioning"
+		class="info.novatec.inspectit.versioning.FileBasedVersioningServiceImpl" />
+
 </beans>

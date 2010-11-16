@@ -9,15 +9,18 @@ import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -129,7 +132,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	private int limit = 10;
 
 	/**
-	 * The data access service to access the data on the CMR.
+	 * The used data access service to access the data on the CMR.
 	 */
 	private IInvocationDataAccessService dataAccessService;
 
@@ -137,6 +140,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 * This data access service is needed because of the ID mappings.
 	 */
 	private CachedGlobalDataAccessService globalDataAccessService;
+
 
 	/**
 	 * {@inheritDoc}
@@ -212,6 +216,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	@Override
 	public Set<PreferenceId> getPreferenceIds() {
 		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
+		preferences.add(PreferenceId.CLEAR_BUFFER);
 		preferences.add(PreferenceId.LIVEMODE);
 		preferences.add(PreferenceId.UPDATE);
 		preferences.add(PreferenceId.ITEMCOUNT);
@@ -241,8 +246,13 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 			invocData = dataAccessService.getInvocationSequenceOverview(template.getPlatformIdent(), limit);
 		}
 
+		// why this? so only update with new data if returned collection is not empty, i would say
+		// with every update, if it is empty, then there is nothing to display
+		// then i also done need the clearInvocationFlag
+		// I changed here, .clear() is now out of if clause
+
+		invocationSequenceData.clear();
 		if (!invocData.isEmpty()) {
-			invocationSequenceData.clear();
 			monitor.subTask("Displaying the Invocation Overview");
 			invocationSequenceData.addAll(invocData);
 		}
@@ -424,5 +434,23 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		}
 		throw new RuntimeException("Could not create the human readable string!");
 	}
-
+	
+	@Override
+	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
+		switch (preferenceEvent.getPreferenceId()) {
+		case CLEAR_BUFFER:
+			if (this.getInputDefinition().getRepositoryDefinition() instanceof CmrRepositoryDefinition) {
+				invocationSequenceData.clear();
+				Display.getDefault().asyncExec(new Runnable() {
+					@SuppressWarnings("unchecked")
+					public void run() {
+						IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+						IWorkbenchPage page = window.getActivePage();
+						IRootEditor rootEditor = (IRootEditor) page.getActiveEditor();
+						rootEditor.setDataInput(Collections.EMPTY_LIST);
+					}
+				});
+			}
+		}
+	}
 }

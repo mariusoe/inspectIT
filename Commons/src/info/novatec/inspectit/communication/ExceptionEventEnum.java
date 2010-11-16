@@ -1,5 +1,7 @@
 package info.novatec.inspectit.communication;
 
+import info.novatec.inspectit.cmr.cache.IObjectSizes;
+
 import java.io.Serializable;
 
 /**
@@ -175,6 +177,15 @@ public class ExceptionEventEnum implements Serializable {
 		names.add("UNREGISTERED_PASSED");
 		literals = java.util.Collections.unmodifiableList(literals);
 		names = java.util.Collections.unmodifiableList(names);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public long getObjectSize(IObjectSizes objectSizes) {
+		long size =  objectSizes.getSizeOfObject();
+		size += objectSizes.getPrimitiveTypesSize(0, 0, 1, 0, 0, 0);
+		return objectSizes.alignTo8Bytes(size);
 	}
 
 }

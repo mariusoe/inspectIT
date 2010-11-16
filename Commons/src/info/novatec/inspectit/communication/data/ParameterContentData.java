@@ -1,5 +1,7 @@
 package info.novatec.inspectit.communication.data;
 
+import info.novatec.inspectit.cmr.cache.IObjectSizes;
+
 import java.io.Serializable;
 
 /**
@@ -158,6 +160,23 @@ public class ParameterContentData implements Serializable {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Returns the approximate size of the object in the memory in bytes.
+	 * <p>
+	 * This method needs to be overwritten by all subclasses.
+	 * 
+	 * @param objectSizes
+	 *            Appropriate instance of {@link IObjectSizes} depending on the VM architecture.
+	 * @return Approximate object size in bytes.
+	 */
+	public long getObjectSize(IObjectSizes objectSizes) {
+		long size = objectSizes.getSizeOfObject();
+		size += objectSizes.getPrimitiveTypesSize(2, 1, 1, 0, 2, 0);
+		size += objectSizes.getSizeOf(content);
+		size += objectSizes.getSizeOf(name);
+		return objectSizes.alignTo8Bytes(size);
 	}
 
 }

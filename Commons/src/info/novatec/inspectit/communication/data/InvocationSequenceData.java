@@ -1,9 +1,11 @@
 package info.novatec.inspectit.communication.data;
 
+import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.communication.MethodSensorData;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -224,6 +226,34 @@ public class InvocationSequenceData extends MethodSensorData {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public long getObjectSize(IObjectSizes objectSizes) {
+		long size =  super.getObjectSize(objectSizes);
+		size += objectSizes.getPrimitiveTypesSize(4, 0, 0, 0, 3, 2);
+		if (null != timerData) {
+			size += timerData.getObjectSize(objectSizes);
+		}
+		if (null != sqlStatementData) {
+			size += sqlStatementData.getObjectSize(objectSizes);
+		}
+		if (null != nestedSequences && nestedSequences instanceof ArrayList) {
+			size += objectSizes.getSizeOf((ArrayList)nestedSequences);
+			Iterator iterator = nestedSequences.iterator();
+			while (iterator.hasNext()) {
+				try {
+					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) iterator.next();
+					size += invocationSequenceData.getObjectSize(objectSizes);
+				}
+				catch (Exception exception) {
+					exception.printStackTrace();
+				}
+			}
+		}
+		return objectSizes.alignTo8Bytes(size);
 	}
 
 }

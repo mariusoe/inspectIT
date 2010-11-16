@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
 
 import com.thoughtworks.xstream.XStream;
@@ -90,6 +92,16 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 	public Object getInvocationSequenceDetail(InvocationSequenceData template) {
 		try {
 			Object object = invocationDataAccessService.getInvocationSequenceDetail(template);
+			
+			if (null == object) {
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Invocation sequence details", "Requested invocation sequence data is not in the buffer any more.");
+					}
+				});
+				return null;
+			}
 
 			if (object instanceof InvocationSequenceData) {
 				// directly return the object

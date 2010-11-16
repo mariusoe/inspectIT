@@ -1,10 +1,11 @@
-package info.novatec.inspectit.cmr.dao.ci.test;
+package info.novatec.inspectit.cmr.test;
 
 import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.testng.annotations.BeforeSuite;
 
@@ -15,6 +16,8 @@ import org.testng.annotations.BeforeSuite;
  * @author Eduard Tudenhoefner
  * 
  */
+
+@ContextConfiguration(locations = { "classpath:spring/spring-context-property.xml" })
 public abstract class AbstractLogSupport extends AbstractTransactionalTestNGSpringContextTests {
 
 	/**
@@ -37,8 +40,5 @@ public abstract class AbstractLogSupport extends AbstractTransactionalTestNGSpri
 		} catch (IOException e) {
 			LOGGER.error("Could not load log4j.properties file: " + e.getMessage());
 		}
-
-		LOGGER.info("Log4j was initialized properly!");
-		LOGGER.info("===============================");
 	}
 }

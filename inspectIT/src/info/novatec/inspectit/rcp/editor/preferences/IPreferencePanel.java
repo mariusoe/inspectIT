@@ -19,11 +19,10 @@ public interface IPreferencePanel {
 	 * @param parent
 	 *            The parent used to draw the elements to.
 	 * @param preferenceSet
-	 *            The set containing the preference IDs which are used to show
-	 *            the correct options.
+	 *            The set containing the preference IDs which are used to show the correct options.
 	 * @param toolBarManager
-	 *            The toolbar manager is needed if buttons are going to be
-	 *            displayed. Otherwise it can be <code>null</code>.
+	 *            The toolbar manager is needed if buttons are going to be displayed. Otherwise it
+	 *            can be <code>null</code>.
 	 * 
 	 */
 	void createPartControl(Composite parent, Set<PreferenceId> preferenceSet, IToolBarManager toolBarManager);
@@ -53,8 +52,8 @@ public interface IPreferencePanel {
 	void setVisible(boolean visible);
 
 	/**
-	 * This method is called when an option is changed and should be applied to
-	 * all the contained views.
+	 * This method is called when an option is changed and should be applied to all the contained
+	 * views.
 	 */
 	void update();
 
@@ -62,6 +61,12 @@ public interface IPreferencePanel {
 	 * Disables the live mode in the preference panel.
 	 */
 	void disableLiveMode();
+
+	/**
+	 * Signals that the buffer has been cleared and that all views that have register for the
+	 * {@link PreferenceId#CLEAR_BUFFER} should delete input data.
+	 */
+	void bufferCleared();
 
 	/**
 	 * Disposes this view / editor.

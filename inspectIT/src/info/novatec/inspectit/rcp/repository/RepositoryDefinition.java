@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.repository;
 
+import info.novatec.inspectit.cmr.service.IBufferService;
 import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
@@ -10,9 +11,8 @@ import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessServi
 import info.novatec.inspectit.rcp.repository.service.cmr.ServerStatusService;
 
 /**
- * The interface to the repository definition. A repository can be anywhere and
- * anything, the implementation will provide the details on how to access the
- * information.
+ * The interface to the repository definition. A repository can be anywhere and anything, the
+ * implementation will provide the details on how to access the information.
  * 
  * @author Patrice Bouillet
  */
@@ -47,16 +47,14 @@ public interface RepositoryDefinition {
 	ServerStatusService getServerStatusService();
 
 	/**
-	 * Returns the combined metrics data access service for this repository
-	 * definition.
+	 * Returns the combined metrics data access service for this repository definition.
 	 * 
 	 * @return The combined metrics data access service.
 	 */
 	ICombinedMetricsDataAccessService getCombinedMetricsDataAccessService();
 
 	/**
-	 * Returns the invocation data access service for this repository
-	 * definition.
+	 * Returns the invocation data access service for this repository definition.
 	 * 
 	 * @return The invocation data access servie.
 	 */
@@ -82,12 +80,19 @@ public interface RepositoryDefinition {
 	 * @return The global data access service.
 	 */
 	CachedGlobalDataAccessService getGlobalDataAccessService();
-	
+
 	/**
 	 * Returns the configuration interface data access service for this repository definition.
 	 * 
 	 * @return The configuration data access service.
 	 */
 	IConfigurationInterfaceDataAccessService getConfigurationInterfaceDataAccessService();
+
+	/**
+	 * Returns the buffer data access service for this repository definition.
+	 * 
+	 * @return
+	 */
+	IBufferService getBufferService();
 
 }

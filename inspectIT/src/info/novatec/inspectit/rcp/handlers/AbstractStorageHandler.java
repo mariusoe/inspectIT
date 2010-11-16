@@ -58,6 +58,7 @@ public abstract class AbstractStorageHandler extends AbstractHandler {
 
 			OutputStream fos = null;
 			OutputStream bos = null;
+			OutputStream gzip = null;
 
 			InputStream input = null;
 
@@ -73,34 +74,40 @@ public abstract class AbstractStorageHandler extends AbstractHandler {
 			// create file
 			File file = new File(path.toString());
 
-			// Now load the whole tree for each one and save it
-			if (dataAccessService instanceof InvocationDataAccessService) {
-				InvocationDataAccessService service = (InvocationDataAccessService) dataAccessService;
-				input = service.getStreamForInvocationSequence(invocationSequenceData);
-			} else if (dataAccessService instanceof StorageInvocationDataAccessService) {
-				StorageInvocationDataAccessService service = (StorageInvocationDataAccessService) dataAccessService;
-				input = service.getStreamForInvocationSequence(invocationSequenceData);
-			}
-
 			try {
 				fos = new FileOutputStream(file);
 				bos = new BufferedOutputStream(fos);
+				gzip = new GZIPOutputStream(bos);
 
-				byte[] b = new byte[4096];
-				int read = 0;
+				// Now load the whole tree for each one and save it
+				if (dataAccessService instanceof InvocationDataAccessService) {
+					InvocationDataAccessService service = (InvocationDataAccessService) dataAccessService;
+					InvocationSequenceData invoc = (InvocationSequenceData) service.getInvocationSequenceDetail(invocationSequenceData);
+					xstream.toXML(invoc, gzip);
+					gzip.flush();
+				} else if (dataAccessService instanceof StorageInvocationDataAccessService) {
+					StorageInvocationDataAccessService service = (StorageInvocationDataAccessService) dataAccessService;
+					input = service.getStreamForInvocationSequence(invocationSequenceData);
+					byte[] b = new byte[4096];
+					int read = 0;
 
-				// Read the whole stream and write it into the buffered
-				// stream
-				while ((read = input.read(b)) != -1) {
-					bos.write(b, 0, read);
+					// Read the whole stream and write it into the buffered
+					// stream
+					while ((read = input.read(b)) != -1) {
+						bos.write(b, 0, read);
+					}
+					bos.flush();
 				}
-				bos.flush();
+				
 			} catch (FileNotFoundException e) {
 				throw new ExecutionException("File not found while saving invocation sequences!", e);
 			} catch (IOException e) {
 				throw new ExecutionException("IO Exception while saving invocation sequences!", e);
 			} finally {
 				try {
+					if (null != gzip) {
+						gzip.close();
+					}
 					if (null != fos) {
 						fos.close();
 					}

@@ -3,8 +3,8 @@ package info.novatec.inspectit.rcp.editor.table;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.AbstractSubView;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.FormRootEditor;
 import info.novatec.inspectit.rcp.editor.table.input.TableInputController;
 
@@ -126,6 +126,8 @@ public class TableSubView extends AbstractSubView {
 						tableInputController.doRefresh(monitor);
 						Display.getDefault().asyncExec(new Runnable() {
 							public void run() {
+								Object input = tableInputController.getTableInput();
+								tableViewer.setInput(input);
 								if (tableViewer.getTable().isVisible()) {
 									tableViewer.refresh();
 								}
@@ -187,6 +189,15 @@ public class TableSubView extends AbstractSubView {
 		}
 		
 		tableInputController.preferenceEventFired(preferenceEvent);
+		switch (preferenceEvent.getPreferenceId()) {
+		case CLEAR_BUFFER:
+			if (tableInputController.getPreferenceIds().contains(PreferenceId.CLEAR_BUFFER)) {
+				tableViewer.refresh();
+			}
+			break;
+		default:
+			break;
+		}
 	}
 
 	/**

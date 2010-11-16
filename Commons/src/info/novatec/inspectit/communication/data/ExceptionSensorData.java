@@ -1,5 +1,6 @@
 package info.novatec.inspectit.communication.data;
 
+import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.communication.ExceptionEventEnum;
 import info.novatec.inspectit.communication.MethodSensorData;
 
@@ -220,6 +221,26 @@ public class ExceptionSensorData extends MethodSensorData {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public long getObjectSize(IObjectSizes objectSizes) {
+		long size =  super.getObjectSize(objectSizes);
+		size += objectSizes.getPrimitiveTypesSize(7, 0, 0, 0, 1, 0);
+		size += objectSizes.getSizeOf(errorMessage);
+		size += objectSizes.getSizeOf(cause);
+		size += objectSizes.getSizeOf(stackTrace);
+		size += objectSizes.getSizeOf(exceptionEventString);
+		size += objectSizes.getSizeOf(throwableType);
+		if (null != exceptionEvent) {
+			size += exceptionEvent.getObjectSize(objectSizes);
+		}
+		if (null != child) {
+			size += child.getObjectSize(objectSizes);
+		}
+		return objectSizes.alignTo8Bytes(size);
 	}
 
 }

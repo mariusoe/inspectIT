@@ -1,5 +1,6 @@
 package info.novatec.inspectit.communication.data;
 
+import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.MethodSensorData;
 
@@ -298,6 +299,15 @@ public class TimerData extends MethodSensorData {
 			cpuDuration = -1.0d;
 		}
 		return this;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public long getObjectSize(IObjectSizes objectSizes) {
+		long size =  super.getObjectSize(objectSizes);
+		size += objectSizes.getPrimitiveTypesSize(0, 0, 0, 0, 1, 9);
+		return objectSizes.alignTo8Bytes(size);
 	}
 
 }

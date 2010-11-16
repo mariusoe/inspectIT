@@ -13,11 +13,14 @@
 		class="info.novatec.inspectit.cmr.dao.impl.PlatformSensorTypeIdentDaoImpl" />
 
 	<bean id="defaultDataDao" class="info.novatec.inspectit.cmr.dao.impl.DefaultDataDaoImpl" />
+
 	<bean id="invocationDataDao"
-		class="info.novatec.inspectit.cmr.dao.impl.InvocationDataDaoImpl" />
+		class="info.novatec.inspectit.cmr.dao.impl.BufferInvocationDataDaoImpl" />
+		
 	<bean id="sqlDataDao" class="info.novatec.inspectit.cmr.dao.impl.SqlDataDaoImpl" />
 	<bean id="exceptionSensorDataDao"
 		class="info.novatec.inspectit.cmr.dao.impl.ExceptionSensorDataDaoImpl" />
+
 	<bean id="combinedMetricsDataDao"
 		class="info.novatec.inspectit.cmr.dao.impl.CombinedMetricsDataDaoImpl" />
 
@@ -33,4 +36,28 @@
 		class="info.novatec.inspectit.cmr.dao.ci.impl.MethodSensorDefinitionDataDaoImpl" />
 	<bean id="platformSensorDefinitionDataDao"
 		class="info.novatec.inspectit.cmr.dao.ci.impl.PlatformSensorDefinitionDataDaoImpl" />
+
+	<bean id="bufferProperties" class="info.novatec.inspectit.cmr.cache.impl.BufferProperties">
+		<property name="evictionOccupancyPercentage" value="${buffer.evictionOccupancyPercentage}"/>
+		<property name="maxHeapSizeOccupancy" value="${buffer.maxHeapSizeOccupancy}"/>
+		<property name="minHeapSizeOccupancy" value="${buffer.minHeapSizeOccupancy}"/>
+		<property name="maxHeapSizeOccupancyActiveFromHeapSize" value="${buffer.maxHeapSizeOccupancyActiveFromHeapSize}"/>
+		<property name="minHeapSizeOccupancyActiveTillHeapSize" value="${buffer.minHeapSizeOccupancyActiveTillHeapSize}"/>
+		<property name="minMemoryDelta" value="${buffer.minMemoryDelta}"/>
+		<property name="maxObjectExpansionRate" value="${buffer.maxObjectExpansionRate}"/>
+		<property name="minObjectExpansionRate" value="${buffer.minObjectExpansionRate}"/>
+		<property name="maxObjectExpansionRateActiveTillBufferSize" value="${buffer.maxObjectExpansionRateActiveTillBufferSize}"/>
+		<property name="minObjectExpansionRateActiveFromBufferSize" value="${buffer.minObjectExpansionRateActiveFromBufferSize}"/>
+		<property name="elementsCountForMaintenance" value="${buffer.elementsCountForMaintenance}"/>
+	</bean>
+	<bean id="bufferBean" class="info.novatec.inspectit.cmr.cache.impl.AtomicBuffer" />
+	<bean id="bufferEvictor" class="info.novatec.inspectit.cmr.cache.impl.BufferEvictor" />
+	<bean id="bufferAnalyzer" class="info.novatec.inspectit.cmr.cache.impl.BufferAnalyzer" />
+	<bean id="bufferIndex" class="info.novatec.inspectit.cmr.cache.impl.BufferIndexer" />
+
+	<bean id="objectSizesFactory"
+		class="info.novatec.inspectit.cmr.cache.impl.ObjectSizesFactory" />
+	<bean id="rootBranchFactory"
+		class="info.novatec.inspectit.cmr.cache.indexing.impl.RootBranchFactory"/>
+
 </beans>

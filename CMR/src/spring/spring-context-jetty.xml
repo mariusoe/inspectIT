@@ -63,6 +63,24 @@
 	</bean>
 	<!-- END -->
 	
+	<!-- Buffer  Service -->
+	<bean name="bufferServiceRequestHandlerServlet"
+		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
+	</bean>
+
+	<bean id="bufferServiceServletHolder"
+		class="org.mortbay.jetty.servlet.ServletHolder">
+		<property name="name" value="bufferServiceExporter" />
+		<property name="servlet" ref="bufferServiceRequestHandlerServlet" />
+	</bean>
+
+	<bean id="bufferServiceServiceMapping"
+		class="org.mortbay.jetty.servlet.ServletMapping">
+		<property name="servletName" value="bufferServiceExporter" />
+		<property name="pathSpec" value="/remoting/BufferService" />
+	</bean>
+	<!-- END -->
+	
 	<!-- Exception Data Access Service -->
 	<bean name="exceptionDataAccessRequestHandlerServlet"
 		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
@@ -165,6 +183,7 @@
 				<ref bean="serverStatusServletHolder" />
 				<ref bean="licenseServletHolder" />
 				<ref bean="configurationInterfaceDataAccessServletHolder" />
+				<ref bean="bufferServiceServletHolder" />
 			</list>
 		</property>
 		<property name="servletMappings">
@@ -177,6 +196,7 @@
 				<ref bean="serverStatusServiceMapping" />
 				<ref bean="licenseServiceMapping" />
 				<ref bean="configurationInterfaceDataAccessServiceMapping" />
+				<ref bean="bufferServiceServiceMapping" />
 			</list>
 		</property>
 	</bean>

@@ -1,20 +1,21 @@
 package info.novatec.inspectit.communication;
 
+import info.novatec.inspectit.cmr.cache.IObjectSizes;
+import info.novatec.inspectit.cmr.cache.indexing.IndexQuery;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
- * The {@link DefaultData} class is the base class for all data and value
- * objects. Data objects are persisted on the CMR and can be requested from the
- * interfaces. Value Objects on the other hand are only used as a transmission
- * container from the Agent(s) to the CMR.
+ * The {@link DefaultData} class is the base class for all data and value objects. Data objects are
+ * persisted on the CMR and can be requested from the interfaces. Value Objects on the other hand
+ * are only used as a transmission container from the Agent(s) to the CMR.
  * <p>
- * Every value object implementation needs to override the
- * {@link #finalizeData()} method to return a data object which can be
- * persisted.
+ * Every value object implementation needs to override the {@link #finalizeData()} method to return
+ * a data object which can be persisted.
  * <p>
- * Data objects are free to use the {@link #finalizeData()} method to generate
- * some additional values (like the average).
+ * Data objects are free to use the {@link #finalizeData()} method to generate some additional
+ * values (like the average).
  * 
  * @author Patrice Bouillet
  * 
@@ -101,8 +102,8 @@ public abstract class DefaultData implements Serializable {
 	}
 
 	/**
-	 * This method has to be overridden by every implementation of a value
-	 * object to return a {@link DefaultData} object which can be persisted.
+	 * This method has to be overridden by every implementation of a value object to return a
+	 * {@link DefaultData} object which can be persisted.
 	 * 
 	 * @return Returns a {@link DefaultData} object which can be persisted.
 	 */
@@ -151,6 +152,50 @@ public abstract class DefaultData implements Serializable {
 				return false;
 			}
 		} else if (!timeStamp.equals(other.timeStamp)) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Returns the approximate size of the object in the memory in bytes.
+	 * <p>
+	 * This method needs to be overridden by all subclasses.
+	 * 
+	 * @param objectSizes
+	 *            Appropriate instance of {@link IObjectSizes} depending on the VM architecture.
+	 * @return Approximate object size in bytes.
+	 */
+	public long getObjectSize(IObjectSizes objectSizes) {
+		long size = objectSizes.getSizeOfObject();
+		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 3, 0);
+		size += objectSizes.getSizeOf(timeStamp);
+		return objectSizes.alignTo8Bytes(size);
+	}
+
+	/**
+	 * Returns if the object is complied with passed {@link IndexQuery}. This method will only
+	 * return true if the object data correspond to the searching parameters set in
+	 * {@link IndexQuery}.
+	 * 
+	 * @param query
+	 *            Query to be check against.
+	 * @return True if the object is complied with query, otherwise false.
+	 */
+	public boolean isQueryComplied(IndexQuery query) {
+		if (query.getObjectClass() != null && !query.getObjectClass().equals(this.getClass())) {
+			return false;
+		}
+		if (query.getMinId() > id) {
+			return false;
+		}
+		if (query.getPlatformIdent() != 0 && query.getPlatformIdent() != platformIdent) {
+			return false;
+		}
+		if (query.getSensorTypeIdent() != 0 && query.getSensorTypeIdent() != sensorTypeIdent) {
+			return false;
+		}
+		if (!query.isInInterval(timeStamp)) {
 			return false;
 		}
 		return true;

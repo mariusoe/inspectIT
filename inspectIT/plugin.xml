@@ -98,6 +98,15 @@
             label="Repository Action Set"
             visible="true">
          <action
+               class="info.novatec.inspectit.rcp.action.ClearRepositoryBufferAction"
+               icon="icons/clean_buffer.png"
+               id="info.novatec.inspectit.rcp.action.ClearRepositoryBuffer"
+               label="&amp;Clear Repository Buffer"
+               style="push"
+               toolbarPath="repository"
+               tooltip="Clear Data From Repository Buffer">
+         </action>
+         <action
                class="info.novatec.inspectit.rcp.action.UpdateRepositoryAction"
                icon="icons/server_refresh.png"
                id="info.novatec.inspectit.rcp.action.UpdateRepositoryAction"
@@ -110,6 +119,7 @@
                icon="icons/server_remove.png"
                id="info.novatec.inspectit.rcp.action.RemoveRepositoryAction"
                label="&amp;Delete Repository Definition"
+               style="push"
                toolbarPath="repository"
                tooltip="Delete Repository Definition">
          </action>
@@ -287,6 +297,7 @@
                         value="tableSubView">
                   </test>
                </with>
+               <!-- TODO: Remove when export of invocations is possible with buffer -->
             </and>
          </activeWhen>
       </handler>
@@ -313,6 +324,7 @@
                         value="tableSubView">
                   </test>
                </with>
+               <!-- TODO: Remove when export of invocations is possible with buffer -->
             </and>
          </activeWhen>
       </handler>

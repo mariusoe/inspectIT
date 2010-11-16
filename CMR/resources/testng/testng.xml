@@ -40,4 +40,16 @@
 				name="info.novatec.inspectit.cmr.dao.ci.test.LazyInitializationTest" />
 		</classes>
 	</test>
+	<test name="Buffer Properties">
+		<classes>
+			<class 
+				name="info.novatec.inspectit.cmr.cache.test.BufferPropertiesTest" />
+		</classes>
+	</test>
+	<test name="Indexing Tree">
+		<classes>
+			<class 
+				name="info.novatec.inspectit.cmr.cache.indexing.test.IndexingTest" />
+		</classes>
+	</test>
 </suite>

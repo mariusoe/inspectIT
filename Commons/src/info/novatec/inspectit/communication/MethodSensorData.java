@@ -1,9 +1,12 @@
 package info.novatec.inspectit.communication;
 
+import info.novatec.inspectit.cmr.cache.IObjectSizes;
+import info.novatec.inspectit.cmr.cache.indexing.IndexQuery;
 import info.novatec.inspectit.communication.data.ParameterContentData;
 
 import java.sql.Timestamp;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -134,6 +137,37 @@ public abstract class MethodSensorData extends DefaultData {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public long getObjectSize(IObjectSizes objectSizes) {
+		long size = super.getObjectSize(objectSizes);
+		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 1, 0);
+		if (null != parameterContentData && parameterContentData instanceof HashSet) {
+			size += objectSizes.getSizeOf((HashSet) parameterContentData);
+			Iterator iterator = parameterContentData.iterator();
+			while (iterator.hasNext()) {
+				try {
+					ParameterContentData parameterContentData = (ParameterContentData) iterator.next();
+					size += parameterContentData.getObjectSize(objectSizes);
+				} catch (Exception exception) {
+					exception.printStackTrace();
+				}
+			}
+		}
+		return objectSizes.alignTo8Bytes(size);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isQueryComplied(IndexQuery query) {
+		if (query.getMethodIdent() != 0 && query.getMethodIdent() != methodIdent) {
+			return false;
+		}
+		return super.isQueryComplied(query);
 	}
 
 }

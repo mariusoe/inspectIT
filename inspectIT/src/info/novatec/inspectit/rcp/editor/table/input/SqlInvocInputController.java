@@ -284,6 +284,10 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		if (null == data) {
 			return false;
 		}
+		
+		if (data.isEmpty()) {
+			return true;
+		}
 
 		if (data.size() != 1) {
 			return false;

@@ -1,6 +1,10 @@
 package info.novatec.inspectit.communication.data;
 
+import info.novatec.inspectit.cmr.cache.IObjectSizes;
+
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class SqlStatementData extends TimerData {
@@ -100,6 +104,29 @@ public class SqlStatementData extends TimerData {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public long getObjectSize(IObjectSizes objectSizes) {
+		long size =  super.getObjectSize(objectSizes);
+		size += objectSizes.getPrimitiveTypesSize(2, 1, 0, 0, 0, 0);
+		size += objectSizes.getSizeOf(sql);
+		if (parameterValues != null && parameterValues instanceof ArrayList) {
+			size += objectSizes.getSizeOf((ArrayList)parameterValues);
+			Iterator iterator = parameterValues.iterator();
+			while (iterator.hasNext()) {
+				try {
+					String str = (String) iterator.next();
+					size += objectSizes.getSizeOf(str);
+				}
+				catch (Exception exception) {
+					exception.printStackTrace();
+				}
+			}
+		}
+		return objectSizes.alignTo8Bytes(size);
 	}
 
 }

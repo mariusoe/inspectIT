@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.repository;
 
+import info.novatec.inspectit.cmr.service.IBufferService;
 import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
@@ -8,9 +9,9 @@ import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.cmr.ServerStatusService;
-import info.novatec.inspectit.rcp.repository.service.storage.StorageNamingConstants;
 import info.novatec.inspectit.rcp.repository.service.storage.StorageGlobalDataAcessService;
 import info.novatec.inspectit.rcp.repository.service.storage.StorageInvocationDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.storage.StorageNamingConstants;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
@@ -130,9 +131,17 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	 * Not supported.
 	 */
 	@Override
+	public IBufferService getBufferService() {
+		throw new UnsupportedOperationException();
+	}
+
+
+	/**
+	 * Not supported.
+	 */
+	@Override
 	public String toString() {
 		return "StorageRepositoryDefinition :: " + path;
 	}
-
 
 }

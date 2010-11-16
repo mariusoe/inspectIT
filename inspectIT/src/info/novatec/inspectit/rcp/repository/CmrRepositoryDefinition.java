@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.repository;
 
+import info.novatec.inspectit.cmr.service.IBufferService;
 import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
@@ -7,6 +8,7 @@ import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.ConfigurationInterfaceDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.cmr.BufferService;
 import info.novatec.inspectit.rcp.repository.service.cmr.CombinedMetricsDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.cmr.ExceptionDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.cmr.GlobalDataAccessService;
@@ -76,6 +78,10 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	 */
 	private final ILicenseService licenseService;
 
+	/**
+	 * The buffer data access service.
+	 */
+	private IBufferService bufferService;
 	
 	/**
 	 * The only constructor of this class. The ip and port is mandatory to
@@ -98,6 +104,7 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 		exceptionDataAccessService = new ExceptionDataAccessService(ip, port);
 		combinedMetricsDataAccessService = new CombinedMetricsDataAccessService(ip, port);
 		configurationInterfaceDataAccessService = new ConfigurationInterfaceDataAccessService(ip, port);
+		bufferService = new BufferService(ip, port);
 	}
 
 	/**
@@ -160,6 +167,15 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	public ILicenseService getLicenseService() {
 		return licenseService;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public IBufferService getBufferService() {
+		return bufferService;
+	}
+	
 
 	/**
 	 * {@inheritDoc}

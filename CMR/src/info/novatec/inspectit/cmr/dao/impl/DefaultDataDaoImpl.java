@@ -1,7 +1,8 @@
 package info.novatec.inspectit.cmr.dao.impl;
 
+import info.novatec.inspectit.cmr.cache.IBuffer;
+import info.novatec.inspectit.cmr.cache.impl.BufferElement;
 import info.novatec.inspectit.cmr.dao.DefaultDataDao;
-import info.novatec.inspectit.cmr.dao.InvocationDataDao;
 import info.novatec.inspectit.cmr.util.Configuration;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.MethodSensorData;
@@ -48,9 +49,9 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	private Configuration configuration;
 
 	/**
-	 * The invocation data dao to persist the invocations.
+	 * The buffer to put invocation sequences in.
 	 */
-	private InvocationDataDao invocationDataDao;
+	private IBuffer<InvocationSequenceData> buffer;
 
 	/**
 	 * {@inheritDoc}
@@ -70,8 +71,9 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 			if (element instanceof InvocationSequenceData) {
 				InvocationSequenceData invoc = (InvocationSequenceData) element;
 				if (configuration.isEnhancedInvocationStorageMode()) {
-					invocationDataDao.saveInvocation(invoc);
-					saveStrippedInvocationInDatabase(invoc, session, true);
+					buffer.put(new BufferElement<InvocationSequenceData>(invoc));
+					// commented out because we don't save anything anymore to the database!
+					// saveStrippedInvocationInDatabase(invoc, session, true);
 				} else {
 					saveInvocationInDatabase(invoc, session, 0);
 				}
@@ -355,11 +357,12 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	}
 
 	/**
-	 * @param invocationDataDao
-	 *            the invocationDataDao to set
+	 * 
+	 * @param buffer
+	 *            buffer to set
 	 */
-	public void setInvocationDataDao(InvocationDataDao invocationDataDao) {
-		this.invocationDataDao = invocationDataDao;
+	public void setBuffer(IBuffer<InvocationSequenceData> buffer) {
+		this.buffer = buffer;
 	}
 
 }

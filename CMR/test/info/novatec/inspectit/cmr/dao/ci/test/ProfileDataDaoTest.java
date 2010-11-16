@@ -8,6 +8,7 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.cmr.dao.ci.ProfileDataDao;
+import info.novatec.inspectit.cmr.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.data.ci.EnvironmentData;
 import info.novatec.inspectit.communication.data.ci.ProfileData;
 import info.novatec.inspectit.communication.exception.EntityNotFoundException;

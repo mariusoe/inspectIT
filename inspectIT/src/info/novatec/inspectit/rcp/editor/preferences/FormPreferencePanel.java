@@ -172,6 +172,14 @@ public class FormPreferencePanel implements IPreferencePanel {
 
 		fireEvent(new PreferenceEvent(PreferenceId.UPDATE));
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void bufferCleared() {
+		fireEvent(new PreferenceEvent(PreferenceId.CLEAR_BUFFER));
+	}
 
 	/**
 	 * Creates the preference controls in the preference control panel.
@@ -206,6 +214,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		if (preferenceSet.contains(PreferenceId.SAMPLINGRATE) || preferenceSet.contains(PreferenceId.TIMELINE)) {
 			toolBarManager.add(switchPreferences);
 		}
+
 		if (preferenceSet.contains(PreferenceId.LIVEMODE)) {
 			toolBarManager.add(switchLiveMode);
 

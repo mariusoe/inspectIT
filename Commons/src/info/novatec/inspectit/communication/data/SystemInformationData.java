@@ -1,9 +1,11 @@
 package info.novatec.inspectit.communication.data;
 
+import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.communication.SystemSensorData;
 
 import java.sql.Timestamp;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -446,6 +448,39 @@ public class SystemInformationData extends SystemSensorData {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public long getObjectSize(IObjectSizes objectSizes) {
+		long size =  super.getObjectSize(objectSizes);
+		size += objectSizes.getPrimitiveTypesSize(12, 0, 1, 0, 6, 0);
+		size += objectSizes.getSizeOf(architecture);
+		size += objectSizes.getSizeOf(bootClassPath);
+		size += objectSizes.getSizeOf(classPath);
+		size += objectSizes.getSizeOf(jitCompilerName);
+		size += objectSizes.getSizeOf(libraryPath);
+		size += objectSizes.getSizeOf(osName);
+		size += objectSizes.getSizeOf(osVersion);
+		size += objectSizes.getSizeOf(vmName);
+		size += objectSizes.getSizeOf(vmSpecName);
+		size += objectSizes.getSizeOf(vmVendor);
+		size += objectSizes.getSizeOf(vmVersion);
+		if (null != vmSet && vmSet instanceof HashSet) {
+			size += objectSizes.getSizeOf((HashSet)vmSet);
+			Iterator iterator = vmSet.iterator();
+			while (iterator.hasNext()) {
+				try{
+					VmArgumentData vmArgumentData = (VmArgumentData) iterator.next();
+					size += vmArgumentData.getObjectSize(objectSizes);
+				}
+				catch (Exception exception) {
+					exception.printStackTrace();
+				}
+			}
+		}
+		return objectSizes.alignTo8Bytes(size);
 	}
 
 }

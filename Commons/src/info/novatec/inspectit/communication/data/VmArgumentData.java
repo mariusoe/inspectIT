@@ -1,5 +1,7 @@
 package info.novatec.inspectit.communication.data;
 
+import info.novatec.inspectit.cmr.cache.IObjectSizes;
+
 import java.io.Serializable;
 
 /**
@@ -119,6 +121,17 @@ public class VmArgumentData implements Serializable {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public long getObjectSize(IObjectSizes objectSizes) {
+		long size =  objectSizes.getSizeOfObject();
+		size += objectSizes.getPrimitiveTypesSize(2, 0, 0, 0, 2, 0);
+		size += objectSizes.getSizeOf(vmName);
+		size += objectSizes.getSizeOf(vmValue);
+		return objectSizes.alignTo8Bytes(size);
 	}
 
 }
