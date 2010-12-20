@@ -46,6 +46,10 @@
                name="windowImages"
                value="icons/16x16.png,icons/32x32.png,icons/48x48.png,icons/64x64.png,icons/128x128.png">
          </property>
+         <property
+               name="aboutImage"
+               value="about.png">
+         </property>
       </product>
    </extension>
    <extension

@@ -337,10 +337,17 @@ GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), rm
 	<target name="integrate-version-information" description="Integrates the version information into the about box of the UI">
 		<property environment="env" />
 		<property name="version" value="${env.RELEASE_VERSION}.${env.BUILD_NUMBER}" />
+		<tstamp/>
 
 		<echo message="Using version: ${version}" />
 
-		<echo file="../plugin.properties" message="aboutText=Version ${version}" />
+		<echo file="../plugin.properties" message="aboutText=
+			inspectIT - http://www.inspectit.eu\n\n\
+			Application Performance Engineering solution\n\
+			\n\n\n\
+			Version: ${version}\n\
+			Build ID: ${DSTAMP}${TSTAMP}
+			" />
 		<echo message="Wrote plugin.properties to inspectIT project" />
 	</target>
 

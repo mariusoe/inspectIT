@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="inspectIT" id="info.novatec.inspectit.rcp.product" application="info.novatec.inspectit.rcp.application" version="1.0.0" useFeatures="false" includeLaunchers="true">
+<product name="inspectIT" uid="info.novatec.inspectit.rcp.product" id="info.novatec.inspectit.rcp.product" application="info.novatec.inspectit.rcp.application" version="1.2.0" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
+      <image path="/inspectIT/about.png"/>
       <text>
          %aboutText
       </text>
@@ -32,8 +33,57 @@
       </win>
    </launcher>
 
+
    <vm>
    </vm>
+
+   <license>
+        <url>http://www.inspectit.eu</url>
+        <text>
+   inspectIT END-USER LICENSE CLICKWRAP AGREEMENT
+This End-User License Agreement (hereinafter referred to as &quot;EULA&quot;) is a legal agreement between the individual or entity (hereinafter referred to as &quot;licensee&quot;) and NovaTec GmbH, Germany, (hereinafter referred to as „NovaTec“) related to the software program(s) licensee has requested to download and license. 
+This license agreement applies to the copy of the accompanying software program(s), (hereinafter SOFTWARE), identified in the title of this license agreement and all material (hereinafter MATERIAL) included with it. By installing, copying, or otherwise using this SOFTWARE, licensee agrees to be bound by the terms of this EULA. If licensee does not agree to the terms of this EULA, licensee may not install or use this SOFTWARE. This SOFTWARE is a proprietary product of NovaTec and is protected under copyright laws and international treaties. This SOFTWARE is licensed, not sold.
+
+1.	GRANT OF LICENSE
+Subject to the terms and conditions of this agreement, NovaTec grants the licensee a non-exclusive, non-transferable, non assignable and time-limited right to use the SOFTWARE or components thereof.
+
+2.	TERMS AND CONDITIONS
+a)	Licensee may request a named user license by registering on NovaTec´s website. The right to use the SOFTWARE is explicitly bound to the user who has registered on NovaTec´s website and applied for that license. All other users of the SOFTWARE need to acquire their own licenses and have their own personal license key files. 
+b)	The SOFTWARE may be installed on several computers provided they are all under the sole control of the licensee.  
+c)	NovaTec reserves the right to reject any application for a licenses without citing any reasons.
+d)	The right to use the SOFTWARE is time-limited and expires within three months after the beginning of licensee´s use of the SOFTWARE. The SOFTWARE is „in use“ by the licensee when it is loaded into RAM (i.e., temporary memory).  
+e)	If licensee wishes to extend the right to use the SOFTWARE, licensee may request a new license key under the same terms and conditions on NovaTec´s website. However, NovaTec reserves the right to discontinue or alter the service of the inspectIT license at any time and without any advance notice.
+f)	The license is free of charge and may be used for commercial and non-commercial software development projects including using it on development and test systems. Any use on productive systems or for productive purposes is explicitly prohibited. 
+g)	NovaTec does not offer any support services for the Software and has no obligation to offer any updates of the SOFTWARE. However, the licensee may download new versions of the SOFTWARE and new license files from NovaTec´s website if NovaTec has opted to release such new versions and license files. 
+
+3.	PROHIBITION OF USE OF THE SOFTWARE
+a)	Licensee must not use this SOFTWARE with a license key created for another user or without a valid license key.
+b)	Licensee must not rent or lease or in any other way give this SOFTWARE or any components of it to third parties, neither in full nor in part. 
+c)	Licensee may not use the license for commercial purposes other than commercial software development projects under provision 2. f) including, but not limited to, consulting services.
+d)	Licensee must not reverse-engineer, decompile, or disassemble this SOFTWARE.
+e)	Licensee must not modify the SOFTWARE in any manner to the purpose of altering or expanding the scope of the license granted under these terms and conditions. 
+f)	Licensee must not remove or obliterate any copyright, trademark or proprietary rights notices of NovaTec from the SOFTWARE.
+
+4.	COPYRIGHT
+All rights, title and copy right in and to the SOFTWARE (including but not limited to any images, photographs, animations, video, audio, music, text and &quot;applets&quot; incorporated into 
+the SOFTWARE), and any copies of the SOFTWARE, are owned by NovaTec and are protected by copyright laws and international treaty provisions.
+
+5.	EXPIRY AND TERMINATION
+This agreement will expire within 3 months after the beginning of licensee&apos;s use of the SOFTWARE. Without prejudice to any other rights, NovaTec may terminate this agreement if licensee fails to comply with the terms and conditions of this EULA. Once this agreement has expired or been terminated, licensee shall stop to use the SOFTWARE and shall destroy all copies of the SOFTWARE and all of its component parts, unless he requests a new license key according to provision 2. e). 
+
+6.	WARRANTY
+NovaTec makes no warranties regarding the SOFTWARE. NovaTec disclaims all warranties either expressed or implied, including but not limited to, implied warranties of merchantability and fitness for a particular purpose, with respect to the SOFTWARE and any other accompanying material. There is no warranty by NovaTec or any other party or person neither that the functions contained in the software will not be altered by the downloading process through the Internet nor that the functions contained in the software will meet licensee&apos;s requirements or that the operation of the software will be uninterrupted or error-free. Licensee assumes all responsibility for the selection of the software to achieve the intended results. Licensee acknowledges that no promise, representation, warranty or undertaking has been made or given by NovaTec to any person or company on its behalf in relation to the profitability of, or any other consequences or benefits to be obtained from the delivery or use of the SOFTWARE and any accompanying materials including but not limited to SOFTWARE, manuals or written materials.
+
+7.	LIABILITY FOR CONSEQUENTIAL DAMAGES
+Licensee fully understands and agrees that NovaTec shall not in any circumstances be liable for any damages whatsoever (including, without limitation, damages for loss of business, business interruption, loss of business information, confidential information or other direct, indirect or consequential loss) arising out of the use or inability to use or supply or non-supply of the SOFTWARE and any other accompanying written materials.
+8.	INDEMNIFICATION
+Licensee agrees to indemnify, defend, and hold NovaTec harmless from any claims, damages, losses, or expenses NovaTec may be exposed to as a result of licensee&apos;s use,  maintenance or operation of the SOFTWARE.
+
+9.	GENERAL
+This agreement supersedes all prior agreements between the parties and represents the complete and exclusive description of the license granted by NovaTec to the licensee. 
+This agreement is governed by German Law only. Each of the parties hereto irrevocably agrees to submit to the jurisdiction of the courts of Germany and further agrees to commence any litigation which may arise hereunder in the courts located in the judicial jurisdiction of Stuttgart, Germany.
+         </text>
+   </license>
 
    <plugins>
       <plugin id="com.ibm.icu"/>
@@ -47,16 +97,16 @@
       <plugin id="org.eclipse.core.databinding.property"/>
       <plugin id="org.eclipse.core.expressions"/>
       <plugin id="org.eclipse.core.filesystem"/>
-      <plugin id="org.eclipse.core.filesystem.hpux.ia64_32" fragment=""/>
-      <plugin id="org.eclipse.core.filesystem.linux.ppc" fragment=""/>
+      <plugin id="org.eclipse.core.filesystem.hpux.ia64_32" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.ppc" fragment="true"/>
       <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment=""/>
-      <plugin id="org.eclipse.core.filesystem.macosx" fragment=""/>
-      <plugin id="org.eclipse.core.filesystem.solaris.sparc" fragment=""/>
-      <plugin id="org.eclipse.core.filesystem.win32.x86" fragment=""/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.macosx" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.solaris.sparc" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.core.jobs"/>
       <plugin id="org.eclipse.core.resources"/>
-      <plugin id="org.eclipse.core.resources.win32.x86" fragment=""/>
+      <plugin id="org.eclipse.core.resources.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.core.runtime.compatibility"/>
       <plugin id="org.eclipse.core.runtime.compatibility.auth"/>
@@ -71,17 +121,17 @@
       <plugin id="org.eclipse.jface.databinding"/>
       <plugin id="org.eclipse.osgi"/>
       <plugin id="org.eclipse.swt"/>
-      <plugin id="org.eclipse.swt.carbon.macosx" fragment=""/>
-      <plugin id="org.eclipse.swt.gtk.linux.ppc" fragment=""/>
+      <plugin id="org.eclipse.swt.carbon.macosx" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.ppc" fragment="true"/>
       <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment=""/>
-      <plugin id="org.eclipse.swt.gtk.solaris.sparc" fragment=""/>
-      <plugin id="org.eclipse.swt.motif.aix.ppc" fragment=""/>
-      <plugin id="org.eclipse.swt.motif.hpux.ia64_32" fragment=""/>
-      <plugin id="org.eclipse.swt.win32.win32.x86" fragment=""/>
-      <plugin id="org.eclipse.swt.win32.win32.x86_64" fragment=""/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.solaris.sparc" fragment="true"/>
+      <plugin id="org.eclipse.swt.motif.aix.ppc" fragment="true"/>
+      <plugin id="org.eclipse.swt.motif.hpux.ia64_32" fragment="true"/>
+      <plugin id="org.eclipse.swt.win32.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.swt.win32.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.ui"/>
-      <plugin id="org.eclipse.ui.carbon" fragment=""/>
+      <plugin id="org.eclipse.ui.carbon" fragment="true"/>
       <plugin id="org.eclipse.ui.forms"/>
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.eclipse.update.configurator"/>
