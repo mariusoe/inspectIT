@@ -134,9 +134,7 @@ public class RMIConnection implements IConnection {
 		} catch (RemoteException remoteException) {
 			LOGGER.throwing(RMIConnection.class.getName(), "registerPlatform(String)", remoteException);
 			if (remoteException.getCause() instanceof LicenseException) {
-				LOGGER.severe("License could not be obtained, aborting application startup!");
-				LOGGER.severe("Cause: " + remoteException.getCause().getMessage());
-				System.exit(-1);
+				LOGGER.severe("License could not be obtained, inspectIT agent will not start! Cause: " + remoteException.getCause().getMessage());
 			}
 			throw new RegistrationException("Could not register the platform", remoteException);
 		} catch (SocketException socketException) {
