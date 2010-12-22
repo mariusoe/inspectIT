@@ -230,13 +230,15 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 		// search for the corresponding item which holds this repo definition.
 		for (PShelfItem shelfItem : items) {
 			if (shelfItem.getData().equals(repositoryDefinition)) {
-				shelfItem.dispose();
 				if (shelfItem.getBody().getChildren().length > 0) {
-					Tree tree = (Tree) shelfItem.getBody().getChildren()[0];
-					TreeViewer treeViewer = findTreeViewer(tree);
-					treeViewers.remove(treeViewer);
+					if (shelfItem.getBody().getChildren()[0] instanceof Tree) {
+						Tree tree = (Tree) shelfItem.getBody().getChildren()[0];
+						TreeViewer treeViewer = findTreeViewer(tree);
+						treeViewers.remove(treeViewer);
+					}
 					selectionProviderIntermediate.setSelectionProviderDelegate(null);
 				}
+				shelfItem.dispose();
 				break;
 			}
 		}
