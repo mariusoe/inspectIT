@@ -47,8 +47,7 @@ public class TreeSubView extends AbstractSubView {
 	private TreeViewer treeViewer;
 
 	/**
-	 * Default constructor which needs a tree input controller to create all the
-	 * content etc.
+	 * Default constructor which needs a tree input controller to create all the content etc.
 	 * 
 	 * @param treeInputController
 	 *            The tree input controller.

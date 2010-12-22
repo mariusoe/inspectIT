@@ -4,9 +4,8 @@ import info.novatec.inspectit.rcp.editor.preferences.control.SamplingRateControl
 import info.novatec.inspectit.rcp.editor.preferences.control.TimeLineControl;
 
 /**
- * The enumeration set for the unique preference group ids. By adding new
- * enumerations you should also create an inner public enumeration class which
- * contains the associated control ids.
+ * The enumeration set for the unique preference group ids. By adding new enumerations you should
+ * also create an inner public enumeration class which contains the associated control ids.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -54,7 +53,7 @@ public enum PreferenceId {
 		/**
 		 * The identifier for the live button.
 		 */
-		BUTTON_LIVE_ID;
+		BUTTON_LIVE_ID, REFRESH_RATE;
 	}
 
 	/**
@@ -82,7 +81,7 @@ public enum PreferenceId {
 		 */
 		SENSOR_TYPE_SELECTION_ID;
 	}
-	
+
 	/**
 	 * Inner enumeration for the INVOCEXCLUSIVETIMESELECTION.
 	 * 
@@ -95,7 +94,7 @@ public enum PreferenceId {
 		 */
 		TIME_SELECTION_ID;
 	}
-	
+
 	/**
 	 * Inner enumeration for the INVOCTOTALTIMESELECTION.
 	 * 

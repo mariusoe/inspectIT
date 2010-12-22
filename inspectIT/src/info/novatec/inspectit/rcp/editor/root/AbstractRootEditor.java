@@ -27,14 +27,13 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
 /**
- * The abstract root editor is the base class of all editors (or more specific
- * the views). Currently, the only root editor existing is the
- * {@link FormRootEditor}. An editor is used here, and not a view, because more
- * than one editor can be opened more easily. Plus the {@link IEditorInput}
- * interface makes it easy to define the input for the views.
+ * The abstract root editor is the base class of all editors (or more specific the views).
+ * Currently, the only root editor existing is the {@link FormRootEditor}. An editor is used here,
+ * and not a view, because more than one editor can be opened more easily. Plus the
+ * {@link IEditorInput} interface makes it easy to define the input for the views.
  * <p>
- * If the same editor is already opened (thus the editorinput is the same as one
- * that is already opened), the view is switched to existing one.
+ * If the same editor is already opened (thus the editorinput is the same as one that is already
+ * opened), the view is switched to existing one.
  * 
  * @author Patrice Bouillet
  * 
@@ -43,8 +42,7 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 
 	/**
 	 * The inner class for the update timer which just calls the
-	 * {@link AbstractRootEditor#refresh()} method in the {@link Display}
-	 * thread.
+	 * {@link AbstractRootEditor#refresh()} method in the {@link Display} thread.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -88,8 +86,7 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 	private ISubView activeSubView;
 
 	/**
-	 * The selection change listener, initialized lazily; <code>null</code> if
-	 * not yet created.
+	 * The selection change listener, initialized lazily; <code>null</code> if not yet created.
 	 */
 	private ISelectionChangedListener selectionChangedListener = null;
 
@@ -197,7 +194,20 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 				 */
 				public void eventFired(PreferenceEvent preferenceEvent) {
 					if (PreferenceId.LIVEMODE.equals(preferenceEvent.getPreferenceId())) {
-						boolean isLiveMode = (Boolean) preferenceEvent.getPreferenceMap().get(LiveMode.BUTTON_LIVE_ID);
+						boolean isLiveMode = false;
+						if (null != updateTimer) {
+							stopUpdateTimer();
+							isLiveMode = true;
+						}
+						if (preferenceEvent.getPreferenceMap().containsKey(LiveMode.REFRESH_RATE)) {
+							int refresh = (Integer) preferenceEvent.getPreferenceMap().get(LiveMode.REFRESH_RATE);
+							getInputDefinition().setUpdateRate(refresh * 1000L);
+						}
+
+						if (preferenceEvent.getPreferenceMap().containsKey(LiveMode.BUTTON_LIVE_ID)) {
+							isLiveMode = (Boolean) preferenceEvent.getPreferenceMap().get(LiveMode.BUTTON_LIVE_ID);
+						}
+
 						if (isLiveMode) {
 							startUpdateTimer();
 						} else {
@@ -312,9 +322,8 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 	}
 
 	/**
-	 * Returns the selection changed listener which listens to the nested
-	 * editor's selection changes, and calls <code>handleSelectionChanged</code>
-	 * .
+	 * Returns the selection changed listener which listens to the nested editor's selection
+	 * changes, and calls <code>handleSelectionChanged</code> .
 	 * 
 	 * @return the selection changed listener
 	 */
@@ -330,8 +339,8 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 	}
 
 	/**
-	 * Returns the post selection change listener which listens to the nested
-	 * editor's selection changes.
+	 * Returns the post selection change listener which listens to the nested editor's selection
+	 * changes.
 	 * 
 	 * @return the post selection change listener.
 	 */
@@ -347,10 +356,10 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 	}
 
 	/**
-	 * Handles a selection changed event from the nested sub view. The default
-	 * implementation gets the selection provider from the site, and calls
-	 * <code>fireSelectionChanged</code> on it (only if it is an instance of
-	 * <code>MultiSubViewSelectionProvider</code>), passing a new event object.
+	 * Handles a selection changed event from the nested sub view. The default implementation gets
+	 * the selection provider from the site, and calls <code>fireSelectionChanged</code> on it (only
+	 * if it is an instance of <code>MultiSubViewSelectionProvider</code>), passing a new event
+	 * object.
 	 * 
 	 * @param event
 	 *            The event.

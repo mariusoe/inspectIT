@@ -3,6 +3,7 @@ package info.novatec.inspectit.rcp.editor.preferences;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.preferences.control.IPreferenceControl;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 
@@ -44,8 +45,8 @@ public class FormPreferencePanel implements IPreferencePanel {
 	private final FormToolkit toolkit;
 
 	/**
-	 * Callbacks which are containing the fire method which is executed whenever
-	 * something is changed and updated.
+	 * Callbacks which are containing the fire method which is executed whenever something is
+	 * changed and updated.
 	 */
 	private List<PreferenceEventCallback> callbacks = new ArrayList<PreferenceEventCallback>();
 
@@ -176,8 +177,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 	 * Creates the preference controls in the preference control panel.
 	 * 
 	 * @param parent
-	 *            The parent {@link Composite} to which the controls will be
-	 *            added.
+	 *            The parent {@link Composite} to which the controls will be added.
 	 * @param preferenceSet
 	 *            The set containing the preference IDs.
 	 */
@@ -201,18 +201,26 @@ public class FormPreferencePanel implements IPreferencePanel {
 	private void createButtons(Set<PreferenceId> preferenceSet, IToolBarManager toolBarManager) {
 		switchLiveMode = new SwitchLiveMode("Live");
 		switchPreferences = new SwitchPreferences("Preferences");
+		MenuAction menuAction = new MenuAction();
 
 		if (preferenceSet.contains(PreferenceId.SAMPLINGRATE) || preferenceSet.contains(PreferenceId.TIMELINE)) {
 			toolBarManager.add(switchPreferences);
 		}
 		if (preferenceSet.contains(PreferenceId.LIVEMODE)) {
 			toolBarManager.add(switchLiveMode);
+
+			// Refresh rate
+			MenuManager refreshMenuManager = new MenuManager("Refresh rate");
+			refreshMenuManager.add(new SetRefreshRateAction("5 (s)", 5, true));
+			refreshMenuManager.add(new SetRefreshRateAction("10 (s)", 10));
+			refreshMenuManager.add(new SetRefreshRateAction("30 (s)", 30));
+			refreshMenuManager.add(new SetRefreshRateAction("60 (s)", 60));
+			menuAction.addContributionItem(refreshMenuManager);
 		}
 		if (preferenceSet.contains(PreferenceId.UPDATE)) {
 			toolBarManager.add(new UpdateAction("Update"));
 		}
 
-		MenuAction menuAction = new MenuAction();
 		if (preferenceSet.contains(PreferenceId.ITEMCOUNT)) {
 			MenuManager countMenuManager = new MenuManager("Item count to show");
 			countMenuManager.add(new SetItemCountAction("10", 10, true));
@@ -554,6 +562,34 @@ public class FormPreferencePanel implements IPreferencePanel {
 				sensorTypePreference.put(PreferenceId.InvocTotalTimeSelection.TIME_SELECTION_ID, new Double(time));
 				PreferenceEvent event = new PreferenceEvent(PreferenceId.INVOCFILTERTOTALTIME);
 				event.setPreferenceMap(sensorTypePreference);
+				fireEvent(event);
+			}
+		}
+	}
+
+	private final class SetRefreshRateAction extends Action {
+		private int rate;
+
+		public SetRefreshRateAction(String text, int rate) {
+			this(text, rate, false);
+		}
+
+		public SetRefreshRateAction(String text, int rate, boolean isChecked) {
+			super(text, Action.AS_RADIO_BUTTON);
+			this.rate = rate;
+			setChecked(isChecked);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void run() {
+			if (isChecked()) {
+				Map<IPreferenceGroup, Object> refreshPreference = new HashMap<IPreferenceGroup, Object>();
+				refreshPreference.put(LiveMode.REFRESH_RATE, rate);
+				PreferenceEvent event = new PreferenceEvent(PreferenceId.LIVEMODE);
+				event.setPreferenceMap(refreshPreference);
 				fireEvent(event);
 			}
 		}
