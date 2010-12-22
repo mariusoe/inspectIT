@@ -327,13 +327,14 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 						TreeViewer viewer = findTreeViewer((Tree) control);
 						if (null != viewer) {
 							treeViewers.remove(viewer);
-							if (viewer.equals(selectionProviderIntermediate.getSelectionProviderDelegate())) {
-								selectionProviderIntermediate.setSelectionProviderDelegate(null);
-							}
 						}
 					}
 					control.dispose();
 				}
+
+				// always clear the selection provider
+				selectionProviderIntermediate.setSelectionProviderDelegate(null);
+
 				if (repositoryDefinition instanceof CmrRepositoryDefinition) {
 					updateServerItem(shelfItem, repositoryDefinition);
 				} else if (repositoryDefinition instanceof StorageRepositoryDefinition) {
