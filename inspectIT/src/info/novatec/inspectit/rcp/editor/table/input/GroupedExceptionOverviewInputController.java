@@ -57,9 +57,9 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	public static final String ID = "inspectit.subview.table.groupedexceptionoverview";
 
 	/**
-	 * The private inner enumeration used to define the used IDs which are
-	 * mapped into the columns. The order in this enumeration represents the
-	 * order of the columns. If it is reordered, nothing else has to be changed.
+	 * The private inner enumeration used to define the used IDs which are mapped into the columns.
+	 * The order in this enumeration represents the order of the columns. If it is reordered,
+	 * nothing else has to be changed.
 	 * 
 	 * @author Eduard Tudenhoefner
 	 * 
@@ -91,8 +91,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in
-		 *            {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITConstants}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;
@@ -136,9 +135,9 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	private List<ExtendedExceptionSensorData> exceptionSensorDataList = new ArrayList<ExtendedExceptionSensorData>();
 
 	/**
-	 * This map holds all objects that are needed to be represented in this
-	 * view. It uses the fqn of an exception as the key. It contains as value
-	 * the objects that are belonging to a specific exception class.
+	 * This map holds all objects that are needed to be represented in this view. It uses the fqn of
+	 * an exception as the key. It contains as value the objects that are belonging to a specific
+	 * exception class.
 	 */
 	private Map<String, List<ExtendedExceptionSensorData>> overviewMap;
 
@@ -318,19 +317,18 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	}
 
 	/**
-	 * Method is used to create {@link ExtendedExceptionSensorData} object that
-	 * are used for the overview of this view. The overview basically shows the
-	 * type of the exception (class name) and the additional information about
-	 * how often an exceptional event was caused.
+	 * Method is used to create {@link ExtendedExceptionSensorData} object that are used for the
+	 * overview of this view. The overview basically shows the type of the exception (class name)
+	 * and the additional information about how often an exceptional event was caused.
 	 * 
 	 * @param throwableType
 	 *            The fqn of the exception class.
 	 * @param dataList
-	 *            The list containing {@link ExtendedExceptionSensorData} object
-	 *            of the same throwableType.
-	 * @return An instance of {@link ExtendedExceptionSensorData} that is used
-	 *         for the overview of this view and contains simply the fqn with
-	 *         additional information about exceptional events.
+	 *            The list containing {@link ExtendedExceptionSensorData} object of the same
+	 *            throwableType.
+	 * @return An instance of {@link ExtendedExceptionSensorData} that is used for the overview of
+	 *         this view and contains simply the fqn with additional information about exceptional
+	 *         events.
 	 */
 	private ExtendedExceptionSensorData createObjectForOverview(String throwableType, List<ExtendedExceptionSensorData> dataList) {
 		ExtendedExceptionSensorData data = new ExtendedExceptionSensorData();
@@ -346,9 +344,8 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	}
 
 	/**
-	 * This method simply gets information from the {@link ExceptionSensorData}
-	 * object and creates a new object of type
-	 * {@link ExtendedExceptionSensorData} with the same data.
+	 * This method simply gets information from the {@link ExceptionSensorData} object and creates a
+	 * new object of type {@link ExtendedExceptionSensorData} with the same data.
 	 * 
 	 * @param data
 	 *            The object where the information is copied from.
@@ -463,8 +460,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	 *            The method ident object.
 	 * @param enumId
 	 *            The enumeration ID.
-	 * @return The styled string containing the information from the data
-	 *         object.
+	 * @return The styled string containing the information from the data object.
 	 */
 	private StyledString getStyledTextForColumn(ExtendedExceptionSensorData data, Column enumId) {
 		switch (enumId) {
@@ -498,8 +494,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	}
 
 	/**
-	 * Data object that contains exceptional events and should be used only for
-	 * this view.
+	 * Data object that contains exceptional events and should be used only for this view.
 	 * 
 	 * @author Eduard Tudenhoefner
 	 * 
@@ -607,10 +602,13 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		}
 
 		/**
-		 * Be very careful, as only {@link #getErrorMessage()} and the
-		 * {@link #getThrowableType()} are used for equality in this context.
+		 * Be very careful, as only {@link #getErrorMessage()} and the {@link #getThrowableType()}
+		 * are used for equality in this context.
 		 */
 		public boolean equals(Object obj) {
+			if (null == obj) {
+				return false;
+			}
 			if (this == obj) {
 				return true;
 			}
