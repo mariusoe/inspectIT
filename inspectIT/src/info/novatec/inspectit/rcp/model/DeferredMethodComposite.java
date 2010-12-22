@@ -14,9 +14,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.progress.IElementCollector;
 
 /**
- * This class only initializes the sub-tree if it is requested. Furthermore, the
- * creation of the objects is done piece after piece, so that an immediate
- * visualization can be seen (important for sub-trees which are very large).
+ * This class only initializes the sub-tree if it is requested. Furthermore, the creation of the
+ * objects is done piece after piece, so that an immediate visualization can be seen (important for
+ * sub-trees which are very large).
  * 
  * @author Patrice Bouillet
  * 
@@ -51,23 +51,25 @@ public class DeferredMethodComposite extends DeferredComposite {
 				targetSensorType.setName(sensorTypeEnum.getDisplayName());
 				targetSensorType.setImageDescriptor(sensorTypeEnum.getImageDescriptor());
 
-				InputDefinition inputDefinition = new InputDefinition();
-				inputDefinition.setRepositoryDefinition(repositoryDefinition);
-				inputDefinition.setId(sensorTypeEnum);
-				inputDefinition.setPartName(sensorTypeEnum.getDisplayName());
-				inputDefinition.setPartTooltip(sensorTypeEnum.getDisplayName());
-				inputDefinition.setImageDescriptor(sensorTypeEnum.getImageDescriptor());
-				inputDefinition.setHeaderText(method.getPlatformIdent().getAgentName());
-				MethodIdent methodIdent = repositoryDefinition.getGlobalDataAccessService().getMethodIdentForId(method.getId());
-				inputDefinition.setHeaderDescription(TextFormatter.getMethodString(methodIdent));
+				if (sensorTypeEnum.isOpenable()) {
+					InputDefinition inputDefinition = new InputDefinition();
+					inputDefinition.setRepositoryDefinition(repositoryDefinition);
+					inputDefinition.setId(sensorTypeEnum);
+					inputDefinition.setPartName(sensorTypeEnum.getDisplayName());
+					inputDefinition.setPartTooltip(sensorTypeEnum.getDisplayName());
+					inputDefinition.setImageDescriptor(sensorTypeEnum.getImageDescriptor());
+					inputDefinition.setHeaderText(method.getPlatformIdent().getAgentName());
+					MethodIdent methodIdent = repositoryDefinition.getGlobalDataAccessService().getMethodIdentForId(method.getId());
+					inputDefinition.setHeaderDescription(TextFormatter.getMethodString(methodIdent));
 
-				IdDefinition idDefinition = new IdDefinition();
-				idDefinition.setPlatformId(method.getPlatformIdent().getId());
-				idDefinition.setSensorTypeId(methodSensorTypeIdent.getId());
-				idDefinition.setMethodId(method.getId());
+					IdDefinition idDefinition = new IdDefinition();
+					idDefinition.setPlatformId(method.getPlatformIdent().getId());
+					idDefinition.setSensorTypeId(methodSensorTypeIdent.getId());
+					idDefinition.setMethodId(method.getId());
 
-				inputDefinition.setIdDefinition(idDefinition);
-				targetSensorType.setInputDefinition(inputDefinition);
+					inputDefinition.setIdDefinition(idDefinition);
+					targetSensorType.setInputDefinition(inputDefinition);
+				}
 
 				collector.add(targetSensorType, monitor);
 				composite.addChild(targetSensorType);

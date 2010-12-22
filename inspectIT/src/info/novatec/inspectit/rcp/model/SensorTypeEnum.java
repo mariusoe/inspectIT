@@ -12,8 +12,7 @@ import java.util.Set;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
- * This enumeration holds all available sensor types with their full qualified
- * name and their image.
+ * This enumeration holds all available sensor types with their full qualified name and their image.
  * 
  * @author Patrice Bouillet
  * 
@@ -28,13 +27,13 @@ public enum SensorTypeEnum {
 	/** The sql sensor type. */
 	SQL("info.novatec.inspectit.agent.sensor.method.jdbc.SQLTimerSensor", InspectITConstants.IMG_DATABASE),
 	/** The jdbc connection sensor type. */
-	JDBC_CONNECTION("info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionSensor", InspectITConstants.IMG_DATABASE),
+	JDBC_CONNECTION("info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionSensor", InspectITConstants.IMG_DATABASE, false),
 	/** The jdbc statement sensor type. */
-	JDBC_STATEMENT("info.novatec.inspectit.agent.sensor.method.jdbc.StatementSensor", InspectITConstants.IMG_DATABASE),
+	JDBC_STATEMENT("info.novatec.inspectit.agent.sensor.method.jdbc.StatementSensor", InspectITConstants.IMG_DATABASE, false),
 	/** The jdbc prepared statement sensor type. */
-	JDBC_PREPARED_STATEMENT("info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementSensor", InspectITConstants.IMG_DATABASE),
+	JDBC_PREPARED_STATEMENT("info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementSensor", InspectITConstants.IMG_DATABASE, false),
 	/** The jdbc prepared statement parameter sensor type. */
-	JDBC_PREPARED_STATEMENT_PARAMETER("info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementParameterSensor", InspectITConstants.IMG_DATABASE),
+	JDBC_PREPARED_STATEMENT_PARAMETER("info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementParameterSensor", InspectITConstants.IMG_DATABASE, false),
 	/** The exception sensor */
 	EXCEPTION_SENSOR("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor", InspectITConstants.IMG_SHOW_ALL),
 	/** The exception sensor overview */
@@ -58,8 +57,8 @@ public enum SensorTypeEnum {
 	THREAD_INFORMATION("info.novatec.inspectit.agent.sensor.platform.ThreadInformation", InspectITConstants.IMG_THREADS_OVERVIEW);
 
 	/**
-	 * The LOOKUP map which is used to get an element of the enumeration when
-	 * passing the full qualified name.
+	 * The LOOKUP map which is used to get an element of the enumeration when passing the full
+	 * qualified name.
 	 */
 	private static final Map<String, SensorTypeEnum> LOOKUP = new HashMap<String, SensorTypeEnum>();
 
@@ -80,18 +79,37 @@ public enum SensorTypeEnum {
 	private ImageDescriptor imageDescriptor;
 
 	/**
-	 * Constructs an element of the enumeration with the given full qualified
-	 * name string.
+	 * Defines if this sensor type can be opened somehow. By default <b>true</b>.
+	 */
+	private boolean openable = true;
+
+	/**
+	 * Constructs an element of the enumeration with the given full qualified name string.
 	 * 
 	 * @param fqn
 	 *            The full qualified name.
 	 * @param imageName
-	 *            The name of the image. Names are defined in
-	 *            {@link InspectITConstants}.
+	 *            The name of the image. Names are defined in {@link InspectITConstants}.
 	 */
 	private SensorTypeEnum(String fqn, String imageName) {
 		this.fqn = fqn;
 		this.imageDescriptor = InspectIT.getDefault().getImageDescriptor(imageName);
+	}
+
+	/**
+	 * Same as standard constructor but the openable can be specified in addition.
+	 * 
+	 * @param fqn
+	 *            The full qualified name.
+	 * @param imageName
+	 *            The name of the image. Names are defined in {@link InspectITConstants}.
+	 * @param openable
+	 *            Defines if this can be opened somehow in the UI.
+	 */
+	private SensorTypeEnum(String fqn, String imageName, boolean openable) {
+		this.fqn = fqn;
+		this.imageDescriptor = InspectIT.getDefault().getImageDescriptor(imageName);
+		this.openable = openable;
 	}
 
 	/**
@@ -115,8 +133,7 @@ public enum SensorTypeEnum {
 	}
 
 	/**
-	 * Returns all elements of the enumeration for the given list of sensor type
-	 * ident objects.
+	 * Returns all elements of the enumeration for the given list of sensor type ident objects.
 	 * 
 	 * @param sensorTypes
 	 *            The passed sensor type ident objects.
@@ -161,6 +178,15 @@ public enum SensorTypeEnum {
 		}
 
 		return name.toString();
+	}
+
+	/**
+	 * Returns if this sensor type can be opened somehow.
+	 * 
+	 * @return if its openable.
+	 */
+	public boolean isOpenable() {
+		return openable;
 	}
 
 }
