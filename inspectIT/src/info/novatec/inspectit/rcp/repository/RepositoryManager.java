@@ -54,7 +54,7 @@ public class RepositoryManager {
 		// load existing definitions
 		for (int i = 1; i < Integer.MAX_VALUE; i++) {
 			String ip = node.get(HOST + i, null);
-			int port = node.getInt(PORT + i, 8080);
+			int port = node.getInt(PORT + i, 8182);
 			if (null != ip) {
 				repositoryDefinitions.add(new CmrRepositoryDefinition(ip, port));
 			} else {

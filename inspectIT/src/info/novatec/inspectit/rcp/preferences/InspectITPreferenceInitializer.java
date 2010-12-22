@@ -25,7 +25,7 @@ public class InspectITPreferenceInitializer extends AbstractPreferenceInitialize
 	public void initializeDefaultPreferences() {
 		IEclipsePreferences node = new ConfigurationScope().getNode(InspectIT.ID);
 		node.put("server_host_1", "localhost");
-		node.putInt("server_port_1", 8080);
+		node.putInt("server_port_1", 8182);
 		try {
 			node.flush();
 		} catch (BackingStoreException e) {

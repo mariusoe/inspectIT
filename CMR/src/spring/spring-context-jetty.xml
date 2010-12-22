@@ -183,7 +183,7 @@
 
 	<bean id="httpServer" class="org.mortbay.jetty.Server"
 		init-method="start">
-		<constructor-arg type="int" value="8080" />
+		<constructor-arg type="int" value="8182" />
 		<property name="threadPool" ref="threadPool" />
 		<property name="stopAtShutdown" value="true" />
 	</bean>

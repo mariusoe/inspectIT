@@ -46,6 +46,7 @@ public class NewRepositoryDefinitionPage extends WizardPage {
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = ncol - 1;
 		port.setLayoutData(gd);
+		port.setText("8182");
 
 		setControl(composite);
 	}
