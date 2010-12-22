@@ -10,8 +10,8 @@ import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
@@ -25,8 +25,8 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -686,7 +686,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		ViewerFilter exclusiveTimeFilter = new InvocationViewerFilter() {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				if (Double.NaN == defaultExclusiveFilterTime) {
+				if (Double.isNaN(defaultExclusiveFilterTime)) {
 					return true;
 				}
 
@@ -704,7 +704,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 						duration = totalDuration - (computeNestedDuration(invocationSequenceData));
 					}
 
-					if (Double.NaN != duration && duration <= defaultExclusiveFilterTime) {
+					if (!Double.isNaN(duration) && duration <= defaultExclusiveFilterTime) {
 						return false;
 					}
 				}
@@ -714,7 +714,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		ViewerFilter totalTimeFilter = new InvocationViewerFilter() {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				if (Double.NaN == defaultTotalFilterTime) {
+				if (Double.isNaN(defaultTotalFilterTime)) {
 					return true;
 				}
 
@@ -737,7 +737,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 						}
 					}
 
-					if (Double.NaN != duration && duration <= defaultExclusiveFilterTime) {
+					if (!Double.isNaN(duration) && duration <= defaultExclusiveFilterTime) {
 						return false;
 					}
 				}
