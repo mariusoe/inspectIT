@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.view.server;
 
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.handlers.OpenViewHandler;
 import info.novatec.inspectit.rcp.model.Component;
 import info.novatec.inspectit.rcp.model.StorageTreeModelManager;
 import info.novatec.inspectit.rcp.model.TreeModelManager;
@@ -14,6 +15,9 @@ import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -32,8 +36,10 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
@@ -272,10 +278,17 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 					}
 				} else {
 					IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
+					ICommandService commandService = (ICommandService) getSite().getService(ICommandService.class);
+
+					Command command = commandService.getCommand(OpenViewHandler.COMMAND);
+					ExecutionEvent executionEvent = handlerService.createExecutionEvent(command, new Event());
+					IEvaluationContext context = (IEvaluationContext) executionEvent.getApplicationContext();
+					context.addVariable(OpenViewHandler.INPUT, ((Component) element).getInputDefinition());
+
 					try {
-						handlerService.executeCommand("info.novatec.inspectit.rcp.commands.openView", null);
-					} catch (Exception ex) {
-						throw new RuntimeException(ex);
+						command.executeWithChecks(executionEvent);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
 					}
 				}
 			}

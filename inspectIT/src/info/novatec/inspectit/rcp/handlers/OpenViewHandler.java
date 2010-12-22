@@ -3,14 +3,11 @@ package info.novatec.inspectit.rcp.handlers;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.root.FormRootEditor;
 import info.novatec.inspectit.rcp.editor.root.RootEditorInput;
-import info.novatec.inspectit.rcp.model.Component;
-import info.novatec.inspectit.rcp.view.server.ServerView;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -26,6 +23,16 @@ import org.eclipse.ui.handlers.HandlerUtil;
 public class OpenViewHandler extends AbstractHandler {
 
 	/**
+	 * The corresponding command id.
+	 */
+	public static final String COMMAND = "info.novatec.inspectit.rcp.commands.openView";
+
+	/**
+	 * The input definition id to look up.
+	 */
+	public static final String INPUT = COMMAND + ".input";
+
+	/**
 	 * The constructor.
 	 */
 	public OpenViewHandler() {
@@ -38,24 +45,21 @@ public class OpenViewHandler extends AbstractHandler {
 		// Get the view
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 		IWorkbenchPage page = window.getActivePage();
-		ServerView view = (ServerView) page.findView(ServerView.ID);
-		// Get the selection
-		ISelection selection = view.getSite().getSelectionProvider().getSelection();
-		if (selection != null && selection instanceof IStructuredSelection) {
-			Object obj = ((IStructuredSelection) selection).getFirstElement();
-			// If we had a selection lets open the editor
-			if (obj != null) {
-				Component component = (Component) obj;
-				if (null != component.getInputDefinition()) {
-					RootEditorInput input = new RootEditorInput(component.getInputDefinition());
-					try {
-						page.openEditor(input, FormRootEditor.ID);
-					} catch (PartInitException e) {
-						e.printStackTrace();
-					}
-				}
+
+		// Get the input definition out of the context
+		IEvaluationContext context = (IEvaluationContext) event.getApplicationContext();
+		InputDefinition inputDefinition = (InputDefinition) context.getVariable(INPUT);
+
+		// open the view if the input definition is set
+		if (null != inputDefinition) {
+			RootEditorInput input = new RootEditorInput(inputDefinition);
+			try {
+				page.openEditor(input, FormRootEditor.ID);
+			} catch (PartInitException e) {
+				e.printStackTrace();
 			}
 		}
+
 		return null;
 	}
 }
