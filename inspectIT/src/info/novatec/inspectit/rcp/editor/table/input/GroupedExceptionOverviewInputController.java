@@ -276,7 +276,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 
 				// updating the counter values of newly created object based on
 				// its event type and adding it to the list
-				data.updateCounterForEventType(data.getExceptionEventString(), (int) data.getThrowableIdentityHashCode());
+				data.updateCounterForEventType(data.getExceptionEvent(), (int) data.getThrowableIdentityHashCode());
 				groupedObjects.add(data);
 				overviewMap.put(ungroupedObject.getThrowableType(), groupedObjects);
 			} else {
@@ -289,11 +289,11 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 					// updating the counter values of already saved object
 					// based on the actual event type
 					ExtendedExceptionSensorData nestedData = groupedObjects.get(groupedObjects.indexOf(data));
-					nestedData.updateCounterForEventType(data.getExceptionEventString(), (int) data.getThrowableIdentityHashCode());
+					nestedData.updateCounterForEventType(data.getExceptionEvent(), (int) data.getThrowableIdentityHashCode());
 				} else {
 					// updating the counter values of newly created object based
 					// on its event type and adding it to the list
-					data.updateCounterForEventType(data.getExceptionEventString(), (int) data.getThrowableIdentityHashCode());
+					data.updateCounterForEventType(data.getExceptionEvent(), (int) data.getThrowableIdentityHashCode());
 					groupedObjects.add(data);
 				}
 			}
@@ -356,7 +356,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		resultObject.setPlatformIdent(data.getPlatformIdent());
 		resultObject.setSensorTypeIdent(data.getSensorTypeIdent());
 		resultObject.setErrorMessage(data.getErrorMessage());
-		resultObject.setExceptionEventString(data.getExceptionEventString());
+		resultObject.setExceptionEvent(data.getExceptionEvent());
 		resultObject.setMethodIdent(data.getMethodIdent());
 		resultObject.setThrowableIdentityHashCode(data.getThrowableIdentityHashCode());
 		resultObject.setThrowableType(data.getThrowableType());
@@ -576,14 +576,14 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		 * @param value
 		 *            The value to be added to the respective counter.
 		 */
-		public void updateCounterForEventType(String eventType, int value) {
+		public void updateCounterForEventType(ExceptionEventEnum eventType, int value) {
 			// all other event types are ignored as we are only interested in
 			// these event types
-			if (eventType.equalsIgnoreCase(ExceptionEventEnum.CREATED.toString())) {
+			if (eventType.toString().equalsIgnoreCase(ExceptionEventEnum.CREATED.toString())) {
 				setCreatedCounter(getCreatedCounter() + value);
-			} else if (eventType.equals(ExceptionEventEnum.RETHROWN.toString())) {
+			} else if (eventType.toString().equals(ExceptionEventEnum.RETHROWN.toString())) {
 				setRethrownCounter(getRethrownCounter() + value);
-			} else if (eventType.equals(ExceptionEventEnum.HANDLED.toString())) {
+			} else if (eventType.toString().equals(ExceptionEventEnum.HANDLED.toString())) {
 				setHandledCounter(getHandledCounter() + value);
 			}
 		}

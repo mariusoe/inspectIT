@@ -58,12 +58,8 @@ public interface InspectITConstants {
 	String IMG_DRILLUP = "drillup.png"; //$NON-NLS-1$
 	String VSA_LOGO = "vsalogo.png"; //$NON-NLS-1$
 	String IMG_CREATED_EXCEPTION = "created_exception.gif"; //$NON-NLS-1$
-	String IMG_METHODPUB_PASSED_EX = "methpub_passed_ex.gif"; //$NON-NLS-1$
-	String IMG_METHODPRO_PASSED_EX = "methpro_passed_ex.gif"; //$NON-NLS-1$
-	String IMG_METHODPRI_PASSED_EX = "methpri_passed_ex.gif"; //$NON-NLS-1$
-	String IMG_METHODDEF_PASSED_EX = "methdef_passed_ex.gif"; //$NON-NLS-1$
-	String IMG_METHODPUB_CATCHED_EX = "methpub_catched_ex.gif"; //$NON-NLS-1$
-	String IMG_METHODPRO_CATCHED_EX = "methpro_catched_ex.gif"; //$NON-NLS-1$
-	String IMG_METHODPRI_CATCHED_EX = "methpri_catched_ex.gif"; //$NON-NLS-1$
-	String IMG_METHODDEF_CATCHED_EX = "methdef_catched_ex.gif"; //$NON-NLS-1$
+
+	String OVERLAY_PRIORITY = "overlay_priority.gif"; //$NON-NLS-1$
+	String OVERLAY_UP = "overlay_up.png"; //$NON-NLS-1$
+	String OVERLAY_ERROR = "overlay_error.gif"; //$NON-NLS-1$
 }

@@ -7,8 +7,8 @@ import info.novatec.inspectit.communication.MethodSensorData;
 import java.sql.Timestamp;
 
 /**
- * The exception sensor data object used to store all information collected on
- * an instrumented exception path.
+ * The exception sensor data object used to store all information collected on an instrumented
+ * exception path.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -26,9 +26,8 @@ public class ExceptionSensorData extends MethodSensorData {
 	private String errorMessage;
 
 	/**
-	 * The name of the throwable that caused this throwable to get thrown, or null if this
-	 * throwable was not caused by another throwable, or if the causative
-	 * throwable is unknown.
+	 * The name of the throwable that caused this throwable to get thrown, or null if this throwable
+	 * was not caused by another throwable, or if the causative throwable is unknown.
 	 */
 	private String cause;
 
@@ -38,16 +37,9 @@ public class ExceptionSensorData extends MethodSensorData {
 	private String stackTrace;
 
 	/**
-	 * The {@link ExceptionEventEnum} indicating by which event this object was
-	 * created.
+	 * The {@link ExceptionEventEnum} indicating by which event this object was created.
 	 */
 	private ExceptionEventEnum exceptionEvent;
-
-	/**
-	 * The string representation of the {@link ExceptionEventEnum} object. This
-	 * object is only used in the database.
-	 */
-	private String exceptionEventString;
 
 	/**
 	 * The detailed name of the {@link Throwable} object.
@@ -90,14 +82,6 @@ public class ExceptionSensorData extends MethodSensorData {
 		this.errorMessage = errorMessage;
 	}
 
-	public String getExceptionEventString() {
-		return exceptionEventString;
-	}
-
-	public void setExceptionEventString(String exceptionEventString) {
-		this.exceptionEventString = exceptionEventString;
-	}
-
 	public String getCause() {
 		return cause;
 	}
@@ -120,7 +104,6 @@ public class ExceptionSensorData extends MethodSensorData {
 
 	public void setExceptionEvent(ExceptionEventEnum exceptionEvent) {
 		this.exceptionEvent = exceptionEvent;
-		exceptionEventString = this.exceptionEvent.toString();
 	}
 
 	public String getThrowableType() {
@@ -140,7 +123,7 @@ public class ExceptionSensorData extends MethodSensorData {
 	}
 
 	public String toString() {
-		return throwableType + "@" + throwableIdentityHashCode + " :: " + exceptionEventString;
+		return throwableType + "@" + throwableIdentityHashCode + " :: " + exceptionEvent.toString();
 	}
 
 	public int hashCode() {
@@ -148,9 +131,7 @@ public class ExceptionSensorData extends MethodSensorData {
 		int result = super.hashCode();
 		result = prime * result + ((cause == null) ? 0 : cause.hashCode());
 		result = prime * result + ((child == null) ? 0 : child.hashCode());
-		result = prime * result + ((errorMessage == null) ? 0 : errorMessage.hashCode());
 		result = prime * result + ((exceptionEvent == null) ? 0 : exceptionEvent.hashCode());
-		result = prime * result + ((exceptionEventString == null) ? 0 : exceptionEventString.hashCode());
 		result = prime * result + ((stackTrace == null) ? 0 : stackTrace.hashCode());
 		result = prime * result + (int) (throwableIdentityHashCode ^ (throwableIdentityHashCode >>> 32));
 		result = prime * result + ((throwableType == null) ? 0 : throwableType.hashCode());
@@ -182,25 +163,11 @@ public class ExceptionSensorData extends MethodSensorData {
 		} else if (!child.equals(other.child)) {
 			return false;
 		}
-		if (errorMessage == null) {
-			if (other.errorMessage != null) {
-				return false;
-			}
-		} else if (!errorMessage.equals(other.errorMessage)) {
-			return false;
-		}
 		if (exceptionEvent == null) {
 			if (other.exceptionEvent != null) {
 				return false;
 			}
 		} else if (!exceptionEvent.equals(other.exceptionEvent)) {
-			return false;
-		}
-		if (exceptionEventString == null) {
-			if (other.exceptionEventString != null) {
-				return false;
-			}
-		} else if (!exceptionEventString.equals(other.exceptionEventString)) {
 			return false;
 		}
 		if (stackTrace == null) {
@@ -222,17 +189,16 @@ public class ExceptionSensorData extends MethodSensorData {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
-		long size =  super.getObjectSize(objectSizes);
+		long size = super.getObjectSize(objectSizes);
 		size += objectSizes.getPrimitiveTypesSize(7, 0, 0, 0, 1, 0);
 		size += objectSizes.getSizeOf(errorMessage);
 		size += objectSizes.getSizeOf(cause);
 		size += objectSizes.getSizeOf(stackTrace);
-		size += objectSizes.getSizeOf(exceptionEventString);
 		size += objectSizes.getSizeOf(throwableType);
 		if (null != exceptionEvent) {
 			size += exceptionEvent.getObjectSize(objectSizes);

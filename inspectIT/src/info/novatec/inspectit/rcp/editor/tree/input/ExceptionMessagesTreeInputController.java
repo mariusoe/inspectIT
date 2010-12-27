@@ -49,9 +49,9 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 	private List<ExtendedExceptionSensorData> exceptionSensorDataList = new ArrayList<ExtendedExceptionSensorData>();
 
 	/**
-	 * The private inner enumeration used to define the used IDs which are
-	 * mapped into the columns. The order in this enumeration represents the
-	 * order of the columns. If it is reordered, nothing else has to be changed.
+	 * The private inner enumeration used to define the used IDs which are mapped into the columns.
+	 * The order in this enumeration represents the order of the columns. If it is reordered,
+	 * nothing else has to be changed.
 	 * 
 	 * @author Eduard Tudenhoefner
 	 * 
@@ -81,8 +81,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in
-		 *            {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITConstants}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;
@@ -272,14 +271,13 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 	 */
 	private static final class ExceptionMessagesTreeContentProvider implements ITreeContentProvider {
 		/**
-		 * The deferred manager is used here to update the tree in a concurrent
-		 * thread so the UI responds much better if many items are displayed.
+		 * The deferred manager is used here to update the tree in a concurrent thread so the UI
+		 * responds much better if many items are displayed.
 		 */
 		private DeferredTreeContentManager manager;
 
 		/**
-		 * The inputDefinition that is needed in
-		 * {@link DeferredStackTracesForErrorMessage}.
+		 * The inputDefinition that is needed in {@link DeferredStackTracesForErrorMessage}.
 		 * 
 		 */
 		private InputDefinition inputDefinition;
@@ -363,8 +361,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 	 *            The method ident object.
 	 * @param enumId
 	 *            The enumeration ID.
-	 * @return The styled string containing the information from the data
-	 *         object.
+	 * @return The styled string containing the information from the data object.
 	 */
 	private StyledString getStyledTextForColumn(ExtendedExceptionSensorData data, Column enumId) {
 		switch (enumId) {
@@ -375,7 +372,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 				// if error message is provided then it's a first level element
 				// of the tree
 				styledString = new StyledString(errorMessage);
-			} else if (null == data.getExceptionEventString() && null != data.getStackTrace()) {
+			} else if (null != data.getStackTrace()) {
 				// otherwise we use an excerpt of the stack trace for the second
 				// level element
 				String stackTrace = crop(data.getStackTrace(), 80);
@@ -428,8 +425,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 	 * @param value
 	 *            The value to crop.
 	 * @param maxLength
-	 *            The maximum length of the string. All characters above
-	 *            maxLength will be cropped.
+	 *            The maximum length of the string. All characters above maxLength will be cropped.
 	 * @return A cropped string which length is smaller than the maxLength.
 	 */
 	private String crop(String value, int maxLength) {

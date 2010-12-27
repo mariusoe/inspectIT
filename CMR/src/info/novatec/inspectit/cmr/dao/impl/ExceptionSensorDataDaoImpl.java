@@ -1,6 +1,7 @@
 package info.novatec.inspectit.cmr.dao.impl;
 
 import info.novatec.inspectit.cmr.dao.ExceptionSensorDataDao;
+import info.novatec.inspectit.communication.ExceptionEventEnum;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 
 import java.sql.Timestamp;
@@ -37,7 +38,7 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
 		criteria.add(Restrictions.gt("this.id", template.getId()));
 		criteria.add(Restrictions.eq("this.platformIdent", template.getPlatformIdent()));
-		criteria.add(Restrictions.eq("this.exceptionEventString", "CREATED"));
+		criteria.add(Restrictions.eq("this.exceptionEvent", ExceptionEventEnum.CREATED));
 		criteria.addOrder(Order.desc("timeStamp"));
 		criteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
 		return getHibernateTemplate().findByCriteria(criteria, -1, limit);
@@ -56,7 +57,7 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
 		criteria.add(Restrictions.gt("this.id", template.getId()));
 		criteria.add(Restrictions.eq("this.platformIdent", template.getPlatformIdent()));
-		criteria.add(Restrictions.eq("this.exceptionEventString", "CREATED"));
+		criteria.add(Restrictions.eq("this.exceptionEvent", ExceptionEventEnum.CREATED));
 		criteria.add(Restrictions.between("timeStamp", new Timestamp(fromDate.getTime()), new Timestamp(toDate.getTime())));
 		criteria.addOrder(Order.desc("timeStamp"));
 		criteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
@@ -71,7 +72,7 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
 		criteria.add(Restrictions.gt("this.id", template.getId()));
 		criteria.add(Restrictions.eq("this.platformIdent", template.getPlatformIdent()));
-		criteria.add(Restrictions.eq("this.exceptionEventString", "CREATED"));
+		criteria.add(Restrictions.eq("this.exceptionEvent", ExceptionEventEnum.CREATED));
 		criteria.addOrder(Order.desc("timeStamp"));
 		criteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
 		return getHibernateTemplate().findByCriteria(criteria);
@@ -85,7 +86,7 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 		DetachedCriteria criteria = DetachedCriteria.forClass(template.getClass());
 		criteria.add(Restrictions.gt("this.id", template.getId()));
 		criteria.add(Restrictions.eq("this.platformIdent", template.getPlatformIdent()));
-		criteria.add(Restrictions.eq("this.exceptionEventString", "CREATED"));
+		criteria.add(Restrictions.eq("this.exceptionEvent", ExceptionEventEnum.CREATED));
 		criteria.add(Restrictions.between("timeStamp", new Timestamp(fromDate.getTime()), new Timestamp(toDate.getTime())));
 		criteria.addOrder(Order.desc("timeStamp"));
 		criteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
@@ -119,18 +120,18 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 		criteria.add(Restrictions.eq("this.platformIdent", template.getPlatformIdent()));
 		ProjectionList projectionList = Projections.projectionList();
 		projectionList.add(Projections.property("throwableType"), "throwableType");
-		projectionList.add(Projections.property("exceptionEventString"), "exceptionEventString");
+		projectionList.add(Projections.property("exceptionEvent"), "exceptionEvent");
 		projectionList.add(Projections.property("errorMessage"), "errorMessage");
 		projectionList.add(Projections.property("stackTrace"), "stackTrace");
 		projectionList.add(Projections.property("cause"), "cause");
-		projectionList.add(Projections.count("exceptionEventString"), "throwableIdentityHashCode");
+		projectionList.add(Projections.count("exceptionEvent"), "throwableIdentityHashCode");
 		projectionList.add(Projections.groupProperty("throwableType"));
-		projectionList.add(Projections.groupProperty("exceptionEventString"));
+		projectionList.add(Projections.groupProperty("exceptionEvent"));
 		projectionList.add(Projections.groupProperty("errorMessage"));
 		projectionList.add(Projections.groupProperty("stackTrace"));
 		projectionList.add(Projections.groupProperty("cause"));
 		criteria.setProjection(projectionList);
-		criteria.addOrder(Order.asc("exceptionEventString"));
+		criteria.addOrder(Order.asc("exceptionEvent"));
 		criteria.setResultTransformer(Transformers.aliasToBean(ExceptionSensorData.class));
 		return getHibernateTemplate().findByCriteria(criteria);
 	}
@@ -163,19 +164,20 @@ public class ExceptionSensorDataDaoImpl extends HibernateDaoSupport implements E
 		criteria.add(Restrictions.between("timeStamp", new Timestamp(fromDate.getTime()), new Timestamp(toDate.getTime())));
 		ProjectionList projectionList = Projections.projectionList();
 		projectionList.add(Projections.property("throwableType"), "throwableType");
-		projectionList.add(Projections.property("exceptionEventString"), "exceptionEventString");
+		projectionList.add(Projections.property("exceptionEvent"), "exceptionEvent");
 		projectionList.add(Projections.property("errorMessage"), "errorMessage");
 		projectionList.add(Projections.property("stackTrace"), "stackTrace");
 		projectionList.add(Projections.property("cause"), "cause");
-		projectionList.add(Projections.count("exceptionEventString"), "throwableIdentityHashCode");
+		projectionList.add(Projections.count("exceptionEvent"), "throwableIdentityHashCode");
 		projectionList.add(Projections.groupProperty("throwableType"));
-		projectionList.add(Projections.groupProperty("exceptionEventString"));
+		projectionList.add(Projections.groupProperty("exceptionEvent"));
 		projectionList.add(Projections.groupProperty("errorMessage"));
 		projectionList.add(Projections.groupProperty("stackTrace"));
 		projectionList.add(Projections.groupProperty("cause"));
 		criteria.setProjection(projectionList);
-		criteria.addOrder(Order.asc("exceptionEventString"));
+		criteria.addOrder(Order.asc("exceptionEvent"));
 		criteria.setResultTransformer(Transformers.aliasToBean(ExceptionSensorData.class));
 		return getHibernateTemplate().findByCriteria(criteria);
 	}
+
 }

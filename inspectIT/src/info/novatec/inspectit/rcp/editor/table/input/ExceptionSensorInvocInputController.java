@@ -12,6 +12,7 @@ import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
+import info.novatec.inspectit.rcp.model.ExceptionImageFactory;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
@@ -20,11 +21,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -60,9 +62,9 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	public static final String ID = "inspectit.subview.table.exceptionsensorinvoc";
 
 	/**
-	 * The cache holding the image objects which are disposed at the end.
+	 * The resource manager is used for the images etc.
 	 */
-	private Map<ImageDescriptor, Image> modifiersImageCache = new HashMap<ImageDescriptor, Image>();
+	private LocalResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources());
 
 	/**
 	 * This map holds the details that are shown in the popup.
@@ -241,11 +243,12 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 				content.append("\n");
 
 				if (null != exceptionDetailsMap && !exceptionDetailsMap.isEmpty()) {
-					List<ExceptionSensorData> exceptionDetails = exceptionDetailsMap.get(data.getThrowableType());
 					content.append("\n");
+					content.append("Exception Hierarchy:\n");
+					List<ExceptionSensorData> exceptionDetails = exceptionDetailsMap.get(data.getThrowableType());
 
 					for (ExceptionSensorData exceptionSensorData : exceptionDetails) {
-						content.append(exceptionSensorData.getExceptionEventString() + " in "
+						content.append(exceptionSensorData.getExceptionEvent().toString().toLowerCase() + " in "
 								+ TextFormatter.getMethodWithParameters(dataAccessService.getMethodIdentForId(exceptionSensorData.getMethodIdent())));
 						content.append("\n");
 					}
@@ -374,7 +377,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 				Collections.reverse(result);
 				// update the error message on each object
 				for (ExceptionSensorData data : result) {
-					if (data.getExceptionEventString().equals(ExceptionEventEnum.CREATED.toString())) {
+					if (ExceptionEventEnum.CREATED.equals(data.getExceptionEvent())) {
 						updateErrorMessage(data);
 					}
 				}
@@ -481,16 +484,10 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 
 			switch (enumId) {
 			case CONSTRUCTOR:
-				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers(), data);
-				Image image = null;
+				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers());
+				Image image = resourceManager.createImage(imageDescriptor);
+				image = ExceptionImageFactory.decorateImageWithException(image, data);
 
-				// first look for the image in the cache
-				if (modifiersImageCache.containsKey(imageDescriptor)) {
-					image = modifiersImageCache.get(imageDescriptor);
-				} else {
-					image = imageDescriptor.createImage();
-					modifiersImageCache.put(imageDescriptor, image);
-				}
 				return image;
 			case ERROR_MESSAGE:
 				return null;
@@ -595,9 +592,6 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	 */
 	@Override
 	public void dispose() {
-		for (Entry<ImageDescriptor, Image> entry : modifiersImageCache.entrySet()) {
-			entry.getValue().dispose();
-		}
-		modifiersImageCache.clear();
+		resourceManager.dispose();
 	}
 }

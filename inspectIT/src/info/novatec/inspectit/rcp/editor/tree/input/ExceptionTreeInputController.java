@@ -8,17 +8,17 @@ import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
+import info.novatec.inspectit.rcp.model.ExceptionImageFactory;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -57,14 +57,9 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 	private List<ExceptionSensorData> exceptionSensorData = new ArrayList<ExceptionSensorData>();
 
 	/**
-	 * The cache holding the color objects which are disposed at the end.
+	 * The resource manager is used for the images etc.
 	 */
-	private Map<Integer, Color> colorCache = new HashMap<Integer, Color>();
-
-	/**
-	 * The cache holding the image objects which are disposed at the end.
-	 */
-	private Map<ImageDescriptor, Image> modifiersImageCache = new HashMap<ImageDescriptor, Image>();
+	private LocalResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources());
 
 	/**
 	 * The private inner enumeration used to define the used IDs which are mapped into the columns.
@@ -318,16 +313,10 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 
 			switch (enumId) {
 			case METHOD_CONSTRUCTOR:
-				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers(), data);
-				Image image = null;
+				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers());
+				Image image = resourceManager.createImage(imageDescriptor);
+				image = ExceptionImageFactory.decorateImageWithException(image, data);
 
-				// first look for the image in the cache
-				if (modifiersImageCache.containsKey(imageDescriptor)) {
-					image = modifiersImageCache.get(imageDescriptor);
-				} else {
-					image = imageDescriptor.createImage();
-					modifiersImageCache.put(imageDescriptor, image);
-				}
 				return image;
 			case EVENT_TYPE:
 				return null;
@@ -366,7 +355,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 		case METHOD_CONSTRUCTOR:
 			return new StyledString(TextFormatter.getMethodWithParameters(methodIdent));
 		case EVENT_TYPE:
-			styledString = new StyledString(data.getExceptionEventString());
+			styledString = new StyledString(data.getExceptionEvent().toString());
 			return styledString;
 		case ERROR_MESSAGE:
 			styledString = new StyledString();
@@ -477,14 +466,6 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 	 */
 	@Override
 	public void dispose() {
-		for (Entry<Integer, Color> entry : colorCache.entrySet()) {
-			entry.getValue().dispose();
-		}
-		colorCache.clear();
-
-		for (Entry<ImageDescriptor, Image> entry : modifiersImageCache.entrySet()) {
-			entry.getValue().dispose();
-		}
-		modifiersImageCache.clear();
+		resourceManager.dispose();
 	}
 }

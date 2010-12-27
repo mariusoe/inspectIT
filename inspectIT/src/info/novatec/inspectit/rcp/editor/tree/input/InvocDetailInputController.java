@@ -16,6 +16,7 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
+import info.novatec.inspectit.rcp.model.ExceptionImageFactory;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
@@ -23,14 +24,13 @@ import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessServi
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -44,6 +44,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -74,14 +75,9 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	private double invocationDuration = 0.0d;
 
 	/**
-	 * The cache holding the color objects which are disposed at the end.
+	 * The resource manager is used for the images etc.
 	 */
-	private Map<Integer, Color> colorCache = new HashMap<Integer, Color>();
-
-	/**
-	 * The cache holding the image object which are disposed at the end.
-	 */
-	private Map<ImageDescriptor, Image> modifiersImageCache = new HashMap<ImageDescriptor, Image>();
+	private LocalResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources());
 
 	/**
 	 * The default value of the selected sensor types.
@@ -327,10 +323,17 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 				}
 
 				if (null != data.getExceptionSensorDataObjects() && !data.getExceptionSensorDataObjects().isEmpty()) {
+					content += "\n";
+					content += "Exception Details:\n";
 					for (Object object : data.getExceptionSensorDataObjects()) {
 						ExceptionSensorData exceptionSensorData = (ExceptionSensorData) object;
-						content += "\n";
-						content += exceptionSensorData.getExceptionEventString() + " " + exceptionSensorData.getThrowableType() + "\n";
+						content += exceptionSensorData.getExceptionEvent().toString().toLowerCase() + " " + exceptionSensorData.getThrowableType() + "\n";
+
+						String stackTrace = exceptionSensorData.getStackTrace();
+						if (null != stackTrace && !"".equals(stackTrace)) {
+							content += "\n";
+							content += stackTrace;
+						}
 					}
 				}
 
@@ -347,7 +350,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		if (null == data) {
 			return false;
 		}
-		
+
 		if (data.isEmpty()) {
 			return true;
 		}
@@ -410,20 +413,14 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			switch (enumId) {
 			case METHOD:
 				ExceptionSensorData exceptionSensorData = null;
+				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers());
+				Image image = resourceManager.createImage(imageDescriptor);
+
 				if (null != data.getExceptionSensorDataObjects() && !data.getExceptionSensorDataObjects().isEmpty()) {
 					exceptionSensorData = (ExceptionSensorData) data.getExceptionSensorDataObjects().get(data.getExceptionSensorDataObjects().size() - 1);
+					image = ExceptionImageFactory.decorateImageWithException(image, exceptionSensorData);
 				}
 
-				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers(), exceptionSensorData);
-				Image image = null;
-
-				// first look for the image in the cache
-				if (modifiersImageCache.containsKey(imageDescriptor)) {
-					image = modifiersImageCache.get(imageDescriptor);
-				} else {
-					image = imageDescriptor.createImage();
-					modifiersImageCache.put(imageDescriptor, image);
-				}
 				return image;
 			case DURATION:
 				return null;
@@ -467,13 +464,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 					return null;
 				}
 
-				// check if the color is in our cache
-				if (colorCache.containsKey(colorValue)) {
-					return colorCache.get(colorValue);
-				}
-
-				Color color = new Color(Display.getDefault(), colorValue, colorValue, colorValue);
-				colorCache.put(colorValue, color);
+				Color color = resourceManager.createColor(new RGB(colorValue, colorValue, colorValue));
 				return color;
 			}
 
@@ -852,14 +843,6 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	 */
 	@Override
 	public void dispose() {
-		for (Entry<Integer, Color> entry : colorCache.entrySet()) {
-			entry.getValue().dispose();
-		}
-		colorCache.clear();
-
-		for (Entry<ImageDescriptor, Image> entry : modifiersImageCache.entrySet()) {
-			entry.getValue().dispose();
-		}
-		modifiersImageCache.clear();
+		resourceManager.dispose();
 	}
 }

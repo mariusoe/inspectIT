@@ -77,8 +77,6 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	 * {@inheritDoc}
 	 */
 	public void afterConstructor(ICoreService coreService, long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc) {
-		// TODO ET: this method is called twice when the constructor of a Throwable calls another
-		// constructor with this(). The first created data object is then discarded.
 		try {
 			long platformId = idManager.getPlatformId();
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());

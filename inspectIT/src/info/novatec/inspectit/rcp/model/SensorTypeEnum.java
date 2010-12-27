@@ -35,7 +35,7 @@ public enum SensorTypeEnum {
 	/** The jdbc prepared statement parameter sensor type. */
 	JDBC_PREPARED_STATEMENT_PARAMETER("info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementParameterSensor", InspectITConstants.IMG_DATABASE, false),
 	/** The exception sensor */
-	EXCEPTION_SENSOR("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor", InspectITConstants.IMG_SHOW_ALL),
+	EXCEPTION_SENSOR("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor", InspectITConstants.IMG_EXCEPTION_SENSOR),
 	/** The exception sensor overview */
 	EXCEPTION_SENSOR_GROUPED("info.novatec.inspectit.agent.sensor.exception.ExceptionSensorOverview", InspectITConstants.IMG_FILTER),
 	/** The combined metrics sensor type */

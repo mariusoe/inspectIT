@@ -28,7 +28,7 @@ public class DeferredStackTracesForErrorMessage implements IDeferredWorkbenchAda
 	public void fetchDeferredChildren(Object object, IElementCollector collector, IProgressMonitor monitor) {
 		ExtendedExceptionSensorData exceptionSensorData = (ExtendedExceptionSensorData) object;
 
-		if (null != exceptionSensorData.getExceptionEventString()) {
+		if (null != exceptionSensorData.getExceptionEvent()) {
 			// DB is only queried when the exception eventType is set.
 			// This check is basically to prevent that DB gets queried when we
 			// have a data object just containing the stack trace. Having such
@@ -101,10 +101,9 @@ public class DeferredStackTracesForErrorMessage implements IDeferredWorkbenchAda
 	 * {@link ExceptionMessagesTreeInputController}.
 	 * 
 	 * @param dataList
-	 *            The list containing {@link ExceptionSensorData} objects to be
-	 *            converted.
-	 * @return A list of {@link ExtendedExceptionSensorData} objects in order to
-	 *         be shown in the {@link ExceptionMessagesTreeInputController}.
+	 *            The list containing {@link ExceptionSensorData} objects to be converted.
+	 * @return A list of {@link ExtendedExceptionSensorData} objects in order to be shown in the
+	 *         {@link ExceptionMessagesTreeInputController}.
 	 */
 	private List<ExtendedExceptionSensorData> convertObjects(List<ExceptionSensorData> dataList) {
 		List<ExtendedExceptionSensorData> convertedObjects = null;

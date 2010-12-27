@@ -5,8 +5,8 @@ import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import java.io.Serializable;
 
 /**
- * As Enumerations aren't directly supported in java 1.4, we have to create some
- * methods which will behave like an enumeration in 1.5.
+ * As Enumerations aren't directly supported in java 1.4, we have to create some methods which will
+ * behave like an enumeration in 1.5.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -19,15 +19,15 @@ public class ExceptionEventEnum implements Serializable {
 	 */
 	private static final long serialVersionUID = -613364227121414500L;
 
-	public static final ExceptionEventEnum CREATED = new ExceptionEventEnum(0);
+	public transient static final ExceptionEventEnum CREATED = new ExceptionEventEnum(0);
 
-	public static final ExceptionEventEnum RETHROWN = new ExceptionEventEnum(1);
+	public transient static final ExceptionEventEnum RETHROWN = new ExceptionEventEnum(1);
 
-	public static final ExceptionEventEnum PASSED = new ExceptionEventEnum(2);
+	public transient static final ExceptionEventEnum PASSED = new ExceptionEventEnum(2);
 
-	public static final ExceptionEventEnum HANDLED = new ExceptionEventEnum(3);
+	public transient static final ExceptionEventEnum HANDLED = new ExceptionEventEnum(3);
 
-	public static final ExceptionEventEnum UNREGISTERED_PASSED = new ExceptionEventEnum(4);
+	public transient static final ExceptionEventEnum UNREGISTERED_PASSED = new ExceptionEventEnum(4);
 
 	/**
 	 * Defines the current event type.
@@ -35,8 +35,7 @@ public class ExceptionEventEnum implements Serializable {
 	private int value;
 
 	/**
-	 * The constructor takes one argument, an integer which defines the current
-	 * event type.
+	 * The constructor takes one argument, an integer which defines the current event type.
 	 * 
 	 * @param value
 	 *            The int value of this priority.
@@ -97,22 +96,21 @@ public class ExceptionEventEnum implements Serializable {
 	}
 
 	/**
-	 * Returns an unmodifiable list containing the literals that are known by
-	 * this enumeration.
+	 * Returns an unmodifiable list containing the literals that are known by this enumeration.
 	 * 
-	 * @return A List containing the actual literals defined by this
-	 *         enumeration, this list can not be modified.
+	 * @return A List containing the actual literals defined by this enumeration, this list can not
+	 *         be modified.
 	 */
 	public static java.util.List literals() {
 		return literals;
 	}
 
 	/**
-	 * Returns an unmodifiable list containing the names of the literals that
-	 * are known by this enumeration.
+	 * Returns an unmodifiable list containing the names of the literals that are known by this
+	 * enumeration.
 	 * 
-	 * @return A List containing the actual names of the literals defined by
-	 *         this enumeration, this list can not be modified.
+	 * @return A List containing the actual names of the literals defined by this enumeration, this
+	 *         list can not be modified.
 	 */
 	public static java.util.List names() {
 		return names;
@@ -133,28 +131,27 @@ public class ExceptionEventEnum implements Serializable {
 	}
 
 	/**
-	 * This method allows the deserialization of an instance of this enumeration
-	 * type to return the actual instance that will be the singleton for the JVM
-	 * in which the current thread is running.
+	 * This method allows the deserialization of an instance of this enumeration type to return the
+	 * actual instance that will be the singleton for the JVM in which the current thread is
+	 * running.
 	 * <p>
-	 * Doing this will allow users to safely use the equality operator
-	 * <code>==</code> for enumerations because a regular deserialized object is
-	 * always a newly constructed instance and will therefore never be an
-	 * existing reference; it is this <code>readResolve()</code> method which
-	 * will intercept the deserialization process in order to return the proper
-	 * singleton reference.
+	 * Doing this will allow users to safely use the equality operator <code>==</code> for
+	 * enumerations because a regular deserialized object is always a newly constructed instance and
+	 * will therefore never be an existing reference; it is this <code>readResolve()</code> method
+	 * which will intercept the deserialization process in order to return the proper singleton
+	 * reference.
 	 * <p>
 	 * This method is documented here: <a href=
-	 * "http://java.sun.com/j2se/1.3/docs/guide/serialization/spec/input.doc6.html"
-	 * >Java Object Serialization Specification</a>
+	 * "http://java.sun.com/j2se/1.3/docs/guide/serialization/spec/input.doc6.html" >Java Object
+	 * Serialization Specification</a>
 	 */
 	private java.lang.Object readResolve() throws java.io.ObjectStreamException {
 		return ExceptionEventEnum.fromInt(this.value);
 	}
 
-	private static final java.util.Map VALUES = new java.util.HashMap(5, 1);
-	private static java.util.List literals = new java.util.ArrayList(5);
-	private static java.util.List names = new java.util.ArrayList(5);
+	private transient static final java.util.Map VALUES = new java.util.HashMap(5, 1);
+	private transient static java.util.List literals = new java.util.ArrayList(5);
+	private transient static java.util.List names = new java.util.ArrayList(5);
 
 	/**
 	 * Initializes the values.
@@ -178,12 +175,12 @@ public class ExceptionEventEnum implements Serializable {
 		literals = java.util.Collections.unmodifiableList(literals);
 		names = java.util.Collections.unmodifiableList(names);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
-		long size =  objectSizes.getSizeOfObject();
+		long size = objectSizes.getSizeOfObject();
 		size += objectSizes.getPrimitiveTypesSize(0, 0, 1, 0, 0, 0);
 		return objectSizes.alignTo8Bytes(size);
 	}
