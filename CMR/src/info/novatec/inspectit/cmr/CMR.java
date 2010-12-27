@@ -14,8 +14,8 @@ import org.springframework.beans.factory.access.BeanFactoryReference;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
 
 /**
- * Main class of the Central Measurement Repository. The main method is used to
- * start the application.
+ * Main class of the Central Measurement Repository. The main method is used to start the
+ * application.
  * 
  * @author Patrice Bouillet
  * 
@@ -51,11 +51,6 @@ public final class CMR {
 		beanFactory = beanFactoryReference.getFactory();
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("Spring successfully initialized");
-		}
-		beanFactoryLocator.useBeanFactory("jetty");
-
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("Spring WebApplicationContext successfully initialized");
 		}
 
 		if (LOGGER.isInfoEnabled()) {

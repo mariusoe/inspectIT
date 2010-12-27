@@ -10,6 +10,7 @@
 			<list>
 				<value>spring/jdbc.properties</value>
 				<value>spring/buffer.properties</value>
+				<value>spring/jetty.properties</value>
 			</list>
 		</property>
 	</bean>

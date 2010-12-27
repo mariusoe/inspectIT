@@ -14,20 +14,9 @@
 				<value>spring/spring-context-util.xml</value>
 				<value>spring/spring-context-service.xml</value>
 				<value>spring/spring-context-jobs.xml</value>
-			</list>
-		</constructor-arg>
-	</bean>
-
-	<!-- child of above -->
-	<bean id="jetty" lazy-init="true"
-		class="org.springframework.context.support.ClassPathXmlApplicationContext">
-		<constructor-arg>
-			<list>
 				<value>spring/spring-context-jetty.xml</value>
+				<value>spring/spring-context-jetty-service.xml</value>
 			</list>
-		</constructor-arg>
-		<constructor-arg>
-			<ref bean="ctx" />
 		</constructor-arg>
 	</bean>
 

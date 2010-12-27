@@ -1,153 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
-	
-	<bean id="threadPool"
-		class="org.mortbay.thread.BoundedThreadPool">
-		<property name="minThreads" value="5" />
-		<property name="maxThreads" value="20" />
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean
+		class="info.novatec.inspectit.cmr.jetty.JettyWebApplicationContextInitializer">
+		<property name="contextAttribute">
+			<util:constant
+				static-field="org.springframework.web.context.WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE" />
+		</property>
+		<property name="jettyContext" ref="servletContext" />
 	</bean>
-	
+
+	<bean id="httpServer" class="org.mortbay.jetty.Server"
+		init-method="start" destroy-method="stop">
+		<constructor-arg type="int" value="${jetty.port}" />
+		<property name="threadPool" ref="threadPool" />
+		<property name="stopAtShutdown" value="true" />
+		<property name="gracefulShutdown" value="${jetty.graceful.shutdown.time}" />
+	</bean>
+
+	<bean id="servletContext" class="org.mortbay.jetty.servlet.Context">
+		<constructor-arg ref="httpServer" />
+		<constructor-arg type="java.lang.String" value="/" />
+
+		<property name="server" ref="httpServer" />
+		<property name="servletHandler" ref="servletHandler" />
+	</bean>
+
+	<bean id="threadPool" class="org.mortbay.thread.BoundedThreadPool">
+		<property name="minThreads" value="${jetty.threads.min}" />
+		<property name="maxThreads" value="${jetty.threads.max}" />
+	</bean>
+
 	<!-- Global Data Access Service -->
 	<bean name="globalDataAccessRequestHandlerServlet"
 		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
 	</bean>
 
-	<bean id="globalDataAccessServletHolder"
-		class="org.mortbay.jetty.servlet.ServletHolder">
+	<bean id="globalDataAccessServletHolder" class="org.mortbay.jetty.servlet.ServletHolder">
 		<property name="name" value="globalDataAccessExporter" />
 		<property name="servlet" ref="globalDataAccessRequestHandlerServlet" />
 	</bean>
 
-	<bean id="globalDataAccessServiceMapping"
-		class="org.mortbay.jetty.servlet.ServletMapping">
+	<bean id="globalDataAccessServiceMapping" class="org.mortbay.jetty.servlet.ServletMapping">
 		<property name="servletName" value="globalDataAccessExporter" />
 		<property name="pathSpec" value="/remoting/GlobalDataAccessService" />
 	</bean>
 	<!-- END -->
-	
+
 	<!-- Sql Data Access Service -->
 	<bean name="sqlDataAccessRequestHandlerServlet"
 		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
 	</bean>
 
-	<bean id="sqlDataAccessServletHolder"
-		class="org.mortbay.jetty.servlet.ServletHolder">
+	<bean id="sqlDataAccessServletHolder" class="org.mortbay.jetty.servlet.ServletHolder">
 		<property name="name" value="sqlDataAccessExporter" />
 		<property name="servlet" ref="sqlDataAccessRequestHandlerServlet" />
 	</bean>
 
-	<bean id="sqlDataAccessServiceMapping"
-		class="org.mortbay.jetty.servlet.ServletMapping">
+	<bean id="sqlDataAccessServiceMapping" class="org.mortbay.jetty.servlet.ServletMapping">
 		<property name="servletName" value="sqlDataAccessExporter" />
 		<property name="pathSpec" value="/remoting/SqlDataAccessService" />
 	</bean>
 	<!-- END -->
-	
+
 	<!-- Invocation Access Service -->
 	<bean name="invocationDataAccessRequestHandlerServlet"
 		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
 	</bean>
 
-	<bean id="invocationDataAccessServletHolder"
-		class="org.mortbay.jetty.servlet.ServletHolder">
+	<bean id="invocationDataAccessServletHolder" class="org.mortbay.jetty.servlet.ServletHolder">
 		<property name="name" value="invocationDataAccessExporter" />
 		<property name="servlet" ref="invocationDataAccessRequestHandlerServlet" />
 	</bean>
 
-	<bean id="invocationDataAccessServiceMapping"
-		class="org.mortbay.jetty.servlet.ServletMapping">
+	<bean id="invocationDataAccessServiceMapping" class="org.mortbay.jetty.servlet.ServletMapping">
 		<property name="servletName" value="invocationDataAccessExporter" />
 		<property name="pathSpec" value="/remoting/InvocationDataAccessService" />
 	</bean>
 	<!-- END -->
-	
-	<!-- Buffer  Service -->
-	<bean name="bufferServiceRequestHandlerServlet"
-		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
-	</bean>
 
-	<bean id="bufferServiceServletHolder"
-		class="org.mortbay.jetty.servlet.ServletHolder">
-		<property name="name" value="bufferServiceExporter" />
-		<property name="servlet" ref="bufferServiceRequestHandlerServlet" />
-	</bean>
-
-	<bean id="bufferServiceServiceMapping"
-		class="org.mortbay.jetty.servlet.ServletMapping">
-		<property name="servletName" value="bufferServiceExporter" />
-		<property name="pathSpec" value="/remoting/BufferService" />
-	</bean>
-	<!-- END -->
-	
 	<!-- Exception Data Access Service -->
 	<bean name="exceptionDataAccessRequestHandlerServlet"
 		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
 	</bean>
 
-	<bean id="exceptionDataAccessServletHolder"
-		class="org.mortbay.jetty.servlet.ServletHolder">
+	<bean id="exceptionDataAccessServletHolder" class="org.mortbay.jetty.servlet.ServletHolder">
 		<property name="name" value="exceptionDataAccessExporter" />
 		<property name="servlet" ref="exceptionDataAccessRequestHandlerServlet" />
 	</bean>
 
-	<bean id="exceptionDataAccessServiceMapping"
-		class="org.mortbay.jetty.servlet.ServletMapping">
+	<bean id="exceptionDataAccessServiceMapping" class="org.mortbay.jetty.servlet.ServletMapping">
 		<property name="servletName" value="exceptionDataAccessExporter" />
 		<property name="pathSpec" value="/remoting/ExceptionDataAccessService" />
 	</bean>
 	<!-- END -->
-	
+
 	<!-- Combined Metrics Data Access Service -->
 	<bean name="combinedMetricsDataAccessRequestHandlerServlet"
 		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
 	</bean>
 
-	<bean id="combinedMetricsDataAccessServletHolder"
-		class="org.mortbay.jetty.servlet.ServletHolder">
+	<bean id="combinedMetricsDataAccessServletHolder" class="org.mortbay.jetty.servlet.ServletHolder">
 		<property name="name" value="combinedMetricsDataAccessExporter" />
-		<property name="servlet" ref="combinedMetricsDataAccessRequestHandlerServlet" />
+		<property name="servlet"
+			ref="combinedMetricsDataAccessRequestHandlerServlet" />
 	</bean>
 
-	<bean id="combinedMetricsDataAccessServiceMapping"
-		class="org.mortbay.jetty.servlet.ServletMapping">
+	<bean id="combinedMetricsDataAccessServiceMapping" class="org.mortbay.jetty.servlet.ServletMapping">
 		<property name="servletName" value="combinedMetricsDataAccessExporter" />
 		<property name="pathSpec" value="/remoting/CombinedMetricsDataAccessService" />
 	</bean>
 	<!-- END -->
-	
+
 	<!-- Server Status Access Service -->
 	<bean name="serverStatusRequestHandlerServlet"
 		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
 	</bean>
 
-	<bean id="serverStatusServletHolder"
-		class="org.mortbay.jetty.servlet.ServletHolder">
+	<bean id="serverStatusServletHolder" class="org.mortbay.jetty.servlet.ServletHolder">
 		<property name="name" value="serverStatusExporter" />
 		<property name="servlet" ref="serverStatusRequestHandlerServlet" />
 	</bean>
 
-	<bean id="serverStatusServiceMapping"
-		class="org.mortbay.jetty.servlet.ServletMapping">
+	<bean id="serverStatusServiceMapping" class="org.mortbay.jetty.servlet.ServletMapping">
 		<property name="servletName" value="serverStatusExporter" />
 		<property name="pathSpec" value="/remoting/ServerStatusService" />
 	</bean>
 	<!-- END -->
-	
+
 	<!-- License Service -->
 	<bean name="licenseRequestHandlerServlet"
 		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
 	</bean>
 
-	<bean id="licenseServletHolder"
-		class="org.mortbay.jetty.servlet.ServletHolder">
+	<bean id="licenseServletHolder" class="org.mortbay.jetty.servlet.ServletHolder">
 		<property name="name" value="licenseExporter" />
 		<property name="servlet" ref="licenseRequestHandlerServlet" />
 	</bean>
 
-	<bean id="licenseServiceMapping"
-		class="org.mortbay.jetty.servlet.ServletMapping">
+	<bean id="licenseServiceMapping" class="org.mortbay.jetty.servlet.ServletMapping">
 		<property name="servletName" value="licenseExporter" />
 		<property name="pathSpec" value="/remoting/LicenseService" />
 	</bean>
@@ -158,21 +151,36 @@
 		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
 	</bean>
 
-	<bean id="configurationInterfaceDataAccessServletHolder"
-		class="org.mortbay.jetty.servlet.ServletHolder">
+	<bean id="configurationInterfaceDataAccessServletHolder" class="org.mortbay.jetty.servlet.ServletHolder">
 		<property name="name" value="configurationInterfaceDataAccessExporter" />
-		<property name="servlet" ref="configurationInterfaceDataAccessRequestHandlerServlet" />
+		<property name="servlet"
+			ref="configurationInterfaceDataAccessRequestHandlerServlet" />
 	</bean>
 
-	<bean id="configurationInterfaceDataAccessServiceMapping"
-		class="org.mortbay.jetty.servlet.ServletMapping">
+	<bean id="configurationInterfaceDataAccessServiceMapping" class="org.mortbay.jetty.servlet.ServletMapping">
 		<property name="servletName" value="configurationInterfaceDataAccessExporter" />
-		<property name="pathSpec" value="/remoting/ConfigurationInterfaceDataAccessService" />
+		<property name="pathSpec"
+			value="/remoting/ConfigurationInterfaceDataAccessService" />
 	</bean>
 	<!-- END -->
 
-	<bean id="servletHandler"
-		class="org.mortbay.jetty.servlet.ServletHandler">
+	<!-- Buffer Service -->
+	<bean name="bufferServiceRequestHandlerServlet"
+		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
+	</bean>
+
+	<bean id="bufferServiceServletHolder" class="org.mortbay.jetty.servlet.ServletHolder">
+		<property name="name" value="bufferServiceExporter" />
+		<property name="servlet" ref="bufferServiceRequestHandlerServlet" />
+	</bean>
+
+	<bean id="bufferServiceServiceMapping" class="org.mortbay.jetty.servlet.ServletMapping">
+		<property name="servletName" value="bufferServiceExporter" />
+		<property name="pathSpec" value="/remoting/BufferService" />
+	</bean>
+	<!-- END -->
+
+	<bean id="servletHandler" class="org.mortbay.jetty.servlet.ServletHandler">
 		<property name="servlets">
 			<list>
 				<ref bean="globalDataAccessServletHolder" />
@@ -199,36 +207,6 @@
 				<ref bean="bufferServiceServiceMapping" />
 			</list>
 		</property>
-	</bean>
-
-	<bean id="httpServer" class="org.mortbay.jetty.Server"
-		init-method="start">
-		<constructor-arg type="int" value="8182" />
-		<property name="threadPool" ref="threadPool" />
-		<property name="stopAtShutdown" value="true" />
-	</bean>
-
-	<bean id="contextLoaderListener"
-		class="org.springframework.web.context.ContextLoaderListener" />
-
-	<bean id="servletContext" class="org.mortbay.jetty.servlet.Context"
-		init-method="start">
-		<constructor-arg ref="httpServer" />
-		<constructor-arg type="java.lang.String" value="/" />
-		<property name="initParams">
-			<map>
-				<entry key="contextConfigLocation"
-					value="classpath:spring/spring-context-jetty-service.xml classpath:spring/spring-context-aop.xml" />
-				<entry key="parentContextKey" value="ctx" />
-			</map>
-		</property>
-		<property name="eventListeners">
-			<list>
-				<ref bean="contextLoaderListener" />
-			</list>
-		</property>
-		<property name="server" ref="httpServer" />
-		<property name="servletHandler" ref="servletHandler" />
 	</bean>
 
 </beans>
