@@ -1,6 +1,5 @@
 package info.novatec.inspectit.cmr.service;
 
-import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.util.LicenseUtil;
 
 import java.io.File;
@@ -64,11 +63,14 @@ public class LicenseService implements ILicenseService, InitializingBean {
 				LOGGER.info("|-License Service active...");
 			}
 		} catch (Exception exception) {
-			LOGGER.error("||-Licensing module could not be started, reason: " + exception.getMessage());
+			if (null == exception.getMessage() || "".equals(exception.getMessage())) {
+				LOGGER.error("||-Licensing module could not be started, reason: " + exception.getClass().getName());
+			} else {
+				LOGGER.error("||-Licensing module could not be started, reason: " + exception.getMessage());
+			}
 			LOGGER.error("||-Please make sure that a license is properly imported");
 			LOGGER.error("||-A license can be imported through the User Interface");
 			LOGGER.error("||-Contact NovaTec Support for further help!");
 		}
 	}
-
 }
