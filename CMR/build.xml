@@ -441,7 +441,13 @@
 	</target>
 
 	<target name="-windows-x64">
-		<!-- T O D O -->
+		<echo file="${build.scripts}/startup.bat" message="jre\bin\java.exe -Xms2048m -Xmx2048m -Xmn1024M -XX:MaxPermSize=192m -XX:PermSize=128m -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:SurvivorRatio=5 -XX:TargetSurvivorRatio=90 -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseBiasedLocking -XX:+UseCompressedOops -XX:+HeapDumpOnOutOfMemoryError -jar ${dist.jar.name}" />
+		<zip destfile="${release.root}/inspectit-cmr.windows.x64.zip">
+			<fileset dir="${build.release.root}" />
+			<zipfileset file="${build.scripts}/startup.bat" prefix="CMR" />
+			<zipfileset src="${jvm.root}/jre-windows-x64.zip" prefix="CMR/jre" />
+		</zip>
+		<delete file="${build.scripts}/startup.bat" />
 	</target>
 	
 	<target name="-create-thirdparty-notification">
