@@ -326,6 +326,23 @@
 		<copy todir="${build.rcp.classes}">
 			<fileset dir="${buildDirectory}/plugins/info.novatec.inspectit.rcp/@dot" includes="**/*.class" />
 		</copy>
+		
+		<!-- integrate the thirdparty contributions to the release -->
+		<antcall target="-create-thirdparty-notification"/>
+		<zip destfile="${release.basedir}/dist/inspectit-linux.gtk.x86.zip" update="true">
+			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
+		</zip>
+		<zip destfile="${release.basedir}/dist/inspectit-win32.win32.x86.zip" update="true">
+			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
+		</zip>
+	</target>
+
+	<target name="-create-thirdparty-notification">
+		<echo file="${release.basedir}/thirdparty.txt" message="The inspectIT UI uses the following third party libraries: ${line.separator}
+Apache Software License, 2.0 : commons-logging (1.0.3), spring (2.5.5), jettison (1.1)${line.separator}
+BSD License : xstream (1.3.1)${line.separator}
+Eclipse Public License (EPL), 1.0 : nebula-cwt (0.9.0), nebula-cdatetime (0.14.0), nebula-pshelf (1.0.0)${line.separator} 
+GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), rmiio (2.0.2), jcommon (1.0.15), jfreechart (1.0.10), jfreechart-swt (1.0.10), jfreechart-experimental (1.0.10)" />
 	</target>
 
 	<!-- Calls the release target and then the analysis targets -->

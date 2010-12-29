@@ -9,3 +9,4 @@ release/dist/
 release/pdebuild/
 release/runtime/
 release/resources/ivy/install/
+release/thirdparty.txt

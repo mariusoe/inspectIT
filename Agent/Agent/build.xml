@@ -318,7 +318,15 @@
 		</unzip>
 	</target>
 
+	<target name="-create-thirdparty-contributions">
+		<echo file="${build.release}/thirdparty.txt" message="The inspectIT agent component uses the following third party libraries: ${line.separator}
+BSD License : PicoContainer (1.3) ${line.separator}
+Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA)" />
+	</target>
+
 	<target name="release-sun1.5" depends="build-agent, build-agent5.0, build-javaagent, unpack-dependencies" description="--> make a jar file for the whole project containing all dependencies">
+		<antcall target="-create-thirdparty-contributions" />
+
 		<mkdir dir="${build.release}" />
 		<delete dir="${build.release}/sun1.5-data" />
 		<mkdir dir="${build.release}/sun1.5-data" />
@@ -327,6 +335,10 @@
 
 		<copy todir="${build.release}/sun1.5-data/agent/config">
 			<fileset dir="${config.root}" includes="**/*.*" />
+		</copy>
+
+		<copy todir="${build.release}/sun1.5-data/agent">
+			<fileset dir="${build.release}" includes="thirdparty.txt" />
 		</copy>
 
 		<jar destfile="${build.release}/sun1.5-data/agent/${dist.jar.name}" manifest="${javaagent.basedir}/META-INF/MANIFEST.MF">
@@ -357,6 +369,8 @@
 	</target>
 
 	<target name="release-sun1.4-execute" if="java-exec.present" depends="build-agent, build-14classloader, unpack-dependencies" description="--> make a jar file for the whole project containing all dependencies">
+		<antcall target="-create-thirdparty-contributions" />
+
 		<mkdir dir="${build.release}" />
 		<delete dir="${build.release}/sun1.4-data" />
 		<mkdir dir="${build.release}/sun1.4-data" />
@@ -369,12 +383,17 @@
 			<fileset dir="${config.root}" includes="**/*.so" />
 		</copy>
 
+		<copy todir="${build.release}/sun1.4-data/agent">
+			<fileset dir="${build.release}" includes="thirdparty.txt" />
+		</copy>
+
 		<jar destfile="${build.release}/sun1.4-data/agent/${dist.jar.name}">
 			<fileset dir="${build.agent.classes}" includes="**/*.class" />
 			<fileset dir="${build.commons.classes}" includes="**/*.class" />
 			<fileset dir="${build.classloader.classes}" includes="**/*.class" />
 			<fileset dir="${build.extract.root}" includes="**/*.class" />
 			<fileset dir="${commons.src}" includes="version.log" />
+			<fileset dir="${build.release}" includes="thirdparty.txt" />
 		</jar>
 
 		<zip destfile="${release.root}/${release.name.sun14}" basedir="${build.release}/sun1.4-data" />
