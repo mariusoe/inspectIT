@@ -1,6 +1,5 @@
 package info.novatec.inspectit.cmr.cache;
 
-
 /**
  * Interface for Buffer functionality.
  * 
@@ -20,12 +19,12 @@ public interface IBuffer<E> {
 	void put(IBufferElement<E> element);
 
 	/**
-	 * Evicts one {@link IBufferElement} from the buffer. The element that needs to be evicted
+	 * Performs the eviction from the buffer. The element or elements that needs to be evicted
 	 * depends on buffer implementation.
 	 * 
 	 * @throws InterruptedException
 	 */
-	void evictLast() throws InterruptedException;
+	void evict() throws InterruptedException;
 
 	/**
 	 * Performs the size analysis of one {@link IBufferElement} in the buffer, that is next in the

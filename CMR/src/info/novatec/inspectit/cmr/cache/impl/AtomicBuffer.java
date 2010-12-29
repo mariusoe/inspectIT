@@ -247,7 +247,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	 * <p>
 	 * This method is designed for multiply thread access.
 	 */
-	public void evictLast() throws InterruptedException {
+	public void evict() throws InterruptedException {
 		// wait until there is need for eviction
 		while (!shouldEvict()) {
 			evictLock.lock();
@@ -263,18 +263,34 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 
 		while (true) {
 			// get the currently last element
-			IBufferElement<E> lastElement = last.get();
-			// check if we really have concrete element because clear buffer can happen anywhere
-			if (emptyBufferElement == lastElement) {
+			IBufferElement<E> currentLastElement = last.get();
+
+			// check if we really have concrete elements because clear buffer can happen anywhere
+			if (emptyBufferElement == currentLastElement) {
 				break;
 			}
+			
+			// set up the values for evicting the fragment of elements
+			IBufferElement<E> newLastElement = currentLastElement;
+			long evictionFragmentMaxSize = (long) (this.getMaxSize() * bufferProperties.getEvictionFragmentSizePercentage());
+			long fragmentSize = 0;
+			int elementsInFragment = 0;
+			
+			// iterate until size of the eviction fragment is reached
+			while (fragmentSize < evictionFragmentMaxSize) {
+				fragmentSize += newLastElement.getBufferElementSize();
+				elementsInFragment++;
+				newLastElement = newLastElement.getNextElement();
+			}
+
+			// change the last element to the right one
 			// only thread that execute compare and set successfully can perform changes
-			if (last.compareAndSet(lastElement, lastElement.getNextElement())) {
-				// subtract the size only if the element is analyzed
-				if (lastElement.isAnalyzed()) {
-					substractFromCurrentSize(lastElement.getBufferElementSize());
-				}
-				lastElement.setEvicted(true);
+			if (last.compareAndSet(currentLastElement, newLastElement)) {
+				// subtract the fragment size
+				substractFromCurrentSize(fragmentSize);
+
+				// add evicted elements to the total count
+				elementsEvicted.addAndGet(elementsInFragment);
 
 				// if the last is now pointing to the empty buffer element, it means that we have
 				// evicted all elements, so first should also point to empty buffer element
@@ -283,12 +299,8 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 					first.set(emptyBufferElement);
 				}
 
-				// if enough elements are evicted, we set cleaning flag to true
-				long evicted = elementsEvicted.incrementAndGet();
-				if (evicted % elementsCountForMaintenance == 0) {
-					// mark for cleaning
-					cleanFlag.set(true);
-				}
+				// mark for cleaning
+				cleanFlag.set(true);
 
 				// break from while
 				break;
@@ -550,7 +562,6 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 		elementsIndexed.set(0);
 		elementsEvicted.set(0);
 		indexingTree.clearAll();
-
 	}
 
 	/**

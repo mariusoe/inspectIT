@@ -62,12 +62,17 @@ public class BufferProperties implements InitializingBean {
 	 * Minimum security object expansion rate active from this buffer size.
 	 */
 	private long minObjectExpansionRateActiveFromBufferSize;
-	
+
 	/**
 	 * Number of elements that need to be processed, so that the maintenance is done.
 	 */
 	private long elementsCountForMaintenance;
-	
+
+	/**
+	 * Size of the eviction fragment in percentages, in relation to the max buffer size.
+	 */
+	private float evictionFragmentSizePercentage;
+
 	/**
 	 * Logger for buffer properties.
 	 */
@@ -161,6 +166,14 @@ public class BufferProperties implements InitializingBean {
 		this.elementsCountForMaintenance = elementsCountForMaintenance;
 	}
 
+	public float getEvictionFragmentSizePercentage() {
+		return evictionFragmentSizePercentage;
+	}
+
+	public void setEvictionFragmentSizePercentage(float evictionFragmentSizePercentage) {
+		this.evictionFragmentSizePercentage = evictionFragmentSizePercentage;
+	}
+
 	/**
 	 * Returns the initial buffer size based on the property set.
 	 * 
@@ -218,9 +231,11 @@ public class BufferProperties implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		//TODO Eviction fragment check
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("|-Buffer properties initialized with following values:");
 			LOGGER.info("||-Eviction occupancy percentage: " + NumberFormat.getInstance().format(evictionOccupancyPercentage * 100) + "%");
+			LOGGER.info("||-Eviction fragment size percentage: " + NumberFormat.getInstance().format(evictionFragmentSizePercentage * 100) + "%");
 			LOGGER.info("||-Max heap size occupancy: " + NumberFormat.getInstance().format(maxHeapSizeOccupancy * 100) + "%");
 			LOGGER.info("||-Min heap size occupancy: " + NumberFormat.getInstance().format(minHeapSizeOccupancy * 100) + "%");
 			LOGGER.info("||-Max heap size occupancy active from heap size: " + NumberFormat.getInstance().format(maxHeapSizeOccupancyActiveFromHeapSize) + " bytes");
@@ -234,6 +249,9 @@ public class BufferProperties implements InitializingBean {
 		if (this.evictionOccupancyPercentage < 0 || this.evictionOccupancyPercentage > 1) {
 			throw new Exception("Buffer properties initialization error: Eviction occupancy must be a percentage value between 0 and 1. Initialization value is: " + evictionOccupancyPercentage);
 		}
+		if (this.evictionFragmentSizePercentage < 0.01 || this.evictionFragmentSizePercentage > 0.5) {
+			throw new Exception("Buffer properties initialization error: Eviction fragment size must be a percentage value between 0.01 and 0.5. Initialization value is: " + evictionFragmentSizePercentage);
+		}
 		if (this.minHeapSizeOccupancy < 0 || this.minHeapSizeOccupancy > 1) {
 			throw new Exception("Buffer properties initialization error: Minimum heap size occupancy must be a percentage value between 0 and 1. Initialization value is: " + minHeapSizeOccupancy);
 		}
@@ -241,16 +259,25 @@ public class BufferProperties implements InitializingBean {
 			throw new Exception("Buffer properties initialization error: Maximum heap size occupancy must be a percentage value between 0 and 1. Initialization value is: " + maxHeapSizeOccupancy);
 		}
 		if (this.maxHeapSizeOccupancy < this.minHeapSizeOccupancy) {
-			throw new Exception("Buffer properties initialization error: Maximum heap size occupancy can not be lower than minimum heap size occupancy. Initialization values are: " + maxHeapSizeOccupancy + " (max) and " + minHeapSizeOccupancy + " (min)");
+			throw new Exception("Buffer properties initialization error: Maximum heap size occupancy can not be lower than minimum heap size occupancy. Initialization values are: "
+					+ maxHeapSizeOccupancy + " (max) and " + minHeapSizeOccupancy + " (min)");
 		}
 		if (this.maxObjectExpansionRate < this.minObjectExpansionRate) {
-			throw new Exception("Buffer properties initialization error: Maximum object expansion rate can not be lower than minimum object expansion rate. Initialization values are: " + maxObjectExpansionRate + " (max) and " + minObjectExpansionRate + " (min)");
+			throw new Exception("Buffer properties initialization error: Maximum object expansion rate can not be lower than minimum object expansion rate. Initialization values are: "
+					+ maxObjectExpansionRate + " (max) and " + minObjectExpansionRate + " (min)");
 		}
 		if (this.maxHeapSizeOccupancyActiveFromHeapSize < this.minHeapSizeOccupancyActiveTillHeapSize) {
-			throw new Exception("Buffer properties initialization error: Heap size from which maximum heap occupancy is active can not be lower than heap size till which minimum heap occupancy is active. Initialization values are: " + maxHeapSizeOccupancyActiveFromHeapSize + " (heap size for max heap occupancy) and " + minHeapSizeOccupancyActiveTillHeapSize + " (heap size for min heap occupancy)");
+			throw new Exception(
+					"Buffer properties initialization error: Heap size from which maximum heap occupancy is active can not be lower than heap size till which minimum heap occupancy is active. Initialization values are: "
+							+ maxHeapSizeOccupancyActiveFromHeapSize + " (heap size for max heap occupancy) and " + minHeapSizeOccupancyActiveTillHeapSize + " (heap size for min heap occupancy)");
 		}
 		if (this.minObjectExpansionRateActiveFromBufferSize < this.maxObjectExpansionRateActiveTillBufferSize) {
-			throw new Exception("Buffer properties initialization error: Buffer size from which minimum object expansion rate is active can not be lower than buffer size till which maximum object expansion rate is active. Initialization values are: " + minObjectExpansionRateActiveFromBufferSize + " (buffer size for min object expansion rate) and " + maxObjectExpansionRateActiveTillBufferSize + " (buffer size for max object expansion rate)");
+			throw new Exception(
+					"Buffer properties initialization error: Buffer size from which minimum object expansion rate is active can not be lower than buffer size till which maximum object expansion rate is active. Initialization values are: "
+							+ minObjectExpansionRateActiveFromBufferSize
+							+ " (buffer size for min object expansion rate) and "
+							+ maxObjectExpansionRateActiveTillBufferSize
+							+ " (buffer size for max object expansion rate)");
 		}
 	}
 }

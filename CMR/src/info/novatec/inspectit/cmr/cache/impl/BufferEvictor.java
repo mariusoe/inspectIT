@@ -3,7 +3,7 @@ package info.novatec.inspectit.cmr.cache.impl;
 import info.novatec.inspectit.cmr.cache.IBuffer;
 
 /**
- * Thread that invokes the {@link IBuffer#evictLast()} method constantly.
+ * Thread that invokes the {@link IBuffer#evict()} method constantly.
  * 
  * @author Ivan Senic
  * 
@@ -25,7 +25,7 @@ public class BufferEvictor extends BufferWorker {
 	 */
 	@Override
 	public void work() throws InterruptedException {
-		buffer.evictLast();
+		buffer.evict();
 	}
 
 }
