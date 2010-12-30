@@ -192,7 +192,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		assertEquals(parameterContentList.size(), 1);
 		// changed due to xstream, the ' at the beginning will be always removed
 		// if displayed to the end-user.
-		assertEquals(parameterContentList.get(0).getContent(), "'Hans");
+		assertEquals(parameterContentList.get(0).getContent(), "'Hans'");
 		assertEquals(parameterContentList.get(0).getSignaturePosition(), 0);
 		assertEquals(parameterContentList.get(0).getName(), "name");
 	}
