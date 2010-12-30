@@ -1,200 +1,210 @@
 package info.novatec.inspectit.rcp.editor.traceinspector.input;
 
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Set;
-
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
 
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Set;
+
 /**
- * This class is used to decorate an {@link InvocationSequenceData} object with information
- * needed in the drawing and managing of the Transaction Inspector. The decorator provides
- * graphical information contained in the invocationBlock member. The decorator is compatible
- * to the {@link InvocationSequenceData} and can replace the original {@link InvocationSequenceData}
- * in any compatible link.  This implementation doesn't follow the original pattern by GOF, 
- * because the decorator is derived from the subject. This is because the subject doesn't implement 
- * an interface or an abstract class suitable for implementing a decorator pattern the normal way.
- * All methods of {@link InvocationSequenceData} must be overridden and delegated. In opposite
- * to the original pattern you will not get support from the compiler, if something changes  
- * in the subject implementation (i.e. new Methods, signature change, etc.).
+ * This class is used to decorate an {@link InvocationSequenceData} object with information needed
+ * in the drawing and managing of the Transaction Inspector. The decorator provides graphical
+ * information contained in the invocationBlock member. The decorator is compatible to the
+ * {@link InvocationSequenceData} and can replace the original {@link InvocationSequenceData} in any
+ * compatible link. This implementation doesn't follow the original pattern by GOF, because the
+ * decorator is derived from the subject. This is because the subject doesn't implement an interface
+ * or an abstract class suitable for implementing a decorator pattern the normal way. All methods of
+ * {@link InvocationSequenceData} must be overridden and delegated. In opposite to the original
+ * pattern you will not get support from the compiler, if something changes in the subject
+ * implementation (i.e. new Methods, signature change, etc.).
+ * 
  * @author Michael Kowatsch
- *
+ * 
  */
 public class InvocationSequenceTraceInspectorDecorator extends InvocationSequenceData {
-    /**
-     * The link to the {@link InvocationSequenceData}, which is the subject of this decorator 
-     */
-    private InvocationSequenceData subject = null;
-    
-    /**
-     * The link to the {@link InvocationBlock}, which is decoration to the subject
-     */
-    private InvocationBlock invocationBlock = null;
-            
-    public InvocationSequenceTraceInspectorDecorator(InvocationSequenceData subject, InvocationBlock invocationBlock) {
-	super();
-	this.subject = subject;
-	this.invocationBlock = invocationBlock;
-    }
+	/**
+	 * The generated serial version UID.
+	 */
+	private static final long serialVersionUID = -6297750313128949804L;
 
-    public InvocationBlock getInvocationBlock() {
-        return invocationBlock;
-    }
+	/**
+	 * The link to the {@link InvocationSequenceData}, which is the subject of this decorator
+	 */
+	private InvocationSequenceData subject = null;
 
-    public void setInvocationBlock(InvocationBlock invocationBlock) {
-        this.invocationBlock = invocationBlock;
-    }
-    
-    public InvocationSequenceData getSubject() {
-        return subject;
-    }
+	/**
+	 * The link to the {@link InvocationBlock}, which is decoration to the subject
+	 */
+	private InvocationBlock invocationBlock = null;
 
-    public void setSubject(InvocationSequenceData subject) {
-        this.subject = subject;
-    }
+	public InvocationSequenceTraceInspectorDecorator(InvocationSequenceData subject, InvocationBlock invocationBlock) {
+		super();
+		this.subject = subject;
+		this.invocationBlock = invocationBlock;
+	}
 
-    public void addParameterContentData(ParameterContentData parameterContent) {
-	subject.addParameterContentData(parameterContent);
-    }
+	public InvocationBlock getInvocationBlock() {
+		return invocationBlock;
+	}
 
-    public boolean equals(Object obj) {
-	return subject.equals(obj);
-    }
+	public void setInvocationBlock(InvocationBlock invocationBlock) {
+		this.invocationBlock = invocationBlock;
+	}
 
-    public DefaultData finalizeData() {
-	return subject.finalizeData();
-    }
+	public InvocationSequenceData getSubject() {
+		return subject;
+	}
 
-    public long getChildCount() {
-	return subject.getChildCount();
-    }
+	public void setSubject(InvocationSequenceData subject) {
+		this.subject = subject;
+	}
 
-    public double getDuration() {
-	return subject.getDuration();
-    }
+	public void addParameterContentData(ParameterContentData parameterContent) {
+		subject.addParameterContentData(parameterContent);
+	}
 
-    public double getEnd() {
-	return subject.getEnd();
-    }
+	public boolean equals(Object obj) {
+		return subject.equals(obj);
+	}
 
-    public long getId() {
-	return subject.getId();
-    }
+	public DefaultData finalizeData() {
+		return subject.finalizeData();
+	}
 
-    public long getMethodIdent() {
-	return subject.getMethodIdent();
-    }
+	public long getChildCount() {
+		return subject.getChildCount();
+	}
 
-    public List getNestedSequences() {
-	return subject.getNestedSequences();
-    }
+	public double getDuration() {
+		return subject.getDuration();
+	}
 
-    public Set getParameterContentData() {
-	return subject.getParameterContentData();
-    }
+	public double getEnd() {
+		return subject.getEnd();
+	}
 
-    public InvocationSequenceData getParentSequence() {
-	return subject.getParentSequence();
-    }
+	public long getId() {
+		return subject.getId();
+	}
 
-    public long getPlatformIdent() {
-	return subject.getPlatformIdent();
-    }
+	public long getMethodIdent() {
+		return subject.getMethodIdent();
+	}
 
-    public long getPosition() {
-	return subject.getPosition();
-    }
+	@SuppressWarnings("rawtypes")
+	public List getNestedSequences() {
+		return subject.getNestedSequences();
+	}
 
-    public long getSensorTypeIdent() {
-	return subject.getSensorTypeIdent();
-    }
+	@SuppressWarnings("rawtypes")
+	public Set getParameterContentData() {
+		return subject.getParameterContentData();
+	}
 
-    public SqlStatementData getSqlStatementData() {
-	return subject.getSqlStatementData();
-    }
+	public InvocationSequenceData getParentSequence() {
+		return subject.getParentSequence();
+	}
 
-    public double getStart() {
-	return subject.getStart();
-    }
+	public long getPlatformIdent() {
+		return subject.getPlatformIdent();
+	}
 
-    public TimerData getTimerData() {
-	return subject.getTimerData();
-    }
+	public long getPosition() {
+		return subject.getPosition();
+	}
 
-    public Timestamp getTimeStamp() {
-	return subject.getTimeStamp();
-    }
+	public long getSensorTypeIdent() {
+		return subject.getSensorTypeIdent();
+	}
 
-    public int hashCode() {
-	return subject.hashCode();
-    }
+	public SqlStatementData getSqlStatementData() {
+		return subject.getSqlStatementData();
+	}
 
-    public void setChildCount(long childCount) {
-	subject.setChildCount(childCount);
-    }
+	public double getStart() {
+		return subject.getStart();
+	}
 
-    public void setDuration(double duration) {
-	subject.setDuration(duration);
-    }
+	public TimerData getTimerData() {
+		return subject.getTimerData();
+	}
 
-    public void setEnd(double end) {
-	subject.setEnd(end);
-    }
+	public Timestamp getTimeStamp() {
+		return subject.getTimeStamp();
+	}
 
-    public void setId(long id) {
-	subject.setId(id);
-    }
+	public int hashCode() {
+		return subject.hashCode();
+	}
 
-    public void setMethodIdent(long methodIdent) {
-	subject.setMethodIdent(methodIdent);
-    }
+	public void setChildCount(long childCount) {
+		subject.setChildCount(childCount);
+	}
 
-    public void setNestedSequences(List nestedSequences) {
-	subject.setNestedSequences(nestedSequences);
-    }
+	public void setDuration(double duration) {
+		subject.setDuration(duration);
+	}
 
-    public void setParameterContentData(Set parameterContentData) {
-	subject.setParameterContentData(parameterContentData);
-    }
+	public void setEnd(double end) {
+		subject.setEnd(end);
+	}
 
-    public void setParentSequence(InvocationSequenceData parentSequence) {
-	subject.setParentSequence(parentSequence);
-    }
+	public void setId(long id) {
+		subject.setId(id);
+	}
 
-    public void setPlatformIdent(long platformIdent) {
-	subject.setPlatformIdent(platformIdent);
-    }
+	public void setMethodIdent(long methodIdent) {
+		subject.setMethodIdent(methodIdent);
+	}
 
-    public void setPosition(long position) {
-	subject.setPosition(position);
-    }
+	@SuppressWarnings("rawtypes")
+	public void setNestedSequences(List nestedSequences) {
+		subject.setNestedSequences(nestedSequences);
+	}
 
-    public void setSensorTypeIdent(long sensorTypeIdent) {
-	subject.setSensorTypeIdent(sensorTypeIdent);
-    }
+	@SuppressWarnings("rawtypes")
+	public void setParameterContentData(Set parameterContentData) {
+		subject.setParameterContentData(parameterContentData);
+	}
 
-    public void setSqlStatementData(SqlStatementData sqlStatementData) {
-	subject.setSqlStatementData(sqlStatementData);
-    }
+	public void setParentSequence(InvocationSequenceData parentSequence) {
+		subject.setParentSequence(parentSequence);
+	}
 
-    public void setStart(double start) {
-	subject.setStart(start);
-    }
+	public void setPlatformIdent(long platformIdent) {
+		subject.setPlatformIdent(platformIdent);
+	}
 
-    public void setTimerData(TimerData timerData) {
-	subject.setTimerData(timerData);
-    }
+	public void setPosition(long position) {
+		subject.setPosition(position);
+	}
 
-    public void setTimeStamp(Timestamp timeStamp) {
-	subject.setTimeStamp(timeStamp);
-    }
+	public void setSensorTypeIdent(long sensorTypeIdent) {
+		subject.setSensorTypeIdent(sensorTypeIdent);
+	}
 
-    public String toString() {
-	return subject.toString();
-    }
+	public void setSqlStatementData(SqlStatementData sqlStatementData) {
+		subject.setSqlStatementData(sqlStatementData);
+	}
+
+	public void setStart(double start) {
+		subject.setStart(start);
+	}
+
+	public void setTimerData(TimerData timerData) {
+		subject.setTimerData(timerData);
+	}
+
+	public void setTimeStamp(Timestamp timeStamp) {
+		subject.setTimeStamp(timeStamp);
+	}
+
+	public String toString() {
+		return subject.toString();
+	}
 
 }

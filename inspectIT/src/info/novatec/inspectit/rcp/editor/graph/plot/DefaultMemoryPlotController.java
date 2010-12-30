@@ -30,8 +30,7 @@ import org.jfree.data.xy.YIntervalSeriesCollection;
 import org.jfree.ui.RectangleInsets;
 
 /**
- * This class creates a {@link XYPlot} containing the
- * {@link MemoryInformationData} informations.
+ * This class creates a {@link XYPlot} containing the {@link MemoryInformationData} informations.
  * 
  * @author Eduard Tudenhoefner
  * @author Patrice Bouillet
@@ -110,9 +109,9 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 	private Date oldToDate = new Date(0);
 
 	/**
-	 * This represents the date of one of the objects which was received at some
-	 * time in the past but was the one with the newest date. This is needed for
-	 * not requesting some data of the CMR sometimes.
+	 * This represents the date of one of the objects which was received at some time in the past
+	 * but was the one with the newest date. This is needed for not requesting some data of the CMR
+	 * sometimes.
 	 */
 	private Date newestDate = new Date(0);
 
@@ -178,8 +177,8 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 		// set the range of y-axis only when we have the systeminformation
 		// sensor
 		if (systemData != null) {
-			rangeAxis.setRange(0, systemData.getMaxHeapMemorySize() / 1024);
-			rangeAxis.setAutoRangeMinimumSize(systemData.getMaxHeapMemorySize() / 1024);
+			rangeAxis.setRange(0.0d, systemData.getMaxHeapMemorySize() / 1024.0d);
+			rangeAxis.setAutoRangeMinimumSize(systemData.getMaxHeapMemorySize() / 1024.0d);
 		}
 
 		final XYPlot subplot = new XYPlot(yintervalseriescollection, null, rangeAxis, renderer);
@@ -199,14 +198,14 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 	private void addUpperPlotData(List<MemoryInformationData> memoryData) {
 		for (MemoryInformationData data : memoryData) {
 			long usedHeapMemoryAvg = (data.getTotalUsedHeapMemorySize() / data.getCount()) / 1024;
-			heapMemory.add(data.getTimeStamp().getTime(), usedHeapMemoryAvg, data.getMinUsedHeapMemorySize() / 1024, data.getMaxUsedHeapMemorySize() / 1024, false);
+			heapMemory.add(data.getTimeStamp().getTime(), usedHeapMemoryAvg, data.getMinUsedHeapMemorySize() / 1024.0d, data.getMaxUsedHeapMemorySize() / 1024.0d, false);
 		}
 		heapMemory.fireSeriesChanged();
 	}
 
 	/**
-	 * Removes all data from the upper plot and sets the
-	 * {@link MemoryInformationData} objects on the plot.
+	 * Removes all data from the upper plot and sets the {@link MemoryInformationData} objects on
+	 * the plot.
 	 * 
 	 * @param memoryData
 	 *            The data to set on the plot.
@@ -241,8 +240,8 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 		// set the range of y-axis only when we have the systeminformation
 		// sensor
 		if (systemData != null) {
-			rangeAxis.setRange(0, systemData.getMaxNonHeapMemorySize() / 1024);
-			rangeAxis.setAutoRangeMinimumSize(systemData.getMaxNonHeapMemorySize() / 1024);
+			rangeAxis.setRange(0, systemData.getMaxNonHeapMemorySize() / 1024.0d);
+			rangeAxis.setAutoRangeMinimumSize(systemData.getMaxNonHeapMemorySize() / 1024.0d);
 		}
 
 		final XYPlot subplot = new XYPlot(yIntervalSeriesCollection, null, rangeAxis, renderer);
@@ -263,14 +262,14 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 		for (MemoryInformationData data : memoryData) {
 			// TODO adjust the fractional part
 			long usedNonHeapMemoryAvg = (data.getTotalUsedNonHeapMemorySize() / data.getCount()) / 1024;
-			nonHeapMemory.add(data.getTimeStamp().getTime(), usedNonHeapMemoryAvg, data.getMinUsedNonHeapMemorySize() / 1024, data.getMaxUsedNonHeapMemorySize() / 1024, false);
+			nonHeapMemory.add(data.getTimeStamp().getTime(), usedNonHeapMemoryAvg, data.getMinUsedNonHeapMemorySize() / 1024.0d, data.getMaxUsedNonHeapMemorySize() / 1024.0d, false);
 		}
 		nonHeapMemory.fireSeriesChanged();
 	}
 
 	/**
-	 * Removes all data from the lower plot and sets the
-	 * {@link MemoryInformationData} objects on the plot.
+	 * Removes all data from the lower plot and sets the {@link MemoryInformationData} objects on
+	 * the plot.
 	 * 
 	 * @param memoryData
 	 *            The data to set on the plot.
@@ -320,8 +319,8 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 				adjustedTimerData = (List<MemoryInformationData>) adjustSamplingRate(data, from, to);
 
 				// we got some data, thus we can set the date
-				oldFromDate = from;
-				oldToDate = to;
+				oldFromDate = (Date) from.clone();
+				oldToDate = (Date) to.clone();
 				if (newestDate.before(data.get(data.size() - 1).getTimeStamp())) {
 					newestDate = new Date(data.get(data.size() - 1).getTimeStamp().getTime());
 				}
@@ -338,7 +337,7 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 
 			if (!leftData.isEmpty()) {
 				oldData.addAll(0, leftData);
-				oldFromDate = from;
+				oldFromDate = (Date) from.clone();
 			}
 
 			if (!rightData.isEmpty()) {
@@ -358,7 +357,7 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 
 			if (!timerData.isEmpty()) {
 				oldData.addAll(timerData);
-				oldToDate = to;
+				oldToDate = (Date) to.clone();
 				if (newestDate.before(timerData.get(timerData.size() - 1).getTimeStamp())) {
 					newestDate = new Date(timerData.get(timerData.size() - 1).getTimeStamp().getTime());
 				}
@@ -373,7 +372,7 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 
 			if (!timerData.isEmpty()) {
 				oldData.addAll(timerData);
-				oldFromDate = from;
+				oldFromDate = (Date) from.clone();
 			}
 
 			adjustedTimerData = (List<MemoryInformationData>) adjustSamplingRate(oldData, from, to);

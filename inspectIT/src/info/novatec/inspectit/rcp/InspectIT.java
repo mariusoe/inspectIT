@@ -42,7 +42,7 @@ public class InspectIT extends AbstractUIPlugin {
 	 * The global repository management tool. It is used to create and save the connection to the
 	 * CMR.
 	 */
-	private RepositoryManager repositoryManager;
+	private volatile RepositoryManager repositoryManager;
 
 	/**
 	 * This method is called upon plug-in activation.
@@ -63,10 +63,6 @@ public class InspectIT extends AbstractUIPlugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		if (repositoryManager != null) {
-			repositoryManager = null;
-		}
-
 		super.stop(context);
 		plugin = null;
 	}
@@ -185,10 +181,14 @@ public class InspectIT extends AbstractUIPlugin {
 	 * 
 	 * @return The repository manager.
 	 */
-	public synchronized RepositoryManager getRepositoryManager() {
+	public RepositoryManager getRepositoryManager() {
 		if (null == repositoryManager) {
-			repositoryManager = new RepositoryManager();
-			repositoryManager.startup();
+			synchronized (this) {
+				if (null == repositoryManager) {
+					repositoryManager = new RepositoryManager();
+					repositoryManager.startup();
+				}
+			}
 		}
 		return repositoryManager;
 	}

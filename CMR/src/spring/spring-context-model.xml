@@ -51,9 +51,9 @@
 		<property name="elementsCountForMaintenance" value="${buffer.elementsCountForMaintenance}"/>
 	</bean>
 	<bean id="bufferBean" class="info.novatec.inspectit.cmr.cache.impl.AtomicBuffer" />
-	<bean id="bufferEvictor" class="info.novatec.inspectit.cmr.cache.impl.BufferEvictor" />
-	<bean id="bufferAnalyzer" class="info.novatec.inspectit.cmr.cache.impl.BufferAnalyzer" />
-	<bean id="bufferIndex" class="info.novatec.inspectit.cmr.cache.impl.BufferIndexer" />
+	<bean id="bufferEvictor" class="info.novatec.inspectit.cmr.cache.impl.BufferEvictor" init-method="start"/>
+	<bean id="bufferAnalyzer" class="info.novatec.inspectit.cmr.cache.impl.BufferAnalyzer" init-method="start"/>
+	<bean id="bufferIndex" class="info.novatec.inspectit.cmr.cache.impl.BufferIndexer" init-method="start"/>
 
 	<bean id="objectSizesFactory"
 		class="info.novatec.inspectit.cmr.cache.impl.ObjectSizesFactory" />

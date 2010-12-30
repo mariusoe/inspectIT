@@ -262,7 +262,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 * @author Eduard Tudenhoefner
 	 * 
 	 */
-	public class MethodExprEditor extends ExprEditor {
+	public static class MethodExprEditor extends ExprEditor {
 
 		/**
 		 * The id of the method which is instrumented with the ExpressionEditor.
@@ -309,7 +309,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 * @author Eduard Tudenhoefner
 	 * 
 	 */
-	public class ConstructorExprEditor extends ExprEditor {
+	public static class ConstructorExprEditor extends ExprEditor {
 
 		/**
 		 * The id of the constructor which is instrumented with the ExpressionEditor.

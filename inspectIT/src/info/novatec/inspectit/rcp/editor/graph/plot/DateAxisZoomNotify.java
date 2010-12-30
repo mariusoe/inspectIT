@@ -4,8 +4,8 @@ import org.eclipse.core.runtime.ListenerList;
 import org.jfree.chart.axis.DateAxis;
 
 /**
- * This class extends the date axis from JFreeChart and adds the possibility to
- * be notified if a zooming event occurs.
+ * This class extends the date axis from JFreeChart and adds the possibility to be notified if a
+ * zooming event occurs.
  * 
  * @author Patrice Bouillet
  * 
@@ -66,6 +66,14 @@ public class DateAxisZoomNotify extends DateAxis {
 		super.zoomRange(lowerPercent, upperPercent);
 
 		notifyZoomListeners();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
 	}
 
 }

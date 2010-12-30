@@ -12,9 +12,8 @@ import org.hibernate.Hibernate;
 import org.hibernate.usertype.UserType;
 
 /**
- * Additional type for Hibernate which maps an arbitrary List to a String in
- * such a way that it concatenates the List with a whitespace (by calling
- * {@link #toString()} on every Object).
+ * Additional type for Hibernate which maps an arbitrary List to a String in such a way that it
+ * concatenates the List with a whitespace (by calling {@link #toString()} on every Object).
  * <p>
  * Example:<br>
  * <ul>
@@ -101,8 +100,7 @@ public class ListStringType implements UserType {
 	}
 
 	/**
-	 * Explodes the given String by splitting it up. The split char is just a
-	 * whitespace.
+	 * Explodes the given String by splitting it up. The split char is just a whitespace.
 	 * 
 	 * @param dbValue
 	 *            The String to explode
@@ -115,10 +113,9 @@ public class ListStringType implements UserType {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	public void nullSafeSet(PreparedStatement st, Object value, int index) throws SQLException {
 		if (value != null) {
-			String v = concat((List) value);
+			String v = concat((List<?>) value);
 			Hibernate.STRING.nullSafeSet(st, v, index);
 		} else {
 			Hibernate.STRING.nullSafeSet(st, null, index);
@@ -126,8 +123,7 @@ public class ListStringType implements UserType {
 	}
 
 	/**
-	 * Concatenates the given list with the whitespace char and returns the
-	 * generated String.
+	 * Concatenates the given list with the whitespace char and returns the generated String.
 	 * 
 	 * @param list
 	 *            The list to concatenate.
@@ -159,8 +155,7 @@ public class ListStringType implements UserType {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
-	public Class returnedClass() {
+	public Class<?> returnedClass() {
 		return List.class;
 	}
 
@@ -168,7 +163,7 @@ public class ListStringType implements UserType {
 	 * {@inheritDoc}
 	 */
 	public int[] sqlTypes() {
-		return TYPES;
+		return TYPES.clone();
 	}
 
 }

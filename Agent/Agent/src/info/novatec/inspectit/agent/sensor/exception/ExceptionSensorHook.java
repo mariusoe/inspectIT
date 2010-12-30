@@ -10,7 +10,6 @@ import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -245,29 +244,6 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 		exceptionSensorData.setErrorMessage(crop(throwable.getMessage(), MAX_VALUE_LENGTH));
 		exceptionSensorData.setStackTrace(crop(stackTraceToString(throwable), MAX_STACKTRACE_LENGTH));
 		// exceptionSensorData.setStackTrace(getStackTrace(throwable));
-	}
-
-	/**
-	 * This method is called to retrieve the stack trace of a {@link Throwable}. The stack trace is
-	 * gathered by accessing the private method {@link Throwable#getOurStackTrace()} with
-	 * reflection. If this method is not available or cannot be accessed, then the stack trace is
-	 * gathered using {@link Throwable#getStackTrace()}.
-	 * 
-	 * @param throwable
-	 *            The {@link Throwable} object where to get the stack trace.
-	 * @return An array of {@link StackTraceElement}.
-	 */
-	private StackTraceElement[] getStackTrace(Throwable throwable) {
-		StackTraceElement[] stackTrace = null;
-		try {
-			Method method = Throwable.class.getDeclaredMethod("getOurStackTrace", null);
-			method.setAccessible(true);
-			stackTrace = ((StackTraceElement[]) method.invoke(throwable, null));
-		} catch (Exception e) {
-			stackTrace = throwable.getStackTrace();
-		}
-
-		return stackTrace;
 	}
 
 	/**

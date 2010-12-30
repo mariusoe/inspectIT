@@ -84,7 +84,7 @@ public class StorageGlobalDataAcessService extends AbstractCachedGlobalDataAcces
 						StoragePlatformIdent platform = (StoragePlatformIdent) platformIdent;
 						platform.setPath(folder);
 						platform.setFolderName(folderName);
-					} else if (platformIdent instanceof PlatformIdent) {
+					} else {
 						platformIdent = new StoragePlatformIdent(platformIdent, folder, folderName);
 					}
 					platformIdents.add(platformIdent);

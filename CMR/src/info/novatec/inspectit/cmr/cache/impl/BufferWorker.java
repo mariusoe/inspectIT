@@ -25,7 +25,6 @@ public abstract class BufferWorker extends Thread {
 		this.buffer = buffer;
 		setDaemon(true);
 		setPriority(MAX_PRIORITY);
-		start();
 	}
 
 	/**

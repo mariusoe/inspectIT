@@ -8,8 +8,8 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.InputDefinition.IdDefinition;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
@@ -140,7 +140,6 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 * This data access service is needed because of the ID mappings.
 	 */
 	private CachedGlobalDataAccessService globalDataAccessService;
-
 
 	/**
 	 * {@inheritDoc}
@@ -354,7 +353,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private final class InvocOverviewViewerComparator extends TableViewerComparator<InvocationSequenceData> {
+	private static final class InvocOverviewViewerComparator extends TableViewerComparator<InvocationSequenceData> {
 
 		/**
 		 * {@inheritDoc}
@@ -434,7 +433,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		}
 		throw new RuntimeException("Could not create the human readable string!");
 	}
-	
+
 	@Override
 	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
 		switch (preferenceEvent.getPreferenceId()) {

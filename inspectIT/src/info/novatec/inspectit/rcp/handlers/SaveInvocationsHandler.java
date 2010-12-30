@@ -47,7 +47,12 @@ public class SaveInvocationsHandler extends AbstractStorageHandler {
 			// create the storage directory if it does not exist
 			File dir = new File(StorageNamingConstants.DEFAULT_STORAGE_DIRECTORY + wizard.getStorageName());
 			if (!dir.exists()) {
-				dir.mkdirs();
+				boolean created = dir.mkdirs();
+				if (!created) {
+					// something unexpected happened and the directory couldn't be created --> abort
+					InspectIT.getDefault().createErrorDialog("The following temp directory could not be created: " + dir.getAbsolutePath(), null, -1);
+					throw new ExecutionException("The following temp directory could not be created: " + dir.getAbsolutePath());
+				}
 			}
 
 			// first, save the invocation sequences

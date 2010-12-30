@@ -35,8 +35,7 @@ import org.jfree.data.xy.YIntervalSeriesCollection;
 import org.jfree.ui.RectangleInsets;
 
 /**
- * This class creates a {@link XYPlot} containing the {@link TimerData}
- * informations.
+ * This class creates a {@link XYPlot} containing the {@link TimerData} informations.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -109,9 +108,9 @@ public class DefaultCombinedMetricsPlotController extends AbstractPlotController
 	private Date oldToDate = new Date(0);
 
 	/**
-	 * This represents the date of one of the objects which was received at some
-	 * time in the past but was the one with the newest date. This is needed for
-	 * not requesting some data of the CMR sometimes.
+	 * This represents the date of one of the objects which was received at some time in the past
+	 * but was the one with the newest date. This is needed for not requesting some data of the CMR
+	 * sometimes.
 	 */
 	private Date newestDate = new Date(0);
 
@@ -180,8 +179,7 @@ public class DefaultCombinedMetricsPlotController extends AbstractPlotController
 	}
 
 	/**
-	 * Removes all data from the upper plot and sets the {@link TimerData}
-	 * objects on the plot.
+	 * Removes all data from the upper plot and sets the {@link TimerData} objects on the plot.
 	 * 
 	 * @param timerData
 	 *            The data to set on the plot.
@@ -233,8 +231,7 @@ public class DefaultCombinedMetricsPlotController extends AbstractPlotController
 	}
 
 	/**
-	 * Removes all data from the lower plot and sets the {@link TimerData}
-	 * objects on the plot.
+	 * Removes all data from the lower plot and sets the {@link TimerData} objects on the plot.
 	 * 
 	 * @param timerData
 	 *            The data to set on the plot.
@@ -300,8 +297,8 @@ public class DefaultCombinedMetricsPlotController extends AbstractPlotController
 				adjustedTimerData = (List<TimerData>) adjustSamplingRate(timerData, from, to);
 
 				// we got some data, thus we can set the date
-				oldFromDate = from;
-				oldToDate = to;
+				oldFromDate = (Date) from.clone();
+				oldToDate = (Date) to.clone();
 				if (newestDate.before(timerData.get(timerData.size() - 1).getTimeStamp())) {
 					newestDate = new Date(timerData.get(timerData.size() - 1).getTimeStamp().getTime());
 				}
@@ -318,12 +315,12 @@ public class DefaultCombinedMetricsPlotController extends AbstractPlotController
 
 			if (!leftData.isEmpty()) {
 				oldTimerData.addAll(0, leftData);
-				oldFromDate = from;
+				oldFromDate = (Date) from.clone();
 			}
 
 			if (!rightData.isEmpty()) {
 				oldTimerData.addAll(rightData);
-				oldToDate = to;
+				oldToDate = (Date) to.clone();
 				if (newestDate.before(rightData.get(rightData.size() - 1).getTimeStamp())) {
 					newestDate = new Date(rightData.get(rightData.size() - 1).getTimeStamp().getTime());
 				}
@@ -338,7 +335,7 @@ public class DefaultCombinedMetricsPlotController extends AbstractPlotController
 
 			if (!timerData.isEmpty()) {
 				oldTimerData.addAll(timerData);
-				oldToDate = to;
+				oldToDate = (Date) to.clone();
 				if (newestDate.before(timerData.get(timerData.size() - 1).getTimeStamp())) {
 					newestDate = new Date(timerData.get(timerData.size() - 1).getTimeStamp().getTime());
 				}
@@ -353,7 +350,7 @@ public class DefaultCombinedMetricsPlotController extends AbstractPlotController
 
 			if (!timerData.isEmpty()) {
 				oldTimerData.addAll(timerData);
-				oldFromDate = from;
+				oldFromDate = (Date) from.clone();
 			}
 
 			adjustedTimerData = (List<TimerData>) adjustSamplingRate(oldTimerData, from, to);

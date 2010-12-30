@@ -28,8 +28,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 
 /**
- * This input controller displays details of all methods involved in an
- * invocation sequence.
+ * This input controller displays details of all methods involved in an invocation sequence.
  * 
  * @author Patrice Bouillet
  * 
@@ -37,9 +36,9 @@ import org.eclipse.swt.SWT;
 public class MethodInvocInputController extends AbstractTableInputController {
 
 	/**
-	 * The private inner enumeration used to define the used IDs which are
-	 * mapped into the columns. The order in this enumeration represents the
-	 * order of the columns. If it is reordered, nothing else has to be changed.
+	 * The private inner enumeration used to define the used IDs which are mapped into the columns.
+	 * The order in this enumeration represents the order of the columns. If it is reordered,
+	 * nothing else has to be changed.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -95,8 +94,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in
-		 *            {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITConstants}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;
@@ -120,8 +118,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	}
 
 	/**
-	 * Data object only used for this class to hold the computation of the
-	 * exlusive time.
+	 * Data object only used for this class to hold the computation of the exlusive time.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -206,6 +203,49 @@ public class MethodInvocInputController extends AbstractTableInputController {
 			return this.sumExclusiveTime;
 		}
 
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = super.hashCode();
+			long temp;
+			temp = Double.doubleToLongBits(averageExclusiveTime);
+			result = prime * result + (int) (temp ^ (temp >>> 32));
+			temp = Double.doubleToLongBits(maxExclusiveTime);
+			result = prime * result + (int) (temp ^ (temp >>> 32));
+			temp = Double.doubleToLongBits(minExclusiveTime);
+			result = prime * result + (int) (temp ^ (temp >>> 32));
+			temp = Double.doubleToLongBits(sumExclusiveTime);
+			result = prime * result + (int) (temp ^ (temp >>> 32));
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (!super.equals(obj)) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			ExclusiveTimerData other = (ExclusiveTimerData) obj;
+			if (Double.doubleToLongBits(averageExclusiveTime) != Double.doubleToLongBits(other.averageExclusiveTime)) {
+				return false;
+			}
+			if (Double.doubleToLongBits(maxExclusiveTime) != Double.doubleToLongBits(other.maxExclusiveTime)) {
+				return false;
+			}
+			if (Double.doubleToLongBits(minExclusiveTime) != Double.doubleToLongBits(other.minExclusiveTime)) {
+				return false;
+			}
+			if (Double.doubleToLongBits(sumExclusiveTime) != Double.doubleToLongBits(other.sumExclusiveTime)) {
+				return false;
+			}
+			return true;
+		}
+
 	}
 
 	/**
@@ -279,11 +319,11 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		if (null == data) {
 			return false;
 		}
-		
+
 		if (data.isEmpty()) {
 			return true;
 		}
-		
+
 		if (data.size() != 1) {
 			return false;
 		}
@@ -301,7 +341,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private final class MethodInvocContentProvider implements IStructuredContentProvider {
+	private static final class MethodInvocContentProvider implements IStructuredContentProvider {
 
 		/**
 		 * {@inheritDoc}
@@ -333,7 +373,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 							timerData.setMaxExclusiveTime(Math.max(exclusiveTime, timerData.getMaxExclusiveTime()));
 							timerData.addTotalExclusiveTime(exclusiveTime);
 
-							if (-1 != invocationSequenceData.getTimerData().getCpuMin()) {
+							if (-1.0d != invocationSequenceData.getTimerData().getCpuMin()) {
 								timerData.setCpuMin(Math.min(invocationSequenceData.getTimerData().getCpuMin(), timerData.getCpuMin()));
 								timerData.setCpuMax(Math.max(invocationSequenceData.getTimerData().getCpuMax(), timerData.getCpuMax()));
 								timerData.addCpuDuration(invocationSequenceData.getTimerData().getCpuDuration());
@@ -434,8 +474,8 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	}
 
 	/**
-	 * Viewer Comparator used by this input controller to display the contents
-	 * of {@link BasicSQLData}.
+	 * Viewer Comparator used by this input controller to display the contents of
+	 * {@link BasicSQLData}.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -501,8 +541,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	 *            The method ident object.
 	 * @param enumId
 	 *            The enumeration ID.
-	 * @return The styled string containing the information from the data
-	 *         object.
+	 * @return The styled string containing the information from the data object.
 	 */
 	private StyledString getStyledTextForColumn(ExclusiveTimerData data, MethodIdent methodIdent, Column enumId) {
 		switch (enumId) {
@@ -594,8 +633,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	 * 
 	 * @param data
 	 *            The data objects which is inspected for its nested elements.
-	 * @return The duration of all nested sequences (with their nested sequences
-	 *         as well).
+	 * @return The duration of all nested sequences (with their nested sequences as well).
 	 */
 	@SuppressWarnings("unchecked")
 	private static double computeNestedDuration(InvocationSequenceData data) {

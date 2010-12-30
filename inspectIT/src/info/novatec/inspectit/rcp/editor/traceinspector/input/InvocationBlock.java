@@ -3,62 +3,66 @@ package info.novatec.inspectit.rcp.editor.traceinspector.input;
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 
-public class InvocationBlock {
-    private Rectangle area = null;
-    private InvocationSequenceData invocationSequence = null;
-    private MethodIdent methodIdent = null;
-    private boolean isHighlighted = false;
-    private double amount = 0.0;
+import java.io.Serializable;
 
-    public InvocationBlock() {	
-    }
-    
-    public InvocationBlock(Rectangle area, InvocationSequenceData invocationSequenceData, MethodIdent methodIdent) {
-	this.area = area;
-	this.invocationSequence = invocationSequenceData;
-	this.methodIdent = methodIdent;
-    }
+public class InvocationBlock implements Serializable {
+	/**
+	 * The generated serial version UID.
+	 */
+	private static final long serialVersionUID = 1839028696356159300L;
+	private Rectangle area = null;
+	private InvocationSequenceData invocationSequence = null;
+	private MethodIdent methodIdent = null;
+	private boolean isHighlighted = false;
+	private double amount = 0.0;
 
-    public Rectangle getArea() {
-	return area;
-    }
+	public InvocationBlock() {
+	}
 
-    public void setArea(Rectangle area) {
-	this.area = area;
-    }
+	public InvocationBlock(Rectangle area, InvocationSequenceData invocationSequenceData, MethodIdent methodIdent) {
+		this.area = area;
+		this.invocationSequence = invocationSequenceData;
+		this.methodIdent = methodIdent;
+	}
 
-    public InvocationSequenceData getInvocationSequence() {
-	return invocationSequence;
-    }
+	public Rectangle getArea() {
+		return area;
+	}
 
-    public void setInvocationSequence(InvocationSequenceData invocationSequence) {
-	this.invocationSequence = invocationSequence;
-    }
+	public void setArea(Rectangle area) {
+		this.area = area;
+	}
 
-    public MethodIdent getMethodIdent() {
-	return methodIdent;
-    }
+	public InvocationSequenceData getInvocationSequence() {
+		return invocationSequence;
+	}
 
-    public void setMethodIdent(MethodIdent methodIdent) {
-	this.methodIdent = methodIdent;
-    }
+	public void setInvocationSequence(InvocationSequenceData invocationSequence) {
+		this.invocationSequence = invocationSequence;
+	}
 
-    public boolean isHighlighted() {
-        return isHighlighted;
-    }
+	public MethodIdent getMethodIdent() {
+		return methodIdent;
+	}
 
-    public void setHighlighted(boolean isHighlighted) {
-        this.isHighlighted = isHighlighted;
-    }
+	public void setMethodIdent(MethodIdent methodIdent) {
+		this.methodIdent = methodIdent;
+	}
 
-    public double getAmount() {
-        return amount;
-    }
+	public boolean isHighlighted() {
+		return isHighlighted;
+	}
 
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-    
-    
+	public void setHighlighted(boolean isHighlighted) {
+		this.isHighlighted = isHighlighted;
+	}
+
+	public double getAmount() {
+		return amount;
+	}
+
+	public void setAmount(double amount) {
+		this.amount = amount;
+	}
 
 }

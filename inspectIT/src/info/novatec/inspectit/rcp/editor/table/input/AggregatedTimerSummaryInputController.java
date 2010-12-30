@@ -21,8 +21,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 
 /**
- * This input controller displays an aggregated summary of the timer data
- * objects in a table.
+ * This input controller displays an aggregated summary of the timer data objects in a table.
  * 
  * @author Patrice Bouillet
  * 
@@ -30,9 +29,9 @@ import org.eclipse.swt.SWT;
 public class AggregatedTimerSummaryInputController extends AbstractTableInputController {
 
 	/**
-	 * The private inner enumeration used to define the used IDs which are
-	 * mapped into the columns. The order in this enumeration represents the
-	 * order of the columns. If it is reordered, nothing else has to be changed.
+	 * The private inner enumeration used to define the used IDs which are mapped into the columns.
+	 * The order in this enumeration represents the order of the columns. If it is reordered,
+	 * nothing else has to be changed.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -64,8 +63,7 @@ public class AggregatedTimerSummaryInputController extends AbstractTableInputCon
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in
-		 *            {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITConstants}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;
@@ -125,7 +123,7 @@ public class AggregatedTimerSummaryInputController extends AbstractTableInputCon
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private final class ContentProvider implements IStructuredContentProvider {
+	private static final class ContentProvider implements IStructuredContentProvider {
 
 		/**
 		 * {@inheritDoc}
@@ -238,8 +236,7 @@ public class AggregatedTimerSummaryInputController extends AbstractTableInputCon
 	 *            The data object to extract the information from.
 	 * @param enumId
 	 *            The enumeration ID.
-	 * @return The styled string containing the information from the data
-	 *         object.
+	 * @return The styled string containing the information from the data object.
 	 */
 	private StyledString getStyledTextForColumn(TimerData data, Column enumId) {
 		switch (enumId) {

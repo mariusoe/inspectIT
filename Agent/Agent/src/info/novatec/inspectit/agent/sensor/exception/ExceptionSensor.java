@@ -16,39 +16,23 @@ import java.util.Map;
 public class ExceptionSensor implements IExceptionSensor {
 
 	/**
-	 * The timer used for accurate measuring.
-	 */
-	private final Timer timer;
-
-	/**
 	 * The ID manager.
 	 */
 	private final IIdManager idManager;
 
 	/**
-	 * The property accessor.
-	 */
-	private final IPropertyAccessor propertyAccessor;
-
-	/**
 	 * The used exception sensor hook.
 	 */
-	private static ExceptionSensorHook exceptionSensorHook = null;
+	private ExceptionSensorHook exceptionSensorHook = null;
 
 	/**
 	 * The default constructor which needs 3 parameter for initialization.
 	 * 
-	 * @param timer
-	 *            The timer used for accurate measuring.
 	 * @param idManager
 	 *            The ID manager.
-	 * @param propertyAccessor
-	 *            The property accessor.
 	 */
 	public ExceptionSensor(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor) {
-		this.timer = timer;
 		this.idManager = idManager;
-		this.propertyAccessor = propertyAccessor;
 	}
 
 	/**

@@ -60,20 +60,29 @@ public final class NumberFormatter {
 	}
 
 	/**
-	 * Converts time in milliseconds to a <code>String</code> in the format
-	 * HH:mm:ss.
+	 * Converts time in milliseconds to a <code>String</code> in the format HH:mm:ss.
 	 * 
 	 * @param time
 	 *            the time in milliseconds.
-	 * @return a <code>String</code> representing the time in the format
-	 *         HH:mm:ss.
+	 * @return a <code>String</code> representing the time in the format HH:mm:ss.
 	 */
 	public static String millisecondsToString(long time) {
 		int seconds = (int) (time / 1000 % 60);
 		int minutes = (int) ((time / 60000) % 60);
 		int hours = (int) ((time / 3600000) % 24);
 		int days = (int) ((time / 3600000) / 24);
-		return new String(days + "d " + hours + "h " + minutes + "m " + seconds + "s");
+
+		StringBuilder builder = new StringBuilder();
+		builder.append(days);
+		builder.append("d ");
+		builder.append(hours);
+		builder.append("h ");
+		builder.append(minutes);
+		builder.append("m ");
+		builder.append(seconds);
+		builder.append("s");
+
+		return builder.toString();
 	}
 
 	/**
@@ -95,7 +104,9 @@ public final class NumberFormatter {
 	 * @return The formatted string.
 	 */
 	public static String formatTimeWithMillis(Date date) {
-		return dateMillisFormat.format(date);
+		synchronized (dateMillisFormat) {
+			return dateMillisFormat.format(date);
+		}
 	}
 
 	/**
@@ -117,7 +128,9 @@ public final class NumberFormatter {
 	 * @return The formatted string.
 	 */
 	public static String formatTime(Date date) {
-		return dateFormat.format(date);
+		synchronized (dateFormat) {
+			return dateFormat.format(date);
+		}
 	}
 
 	/**
@@ -156,8 +169,7 @@ public final class NumberFormatter {
 	}
 
 	/**
-	 * Adds a %-sign to a floating number. For example: input = 12 / output = 12
-	 * %.
+	 * Adds a %-sign to a floating number. For example: input = 12 / output = 12 %.
 	 * 
 	 * @param percent
 	 *            The value to format.
@@ -168,8 +180,7 @@ public final class NumberFormatter {
 	}
 
 	/**
-	 * Formats an integer value. For example: input = 1234567 / output =
-	 * 1,234,567.
+	 * Formats an integer value. For example: input = 1234567 / output = 1,234,567.
 	 * 
 	 * @param number
 	 *            The value to format.
@@ -191,8 +202,7 @@ public final class NumberFormatter {
 	}
 
 	/**
-	 * Formats a double value. For example: input = 123545.9876543 / output =
-	 * 123545.987.
+	 * Formats a double value. For example: input = 123545.9876543 / output = 123545.987.
 	 * 
 	 * @param number
 	 *            The value to format.

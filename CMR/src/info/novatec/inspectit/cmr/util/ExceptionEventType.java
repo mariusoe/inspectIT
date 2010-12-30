@@ -29,7 +29,7 @@ public class ExceptionEventType implements UserType {
 	 */
 	@Override
 	public int[] sqlTypes() {
-		return TYPES;
+		return TYPES.clone();
 	}
 
 	/**

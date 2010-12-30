@@ -122,11 +122,6 @@ public class SqlInputController extends AbstractTableInputController {
 	}
 
 	/**
-	 * The limit of the result set.
-	 */
-	private int limit = 10;
-
-	/**
 	 * The template which is send to the Repository to retrieve the actual data.
 	 */
 	private SqlStatementData template;
@@ -227,14 +222,6 @@ public class SqlInputController extends AbstractTableInputController {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setLimit(int limit) {
-		this.limit = limit;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	@SuppressWarnings("unchecked")
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Getting SQL information from the CMR", IProgressMonitor.UNKNOWN);
@@ -281,7 +268,7 @@ public class SqlInputController extends AbstractTableInputController {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private final class SqlContentProvider implements IStructuredContentProvider {
+	private static final class SqlContentProvider implements IStructuredContentProvider {
 
 		/**
 		 * {@inheritDoc}

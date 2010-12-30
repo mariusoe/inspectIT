@@ -29,8 +29,8 @@ import org.jfree.data.xy.YIntervalSeriesCollection;
 import org.jfree.ui.RectangleInsets;
 
 /**
- * This class creates a {@link XYPlot} containing the
- * {@link ClassLoadingInformationData} informations.
+ * This class creates a {@link XYPlot} containing the {@link ClassLoadingInformationData}
+ * informations.
  * 
  * @author Eduard Tudenhoefner
  * @author Patrice Bouillet
@@ -94,9 +94,9 @@ public class DefaultClassesPlotController extends AbstractPlotController {
 	private Date oldToDate = new Date(0);
 
 	/**
-	 * This represents the date of one of the objects which was received at some
-	 * time in the past but was the one with the newest date. This is needed for
-	 * not requesting some data of the CMR sometimes.
+	 * This represents the date of one of the objects which was received at some time in the past
+	 * but was the one with the newest date. This is needed for not requesting some data of the CMR
+	 * sometimes.
 	 */
 	private Date newestDate = new Date(0);
 
@@ -181,8 +181,8 @@ public class DefaultClassesPlotController extends AbstractPlotController {
 	}
 
 	/**
-	 * Removes all data from the upper plot and sets the
-	 * {@link ClassLoadingInformationData} objects on the plot.
+	 * Removes all data from the upper plot and sets the {@link ClassLoadingInformationData} objects
+	 * on the plot.
 	 * 
 	 * @param classLoadingData
 	 *            The data to set on the plot.
@@ -233,8 +233,8 @@ public class DefaultClassesPlotController extends AbstractPlotController {
 				adjustedTimerData = (List<ClassLoadingInformationData>) adjustSamplingRate(data, from, to);
 
 				// we got some data, thus we can set the date
-				oldFromDate = from;
-				oldToDate = to;
+				oldFromDate = (Date) from.clone();
+				oldToDate = (Date) to.clone();
 				if (newestDate.before(data.get(data.size() - 1).getTimeStamp())) {
 					newestDate = new Date(data.get(data.size() - 1).getTimeStamp().getTime());
 				}
@@ -251,12 +251,12 @@ public class DefaultClassesPlotController extends AbstractPlotController {
 
 			if (!leftData.isEmpty()) {
 				oldData.addAll(0, leftData);
-				oldFromDate = from;
+				oldFromDate = (Date) from.clone();
 			}
 
 			if (!rightData.isEmpty()) {
 				oldData.addAll(rightData);
-				oldToDate = to;
+				oldToDate = (Date) to.clone();
 				if (newestDate.before(rightData.get(rightData.size() - 1).getTimeStamp())) {
 					newestDate = new Date(rightData.get(rightData.size() - 1).getTimeStamp().getTime());
 				}
@@ -271,7 +271,7 @@ public class DefaultClassesPlotController extends AbstractPlotController {
 
 			if (!timerData.isEmpty()) {
 				oldData.addAll(timerData);
-				oldToDate = to;
+				oldToDate = (Date) to.clone();
 				if (newestDate.before(timerData.get(timerData.size() - 1).getTimeStamp())) {
 					newestDate = new Date(timerData.get(timerData.size() - 1).getTimeStamp().getTime());
 				}
@@ -286,7 +286,7 @@ public class DefaultClassesPlotController extends AbstractPlotController {
 
 			if (!timerData.isEmpty()) {
 				oldData.addAll(timerData);
-				oldFromDate = from;
+				oldFromDate = (Date) from.clone();
 			}
 
 			adjustedTimerData = (List<ClassLoadingInformationData>) adjustSamplingRate(oldData, from, to);

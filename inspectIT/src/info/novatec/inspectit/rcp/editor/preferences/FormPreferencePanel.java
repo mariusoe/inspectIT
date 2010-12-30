@@ -15,7 +15,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IToolBarManager;
@@ -172,7 +171,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 
 		fireEvent(new PreferenceEvent(PreferenceId.UPDATE));
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -399,7 +398,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private final class MenuAction extends Action implements IMenuCreator {
+	private static final class MenuAction extends Action implements IMenuCreator {
 
 		/**
 		 * The menu manager.
@@ -413,16 +412,6 @@ public class FormPreferencePanel implements IPreferencePanel {
 			super("", Action.AS_DROP_DOWN_MENU);
 			menuManager = new MenuManager();
 			setMenuCreator(this);
-		}
-
-		/**
-		 * Adds an action to this menu.
-		 * 
-		 * @param action
-		 *            The action to add.
-		 */
-		public void addMenuAction(IAction action) {
-			menuManager.add(action);
 		}
 
 		/**

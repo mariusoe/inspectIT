@@ -98,7 +98,7 @@ public abstract class AbstractStorageHandler extends AbstractHandler {
 					}
 					bos.flush();
 				}
-				
+
 			} catch (FileNotFoundException e) {
 				throw new ExecutionException("File not found while saving invocation sequences!", e);
 			} catch (IOException e) {
@@ -216,12 +216,12 @@ public abstract class AbstractStorageHandler extends AbstractHandler {
 	 * @param path
 	 *            the path to the directory.
 	 */
-	protected void deleteDirectory(File path) {
+	protected void deleteDirectory(File path) throws ExecutionException {
 		if (!path.isDirectory()) {
-			throw new RuntimeException("Cannot delete path because it is not a folder: " + path.getAbsolutePath());
+			throw new ExecutionException("Cannot delete path because it is not a folder: " + path.getAbsolutePath());
 		}
 		if ("".equals(path.getName())) {
-			throw new RuntimeException("Cannot delete root folder!");
+			throw new ExecutionException("Cannot delete root folder!");
 		}
 
 		if (path.exists()) {
@@ -230,7 +230,10 @@ public abstract class AbstractStorageHandler extends AbstractHandler {
 				if (files[i].isDirectory()) {
 					deleteDirectory(files[i]);
 				}
-				files[i].delete();
+				boolean isDeleted = files[i].delete();
+				if (!isDeleted) {
+					throw new ExecutionException("The following folder could not be deleted: " + files[i].getAbsolutePath());
+				}
 			}
 			path.delete();
 		}

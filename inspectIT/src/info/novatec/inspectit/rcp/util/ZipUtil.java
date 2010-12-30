@@ -21,14 +21,13 @@ public class ZipUtil {
 	private static final byte[] buffer = new byte[0xFFFF];
 
 	/**
-	 * Zip the srcFolder into the destFileZipFile. All the folder subtree of the
-	 * src folder is added to the destZipFile archive.
+	 * Zip the srcFolder into the destFileZipFile. All the folder subtree of the src folder is added
+	 * to the destZipFile archive.
 	 * 
 	 * @param srcFolder
 	 *            the path of the srcFolder
 	 * @param destZipFile
-	 *            the path of the destination zipFile. This file will be created
-	 *            or erased.
+	 *            the path of the destination zipFile. This file will be created or erased.
 	 */
 	public static void zipFolder(String srcFolder, String destZipFile) {
 		ZipOutputStream zip = null;
@@ -82,7 +81,10 @@ public class ZipUtil {
 		File file = new File(destDir, entry.getName());
 
 		if (entry.isDirectory()) {
-			file.mkdirs();
+			boolean created = file.mkdirs();
+			if (!created) {
+				throw new RuntimeException("Could not created the following directory: " + file.getAbsolutePath());
+			}
 		} else {
 			new File(file.getParent()).mkdirs();
 
@@ -108,9 +110,8 @@ public class ZipUtil {
 	}
 
 	/**
-	 * Write the content of srcFile in a new ZipEntry, named path+srcFile, of
-	 * the zip stream. The result is that the srcFile will be in the path folder
-	 * in the generated archive.
+	 * Write the content of srcFile in a new ZipEntry, named path+srcFile, of the zip stream. The
+	 * result is that the srcFile will be in the path folder in the generated archive.
 	 * 
 	 * @param path
 	 *            the relative path with the root archive.
@@ -127,8 +128,9 @@ public class ZipUtil {
 		} else {
 			// Transfer bytes from in to out
 			int len;
+			FileInputStream in = null;
 			try {
-				FileInputStream in = new FileInputStream(srcFile);
+				in = new FileInputStream(srcFile);
 				if (includeDir) {
 					zip.putNextEntry(new ZipEntry(path + "/" + file.getName()));
 				} else {
@@ -139,6 +141,14 @@ public class ZipUtil {
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
+			} finally {
+				if (null != in) {
+					try {
+						in.close();
+					} catch (IOException e) {
+						// do not care
+					}
+				}
 			}
 		}
 	}

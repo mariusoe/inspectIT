@@ -140,7 +140,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 		if (null != child) {
 			// we store in each object the error message from the root data object that has the
 			// CREATED event
-			if (data.getErrorMessage() != child.getErrorMessage()) {
+			if (!data.getErrorMessage().equals(child.getErrorMessage())) {
 				child.setErrorMessage(data.getErrorMessage());
 			}
 			// first save the lowermost child

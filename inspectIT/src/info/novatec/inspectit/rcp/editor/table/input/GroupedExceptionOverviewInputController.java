@@ -505,7 +505,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		/**
 		 * The inputDefinition.
 		 */
-		private InputDefinition inputDefinition;
+		private transient InputDefinition inputDefinition;
 
 		/**
 		 * The created counter.
@@ -646,7 +646,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	 * @author Eduard Tudenhoefner
 	 * 
 	 */
-	private final class GroupedExceptionOverviewViewerComparator extends TableViewerComparator<ExtendedExceptionSensorData> {
+	private static final class GroupedExceptionOverviewViewerComparator extends TableViewerComparator<ExtendedExceptionSensorData> {
 
 		/**
 		 * {@inheritDoc}

@@ -5,6 +5,7 @@ import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 import info.novatec.inspectit.javassist.CtBehavior;
 import info.novatec.inspectit.javassist.Modifier;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -268,7 +269,12 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private static class SensorTypeConfigComparator implements Comparator {
+	private static class SensorTypeConfigComparator implements Comparator, Serializable {
+
+		/**
+		 * The generated serial version UID.
+		 */
+		private static final long serialVersionUID = -2156911328015024777L;
 
 		/**
 		 * {@inheritDoc}

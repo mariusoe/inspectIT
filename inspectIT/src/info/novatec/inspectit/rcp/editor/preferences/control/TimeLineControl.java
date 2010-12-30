@@ -24,8 +24,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 /**
- * This class creates a control group for the preference panel. It contains a
- * time line where you can select a time range for a historical view.
+ * This class creates a control group for the preference panel. It contains a time line where you
+ * can select a time range for a historical view.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -38,20 +38,17 @@ public class TimeLineControl implements IPreferenceControl {
 	private static final PreferenceId CONTROL_GROUP_ID = PreferenceId.TIMELINE;
 
 	/**
-	 * The map containing all configurable values by the slider for the day
-	 * spinner.
+	 * The map containing all configurable values by the slider for the day spinner.
 	 */
 	private Map<Integer, Integer> daysValueMap;
 
 	/**
-	 * The map containing all configurable values by the slider for the hour
-	 * spinner.
+	 * The map containing all configurable values by the slider for the hour spinner.
 	 */
 	private Map<Integer, Integer> hoursValueMap;
 
 	/**
-	 * The map containing all configurable values by the slider for the minute
-	 * spinner.
+	 * The map containing all configurable values by the slider for the minute spinner.
 	 */
 	private Map<Integer, Integer> minutesValueMap;
 
@@ -343,9 +340,9 @@ public class TimeLineControl implements IPreferenceControl {
 	 * @return the value.
 	 */
 	private Integer getKeyFromValue(Map<Integer, Integer> map, Integer value) {
-		for (Integer val : map.keySet()) {
-			if (map.get(val).equals(value)) {
-				return val;
+		for (Map.Entry<Integer, Integer> entrySet : map.entrySet()) {
+			if (entrySet.getValue().equals(value)) {
+				return entrySet.getKey();
 			}
 		}
 		return null;

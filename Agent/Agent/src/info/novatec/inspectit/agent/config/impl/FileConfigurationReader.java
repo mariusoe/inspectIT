@@ -24,8 +24,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This config reader class reads simple config files. Simple in the way as you
- * don't need any additional java libraries and every statement is in one line.
+ * This config reader class reads simple config files. Simple in the way as you don't need any
+ * additional java libraries and every statement is in one line.
  * 
  * @author Patrice Bouillet
  * 
@@ -38,8 +38,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	private static final Logger LOGGER = Logger.getLogger(FileConfigurationReader.class.getName());
 
 	/**
-	 * The configuration storage implementation. Used to store the information
-	 * to.
+	 * The configuration storage implementation. Used to store the information to.
 	 */
 	private final IConfigurationStorage configurationStorage;
 
@@ -65,23 +64,26 @@ public class FileConfigurationReader implements IConfigurationReader {
 	private static final String CONFIG_INCLUDE_FILE = "$include";
 
 	/**
-	 * Regular expression pattern to find the signatures of the method
-	 * definitions in the configuration file. Pre-compiled for faster execution.
+	 * Regular expression pattern to find the signatures of the method definitions in the
+	 * configuration file. Pre-compiled for faster execution.
 	 */
 	private final Pattern methodSignature = Pattern.compile(".*\\((.+)\\)");
 
 	/**
-	 * Regular expression pattern to find empty signatures -> '()' .
-	 * Pre-compiled for faster execution.
+	 * Regular expression pattern to find empty signatures -> '()' . Pre-compiled for faster
+	 * execution.
 	 */
 	private final Pattern emptyMethodSignature = Pattern.compile(".*\\(\\)");
 
+	/**
+	 * Defines if the exception sensor is already created.
+	 */
 	private boolean firstCreationOfExceptionSensor = true;
 
 	/**
 	 * The configuration file.
 	 */
-	private static File configFile;
+	private File configFile;
 
 	/**
 	 * Default constructor which accepts one parameter.
@@ -94,8 +96,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	}
 
 	/**
-	 * The default location for this reader is the path in the system variable
-	 * 'inspectit.config'.
+	 * The default location for this reader is the path in the system variable 'inspectit.config'.
 	 * <p>
 	 * {@inheritDoc}
 	 */
@@ -127,8 +128,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	 * @param reader
 	 *            The reader to open and parse.
 	 * @throws ParserException
-	 *             Thrown if there was an exception caught by parsing the config
-	 *             file.
+	 *             Thrown if there was an exception caught by parsing the config file.
 	 */
 	private void parse(Reader reader) throws ParserException {
 		// check for a valid Reader object
@@ -208,11 +208,9 @@ public class FileConfigurationReader implements IConfigurationReader {
 	 * Processes a exception sensor line.
 	 * 
 	 * @param tokenizer
-	 *            The tokenizer which contains the strings to create a sensor
-	 *            type.
+	 *            The tokenizer which contains the strings to create a sensor type.
 	 * @throws ParserException
-	 *             Thrown if there was an exception caught by parsing the config
-	 *             file.
+	 *             Thrown if there was an exception caught by parsing the config file.
 	 */
 	private void processExceptionSensorLine(StringTokenizer tokenizer) throws ParserException {
 		// the sensor name is hardcoded here, because we don't define the
@@ -250,11 +248,9 @@ public class FileConfigurationReader implements IConfigurationReader {
 	 * Processes a method sensor type line.
 	 * 
 	 * @param tokenizer
-	 *            The tokenizer which contains the strings to create a sensor
-	 *            type.
+	 *            The tokenizer which contains the strings to create a sensor type.
 	 * @throws ParserException
-	 *             Thrown if there was an exception caught by parsing the config
-	 *             file.
+	 *             Thrown if there was an exception caught by parsing the config file.
 	 */
 	private void processMethodSensorTypeLine(StringTokenizer tokenizer) throws ParserException {
 		String sensorTypeName = tokenizer.nextToken();
@@ -282,11 +278,9 @@ public class FileConfigurationReader implements IConfigurationReader {
 	 * Processes a platform sensor type line.
 	 * 
 	 * @param tokenizer
-	 *            The tokenizer which contains the strings to create a sensor
-	 *            type.
+	 *            The tokenizer which contains the strings to create a sensor type.
 	 * @throws ParserException
-	 *             Thrown if there was an exception caught by parsing the config
-	 *             file.
+	 *             Thrown if there was an exception caught by parsing the config file.
 	 */
 	private void processPlatformSensorTypeLine(StringTokenizer tokenizer) throws ParserException {
 		String sensorTypeClass = tokenizer.nextToken();
@@ -312,8 +306,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	 * @param tokenizer
 	 *            The tokenizer which contains the strings to create a sensor.
 	 * @throws ParserException
-	 *             Thrown if there was an exception caught by parsing the config
-	 *             file.
+	 *             Thrown if there was an exception caught by parsing the config file.
 	 */
 	private void processSensorLine(StringTokenizer tokenizer) throws ParserException {
 		String sensorTypeName = tokenizer.nextToken();
@@ -376,11 +369,9 @@ public class FileConfigurationReader implements IConfigurationReader {
 	 * Processes a repository line and initializes it afterwards.
 	 * 
 	 * @param tokenizer
-	 *            The string tokenizer which contains the definition of the
-	 *            repository.
+	 *            The string tokenizer which contains the definition of the repository.
 	 * @throws ParserException
-	 *             Thrown if there was an exception caught by parsing the config
-	 *             file.
+	 *             Thrown if there was an exception caught by parsing the config file.
 	 */
 	private void processRepositoryLine(StringTokenizer tokenizer) throws ParserException {
 		String host = tokenizer.nextToken();
@@ -399,11 +390,9 @@ public class FileConfigurationReader implements IConfigurationReader {
 	 * Processes a send strategy line.
 	 * 
 	 * @param tokenizer
-	 *            The tokenizer which contains the strings to create a sending
-	 *            strategy.
+	 *            The tokenizer which contains the strings to create a sending strategy.
 	 * @throws ParserException
-	 *             Thrown if there was an exception caught by parsing the config
-	 *             file.
+	 *             Thrown if there was an exception caught by parsing the config file.
 	 */
 	private void processSendStrategyLine(StringTokenizer tokenizer) throws ParserException {
 		String sendStrategyClass = tokenizer.nextToken();
@@ -427,11 +416,9 @@ public class FileConfigurationReader implements IConfigurationReader {
 	 * Processes a buffer strategy line.
 	 * 
 	 * @param tokenizer
-	 *            The tokenizer which contains the strings to create a buffer
-	 *            strategy.
+	 *            The tokenizer which contains the strings to create a buffer strategy.
 	 * @throws ParserException
-	 *             Thrown if there was an exception caught by parsing the config
-	 *             file.
+	 *             Thrown if there was an exception caught by parsing the config file.
 	 */
 	private void processBufferStrategyLine(StringTokenizer tokenizer) throws ParserException {
 		String bufferStrategyClass = tokenizer.nextToken();
@@ -455,11 +442,9 @@ public class FileConfigurationReader implements IConfigurationReader {
 	 * Process an additional configuration file.
 	 * 
 	 * @param tokenizer
-	 *            The tokenizer which contains the path to an additional
-	 *            configuration file.
+	 *            The tokenizer which contains the path to an additional configuration file.
 	 * @throws ParserException
-	 *             Thrown if there was an exception caught by parsing the config
-	 *             file.
+	 *             Thrown if there was an exception caught by parsing the config file.
 	 */
 	private void processIncludeFileLine(StringTokenizer tokenizer) throws ParserException {
 		String fileName = tokenizer.nextToken();

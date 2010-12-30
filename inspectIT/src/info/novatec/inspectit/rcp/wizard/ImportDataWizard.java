@@ -49,7 +49,11 @@ public class ImportDataWizard extends Wizard implements IImportWizard {
 					monitor.beginTask("Importing data...", IProgressMonitor.UNKNOWN);
 					File dir = new File(StorageNamingConstants.DEFAULT_STORAGE_DIRECTORY);
 					if (!dir.exists()) {
-						dir.mkdirs();
+						boolean created = dir.mkdirs();
+						if (!created) {
+							InspectIT.getDefault().createErrorDialog("The following temp directory could not be created: " + dir.getAbsolutePath(), null, -1);
+							monitor.setCanceled(true);
+						}
 					}
 					File file = new File(fileName);
 					String folder = file.getName().split("\\.")[0];
@@ -72,4 +76,5 @@ public class ImportDataWizard extends Wizard implements IImportWizard {
 
 		return true;
 	}
+
 }
