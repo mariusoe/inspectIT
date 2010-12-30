@@ -379,6 +379,24 @@ public class MethodInvocInputController extends AbstractTableInputController {
 								timerData.addCpuDuration(invocationSequenceData.getTimerData().getCpuDuration());
 								timerData.setCpuAverage(timerData.getCpuDuration() / timerData.getCount());
 							}
+						} else if (null != invocationSequenceData.getSqlStatementData() && 1 == invocationSequenceData.getSqlStatementData().getCount()) {
+							timerData.setMin(Math.min(invocationSequenceData.getSqlStatementData().getMin(), timerData.getMin()));
+							timerData.setMax(Math.max(invocationSequenceData.getSqlStatementData().getMax(), timerData.getMax()));
+							timerData.addDuration(invocationSequenceData.getSqlStatementData().getDuration());
+							timerData.setAverage(timerData.getDuration() / timerData.getCount());
+
+							double exclusiveTime = invocationSequenceData.getSqlStatementData().getDuration() - (computeNestedDuration(invocationSequenceData));
+							timerData.setAverageExclusiveTime(((timerData.getAverageExclusiveTime() * (timerData.getCount() - 1)) + exclusiveTime) / timerData.getCount());
+							timerData.setMinExclusiveTime(Math.min(exclusiveTime, timerData.getMinExclusiveTime()));
+							timerData.setMaxExclusiveTime(Math.max(exclusiveTime, timerData.getMaxExclusiveTime()));
+							timerData.addTotalExclusiveTime(exclusiveTime);
+
+							if (-1.0d != invocationSequenceData.getSqlStatementData().getCpuMin()) {
+								timerData.setCpuMin(Math.min(invocationSequenceData.getSqlStatementData().getCpuMin(), timerData.getCpuMin()));
+								timerData.setCpuMax(Math.max(invocationSequenceData.getSqlStatementData().getCpuMax(), timerData.getCpuMax()));
+								timerData.addCpuDuration(invocationSequenceData.getSqlStatementData().getCpuDuration());
+								timerData.setCpuAverage(timerData.getCpuDuration() / timerData.getCount());
+							}
 						}
 						break;
 					}
