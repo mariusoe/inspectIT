@@ -325,14 +325,14 @@ Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA)" />
 	</target>
 
 	<target name="release-sun1.5" depends="build-agent, build-agent5.0, build-javaagent, unpack-dependencies" description="--> make a jar file for the whole project containing all dependencies">
-		<antcall target="-create-thirdparty-contributions" />
-
 		<mkdir dir="${build.release}" />
 		<delete dir="${build.release}/sun1.5-data" />
 		<mkdir dir="${build.release}/sun1.5-data" />
 		<mkdir dir="${build.release}/sun1.5-data/agent" />
 		<mkdir dir="${build.release}/sun1.5-data/agent/config" />
 
+		<antcall target="-create-thirdparty-contributions" />
+		
 		<copy todir="${build.release}/sun1.5-data/agent/config">
 			<fileset dir="${config.root}" includes="**/*.*" />
 		</copy>
@@ -369,14 +369,14 @@ Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA)" />
 	</target>
 
 	<target name="release-sun1.4-execute" if="java-exec.present" depends="build-agent, build-14classloader, unpack-dependencies" description="--> make a jar file for the whole project containing all dependencies">
-		<antcall target="-create-thirdparty-contributions" />
-
 		<mkdir dir="${build.release}" />
 		<delete dir="${build.release}/sun1.4-data" />
 		<mkdir dir="${build.release}/sun1.4-data" />
 		<mkdir dir="${build.release}/sun1.4-data/agent" />
 		<mkdir dir="${build.release}/sun1.4-data/agent/config" />
 
+		<antcall target="-create-thirdparty-contributions" />
+		
 		<copy todir="${build.release}/sun1.4-data/agent/config">
 			<fileset dir="${config.root}" includes="**/*.cfg" />
 			<fileset dir="${config.root}" includes="**/*.dll" />
