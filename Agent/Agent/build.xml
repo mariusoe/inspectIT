@@ -80,6 +80,7 @@
 		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.libs" />
 		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.libs" />
 		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.libs" />
+		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="path.libs" />
 		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs" />
 		<taskdef resource="checkstyletask.properties" classpathref="path.libs" />
 
@@ -199,7 +200,7 @@
 			<classpath location="${build.agent50.instrumented.classes}" />
 		</cobertura-instrument>
 
-		<testng annotations="JDK" failureproperty="error.test.agent" outputdir="${build.qa.test.testdata}" haltonfailure="${testng.haltonfailure}">
+		<testng failureproperty="error.test.agent" outputdir="${build.qa.test.testdata}" haltonfailure="${testng.haltonfailure}">
 			<classpath refid="path.agent.test.classes" />
 			<classpath refid="path.libs" />
 			<classpath refid="path.common.classes" />
@@ -208,8 +209,6 @@
 
 			<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${build.qa.test.coveragedata}/cobertura.ser" />
 
-			<sourcedir location="${agenttest.src}" />
-			<sourcedir location="${agent50.src}" />
 			<xmlfileset file="${agenttest.ressources.testng}/testng.xml" />
 			<xmlfileset file="${agent50test.ressources.testng}/testng.xml" />
 		</testng>
@@ -245,9 +244,9 @@
 		<mkdir dir="${build.qa.analysis.pmd}" />
 		<mkdir dir="${build.qa.analysis.checkstyle}" />
 		<mkdir dir="${build.qa.analysis.findbugs}" />
+		<mkdir dir="${build.qa.analysis.cpd}" />
 
-		<pmd maxRuleViolations="${pmd.maximum.violations}">
-			<ruleset>${pmd.rules.file}</ruleset>
+		<pmd maxRuleViolations="${pmd.maximum.violations}" rulesetfiles="${pmd.rules.file}">
 			<formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true" />
 			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true" />
 			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml" />
@@ -289,7 +288,7 @@
 			<path refid="findbugs.classpath" />
 		</pathconvert>
 
-		<findbugs output="xml" classpath="${findbugs.classpath}" excludefilter="${basedir}/resources/findbugs/excludeFilter.xml" outputFile="${build.qa.analysis}/findbugs/findbugs.xml" pluginlist="${lib.root}/test/findbugs.jar">
+		<findbugs output="xml" classpath="${findbugs.classpath}" excludefilter="${basedir}/resources/findbugs/excludeFilter.xml" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="${lib.root}/test/findbugs.jar">
 			<sourcePath path="${src.root}" />
 			<class location="${build.agent.classes}" />
 			<auxClasspath>
@@ -297,7 +296,17 @@
 				<pathelement path="${build.commons.classes}" />
 			</auxClasspath>
 		</findbugs>
-		<xslt in="${build.qa.analysis}/findbugs/findbugs.xml" style="${basedir}/resources/findbugs/fancy-hist.xsl" out="${build.qa.analysis}/findbugs.html" />
+		<xslt in="${build.qa.analysis.findbugs}/findbugs.xml" style="${basedir}/resources/findbugs/fancy-hist.xsl" out="${build.qa.analysis}/findbugs.html" />
+
+		<cpd format="xml" language="java" minimumTokenCount="100" outputFile="${build.qa.analysis.cpd}/cpd.xml">
+			<fileset dir="${src.root}">
+				<include name="info/novatec/inspectit/**/*.java" />
+				<exclude name="**/javassist/**" />
+			</fileset>
+			<fileset dir="${agent50.src}">
+				<include name="info/novatec/inspectit/**/*.java" />
+			</fileset>
+		</cpd>
 	</target>
 
 

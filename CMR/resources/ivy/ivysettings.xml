@@ -10,8 +10,8 @@
 		<ibiblio name="jboss-public2" root="https://repository.jboss.org/nexus/content/groups/public-jboss/" m2compatible="true" usepoms="false"/>
 		<ibiblio name="eviware" root="http://www.eviware.com/repository/maven2/" m2compatible="true" usepoms="false" />
 		<ibiblio name="java.net2" root="http://download.java.net/maven/2/" m2compatible="true"/>
-      	<ibiblio name="ibiblio"/>
-      	<ibiblio name="maven" root="http://repo1.maven.org/maven2" m2compatible="true" usepoms="false"/>
+		<ibiblio name="ibiblio"/>
+		<ibiblio name="maven" root="http://repo1.maven.org/maven2" m2compatible="true" usepoms="false"/>
 	</chain>
 	</resolvers>
 </ivysettings>

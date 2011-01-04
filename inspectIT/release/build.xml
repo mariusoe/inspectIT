@@ -126,6 +126,7 @@
 		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.libs" />
 		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.libs" />
 		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.libs" />
+		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="path.libs" />
 		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs" />
 		<taskdef resource="checkstyletask.properties" classpathref="path.libs" />
 	</target>
@@ -198,18 +199,20 @@
 		</copy>
 
 		<cobertura-instrument datafile="${build.qa.test.coveragedata}/cobertura.ser">
-			<includeClasses regex="info.novatec.inspectit.*" />
+			<!-- Deactivate Cobertura for now ... -->
+			<!-- includeClasses regex="info.novatec.inspectit.*" /-->
 			<excludeClasses regex="info.novatec.inspectit.*\.test.*" />
 			<excludeClasses regex="info.novatec.inspectit.cmr.*" />
 			<excludeClasses regex="info.novatec.inspectit.communication.*" />
-			<instrumentationClasspath>
+			<!-- Deactivate Cobertura for now ... -->
+			<!--instrumentationClasspath>
 				<path location="${build.instrumented.classes}" />
-			</instrumentationClasspath>
+			</instrumentationClasspath-->
 			<classpath refid="path.libs" />
 			<classpath location="${build.instrumented.classes}" />
 		</cobertura-instrument>
 
-		<testng annotations="JDK" outputdir="${build.qa.test.testdata}" haltonfailure="${testng.haltonfailure}">
+		<testng outputdir="${build.qa.test.testdata}" haltonfailure="${testng.haltonfailure}">
 			<classpath refid="path.libs" />
 			<classpath refid="path.commons.classes" />
 			<classpath refid="path.test.class" />
@@ -219,7 +222,6 @@
 
 			<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${build.qa.test.coveragedata}/cobertura.ser" />
 
-			<sourcedir location="${test.root}" />
 			<xmlfileset file="${resources.testng}/testng.xml" />
 		</testng>
 
@@ -255,9 +257,10 @@
 		<mkdir dir="${build.qa.analysis.pmd}" />
 		<mkdir dir="${build.qa.analysis.checkstyle}" />
 		<mkdir dir="${build.qa.analysis.findbugs}" />
+		<mkdir dir="${build.qa.analysis.cpd}" />
 
-		<pmd maxRuleViolations="${pmd.maximum.violations}">
-			<ruleset>${pmd.rules.file}</ruleset>
+		<echo message="Analyse Code with tool: PMD" level="info" />
+		<pmd maxRuleViolations="${pmd.maximum.violations}" rulesetfiles="${pmd.rules.file}">
 			<formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true" />
 			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true" />
 			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml" />
@@ -270,6 +273,7 @@
 		<!-- this js is used for the sortable report -->
 		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >" />
 
+		<echo message="Analyse Code with tool: Checkstyle" level="info" />
 		<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
 			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
 			<fileset dir="${src.root}" includes="**/*.java" />
@@ -278,14 +282,14 @@
 		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl" />
 		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >" />
 
-
+		<echo message="Analyse Code with tool: FindBugs" level="info" />
 		<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
 		<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
 		<pathconvert property="findbugs.classpath">
 			<path refid="findbugs.classpath" />
 		</pathconvert>
 
-		<findbugs output="xml" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis}/findbugs/findbugs.xml" pluginlist="${lib.root}/test/findbugs.jar">
+		<findbugs output="xml" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="${lib.root}/test/findbugs.jar">
 			<sourcePath path="${src.root}" />
 			<class location="${buildDirectory}/plugins/info.novatec.inspectit.rcp/@dot" />
 			<auxClasspath>
@@ -293,7 +297,12 @@
 				<fileset dir="${lib.root}" includes="**/*.jar" />
 			</auxClasspath>
 		</findbugs>
-		<xslt in="${build.qa.analysis}/findbugs/findbugs.xml" style="${release.basedir}/resources/findbugs/fancy-hist.xsl" out="${build.qa.analysis}/findbugs.html" />
+		<xslt in="${build.qa.analysis.findbugs}/findbugs.xml" style="${release.basedir}/resources/findbugs/fancy-hist.xsl" out="${build.qa.analysis}/findbugs.html" />
+
+		<echo message="Analyse Code with tool: CPD" level="info" />
+		<cpd format="xml" language="java" minimumTokenCount="100" outputFile="${build.qa.analysis.cpd}/cpd.xml">
+			<fileset dir="${src.root}" includes="**/*.java" />
+		</cpd>
 	</target>
 
 
@@ -303,7 +312,7 @@
 	<!-- This target actually executes the PDE Build process by  		 -->
 	<!-- launching the Eclipse antRunner application.     				 -->
 	<!-- *************************************************************** -->
-	<target name="release" depends="retrieve-eclipse" unless="release.run">
+	<target name="release" depends="retrieve-eclipse">
 		<mkdir dir="${basedir}/dist" />
 		<echo message="Executing ${eclipseLocation}/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
@@ -326,9 +335,9 @@
 		<copy todir="${build.rcp.classes}">
 			<fileset dir="${buildDirectory}/plugins/info.novatec.inspectit.rcp/@dot" includes="**/*.class" />
 		</copy>
-		
+
 		<!-- integrate the thirdparty contributions to the release -->
-		<antcall target="-create-thirdparty-notification"/>
+		<antcall target="-create-thirdparty-notification" />
 		<zip destfile="${release.basedir}/dist/inspectit-linux.gtk.x86.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
 		</zip>
@@ -346,15 +355,7 @@ GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), rm
 	</target>
 
 	<!-- Calls the release target and then the analysis targets -->
-	<target name="release-and-analyze" description="--> Calls the release target and then executes the static analysis with the functional tests">
-		<antcall target="static-analysis" />
-
-		<!-- Need to set the property so that the release target wont be called again -->
-		<property name="release.run" value="true" />
-
-		<antcall target="functional-tests" />
-	</target>
-
+	<target name="release-and-analyze" depends="static-analysis, functional-tests, release" description="--> Calls the release target and then executes the static analysis with the functional tests"/>
 
 	<!-- *************************************************************** -->
 	<!--                I V Y     T A R G E T S   		                 -->
