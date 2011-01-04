@@ -49,6 +49,8 @@
 		<delete dir="${build.root}" />
 		<delete dir="${dist.root}" />
 		<delete dir="${src.generated.root}" />
+		<delete dir="${lib.root}/prod" />
+		<delete dir="${lib.root}/test" />
 	</target>
 
 	<target name="init" description="--> Creates necessary folder structure">

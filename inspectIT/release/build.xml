@@ -64,6 +64,9 @@
 		<delete file="../lib/inspectit-commons.jar" />
 		<delete dir="${basedir}/build" />
 		<delete dir="${basedir}/dist" />
+		
+		<delete dir="${lib.root}/prod" />
+		<delete dir="${lib.root}/test" />
 
 		<!-- clean the PDE build environment -->
 		<delete dir="${buildDirectory}" />
