@@ -12,6 +12,7 @@
 		<ibiblio name="jboss" root="http://repository.jboss.com/maven2/" m2compatible="true" usepoms="false"/>
 		<ibiblio name="jboss-public" root="https://repository.jboss.org/nexus/content/groups/public/" m2compatible="true" usepoms="false"/>
 		<ibiblio name="jboss-public2" root="https://repository.jboss.org/nexus/content/groups/public-jboss/" m2compatible="true" usepoms="false"/>
+		<ibiblio name="geotools" root="http://download.osgeo.org/webdav/geotools/" m2compatible="true" usepoms="false"/>
 	</chain>
 	</resolvers>
 </ivysettings>
