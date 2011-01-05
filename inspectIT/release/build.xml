@@ -64,7 +64,7 @@
 		<delete file="../lib/inspectit-commons.jar" />
 		<delete dir="${basedir}/build" />
 		<delete dir="${basedir}/dist" />
-		
+
 		<delete dir="${lib.root}/prod" />
 		<delete dir="${lib.root}/test" />
 
@@ -332,7 +332,18 @@ GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), rm
 	</target>
 
 	<!-- Calls the release target and then the analysis targets -->
-	<target name="release-and-analyze" depends="static-analysis, functional-tests, release" description="--> Calls the release target and then executes the static analysis with the functional tests"/>
+	<target name="release-and-analyze" depends="static-analysis, functional-tests, release" description="--> Calls the release target and then executes the static analysis with the functional tests" />
+
+	<target name="integrate-version-information" description="Integrates the version information into the about box of the UI">
+		<property environment="env" />
+		<property name="version" value="${env.RELEASE_VERSION}.${env.BUILD_NUMBER}" />
+
+		<echo message="Using version: ${version}" />
+
+		<echo file="${project.root}/inspectIT/plugin.properties" message="aboutText=Version ${version}" />
+		<echo message="Wrote plugin.properties to inspectIT project" />
+	</target>
+
 
 	<!-- *************************************************************** -->
 	<!--                I V Y     T A R G E T S   		                 -->

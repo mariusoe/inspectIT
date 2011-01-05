@@ -334,7 +334,7 @@ Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA)" />
 		<mkdir dir="${build.release}/sun1.5-data/agent/config" />
 
 		<antcall target="-create-thirdparty-contributions" />
-		
+
 		<copy todir="${build.release}/sun1.5-data/agent/config">
 			<fileset dir="${config.root}" includes="**/*.*" />
 		</copy>
@@ -378,7 +378,7 @@ Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA)" />
 		<mkdir dir="${build.release}/sun1.4-data/agent/config" />
 
 		<antcall target="-create-thirdparty-contributions" />
-		
+
 		<copy todir="${build.release}/sun1.4-data/agent/config">
 			<fileset dir="${config.root}" includes="**/*.cfg" />
 			<fileset dir="${config.root}" includes="**/*.dll" />
@@ -402,6 +402,16 @@ Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA)" />
 	</target>
 
 	<target name="release-all" depends="release-sun1.4, release-sun1.5" description="--> releases the agent for all versions" />
+
+	<target name="integrate-version-information" description="This target creates a version.log file in the commons directory.">
+		<property environment="env" />
+		<property name="version" value="${env.RELEASE_VERSION}.${env.BUILD_NUMBER}" />
+
+		<echo message="Using version: ${version}" />
+
+		<echo file="${commons.src.root}/version.log" message="${version}" />
+		<echo message="Wrote version.log to Commons/src" />
+	</target>
 
 
 	<!-- *************************************************************** -->
