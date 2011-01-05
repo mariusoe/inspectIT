@@ -226,15 +226,6 @@
 		</cobertura-report>
 		<echo file="${build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >" />
 
-		<!-- generates a JUnit report from the TestNG xml format, because Hudson cant handle the TestNG format -->
-		<junitreport todir="${build.qa.test}/testdata">
-			<fileset dir="${build.qa.test}/testdata">
-				<include name="*/*.xml" />
-			</fileset>
-
-			<report format="noframes" todir="${build.qa.test}/testdata" />
-		</junitreport>
-
 		<!-- create html pages that link to the interesting parts -->
 		<echo file="${build.qa.test}/testresults.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/index.html&quot; >" />
 		<echo file="${build.qa.test}/testreport.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/emailable-report.html&quot; >" />
