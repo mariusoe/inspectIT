@@ -340,7 +340,7 @@ GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), rm
 
 		<echo message="Using version: ${version}" />
 
-		<echo file="${project.root}/inspectIT/plugin.properties" message="aboutText=Version ${version}" />
+		<echo file="../plugin.properties" message="aboutText=Version ${version}" />
 		<echo message="Wrote plugin.properties to inspectIT project" />
 	</target>
 
