@@ -27,7 +27,7 @@ public class Branch<E extends DefaultData> implements ITreeComponent<E> {
 	/**
 	 * Branch indexer.
 	 */
-	protected IBranchIndexer<E> branchIndexer;
+	private IBranchIndexer<E> branchIndexer;
 
 	/**
 	 * Map for holding references.
@@ -38,7 +38,7 @@ public class Branch<E extends DefaultData> implements ITreeComponent<E> {
 	 * Default constructor. {@link Branch} can only be initialized with proper branch indexer
 	 * supplied. If null is passed, {@link IllegalArgumentException} will be thrown.
 	 * 
-	 * @param branchIndexer
+	 * @param branchIndexer 
 	 */
 	public Branch(IBranchIndexer<E> branchIndexer) {
 		super();
@@ -47,6 +47,15 @@ public class Branch<E extends DefaultData> implements ITreeComponent<E> {
 		}
 		this.branchIndexer = branchIndexer;
 		map = new ConcurrentHashMap<Object, ITreeComponent<E>>();
+	}
+
+	/**
+	 * Returns branch indexer.
+	 * 
+	 * @return Branch indexer
+	 */
+	protected IBranchIndexer<E> getBranchIndexer() {
+		return branchIndexer;
 	}
 
 	/**
@@ -228,7 +237,7 @@ public class Branch<E extends DefaultData> implements ITreeComponent<E> {
 			map.remove(key);
 		}
 
-		if (map.size() == 0) {
+		if (map.isEmpty()) {
 			return true;
 		}
 		return false;

@@ -76,6 +76,10 @@ public class BufferInvocationDataDaoImpl implements InvocationDataDao {
 	/**
 	 * Clone invocation sequence. This method returns new object exacly same as the input object,
 	 * but with out nested sequences set.
+	 * 
+	 * @param invData
+	 *            Invocation sequence to be cloned.
+	 * @return Cloned invocation sequence.
 	 */
 	private InvocationSequenceData cloneInvocationSequence(InvocationSequenceData invData) {
 		InvocationSequenceData clone = new InvocationSequenceData(invData.getTimeStamp(), invData.getPlatformIdent(), invData.getSensorTypeIdent(), invData.getMethodIdent());
@@ -93,6 +97,11 @@ public class BufferInvocationDataDaoImpl implements InvocationDataDao {
 		return clone;
 	}
 
+	/**
+	 * Sets the root branch of indexing tree to query.
+	 * 
+	 * @param indexingTree 
+	 */
 	public void setIndexingTree(ITreeComponent<InvocationSequenceData> indexingTree) {
 		this.indexingTree = indexingTree;
 	}

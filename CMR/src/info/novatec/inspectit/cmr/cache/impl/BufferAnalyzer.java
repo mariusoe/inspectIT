@@ -25,7 +25,7 @@ public class BufferAnalyzer extends BufferWorker {
 	 */
 	@Override
 	public void work() throws InterruptedException {
-		buffer.analyzeNext();
+		getBuffer().analyzeNext();
 	}
 	
 }

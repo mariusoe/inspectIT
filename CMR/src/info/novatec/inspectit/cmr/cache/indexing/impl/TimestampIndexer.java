@@ -23,7 +23,7 @@ public class TimestampIndexer<E extends DefaultData> extends AbstractIndexer<E> 
 	/**
 	 * Indexing period.
 	 */
-	private static final long indexingPeriod = 60 * 1000;
+	private static final long INDEXING_PERIOD = 60 * 1000;
 
 	/**
 	 * Set of created time stamp keys.
@@ -40,6 +40,9 @@ public class TimestampIndexer<E extends DefaultData> extends AbstractIndexer<E> 
 	/**
 	 * Constructor that defines child indexer and child branch type. See
 	 * {@link AbstractIndexer#AbstractIndexer(ChildBranchType, IBranchIndexer)}
+	 * 
+	 * @param childBrunchType 
+	 * @param branchIndexer 
 	 * 
 	 */
 	public TimestampIndexer(ChildBranchType childBrunchType, IBranchIndexer<E> branchIndexer) {
@@ -67,10 +70,10 @@ public class TimestampIndexer<E extends DefaultData> extends AbstractIndexer<E> 
 		}
 		long startKey = getKey(query.getFromDate());
 		long endKey = getKey(query.getToDate());
-		int size = (int) ((endKey - startKey) / indexingPeriod + 1);
+		int size = (int) ((endKey - startKey) / INDEXING_PERIOD + 1);
 		ArrayList<Object> keysList = new ArrayList<Object>();
 		for (int i = 0; i < size; i++) {
-			long key = startKey + i * indexingPeriod;
+			long key = startKey + i * INDEXING_PERIOD;
 			if (createdKeysSet.contains(key)) {
 				keysList.add(key);
 			}
@@ -82,10 +85,11 @@ public class TimestampIndexer<E extends DefaultData> extends AbstractIndexer<E> 
 	 * Returns proper key for given timestamp.
 	 * 
 	 * @param timestamp
-	 * @return
+	 *            Timestamp to map.
+	 * @return Mapping key.
 	 */
 	private long getKey(Timestamp timestamp) {
-		return timestamp.getTime() - timestamp.getTime() % indexingPeriod;
+		return timestamp.getTime() - timestamp.getTime() % INDEXING_PERIOD;
 	}
 
 	/**
@@ -99,7 +103,7 @@ public class TimestampIndexer<E extends DefaultData> extends AbstractIndexer<E> 
 	 * {@inheritDoc}
 	 */
 	public IBranchIndexer<E> getNewInstance() {
-		return new TimestampIndexer<E>(childBranchType, childIndexer);
+		return new TimestampIndexer<E>(super.getChildBranchType(), super.getChildIndexer());
 	}
 
 }

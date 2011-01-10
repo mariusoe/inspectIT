@@ -3,6 +3,7 @@ package info.novatec.inspectit.cmr.cache.impl;
 import java.text.NumberFormat;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
@@ -78,98 +79,230 @@ public class BufferProperties implements InitializingBean {
 	 */
 	private static final Logger LOGGER = Logger.getLogger(BufferProperties.class);
 
+	/**
+	 * Returns buffer eviction occupancy percentage.
+	 * 
+	 * @return Buffer eviction occupancy percentage as float.
+	 */
 	public float getEvictionOccupancyPercentage() {
 		return evictionOccupancyPercentage;
 	}
 
+	/**
+	 * Sets buffer eviction occupancy percentage.
+	 * 
+	 * @param evictionOccupancyPercentage
+	 *            Buffer eviction occupancy percentage as float.
+	 */
 	public void setEvictionOccupancyPercentage(float evictionOccupancyPercentage) {
 		this.evictionOccupancyPercentage = evictionOccupancyPercentage;
 	}
 
+	/**
+	 * Returns maximum heap occupancy percentage.
+	 * 
+	 * @return Maximum heap occupancy percentage as float.
+	 */
 	public float getMaxHeapSizeOccupancy() {
 		return maxHeapSizeOccupancy;
 	}
 
+	/**
+	 * Sets maximum heap occupancy percentage.
+	 * 
+	 * @param maxHeapSizeOccupancy
+	 *            Maximum heap occupancy percentage as float.
+	 */
 	public void setMaxHeapSizeOccupancy(float maxHeapSizeOccupancy) {
 		this.maxHeapSizeOccupancy = maxHeapSizeOccupancy;
 	}
 
+	/**
+	 * Returns minimum heap occupancy percentage.
+	 * 
+	 * @return Minimum heap occupancy percentage as float.
+	 */
 	public float getMinHeapSizeOccupancy() {
 		return minHeapSizeOccupancy;
 	}
 
+	/**
+	 * Sets minimum heap occupancy percentage.
+	 * 
+	 * @param minHeapSizeOccupancy
+	 *            Minimum heap occupancy percentage as float.
+	 */
 	public void setMinHeapSizeOccupancy(float minHeapSizeOccupancy) {
 		this.minHeapSizeOccupancy = minHeapSizeOccupancy;
 	}
 
+	/**
+	 * Returns the heap size from which maximum heap occupancy percentage is active.
+	 * 
+	 * @return Heap size in bytes.
+	 */
 	public long getMaxHeapSizeOccupancyActiveFromHeapSize() {
 		return maxHeapSizeOccupancyActiveFromHeapSize;
 	}
 
+	/**
+	 * Sets the heap size from which maximum heap occupancy percentage is active.
+	 * 
+	 * @param maxHeapSizeOccupancyActiveFromHeapSize
+	 *            Heap size in bytes.
+	 */
 	public void setMaxHeapSizeOccupancyActiveFromHeapSize(long maxHeapSizeOccupancyActiveFromHeapSize) {
 		this.maxHeapSizeOccupancyActiveFromHeapSize = maxHeapSizeOccupancyActiveFromHeapSize;
 	}
 
+	/**
+	 * Returns the heap size till which minimum heap occupancy percentage is active.
+	 * 
+	 * @return Heap size in bytes.
+	 */
 	public long getMinHeapSizeOccupancyActiveTillHeapSize() {
 		return minHeapSizeOccupancyActiveTillHeapSize;
 	}
 
+	/**
+	 * Sets the heap size till which minimum heap occupancy percentage is active.
+	 * 
+	 * @param minHeapSizeOccupancyActiveTillHeapSize
+	 *            Heap size in bytes.
+	 */
 	public void setMinHeapSizeOccupancyActiveTillHeapSize(long minHeapSizeOccupancyActiveTillHeapSize) {
 		this.minHeapSizeOccupancyActiveTillHeapSize = minHeapSizeOccupancyActiveTillHeapSize;
 	}
 
+	/**
+	 * Returns minimum memory size that needs always to be available to CMR regardless of buffer.
+	 * 
+	 * @return Memory size in bytes.
+	 */
 	public long getMinMemoryDelta() {
 		return minMemoryDelta;
 	}
 
+	/**
+	 * Sets minimum memory size that needs always to be available to CMR regardless of buffer.
+	 * 
+	 * @param minMemoryDelta
+	 *            memory size in bytes.
+	 */
 	public void setMinMemoryDelta(long minMemoryDelta) {
 		this.minMemoryDelta = minMemoryDelta;
 	}
 
+	/**
+	 * Returns maximum security object expansion rate in percentages.
+	 * 
+	 * @return Maximum security object expansion rate in percentages as float.
+	 */
 	public float getMaxObjectExpansionRate() {
 		return maxObjectExpansionRate;
 	}
 
+	/**
+	 * Sets maximum security object expansion rate in percentages.
+	 * 
+	 * @param maxObjectExpansionRate
+	 *            Maximum security object expansion rate in percentages as float.
+	 */
 	public void setMaxObjectExpansionRate(float maxObjectExpansionRate) {
 		this.maxObjectExpansionRate = maxObjectExpansionRate;
 	}
 
+	/**
+	 * Returns minimum security object expansion rate in percentages.
+	 * 
+	 * @return Minimum security object expansion rate in percentages as float.
+	 */
 	public float getMinObjectExpansionRate() {
 		return minObjectExpansionRate;
 	}
 
+	/**
+	 * Sets minimum security object expansion rate in percentages.
+	 * 
+	 * @param minObjectExpansionRate
+	 *            Minimum security object expansion rate in percentages as float.
+	 */
 	public void setMinObjectExpansionRate(float minObjectExpansionRate) {
 		this.minObjectExpansionRate = minObjectExpansionRate;
 	}
 
+	/**
+	 * Returns buffer size till which maximum object expansion rate is active.
+	 * 
+	 * @return Buffer size in bytes.
+	 */
 	public long getMaxObjectExpansionRateActiveTillBufferSize() {
 		return maxObjectExpansionRateActiveTillBufferSize;
 	}
 
+	/**
+	 * Sets buffer size till which maximum object expansion rate is active.
+	 * 
+	 * @param maxObjectExpansionRateActiveTillBufferSize
+	 *            Buffer size in bytes.
+	 */
 	public void setMaxObjectExpansionRateActiveTillBufferSize(long maxObjectExpansionRateActiveTillBufferSize) {
 		this.maxObjectExpansionRateActiveTillBufferSize = maxObjectExpansionRateActiveTillBufferSize;
 	}
 
+	/**
+	 * Returns buffer size from which minimum object expansion rate is active.
+	 * 
+	 * @return Buffer size in bytes.
+	 */
 	public long getMinObjectExpansionRateActiveFromBufferSize() {
 		return minObjectExpansionRateActiveFromBufferSize;
 	}
 
+	/**
+	 * Sets buffer size from which minimum object expansion rate is active.
+	 * 
+	 * @param minObjectExpansionRateActiveFromBufferSize
+	 *            Buffer size in bytes.
+	 */
 	public void setMinObjectExpansionRateActiveFromBufferSize(long minObjectExpansionRateActiveFromBufferSize) {
 		this.minObjectExpansionRateActiveFromBufferSize = minObjectExpansionRateActiveFromBufferSize;
 	}
 
+	/**
+	 * Returns number of elements that need to be processed, so that the buffer maintenance is done.
+	 * 
+	 * @return Number of buffer elements.
+	 */
 	public long getElementsCountForMaintenance() {
 		return elementsCountForMaintenance;
 	}
 
+	/**
+	 * Sets number of elements that need to be processed, so that the buffer maintenance is done.
+	 * 
+	 * @param elementsCountForMaintenance
+	 *            Number of buffer elements.
+	 */
 	public void setElementsCountForMaintenance(long elementsCountForMaintenance) {
 		this.elementsCountForMaintenance = elementsCountForMaintenance;
 	}
 
+	/**
+	 * Returns size of the eviction fragment in percentages, in relation to the max buffer size.
+	 * 
+	 * @return Eviction fragment in percentages as float.
+	 */
 	public float getEvictionFragmentSizePercentage() {
 		return evictionFragmentSizePercentage;
 	}
 
+	/**
+	 * Sets size of the eviction fragment in percentages, in relation to the max buffer size.
+	 * 
+	 * @param evictionFragmentSizePercentage
+	 *            Eviction fragment in percentages as float.
+	 */
 	public void setEvictionFragmentSizePercentage(float evictionFragmentSizePercentage) {
 		this.evictionFragmentSizePercentage = evictionFragmentSizePercentage;
 	}
@@ -229,9 +362,11 @@ public class BufferProperties implements InitializingBean {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		//TODO Eviction fragment check
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("|-Buffer properties initialized with following values:");
 			LOGGER.info("||-Eviction occupancy percentage: " + NumberFormat.getInstance().format(evictionOccupancyPercentage * 100) + "%");
@@ -247,32 +382,33 @@ public class BufferProperties implements InitializingBean {
 
 		}
 		if (this.evictionOccupancyPercentage < 0 || this.evictionOccupancyPercentage > 1) {
-			throw new Exception("Buffer properties initialization error: Eviction occupancy must be a percentage value between 0 and 1. Initialization value is: " + evictionOccupancyPercentage);
+			throw new BeanInitializationException("Buffer properties initialization error: Eviction occupancy must be a percentage value between 0 and 1. Initialization value is: " + evictionOccupancyPercentage);
 		}
 		if (this.evictionFragmentSizePercentage < 0.01 || this.evictionFragmentSizePercentage > 0.5) {
-			throw new Exception("Buffer properties initialization error: Eviction fragment size must be a percentage value between 0.01 and 0.5. Initialization value is: " + evictionFragmentSizePercentage);
+			throw new BeanInitializationException("Buffer properties initialization error: Eviction fragment size must be a percentage value between 0.01 and 0.5. Initialization value is: "
+					+ evictionFragmentSizePercentage);
 		}
 		if (this.minHeapSizeOccupancy < 0 || this.minHeapSizeOccupancy > 1) {
-			throw new Exception("Buffer properties initialization error: Minimum heap size occupancy must be a percentage value between 0 and 1. Initialization value is: " + minHeapSizeOccupancy);
+			throw new BeanInitializationException("Buffer properties initialization error: Minimum heap size occupancy must be a percentage value between 0 and 1. Initialization value is: " + minHeapSizeOccupancy);
 		}
 		if (this.maxHeapSizeOccupancy < 0 || this.maxHeapSizeOccupancy > 1) {
-			throw new Exception("Buffer properties initialization error: Maximum heap size occupancy must be a percentage value between 0 and 1. Initialization value is: " + maxHeapSizeOccupancy);
+			throw new BeanInitializationException("Buffer properties initialization error: Maximum heap size occupancy must be a percentage value between 0 and 1. Initialization value is: " + maxHeapSizeOccupancy);
 		}
 		if (this.maxHeapSizeOccupancy < this.minHeapSizeOccupancy) {
-			throw new Exception("Buffer properties initialization error: Maximum heap size occupancy can not be lower than minimum heap size occupancy. Initialization values are: "
+			throw new BeanInitializationException("Buffer properties initialization error: Maximum heap size occupancy can not be lower than minimum heap size occupancy. Initialization values are: "
 					+ maxHeapSizeOccupancy + " (max) and " + minHeapSizeOccupancy + " (min)");
 		}
 		if (this.maxObjectExpansionRate < this.minObjectExpansionRate) {
-			throw new Exception("Buffer properties initialization error: Maximum object expansion rate can not be lower than minimum object expansion rate. Initialization values are: "
+			throw new BeanInitializationException("Buffer properties initialization error: Maximum object expansion rate can not be lower than minimum object expansion rate. Initialization values are: "
 					+ maxObjectExpansionRate + " (max) and " + minObjectExpansionRate + " (min)");
 		}
 		if (this.maxHeapSizeOccupancyActiveFromHeapSize < this.minHeapSizeOccupancyActiveTillHeapSize) {
-			throw new Exception(
+			throw new BeanInitializationException(
 					"Buffer properties initialization error: Heap size from which maximum heap occupancy is active can not be lower than heap size till which minimum heap occupancy is active. Initialization values are: "
 							+ maxHeapSizeOccupancyActiveFromHeapSize + " (heap size for max heap occupancy) and " + minHeapSizeOccupancyActiveTillHeapSize + " (heap size for min heap occupancy)");
 		}
 		if (this.minObjectExpansionRateActiveFromBufferSize < this.maxObjectExpansionRateActiveTillBufferSize) {
-			throw new Exception(
+			throw new BeanInitializationException(
 					"Buffer properties initialization error: Buffer size from which minimum object expansion rate is active can not be lower than buffer size till which maximum object expansion rate is active. Initialization values are: "
 							+ minObjectExpansionRateActiveFromBufferSize
 							+ " (buffer size for min object expansion rate) and "

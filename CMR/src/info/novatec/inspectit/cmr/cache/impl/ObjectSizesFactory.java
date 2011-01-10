@@ -24,8 +24,8 @@ public class ObjectSizesFactory implements FactoryBean {
 	public Object getObject() throws Exception {
 		boolean is64Bit = System.getProperty("sun.arch.data.model").indexOf("64") != -1;
 		if (is64Bit) {
-			RuntimeMXBean RuntimemxBean = ManagementFactory.getRuntimeMXBean();
-			List<String> arguments = RuntimemxBean.getInputArguments();
+			RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+			List<String> arguments = runtimeMXBean.getInputArguments();
 			boolean compresedOops = false;
 			for (String argument : arguments) {
 				if (argument.indexOf("UseCompressedOops") != -1) {

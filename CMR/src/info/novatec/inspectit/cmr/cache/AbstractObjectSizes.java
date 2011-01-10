@@ -27,7 +27,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	/**
 	 * Returns the size of reference in bytes.
 	 * 
-	 * @return
+	 * @return Size of reference.
 	 */
 	public abstract long getReferenceSize();
 
@@ -42,7 +42,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * {@inheritDoc}
 	 * <p>
 	 * The formula used is: 24 bytes for String object 12 bytes for char[] 2 bytes * number of chars
-	 * in the string
+	 * in the string.
 	 */
 	public long getSizeOf(String str) {
 		if (null == str) {
@@ -70,7 +70,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * {@inheritDoc}
 	 * <p>
 	 * The formula used is: 20 bytes + one reference for ArrayList object 12 bytes for array
-	 * reference size * array length
+	 * reference size * array length.
 	 */
 	@SuppressWarnings("rawtypes")
 	public long getSizeOf(List arrayList) {
@@ -85,7 +85,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * {@inheritDoc}
 	 * <p>
 	 * The formula used is: 12 bytes + one reference for HashSet object size of HashMap object
-	 * because HashSet uses it
+	 * because HashSet uses it.
 	 */
 	@SuppressWarnings("rawtypes")
 	public long getSizeOf(Set hashSet) {
@@ -102,7 +102,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * {@inheritDoc}
 	 * <p>
 	 * The formula used is: 28 bytes + three references for HashMap object 12 bytes for elements
-	 * array reference size * map size map size * HashMap.Entry size (12 bytes + three references)
+	 * array reference size * map size map size * HashMap.Entry size (12 bytes + three references).
 	 */
 	@SuppressWarnings("rawtypes")
 	public long getSizeOf(Map hashMap) {
@@ -118,7 +118,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * {@inheritDoc}
 	 */
 	public long alignTo8Bytes(long size) {
-		return size += size % 8;
+		return size + size % 8;
 	}
 
 	/**

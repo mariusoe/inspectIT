@@ -104,14 +104,15 @@ public class HealthStatus {
 	/**
 	 * Log a graphical version of the load average.
 	 * 
-	 * @param loadAverage
+	 * @param loadAvg
 	 *            The current load average over the last 60 seconds.
 	 * @param availCpus
 	 *            The available cpus.
 	 * 
 	 * @see OperatingSystemMXBean#getSystemLoadAverage()
 	 */
-	private void logGraphicalLoadAverage(double loadAverage, int availCpus) {
+	private void logGraphicalLoadAverage(double loadAvg, int availCpus) {
+		double loadAverage = loadAvg;
 		if (loadAverage < 0) {
 			loadAverage = 0;
 		}
@@ -197,6 +198,7 @@ public class HealthStatus {
 	 * 
 	 * @param memoryUsage
 	 *            The memory usage object to log.
+	 * @param title Title of graphical box.
 	 * 
 	 * @see MemoryUsage
 	 */

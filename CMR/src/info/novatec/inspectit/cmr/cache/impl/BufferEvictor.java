@@ -25,7 +25,7 @@ public class BufferEvictor extends BufferWorker {
 	 */
 	@Override
 	public void work() throws InterruptedException {
-		buffer.evict();
+		getBuffer().evict();
 	}
 
 }

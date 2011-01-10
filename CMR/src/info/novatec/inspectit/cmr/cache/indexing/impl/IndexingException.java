@@ -14,14 +14,19 @@ public class IndexingException extends Exception {
 	private static final long serialVersionUID = -8640380079673438659L;
 
 	/**
-	 * {@link Exception#Exception(String)}
+	 * Same as {@link Exception#Exception(String)}.
+	 * 
+	 * @param message 
 	 */
 	public IndexingException(String message) {
 		super(message);
 	}
 
 	/**
-	 * {@link Exception#Exception(String, Throwable)}
+	 * Same as {@link Exception#Exception(String, Throwable)}.
+	 * 
+	 * @param message 
+	 * @param throwable 
 	 */
 	public IndexingException(String message, Throwable throwable) {
 		super(message, throwable);

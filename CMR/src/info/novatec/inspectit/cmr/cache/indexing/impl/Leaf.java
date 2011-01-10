@@ -123,7 +123,7 @@ public class Leaf<E extends DefaultData> implements ITreeComponent<E> {
 		for (Object key : toClean) {
 			map.remove(key);
 		}
-		if (map.size() == 0) {
+		if (map.isEmpty()) {
 			return true;
 		}
 		return false;

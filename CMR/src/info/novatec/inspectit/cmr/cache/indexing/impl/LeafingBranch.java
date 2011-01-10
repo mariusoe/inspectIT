@@ -28,7 +28,7 @@ public class LeafingBranch<E extends DefaultData> extends Branch<E> {
 	/**
 	 * Default constructor.
 	 * 
-	 * @param branchIndexer
+	 * @param branchIndexer 
 	 */
 	public LeafingBranch(IBranchIndexer<E> branchIndexer) {
 		super(branchIndexer);
@@ -72,7 +72,7 @@ public class LeafingBranch<E extends DefaultData> extends Branch<E> {
 	 */
 	@Override
 	public List<E> query(IndexQuery query) {
-		Object[] keys = branchIndexer.getKeys(query);
+		Object[] keys = getBranchIndexer().getKeys(query);
 		if (null == keys) {
 			if (isQueryIndexedUnder(query)) {
 				return queryAllTreeComponents(query);
@@ -135,7 +135,7 @@ public class LeafingBranch<E extends DefaultData> extends Branch<E> {
 	 *         branch, otherwise false.
 	 */
 	private boolean isQueryIndexedUnder(IndexQuery query) {
-		IBranchIndexer<E> branchIndexer = this.branchIndexer.getChildIndexer();
+		IBranchIndexer<E> branchIndexer = getBranchIndexer().getChildIndexer();
 		while (null != branchIndexer) {
 			if (null != branchIndexer.getKeys(query)) {
 				return true;

@@ -27,6 +27,8 @@ public class ObjectTypeIndexer<E extends DefaultData> extends AbstractIndexer<E>
 	 * Constructor that defines child indexer and child branch type. See
 	 * {@link AbstractIndexer#AbstractIndexer(ChildBranchType, IBranchIndexer)}
 	 * 
+	 * @param childBrunchType 
+	 * @param branchIndexer 
 	 */
 	public ObjectTypeIndexer(ChildBranchType childBrunchType, IBranchIndexer<E> branchIndexer) {
 		super(childBrunchType, branchIndexer);
@@ -60,6 +62,8 @@ public class ObjectTypeIndexer<E extends DefaultData> extends AbstractIndexer<E>
 
 	/**
 	 * Not supported.
+	 * 
+	 * @return Not supported.
 	 */
 	public IBranchIndexer<E> getNewInstance() {
 		throw new UnsupportedOperationException("Branch indexer can not return new instance because it uses the shared one.");

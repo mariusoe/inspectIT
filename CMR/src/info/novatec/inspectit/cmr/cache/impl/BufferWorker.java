@@ -14,12 +14,13 @@ public abstract class BufferWorker extends Thread {
 	/**
 	 * Buffer to work on.
 	 */
-	protected IBuffer<?> buffer;
+	private IBuffer<?> buffer;
 
 	/**
 	 * Default constructor. Thread is set to be a daemon, to have highest priority and started.
 	 * 
 	 * @param buffer
+	 *            Buffer to work on.
 	 */
 	public BufferWorker(IBuffer<?> buffer) {
 		this.buffer = buffer;
@@ -31,11 +32,21 @@ public abstract class BufferWorker extends Thread {
 	 * Defines the work to be done on the buffer.
 	 * 
 	 * @throws InterruptedException
+	 *             {@link InterruptedException}
 	 */
 	public abstract void work() throws InterruptedException;
 
 	/**
-	 * {@inheritDocs}
+	 * Returns buffer that worker is working on.
+	 * 
+	 * @return Buffer.
+	 */
+	protected IBuffer<?> getBuffer() {
+		return buffer;
+	}
+
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void run() {

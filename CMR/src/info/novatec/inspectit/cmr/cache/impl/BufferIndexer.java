@@ -25,7 +25,7 @@ public class BufferIndexer extends BufferWorker {
 	 */
 	@Override
 	public void work() throws InterruptedException {
-		buffer.indexNext();
+		getBuffer().indexNext();
 	}
 
 }

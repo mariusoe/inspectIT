@@ -25,6 +25,8 @@ public class MethodIdentIndexer<E extends MethodSensorData> extends AbstractInde
 	 * Constructor that defines child indexer and child branch type. See
 	 * {@link AbstractIndexer#AbstractIndexer(ChildBranchType, IBranchIndexer)}
 	 * 
+	 * @param childBrunchType 
+	 * @param branchIndexer 
 	 */
 	public MethodIdentIndexer(ChildBranchType childBrunchType, IBranchIndexer<E> branchIndexer) {
 		super(childBrunchType, branchIndexer);
@@ -61,6 +63,8 @@ public class MethodIdentIndexer<E extends MethodSensorData> extends AbstractInde
 
 	/**
 	 * Not supported.
+	 * 
+	 * @return Not supported.
 	 */
 	public IBranchIndexer<E> getNewInstance() {
 		throw new UnsupportedOperationException("Branch indexer can not return new instance because it uses the shared one.");

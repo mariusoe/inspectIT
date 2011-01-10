@@ -22,18 +22,25 @@ public abstract class AbstractIndexer<E extends DefaultData> implements IBranchI
 	 * 
 	 */
 	public enum ChildBranchType {
+
+		/**
+		 * Type of branch.
+		 * 
+		 * @see Branch
+		 * @see LeafingBranch
+		 */
 		NORMAL_BRANCH, LEAFING_BRANCH;
 	}
 
 	/**
 	 * Child indexer.
 	 */
-	protected IBranchIndexer<E> childIndexer;
+	private IBranchIndexer<E> childIndexer;
 
 	/**
 	 * Type of the child brunch.
 	 */
-	protected ChildBranchType childBranchType;
+	private ChildBranchType childBranchType;
 
 	/**
 	 * Default constructor. No child indexer is set.
@@ -45,7 +52,7 @@ public abstract class AbstractIndexer<E extends DefaultData> implements IBranchI
 	/**
 	 * Constructor that defines child indexer and child branch type.
 	 * 
-	 * @param childBrunchType
+	 * @param childBranchType
 	 *            Type of the branch that will be made under {@link Branch} that this indexer is
 	 *            serving.
 	 * @param childIndexer
@@ -64,6 +71,15 @@ public abstract class AbstractIndexer<E extends DefaultData> implements IBranchI
 	 */
 	public IBranchIndexer<E> getChildIndexer() {
 		return childIndexer;
+	}
+
+	/**
+	 * Returns type of child branch.
+	 * 
+	 * @return Type of child branch
+	 */
+	public ChildBranchType getChildBranchType() {
+		return childBranchType;
 	}
 
 	/**

@@ -36,7 +36,7 @@ public class BufferElement<E extends DefaultData> implements IBufferElement<E> {
 	/**
 	 * Is it evicted.
 	 */
-	boolean evicted = false;
+	private boolean evicted = false;
 
 	/**
 	 * Default constructor.

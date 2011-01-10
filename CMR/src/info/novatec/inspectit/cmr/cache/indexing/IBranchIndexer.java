@@ -13,7 +13,7 @@ public interface IBranchIndexer<E> {
 	/**
 	 * Returns the key for one element.
 	 * 
-	 * @param element
+	 * @param element 
 	 * @return Key or null if passed element is null, or indexing value is not set.
 	 */
 	Object getKey(E element);
@@ -21,7 +21,7 @@ public interface IBranchIndexer<E> {
 	/**
 	 * Return arrays of mapping keys that correspond to the passed query.
 	 * 
-	 * @param query
+	 * @param query 
 	 * @return Keys or null if no keys are associated with query.
 	 */
 	Object[] getKeys(IndexQuery query);
@@ -29,7 +29,7 @@ public interface IBranchIndexer<E> {
 	/**
 	 * Returns the {@link IBranchIndexer} for next {@link ITreeComponent} in the tree.
 	 * 
-	 * @return
+	 * @return Child indexer.
 	 */
 	IBranchIndexer<E> getChildIndexer();
 
@@ -38,7 +38,7 @@ public interface IBranchIndexer<E> {
 	 * {@link #getChildIndexer()} returned object is not null the tree will create new
 	 * {@link Branch} (or its subclass), otherwise new {@link Leaf}.
 	 * 
-	 * @return
+	 * @return Next tree component.
 	 */
 	ITreeComponent<E> getNextTreeComponent();
 
@@ -47,7 +47,7 @@ public interface IBranchIndexer<E> {
 	 * meaning if all branches on the level where this indexer is used can use one and same
 	 * instance.
 	 * 
-	 * @return
+	 * @return If instance of indexer is shared between all indexers of same type.
 	 */
 	boolean sharedInstance();
 
@@ -56,7 +56,7 @@ public interface IBranchIndexer<E> {
 	 * child indexer. This method will be used only if {@link #sharedInstance()} returns false, thus
 	 * with indexer that can not have same instance for all branches on the level where it is used.
 	 * 
-	 * @return
+	 * @return New instance of indexer of same type.
 	 */
 	IBranchIndexer<E> getNewInstance();
 

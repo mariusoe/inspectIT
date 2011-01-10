@@ -18,7 +18,7 @@ public interface ITreeComponent<E> {
 	/**
 	 * Put the element in the tree component.
 	 * 
-	 * @param element
+	 * @param element 
 	 * @throws IndexingException
 	 *             Exception is thrown if the element can not be properly indexed.
 	 */
@@ -29,7 +29,7 @@ public interface ITreeComponent<E> {
 	 * should have as large as possible information set, because then the method will be performed
 	 * much faster. If passed element is null, null is returned.
 	 * 
-	 * @param template
+	 * @param template 
 	 * @return Found element, or null if element does not exists in the tree.
 	 */
 	E get(E template);
@@ -39,7 +39,7 @@ public interface ITreeComponent<E> {
 	 * component. The template object should have as large as possible information set, because then
 	 * the method will be performed much faster. If passed element is null, null is returned.
 	 * 
-	 * @param template
+	 * @param template 
 	 * @return Found element, or null if element does not exists in the tree.
 	 */
 	E getAndRemove(E template);
@@ -48,7 +48,7 @@ public interface ITreeComponent<E> {
 	 * Returns the list of elements that satisfies the query. The query object should define as
 	 * large as possible information set, because then the search is performed faster.
 	 * 
-	 * @param query
+	 * @param query 
 	 * @return List of elements, or empty list if nothing is found.
 	 */
 	List<E> query(IndexQuery query);
@@ -72,15 +72,15 @@ public interface ITreeComponent<E> {
 	 * Computes the size of the {@link ITreeComponent} with underlined {@link ITreeComponent} sizes
 	 * also, but without referenced elements.
 	 * 
-	 * @param query
-	 * @return
+	 * @param objectSizes   
+	 * @return Size of tree component in bytes.
 	 */
 	long getComponentSize(IObjectSizes objectSizes);
 
 	/**
 	 * Returns number of elements that are indexed in this tree component.
 	 * 
-	 * @return
+	 * @return Number of indexed elements.
 	 */
 	long getNumberOfElements();
 

@@ -164,13 +164,6 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	private static final Logger LOGGER = Logger.getLogger(AtomicBuffer.class);
 
 	/**
-	 * Default constructor.
-	 */
-	public AtomicBuffer() {
-
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * <p>
 	 * This method also set the ID of the object that buffer element is holding, thus overwriting
@@ -198,12 +191,12 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 
 				// if currently first is not pointing to marker, it means that we already have
 				// elements in the buffer, so connect elements
-				if (emptyBufferElement != currenltyFirst) {
+				if (!emptyBufferElement.equals(currenltyFirst)) {
 					currenltyFirst.setNextElement(element);
-				}
-				// otherwise this is the first element in the buffer, so references are connected
-				// and notify flag is set
-				else {
+				} else {
+					// otherwise this is the first element in the buffer, so references are
+					// connected
+					// and notify flag is set
 					nextForAnalysis.set(element);
 					nextForIndexing.set(element);
 					last.set(element);
@@ -266,16 +259,16 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 			IBufferElement<E> currentLastElement = last.get();
 
 			// check if we really have concrete elements because clear buffer can happen anywhere
-			if (emptyBufferElement == currentLastElement) {
+			if (emptyBufferElement.equals(currentLastElement)) {
 				break;
 			}
-			
+
 			// set up the values for evicting the fragment of elements
 			IBufferElement<E> newLastElement = currentLastElement;
 			long evictionFragmentMaxSize = (long) (this.getMaxSize() * bufferProperties.getEvictionFragmentSizePercentage());
 			long fragmentSize = 0;
 			int elementsInFragment = 0;
-			
+
 			// iterate until size of the eviction fragment is reached
 			while (fragmentSize < evictionFragmentMaxSize) {
 				fragmentSize += newLastElement.getBufferElementSize();
@@ -333,7 +326,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 			// get next for analysis
 			IBufferElement<E> elementToAnalyze = nextForAnalysis.get();
 			// check if we really have concrete element because clear buffer can happen anywhere
-			if (emptyBufferElement == elementToAnalyze) {
+			if (emptyBufferElement.equals(elementToAnalyze)) {
 				break;
 			}
 
@@ -394,7 +387,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 			// get next for analysis
 			IBufferElement<E> elementToIndex = nextForIndexing.get();
 			// check if we really have concrete element because clear buffer can happen anywhere
-			if (emptyBufferElement == elementToIndex) {
+			if (emptyBufferElement.equals(elementToIndex)) {
 				break;
 			}
 
@@ -417,8 +410,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 					}
 				} catch (IndexingException e) {
 					// indexing exception should not happen
-					LOGGER.error(e.getMessage());
-					e.printStackTrace();
+					LOGGER.error(e.getMessage(), e);
 				}
 
 				// if now we are pointing to the marker we go to sleep until we are informed that
@@ -443,20 +435,17 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 		}
 
 		// if clean flag is set thread should try to perform indexing tree cleaning
-		if (cleanFlag.get()) {
-			// only thread that successfully executes the compare and set will do the cleaning
-			if (cleanFlag.compareAndSet(true, false)) {
-				long time = 0;
-				if (LOGGER.isDebugEnabled()) {
-					time = System.nanoTime();
-				}
+		// only thread that successfully executes the compare and set will do the cleaning
+		if (cleanFlag.get() && cleanFlag.compareAndSet(true, false)) {
+			long time = 0;
+			if (LOGGER.isDebugEnabled()) {
+				time = System.nanoTime();
+			}
 
-				indexingTree.clean();
+			indexingTree.clean();
 
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Indexing tree cleaning duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
-				}
-
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Indexing tree cleaning duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
 			}
 		}
 
@@ -489,6 +478,12 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 		return currentSize.get();
 	}
 
+	/**
+	 * Sets the current size of the buffer.
+	 * 
+	 * @param currentSize
+	 *            Size in bytes.
+	 */
 	public void setCurrentSize(long currentSize) {
 		this.currentSize.set(currentSize);
 		notifyEvictionIfNeeded();
@@ -498,6 +493,9 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	 * Adds size value to the current size.
 	 * <p>
 	 * This method is thread safe.
+	 * 
+	 * @param size
+	 *            Size in bytes.
 	 */
 	private void addToCurrentSize(long size) {
 		currentSize.addAndGet(size);
@@ -508,6 +506,9 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	 * Subtracts size value from the current size.
 	 * <p>
 	 * This method is thread safe.
+	 * 
+	 * @param size
+	 *            Size in bytes.
 	 */
 	private void substractFromCurrentSize(long size) {
 		currentSize.addAndGet(-(size));
@@ -567,7 +568,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	/**
 	 * Returns the number of inserted elements since the buffer has been created.
 	 * 
-	 * @return
+	 * @return Number of inserted elements.
 	 */
 	public long getInsertedElemenets() {
 		return elementsAdded.get();
@@ -576,7 +577,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	/**
 	 * Returns the number of evicted elements since the buffer has been created.
 	 * 
-	 * @return
+	 * @return Number of evicted elements.
 	 */
 	public long getEvictedElemenets() {
 		return elementsEvicted.get();
@@ -585,7 +586,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	/**
 	 * Returns the number of indexed elements since the buffer has been created.
 	 * 
-	 * @return
+	 * @return Number of indexed elements.
 	 */
 	public long getIndexedElements() {
 		return elementsIndexed.get();
@@ -595,6 +596,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	 * Setter for object sizes.
 	 * 
 	 * @param objectSizes
+	 *            Proper {@link IObjectSizes} instance.
 	 */
 	public void setObjectSizes(IObjectSizes objectSizes) {
 		this.objectSizes = objectSizes;
@@ -603,7 +605,8 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	/**
 	 * Setter for buffer properties.
 	 * 
-	 * @param objectSizes
+	 * @param bufferProperties
+	 *            Set of properties for this buffer.
 	 */
 	public void setBufferProperties(BufferProperties bufferProperties) {
 		this.bufferProperties = bufferProperties;
@@ -613,6 +616,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	 * Setter for the root branch for the indexing tree.
 	 * 
 	 * @param indexingTree
+	 *            Root branch.
 	 */
 	public void setIndexingTree(ITreeComponent<E> indexingTree) {
 		this.indexingTree = indexingTree;
@@ -644,15 +648,26 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	 */
 	@Override
 	public String toString() {
-		String msg = "";
-		msg += "The buffer occupancy status: " + NumberFormat.getInstance().format(currentSize.get()) + " bytes occupied from total " + NumberFormat.getInstance().format(maxSize.get())
-				+ " bytes available (" + NumberFormat.getInstance().format(getOccupancyPercentage() * 100) + "%).\n";
-		msg += "Elements processed in the buffer since last clear buffer:\n";
-		msg += "-Elements added: " + NumberFormat.getInstance().format(elementsAdded.get()) + "\n";
-		msg += "-Elements analyzed: " + NumberFormat.getInstance().format(elementsAnalyzed.get()) + "\n";
-		msg += "-Elements indexed: " + NumberFormat.getInstance().format(elementsIndexed.get()) + "\n";
-		msg += "-Elements evicted: " + NumberFormat.getInstance().format(elementsEvicted.get()) + "\n";
-		return msg;
+		StringBuffer msg = new StringBuffer(256);
+		msg.append("The buffer occupancy status: ");
+		msg.append(NumberFormat.getInstance().format(currentSize.get()));
+		msg.append(" bytes occupied from total ");
+		msg.append(NumberFormat.getInstance().format(maxSize.get()));
+		msg.append(" bytes available (");
+		msg.append(NumberFormat.getInstance().format(getOccupancyPercentage() * 100));
+		msg.append("%).\nElements processed in the buffer since last clear buffer:\n-Elements added: ");
+		msg.append(NumberFormat.getInstance().format(elementsAdded.get()));
+
+		msg.append("\n-Elements analyzed: ");
+		msg.append(NumberFormat.getInstance().format(elementsAnalyzed.get()));
+
+		msg.append("\n-Elements indexed: ");
+		msg.append(NumberFormat.getInstance().format(elementsIndexed.get()));
+
+		msg.append("\n-Elements evicted: ");
+		msg.append(NumberFormat.getInstance().format(elementsEvicted.get()));
+		msg.append('\n');
+		return msg.toString();
 	}
 
 	/**
