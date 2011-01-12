@@ -7,7 +7,7 @@ import static org.testng.Assert.fail;
 import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.cmr.dao.ci.ExceptionSensorDefinitionDataDao;
 import info.novatec.inspectit.cmr.dao.ci.ProfileDataDao;
-import info.novatec.inspectit.cmr.test.AbstractLogSupport;
+import info.novatec.inspectit.cmr.test.AbstractTransactionalTestNGLogSupport;
 import info.novatec.inspectit.communication.data.ci.EnvironmentData;
 import info.novatec.inspectit.communication.data.ci.ExceptionSensorDefinitionData;
 import info.novatec.inspectit.communication.data.ci.ProfileData;
@@ -29,8 +29,8 @@ import org.testng.annotations.Test;
  * @author Matthias Huber
  * 
  */
-@ContextConfiguration(locations = { "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
-public class ExceptionSensorDefinitionDataDaoTest extends AbstractLogSupport {
+@ContextConfiguration(locations = { "classpath:spring/spring-context-property.xml", "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
+public class ExceptionSensorDefinitionDataDaoTest extends AbstractTransactionalTestNGLogSupport {
 
 	/**
 	 * The {@link ExceptionSensorDefinitionDataDao} to test.

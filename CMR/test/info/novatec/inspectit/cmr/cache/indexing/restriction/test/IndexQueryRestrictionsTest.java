@@ -2,7 +2,7 @@ package info.novatec.inspectit.cmr.cache.indexing.restriction.test;
 
 import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
 import info.novatec.inspectit.cmr.cache.indexing.restriction.impl.IndexQueryRestrictionFactory;
-import info.novatec.inspectit.cmr.test.AbstractLogSupport;
+import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.cmr.util.IndexQueryProvider;
 import info.novatec.inspectit.communication.data.TimerData;
 
@@ -13,13 +13,13 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Tests the indexing restirction used with index queries.
+ * Tests the indexing restriction used with index queries.
  * 
  * @author Ivan Senic
  * 
  */
-@ContextConfiguration(locations = { "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
-public class IndexingRestricionTests extends AbstractLogSupport {
+@ContextConfiguration(locations = { "classpath:spring/spring-context-property.xml", "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
+public class IndexQueryRestrictionsTest extends AbstractTestNGLogSupport {
 
 	/**
 	 * Timer data.

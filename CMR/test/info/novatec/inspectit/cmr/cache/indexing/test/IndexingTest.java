@@ -5,7 +5,7 @@ import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
 import info.novatec.inspectit.cmr.cache.indexing.impl.Branch;
 import info.novatec.inspectit.cmr.cache.indexing.impl.IndexingException;
 import info.novatec.inspectit.cmr.cache.indexing.impl.LeafingBranch;
-import info.novatec.inspectit.cmr.test.AbstractLogSupport;
+import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.cmr.util.IndexQueryProvider;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.MethodSensorData;
@@ -31,9 +31,8 @@ import org.testng.annotations.Test;
  * @author Ivan Senic
  * 
  */
-
-@ContextConfiguration(locations = { "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
-public class IndexingTest  extends AbstractLogSupport {
+@ContextConfiguration(locations = { "classpath:spring/spring-context-property.xml", "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
+public class IndexingTest extends AbstractTestNGLogSupport {
 
 	/**
 	 * Branch to test.

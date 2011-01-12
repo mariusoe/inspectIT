@@ -1,7 +1,7 @@
 package info.novatec.inspectit.cmr.cache.test;
 
 import info.novatec.inspectit.cmr.cache.impl.BufferProperties;
-import info.novatec.inspectit.cmr.test.AbstractLogSupport;
+import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -15,8 +15,8 @@ import org.testng.annotations.Test;
  * @author Ivan Senic
  * 
  */
-@ContextConfiguration(locations = { "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
-public class BufferPropertiesTest extends AbstractLogSupport {
+@ContextConfiguration(locations = { "classpath:spring/spring-context-property.xml", "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
+public class BufferPropertiesTest extends AbstractTestNGLogSupport {
 
 	/**
 	 * Buffer properties to test.

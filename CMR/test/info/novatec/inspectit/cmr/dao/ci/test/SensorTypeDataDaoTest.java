@@ -5,7 +5,7 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.cmr.dao.ci.SensorTypeDataDao;
-import info.novatec.inspectit.cmr.test.AbstractLogSupport;
+import info.novatec.inspectit.cmr.test.AbstractTransactionalTestNGLogSupport;
 import info.novatec.inspectit.communication.data.ci.EnvironmentData;
 import info.novatec.inspectit.communication.data.ci.SensorTypeData;
 import info.novatec.inspectit.communication.exception.EntityNotFoundException;
@@ -27,8 +27,8 @@ import org.testng.annotations.Test;
  * @author Matthias Huber
  * 
  */
-@ContextConfiguration(locations = { "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
-public class SensorTypeDataDaoTest extends AbstractLogSupport {
+@ContextConfiguration(locations = { "classpath:spring/spring-context-property.xml", "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
+public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGLogSupport {
 
 	/**
 	 * The {@link SensorTypeDataDao} to test.

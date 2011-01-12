@@ -8,7 +8,7 @@ import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.cmr.dao.ci.MethodSensorDefinitionDataDao;
 import info.novatec.inspectit.cmr.dao.ci.ProfileDataDao;
 import info.novatec.inspectit.cmr.dao.ci.SensorTypeDataDao;
-import info.novatec.inspectit.cmr.test.AbstractLogSupport;
+import info.novatec.inspectit.cmr.test.AbstractTransactionalTestNGLogSupport;
 import info.novatec.inspectit.communication.data.ci.EnvironmentData;
 import info.novatec.inspectit.communication.data.ci.MethodSensorDefinitionData;
 import info.novatec.inspectit.communication.data.ci.ProfileData;
@@ -32,8 +32,8 @@ import org.testng.annotations.Test;
  * @author Matthias Huber
  * 
  */
-@ContextConfiguration(locations = { "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
-public class MethodSensorDefinitionDataDaoTest extends AbstractLogSupport {
+@ContextConfiguration(locations = { "classpath:spring/spring-context-property.xml", "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
+public class MethodSensorDefinitionDataDaoTest extends AbstractTransactionalTestNGLogSupport {
 
 	/**
 	 * The {@link MethodSensorDefinitionDataDao} to test.
