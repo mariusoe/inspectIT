@@ -14,5 +14,8 @@
 
 	<bean id="versioning"
 		class="info.novatec.inspectit.versioning.FileBasedVersioningServiceImpl" />
+	
+	<bean id="cacheIdGenerator"
+		class="info.novatec.inspectit.cmr.util.CacheIdGenerator" />
 
 </beans>

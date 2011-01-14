@@ -13,8 +13,10 @@ import info.novatec.inspectit.rcp.editor.table.input.ExceptionSensorInvocInputCo
 import info.novatec.inspectit.rcp.editor.table.input.GroupedExceptionOverviewInputController;
 import info.novatec.inspectit.rcp.editor.table.input.InvocOverviewInputController;
 import info.novatec.inspectit.rcp.editor.table.input.MethodInvocInputController;
+import info.novatec.inspectit.rcp.editor.table.input.NavigationInvocOverviewInputController;
 import info.novatec.inspectit.rcp.editor.table.input.SqlInputController;
 import info.novatec.inspectit.rcp.editor.table.input.SqlInvocInputController;
+import info.novatec.inspectit.rcp.editor.table.input.TimerDataInputController;
 import info.novatec.inspectit.rcp.editor.table.input.UngroupedExceptionOverviewInputController;
 import info.novatec.inspectit.rcp.editor.table.input.UngroupedExceptionOverviewStackTraceInputController;
 import info.novatec.inspectit.rcp.editor.text.TextSubView;
@@ -23,7 +25,6 @@ import info.novatec.inspectit.rcp.editor.text.input.CpuInputController;
 import info.novatec.inspectit.rcp.editor.text.input.MemoryInputController;
 import info.novatec.inspectit.rcp.editor.text.input.ThreadsInputController;
 import info.novatec.inspectit.rcp.editor.text.input.VmSummaryInputController;
-import info.novatec.inspectit.rcp.editor.traceinspector.TraceInspectorSubView;
 import info.novatec.inspectit.rcp.editor.tree.TreeSubView;
 import info.novatec.inspectit.rcp.editor.tree.input.ExceptionMessagesTreeInputController;
 import info.novatec.inspectit.rcp.editor.tree.input.ExceptionTreeInputController;
@@ -142,6 +143,31 @@ public final class SubViewFactory {
 			combinedMetricsSubView.addSubView(new GraphSubView(sensorTypeEnum), new GridData(SWT.FILL, SWT.FILL, true, true));
 			combinedMetricsSubView.addSubView(combinedMetricsSummarySubView, new GridData(SWT.FILL, SWT.FILL, true, false));
 			return combinedMetricsSubView;
+		case NAVIGATION_INVOCATION:
+			SashCompositeSubView invocSubView1 = new SashCompositeSubView();
+			ISubView invocOverview1 = new TableSubView(new NavigationInvocOverviewInputController());
+			TabbedCompositeSubView invocTabbedSubView1 = new TabbedCompositeSubView();
+			ISubView invocDetails1 = new TreeSubView(new InvocDetailInputController());
+			ISubView invocSql1 = new TableSubView(new SqlInvocInputController());
+			ISubView invocMethods1 = new TableSubView(new MethodInvocInputController());
+			ISubView invocExceptions1 = new TableSubView(new ExceptionSensorInvocInputController());
+//			ISubView traceInspector = new TraceInspectorSubView();
+
+			invocTabbedSubView1.addSubView(invocDetails1, "Call Hierarchy", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CALL_HIERARCHY));
+			invocTabbedSubView1.addSubView(invocSql1, "SQL", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_DATABASE));
+			invocTabbedSubView1.addSubView(invocMethods1, "Methods", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_METHOD_PUBLIC));
+			invocTabbedSubView1.addSubView(invocExceptions1, "Exceptions", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_EXCEPTION_SENSOR));
+			// invocTabbedSubView.addSubView(traceInspector, "Trace Inspector",
+			// InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CALL_HIERARCHY));
+
+			invocSubView1.addSubView(invocOverview1, 1);
+			invocSubView1.addSubView(invocTabbedSubView1, 2);
+
+			return invocSubView1;
+		case AGGREGATED_TIMER_DATA: 
+			SashCompositeSubView timerSashSubView = new SashCompositeSubView();
+			timerSashSubView.addSubView(new TableSubView(new TimerDataInputController()));
+			return timerSashSubView;
 		default:
 			throw new IllegalArgumentException("Could not create sub-view. Not supported: " + sensorTypeEnum.toString());
 		}

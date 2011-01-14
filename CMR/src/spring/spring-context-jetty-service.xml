@@ -27,6 +27,9 @@
 
 	<bean id="bufferService"
 		class="info.novatec.inspectit.cmr.service.BufferService" />
+		
+	<bean id="timerDataAccessService"
+		class="info.novatec.inspectit.cmr.service.TimerDataAccessService" />
 
 	<bean name="globalDataAccessExporter"
 		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
@@ -91,5 +94,11 @@
 			value="info.novatec.inspectit.cmr.service.IBufferService" />
 	</bean>
 	
-
+	<bean name="timerDataAccessServiceExporter"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
+		<property name="service" ref="timerDataAccessService" />
+		<property name="serviceInterface"
+			value="info.novatec.inspectit.cmr.service.ITimerDataAccessService" />
+	</bean>
+	
 </beans>

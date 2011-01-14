@@ -7,6 +7,7 @@ import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
+import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.cmr.ServerStatusService;
 
@@ -91,8 +92,14 @@ public interface RepositoryDefinition {
 	/**
 	 * Returns the buffer data access service for this repository definition.
 	 * 
-	 * @return
+	 * @return The buffer service.
 	 */
 	IBufferService getBufferService();
 
+	/**
+	 * Returns the timer data access service for this repository definition.
+	 * 
+	 * @return The timer data access service.
+	 */
+	ITimerDataAccessService getTimerDataAccessService();
 }

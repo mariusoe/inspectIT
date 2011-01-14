@@ -97,6 +97,11 @@ public class BufferSqlDataDaoImpl implements SqlDataDao {
 		if (aggregatedStatement.getCpuMin() > newStatement.getCpuMin()) {
 			aggregatedStatement.setCpuMin(newStatement.getCpuMin());
 		}
+		if (null != newStatement.getInvocationParentsIdSet()) {
+			for (Object invocationId : newStatement.getInvocationParentsIdSet()) {
+				aggregatedStatement.addInvocationParentId((Long) invocationId);
+			}
+		}
 	}
 
 	/**

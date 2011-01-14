@@ -8,19 +8,16 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.InputDefinition.IdDefinition;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
-import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -142,6 +139,32 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	private CachedGlobalDataAccessService globalDataAccessService;
 
 	/**
+	 * 
+	 * @return Returns list of invocation sequence data that represents a table input.
+	 */
+	protected List<InvocationSequenceData> getInvocationSequenceData() {
+		return invocationSequenceData;
+	}
+
+	/**
+	 * Returns data access service for retrieving the data from the server.
+	 * 
+	 * @return Returns data access service.
+	 */
+	protected IInvocationDataAccessService getDataAccessService() {
+		return dataAccessService;
+	}
+
+	/**
+	 * Returns current view item count limit defined for the view.
+	 * 
+	 * @return Returns current view item count limit.
+	 */
+	protected int getLimit() {
+		return limit;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -221,7 +244,10 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		preferences.add(PreferenceId.ITEMCOUNT);
 		return preferences;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean canOpenInput(List<? extends DefaultData> data) {
 		if (data.isEmpty()) {

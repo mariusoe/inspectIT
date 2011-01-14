@@ -2,7 +2,6 @@ package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.communication.ExceptionEventEnum;
-import info.novatec.inspectit.communication.MethodSensorData;
 
 import java.sql.Timestamp;
 
@@ -13,7 +12,7 @@ import java.sql.Timestamp;
  * @author Eduard Tudenhoefner
  * 
  */
-public class ExceptionSensorData extends MethodSensorData {
+public class ExceptionSensorData extends InvocationAwareData {
 
 	/**
 	 * The serial version UIDs.
@@ -55,7 +54,7 @@ public class ExceptionSensorData extends MethodSensorData {
 	 * The identity hash code of the thrown {@link Throwable} object.
 	 */
 	private long throwableIdentityHashCode;
-
+	
 	/**
 	 * Default no-args constructor.
 	 */
@@ -207,6 +206,10 @@ public class ExceptionSensorData extends MethodSensorData {
 			size += child.getObjectSize(objectSizes);
 		}
 		return objectSizes.alignTo8Bytes(size);
+	}
+	
+	public double getInvocationAffiliationPercentage() {
+		return (double) getObjectsInInvocationsCount() / 1d;
 	}
 
 }

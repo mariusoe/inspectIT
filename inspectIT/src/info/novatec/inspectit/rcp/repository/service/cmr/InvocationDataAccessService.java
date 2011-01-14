@@ -4,6 +4,7 @@ import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.rcp.InspectIT;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -71,6 +72,17 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit) {
 		try {
 			return invocationDataAccessService.getInvocationSequenceOverview(platformId, limit);
+		} catch (Exception e) {
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the invocation sequence overview from the CMR!", e, -1);
+			return Collections.EMPTY_LIST;
+		}
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection invocationIdCollection, int limit) {
+		try {
+			return invocationDataAccessService.getInvocationSequenceOverview(platformId, invocationIdCollection, limit);
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog("There was an error retrieving the invocation sequence overview from the CMR!", e, -1);
 			return Collections.EMPTY_LIST;

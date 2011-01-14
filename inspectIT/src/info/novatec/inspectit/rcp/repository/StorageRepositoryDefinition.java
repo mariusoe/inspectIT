@@ -7,6 +7,7 @@ import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
+import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.cmr.ServerStatusService;
 import info.novatec.inspectit.rcp.repository.service.storage.StorageGlobalDataAcessService;
@@ -135,6 +136,13 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Not supported.
+	 */
+	@Override
+	public ITimerDataAccessService getTimerDataAccessService() {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Not supported.

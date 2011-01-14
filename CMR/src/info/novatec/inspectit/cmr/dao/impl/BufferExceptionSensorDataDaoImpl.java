@@ -7,6 +7,7 @@ import info.novatec.inspectit.cmr.dao.ExceptionSensorDataDao;
 import info.novatec.inspectit.cmr.util.IndexQueryProvider;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 
 import java.sql.Timestamp;
@@ -105,14 +106,14 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<ExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template) {
+	public List<AggregatedExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template) {
 		return this.getDataForGroupedExceptionOverview(template, null, null);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<ExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
+	public List<AggregatedExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
 		query.setObjectClass(ExceptionSensorData.class);
 		query.setPlatformIdent(template.getPlatformIdent());
@@ -123,16 +124,16 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 			query.setToDate(new Timestamp(toDate.getTime()));
 		}
 		List<ExceptionSensorData> results = indexingTree.query(query);
-		Map<Integer, ExceptionSensorData> aggregatedMap = new HashMap<Integer, ExceptionSensorData>();
-		List<ExceptionSensorData> aggregatedResults = new ArrayList<ExceptionSensorData>();
+		Map<Integer, AggregatedExceptionSensorData> aggregatedMap = new HashMap<Integer, AggregatedExceptionSensorData>();
+		List<AggregatedExceptionSensorData> aggregatedResults = new ArrayList<AggregatedExceptionSensorData>();
 		for (ExceptionSensorData exceptionData : results) {
-			aggregateExceptionData(exceptionData, aggregatedMap, aggregatedResults);
+			performAggregation(exceptionData, aggregatedMap, aggregatedResults);
 		}
 		return aggregatedResults;
 	}
 
 	/**
-	 * Aggregated exception data for the purpose of
+	 * Aggregates set of exception data for the purpose of
 	 * {@link #getDataForGroupedExceptionOverview(ExceptionSensorData, Date, Date)}.
 	 * 
 	 * @param exceptionData
@@ -145,19 +146,19 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 	 * @see #getDataForGroupedExceptionOverview(ExceptionSensorData)
 	 * @see #getDataForGroupedExceptionOverview(ExceptionSensorData, Date, Date)
 	 */
-	private void aggregateExceptionData(ExceptionSensorData exceptionData, Map<Integer, ExceptionSensorData> aggregatedMap, List<ExceptionSensorData> aggregatedResults) {
+	private void performAggregation(ExceptionSensorData exceptionData, Map<Integer, AggregatedExceptionSensorData> aggregatedMap, List<AggregatedExceptionSensorData> aggregatedResults) {
 		int key = getGroupExceptionOverviewMapKey(exceptionData);
-		ExceptionSensorData aggregatedExceptionData = aggregatedMap.get(key);
+		AggregatedExceptionSensorData aggregatedExceptionData = aggregatedMap.get(key);
 		if (null != aggregatedExceptionData) {
-			aggregatedExceptionData.setThrowableIdentityHashCode(aggregatedExceptionData.getThrowableIdentityHashCode() + 1);
+			aggregatedExceptionData.aggregateExceptionData(exceptionData);
 		} else {
-			ExceptionSensorData clone = cloneExceptionSensorData(exceptionData);
-			clone.setThrowableIdentityHashCode(1);
+			AggregatedExceptionSensorData clone = cloneExceptionSensorData(exceptionData);
+			clone.aggregateExceptionData(exceptionData);
 			aggregatedMap.put(key, clone);
 			aggregatedResults.add(clone);
 		}
 		if (null != exceptionData.getChild()) {
-			aggregateExceptionData(exceptionData.getChild(), aggregatedMap, aggregatedResults);
+			performAggregation(exceptionData.getChild(), aggregatedMap, aggregatedResults);
 		}
 	}
 
@@ -173,10 +174,7 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 		final int prime = 31;
 		int result = 0;
 		result = prime * result + ((exceptionSensorData.getThrowableType() == null) ? 0 : exceptionSensorData.getThrowableType().hashCode());
-		result = prime * result + ((exceptionSensorData.getExceptionEvent() == null) ? 0 : exceptionSensorData.getExceptionEvent().hashCode());
 		result = prime * result + ((exceptionSensorData.getErrorMessage() == null) ? 0 : exceptionSensorData.getErrorMessage().hashCode());
-		result = prime * result + ((exceptionSensorData.getStackTrace() == null) ? 0 : exceptionSensorData.getStackTrace().hashCode());
-		result = prime * result + ((exceptionSensorData.getCause() == null) ? 0 : exceptionSensorData.getCause().hashCode());
 		return result;
 	}
 
@@ -188,8 +186,8 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 	 *            Exception data to be cloned.
 	 * @return New exception data object.
 	 */
-	private ExceptionSensorData cloneExceptionSensorData(ExceptionSensorData exceptionData) {
-		ExceptionSensorData clone = new ExceptionSensorData();
+	private AggregatedExceptionSensorData cloneExceptionSensorData(ExceptionSensorData exceptionData) {
+		AggregatedExceptionSensorData clone = new AggregatedExceptionSensorData();
 		clone.setCause(exceptionData.getCause());
 		clone.setErrorMessage(exceptionData.getErrorMessage());
 		clone.setExceptionEvent(exceptionData.getExceptionEvent());
@@ -202,24 +200,40 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<ExceptionSensorData> getStackTracesForErrorMessage(ExceptionSensorData template) {
+	@Override
+	public List<ExceptionSensorData> getStackTraceMessagesForThrowableType(ExceptionSensorData template) {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
 		query.setObjectClass(ExceptionSensorData.class);
 		query.setPlatformIdent(template.getPlatformIdent());
-		query.setMinId(template.getId());
-		query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("errorMessage", template.getErrorMessage()));
+		query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("throwableType", template.getThrowableType()));
 		query.addIndexingRestriction(IndexQueryRestrictionFactory.isNotNull("stackTrace"));
 		List<ExceptionSensorData> results = indexingTree.query(query);
-		Map<Integer, ExceptionSensorData> distinctStackTrace = new HashMap<Integer, ExceptionSensorData>();
+		Map<Integer, ExceptionSensorData> distinctStackTraceErrorCombination = new HashMap<Integer, ExceptionSensorData>();
 		List<ExceptionSensorData> returnList = new ArrayList<ExceptionSensorData>();
 		for (ExceptionSensorData exceptionData : results) {
-			if (null == distinctStackTrace.get(exceptionData.getStackTrace().hashCode())) {
-				distinctStackTrace.put(exceptionData.getStackTrace().hashCode(), exceptionData);
+			int key = getDisctinctStackTraceErrorCombinatonKey(exceptionData);
+			if (null == distinctStackTraceErrorCombination.get(key)) {
+				distinctStackTraceErrorCombination.put(key, exceptionData);
 				returnList.add(exceptionData);
 			}
 		}
 		return returnList;
+	}
 
+	/**
+	 * Map key for aggregation for purpose of
+	 * {@link #getStackTraceMessagesForThrowableType(ExceptionSensorData)}.
+	 * 
+	 * @param exceptionSensorData
+	 *            data
+	 * @return map key
+	 */
+	private int getDisctinctStackTraceErrorCombinatonKey(ExceptionSensorData exceptionSensorData) {
+		final int prime = 31;
+		int result = 0;
+		result = prime * result + ((exceptionSensorData.getErrorMessage() == null) ? 0 : exceptionSensorData.getErrorMessage().hashCode());
+		result = prime * result + ((exceptionSensorData.getStackTrace() == null) ? 0 : exceptionSensorData.getStackTrace().hashCode());
+		return result;
 	}
 
 	/**

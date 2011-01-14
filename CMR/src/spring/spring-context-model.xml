@@ -37,6 +37,8 @@
 		class="info.novatec.inspectit.cmr.dao.ci.impl.MethodSensorDefinitionDataDaoImpl" />
 	<bean id="platformSensorDefinitionDataDao"
 		class="info.novatec.inspectit.cmr.dao.ci.impl.PlatformSensorDefinitionDataDaoImpl" />
+	<bean id="timerDataDao" 
+		class="info.novatec.inspectit.cmr.dao.impl.BufferTimerDataDaoImpl" />
 
 	<bean id="bufferProperties" class="info.novatec.inspectit.cmr.cache.impl.BufferProperties">
 		<property name="evictionOccupancyPercentage" value="${buffer.evictionOccupancyPercentage}"/>
@@ -70,6 +72,5 @@
 		scope="prototype" lazy-init="true" />
 	<bean id="restrictionProcessor"
 		class="info.novatec.inspectit.cmr.cache.indexing.restriction.impl.CachingIndexQueryRestrictionProcessor" />
-
-
+	
 </beans>

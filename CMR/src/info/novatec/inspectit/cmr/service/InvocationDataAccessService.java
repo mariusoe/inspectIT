@@ -4,6 +4,7 @@ import info.novatec.inspectit.cmr.dao.InvocationDataDao;
 import info.novatec.inspectit.cmr.util.aop.Log;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -40,6 +41,16 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 	@Log
 	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit) {
 		List<InvocationSequenceData> result = invocationDataDao.getInvocationSequenceOverview(platformId, methodId, limit);
+		return result;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Log
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection invocationIdCollection, int limit) {
+		List<InvocationSequenceData> result = invocationDataDao.getInvocationSequenceOverview(platformId, invocationIdCollection, limit);
 		return result;
 	}
 

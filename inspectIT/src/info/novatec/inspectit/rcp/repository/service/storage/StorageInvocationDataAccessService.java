@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -112,6 +113,17 @@ public class StorageInvocationDataAccessService implements IInvocationDataAccess
 		} else {
 			throw new RuntimeException("ERROR: file does not exist: " + file.getAbsolutePath());
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Not supported for storage.
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection invocationIdCollection, int limit) {
+		return Collections.emptyList();
 	}
 
 	/**

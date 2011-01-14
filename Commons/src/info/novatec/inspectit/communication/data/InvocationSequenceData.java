@@ -5,6 +5,7 @@ import info.novatec.inspectit.communication.MethodSensorData;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -288,6 +289,29 @@ public class InvocationSequenceData extends MethodSensorData {
 			}
 		}
 		return objectSizes.alignTo8Bytes(size);
+	}
+	
+	/**
+	 * Clones invocation sequence. This method returns new object exactly same as the original object,
+	 * but with out nested sequences set.
+	 * 
+	 * @return Cloned invocation sequence.
+	 */
+	public InvocationSequenceData getClonedInvocationSequence() {
+		InvocationSequenceData clone = new InvocationSequenceData(this.getTimeStamp(), this.getPlatformIdent(), this.getSensorTypeIdent(), this.getMethodIdent());
+		clone.setId(this.getId());
+		clone.setChildCount(this.getChildCount());
+		clone.setDuration(this.getDuration());
+		clone.setEnd(this.getEnd());
+		clone.setNestedSequences(Collections.EMPTY_LIST);
+		clone.setParameterContentData(this.getParameterContentData());
+		clone.setParentSequence(this.getParentSequence());
+		clone.setPosition(this.getPosition());
+		clone.setSqlStatementData(this.getSqlStatementData());
+		clone.setTimerData(this.getTimerData());
+		clone.setExceptionSensorDataObjects(this.getExceptionSensorDataObjects());
+		clone.setStart(this.getStart());
+		return clone;
 	}
 
 }

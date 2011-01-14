@@ -6,7 +6,6 @@ import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController.SubViewClassification;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.ExceptionImageFactory;
@@ -71,13 +70,13 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 	 * 
 	 */
 	private static enum Column {
-		/** the event type column */
+		/** The event type column. */
 		EVENT_TYPE("Event Type", 280, null),
 		/** The method column. */
 		METHOD_CONSTRUCTOR("Method / Constructor", 500, InspectITConstants.IMG_METHOD_PUBLIC),
-		/** the error message column */
+		/** The error message column. */
 		ERROR_MESSAGE("Error Message", 250, null),
-		/** The cause column */
+		/** The cause column. */
 		CAUSE("Cause", 120, null);
 
 		/** The name. */
@@ -176,7 +175,9 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * {@inheritDoc}.
+	 * <p>
+	 * @see AbstractTreeInputController#showDetails(Shell, Object)
 	 */
 	public void showDetails(Shell parent, Object element) {
 		final ExceptionSensorData data = (ExceptionSensorData) element;
@@ -398,10 +399,6 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 		 * {@inheritDoc}
 		 */
 		public Object getParent(Object child) {
-			if (child instanceof ExceptionSensorData) {
-				return child;
-			}
-
 			return null;
 		}
 

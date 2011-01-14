@@ -68,6 +68,8 @@ public class SqlInputController extends AbstractTableInputController {
 	private static enum Column {
 		/** The statement column. */
 		STATEMENT("Statement", 600, InspectITConstants.IMG_DATABASE),
+		/** Invocation Affiliation. */
+		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITConstants.IMG_INVOCATION),
 		/** The count column. */
 		COUNT("Count", 80, null),
 		/** The average column. */
@@ -218,7 +220,7 @@ public class SqlInputController extends AbstractTableInputController {
 		preferences.add(PreferenceId.UPDATE);
 		return preferences;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -322,6 +324,8 @@ public class SqlInputController extends AbstractTableInputController {
 			switch ((Column) getEnumSortColumn()) {
 			case STATEMENT:
 				return sql1.getSql().compareTo(sql2.getSql());
+			case INVOCATION_AFFILLIATION:
+				return Double.compare(sql1.getInvocationAffiliationPercentage(), sql2.getInvocationAffiliationPercentage());
 			case COUNT:
 				return Long.valueOf(sql1.getCount()).compareTo(Long.valueOf(sql2.getCount()));
 			case AVERAGE:
@@ -358,9 +362,10 @@ public class SqlInputController extends AbstractTableInputController {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * {@inheritDoc}.
+	 * <p>
+	 * @see TableInputController#showDetails(Shell, Object)
 	 */
-	@Override
 	public void showDetails(Shell parent, Object element) {
 		final SqlStatementData data = (SqlStatementData) element;
 		final MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
@@ -468,6 +473,13 @@ public class SqlInputController extends AbstractTableInputController {
 		case STATEMENT:
 			String sql = data.getSql().replaceAll("[\r\n]+", " ");
 			return new StyledString(sql);
+		case INVOCATION_AFFILLIATION:
+			int percentage = (int) (data.getInvocationAffiliationPercentage() * 100);
+			int invocations = 0;
+			if (null != data.getInvocationParentsIdSet()) {
+				invocations = data.getInvocationParentsIdSet().size();
+			}
+			return TextFormatter.getInvocationAffilliationPercentageString(percentage, invocations);
 		case COUNT:
 			return new StyledString(Long.toString(data.getCount()));
 		case AVERAGE:

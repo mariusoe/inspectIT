@@ -2,6 +2,7 @@ package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.ExceptionSensorDataDao;
 import info.novatec.inspectit.cmr.util.aop.Log;
+import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 
 import java.util.Date;
@@ -77,8 +78,8 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 	 * {@inheritDoc}
 	 */
 	@Log
-	public List<ExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template) {
-		List<ExceptionSensorData> result = exceptionSensorDataDao.getDataForGroupedExceptionOverview(template);
+	public List<AggregatedExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template) {
+		List<AggregatedExceptionSensorData> result = exceptionSensorDataDao.getDataForGroupedExceptionOverview(template);
 		return result;
 	}
 
@@ -86,17 +87,17 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 	 * {@inheritDoc}
 	 */
 	@Log
-	public List<ExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
-		List<ExceptionSensorData> result = exceptionSensorDataDao.getDataForGroupedExceptionOverview(template, fromDate, toDate);
+	public List<AggregatedExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
+		List<AggregatedExceptionSensorData> result = exceptionSensorDataDao.getDataForGroupedExceptionOverview(template, fromDate, toDate);
 		return result;
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Log
-	public List<ExceptionSensorData> getStackTracesForErrorMessage(ExceptionSensorData template) {
-		List<ExceptionSensorData> result = exceptionSensorDataDao.getStackTracesForErrorMessage(template);
+	public List<ExceptionSensorData> getStackTraceMessagesForThrowableType(ExceptionSensorData template) {
+		List<ExceptionSensorData> result = exceptionSensorDataDao.getStackTraceMessagesForThrowableType(template);
 		return result;
 	}
 

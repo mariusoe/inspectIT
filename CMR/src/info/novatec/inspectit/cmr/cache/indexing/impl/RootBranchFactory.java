@@ -1,7 +1,5 @@
 package info.novatec.inspectit.cmr.cache.indexing.impl;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import info.novatec.inspectit.cmr.cache.indexing.AbstractIndexer.ChildBranchType;
 import info.novatec.inspectit.cmr.cache.indexing.IBranchIndexer;
 import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
@@ -53,12 +51,8 @@ public class RootBranchFactory implements FactoryBean {
 	 * @author Ivan Senic
 	 * 
 	 */
-	private static class RootBranch<E extends DefaultData> extends Branch<E> {
+	private class RootBranch<E extends DefaultData> extends Branch<E> {
 
-		/**
-		 * ID generator.
-		 */
-		private AtomicLong nextId = new AtomicLong(Long.MAX_VALUE / 2);
 
 		/**
 		 * Default constructor.
@@ -80,9 +74,10 @@ public class RootBranchFactory implements FactoryBean {
 			if (null == element) {
 				throw new IndexingException("Null object can not be indexed.");
 			}
-			element.setId(nextId.incrementAndGet());
 			super.put(element);
 		}
+		
+		
 	}
 
 }

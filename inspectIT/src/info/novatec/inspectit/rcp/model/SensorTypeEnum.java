@@ -34,11 +34,11 @@ public enum SensorTypeEnum {
 	JDBC_PREPARED_STATEMENT("info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementSensor", InspectITConstants.IMG_DATABASE, false),
 	/** The jdbc prepared statement parameter sensor type. */
 	JDBC_PREPARED_STATEMENT_PARAMETER("info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementParameterSensor", InspectITConstants.IMG_DATABASE, false),
-	/** The exception sensor */
+	/** The exception sensor. */
 	EXCEPTION_SENSOR("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor", InspectITConstants.IMG_EXCEPTION_SENSOR),
-	/** The exception sensor overview */
+	/** The exception sensor overview. */
 	EXCEPTION_SENSOR_GROUPED("info.novatec.inspectit.agent.sensor.exception.ExceptionSensorOverview", InspectITConstants.IMG_FILTER),
-	/** The combined metrics sensor type */
+	/** The combined metrics sensor type. */
 	MARVIN_WORKFLOW("info.novatec.inspectit.agent.sensor.method.marvintimer.MarvinWorkflowSensor", InspectITConstants.IMG_INVOCATION),
 
 	/** The classloading information sensor type. */
@@ -54,8 +54,11 @@ public enum SensorTypeEnum {
 	/** The system information sensor type. */
 	SYSTEM_INFORMATION("info.novatec.inspectit.agent.sensor.platform.SystemInformation", InspectITConstants.IMG_SYSTEM_OVERVIEW),
 	/** The thread information sensor type. */
-	THREAD_INFORMATION("info.novatec.inspectit.agent.sensor.platform.ThreadInformation", InspectITConstants.IMG_THREADS_OVERVIEW);
-
+	THREAD_INFORMATION("info.novatec.inspectit.agent.sensor.platform.ThreadInformation", InspectITConstants.IMG_THREADS_OVERVIEW),
+	/** The navigation invocation sequence sensor type. */
+	NAVIGATION_INVOCATION("info.novatec.inspectit.agent.sensor.method.invocationsequence.NavigationInvocationSequenceSensor", InspectITConstants.IMG_INVOCATION),
+	/** The aggregated timer data sensor type. */
+	AGGREGATED_TIMER_DATA("info.novatec.inspectit.agent.sensor.method.invocationsequence.AggregatedTimerSensor", InspectITConstants.IMG_TIMER);
 	/**
 	 * The LOOKUP map which is used to get an element of the enumeration when passing the full
 	 * qualified name.

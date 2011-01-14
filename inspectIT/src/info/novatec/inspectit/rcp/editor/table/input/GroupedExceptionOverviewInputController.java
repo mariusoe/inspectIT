@@ -2,7 +2,7 @@ package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
@@ -13,9 +13,9 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
+import info.novatec.inspectit.rcp.formatter.TextFormatter;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -67,6 +67,8 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	private static enum Column {
 		/** The class column. */
 		FQN("Fully-Qualified Name", 450, InspectITConstants.IMG_CLASS),
+		/** Invocation Affiliation. */
+		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITConstants.IMG_INVOCATION),
 		/** The CREATED column. */
 		CREATED("Created", 70, null),
 		/** The RETHROWN column. */
@@ -132,14 +134,14 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	/**
 	 * The list of {@link ExceptionSensorData} objects which is displayed.
 	 */
-	private List<ExtendedExceptionSensorData> exceptionSensorDataList = new ArrayList<ExtendedExceptionSensorData>();
+	private List<AggregatedExceptionSensorData> exceptionSensorDataList = new ArrayList<AggregatedExceptionSensorData>();
 
 	/**
 	 * This map holds all objects that are needed to be represented in this view. It uses the fqn of
 	 * an exception as the key. It contains as value the objects that are belonging to a specific
 	 * exception class.
 	 */
-	private Map<String, List<ExtendedExceptionSensorData>> overviewMap;
+	private Map<String, List<AggregatedExceptionSensorData>> overviewMap;
 
 	/**
 	 * The data access service to access the data on the CMR.
@@ -224,7 +226,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		preferences.add(PreferenceId.TIMELINE);
 		return preferences;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -264,7 +266,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Updating Grouped Exception Overview", IProgressMonitor.UNKNOWN);
 		monitor.subTask("Retrieving the Grouped Exception Overview data from the CMR");
-		List<ExceptionSensorData> ungroupedList = null;
+		List<AggregatedExceptionSensorData> ungroupedList = null;
 
 		// if fromDate and toDate are set, then we retrieve only the data for
 		// this time interval
@@ -274,48 +276,31 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 			ungroupedList = dataAccessService.getDataForGroupedExceptionOverview(template);
 		}
 
-		List<ExtendedExceptionSensorData> groupedOverviewList = new ArrayList<ExtendedExceptionSensorData>();
-		overviewMap = new HashMap<String, List<ExtendedExceptionSensorData>>();
+		List<AggregatedExceptionSensorData> groupedOverviewList = new ArrayList<AggregatedExceptionSensorData>();
+		overviewMap = new HashMap<String, List<AggregatedExceptionSensorData>>();
 
-		for (ExceptionSensorData ungroupedObject : ungroupedList) {
-			List<ExtendedExceptionSensorData> groupedObjects = Collections.EMPTY_LIST;
-			ExtendedExceptionSensorData data = copyInformation(ungroupedObject);
-
+		for (AggregatedExceptionSensorData ungroupedObject : ungroupedList) {
+			List<AggregatedExceptionSensorData> groupedObjects = Collections.EMPTY_LIST;
 			if (!overviewMap.containsKey(ungroupedObject.getThrowableType())) {
 				// map doesn't contain the actual exception class, so we create
 				// and add a new list for exception classes of the same type
-				groupedObjects = new ArrayList<ExtendedExceptionSensorData>();
-
-				// updating the counter values of newly created object based on
-				// its event type and adding it to the list
-				data.updateCounterForEventType(data.getExceptionEvent(), (int) data.getThrowableIdentityHashCode());
-				groupedObjects.add(data);
+				groupedObjects = new ArrayList<AggregatedExceptionSensorData>();
+				groupedObjects.add(ungroupedObject);
 				overviewMap.put(ungroupedObject.getThrowableType(), groupedObjects);
 			} else {
 				// map contains the actual exception class, so we get the list
 				// and search for the object within the list where the counter
 				// values must be updated
 				groupedObjects = overviewMap.get(ungroupedObject.getThrowableType());
-
-				if (groupedObjects.contains(data)) {
-					// updating the counter values of already saved object
-					// based on the actual event type
-					ExtendedExceptionSensorData nestedData = groupedObjects.get(groupedObjects.indexOf(data));
-					nestedData.updateCounterForEventType(data.getExceptionEvent(), (int) data.getThrowableIdentityHashCode());
-				} else {
-					// updating the counter values of newly created object based
-					// on its event type and adding it to the list
-					data.updateCounterForEventType(data.getExceptionEvent(), (int) data.getThrowableIdentityHashCode());
-					groupedObjects.add(data);
-				}
+				groupedObjects.add(ungroupedObject);
 			}
 		}
 
 		// we are creating the list that contains all object to be shown in the
 		// overview
-		for (Map.Entry<String, List<ExtendedExceptionSensorData>> entry : overviewMap.entrySet()) {
+		for (Map.Entry<String, List<AggregatedExceptionSensorData>> entry : overviewMap.entrySet()) {
 			String throwableType = entry.getKey();
-			ExtendedExceptionSensorData data = createObjectForOverview(throwableType, overviewMap.get(throwableType));
+			AggregatedExceptionSensorData data = createObjectForOverview(throwableType, entry.getValue());
 			groupedOverviewList.add(data);
 		}
 
@@ -329,53 +314,24 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	}
 
 	/**
-	 * Method is used to create {@link ExtendedExceptionSensorData} object that are used for the
-	 * overview of this view. The overview basically shows the type of the exception (class name)
-	 * and the additional information about how often an exceptional event was caused.
+	 * Creates the {@link AggregatedExceptionSensorData} object for the table input from the list of
+	 * same type aggregated objects.
 	 * 
 	 * @param throwableType
-	 *            The fqn of the exception class.
+	 *            Throwable type.
 	 * @param dataList
-	 *            The list containing {@link ExtendedExceptionSensorData} object of the same
-	 *            throwableType.
-	 * @return An instance of {@link ExtendedExceptionSensorData} that is used for the overview of
-	 *         this view and contains simply the fqn with additional information about exceptional
-	 *         events.
+	 *            List of {@link AggregatedExceptionSensorData}
+	 * @return Aggregated data for the table.
 	 */
-	private ExtendedExceptionSensorData createObjectForOverview(String throwableType, List<ExtendedExceptionSensorData> dataList) {
-		ExtendedExceptionSensorData data = new ExtendedExceptionSensorData();
+	private AggregatedExceptionSensorData createObjectForOverview(String throwableType, List<AggregatedExceptionSensorData> dataList) {
+		AggregatedExceptionSensorData data = new AggregatedExceptionSensorData();
 		data.setThrowableType(throwableType);
 
-		for (ExtendedExceptionSensorData object : dataList) {
-			data.setCreatedCounter(data.getCreatedCounter() + object.getCreatedCounter());
-			data.setRethrownCounter(data.getRethrownCounter() + object.getRethrownCounter());
-			data.setHandledCounter(data.getHandledCounter() + object.getHandledCounter());
+		for (AggregatedExceptionSensorData object : dataList) {
+			data.aggregateExceptionData(object);
 		}
 
 		return data;
-	}
-
-	/**
-	 * This method simply gets information from the {@link ExceptionSensorData} object and creates a
-	 * new object of type {@link ExtendedExceptionSensorData} with the same data.
-	 * 
-	 * @param data
-	 *            The object where the information is copied from.
-	 */
-	private ExtendedExceptionSensorData copyInformation(ExceptionSensorData data) {
-		ExtendedExceptionSensorData resultObject = new ExtendedExceptionSensorData();
-		resultObject.setId(data.getId());
-		resultObject.setPlatformIdent(data.getPlatformIdent());
-		resultObject.setSensorTypeIdent(data.getSensorTypeIdent());
-		resultObject.setErrorMessage(data.getErrorMessage());
-		resultObject.setExceptionEvent(data.getExceptionEvent());
-		resultObject.setMethodIdent(data.getMethodIdent());
-		resultObject.setThrowableIdentityHashCode(data.getThrowableIdentityHashCode());
-		resultObject.setThrowableType(data.getThrowableType());
-		resultObject.setStackTrace(data.getStackTrace());
-		resultObject.setCause(data.getCause());
-
-		return resultObject;
 	}
 
 	/**
@@ -389,8 +345,8 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 				PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
 					public void run(final IProgressMonitor monitor) {
 						monitor.beginTask("Retrieving Exception Messages", IProgressMonitor.UNKNOWN);
-						ExtendedExceptionSensorData data = (ExtendedExceptionSensorData) selection.getFirstElement();
-						final List<ExtendedExceptionSensorData> dataList = (List<ExtendedExceptionSensorData>) overviewMap.get(data.getThrowableType());
+						AggregatedExceptionSensorData data = (AggregatedExceptionSensorData) selection.getFirstElement();
+						final List<AggregatedExceptionSensorData> dataList = (List<AggregatedExceptionSensorData>) overviewMap.get(data.getThrowableType());
 
 						Display.getDefault().asyncExec(new Runnable() {
 							public void run() {
@@ -424,7 +380,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		 */
 		@Override
 		protected StyledString getStyledText(Object element, int index) {
-			ExtendedExceptionSensorData data = (ExtendedExceptionSensorData) element;
+			AggregatedExceptionSensorData data = (AggregatedExceptionSensorData) element;
 			Column enumId = Column.fromOrd(index);
 
 			return getStyledTextForColumn(data, enumId);
@@ -445,7 +401,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		 */
 		@SuppressWarnings("unchecked")
 		public Object[] getElements(Object inputElement) {
-			List<ExtendedExceptionSensorData> exceptionSensorData = (List<ExtendedExceptionSensorData>) inputElement;
+			List<AggregatedExceptionSensorData> exceptionSensorData = (List<AggregatedExceptionSensorData>) inputElement;
 			return exceptionSensorData.toArray();
 		}
 
@@ -468,22 +424,27 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	 * 
 	 * @param data
 	 *            The data object to extract the information from.
-	 * @param methodIdent
-	 *            The method ident object.
 	 * @param enumId
 	 *            The enumeration ID.
 	 * @return The styled string containing the information from the data object.
 	 */
-	private StyledString getStyledTextForColumn(ExtendedExceptionSensorData data, Column enumId) {
+	private StyledString getStyledTextForColumn(AggregatedExceptionSensorData data, Column enumId) {
 		switch (enumId) {
 		case FQN:
 			return new StyledString(data.getThrowableType());
+		case INVOCATION_AFFILLIATION:
+			int percentage = (int) (data.getInvocationAffiliationPercentage() * 100);
+			int invocations = 0;
+			if (null != data.getInvocationParentsIdSet()) {
+				invocations = data.getInvocationParentsIdSet().size();
+			}
+			return TextFormatter.getInvocationAffilliationPercentageString(percentage, invocations);
 		case CREATED:
-			return new StyledString("" + data.getCreatedCounter());
+			return new StyledString("" + data.getCreated());
 		case RETHROWN:
-			return new StyledString("" + data.getRethrownCounter());
+			return new StyledString("" + data.getPassed());
 		case HANDLED:
-			return new StyledString("" + data.getHandledCounter());
+			return new StyledString("" + data.getHandled());
 		default:
 			return new StyledString("error");
 		}
@@ -493,8 +454,8 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	 * {@inheritDoc}
 	 */
 	public Object getReadableString(Object object) {
-		if (object instanceof ExtendedExceptionSensorData) {
-			ExtendedExceptionSensorData data = (ExtendedExceptionSensorData) object;
+		if (object instanceof AggregatedExceptionSensorData) {
+			AggregatedExceptionSensorData data = (AggregatedExceptionSensorData) object;
 			StringBuilder sb = new StringBuilder();
 			for (Column column : Column.values()) {
 				sb.append(getStyledTextForColumn(data, column).toString());
@@ -506,174 +467,29 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	}
 
 	/**
-	 * Data object that contains exceptional events and should be used only for this view.
-	 * 
-	 * @author Eduard Tudenhoefner
-	 * 
-	 */
-	@SuppressWarnings("serial")
-	public static class ExtendedExceptionSensorData extends ExceptionSensorData {
-
-		/**
-		 * The inputDefinition.
-		 */
-		private transient InputDefinition inputDefinition;
-
-		/**
-		 * The created counter.
-		 */
-		private int createdCounter = 0;
-
-		/**
-		 * The rethrown counter.
-		 */
-		private int rethrownCounter = 0;
-
-		/**
-		 * The handled counter.
-		 */
-		private int handledCounter = 0;
-
-		/**
-		 * Default no-arg constructor
-		 */
-		public ExtendedExceptionSensorData() {
-			super();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		public ExtendedExceptionSensorData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent) {
-			super(timeStamp, platformIdent, sensorTypeIdent, methodIdent);
-		}
-
-		public int getCreatedCounter() {
-			return createdCounter;
-		}
-
-		public void setCreatedCounter(int createdCounter) {
-			this.createdCounter = createdCounter;
-		}
-
-		public int getRethrownCounter() {
-			return rethrownCounter;
-		}
-
-		public void setRethrownCounter(int rethrownCounter) {
-			this.rethrownCounter = rethrownCounter;
-		}
-
-		public int getHandledCounter() {
-			return handledCounter;
-		}
-
-		public void setHandledCounter(int handledCounter) {
-			this.handledCounter = handledCounter;
-		}
-
-		public InputDefinition getInputDefinition() {
-			return inputDefinition;
-		}
-
-		public void setInputDefinition(InputDefinition inputDefinition) {
-			this.inputDefinition = inputDefinition;
-		}
-
-		/**
-		 * The respective counter is updated based on the eventType.
-		 * 
-		 * @param eventType
-		 *            The event type of the exception.
-		 * @param value
-		 *            The value to be added to the respective counter.
-		 */
-		public void updateCounterForEventType(ExceptionEventEnum eventType, int value) {
-			// all other event types are ignored as we are only interested in
-			// these event types
-			if (eventType.toString().equalsIgnoreCase(ExceptionEventEnum.CREATED.toString())) {
-				setCreatedCounter(getCreatedCounter() + value);
-			} else if (eventType.toString().equals(ExceptionEventEnum.RETHROWN.toString())) {
-				setRethrownCounter(getRethrownCounter() + value);
-			} else if (eventType.toString().equals(ExceptionEventEnum.HANDLED.toString())) {
-				setHandledCounter(getHandledCounter() + value);
-			}
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = super.hashCode();
-			result = prime * result + createdCounter;
-			result = prime * result + handledCounter;
-			result = prime * result + rethrownCounter;
-			return result;
-		}
-
-		/**
-		 * Be very careful, as only {@link #getErrorMessage()} and the {@link #getThrowableType()}
-		 * are used for equality in this context.
-		 */
-		public boolean equals(Object obj) {
-			if (null == obj) {
-				return false;
-			}
-			if (this == obj) {
-				return true;
-			}
-			if (getClass() != obj.getClass()) {
-				return false;
-			}
-			ExtendedExceptionSensorData other = (ExtendedExceptionSensorData) obj;
-
-			if (getClass() != obj.getClass()) {
-				return false;
-			}
-
-			if (super.getErrorMessage() == null) {
-				if (other.getErrorMessage() != null) {
-					return false;
-				}
-			} else if (!super.getErrorMessage().equals(other.getErrorMessage())) {
-				return false;
-			}
-			if (super.getThrowableType() == null) {
-				if (other.getThrowableType() != null) {
-					return false;
-				}
-			} else if (!super.getThrowableType().equals(other.getThrowableType())) {
-				return false;
-			}
-			return true;
-		}
-
-	}
-
-	/**
 	 * Viewer Comparator used by this input controller to display the contents.
 	 * 
 	 * @author Eduard Tudenhoefner
 	 * 
 	 */
-	private static final class GroupedExceptionOverviewViewerComparator extends TableViewerComparator<ExtendedExceptionSensorData> {
+	private static final class GroupedExceptionOverviewViewerComparator extends TableViewerComparator<AggregatedExceptionSensorData> {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int compareElements(Viewer viewer, ExtendedExceptionSensorData data1, ExtendedExceptionSensorData data2) {
+		protected int compareElements(Viewer viewer, AggregatedExceptionSensorData data1, AggregatedExceptionSensorData data2) {
 			switch ((Column) getEnumSortColumn()) {
 			case FQN:
 				return data1.getThrowableType().compareTo(data2.getThrowableType());
+			case INVOCATION_AFFILLIATION:
+				return Double.compare(data1.getInvocationAffiliationPercentage(), data2.getInvocationAffiliationPercentage());
 			case CREATED:
-				return Integer.valueOf(data1.getCreatedCounter()).compareTo(Integer.valueOf(data2.getCreatedCounter()));
+				return Long.valueOf(data1.getCreated()).compareTo(Long.valueOf(data2.getCreated()));
 			case RETHROWN:
-				return Integer.valueOf(data1.getRethrownCounter()).compareTo(Integer.valueOf(data2.getRethrownCounter()));
+				return Long.valueOf(data1.getPassed()).compareTo(Long.valueOf(data2.getPassed()));
 			case HANDLED:
-				return Integer.valueOf(data1.getHandledCounter()).compareTo(Integer.valueOf(data2.getHandledCounter()));
+				return Long.valueOf(data1.getHandled()).compareTo(Long.valueOf(data2.getHandled()));
 			default:
 				return 0;
 			}

@@ -2,7 +2,6 @@ package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.communication.MethodSensorData;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.List;
  * @author Patrice Bouillet
  * 
  */
-public class TimerData extends MethodSensorData {
+public class TimerData extends InvocationAwareData {
 
 	/**
 	 * The serial version uid for this class.
@@ -308,6 +307,13 @@ public class TimerData extends MethodSensorData {
 		long size =  super.getObjectSize(objectSizes);
 		size += objectSizes.getPrimitiveTypesSize(0, 0, 0, 0, 1, 9);
 		return objectSizes.alignTo8Bytes(size);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public double getInvocationAffiliationPercentage() {
+		return (double) getObjectsInInvocationsCount() / count;
 	}
 
 }

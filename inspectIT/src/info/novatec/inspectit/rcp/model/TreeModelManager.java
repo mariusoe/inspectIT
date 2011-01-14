@@ -91,6 +91,7 @@ public class TreeModelManager {
 			agentTree.addChild(getInstrumentedMethodsTree(platformIdent, repositoryDefinition));
 			agentTree.addChild(getInvocationSequenceTree(platformIdent, repositoryDefinition));
 			agentTree.addChild(getSqlTree(platformIdent, repositoryDefinition));
+			agentTree.addChild(getTimerTree(platformIdent, repositoryDefinition));
 			agentTree.addChild(getSystemOverviewTree(platformIdent, repositoryDefinition));
 			agentTree.addChild(getExceptionSensorTree(platformIdent, repositoryDefinition));
 			agentTree.addChild(getCombinedMetricsTree(platformIdent, repositoryDefinition));
@@ -794,5 +795,43 @@ public class TreeModelManager {
 		combinedMetrics.setRepositoryDefinition(definition);
 
 		return combinedMetrics;
+	}
+	
+	/**
+	 * Returns the Timer data tree.
+	 * 
+	 * @param platformIdent
+	 *            The platform ident used to create the tree.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
+	 * @return The timer data tree.
+	 */
+	private Component getTimerTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
+		Composite timerDataComposite = new Composite();
+		timerDataComposite.setName("Timer Data");
+		timerDataComposite.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_TIMER));
+
+		Component showAll = new Leaf();
+		showAll.setName("Show All");
+		showAll.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_SHOW_ALL));
+
+		InputDefinition inputDefinition = new InputDefinition();
+		inputDefinition.setRepositoryDefinition(definition);
+		inputDefinition.setId(SensorTypeEnum.AGGREGATED_TIMER_DATA);
+		inputDefinition.setPartName("Aggregated Timer Data (Show All)");
+		inputDefinition.setPartTooltip("Aggregated Timer Data (Show All)");
+		inputDefinition.setImageDescriptor(SensorTypeEnum.AGGREGATED_TIMER_DATA.getImageDescriptor());
+		inputDefinition.setHeaderText("Aggregated Timer Data");
+		inputDefinition.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+
+		IdDefinition idDefinition = new IdDefinition();
+		idDefinition.setPlatformId(platformIdent.getId());
+
+		inputDefinition.setIdDefinition(idDefinition);
+		showAll.setInputDefinition(inputDefinition);
+
+		timerDataComposite.addChild(showAll);
+
+		return timerDataComposite;
 	}
 }

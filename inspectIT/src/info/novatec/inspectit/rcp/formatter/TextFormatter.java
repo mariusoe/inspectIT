@@ -1,6 +1,11 @@
 package info.novatec.inspectit.rcp.formatter;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.communication.data.ExceptionSensorData;
+import info.novatec.inspectit.communication.data.InvocationAwareData;
+import info.novatec.inspectit.communication.data.SqlStatementData;
+import info.novatec.inspectit.communication.data.TimerData;
+import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -83,6 +88,47 @@ public final class TextFormatter {
 	 */
 	public static String getMethodString(MethodIdent methodIdent) {
 		return getStyledMethodString(methodIdent).getString();
+	}
+
+	/**
+	 * Returns styled string for invocation affilliation percentage.
+	 * 
+	 * @param percentage
+	 *            Percentage.
+	 * @return Styled string.
+	 */
+	public static StyledString getInvocationAffilliationPercentageString(int percentage, int invocationsNumber) {
+		StyledString styledString = new StyledString();
+
+		styledString.append(String.valueOf(percentage), StyledString.QUALIFIER_STYLER);
+		styledString.append("% (in ", StyledString.QUALIFIER_STYLER);
+		styledString.append(String.valueOf(invocationsNumber), StyledString.QUALIFIER_STYLER);
+		styledString.append(" inv)", StyledString.QUALIFIER_STYLER);
+		return styledString;
+	}
+	
+	/**
+	 * Get the textual representation of objects that will be displayed in the new view.
+	 * 
+	 * @param invAwareData
+	 *            Invocation aware object to get representation for.
+	 * @param repositoryDefinition
+	 *            Repository definition. Needed for the method name retrival.
+	 * @return String.
+	 */
+	public static String getInvocationAwareDataTextualRepresentation(InvocationAwareData invAwareData, RepositoryDefinition repositoryDefinition) {
+		if (invAwareData instanceof SqlStatementData) {
+			SqlStatementData sqlData = (SqlStatementData) invAwareData;
+			return "SQL: " + sqlData.getSql();
+		} else if (invAwareData instanceof TimerData) {
+			TimerData timerData = (TimerData) invAwareData;
+			MethodIdent methodIdent = repositoryDefinition.getGlobalDataAccessService().getMethodIdentForId(timerData.getMethodIdent());
+			return TextFormatter.getMethodString(methodIdent);
+		} else if (invAwareData instanceof ExceptionSensorData) {
+			ExceptionSensorData exData = (ExceptionSensorData) invAwareData;
+			return "Exception: " + exData.getThrowableType();
+		}
+		return "";
 	}
 
 }

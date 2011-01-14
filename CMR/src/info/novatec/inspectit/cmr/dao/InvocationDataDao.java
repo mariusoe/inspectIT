@@ -2,6 +2,7 @@ package info.novatec.inspectit.cmr.dao;
 
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -45,6 +46,25 @@ public interface InvocationDataDao {
 	 */
 	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit);
 
+	/**
+	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
+	 * other objects. Thus this list can be used to get an overview of the available invocation
+	 * sequences. The limit defines the size of the list.
+	 * <p>
+	 * Compared with the method above, this service method returns only the invocations which ID is
+	 * in invocation ID collection supplied.
+	 * 
+	 * @param platformId
+	 *            Platform ID where to look for the objects. If the zero value is passed, looking
+	 *            for the object will be done in all platforms.
+	 * @param invocationIdCollection
+	 *            Collections of invocations IDs to search.
+	 * @param limit
+	 *            The limit/size of the list.
+	 * @return Returns the list of invocation sequences.
+	 */
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit);
+	
 	/**
 	 * This service method is used to get all the details of a specific invocation sequence.
 	 * 

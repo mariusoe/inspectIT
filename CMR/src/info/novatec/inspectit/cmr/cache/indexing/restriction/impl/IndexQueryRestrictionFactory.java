@@ -1,5 +1,7 @@
 package info.novatec.inspectit.cmr.cache.indexing.restriction.impl;
 
+import java.util.Collection;
+
 import info.novatec.inspectit.cmr.cache.indexing.restriction.AbstractIndexQueryRestriction;
 import info.novatec.inspectit.cmr.cache.indexing.restriction.IIndexQueryRestriction;
 
@@ -134,6 +136,21 @@ public final class IndexQueryRestrictionFactory {
 	 */
 	public static IIndexQueryRestriction isNotNull(String fieldName) {
 		return new IsNotNullIndexingRestriction(fieldName);
+	}
+
+	/**
+	 * Returns is in collection restriction. This restriction will check if the object supplied via
+	 * {@link IIndexQueryRestriction#isFulfilled(Object)} is in the supplied collection.
+	 * 
+	 * @param fieldName
+	 *            Name of the field that is restriction bounded to.
+	 * @param collection
+	 *            Collection to check in.
+	 * @return index query restriction
+	 * @see Collection#contains(Object);
+	 */
+	public static IIndexQueryRestriction isInCollection(String fieldName, Collection<?> collection) {
+		return new IsInCollection(fieldName, collection);
 	}
 
 	/**
@@ -464,6 +481,43 @@ public final class IndexQueryRestrictionFactory {
 		@Override
 		public boolean isFulfilled(Object object) {
 			return object != null;
+		}
+
+	}
+
+	/**
+	 * This restriction checks if the value supplied via
+	 * {@link IIndexQueryRestriction#isFulfilled(Object)} is in a collection.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private static class IsInCollection extends AbstractIndexQueryRestriction {
+
+		/**
+		 * Collection to look in.
+		 */
+		private Collection<?> collection;
+
+		/**
+		 * Default constructor.
+		 * 
+		 * @param fieldName
+		 *            Name of the field that is restriction bounded to.
+		 * @param collection
+		 *            Collection to look in.
+		 */
+		public IsInCollection(String fieldName, Collection<?> collection) {
+			super(fieldName);
+			this.collection = collection;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isFulfilled(Object fieldValue) {
+			return collection.contains(fieldValue);
 		}
 
 	}

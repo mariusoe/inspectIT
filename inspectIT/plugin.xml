@@ -176,6 +176,14 @@
       <command
             id="info.novatec.inspectit.rcp.commands.documentation"
             name="Documentation">
+	  </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.navigateToInvocations"
+            name="Invocation(s)">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.navigateToPlotting"
+            name="History Graph">
       </command>
       <command
             defaultHandler="info.novatec.inspectit.rcp.handlers.LicenseInformationHandler"
@@ -406,6 +414,92 @@
       <handler
             class="info.novatec.inspectit.rcp.handlers.OpenDocumentationHandler"
             commandId="info.novatec.inspectit.rcp.commands.documentation">
+	  </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.NavigateToInvocationsHandler"
+            commandId="info.novatec.inspectit.rcp.commands.navigateToInvocations">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.activeSubView"
+                        value="tableSubView">
+                  </test>
+                  <test
+                        property="info.novatec.inspectit.subViewClassification"
+                        value="master">
+                  </test>
+               </with>
+               <with
+                     variable="selection">
+                  <test
+                        property="info.novatec.inspectit.canNavigateToInvocations">
+                  </test>
+               </with>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.communication.data.InvocationAwareData">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.NavigateToPlotting"
+            commandId="info.novatec.inspectit.rcp.commands.navigateToPlotting">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <or>
+                     <and>
+                        <instanceof
+                              value="info.novatec.inspectit.communication.data.TimerData">
+                        </instanceof>
+                        <not>
+                           <instanceof
+                                 value="info.novatec.inspectit.communication.data.SqlStatementData">
+                           </instanceof>
+                        </not>
+                     </and>
+                     <instanceof
+                           value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                     </instanceof>
+                  </or>
+               </iterate>
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                  </instanceof>
+                  <or>
+                     <test
+                           property="info.novatec.inspectit.activeSubView"
+                           value="tableSubView">
+                     </test>
+                     <test
+                           property="info.novatec.inspectit.activeSubView"
+                           value="treeSubView">
+                     </test>
+                  </or>
+               </with>
+               <with
+                     variable="selection">
+                  <test
+                        property="info.novatec.inspectit.canNavigateToPlotting">
+                  </test>
+               </with>
+            </and>
+         </activeWhen>
       </handler>
    </extension>
    <extension
@@ -424,6 +518,27 @@
             properties="tableShowDetails"
             type="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
       </propertyTester>
+      <propertyTester
+            class="info.novatec.inspectit.rcp.editor.testers.NavigateToInvocationsTester"
+            id="info.novatec.inspectit.NavigateToInvocations"
+            namespace="info.novatec.inspectit"
+            properties="canNavigateToInvocations"
+            type="org.eclipse.jface.viewers.StructuredSelection">
+      </propertyTester>
+      <propertyTester
+            class="info.novatec.inspectit.rcp.editor.testers.SubViewClassificationTester"
+            id="info.novatec.inspectit.SubViewClassificationTester"
+            namespace="info.novatec.inspectit"
+            properties="subViewClassification"
+            type="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+      </propertyTester>
+      <propertyTester
+            class="info.novatec.inspectit.rcp.editor.testers.NavigateToPlottingTester"
+            id="info.novatec.inspectit.NavigateToPlottingTester"
+            namespace="info.novatec.inspectit"
+            properties="canNavigateToPlotting"
+            type="org.eclipse.jface.viewers.StructuredSelection">
+      </propertyTester>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -433,6 +548,19 @@
                commandId="info.novatec.inspectit.rcp.commands.details"
                style="push">
          </command>
+         <menu
+               label="Navigate To">
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.navigateToInvocations"
+                  icon="icons/invocation.png"
+                  style="push">
+            </command>
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.navigateToPlotting"
+                  icon="icons/timer.png"
+                  style="push">
+            </command>
+         </menu>
          <separator
                name="inspectit.editor.formrooteditor.treesubview.separator1"
                visible="true">
@@ -460,6 +588,19 @@
                commandId="info.novatec.inspectit.rcp.commands.details"
                style="push">
          </command>
+         <menu
+               label="Navigate To">
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.navigateToInvocations"
+                  icon="icons/invocation.png"
+                  style="push">
+            </command>
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.navigateToPlotting"
+                  icon="icons/timer.png"
+                  style="push">
+            </command>
+         </menu>
          <separator
                name="inspectit.editor.formrooteditor.tablesubview.separator1"
                visible="true">

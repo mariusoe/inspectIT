@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.repository.service.cmr;
 
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
+import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 
@@ -23,14 +24,12 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	private static final String EXCEPTION_DATA_ACCESS_SERVICE = "ExceptionDataAccessService";
 
 	/**
-	 * The proxy factory bean by Spring which initializes the data access
-	 * service.
+	 * The proxy factory bean by Spring which initializes the data access service.
 	 */
 	private final HttpInvokerProxyFactoryBean httpInvokerProxyFactoryBean;
 
 	/**
-	 * The exception data access service exposed by the CMR and initialized by
-	 * Spring.
+	 * The exception data access service exposed by the CMR and initialized by Spring.
 	 */
 	private final IExceptionDataAccessService exceptionDataAccessService;
 
@@ -120,7 +119,7 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public List<ExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template) {
+	public List<AggregatedExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template) {
 		try {
 			return exceptionDataAccessService.getDataForGroupedExceptionOverview(template);
 		} catch (Exception e) {
@@ -133,7 +132,7 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public List<ExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
+	public List<AggregatedExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
 		try {
 			return exceptionDataAccessService.getDataForGroupedExceptionOverview(template, fromDate, toDate);
 		} catch (Exception e) {
@@ -146,9 +145,9 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public List<ExceptionSensorData> getStackTracesForErrorMessage(ExceptionSensorData template) {
+	public List<ExceptionSensorData> getStackTraceMessagesForThrowableType(ExceptionSensorData template) {
 		try {
-			return exceptionDataAccessService.getStackTracesForErrorMessage(template);
+			return exceptionDataAccessService.getStackTraceMessagesForThrowableType(template);
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog("There was an error retrieving the stack traces from the CMR!", e, -1);
 			return Collections.EMPTY_LIST;
