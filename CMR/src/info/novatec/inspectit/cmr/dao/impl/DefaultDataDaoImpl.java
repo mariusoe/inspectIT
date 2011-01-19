@@ -20,6 +20,7 @@ import info.novatec.inspectit.communication.data.VmArgumentData;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -84,8 +85,6 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 		StatelessSession session = getHibernateTemplate().getSessionFactory().openStatelessSession();
 		Transaction tx = session.beginTransaction();
 		for (DefaultData element : defaultDataCollection) {
-			// TODO ET: constructor delegation filtering must be done here instead of in the
-			// InvocationHook
 			if (element instanceof InvocationSequenceData) {
 				InvocationSequenceData invoc = (InvocationSequenceData) element;
 				if (configuration.isEnhancedInvocationStorageMode()) {
@@ -135,6 +134,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	 */
 	@SuppressWarnings("unchecked")
 	private void extractDataFromInvocation(StatelessSession session, InvocationSequenceData invData) {
+		Set<Long> identityHashCodeSet = new HashSet<Long>();
 		for (InvocationSequenceData child : (List<InvocationSequenceData>) invData.getNestedSequences()) {
 			if (null != child.getTimerData()) {
 				saveTimerData(session, child.getTimerData());
@@ -151,16 +151,55 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 					ExceptionSensorData exceptionData = (ExceptionSensorData) data;
 					if (exceptionData.getExceptionEvent() == ExceptionEventEnum.CREATED) {
 						connectErrorMessagesInExceptionData(exceptionData);
-						try {
-							indexingTree.put(exceptionData);
-						} catch (IndexingException e) {
-							// indexing exception should not happen
-							LOGGER.error(e.getMessage(), e);
+						if (identityHashCodeSet.add(exceptionData.getThrowableIdentityHashCode())) {
+							ExceptionSensorData dataToIndex = manageExceptionConstructorDelegation(invData, exceptionData);
+							try {
+								indexingTree.put(dataToIndex);
+							} catch (IndexingException e) {
+								// indexing exception should not happen
+								LOGGER.error(e.getMessage(), e);
+							}
 						}
 					}
 				}
 			}
 			extractDataFromInvocation(session, child);
+		}
+	}
+
+	/**
+	 * Deals with the constructor delegation in the invocation sequence data.
+	 * 
+	 * @param parent
+	 *            Invocation parent where the exception data is found.
+	 * @param firstExceptionData
+	 *            Exception that needs to be handled.
+	 * @return Exception data that will be indexed.
+	 */
+	@SuppressWarnings("unchecked")
+	private ExceptionSensorData manageExceptionConstructorDelegation(InvocationSequenceData parent, ExceptionSensorData firstExceptionData) {
+		InvocationSequenceData lastInvocationChild = null;
+		ExceptionSensorData lastExceptionData = null;
+		long identityHashCode = firstExceptionData.getThrowableIdentityHashCode();
+
+		for (InvocationSequenceData invData : (List<InvocationSequenceData>) parent.getNestedSequences()) {
+			if (null != invData.getExceptionSensorDataObjects()) {
+				for (ExceptionSensorData exData : (List<ExceptionSensorData>) invData.getExceptionSensorDataObjects()) {
+					if (exData.getThrowableIdentityHashCode() == identityHashCode) {
+						if (null != lastInvocationChild) {
+							lastInvocationChild.setExceptionSensorDataObjects(null);
+						}
+						lastInvocationChild = invData;
+						lastExceptionData = exData;
+					}
+				}
+			}
+		}
+
+		if (null != lastExceptionData) {
+			return lastExceptionData;
+		} else {
+			return firstExceptionData;
 		}
 	}
 
