@@ -116,8 +116,12 @@ public class HealthStatus {
 		if (loadAverage < 0) {
 			loadAverage = 0;
 		}
-		double value = (WIDTH + 2.0d) / availCpus;
+		double value = (double) WIDTH / availCpus;
 		long load = Math.round(loadAverage * value);
+		if (load > WIDTH) {
+			//Necessary so that we don't brake the limit in graphical representation
+			load = WIDTH;
+		}
 		String title = "CPU load";
 
 		// print first line
@@ -203,7 +207,7 @@ public class HealthStatus {
 	 * @see MemoryUsage
 	 */
 	private void logGraphicalMemoryUsage(MemoryUsage memoryUsage, String title) {
-		double value = (WIDTH + 2.0d) / memoryUsage.getMax();
+		double value =  (double) WIDTH / memoryUsage.getMax();
 		long used = Math.round(memoryUsage.getUsed() * value);
 		long committed = Math.round(memoryUsage.getCommitted() * value);
 
@@ -239,7 +243,11 @@ public class HealthStatus {
 		for (long i = pos; i < WIDTH; i++) {
 			sb.append(" ");
 		}
-		sb.append(START_END_CHAR);
+		
+		//only print last char if committed is smaller
+		if (committed < WIDTH) {
+			sb.append(START_END_CHAR);
+		}
 		LOGGER.info(sb.toString());
 
 		// print last line
