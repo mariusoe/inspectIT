@@ -8,9 +8,9 @@
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
-				<value>spring/jdbc.properties</value>
-				<value>spring/buffer.properties</value>
-				<value>spring/jetty.properties</value>
+				<value>config/jdbc.properties</value>
+				<value>config/buffer.properties</value>
+				<value>config/jetty.properties</value>
 			</list>
 		</property>
 	</bean>
