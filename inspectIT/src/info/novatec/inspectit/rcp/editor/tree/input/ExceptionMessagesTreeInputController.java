@@ -331,7 +331,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 		 * {@inheritDoc}
 		 */
 		public Object getParent(Object element) {
-			return element;
+			return null;
 		}
 
 		/**
@@ -339,7 +339,10 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 		 */
 		public boolean hasChildren(Object parent) {
 			if (null != parent && parent instanceof ExtendedExceptionSensorData) {
-				return true;
+				ExtendedExceptionSensorData exData = (ExtendedExceptionSensorData) parent;
+				if (exData.getErrorMessage() != null) {
+					return true;
+				}
 			}
 
 			return false;
