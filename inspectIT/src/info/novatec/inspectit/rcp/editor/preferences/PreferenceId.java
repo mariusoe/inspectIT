@@ -15,7 +15,7 @@ public enum PreferenceId {
 	/**
 	 * The identifiers of the different control groups.
 	 */
-	TIMELINE, SAMPLINGRATE, LIVEMODE, UPDATE, ITEMCOUNT, FILTERSENSORTYPE, INVOCFILTEREXCLUSIVETIME, INVOCFILTERTOTALTIME, CLEAR_BUFFER;
+	TIMELINE, SAMPLINGRATE, LIVEMODE, UPDATE, ITEMCOUNT, FILTERSENSORTYPE, INVOCFILTEREXCLUSIVETIME, INVOCFILTERTOTALTIME, CLEAR_BUFFER, STEPPABLE_CONTROL;
 
 	/**
 	 * Inner enumeration for TIMELINE.
@@ -111,6 +111,19 @@ public enum PreferenceId {
 		 * The identifier for the time selection.
 		 */
 		TIME_SELECTION_ID;
+	}
+
+	/**
+	 * Inner enumeration for STEPPABLE_CONTROL.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	public enum SteppableControl implements IPreferenceGroup {
+		/**
+		 * The identifier for the switch stepping control button.
+		 */
+		BUTTON_STEPPABLE_CONTROL_ID;
 	}
 
 }

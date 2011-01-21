@@ -142,6 +142,9 @@ public class InspectIT extends AbstractUIPlugin {
 		addImageToRegistry(reg, InspectITConstants.OVERLAY_PRIORITY);
 		addImageToRegistry(reg, InspectITConstants.OVERLAY_UP);
 		addImageToRegistry(reg, InspectITConstants.OVERLAY_ERROR);
+		addImageToRegistry(reg, InspectITConstants.IMG_NEXT);
+		addImageToRegistry(reg, InspectITConstants.IMG_PREVIOUS);
+		addImageToRegistry(reg, InspectITConstants.IMG_RIGHT_DOWN_ARROW);
 	}
 
 	/**

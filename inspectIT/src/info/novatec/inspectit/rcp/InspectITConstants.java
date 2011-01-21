@@ -58,6 +58,9 @@ public interface InspectITConstants {
 	String IMG_DRILLUP = "drillup.png"; //$NON-NLS-1$
 	String VSA_LOGO = "vsalogo.png"; //$NON-NLS-1$
 	String IMG_CREATED_EXCEPTION = "created_exception.gif"; //$NON-NLS-1$
+	String IMG_NEXT = "next.png"; //$NON-NLS-1$
+	String IMG_PREVIOUS = "previous.png"; //$NON-NLS-1$
+	String IMG_RIGHT_DOWN_ARROW = "right_down.png"; //$NON-NLS-1$
 
 	String OVERLAY_PRIORITY = "overlay_priority.gif"; //$NON-NLS-1$
 	String OVERLAY_UP = "overlay_up.png"; //$NON-NLS-1$

@@ -159,6 +159,11 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	 * This data access service is needed because of the ID mappings.
 	 */
 	private CachedGlobalDataAccessService globalDataAccessService;
+	
+	/**
+	 * Current input of the tree.
+	 */
+	private Object input;
 
 	/**
 	 * {@inheritDoc}
@@ -182,6 +187,14 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 				viewerColumn.getColumn().setImage(column.imageDescriptor.createImage());
 			}
 		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Object getTreeInput() {
+		return input;
 	}
 
 	/**
@@ -599,7 +612,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private static final class InvocDetailContentProvider implements ITreeContentProvider {
+	private final class InvocDetailContentProvider implements ITreeContentProvider {
 
 		/**
 		 * The deferred manager is used here to update the tree in a concurrent thread so the UI
@@ -664,6 +677,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		 */
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			manager = new DeferredTreeContentManager((AbstractTreeViewer) viewer);
+			input = newInput;
 		}
 
 		/**

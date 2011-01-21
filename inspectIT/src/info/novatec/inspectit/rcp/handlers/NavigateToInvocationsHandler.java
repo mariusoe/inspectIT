@@ -82,6 +82,7 @@ public class NavigateToInvocationsHandler extends AbstractHandler {
 				inputDefinition.setHeaderDescription("Show One  (that contains " + textualDesc + ")");
 			}
 			inputDefinition.addAdditionalOption("invocationAwareDataList", invocationAwareDataList);
+			inputDefinition.addAdditionalOption("steppingObjects", invocationAwareDataList);
 			IdDefinition idDefinition = new IdDefinition();
 			idDefinition.setPlatformId(platformIdent);
 			inputDefinition.setIdDefinition(idDefinition);

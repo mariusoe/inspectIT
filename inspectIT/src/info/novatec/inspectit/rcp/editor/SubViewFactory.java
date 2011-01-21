@@ -25,10 +25,12 @@ import info.novatec.inspectit.rcp.editor.text.input.CpuInputController;
 import info.novatec.inspectit.rcp.editor.text.input.MemoryInputController;
 import info.novatec.inspectit.rcp.editor.text.input.ThreadsInputController;
 import info.novatec.inspectit.rcp.editor.text.input.VmSummaryInputController;
+import info.novatec.inspectit.rcp.editor.tree.SteppingTreeSubView;
 import info.novatec.inspectit.rcp.editor.tree.TreeSubView;
 import info.novatec.inspectit.rcp.editor.tree.input.ExceptionMessagesTreeInputController;
 import info.novatec.inspectit.rcp.editor.tree.input.ExceptionTreeInputController;
 import info.novatec.inspectit.rcp.editor.tree.input.InvocDetailInputController;
+import info.novatec.inspectit.rcp.editor.tree.input.SteppingInvocDetailInputController;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 
 import org.eclipse.swt.SWT;
@@ -147,7 +149,7 @@ public final class SubViewFactory {
 			SashCompositeSubView invocSubView1 = new SashCompositeSubView();
 			ISubView invocOverview1 = new TableSubView(new NavigationInvocOverviewInputController());
 			TabbedCompositeSubView invocTabbedSubView1 = new TabbedCompositeSubView();
-			ISubView invocDetails1 = new TreeSubView(new InvocDetailInputController());
+			ISubView invocDetails1 = new SteppingTreeSubView(new SteppingInvocDetailInputController());
 			ISubView invocSql1 = new TableSubView(new SqlInvocInputController());
 			ISubView invocMethods1 = new TableSubView(new MethodInvocInputController());
 			ISubView invocExceptions1 = new TableSubView(new ExceptionSensorInvocInputController());

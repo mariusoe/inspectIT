@@ -214,6 +214,10 @@ public class FormPreferencePanel implements IPreferencePanel {
 			toolBarManager.add(switchPreferences);
 		}
 
+		if (preferenceSet.contains(PreferenceId.STEPPABLE_CONTROL)) {
+			toolBarManager.add(new SwitchSteppingControl("Stepping control"));
+		}
+
 		if (preferenceSet.contains(PreferenceId.LIVEMODE)) {
 			toolBarManager.add(switchLiveMode);
 
@@ -613,6 +617,42 @@ public class FormPreferencePanel implements IPreferencePanel {
 		}
 
 		switchLiveMode = null;
+	}
+
+	/**
+	 * Action for turning the stepping control off and on.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private final class SwitchSteppingControl extends Action {
+
+		/**
+		 * Default constructor.
+		 * 
+		 * @param text
+		 *            the action's text, or <code>null</code> if there is no text
+		 * @see Action
+		 */
+		public SwitchSteppingControl(String text) {
+			super(text, AS_CHECK_BOX);
+			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_RIGHT_DOWN_ARROW));
+			// by default is on
+			setChecked(true);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void run() {
+			PreferenceEvent event = new PreferenceEvent(PreferenceId.STEPPABLE_CONTROL);
+			Map<IPreferenceGroup, Object> steppablePreference = new HashMap<IPreferenceGroup, Object>();
+			steppablePreference.put(PreferenceId.SteppableControl.BUTTON_STEPPABLE_CONTROL_ID, this.isChecked());
+			event.setPreferenceMap(steppablePreference);
+			fireEvent(event);
+		}
+
 	}
 
 }
