@@ -75,7 +75,9 @@
 	<target name="dist-commons">
 		<mkdir dir="${basedir}/build" />
 		<mkdir dir="${build.common.classes}" />
-		<javac source="1.4" target="1.4" debug="true" fork="true" destdir="${build.common.classes}" srcdir="../../Commons" />
+		<javac source="1.4" target="1.4" debug="true" fork="true" includeAntRuntime="no" destdir="${build.common.classes}" srcdir="../../Commons">
+			<compilerarg value="-Xlint:unchecked" />
+		</javac>
 	</target>
 
 	<target name="init" depends="dist-commons">
@@ -169,10 +171,11 @@
 		<mkdir dir="${build.qa.test.testdata}" />
 		<mkdir dir="${build.test.classes}" />
 
-		<javac source="1.6" target="1.6" debug="true" nowarn="off" destdir="${build.test.classes}" srcdir="${test.root}">
+		<javac source="1.6" target="1.6" debug="true" nowarn="off" includeAntRuntime="no" destdir="${build.test.classes}" srcdir="${test.root}">
 			<classpath refid="path.libs" />
 			<classpath refid="path.rcp" />
 			<classpath refid="path.commons.classes" />
+			<compilerarg value="-Xlint:unchecked" />
 		</javac>
 
 		<!-- instrument the classes that should be included in test coverage -->

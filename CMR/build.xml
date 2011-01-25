@@ -99,15 +99,21 @@
 	<target name="build-commons" description="--> builds a clean distribution of the commons project and copies the classes to the local build folder">
 		<mkdir dir="${build.commons.classes}" />
 
-		<javac source="1.4" target="1.4" debug="true" fork="true" destdir="${build.commons.classes}" srcdir="${src.commons}" />
+		<javac source="1.4" target="1.4" debug="true" fork="true" includeAntRuntime="no" destdir="${build.commons.classes}" srcdir="${src.commons}">
+			<compilerarg value="-Xlint:unchecked" />
+		</javac>
 	</target>
 
 	<target name="build" depends="init, build-commons" description="--> Compiles the sources">
 		<mkdir dir="${build.cmr.generated.classes}" />
 		<mkdir dir="${build.cmr.classes}" />
 
-		<javac source="1.5" target="1.5" debug="true" debuglevel="lines,vars,source" destdir="${build.cmr.generated.classes}" srcdir="${src.generated.root}" classpathref="compile.classpath" />
-		<javac source="1.5" target="1.5" debug="true" debuglevel="lines,vars,source" destdir="${build.cmr.classes}" srcdir="${src.root}" classpathref="compile.classpath" />
+		<javac source="1.5" target="1.5" debug="true" debuglevel="lines,vars,source" includeAntRuntime="no" destdir="${build.cmr.generated.classes}" srcdir="${src.generated.root}" classpathref="compile.classpath">
+			<compilerarg value="-Xlint:unchecked" />
+		</javac>
+		<javac source="1.5" target="1.5" debug="true" debuglevel="lines,vars,source" includeAntRuntime="no" destdir="${build.cmr.classes}" srcdir="${src.root}" classpathref="compile.classpath">
+			<compilerarg value="-Xlint:unchecked" />
+		</javac>
 
 		<rmic stubversion="1.2" base="${build.cmr.generated.classes}" classpathref="complete.classpath" classname="info.novatec.inspectit.cmr.service.AgentStorageService" sourcebase="${src.generated.root}" />
 		<rmic stubversion="1.2" base="${build.cmr.generated.classes}" classpathref="complete.classpath" classname="info.novatec.inspectit.cmr.service.RegistrationService" sourcebase="${src.generated.root}" />
@@ -127,8 +133,9 @@
 		<mkdir dir="${build.qa.test.coveragedata}" />
 		<mkdir dir="${build.test.classes}" />
 
-		<javac source="1.6" target="1.6" debug="true" debuglevel="lines,vars,source" nowarn="off" destdir="${build.test.classes}" srcdir="${test.root}">
+		<javac source="1.6" target="1.6" debug="true" debuglevel="lines,vars,source" nowarn="off" includeAntRuntime="no" destdir="${build.test.classes}" srcdir="${test.root}">
 			<classpath refid="complete.classpath" />
+			<compilerarg value="-Xlint:unchecked" />
 		</javac>
 
 		<!-- instrument the classes that should be included in test coverage -->
@@ -190,7 +197,7 @@
 		<mkdir dir="${build.qa.analysis.findbugs}" />
 		<mkdir dir="${build.qa.analysis.cpd}" />
 
-		<echo message="Analyse Code with tool: PMD" level="info"/>
+		<echo message="Analyse Code with tool: PMD" level="info" />
 		<pmd maxRuleViolations="${pmd.maximum.violations}" rulesetfiles="${pmd.rules.file}">
 			<formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true" />
 			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true" />
@@ -209,7 +216,7 @@
 		<!-- this js is used for the sortable report -->
 		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >" />
 
-		<echo message="Analyse Code with tool: Checkstyle" level="info"/>
+		<echo message="Analyse Code with tool: Checkstyle" level="info" />
 		<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
 			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
 			<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" />
@@ -218,7 +225,7 @@
 		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl" />
 		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >" />
 
-		<echo message="Analyse Code with tool: FindBugs" level="info"/>
+		<echo message="Analyse Code with tool: FindBugs" level="info" />
 		<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
 		<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
 		<pathconvert property="findbugs.classpath">
@@ -235,7 +242,7 @@
 		</findbugs>
 		<xslt in="${build.qa.analysis.findbugs}/findbugs.xml" style="${basedir}/resources/findbugs/fancy-hist.xsl" out="${build.qa.analysis}/findbugs.html" />
 
-		<echo message="Analyse Code with tool: CPD" level="info"/>
+		<echo message="Analyse Code with tool: CPD" level="info" />
 		<cpd format="xml" language="java" minimumTokenCount="100" outputFile="${build.qa.analysis.cpd}/cpd.xml">
 			<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" />
 		</cpd>
