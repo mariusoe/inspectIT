@@ -98,7 +98,6 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 
 		List<UnregisteredSensorConfig> unregisteredSensorConfigs = new ArrayList<UnregisteredSensorConfig>();
 		UnregisteredSensorConfig unregisteredSensorConfig = mock(UnregisteredSensorConfig.class);
-		when(unregisteredSensorConfig.getSensorName()).thenReturn("simpleClassAndMethod");
 		when(unregisteredSensorConfig.getTargetClassName()).thenReturn(className);
 		when(unregisteredSensorConfig.getTargetMethodName()).thenReturn(methodName);
 		MethodSensorTypeConfig methodSensorTypeConfig = mock(MethodSensorTypeConfig.class);
@@ -136,7 +135,6 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 
 		List<UnregisteredSensorConfig> unregisteredSensorConfigs = new ArrayList<UnregisteredSensorConfig>();
 		UnregisteredSensorConfig unregisteredSensorConfig = mock(UnregisteredSensorConfig.class);
-		when(unregisteredSensorConfig.getSensorName()).thenReturn("methodWithOneParameter");
 		when(unregisteredSensorConfig.getTargetClassName()).thenReturn(className);
 		when(unregisteredSensorConfig.getTargetMethodName()).thenReturn(methodName);
 		MethodSensorTypeConfig methodSensorTypeConfig = mock(MethodSensorTypeConfig.class);
@@ -211,7 +209,6 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 		when(config.isVirtual()).thenReturn(false);
 		when(config.isIgnoreSignature()).thenReturn(true);
 		when(config.getSensorTypeConfig()).thenReturn(sensorTypeConfig);
-		when(config.getSensorName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
 		when(config.getSettings()).thenReturn(settings);
 		ThrowableMatcher matcher = new ThrowableMatcher(inheritanceAnalyzer, classPoolAnalyzer, config, superclassMatcher);
 		when(config.getMatcher()).thenReturn(matcher);

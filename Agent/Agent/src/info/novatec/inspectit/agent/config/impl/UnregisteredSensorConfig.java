@@ -204,25 +204,6 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
-	 * Returns the sensor name.
-	 * 
-	 * @return The sensor name.
-	 */
-	public String getSensorName() {
-		return sensorName;
-	}
-
-	/**
-	 * Sets the sensor name.
-	 * 
-	 * @param sensorName
-	 *            The sensor name.
-	 */
-	public void setSensorName(String sensorName) {
-		this.sensorName = sensorName;
-	}
-
-	/**
 	 * Returns the sensor type configuration.
 	 * 
 	 * @return The sensor type configuration.

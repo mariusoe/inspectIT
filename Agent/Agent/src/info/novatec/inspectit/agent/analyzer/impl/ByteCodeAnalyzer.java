@@ -223,8 +223,7 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 
 			for (Iterator configsIterator = configs.iterator(); configsIterator.hasNext();) {
 				UnregisteredSensorConfig usc = (UnregisteredSensorConfig) configsIterator.next();
-				String sensorName = replaceKeywords(usc.getSensorName(), ctBehavior.getDeclaringClass().getSimpleName(), ctBehavior.getName(), parameterTypes);
-				rsc.addSensorTypeConfig(usc.getSensorTypeConfig(), sensorName);
+				rsc.addSensorTypeConfig(usc.getSensorTypeConfig());
 				rsc.getSettings().putAll(usc.getSettings());
 
 				if (usc.isPropertyAccess()) {
@@ -263,32 +262,6 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 		}
 
 		return ctBehavior.getDeclaringClass().toBytecode();
-	}
-
-	/**
-	 * Replace all the place holders of the string which was set by the user in the configuration
-	 * file.
-	 * 
-	 * @param sensorName
-	 *            The name of the sensor where all reserved keywords will be replaced.
-	 * @param className
-	 *            The name of the class.
-	 * @param methodName
-	 *            The name of the method.
-	 * @param parameterTypes
-	 *            A list containing the parameters of the method.
-	 * @return The modified sensor name with all replaced keywords.
-	 */
-	private String replaceKeywords(String sensorName, String className, String methodName, List parameterTypes) {
-		sensorName = sensorName.replaceAll("%classname%", className.replaceAll("\\$", "?"));
-		sensorName = sensorName.replaceAll("%methodname%", methodName.replaceAll("\\$", "?"));
-		if (parameterTypes.size() > 0) {
-			sensorName = sensorName.replaceAll("%parametertypes%", parameterTypes.toString().replaceAll("\\$", "?"));
-		} else {
-			sensorName = sensorName.replaceAll("%parametertypes%", "");
-		}
-
-		return sensorName;
 	}
 
 }

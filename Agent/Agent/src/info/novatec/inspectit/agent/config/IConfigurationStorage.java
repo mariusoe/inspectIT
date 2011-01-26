@@ -196,8 +196,6 @@ public interface IConfigurationStorage {
 	/**
 	 * Adds a new sensor definition.
 	 * 
-	 * @param sensorName
-	 *            The name of the sensor.
 	 * @param sensorTypeName
 	 *            The name of the sensor type.
 	 * @param targetClassName
@@ -219,7 +217,7 @@ public interface IConfigurationStorage {
 	 *             This exception is thrown if something unexpected happens while initializing the
 	 *             buffer strategy.
 	 */
-	void addSensor(String sensorName, String sensorTypeName, String targetClassName, String targetMethodName, List parameterList, boolean ignoreSignature, Map settings) throws StorageException;
+	void addSensor(String sensorTypeName, String targetClassName, String targetMethodName, List parameterList, boolean ignoreSignature, Map settings) throws StorageException;
 
 	/**
 	 * Returns a {@link List} of the {@link UnregisteredSensorConfig} classes.

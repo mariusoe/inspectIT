@@ -286,11 +286,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addSensor(String sensorName, String sensorTypeName, String targetClassName, String targetMethodName, List parameterList, boolean ignoreSignature, Map settings) throws StorageException {
-		if ((null == sensorName) || "".equals(sensorName)) {
-			throw new StorageException("Sensor name cannot be null or empty!");
-		}
-
+	public void addSensor(String sensorTypeName, String targetClassName, String targetMethodName, List parameterList, boolean ignoreSignature, Map settings) throws StorageException {
 		if ((null == sensorTypeName) || "".equals(sensorTypeName)) {
 			throw new StorageException("Sensor type name for the sensor cannot be null or empty!");
 		}
@@ -385,7 +381,6 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		if ("<init>".equals(targetMethodName)) {
 			sensorConfig.setConstructor(true);
 		}
-		sensorConfig.setSensorName(sensorName);
 		sensorConfig.setIgnoreSignature(ignoreSignature);
 		sensorConfig.setParameterTypes(parameterList);
 		sensorConfig.setSettings(settings);
@@ -526,7 +521,6 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		sensorConfig.setSensorTypeConfig(getExceptionSensorTypeConfigForName(sensorTypeName));
 		sensorConfig.setTargetMethodName("");
 		sensorConfig.setConstructor(true);
-		sensorConfig.setSensorName(sensorTypeName);
 		sensorConfig.setSettings(settings);
 		sensorConfig.setExceptionSensorActivated(true);
 		sensorConfig.setIgnoreSignature(true);

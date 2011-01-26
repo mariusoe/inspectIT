@@ -106,33 +106,33 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		configurationStorage.setBufferStrategy("info.novatec.inspectit.agent.buffer.impl.SimpleBufferStrategy", null);
 
 		// sensor definitions
-		configurationStorage.addSensor("TimerSensorTest", "timer", "*", "*", null, true, null);
+		configurationStorage.addSensor("timer", "*", "*", null, true, null);
 
-		configurationStorage.addSensor("InvocSensorTest", "isequence", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", null, true, null);
+		configurationStorage.addSensor("isequence", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", null, true, null);
 
 		List<String> parameterList = new ArrayList<String>();
 		parameterList.add("java.lang.String");
-		configurationStorage.addSensor("ParameterTest", "timer", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", parameterList, false, null);
+		configurationStorage.addSensor("timer", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", parameterList, false, null);
 
 		settings = new HashMap<String, String>();
 		settings.put("interface", "true");
-		configurationStorage.addSensor("InterfaceTest", "timer", "info.novatec.IService", "*Service", null, true, settings);
+		configurationStorage.addSensor("timer", "info.novatec.IService", "*Service", null, true, settings);
 
 		settings = new HashMap<String, String>();
 		settings.put("superclass", "true");
-		configurationStorage.addSensor("SuperclassTest", "isequence", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", null, true, settings);
+		configurationStorage.addSensor("isequence", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", null, true, settings);
 
 		Map<String, List<String>> fieldSettings = new HashMap<String, List<String>>();
 		List<String> list = new ArrayList<String>();
 		list.add("LastOutput;jlbOutput.text");
 		fieldSettings.put("field", list);
-		configurationStorage.addSensor("FieldTest", "timer", "*", "*", null, true, fieldSettings);
+		configurationStorage.addSensor("timer", "*", "*", null, true, fieldSettings);
 
 		fieldSettings = new HashMap<String, List<String>>();
 		list = new ArrayList<String>();
 		list.add("0;Source;msg");
 		fieldSettings.put("property", list);
-		configurationStorage.addSensor("MethodPropertyTest", "timer", "*", "*", null, true, fieldSettings);
+		configurationStorage.addSensor("timer", "*", "*", null, true, fieldSettings);
 	}
 
 	@Test()
@@ -474,7 +474,6 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		// the first 4 configs are the ones from the exception sensor
 		// first
 		UnregisteredSensorConfig config = configs.get(4);
-		assertEquals(config.getSensorName(), "TimerSensorTest");
 		assertEquals(config.getSensorTypeConfig().getName(), "timer");
 		assertNull(config.getTargetPackageName());
 		assertEquals(config.getTargetClassName(), "*");
@@ -489,7 +488,6 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 		// second
 		config = configs.get(5);
-		assertEquals(config.getSensorName(), "InvocSensorTest");
 		assertEquals(config.getSensorTypeConfig().getName(), "isequence");
 		assertNull(config.getTargetPackageName());
 		assertEquals(config.getTargetClassName(), "info.novatec.inspectitsamples.calculator.Calculator");
@@ -504,7 +502,6 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 		// third
 		config = configs.get(6);
-		assertEquals(config.getSensorName(), "ParameterTest");
 		assertEquals(config.getSensorTypeConfig().getName(), "timer");
 		assertNull(config.getTargetPackageName());
 		assertEquals(config.getTargetClassName(), "info.novatec.inspectitsamples.calculator.Calculator");
@@ -520,7 +517,6 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 		// fourth
 		config = configs.get(7);
-		assertEquals(config.getSensorName(), "InterfaceTest");
 		assertEquals(config.getSensorTypeConfig().getName(), "timer");
 		assertNull(config.getTargetPackageName());
 		assertEquals(config.getTargetClassName(), "info.novatec.IService");
@@ -537,7 +533,6 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 		// fifth
 		config = configs.get(8);
-		assertEquals(config.getSensorName(), "SuperclassTest");
 		assertEquals(config.getSensorTypeConfig().getName(), "isequence");
 		assertNull(config.getTargetPackageName());
 		assertEquals(config.getTargetClassName(), "info.novatec.inspectitsamples.calculator.Calculator");
@@ -580,64 +575,50 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	}
 
 	@Test(expectedExceptions = { StorageException.class })
-	public void addNullSensorName() throws StorageException {
-		configurationStorage.addSensor(null, "xxx", "xxx", "xxx", null, false, null);
-
-		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
-	}
-
-	@Test(expectedExceptions = { StorageException.class })
-	public void addEmptySensorName() throws StorageException {
-		configurationStorage.addSensor("", "xxx", "xxx", "xxx", null, false, null);
-
-		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
-	}
-
-	@Test(expectedExceptions = { StorageException.class })
 	public void addNullSensorTypeName() throws StorageException {
-		configurationStorage.addSensor("xxx", null, "xxx", "xxx", null, false, null);
+		configurationStorage.addSensor(null, "xxx", "xxx", null, false, null);
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 
 	@Test(expectedExceptions = { StorageException.class })
 	public void addEmptySensorTypeName() throws StorageException {
-		configurationStorage.addSensor("xxx", "", "xxx", "xxx", null, false, null);
+		configurationStorage.addSensor("", "xxx", "xxx", null, false, null);
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 
 	@Test(expectedExceptions = { StorageException.class })
 	public void addNullSensorTargetClassName() throws StorageException {
-		configurationStorage.addSensor("xxx", "xxx", null, "xxx", null, false, null);
+		configurationStorage.addSensor("xxx", null, "xxx", null, false, null);
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 
 	@Test(expectedExceptions = { StorageException.class })
 	public void addEmptySensorTargetClassName() throws StorageException {
-		configurationStorage.addSensor("xxx", "xxx", "", "xxx", null, false, null);
+		configurationStorage.addSensor("xxx", "", "xxx", null, false, null);
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 
 	@Test(expectedExceptions = { StorageException.class })
 	public void addNullSensorTargetMethodName() throws StorageException {
-		configurationStorage.addSensor("xxx", "xxx", "xxx", null, null, false, null);
+		configurationStorage.addSensor("xxx", "xxx", null, null, false, null);
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 
 	@Test(expectedExceptions = { StorageException.class })
 	public void addEmptySensorTargetMethodName() throws StorageException {
-		configurationStorage.addSensor("xxx", "xxx", "xxx", "", null, false, null);
+		configurationStorage.addSensor("xxx", "xxx", "", null, false, null);
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 
 	@Test(expectedExceptions = { StorageException.class })
 	public void addSensorInvalidSensorTypeName() throws StorageException {
-		configurationStorage.addSensor("xxx", "xxx", "xxx", "xxx", null, false, null);
+		configurationStorage.addSensor("xxx", "xxx", "xxx", null, false, null);
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}

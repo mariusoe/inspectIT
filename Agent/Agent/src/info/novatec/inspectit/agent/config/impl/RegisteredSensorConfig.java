@@ -70,11 +70,6 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	private Map reverseMethodHookMap = new LinkedHashMap();
 
 	/**
-	 * Maps the sensor types to the sensor names.
-	 */
-	private Map sensorTypeToName = new HashMap();
-
-	/**
 	 * The method visibility.
 	 */
 	private int modifiers;
@@ -146,24 +141,12 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
-	 * Returns an unmodifiable {@link Map} implementation of the sensor types as the keys and the
-	 * sensor names as the values.
-	 * 
-	 * @return The sensor type to name map.
-	 */
-	public Map getSensorTypeToNameMapping() {
-		return Collections.unmodifiableMap(sensorTypeToName);
-	}
-
-	/**
 	 * Adds a sensor type to this configuration.
 	 * 
 	 * @param sensorTypeConfig
 	 *            The sensor type to add.
-	 * @param sensorName
-	 *            The name of the sensor.
 	 */
-	public void addSensorTypeConfig(MethodSensorTypeConfig sensorTypeConfig, String sensorName) {
+	public void addSensorTypeConfig(MethodSensorTypeConfig sensorTypeConfig) {
 		// check for the invocation sequence sensor type
 		if (sensorTypeConfig.getClassName().endsWith("InvocationSequenceSensor")) {
 			invocationSequenceSensorTypeConfig = sensorTypeConfig;
@@ -175,7 +158,6 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 
 		if (!sensorTypeConfigs.contains(sensorTypeConfig)) {
 			sensorTypeConfigs.add(sensorTypeConfig);
-			sensorTypeToName.put(sensorTypeConfig, sensorName);
 
 			sortSensorTypeConfigs();
 			sortMethodHooks();
@@ -195,7 +177,6 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	public void removeSensorTypeConfig(MethodSensorTypeConfig sensorTypeConfig) {
 		if (sensorTypeConfigs.contains(sensorTypeConfig)) {
 			sensorTypeConfigs.remove(sensorTypeConfig);
-			sensorTypeToName.remove(sensorTypeConfig);
 
 			sortMethodHooks();
 

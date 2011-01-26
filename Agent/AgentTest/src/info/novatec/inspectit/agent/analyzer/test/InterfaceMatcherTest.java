@@ -48,7 +48,6 @@ public class InterfaceMatcherTest extends MockInit {
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {
 		unregisteredSensorConfig = new UnregisteredSensorConfig(classPoolAnalyzer, mock(IInheritanceAnalyzer.class));
-		unregisteredSensorConfig.setSensorName("testSensor");
 		unregisteredSensorConfig.setIgnoreSignature(false);
 		unregisteredSensorConfig.setInterface(true);
 		unregisteredSensorConfig.setSuperclass(false);

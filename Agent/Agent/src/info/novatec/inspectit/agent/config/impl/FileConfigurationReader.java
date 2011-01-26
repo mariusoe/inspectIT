@@ -312,7 +312,6 @@ public class FileConfigurationReader implements IConfigurationReader {
 		String sensorTypeName = tokenizer.nextToken();
 		String targetClassName = tokenizer.nextToken();
 		String targetMethodName = tokenizer.nextToken();
-		String sensorName = tokenizer.nextToken();
 		boolean ignoreSignature = false;
 
 		// Trying to match the parameter types (if there are any)
@@ -359,7 +358,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 		}
 
 		try {
-			configurationStorage.addSensor(sensorName, sensorTypeName, targetClassName, targetMethodName, parameterList, ignoreSignature, settings);
+			configurationStorage.addSensor(sensorTypeName, targetClassName, targetMethodName, parameterList, ignoreSignature, settings);
 		} catch (StorageException e) {
 			throw new ParserException("Could not add the sensor to the storage", e);
 		}

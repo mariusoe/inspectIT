@@ -192,14 +192,13 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		String sensorTypeName = "isequence";
 		String className = "info.novatec.inspectitsamples.calculator.Calculator";
 		String methodName = "actionPerformed";
-		String sensorName = "test";
 
-		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "() " + sensorName);
+		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "() ");
 		writer.close();
 
 		fileConfigurationReader.load();
 
-		verify(configurationStorage, times(1)).addSensor(sensorName, sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, Collections.EMPTY_MAP);
 		verifyNoMoreInteractions(configurationStorage);
 	}
 
@@ -208,14 +207,13 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		String sensorTypeName = "timer";
 		String className = "*";
 		String methodName = "*";
-		String sensorName = "test";
 
-		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "() " + sensorName);
+		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "() ");
 		writer.close();
 
 		fileConfigurationReader.load();
 
-		verify(configurationStorage, times(1)).addSensor(sensorName, sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, Collections.EMPTY_MAP);
 		verifyNoMoreInteractions(configurationStorage);
 	}
 
@@ -224,14 +222,13 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		String sensorTypeName = "isequence";
 		String className = "info.novatec.inspectitsamples.calculator.Calculator";
 		String methodName = "actionPerformed";
-		String sensorName = "test";
 
-		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + " " + sensorName);
+		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + " ");
 		writer.close();
 
 		fileConfigurationReader.load();
 
-		verify(configurationStorage, times(1)).addSensor(sensorName, sensorTypeName, className, methodName, Collections.EMPTY_LIST, true, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, true, Collections.EMPTY_MAP);
 		verifyNoMoreInteractions(configurationStorage);
 	}
 
@@ -241,9 +238,8 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		String className = "info.novatec.inspectitsamples.calculator.Calculator";
 		String methodName = "actionPerformed";
 		String parameter = "java.lang.String";
-		String sensorName = "test";
 
-		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "(" + parameter + ") " + sensorName);
+		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "(" + parameter + ") ");
 		writer.close();
 
 		fileConfigurationReader.load();
@@ -251,7 +247,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		List<String> parameterList = new ArrayList<String>();
 		parameterList.add(parameter);
 
-		verify(configurationStorage, times(1)).addSensor(sensorName, sensorTypeName, className, methodName, parameterList, false, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, parameterList, false, Collections.EMPTY_MAP);
 		verifyNoMoreInteractions(configurationStorage);
 	}
 
@@ -263,9 +259,8 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		String parameterOne = "java.lang.String";
 		String parameterTwo = "java.lang.Object";
 		String parameterThree = "java.io.File";
-		String sensorName = "test";
 
-		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "(" + parameterOne + "," + parameterTwo + "," + parameterThree + ") " + sensorName);
+		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "(" + parameterOne + "," + parameterTwo + "," + parameterThree + ") ");
 		writer.close();
 
 		fileConfigurationReader.load();
@@ -275,7 +270,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		parameterList.add(parameterTwo);
 		parameterList.add(parameterThree);
 
-		verify(configurationStorage, times(1)).addSensor(sensorName, sensorTypeName, className, methodName, parameterList, false, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, parameterList, false, Collections.EMPTY_MAP);
 		verifyNoMoreInteractions(configurationStorage);
 	}
 
@@ -284,10 +279,9 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		String sensorTypeName = "isequence";
 		String className = "info.novatec.inspectitsamples.calculator.Calculator";
 		String methodName = "actionPerformed";
-		String sensorName = "test";
 		String parameterRecord = "0;Source;text";
 
-		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "() " + sensorName + " p=" + parameterRecord);
+		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "() " + " p=" + parameterRecord);
 		writer.close();
 
 		fileConfigurationReader.load();
@@ -297,7 +291,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		propertyList.add(parameterRecord);
 		settings.put("property", propertyList);
 
-		verify(configurationStorage, times(1)).addSensor(sensorName, sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
 		verifyNoMoreInteractions(configurationStorage);
 	}
 
@@ -306,10 +300,9 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		String sensorTypeName = "isequence";
 		String className = "info.novatec.inspectitsamples.calculator.Calculator";
 		String methodName = "actionPerformed";
-		String sensorName = "test";
 		String fieldRecord = "LastOutput;jlbOutput.text";
 
-		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "() " + sensorName + " f=" + fieldRecord);
+		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "() " + " f=" + fieldRecord);
 		writer.close();
 
 		fileConfigurationReader.load();
@@ -319,7 +312,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		propertyList.add(fieldRecord);
 		settings.put("field", propertyList);
 
-		verify(configurationStorage, times(1)).addSensor(sensorName, sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
 		verifyNoMoreInteractions(configurationStorage);
 	}
 
@@ -328,10 +321,9 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		String sensorTypeName = "isequence";
 		String className = "info.novatec.inspectitsamples.calculator.Calculator";
 		String methodName = "actionPerformed";
-		String sensorName = "test";
 		String minDuration = "100.0";
 
-		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "() " + sensorName + " minDuration=" + minDuration);
+		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "() " + " minDuration=" + minDuration);
 		writer.close();
 
 		fileConfigurationReader.load();
@@ -339,7 +331,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		Map<String, String> settings = new HashMap<String, String>();
 		settings.put("minDuration", minDuration);
 
-		verify(configurationStorage, times(1)).addSensor(sensorName, sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
 		verifyNoMoreInteractions(configurationStorage);
 	}
 
