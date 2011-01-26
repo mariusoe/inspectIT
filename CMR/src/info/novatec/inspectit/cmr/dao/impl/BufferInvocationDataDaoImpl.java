@@ -68,15 +68,8 @@ public class BufferInvocationDataDaoImpl implements InvocationDataDao {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object getInvocationSequenceDetail(InvocationSequenceData template) {
+	public InvocationSequenceData getInvocationSequenceDetail(InvocationSequenceData template) {
 		return indexingTree.get(template);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void saveInvocation(InvocationSequenceData invocation) {
-		throw new UnsupportedOperationException("Buffer Invocation Data Dao can not persist the invocation sequence.");
 	}
 
 	/**

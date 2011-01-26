@@ -23,7 +23,6 @@ Bundle-ClassPath: .,
  lib/prod/jfreechart-experimental.jar,
  lib/prod/jfreechart-swt.jar,
  lib/prod/jfreechart.jar,
- lib/prod/rmiio.jar,
  lib/prod/spring.jar,
  lib/prod/swtgraphics2d.jar,
  lib/prod/xstream.jar

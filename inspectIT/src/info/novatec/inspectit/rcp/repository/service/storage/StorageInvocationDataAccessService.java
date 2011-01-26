@@ -118,7 +118,7 @@ public class StorageInvocationDataAccessService implements IInvocationDataAccess
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object getInvocationSequenceDetail(InvocationSequenceData template) {
+	public InvocationSequenceData getInvocationSequenceDetail(InvocationSequenceData template) {
 		String path = getFilenameForInvocation(template);
 		File file = new File(path);
 		try {

@@ -47,8 +47,8 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 	 * {@inheritDoc}
 	 */
 	@Log
-	public Object getInvocationSequenceDetail(InvocationSequenceData template) {
-		Object result = invocationDataDao.getInvocationSequenceDetail(template);
+	public InvocationSequenceData getInvocationSequenceDetail(InvocationSequenceData template) {
+		InvocationSequenceData result = invocationDataDao.getInvocationSequenceDetail(template);
 		return result;
 	}
 

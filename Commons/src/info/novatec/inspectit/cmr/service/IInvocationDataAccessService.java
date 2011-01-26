@@ -56,6 +56,6 @@ public interface IInvocationDataAccessService {
 	 *            The template data object.
 	 * @return The detailed invocation sequence object.
 	 */
-	Object getInvocationSequenceDetail(InvocationSequenceData template);
+	InvocationSequenceData getInvocationSequenceDetail(InvocationSequenceData template);
 
 }

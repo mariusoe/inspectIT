@@ -13,16 +13,6 @@ import java.util.List;
 public interface InvocationDataDao {
 
 	/**
-	 * The directory if file-based storage is selected.
-	 */
-	public static final String INVOCATION_STORAGE_DIRECTORY = "db/invocations/";
-
-	/**
-	 * The file ending of the invocations.
-	 */
-	public static final String INVOCATION_FILE_ENDING = ".inv";
-
-	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
 	 * other objects. Thus this list can be used to get an overview of the available invocation
 	 * sequences. The limit defines the size of the list.
@@ -62,14 +52,6 @@ public interface InvocationDataDao {
 	 *            The template data object.
 	 * @return The detailed invocation sequence object.
 	 */
-	Object getInvocationSequenceDetail(InvocationSequenceData template);
-
-	/**
-	 * Saves the passed invocation object.
-	 * 
-	 * @param invocation
-	 *            the invocation object to save.
-	 */
-	void saveInvocation(InvocationSequenceData invocation);
+	InvocationSequenceData getInvocationSequenceDetail(InvocationSequenceData template);
 
 }
