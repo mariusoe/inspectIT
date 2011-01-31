@@ -173,6 +173,10 @@
             id="info.novatec.inspectit.rcp.commands.details"
             name="Details">
       </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.documentation"
+            name="Documentation">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -394,6 +398,10 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.OpenDocumentationHandler"
+            commandId="info.novatec.inspectit.rcp.commands.documentation">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -499,6 +507,10 @@
          <menu
                id="helpMenu"
                label="&amp;Help">
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.documentation"
+                  style="push">
+            </command>
             <command
                   commandId="org.eclipse.ui.help.aboutAction"
                   style="push">
