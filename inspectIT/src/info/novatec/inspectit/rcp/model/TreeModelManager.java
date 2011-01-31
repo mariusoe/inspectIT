@@ -156,9 +156,9 @@ public class TreeModelManager {
 		inputDefinition.setIdDefinition(idDefinition);
 		showAll.setInputDefinition(inputDefinition);
 
-		Component search = new Leaf();
+		/*Component search = new Leaf();
 		search.setName("Search");
-		search.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_SEARCH));
+		search.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_SEARCH));*/
 
 		Composite browser = new Composite();
 		browser.setName("Browser");
@@ -190,7 +190,7 @@ public class TreeModelManager {
 		}
 
 		invocationSequence.addChild(showAll);
-		invocationSequence.addChild(search);
+		/*invocationSequence.addChild(search);*/
 		invocationSequence.addChild(browser);
 
 		return invocationSequence;
@@ -349,7 +349,7 @@ public class TreeModelManager {
 		inputDefinition.setIdDefinition(idDefinition);
 		showAll.setInputDefinition(inputDefinition);
 
-		Composite filters = new Composite();
+		/*Composite filters = new Composite();
 		filters.setName("Predefined Filters");
 		filters.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_FILTER));
 
@@ -371,11 +371,11 @@ public class TreeModelManager {
 
 		Component search = new Leaf();
 		search.setName("Search");
-		search.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_SEARCH));
+		search.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_SEARCH));*/
 
 		invocationSequence.addChild(showAll);
-		invocationSequence.addChild(filters);
-		invocationSequence.addChild(search);
+		/*invocationSequence.addChild(filters);
+		invocationSequence.addChild(search);*/
 
 		return invocationSequence;
 	}
