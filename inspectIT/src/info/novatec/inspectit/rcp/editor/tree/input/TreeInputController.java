@@ -4,6 +4,7 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController;
 import info.novatec.inspectit.rcp.editor.tree.TreeSubView;
 import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
 
@@ -24,7 +25,7 @@ import org.eclipse.swt.widgets.Shell;
  * @author Patrice Bouillet
  * 
  */
-public interface TreeInputController {
+public interface TreeInputController extends SubViewClassificationController {
 
 	/**
 	 * Sets the input definition of this controller.

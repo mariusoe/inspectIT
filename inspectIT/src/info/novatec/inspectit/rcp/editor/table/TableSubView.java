@@ -6,6 +6,7 @@ import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.FormRootEditor;
+import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController.SubViewClassification;
 import info.novatec.inspectit.rcp.editor.table.input.TableInputController;
 
 import java.util.List;
@@ -57,8 +58,7 @@ public class TableSubView extends AbstractSubView {
 	private volatile boolean jobInSchedule = false;
 
 	/**
-	 * Default constructor which needs a tree input controller to create all the
-	 * content etc.
+	 * Default constructor which needs a tree input controller to create all the content etc.
 	 * 
 	 * @param tableInputController
 	 *            The table input controller.
@@ -126,10 +126,13 @@ public class TableSubView extends AbstractSubView {
 						tableInputController.doRefresh(monitor);
 						Display.getDefault().asyncExec(new Runnable() {
 							public void run() {
-								Object input = tableInputController.getTableInput();
-								tableViewer.setInput(input);
-								if (tableViewer.getTable().isVisible()) {
-									tableViewer.refresh();
+								// refresh should only influence the master sub views
+								if (tableInputController.getSubViewClassification() == SubViewClassification.MASTER) {
+									Object input = tableInputController.getTableInput();
+									tableViewer.setInput(input);
+									if (tableViewer.getTable().isVisible()) {
+										tableViewer.refresh();
+									}
 								}
 							}
 						});
@@ -188,7 +191,7 @@ public class TableSubView extends AbstractSubView {
 			tableInputController.setLimit(limit);
 			this.doRefresh();
 		}
-		
+
 		tableInputController.preferenceEventFired(preferenceEvent);
 		switch (preferenceEvent.getPreferenceId()) {
 		case CLEAR_BUFFER:

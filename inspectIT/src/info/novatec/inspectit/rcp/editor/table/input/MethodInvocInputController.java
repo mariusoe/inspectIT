@@ -699,5 +699,13 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		}
 		throw new RuntimeException("Could not create the human readable string!");
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SubViewClassification getSubViewClassification() {
+		return SubViewClassification.SLAVE;
+	}
 
 }

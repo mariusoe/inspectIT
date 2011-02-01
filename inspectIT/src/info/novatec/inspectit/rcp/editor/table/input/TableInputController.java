@@ -4,6 +4,7 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController;
 import info.novatec.inspectit.rcp.editor.table.TableSubView;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 
@@ -24,7 +25,7 @@ import org.eclipse.swt.widgets.Shell;
  * @author Patrice Bouillet
  * 
  */
-public interface TableInputController {
+public interface TableInputController extends SubViewClassificationController {
 
 	/**
 	 * Sets the input definition of this controller.

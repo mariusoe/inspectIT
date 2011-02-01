@@ -15,8 +15,8 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * The abstract class of the {@link TableInputController} interface to provide
- * some standard methods.
+ * The abstract class of the {@link TableInputController} interface to provide some standard
+ * methods.
  * 
  * @author Patrice Bouillet
  * 
@@ -106,7 +106,7 @@ public abstract class AbstractTableInputController implements TableInputControll
 	 */
 	public void setLimit(int limit) {
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * <p>
@@ -114,7 +114,7 @@ public abstract class AbstractTableInputController implements TableInputControll
 	 */
 	public void showDetails(Shell parent, Object element) {
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * <p>
@@ -129,6 +129,16 @@ public abstract class AbstractTableInputController implements TableInputControll
 	 * {@inheritDoc}
 	 */
 	public void dispose() {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * By default controller sets the sub view to be master.
+	 */
+	@Override
+	public SubViewClassification getSubViewClassification() {
+		return SubViewClassification.MASTER;
 	}
 
 }

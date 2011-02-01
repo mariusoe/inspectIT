@@ -6,6 +6,7 @@ import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController.SubViewClassification;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.ExceptionImageFactory;
@@ -467,5 +468,13 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 	@Override
 	public void dispose() {
 		resourceManager.dispose();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SubViewClassification getSubViewClassification() {
+		return SubViewClassification.SLAVE;
 	}
 }

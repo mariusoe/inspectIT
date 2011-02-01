@@ -845,4 +845,12 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	public void dispose() {
 		resourceManager.dispose();
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SubViewClassification getSubViewClassification() {
+		return SubViewClassification.SLAVE;
+	}
 }

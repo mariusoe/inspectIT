@@ -5,6 +5,7 @@ import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController.SubViewClassification;
 import info.novatec.inspectit.rcp.editor.table.input.GroupedExceptionOverviewInputController.ExtendedExceptionSensorData;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 
@@ -436,5 +437,13 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 			return value.substring(0, maxLength);
 		}
 		return value;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SubViewClassification getSubViewClassification() {
+		return SubViewClassification.SLAVE;
 	}
 }

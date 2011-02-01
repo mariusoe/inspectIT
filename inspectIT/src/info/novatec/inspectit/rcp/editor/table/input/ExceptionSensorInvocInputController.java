@@ -303,6 +303,10 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		if (null == data) {
 			return false;
 		}
+		
+		if (data.isEmpty()) {
+			return true;
+		}
 
 		if (data.size() != 1) {
 			return false;
@@ -593,5 +597,13 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	@Override
 	public void dispose() {
 		resourceManager.dispose();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SubViewClassification getSubViewClassification() {
+		return SubViewClassification.SLAVE;
 	}
 }

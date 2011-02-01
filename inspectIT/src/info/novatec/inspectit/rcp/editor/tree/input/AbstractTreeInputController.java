@@ -172,4 +172,14 @@ public class AbstractTreeInputController implements TreeInputController {
 	 */
 	public void dispose() {
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * By default controller sets the sub view to be master.
+	 */
+	@Override
+	public SubViewClassification getSubViewClassification() {
+		return SubViewClassification.MASTER;
+	}
 }

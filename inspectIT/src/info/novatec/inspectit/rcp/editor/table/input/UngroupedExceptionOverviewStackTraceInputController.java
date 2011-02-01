@@ -308,5 +308,13 @@ public class UngroupedExceptionOverviewStackTraceInputController extends Abstrac
 		}
 		colorCache.clear();
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SubViewClassification getSubViewClassification() {
+		return SubViewClassification.SLAVE;
+	}
 
 }
