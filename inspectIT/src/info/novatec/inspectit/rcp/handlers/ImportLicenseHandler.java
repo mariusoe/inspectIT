@@ -3,7 +3,6 @@ package info.novatec.inspectit.rcp.handlers;
 import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
-import info.novatec.inspectit.rcp.view.server.ServerView;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,6 +12,7 @@ import java.io.IOException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -28,7 +28,20 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * @see org.eclipse.core.commands.AbstractHandler
  */
 public class ImportLicenseHandler extends AbstractHandler {
+	
+	/**
+	 * Command name.
+	 */
+	public static final String COMMAND = "info.novatec.inspectit.rcp.commands.importLicense";
+	
+	/**
+	 * Input name.
+	 */
+	public static final String INPUT = COMMAND + ".input";
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		FileDialog fileDialog = new FileDialog(HandlerUtil.getActiveShell(event), SWT.OPEN);
@@ -58,8 +71,13 @@ public class ImportLicenseHandler extends AbstractHandler {
 				}
 			}
 
-			ServerView serverView = (ServerView) HandlerUtil.getActiveWorkbenchWindow(event).getActivePage().findView(ServerView.ID);
-			RepositoryDefinition repositoryDefinition = serverView.getActiveRepositoryDefinition();
+			IEvaluationContext context = (IEvaluationContext) event.getApplicationContext();
+			Object input = context.getVariable(INPUT);
+			if (null == input) {
+				showException(new RuntimeException("License importing can not continue, due to the wrong application context data."));
+				return null;
+			}
+			RepositoryDefinition repositoryDefinition = (RepositoryDefinition) input;
 			ILicenseService licenseService = repositoryDefinition.getLicenseService();
 
 			try {

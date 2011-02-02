@@ -1,6 +1,10 @@
 package info.novatec.inspectit.rcp.repository.service.cmr;
 
+import java.util.Collections;
+
 import info.novatec.inspectit.cmr.service.ILicenseService;
+import info.novatec.inspectit.communication.data.LicenseInfoData;
+import info.novatec.inspectit.rcp.InspectIT;
 
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
 
@@ -48,6 +52,19 @@ public class LicenseService implements ILicenseService {
 	 */
 	public void receiveLicenseContent(byte[] licenseContent) throws Exception {
 		licenseService.receiveLicenseContent(licenseContent);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public LicenseInfoData getLicenseInfoData() {
+		try {
+			return licenseService.getLicenseInfoData();
+		} catch (Exception e) {
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the licence information from the CMR!", e, -1);
+			return null;
+		}
 	}
 
 }

@@ -177,6 +177,11 @@
             id="info.novatec.inspectit.rcp.commands.documentation"
             name="Documentation">
       </command>
+      <command
+            defaultHandler="info.novatec.inspectit.rcp.handlers.LicenseInformationHandler"
+            id="info.novatec.inspectit.rcp.commands.licenseInfo"
+            name="License Information">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -498,10 +503,8 @@
                id="licenseMenu"
                label="&amp;License">
             <command
-                  commandId="info.novatec.inspectit.rcp.commands.importLicense"
-                  label="Import License"
-                  style="push"
-                  tooltip="Imports the License into the Server">
+                  commandId="info.novatec.inspectit.rcp.commands.licenseInfo"
+                  style="push">
             </command>
          </menu>
          <menu

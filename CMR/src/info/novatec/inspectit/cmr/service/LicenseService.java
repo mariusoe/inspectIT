@@ -1,6 +1,7 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.util.LicenseUtil;
+import info.novatec.inspectit.communication.data.LicenseInfoData;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,6 +39,13 @@ public class LicenseService implements ILicenseService, InitializingBean {
 		licenseUtil.initializeLicense();
 		LOGGER.info("Licensing module restarted.");
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public LicenseInfoData getLicenseInfoData() {
+		return licenseUtil.getLicenceInfoData();
+	}
 
 	/**
 	 * @param licenseUtil
@@ -70,7 +78,7 @@ public class LicenseService implements ILicenseService, InitializingBean {
 			}
 			LOGGER.error("||-Please make sure that a license is properly imported");
 			LOGGER.error("||-A license can be imported through the User Interface");
-			LOGGER.error("||-Contact NovaTec Support for further help!");
+			LOGGER.error("||-Please contact NovaTec Support or visit http://www.inspectit.eu to receive your own key file!");
 		}
 	}
 }

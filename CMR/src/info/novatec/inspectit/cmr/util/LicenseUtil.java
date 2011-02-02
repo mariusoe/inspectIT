@@ -1,11 +1,13 @@
 package info.novatec.inspectit.cmr.util;
 
 import info.novatec.inspectit.cmr.CMR;
+import info.novatec.inspectit.communication.data.LicenseInfoData;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -156,7 +158,8 @@ public class LicenseUtil {
 	@SuppressWarnings("unchecked")
 	public void initializeLicense() throws Exception {
 		if (!(new File(PUBLIC_KEY_STORE)).exists()) {
-			LOGGER.error("||-No public key file available, shutting down CMR! Please contact NovaTec Support to receive your own key file!");
+			LOGGER.error("||-No public key file available at location '" + PUBLIC_KEY_STORE + "', shutting down CMR!");
+			LOGGER.error("||-Please contact NovaTec Support or visit http://www.inspectit.eu to receive your own key file!");
 			System.exit(-1);
 		}
 		// uninstall first the license on the pc, we always want a fresh one
@@ -166,6 +169,14 @@ public class LicenseUtil {
 		licenseExtras = (HashMap<String, String>) licenseContent.getExtra();
 
 		LOGGER.info("||-# of concurrent Agents allowed: " + licenseExtras.get(ALLOWED_AGENT_AMOUNT_KEY));
+		LOGGER.info("||-# license holder: " + licenseContent.getHolder());
+		LOGGER.info("||-# license issuer: " + licenseContent.getIssuer());
+		LOGGER.info("||-# license issued on: " + DateFormat.getDateInstance().format(licenseContent.getIssued()));
+		LOGGER.info("||-# license valid from: " + DateFormat.getDateInstance().format(licenseContent.getNotBefore()));
+		LOGGER.info("||-# license valid until: " + DateFormat.getDateInstance().format(licenseContent.getNotAfter()));
+		LOGGER.info("||-# license consumer type: " + licenseContent.getConsumerType());
+		LOGGER.info("||-# license consumer amount: " + licenseContent.getConsumerAmount());
+		LOGGER.info("||-# license additional info: " + licenseContent.getInfo());
 	}
 
 	/**
@@ -213,11 +224,33 @@ public class LicenseUtil {
 
 			// if not we throw a exception to the caller that he knows that the
 			// license is not valid
-			throw new LicenseContentException("Maximum Agent Count Reached");
+			throw new LicenseContentException("Maximum agent count of " + licenseExtras.get(ALLOWED_AGENT_AMOUNT_KEY) + " allowed agent(s) is reached");
 		}
 
 		LOGGER.info("Valid license for Agent '" + agentName + "'");
 		LOGGER.info("Remaining Agent slots: " + (Integer.parseInt(licenseExtras.get(ALLOWED_AGENT_AMOUNT_KEY)) - registeredAgents.size()));
+	}
+	
+	/**
+	 * 
+	 * @return Returns the license information for the CMR.
+	 */
+	public LicenseInfoData getLicenceInfoData() {
+		if (null == licenseContent) {
+			return null;
+		}
+		LicenseInfoData licenseData = new LicenseInfoData();
+		licenseData.setIssued(licenseContent.getIssued());
+		licenseData.setNotBefore(licenseContent.getNotBefore());
+		licenseData.setNotAfter(licenseContent.getNotAfter());
+		licenseData.setConsumerAmount(licenseContent.getConsumerAmount());
+		licenseData.setConsumerType(licenseContent.getConsumerType());
+		licenseData.setInfo(licenseContent.getInfo());
+		licenseData.setSubject(licenseContent.getSubject());
+		licenseData.setMaximumAgents(Integer.parseInt(licenseExtras.get(ALLOWED_AGENT_AMOUNT_KEY)));
+		licenseData.setIssuer(licenseContent.getIssuer().getName());
+		licenseData.setHolder(licenseContent.getHolder().getName());
+		return licenseData;
 	}
 
 }
