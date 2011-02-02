@@ -215,6 +215,8 @@ public abstract class AbstractStorageHandler extends AbstractHandler {
 	 * 
 	 * @param path
 	 *            the path to the directory.
+	 * @throws ExecutionException
+	 *             if an exception occurred during execution.
 	 */
 	protected void deleteDirectory(File path) throws ExecutionException {
 		if (!path.isDirectory()) {
@@ -235,7 +237,10 @@ public abstract class AbstractStorageHandler extends AbstractHandler {
 					throw new ExecutionException("The following folder could not be deleted: " + files[i].getAbsolutePath());
 				}
 			}
-			path.delete();
+			boolean isDeleted = path.delete();
+			if (!isDeleted) {
+				throw new ExecutionException("The following folder could not be deleted: " + path.getAbsolutePath());
+			}
 		}
 	}
 
