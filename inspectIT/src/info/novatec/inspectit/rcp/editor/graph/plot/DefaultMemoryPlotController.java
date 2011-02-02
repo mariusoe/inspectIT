@@ -342,7 +342,7 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 
 			if (!rightData.isEmpty()) {
 				oldData.addAll(rightData);
-				oldToDate = to;
+				oldToDate = (Date) to.clone();
 				if (newestDate.before(rightData.get(rightData.size() - 1).getTimeStamp())) {
 					newestDate = new Date(rightData.get(rightData.size() - 1).getTimeStamp().getTime());
 				}
