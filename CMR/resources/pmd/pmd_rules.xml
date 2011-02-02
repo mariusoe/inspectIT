@@ -47,7 +47,7 @@
    <rule ref="rulesets/basic.xml/EmptyStatementNotInLoop"/>
    <rule ref="rulesets/basic.xml/BooleanInstantiation"/>
    <rule ref="rulesets/basic.xml/UnnecessaryFinalModifier"/>
-   <rule ref="rulesets/basic.xml/CollapsibleIfStatements"/>
+   <!-- rule ref="rulesets/basic.xml/CollapsibleIfStatements"/-->
    <rule ref="rulesets/basic.xml/UselessOverridingMethod"/>
    <rule ref="rulesets/basic.xml/ClassCastExceptionWithToArray"/>
    <rule ref="rulesets/basic.xml/AvoidDecimalLiteralsInBigDecimalConstructor"/>
@@ -135,7 +135,7 @@
    <!-- rule ref="rulesets/design.xml/SingularField"/-->
    <rule ref="rulesets/design.xml/ReturnEmptyArrayRatherThanNull"/>
    <rule ref="rulesets/design.xml/AbstractClassWithoutAnyMethod"/>
-   <rule ref="rulesets/design.xml/TooFewBranchesForASwitchStatement"/>
+   <!-- rule ref="rulesets/design.xml/TooFewBranchesForASwitchStatement"/-->
    <!-- rule ref="rulesets/j2ee.xml/UseProperClassLoader"/-->
    <!-- rule ref="rulesets/j2ee.xml/MDBAndSessionBeanNamingConvention"/-->
    <!-- rule ref="rulesets/j2ee.xml/RemoteSessionInterfaceNamingConvention"/-->
@@ -145,7 +145,7 @@
    <!-- rule ref="rulesets/j2ee.xml/DoNotCallSystemExit"/-->
    <!-- rule ref="rulesets/j2ee.xml/StaticEJBFieldShouldBeFinal"/-->
    <!-- rule ref="rulesets/j2ee.xml/DoNotUseThreads"/-->
-   <rule ref="rulesets/optimizations.xml/AvoidInstantiatingObjectsInLoops"/>
+   <!-- rule ref="rulesets/optimizations.xml/AvoidInstantiatingObjectsInLoops"/-->
    <rule ref="rulesets/optimizations.xml/UseArrayListInsteadOfVector"/>
    <rule ref="rulesets/optimizations.xml/SimplifyStartsWith"/>
    <rule ref="rulesets/optimizations.xml/UseStringBufferForStringAppends"/>
@@ -160,13 +160,13 @@
    <rule ref="rulesets/coupling.xml/LooseCoupling"/>
    <rule ref="rulesets/imports.xml/DuplicateImports"/>
    <rule ref="rulesets/imports.xml/DontImportJavaLang"/>
-   <rule ref="rulesets/imports.xml/ImportFromSamePackage"/>
+   <!-- rule ref="rulesets/imports.xml/ImportFromSamePackage"/-->
    <rule ref="rulesets/imports.xml/TooManyStaticImports"/>
    <rule ref="rulesets/junit.xml/JUnitStaticSuite"/>
    <rule ref="rulesets/junit.xml/JUnitSpelling"/>
    <rule ref="rulesets/junit.xml/JUnitAssertionsShouldIncludeMessage"/>
    <rule ref="rulesets/junit.xml/JUnitTestsShouldIncludeAssert"/>
-   <rule ref="rulesets/junit.xml/TestClassWithoutTestCases"/>
+   <!-- rule ref="rulesets/junit.xml/TestClassWithoutTestCases"/-->
    <rule ref="rulesets/junit.xml/UnnecessaryBooleanAssertion"/>
    <rule ref="rulesets/junit.xml/UseAssertEqualsInsteadOfAssertTrue"/>
    <rule ref="rulesets/junit.xml/UseAssertSameInsteadOfAssertTrue"/>
