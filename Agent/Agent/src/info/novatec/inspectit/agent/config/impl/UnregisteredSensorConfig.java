@@ -64,11 +64,6 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 	private IMatcher matcher;
 
 	/**
-	 * The name of the sensor.
-	 */
-	private String sensorName;
-
-	/**
 	 * The sensor type of this configuration. As there can be only one, this is just a direct
 	 * reference.
 	 */
