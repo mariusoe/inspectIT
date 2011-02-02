@@ -16,7 +16,6 @@
 		init-method="start" destroy-method="stop">
 		<constructor-arg type="int" value="${jetty.port}" />
 		<property name="threadPool" ref="threadPool" />
-		<property name="stopAtShutdown" value="true" />
 		<property name="gracefulShutdown" value="${jetty.graceful.shutdown.time}" />
 	</bean>
 
