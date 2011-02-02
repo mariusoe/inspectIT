@@ -16,9 +16,13 @@ import java.util.zip.ZipOutputStream;
  * 
  * @author Patrice Bouillet
  */
-public class ZipUtil {
+public final class ZipUtil {
 
-	private static final byte[] buffer = new byte[0xFFFF];
+	/**
+	 * 
+	 */
+	private ZipUtil() {
+	}
 
 	/**
 	 * Zip the srcFolder into the destFileZipFile. All the folder subtree of the src folder is added
@@ -77,16 +81,32 @@ public class ZipUtil {
 		}
 	}
 
+	/**
+	 * Extracts the zip entry and creates appropriate directory structures.
+	 * 
+	 * @param zf
+	 *            the zip file.
+	 * @param entry
+	 *            the zip entry.
+	 * @param destDir
+	 *            the destination directory.
+	 * @throws IOException
+	 *             if an I/O error has occurred
+	 */
 	private static void extractEntry(ZipFile zf, ZipEntry entry, String destDir) throws IOException {
 		File file = new File(destDir, entry.getName());
 
 		if (entry.isDirectory()) {
 			boolean created = file.mkdirs();
 			if (!created) {
-				throw new RuntimeException("Could not created the following directory: " + file.getAbsolutePath());
+				throw new RuntimeException("Could not create the following directory: " + file.getAbsolutePath());
 			}
 		} else {
-			new File(file.getParent()).mkdirs();
+			File parentFile = new File(file.getParent());
+			boolean created = parentFile.mkdirs();
+			if (!created) {
+				throw new RuntimeException("Could not create the following directory: " + parentFile.getAbsolutePath());
+			}
 
 			InputStream is = null;
 			OutputStream os = null;
@@ -94,6 +114,7 @@ public class ZipUtil {
 			try {
 				is = zf.getInputStream(entry);
 				os = new FileOutputStream(file);
+				byte[] buffer = new byte[0xFFFF];
 
 				for (int len; (len = is.read(buffer)) != -1;) {
 					os.write(buffer, 0, len);
@@ -120,6 +141,7 @@ public class ZipUtil {
 	 * @param zip
 	 *            the stream to use to write the given file.
 	 * @param includeDir
+	 *            if the directory shall be included in this entry
 	 */
 	private static void addToZip(String path, String srcFile, ZipOutputStream zip, boolean includeDir) {
 		File file = new File(srcFile);
@@ -136,6 +158,8 @@ public class ZipUtil {
 				} else {
 					zip.putNextEntry(new ZipEntry(file.getName()));
 				}
+
+				byte[] buffer = new byte[0xFFFF];
 				while ((len = in.read(buffer)) > 0) {
 					zip.write(buffer, 0, len);
 				}
@@ -158,10 +182,12 @@ public class ZipUtil {
 	 * 
 	 * @param path
 	 *            the relative path with the root archive.
-	 * @param srcFile
-	 *            the absolute path of the file to add
+	 * @param srcFolder
+	 *            the folder path of the file to add
 	 * @param zip
 	 *            the stream to use to write the given file.
+	 * @param includeDir
+	 *            if the directory shall be included in this entry
 	 */
 	private static void addFolderToZip(String path, String srcFolder, ZipOutputStream zip, boolean includeDir) {
 		File file = new File(srcFolder);
