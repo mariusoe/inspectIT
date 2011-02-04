@@ -6,8 +6,9 @@ import info.novatec.inspectit.rcp.editor.graph.plot.DateAxisZoomNotify;
 import info.novatec.inspectit.rcp.editor.graph.plot.PlotController;
 import info.novatec.inspectit.rcp.editor.graph.plot.ZoomListener;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 
 import java.awt.Color;
@@ -32,8 +33,8 @@ import org.jfree.data.Range;
 import org.jfree.experimental.chart.swt.ChartComposite;
 
 /**
- * This sub-view can create charts which can contain themselves some plots. The
- * plots are defined by {@link PlotController}.
+ * This sub-view can create charts which can contain themselves some plots. The plots are defined by
+ * {@link PlotController}.
  * 
  * @author Patrice Bouillet
  * 
@@ -58,7 +59,7 @@ public class GraphSubView extends AbstractSubView {
 	/**
 	 * If we are in the auto update mode.
 	 */
-	private boolean autoUpdate = true;
+	private boolean autoUpdate = LiveMode.ACTIVE_DEFAULT;
 
 	/**
 	 * One minute in milliseconds.
@@ -86,8 +87,7 @@ public class GraphSubView extends AbstractSubView {
 	private boolean isDisposed = false;
 
 	/**
-	 * The constructor taking one parameter and creating a
-	 * {@link PlotController}.
+	 * The constructor taking one parameter and creating a {@link PlotController}.
 	 * 
 	 * @param fqn
 	 *            The fully-qualified-name of the corresponding sensor type.
@@ -97,8 +97,7 @@ public class GraphSubView extends AbstractSubView {
 	}
 
 	/**
-	 * The constructor taking one parameter and creating a
-	 * {@link PlotController}.
+	 * The constructor taking one parameter and creating a {@link PlotController}.
 	 * 
 	 * @param sensorTypeEnum
 	 *            The sensor type enumeration of the corresponding sensor type.

@@ -54,6 +54,11 @@ public enum PreferenceId {
 		 * The identifier for the live button.
 		 */
 		BUTTON_LIVE_ID, REFRESH_RATE;
+
+		/**
+		 * Defines if the live mode is active by default.
+		 */
+		public static final boolean ACTIVE_DEFAULT = false;
 	}
 
 	/**
@@ -77,7 +82,7 @@ public enum PreferenceId {
 	 */
 	public enum SensorTypeSelection implements IPreferenceGroup {
 		/**
-		 * The identifier for the sensor type selections.-
+		 * The identifier for the sensor type selections.
 		 */
 		SENSOR_TYPE_SELECTION_ID;
 	}

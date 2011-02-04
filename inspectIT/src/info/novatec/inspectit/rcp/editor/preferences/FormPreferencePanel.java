@@ -380,7 +380,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		public SwitchLiveMode(String text) {
 			super(text);
 			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_LIVE_MODE));
-			setChecked(false);
+			setChecked(LiveMode.ACTIVE_DEFAULT);
 		}
 
 		/**

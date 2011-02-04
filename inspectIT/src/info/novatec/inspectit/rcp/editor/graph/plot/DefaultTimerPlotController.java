@@ -29,7 +29,6 @@ import org.jfree.data.RangeType;
 import org.jfree.data.time.Millisecond;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.data.xy.XYBarDataset;
 import org.jfree.data.xy.YIntervalSeriesCollection;
 import org.jfree.ui.RectangleInsets;
@@ -208,7 +207,7 @@ public class DefaultTimerPlotController extends AbstractPlotController {
 	 * @return An instance of {@link XYPlot}
 	 */
 	private XYPlot initializeLowerPlot() {
-		countPop = new TimeSeries("Count", Millisecond.class);
+		countPop = new TimeSeries("Count");
 
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
 		dataset.addSeries(countPop);
@@ -248,9 +247,11 @@ public class DefaultTimerPlotController extends AbstractPlotController {
 	 *            the input data.
 	 */
 	private void addLowerPlotData(List<TimerData> timerData) {
+		countPop.setNotify(false);
 		for (TimerData data : timerData) {
-			countPop.add(new TimeSeriesDataItem(new Millisecond(data.getTimeStamp()), data.getCount()), false);
+			countPop.addOrUpdate(new Millisecond(data.getTimeStamp()), data.getCount());
 		}
+		countPop.setNotify(true);
 		countPop.fireSeriesChanged();
 	}
 
