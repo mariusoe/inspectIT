@@ -218,8 +218,8 @@ public class AggregatedTimerSummaryInputController extends AbstractTableInputCon
 	 */
 	@Override
 	public boolean canOpenInput(List<? extends DefaultData> data) {
-		if (null == data) {
-			return false;
+		if (null == data || data.isEmpty()) {
+			return true;
 		}
 
 		if (!(data.get(0) instanceof TimerData)) {
@@ -269,6 +269,14 @@ public class AggregatedTimerSummaryInputController extends AbstractTableInputCon
 			return sb.toString();
 		}
 		throw new RuntimeException("Could not create the human readable string!");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SubViewClassification getSubViewClassification() {
+		return SubViewClassification.SLAVE;
 	}
 
 }

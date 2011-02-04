@@ -386,6 +386,12 @@ public class DefaultTimerPlotController extends AbstractPlotController {
 					getRootEditor().setDataInput(dataToSet);
 				}
 			});
+		} else {
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					getRootEditor().setDataInput(null);
+				}
+			});
 		}
 	}
 
