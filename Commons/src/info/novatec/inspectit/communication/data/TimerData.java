@@ -4,11 +4,11 @@ import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.communication.DefaultData;
 
 import java.sql.Timestamp;
+import java.util.Iterator;
 import java.util.List;
 
 /**
- * The timer data class stores information about the execution time of a java
- * method.
+ * The timer data class stores information about the execution time of a java method.
  * 
  * @author Patrice Bouillet
  * 
@@ -16,9 +16,9 @@ import java.util.List;
 public class TimerData extends InvocationAwareData {
 
 	/**
-	 * The serial version uid for this class.
+	 * Generated serial UID.
 	 */
-	private static final long serialVersionUID = 7001746257144702456L;
+	private static final long serialVersionUID = 8992128958802371539L;
 
 	/**
 	 * The minimum value.
@@ -69,6 +69,26 @@ public class TimerData extends InvocationAwareData {
 	 * The cpu average time.
 	 */
 	private double cpuAverage = 0;
+
+	/**
+	 * Exclusive count. Needed because this count can be less than the total count.
+	 */
+	private long exclusiveCount = 0;
+
+	/**
+	 * Exclusive duration.
+	 */
+	private double exclusiveDuration;
+
+	/**
+	 * Exclusive max duration;
+	 */
+	private double exclusiveMax = 0;
+
+	/**
+	 * Exclusive min duration.
+	 */
+	private double exclusiveMin = Double.MAX_VALUE;
 
 	/**
 	 * Default no-args constructor.
@@ -208,6 +228,55 @@ public class TimerData extends InvocationAwareData {
 		this.cpuAverage = cpuAverage;
 	}
 
+	public long getExclusiveCount() {
+		return exclusiveCount;
+	}
+
+	public void setExclusiveCount(long exclusiveCount) {
+		this.exclusiveCount = exclusiveCount;
+	}
+
+	public void increaseExclusiveCount() {
+		this.exclusiveCount++;
+	}
+
+	public double getExclusiveDuration() {
+		return exclusiveDuration;
+	}
+
+	public void setExclusiveDuration(double exclusiveDuration) {
+		this.exclusiveDuration = exclusiveDuration;
+	}
+
+	public void addExclusiveDuration(double exclusiveDuration) {
+		this.exclusiveDuration += exclusiveDuration;
+	}
+
+	public double getExclusiveMax() {
+		return exclusiveMax;
+	}
+
+	public void setExclusiveMax(double exclusiveMax) {
+		this.exclusiveMax = exclusiveMax;
+	}
+
+	public double getExclusiveMin() {
+		return exclusiveMin;
+	}
+
+	public void setExclusiveMin(double exclusiveMin) {
+		this.exclusiveMin = exclusiveMin;
+	}
+
+	/**
+	 * Returns the average exclusive time calculated as exclusive duration % count.
+	 * 
+	 * @return Average exclusive time.
+	 */
+	public double getExclusiveAverage() {
+		return exclusiveDuration / exclusiveCount;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -227,6 +296,13 @@ public class TimerData extends InvocationAwareData {
 		temp = Double.doubleToLongBits(cpuMin);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		temp = Double.doubleToLongBits(duration);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + (int) (exclusiveCount ^ (exclusiveCount >>> 32));
+		temp = Double.doubleToLongBits(exclusiveDuration);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(exclusiveMax);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(exclusiveMin);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		temp = Double.doubleToLongBits(max);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -272,6 +348,18 @@ public class TimerData extends InvocationAwareData {
 		if (Double.doubleToLongBits(duration) != Double.doubleToLongBits(other.duration)) {
 			return false;
 		}
+		if (exclusiveCount != other.exclusiveCount) {
+			return false;
+		}
+		if (Double.doubleToLongBits(exclusiveDuration) != Double.doubleToLongBits(other.exclusiveDuration)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(exclusiveMax) != Double.doubleToLongBits(other.exclusiveMax)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(exclusiveMin) != Double.doubleToLongBits(other.exclusiveMin)) {
+			return false;
+		}
 		if (Double.doubleToLongBits(max) != Double.doubleToLongBits(other.max)) {
 			return false;
 		}
@@ -297,23 +385,61 @@ public class TimerData extends InvocationAwareData {
 			cpuMax = -1.0d;
 			cpuDuration = -1.0d;
 		}
+		if (Double.MAX_VALUE == exclusiveMin) {
+			exclusiveDuration = -1.0d;
+			exclusiveMin = -1.0d;
+			exclusiveMax = -1.0d;
+		}
 		return this;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
-		long size =  super.getObjectSize(objectSizes);
-		size += objectSizes.getPrimitiveTypesSize(0, 0, 0, 0, 1, 9);
+		long size = super.getObjectSize(objectSizes);
+		size += objectSizes.getPrimitiveTypesSize(0, 0, 0, 0, 2, 12);
 		return objectSizes.alignTo8Bytes(size);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public double getInvocationAffiliationPercentage() {
 		return (double) getObjectsInInvocationsCount() / count;
+	}
+
+	/**
+	 * Aggregates the values given in the supplied timer data parameter to the objects data.
+	 * 
+	 * @param timerData
+	 *            Data to be aggregated into current object.
+	 */
+	public void aggregateTimerData(TimerData timerData) {
+		this.setCount(this.getCount() + timerData.getCount());
+		this.setDuration(this.getDuration() + timerData.getDuration());
+		this.setAverage(this.getDuration() / this.getCount());
+		this.setMax(Math.max(this.getMax(), timerData.getMax()));
+		this.setMin(Math.min(this.getMin(), timerData.getMin()));
+
+		if (-1 != timerData.getCpuDuration()) {
+			this.setCpuDuration(this.getCpuDuration() + timerData.getCpuDuration());
+			this.setCpuAverage(this.getCpuDuration() / this.getCount());
+			this.setCpuMax(Math.max(this.getCpuMax(), timerData.getCpuMax()));
+			this.setCpuMin(Math.min(this.getCpuMin(), timerData.getCpuMin()));
+		}
+		if (null != timerData.getInvocationParentsIdSet()) {
+			Iterator it = timerData.getInvocationParentsIdSet().iterator();
+			while (it.hasNext()) {
+				this.addInvocationParentId((Long) it.next());
+			}
+		}
+		if (-1 != timerData.getExclusiveDuration()) {
+			this.addExclusiveDuration(timerData.getExclusiveDuration());
+			this.setExclusiveCount(this.getExclusiveCount() + timerData.getExclusiveCount());
+			this.setExclusiveMax(Math.max(this.getExclusiveMax(), timerData.getExclusiveMax()));
+			this.setExclusiveMin(Math.min(this.getExclusiveMin(), timerData.getExclusiveMin()));
+		}
 	}
 
 }

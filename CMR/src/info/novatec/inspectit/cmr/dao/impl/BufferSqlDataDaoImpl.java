@@ -44,10 +44,10 @@ public class BufferSqlDataDaoImpl implements SqlDataDao {
 			int key = getMapKey(sqlStatement);
 			SqlStatementData aggregatedStatement = aggregatedStatementsMap.get(key);
 			if (null != aggregatedStatement) {
-				aggregateStatement(aggregatedStatement, sqlStatement);
+				aggregatedStatement.aggregateTimerData(sqlStatement);
 			} else {
 				SqlStatementData clone = cloneSqlStatementData(sqlStatement);
-				aggregateStatement(clone, sqlStatement);
+				clone.aggregateTimerData(sqlStatement);
 				aggregatedStatementsMap.put(key, clone);
 				aggregatedSqlStatements.add(clone);
 			}
@@ -69,39 +69,6 @@ public class BufferSqlDataDaoImpl implements SqlDataDao {
 		result = prime * result + (int) (sqlStatementData.getMethodIdent() ^ (sqlStatementData.getMethodIdent() >>> 32));
 		result = prime * result + ((sqlStatementData.getSql() == null) ? 0 : sqlStatementData.getSql().hashCode());
 		return result;
-	}
-
-	/**
-	 * Aggregates two invocation sequences.
-	 * 
-	 * @param aggregatedStatement
-	 *            SQL statement that will be updated with aggregation.
-	 * @param newStatement
-	 *            SQL statement that bring new data.
-	 */
-	private void aggregateStatement(SqlStatementData aggregatedStatement, SqlStatementData newStatement) {
-		aggregatedStatement.setCount(aggregatedStatement.getCount() + newStatement.getCount());
-		aggregatedStatement.setDuration(aggregatedStatement.getDuration() + newStatement.getDuration());
-		aggregatedStatement.setAverage(aggregatedStatement.getDuration() / aggregatedStatement.getCount());
-		if (aggregatedStatement.getMax() < newStatement.getMax()) {
-			aggregatedStatement.setMax(newStatement.getMax());
-		}
-		if (aggregatedStatement.getMin() > newStatement.getMin()) {
-			aggregatedStatement.setMin(newStatement.getMin());
-		}
-		aggregatedStatement.setCpuDuration(aggregatedStatement.getCpuDuration() + newStatement.getCpuDuration());
-		aggregatedStatement.setCpuAverage(aggregatedStatement.getCpuDuration() / aggregatedStatement.getCount());
-		if (aggregatedStatement.getCpuMax() < newStatement.getCpuMax()) {
-			aggregatedStatement.setCpuMax(newStatement.getCpuMax());
-		}
-		if (aggregatedStatement.getCpuMin() > newStatement.getCpuMin()) {
-			aggregatedStatement.setCpuMin(newStatement.getCpuMin());
-		}
-		if (null != newStatement.getInvocationParentsIdSet()) {
-			for (Object invocationId : newStatement.getInvocationParentsIdSet()) {
-				aggregatedStatement.addInvocationParentId((Long) invocationId);
-			}
-		}
 	}
 
 	/**

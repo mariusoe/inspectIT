@@ -43,10 +43,10 @@ public class BufferTimerDataDaoImpl implements TimerDataDao {
 			long key = tData.getMethodIdent();
 			TimerData aggregatedTimerData = aggregatedMap.get(key);
 			if (null != aggregatedTimerData) {
-				aggregateTimerData(aggregatedTimerData, tData);
+				aggregatedTimerData.aggregateTimerData(tData);
 			} else {
 				TimerData clone = cloneTimerData(tData);
-				aggregateTimerData(clone, tData);
+				clone.aggregateTimerData(tData);
 				aggregatedMap.put(key, clone);
 				aggregatedResults.add(clone);
 			}
@@ -68,39 +68,6 @@ public class BufferTimerDataDaoImpl implements TimerDataDao {
 		clone.setSensorTypeIdent(timerData.getSensorTypeIdent());
 		clone.setMethodIdent(timerData.getMethodIdent());
 		return clone;
-	}
-
-	/**
-	 * Aggregates timer data.
-	 * 
-	 * @param aggregatedTimerData
-	 *            Timer data that values will be aggregated to
-	 * @param timerData
-	 *            Other timer data
-	 */
-	private void aggregateTimerData(TimerData aggregatedTimerData, TimerData timerData) {
-		aggregatedTimerData.setCount(aggregatedTimerData.getCount() + timerData.getCount());
-		aggregatedTimerData.setDuration(aggregatedTimerData.getDuration() + timerData.getDuration());
-		aggregatedTimerData.setAverage(aggregatedTimerData.getDuration() / aggregatedTimerData.getCount());
-		if (aggregatedTimerData.getMax() < timerData.getMax()) {
-			aggregatedTimerData.setMax(timerData.getMax());
-		}
-		if (aggregatedTimerData.getMin() > timerData.getMin()) {
-			aggregatedTimerData.setMin(timerData.getMin());
-		}
-		aggregatedTimerData.setCpuDuration(aggregatedTimerData.getCpuDuration() + timerData.getCpuDuration());
-		aggregatedTimerData.setCpuAverage(aggregatedTimerData.getCpuDuration() / aggregatedTimerData.getCount());
-		if (aggregatedTimerData.getCpuMax() < timerData.getCpuMax()) {
-			aggregatedTimerData.setCpuMax(timerData.getCpuMax());
-		}
-		if (aggregatedTimerData.getCpuMin() > timerData.getCpuMin()) {
-			aggregatedTimerData.setCpuMin(timerData.getCpuMin());
-		}
-		if (null != timerData.getInvocationParentsIdSet()) {
-			for (Object invocationId : timerData.getInvocationParentsIdSet()) {
-				aggregatedTimerData.addInvocationParentId((Long) invocationId);
-			}
-		}
 	}
 
 	/**

@@ -46,7 +46,13 @@ public class AggregatedTimerSummaryInputController extends AbstractTableInputCon
 		/** The maximum column. */
 		MAX("Max (ms)", 100, null),
 		/** The duration column. */
-		DURATION("Duration (ms)", 100, null);
+		DURATION("Duration (ms)", 100, null),
+		/** The average exclusive duration column. */
+		EXCLUSIVEAVERAGE("Exc. Avg (ms)", 100, null),
+		/** The min exclusive duration column. */
+		EXCLUSIVEMIN("Exc. Min (ms)", 100, null),
+		/** The max exclusive duration column. */
+		EXCLUSIVEMAX("Exc. Max (ms)", 100, null);
 
 		/** The name. */
 		private String name;
@@ -144,18 +150,10 @@ public class AggregatedTimerSummaryInputController extends AbstractTableInputCon
 		private Object[] aggregateData(List<TimerData> timerData) {
 			if (!timerData.isEmpty()) {
 				TimerData aggregatedData = new TimerData();
-				aggregatedData.setMax(0d);
-				aggregatedData.setMin(Double.MAX_VALUE);
-				aggregatedData.setDuration(0d);
-				aggregatedData.setCount(0L);
 
 				for (TimerData data : timerData) {
-					aggregatedData.setMax(Math.max(aggregatedData.getMax(), data.getMax()));
-					aggregatedData.setMin(Math.min(aggregatedData.getMin(), data.getMin()));
-					aggregatedData.addDuration(data.getDuration());
-					aggregatedData.setCount(aggregatedData.getCount() + data.getCount());
+					aggregatedData.aggregateTimerData(data);
 				}
-				aggregatedData.setAverage(aggregatedData.getDuration() / aggregatedData.getCount());
 
 				Object[] result = new Object[1];
 				result[0] = aggregatedData;
@@ -250,6 +248,24 @@ public class AggregatedTimerSummaryInputController extends AbstractTableInputCon
 			return new StyledString(NumberFormatter.formatDouble(data.getMax()));
 		case DURATION:
 			return new StyledString(NumberFormatter.formatDouble(data.getDuration()));
+		case EXCLUSIVEAVERAGE:
+			if (data.getExclusiveAverage() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveAverage()));
+			} else {
+				return new StyledString("");
+			}
+		case EXCLUSIVEMAX:
+			if (data.getExclusiveMax() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveMax()));
+			} else {
+				return new StyledString("");
+			}
+		case EXCLUSIVEMIN:
+			if (data.getExclusiveMin() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveMin()));
+			} else {
+				return new StyledString("");
+			}
 		default:
 			return new StyledString("error");
 		}

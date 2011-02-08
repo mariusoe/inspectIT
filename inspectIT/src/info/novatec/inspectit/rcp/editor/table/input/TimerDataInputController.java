@@ -70,6 +70,12 @@ public class TimerDataInputController extends AbstractTableInputController {
 		MAX("Max (ms)", 60, null),
 		/** The duration column. */
 		DURATION("Duration (ms)", 70, null),
+		/** The average exclusive duration column. */
+		EXCLUSIVEAVERAGE("Exc. Avg (ms)", 80, null),
+		/** The min exclusive duration column. */
+		EXCLUSIVEMIN("Exc. Min (ms)", 80, null),
+		/** The max exclusive duration column. */
+		EXCLUSIVEMAX("Exc. Max (ms)", 80, null),
 		/** The cpu average column. */
 		CPUAVERAGE("Cpu Avg (ms)", 60, null),
 		/** The cpu minimum column. */
@@ -371,6 +377,12 @@ public class TimerDataInputController extends AbstractTableInputController {
 				return Double.compare(timer1.getCpuMax(), timer2.getCpuMax());
 			case CPUDURATION:
 				return Double.compare(timer1.getCpuDuration(), timer2.getCpuDuration());
+			case EXCLUSIVEAVERAGE:
+				return Double.compare(timer1.getExclusiveAverage(), timer2.getExclusiveAverage());
+			case EXCLUSIVEMAX:
+				return Double.compare(timer1.getExclusiveMax(), timer2.getExclusiveMax());
+			case EXCLUSIVEMIN:
+				return Double.compare(timer1.getExclusiveMin(), timer2.getExclusiveMin());
 			default:
 				return 0;
 			}
@@ -453,6 +465,24 @@ public class TimerDataInputController extends AbstractTableInputController {
 		case CPUDURATION:
 			if (data.getCpuMin() != -1 && Double.MAX_VALUE != data.getCpuMin()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getCpuDuration()));
+			} else {
+				return emptyStyledString;
+			}
+		case EXCLUSIVEAVERAGE:
+			if (data.getExclusiveAverage() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveAverage()));
+			} else {
+				return emptyStyledString;
+			}
+		case EXCLUSIVEMAX:
+			if (data.getExclusiveMax() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveMax()));
+			} else {
+				return emptyStyledString;
+			}
+		case EXCLUSIVEMIN:
+			if (data.getExclusiveMin() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveMin()));
 			} else {
 				return emptyStyledString;
 			}

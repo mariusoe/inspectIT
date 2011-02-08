@@ -109,7 +109,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		/** The duration column. */
 		DURATION("Duration (ms)", 100, InspectITConstants.IMG_LAST_HOUR),
 		/** The exclusive duration column. */
-		EXCLUSIVE("Exclusive duration (ms)", 100, null),
+		EXCLUSIVE("Exc. duration (ms)", 100, null),
 		/** The cpu duration column. */
 		CPUDURATION("Cpu Duration (ms)", 100, null),
 		/** The count column. */
@@ -159,7 +159,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	 * This data access service is needed because of the ID mappings.
 	 */
 	private CachedGlobalDataAccessService globalDataAccessService;
-	
+
 	/**
 	 * Current input of the tree.
 	 */
@@ -188,7 +188,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			}
 		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -313,6 +313,9 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 					TimerData timer = data.getTimerData();
 					content += "\n";
 					content += "Method duration: " + timer.getDuration() + "\n";
+				} else if (null == data.getParentSequence()) {
+					content += "\n";
+					content += "Invocation duration: " + data.getDuration() + "\n";
 				}
 
 				if (null != data.getSqlStatementData()) {
@@ -363,7 +366,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		if (null == data) {
 			return false;
 		}
-		
+
 		if (data.isEmpty()) {
 			return true;
 		}
@@ -458,12 +461,12 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			InvocationSequenceData data = (InvocationSequenceData) element;
 			double duration = -1.0d;
 
-			if (null == data.getParentSequence()) {
-				duration = data.getDuration();
-			} else if (null != data.getTimerData()) {
+			if (null != data.getTimerData()) {
 				duration = data.getTimerData().getDuration();
 			} else if (null != data.getSqlStatementData() && 1 == data.getSqlStatementData().getCount()) {
 				duration = data.getSqlStatementData().getDuration();
+			} else if (null == data.getParentSequence()) {
+				duration = data.getDuration();
 			}
 
 			if (-1.0d != duration) {
@@ -504,12 +507,12 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			return TextFormatter.getStyledMethodString(methodIdent);
 		case DURATION:
 			styledString = new StyledString();
-			if (null == data.getParentSequence()) {
-				styledString.append(NumberFormatter.formatDouble(data.getDuration()));
-			} else if (null != data.getTimerData()) {
+			if (null != data.getTimerData()) {
 				styledString.append(NumberFormatter.formatDouble(data.getTimerData().getDuration()));
 			} else if (null != data.getSqlStatementData() && 1 == data.getSqlStatementData().getCount()) {
 				styledString.append(NumberFormatter.formatDouble(data.getSqlStatementData().getDuration()));
+			} else if (null == data.getParentSequence()) {
+				styledString.append(NumberFormatter.formatDouble(data.getDuration()));
 			}
 			return styledString;
 		case CPUDURATION:
@@ -522,12 +525,12 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			styledString = new StyledString();
 			double duration = -1.0d;
 
-			if (null == data.getParentSequence()) {
-				duration = data.getDuration();
-			} else if (null != data.getTimerData()) {
+			if (null != data.getTimerData()) {
 				duration = data.getTimerData().getDuration();
 			} else if (null != data.getSqlStatementData() && 1 == data.getSqlStatementData().getCount()) {
 				duration = data.getSqlStatementData().getDuration();
+			} else if (null == data.getParentSequence()) {
+				duration = data.getDuration();
 			}
 
 			if (-1.0d != duration) {
@@ -585,14 +588,14 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		double nestedDuration = 0d;
 		boolean added = false;
 		for (InvocationSequenceData nestedData : (List<InvocationSequenceData>) data.getNestedSequences()) {
-			if (null == nestedData.getParentSequence()) {
-				nestedDuration = nestedDuration + nestedData.getDuration();
-				added = true;
-			} else if (null != nestedData.getTimerData()) {
+			if (null != nestedData.getTimerData()) {
 				nestedDuration = nestedDuration + nestedData.getTimerData().getDuration();
 				added = true;
 			} else if (null != nestedData.getSqlStatementData() && 1 == nestedData.getSqlStatementData().getCount()) {
 				nestedDuration = nestedDuration + nestedData.getSqlStatementData().getDuration();
+				added = true;
+			} else if (null == nestedData.getParentSequence()) {
+				nestedDuration = nestedDuration + nestedData.getDuration();
 				added = true;
 			}
 			if (!added && !nestedData.getNestedSequences().isEmpty()) {
@@ -719,13 +722,13 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 
 					// filter by the exclusive duration
 					double duration = Double.NaN;
-					if (null == invocationSequenceData.getParentSequence()) {
-						duration = invocationSequenceData.getDuration() - (computeNestedDuration(invocationSequenceData));
-					} else if (null != invocationSequenceData.getSqlStatementData() && 1 == invocationSequenceData.getSqlStatementData().getCount()) {
+					if (null != invocationSequenceData.getSqlStatementData() && 1 == invocationSequenceData.getSqlStatementData().getCount()) {
 						duration = invocationSequenceData.getSqlStatementData().getDuration();
 					} else if (null != invocationSequenceData.getTimerData()) {
 						double totalDuration = invocationSequenceData.getTimerData().getDuration();
 						duration = totalDuration - (computeNestedDuration(invocationSequenceData));
+					} else if (null == invocationSequenceData.getParentSequence()) {
+						duration = invocationSequenceData.getDuration() - (computeNestedDuration(invocationSequenceData));
 					}
 
 					if (!Double.isNaN(duration) && duration <= defaultExclusiveFilterTime) {
@@ -747,16 +750,16 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 
 					// filter by the exclusive duration
 					double duration = Double.NaN;
-					if (null == invocationSequenceData.getParentSequence()) {
-						if (invocationSequenceData.getDuration() <= defaultTotalFilterTime) {
-							return false;
-						}
-					} else if (null != invocationSequenceData.getSqlStatementData() && 1 == invocationSequenceData.getSqlStatementData().getCount()) {
+					if (null != invocationSequenceData.getSqlStatementData() && 1 == invocationSequenceData.getSqlStatementData().getCount()) {
 						if (invocationSequenceData.getSqlStatementData().getDuration() <= defaultTotalFilterTime) {
 							return false;
 						}
 					} else if (null != invocationSequenceData.getTimerData()) {
 						if (invocationSequenceData.getTimerData().getDuration() <= defaultTotalFilterTime) {
+							return false;
+						}
+					} else if (null == invocationSequenceData.getParentSequence()) {
+						if (invocationSequenceData.getDuration() <= defaultTotalFilterTime) {
 							return false;
 						}
 					}
@@ -859,7 +862,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	public void dispose() {
 		resourceManager.dispose();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

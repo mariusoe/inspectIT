@@ -95,7 +95,6 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 			if (element instanceof InvocationSequenceData) {
 				InvocationSequenceData invoc = (InvocationSequenceData) element;
 				if (configuration.isEnhancedInvocationStorageMode()) {
-					extractRootInvocationData(session, invoc);
 					extractDataFromInvocation(session, invoc, invoc);
 					buffer.put(new BufferElement<MethodSensorData>(invoc));
 					// commented out because we don't save anything anymore to the database!
@@ -146,21 +145,30 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	 */
 	@SuppressWarnings("unchecked")
 	private void extractDataFromInvocation(StatelessSession session, InvocationSequenceData invData, InvocationSequenceData topInvocationParent) {
+		double exclusiveDurationDelta = 0d;
 		Set<Long> identityHashCodeSet = new HashSet<Long>();
 		for (InvocationSequenceData child : (List<InvocationSequenceData>) invData.getNestedSequences()) {
 			cacheIdGenerator.assignObjectAnId(child);
 			if (null != child.getTimerData()) {
-				saveTimerData(session, child.getTimerData());
-				cacheIdGenerator.assignObjectAnId(child.getTimerData());
-				child.getTimerData().addInvocationParentId(topInvocationParent.getId());
-				try {
-					indexingTree.put(child.getTimerData());
-				} catch (IndexingException e) {
-					// indexing exception should not happen
-					LOGGER.error(e.getMessage(), e);
-				}
+				// this object is now saved in the next recursion step when the exclusive duration
+				// is set
+				// thus just calculate the exclusive duration
+				exclusiveDurationDelta += child.getTimerData().getDuration();
 			}
 			if (null != child.getSqlStatementData()) {
+				if (null == child.getTimerData()) {
+					// I don't know if the situation that both timer and sql are set in one
+					// invocation, but just to be sure I only include the time of the sql, if i did
+					// not already included the time of the timer before
+					exclusiveDurationDelta += child.getSqlStatementData().getDuration();
+				}
+
+				// for SQLs we know immediately that exclusive duration is as a duration
+				child.getSqlStatementData().setExclusiveCount(1L);
+				child.getSqlStatementData().setExclusiveDuration(child.getSqlStatementData().getDuration());
+				child.getSqlStatementData().setExclusiveMax(child.getSqlStatementData().getDuration());
+				child.getSqlStatementData().setExclusiveMin(child.getSqlStatementData().getDuration());
+
 				cacheIdGenerator.assignObjectAnId(child.getSqlStatementData());
 				child.getSqlStatementData().addInvocationParentId(topInvocationParent.getId());
 				try {
@@ -191,29 +199,21 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 			}
 			extractDataFromInvocation(session, child, topInvocationParent);
 		}
-	}
+		if (null != invData.getTimerData()) {
+			double exclusiveTime = invData.getTimerData().getDuration() - exclusiveDurationDelta;
+			invData.getTimerData().setExclusiveCount(1L);
+			invData.getTimerData().setExclusiveDuration(exclusiveTime);
+			invData.getTimerData().setExclusiveMin(exclusiveTime);
+			invData.getTimerData().setExclusiveMax(exclusiveTime);
 
-	/**
-	 * Extract data from the root invocation object.
-	 * 
-	 * @param session
-	 *            Stateless session.
-	 * @param rootInvocation
-	 *            Root invocation.
-	 */
-	private void extractRootInvocationData(StatelessSession session, InvocationSequenceData rootInvocation) {
-		// make sure that it is root
-		if (rootInvocation.getParentSequence() == null) {
-			if (rootInvocation.getTimerData() != null) {
-				saveTimerData(session, rootInvocation.getTimerData());
-				cacheIdGenerator.assignObjectAnId(rootInvocation.getTimerData());
-				rootInvocation.getTimerData().addInvocationParentId(rootInvocation.getId());
-				try {
-					indexingTree.put(rootInvocation.getTimerData());
-				} catch (IndexingException e) {
-					// indexing exception should not happen
-					LOGGER.error(e.getMessage(), e);
-				}
+			saveTimerData(session, invData.getTimerData());
+			cacheIdGenerator.assignObjectAnId(invData.getTimerData());
+			invData.getTimerData().addInvocationParentId(topInvocationParent.getId());
+			try {
+				indexingTree.put(invData.getTimerData());
+			} catch (IndexingException e) {
+				// indexing exception should not happen
+				LOGGER.error(e.getMessage(), e);
 			}
 		}
 	}

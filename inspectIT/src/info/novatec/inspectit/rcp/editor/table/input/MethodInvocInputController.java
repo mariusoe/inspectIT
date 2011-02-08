@@ -2,7 +2,6 @@ package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
@@ -15,7 +14,9 @@ import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
@@ -60,14 +61,14 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		MAX("Max (ms)", 60, null),
 		/** The duration column. */
 		DURATION("Duration (ms)", 70, null),
-		/** The total exclusive duration column. */
-		EXCLUSIVESUM("Total exclusive duration (ms)", 100, null),
 		/** The average exclusive duration column. */
-		EXCLUSIVEAVERAGE("Average exclusive duration (ms)", 100, null),
+		EXCLUSIVEAVERAGE("Exc. Avg (ms)", 80, null),
 		/** The min exclusive duration column. */
-		EXCLUSIVEMIN("Min exclusive duration (ms)", 100, null),
+		EXCLUSIVEMIN("Exc. Min (ms)", 80, null),
 		/** The max exclusive duration column. */
-		EXCLUSIVEMAX("Max exclusive duration (ms)", 100, null),
+		EXCLUSIVEMAX("Exc. Max (ms)", 80, null),
+		/** The total exclusive duration column. */
+		EXCLUSIVESUM("Exc. duration (ms)", 80, null),
 		/** The cpu average column. */
 		CPUAVERAGE("Cpu Avg (ms)", 60, null),
 		/** The cpu minimum column. */
@@ -115,137 +116,6 @@ public class MethodInvocInputController extends AbstractTableInputController {
 			}
 			return Column.values()[i];
 		}
-	}
-
-	/**
-	 * Data object only used for this class to hold the computation of the exlusive time.
-	 * 
-	 * @author Patrice Bouillet
-	 * 
-	 */
-	@SuppressWarnings("serial")
-	private static class ExclusiveTimerData extends TimerData {
-		/**
-		 * The average exclusive time.
-		 */
-		private double averageExclusiveTime;
-
-		/**
-		 * The minimum exclusive time.
-		 */
-		private double minExclusiveTime;
-		/**
-		 * The maximum exclusive time.
-		 */
-		private double maxExclusiveTime;
-		/**
-		 * The total exclusive time.
-		 */
-		private double sumExclusiveTime = 0.0d;
-
-		/**
-		 * @return the averageExclusiveTime
-		 */
-		public double getAverageExclusiveTime() {
-			return averageExclusiveTime;
-		}
-
-		/**
-		 * @param averageExclusiveTime
-		 *            the averageExclusiveTime to set
-		 */
-		public void setAverageExclusiveTime(double averageExclusiveTime) {
-			this.averageExclusiveTime = averageExclusiveTime;
-		}
-
-		/**
-		 * @return the minExclusiveTime
-		 */
-		public double getMinExclusiveTime() {
-			return minExclusiveTime;
-		}
-
-		/**
-		 * @param minExclusiveTime
-		 *            the minExclusiveTime to set
-		 */
-		public void setMinExclusiveTime(double minExclusiveTime) {
-			this.minExclusiveTime = minExclusiveTime;
-		}
-
-		/**
-		 * @return the maxExclusiveTime
-		 */
-		public double getMaxExclusiveTime() {
-			return maxExclusiveTime;
-		}
-
-		/**
-		 * @param maxExclusiveTime
-		 *            the maxExclusiveTime to set
-		 */
-		public void setMaxExclusiveTime(double maxExclusiveTime) {
-			this.maxExclusiveTime = maxExclusiveTime;
-		}
-
-		/**
-		 * @param totalExclusiveTime
-		 *            The total exlusive time to add.
-		 */
-		public void addTotalExclusiveTime(double totalExclusiveTime) {
-			this.sumExclusiveTime = this.sumExclusiveTime + totalExclusiveTime;
-		}
-
-		/**
-		 * @return the total exclusive time.
-		 */
-		public double getTotalExclusiveTime() {
-			return this.sumExclusiveTime;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = super.hashCode();
-			long temp;
-			temp = Double.doubleToLongBits(averageExclusiveTime);
-			result = prime * result + (int) (temp ^ (temp >>> 32));
-			temp = Double.doubleToLongBits(maxExclusiveTime);
-			result = prime * result + (int) (temp ^ (temp >>> 32));
-			temp = Double.doubleToLongBits(minExclusiveTime);
-			result = prime * result + (int) (temp ^ (temp >>> 32));
-			temp = Double.doubleToLongBits(sumExclusiveTime);
-			result = prime * result + (int) (temp ^ (temp >>> 32));
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if (!super.equals(obj)) {
-				return false;
-			}
-			if (getClass() != obj.getClass()) {
-				return false;
-			}
-			ExclusiveTimerData other = (ExclusiveTimerData) obj;
-			if (Double.doubleToLongBits(averageExclusiveTime) != Double.doubleToLongBits(other.averageExclusiveTime)) {
-				return false;
-			}
-			if (Double.doubleToLongBits(maxExclusiveTime) != Double.doubleToLongBits(other.maxExclusiveTime)) {
-				return false;
-			}
-			if (Double.doubleToLongBits(minExclusiveTime) != Double.doubleToLongBits(other.minExclusiveTime)) {
-				return false;
-			}
-			if (Double.doubleToLongBits(sumExclusiveTime) != Double.doubleToLongBits(other.sumExclusiveTime)) {
-				return false;
-			}
-			return true;
-		}
-
 	}
 
 	/**
@@ -349,105 +219,113 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		@SuppressWarnings("unchecked")
 		public Object[] getElements(Object inputElement) {
 			List<InvocationSequenceData> invocationSequenceDataList = (List<InvocationSequenceData>) inputElement;
-			List<ExclusiveTimerData> timerDataList = extractMethodData(invocationSequenceDataList, new ArrayList<ExclusiveTimerData>());
+			List<TimerData> timerDataList = aggregateTimerData(invocationSequenceDataList, new ArrayList<TimerData>(), new HashMap<Long, TimerData>());
 			return timerDataList.toArray();
 		}
 
+		/**
+		 * Creates a list of aggregated timer data from the invocation data list.
+		 * 
+		 * @param invocationList
+		 *            Invocation list.
+		 * @param timerDataList
+		 *            List where results will be store (same list is returned). Usually empty list
+		 *            should be supplied.
+		 * @param cacheMap
+		 *            Map for caching. Usually empty map should be supplied.
+		 * @return List of aggregated timer data.
+		 */
 		@SuppressWarnings("unchecked")
-		private List<ExclusiveTimerData> extractMethodData(List<InvocationSequenceData> invocationSequenceDataList, ArrayList<ExclusiveTimerData> timerDataList) {
-			for (InvocationSequenceData invocationSequenceData : invocationSequenceDataList) {
-				boolean dataFound = false;
-				for (ExclusiveTimerData timerData : timerDataList) {
-					if (equalsMethods(invocationSequenceData, timerData)) {
-						dataFound = true;
-						timerData.increaseCount();
-						if (null != invocationSequenceData.getTimerData()) {
-							timerData.setMin(Math.min(invocationSequenceData.getTimerData().getMin(), timerData.getMin()));
-							timerData.setMax(Math.max(invocationSequenceData.getTimerData().getMax(), timerData.getMax()));
-							timerData.addDuration(invocationSequenceData.getTimerData().getDuration());
-							timerData.setAverage(timerData.getDuration() / timerData.getCount());
-
-							double exclusiveTime = invocationSequenceData.getTimerData().getDuration() - (computeNestedDuration(invocationSequenceData));
-							timerData.setAverageExclusiveTime(((timerData.getAverageExclusiveTime() * (timerData.getCount() - 1)) + exclusiveTime) / timerData.getCount());
-							timerData.setMinExclusiveTime(Math.min(exclusiveTime, timerData.getMinExclusiveTime()));
-							timerData.setMaxExclusiveTime(Math.max(exclusiveTime, timerData.getMaxExclusiveTime()));
-							timerData.addTotalExclusiveTime(exclusiveTime);
-
-							if (-1.0d != invocationSequenceData.getTimerData().getCpuMin()) {
-								timerData.setCpuMin(Math.min(invocationSequenceData.getTimerData().getCpuMin(), timerData.getCpuMin()));
-								timerData.setCpuMax(Math.max(invocationSequenceData.getTimerData().getCpuMax(), timerData.getCpuMax()));
-								timerData.addCpuDuration(invocationSequenceData.getTimerData().getCpuDuration());
-								timerData.setCpuAverage(timerData.getCpuDuration() / timerData.getCount());
-							}
-						} else if (null != invocationSequenceData.getSqlStatementData() && 1 == invocationSequenceData.getSqlStatementData().getCount()) {
-							timerData.setMin(Math.min(invocationSequenceData.getSqlStatementData().getMin(), timerData.getMin()));
-							timerData.setMax(Math.max(invocationSequenceData.getSqlStatementData().getMax(), timerData.getMax()));
-							timerData.addDuration(invocationSequenceData.getSqlStatementData().getDuration());
-							timerData.setAverage(timerData.getDuration() / timerData.getCount());
-
-							double exclusiveTime = invocationSequenceData.getSqlStatementData().getDuration() - (computeNestedDuration(invocationSequenceData));
-							timerData.setAverageExclusiveTime(((timerData.getAverageExclusiveTime() * (timerData.getCount() - 1)) + exclusiveTime) / timerData.getCount());
-							timerData.setMinExclusiveTime(Math.min(exclusiveTime, timerData.getMinExclusiveTime()));
-							timerData.setMaxExclusiveTime(Math.max(exclusiveTime, timerData.getMaxExclusiveTime()));
-							timerData.addTotalExclusiveTime(exclusiveTime);
-
-							if (-1.0d != invocationSequenceData.getSqlStatementData().getCpuMin()) {
-								timerData.setCpuMin(Math.min(invocationSequenceData.getSqlStatementData().getCpuMin(), timerData.getCpuMin()));
-								timerData.setCpuMax(Math.max(invocationSequenceData.getSqlStatementData().getCpuMax(), timerData.getCpuMax()));
-								timerData.addCpuDuration(invocationSequenceData.getSqlStatementData().getCpuDuration());
-								timerData.setCpuAverage(timerData.getCpuDuration() / timerData.getCount());
-							}
-						}
-						break;
+		private List<TimerData> aggregateTimerData(List<InvocationSequenceData> invocationList, List<TimerData> timerDataList, Map<Long, TimerData> cacheMap) {
+			for (InvocationSequenceData invocationData : invocationList) {
+				TimerData timerData = null;
+				if (null != invocationData.getTimerData()) {
+					timerData = invocationData.getTimerData();
+				} else if (null != invocationData.getSqlStatementData()) {
+					timerData = invocationData.getSqlStatementData();
+				} else if (null == invocationData.getParentSequence()) {
+					timerData = createTimerDataForRootInvocation(invocationData);
+				}
+				if (null != timerData) {
+					TimerData aggregatedTimerData = cacheMap.get(timerData.getMethodIdent());
+					if (null != aggregatedTimerData) {
+						aggregatedTimerData.aggregateTimerData(timerData);
+					} else {
+						TimerData clone = new TimerData();
+						clone.setPlatformIdent(timerData.getPlatformIdent());
+						clone.setMethodIdent(timerData.getMethodIdent());
+						clone.setSensorTypeIdent(timerData.getSensorTypeIdent());
+						clone.aggregateTimerData(timerData);
+						cacheMap.put(timerData.getMethodIdent(), clone);
+						timerDataList.add(clone);
 					}
 				}
-				if (!dataFound) {
-					ExclusiveTimerData timerData = new ExclusiveTimerData();
-					timerData.setMethodIdent(invocationSequenceData.getMethodIdent());
-					timerData.setCount(1L);
-					timerDataList.add(timerData);
-
-					double time = Double.MIN_VALUE;
-					if (null == invocationSequenceData.getParentSequence()) {
-						time = invocationSequenceData.getDuration();
-					} else if (null != invocationSequenceData.getTimerData()) {
-						time = invocationSequenceData.getTimerData().getDuration();
-					} else if (null != invocationSequenceData.getSqlStatementData() && 1 == invocationSequenceData.getSqlStatementData().getCount()) {
-						time = invocationSequenceData.getSqlStatementData().getDuration();
-					}
-
-					if (time != Double.MIN_VALUE) {
-						timerData.setMin(time);
-						timerData.setMax(time);
-						timerData.setDuration(time);
-						timerData.setAverage(time);
-
-						double exclusiveTime = time - (computeNestedDuration(invocationSequenceData));
-						timerData.setAverageExclusiveTime(exclusiveTime);
-						timerData.setMinExclusiveTime(exclusiveTime);
-						timerData.setMaxExclusiveTime(exclusiveTime);
-						timerData.addTotalExclusiveTime(exclusiveTime);
-						if (null != invocationSequenceData.getTimerData() && -1 != invocationSequenceData.getTimerData().getCpuMin()) {
-							timerData.setCpuMin(invocationSequenceData.getTimerData().getCpuMin());
-							timerData.setCpuMax(invocationSequenceData.getTimerData().getCpuMax());
-							timerData.setCpuDuration(invocationSequenceData.getTimerData().getCpuDuration());
-							timerData.setCpuAverage(invocationSequenceData.getTimerData().getCpuAverage());
-						}
-					}
-				}
-				if (null != invocationSequenceData.getNestedSequences() && !invocationSequenceData.getNestedSequences().isEmpty()) {
-					extractMethodData(invocationSequenceData.getNestedSequences(), timerDataList);
-				}
+				aggregateTimerData(invocationData.getNestedSequences(), timerDataList, cacheMap);
 			}
 
 			return timerDataList;
 		}
 
-		private boolean equalsMethods(MethodSensorData method1, MethodSensorData method2) {
-			if (method1.getMethodIdent() != method2.getMethodIdent()) {
-				return false;
+		/**
+		 * Creates the timer data from a root invocation object.
+		 * 
+		 * @param invocationData
+		 *            Root invocation object.
+		 * @return Timer data with set duration from the invocation and calculated exclusive
+		 *         duration.
+		 */
+		private TimerData createTimerDataForRootInvocation(InvocationSequenceData invocationData) {
+			TimerData timerData = new TimerData();
+			timerData.setPlatformIdent(invocationData.getPlatformIdent());
+			timerData.setMethodIdent(invocationData.getMethodIdent());
+			timerData.setDuration(invocationData.getDuration());
+			timerData.setMax(invocationData.getDuration());
+			timerData.setMin(invocationData.getDuration());
+			timerData.increaseCount();
+			double exclusiveTime = invocationData.getDuration() - computeNestedDuration(invocationData);
+			timerData.setExclusiveDuration(exclusiveTime);
+			timerData.setExclusiveMax(exclusiveTime);
+			timerData.setExclusiveMin(exclusiveTime);
+			timerData.increaseExclusiveCount();
+			timerData.finalizeData();
+			return timerData;
+		}
+
+		/**
+		 * Computes the duration of the nested invocation elements.
+		 * 
+		 * @param data
+		 *            The data objects which is inspected for its nested elements.
+		 * @return The duration of all nested sequences (with their nested sequences as well).
+		 */
+		@SuppressWarnings("unchecked")
+		private static double computeNestedDuration(InvocationSequenceData data) {
+			if (data.getNestedSequences().isEmpty()) {
+				return 0;
 			}
-			return true;
+
+			double nestedDuration = 0d;
+			boolean added = false;
+			for (InvocationSequenceData nestedData : (List<InvocationSequenceData>) data.getNestedSequences()) {
+				if (null == nestedData.getParentSequence()) {
+					nestedDuration = nestedDuration + nestedData.getDuration();
+					added = true;
+				} else if (null != nestedData.getTimerData()) {
+					nestedDuration = nestedDuration + nestedData.getTimerData().getDuration();
+					added = true;
+				} else if (null != nestedData.getSqlStatementData() && 1 == nestedData.getSqlStatementData().getCount()) {
+					nestedDuration = nestedDuration + nestedData.getSqlStatementData().getDuration();
+					added = true;
+				}
+				if (!added && !nestedData.getNestedSequences().isEmpty()) {
+					// nothing was added, but there could be child elements with
+					// time measurements
+					nestedDuration = nestedDuration + computeNestedDuration(nestedData);
+				}
+				added = false;
+			}
+
+			return nestedDuration;
 		}
 
 		/**
@@ -483,7 +361,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		 */
 		@Override
 		public StyledString getStyledText(Object element, int index) {
-			ExclusiveTimerData data = (ExclusiveTimerData) element;
+			TimerData data = (TimerData) element;
 			MethodIdent methodIdent = dataAccessService.getMethodIdentForId(data.getMethodIdent());
 			Column enumId = Column.fromOrd(index);
 
@@ -498,13 +376,13 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private final class MethodInputViewerComparator extends TableViewerComparator<ExclusiveTimerData> {
+	private final class MethodInputViewerComparator extends TableViewerComparator<TimerData> {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int compareElements(Viewer viewer, ExclusiveTimerData timer1, ExclusiveTimerData timer2) {
+		protected int compareElements(Viewer viewer, TimerData timer1, TimerData timer2) {
 			MethodIdent methodIdent1 = dataAccessService.getMethodIdentForId(timer1.getMethodIdent());
 			MethodIdent methodIdent2 = dataAccessService.getMethodIdentForId(timer2.getMethodIdent());
 
@@ -536,13 +414,13 @@ public class MethodInvocInputController extends AbstractTableInputController {
 			case CPUDURATION:
 				return Double.compare(timer1.getCpuDuration(), timer2.getCpuDuration());
 			case EXCLUSIVESUM:
-				return Double.compare(timer1.getTotalExclusiveTime(), timer2.getTotalExclusiveTime());
+				return Double.compare(timer1.getExclusiveDuration(), timer2.getExclusiveDuration());
 			case EXCLUSIVEAVERAGE:
-				return Double.compare(timer1.getAverageExclusiveTime(), timer2.getAverageExclusiveTime());
+				return Double.compare(timer1.getExclusiveAverage(), timer2.getExclusiveAverage());
 			case EXCLUSIVEMIN:
-				return Double.compare(timer1.getMinExclusiveTime(), timer2.getMinExclusiveTime());
+				return Double.compare(timer1.getExclusiveMin(), timer2.getExclusiveMin());
 			case EXCLUSIVEMAX:
-				return Double.compare(timer1.getMaxExclusiveTime(), timer2.getMaxExclusiveTime());
+				return Double.compare(timer1.getExclusiveMax(), timer2.getExclusiveMax());
 			default:
 				return 0;
 			}
@@ -561,7 +439,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	 *            The enumeration ID.
 	 * @return The styled string containing the information from the data object.
 	 */
-	private StyledString getStyledTextForColumn(ExclusiveTimerData data, MethodIdent methodIdent, Column enumId) {
+	private StyledString getStyledTextForColumn(TimerData data, MethodIdent methodIdent, Column enumId) {
 		switch (enumId) {
 		case PACKAGE:
 			return new StyledString(methodIdent.getPackageName());
@@ -622,22 +500,26 @@ public class MethodInvocInputController extends AbstractTableInputController {
 				return emptyStyledString;
 			}
 		case EXCLUSIVESUM:
-			return new StyledString(NumberFormatter.formatDouble(data.getTotalExclusiveTime()));
+			if (data.getExclusiveDuration() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveDuration()));
+			} else {
+				return emptyStyledString;
+			}
 		case EXCLUSIVEAVERAGE:
-			if (data.getMin() != Double.MAX_VALUE) {
-				return new StyledString(NumberFormatter.formatDouble(data.getAverageExclusiveTime()));
+			if (data.getExclusiveAverage() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveAverage()));
 			} else {
 				return emptyStyledString;
 			}
 		case EXCLUSIVEMIN:
-			if (data.getMin() != Double.MAX_VALUE) {
-				return new StyledString(NumberFormatter.formatDouble(data.getMinExclusiveTime()));
+			if (data.getExclusiveMin() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveMin()));
 			} else {
 				return emptyStyledString;
 			}
 		case EXCLUSIVEMAX:
-			if (data.getMin() != Double.MAX_VALUE) {
-				return new StyledString(NumberFormatter.formatDouble(data.getMaxExclusiveTime()));
+			if (data.getExclusiveMax() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveMax()));
 			} else {
 				return emptyStyledString;
 			}
@@ -647,48 +529,11 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	}
 
 	/**
-	 * Computes the duration of the nested invocation elements.
-	 * 
-	 * @param data
-	 *            The data objects which is inspected for its nested elements.
-	 * @return The duration of all nested sequences (with their nested sequences as well).
-	 */
-	@SuppressWarnings("unchecked")
-	private static double computeNestedDuration(InvocationSequenceData data) {
-		if (data.getNestedSequences().isEmpty()) {
-			return 0;
-		}
-
-		double nestedDuration = 0d;
-		boolean added = false;
-		for (InvocationSequenceData nestedData : (List<InvocationSequenceData>) data.getNestedSequences()) {
-			if (null == nestedData.getParentSequence()) {
-				nestedDuration = nestedDuration + nestedData.getDuration();
-				added = true;
-			} else if (null != nestedData.getTimerData()) {
-				nestedDuration = nestedDuration + nestedData.getTimerData().getDuration();
-				added = true;
-			} else if (null != nestedData.getSqlStatementData() && 1 == nestedData.getSqlStatementData().getCount()) {
-				nestedDuration = nestedDuration + nestedData.getSqlStatementData().getDuration();
-				added = true;
-			}
-			if (!added && !nestedData.getNestedSequences().isEmpty()) {
-				// nothing was added, but there could be child elements with
-				// time measurements
-				nestedDuration = nestedDuration + computeNestedDuration(nestedData);
-			}
-			added = false;
-		}
-
-		return nestedDuration;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	public Object getReadableString(Object object) {
-		if (object instanceof ExclusiveTimerData) {
-			ExclusiveTimerData data = (ExclusiveTimerData) object;
+		if (object instanceof TimerData) {
+			TimerData data = (TimerData) object;
 			StringBuilder sb = new StringBuilder();
 			MethodIdent methodIdent = dataAccessService.getMethodIdentForId(data.getMethodIdent());
 			for (Column column : Column.values()) {
@@ -699,7 +544,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		}
 		throw new RuntimeException("Could not create the human readable string!");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

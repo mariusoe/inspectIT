@@ -14,5 +14,9 @@
 		<property name="cpuMax" column="cpu_max" />
 		<property name="cpuDuration" column="cpu_duration"/>
 		<property name="cpuAverage" column="cpu_average"/>
+		<property name="exclusiveCount" column="exclusive_count"/>
+		<property name="exclusiveDuration" column="exclusive_duration"/>
+		<property name="exclusiveMin" column="exclusive_min"/>
+		<property name="exclusiveMax" column="exclusive_max"/>
 	</union-subclass>
 </hibernate-mapping>
