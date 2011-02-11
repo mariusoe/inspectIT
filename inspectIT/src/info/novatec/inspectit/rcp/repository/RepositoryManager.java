@@ -7,9 +7,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
 
 /**
  * The repository manager stores all the repository definitions.
@@ -40,21 +44,18 @@ public class RepositoryManager {
 	private ListenerList<RepositoryChangeListener> repositoryChangeListeners = new ListenerList<RepositoryChangeListener>();
 
 	/**
-	 * The configuration scope
-	 */
-	private ConfigurationScope scope;
-
-	/**
 	 * Starts the repository manager (e.g. loads all the saved data).
 	 */
 	public void startup() {
-		scope = new ConfigurationScope();
-		IEclipsePreferences node = scope.getNode(InspectIT.ID);
+		IPreferencesService service = Platform.getPreferencesService();
+		Preferences configurationNode = new ConfigurationScope().getNode(InspectIT.ID);
+		Preferences defaultNode = new DefaultScope().getNode(InspectIT.ID);
+		Preferences[] nodes = new Preferences[] { configurationNode, defaultNode };
 
 		// load existing definitions
 		for (int i = 1; i < Integer.MAX_VALUE; i++) {
-			String ip = node.get(HOST + i, null);
-			int port = node.getInt(PORT + i, 8182);
+			String ip = service.get(HOST + i, null, nodes);
+			int port = Integer.parseInt(service.get(PORT + i, "8182", nodes));
 			if (null != ip) {
 				repositoryDefinitions.add(new CmrRepositoryDefinition(ip, port));
 			} else {
@@ -152,7 +153,7 @@ public class RepositoryManager {
 	 * Save the preferences to the backend store.
 	 */
 	private void savePreference() {
-		IEclipsePreferences node = scope.getNode(InspectIT.ID);
+		IEclipsePreferences node = new ConfigurationScope().getNode(InspectIT.ID);
 		// first, remove all existing preferences
 		for (int i = 1; i < Integer.MAX_VALUE; i++) {
 			String ip = node.get(HOST + i, null);
