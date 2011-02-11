@@ -242,9 +242,8 @@ public class TimeLineControl implements IPreferenceControl {
 
 		oldToDate.setTime(cDateTime.getSelection());
 		oldFromDate.setTime(oldToDate.getTime());
-		oldFromDate.add(GregorianCalendar.DAY_OF_WEEK, -(spinnerDays.getSelection()));
-		oldFromDate.add(GregorianCalendar.HOUR_OF_DAY, -(spinnerHours.getSelection()));
-		oldFromDate.add(GregorianCalendar.MINUTE, -(spinnerMinutes.getSelection()));
+		// default state is 10 minutes before the current time
+		oldFromDate.add(GregorianCalendar.MINUTE, -10);
 
 		return timeLineRow;
 	}
