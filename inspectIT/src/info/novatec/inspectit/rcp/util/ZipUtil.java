@@ -103,9 +103,11 @@ public final class ZipUtil {
 			}
 		} else {
 			File parentFile = new File(file.getParent());
-			boolean created = parentFile.mkdirs();
-			if (!created) {
-				throw new RuntimeException("Could not create the following directory: " + parentFile.getAbsolutePath());
+			if (!parentFile.exists()) {
+				boolean created = parentFile.mkdirs();
+				if (!created) {
+					throw new RuntimeException("Could not create the following directory: " + parentFile.getAbsolutePath());
+				}
 			}
 
 			InputStream is = null;
