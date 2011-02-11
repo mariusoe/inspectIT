@@ -353,6 +353,9 @@ Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA)" />
 		</jar>
 
 		<zip destfile="${release.root}/${release.name.sun15}" basedir="${build.release}/sun1.5-data" />
+		<zip destfile="${release.root}/${release.name.sun15}" update="true">
+			<zipfileset dir="${commons.basedir}/resources" prefix="agent" includes="inspectIT-licence.pdf" />
+		</zip>
 	</target>
 
 	<target name="release-sun1.4" depends="release-sun1.4-execute, release-sun1.4-missing-java-exec" />
@@ -399,6 +402,9 @@ Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA)" />
 		</jar>
 
 		<zip destfile="${release.root}/${release.name.sun14}" basedir="${build.release}/sun1.4-data" />
+		<zip destfile="${release.root}/${release.name.sun14}" update="true">
+			<zipfileset dir="${commons.basedir}/resources" prefix="agent" includes="inspectIT-licence.pdf" />
+		</zip>
 	</target>
 
 	<target name="release-all" depends="release-sun1.4, release-sun1.5" description="--> releases the agent for all versions" />

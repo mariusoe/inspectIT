@@ -317,9 +317,11 @@
 		<antcall target="-create-thirdparty-notification" />
 		<zip destfile="${release.basedir}/dist/inspectit-linux.gtk.x86.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
+			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
 		</zip>
 		<zip destfile="${release.basedir}/dist/inspectit-win32.win32.x86.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
+			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
 		</zip>
 	</target>
 
