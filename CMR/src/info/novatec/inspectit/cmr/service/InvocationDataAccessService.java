@@ -8,14 +8,18 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Patrice Bouillet
  * 
  */
-public class InvocationDataAccessService implements IInvocationDataAccessService, InitializingBean {
+@Service
+public class InvocationDataAccessService implements IInvocationDataAccessService {
 
 	/**
 	 * The logger of this class.
@@ -25,6 +29,7 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 	/**
 	 * The invocation DAO.
 	 */
+	@Autowired
 	private InvocationDataDao invocationDataDao;
 
 	/**
@@ -82,17 +87,12 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 	}
 
 	/**
-	 * @param invocationDataDao
-	 *            the invocationDataDao to set
+	 * Is executed after dependency injection is done to perform any initialization.
+	 * 
+	 * @throws Exception if an error occurs during {@link PostConstruct}
 	 */
-	public void setInvocationDataDao(InvocationDataDao invocationDataDao) {
-		this.invocationDataDao = invocationDataDao;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void postConstruct() throws Exception {
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("|-Invocation Data Access Service active...");
 		}

@@ -29,7 +29,7 @@ import org.testng.annotations.Test;
  * @author Matthias Huber
  * 
  */
-@ContextConfiguration(locations = { "classpath:spring/spring-context-property.xml", "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
+@ContextConfiguration(locations = { "classpath:spring/spring-context-property.xml", "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml", "classpath:spring/spring-context-util.xml" })
 public class ExceptionSensorDefinitionDataDaoTest extends AbstractTransactionalTestNGLogSupport {
 
 	/**

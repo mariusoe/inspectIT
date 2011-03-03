@@ -8,10 +8,14 @@ import info.novatec.inspectit.cmr.util.PlatformIdentCache;
 import java.util.List;
 
 import org.hibernate.FetchMode;
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * The default implementation of the {@link MethodIdentDao} interface by using the
@@ -23,11 +27,28 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * @author Patrice Bouillet
  * 
  */
+@Repository
 public class MethodIdentDaoImpl extends HibernateDaoSupport implements MethodIdentDao {
-	
+
+	/**
+	 * This constructor is used to set the {@link SessionFactory} that is needed by
+	 * {@link HibernateDaoSupport}. In a future version it may be useful to go away from the
+	 * {@link HibernateDaoSupport} and directly use the {@link SessionFactory}. This is described
+	 * here:
+	 * http://blog.springsource.com/2007/06/26/so-should-you-still-use-springs-hibernatetemplate
+	 * -andor-jpatemplate
+	 * 
+	 * @param sessionFactory
+	 */
+	@Autowired
+	public MethodIdentDaoImpl(SessionFactory sessionFactory) {
+		setSessionFactory(sessionFactory);
+	}
+
 	/**
 	 * {@link PlatformIdent} cache.
 	 */
+	@Autowired
 	private PlatformIdentCache platformIdentCache;
 
 	/**
@@ -96,13 +117,6 @@ public class MethodIdentDaoImpl extends HibernateDaoSupport implements MethodIde
 		platformCriteria.add(Restrictions.eq("id", platformIdent.getId()));
 
 		return getHibernateTemplate().findByCriteria(methodCriteria);
-	}
-
-	/**
-	 * @param platformIdentCache the platformIdentCache to set
-	 */
-	public void setPlatformIdentCache(PlatformIdentCache platformIdentCache) {
-		this.platformIdentCache = platformIdentCache;
 	}
 	
 }

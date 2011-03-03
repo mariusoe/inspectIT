@@ -1,11 +1,11 @@
 package info.novatec.inspectit.cmr.jetty;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.servlet.Context;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.context.support.GenericWebApplicationContext;
@@ -25,7 +25,7 @@ import org.springframework.web.context.support.GenericWebApplicationContext;
  * 
  * @author NovaProvisioning
  */
-public class JettyWebApplicationContextInitializer implements ApplicationContextAware, InitializingBean {
+public class JettyWebApplicationContextInitializer implements ApplicationContextAware {
 
 	/**
 	 * The logger of this class.
@@ -79,7 +79,8 @@ public class JettyWebApplicationContextInitializer implements ApplicationContext
 	 * @throws Exception
 	 *             in case of an error while starting the Jetty context
 	 */
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void postConstruct() throws Exception {
 		ServletContext servletContext = jettyContext.getServletContext();
 
 		GenericWebApplicationContext webCtx = new GenericWebApplicationContext();

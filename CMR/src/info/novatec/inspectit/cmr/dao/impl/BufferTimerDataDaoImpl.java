@@ -13,22 +13,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
 /**
  * Implementation of {@link TimerData} that searches for timer data in buffer.
  * 
  * @author Ivan Senic
  * 
  */
+@Repository
 public class BufferTimerDataDaoImpl implements TimerDataDao {
 
 	/**
 	 * Indexing tree to search for data.
 	 */
+	@Autowired
 	private ITreeComponent<TimerData> indexingTree;
 
 	/**
 	 * Index query provider.
 	 */
+	@Autowired
 	private IndexQueryProvider indexQueryProvider;
 
 	/**
@@ -90,24 +96,6 @@ public class BufferTimerDataDaoImpl implements TimerDataDao {
 		clone.setSensorTypeIdent(timerData.getSensorTypeIdent());
 		clone.setMethodIdent(timerData.getMethodIdent());
 		return clone;
-	}
-
-	/**
-	 * 
-	 * @param indexingTree
-	 *            Indexing tree to be set.
-	 */
-	public void setBuffer(ITreeComponent<TimerData> indexingTree) {
-		this.indexingTree = indexingTree;
-	}
-
-	/**
-	 * 
-	 * @param indexQueryProvider
-	 *            Index query provider to be set.
-	 */
-	public void setIndexQueryProvider(IndexQueryProvider indexQueryProvider) {
-		this.indexQueryProvider = indexQueryProvider;
 	}
 
 }

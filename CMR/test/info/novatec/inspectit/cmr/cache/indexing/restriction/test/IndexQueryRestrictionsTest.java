@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
  * @author Ivan Senic
  * 
  */
-@ContextConfiguration(locations = { "classpath:spring/spring-context-property.xml", "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
+@ContextConfiguration(locations = { "classpath:spring/spring-context-property.xml", "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml", "classpath:spring/spring-context-util.xml" })
 public class IndexQueryRestrictionsTest extends AbstractTestNGLogSupport {
 
 	/**

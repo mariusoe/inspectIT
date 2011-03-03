@@ -9,9 +9,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * Aggregator for the {@link TimerData} obejcts that need to be persisted to the DB.
@@ -20,23 +24,30 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * @see https://confluence.novatec-gmbh.de/display/INSPECTIT/TimerData+Aggregator
  * 
  */
+@Repository
 public class TimerDataAggregator extends HibernateDaoSupport {
 
 	/**
 	 * Period of time in which all timer data should be aggregated. In milliseconds.
 	 */
+	@Value("${cmr.aggregationPeriod}")
 	private long aggregationPeriod;
 
 	/**
 	 * Max elements in the cache.
 	 */
+	@Value("${cmr.maxElements}")
 	private int maxElements;
 
 	/**
 	 * Sleeping period for thread that is cleaning the cache (persisting the objects). In
 	 * milliseconds.
+	 * 
+	 * This field is protected during the need that the testcase {@link TimerDataAggregatorTest}
+	 * have to overwrite it.
 	 */
-	private long cacheCleanSleepingPeriod;
+	@Value("${cmr.cacheCleanSleepingPeriod}")
+	protected long cacheCleanSleepingPeriod;
 
 	/**
 	 * Current element count in cache.
@@ -69,9 +80,17 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 	private TimerData mostRecentlyAdded;
 
 	/**
-	 * Default constructor.
+	 * This constructor is used to set the {@link SessionFactory} that is needed by
+	 * {@link HibernateDaoSupport}. In a future version it may be useful to go away from the
+	 * {@link HibernateDaoSupport} and directly use the {@link SessionFactory}. This is described
+	 * here:
+	 * http://blog.springsource.com/2007/06/26/so-should-you-still-use-springs-hibernatetemplate
+	 * -andor-jpatemplate
+	 * 
+	 * @param sessionFactory
 	 */
-	public TimerDataAggregator() {
+	@Autowired
+	public TimerDataAggregator(SessionFactory sessionFactory) {
 		super();
 
 		elementCount = new AtomicInteger(0);
@@ -82,6 +101,8 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 
 		CacheCleaner cacheCleaner = new CacheCleaner();
 		cacheCleaner.start();
+		
+		setSessionFactory(sessionFactory);
 	}
 
 	/**
@@ -92,14 +113,6 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 	}
 
 	/**
-	 * @param aggregationPeriod
-	 *            the aggregationPeriod to set
-	 */
-	public void setAggregationPeriod(long aggregationPeriod) {
-		this.aggregationPeriod = aggregationPeriod;
-	}
-
-	/**
 	 * @return the maxElements
 	 */
 	public int getMaxElements() {
@@ -107,26 +120,10 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 	}
 
 	/**
-	 * @param maxElements
-	 *            the maxElements to set
-	 */
-	public void setMaxElements(int maxElements) {
-		this.maxElements = maxElements;
-	}
-
-	/**
 	 * @return the cacheCleanSleepingPeriod
 	 */
 	public long getCacheCleanSleepingPeriod() {
 		return cacheCleanSleepingPeriod;
-	}
-
-	/**
-	 * @param cacheCleanSleepingPeriod
-	 *            the cacheCleanSleepingPeriod to set
-	 */
-	public void setCacheCleanSleepingPeriod(long cacheCleanSleepingPeriod) {
-		this.cacheCleanSleepingPeriod = cacheCleanSleepingPeriod;
 	}
 
 	/**

@@ -10,8 +10,12 @@ import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 /**
  * This service is used to check the health of the CMR in terms of cpu, memory, some overall
@@ -20,7 +24,8 @@ import org.springframework.beans.factory.InitializingBean;
  * @author Patrice Bouillet
  * 
  */
-public class HealthStatus implements InitializingBean {
+@Component
+public class HealthStatus {
 
 	/**
 	 * The logger of this class.
@@ -66,16 +71,19 @@ public class HealthStatus implements InitializingBean {
 	/**
 	 * Buffer that reports status.
 	 */
+	@Autowired
 	private IBuffer<?> buffer;
 
 	/**
 	 * {@link AgentStorageService} for reporting the amount of dropped data on the CMR.
 	 */
+	@Autowired
 	private AgentStorageService agentStorageService;
 
 	/**
 	 * Log all the statistics.
 	 */
+	@Scheduled(fixedRate=60000)
 	public void logStatistics() {
 		if (beansAvailable) {
 			if (LOGGER.isInfoEnabled()) {
@@ -411,8 +419,9 @@ public class HealthStatus implements InitializingBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void afterPropertiesSet() throws Exception {
-		startUpCheck();
+	@PostConstruct
+	public void postConstruct() throws Exception {
+	startUpCheck();
 		if (beansAvailable) {
 			if (LOGGER.isInfoEnabled()) {
 				LOGGER.info("Health Service active...");
@@ -422,23 +431,6 @@ public class HealthStatus implements InitializingBean {
 				LOGGER.info("Health Service not active...");
 			}
 		}
-	}
-
-	/**
-	 * 
-	 * @param buffer
-	 *            buffer to be set
-	 */
-	public void setBuffer(IBuffer<?> buffer) {
-		this.buffer = buffer;
-	}
-
-	/**
-	 * @param agentStorageService
-	 *            the agentStorageService to set
-	 */
-	public void setAgentStorageService(AgentStorageService agentStorageService) {
-		this.agentStorageService = agentStorageService;
 	}
 
 }

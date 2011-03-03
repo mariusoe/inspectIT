@@ -10,8 +10,12 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * The default implementation of the {@link IAgentStorageService} interface. Uses an implementation
@@ -20,7 +24,8 @@ import org.springframework.beans.factory.InitializingBean;
  * @author Patrice Bouillet
  * 
  */
-public class AgentStorageService implements IAgentStorageService, InitializingBean {
+@Service
+public class AgentStorageService implements IAgentStorageService {
 
 	/**
 	 * The logger of this class.
@@ -41,9 +46,11 @@ public class AgentStorageService implements IAgentStorageService, InitializingBe
 	 * Amount of milliseconds after which the data is thrown away if queue is full.
 	 */
 	private static final long DATA_THROW_TIMEOUT_MILLIS = 10;
+	
 	/**
 	 * The default data DAO.
 	 */
+	@Autowired
 	private DefaultDataDao defaultDataDao;
 
 	/**
@@ -54,6 +61,7 @@ public class AgentStorageService implements IAgentStorageService, InitializingBe
 	/**
 	 * Count of thread to process data.
 	 */
+	@Value("${cmr.agentStorageServiceThreadCount}")
 	private int threadCount;
 
 	/**
@@ -92,27 +100,12 @@ public class AgentStorageService implements IAgentStorageService, InitializingBe
 	}
 
 	/**
-	 * Sets the default data dao bean.
+	 * Is executed after dependency injection is done to perform any initialization.
 	 * 
-	 * @param defaultDataDao
-	 *            the dao bean.
+	 * @throws Exception if an error occurs during {@link PostConstruct}
 	 */
-	public void setDefaultDataDao(DefaultDataDao defaultDataDao) {
-		this.defaultDataDao = defaultDataDao;
-	}
-
-	/**
-	 * @param threadCount
-	 *            the threadCount to set
-	 */
-	public void setThreadCount(int threadCount) {
-		this.threadCount = threadCount;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void postConstruct() throws Exception {
 		if (threadCount <= 0) {
 			threadCount = 1;
 		} else if (threadCount > MAX_THREADS) {

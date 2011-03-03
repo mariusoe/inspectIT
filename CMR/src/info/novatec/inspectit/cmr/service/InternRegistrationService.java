@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -27,7 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Patrice Bouillet
  * 
  */
-public class InternRegistrationService {
+@Service
+public class InternRegistrationService implements IInternRegistrationService {
 
 	/**
 	 * The logger of this class.
@@ -37,21 +40,25 @@ public class InternRegistrationService {
 	/**
 	 * The platform ident DAO.
 	 */
+	@Autowired
 	private PlatformIdentDao platformIdentDao;
 
 	/**
 	 * The method ident DAO.
 	 */
+	@Autowired
 	private MethodIdentDao methodIdentDao;
 
 	/**
 	 * The method sensor type ident DAO.
 	 */
+	@Autowired
 	private MethodSensorTypeIdentDao methodSensorTypeIdentDao;
 
 	/**
 	 * The platform sensor type ident DAO.
 	 */
+	@Autowired
 	private PlatformSensorTypeIdentDao platformSensorTypeIdentDao;
 
 	/**
@@ -186,22 +193,6 @@ public class InternRegistrationService {
 		platformIdentDao.saveOrUpdate(platformIdent);
 
 		return platformSensorTypeIdent.getId();
-	}
-
-	public void setPlatformIdentDao(PlatformIdentDao platformIdentDao) {
-		this.platformIdentDao = platformIdentDao;
-	}
-
-	public void setMethodIdentDao(MethodIdentDao methodIdentDao) {
-		this.methodIdentDao = methodIdentDao;
-	}
-
-	public void setMethodSensorTypeIdentDao(MethodSensorTypeIdentDao methodSensorTypeIdentDao) {
-		this.methodSensorTypeIdentDao = methodSensorTypeIdentDao;
-	}
-
-	public void setPlatformSensorTypeIdentDao(PlatformSensorTypeIdentDao platformSensorTypeIdentDao) {
-		this.platformSensorTypeIdentDao = platformSensorTypeIdentDao;
 	}
 
 }

@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.prefs.Preferences;
 
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import de.schlichtherle.license.CipherParam;
 import de.schlichtherle.license.KeyStoreParam;
@@ -33,6 +34,7 @@ import de.schlichtherle.util.ObfuscatedString;
  * @author Patrice Bouillet
  * 
  */
+@Component
 public class LicenseUtil {
 
 	/**

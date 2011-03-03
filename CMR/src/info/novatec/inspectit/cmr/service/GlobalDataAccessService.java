@@ -10,14 +10,18 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Patrice Bouillet
  * 
  */
-public class GlobalDataAccessService implements IGlobalDataAccessService, InitializingBean {
+@Service
+public class GlobalDataAccessService implements IGlobalDataAccessService {
 
 	/**
 	 * The logger of this class.
@@ -27,11 +31,13 @@ public class GlobalDataAccessService implements IGlobalDataAccessService, Initia
 	/**
 	 * The platform ident DAO.
 	 */
+	@Autowired
 	private PlatformIdentDao platformIdentDao;
 
 	/**
 	 * The default data DAO.
 	 */
+	@Autowired
 	private DefaultDataDao defaultDataDao;
 
 	/**
@@ -93,18 +99,13 @@ public class GlobalDataAccessService implements IGlobalDataAccessService, Initia
 		return result;
 	}
 
-	public void setDefaultDataDao(DefaultDataDao defaultDataDao) {
-		this.defaultDataDao = defaultDataDao;
-	}
-
-	public void setPlatformIdentDao(PlatformIdentDao platformIdentDao) {
-		this.platformIdentDao = platformIdentDao;
-	}
-
 	/**
-	 * {@inheritDoc}
+	 * Is executed after dependency injection is done to perform any initialization.
+	 * 
+	 * @throws Exception if an error occurs during {@link PostConstruct}
 	 */
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void postConstruct() throws Exception {
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("|-Global Data Access Service active...");
 		}

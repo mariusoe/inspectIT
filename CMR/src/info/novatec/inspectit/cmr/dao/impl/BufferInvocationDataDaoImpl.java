@@ -16,6 +16,9 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
 /**
  * Implementation of {@link InvocationDataDao} that works with the data from the buffer indexing
  * tree.
@@ -23,16 +26,19 @@ import java.util.List;
  * @author Ivan Senic
  * 
  */
+@Repository
 public class BufferInvocationDataDaoImpl implements InvocationDataDao {
 
 	/**
 	 * Tree to look for data.
 	 */
+	@Autowired
 	private ITreeComponent<InvocationSequenceData> indexingTree;
 
 	/**
 	 * Index query provider.
 	 */
+	@Autowired
 	private IndexQueryProvider indexQueryProvider;
 	
 	/**
@@ -126,24 +132,6 @@ public class BufferInvocationDataDaoImpl implements InvocationDataDao {
 	 */
 	public InvocationSequenceData getInvocationSequenceDetail(InvocationSequenceData template) {
 		return indexingTree.get(template);
-	}
-
-	/**
-	 * 
-	 * @param indexingTree
-	 *            Root branch of indexing tree to query.
-	 */
-	public void setIndexingTree(ITreeComponent<InvocationSequenceData> indexingTree) {
-		this.indexingTree = indexingTree;
-	}
-
-	/**
-	 * 
-	 * @param indexQueryProvider
-	 *            Index query provider.
-	 */
-	public void setIndexQueryProvider(IndexQueryProvider indexQueryProvider) {
-		this.indexQueryProvider = indexQueryProvider;
 	}
 
 }

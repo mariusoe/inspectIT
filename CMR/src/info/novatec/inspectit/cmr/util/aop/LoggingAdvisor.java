@@ -5,6 +5,7 @@ import org.springframework.aop.Pointcut;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.aop.support.AbstractPointcutAdvisor;
 import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
+import org.springframework.stereotype.Component;
 
 /**
  * This logging advisor will be automatically loaded as long as there is an
@@ -14,6 +15,7 @@ import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
  * @author Patrice Bouillet
  * 
  */
+@Component
 public class LoggingAdvisor extends AbstractPointcutAdvisor {
 
 	/**

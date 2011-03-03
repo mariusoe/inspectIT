@@ -5,8 +5,11 @@ import info.novatec.inspectit.cmr.util.LicenseUtil;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import de.schlichtherle.license.LicenseContentException;
 
@@ -18,7 +21,8 @@ import de.schlichtherle.license.LicenseContentException;
  * @author Patrice Bouillet
  * 
  */
-public class RegistrationService implements IRegistrationService, InitializingBean {
+@Service
+public class RegistrationService implements IRegistrationService {
 
 	/**
 	 * The logger of this class.
@@ -28,12 +32,14 @@ public class RegistrationService implements IRegistrationService, InitializingBe
 	/**
 	 * The 'real' registration service.
 	 */
-	private InternRegistrationService internRegistrationService;
+	@Autowired
+	private IInternRegistrationService internRegistrationService;
 
 	/**
 	 * The license utility to check for a valid license and abort the registration of the agent if
 	 * necessary.
 	 */
+	@Autowired
 	private LicenseUtil licenseUtil;
 
 	/**
@@ -87,18 +93,13 @@ public class RegistrationService implements IRegistrationService, InitializingBe
 		return internRegistrationService.registerPlatformSensorTypeIdent(platformId, fullyQualifiedClassName);
 	}
 
-	public void setInternRegistrationService(InternRegistrationService internRegistrationService) {
-		this.internRegistrationService = internRegistrationService;
-	}
-
-	public void setLicenseUtil(LicenseUtil licenseUtil) {
-		this.licenseUtil = licenseUtil;
-	}
-
 	/**
-	 * {@inheritDoc}
+	 * Is executed after dependency injection is done to perform any initialization.
+	 * 
+	 * @throws Exception if an error occurs during {@link PostConstruct}
 	 */
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void postConstruct() throws Exception {
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("|-Registration Service active...");
 		}

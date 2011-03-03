@@ -19,22 +19,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
 /**
  * {@link ExceptionSensorDataDao} that works woth the data from the buffer.
  * 
  * @author Ivan Senic
  * 
  */
+@Repository
 public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao {
 
 	/**
 	 * Root branch to search in.
 	 */
+	@Autowired
 	private ITreeComponent<ExceptionSensorData> indexingTree;
 
 	/**
 	 * Index query provider.
 	 */
+	@Autowired
 	private IndexQueryProvider indexQueryProvider;
 
 	/**
@@ -255,24 +261,6 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 		result = prime * result + ((exceptionSensorData.getErrorMessage() == null) ? 0 : exceptionSensorData.getErrorMessage().hashCode());
 		result = prime * result + ((exceptionSensorData.getStackTrace() == null) ? 0 : exceptionSensorData.getStackTrace().hashCode());
 		return result;
-	}
-
-	/**
-	 * 
-	 * @param indexingTree
-	 *            Root branch to search in.
-	 */
-	public void setIndexingTree(ITreeComponent<ExceptionSensorData> indexingTree) {
-		this.indexingTree = indexingTree;
-	}
-
-	/**
-	 * 
-	 * @param indexQueryProvider
-	 *            Index query provider.
-	 */
-	public void setIndexQueryProvider(IndexQueryProvider indexQueryProvider) {
-		this.indexQueryProvider = indexQueryProvider;
 	}
 
 }

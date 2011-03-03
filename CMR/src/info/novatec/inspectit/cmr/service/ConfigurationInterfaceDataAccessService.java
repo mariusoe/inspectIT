@@ -19,43 +19,51 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 
  * @author Matthias Huber
  * 
  */
-public class ConfigurationInterfaceDataAccessService implements IConfigurationInterfaceDataAccessService, InitializingBean {
+@Service
+public class ConfigurationInterfaceDataAccessService implements IConfigurationInterfaceDataAccessService {
 
 	/**
 	 * The environment data DAO.
 	 */
+	@Autowired
 	private EnvironmentDataDao environmentDataDao;
 
 	/**
 	 * The profile data DAO.
 	 */
+	@Autowired
 	private ProfileDataDao profileDataDao;
 
 	/**
 	 * The sensor type data DAO.
 	 */
+	@Autowired
 	private SensorTypeDataDao sensorTypeDataDao;
 
 	/**
 	 * The exception sensor definition data DAO.
 	 */
+	@Autowired
 	private ExceptionSensorDefinitionDataDao exceptionSensorDefinitionDataDao;
 
 	/**
 	 * The method sensor definition data DAO.
 	 */
+	@Autowired
 	private MethodSensorDefinitionDataDao methodSensorDefinitionDataDao;
 
 	/**
 	 * The platform sensor definition data DAO.
 	 */
+	@Autowired
 	private PlatformSensorDefinitionDataDao platformSensorDefinitionDataDao;
 
 	/**
@@ -231,36 +239,6 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	@Log
 	public void updateSensorType(SensorTypeData sensorTypeData) {
 		sensorTypeDataDao.updateSensorType(sensorTypeData);
-	}
-
-	public void setEnvironmentDataDao(EnvironmentDataDao environmentDataDao) {
-		this.environmentDataDao = environmentDataDao;
-	}
-
-	public void setProfileDataDao(ProfileDataDao profileDataDao) {
-		this.profileDataDao = profileDataDao;
-	}
-
-	public void setSensorTypeDataDao(SensorTypeDataDao sensorTypeDataDao) {
-		this.sensorTypeDataDao = sensorTypeDataDao;
-	}
-
-	public void setExceptionSensorDefinitionDataDao(ExceptionSensorDefinitionDataDao exceptionSensorDefinitionDataDao) {
-		this.exceptionSensorDefinitionDataDao = exceptionSensorDefinitionDataDao;
-	}
-
-	public void setMethodSensorDefinitionDataDao(MethodSensorDefinitionDataDao methodSensorDefinitionDataDao) {
-		this.methodSensorDefinitionDataDao = methodSensorDefinitionDataDao;
-	}
-
-	public void setPlatformSensorDefinitionDataDao(PlatformSensorDefinitionDataDao platformSensorDefinitionDataDao) {
-		this.platformSensorDefinitionDataDao = platformSensorDefinitionDataDao;
-	}
-
-	/**
-	 * @see InitializingBean#afterPropertiesSet()
-	 */
-	public void afterPropertiesSet() throws Exception {
 	}
 
 	private Set<SensorTypeData> generateStandardSensorTypes() {

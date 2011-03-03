@@ -3,15 +3,19 @@ package info.novatec.inspectit.cmr.service;
 import info.novatec.inspectit.cmr.cache.IBuffer;
 import info.novatec.inspectit.cmr.util.aop.Log;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 
  * @author Ivan Senic
  * 
  */
-public class BufferService implements IBufferService, InitializingBean {
+@Service
+public class BufferService implements IBufferService {
 
 	/**
 	 * The logger of this class.
@@ -21,6 +25,7 @@ public class BufferService implements IBufferService, InitializingBean {
 	/**
 	 * Buffer data dao.
 	 */
+	@Autowired
 	private IBuffer<?> buffer;
 
 	/**
@@ -32,21 +37,15 @@ public class BufferService implements IBufferService, InitializingBean {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Is executed after dependency injection is done to perform any initialization.
+	 * 
+	 * @throws Exception if an error occurs during {@link PostConstruct}
 	 */
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void postConstruct() throws Exception {
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("|-Buffer Service active...");
 		}
-	}
-
-	/**
-	 * 
-	 * @param buffer
-	 *            buffer to set
-	 */
-	public void setBuffer(IBuffer<?> buffer) {
-		this.buffer = buffer;
 	}
 
 }

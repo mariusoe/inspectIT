@@ -18,8 +18,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
 
 /**
  * Buffer uses atomic variables and references to handle the synchronization. Thus, non of its
@@ -31,7 +32,7 @@ import org.springframework.beans.factory.InitializingBean;
  * @param <E>
  *            Parameterized type of elements buffer can hold.
  */
-public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, InitializingBean {
+public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 
 	/**
 	 * Buffer properties.
@@ -685,12 +686,12 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Is executed after dependency injection is done to perform any initialization.
 	 * 
-	 * @throws Exception
+	 * @throws Exception if an error occurs during {@link PostConstruct}
 	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void postConstruct() throws Exception {
 		this.maxSize = new AtomicLong(bufferProperties.getInitialBufferSize());
 		this.evictionOccupancyPercentage = new AtomicInteger(Float.floatToIntBits(bufferProperties.getEvictionOccupancyPercentage()));
 		this.objectSizes.setObjectSecurityExpansionRate(bufferProperties.getObjectSecurityExpansionRate(maxSize.get()));

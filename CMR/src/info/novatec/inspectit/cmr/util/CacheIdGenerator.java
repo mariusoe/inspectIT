@@ -2,6 +2,8 @@ package info.novatec.inspectit.cmr.util;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.springframework.stereotype.Component;
+
 import info.novatec.inspectit.communication.DefaultData;
 
 /**
@@ -12,6 +14,7 @@ import info.novatec.inspectit.communication.DefaultData;
  * @author Ivan Senic
  * 
  */
+@Component
 public class CacheIdGenerator {
 
 	/**

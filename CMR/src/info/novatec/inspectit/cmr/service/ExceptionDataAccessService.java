@@ -8,8 +8,11 @@ import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Service class for retrieving {@link ExceptionSensorData} objects from the CMR.
@@ -17,7 +20,8 @@ import org.springframework.beans.factory.InitializingBean;
  * @author Eduard Tudenhoefner
  * 
  */
-public class ExceptionDataAccessService implements IExceptionDataAccessService, InitializingBean {
+@Service
+public class ExceptionDataAccessService implements IExceptionDataAccessService {
 
 	/**
 	 * The logger of this class.
@@ -27,6 +31,7 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 	/**
 	 * The exception sensor DAO.
 	 */
+	@Autowired
 	private ExceptionSensorDataDao exceptionSensorDataDao;
 
 	/**
@@ -102,20 +107,14 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService, 
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Is executed after dependency injection is done to perform any initialization.
+	 * 
+	 * @throws Exception if an error occurs during {@link PostConstruct}
 	 */
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void postConstruct() throws Exception {
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("|-Exception Sensor Data Access Service active...");
 		}
-	}
-
-	/**
-	 * 
-	 * @param exceptionSensorDataDao
-	 *            The {@link ExceptionSensorDataDao} to set.
-	 */
-	public void setExceptionSensorDataDao(ExceptionSensorDataDao exceptionSensorDataDao) {
-		this.exceptionSensorDataDao = exceptionSensorDataDao;
 	}
 }

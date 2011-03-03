@@ -9,19 +9,38 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.FetchMode;
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * 
  * @author Eduard Tudenhoefner
  * 
  */
+@Repository
 public class CombinedMetricsDataDaoImpl extends HibernateDaoSupport implements CombinedMetricsDataDao {
 
+	/**
+	 * This constructor is used to set the {@link SessionFactory} that is needed by
+	 * {@link HibernateDaoSupport}. In a future version it may be useful to go away from the
+	 * {@link HibernateDaoSupport} and directly use the {@link SessionFactory}. This is described
+	 * here:
+	 * http://blog.springsource.com/2007/06/26/so-should-you-still-use-springs-hibernatetemplate
+	 * -andor-jpatemplate
+	 * 
+	 * @param sessionFactory
+	 */
+	@Autowired
+	public CombinedMetricsDataDaoImpl(SessionFactory sessionFactory) {
+		setSessionFactory(sessionFactory);
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

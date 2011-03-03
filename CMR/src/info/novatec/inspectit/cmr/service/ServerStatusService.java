@@ -2,10 +2,13 @@ package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.versioning.IVersioningService;
 
+import javax.annotation.PostConstruct;
+
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of the {@link IServerStatusService} interface to provide information about the
@@ -14,7 +17,8 @@ import org.springframework.beans.factory.InitializingBean;
  * @author Patrice Bouillet
  * 
  */
-public class ServerStatusService implements IServerStatusService, InitializingBean {
+@Service
+public class ServerStatusService implements IServerStatusService {
 
 	/**
 	 * The logger of this class.
@@ -29,6 +33,7 @@ public class ServerStatusService implements IServerStatusService, InitializingBe
 	/**
 	 * The versioning Service.
 	 */
+	@Autowired
 	private IVersioningService versioning;
 
 	/**
@@ -39,9 +44,12 @@ public class ServerStatusService implements IServerStatusService, InitializingBe
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Is executed after dependency injection is done to perform any initialization.
+	 * 
+	 * @throws Exception if an error occurs during {@link PostConstruct}
 	 */
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void postConstruct() throws Exception {
 		status = IServerStatusService.SERVER_ONLINE;
 
 		if (LOGGER.isInfoEnabled()) {
@@ -59,10 +67,6 @@ public class ServerStatusService implements IServerStatusService, InitializingBe
 			}
 			return "n/a";
 		}
-	}
-
-	public void setVersioning(IVersioningService service) {
-		this.versioning = service;
 	}
 
 }

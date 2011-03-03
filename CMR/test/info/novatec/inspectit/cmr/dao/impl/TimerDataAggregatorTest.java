@@ -1,4 +1,4 @@
-package info.novatec.inspectit.cmr.dao.test;
+package info.novatec.inspectit.cmr.dao.impl;
 
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyLong;

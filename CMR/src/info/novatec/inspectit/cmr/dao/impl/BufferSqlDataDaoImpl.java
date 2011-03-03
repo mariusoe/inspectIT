@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
 /**
  * Implementation of the {@link SqlDataDao} that searches for the SQL statements in the indexing
  * tree.
@@ -20,16 +23,19 @@ import java.util.Map;
  * @author Ivan Senic
  * 
  */
+@Repository
 public class BufferSqlDataDaoImpl implements SqlDataDao {
 
 	/**
 	 * Indexing tree to search for data.
 	 */
+	@Autowired
 	private ITreeComponent<SqlStatementData> indexingTree;
 
 	/**
 	 * Index query provider.
 	 */
+	@Autowired
 	private IndexQueryProvider indexQueryProvider;
 
 	/**
@@ -103,24 +109,6 @@ public class BufferSqlDataDaoImpl implements SqlDataDao {
 		clone.setMethodIdent(sqlStatement.getMethodIdent());
 		clone.setSql(sqlStatement.getSql());
 		return clone;
-	}
-
-	/**
-	 * 
-	 * @param indexingTree
-	 *            Indexing tree to be set.
-	 */
-	public void setBuffer(ITreeComponent<SqlStatementData> indexingTree) {
-		this.indexingTree = indexingTree;
-	}
-
-	/**
-	 * 
-	 * @param indexQueryProvider
-	 *            Index query provider to be set.
-	 */
-	public void setIndexQueryProvider(IndexQueryProvider indexQueryProvider) {
-		this.indexQueryProvider = indexQueryProvider;
 	}
 
 }

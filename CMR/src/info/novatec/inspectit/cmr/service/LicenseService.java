@@ -6,15 +6,19 @@ import info.novatec.inspectit.communication.data.LicenseInfoData;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Default implementation of the {@link ILicenseService} interface.
  * 
  * @author Dirk Maucher
  */
-public class LicenseService implements ILicenseService, InitializingBean {
+@Service
+public class LicenseService implements ILicenseService {
 
 	/**
 	 * The logger of this class.
@@ -24,6 +28,7 @@ public class LicenseService implements ILicenseService, InitializingBean {
 	/**
 	 * The license utility for reinitializing.
 	 */
+	@Autowired
 	private LicenseUtil licenseUtil;
 
 	/**
@@ -48,17 +53,12 @@ public class LicenseService implements ILicenseService, InitializingBean {
 	}
 
 	/**
-	 * @param licenseUtil
-	 *            the licenseUtil to set
+	 * Is executed after dependency injection is done to perform any initialization.
+	 * 
+	 * @throws Exception if an error occurs during {@link PostConstruct}
 	 */
-	public void setLicenseUtil(LicenseUtil licenseUtil) {
-		this.licenseUtil = licenseUtil;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void postConstruct() throws Exception {
 		// initialize the license
 		try {
 			if (LOGGER.isInfoEnabled()) {

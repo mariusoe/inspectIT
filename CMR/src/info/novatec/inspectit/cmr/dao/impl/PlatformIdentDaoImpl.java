@@ -10,12 +10,18 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * The default implementation of the {@link PlatformIdentDao} interface by using the
@@ -27,12 +33,29 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * @author Patrice Bouillet
  * 
  */
+@Repository
 public class PlatformIdentDaoImpl extends HibernateDaoSupport implements PlatformIdentDao {
 
 	/**
 	 * {@link PlatformIdent} cache.
 	 */
+	@Autowired
 	private PlatformIdentCache platformIdentCache;
+
+	/**
+	 * This constructor is used to set the {@link SessionFactory} that is needed by
+	 * {@link HibernateDaoSupport}. In a future version it may be useful to go away from the
+	 * {@link HibernateDaoSupport} and directly use the {@link SessionFactory}. This is described
+	 * here:
+	 * http://blog.springsource.com/2007/06/26/so-should-you-still-use-springs-hibernatetemplate
+	 * -andor-jpatemplate
+	 * 
+	 * @param sessionFactory
+	 */
+	@Autowired
+	public PlatformIdentDaoImpl(SessionFactory sessionFactory) {
+		setSessionFactory(sessionFactory);
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -149,7 +172,8 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 	/**
 	 * Initialize all platform idents from the database.
 	 */
-	public void initPlatformIdentCache() {
+	@PostConstruct
+	public void postConstruct() {
 		Collection<Long> excludeList = Collections.emptyList();
 		loadIdentsFromDB(excludeList);
 	}
@@ -179,14 +203,6 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 			platformIdentCache.markClean(platformIdent);
 		}
 		return platformIdents;
-	}
-
-	/**
-	 * @param platformIdentCache
-	 *            the platformIdentCache to set
-	 */
-	public void setPlatformIdentCache(PlatformIdentCache platformIdentCache) {
-		this.platformIdentCache = platformIdentCache;
 	}
 
 }

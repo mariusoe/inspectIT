@@ -5,8 +5,11 @@ import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 
 import java.util.List;
 
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 
 /**
@@ -19,7 +22,23 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * @author Patrice Bouillet
  * 
  */
+@Repository
 public class MethodSensorTypeIdentDaoImpl extends HibernateDaoSupport implements MethodSensorTypeIdentDao {
+
+	/**
+	 * This constructor is used to set the {@link SessionFactory} that is needed by
+	 * {@link HibernateDaoSupport}. In a future version it may be useful to go away from the
+	 * {@link HibernateDaoSupport} and directly use the {@link SessionFactory}. This is described
+	 * here:
+	 * http://blog.springsource.com/2007/06/26/so-should-you-still-use-springs-hibernatetemplate
+	 * -andor-jpatemplate
+	 * 
+	 * @param sessionFactory
+	 */
+	@Autowired
+	public MethodSensorTypeIdentDaoImpl(SessionFactory sessionFactory) {
+		setSessionFactory(sessionFactory);
+	}
 
 	/**
 	 * {@inheritDoc}

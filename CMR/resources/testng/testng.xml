@@ -61,7 +61,7 @@
 	<test name="Timer Data Aggregator">
 		<classes>
 			<class 
-				name="info.novatec.inspectit.cmr.dao.test.TimerDataAggregatorTest" />
+				name="info.novatec.inspectit.cmr.dao.impl.TimerDataAggregatorTest" />
 		</classes>
 	</test>
 	<test name="Platform Ident Cache">

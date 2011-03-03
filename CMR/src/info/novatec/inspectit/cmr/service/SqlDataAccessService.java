@@ -7,14 +7,18 @@ import info.novatec.inspectit.communication.data.SqlStatementData;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Patrice Bouillet
  * 
  */
-public class SqlDataAccessService implements ISqlDataAccessService, InitializingBean {
+@Service
+public class SqlDataAccessService implements ISqlDataAccessService {
 
 	/**
 	 * The logger of this class.
@@ -24,6 +28,7 @@ public class SqlDataAccessService implements ISqlDataAccessService, Initializing
 	/**
 	 * The sql DAO.
 	 */
+	@Autowired
 	private SqlDataDao sqlDataDao;
 
 	/**
@@ -45,17 +50,12 @@ public class SqlDataAccessService implements ISqlDataAccessService, Initializing
 	}
 
 	/**
-	 * @param sqlDataDao
-	 *            the sqlDataDao to set
+	 * Is executed after dependency injection is done to perform any initialization.
+	 * 
+	 * @throws Exception if an error occurs during {@link PostConstruct}
 	 */
-	public void setSqlDataDao(SqlDataDao sqlDataDao) {
-		this.sqlDataDao = sqlDataDao;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void postConstruct() throws Exception {
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("|-SQL Data Access Service active...");
 		}

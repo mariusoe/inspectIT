@@ -6,6 +6,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+
 /**
  * Bean for caching the {@link PlatformIdent} objects, so that they don't have to be loaded from the
  * database all the time.
@@ -13,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Ivan Senic
  * 
  */
+@Component
 public class PlatformIdentCache {
 
 	/**

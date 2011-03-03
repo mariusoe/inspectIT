@@ -7,9 +7,10 @@ import java.lang.management.RuntimeMXBean;
 import java.text.NumberFormat;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanInitializationException;
-import org.springframework.beans.factory.InitializingBean;
 
 /**
  * Set of properties for one buffer.
@@ -17,7 +18,7 @@ import org.springframework.beans.factory.InitializingBean;
  * @author Ivan Senic
  * 
  */
-public class BufferProperties implements InitializingBean {
+public class BufferProperties {
 
 	/**
 	 * Name of the memory pool for old generation.
@@ -462,10 +463,12 @@ public class BufferProperties implements InitializingBean {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Is executed after dependency injection is done to perform any initialization.
+	 * 
+	 * @throws Exception if an error occurs during {@link PostConstruct}
 	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void postConstruct() throws Exception {
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("|-Buffer properties initialized with following values:");
 			LOGGER.info("||-Eviction occupancy percentage: " + NumberFormat.getInstance().format(evictionOccupancyPercentage * 100) + "%");

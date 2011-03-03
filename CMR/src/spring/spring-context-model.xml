@@ -4,52 +4,12 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"
 	default-autowire="autodetect">
 
-	<bean id="methodIdentDao" class="info.novatec.inspectit.cmr.dao.impl.MethodIdentDaoImpl" />
-	<bean id="methodSensorTypeIdentDao"
-		class="info.novatec.inspectit.cmr.dao.impl.MethodSensorTypeIdentDaoImpl" />
-	<bean id="platformIdentDao"
-		class="info.novatec.inspectit.cmr.dao.impl.PlatformIdentDaoImpl" init-method="initPlatformIdentCache"/>
-	<bean id="platformSensorTypeIdentDao"
-		class="info.novatec.inspectit.cmr.dao.impl.PlatformSensorTypeIdentDaoImpl" />
-	<bean id="platformIdentCache"
-		class="info.novatec.inspectit.cmr.util.PlatformIdentCache" />
-
 	<bean id="defaultDataDao" class="info.novatec.inspectit.cmr.dao.impl.DefaultDataDaoImpl" >
 		<property name="saveTimerDataToDatabase" value="${cmr.saveTimerDataToDatabase}" />
 	</bean>
 
-	<bean id="invocationDataDao"
-		class="info.novatec.inspectit.cmr.dao.impl.BufferInvocationDataDaoImpl" />
-
-	<bean id="sqlDataDao"
-		class="info.novatec.inspectit.cmr.dao.impl.BufferSqlDataDaoImpl" />
-	<bean id="exceptionSensorDataDao"
-		class="info.novatec.inspectit.cmr.dao.impl.BufferExceptionSensorDataDaoImpl" />
-
-	<bean id="combinedMetricsDataDao"
-		class="info.novatec.inspectit.cmr.dao.impl.CombinedMetricsDataDaoImpl" />
-
-	<bean id="environmentDataDao"
-		class="info.novatec.inspectit.cmr.dao.ci.impl.EnvironmentDataDaoImpl" />
-	<bean id="profileDataDao"
-		class="info.novatec.inspectit.cmr.dao.ci.impl.ProfileDataDaoImpl" />
-	<bean id="sensorTypeDataDao"
-		class="info.novatec.inspectit.cmr.dao.ci.impl.SensorTypeDataDaoImpl" />
-	<bean id="exceptionSensorDefinitionDataDao"
-		class="info.novatec.inspectit.cmr.dao.ci.impl.ExceptionSensorDefinitionDataDaoImpl" />
-	<bean id="methodSensorDefinitionDataDao"
-		class="info.novatec.inspectit.cmr.dao.ci.impl.MethodSensorDefinitionDataDaoImpl" />
-	<bean id="platformSensorDefinitionDataDao"
-		class="info.novatec.inspectit.cmr.dao.ci.impl.PlatformSensorDefinitionDataDaoImpl" />
-	<bean id="timerDataDao" 
-		class="info.novatec.inspectit.cmr.dao.impl.BufferTimerDataDaoImpl" />
 	<bean id="httpTimerDataDao" 
 		class="info.novatec.inspectit.cmr.dao.impl.BufferHttpTimerDataDaoImpl" />
-	<bean id="timerDataAggregator" class="info.novatec.inspectit.cmr.dao.impl.TimerDataAggregator">
-		<property name="maxElements" value="200"/>
-		<property name="aggregationPeriod" value="10000"/>
-		<property name="cacheCleanSleepingPeriod" value="60000"/>
-	</bean>
 	<bean id="bufferProperties" class="info.novatec.inspectit.cmr.cache.impl.BufferProperties">
 		<property name="evictionOccupancyPercentage" value="${buffer.evictionOccupancyPercentage}"/>
 		<property name="maxObjectExpansionRate" value="${buffer.maxObjectExpansionRate}"/>
