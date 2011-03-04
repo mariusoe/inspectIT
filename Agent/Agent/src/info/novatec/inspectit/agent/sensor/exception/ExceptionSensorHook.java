@@ -241,7 +241,15 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 		if (null != cause) {
 			exceptionSensorData.setCause(crop(cause.getClass().getName(), MAX_VALUE_LENGTH));
 		}
-		exceptionSensorData.setErrorMessage(crop(throwable.getMessage(), MAX_VALUE_LENGTH));
+
+		try {
+			// see INSPECTIT-378: This is only a quickfix for a NPE that is thrown when accessing
+			// the message. This should be removed later on because there should not be the
+			// intention of catching an exception here.
+			exceptionSensorData.setErrorMessage(crop(throwable.getMessage(), MAX_VALUE_LENGTH));
+		} catch (Exception e) {
+			LOGGER.log(Level.FINER, "It was not possible to retrieve the Error Message from " + throwable.getClass().getName(), e);
+		}
 		exceptionSensorData.setStackTrace(crop(stackTraceToString(throwable), MAX_STACKTRACE_LENGTH));
 		// exceptionSensorData.setStackTrace(getStackTrace(throwable));
 	}
