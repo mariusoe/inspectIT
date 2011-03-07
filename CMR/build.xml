@@ -298,7 +298,7 @@
 
 	<target name="check.download" unless="download-ok" depends="check.init">
 		<echo message="Downloading ${md5.file}" />
-		<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5">
+		<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
 			<fileset dir="${jvm.root}/tmp">
 				<include name="${md5.file}" />
 			</fileset>
@@ -310,7 +310,7 @@
 			<isfalse value="${download-jre}" />
 			<then>
 				<echo message="Downloading ${zip.file}" />
-				<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5">
+				<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
 					<fileset dir="${jvm.root}/tmp">
 						<include name="${zip.file}" />
 					</fileset>
@@ -372,7 +372,7 @@
 						<!-- rename the file to indicate that it is a newer version -->
 						<antcall target="-notify-about-jre-update" />
 						<echo message="Downloading ${zip.file}" />
-						<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5">
+						<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5"  passive="true">
 							<fileset dir="${jvm.root}/tmp">
 								<include name="${zip.file}" />
 							</fileset>
