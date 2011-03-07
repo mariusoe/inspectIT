@@ -18,12 +18,12 @@ import info.novatec.inspectit.rcp.editor.table.input.SqlInputController;
 import info.novatec.inspectit.rcp.editor.table.input.SqlInvocInputController;
 import info.novatec.inspectit.rcp.editor.table.input.TimerDataInputController;
 import info.novatec.inspectit.rcp.editor.table.input.UngroupedExceptionOverviewInputController;
-import info.novatec.inspectit.rcp.editor.table.input.UngroupedExceptionOverviewStackTraceInputController;
 import info.novatec.inspectit.rcp.editor.text.TextSubView;
 import info.novatec.inspectit.rcp.editor.text.input.ClassesInputController;
 import info.novatec.inspectit.rcp.editor.text.input.CpuInputController;
 import info.novatec.inspectit.rcp.editor.text.input.MemoryInputController;
 import info.novatec.inspectit.rcp.editor.text.input.ThreadsInputController;
+import info.novatec.inspectit.rcp.editor.text.input.UngroupedExceptionOverviewStackTraceInputController;
 import info.novatec.inspectit.rcp.editor.text.input.VmSummaryInputController;
 import info.novatec.inspectit.rcp.editor.tree.SteppingTreeSubView;
 import info.novatec.inspectit.rcp.editor.tree.TreeSubView;
@@ -122,7 +122,7 @@ public final class SubViewFactory {
 			ISubView ungroupedExceptionOverview = new TableSubView(new UngroupedExceptionOverviewInputController());
 			TabbedCompositeSubView exceptionTreeTabbedSubView = new TabbedCompositeSubView();
 			ISubView exceptionTree = new TreeSubView(new ExceptionTreeInputController());
-			ISubView stackTraceInput = new TableSubView(new UngroupedExceptionOverviewStackTraceInputController());
+			ISubView stackTraceInput = new TextSubView(new UngroupedExceptionOverviewStackTraceInputController());
 
 			exceptionTreeTabbedSubView.addSubView(exceptionTree, "Exception Tree", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_EXCEPTION_TREE));
 			exceptionTreeTabbedSubView.addSubView(stackTraceInput, "Stack Trace", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_STACKTRACE));

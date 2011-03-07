@@ -23,7 +23,7 @@ import org.eclipse.ui.forms.widgets.Section;
  * @author Eduard Tudenhoefner
  * 
  */
-public class ClassesInputController implements TextInputController {
+public class ClassesInputController extends AbstractTextInputController {
 
 	/**
 	 * The ID of this subview / controller.
@@ -69,6 +69,8 @@ public class ClassesInputController implements TextInputController {
 	 * {@inheritDoc}
 	 */
 	public void setInputDefinition(InputDefinition inputDefinition) {
+		super.setInputDefinition(inputDefinition);
+		
 		classLoadingObj = new ClassLoadingInformationData();
 		classLoadingObj.setPlatformIdent(inputDefinition.getIdDefinition().getPlatformId());
 

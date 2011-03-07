@@ -23,7 +23,7 @@ import org.eclipse.ui.forms.widgets.Section;
  * @author Eduard Tudenhoefner
  * 
  */
-public class CpuInputController implements TextInputController {
+public class CpuInputController extends AbstractTextInputController {
 
 	/**
 	 * The ID of this subview / controller.
@@ -64,6 +64,8 @@ public class CpuInputController implements TextInputController {
 	 * {@inheritDoc}
 	 */
 	public void setInputDefinition(InputDefinition inputDefinition) {
+		super.setInputDefinition(inputDefinition);
+		
 		cpuObj = new CpuInformationData();
 		cpuObj.setPlatformIdent(inputDefinition.getIdDefinition().getPlatformId());
 

@@ -23,7 +23,7 @@ import org.eclipse.ui.forms.widgets.Section;
  * @author Eduard Tudenhoefner
  * 
  */
-public class ThreadsInputController implements TextInputController {
+public class ThreadsInputController extends AbstractTextInputController {
 
 	/**
 	 * The ID of this subview / controller.
@@ -74,6 +74,8 @@ public class ThreadsInputController implements TextInputController {
 	 * {@inheritDoc}
 	 */
 	public void setInputDefinition(InputDefinition inputDefinition) {
+		super.setInputDefinition(inputDefinition);
+		
 		threadObj = new ThreadInformationData();
 		threadObj.setPlatformIdent(inputDefinition.getIdDefinition().getPlatformId());
 

@@ -93,6 +93,7 @@ public class TextSubView extends AbstractSubView {
 	 * {@inheritDoc}
 	 */
 	public void setDataInput(List<? extends DefaultData> data) {
+		textInputController.setDataInput(data);
 	}
 
 	/**

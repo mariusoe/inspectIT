@@ -24,7 +24,7 @@ import org.eclipse.ui.forms.widgets.Section;
  * @author Eduard Tudenhoefner
  * 
  */
-public class MemoryInputController implements TextInputController {
+public class MemoryInputController extends AbstractTextInputController {
 
 	/**
 	 * The ID of this subview / controller.
@@ -90,6 +90,8 @@ public class MemoryInputController implements TextInputController {
 	 * {@inheritDoc}
 	 */
 	public void setInputDefinition(InputDefinition inputDefinition) {
+		super.setInputDefinition(inputDefinition);
+		
 		memoryObj = new MemoryInformationData();
 		memoryObj.setPlatformIdent(inputDefinition.getIdDefinition().getPlatformId());
 

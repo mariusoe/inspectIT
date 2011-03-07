@@ -35,7 +35,7 @@ import org.eclipse.ui.forms.widgets.Section;
  * @author Eduard Tudenhoefner
  * 
  */
-public class VmSummaryInputController implements TextInputController {
+public class VmSummaryInputController extends AbstractTextInputController {
 
 	/**
 	 * The ID of this subview / controller.
@@ -221,6 +221,8 @@ public class VmSummaryInputController implements TextInputController {
 	 * {@inheritDoc}
 	 */
 	public void setInputDefinition(InputDefinition inputDefinition) {
+		super.setInputDefinition(inputDefinition);
+		
 		long platformId = inputDefinition.getIdDefinition().getPlatformId();
 
 		systemObj = new SystemInformationData();
