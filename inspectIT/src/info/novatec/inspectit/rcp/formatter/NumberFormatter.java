@@ -36,7 +36,7 @@ public final class NumberFormatter {
 	/**
 	 * Formats a decimal number with the specified pattern.
 	 */
-	private static DecimalFormat intFormat = new DecimalFormat(",###");
+	private static DecimalFormat intFormat = new DecimalFormat("###");
 
 	/**
 	 * Formats a decimal number with the specified pattern.

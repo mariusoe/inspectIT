@@ -112,6 +112,8 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		EXCLUSIVE("Exc. duration (ms)", 100, null),
 		/** The cpu duration column. */
 		CPUDURATION("Cpu Duration (ms)", 100, null),
+		/** The time-stamp column. **/
+		START_DELTA("Start Delta (ms)", 100, InspectITConstants.IMG_TIMER),
 		/** The count column. */
 		SQL("SQL", 300, InspectITConstants.IMG_DATABASE),
 		/** The parameter/field contents. */
@@ -505,6 +507,13 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		switch (enumId) {
 		case METHOD:
 			return TextFormatter.getStyledMethodString(methodIdent);
+		case START_DELTA:
+			InvocationSequenceData root = data;
+			while (root.getParentSequence() != null) {
+				root = root.getParentSequence();
+			}
+			long delta = data.getTimeStamp().getTime() - root.getTimeStamp().getTime();
+			return new StyledString(NumberFormatter.formatLong(delta));
 		case DURATION:
 			styledString = new StyledString();
 			if (null != data.getTimerData()) {
