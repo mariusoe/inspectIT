@@ -360,6 +360,25 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		fileConfigurationReader.load();
 	}
+	
+	@Test
+	public void loadAndVerifyModifiers() throws ParserException, StorageException {
+		String sensorTypeName = "isequence";
+		String className = "info.novatec.inspectitsamples.calculator.Calculator";
+		String methodName = "actionPerformed";
+		String modifiers = "pub,priv";
+
+		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "() " + " modifiers=" + modifiers);
+		writer.close();
+
+		fileConfigurationReader.load();
+		
+		Map<String, String> settings = new HashMap<String, String>();
+		settings.put("modifiers", modifiers);
+
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
+		verifyNoMoreInteractions(configurationStorage);
+	}
 
 	@AfterClass(alwaysRun = true)
 	public void deleteConfiguration() {

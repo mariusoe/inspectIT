@@ -7,9 +7,11 @@ import info.novatec.inspectit.agent.analyzer.impl.AnnotationMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.DirectMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.IndirectMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.InterfaceMatcher;
+import info.novatec.inspectit.agent.analyzer.impl.ModifierMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.SimpleMatchPattern;
 import info.novatec.inspectit.agent.analyzer.impl.SuperclassMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.ThrowableMatcher;
+import info.novatec.inspectit.javassist.Modifier;
 
 import java.util.Iterator;
 import java.util.List;
@@ -58,6 +60,12 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 	 * Determines whether the exception sensor is activated.
 	 */
 	private boolean exceptionSensorActivated = false;
+
+	/**
+	 * Integer value defining the modifier. Values are defined in {@link Modifier} class. Default
+	 * value is 0, which means that no modifiers were set.
+	 */
+	private int modifiers = 0;
 
 	/**
 	 * The matcher used to compare class name / method name and all method parameters.
@@ -234,6 +242,27 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
+	 * Returns the integer value that defines the modifiers of methods to be instrumented. The values
+	 * are defined in {@link Modifier} class. Default value is 0, and this means no modifiers are set.
+	 * 
+	 * @return the modifiers int value
+	 */
+	public int getModifiers() {
+		return modifiers;
+	}
+
+	/**
+	 * Sets the integer value that defines the modifiers of methods to be instrumented. The values
+	 * are defined in {@link Modifier} class. Default value is 0, and this means no modifiers are set.
+	 * 
+	 * @param modifiers
+	 *            the modifier int value
+	 */
+	public void setModifiers(int modifiers) {
+		this.modifiers = modifiers;
+	}
+
+	/**
 	 * Returns the matcher which is used by this sensor configuration.
 	 * 
 	 * @return The {@link Matcher}.
@@ -282,6 +311,10 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 
 		if (exceptionSensorActivated) {
 			matcher = new ThrowableMatcher(inheritanceAnalyzer, classPoolAnalyzer, this, matcher);
+		}
+
+		if (modifiers != 0) {
+			matcher = new ModifierMatcher(classPoolAnalyzer, this, matcher);
 		}
 	}
 

@@ -2,15 +2,18 @@ package info.novatec.inspectit.agent.config.impl;
 
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
+import info.novatec.inspectit.agent.analyzer.impl.ModifierMatcher;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.PriorityEnum;
 import info.novatec.inspectit.agent.config.StorageException;
+import info.novatec.inspectit.javassist.Modifier;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -323,6 +326,27 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		// check for annotation
 		if (settings.containsKey("annotation")) {
 			sensorConfig.setAnnotationClassName((String) settings.get("annotation"));
+		}
+
+		// check if the modifiers are set
+		if (settings.containsKey("modifiers")) {
+			String modifiersString = (String) settings.get("modifiers");
+			String separator = ",";
+			StringTokenizer tokenizer = new StringTokenizer(modifiersString, separator);
+			int modifiers = 0;
+			while (tokenizer.hasMoreTokens()) {
+				String modifier = tokenizer.nextToken().trim();
+				if (modifier != null && modifier.startsWith("pub")) {
+					modifiers |= Modifier.PUBLIC; 
+				} else if (modifier != null && modifier.startsWith("priv")) {
+					modifiers |= Modifier.PRIVATE;
+				} else if (modifier != null && modifier.startsWith("prot")) {
+					modifiers |= Modifier.PROTECTED;
+				} else if (modifier != null && modifier.startsWith("def")) {
+					modifiers |= ModifierMatcher.DEFAULT;
+				} 
+			}
+			sensorConfig.setModifiers(modifiers);
 		}
 
 		if (settings.containsKey("field")) {

@@ -24,6 +24,7 @@ import info.novatec.inspectit.agent.config.impl.PropertyAccessor.PropertyPathSta
 import info.novatec.inspectit.agent.config.impl.StrategyConfig;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.javassist.Modifier;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -138,6 +139,9 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		settings.put("annotation", "javax.ejb.StatelessBean");
 		configurationStorage.addSensor("isequence", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", null, false, settings);
 
+                settings = new HashMap<String, String>();
+		settings.put("modifiers", "pub,prot");
+		configurationStorage.addSensor("timer", "*", "*", null, true, settings);
 	}
 
 	@Test()
@@ -323,7 +327,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	public void exceptionSensorParameterCheck() {
 		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
 		assertNotNull(configs);
-		assertEquals(configs.size(), 12);
+		assertEquals(configs.size(), 13);
 
 		// first
 		UnregisteredSensorConfig config = configs.get(0);
@@ -474,7 +478,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	public void sensorCheck() {
 		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
 		assertNotNull(configs);
-		assertEquals(configs.size(), 12);
+		assertEquals(configs.size(), 13);
 		
 		// the first 4 configs are the ones from the exception sensor
 		// first
@@ -633,7 +637,6 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	public void annotationCheck() {
 		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
 		assertNotNull(configs);
-		assertEquals(configs.size(), 12);
 		
 		UnregisteredSensorConfig annotationConfig = configs.get(11);
 		assertNotNull(annotationConfig.getAnnotationClassName());
@@ -642,4 +645,19 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void modifiersCheck() {
+		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
+		assertNotNull(configs);
+		
+		// 11 is index of config with modifiers
+		UnregisteredSensorConfig configWithModifiers = configs.get(12);
+		assertTrue(configWithModifiers.getSettings().containsKey("modifiers"));
+		assertTrue(configWithModifiers.getModifiers() != 0);
+		assertTrue(Modifier.isPublic(configWithModifiers.getModifiers()));
+		assertTrue(Modifier.isProtected(configWithModifiers.getModifiers()));
+		
+		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
+	}
 }
