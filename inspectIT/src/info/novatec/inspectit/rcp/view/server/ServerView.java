@@ -18,6 +18,10 @@ import java.util.List;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -36,7 +40,9 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.commands.ICommandService;
@@ -167,53 +173,11 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	 * @param repositoryDefinition
 	 *            The repository definition for this item.
 	 */
-	private void createServerItem(PShelf pShelf, RepositoryDefinition repositoryDefinition, int index) {
-		PShelfItem item = new PShelfItem(pShelf, SWT.NONE, index);
+	private void createServerItem(PShelf pShelf, final RepositoryDefinition repositoryDefinition, int index) {
+		final PShelfItem item = new PShelfItem(pShelf, SWT.NONE, index);
 
-		// Check the version of the CMR
-		String cmrVersion = repositoryDefinition.getServerStatusService().getVersion();
-
-		item.setText(repositoryDefinition.getIp() + " : " + repositoryDefinition.getPort() + " [v. " + cmrVersion + "]");
-		item.getBody().setLayout(new FillLayout());
-		item.setData(repositoryDefinition);
-
-		updateServerItem(item, repositoryDefinition);
-	}
-
-	/**
-	 * Updates a specific server item.
-	 * 
-	 * @param item
-	 *            The item to update.
-	 * @param repositoryDefinition
-	 *            The repository definition which is needed to update the information
-	 */
-	private void updateServerItem(PShelfItem item, RepositoryDefinition repositoryDefinition) {
-		if (repositoryDefinition.getServerStatusService().isOnline()) {
-			item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_ONLINE));
-
-			Tree tree = toolkit.createTree(item.getBody(), SWT.V_SCROLL | SWT.H_SCROLL);
-			final TreeViewer treeViewer = new TreeViewer(tree);
-			treeViewer.setContentProvider(new ServerViewContentProvider());
-			treeViewer.setLabelProvider(serverViewLabelProvider);
-			treeViewer.setComparator(serverViewSorter);
-			treeViewer.addDoubleClickListener(treeViewDoubleClickListener);
-			treeViewer.setInput(new TreeModelManager(repositoryDefinition));
-			treeViewer.expandToLevel(2);
-
-			ColumnViewerToolTipSupport.enableFor(treeViewer, ToolTip.NO_RECREATE);
-
-			treeViewers.add(treeViewer);
-
-			if (null == selectionProviderIntermediate.getSelectionProviderDelegate()) {
-				selectionProviderIntermediate.setSelectionProviderDelegate(treeViewer);
-			}
-		} else {
-			item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_OFFLINE));
-
-			toolkit.createLabel(item.getBody(), "CMR is currently not online, please try again later!", SWT.WRAP | SWT.READ_ONLY);
-		}
-		item.getBody().layout();
+		UpdateRepositoryJob updateRepositoryJob = new UpdateRepositoryJob(item, repositoryDefinition);
+		updateRepositoryJob.schedule();
 	}
 
 	/**
@@ -319,7 +283,7 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 
 		// search for the corresponding item which holds this repository
 		// definition.
-		for (PShelfItem shelfItem : items) {
+		for (final PShelfItem shelfItem : items) {
 			if (shelfItem.getData().equals(repositoryDefinition)) {
 				Control[] controls = shelfItem.getBody().getChildren();
 				for (Control control : controls) {
@@ -336,7 +300,9 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 				selectionProviderIntermediate.setSelectionProviderDelegate(null);
 
 				if (repositoryDefinition instanceof CmrRepositoryDefinition) {
-					updateServerItem(shelfItem, repositoryDefinition);
+					UpdateRepositoryJob updateRepositoryJob = new UpdateRepositoryJob(shelfItem, repositoryDefinition);
+					updateRepositoryJob.schedule();
+
 				} else if (repositoryDefinition instanceof StorageRepositoryDefinition) {
 					updateStorageArea(shelfItem, repositoryDefinition);
 				}
@@ -431,6 +397,117 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	public void dispose() {
 		super.dispose();
 		toolkit.dispose();
+	}
+
+	/**
+	 * Updates the repository in one {@link PShelfItem}.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private class UpdateRepositoryJob extends Job {
+
+		/**
+		 * Shelf.
+		 */
+		private PShelfItem item;
+
+		/**
+		 * Repository.
+		 */
+		private RepositoryDefinition repositoryDefinition;
+
+		/**
+		 * Info label.
+		 */
+		private Label infoLabel;
+
+		/**
+		 * Constructor with repository to update and shelf.
+		 * 
+		 * @param item
+		 *            Shelf that needs to be update.
+		 * @param repositoryDefinition
+		 *            Repository that needs to be displayed in a shelf.
+		 */
+		public UpdateRepositoryJob(PShelfItem item, RepositoryDefinition repositoryDefinition) {
+			super("Update Repository Job");
+			this.item = item;
+			this.repositoryDefinition = repositoryDefinition;
+			initializeUpdate();
+		}
+
+		/**
+		 * Set up the loading message.
+		 */
+		private void initializeUpdate() {
+			Display.getDefault().asyncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					item.setText(repositoryDefinition.getIp() + " : " + repositoryDefinition.getPort() + " [v.  ? ]");
+					item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_REFRESH));
+					item.getBody().setLayout(new FillLayout());
+					item.setData(repositoryDefinition);
+
+					infoLabel = toolkit.createLabel(item.getBody(), "Loading repository...", SWT.WRAP | SWT.READ_ONLY);
+					item.getBody().layout();
+				}
+			});
+
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * <p>
+		 * Performs the update of repository.
+		 */
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			if (repositoryDefinition.getServerStatusService().isOnline()) {
+				Display.getDefault().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						infoLabel.dispose();
+						item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_ONLINE));
+						item.setText(repositoryDefinition.getIp() + " : " + repositoryDefinition.getPort() + " [v. " + repositoryDefinition.getServerStatusService().getVersion() + " ]");
+
+						Tree tree = toolkit.createTree(item.getBody(), SWT.V_SCROLL | SWT.H_SCROLL);
+						final TreeViewer treeViewer = new TreeViewer(tree);
+						treeViewer.setContentProvider(new ServerViewContentProvider());
+						treeViewer.setLabelProvider(serverViewLabelProvider);
+						treeViewer.setComparator(serverViewSorter);
+						treeViewer.addDoubleClickListener(treeViewDoubleClickListener);
+						treeViewer.setInput(new TreeModelManager(repositoryDefinition));
+						treeViewer.expandToLevel(2);
+
+						ColumnViewerToolTipSupport.enableFor(treeViewer, ToolTip.NO_RECREATE);
+
+						treeViewers.add(treeViewer);
+
+						if (null == selectionProviderIntermediate.getSelectionProviderDelegate()) {
+							selectionProviderIntermediate.setSelectionProviderDelegate(treeViewer);
+						}
+						item.getBody().layout();
+					}
+				});
+			} else {
+				Display.getDefault().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_OFFLINE));
+
+						infoLabel.setText("CMR is currently not online, please try again later!");
+						item.getBody().layout();
+					}
+				});
+
+			}
+			return Status.OK_STATUS;
+		}
+
 	}
 
 }

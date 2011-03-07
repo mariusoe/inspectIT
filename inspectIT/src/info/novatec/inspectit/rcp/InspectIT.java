@@ -95,6 +95,7 @@ public class InspectIT extends AbstractUIPlugin {
 	protected void initializeImageRegistry(ImageRegistry reg) {
 		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_ONLINE);
 		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_OFFLINE);
+		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_REFRESH);
 		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_ADD);
 		addImageToRegistry(reg, InspectITConstants.IMG_AGENT);
 		addImageToRegistry(reg, InspectITConstants.IMG_INSTRUMENTATION_BROWSER);

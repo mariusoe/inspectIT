@@ -14,6 +14,7 @@ public interface InspectITConstants {
 	// images
 	String IMG_SERVER_ONLINE = "server_online.png"; //$NON-NLS-1$
 	String IMG_SERVER_OFFLINE = "server_offline.png"; //$NON-NLS-1$
+	String IMG_SERVER_REFRESH = "server_refresh.png";
 	String IMG_SERVER_ADD = "server_add.png"; //$NON-NLS-1$
 	String IMG_AGENT = "agent.png"; //$NON-NLS-1$
 	String IMG_INSTRUMENTATION_BROWSER = "instrumentation_browser.gif"; //$NON-NLS-1$
