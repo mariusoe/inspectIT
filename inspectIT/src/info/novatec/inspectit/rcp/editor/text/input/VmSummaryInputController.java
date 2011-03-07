@@ -419,27 +419,35 @@ public class VmSummaryInputController implements TextInputController {
 			addItemToSection(toolkit, SECTION_OS, "Architecture: ", minTitleColumnWidth);
 			addItemToSection(toolkit, SECTION_OS, data.getArchitecture(), minInformationColumnWidth);
 
+			// token delimiter can be : or ; 
+			// thus checking the provided class-path to see which one fits 
+			String tokenDelimiter = ":";
+			String classPath = data.getClassPath();
+			if (classPath.indexOf(tokenDelimiter) == -1) {
+				tokenDelimiter = ";";
+			}
+			
 			// some classpath informations with formatting
 			addItemToMinimizedSection(toolkit, SECTION_CLASSPATH, "Class path: ");
-			StringTokenizer classpathTokenizer = new StringTokenizer(data.getClassPath(), ":");
+			StringTokenizer classpathTokenizer = new StringTokenizer(data.getClassPath(), tokenDelimiter);
 			while (classpathTokenizer.hasMoreTokens()) {
 				addItemToMinimizedSection(toolkit, SECTION_CLASSPATH, " \t" + classpathTokenizer.nextToken());
 			}
 
 			addItemToMinimizedSection(toolkit, SECTION_CLASSPATH, "Boot class path: ");
-			StringTokenizer bootClasspathTokenizer = new StringTokenizer(data.getBootClassPath(), ":");
+			StringTokenizer bootClasspathTokenizer = new StringTokenizer(data.getBootClassPath(), tokenDelimiter);
 			while (bootClasspathTokenizer.hasMoreTokens()) {
 				addItemToMinimizedSection(toolkit, SECTION_CLASSPATH, " \t" + bootClasspathTokenizer.nextToken());
 			}
 
 			addItemToMinimizedSection(toolkit, SECTION_CLASSPATH, "Library Path: ");
-			StringTokenizer libPathTokenizer = new StringTokenizer(data.getLibraryPath(), ":");
+			StringTokenizer libPathTokenizer = new StringTokenizer(data.getLibraryPath(), tokenDelimiter);
 			while (libPathTokenizer.hasMoreTokens()) {
 				addItemToMinimizedSection(toolkit, SECTION_CLASSPATH, " \t" + libPathTokenizer.nextToken());
 			}
 
 			// sorting vm arguments
-			TreeSet<VmArgumentData> treeSet = new TreeSet(new Comparator<VmArgumentData>() {
+			TreeSet<VmArgumentData> treeSet = new TreeSet<VmArgumentData>(new Comparator<VmArgumentData>() {
 				public int compare(VmArgumentData one, VmArgumentData two) {
 					return one.getVmName().compareTo(two.getVmName());
 				}
