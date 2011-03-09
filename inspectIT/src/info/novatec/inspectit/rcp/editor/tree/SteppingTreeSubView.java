@@ -85,7 +85,10 @@ public class SteppingTreeSubView extends TreeSubView {
 		if (steppingControl == null) {
 			steppingControl = new SteppingControl(subComposite, toolkit, steppingTreeInputController.getSteppingObjectList());
 		}
-		steppingControl.showControl();
+
+		if (steppingTreeInputController.initSteppingControlVisible()) {
+			steppingControl.showControl();
+		}
 
 		// the focus has to be passed to the subComposite, because it can not register it
 		getTreeViewer().getTree().addFocusListener(new FocusAdapter() {
@@ -147,6 +150,33 @@ public class SteppingTreeSubView extends TreeSubView {
 		default:
 			break;
 		}
+	}
+
+	/**
+	 * Adds new element to the stepping control. This method will also register the new object with
+	 * the {@link SteppingTreeInputController}.
+	 * 
+	 * @param element
+	 *            Object to be added.
+	 */
+	public void addObjectToSteppingControl(Object element) {
+		steppingTreeInputController.addObjectToSteppingObjectList(element);
+		if (steppingControl.isControlShown()) {
+			steppingControl.inputChanged();
+			steppingControl.selectObject(element);
+		} else {
+			steppingControl.showControl();
+		}
+	}
+
+	/**
+	 * Alters the state of the stepping control button on preference panel.
+	 * 
+	 * @param checked
+	 *            Should button be checked or not.
+	 */
+	private void setSwitchSteppingControlButtonChecked(boolean checked) {
+		this.getRootEditor().getPreferencePanel().setSteppingControlChecked(checked);
 	}
 
 	/**
@@ -313,7 +343,6 @@ public class SteppingTreeSubView extends TreeSubView {
 			gd.heightHint = 0;
 			gd.widthHint = 0;
 			helpComposite.setLayoutData(gd);
-			
 
 			objectSelection.addListener(SWT.Modify, new Listener() {
 				@Override
@@ -389,6 +418,21 @@ public class SteppingTreeSubView extends TreeSubView {
 		}
 
 		/**
+		 * Selects the given object in the stepping control, if the object is currently in the
+		 * combo-box.
+		 * 
+		 * @param element Element to select.
+		 */
+		public void selectObject(Object element) {
+			if (controlShown) {
+				int index = objectsInCombo.indexOf(element);
+				if (index != -1) {
+					objectSelection.select(index);
+				}
+			}
+		}
+
+		/**
 		 * Hides stepping control.
 		 */
 		public void hideControl() {
@@ -396,6 +440,7 @@ public class SteppingTreeSubView extends TreeSubView {
 				mainComposite.dispose();
 				subComposite.layout();
 				controlShown = false;
+				setSwitchSteppingControlButtonChecked(false);
 			}
 		}
 
@@ -408,6 +453,7 @@ public class SteppingTreeSubView extends TreeSubView {
 				subComposite.layout();
 				controlShown = true;
 				inputChanged();
+				setSwitchSteppingControlButtonChecked(true);
 			}
 		}
 
@@ -457,6 +503,8 @@ public class SteppingTreeSubView extends TreeSubView {
 							info.setText("No occurrences found");
 						}
 					}
+				} else if (steppableObjects.isEmpty()) {
+					info.setText("No object to locate");
 				} else {
 					info.setText("No invocation loaded");
 				}
@@ -478,6 +526,13 @@ public class SteppingTreeSubView extends TreeSubView {
 				}
 			}
 			return list;
+		}
+
+		/**
+		 * @return the controlShown
+		 */
+		public boolean isControlShown() {
+			return controlShown;
 		}
 
 	}

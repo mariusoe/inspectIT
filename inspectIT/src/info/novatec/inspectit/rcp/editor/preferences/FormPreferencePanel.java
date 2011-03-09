@@ -60,6 +60,11 @@ public class FormPreferencePanel implements IPreferencePanel {
 	private Action switchPreferences;
 
 	/**
+	 * THe button for switching the stepping control.
+	 */
+	private Action switchSteppingControl;
+
+	/**
 	 * The list of created preference controls.
 	 */
 	private List<IPreferenceControl> preferenceControlList = new ArrayList<IPreferenceControl>();
@@ -181,6 +186,15 @@ public class FormPreferencePanel implements IPreferencePanel {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public void setSteppingControlChecked(boolean checked) {
+		if (null != switchSteppingControl) {
+			switchSteppingControl.setChecked(checked);
+		}
+	}
+	
+	/**
 	 * Creates the preference controls in the preference control panel.
 	 * 
 	 * @param parent
@@ -215,7 +229,8 @@ public class FormPreferencePanel implements IPreferencePanel {
 		}
 
 		if (preferenceSet.contains(PreferenceId.STEPPABLE_CONTROL)) {
-			toolBarManager.add(new SwitchSteppingControl("Stepping control"));
+			switchSteppingControl = new SwitchSteppingControl("Stepping control");
+			toolBarManager.add(switchSteppingControl);
 		}
 
 		if (preferenceSet.contains(PreferenceId.LIVEMODE)) {
@@ -637,8 +652,6 @@ public class FormPreferencePanel implements IPreferencePanel {
 		public SwitchSteppingControl(String text) {
 			super(text, AS_CHECK_BOX);
 			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_RIGHT_DOWN_ARROW));
-			// by default is on
-			setChecked(true);
 		}
 
 		/**

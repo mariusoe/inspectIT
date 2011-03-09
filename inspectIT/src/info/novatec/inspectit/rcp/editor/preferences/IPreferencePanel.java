@@ -69,6 +69,14 @@ public interface IPreferencePanel {
 	void bufferCleared();
 
 	/**
+	 * Checking the switch stepping control button on preference panel if stepping button exists.
+	 * 
+	 * @param checked
+	 *            True to be checked, false for not checked.
+	 */
+	void setSteppingControlChecked(boolean checked);
+
+	/**
 	 * Disposes this view / editor.
 	 */
 	void dispose();

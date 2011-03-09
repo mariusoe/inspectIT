@@ -198,6 +198,10 @@
             id="info.novatec.inspectit.rcp.commands.navigateToStartMethodInvocations"
             name="Only This Method Invocations">
       </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.addToSteppingObjects"
+            name="Locate in Call Hierarchy">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -535,6 +539,42 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.AddToSteppingObjectsHandler"
+            commandId="info.novatec.inspectit.rcp.commands.addToSteppingObjects">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.hasSubView"
+                        value="steppingTreeSubView">
+                  </test>
+                  <or>
+                     <test
+                           property="info.novatec.inspectit.activeSubView"
+                           value="tableSubView">
+                     </test>
+                     <test
+                           property="info.novatec.inspectit.activeSubView"
+                           value="treeSubView">
+                     </test>
+                  </or>
+               </with>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.communication.MethodSensorData">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -542,7 +582,7 @@
             class="info.novatec.inspectit.rcp.editor.testers.ActiveSubViewTester"
             id="info.novatec.inspectit.ActiveSubViewTester"
             namespace="info.novatec.inspectit"
-            properties="activeSubView"
+            properties="activeSubView, hasSubView"
             type="java.lang.Object">
       </propertyTester>
       <propertyTester
@@ -595,6 +635,27 @@
                   style="push">
             </command>
          </menu>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.addToSteppingObjects"
+               icon="icons/right_down.png"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <and>
+                  <with
+                        variable="activeEditor">
+                     <test
+                           property="info.novatec.inspectit.hasSubView"
+                           value="steppingTreeSubView">
+                     </test>
+                  </with>
+                  <iterate>
+                     <instanceof
+                           value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                     </instanceof>
+                  </iterate></and>
+            </visibleWhen>
+         </command>
          <separator
                name="inspectit.editor.formrooteditor.treesubview.separator1"
                visible="true">
@@ -675,6 +736,33 @@
                </visibleWhen>
             </command>
          </menu>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.addToSteppingObjects"
+               icon="icons/right_down.png"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <and>
+                  <with
+                        variable="activeEditor">
+                     <test
+                           property="info.novatec.inspectit.hasSubView"
+                           value="steppingTreeSubView">
+                     </test>
+                  </with>
+                  <iterate>
+                     <instanceof
+                           value="info.novatec.inspectit.communication.MethodSensorData">
+                     </instanceof>
+                     <not>
+                        <instanceof
+                              value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                        </instanceof>
+                     </not>
+                  </iterate>
+               </and>
+            </visibleWhen>
+         </command>
          <separator
                name="inspectit.editor.formrooteditor.tablesubview.separator1"
                visible="true">

@@ -60,4 +60,18 @@ public interface SteppingTreeInputController extends TreeInputController {
 	 * @return Textual representation.
 	 */
 	String getElementTextualRepresentation(Object element);
+
+	/**
+	 * Registers a new object that should be provided for stepping functionality.
+	 * 
+	 * @param element
+	 *            Object to be added to the list.
+	 */
+	void addObjectToSteppingObjectList(Object element);
+
+	/**
+	 * 
+	 * @return Returns if the sub-view should be loaded with stepping control visible or not.
+	 */
+	boolean initSteppingControlVisible();
 }

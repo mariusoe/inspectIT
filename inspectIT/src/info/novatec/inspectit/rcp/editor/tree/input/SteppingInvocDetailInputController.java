@@ -12,6 +12,7 @@ import info.novatec.inspectit.rcp.editor.tree.SteppingTreeSubView;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -30,7 +31,7 @@ public class SteppingInvocDetailInputController extends InvocDetailInputControll
 	 * The ID of this subview / controller.
 	 */
 	public static final String ID = "inspectit.subview.tree.steppinginvocdetail";
-	
+
 	/**
 	 * List of the objects that are possible to locate in the tree.
 	 */
@@ -42,6 +43,22 @@ public class SteppingInvocDetailInputController extends InvocDetailInputControll
 	private CachedGlobalDataAccessService globalDataAccessService;
 
 	/**
+	 * Is stepping control be initially visible.
+	 */
+	private boolean initVisible;
+
+	/**
+	 * {@link DefaultAbsoluteLocationPath} construct that defines if the stepping control is visible
+	 * or not.
+	 * 
+	 * @param initVisible
+	 *            Should stepping control be initially visible.
+	 */
+	public SteppingInvocDetailInputController(boolean initVisible) {
+		this.initVisible = initVisible;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
@@ -49,7 +66,13 @@ public class SteppingInvocDetailInputController extends InvocDetailInputControll
 	public void setInputDefinition(InputDefinition inputDefinition) {
 		super.setInputDefinition(inputDefinition);
 
-		steppingObjectsList = (List<Object>) inputDefinition.getAdditionalOption("steppingObjects");
+		Object steppingObj = inputDefinition.getAdditionalOption("steppingObjects");
+		if (null != steppingObj) {
+			steppingObjectsList = (List<Object>) steppingObj;
+		} else {
+			steppingObjectsList = new ArrayList<Object>();
+		}
+
 		globalDataAccessService = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService();
 	}
 
@@ -69,6 +92,24 @@ public class SteppingInvocDetailInputController extends InvocDetailInputControll
 	@Override
 	public List<Object> getSteppingObjectList() {
 		return steppingObjectsList;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void addObjectToSteppingObjectList(Object element) {
+		if (!steppingObjectsList.contains(element)) {
+			steppingObjectsList.add(element);
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean initSteppingControlVisible() {
+		return initVisible;
 	}
 
 	/**
@@ -166,7 +207,15 @@ public class SteppingInvocDetailInputController extends InvocDetailInputControll
 					return invocationData;
 				}
 			}
+		} else if (invocationData.getSqlStatementData() != null) {
+			if (invocationData.getSqlStatementData().getMethodIdent() == timerData.getMethodIdent()) {
+				occurrencesLeft.decrement();
+				if (occurrencesLeft.intValue() == 0) {
+					return invocationData;
+				}
+			}
 		}
+		
 		if (null != invocationData.getNestedSequences()) {
 			for (InvocationSequenceData child : (List<InvocationSequenceData>) invocationData.getNestedSequences()) {
 				InvocationSequenceData foundData = getTimerOccurrence(child, timerData, occurrencesLeft);
@@ -267,6 +316,10 @@ public class SteppingInvocDetailInputController extends InvocDetailInputControll
 		int occurances = 0;
 		if (invocationData.getTimerData() != null) {
 			if (invocationData.getTimerData().getMethodIdent() == timerData.getMethodIdent()) {
+				occurances++;
+			}
+		} else if (invocationData.getSqlStatementData() != null) {
+			if (invocationData.getSqlStatementData().getMethodIdent() == timerData.getMethodIdent()) {
 				occurances++;
 			}
 		}

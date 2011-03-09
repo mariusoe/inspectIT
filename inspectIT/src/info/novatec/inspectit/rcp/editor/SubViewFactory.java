@@ -96,7 +96,7 @@ public final class SubViewFactory {
 			SashCompositeSubView invocSubView = new SashCompositeSubView();
 			ISubView invocOverview = new TableSubView(new InvocOverviewInputController());
 			TabbedCompositeSubView invocTabbedSubView = new TabbedCompositeSubView();
-			ISubView invocDetails = new TreeSubView(new InvocDetailInputController());
+			ISubView invocDetails = new SteppingTreeSubView(new SteppingInvocDetailInputController(false));
 			ISubView invocSql = new TableSubView(new SqlInvocInputController());
 			ISubView invocMethods = new TableSubView(new MethodInvocInputController());
 			ISubView invocExceptions = new TableSubView(new ExceptionSensorInvocInputController());
@@ -149,7 +149,7 @@ public final class SubViewFactory {
 			SashCompositeSubView invocSubView1 = new SashCompositeSubView();
 			ISubView invocOverview1 = new TableSubView(new NavigationInvocOverviewInputController());
 			TabbedCompositeSubView invocTabbedSubView1 = new TabbedCompositeSubView();
-			ISubView invocDetails1 = new SteppingTreeSubView(new SteppingInvocDetailInputController());
+			ISubView invocDetails1 = new SteppingTreeSubView(new SteppingInvocDetailInputController(true));
 			ISubView invocSql1 = new TableSubView(new SqlInvocInputController());
 			ISubView invocMethods1 = new TableSubView(new MethodInvocInputController());
 			ISubView invocExceptions1 = new TableSubView(new ExceptionSensorInvocInputController());
