@@ -334,6 +334,25 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
 		verifyNoMoreInteractions(configurationStorage);
 	}
+	
+	@Test
+	public void loadAndVerifyAnnotation() throws ParserException, StorageException {
+		String sensorTypeName = "isequence";
+		String className = "info.novatec.inspectitsamples.calculator.Calculator";
+		String methodName = "actionPerformed";
+		String annotationClassName = "javax.ejb.StatelessBean";
+		
+		writer.println("sensor " + sensorTypeName + " " + className + " " + methodName + "() " + " @" + annotationClassName);
+		writer.close();
+
+		fileConfigurationReader.load();
+		
+		Map<String, String> settings = new HashMap<String, String>();
+		settings.put("annotation", annotationClassName);
+		
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
+		verifyNoMoreInteractions(configurationStorage);
+	}
 
 	@Test(expectedExceptions = { ParserException.class })
 	public void loadInvalidFile() throws ParserException {

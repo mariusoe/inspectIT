@@ -319,6 +319,11 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		if (settings.containsKey("interface") && settings.get("interface").equals("true")) {
 			sensorConfig.setInterface(true);
 		}
+		
+		// check for annotation
+		if (settings.containsKey("annotation")) {
+			sensorConfig.setAnnotationClassName((String) settings.get("annotation"));
+		}
 
 		if (settings.containsKey("field")) {
 			sensorConfig.setPropertyAccess(true);

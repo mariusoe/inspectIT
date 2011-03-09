@@ -121,7 +121,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		settings = new HashMap<String, String>();
 		settings.put("superclass", "true");
 		configurationStorage.addSensor("isequence", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", null, true, settings);
-
+		
 		Map<String, List<String>> fieldSettings = new HashMap<String, List<String>>();
 		List<String> list = new ArrayList<String>();
 		list.add("LastOutput;jlbOutput.text");
@@ -133,6 +133,11 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		list.add("0;Source;msg");
 		fieldSettings.put("property", list);
 		configurationStorage.addSensor("timer", "*", "*", null, true, fieldSettings);
+		
+		settings = new HashMap<String, String>();
+		settings.put("annotation", "javax.ejb.StatelessBean");
+		configurationStorage.addSensor("isequence", "info.novatec.inspectitsamples.calculator.Calculator", "actionPerformed", null, false, settings);
+
 	}
 
 	@Test()
@@ -318,7 +323,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	public void exceptionSensorParameterCheck() {
 		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
 		assertNotNull(configs);
-		assertEquals(configs.size(), 11);
+		assertEquals(configs.size(), 12);
 
 		// first
 		UnregisteredSensorConfig config = configs.get(0);
@@ -469,7 +474,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	public void sensorCheck() {
 		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
 		assertNotNull(configs);
-		assertEquals(configs.size(), 11);
+		assertEquals(configs.size(), 12);
 		
 		// the first 4 configs are the ones from the exception sensor
 		// first
@@ -620,6 +625,20 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	public void addSensorInvalidSensorTypeName() throws StorageException {
 		configurationStorage.addSensor("xxx", "xxx", "xxx", null, false, null);
 
+		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void annotationCheck() {
+		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
+		assertNotNull(configs);
+		assertEquals(configs.size(), 12);
+		
+		UnregisteredSensorConfig annotationConfig = configs.get(11);
+		assertNotNull(annotationConfig.getAnnotationClassName());
+		assertEquals(annotationConfig.getAnnotationClassName(), "javax.ejb.StatelessBean");
+		
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 

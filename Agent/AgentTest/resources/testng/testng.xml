@@ -46,6 +46,12 @@
 				name="info.novatec.inspectit.agent.analyzer.test.SuperclassMatcherTest" />
 		</classes>
 	</test>
+	<test name="Annotation Matcher">
+		<classes>
+			<class
+				name="info.novatec.inspectit.agent.analyzer.test.AnnotationMatcherTest" />
+		</classes>
+	</test>
 	<test name="Simple Buffer Strategy">
 		<classes>
 			<class

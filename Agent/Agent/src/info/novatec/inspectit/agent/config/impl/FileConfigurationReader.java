@@ -334,26 +334,30 @@ public class FileConfigurationReader implements IConfigurationReader {
 		Map settings = new HashMap();
 		while (tokenizer.hasMoreTokens()) {
 			String parameterToken = tokenizer.nextToken();
-			StringTokenizer parameterTokenizer = new StringTokenizer(parameterToken, "=");
-			String leftSide = parameterTokenizer.nextToken();
-			String rightSide = parameterTokenizer.nextToken();
-
-			if ("property".equals(leftSide) || "p".equals(leftSide)) {
-				List propertyAccessorList = (List) settings.get("property");
-				if (null == propertyAccessorList) {
-					propertyAccessorList = new ArrayList();
-					settings.put("property", propertyAccessorList);
-				}
-				propertyAccessorList.add(rightSide);
-			} else if ("field".equals(leftSide) || "f".equals(leftSide)) {
-				List propertyAccessorList = (List) settings.get("field");
-				if (null == propertyAccessorList) {
-					propertyAccessorList = new ArrayList();
-					settings.put("field", propertyAccessorList);
-				}
-				propertyAccessorList.add(rightSide);
+			if (parameterToken.charAt(0) == '@') {
+				settings.put("annotation", parameterToken.substring(1));
 			} else {
-				settings.put(leftSide, rightSide);
+				StringTokenizer parameterTokenizer = new StringTokenizer(parameterToken, "=");
+				String leftSide = parameterTokenizer.nextToken();
+				String rightSide = parameterTokenizer.nextToken();
+
+				if ("property".equals(leftSide) || "p".equals(leftSide)) {
+					List propertyAccessorList = (List) settings.get("property");
+					if (null == propertyAccessorList) {
+						propertyAccessorList = new ArrayList();
+						settings.put("property", propertyAccessorList);
+					}
+					propertyAccessorList.add(rightSide);
+				} else if ("field".equals(leftSide) || "f".equals(leftSide)) {
+					List propertyAccessorList = (List) settings.get("field");
+					if (null == propertyAccessorList) {
+						propertyAccessorList = new ArrayList();
+						settings.put("field", propertyAccessorList);
+					}
+					propertyAccessorList.add(rightSide);
+				} else {
+					settings.put(leftSide, rightSide);
+				}
 			}
 		}
 

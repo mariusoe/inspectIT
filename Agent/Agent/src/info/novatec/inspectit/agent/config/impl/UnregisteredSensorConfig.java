@@ -3,6 +3,7 @@ package info.novatec.inspectit.agent.config.impl;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatcher;
+import info.novatec.inspectit.agent.analyzer.impl.AnnotationMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.DirectMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.IndirectMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.InterfaceMatcher;
@@ -68,6 +69,11 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 	 * reference.
 	 */
 	private MethodSensorTypeConfig sensorTypeConfig;
+
+	/**
+	 * Annotation that is defining what has to be instrumented.
+	 */
+	private String annotationClassName;
 
 	/**
 	 * Default constructor which accepts 2 parameter.
@@ -237,6 +243,26 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
+	 * Annotation class name that is defining what needs to be instrumented.
+	 * 
+	 * @return the annotation class name
+	 */
+	public String getAnnotationClassName() {
+		return annotationClassName;
+	}
+
+	/**
+	 * Sets the annotation class name. If the annotation is set, the classes and method will be
+	 * matched based on this annotation.
+	 * 
+	 * @param annotationClassName
+	 *            the annotation to set
+	 */
+	public void setAnnotationClassName(String annotationClassName) {
+		this.annotationClassName = annotationClassName;
+	}
+
+	/**
 	 * Completes the whole configuration. Has to be called after all settings are set.
 	 */
 	public void completeConfiguration() {
@@ -248,6 +274,10 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 			matcher = new InterfaceMatcher(inheritanceAnalyzer, classPoolAnalyzer, this);
 		} else if (virtual && !superclass && !interf) {
 			matcher = new IndirectMatcher(classPoolAnalyzer, this);
+		}
+		
+		if (null != annotationClassName) {
+			matcher = new AnnotationMatcher(classPoolAnalyzer, this, matcher);
 		}
 
 		if (exceptionSensorActivated) {
