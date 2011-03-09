@@ -177,8 +177,18 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 		// set the range of y-axis only when we have the systeminformation
 		// sensor
 		if (systemData != null) {
-			rangeAxis.setRange(0.0d, systemData.getMaxHeapMemorySize() / 1024.0d);
-			rangeAxis.setAutoRangeMinimumSize(systemData.getMaxHeapMemorySize() / 1024.0d);
+			// if the max heap size is not available set the range upper level to the double of
+			// initial heap size, if this is also unavailable then set it to 728MB
+			double maxHeapUpperRange;
+			if (systemData.getMaxHeapMemorySize() != -1) {
+				maxHeapUpperRange = systemData.getMaxHeapMemorySize() / 1024.0d;
+			} else if (systemData.getInitHeapMemorySize() != -1) {
+				maxHeapUpperRange = systemData.getInitHeapMemorySize() * 2 / 1024.0d;
+			} else {
+				maxHeapUpperRange = 728 * 1024 * 1024;
+			}
+			rangeAxis.setRange(0.0d, maxHeapUpperRange);
+			rangeAxis.setAutoRangeMinimumSize(maxHeapUpperRange);
 		}
 
 		final XYPlot subplot = new XYPlot(yintervalseriescollection, null, rangeAxis, renderer);
@@ -240,8 +250,18 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 		// set the range of y-axis only when we have the systeminformation
 		// sensor
 		if (systemData != null) {
-			rangeAxis.setRange(0, systemData.getMaxNonHeapMemorySize() / 1024.0d);
-			rangeAxis.setAutoRangeMinimumSize(systemData.getMaxNonHeapMemorySize() / 1024.0d);
+			// if the max non heap size is not available set the range upper level to the double of
+			// initial non heap size, if this is also unavailable then set it to 128MB
+			double maxNonHeapUpperRange;
+			if (systemData.getMaxNonHeapMemorySize() != -1) {
+				maxNonHeapUpperRange = systemData.getMaxNonHeapMemorySize() / 1024.0d;
+			} else if (systemData.getInitNonHeapMemorySize() != -1) {
+				maxNonHeapUpperRange = systemData.getInitNonHeapMemorySize() * 2 / 1024.0d;
+			} else {
+				maxNonHeapUpperRange = 128 * 1024 * 1024;
+			}
+			rangeAxis.setRange(0, maxNonHeapUpperRange);
+			rangeAxis.setAutoRangeMinimumSize(maxNonHeapUpperRange);
 		}
 
 		final XYPlot subplot = new XYPlot(yIntervalSeriesCollection, null, rangeAxis, renderer);
