@@ -216,12 +216,16 @@ public class DeferredTreeViewer extends TreeViewer {
 			// then only set selection
 			Widget w = internalGetWidgetToSelect(elementOrTreePath);
 			if (null != w) {
+				//if widget is already available selected it
 				List<Object> selectionList = new ArrayList<Object>();
 				selectionList.add(w);
 				setSelection(selectionList);
+				// and overwrite any earlier set selection object
+				objectToSelect.set(null);
+			} else {
+				// otherwise set object to selected
+				objectToSelect.set(elementOrTreePath);
 			}
-			// and overwrite any earlier set selection object
-			objectToSelect.set(null);
 		} else {
 			// get all the objects that need to be expanded so that object is visible
 			objectToSelect.set(elementOrTreePath);
