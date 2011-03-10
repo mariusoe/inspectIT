@@ -306,7 +306,11 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 					ExceptionSensorData template = input.get(0);
 					List<ExceptionSensorData> exceptionStackTraceObjects = dataAccessService.getStackTraceMessagesForThrowableType(template);
 					parentChildrenMap = new HashMap<AggregatedExceptionSensorData, List<ExceptionSensorData>>();
+					int i = 1;
 					for (AggregatedExceptionSensorData aggExceptionSensorData : input) {
+						// id has to be set because if the hash value of the object in the map
+						// otherwise there is a chance of the same hash values
+						aggExceptionSensorData.setId(i++);
 						List<ExceptionSensorData> children = new ArrayList<ExceptionSensorData>();
 						for (ExceptionSensorData exData : exceptionStackTraceObjects) {
 							if (exData.getErrorMessage().equals(aggExceptionSensorData.getErrorMessage())) {
@@ -375,20 +379,24 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 		switch (enumId) {
 		case ERROR_MESSAGE:
 			StyledString styledString;
-			String errorMessage = data.getErrorMessage();
-			if (null != errorMessage && !"".equals(errorMessage)) {
-				// if error message is provided then it's a first level element
-				// of the tree
-				styledString = new StyledString(errorMessage);
-			} else if (null != data.getStackTrace()) {
-				// otherwise we use an excerpt of the stack trace for the second
-				// level element
-				String stackTrace = crop(data.getStackTrace(), 80);
-				styledString = new StyledString(stackTrace);
+			if (parentChildrenMap.containsKey(data)) {
+				String errorMessage = data.getErrorMessage();
+				if (null != errorMessage && !"".equals(errorMessage)) {
+					// if error message is provided then it's a first level element
+					// of the tree
+					styledString = new StyledString(errorMessage);
+				} else {
+					// is used when there is no error message provided in the first
+					// level element
+					styledString = new StyledString("No Error Message provided");
+				}
 			} else {
-				// is used when there is no error message provided in the first
-				// level element
-				styledString = new StyledString("No Error Message provided");
+				String[] stackTraceLines = data.getStackTrace().split("\n");
+				if (stackTraceLines.length > 1) {
+					styledString = new StyledString(stackTraceLines[1]);
+				} else {
+					styledString = new StyledString("Stack track not available");
+				}
 			}
 			return styledString;
 		case CREATED:
@@ -431,22 +439,6 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 			return sb.toString();
 		}
 		throw new RuntimeException("Could not create the human readable string!");
-	}
-
-	/**
-	 * Crops a string if it is longer than the specified maxLength.
-	 * 
-	 * @param value
-	 *            The value to crop.
-	 * @param maxLength
-	 *            The maximum length of the string. All characters above maxLength will be cropped.
-	 * @return A cropped string which length is smaller than the maxLength.
-	 */
-	private String crop(String value, int maxLength) {
-		if (null != value && value.length() > maxLength) {
-			return value.substring(0, maxLength);
-		}
-		return value;
 	}
 
 	/**

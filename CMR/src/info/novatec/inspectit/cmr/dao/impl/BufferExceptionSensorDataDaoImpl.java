@@ -208,13 +208,20 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 		query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("throwableType", template.getThrowableType()));
 		query.addIndexingRestriction(IndexQueryRestrictionFactory.isNotNull("stackTrace"));
 		List<ExceptionSensorData> results = indexingTree.query(query);
-		Map<Integer, ExceptionSensorData> distinctStackTraceErrorCombination = new HashMap<Integer, ExceptionSensorData>();
+		Map<Integer, AggregatedExceptionSensorData> distinctStackTraceErrorCombination = new HashMap<Integer, AggregatedExceptionSensorData>();
 		List<ExceptionSensorData> returnList = new ArrayList<ExceptionSensorData>();
 		for (ExceptionSensorData exceptionData : results) {
-			int key = getDisctinctStackTraceErrorCombinatonKey(exceptionData);
-			if (null == distinctStackTraceErrorCombination.get(key)) {
-				distinctStackTraceErrorCombination.put(key, exceptionData);
-				returnList.add(exceptionData);
+			ExceptionSensorData dataToAggregate = exceptionData;
+			while (null != dataToAggregate) {
+				int key = getDisctinctStackTraceErrorCombinatonKey(exceptionData);
+				AggregatedExceptionSensorData aggregatedExceptionSensorData = distinctStackTraceErrorCombination.get(key);
+				if (null == aggregatedExceptionSensorData) {
+					aggregatedExceptionSensorData = cloneExceptionSensorData(dataToAggregate);
+					distinctStackTraceErrorCombination.put(key, aggregatedExceptionSensorData);
+					returnList.add(aggregatedExceptionSensorData);
+				}
+				aggregatedExceptionSensorData.aggregateExceptionData(dataToAggregate);
+				dataToAggregate =  dataToAggregate.getChild();
 			}
 		}
 		return returnList;
