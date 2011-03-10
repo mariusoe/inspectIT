@@ -3,8 +3,10 @@ package info.novatec.inspectit.rcp.editor.table;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.AbstractSubView;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceConstants;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.editor.root.FormRootEditor;
 import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController.SubViewClassification;
 import info.novatec.inspectit.rcp.editor.table.input.TableInputController;
@@ -32,6 +34,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
@@ -111,6 +114,10 @@ public class TableSubView extends AbstractSubView {
 
 		Object input = tableInputController.getTableInput();
 		tableViewer.setInput(input);
+
+		if (getPreferenceIds().contains(PreferenceId.ITEMCOUNT)) {
+			updateCountItemsMessage(PreferenceConstants.DEFAULT_ITEM_COUNT);
+		}
 	}
 
 	/**
@@ -190,6 +197,7 @@ public class TableSubView extends AbstractSubView {
 			int limit = (Integer) preferenceMap.get(PreferenceId.ItemCount.COUNT_SELECTION_ID);
 			tableInputController.setLimit(limit);
 			this.doRefresh();
+			updateCountItemsMessage(limit);
 		}
 
 		tableInputController.preferenceEventFired(preferenceEvent);
@@ -219,6 +227,28 @@ public class TableSubView extends AbstractSubView {
 	@Override
 	public void dispose() {
 		tableInputController.dispose();
+	}
+
+	/**
+	 * Updates the message on the editor's form header, based on the number of items displayed
+	 * Currently. Message will be displayed only for master views.
+	 * 
+	 * @param limit Number of items displayed. -1 for all.
+	 */
+	private void updateCountItemsMessage(int limit) {
+		if (getTableInputController().getSubViewClassification().equals(SubViewClassification.MASTER)) {
+			AbstractRootEditor editor = this.getRootEditor();
+			if (editor instanceof FormRootEditor) {
+				Form form = ((FormRootEditor) editor).getForm();
+				StringBuilder message = new StringBuilder(editor.getInputDefinition().getHeaderDescription() + " - ");
+				if (limit == -1) {
+					message.append("all displayed");
+				} else {
+					message.append("last " + limit + " displayed");
+				}
+				form.setMessage(message.toString());
+			}
+		}
 	}
 
 }

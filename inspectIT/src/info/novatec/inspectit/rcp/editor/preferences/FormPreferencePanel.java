@@ -235,13 +235,13 @@ public class FormPreferencePanel implements IPreferencePanel {
 
 		if (preferenceSet.contains(PreferenceId.ITEMCOUNT)) {
 			MenuManager countMenuManager = new MenuManager("Item count to show");
-			countMenuManager.add(new SetItemCountAction("10", 10, true));
+			countMenuManager.add(new SetItemCountAction("10", 10));
 			countMenuManager.add(new SetItemCountAction("20", 20));
 			countMenuManager.add(new SetItemCountAction("50", 50));
 			countMenuManager.add(new SetItemCountAction("100", 100));
 			countMenuManager.add(new SetItemCountAction("200", 200));
 			countMenuManager.add(new SetItemCountAction("500", 500));
-			countMenuManager.add(new SetItemCountAction("All...", -1));
+			countMenuManager.add(new SetItemCountAction("All...", -1, true));
 			menuAction.addContributionItem(countMenuManager);
 		}
 		if (preferenceSet.contains(PreferenceId.FILTERSENSORTYPE)) {

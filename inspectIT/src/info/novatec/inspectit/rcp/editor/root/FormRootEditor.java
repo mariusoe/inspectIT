@@ -74,4 +74,13 @@ public class FormRootEditor extends AbstractRootEditor {
 		toolkit.dispose();
 	}
 
+	/**
+	 * @return the form
+	 */
+	public Form getForm() {
+		return form;
+	}
+	
+	
+
 }

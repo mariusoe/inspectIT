@@ -8,6 +8,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.InputDefinition.IdDefinition;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceConstants;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
@@ -126,7 +127,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	/**
 	 * The limit of the result set.
 	 */
-	private int limit = 10;
+	private int limit = PreferenceConstants.DEFAULT_ITEM_COUNT;
 
 	/**
 	 * The used data access service to access the data on the CMR.

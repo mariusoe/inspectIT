@@ -10,6 +10,7 @@ import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.formatter.SensorTypeAvailabilityEnum;
+import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.combinedmetrics.DeferredCombinedMetricsComposite;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.view.server.ServerView;
@@ -282,7 +283,7 @@ public class TreeModelManager {
 		inputDefinition.setPartTooltip("Invocation Sequence");
 		inputDefinition.setImageDescriptor(SensorTypeEnum.INVOCATION_SEQUENCE.getImageDescriptor());
 		inputDefinition.setHeaderText("Invocation Sequence");
-		inputDefinition.setHeaderDescription(methodIdent.getPlatformIdent().getAgentName());
+		inputDefinition.setHeaderDescription(TextFormatter.getMethodWithParameters(methodIdent));
 
 		IdDefinition idDefinition = new IdDefinition();
 		idDefinition.setPlatformId(methodIdent.getPlatformIdent().getId());

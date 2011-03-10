@@ -8,6 +8,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceConstants;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
@@ -123,7 +124,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	/**
 	 * The limit of the result set.
 	 */
-	private int limit = 10;
+	private int limit = PreferenceConstants.DEFAULT_ITEM_COUNT;
 
 	/**
 	 * Indicates from which point in time data should be shown.
