@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.editor.testers;
 
 import info.novatec.inspectit.rcp.editor.ISubView;
 import info.novatec.inspectit.rcp.editor.composite.AbstractCompositeSubView;
+import info.novatec.inspectit.rcp.editor.graph.GraphSubView;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableSubView;
 import info.novatec.inspectit.rcp.editor.tree.SteppingTreeSubView;
@@ -29,7 +30,9 @@ public class ActiveSubViewTester extends PropertyTester {
 				}
 			} else if ("hasSubView".equals(property)) {
 				if ("steppingTreeSubView".equals(expectedValue)) {
-					return isSteppingTreeSubViewOneOfSubViews(rootEditor.getSubView());
+					return isSubViewExisting(rootEditor.getSubView(), SteppingTreeSubView.class);
+				} else if ("graphSubView".equals(expectedValue)) {
+					return isSubViewExisting(rootEditor.getSubView(), GraphSubView.class);
 				}
 			}
 		}
@@ -38,21 +41,22 @@ public class ActiveSubViewTester extends PropertyTester {
 	}
 
 	/**
-	 * Returns if the given sub view is a {@link SteppingTreeSubView} or if the
-	 * {@link SteppingTreeSubView} is part of sub-view of {@link AbstractCompositeSubView} in case
-	 * this sub-view is provided. This is a recursive method.
+	 * Returns if the given sub view is a instance of given sub-view class or if there is a sub-view
+	 * of this class in case composite sub-view is provided. This is a recursive method.
 	 * 
 	 * @param subView
 	 *            Sub-view to check.
-	 * @return Returns true if the {@link SteppingTreeSubView} is found.
+	 * @param subViewClass
+	 *            Class to search for.
+	 * @return Returns true if the wanted class is found.
 	 */
-	private boolean isSteppingTreeSubViewOneOfSubViews(ISubView subView) {
-		if (subView instanceof SteppingTreeSubView) {
+	private boolean isSubViewExisting(ISubView subView, Class<? extends ISubView> subViewClass) {
+		if (subViewClass.isInstance(subView)) {
 			return true;
 		} else if (subView instanceof AbstractCompositeSubView) {
 			AbstractCompositeSubView compositeSubView = (AbstractCompositeSubView) subView;
 			for (ISubView viewInCompositeSubView : compositeSubView.getSubViews()) {
-				if (isSteppingTreeSubViewOneOfSubViews(viewInCompositeSubView)) {
+				if (isSubViewExisting(viewInCompositeSubView, subViewClass)) {
 					return true;
 				}
 			}

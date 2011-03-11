@@ -503,6 +503,12 @@
                            value="treeSubView">
                      </test>
                   </or>
+                  <not>
+                     <test
+                           property="info.novatec.inspectit.hasSubView"
+                           value="graphSubView">
+                     </test>
+                  </not>
                </with>
                <with
                      variable="selection">
@@ -597,7 +603,7 @@
             id="info.novatec.inspectit.ActiveSubViewTester"
             namespace="info.novatec.inspectit"
             properties="activeSubView, hasSubView"
-            type="java.lang.Object">
+            type="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
       </propertyTester>
       <propertyTester
             class="info.novatec.inspectit.rcp.editor.testers.TableShowDetailsTester"
