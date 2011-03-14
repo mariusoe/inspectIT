@@ -3,8 +3,10 @@ package info.novatec.inspectit.rcp.editor.tree;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -12,6 +14,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.progress.DeferredTreeContentManager;
 import org.eclipse.ui.progress.PendingUpdateAdapter;
@@ -33,7 +36,7 @@ public class DeferredTreeViewer extends TreeViewer {
 	/**
 	 * List of the elements that need to be expanded.
 	 */
-	private List<Object> objectsToBeExpanded = Collections.synchronizedList(new ArrayList<Object>());
+	private Set<Object> objectsToBeExpanded = Collections.synchronizedSet(new HashSet<Object>());
 
 	/**
 	 * Object to be selected.
@@ -216,7 +219,7 @@ public class DeferredTreeViewer extends TreeViewer {
 			// then only set selection
 			Widget w = internalGetWidgetToSelect(elementOrTreePath);
 			if (null != w) {
-				//if widget is already available selected it
+				// if widget is already available selected it
 				List<Object> selectionList = new ArrayList<Object>();
 				selectionList.add(w);
 				setSelection(selectionList);
@@ -230,10 +233,23 @@ public class DeferredTreeViewer extends TreeViewer {
 			// get all the objects that need to be expanded so that object is visible
 			objectToSelect.set(elementOrTreePath);
 			List<Object> objectsToExpand = createObjectList(parent, new ArrayList<Object>());
-			objectsToBeExpanded.addAll(objectsToExpand);
-			Widget w = internalExpand(elementOrTreePath, true);
-			if (w != null) {
-				internalExpandToLevel(w, level);
+			if (!objectsToExpand.isEmpty()) {
+				objectsToBeExpanded.addAll(objectsToExpand);
+				Widget w = internalExpand(elementOrTreePath, true);
+				if (w != null) {
+					internalExpandToLevel(w, level);
+				}
+			} else {
+				// if the list if empty, this means that no object in the tree has to load the children, and they are all expanded, thus we can just select the wanted object
+				Widget w = internalGetWidgetToSelect(elementOrTreePath);
+				if (null != w) {
+					// if widget is here available
+					List<Object> selectionList = new ArrayList<Object>();
+					selectionList.add(w);
+					setSelection(selectionList);
+					// and overwrite any earlier set selection object
+					objectToSelect.set(null);
+				}
 			}
 		}
 	}
@@ -249,16 +265,62 @@ public class DeferredTreeViewer extends TreeViewer {
 	 * @return List of objects for expansion.
 	 */
 	private List<Object> createObjectList(Object object, List<Object> objectList) {
-		if (!isRootElement(object)) {	
-			if (!getExpandedState(object)) {
+		if (areFiltersPassed(object) && !getExpandedState(object)) {
+			if (childrenLoaded(object)) {
+				// if children are loaded for this object we simply expand it directly
+				expandToLevel(object, 1);
+			} else {
 				if (objectList == null) {
 					objectList = new ArrayList<Object>();
 				}
 				objectList.add(object);
-				createObjectList(getParentElement(object), objectList);
 			}
 		}
+		Object parent = getParentElement(object);
+		if (null != parent) {
+			createObjectList(parent, objectList);
+		}
 		return objectList;
+	}
+
+	/**
+	 * Returns if all the filters are passed for the specific object.
+	 * 
+	 * @param object
+	 *            Object to test.
+	 * @return True if all the filters are passed, and thus object is visible in the tree. False
+	 *         otherwise.
+	 */
+	private boolean areFiltersPassed(Object object) {
+		ViewerFilter[] filters = getFilters();
+		if (null != filters) {
+			for (ViewerFilter filer : filters) {
+				if (!filer.select(this, getParentElement(object), object)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Tests if the children of the tree item have been loaded.
+	 * 
+	 * @param object
+	 *            Object to test.
+	 * @return True if the children have been fetched.
+	 */
+	private boolean childrenLoaded(Object object) {
+		Item[] children = getChildren(doFindItem(object));
+		if (null == children) {
+			return false;
+		}
+		for (Item item : children) {
+			if (!(item instanceof TreeItem)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**

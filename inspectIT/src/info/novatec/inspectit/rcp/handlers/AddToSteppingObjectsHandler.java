@@ -46,11 +46,11 @@ public class AddToSteppingObjectsHandler extends AbstractHandler {
 					Object element = iterator.next();
 					if (element instanceof InvocationSequenceData) {
 						InvocationSequenceData invData = (InvocationSequenceData) element;
-						if (invData.getTimerData() != null) {
-							steppingTreeSubView.addObjectToSteppingControl(invData.getTimerData());
-						} else if (invData.getSqlStatementData() != null) {
+						if (invData.getSqlStatementData() != null) {
 							steppingTreeSubView.addObjectToSteppingControl(invData.getSqlStatementData());
 							steppingTreeSubView.addObjectToSteppingControl(getTimerDataFromSql(invData.getSqlStatementData()));
+						} else if (invData.getTimerData() != null) {
+							steppingTreeSubView.addObjectToSteppingControl(invData.getTimerData());
 						} else if (invData.getExceptionSensorDataObjects() != null && invData.getExceptionSensorDataObjects().isEmpty()) {
 							steppingTreeSubView.addObjectToSteppingControl(invData.getExceptionSensorDataObjects().get(0));
 						}

@@ -1,8 +1,11 @@
 package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.rcp.editor.tree.SteppingTreeSubView;
+import info.novatec.inspectit.rcp.util.ElementOccurrenceCount;
 
 import java.util.List;
+
+import org.eclipse.jface.viewers.ViewerFilter;
 
 /**
  * An extension of {@link TreeInputController} that provides the necesarry functionality for
@@ -24,9 +27,12 @@ public interface SteppingTreeInputController extends TreeInputController {
 	 * 
 	 * @param element
 	 *            Template element to count occurrences for.
+	 * @param filters
+	 *            Array of filters that each occurrence has to pass, so that it is included in the
+	 *            count.
 	 * @return Number of occurrences.
 	 */
-	int countOccurrences(Object element);
+	ElementOccurrenceCount countOccurrences(Object element, ViewerFilter[] filters);
 
 	/**
 	 * Checks if the supplied occurrence of one stepping element in reachable in the current tree
@@ -36,9 +42,12 @@ public interface SteppingTreeInputController extends TreeInputController {
 	 *            Template element.
 	 * @param occurance
 	 *            Wanted occurrence.
+	 * @param filters
+	 *            Array of filters that each occurrence has to pass, so that it is included in the
+	 *            count, and final result.
 	 * @return True if wanted occurrence for the object is reachable, otherwise false.
 	 */
-	boolean isElementOccurrenceReachable(Object element, int occurance);
+	boolean isElementOccurrenceReachable(Object element, int occurance, ViewerFilter[] filters);
 
 	/**
 	 * Returns the concrete element from the tree input that correspond to the template element and
@@ -46,11 +55,14 @@ public interface SteppingTreeInputController extends TreeInputController {
 	 * 
 	 * @param template
 	 *            Template element.
-	 * @param occurance
+	 * @param occurrence
 	 *            Wanted occurrence.
+	 * @param filters
+	 *            Array of filters that each occurrence has to pass, so that it is included in the
+	 *            count.
 	 * @return Concrete element or null if the wanted occurrence is not reachable.
 	 */
-	Object getElement(Object template, int occurance);
+	Object getElement(Object template, int occurrence, ViewerFilter[] filters);
 
 	/**
 	 * Returns the textual representation of the stepping element.

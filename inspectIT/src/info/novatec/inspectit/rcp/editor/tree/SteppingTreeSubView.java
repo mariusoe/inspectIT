@@ -7,8 +7,8 @@ import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.tree.input.SteppingTreeInputController;
+import info.novatec.inspectit.rcp.util.ElementOccurrenceCount;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -145,6 +145,9 @@ public class SteppingTreeSubView extends TreeSubView {
 			}
 			break;
 		case CLEAR_BUFFER:
+		case FILTERSENSORTYPE:
+		case INVOCFILTEREXCLUSIVETIME:
+		case INVOCFILTERTOTALTIME:
 			steppingControl.inputChanged();
 			break;
 		default:
@@ -186,14 +189,27 @@ public class SteppingTreeSubView extends TreeSubView {
 	 * 
 	 * @param template
 	 *            Element to reach.
-	 * @param occurance
+	 * @param occurrence
 	 *            Wanted occurrence in the tree.
 	 */
-	private void expandToObject(Object template, int occurance) {
-		Object realElement = steppingTreeInputController.getElement(template, occurance);
+	private void expandToObject(Object template, int occurrence) {
+		Object realElement = steppingTreeInputController.getElement(template, occurrence, getTreeViewer().getFilters());
 		if (null != realElement) {
 			((DeferredTreeViewer) getTreeViewer()).expandToObjectAndSelect(realElement, 0);
 		}
+	}
+
+	/**
+	 * Counts total occurrences found for given element. This method is just delegating the call to
+	 * the {@link SteppingTreeInputController}. Result depends on the filters that are currently
+	 * active for the tree.
+	 * 
+	 * @param element
+	 *            Element to count occurrences.
+	 * @return Total number of elements found.
+	 */
+	private ElementOccurrenceCount countOccurrences(Object element) {
+		return steppingTreeInputController.countOccurrences(element, getTreeViewer().getFilters());
 	}
 
 	/**
@@ -279,9 +295,14 @@ public class SteppingTreeSubView extends TreeSubView {
 		private int occurrence;
 
 		/**
-		 * Total occurrence of the selected object that could be reached.
+		 * Visible occurrence of the selected object that could be reached.
 		 */
-		private int totalOccurrences;
+		private int visibleOccurrences;
+		
+		/**
+		 * Filtered occurrence of the selected object that could not be reached.
+		 */
+		private int filteredOccurrences;
 
 		/**
 		 * Default constructor.
@@ -353,9 +374,13 @@ public class SteppingTreeSubView extends TreeSubView {
 						selectedObject = selObject;
 						if (isInputSet()) {
 							occurrence = 0;
-							totalOccurrences = steppingTreeInputController.countOccurrences(selectedObject);
-							expandToObject(selectedObject, ++occurrence);
-							if (!(totalOccurrences > occurrence)) {
+							ElementOccurrenceCount elementOccurrenceCount = countOccurrences(selectedObject);
+							visibleOccurrences = elementOccurrenceCount.getVisibleOccurrences();
+							filteredOccurrences = elementOccurrenceCount.getFilteredOccurrences();
+							if (visibleOccurrences > 0) {
+								expandToObject(selectedObject, ++occurrence);
+							}
+							if (!(visibleOccurrences > occurrence)) {
 								next.setEnabled(false);
 							} else {
 								next.setEnabled(true);
@@ -365,9 +390,12 @@ public class SteppingTreeSubView extends TreeSubView {
 							} else {
 								previous.setEnabled(true);
 							}
-							updateInfoBox();
 						}
+					} else {
+						next.setEnabled(false);
+						previous.setEnabled(false);
 					}
+					updateInfoBox();
 				}
 			});
 
@@ -375,7 +403,7 @@ public class SteppingTreeSubView extends TreeSubView {
 				@Override
 				public void handleEvent(Event event) {
 					expandToObject(selectedObject, ++occurrence);
-					if (!(totalOccurrences > occurrence)) {
+					if (!(visibleOccurrences > occurrence)) {
 						next.setEnabled(false);
 					}
 					if (!(occurrence > 1)) {
@@ -412,16 +440,18 @@ public class SteppingTreeSubView extends TreeSubView {
 			String representation = steppingTreeInputController.getElementTextualRepresentation(object);
 			// Assure that string is not too long
 			if (representation.length() > 120) {
-				return representation.substring(0, 118) + "..";
+				representation = representation.substring(0, 118) + "..";
 			}
-			return representation;
+			ElementOccurrenceCount elementOccurrenceCount = countOccurrences(object);
+			return representation + " (" + elementOccurrenceCount.getVisibleOccurrences() + " visible, " + elementOccurrenceCount.getFilteredOccurrences() + " filtered)";
 		}
 
 		/**
 		 * Selects the given object in the stepping control, if the object is currently in the
 		 * combo-box.
 		 * 
-		 * @param element Element to select.
+		 * @param element
+		 *            Element to select.
 		 */
 		public void selectObject(Object element) {
 			if (controlShown) {
@@ -463,16 +493,22 @@ public class SteppingTreeSubView extends TreeSubView {
 		public void inputChanged() {
 			if (controlShown) {
 				if (isInputSet()) {
-					objectsInCombo = createObjectsForComboList();
+					objectsInCombo = steppableObjects;
 					objectSelection.removeAll();
-					for (Object object : objectsInCombo) {
-						objectSelection.add(getTextualString(object));
-					}
-					objectSelection.pack(true);
-					if (null != selectedObject && objectsInCombo.contains(selectedObject)) {
-						objectSelection.select(objectsInCombo.indexOf(selectedObject));
+					if (!objectsInCombo.isEmpty()) {
+						for (Object object : objectsInCombo) {
+							objectSelection.add(getTextualString(object));
+						}
+						objectSelection.pack(true);
+						if (null != selectedObject && objectsInCombo.contains(selectedObject)) {
+							objectSelection.select(objectsInCombo.indexOf(selectedObject));
+						} else {
+							objectSelection.select(0);
+						}
 					} else {
-						objectSelection.select(0);
+						next.setEnabled(false);
+						previous.setEnabled(false);
+						updateInfoBox();
 					}
 				} else {
 					objectSelection.removeAll();
@@ -489,43 +525,30 @@ public class SteppingTreeSubView extends TreeSubView {
 		 */
 		private void updateInfoBox() {
 			if (controlShown) {
-				if (isInputSet()) {
-					if (objectSelection.getSelectionIndex() != -1) {
-						if (occurrence == 0 && totalOccurrences != 0) {
-							String msg = "Found " + totalOccurrences + " occurrence";
-							if (totalOccurrences > 1) {
-								msg += "s";
-							}
-							info.setText(msg);
-						} else if (occurrence != 0) {
-							info.setText(occurrence + "/" + totalOccurrences);
-						} else {
-							info.setText("No occurrences found");
+				String msg = "";
+				if (isInputSet() && objectSelection.getSelectionIndex() != -1) {
+					if (occurrence == 0 && visibleOccurrences != 0) {
+						msg = "Found " + visibleOccurrences + " occurrence";
+						if (visibleOccurrences > 1) {
+							msg += "s";
 						}
+						
+					} else if (occurrence != 0) {
+						msg = occurrence + "/" + visibleOccurrences;
+					} else {
+						msg = "No occurrences found";
 					}
-				} else if (steppableObjects.isEmpty()) {
-					info.setText("No object to locate");
+					if (filteredOccurrences > 0) {
+						msg += " (" + filteredOccurrences + " filtered out)";
+					}
+				} else if (objectSelection.getItemCount() == 0) {
+					msg = "No object to locate";
 				} else {
-					info.setText("No invocation loaded");
+					msg = "No invocation loaded";
 				}
+				info.setText(msg);
 				mainComposite.layout();
 			}
-		}
-
-		/**
-		 * Creates the list of objects that will be inserted to combo, thus only objects that are
-		 * locate-able in the invocation.
-		 * 
-		 * @return List of objects.
-		 */
-		private List<Object> createObjectsForComboList() {
-			List<Object> list = new ArrayList<Object>();
-			for (Object object : steppableObjects) {
-				if (steppingTreeInputController.isElementOccurrenceReachable(object, 1)) {
-					list.add(object);
-				}
-			}
-			return list;
 		}
 
 		/**
