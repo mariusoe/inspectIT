@@ -20,6 +20,7 @@ import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -269,11 +270,13 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	@Override
 	public Set<PreferenceId> getPreferenceIds() {
 		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
-		preferences.add(PreferenceId.TIMELINE);
-		preferences.add(PreferenceId.CLEAR_BUFFER);
-		preferences.add(PreferenceId.LIVEMODE);
+		if (getInputDefinition().getRepositoryDefinition() instanceof CmrRepositoryDefinition) {
+			preferences.add(PreferenceId.CLEAR_BUFFER);
+			preferences.add(PreferenceId.LIVEMODE);
+		}
 		preferences.add(PreferenceId.UPDATE);
 		preferences.add(PreferenceId.ITEMCOUNT);
+		preferences.add(PreferenceId.TIMELINE);
 		return preferences;
 	}
 

@@ -1,9 +1,9 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.DefaultDataDao;
-import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.cmr.util.Converter;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.spring.logger.Logger;
 
 import java.lang.ref.SoftReference;
 import java.rmi.RemoteException;

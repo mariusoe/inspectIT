@@ -1,8 +1,6 @@
 package info.novatec.inspectit.rcp.repository;
 
-import info.novatec.inspectit.cmr.service.IBufferService;
 import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
-import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
@@ -34,6 +32,13 @@ public interface RepositoryDefinition {
 	 * @return The port.
 	 */
 	int getPort();
+
+	/**
+	 * Returns the repository symbolic name.
+	 * 
+	 * @return Returns the repository symbolic name.
+	 */
+	String getName();
 
 	/**
 	 * Returns the license service for this repository definition.
@@ -83,20 +88,6 @@ public interface RepositoryDefinition {
 	 * @return The global data access service.
 	 */
 	CachedDataService getCachedDataService();
-
-	/**
-	 * Returns the configuration interface data access service for this repository definition.
-	 * 
-	 * @return The configuration data access service.
-	 */
-	IConfigurationInterfaceDataAccessService getConfigurationInterfaceDataAccessService();
-
-	/**
-	 * Returns the buffer data access service for this repository definition.
-	 * 
-	 * @return The buffer service.
-	 */
-	IBufferService getBufferService();
 
 	/**
 	 * Returns the timer data access service for this repository definition.

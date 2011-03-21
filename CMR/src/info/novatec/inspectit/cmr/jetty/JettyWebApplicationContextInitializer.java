@@ -1,6 +1,6 @@
 package info.novatec.inspectit.cmr.jetty;
 
-import info.novatec.inspectit.cmr.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;

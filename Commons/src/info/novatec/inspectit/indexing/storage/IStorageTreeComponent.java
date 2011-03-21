@@ -1,0 +1,16 @@
+package info.novatec.inspectit.indexing.storage;
+
+import info.novatec.inspectit.indexing.ITreeComponent;
+
+/**
+ * Special tree component for purposes of indxing for storage.
+ * 
+ * @author Ivan Senic
+ * 
+ * @param <E>
+ *            Type of elements to be stored.
+ */
+public interface IStorageTreeComponent<E> extends ITreeComponent<IStorageDescriptor, E> {
+
+
+}

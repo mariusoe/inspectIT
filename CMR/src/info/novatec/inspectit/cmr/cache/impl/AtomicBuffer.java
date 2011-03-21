@@ -4,11 +4,11 @@ import info.novatec.inspectit.cmr.cache.IBuffer;
 import info.novatec.inspectit.cmr.cache.IBufferElement;
 import info.novatec.inspectit.cmr.cache.IBufferElement.BufferElementState;
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
-import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
-import info.novatec.inspectit.cmr.cache.indexing.impl.IndexingException;
-import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.cmr.util.Converter;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
+import info.novatec.inspectit.indexing.impl.IndexingException;
+import info.novatec.inspectit.spring.logger.Logger;
 
 import java.text.NumberFormat;
 import java.util.concurrent.ExecutorService;
@@ -29,9 +29,9 @@ import org.springframework.stereotype.Component;
  * Buffer uses atomic variables and references to handle the synchronization. Thus, non of its
  * methods is synchronized, nor synchronized block were used. However, the whole buffer is thread
  * safe.
- * 
+ *
  * @author Ivan Senic
- * 
+ *
  * @param <E>
  *            Parameterized type of elements buffer can hold.
  */
@@ -58,7 +58,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	 * Indexing tree where the elements will be indexed.
 	 */
 	@Autowired
-	private ITreeComponent<E> indexingTree;
+	private IBufferTreeComponent<E> indexingTree;
 
 	/**
 	 * Max size of the buffer in atomic long.
@@ -539,7 +539,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 
 	/**
 	 * Sets the current size of the buffer.
-	 * 
+	 *
 	 * @param currentSize
 	 *            Size in bytes.
 	 */
@@ -552,7 +552,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	 * Adds size value to the current size.
 	 * <p>
 	 * This method is thread safe.
-	 * 
+	 *
 	 * @param size
 	 *            Size in bytes.
 	 * @param areObjects
@@ -572,7 +572,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	 * Subtracts size value from the current size.
 	 * <p>
 	 * This method is thread safe.
-	 * 
+	 *
 	 * @param size
 	 *            Size in bytes.
 	 */
@@ -636,7 +636,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 
 	/**
 	 * Returns the number of inserted elements since the buffer has been created.
-	 * 
+	 *
 	 * @return Number of inserted elements.
 	 */
 	public long getInsertedElemenets() {
@@ -645,7 +645,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 
 	/**
 	 * Returns the number of evicted elements since the buffer has been created.
-	 * 
+	 *
 	 * @return Number of evicted elements.
 	 */
 	public long getEvictedElemenets() {
@@ -654,7 +654,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 
 	/**
 	 * Returns the number of indexed elements since the buffer has been created.
-	 * 
+	 *
 	 * @return Number of indexed elements.
 	 */
 	public long getIndexedElements() {
@@ -662,8 +662,30 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public E getOldestElement() {
+		IBufferElement<E> bufferElement  = last.get();
+		if (null != bufferElement) {
+			return bufferElement.getObject();
+		}
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public E getNewestElement() {
+		IBufferElement<E> bufferElement  = first.get();
+		if (null != bufferElement) {
+			return bufferElement.getObject();
+		}
+		return null;
+	}
+
+	/**
 	 * Is executed after dependency injection is done to perform any initialization.
-	 * 
+	 *
 	 * @throws Exception
 	 *             if an error occurs during {@link PostConstruct}
 	 */
@@ -728,9 +750,9 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 
 	/**
 	 * Class that serves as a marker for empty buffer element.
-	 * 
+	 *
 	 * @author Ivan Senic
-	 * 
+	 *
 	 */
 	private class EmptyBufferElement implements IBufferElement<E> {
 

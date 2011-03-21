@@ -30,6 +30,18 @@
 
 		<property name="server" ref="httpServer" />
 		<property name="servletHandler" ref="servletHandler" />
+		<property name="mimeTypes">
+			<bean class="org.mortbay.jetty.MimeTypes">
+				<property name="mimeMap">
+					<map>
+						<entry key="agent" value="application/octet-stream" />
+						<entry key="index" value="application/octet-stream" />
+						<entry key="storage" value="application/octet-stream" />
+						<entry key="itdata" value="application/octet-stream" />
+					</map>
+				</property>
+			</bean>
+		</property>
 	</bean>
 
 	<bean id="threadPool" class="org.mortbay.thread.BoundedThreadPool">
@@ -202,7 +214,7 @@
 		<property name="servletName" value="timerDataAccessServiceExporter" />
 		<property name="pathSpec" value="/remoting/TimerDataAccessService" />
 	</bean>
-
+	<!-- END -->
 
 	<!-- HTTP Timer Data Access Service -->
 	<bean name="httpTimerDataAccessServiceRequestHandlerServlet"
@@ -222,6 +234,48 @@
 		<property name="pathSpec" value="/remoting/HttpTimerDataAccessService" />
 	</bean>
 	<!-- END -->
+	
+	<!-- Storage  Service -->
+	<bean name="storageServiceRequestHandlerServlet"
+		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
+	</bean>
+
+	<bean id="storageServiceServletHolder"
+		class="org.mortbay.jetty.servlet.ServletHolder">
+		<property name="name" value="storageServiceExporter" />
+		<property name="servlet" ref="storageServiceRequestHandlerServlet" />
+	</bean>
+
+	<bean id="storageServiceServiceMapping"
+		class="org.mortbay.jetty.servlet.ServletMapping">
+		<property name="servletName" value="storageServiceExporter" />
+		<property name="pathSpec" value="/remoting/StorageService" />
+	</bean>
+	<!-- END -->
+	
+	<!-- DEFAULT SERVER FOR STATIC CONTENT -->
+	<bean id="defaultServlet" class="org.mortbay.jetty.servlet.DefaultServlet" />
+
+	
+	<bean id="defaultServletHolder"
+		class="org.mortbay.jetty.servlet.ServletHolder">
+		<property name="name" value="defaultServletExporter" />
+		<property name="servlet" ref="defaultServlet" />
+		<property name="initParameters">
+			<map>
+				<entry key="dirAllowed" value="false"/>
+				<entry key="resourceBase" value="./${storage.storageDefaultFolder}" />
+			</map>
+		</property>	
+	</bean>
+
+	<bean id="defaultServletMapping"
+		class="org.mortbay.jetty.servlet.ServletMapping">
+		<property name="servletName" value="defaultServletExporter" />
+		<property name="pathSpec" value="/"/>
+	</bean>
+	
+	<!-- END -->
 
 	<bean id="servletHandler" class="org.mortbay.jetty.servlet.ServletHandler">
 		<property name="servlets">
@@ -237,6 +291,8 @@
 				<ref bean="bufferServiceServletHolder" />
 				<ref bean="timerDataAccessServiceServletHolder" />
 				<ref bean="httpTimerDataAccessServiceServletHolder" />
+				<ref bean="storageServiceServletHolder" />
+				<ref bean="defaultServletHolder" />
 			</list>
 		</property>
 		<property name="servletMappings">
@@ -252,6 +308,8 @@
 				<ref bean="bufferServiceServiceMapping" />
 				<ref bean="timerDataAccessServiceServiceMapping" />
 				<ref bean="httpTimerDataAccessServiceServiceMapping" />
+				<ref bean="storageServiceServiceMapping" />
+				<ref bean="defaultServletMapping" />
 			</list>
 		</property>
 	</bean>

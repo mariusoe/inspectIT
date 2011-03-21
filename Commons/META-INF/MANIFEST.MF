@@ -2,13 +2,70 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: inspectIT Commons
 Bundle-SymbolicName: info.novatec.inspectit.commons
-Bundle-Version: 0.0.2
+Bundle-Version: 1.4.0
 Export-Package: info.novatec.inspectit.cmr.model,
  info.novatec.inspectit.cmr.service,
  info.novatec.inspectit.communication,
  info.novatec.inspectit.communication.data,
  info.novatec.inspectit.communication.data.ci,
+ info.novatec.inspectit.communication.data.cmr,
  info.novatec.inspectit.communication.exception,
- info.novatec.inspectit.communication.valueobject
+ info.novatec.inspectit.communication.valueobject,
+ info.novatec.inspectit.indexing,
+ info.novatec.inspectit.indexing.aggregation,
+ info.novatec.inspectit.indexing.aggregation.impl;uses:="info.novatec.inspectit.indexing.aggregation,info.novatec.inspectit.communication.data",
+ info.novatec.inspectit.indexing.buffer;uses:="info.novatec.inspectit.indexing.indexer,info.novatec.inspectit.indexing",
+ info.novatec.inspectit.indexing.buffer.impl;
+  uses:="info.novatec.inspectit.indexing.indexer,
+   info.novatec.inspectit.indexing.buffer,
+   info.novatec.inspectit.cmr.cache,
+   info.novatec.inspectit.indexing",
+ info.novatec.inspectit.indexing.impl;uses:="info.novatec.inspectit.communication,info.novatec.inspectit.indexing.restriction,info.novatec.inspectit.indexing",
+ info.novatec.inspectit.indexing.indexer;uses:="info.novatec.inspectit.indexing",
+ info.novatec.inspectit.indexing.indexer.impl;uses:="info.novatec.inspectit.indexing.indexer,info.novatec.inspectit.indexing",
+ info.novatec.inspectit.indexing.query.factory,
+ info.novatec.inspectit.indexing.query.factory.impl,
+ info.novatec.inspectit.indexing.query.provider,
+ info.novatec.inspectit.indexing.query.provider.impl,
+ info.novatec.inspectit.indexing.restriction,
+ info.novatec.inspectit.indexing.restriction.impl;uses:="info.novatec.inspectit.indexing.restriction",
+ info.novatec.inspectit.indexing.storage;uses:="info.novatec.inspectit.indexing.indexer,info.novatec.inspectit.indexing",
+ info.novatec.inspectit.indexing.storage.impl;
+  uses:="info.novatec.inspectit.indexing.indexer,
+   info.novatec.inspectit.cmr.cache,
+   info.novatec.inspectit.indexing.impl,
+   info.novatec.inspectit.indexing,
+   info.novatec.inspectit.indexing.storage,
+   org.springframework.beans.factory",
+ info.novatec.inspectit.spring.logger,
+ info.novatec.inspectit.storage,
+ info.novatec.inspectit.storage.label,
+ info.novatec.inspectit.storage.label.type,
+ info.novatec.inspectit.storage.label.type.impl,
+ info.novatec.inspectit.storage.serializer,
+ info.novatec.inspectit.storage.serializer.impl;
+  uses:="info.novatec.inspectit.storage.serializer,
+   com.esotericsoftware.kryo.util,
+   info.novatec.inspectit.storage.serializer.schema,
+   com.esotericsoftware.kryo",
+ info.novatec.inspectit.storage.serializer.schema,
+ info.novatec.inspectit.storage.serializer.util;uses:="info.novatec.inspectit.cmr.model",
+ schema
 Bundle-Vendor: NovaTec GmbH
-Bundle-RequiredExecutionEnvironment: J2SE-1.4
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ClassPath: .,
+ lib/prod/aopalliance.jar,
+ lib/prod/asm.jar,
+ lib/prod/cglib-nodep.jar,
+ lib/prod/commons-lang.jar,
+ lib/prod/commons-logging.jar,
+ lib/prod/kryo.jar,
+ lib/prod/minlog.jar,
+ lib/prod/reflectasm.jar,
+ lib/prod/spring-aop.jar,
+ lib/prod/spring-asm.jar,
+ lib/prod/spring-beans.jar,
+ lib/prod/spring-context.jar,
+ lib/prod/spring-core.jar,
+ lib/prod/spring-expression.jar,
+ lib/prod/spring-web.jar

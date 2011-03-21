@@ -81,9 +81,15 @@ public class TreeSubView extends AbstractSubView implements ISearchExecutor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void createPartControl(Composite parent, FormToolkit toolkit) {
+	@Override
+	public void init() {
 		treeInputController.setInputDefinition(getRootEditor().getInputDefinition());
+	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public void createPartControl(Composite parent, FormToolkit toolkit) {
 		final Tree tree = toolkit.createTree(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.VIRTUAL | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		tree.setHeaderVisible(true);
 

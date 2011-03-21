@@ -1,5 +1,7 @@
 package info.novatec.inspectit.cmr.service;
 
+import info.novatec.inspectit.communication.data.cmr.BufferStatusData;
+
 /**
  * Service that defines the possible general requests to the buffer.
  * 
@@ -14,4 +16,10 @@ public interface IBufferService {
 	 */
 	void clearBuffer();
 
+	/**
+	 * Returns the current buffer status via {@link BufferStatusData}.
+	 * 
+	 * @return {@link BufferStatusData}.
+	 */
+	BufferStatusData getBufferStatusData();
 }

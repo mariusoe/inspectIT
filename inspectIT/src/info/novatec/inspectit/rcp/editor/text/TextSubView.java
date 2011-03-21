@@ -2,8 +2,8 @@ package info.novatec.inspectit.rcp.editor.text;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.AbstractSubView;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.text.input.TextInputController;
 
 import java.util.Collections;
@@ -49,9 +49,15 @@ public class TextSubView extends AbstractSubView {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void createPartControl(Composite parent, FormToolkit toolkit) {
+	@Override
+	public void init() {
 		textInputController.setInputDefinition(getRootEditor().getInputDefinition());
+	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public void createPartControl(Composite parent, FormToolkit toolkit) {
 		composite = toolkit.createComposite(parent);
 		composite.setLayout(new GridLayout(1, false));
 		textInputController.createPartControl(composite, toolkit);

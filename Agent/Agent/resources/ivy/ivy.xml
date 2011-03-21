@@ -4,6 +4,8 @@
 
     <!-- http://www.jarvana.com/jarvana/ is a nice page for finding projects-->
 
+    <!-- PLEASE UPDATE THE 3rd PARTY NOTIFICATION LIST IN build.xml FOR ANY CHANGE -->
+
     <configurations>
     	<conf name="prod" visibility="private" transitive="false"/>
     	<conf name="test" visibility="private" extends="prod" transitive="false"/>

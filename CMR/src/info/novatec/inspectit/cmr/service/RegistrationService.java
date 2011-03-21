@@ -10,8 +10,8 @@ import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
-import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.cmr.util.LicenseUtil;
+import info.novatec.inspectit.spring.logger.Logger;
 
 import java.rmi.RemoteException;
 import java.sql.Timestamp;

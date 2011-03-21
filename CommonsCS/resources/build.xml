@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+<!-- ======================================================================
+		inspectIT - CommonsCS
+		Sophisticated Monitoring tool by NovaTec GmbH
+		====================================================================== -->
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="inspectIT - CommonsCS" default="release" basedir="../">
+	<description>
+		Sophisticated Monitoring tool by NovaTec GmbH
+	</description>
+
+	<property file="${basedir}/resources/build.properties" />
+
+	<target name="clean">
+		<delete dir="${build.root}" />
+		<delete dir="${lib.root}" />
+	</target>
+
+	<target name="init" description="--> Creates necessary folder structure">
+		<mkdir dir="${build.root}" />
+		<antcall target="init-ivy" />
+
+		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+		<ivy:resolve file="${ivy.file}" />
+		<ivy:cachepath pathid="lib.prod" conf="prod" />
+	</target>
+
+	<target name="init-static-analysis">
+		<antcall target="init-ivy" />
+
+		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+		<!-- needed for Checkstyle, PMD & Findbugs -->
+		<ivy:cachepath pathid="path.checkstyle" organisation="com.puppycrawl.tools" module="checkstyle" revision="5.5" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.pmd" organisation="pmd" module="pmd" revision="4.3" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.findbugs" organisation="com.google.code.findbugs" module="findbugs-ant" revision="2.0.0" conf="default" inline="true" />
+		<!-- Ingnore path missing warnings -->
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.pmd" />
+		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="path.pmd" />
+		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.findbugs" />
+		<taskdef resource="checkstyletask.properties" classpathref="path.checkstyle" />
+	</target>
+
+	<!-- *************************************************************** -->
+	<!--                   B U I L D    T A R G E T S                    -->
+	<!-- *************************************************************** -->
+
+	<target name="release-commons" description="--> call the release of the commons project">
+		<ant antfile="${build.commons.file}" target="release" inheritAll="false" useNativeBasedir="true" />
+	</target>
+
+	<target name="build" depends="init, release-commons" description="--> builds a clean distribution of the cscommons project and copies the classes to the local build folder">
+		<mkdir dir="${build.commonscs.classes}" />
+
+		<path id="compile.classpath">
+			<pathelement location="${build.commons.classes}" />
+			<path refid="lib.prod" />
+		</path>
+
+		<javac source="1.7" target="1.7" debug="true" fork="true" includeAntRuntime="no" destdir="${build.commonscs.classes}" srcdir="${src.root}" classpathref="compile.classpath">
+			<compilerarg value="-Xlint:unchecked" />
+		</javac>
+
+	</target>
+
+
+
+	<!-- *************************************************************** -->
+	<!--                R E L E A S E     T A R G E T S                  -->
+	<!-- *************************************************************** -->
+
+	<target name="release" depends="build" description="--> Creates the distribution jar">
+		<mkdir dir="${build.release.root}" />
+
+		<copy todir="${build.release.root}/lib" flatten="true">
+			<path refid="lib.prod" />
+		</copy>
+
+		<copy todir="${build.release.root}/lib">
+			<fileset dir="${commons.build.release}" includes="*.jar" />
+			<fileset dir="${commons.build.release}/lib" includes="*.jar" />
+		</copy>
+
+		<jar destfile="${build.release.root}/${dist.jar.name}" basedir="${build.commonscs.classes}" />
+	</target>
+
+	<target name="release-as-plugin" depends="build" if="pluginReleaseDir" description="--> Release the classes and manifest as plug-in in defined directory">
+		<mkdir dir="${pluginReleaseDir}/${plugin.name}" />
+		<mkdir dir="${pluginReleaseDir}/${plugin.name}/META-INF" />
+
+		<!-- The retrieve is needed when the plug-in release is done -->
+		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+		<ivy:resolve file="${ivy.file}" />
+		<ivy:retrieve pattern="${basedir}/lib/[conf]/[artifact].[ext]" />
+
+		<copy file="${basedir}/META-INF/MANIFEST.MF" todir="${pluginReleaseDir}/${plugin.name}/META-INF" />
+		<copy todir="${pluginReleaseDir}/${plugin.name}">
+			<fileset dir="${build.commonscs.classes}">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+		<copy todir="${pluginReleaseDir}/${plugin.name}/lib/prod">
+			<fileset dir="${lib.root}/prod">
+				<include name="**/*.jar" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- Calls the release target and then the analysis targets -->
+	<target name="release-and-analyze" depends="static-analysis, release" description="--> Calls the release target and then executes the static analysis" />
+
+	<!-- *************************************************************** -->
+	<!--                Q U A L I T Y     T A R G E T S                  -->
+	<!-- *************************************************************** -->
+
+	<!-- Depends on build, because the compiled classes are needed for the analysis -->
+	<target name="static-analysis" depends="init-static-analysis, build">
+		<mkdir dir="${build.qa.analysis}" />
+		<mkdir dir="${build.qa.analysis.pmd}" />
+		<mkdir dir="${build.qa.analysis.checkstyle}" />
+		<mkdir dir="${build.qa.analysis.findbugs}" />
+		<mkdir dir="${build.qa.analysis.cpd}" />
+
+		<echo message="Analyse Code with tool: PMD" level="info" />
+		<pmd maxRuleViolations="${pmd.maximum.violations}" rulesetfiles="${pmd.rules.file}">
+			<formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true" />
+			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true" />
+			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml" />
+			<fileset dir="${src.root}">
+				<include name="info/novatec/inspectit/**/*.java" />
+				<exclude name="**/*_Stub.java" />
+			</fileset>
+			<fileset dir="${src.commons}">
+				<include name="info/novatec/inspectit/**/*.java" />
+				<exclude name="**/*_Stub.java" />
+			</fileset>
+		</pmd>
+		<xslt in="${build.qa.analysis.pmd}/pmd_results.xml" style="${pmd.config.root}/pmd-report.xslt" out="${build.qa.analysis.pmd}/sortable_report.html" />
+		<copy todir="${build.qa.analysis.pmd}" file="${pmd.config.root}/sorttable.js" />
+		<!-- this js is used for the sortable report -->
+		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >" />
+
+		<echo message="Analyse Code with tool: Checkstyle" level="info" />
+		<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
+			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
+			<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" />
+		</checkstyle>
+
+		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl" />
+		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >" />
+
+		<echo message="Analyse Code with tool: FindBugs" level="info" />
+		<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
+		<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
+		<pathconvert property="findbugs.classpath">
+			<path refid="path.findbugs" />
+		</pathconvert>
+
+		<findbugs output="xml" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="findbugs.jar">
+			<sourcePath path="${src.root}" />
+			<class location="${build.commonscs.classes}" />
+			<auxClasspath>
+				<pathelement path="${build.commons.classes}" />
+				<path refid="lib.prod" />
+			</auxClasspath>
+		</findbugs>
+		<xslt in="${build.qa.analysis.findbugs}/findbugs.xml" style="${basedir}/resources/findbugs/fancy-hist.xsl" out="${build.qa.analysis}/findbugs.html" />
+
+		<echo message="Analyse Code with tool: CPD" level="info" />
+		<cpd format="xml" language="java" minimumTokenCount="100" outputFile="${build.qa.analysis.cpd}/cpd.xml">
+			<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" />
+		</cpd>
+	</target>
+
+
+	<!-- *************************************************************** -->
+	<!--                I V Y     T A R G E T S   		                 -->
+	<!-- *************************************************************** -->
+	<target name="checkForIvy">
+		<condition property="skipIvyDownload">
+			<available file="${ivy.jar.file}" property="skipIvyDownload" />
+		</condition>
+	</target>
+
+	<target name="init-ivy" depends="checkForIvy" unless="skipIvyDownload">
+		<mkdir dir="${ivy.jar.dir}" />
+		<!-- download Ivy from web site so that it can be used even without any special installation -->
+		<echo message="Installing ivy version: ${ivy.install.version}" />
+		<get src="${ivy.download.url}" dest="${ivy.jar.file}" usetimestamp="true" />
+
+		<path id="ivy.lib.path">
+			<fileset dir="${ivy.jar.dir}" includes="*.jar" />
+		</path>
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
+	</target>
+
+	<target name="clean-ivy" depends="init-ivy" description="--> clean the ivy installation and the ivy cache">
+		<!--  The ivy cache is cleaned and the install directory is deleted -->
+		<ivy:cleancache />
+		<delete dir="${ivy.jar.dir}" />
+	</target>
+</project>

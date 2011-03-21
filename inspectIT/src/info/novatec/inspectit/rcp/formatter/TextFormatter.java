@@ -6,10 +6,26 @@ import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationAwareData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
+import info.novatec.inspectit.storage.StorageData;
+import info.novatec.inspectit.storage.StorageData.StorageState;
+import info.novatec.inspectit.storage.WritingStatus;
+import info.novatec.inspectit.storage.label.AbstractStorageLabel;
+import info.novatec.inspectit.storage.label.BooleanStorageLabel;
+import info.novatec.inspectit.storage.label.type.AbstractCustomStorageLabelType;
+import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
+import info.novatec.inspectit.storage.label.type.impl.AssigneeLabelType;
+import info.novatec.inspectit.storage.label.type.impl.CreationDateLabelType;
+import info.novatec.inspectit.storage.label.type.impl.ExploredByLabelType;
+import info.novatec.inspectit.storage.label.type.impl.RatingLabelType;
+import info.novatec.inspectit.storage.label.type.impl.StatusLabelType;
+import info.novatec.inspectit.storage.label.type.impl.UseCaseLabelType;
 
+import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.jface.preference.JFacePreferences;
@@ -188,4 +204,168 @@ public final class TextFormatter {
 		}
 		return "";
 	}
+
+	/**
+	 * Returns the styled string for the storage data and its CMR repository definition.
+	 * 
+	 * @param storageData
+	 *            {@link StorageData}.
+	 * @param cmrRepositoryDefinition
+	 *            {@link CmrRepositoryDefinition}.
+	 * @return Styled string for nicer representation.
+	 */
+	public static StyledString getStyledStorageDataString(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition) {
+		StyledString styledString = new StyledString();
+		styledString.append(storageData.getName());
+		styledString.append(" ");
+		styledString.append("[" + cmrRepositoryDefinition.getName() + "]", StyledString.QUALIFIER_STYLER);
+		styledString.append(" - ");
+		styledString.append(getStorageStateTextualRepresentation(storageData.getState()), StyledString.DECORATIONS_STYLER);
+		styledString.append(", " + NumberFormatter.formatBytesToMBytes(storageData.getDiskSize()), StyledString.DECORATIONS_STYLER);
+		return styledString;
+	}
+
+	/**
+	 * @param storageState
+	 *            Storage state.
+	 * @return Returns the textual representation of the storage state.
+	 */
+	public static String getStorageStateTextualRepresentation(StorageState storageState) {
+		if (storageState == StorageState.CREATED_NOT_OPENED) {
+			return "Created";
+		} else if (storageState == StorageState.OPENED) {
+			return "Writable";
+		} else if (storageState == StorageState.CLOSED) {
+			return "Readable";
+		} else if (storageState == StorageState.RECORDING) {
+			return "Recording";
+		}
+		return "UNKNOWN STATE";
+	}
+
+	/**
+	 * Returns the name of the label, based on it's type. If label is <code>null</code>, string
+	 * "null" will be returned.
+	 * 
+	 * @param label
+	 *            Label to get name for.
+	 * @return Returns the name of the label, based on it's class.
+	 */
+	public static String getLabelName(AbstractStorageLabel<?> label) {
+		if (null == label) {
+			return "null";
+		} else {
+			return getLabelName(label.getStorageLabelType());
+		}
+	}
+
+	/**
+	 * Returns the name of the label type. If label type is <code>null</code>, string "null" will be
+	 * returned.
+	 * 
+	 * @param labelType
+	 *            Label type to get name for.
+	 * @return Returns the name of the label, based on it's class.
+	 */
+	public static String getLabelName(AbstractStorageLabelType<?> labelType) {
+		if (null == labelType) {
+			return "null";
+		} else if (AssigneeLabelType.class.equals(labelType.getClass())) {
+			return "Assignee";
+		} else if (CreationDateLabelType.class.equals(labelType.getClass())) {
+			return "Creation Date";
+		} else if (ExploredByLabelType.class.equals(labelType.getClass())) {
+			return "Explored By";
+		} else if (RatingLabelType.class.equals(labelType.getClass())) {
+			return "Rating";
+		} else if (StatusLabelType.class.equals(labelType.getClass())) {
+			return "Status";
+		} else if (UseCaseLabelType.class.equals(labelType.getClass())) {
+			return "Use Case";
+		} else if (AbstractCustomStorageLabelType.class.isAssignableFrom(labelType.getClass())) {
+			return ((AbstractCustomStorageLabelType<?>) labelType).getName();
+		} else {
+			return "Unknown Label";
+		}
+	}
+
+	/**
+	 * Returns the class type of the label type.
+	 * 
+	 * @param labelType
+	 *            Label type to get name for.
+	 * @return Returns the class type of the label type.
+	 */
+	public static String getLabelValueType(AbstractStorageLabelType<?> labelType) {
+		if (null == labelType) {
+			return "null";
+		} else if (Boolean.class.equals(labelType.getValueClass())) {
+			return "Yes/No";
+		} else if (Date.class.equals(labelType.getValueClass())) {
+			return "Date";
+		} else if (Number.class.equals(labelType.getValueClass())) {
+			return "Number";
+		} else if (String.class.equals(labelType.getValueClass())) {
+			return "Text";
+		} else {
+			return "Unknown Label Type";
+		}
+	}
+
+	/**
+	 * Returns the name of the label, based on it's class. If label is <code>null</code>, string
+	 * "null" will be returned.
+	 * 
+	 * @param label
+	 *            Label to get name for.
+	 * @param grouped
+	 *            TODO
+	 * @return Returns the name of the label, based on it's class.
+	 */
+	public static String getLabelValue(AbstractStorageLabel<?> label, boolean grouped) {
+		if (null == label) {
+			return "null";
+		} else if (CreationDateLabelType.class.equals(label.getStorageLabelType().getClass())) {
+			Date date = (Date) ((AbstractStorageLabel<?>) label).getValue();
+			if (grouped) {
+				return DateFormat.getDateInstance().format(date);
+			} else {
+				return DateFormat.getDateTimeInstance().format(date);
+			}
+		} else if (BooleanStorageLabel.class.equals(label.getClass())) {
+			BooleanStorageLabel booleanStorageLabel = (BooleanStorageLabel) label;
+			if (booleanStorageLabel.getValue().booleanValue()) {
+				return "Yes";
+			} else {
+				return "No";
+			}
+		} else {
+			return label.getFormatedValue();
+		}
+	}
+
+	/**
+	 * Returns text representation for the {@link WritingStatus} or empty string if status is
+	 * <code>null</code>.
+	 * 
+	 * @param recordingWritingStatus
+	 *            Status of writing.
+	 * @return String that represent the status.
+	 */
+	public static String getWritingStatusText(WritingStatus recordingWritingStatus) {
+		if (null == recordingWritingStatus) {
+			return "";
+		}
+		switch (recordingWritingStatus) {
+		case GOOD:
+			return "[GREEN] There are no problems.";
+		case MEDIUM:
+			return "[YELLOW] Amount of data tried to be recorded is slightly higer than what CMR can support. However, no data loss should be expected.";
+		case BAD:
+			return "[RED] Amount of data tried to be recorded is too high for CMR to manage. Data loss should be expected.";
+		default:
+			return "";
+		}
+	}
+
 }

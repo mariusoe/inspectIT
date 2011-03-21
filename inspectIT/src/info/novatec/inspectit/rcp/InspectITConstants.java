@@ -14,7 +14,10 @@ public interface InspectITConstants {
 	// images
 	String IMG_SERVER_ONLINE = "server_online.png"; //$NON-NLS-1$
 	String IMG_SERVER_OFFLINE = "server_offline.png"; //$NON-NLS-1$
+	String IMG_SERVER_ONLINE_SMALL = "server_online_16x16.png"; //$NON-NLS-1$
+	String IMG_SERVER_OFFLINE_SMALL = "server_offline_16x16.png"; //$NON-NLS-1$
 	String IMG_SERVER_REFRESH = "server_refresh.png";
+	String IMG_SERVER_REFRESH_SMALL = "server_refresh_16x16.png";
 	String IMG_SERVER_ADD = "server_add.png"; //$NON-NLS-1$
 	String IMG_AGENT = "agent.png"; //$NON-NLS-1$
 	String IMG_INSTRUMENTATION_BROWSER = "instrumentation_browser.gif"; //$NON-NLS-1$
@@ -65,9 +68,31 @@ public interface InspectITConstants {
 	String IMG_TRASH = "trash.png"; //$NON-NLS-1$
 	String IMG_TOOL = "tool.png"; //$NON-NLS-1$
 	String IMG_CHECKMARK = "checkmark.png"; //$NON-NLS-1$
-	String IMG_CLOSE = "close.png";
 	String IMG_WINDOW = "window.png"; //$NON-NLS-1$
 	String IMG_FONT = "font.png";
+	String IMG_COLLAPSE = "collapseall.gif";
+	String IMG_ADD = "add.png";
+	String IMG_STOARGE_NEW = "storage_new.gif";
+	String IMG_STOARGE_OPENED = "storage_opened.png";
+	String IMG_STOARGE_RECORDING = "storage_recording.gif";
+	String IMG_STOARGE_CLOSED = "storage_closed.png";
+	String IMG_STOARGE_AVAILABLE = "storage_available.gif";
+	String IMG_STOARGE_NOT_AVAILABLE = "storage_notavailable.gif";
+	String IMG_ASSIGNEE_LABEL_ICON = "assignee_label.png";
+	String IMG_DATE_LABEL_ICON = IMG_LAST_WEEK;
+	String IMG_MOUNTEDBY_LABEL_ICON = "mounted_by_label.png";
+	String IMG_RATING_LABEL_ICON = "rating_label.png";
+	String IMG_STATUS_LABEL_ICON = "status_label.png";
+	String IMG_USECASE_LABEL_ICON = "usecase_label.png";
+	String IMG_USER_LABEL_ICON = "userdefined_label.png";
+	String IMG_PROPERTIES = "properties.gif";
+	String IMG_CLOSE = "close.png";
+	String IMG_RECORD = "record.png";
+	String IMG_RECORD_GRAY = "record_gray.png";
+	String IMG_EVENT_GREEN = "event_green.png";
+	String IMG_EVENT_RED = "event_red.png";
+	String IMG_EVENT_YELLOW = "event_yellow.png";
+	String IMG_STORAGE_OVERLAY = "storage_overlay.png";
 
 	String IMG_HTTP = "http_clean.png"; //$NON-NLS-1$
 	String IMG_HTTP_AGGREGATE = "http_network.png"; //$NON-NLS-1$
@@ -77,5 +102,4 @@ public interface InspectITConstants {
 	String OVERLAY_PRIORITY = "overlay_priority.gif"; //$NON-NLS-1$
 	String OVERLAY_UP = "overlay_up.png"; //$NON-NLS-1$
 	String OVERLAY_ERROR = "overlay_error.gif"; //$NON-NLS-1$
-
 }

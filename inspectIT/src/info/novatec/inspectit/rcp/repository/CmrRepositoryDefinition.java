@@ -10,15 +10,15 @@ import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.IServerStatusService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
+import info.novatec.inspectit.cmr.service.IStorageService;
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider;
 import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 import info.novatec.inspectit.rcp.repository.service.cmr.CmrServiceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.springframework.remoting.RemoteConnectFailureException;
 
 /**
  * The CMR repository definition initializes the services exposed by the CMR.
@@ -29,7 +29,27 @@ import org.springframework.remoting.RemoteConnectFailureException;
  * @author Matthias Huber
  * 
  */
-public class CmrRepositoryDefinition implements RepositoryDefinition {
+public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrRepositoryProvider {
+
+	/**
+	 * Default CMR name.
+	 */
+	public static final String DEFAULT_NAME = "Local CMR";
+
+	/**
+	 * Default CMR ip address.
+	 */
+	public static final String DEFAULT_IP = "localhost";
+
+	/**
+	 * Default CMR port.
+	 */
+	public static final int DEFAULT_PORT = 8182;
+
+	/**
+	 * Default description.
+	 */
+	public static final String DEFAULT_DESCRIPTION = "This Central Management Repository (CMR) is automatically added by default when you first start the inspectIT.";
 
 	/**
 	 * Enumeration for the online status of {@link CmrRepositoryDefinition}.
@@ -38,6 +58,11 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	 * 
 	 */
 	public enum OnlineStatus {
+		
+		/**
+		 * Unknown state before the first check.
+		 */
+		UNKNOWN,
 
 		/**
 		 * CMR is off-line.
@@ -63,6 +88,9 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 		 */
 		public boolean canChangeTo(OnlineStatus newStatus) {
 			if (this.equals(newStatus)) {
+				return false;
+			}
+			if (newStatus.equals(UNKNOWN)) {
 				return false;
 			}
 			switch (this) {
@@ -94,6 +122,16 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	 * State of the CMR.
 	 */
 	private OnlineStatus onlineStatus;
+
+	/**
+	 * CMR name assigned by user.
+	 */
+	private String name;
+
+	/**
+	 * Optional description for the CMR.
+	 */
+	private String description;
 
 	/**
 	 * The cached data service.
@@ -149,19 +187,24 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	 * The http timer data access service.
 	 */
 	private IHttpTimerDataAccessService httpTimerDataAccessService;
-	
+
 	/**
 	 * The {@link IGlobalDataAccessService}.
 	 */
 	private IGlobalDataAccessService globalDataAccessService;
 
 	/**
-	 * /** CMR repository change listeners.
+	 * The storage service.
 	 */
-	private List<CmrRepositoryChangeListener> cmrRepositoryChangeListeners = new ArrayList<CmrRepositoryChangeListener>();
+	private IStorageService storageService;
 
 	/**
-	 * The only constructor of this class. The ip and port is mandatory to create the connection.
+	 * CMR repository change listeners.
+	 */
+	private List<CmrRepositoryChangeListener> cmrRepositoryChangeListeners = new ArrayList<CmrRepositoryChangeListener>(1);
+
+	/**
+	 * Calls default constructor with name 'Undefined'.
 	 * 
 	 * @param ip
 	 *            The ip of the CMR.
@@ -169,9 +212,24 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	 *            The port used by the CMR.
 	 */
 	public CmrRepositoryDefinition(String ip, int port) {
+		this(ip, port, "Undefined");
+	}
+
+	/**
+	 * The default constructor of this class. The ip and port is mandatory to create the connection.
+	 * 
+	 * @param ip
+	 *            The ip of the CMR.
+	 * @param port
+	 *            The port used by the CMR.
+	 * @param name
+	 *            The name of the CMR assigned by user.
+	 */
+	public CmrRepositoryDefinition(String ip, int port, String name) {
 		this.ip = ip;
 		this.port = port;
-		this.onlineStatus = OnlineStatus.OFFLINE;
+		this.onlineStatus = OnlineStatus.UNKNOWN;
+		this.name = name;
 
 		CmrServiceProvider cmrServiceProvider = (CmrServiceProvider) InspectIT.getDefault().getApplicationContext().getBean("cmrServiceProvider");
 
@@ -185,8 +243,9 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 		httpTimerDataAccessService = cmrServiceProvider.getHttpTimerDataAccessService(this);
 		bufferService = cmrServiceProvider.getBufferService(this);
 		timerDataAccessService = cmrServiceProvider.getTimerDataAccessService(this);
-		globalDataAccessService  = cmrServiceProvider.getGlobalDataAccessService(this);
-		
+		globalDataAccessService = cmrServiceProvider.getGlobalDataAccessService(this);
+		storageService = cmrServiceProvider.getStorageService(this);
+
 		cachedDataService = new CachedDataService(globalDataAccessService);
 	}
 
@@ -230,7 +289,9 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 		return combinedMetricsDataAccessService;
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public IConfigurationInterfaceDataAccessService getConfigurationInterfaceDataAccessService() {
 		return configurationInterfaceDataAccessService;
 	}
@@ -254,7 +315,6 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public IBufferService getBufferService() {
 		return bufferService;
 	}
@@ -270,11 +330,18 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	/**
 	 * {@inheritDoc}
 	 */
+	public IStorageService getStorageService() {
+		return storageService;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public IHttpTimerDataAccessService getHttpTimerDataAccessService() {
 		return httpTimerDataAccessService;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -306,8 +373,10 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	 *            {@link CmrRepositoryChangeListener}.
 	 */
 	public void addCmrRepositoryChangeListener(CmrRepositoryChangeListener cmrRepositoryChangeListener) {
-		if (!cmrRepositoryChangeListeners.contains(cmrRepositoryChangeListener)) {
-			cmrRepositoryChangeListeners.add(cmrRepositoryChangeListener);
+		synchronized (cmrRepositoryChangeListeners) {
+			if (!cmrRepositoryChangeListeners.contains(cmrRepositoryChangeListener)) {
+				cmrRepositoryChangeListeners.add(cmrRepositoryChangeListener);
+			}
 		}
 	}
 
@@ -318,7 +387,39 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	 *            {@link CmrRepositoryChangeListener}.
 	 */
 	public void removeCmrRepositoryChangeListener(CmrRepositoryChangeListener cmrRepositoryChangeListener) {
-		cmrRepositoryChangeListeners.remove(cmrRepositoryChangeListener);
+		synchronized (cmrRepositoryChangeListeners) {
+			cmrRepositoryChangeListeners.remove(cmrRepositoryChangeListener);
+		}
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description
+	 *            the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	/**
@@ -339,8 +440,10 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 		if (onlineStatus.canChangeTo(newStatus)) {
 			OnlineStatus oldStatus = onlineStatus;
 			onlineStatus = newStatus;
-			for (CmrRepositoryChangeListener changeListener : cmrRepositoryChangeListeners) {
-				changeListener.repositoryOnlineStatusUpdated(this, oldStatus, newStatus);
+			synchronized (cmrRepositoryChangeListeners) {
+				for (CmrRepositoryChangeListener changeListener : cmrRepositoryChangeListeners) {
+					changeListener.repositoryOnlineStatusUpdated(this, oldStatus, newStatus);
+				}
 			}
 			return true;
 		}
@@ -372,9 +475,16 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 				return true;
 			}
 			return false;
-		} catch (RemoteConnectFailureException e) {
+		} catch (Exception e) {
 			return false;
-		} 
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public CmrRepositoryDefinition getCmrRepositoryDefinition() {
+		return this;
 	}
 
 	/**
@@ -422,6 +532,7 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	 */
 	@Override
 	public String toString() {
-		return "Repository definition :: IP=" + ip + " Port=" + port;
+		return "Repository definition :: Name=" + name + " IP=" + ip + " Port=" + port;
 	}
+
 }

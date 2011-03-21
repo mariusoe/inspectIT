@@ -174,7 +174,18 @@ public final class NumberFormatter {
 	 * @return A formatted string.
 	 */
 	public static String formatBytesToKBytes(long bytes) {
-		return decFormat.format(bytes / 1024) + " kB";
+		return decFormat.format((double) bytes / 1024) + " Kb";
+	}
+	
+	/**
+	 * Formats bytes to megaBytes.
+	 * 
+	 * @param bytes
+	 *            The bytes to format.
+	 * @return A formatted string.
+	 */
+	public static String formatBytesToMBytes(long bytes) {
+		return decFormat.format((double) bytes / (1024 * 1024)) + " Mb";
 	}
 
 	/**

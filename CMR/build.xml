@@ -14,10 +14,6 @@
 		<pathelement location="${build.test.classes}" />
 	</path>
 
-	<path id="path.common.classes">
-		<pathelement location="${build.commons.classes}" />
-	</path>
-
 	<target name="clean" description="--> Cleans the project">
 		<delete dir="${build.root}" failonerror="false" />
 		<delete dir="${release.root}" failonerror="false" />
@@ -72,7 +68,6 @@
 		<taskdef name="wptg-ftp" classname="org.apache.tools.ant.taskdefs.optional.net.FTP" loaderref="ant.coreLoader" />
 	</target>
 
-
 	<!-- *************************************************************** -->
 	<!--                   B U I L D    T A R G E T S                    -->
 	<!-- *************************************************************** -->
@@ -80,21 +75,24 @@
 	<!-- to create the CMR component.                                    -->
 	<!-- *************************************************************** -->
 
-	<target name="build-commons" description="--> builds a clean distribution of the commons project and copies the classes to the local build folder">
-		<mkdir dir="${build.commons.classes}" />
+	<target name="release-commons" description="--> call the release of the commons project">
+			<ant antfile="${build.commons.file}" target="release" inheritAll="false" useNativeBasedir="true" />
+		</target>
 
-		<javac source="1.5" target="1.5" debug="true" fork="true" destdir="${build.commons.classes}" srcdir="${src.commons}" includeAntRuntime="no" />
+	<target name="release-commonscs" description="--> call the release of the commonscs project">
+		<ant antfile="${build.commonscs.file}" target="release" inheritAll="false" useNativeBasedir="true" />
 	</target>
 
-	<target name="build" depends="init, build-commons" description="--> Compiles the sources">
+	<target name="build" depends="init, release-commons, release-commonscs" description="--> Compiles the sources">
 		<mkdir dir="${build.cmr.classes}" />
 
 		<path id="compile.classpath">
 			<pathelement location="${build.commons.classes}" />
+			<pathelement location="${build.commonscs.classes}" />
 			<path refid="lib.prod" />
 		</path>
 
-		<javac source="1.5" target="1.5" debug="true" debuglevel="lines,vars,source" destdir="${build.cmr.classes}" srcdir="${src.root}" classpathref="compile.classpath" includeAntRuntime="no" />
+		<javac source="1.6" target="1.6" debug="true" debuglevel="lines,vars,source" destdir="${build.cmr.classes}" srcdir="${src.root}" classpathref="compile.classpath" includeAntRuntime="no" />
 	</target>
 
 
@@ -113,12 +111,15 @@
 
 		<path id="complete.classpath">
 			<pathelement location="${build.cmr.classes}" />
-			<pathelement location="${build.commons.classes}" />
+			<fileset dir="${commons.build.release}" includes="*.jar" />
+			<fileset dir="${commons.build.release}/lib" includes="*.jar" />
+			<fileset dir="${commonscs.build.release}" includes="*.jar" />
+			<fileset dir="${commonscs.build.release}/lib" includes="*.jar" />
 			<path refid="lib.prod" />
 			<path refid="lib.test" />
 		</path>
 
-		<javac source="1.6" target="1.6" debug="true" debuglevel="lines,vars,source" nowarn="off" includeAntRuntime="no" destdir="${build.test.classes}" srcdir="${test.root}">
+		<javac source="1.7" target="1.7" debug="true" debuglevel="lines,vars,source" nowarn="off" includeAntRuntime="no" destdir="${build.test.classes}" srcdir="${test.root}">
 			<classpath refid="complete.classpath" />
 			<compilerarg value="-Xlint:unchecked" />
 		</javac>
@@ -247,6 +248,11 @@
 
 		<copy todir="${build.release.root.cmr}/lib" flatten="true">
 			<path refid="lib.prod" />
+		</copy>
+
+		<copy todir="${build.release.root.cmr}/lib">
+			<fileset dir="${commonscs.build.release}" includes="*.jar" />
+			<fileset dir="${commonscs.build.release}/lib" includes="*.jar" />
 		</copy>
 
 		<jar destfile="${build.release.root.cmr}/lib/inspectit-commons.jar" basedir="${build.commons.classes}" />
@@ -432,7 +438,7 @@
 		<tar destfile="${release.root}/inspectit-cmr.linux.x86.tar.gz" compression="gzip">
 			<fileset dir="${build.release.root}" />
 			<tarfileset file="${build.scripts}/startup.sh" prefix="CMR" filemode="755" />
-			<zipfileset src="${jvm.root}/jre6-linux-x86.zip" prefix="CMR/jre" filemode="755" />
+			<zipfileset src="${jvm.root}/jre7-linux-x86.zip" prefix="CMR/jre" filemode="755" />
 			<zipfileset dir="${commons.basedir}/resources" prefix="CMR" includes="inspectIT-licence.pdf" />
 		</tar>
 		<delete file="${build.scripts}/startup.sh" failonerror="false" />
@@ -443,7 +449,7 @@
 		<tar destfile="${release.root}/inspectit-cmr.linux.x64.tar.gz" compression="gzip">
 			<fileset dir="${build.release.root}" />
 			<tarfileset file="${build.scripts}/startup.sh" prefix="CMR" filemode="755" />
-			<zipfileset src="${jvm.root}/jre6-linux-x64.zip" prefix="CMR/jre" filemode="755" />
+			<zipfileset src="${jvm.root}/jre7-linux-x64.zip" prefix="CMR/jre" filemode="755" />
 			<zipfileset dir="${commons.basedir}/resources" prefix="CMR" includes="inspectIT-licence.pdf" />
 		</tar>
 		<delete file="${build.scripts}/startup.sh" failonerror="false" />
@@ -454,7 +460,7 @@
 		<zip destfile="${release.root}/inspectit-cmr.windows.x86.zip">
 			<fileset dir="${build.release.root}" />
 			<zipfileset file="${build.scripts}/startup.bat" prefix="CMR" />
-			<zipfileset src="${jvm.root}/jre6-windows-x86.zip" prefix="CMR/jre" />
+			<zipfileset src="${jvm.root}/jre7-windows-x86.zip" prefix="CMR/jre" />
 			<zipfileset dir="${commons.basedir}/resources" prefix="CMR" includes="inspectIT-licence.pdf" />
 		</zip>
 		<delete file="${build.scripts}/startup.bat" failonerror="false" />
@@ -465,7 +471,7 @@
 		<zip destfile="${release.root}/inspectit-cmr.windows.x64.zip">
 			<fileset dir="${build.release.root}" />
 			<zipfileset file="${build.scripts}/startup.bat" prefix="CMR" />
-			<zipfileset src="${jvm.root}/jre6-windows-x64.zip" prefix="CMR/jre" />
+			<zipfileset src="${jvm.root}/jre7-windows-x64.zip" prefix="CMR/jre" />
 			<zipfileset dir="${commons.basedir}/resources" prefix="CMR" includes="inspectIT-licence.pdf" />
 		</zip>
 		<delete file="${build.scripts}/startup.bat" failonerror="false" />
@@ -474,12 +480,12 @@
 	<target name="-create-thirdparty-notification">
 		<echo file="${build.release.root.cmr}/thirdparty.txt" message="The CMR uses the following third party libraries: ${line.separator} ${line.separator}
 Apache Software License, 1.1 : hessian (3.1.5) ${line.separator}
-Apache Software License, 2.0 : commons-logging (1.1.1), log4j (1.2.15), spring (2.5.5), spring-web (2.5.5), servlet-api (2.5), commons-collections (3.2), cglib-nodep (2.1_3), quartz (1.5.2), jetty (6.1.16), jetty-util (6.1.16), commons-codec (1.3), truelicense (1.29), truexml (1.29), jettison (1.2) ${line.separator}
-BSD License : dom4j (1.6.1), antlr (2.7.7), xstream (1.3.1) ${line.separator}
+Apache Software License, 2.0 : commons-logging (1.1.1), commons-lang (2.5), commons-collections (3.2), commons-codec (1.3) log4j (1.2.15), servlet-api (2.5),  jetty (6.1.26), jetty-util (6.1.26), spring-core (3.1.0.RELEASE), spring-context (3.1.0.RELEASE), spring-context-support (3.1.0.RELEASE), spring-beans (3.1.0.RELEASE), spring-orm (3.1.0.RELEASE), spring-tx (3.1.0.RELEASE), spring-web (3.1.0.RELEASE), spring-asm (3.1.0.RELEASE), spring-expression (3.1.0.RELEASE), spring-aop (3.1.0.RELEASE), spring-jdbc (3.1.0.RELEASE), cglib-nodep (2.2.2),  truelicense (1.29), truexml (1.29) ${line.separator}
+BSD License : dom4j (1.6.1),  antlr (2.7.7), kryo (1.04), reflectasm (1.01), minlog (1.2), asm (3.3.1) ${line.separator}
 Common Development and Distribution License (CDDL), 1.0 : jta (1.0.1B) ${line.separator}
 GNU Lesser General Public License (LGPL), 2.1 : hibernate (3.5.3-Final), c3p0 (0.9.1.2) ${line.separator}
 MIT License : slf4j-api (1.5.6), slf4j-log4j12 (1.5.6) ${line.separator}
-Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA), h2 (1.2.138)" />
+Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA), h2 (1.2.148)" />
 	</target>
 
 

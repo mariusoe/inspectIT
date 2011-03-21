@@ -2,8 +2,8 @@ package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.InvocationDataDao;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
-import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
+import info.novatec.inspectit.spring.logger.Logger;
 
 import java.util.Collection;
 import java.util.Date;

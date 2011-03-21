@@ -74,16 +74,32 @@
             class="info.novatec.inspectit.rcp.Perspective"
             fixed="true"
             id="inspectit.perspective"
-            name="inspectIT Perspective">
+            name="inspectIT">
       </perspective>
    </extension>
    <extension
          point="org.eclipse.ui.views">
       <view
-            name="Server View"
-            icon="icons/sample.gif"
-            class="info.novatec.inspectit.rcp.view.server.ServerView"
-            id="inspectit.serverview">
+            allowMultiple="false"
+            class="info.novatec.inspectit.rcp.view.impl.StorageManagerView"
+            icon="icons/file_manager.png"
+            id="info.novatec.inspectit.rcp.view.storageManager"
+            name="Storage Manager"
+            restorable="true">
+      </view>
+      <view
+            class="info.novatec.inspectit.rcp.view.impl.DataExplorerView"
+            icon="icons/data_explorer.png"
+            id="info.novatec.inspectit.rcp.view.dataExplorer"
+            name="Data Explorer"
+            restorable="true">
+      </view>
+      <view
+            class="info.novatec.inspectit.rcp.view.impl.RepositoryManagerView"
+            icon="icons/server_explorer.png"
+            id="info.novatec.inspectit.rcp.view.repositoryManager"
+            name="Repository Manager"
+            restorable="true">
       </view>
    </extension>
    <extension
@@ -97,53 +113,43 @@
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">
-      <actionSet
-            id="info.novatec.inspectit.rcp.actionSet"
-            label="Repository Action Set"
-            visible="true">
-         <action
-               class="info.novatec.inspectit.rcp.action.ClearRepositoryBufferAction"
-               icon="icons/clean_buffer.png"
-               id="info.novatec.inspectit.rcp.action.ClearRepositoryBuffer"
-               label="&amp;Clear Repository Buffer"
-               style="push"
-               toolbarPath="repository"
-               tooltip="Clear Data From Repository Buffer">
-         </action>
-         <action
-               class="info.novatec.inspectit.rcp.action.UpdateRepositoryAction"
-               icon="icons/server_refresh.png"
-               id="info.novatec.inspectit.rcp.action.UpdateRepositoryAction"
-               label="&amp;Refresh Repository"
-               toolbarPath="repository"
-               tooltip="Refresh Repository">
-         </action>
-         <action
-               class="info.novatec.inspectit.rcp.action.RemoveRepositoryAction"
-               icon="icons/server_remove.png"
-               id="info.novatec.inspectit.rcp.action.RemoveRepositoryAction"
-               label="&amp;Delete Repository Definition"
-               style="push"
-               toolbarPath="repository"
-               tooltip="Delete Repository Definition">
-         </action>
-         <action
-               class="info.novatec.inspectit.rcp.action.CreateRepositoryAction"
-               icon="icons/server_add.png"
-               id="info.novatec.inspectit.rcp.action.CreateRepositoryAction"
-               label="&amp;Add Repository Definition"
-               toolbarPath="repository"
-               tooltip="Add Repository Definition">
-         </action>
-      </actionSet>
    </extension>
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
-            class="info.novatec.inspectit.rcp.wizard.NewRepositoryDefinitionWizard"
-            icon="icons/server_add.png"
-            id="inspectit.repositorywizard"
-            name="New Repository Definition">
+            class="info.novatec.inspectit.rcp.wizard.CreateStorageWizard"
+            icon="icons/storage_new.gif"
+            id="info.novatec.inspectit.rcp.wizard.createStorageWizard"
+            name="Create Storage Wizard">
+      </wizard>
+      <wizard
+            class="info.novatec.inspectit.rcp.wizard.AddStorageLabelWizard"
+            icon="icons/label_add.png"
+            id="info.novatec.inspectit.rcp.wizard.addStorageLabelWizard"
+            name="Add Storage Label Wizard">
+      </wizard>
+      <wizard
+            class="info.novatec.inspectit.rcp.wizard.CopyBufferToStorageWizard"
+            icon="icons/copy_buffer.png"
+            id="info.novatec.inspectit.rcp.wizard.copyBufferToStorageWizard"
+            name="Copy Buffer to Storage Wizard">
+      </wizard>
+      <wizard
+            class="info.novatec.inspectit.rcp.wizard.StartRecordingWizard"
+            icon="icons/storage_recording.gif"
+            id="info.novatec.inspectit.rcp.wizard.startRecordingWizard"
+            name="Start Recording Wizard">
+      </wizard>
+      <wizard
+            class="info.novatec.inspectit.rcp.wizard.ManageLabelWizard"
+            icon="icons/label.png"
+            id="info.novatec.inspectit.rcp.wizard.manageLabelsWizard"
+            name="Manage Labels Wizard">
+      </wizard>
+      <wizard
+            class="info.novatec.inspectit.rcp.wizard.CopyDataToStorageWizard"
+            id="info.novatec.inspectit.rcp.wizard.copyDataToStorageWizard"
+            name="Copy Data to Storage Wizard">
       </wizard>
    </extension>
    <extension
@@ -166,14 +172,6 @@
             name="Import License">
       </command>
       <command
-            id="info.novatec.inspectit.rcp.commands.exportInvocations"
-            name="Export">
-      </command>
-      <command
-            id="info.novatec.inspectit.rcp.commands.saveInvocations"
-            name="Save">
-      </command>
-      <command
             id="info.novatec.inspectit.rcp.commands.details"
             name="Details">
       </command>
@@ -188,11 +186,6 @@
       <command
             id="info.novatec.inspectit.rcp.commands.navigateToPlotting"
             name="History Graph">
-      </command>
-      <command
-            defaultHandler="info.novatec.inspectit.rcp.handlers.LicenseInformationHandler"
-            id="info.novatec.inspectit.rcp.commands.licenseInfo"
-            name="License Information">
       </command>
       <command
             id="info.novatec.inspectit.rcp.commands.navigateToStartMethodInvocations"
@@ -233,6 +226,66 @@
                name="Parameter"
                optional="true">
          </commandParameter>
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.createStorage"
+            name="Create Storage">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.closeStorage"
+            name="Close Storage">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.deleteStorage"
+            name="Delete Storage">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.addStorageLabel"
+            name="Add Storage Label">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.removeStorageLabel"
+            name="Remove Storage Label">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.startRecording"
+            name="Start Recording">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.stopRecording"
+            name="Stop Recording">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.showRepository"
+            name="Show Repository">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.copyBufferToStorage"
+            name="Copy Buffer to Storage">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.clearRepositoryBuffer"
+            name="Clear Repository Buffer">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.addCmrRepository"
+            name="Add CMR Repository">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.removeCmrRepository"
+            name="Remove CMR Repository">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.showLabelsManager"
+            name="Show Labels Manager">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.licenseInfo"
+            name="License Information">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.closeAndShowStorage"
+            name="Close And Show Storage">
       </command>
    </extension>
    <extension
@@ -332,71 +385,6 @@
                         value="treeSubView">
                   </test>
                </with>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
-            class="info.novatec.inspectit.rcp.handlers.ExportInvocationsHandler"
-            commandId="info.novatec.inspectit.rcp.commands.exportInvocations">
-         <activeWhen>
-            <and>
-               <count
-                     value="+">
-               </count>
-               <iterate>
-                  <instanceof
-                        value="info.novatec.inspectit.communication.data.InvocationSequenceData">
-                  </instanceof>
-               </iterate>
-               <with
-                     variable="activeEditor">
-                  <instanceof
-                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
-                  </instanceof>
-                  <test
-                        property="info.novatec.inspectit.activeSubView"
-                        value="tableSubView">
-                  </test>
-               </with>
-               <!-- TODO: Remove when export of invocations is possible with buffer -->
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
-            class="info.novatec.inspectit.rcp.handlers.SaveInvocationsHandler"
-            commandId="info.novatec.inspectit.rcp.commands.saveInvocations">
-         <activeWhen>
-            <and>
-               <count
-                     value="+">
-               </count>
-               <iterate>
-                  <instanceof
-                        value="info.novatec.inspectit.communication.data.InvocationSequenceData">
-                  </instanceof>
-               </iterate>
-               <with
-                     variable="activeEditor">
-                  <instanceof
-                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
-                  </instanceof>
-                  <test
-                        property="info.novatec.inspectit.activeSubView"
-                        value="tableSubView">
-                  </test>
-               </with>
-               <!-- TODO: Remove when export of invocations is possible with buffer -->
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
-            class="info.novatec.inspectit.rcp.handlers.DeleteStorageDataHandler"
-            commandId="org.eclipse.ui.edit.delete">
-         <activeWhen>
-            <and>
-               <count
-                     value="1">
-               </count>
             </and>
          </activeWhen>
       </handler>
@@ -633,7 +621,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="info.novatec.inspectit.rcp.handlers.RefreshViewHandler"
+            class="info.novatec.inspectit.rcp.handlers.RefreshEditorHandler"
             commandId="org.eclipse.ui.file.refresh">
          <activeWhen>
             <and>
@@ -647,13 +635,305 @@
          </activeWhen>
       </handler>
       <handler
+            class="info.novatec.inspectit.rcp.handlers.RefreshViewHandler"
+            commandId="org.eclipse.ui.file.refresh">
+         <activeWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="info.novatec.inspectit.rcp.view.IRefreshableView">
+               </instanceof>
+               <test
+                     property="info.novatec.inspectit.canRefresh">
+               </test>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.CreateStorageHandler"
+            commandId="info.novatec.inspectit.rcp.commands.createStorage">
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.CloseStorageHandler"
+            commandId="info.novatec.inspectit.rcp.commands.closeStorage">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.IStorageDataProvider">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.storageState"
+                        value="OPENED">
+                  </test>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.DeleteStorageHandler"
+            commandId="info.novatec.inspectit.rcp.commands.deleteStorage">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.IStorageDataProvider">
+                  </instanceof>
+                  <or>
+                     <test
+                           property="info.novatec.inspectit.storageState"
+                           value="CREATED">
+                     </test>
+                     <test
+                           property="info.novatec.inspectit.storageState"
+                           value="CLOSED">
+                     </test>
+                  </or>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.AddStorageLabelHandler"
+            commandId="info.novatec.inspectit.rcp.commands.addStorageLabel">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.IStorageDataProvider">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.RemoveStorageLabelHandler"
+            commandId="info.novatec.inspectit.rcp.commands.removeStorageLabel">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.IStorageDataProvider">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.StartRecordingHandler"
+            commandId="info.novatec.inspectit.rcp.commands.startRecording">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
+                  </instanceof>
+               </iterate>
+               <iterate>
+                  <test
+                        property="info.novatec.inspectit.onlineStatus"
+                        value="ONLINE">
+                  </test>
+               </iterate>
+               <iterate>
+                  <test
+                        property="info.novatec.inspectit.recordingActive"
+                        value="false">
+                  </test></iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.StopRecordingHanlder"
+            commandId="info.novatec.inspectit.rcp.commands.stopRecording">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.onlineStatus"
+                        value="ONLINE">
+                  </test>
+                  <test
+                        property="info.novatec.inspectit.recordingActive"
+                        value="true">
+                  </test>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.ShowRepositoryHandler"
+            commandId="info.novatec.inspectit.rcp.commands.showRepository">
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.ClearRepositoryBufferHandler"
+            commandId="info.novatec.inspectit.rcp.commands.clearRepositoryBuffer">
+         <activeWhen>
+            <or>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.onlineStatus"
+                        value="ONLINE">
+                  </test>
+               </iterate>
+               <with
+                     variable="activePart">
+                  <test
+                        property="info.novatec.inspectit.repositoryType"
+                        value="cmrRepositoryDefinition">
+                  </test>
+                  <test
+                        property="info.novatec.inspectit.onlineStatus"
+                        value="ONLINE">
+                  </test>
+               </with>
+            </or>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.AddCmrRepositoryHandler"
+            commandId="info.novatec.inspectit.rcp.commands.addCmrRepository">
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.RemoveCmrRepositoryHandler"
+            commandId="info.novatec.inspectit.rcp.commands.removeCmrRepository">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.CopyBufferToStorageHandler"
+            commandId="info.novatec.inspectit.rcp.commands.copyBufferToStorage">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.onlineStatus"
+                        value="ONLINE">
+                  </test>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.ShowLabelsManagerHandler"
+            commandId="info.novatec.inspectit.rcp.commands.showLabelsManager">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.onlineStatus"
+                        value="ONLINE">
+                  </test>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.LicenseInfoHandler"
+            commandId="info.novatec.inspectit.rcp.commands.licenseInfo">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.onlineStatus"
+                        value="ONLINE">
+                  </test>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.CopyDataToStorageHandler"
+            commandId="org.eclipse.ui.file.save">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.communication.DefaultData">
+                  </instanceof>
+               </iterate>
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.repositoryType"
+                        value="cmrRepositoryDefinition">
+                  </test>
+               </with>
+               <with
+                     variable="selection">
+                  <instanceof
+                        value="org.eclipse.jface.viewers.StructuredSelection">
+                  </instanceof>
+               </with>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
             class="info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler"
             commandId="info.novatec.inspectit.rcp.commands.showHideColumn">
       </handler>
       <handler
             class="info.novatec.inspectit.rcp.handlers.FindHandler"
             commandId="org.eclipse.ui.edit.findReplace">
-      </handler>    
+      </handler>
       <handler
             class="info.novatec.inspectit.rcp.handlers.NavigateToExceptionTypeHandler"
             commandId="info.novatec.inspectit.rcp.commands.navigateToExceptionType">
@@ -703,6 +983,41 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.EditCmrRepositoryHandler"
+            commandId="org.eclipse.ui.edit.rename">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
+                  </instanceof></iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.EditStorageDataHandler"
+            commandId="org.eclipse.ui.edit.rename">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.IStorageDataProvider">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.CloseAndShowStorageHandler"
+            commandId="info.novatec.inspectit.rcp.commands.closeAndShowStorage">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -747,6 +1062,47 @@
             namespace="info.novatec.inspectit"
             properties="canMaximize, canMinimize"
             type="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+      </propertyTester>
+      <propertyTester
+            class="info.novatec.inspectit.rcp.tester.StorageStateTester"
+            id="info.inspectit.rcp.StorageStateTester"
+            namespace="info.novatec.inspectit"          properties="storageState, isStorageMounted"
+            type="info.novatec.inspectit.rcp.provider.IStorageDataProvider">
+      </propertyTester>
+      <propertyTester
+            class="info.novatec.inspectit.rcp.tester.CmrOnlineStatusTester"
+            id="info.inspectit.rcp.CmrTester"
+            namespace="info.novatec.inspectit"
+            properties="onlineStatus, recordingActive"
+            type="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
+      </propertyTester>
+      <propertyTester
+            class="info.novatec.inspectit.rcp.tester.CmrOnlineStatusTester"
+            id="info.inspectit.rcp.CmrTester"
+            namespace="info.novatec.inspectit"
+            properties="onlineStatus, recordingActive"
+            type="info.novatec.inspectit.rcp.provider.IStorageDataProvider">
+      </propertyTester>
+      <propertyTester
+            class="info.novatec.inspectit.rcp.tester.CmrOnlineStatusTester"
+            id="info.inspectit.rcp.CmrTester"
+            namespace="info.novatec.inspectit"
+            properties="onlineStatus, recordingActive"
+            type="info.novatec.inspectit.rcp.provider.IInputDefinitionProvider">
+      </propertyTester>
+      <propertyTester
+            class="info.novatec.inspectit.rcp.tester.InputDefinitionTester"
+            id="info.inspectit.rcp.InputDefinitionTester"
+            namespace="info.novatec.inspectit"
+            properties="repositoryType"
+            type="info.novatec.inspectit.rcp.provider.IInputDefinitionProvider">
+      </propertyTester>
+      <propertyTester
+            class="info.novatec.inspectit.rcp.tester.CanRefreshViewTester"
+            id="info.inspectit.rcp.CanRefreshTester"
+            namespace="info.novatec.inspectit"
+            properties="canRefresh"
+            type="info.novatec.inspectit.rcp.view.IRefreshableView">
       </propertyTester>
    </extension>
    <extension
@@ -1087,12 +1443,22 @@
                visible="true">
          </separator>
          <command
-               commandId="info.novatec.inspectit.rcp.commands.saveInvocations"
+               commandId="org.eclipse.ui.file.save"
+               label="Save on Server"
                style="push">
-         </command>
-         <command
-               commandId="info.novatec.inspectit.rcp.commands.exportInvocations"
-               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <and>
+                  <count
+                        value="+">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                     </instanceof>
+                  </iterate>
+               </and>
+            </visibleWhen>
          </command>
       </menuContribution>
       <menuContribution
@@ -1101,23 +1467,47 @@
                id="fileMenu"
                label="&amp;File">
             <command
-                  commandId="org.eclipse.ui.file.import"
-                  style="push">
-            </command>
-            <separator
-                  name="menu.file.separator1"
-                  visible="true">
-            </separator>
-            <command
                   commandId="org.eclipse.ui.file.exit"
                   style="push">
             </command>
          </menu>
          <menu
-               id="licenseMenu"
-               label="&amp;License">
+               label="Window">
+            <menu
+                  label="Show View">
+               <command
+                     commandId="org.eclipse.ui.views.showView"
+                     icon="icons/data_explorer.png"
+                     label="Data Explorer"
+                     style="push">
+                  <parameter
+                        name="org.eclipse.ui.views.showView.viewId"
+                        value="info.novatec.inspectit.rcp.view.dataExplorer">
+                  </parameter>
+               </command>
+               <command
+                     commandId="org.eclipse.ui.views.showView"
+                     icon="icons/file_manager.png"
+                     label="Storage Manager"
+                     style="push">
+                  <parameter
+                        name="org.eclipse.ui.views.showView.viewId"
+                        value="info.novatec.inspectit.rcp.view.storageManager">
+                  </parameter>
+               </command>
+               <command
+                     commandId="org.eclipse.ui.views.showView"
+                     icon="icons/server_explorer.png"
+                     label="Repository Manager"
+                     style="push">
+                  <parameter
+                        name="org.eclipse.ui.views.showView.viewId"
+                        value="info.novatec.inspectit.rcp.view.repositoryManager">
+                  </parameter>
+               </command>
+            </menu>
             <command
-                  commandId="info.novatec.inspectit.rcp.commands.licenseInfo"
+                  commandId="org.eclipse.ui.window.resetPerspective"
                   style="push">
             </command>
          </menu>
@@ -1135,18 +1525,245 @@
          </menu>
       </menuContribution>
       <menuContribution
-            locationURI="popup:inspectit.serverview.storagetree">
+            allPopups="false"
+            locationURI="toolbar:info.novatec.inspectit.rcp.view.dataExplorer">
          <command
-               commandId="org.eclipse.ui.file.import"
+               commandId="info.novatec.inspectit.rcp.commands.clearRepositoryBuffer"
+               icon="icons/clean_buffer.png"
+               id="info.novatec.inspectit.rcp.view.dataExplorer.clearBuffer"
+               label="Clear Repository Buffer"
+               style="push"
+               tooltip="Clear Repository Buffer">
+            <visibleWhen
+                  checkEnabled="false">
+               <equals
+                     value="false">
+               </equals>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.ui.file.refresh"
+               icon="icons/refresh.png"
+               id="info.novatec.inspectit.rcp.view.dataExplorer.refresh"
+               style="push"
+               tooltip="Update Repository">
+            <visibleWhen
+                  checkEnabled="false">
+               <equals
+                     value="false">
+               </equals>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:info.novatec.inspectit.rcp.view.storageManager">
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.createStorage"
+               icon="icons/add.png"
+               style="push"
+               tooltip="Create Storage">
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.rename"
+               icon="icons/edit.png"
+               label="Edit"
                style="push">
          </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.closeStorage"
+               icon="icons/finalize_storage.png"
+               style="push"
+               tooltip="Finalize Storage">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.deleteStorage"
+               icon="icons/delete.png"
+               style="push"
+               tooltip="Delete Storage">
+         </command>
          <separator
-               name="menu.storagetree.separator1"
+               name="info.novatec.inspectit.rcp.storageManagerToolbar.separator1"
                visible="true">
          </separator>
          <command
-               commandId="org.eclipse.ui.edit.delete"
+               commandId="org.eclipse.ui.file.refresh"
+               icon="icons/refresh.png"
+               style="push"
+               tooltip="Update Storage List">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:info.novatec.inspectit.rcp.view.repositoryManager">
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.addCmrRepository"
+               icon="icons/add.png"
+               style="push"
+               tooltip="Add Central Management Repository (CMR)">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.removeCmrRepository"
+               icon="icons/remove.png"
+               style="push"
+               tooltip="Remove Central Management Repository (CMR)">
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.rename"
+               icon="icons/edit.png"
+               style="push"
+               tooltip="Edit Central Management Repository (CMR)">
+         </command>
+         <separator
+               name="info.novatec.inspectit.rcp.repositoryManagerToolbar.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.startRecording"
+               icon="icons/record.png"
+               style="push"
+               tooltip="Start Recording">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.stopRecording"
+               icon="icons/record_stop.png"
+               style="push"
+               tooltip="Stop Recording">
+         </command>
+         <separator
+               name="info.novatec.inspectit.rcp.repositoryManagerToolbar.separator2"
+               visible="true">
+         </separator>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.copyBufferToStorage"
+               icon="icons/copy_buffer.png"
+               style="push"
+               tooltip="Copy Repository Buffer to Storage">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.clearRepositoryBuffer"
+               icon="icons/clean_buffer.png"
+               style="push"
+               tooltip="Clear Repository Buffer">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.showLabelsManager"
+               icon="icons/label.png"
+               style="push"
+               tooltip="Manage Labels on Repository">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.licenseInfo"
+               icon="icons/license.png"
+               style="push"
+               tooltip="License Information">
+         </command>
+         <separator
+               name="info.novatec.inspectit.rcp.repositoryManagerToolbar.separator3"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.ui.file.refresh"
+               icon="icons/refresh.png"
+               style="push"
+               tooltip="Update Repositories">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:info.novatec.inspectit.rcp.view.storageManager.storageTree">
+         <command
+               commandId="org.eclipse.ui.edit.rename"
+               icon="icons/edit.png"
+               label="Edit"
                style="push">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.closeStorage"
+               icon="icons/finalize_storage.png"
+               label="Finalize Storage"
+               style="push">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.deleteStorage"
+               icon="icons/delete.png"
+               label="Delete Storage"
+               style="push">
+         </command>
+         <separator
+               name="info.novatec.inspectit.storageManagerView.storageTree.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.addStorageLabel"
+               icon="icons/label_add.png"
+               label="Add Label"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:info.novatec.inspectit.rcp.view.repositoryManager.repositoryTree">
+         <command
+               commandId="org.eclipse.ui.edit.rename"
+               icon="icons/edit.png"
+               label="Edit"
+               style="push">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.removeCmrRepository"
+               icon="icons/remove.png"
+               label="Remove"
+               style="push"
+               tooltip="Remove Central Management Repository (CMR)">
+         </command>
+         <separator
+               name="info.novatec.inspectit.rcp.repositoryManagerToolbar.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.startRecording"
+               icon="icons/record.png"
+               label="Start Recording"
+               style="push"
+               tooltip="Start Recording">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.stopRecording"
+               icon="icons/record_stop.png"
+               label="Stop Recording"
+               style="push"
+               tooltip="Stop Recording">
+         </command>
+         <separator
+               name="info.novatec.inspectit.rcp.repositoryManagerToolbar.separator2"
+               visible="true">
+         </separator>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.copyBufferToStorage"
+               icon="icons/copy_buffer.png"
+               label="Copy Repository Buffer to Storage"
+               style="push"
+               tooltip="Copy Repository Buffer to Storage">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.clearRepositoryBuffer"
+               icon="icons/clean_buffer.png"
+               label="Clear Repository Buffer"
+               style="push"
+               tooltip="Clear Repository Buffer">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.showLabelsManager"
+               icon="icons/label.png"
+               label="Manage Labels on Repository"
+               style="push"
+               tooltip="Manage Labels on Repository">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.licenseInfo"
+               icon="icons/license.png"
+               label="License Information"
+               style="push"
+               tooltip="License Information">
          </command>
       </menuContribution>
    </extension>
@@ -1161,19 +1778,12 @@
       </factory>
    </extension>
    <extension
-         point="org.eclipse.ui.importWizards">
-      <wizard
-            class="info.novatec.inspectit.rcp.wizard.ImportDataWizard"
-            icon="icons/16x16.png"
-            id="inspectit.importinvocationwizard"
-            name="inspectIT Data (*.itd)">
-         <description>
-            Import inspectIT Data (*.itd) into your current Storage Area.
-         </description>
-      </wizard>
-   </extension>
-   <extension
          point="org.eclipse.ui.bindings">
+      <key
+            commandId="info.novatec.inspectit.rcp.commands.clearRepositoryBuffer"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+D">
+      </key>
       <key
             commandId="info.novatec.inspectit.rcp.commands.maximizeActiveView"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"

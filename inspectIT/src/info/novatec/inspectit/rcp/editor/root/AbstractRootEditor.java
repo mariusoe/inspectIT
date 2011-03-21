@@ -10,6 +10,8 @@ import info.novatec.inspectit.rcp.editor.preferences.IPreferencePanel;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
+import info.novatec.inspectit.rcp.formatter.ImageFormatter;
+import info.novatec.inspectit.rcp.provider.IInputDefinitionProvider;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.util.List;
@@ -42,7 +44,7 @@ import org.eclipse.ui.part.EditorPart;
  * @author Patrice Bouillet
  * 
  */
-public abstract class AbstractRootEditor extends EditorPart implements IRootEditor {
+public abstract class AbstractRootEditor extends EditorPart implements IRootEditor, IInputDefinitionProvider {
 
 	/**
 	 * The inner class for the update timer which just calls the
@@ -174,10 +176,11 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 		// set site and input
 		setSite(editorSite);
 		setInput(editorInput);
-		setTitleImage(getInputDefinition().getEditorPropertiesData().getImageDescriptor().createImage());
+		setTitleImage(ImageFormatter.getOverlayedEditorImageDescriptor(getInputDefinition().getEditorPropertiesData().getImageDescriptor(), getInputDefinition().getRepositoryDefinition()));
 
 		this.subView = SubViewFactory.createSubView(getInputDefinition().getId());
 		this.subView.setRootEditor(this);
+		this.subView.init();
 		editorSite.setSelectionProvider(new MultiSubViewSelectionProvider(this));
 	}
 
@@ -290,6 +293,8 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 	public void setFocus() {
 		if ((null != getActiveSubView()) && (null != getActiveSubView().getControl())) {
 			getActiveSubView().getControl().setFocus();
+		} else if (null != subView && null != subView.getControl()) {
+			subView.getControl().setFocus();
 		}
 	}
 

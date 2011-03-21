@@ -2,9 +2,9 @@ package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.CombinedMetricsDataDao;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
-import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.TimerData;
+import info.novatec.inspectit.spring.logger.Logger;
 
 import java.util.Collections;
 import java.util.Date;

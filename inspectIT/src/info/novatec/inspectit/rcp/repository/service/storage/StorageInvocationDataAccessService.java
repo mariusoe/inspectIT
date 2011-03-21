@@ -1,48 +1,38 @@
 package info.novatec.inspectit.rcp.repository.service.storage;
 
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
+import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
-import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
+import info.novatec.inspectit.indexing.query.factory.impl.InvocationSequenceDataQueryFactory;
+import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
+import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
+import info.novatec.inspectit.indexing.storage.impl.StorageIndexQuery;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
 
-public class StorageInvocationDataAccessService implements IInvocationDataAccessService {
+/**
+ * {@link IInvocationDataAccessService} for storage purposes.
+ *
+ * @author Ivan Senic
+ *
+ */
+public class StorageInvocationDataAccessService extends AbstractStorageService<InvocationSequenceData> implements IInvocationDataAccessService {
 
 	/**
-	 * The definition.
+	 * Indexing tree.
 	 */
-	private StorageRepositoryDefinition storageRepositoryDefinition;
+	private IStorageTreeComponent<InvocationSequenceData> indexingTree;
 
 	/**
-	 * Only constructor which needs the definition to be passed.
-	 * 
-	 * @param storageRepositoryDefinition
-	 *            the definition.
+	 * Index query provider.
 	 */
-	public StorageInvocationDataAccessService(StorageRepositoryDefinition storageRepositoryDefinition) {
-		this.storageRepositoryDefinition = storageRepositoryDefinition;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit) {
-		return this.getInvocationSequenceOverview(platformId, limit, null, null);
-	}
-	
+	private InvocationSequenceDataQueryFactory<StorageIndexQuery> invocationDataQueryFactory;
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -53,181 +43,112 @@ public class StorageInvocationDataAccessService implements IInvocationDataAccess
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit) {
+		return this.getInvocationSequenceOverview(platformId, 0, limit);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate) {
-		File file = new File(storageRepositoryDefinition.getPath() + File.separator + StorageNamingConstants.FILE_NAME_INVOCATION_OVERVIEW);
-		if (file.exists()) {
-			if (file.isFile()) {
-				try {
-					List<InvocationSequenceData> data = (List<InvocationSequenceData>) loadInvocationSequenceData(file);
+		StorageIndexQuery query = invocationDataQueryFactory.getInvocationSequenceOverview(platformId, methodId, limit, fromDate, toDate);
+		query.setOnlyInvocationsWithoutChildren(true);
+		List<InvocationSequenceData> results = super.executeQuery(query, null);
 
-					// filter the collection
-					for (Iterator<InvocationSequenceData> iterator = data.iterator(); iterator.hasNext();) {
-						InvocationSequenceData invocationSequenceData = iterator.next();
-						if (methodId != invocationSequenceData.getMethodIdent()) {
-							iterator.remove();
-						} else if (fromDate != null && invocationSequenceData.getTimeStamp().compareTo(fromDate) < 0) {
-							iterator.remove();
-						} else if (toDate != null && invocationSequenceData.getTimeStamp().compareTo(toDate) > 0) {
-							iterator.remove();
-						}
-					}
-
-					// now sort
-					if (data.size() > limit) {
-						Collections.sort(data, new Comparator<InvocationSequenceData>() {
-							@Override
-							public int compare(InvocationSequenceData o1, InvocationSequenceData o2) {
-								Long timeOne = Long.valueOf(o1.getTimeStamp().getTime());
-								Long timeTwo = Long.valueOf(o2.getTimeStamp().getTime());
-								return timeOne.compareTo(timeTwo);
-							}
-						});
-					}
-
-					return data;
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-			} else {
-				throw new RuntimeException("ERROR: folder should be a file for displaying: " + file.getAbsolutePath());
+		Collections.sort(results, new Comparator<DefaultData>() {
+			public int compare(DefaultData o1, DefaultData o2) {
+				return o2.getTimeStamp().compareTo(o1.getTimeStamp());
 			}
-		} else {
-			throw new RuntimeException("ERROR: file does not exist: " + file.getAbsolutePath());
+		});
+		List<InvocationSequenceData> returnList = new ArrayList<InvocationSequenceData>();
+		int i = 0;
+		for (InvocationSequenceData data : results) {
+			if (i < limit || -1 == limit) {
+				returnList.add(data.getClonedInvocationSequence());
+			} else {
+				break;
+			}
+			i++;
 		}
+		return returnList;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate) {
-		File file = new File(storageRepositoryDefinition.getPath() + File.separator + StorageNamingConstants.FILE_NAME_INVOCATION_OVERVIEW);
-		if (file.exists()) {
-			if (file.isFile()) {
-				try {
-					List<InvocationSequenceData> data = (List<InvocationSequenceData>) loadInvocationSequenceData(file);
-
-					// filter the collection
-					for (Iterator<InvocationSequenceData> iterator = data.iterator(); iterator.hasNext();) {
-						InvocationSequenceData invocationSequenceData = iterator.next();
-						if (fromDate != null && invocationSequenceData.getTimeStamp().compareTo(fromDate) < 0) {
-							iterator.remove();
-						} else if (toDate != null && invocationSequenceData.getTimeStamp().compareTo(toDate) > 0) {
-							iterator.remove();
-						}
-					}
-					
-					// sort the collection
-					if (data.size() > limit) {
-						Collections.sort(data, new Comparator<InvocationSequenceData>() {
-							@Override
-							public int compare(InvocationSequenceData o1, InvocationSequenceData o2) {
-								Long timeOne = Long.valueOf(o1.getTimeStamp().getTime());
-								Long timeTwo = Long.valueOf(o2.getTimeStamp().getTime());
-								return timeOne.compareTo(timeTwo);
-							}
-						});
-					}
-
-					return data;
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-			} else {
-				throw new RuntimeException("ERROR: folder should be a file for displaying: " + file.getAbsolutePath());
-			}
-		} else {
-			throw new RuntimeException("ERROR: file does not exist: " + file.getAbsolutePath());
-		}
+		return this.getInvocationSequenceOverview(platformId, 0, limit, fromDate, toDate);
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
-	 * Not supported for storage.
 	 */
-	@SuppressWarnings("rawtypes")
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection invocationIdCollection, int limit) {
-		return Collections.emptyList();
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit) {
+		StorageIndexQuery query = invocationDataQueryFactory.getInvocationSequenceOverview(platformId, invocationIdCollection, limit);
+		query.setOnlyInvocationsWithoutChildren(true);
+		List<InvocationSequenceData> results = super.executeQuery(query, null);
+
+		Collections.sort(results, new Comparator<DefaultData>() {
+			public int compare(DefaultData o1, DefaultData o2) {
+				return o2.getTimeStamp().compareTo(o1.getTimeStamp());
+			}
+		});
+		List<InvocationSequenceData> returnList = new ArrayList<InvocationSequenceData>();
+		int i = 0;
+		for (InvocationSequenceData data : results) {
+			if (i < limit || -1 == limit) {
+				returnList.add(data.getClonedInvocationSequence());
+			} else {
+				break;
+			}
+			i++;
+		}
+		return returnList;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public InvocationSequenceData getInvocationSequenceDetail(InvocationSequenceData template) {
-		String path = getFilenameForInvocation(template);
-		File file = new File(path);
-		try {
-			InvocationSequenceData data = (InvocationSequenceData) loadInvocationSequenceData(file);
-			return data;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		// here we need to create new query since this one does not exist in factory
+		StorageIndexQuery query = invocationDataQueryFactory.getIndexQueryProvider().getIndexQuery();
+		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
+		searchedClasses.add(InvocationSequenceData.class);
+		query.setObjectClasses(searchedClasses);
+		query.setPlatformIdent(template.getPlatformIdent());
+		query.setMethodIdent(template.getMethodIdent());
+		query.setSensorTypeIdent(template.getSensorTypeIdent());
+		query.setOnlyInvocationsWithoutChildren(false);
+		ArrayList<Long> includeIds = new ArrayList<Long>();
+		includeIds.add(template.getId());
+		query.setIncludeIds(includeIds);
+		List<IStorageDescriptor> descriptors = indexingTree.query(query);
+		List<InvocationSequenceData> results = getHttpDataRetriever().getDataViaHttp(getCmrRepositoryDefinition(), getStorageIdProvider(), descriptors);
+		if (results.size() == 1) {
+			return results.get(0);
 		}
-	}
-
-	private Object loadInvocationSequenceData(File fileObject) throws IOException {
-		InputStream fis = null;
-		InputStream bis = null;
-		InputStream input = null;
-		try {
-			fis = new FileInputStream(fileObject);
-			bis = new BufferedInputStream(fis);
-			input = new GZIPInputStream(bis);
-
-			return storageRepositoryDefinition.getXstream().fromXML(input);
-		} finally {
-			try {
-				if (null != input) {
-					input.close();
-				}
-				if (null != bis) {
-					bis.close();
-				}
-				if (null != fis) {
-					fis.close();
-				}
-			} catch (IOException e) {
-				// ignore the exception
-			}
-		}
+		return null;
 	}
 
 	/**
-	 * Returns a stream for an invocation sequence object.
-	 * 
-	 * @param template
-	 *            The template to search for.
-	 * @return the stream.
+	 * {@inheritDoc}
 	 */
-	public InputStream getStreamForInvocationSequence(InvocationSequenceData template) {
-		String path = getFilenameForInvocation(template);
-		File file = new File(path);
-		try {
-			return new FileInputStream(file);
-		} catch (FileNotFoundException e) {
-			InspectIT.getDefault().createErrorDialog("Could not load stored invocation file!", e, -1);
-			throw new RuntimeException(e);
-		}
+	protected IStorageTreeComponent<InvocationSequenceData> getIndexingTree() {
+		return indexingTree;
 	}
 
 	/**
-	 * Creates the path to the invocation sequence file.
-	 * 
-	 * @param template
-	 *            the template which contains the storage repository path.
-	 * @return the complete path
+	 * @param indexingTree the indexingTree to set
 	 */
-	private String getFilenameForInvocation(InvocationSequenceData template) {
-		// create path
-		StringBuilder path = new StringBuilder();
-		path.append(storageRepositoryDefinition.getPath());
-		path.append(File.separator);
-		path.append(template.getTimeStamp().getTime());
-		path.append("_");
-		path.append(Double.valueOf(template.getDuration() * 1000).longValue());
-		path.append(StorageNamingConstants.FILE_ENDING_INVOCATIONS);
-		return path.toString();
+	public void setIndexingTree(IStorageTreeComponent<InvocationSequenceData> indexingTree) {
+		this.indexingTree = indexingTree;
+	}
+
+	/**
+	 * @param invocationDataQueryFactory the invocationDataQueryFactory to set
+	 */
+	public void setInvocationDataQueryFactory(InvocationSequenceDataQueryFactory<StorageIndexQuery> invocationDataQueryFactory) {
+		this.invocationDataQueryFactory = invocationDataQueryFactory;
 	}
 
 }

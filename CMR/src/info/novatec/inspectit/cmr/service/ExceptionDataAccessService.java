@@ -2,9 +2,9 @@ package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.ExceptionSensorDataDao;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
-import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
+import info.novatec.inspectit.spring.logger.Logger;
 
 import java.util.Date;
 import java.util.List;

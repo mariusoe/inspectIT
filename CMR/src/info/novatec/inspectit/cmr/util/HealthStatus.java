@@ -2,7 +2,10 @@ package info.novatec.inspectit.cmr.util;
 
 import info.novatec.inspectit.cmr.cache.IBuffer;
 import info.novatec.inspectit.cmr.service.AgentStorageService;
-import info.novatec.inspectit.cmr.spring.logger.Logger;
+import info.novatec.inspectit.cmr.storage.CmrStorageManager;
+import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.storage.StorageData;
+import info.novatec.inspectit.storage.nio.write.WritingChannelManager;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
@@ -10,6 +13,7 @@ import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -22,9 +26,9 @@ import org.springframework.stereotype.Component;
 /**
  * This service is used to check the health of the CMR in terms of cpu, memory, some overall
  * statistics etc.
- * 
+ *
  * @author Patrice Bouillet
- * 
+ *
  */
 @Component
 public class HealthStatus {
@@ -88,6 +92,18 @@ public class HealthStatus {
 	private AgentStorageService agentStorageService;
 
 	/**
+	 * {@link WritingChannelManager} for status of IO tasks.
+	 */
+	@Autowired
+	private WritingChannelManager writingChannelManager;
+
+	/**
+	 * Storage manager for status of writing tasks.
+	 */
+	@Autowired
+	private CmrStorageManager storageManager;
+
+	/**
 	 * Log all the statistics.
 	 */
 	@Scheduled(fixedRate = FIXED_RATE)
@@ -104,6 +120,7 @@ public class HealthStatus {
 		if (log.isInfoEnabled()) {
 			logDroppedData();
 			logBufferStatistics();
+			logStorageStatistics();
 		}
 	}
 
@@ -135,12 +152,12 @@ public class HealthStatus {
 
 	/**
 	 * Log a graphical version of the load average.
-	 * 
+	 *
 	 * @param loadAvg
 	 *            The current load average over the last 60 seconds.
 	 * @param availCpus
 	 *            The available cpus.
-	 * 
+	 *
 	 * @see OperatingSystemMXBean#getSystemLoadAverage()
 	 */
 	private void logGraphicalLoadAverage(double loadAvg, int availCpus) {
@@ -231,12 +248,12 @@ public class HealthStatus {
 
 	/**
 	 * Log a graphical version of the memory usage object..
-	 * 
+	 *
 	 * @param memoryUsage
 	 *            The memory usage object to log.
 	 * @param title
 	 *            Title of graphical box.
-	 * 
+	 *
 	 * @see MemoryUsage
 	 */
 	private void logGraphicalMemoryUsage(MemoryUsage memoryUsage, String title) {
@@ -297,7 +314,7 @@ public class HealthStatus {
 
 	/**
 	 * Checks if the values in {@link MemoryUsage} are OK for the graphical memory logging.
-	 * 
+	 *
 	 * @param memoryUsage
 	 *            {@link MemoryUsage}
 	 * @return True if values are OK.
@@ -346,7 +363,7 @@ public class HealthStatus {
 
 	/**
 	 * Log a graphical version of buffer occupancy.
-	 * 
+	 *
 	 * @param bufferOccupancy
 	 *            Current buffer occupancy in percentages.
 	 */
@@ -385,6 +402,22 @@ public class HealthStatus {
 		}
 		sb.append(START_END_CHAR);
 		log.info(sb.toString());
+	}
+
+	/**
+	 * Logs the storage stats.
+	 */
+	private void logStorageStatistics() {
+		log.info("Status of the Write Channel Manager's executor service: " + writingChannelManager.getExecutorServiceStatus());
+		log.info("Status of each writable storage and its executor service:");
+		Map<StorageData, String> writersStatusMap = storageManager.getWritersStatus();
+		if (!writersStatusMap.isEmpty()) {
+			for (Map.Entry<StorageData, String> entry : writersStatusMap.entrySet()) {
+				log.info("Storage " + entry.getKey() + " - " + entry.getValue());
+			}
+		} else {
+			log.info("No active writable storage available.");
+		}
 	}
 
 	/**

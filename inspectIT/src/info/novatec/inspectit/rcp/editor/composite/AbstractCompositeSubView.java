@@ -108,6 +108,16 @@ public abstract class AbstractCompositeSubView extends AbstractSubView {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public void init() {
+		for (ISubView subView : subViews) {
+			subView.init();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setRootEditor(AbstractRootEditor rootEditor) {
 		super.setRootEditor(rootEditor);
 

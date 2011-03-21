@@ -1,6 +1,6 @@
 package info.novatec.inspectit.rcp.dialog;
 
-import info.novatec.inspectit.communication.data.LicenseInfoData;
+import info.novatec.inspectit.communication.data.cmr.LicenseInfoData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.handlers.ImportLicenseHandler;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
@@ -172,7 +172,7 @@ public class LicenseInformationDialog extends Dialog {
 	 */
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
-		shell.setText("Licence Information - " + repositoryDefinition.getIp() + ":" + repositoryDefinition.getPort());
+		shell.setText("Licence Information - " + repositoryDefinition.getName() + " (" + repositoryDefinition.getIp() + ":" + repositoryDefinition.getPort() + ")");
 	}
 
 	/**

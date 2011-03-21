@@ -10,9 +10,7 @@ import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.formatter.SensorTypeAvailabilityEnum;
-import info.novatec.inspectit.rcp.model.combinedmetrics.DeferredCombinedMetricsComposite;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
-import info.novatec.inspectit.rcp.view.server.ServerView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,12 +32,12 @@ public class TreeModelManager {
 	/**
 	 * The repository definition used by this tree.
 	 */
-	protected RepositoryDefinition repositoryDefinition;
+	private RepositoryDefinition repositoryDefinition;
 
 	/**
-	 * The format string of the output.
+	 * Platform ident.
 	 */
-	private static final String METHOD_FORMAT = "%s(%s)";
+	private PlatformIdent platformIdent;
 
 	/**
 	 * Every tree model manager needs a reference to a {@link RepositoryDefinition} which reflects a
@@ -47,11 +45,14 @@ public class TreeModelManager {
 	 * 
 	 * @param repositoryDefinition
 	 *            The definition of the repository / CMR.
+	 * @param platformIdent
+	 *            {@link PlatformIdent} to create tree for.
 	 */
-	public TreeModelManager(RepositoryDefinition repositoryDefinition) {
+	public TreeModelManager(RepositoryDefinition repositoryDefinition, PlatformIdent platformIdent) {
 		Assert.isNotNull(repositoryDefinition);
 
 		this.repositoryDefinition = repositoryDefinition;
+		this.platformIdent = platformIdent;
 	}
 
 	/**
@@ -59,46 +60,19 @@ public class TreeModelManager {
 	 * 
 	 * @return The root elements.
 	 */
-	@SuppressWarnings("unchecked")
 	public Object[] getRootElements() {
-		List<Component> agents = new ArrayList<Component>();
-
-		for (PlatformIdent platformIdent : (List<PlatformIdent>) repositoryDefinition.getGlobalDataAccessService().getConnectedAgents()) {
-			Composite agentTree = new Composite();
-			agentTree.setName(platformIdent.getAgentName() + " [v. " + platformIdent.getVersion() + "]");
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.append("Name: ");
-			stringBuilder.append(platformIdent.getAgentName());
-			stringBuilder.append("\n");
-			stringBuilder.append("[v. ");
-			stringBuilder.append(platformIdent.getVersion());
-			stringBuilder.append("]");
-			stringBuilder.append("\n");
-			Collections.sort(platformIdent.getDefinedIPs());
-			for (String ip : (List<String>) platformIdent.getDefinedIPs()) {
-				stringBuilder.append(ip);
-				if (platformIdent.getDefinedIPs().indexOf(ip) != platformIdent.getDefinedIPs().size() - 1) {
-					stringBuilder.append("\n");
-				}
-			}
-			agentTree.setTooltip(stringBuilder.toString());
-			agentTree.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_AGENT));
-
+		List<Component> components = new ArrayList<Component>();
+		if (null != platformIdent) {
 			// Add all sub-trees to this Agent
-			agentTree.addChild(getInstrumentedMethodsTree(platformIdent, repositoryDefinition));
-			agentTree.addChild(getInvocationSequenceTree(platformIdent, repositoryDefinition));
-			agentTree.addChild(getSqlTree(platformIdent, repositoryDefinition));
-			agentTree.addChild(getTimerTree(platformIdent, repositoryDefinition));
-			agentTree.addChild(getHttpTimerTree(platformIdent, repositoryDefinition));
-			agentTree.addChild(getSystemOverviewTree(platformIdent, repositoryDefinition));
-			agentTree.addChild(getExceptionSensorTree(platformIdent, repositoryDefinition));
-			agentTree.addChild(getCombinedMetricsTree(platformIdent, repositoryDefinition));
-
-			// add it to the list of the agents
-			agents.add(agentTree);
+			components.add(getInstrumentedMethodsTree(platformIdent, repositoryDefinition));
+			components.add(getInvocationSequenceTree(platformIdent, repositoryDefinition));
+			components.add(getSqlTree(platformIdent, repositoryDefinition));
+			components.add(getTimerTree(platformIdent, repositoryDefinition));
+			components.add(getHttpTimerTree(platformIdent, repositoryDefinition));
+			components.add(getExceptionSensorTree(platformIdent, repositoryDefinition));
+			components.add(getSystemOverviewTree(platformIdent, repositoryDefinition));
 		}
-
-		return agents.toArray();
+		return components.toArray();
 	}
 
 	/**
@@ -170,7 +144,7 @@ public class TreeModelManager {
 	}
 
 	/**
-
+	 * 
 	 * Returns the SQL tree.
 	 * 
 	 * @param platformIdent
@@ -650,25 +624,6 @@ public class TreeModelManager {
 	}
 
 	/**
-	 * Returns the combined metrics tree.
-	 * 
-	 * @param platformIdent
-	 *            The {@link PlatformIdent} object.
-	 * @param definition
-	 *            The {@link RepositoryDefinition} object.
-	 * @return The combined metrics tree.
-	 */
-	private Component getCombinedMetricsTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
-		DeferredCombinedMetricsComposite combinedMetrics = new DeferredCombinedMetricsComposite();
-		combinedMetrics.setName("Combined Metrics");
-		combinedMetrics.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_TIMER));
-		combinedMetrics.setPlatformIdent(platformIdent);
-		combinedMetrics.setRepositoryDefinition(definition);
-
-		return combinedMetrics;
-	}
-
-	/**
 	 * Returns the Timer data tree.
 	 * 
 	 * @param platformIdent
@@ -784,4 +739,5 @@ public class TreeModelManager {
 
 		return timerDataComposite;
 	}
+
 }

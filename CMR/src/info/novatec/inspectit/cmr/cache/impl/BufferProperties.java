@@ -1,6 +1,6 @@
 package info.novatec.inspectit.cmr.cache.impl;
 
-import info.novatec.inspectit.cmr.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Logger;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;

@@ -1,10 +1,11 @@
 package info.novatec.inspectit.cmr.dao.impl;
 
-import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
-import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
 import info.novatec.inspectit.cmr.dao.SqlDataDao;
-import info.novatec.inspectit.cmr.util.IndexQueryProvider;
 import info.novatec.inspectit.communication.data.SqlStatementData;
+import info.novatec.inspectit.indexing.IIndexQuery;
+import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
+import info.novatec.inspectit.indexing.query.factory.impl.SqlStatementDataQueryFactory;
+import info.novatec.inspectit.indexing.query.provider.impl.IndexQueryProvider;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -19,9 +20,9 @@ import org.springframework.stereotype.Repository;
 /**
  * Implementation of the {@link SqlDataDao} that searches for the SQL statements in the indexing
  * tree.
- * 
+ *
  * @author Ivan Senic
- * 
+ *
  */
 @Repository
 public class BufferSqlDataDaoImpl implements SqlDataDao {
@@ -30,13 +31,13 @@ public class BufferSqlDataDaoImpl implements SqlDataDao {
 	 * Indexing tree to search for data.
 	 */
 	@Autowired
-	private ITreeComponent<SqlStatementData> indexingTree;
+	private IBufferTreeComponent<SqlStatementData> indexingTree;
 
 	/**
 	 * Index query provider.
 	 */
 	@Autowired
-	private IndexQueryProvider indexQueryProvider;
+	private SqlStatementDataQueryFactory<IIndexQuery> sqlDataQueryFactory;
 
 	/**
 	 * {@inheritDoc}
@@ -44,23 +45,13 @@ public class BufferSqlDataDaoImpl implements SqlDataDao {
 	public List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData sqlStatementData) {
 		return this.getAggregatedSqlStatements(sqlStatementData, null, null);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData sqlStatementData, Date fromDate, Date toDate) {
-		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
-		query.setPlatformIdent(sqlStatementData.getPlatformIdent());
-		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
-		searchedClasses.add(SqlStatementData.class);
-		query.setObjectClasses(searchedClasses);
-		if (null != fromDate) {
-			query.setFromDate(new Timestamp(fromDate.getTime()));
-		}
-		if (null != toDate) {
-			query.setToDate(new Timestamp(toDate.getTime()));
-		}
-		
+		IIndexQuery query = sqlDataQueryFactory.getAggregatedSqlStatementsQuery(sqlStatementData, fromDate, toDate);
+
 		List<SqlStatementData> allSqlStatements = indexingTree.query(query);
 		Map<Integer, SqlStatementData> aggregatedStatementsMap = new HashMap<Integer, SqlStatementData>();
 		List<SqlStatementData> aggregatedSqlStatements = new ArrayList<SqlStatementData>();
@@ -82,7 +73,7 @@ public class BufferSqlDataDaoImpl implements SqlDataDao {
 	/**
 	 * Returns map key based on the grouping of the SQL statements for
 	 * {@link #getAggregatedSqlStatements(SqlStatementData)}.
-	 * 
+	 *
 	 * @param sqlStatementData
 	 *            SQL data that map key is needed for.
 	 * @return Map key.
@@ -98,7 +89,7 @@ public class BufferSqlDataDaoImpl implements SqlDataDao {
 	/**
 	 * Clones the SQL statement data, so that aggregated values are put in the new object, thus
 	 * keeping the original objects in the buffer.
-	 * 
+	 *
 	 * @param sqlStatement
 	 *            Statement to be cloned.
 	 * @return Cloned SQL statement.

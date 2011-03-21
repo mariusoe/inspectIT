@@ -1,8 +1,8 @@
 package info.novatec.inspectit.cmr.service;
 
-import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.cmr.util.LicenseUtil;
-import info.novatec.inspectit.communication.data.LicenseInfoData;
+import info.novatec.inspectit.communication.data.cmr.LicenseInfoData;
+import info.novatec.inspectit.spring.logger.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;

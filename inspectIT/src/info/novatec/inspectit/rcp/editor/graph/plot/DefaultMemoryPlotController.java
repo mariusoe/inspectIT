@@ -5,6 +5,7 @@ import info.novatec.inspectit.communication.data.MemoryInformationData;
 import info.novatec.inspectit.communication.data.SystemInformationData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -423,9 +424,11 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 	 */
 	public Set<PreferenceId> getPreferenceIds() {
 		Set<PreferenceId> preferenceIds = EnumSet.noneOf(PreferenceId.class);
+		if (getInputDefinition().getRepositoryDefinition() instanceof CmrRepositoryDefinition) {
+			preferenceIds.add(PreferenceId.LIVEMODE);
+		}
 		preferenceIds.add(PreferenceId.TIMELINE);
 		preferenceIds.add(PreferenceId.SAMPLINGRATE);
-		preferenceIds.add(PreferenceId.LIVEMODE);
 		preferenceIds.add(PreferenceId.UPDATE);
 		return preferenceIds;
 	}

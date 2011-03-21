@@ -1,6 +1,6 @@
 package info.novatec.inspectit.cmr.service;
 
-import info.novatec.inspectit.communication.data.LicenseInfoData;
+import info.novatec.inspectit.communication.data.cmr.LicenseInfoData;
 
 /**
  * This is used for communication between the GUI and CMR regarding the license management. It is

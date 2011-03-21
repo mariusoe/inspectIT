@@ -10,6 +10,7 @@ import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.IServerStatusService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
+import info.novatec.inspectit.cmr.service.IStorageService;
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 
@@ -240,5 +241,25 @@ public abstract class CmrServiceProvider {
 	 * @return Returns Spring created {@link ConfigurationInterfaceDataAccessService}.
 	 */
 	protected abstract IConfigurationInterfaceDataAccessService getConfigurationInterfaceDataAccessService();
+
+	/**
+	 * Returns properly initialized {@link StorageService}.
+	 * 
+	 * @param cmrRepositoryDefinition
+	 *            {@link CmrRepositoryDefinition} to bound service to.
+	 * @return Returns {@link StorageService}.
+	 */
+	public IStorageService getStorageService(CmrRepositoryDefinition cmrRepositoryDefinition) {
+		IStorageService storageService = getStorageService();
+		((ICmrService) storageService).initService(cmrRepositoryDefinition);
+		return storageService;
+	}
+
+	/**
+	 * Returns Spring created {@link StorageService}.
+	 * 
+	 * @return Returns Spring created {@link StorageService}.
+	 */
+	protected abstract IStorageService getStorageService();
 
 }

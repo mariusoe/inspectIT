@@ -93,9 +93,15 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void createPartControl(Composite parent, FormToolkit toolkit) {
+	@Override
+	public void init() {
 		tableInputController.setInputDefinition(getRootEditor().getInputDefinition());
+	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public void createPartControl(Composite parent, FormToolkit toolkit) {
 		final Table table = toolkit.createTable(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);

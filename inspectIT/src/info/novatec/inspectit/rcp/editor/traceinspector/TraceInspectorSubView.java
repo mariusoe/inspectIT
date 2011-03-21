@@ -45,6 +45,16 @@ public class TraceInspectorSubView extends AbstractSubView {
 	private TraceInspectorController traceInspectorController = null;
 	private SWTCanvasAdapter canvasAdapter = null;
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void init() {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void createPartControl(Composite parent, FormToolkit toolkit) {
 		Composite composite = new Composite(parent, SWT.BORDER | SWT.VERTICAL | SWT.FILL);

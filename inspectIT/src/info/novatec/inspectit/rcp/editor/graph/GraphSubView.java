@@ -109,9 +109,16 @@ public class GraphSubView extends AbstractSubView {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
+	public void init() {
+		plotController.setInputDefinition(getRootEditor().getInputDefinition());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public void createPartControl(Composite parent, FormToolkit toolkit) {
 		// set the input definition
-		plotController.setInputDefinition(getRootEditor().getInputDefinition());
 		plotController.setRootEditor(getRootEditor());
 
 		// create the composite

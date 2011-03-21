@@ -8,7 +8,15 @@
 	</path>
 
 	<path id="path.commons.classes">
-		<pathelement location="${build.common.classes}" />
+		<pathelement location="${buildDirectory}/plugins/${commons.plugin}" />
+	</path>
+
+	<path id="path.commonscs.classes">
+		<pathelement location="${buildDirectory}/plugins/${commonscs.plugin}" />
+	</path>
+
+	<path id="path.commonscs.libs">
+		<fileset dir="${lib.commonscs}" includes="**/*.jar" />
 	</path>
 
 	<path id="path.rcp">
@@ -62,12 +70,18 @@
 	</target>
 
 	<target name="dist-commons">
-		<mkdir dir="${basedir}/build" />
-		<mkdir dir="${build.common.classes}" />
-		<javac source="1.5" target="1.5" debug="true" fork="true" destdir="${build.common.classes}" srcdir="../../Commons" includeAntRuntime="no" />
+		<ant antfile="${build.commons.file}" target="release-as-plugin" inheritAll="false" useNativeBasedir="true">
+			<property name="pluginReleaseDir" value="${buildDirectory}/plugins"/>
+		</ant>
 	</target>
 
-	<target name="init" depends="dist-commons">
+	<target name="dist-commonscs">
+		<ant antfile="${build.commonscs.file}" target="release-as-plugin" inheritAll="false" useNativeBasedir="true">
+			<property name="pluginReleaseDir" value="${buildDirectory}/plugins"/>
+		</ant>
+	</target>
+
+	<target name="init" depends="dist-commons, dist-commonscs">
 		<mkdir dir="${buildDirectory}" />
 		<mkdir dir="${buildDirectory}/plugins/info.novatec.inspectit.commons" />
 		<mkdir dir="${buildDirectory}/plugins/info.novatec.inspectit.commons/META-INF" />
@@ -81,15 +95,6 @@
 		<ivy:retrieve pattern="${basedir}/../lib/[conf]/[artifact].[ext]" />
 		<ivy:cachepath pathid="lib.prod" conf="prod" />
 		<ivy:cachepath pathid="lib.test" conf="test" />
-
-		<!-- Commons plugin -->
-		<!-- Currently I would say this is not even necessary! as the lib is integrated with the RCP product -->
-		<copy file="../../Commons/META-INF/MANIFEST.MF" todir="${buildDirectory}/plugins/info.novatec.inspectit.commons/META-INF" />
-		<copy todir="${buildDirectory}/plugins/info.novatec.inspectit.commons">
-			<fileset dir="${build.common.classes}">
-				<include name="**/*.*" />
-			</fileset>
-		</copy>
 
 		<copy todir="${buildDirectory}/plugins/${topLevelElementId}">
 			<fileset dir="${basedir}/..">
@@ -182,11 +187,12 @@
 		<mkdir dir="${build.qa.test.testdata}" />
 		<mkdir dir="${build.test.classes}" />
 
-		<javac source="1.6" target="1.6" debug="true" nowarn="off" includeAntRuntime="no" destdir="${build.test.classes}" srcdir="${test.root}">
+		<javac source="1.7" target="1.7" debug="true" nowarn="off" includeAntRuntime="no" destdir="${build.test.classes}" srcdir="${test.root}">
 			<classpath refid="lib.prod" />
 			<classpath refid="lib.test" />
 			<classpath refid="path.rcp" />
 			<classpath refid="path.commons.classes" />
+			<classpath refid="path.commonscs.classes" />
 			<compilerarg value="-Xlint:unchecked" />
 		</javac>
 
@@ -218,6 +224,7 @@
 			<classpath refid="lib.prod" />
 			<classpath refid="lib.test" />
 			<classpath refid="path.commons.classes" />
+			<classpath refid="path.commonscs.classes" />
 			<classpath refid="path.test.class" />
 			<classpath location="${build.instrumented.classes}" />
 			<classpath location="${test.root}" />
@@ -339,39 +346,40 @@
 		<zip destfile="${release.basedir}/dist/inspectit-win32.win32.x86.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
 			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
-			<zipfileset src="${jvm.root}/jre6-windows-x86.zip" prefix="inspectit/jre" filemode="775" />
+			<zipfileset src="${jvm.root}/jre7-windows-x86.zip" prefix="inspectit/jre" filemode="775" />
 		</zip>
 		<zip destfile="${release.basedir}/dist/inspectit-win32.win32.x86_64.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
 			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
-			<zipfileset src="${jvm.root}/jre6-windows-x64.zip" prefix="inspectit/jre" filemode="775" />
+			<zipfileset src="${jvm.root}/jre7-windows-x64.zip" prefix="inspectit/jre" filemode="775" />
 		</zip>
 		<zip destfile="${release.basedir}/dist/inspectit-linux.gtk.x86.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
 			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
-			<zipfileset src="${jvm.root}/jre6-linux-x86.zip" prefix="inspectit/jre" filemode="775" />
+			<zipfileset src="${jvm.root}/jre7-linux-x86.zip" prefix="inspectit/jre" filemode="775" />
 		</zip>
 		<zip destfile="${release.basedir}/dist/inspectit-linux.gtk.x86_64.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
 			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
-			<zipfileset src="${jvm.root}/jre6-linux-x64.zip" prefix="inspectit/jre" filemode="775" />
+			<zipfileset src="${jvm.root}/jre7-linux-x64.zip" prefix="inspectit/jre" filemode="775" />
 		</zip>
-		<zip destfile="${release.basedir}/dist/inspectit-macosx.cocoa.x86.zip" update="true">
+		<!-- The Mac versions are unavailable until Java7 is done for Mac -->
+		<!-- <zip destfile="${release.basedir}/dist/inspectit-macosx.cocoa.x86.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
 			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
 		</zip>
 		<zip destfile="${release.basedir}/dist/inspectit-macosx.cocoa.x86_64.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
 			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
-		</zip>
+		</zip> -->
 	</target>
 
 	<target name="-create-thirdparty-notification">
 		<echo file="${release.basedir}/thirdparty.txt" message="The inspectIT UI uses the following third party libraries: ${line.separator}
-Apache Software License, 2.0 : commons-logging (1.0.3), spring (2.5.5), jettison (1.1)${line.separator}
-BSD License : xstream (1.3.1)${line.separator}
-Eclipse Public License (EPL), 1.0 : nebula-cwt (0.9.0), nebula-cdatetime (0.14.0), nebula-pshelf (1.0.0)${line.separator}
-GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), rmiio (2.0.2), jcommon (1.0.15), jfreechart (1.0.10), jfreechart-swt (1.0.10), jfreechart-experimental (1.0.10)" />
+Apache Software License, 2.0 :  jettison (1.2), httpclient(4.1.1), httpcore (4.1.1), guava (11.0.1), commons-logging (1.1.1), commons-lang (2.5), spring-core (3.1.0.RELEASE), spring-context (3.1.0.RELEASE), spring-beans (3.1.0.RELEASE), spring-web (3.1.0.RELEASE), spring-asm (3.1.0.RELEASE), spring-expression (3.1.0.RELEASE), spring-aop (3.1.0.RELEASE), cglib-nodep (2.2.2),  ${line.separator}
+BSD License :  xstream (1.3.1), kryo (1.04), reflectasm (1.01), minlog (1.2), asm (3.3.1) ${line.separator}
+Eclipse Public License (EPL), 1.0 : nebula-cwt (0.9.0), nebula-cdatetime (0.14.0) ${line.separator}
+GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), jcommon (1.0.16), jfreechart (1.0.13), jfreechart-swt (1.0.13), jfreechart-experimental (1.0.13), swtgraphics2d (1.0.13)" />
 	</target>
 
 	<!-- Calls the release target and then the analysis targets -->

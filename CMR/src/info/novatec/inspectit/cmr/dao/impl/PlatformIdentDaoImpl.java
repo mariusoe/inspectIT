@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -157,6 +158,45 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 		if (cleanIdents.size() != platformIdentCache.getSize()) {
 			List<PlatformIdent> cleanPlatformIdents = loadIdentsFromDB(cleanIdents);
 			initializedPlatformIdents.addAll(cleanPlatformIdents);
+		}
+
+		Collections.sort(initializedPlatformIdents, new Comparator<PlatformIdent>() {
+			@Override
+			public int compare(PlatformIdent o1, PlatformIdent o2) {
+				return (int) (o1.getId().longValue() - o2.getId().longValue());
+			}
+		});
+		return initializedPlatformIdents;
+	}
+
+	/**
+	 * Find all initialized agents that have a id in a given set.
+	 * 
+	 * @param wantedAgentsIds
+	 *            Agents Ids.
+	 * @return List of {@link PlatformIdent}.
+	 */
+	public List<PlatformIdent> findAllInitialized(Set<Long> wantedAgentsIds) {
+		if (null == wantedAgentsIds) {
+			return Collections.emptyList();
+		}
+		
+		List<PlatformIdent> initializedPlatformIdents = new ArrayList<PlatformIdent>();
+		List<Long> cleanIdents = new ArrayList<Long>();
+		for (PlatformIdent platformIdent : platformIdentCache.getCleanPlatformIdents()) {
+			cleanIdents.add(platformIdent.getId());
+			if (wantedAgentsIds.contains(platformIdent.getId())) {
+				initializedPlatformIdents.add(platformIdent);
+			}
+		}
+
+		if (cleanIdents.size() != platformIdentCache.getSize()) {
+			List<PlatformIdent> cleanPlatformIdents = loadIdentsFromDB(cleanIdents);
+			for (PlatformIdent platformIdent : cleanPlatformIdents) {
+				if (wantedAgentsIds.contains(platformIdent.getId())) {
+					initializedPlatformIdents.add(platformIdent);
+				}
+			}
 		}
 
 		Collections.sort(initializedPlatformIdents, new Comparator<PlatformIdent>() {

@@ -5,7 +5,7 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.service.cmr.ICmrService;
 
-import java.lang.reflect.Method;
+import java.net.ConnectException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +15,8 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.remoting.RemoteConnectFailureException;
+
+import com.google.common.base.Defaults;
 
 /**
  * Our service method interceptor that will catch {@link InspectITCommunicationException} and if the
@@ -35,26 +37,41 @@ public class ServiceMethodInterceptor implements MethodInterceptor {
 			CmrRepositoryDefinition cmrRepositoryDefinition = getRepositoryDefinition(paramMethodInvocation);
 			if (null != cmrRepositoryDefinition && isServiceMethod(paramMethodInvocation)) {
 				if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.OFFLINE) {
-					InspectIT.getDefault().getRepositoryManager().forceCmrRepositoryOnlineStatusUpdate(cmrRepositoryDefinition);
+					InspectIT.getDefault().getCmrRepositoryManager().forceCmrRepositoryOnlineStatusUpdate(cmrRepositoryDefinition);
 				}
 			} else if (null == cmrRepositoryDefinition) {
 				throw new RuntimeException("Service proxy not bounded to the CMR repository definition");
 			}
 			return rval;
 		} catch (RemoteConnectFailureException e) {
-			CmrRepositoryDefinition cmrRepositoryDefinition = getRepositoryDefinition(paramMethodInvocation);
-			if (null != cmrRepositoryDefinition) {
-				if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
-					InspectIT.getDefault().getRepositoryManager().forceCmrRepositoryOnlineStatusUpdate(cmrRepositoryDefinition);
-				}
-				InspectIT.getDefault().createErrorDialog("The server: '" + cmrRepositoryDefinition.getIp() + ":" + cmrRepositoryDefinition.getPort() + "' is currenlty unavailable.", e, -1);
-			} else {
-				throw new RuntimeException("Service proxy not bounded to the CMR repository definition");
-			}
+			handleConnectionFailure(paramMethodInvocation, e);
+			return getDefaultReturnValue(paramMethodInvocation);
+		} catch (ConnectException e) {
+			handleConnectionFailure(paramMethodInvocation, e);
 			return getDefaultReturnValue(paramMethodInvocation);
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog("Exception thrown trying to invoke a service method.", e, -1);
 			return getDefaultReturnValue(paramMethodInvocation);
+		}
+	}
+
+	/**
+	 * Handles the connection failure.
+	 * 
+	 * @param paramMethodInvocation
+	 *            {@link MethodInvocation}.
+	 * @param e
+	 *            {@link Throwable}.
+	 */
+	private void handleConnectionFailure(MethodInvocation paramMethodInvocation, Throwable e) {
+		CmrRepositoryDefinition cmrRepositoryDefinition = getRepositoryDefinition(paramMethodInvocation);
+		if (null != cmrRepositoryDefinition) {
+			if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
+				InspectIT.getDefault().getCmrRepositoryManager().forceCmrRepositoryOnlineStatusUpdate(cmrRepositoryDefinition);
+			}
+			InspectIT.getDefault().createErrorDialog("The server: '" + cmrRepositoryDefinition.getIp() + ":" + cmrRepositoryDefinition.getPort() + "' is currenlty unavailable.", e, -1);
+		} else {
+			throw new RuntimeException("Service proxy not bounded to the CMR repository definition");
 		}
 	}
 
@@ -96,9 +113,9 @@ public class ServiceMethodInterceptor implements MethodInterceptor {
 	 * 
 	 * @param paramMethodInvocation
 	 *            {@link MethodInvocation}
-	 * @return If the {@link Method} invoked by {@link MethodInvocation} is one of tree major
-	 *         collection types (List, Map, Set) method returns the empty collection of correct
-	 *         type. Otherwise it returns null.
+	 * @return If the method invoked by {@link MethodInvocation} is one of tree major collection
+	 *         types (List, Map, Set) method returns the empty collection of correct type. Otherwise
+	 *         it returns null.
 	 */
 	private Object getDefaultReturnValue(MethodInvocation paramMethodInvocation) {
 		Class<?> returnType = paramMethodInvocation.getMethod().getReturnType();
@@ -110,14 +127,14 @@ public class ServiceMethodInterceptor implements MethodInterceptor {
 			return Collections.emptySet();
 		} else if (returnType.isPrimitive()) {
 			try {
-				return returnType.newInstance();
+				return Defaults.defaultValue(returnType);
 			} catch (Exception e) {
 				return null;
 			}
 		} else {
 			return null;
 		}
-		
+
 	}
 
 }

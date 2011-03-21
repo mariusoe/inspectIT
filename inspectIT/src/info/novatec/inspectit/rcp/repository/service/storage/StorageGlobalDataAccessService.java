@@ -3,166 +3,179 @@ package info.novatec.inspectit.rcp.repository.service.storage;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
+import info.novatec.inspectit.communication.MethodSensorData;
+import info.novatec.inspectit.communication.data.InvocationSequenceData;
+import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
+import info.novatec.inspectit.indexing.storage.impl.StorageIndexQuery;
+import info.novatec.inspectit.rcp.storage.util.StorageIndexQueryProvider;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
 
 /**
- * Storage based global data access server.
+ * {@link IGlobalDataAccessService} for storage purposes. This class indirectly uses the
+ * {@link AbstractCachedGlobalDataAccessService} to cache the data.
  * 
- * @author Patrice Bouillet
+ * @author Ivan Senic
  * 
  */
-public class StorageGlobalDataAccessService implements IGlobalDataAccessService {
+public class StorageGlobalDataAccessService extends AbstractStorageService<DefaultData> implements IGlobalDataAccessService {
 
 	/**
-	 * The definition.
+	 * List of agents.
 	 */
-	private StorageRepositoryDefinition storageRepositoryDefinition;
-	
+	private List<PlatformIdent> agents;
 
 	/**
-	 * Only constructor which needs a root path to be passed.
-	 * 
-	 * @param storageRepositoryDefinition
-	 *            the root path.
+	 * Indexing tree.
 	 */
-	public StorageGlobalDataAccessService(StorageRepositoryDefinition storageRepositoryDefinition) {
-		this.storageRepositoryDefinition = storageRepositoryDefinition;
-	}
+	private IStorageTreeComponent<DefaultData> indexingTree;
 
-	@Override
+	/**
+	 * {@link StorageIndexQueryProvider}.
+	 */
+	private StorageIndexQueryProvider storageIndexQueryProvider;
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public List<PlatformIdent> getConnectedAgents() {
-		// first, we have to analyze this directory with all its sub-directories
-		// and see if we can find some saved data.
-		File file = new File(storageRepositoryDefinition.getPath());
-		List<PlatformIdent> platformIdents = new ArrayList<PlatformIdent>();
-
-		if (file.exists()) {
-			if (file.isDirectory()) {
-				recursiveTraversal(file, platformIdents);
-			} else {
-				throw new RuntimeException("Path is not a folder: " + storageRepositoryDefinition.getPath());
-			}
-		}
-
-		return platformIdents;
+		return agents;
 	}
 
 	/**
-	 * Traverse through the directory hierarchy and find our saved data.
-	 * 
-	 * @param fileObject
-	 *            The file/folder to scan.
-	 * @param platformIdents
-	 *            The already found platform ident objects.
+	 * {@inheritDoc}
 	 */
-	private void recursiveTraversal(File fileObject, List<PlatformIdent> platformIdents) {
-		if (fileObject.isDirectory()) {
-			File allFiles[] = fileObject.listFiles();
-			for (File aFile : allFiles) {
-				recursiveTraversal(aFile, platformIdents);
-			}
-		} else if (fileObject.isFile()) {
-			if (StorageNamingConstants.FILE_NAME_PLATFORM.equals(fileObject.getName())) {
-				PlatformIdent platformIdent;
-				try {
-					platformIdent = loadPlatformIdent(fileObject);
-					String folder = fileObject.getParentFile().getAbsolutePath();
-					String folderName = fileObject.getParentFile().getName();
-					if (platformIdent instanceof StoragePlatformIdent) {
-						// was stored before, thus we modify the metadata
-						StoragePlatformIdent platform = (StoragePlatformIdent) platformIdent;
-						platform.setPath(folder);
-						platform.setFolderName(folderName);
-					} else {
-						platformIdent = new StoragePlatformIdent(platformIdent, folder, folderName);
-					}
-					platformIdents.add(platformIdent);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+	public List<DefaultData> getLastDataObjects(DefaultData template, long timeInterval) {
+		Timestamp toDate = new Timestamp(new Date().getTime());
+		Timestamp fromDate = new Timestamp(toDate.getTime() - timeInterval);
+		return this.getDataObjectsInInterval(template, fromDate, toDate);
 	}
 
 	/**
-	 * Load the platform ident object from the passed file.
-	 * 
-	 * @param fileObject
-	 *            The file object.
-	 * @return the platform ident object
-	 * @throws IOException
-	 *             throws IOException in case of something goes wrong while readin
-	 */
-	private PlatformIdent loadPlatformIdent(File fileObject) throws IOException {
-		InputStream fis = null;
-		InputStream bis = null;
-		InputStream input = null;
-		try {
-			fis = new FileInputStream(fileObject);
-			bis = new BufferedInputStream(fis);
-			input = new GZIPInputStream(bis);
-
-			return (PlatformIdent) storageRepositoryDefinition.getXstream().fromXML(input);
-		} finally {
-			try {
-				if (null != input) {
-					input.close();
-				}
-				if (null != bis) {
-					bis.close();
-				}
-				if (null != fis) {
-					fis.close();
-				}
-			} catch (IOException e) {
-				// ignore the exception
-			}
-		}
-	}
-
-	/**
-	 * Not supported.
-	 */
-	public List<? extends DefaultData> getLastDataObjects(DefaultData template, long timeInterval) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Not supported.
+	 * {@inheritDoc}
 	 */
 	public DefaultData getLastDataObject(DefaultData template) {
-		throw new UnsupportedOperationException();
+		// Problematic, to get the last object we need to de-serialize all to find which one has
+		// highest timestamp
+		// TODO Solution!?
+		return null;
 	}
 
 	/**
-	 * Not supported.
+	 * {@inheritDoc}
 	 */
-	public List<? extends DefaultData> getDataObjectsSinceId(DefaultData template) {
-		throw new UnsupportedOperationException();
+	public List<DefaultData> getDataObjectsSinceId(DefaultData template) {
+		StorageIndexQuery query = storageIndexQueryProvider.createNewStorageIndexQuery();
+		query.setMinId(template.getId());
+		ArrayList<Class<?>> searchClasses = new ArrayList<Class<?>>();
+		searchClasses.add(template.getClass());
+		query.setObjectClasses(searchClasses);
+		query.setPlatformIdent(template.getPlatformIdent());
+		query.setSensorTypeIdent(template.getSensorTypeIdent());
+		if (template instanceof MethodSensorData) {
+			query.setMethodIdent(((MethodSensorData) template).getMethodIdent());
+			if (template instanceof InvocationSequenceData) {
+				query.setOnlyInvocationsWithoutChildren(true);
+			}
+		}
+
+		return super.executeQuery(query, null);
 	}
 
 	/**
-	 * Not supported.
+	 * {@inheritDoc}
 	 */
-	public List<? extends DefaultData> getDataObjectsSinceIdIgnoreMethodId(DefaultData template) {
-		throw new UnsupportedOperationException();
+	public List<DefaultData> getDataObjectsSinceIdIgnoreMethodId(DefaultData template) {
+		StorageIndexQuery query = storageIndexQueryProvider.createNewStorageIndexQuery();
+		query.setMinId(template.getId());
+		ArrayList<Class<?>> searchClasses = new ArrayList<Class<?>>();
+		searchClasses.add(template.getClass());
+		query.setObjectClasses(searchClasses);
+		query.setPlatformIdent(template.getPlatformIdent());
+
+		return super.executeQuery(query, null);
 	}
 
 	/**
-	 * Not supported.
+	 * {@inheritDoc}
 	 */
-	public List<? extends DefaultData> getDataObjectsFromToDate(DefaultData template, Date fromDate, Date toDate) {
-		throw new UnsupportedOperationException();
+	public List<DefaultData> getDataObjectsFromToDate(DefaultData template, Date fromDate, Date toDate) {
+		return this.getDataObjectsInInterval(template, new Timestamp(fromDate.getTime()), new Timestamp(toDate.getTime()));
 	}
 
+	/**
+	 * Returns data objects in wanted interval based on the wanted template.
+	 * 
+	 * @param template
+	 *            Template to base search on.
+	 * @param fromDate
+	 *            From date as Timestamp.
+	 * @param toDate
+	 *            To date as Timestamp.
+	 * @return List of {@link DefaultData} objects.
+	 */
+	private List<DefaultData> getDataObjectsInInterval(DefaultData template, Timestamp fromDate, Timestamp toDate) {
+		StorageIndexQuery query = storageIndexQueryProvider.createNewStorageIndexQuery();
+		ArrayList<Class<?>> searchClasses = new ArrayList<Class<?>>();
+		searchClasses.add(template.getClass());
+		query.setObjectClasses(searchClasses);
+		query.setPlatformIdent(template.getPlatformIdent());
+		query.setSensorTypeIdent(template.getSensorTypeIdent());
+		query.setToDate(toDate);
+		query.setFromDate(fromDate);
+		if (template instanceof MethodSensorData) {
+			query.setMethodIdent(((MethodSensorData) template).getMethodIdent());
+			if (template instanceof InvocationSequenceData) {
+				query.setOnlyInvocationsWithoutChildren(true);
+			}
+		}
+
+		List<DefaultData> returnList = super.executeQuery(query, null);
+		Collections.sort(returnList, new Comparator<DefaultData>() {
+
+			@Override
+			public int compare(DefaultData o1, DefaultData o2) {
+				return o1.getTimeStamp().compareTo(o2.getTimeStamp());
+			}
+		});
+		
+		return returnList;
+	}
+
+	/**
+	 * @param agents
+	 *            the agents to set
+	 */
+	public void setAgents(List<PlatformIdent> agents) {
+		this.agents = agents;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	protected IStorageTreeComponent<DefaultData> getIndexingTree() {
+		return indexingTree;
+	}
+
+	/**
+	 * @param indexingTree
+	 *            the indexingTree to set
+	 */
+	public void setIndexingTree(IStorageTreeComponent<DefaultData> indexingTree) {
+		this.indexingTree = indexingTree;
+	}
+
+	/**
+	 * @param storageIndexQueryProvider
+	 *            the storageIndexQueryProvider to set
+	 */
+	public void setStorageIndexQueryProvider(StorageIndexQueryProvider storageIndexQueryProvider) {
+		this.storageIndexQueryProvider = storageIndexQueryProvider;
+	}
+	
 }

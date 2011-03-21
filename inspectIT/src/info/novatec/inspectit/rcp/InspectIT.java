@@ -1,8 +1,11 @@
 package info.novatec.inspectit.rcp;
 
-import info.novatec.inspectit.rcp.repository.RepositoryManager;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryManager;
+import info.novatec.inspectit.rcp.storage.InspectITStorageManager;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -10,6 +13,8 @@ import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
@@ -44,12 +49,25 @@ public class InspectIT extends AbstractUIPlugin {
 	 * The global repository management tool. It is used to create and save the connection to the
 	 * CMR.
 	 */
-	private volatile RepositoryManager repositoryManager;
+	private volatile CmrRepositoryManager cmrRepositoryManager;
 
 	/**
 	 * Preferences store for the plug-in.
 	 */
 	private volatile ScopedPreferenceStore preferenceStore;
+
+	/**
+	 * The global storage manager.
+	 */
+	private volatile InspectITStorageManager storageManager;
+
+	/**
+	 * List of property change listener in the plug-in.
+	 * <p>
+	 * Currently the property change mechanism of Eclipse RCP is not used in inspectIT. However, it
+	 * might be used in future.
+	 */
+	private List<IPropertyChangeListener> propertyChangeListeners = new ArrayList<IPropertyChangeListener>();
 
 	/**
 	 * This method is called upon plug-in activation.
@@ -82,6 +100,9 @@ public class InspectIT extends AbstractUIPlugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
+		if (null != cmrRepositoryManager) {
+			cmrRepositoryManager.cancelAllUpdateRepositoriesJobs();
+		}
 		super.stop(context);
 		plugin = null;
 	}
@@ -89,10 +110,45 @@ public class InspectIT extends AbstractUIPlugin {
 	/**
 	 * Returns the shared instance.
 	 * 
-	 * @return the default.
+	 * @return Returns the shared instance.
 	 */
 	public static InspectIT getDefault() {
 		return plugin;
+	}
+
+	/**
+	 * Registers the {@link IPropertyChangeListener} with the plug-in. Has no effect if the listener
+	 * is already registered.
+	 * 
+	 * @param propertyChangeListener
+	 *            {@link IPropertyChangeListener} to add.
+	 */
+	public void addPropertyChangeListener(IPropertyChangeListener propertyChangeListener) {
+		if (!propertyChangeListeners.contains(propertyChangeListener)) {
+			propertyChangeListeners.add(propertyChangeListener);
+		}
+	}
+
+	/**
+	 * Unregisters the {@link IPropertyChangeListener} from the plug-in.
+	 * 
+	 * @param propertyChangeListener
+	 *            {@link IPropertyChangeListener} to remove.
+	 */
+	public void removePropertyChangeListener(IPropertyChangeListener propertyChangeListener) {
+		propertyChangeListeners.remove(propertyChangeListener);
+	}
+
+	/**
+	 * Delegates the {@link PropertyChangeEvent} to all listeners.
+	 * 
+	 * @param event
+	 *            Event to delegate.
+	 */
+	public void firePropertyChangeEvent(PropertyChangeEvent event) {
+		for (IPropertyChangeListener listener : propertyChangeListeners) {
+			listener.propertyChange(event);
+		}
 	}
 
 	/**
@@ -116,7 +172,10 @@ public class InspectIT extends AbstractUIPlugin {
 	protected void initializeImageRegistry(ImageRegistry reg) {
 		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_ONLINE);
 		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_OFFLINE);
+		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_ONLINE_SMALL);
+		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_OFFLINE_SMALL);
 		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_REFRESH);
+		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_REFRESH_SMALL);
 		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_ADD);
 		addImageToRegistry(reg, InspectITConstants.IMG_AGENT);
 		addImageToRegistry(reg, InspectITConstants.IMG_INSTRUMENTATION_BROWSER);
@@ -174,9 +233,31 @@ public class InspectIT extends AbstractUIPlugin {
 		addImageToRegistry(reg, InspectITConstants.IMG_HTTP_TAGGED);
 		addImageToRegistry(reg, InspectITConstants.IMG_HTTP_AGGREGATION_REQUESTMESSAGE);
 		addImageToRegistry(reg, InspectITConstants.IMG_CHECKMARK);
-		addImageToRegistry(reg, InspectITConstants.IMG_CLOSE);
 		addImageToRegistry(reg, InspectITConstants.IMG_WINDOW);
 		addImageToRegistry(reg, InspectITConstants.IMG_FONT);
+		addImageToRegistry(reg, InspectITConstants.IMG_COLLAPSE);
+		addImageToRegistry(reg, InspectITConstants.IMG_ADD);
+		addImageToRegistry(reg, InspectITConstants.IMG_STOARGE_NEW);
+		addImageToRegistry(reg, InspectITConstants.IMG_STOARGE_OPENED);
+		addImageToRegistry(reg, InspectITConstants.IMG_STOARGE_RECORDING);
+		addImageToRegistry(reg, InspectITConstants.IMG_STOARGE_CLOSED);
+		addImageToRegistry(reg, InspectITConstants.IMG_STOARGE_AVAILABLE);
+		addImageToRegistry(reg, InspectITConstants.IMG_STOARGE_NOT_AVAILABLE);
+		addImageToRegistry(reg, InspectITConstants.IMG_ASSIGNEE_LABEL_ICON);
+		addImageToRegistry(reg, InspectITConstants.IMG_MOUNTEDBY_LABEL_ICON);
+		addImageToRegistry(reg, InspectITConstants.IMG_RATING_LABEL_ICON);
+		addImageToRegistry(reg, InspectITConstants.IMG_STATUS_LABEL_ICON);
+		addImageToRegistry(reg, InspectITConstants.IMG_USECASE_LABEL_ICON);
+		addImageToRegistry(reg, InspectITConstants.IMG_USER_LABEL_ICON);
+		addImageToRegistry(reg, InspectITConstants.IMG_PROPERTIES);
+		addImageToRegistry(reg, InspectITConstants.IMG_CLOSE);
+		addImageToRegistry(reg, InspectITConstants.IMG_CHECKMARK);
+		addImageToRegistry(reg, InspectITConstants.IMG_RECORD);
+		addImageToRegistry(reg, InspectITConstants.IMG_RECORD_GRAY);
+		addImageToRegistry(reg, InspectITConstants.IMG_EVENT_GREEN);
+		addImageToRegistry(reg, InspectITConstants.IMG_EVENT_RED);
+		addImageToRegistry(reg, InspectITConstants.IMG_EVENT_YELLOW);
+		addImageToRegistry(reg, InspectITConstants.IMG_STORAGE_OVERLAY);
 	}
 
 	/**
@@ -212,23 +293,6 @@ public class InspectIT extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns the repository manager.
-	 * 
-	 * @return The repository manager.
-	 */
-	public RepositoryManager getRepositoryManager() {
-		if (null == repositoryManager) {
-			synchronized (this) {
-				if (null == repositoryManager) {
-					repositoryManager = new RepositoryManager();
-					repositoryManager.startup();
-				}
-			}
-		}
-		return repositoryManager;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	public ScopedPreferenceStore getPreferenceStore() {
@@ -240,6 +304,36 @@ public class InspectIT extends AbstractUIPlugin {
 			}
 		}
 		return preferenceStore;
+	}
+
+	/**
+	 * @return Returns the CMR repository manager.
+	 */
+	public CmrRepositoryManager getCmrRepositoryManager() {
+		if (null == cmrRepositoryManager) {
+			synchronized (this) {
+				if (null == cmrRepositoryManager) {
+					cmrRepositoryManager = new CmrRepositoryManager();
+				}
+			}
+		}
+		return cmrRepositoryManager;
+	}
+
+	/**
+	 * 
+	 * @return Returns the {@link InspectITStorageManager}.
+	 */
+	public InspectITStorageManager getInspectITStorageManager() {
+		if (null == storageManager) {
+			synchronized (this) {
+				if (null == storageManager) {
+					storageManager = (InspectITStorageManager) applicationContext.getBean("storageManager");
+					storageManager.startUp();
+				}
+			}
+		}
+		return storageManager;
 	}
 
 	/**

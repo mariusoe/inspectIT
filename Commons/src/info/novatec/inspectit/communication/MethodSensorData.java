@@ -1,8 +1,8 @@
 package info.novatec.inspectit.communication;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
-import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
 import info.novatec.inspectit.communication.data.ParameterContentData;
+import info.novatec.inspectit.indexing.IIndexQuery;
 
 import java.sql.Timestamp;
 import java.util.HashSet;

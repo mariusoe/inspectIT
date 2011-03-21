@@ -40,7 +40,11 @@ class CmrRepositoryPreferenceValueProvider extends PreferenceValueProvider<List<
 	public String getValueForObject(List<CmrRepositoryDefinition> repositoryDefinitions) {
 		StringBuilder value = new StringBuilder();
 		for (CmrRepositoryDefinition cmrRepositoryDefinition : repositoryDefinitions) {
-			value.append(cmrRepositoryDefinition.getIp() + PreferencesConstants.PREF_SPLIT_REGEX + cmrRepositoryDefinition.getPort() + PreferencesConstants.PREF_OBJECT_SEPARATION_TOKEN);
+			value.append(cmrRepositoryDefinition.getIp() + PreferencesConstants.PREF_SPLIT_REGEX + cmrRepositoryDefinition.getPort() + PreferencesConstants.PREF_SPLIT_REGEX + cmrRepositoryDefinition.getName() + PreferencesConstants.PREF_SPLIT_REGEX);
+			if (null != cmrRepositoryDefinition.getDescription()) {
+				value.append(cmrRepositoryDefinition.getDescription());
+			}
+			value.append(PreferencesConstants.PREF_OBJECT_SEPARATION_TOKEN);
 		}
 		return value.toString();
 	}
@@ -54,9 +58,16 @@ class CmrRepositoryPreferenceValueProvider extends PreferenceValueProvider<List<
 		while (tokenizer.hasMoreTokens()) {
 			String nextValue = tokenizer.nextToken();
 			String[] splitted = nextValue.split(PreferencesConstants.PREF_SPLIT_REGEX);
+			CmrRepositoryDefinition cmrRepositoryDefinition = null;
 			if (splitted.length == 2) {
 				try {
-					returnList.add(new CmrRepositoryDefinition(splitted[0], Integer.parseInt(splitted[1])));
+					cmrRepositoryDefinition = new CmrRepositoryDefinition(splitted[0], Integer.parseInt(splitted[1]));
+				} catch (Exception e) {
+					throw new PreferenceException("Error trying to create a CMR repository definition from preference store.", e);
+				}
+			} else if (splitted.length > 2) {
+				try {
+					cmrRepositoryDefinition = new CmrRepositoryDefinition(splitted[0], Integer.parseInt(splitted[1]), splitted[2]);
 				} catch (Exception e) {
 					throw new PreferenceException("Error trying to create a CMR repository definition from preference store.", e);
 				}
@@ -64,6 +75,11 @@ class CmrRepositoryPreferenceValueProvider extends PreferenceValueProvider<List<
 				throw new PreferenceException("CMR repository definition values saved in the preference store are not correct. Received values via the string '" + nextValue + "' are "
 						+ Arrays.asList(splitted) + ". Definition will be skipped.");
 			}
+			
+			if (null != cmrRepositoryDefinition && splitted.length > 3) {
+				cmrRepositoryDefinition.setDescription(splitted[3]);
+			}
+			returnList.add(cmrRepositoryDefinition);
 		}
 		return returnList;
 	}

@@ -1,7 +1,7 @@
 package info.novatec.inspectit.communication;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
-import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
+import info.novatec.inspectit.indexing.IIndexQuery;
 
 import java.io.Serializable;
 import java.sql.Timestamp;

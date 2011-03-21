@@ -1,12 +1,11 @@
 package info.novatec.inspectit.cmr.dao.impl;
 
-import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
-import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
 import info.novatec.inspectit.cmr.dao.HttpTimerDataDao;
-import info.novatec.inspectit.cmr.util.IndexQueryProvider;
 import info.novatec.inspectit.communication.data.HttpTimerData;
+import info.novatec.inspectit.indexing.IIndexQuery;
+import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
+import info.novatec.inspectit.indexing.query.factory.impl.HttpTimerDataQueryFactory;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  * Provides <code>HttpTimerData</code> information from the CMR internal in memory buffer.
- * 
+ *
  * @author Stefan Siegl
  */
 @Repository
@@ -28,13 +27,13 @@ public class BufferHttpTimerDataDaoImpl implements HttpTimerDataDao {
 	 * Indexing tree to search for data.
 	 */
 	@Autowired
-	private ITreeComponent<HttpTimerData> indexingTree;
+	private IBufferTreeComponent<HttpTimerData> indexingTree;
 
 	/**
-	 * Index query provider.
+	 * Index query factory.
 	 */
 	@Autowired
-	private IndexQueryProvider indexQueryProvider;
+	private HttpTimerDataQueryFactory<IIndexQuery> httpDataQueryFactory;
 
 	/**
 	 * {@inheritDoc}
@@ -71,7 +70,7 @@ public class BufferHttpTimerDataDaoImpl implements HttpTimerDataDao {
 	/**
 	 * Return all <code>HttpTimerData</code> objects in the buffer. Currently this is the best
 	 * approach as the querying does not feature a better way of specifying elements.
-	 * 
+	 *
 	 * @param httpData
 	 *            <code>HttpTimerData</code> object used to retrieve the platformId
 	 * @param fromDate
@@ -81,17 +80,7 @@ public class BufferHttpTimerDataDaoImpl implements HttpTimerDataDao {
 	 * @return all <code>HttpTimerData</code> objects in the buffer.
 	 */
 	private List<HttpTimerData> findAllHttpTimers(HttpTimerData httpData, Date fromDate, Date toDate) {
-		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
-		query.setPlatformIdent(httpData.getPlatformIdent());
-		ArrayList<Class<?>> classesToSearch = new ArrayList<Class<?>>();
-		classesToSearch.add(HttpTimerData.class);
-		query.setObjectClasses(classesToSearch);
-		if (null != fromDate) {
-			query.setFromDate(new Timestamp(fromDate.getTime()));
-		}
-		if (null != toDate) {
-			query.setToDate(new Timestamp(toDate.getTime()));
-		}
+		IIndexQuery query = httpDataQueryFactory.getFindAllHttpTimersQuery(httpData, fromDate, toDate);
 		return indexingTree.query(query);
 	}
 
@@ -109,7 +98,7 @@ public class BufferHttpTimerDataDaoImpl implements HttpTimerDataDao {
 	 * including the request method allows to broaden the categorization criterion from the
 	 * uri/usecase to also include the request method (includeRequestMethod = true).</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param input
 	 *            the data to aggregate
 	 * @param uriBased
@@ -159,7 +148,7 @@ public class BufferHttpTimerDataDaoImpl implements HttpTimerDataDao {
 
 	/**
 	 * Builds an aggregation key for the given information.
-	 * 
+	 *
 	 * @param data
 	 *            the timer
 	 * @param uriBased
@@ -186,7 +175,7 @@ public class BufferHttpTimerDataDaoImpl implements HttpTimerDataDao {
 	/**
 	 * Returns cloned timer data, with copied platform ident, sensor type ident and method ident
 	 * from a given timer data. It will <b> not </b> include the timer data!
-	 * 
+	 *
 	 * @param data
 	 *            timer data to copy values to
 	 * @param uriBased
@@ -212,7 +201,7 @@ public class BufferHttpTimerDataDaoImpl implements HttpTimerDataDao {
 
 	/**
 	 * Aggregation Key used for the aggregation of HttpTimerData objects.
-	 * 
+	 *
 	 * @author Stefan Siegl
 	 */
 	private static class AggregationKey {

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: inspectIT
 Bundle-SymbolicName: info.novatec.inspectit.rcp;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.4.0
 Bundle-Activator: info.novatec.inspectit.rcp.InspectIT
 Bundle-Vendor: NovaTec GmbH
 Bundle-Localization: plugin
@@ -10,7 +10,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.expressions;bundle-version="3.4.0",
  org.eclipse.ui.forms;bundle-version="3.3.0",
- info.novatec.inspectit.commons;bundle-version="0.0.2"
+ info.novatec.inspectit.commons;bundle-version="1.4.0",
+ info.novatec.inspectit.commonscs;bundle-version="1.4.0"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  lib/prod/commons-logging.jar,
@@ -30,10 +31,12 @@ Bundle-ClassPath: .,
  lib/prod/spring-beans.jar,
  lib/prod/spring-context.jar,
  lib/prod/spring-core.jar,
+ lib/prod/httpclient.jar,
+ lib/prod/httpcore.jar,
  lib/prod/spring-web.jar,
  lib/prod/spring-asm.jar,
  lib/prod/spring-expression.jar,
  lib/prod/spring-aop.jar,
  lib/prod/aopalliance.jar,
  lib/prod/guava.jar
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

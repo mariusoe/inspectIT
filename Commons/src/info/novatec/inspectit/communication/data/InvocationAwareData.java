@@ -199,7 +199,7 @@ public abstract class InvocationAwareData extends MethodSensorData {
 	 * @author Ivan Senic
 	 * 
 	 */
-	private static class MutableInt implements Serializable {
+	public static class MutableInt implements Serializable {
 
 		/**
 		 * Generated UID.
@@ -210,6 +210,12 @@ public abstract class InvocationAwareData extends MethodSensorData {
 		 * Value.
 		 */
 		private int value;
+
+		/**
+		 * No-arg constructor for serialization.
+		 */
+		public MutableInt() {
+		}
 
 		/**
 		 * Constructor that sets initial value.
@@ -243,6 +249,38 @@ public abstract class InvocationAwareData extends MethodSensorData {
 		 */
 		public void add(int delta) {
 			value += delta;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + value;
+			return result;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			MutableInt other = (MutableInt) obj;
+			if (value != other.value) {
+				return false;
+			}
+			return true;
 		}
 
 	}

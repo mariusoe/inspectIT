@@ -2,10 +2,8 @@ package info.novatec.inspectit.cmr.dao.impl;
 
 import info.novatec.inspectit.cmr.cache.IBuffer;
 import info.novatec.inspectit.cmr.cache.impl.BufferElement;
-import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
-import info.novatec.inspectit.cmr.cache.indexing.impl.IndexingException;
 import info.novatec.inspectit.cmr.dao.DefaultDataDao;
-import info.novatec.inspectit.cmr.spring.logger.Logger;
+import info.novatec.inspectit.cmr.storage.CmrStorageManager;
 import info.novatec.inspectit.cmr.util.CacheIdGenerator;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.ExceptionEvent;
@@ -16,6 +14,9 @@ import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.SystemInformationData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.communication.data.VmArgumentData;
+import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
+import info.novatec.inspectit.indexing.impl.IndexingException;
+import info.novatec.inspectit.spring.logger.Logger;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
  * <p>
  * Delegates many calls to the {@link HibernateTemplate} returned by the {@link HibernateDaoSupport}
  * class.
- * 
+ *
  * @author Patrice Bouillet
  * @author Eduard Tudenhoefner
  * @author Ivan Senic
@@ -69,13 +70,19 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	 * The indexing tree for direct object indexing.
 	 */
 	@Autowired
-	private ITreeComponent<MethodSensorData> indexingTree;
+	private IBufferTreeComponent<DefaultData> indexingTree;
 
 	/**
 	 * Id generator for the objects that are going to the cache.
 	 */
 	@Autowired
 	private CacheIdGenerator cacheIdGenerator;
+
+	/**
+	 * Storage manager.
+	 */
+	@Autowired
+	private CmrStorageManager storageManager;
 
 	/**
 	 * Timer data aggregator.
@@ -96,7 +103,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	 * here:
 	 * http://blog.springsource.com/2007/06/26/so-should-you-still-use-springs-hibernatetemplate
 	 * -andor-jpatemplate
-	 * 
+	 *
 	 * @param sessionFactory
 	 */
 	@Autowired
@@ -117,6 +124,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	public void saveAll(List<? extends DefaultData> defaultDataCollection) {
 		StatelessSession session = getHibernateTemplate().getSessionFactory().openStatelessSession();
 		Transaction tx = session.beginTransaction();
+		boolean isRecording = storageManager.isRecordingOn();
 		for (DefaultData element : defaultDataCollection) {
 			cacheIdGenerator.assignObjectAnId(element);
 			if (element instanceof InvocationSequenceData) {
@@ -154,6 +162,10 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 			} else {
 				session.insert(element);
 			}
+
+			if (isRecording) {
+				storageManager.record(element);
+			}
 		}
 		tx.commit();
 		session.close();
@@ -162,14 +174,14 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	/**
 	 * Extract data from the invocation in the way that timer data is saved to the Db, while SQL
 	 * statements and Exceptions are indexed into the root branch.
-	 * 
+	 *
 	 * @param session
 	 *            Session needed for DB persistence.
 	 * @param invData
 	 *            Invocation data to be extracted.
 	 * @param topInvocationParent
 	 *            Top invocation object.
-	 * 
+	 *
 	 */
 	private void extractDataFromInvocation(StatelessSession session, InvocationSequenceData invData, InvocationSequenceData topInvocationParent) {
 		double exclusiveDurationDelta = 0d;
@@ -278,7 +290,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 
 	/**
 	 * Computes the duration of the nested invocation elements.
-	 * 
+	 *
 	 * @param data
 	 *            The data objects which is inspected for its nested elements.
 	 * @return The duration of all nested sequences (with their nested sequences as well).
@@ -313,7 +325,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	/**
 	 * Deals with the constructor delegation in the invocation sequence data. This method has side
 	 * effects.
-	 * 
+	 *
 	 * @param parent
 	 *            Invocation parent where the exception data is found.
 	 * @param firstExceptionData
@@ -365,7 +377,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 
 	/**
 	 * Connects exception message between linked exception data.
-	 * 
+	 *
 	 * @param exceptionSensorData
 	 *            Parent exception data, thus the one that has exception event CREATED.
 	 */

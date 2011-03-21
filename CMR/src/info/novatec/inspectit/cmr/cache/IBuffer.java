@@ -22,7 +22,8 @@ public interface IBuffer<E> {
 	 * Performs the eviction from the buffer. The element or elements that needs to be evicted
 	 * depends on buffer implementation.
 	 * 
-	 * @throws InterruptedException {@link InterruptedException}
+	 * @throws InterruptedException
+	 *             {@link InterruptedException}
 	 */
 	void evict() throws InterruptedException;
 
@@ -30,7 +31,8 @@ public interface IBuffer<E> {
 	 * Performs the size analysis of one {@link IBufferElement} in the buffer, that is next in the
 	 * line for analysis. The size of the object is added to the current size of the buffer.
 	 * 
-	 * @throws InterruptedException {@link InterruptedException}
+	 * @throws InterruptedException
+	 *             {@link InterruptedException}
 	 */
 	void analyzeNext() throws InterruptedException;
 
@@ -38,7 +40,8 @@ public interface IBuffer<E> {
 	 * Performs the indexing of one {@link IBufferElement} in the buffer, that is next in the line
 	 * for indexing.
 	 * 
-	 * @throws InterruptedException {@link InterruptedException}
+	 * @throws InterruptedException
+	 *             {@link InterruptedException}
 	 */
 	void indexNext() throws InterruptedException;
 
@@ -92,4 +95,16 @@ public interface IBuffer<E> {
 	 * @return Current buffer occupancy percentage presented as a float ranging from 0 to 1.
 	 */
 	float getOccupancyPercentage();
+
+	/**
+	 * 
+	 * @return Returns the oldest element in the buffer.
+	 */
+	E getOldestElement();
+
+	/**
+	 * 
+	 * @return Returns the newest element in the buffer.
+	 */
+	E getNewestElement();
 }

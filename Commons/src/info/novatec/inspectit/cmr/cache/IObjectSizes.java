@@ -154,4 +154,5 @@ public interface IObjectSizes {
 	 * @return Size in bytes.
 	 */
 	public long getSizeOfArray(int arraySize);
+	
 }

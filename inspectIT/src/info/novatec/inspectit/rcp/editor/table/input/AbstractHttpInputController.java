@@ -9,6 +9,7 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.TimeResolution;
 import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -151,8 +152,10 @@ public abstract class AbstractHttpInputController extends AbstractTableInputCont
 	@Override
 	public Set<PreferenceId> getPreferenceIds() {
 		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
-		preferences.add(PreferenceId.CLEAR_BUFFER);
-		preferences.add(PreferenceId.LIVEMODE);
+		if (getInputDefinition().getRepositoryDefinition() instanceof CmrRepositoryDefinition) {
+			preferences.add(PreferenceId.CLEAR_BUFFER);
+			preferences.add(PreferenceId.LIVEMODE);
+		}
 		preferences.add(PreferenceId.UPDATE);
 		preferences.add(PreferenceId.TIMELINE);
 		preferences.add(PreferenceId.HTTP_AGGREGATION_REQUESTMETHOD);

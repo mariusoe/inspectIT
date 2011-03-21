@@ -5,6 +5,7 @@ import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -50,7 +51,9 @@ public class NavigationInvocOverviewInputController extends InvocOverviewInputCo
 	@Override
 	public Set<PreferenceId> getPreferenceIds() {
 		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
-		preferences.add(PreferenceId.CLEAR_BUFFER);
+		if (getInputDefinition().getRepositoryDefinition() instanceof CmrRepositoryDefinition) {
+			preferences.add(PreferenceId.CLEAR_BUFFER);
+		}
 		preferences.add(PreferenceId.ITEMCOUNT);
 		return preferences;
 	}

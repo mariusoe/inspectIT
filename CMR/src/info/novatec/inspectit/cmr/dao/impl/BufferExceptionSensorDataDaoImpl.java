@@ -1,16 +1,13 @@
 package info.novatec.inspectit.cmr.dao.impl;
 
-import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
-import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
-import info.novatec.inspectit.cmr.cache.indexing.restriction.impl.IndexQueryRestrictionFactory;
 import info.novatec.inspectit.cmr.dao.ExceptionSensorDataDao;
-import info.novatec.inspectit.cmr.util.IndexQueryProvider;
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
+import info.novatec.inspectit.indexing.IIndexQuery;
+import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
+import info.novatec.inspectit.indexing.query.factory.impl.ExceptionSensorDataQueryFactory;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,13 +32,13 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 	 * Root branch to search in.
 	 */
 	@Autowired
-	private ITreeComponent<ExceptionSensorData> indexingTree;
+	private IBufferTreeComponent<ExceptionSensorData> indexingTree;
 
 	/**
 	 * Index query provider.
 	 */
 	@Autowired
-	private IndexQueryProvider indexQueryProvider;
+	private ExceptionSensorDataQueryFactory<IIndexQuery> exceptionSensorDataQueryFactory;
 
 	/**
 	 * {@inheritDoc}
@@ -54,28 +51,7 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 	 * {@inheritDoc}
 	 */
 	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate) {
-		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
-		query.setPlatformIdent(template.getPlatformIdent());
-		if (template.getSensorTypeIdent() != -1) {
-			query.setSensorTypeIdent(template.getSensorTypeIdent());
-		}
-		if (template.getMethodIdent() != -1) {
-			query.setMethodIdent(template.getMethodIdent());
-		}
-		if (null != template.getThrowableType()) {
-			query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("throwableType", template.getThrowableType()));
-		}
-		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
-		searchedClasses.add(ExceptionSensorData.class);
-		query.setObjectClasses(searchedClasses);
-		query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("exceptionEvent", ExceptionEvent.CREATED));
-		if (null != fromDate) {
-			query.setFromDate(new Timestamp(fromDate.getTime()));
-		}
-		if (null != toDate) {
-			query.setToDate(new Timestamp(toDate.getTime()));
-		}
-
+		IIndexQuery query = exceptionSensorDataQueryFactory.getUngroupedExceptionOverviewQuery(template, limit, fromDate, toDate);
 		List<ExceptionSensorData> results = indexingTree.query(query);
 		Collections.sort(results, new Comparator<DefaultData>() {
 			public int compare(DefaultData o1, DefaultData o2) {
@@ -111,12 +87,7 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 	 * {@inheritDoc}
 	 */
 	public List<ExceptionSensorData> getExceptionTree(ExceptionSensorData template) {
-		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
-		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
-		searchedClasses.add(ExceptionSensorData.class);
-		query.setObjectClasses(searchedClasses);
-		query.setPlatformIdent(template.getPlatformIdent());
-		query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("throwableIdentityHashCode", template.getThrowableIdentityHashCode()));
+		IIndexQuery query = exceptionSensorDataQueryFactory.getExceptionTreeQuery(template);
 		List<ExceptionSensorData> results = indexingTree.query(query);
 		Collections.reverse(results);
 		return results;
@@ -133,20 +104,7 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 	 * {@inheritDoc}
 	 */
 	public List<AggregatedExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
-		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
-		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
-		searchedClasses.add(ExceptionSensorData.class);
-		query.setObjectClasses(searchedClasses);
-		query.setPlatformIdent(template.getPlatformIdent());
-		if (null != fromDate) {
-			query.setFromDate(new Timestamp(fromDate.getTime()));
-		}
-		if (null != toDate) {
-			query.setToDate(new Timestamp(toDate.getTime()));
-		}
-		if (null != template.getThrowableType()) {
-			query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("throwableType", template.getThrowableType()));
-		}
+		IIndexQuery query = exceptionSensorDataQueryFactory.getDataForGroupedExceptionOverviewQuery(template, fromDate, toDate);
 		List<ExceptionSensorData> results = indexingTree.query(query);
 		Map<Integer, AggregatedExceptionSensorData> aggregatedMap = new HashMap<Integer, AggregatedExceptionSensorData>();
 		List<AggregatedExceptionSensorData> aggregatedResults = new ArrayList<AggregatedExceptionSensorData>();
@@ -227,13 +185,7 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 	 */
 	@Override
 	public List<ExceptionSensorData> getStackTraceMessagesForThrowableType(ExceptionSensorData template) {
-		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
-		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
-		searchedClasses.add(ExceptionSensorData.class);
-		query.setObjectClasses(searchedClasses);
-		query.setPlatformIdent(template.getPlatformIdent());
-		query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("throwableType", template.getThrowableType()));
-		query.addIndexingRestriction(IndexQueryRestrictionFactory.isNotNull("stackTrace"));
+		IIndexQuery query = exceptionSensorDataQueryFactory.getStackTraceMessagesForThrowableTypeQuery(template);
 		List<ExceptionSensorData> results = indexingTree.query(query);
 		Map<Integer, AggregatedExceptionSensorData> distinctStackTraceErrorCombination = new HashMap<Integer, AggregatedExceptionSensorData>();
 		List<ExceptionSensorData> returnList = new ArrayList<ExceptionSensorData>();

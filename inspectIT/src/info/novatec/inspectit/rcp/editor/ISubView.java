@@ -1,8 +1,8 @@
 package info.novatec.inspectit.rcp.editor;
 
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 
 import java.util.Collections;
@@ -23,8 +23,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 public interface ISubView {
 
 	/**
-	 * Sets the root editor for this sub view. This is needed for event handling
-	 * purposes or the access to the preference area.
+	 * Sets the root editor for this sub view. This is needed for event handling purposes or the
+	 * access to the preference area.
 	 * 
 	 * @param rootEditor
 	 *            The root editor.
@@ -39,39 +39,42 @@ public interface ISubView {
 	AbstractRootEditor getRootEditor();
 
 	/**
+	 * Informs the sub-view has to do all initialization tasks. This method will be called after the
+	 * {@link #setRootEditor(AbstractRootEditor)} has been executed, so that sub-view can get all
+	 * necessary information from {@link AbstractRootEditor}.
+	 */
+	void init();
+
+	/**
 	 * Creates the part control of this view.
 	 * 
 	 * @param parent
 	 *            The parent used to draw the elements to.
 	 * @param toolkit
-	 *            The form toolkit which is used for defining the colors of the
-	 *            widgets. Can be <code>null</code> to indicate that there is no
-	 *            toolkit.
+	 *            The form toolkit which is used for defining the colors of the widgets. Can be
+	 *            <code>null</code> to indicate that there is no toolkit.
 	 */
 	void createPartControl(Composite parent, FormToolkit toolkit);
 
 	/**
-	 * A sub-view should return all preference IDs itself is in need of and the
-	 * ones of the children (it is a sub-view containing other views).
+	 * A sub-view should return all preference IDs itself is in need of and the ones of the children
+	 * (it is a sub-view containing other views).
 	 * 
-	 * @return A {@link Set} containing all {@link PreferenceId}. Returning
-	 *         <code>null</code> is not permitted here. At least a
-	 *         {@link Collections#EMPTY_SET} should be returned.
+	 * @return A {@link Set} containing all {@link PreferenceId}. Returning <code>null</code> is not
+	 *         permitted here. At least a {@link Collections#EMPTY_SET} should be returned.
 	 */
 	Set<PreferenceId> getPreferenceIds();
 
 	/**
-	 * Every sub-view contains some logic to retrieve the data on its own. This
-	 * method invokes the refresh process which should update the view.
+	 * Every sub-view contains some logic to retrieve the data on its own. This method invokes the
+	 * refresh process which should update the view.
 	 * <p>
-	 * For some views, it is possible that they do not show or do anything for
-	 * default.
+	 * For some views, it is possible that they do not show or do anything for default.
 	 */
 	void doRefresh();
 
 	/**
-	 * This method is called whenever something is changed in one of the
-	 * preferences.
+	 * This method is called whenever something is changed in one of the preferences.
 	 * 
 	 * @param preferenceEvent
 	 *            The event object containing the changed objects.
@@ -79,9 +82,8 @@ public interface ISubView {
 	void preferenceEventFired(PreferenceEvent preferenceEvent);
 
 	/**
-	 * This will set the data input of the view. Every view can initialize
-	 * itself with some data (like live data from the server). This is only
-	 * needed if some specific needs to be displayed.
+	 * This will set the data input of the view. Every view can initialize itself with some data
+	 * (like live data from the server). This is only needed if some specific needs to be displayed.
 	 * 
 	 * @param data
 	 *            The list of {@link DefaultData} objects.

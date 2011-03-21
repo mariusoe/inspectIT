@@ -4,8 +4,8 @@ import info.novatec.inspectit.cmr.dao.DefaultDataDao;
 import info.novatec.inspectit.cmr.dao.PlatformIdentDao;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
-import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.spring.logger.Logger;
 
 import java.util.Collections;
 import java.util.Date;

@@ -5,6 +5,7 @@ import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
 import info.novatec.inspectit.communication.data.CpuInformationData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -305,9 +306,11 @@ public class DefaultCpuPlotController extends AbstractPlotController {
 	 */
 	public Set<PreferenceId> getPreferenceIds() {
 		Set<PreferenceId> preferenceList = EnumSet.noneOf(PreferenceId.class);
+		if (getInputDefinition().getRepositoryDefinition() instanceof CmrRepositoryDefinition) {
+			preferenceList.add(PreferenceId.LIVEMODE);
+		}
 		preferenceList.add(PreferenceId.TIMELINE);
 		preferenceList.add(PreferenceId.SAMPLINGRATE);
-		preferenceList.add(PreferenceId.LIVEMODE);
 		preferenceList.add(PreferenceId.UPDATE);
 		return preferenceList;
 	}
