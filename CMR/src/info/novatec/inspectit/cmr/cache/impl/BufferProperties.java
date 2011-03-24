@@ -65,14 +65,15 @@ public class BufferProperties implements InitializingBean {
 	private long minObjectExpansionRateActiveFromBufferSize;
 
 	/**
-	 * Number of elements that need to be processed, so that the maintenance is done.
-	 */
-	private long elementsCountForMaintenance;
-
-	/**
 	 * Size of the eviction fragment in percentages, in relation to the max buffer size.
 	 */
 	private float evictionFragmentSizePercentage;
+
+	/**
+	 * Number of bytes that need to be added or removed for the buffer so that update and clean of
+	 * the indexing tree is performed.
+	 */
+	private long flagsSetOnBytes;
 
 	/**
 	 * Logger for buffer properties.
@@ -270,25 +271,6 @@ public class BufferProperties implements InitializingBean {
 	}
 
 	/**
-	 * Returns number of elements that need to be processed, so that the buffer maintenance is done.
-	 * 
-	 * @return Number of buffer elements.
-	 */
-	public long getElementsCountForMaintenance() {
-		return elementsCountForMaintenance;
-	}
-
-	/**
-	 * Sets number of elements that need to be processed, so that the buffer maintenance is done.
-	 * 
-	 * @param elementsCountForMaintenance
-	 *            Number of buffer elements.
-	 */
-	public void setElementsCountForMaintenance(long elementsCountForMaintenance) {
-		this.elementsCountForMaintenance = elementsCountForMaintenance;
-	}
-
-	/**
 	 * Returns size of the eviction fragment in percentages, in relation to the max buffer size.
 	 * 
 	 * @return Eviction fragment in percentages as float.
@@ -305,6 +287,23 @@ public class BufferProperties implements InitializingBean {
 	 */
 	public void setEvictionFragmentSizePercentage(float evictionFragmentSizePercentage) {
 		this.evictionFragmentSizePercentage = evictionFragmentSizePercentage;
+	}
+
+	/**
+	 * @return Number of bytes that need to be added or removed for the buffer so that update and
+	 *         clean of the indexing tree is performed.
+	 */
+	public long getFlagsSetOnBytes() {
+		return flagsSetOnBytes;
+	}
+
+	/**
+	 * @param flagsSetOnBytes
+	 *            Number of bytes that need to be added or removed for the buffer so that update and
+	 *            clean of the indexing tree is performed.
+	 */
+	public void setFlagsSetOnBytes(long flagsSetOnBytes) {
+		this.flagsSetOnBytes = flagsSetOnBytes;
 	}
 
 	/**
@@ -379,28 +378,31 @@ public class BufferProperties implements InitializingBean {
 			LOGGER.info("||-Min object size expansion: " + NumberFormat.getInstance().format(minObjectExpansionRate * 100) + "%");
 			LOGGER.info("||-Max object size expansion active till buffer size: " + NumberFormat.getInstance().format(maxObjectExpansionRateActiveTillBufferSize) + " bytes");
 			LOGGER.info("||-Min object size expansion active from buffer size: " + NumberFormat.getInstance().format(minObjectExpansionRateActiveFromBufferSize) + " bytes");
-
 		}
 		if (this.evictionOccupancyPercentage < 0 || this.evictionOccupancyPercentage > 1) {
-			throw new BeanInitializationException("Buffer properties initialization error: Eviction occupancy must be a percentage value between 0 and 1. Initialization value is: " + evictionOccupancyPercentage);
+			throw new BeanInitializationException("Buffer properties initialization error: Eviction occupancy must be a percentage value between 0 and 1. Initialization value is: "
+					+ evictionOccupancyPercentage);
 		}
 		if (this.evictionFragmentSizePercentage < 0.01 || this.evictionFragmentSizePercentage > 0.5) {
 			throw new BeanInitializationException("Buffer properties initialization error: Eviction fragment size must be a percentage value between 0.01 and 0.5. Initialization value is: "
 					+ evictionFragmentSizePercentage);
 		}
 		if (this.minHeapSizeOccupancy < 0 || this.minHeapSizeOccupancy > 1) {
-			throw new BeanInitializationException("Buffer properties initialization error: Minimum heap size occupancy must be a percentage value between 0 and 1. Initialization value is: " + minHeapSizeOccupancy);
+			throw new BeanInitializationException("Buffer properties initialization error: Minimum heap size occupancy must be a percentage value between 0 and 1. Initialization value is: "
+					+ minHeapSizeOccupancy);
 		}
 		if (this.maxHeapSizeOccupancy < 0 || this.maxHeapSizeOccupancy > 1) {
-			throw new BeanInitializationException("Buffer properties initialization error: Maximum heap size occupancy must be a percentage value between 0 and 1. Initialization value is: " + maxHeapSizeOccupancy);
+			throw new BeanInitializationException("Buffer properties initialization error: Maximum heap size occupancy must be a percentage value between 0 and 1. Initialization value is: "
+					+ maxHeapSizeOccupancy);
 		}
 		if (this.maxHeapSizeOccupancy < this.minHeapSizeOccupancy) {
 			throw new BeanInitializationException("Buffer properties initialization error: Maximum heap size occupancy can not be lower than minimum heap size occupancy. Initialization values are: "
 					+ maxHeapSizeOccupancy + " (max) and " + minHeapSizeOccupancy + " (min)");
 		}
 		if (this.maxObjectExpansionRate < this.minObjectExpansionRate) {
-			throw new BeanInitializationException("Buffer properties initialization error: Maximum object expansion rate can not be lower than minimum object expansion rate. Initialization values are: "
-					+ maxObjectExpansionRate + " (max) and " + minObjectExpansionRate + " (min)");
+			throw new BeanInitializationException(
+					"Buffer properties initialization error: Maximum object expansion rate can not be lower than minimum object expansion rate. Initialization values are: " + maxObjectExpansionRate
+							+ " (max) and " + minObjectExpansionRate + " (min)");
 		}
 		if (this.maxHeapSizeOccupancyActiveFromHeapSize < this.minHeapSizeOccupancyActiveTillHeapSize) {
 			throw new BeanInitializationException(
@@ -415,5 +417,11 @@ public class BufferProperties implements InitializingBean {
 							+ maxObjectExpansionRateActiveTillBufferSize
 							+ " (buffer size for max object expansion rate)");
 		}
+		if (this.getFlagsSetOnBytes() <= 0) {
+			throw new BeanInitializationException(
+					"Buffer properties initialization error: The number of bytes that activate the clean and update of the indexing tree can not be less or equal than zero. Initialization value is: "
+							+ this.getFlagsSetOnBytes());
+		}
 	}
+
 }

@@ -468,7 +468,7 @@ public class SystemInformationData extends SystemSensorData {
 		size += objectSizes.getSizeOf(vmVendor);
 		size += objectSizes.getSizeOf(vmVersion);
 		if (null != vmSet && vmSet instanceof HashSet) {
-			size += objectSizes.getSizeOf((HashSet)vmSet);
+			size += objectSizes.getSizeOfHashSet(vmSet.size());
 			Iterator iterator = vmSet.iterator();
 			while (iterator.hasNext()) {
 				try{

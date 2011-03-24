@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This interface defines necessary methods that are needed for object size calculations.
@@ -66,23 +64,40 @@ public interface IObjectSizes {
 	 * include the size of elements that are in the set. The calculation may not be correct for
 	 * other set types.
 	 * 
-	 * @param hashSet
-	 *            HashSet which size has to be calculated.
-	 * @return Size of {@link HashSet} object in bytes, or 0 if passed object is null.
+	 * @param hashSetSize
+	 *            HashSet size that has to be calculated.
+	 * @return Size of {@link HashSet} object in bytes.
 	 */
-	long getSizeOf(Set hashSet);
+	long getSizeOfHashSet(int hashSetSize);
 
 	/**
-	 * Calculates the approximate size of the {@link HashMap} or {@link ConcurrentHashMap} object.
-	 * The calculation does not include the size of elements that are in the map. The calculation
-	 * may not be correct for other map types.
+	 * Calculates the approximate size of the {@link HashMap} object. The calculation does not
+	 * include the size of elements that are in the map. The calculation may not be correct for
+	 * other map types.
 	 * 
 	 * @param hashMap
-	 *            HashMap which size has to be calculated.
-	 * @return Size of {@link HashMap} or {@link ConcurrentHashMap} object in bytes, or 0 if passed
-	 *         object is null.
+	 *            HashMap size that has to be calculated.
+	 * @return Size of {@link HashMap} object in bytes.
 	 */
-	long getSizeOf(Map hashMap);
+	long getSizeOfHashMap(int hashMapSize);
+
+	/**
+	 * Calculates the approximate size of the {@link ConcurrentHashMap} object. The calculation does
+	 * not include the size of elements that are in the map. The calculation may not be correct for
+	 * other map types.
+	 * 
+	 * @param hashMap
+	 *            Concurrent HashMap size that has to be calculated.
+	 * @return Size of {@link ConcurrentHashMap} object in bytes.
+	 */
+	long getSizeOfConcurrentHashMap(int mapSize, int concurrencyLevel);
+
+	/**
+	 * Calculates size of the {@link Long} objects
+	 * 
+	 * @return Size of the {@link Long} objects in byte.
+	 */
+	long getSizeOfLongObject();
 
 	/**
 	 * Returns the object size based on the number of given primitive fields in the object's class.

@@ -23,6 +23,11 @@ import java.util.concurrent.ConcurrentHashMap;
  *            Element type that the branch can index (and hold).
  */
 public class Branch<E extends DefaultData> implements ITreeComponent<E> {
+	
+	/**
+	 * Initial concurrency level for the {@link ConcurrentHashMap}.
+	 */
+	private static final int CONCURRENCY_LEVEL = 4;
 
 	/**
 	 * Branch indexer.
@@ -46,7 +51,7 @@ public class Branch<E extends DefaultData> implements ITreeComponent<E> {
 			throw new IllegalArgumentException();
 		}
 		this.branchIndexer = branchIndexer;
-		map = new ConcurrentHashMap<Object, ITreeComponent<E>>();
+		map = new ConcurrentHashMap<Object, ITreeComponent<E>>(1, 0.75f, CONCURRENCY_LEVEL);
 	}
 
 	/**
@@ -210,12 +215,12 @@ public class Branch<E extends DefaultData> implements ITreeComponent<E> {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("rawtypes")
 	public long getComponentSize(IObjectSizes objectSizes) {
+		int mapSize = map.size();
 		long size = objectSizes.getSizeOfObject();
 		size += objectSizes.getPrimitiveTypesSize(2, 0, 0, 0, 0, 0);
-		size += objectSizes.getSizeOf((ConcurrentHashMap) map);
-		size += map.size() * 16; // for a Long key in a Map.entry
+		size += objectSizes.getSizeOfConcurrentHashMap(mapSize, CONCURRENCY_LEVEL);
+		size += mapSize * objectSizes.getSizeOfLongObject(); // for a Long key in a Map.entry
 		for (ITreeComponent<E> treeComponent : map.values()) {
 			size += treeComponent.getComponentSize(objectSizes);
 		}

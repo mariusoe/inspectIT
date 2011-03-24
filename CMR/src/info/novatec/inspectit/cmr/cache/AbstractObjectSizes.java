@@ -2,8 +2,7 @@ package info.novatec.inspectit.cmr.cache;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This is an abstract class that holds general calculations and object sizes that are equal in both
@@ -77,40 +76,61 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 		if (null == arrayList) {
 			return 0;
 		}
-		long size = 20 + getReferenceSize() + 12 + getReferenceSize() * arrayList.size();
+		long size = this.getSizeOfObject() + this.getPrimitiveTypesSize(1, 0, 2, 0, 0, 0) + this.getSizeOfArray(arrayList.size());
 		return alignTo8Bytes(size);
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
-	 * The formula used is: 12 bytes + one reference for HashSet object size of HashMap object
-	 * because HashSet uses it.
 	 */
-	@SuppressWarnings("rawtypes")
-	public long getSizeOf(Set hashSet) {
-		if (null == hashSet) {
-			return 0;
-		}
-		int hashSetSize = hashSet.size();
-		long size = 12 + getReferenceSize();
-		long hashMapSize = alignTo8Bytes(28 + 3 * getReferenceSize() + alignTo8Bytes(12 + hashSetSize * getReferenceSize()) + (hashSetSize * alignTo8Bytes(12 + 3 * getReferenceSize())));
-		return alignTo8Bytes(size + hashMapSize);
+	public long getSizeOfHashSet(int hashSetSize) {
+		long size = this.getSizeOfObject();
+		size += this.getPrimitiveTypesSize(1, 0, 0, 0, 0, 0);
+		size += this.getSizeOfHashMap(hashSetSize);
+		// for every object in the set there is additional empty object in the HashMap as value
+		size += this.getSizeOfObject() * hashSetSize;
+		return alignTo8Bytes(size);
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
-	 * The formula used is: 28 bytes + three references for HashMap object 12 bytes for elements
-	 * array reference size * map size map size * HashMap.Entry size (12 bytes + three references).
 	 */
-	@SuppressWarnings("rawtypes")
-	public long getSizeOf(Map hashMap) {
-		if (null == hashMap) {
-			return 0;
-		}
-		int hashMapSize = hashMap.size();
-		long size = 28 + 3 * getReferenceSize() + alignTo8Bytes(12 + hashMapSize * getReferenceSize()) + (hashMapSize * alignTo8Bytes(12 + 3 * getReferenceSize()));
+	public long getSizeOfHashMap(int hashMapSize) {
+		long size = this.getSizeOfObject();
+		size += this.getPrimitiveTypesSize(5, 0, 3, 1, 0, 0);
+		int mapCapacity = this.getHashMapCapacityFromSize(hashMapSize);
+
+		// for entries
+		size += this.getSizeOfArray(mapCapacity);
+		size += hashMapSize * this.getSizeOfHashMapEntry();
+
+		size += this.getSizeOfHashMapFrontCache(hashMapSize);
+
+		// To each hash map I add 16 bytes because keySet, entrySet and values fields, that can each
+		// hold 16 bytes 
+		// These fields are null until these sets are requested by user.
+		// Thus I add for one
+		size += 16;
+		
+		return alignTo8Bytes(size);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public long getSizeOfConcurrentHashMap(int mapSize, int concurrencyLevel) {
+		long size = this.getSizeOfObject();
+		size += this.getPrimitiveTypesSize(6, 0, 2, 0, 0, 0);
+
+		// array of segments based on capacity
+		size += this.getSizeOfArray(concurrencyLevel);
+		size += concurrencyLevel * this.getSizeOfConcurrentSeqment();
+
+		// and for each object in the map there is the reference to the HashEntry in Segment that we
+		// need to add
+		size += mapSize * alignTo8Bytes(this.getReferenceSize());
+		size += mapSize * this.getSizeOfHashEntry();
+
 		return alignTo8Bytes(size);
 	}
 
@@ -119,6 +139,15 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 */
 	public long alignTo8Bytes(long size) {
 		return size + size % 8;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getSizeOfLongObject() {
+		long size = this.getSizeOfObject() + getPrimitiveTypesSize(0, 0, 0, 0, 1, 0);
+		return alignTo8Bytes(size);
 	}
 
 	/**
@@ -140,6 +169,98 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 */
 	public void setObjectSecurityExpansionRate(float objectSecurityExpansionRate) {
 		this.objectSecurityExpansionRate = objectSecurityExpansionRate;
+	}
+
+	/**
+	 * Calculates the size of the array with out objects in the array.
+	 * 
+	 * @param arraySize
+	 *            Size of array (length).
+	 * @return Size in bytes.
+	 */
+	private long getSizeOfArray(int arraySize) {
+		long size = this.getSizeOfObject();
+		size += this.getPrimitiveTypesSize(1 + arraySize, 0, 0, 0, 0, 0);
+		return alignTo8Bytes(size);
+	}
+
+	/**
+	 * Calculates the size of the {@link ConcurrentHashMap} seqment.
+	 * 
+	 * @return Size in bytes.
+	 */
+	private long getSizeOfConcurrentSeqment() {
+		long size = this.getSizeOfObject();
+		size += this.getPrimitiveTypesSize(2, 0, 3, 1, 0, 0);
+
+		// plus the reentrant lock
+		size += alignTo8Bytes(this.getPrimitiveTypesSize(2, 0, 3, 1, 0, 0));
+
+		// plus just the empty array because we don't know how many objects segment has, this is
+		// calculated additionally in concurrent map
+		size += this.getSizeOfArray(0);
+		return alignTo8Bytes(size);
+	}
+
+	/**
+	 * Calculates the size of the hash entry.
+	 * 
+	 * @return Size in bytes.
+	 */
+	private long getSizeOfHashEntry() {
+		long size = this.getSizeOfObject();
+		size += this.getPrimitiveTypesSize(3, 0, 1, 0, 0, 0);
+		return alignTo8Bytes(size);
+	}
+
+	/**
+	 * Calculates the size of the hash map front cache.
+	 * 
+	 * @param hashMapSize
+	 *            Size of hashMap.
+	 * @return Size in bytes.
+	 */
+	private long getSizeOfHashMapFrontCache(int hashMapSize) {
+		int mapCapacity = getHashMapCapacityFromSize(hashMapSize);
+		long size = this.getSizeOfObject();
+		size += this.getPrimitiveTypesSize(2, 0, 1, 0, 0, 0);
+		size += this.getSizeOfArray(mapCapacity);
+		return alignTo8Bytes(size);
+	}
+
+	/**
+	 * Returns the size of a HashMap entry. Not that the key and value objects are not in this size.
+	 * If HashSet is used the HashMapEntry value object will be a simple Object, thus this size has
+	 * to be added to the HashSet.
+	 * 
+	 * @return Returns the size of a HashMap entry. Not that the key and value objects are not in
+	 *         this size. If HashSet is used the HashMapEntry value object will be a simple Object,
+	 *         thus this size has to be added to the HashSet.
+	 */
+	private long getSizeOfHashMapEntry() {
+		long size = this.getSizeOfObject();
+		size += this.getPrimitiveTypesSize(4, 0, 1, 0, 0, 0);
+		return alignTo8Bytes(size);
+	}
+
+	/**
+	 * Returns the capacity of the HashMap from it size. The calculations take the default capacity
+	 * of 16 and default load factor of 0.75.
+	 * 
+	 * @param hashMapSize
+	 *            Size of hash map.
+	 * @return Returns the capacity of the HashMap from it size. The calculations take the default
+	 *         capacity of 16 and default load factor of 0.75.
+	 */
+	private int getHashMapCapacityFromSize(int hashMapSize) {
+		if (hashMapSize == 0) {
+			return 0;
+		}
+		int capacity = 16;
+		while (capacity * 0.75 < hashMapSize) {
+			capacity *= 2;
+		}
+		return capacity;
 	}
 
 }

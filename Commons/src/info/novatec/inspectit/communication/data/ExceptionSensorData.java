@@ -194,7 +194,7 @@ public class ExceptionSensorData extends InvocationAwareData {
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
 		long size = super.getObjectSize(objectSizes);
-		size += objectSizes.getPrimitiveTypesSize(7, 0, 0, 0, 1, 0);
+		size += objectSizes.getPrimitiveTypesSize(6, 0, 0, 0, 1, 0);
 		size += objectSizes.getSizeOf(errorMessage);
 		size += objectSizes.getSizeOf(cause);
 		size += objectSizes.getSizeOf(stackTrace);

@@ -9,7 +9,6 @@ import info.novatec.inspectit.cmr.util.Converter;
 import info.novatec.inspectit.communication.DefaultData;
 
 import java.text.NumberFormat;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -134,14 +133,14 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	private AtomicLong indexingTreeSize = new AtomicLong();
 
 	/**
-	 * Number of elements when threads do maintenance.
+	 * Data added to the buffer in bytes.
 	 */
-	private long elementsCountForMaintenance;
+	private AtomicLong dataAddedInBytes = new AtomicLong();
 
 	/**
-	 * Flag that signals if the indexing tree is ready to be cleaned.
+	 * Data removed from the buffer in bytes.
 	 */
-	private AtomicBoolean cleanFlag = new AtomicBoolean();
+	private AtomicLong dataRemovedInBytes = new AtomicLong();
 
 	/**
 	 * Correct interface for calculating object sizes.
@@ -286,9 +285,6 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 					first.set(emptyBufferElement);
 				}
 
-				// mark for cleaning
-				cleanFlag.set(true);
-
 				// break from while
 				break;
 			}
@@ -330,7 +326,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 				// perform analysis
 				elementToAnalyze.calculateAndSetBufferElementSize(objectSizes);
 				elementToAnalyze.setAnalyzed(true);
-				addToCurrentSize(elementToAnalyze.getBufferElementSize());
+				addToCurrentSize(elementToAnalyze.getBufferElementSize(), true);
 				elementsAnalyzed.incrementAndGet();
 
 				// if now we are pointing to the marker we go to sleep until we are informed that
@@ -393,13 +389,29 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 
 					// increase number of indexed elements, and perform calculation of the indexing
 					// tree size if enough elements have been indexed
-					long indexed = elementsIndexed.incrementAndGet();
-					if (indexed % elementsCountForMaintenance == 0) {
+					elementsIndexed.incrementAndGet();
+
+					if (dataAddedInBytes.get() > bufferProperties.getFlagsSetOnBytes()) {
+						dataAddedInBytes.set(0);
+						long time = 0;
+						if (LOGGER.isDebugEnabled()) {
+							time = System.nanoTime();
+						}
+
 						long newSize = indexingTree.getComponentSize(objectSizes);
 						newSize += newSize * objectSizes.getObjectSecurityExpansionRate();
-						long oldSize = indexingTreeSize.get();
-						if (indexingTreeSize.compareAndSet(oldSize, newSize)) {
-							addToCurrentSize(newSize - oldSize);
+						long oldSize = 0;
+						while (true) {
+							oldSize = indexingTreeSize.get();
+							if (indexingTreeSize.compareAndSet(oldSize, newSize)) {
+								addToCurrentSize(newSize - oldSize, false);
+								break;
+							}
+						}
+
+						if (LOGGER.isDebugEnabled()) {
+							LOGGER.debug("Indexing tree size update duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+							LOGGER.debug("Indexing tree delta: " + (newSize - oldSize));
 						}
 					}
 				} catch (IndexingException e) {
@@ -430,7 +442,8 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 
 		// if clean flag is set thread should try to perform indexing tree cleaning
 		// only thread that successfully executes the compare and set will do the cleaning
-		if (cleanFlag.get() && cleanFlag.compareAndSet(true, false)) {
+		if (dataRemovedInBytes.get() > bufferProperties.getFlagsSetOnBytes()) {
+			dataRemovedInBytes.set(0);
 			long time = 0;
 			if (LOGGER.isDebugEnabled()) {
 				time = System.nanoTime();
@@ -490,10 +503,17 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	 * 
 	 * @param size
 	 *            Size in bytes.
+	 * @param areObjects
+	 *            Defines if the size that is added to the current size relates to the objects in
+	 *            buffer. True means size is related to objects in buffer, false means that the size
+	 *            relates to the indexing tree.
 	 */
-	private void addToCurrentSize(long size) {
+	private void addToCurrentSize(long size, boolean areObjects) {
 		currentSize.addAndGet(size);
 		notifyEvictionIfNeeded();
+		if (areObjects) {
+			dataAddedInBytes.addAndGet(size);
+		}
 	}
 
 	/**
@@ -506,6 +526,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	 */
 	private void substractFromCurrentSize(long size) {
 		currentSize.addAndGet(-(size));
+		dataRemovedInBytes.addAndGet(size);
 	}
 
 	/**
@@ -557,6 +578,8 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 		elementsIndexed.set(0);
 		elementsEvicted.set(0);
 		indexingTree.clearAll();
+		dataAddedInBytes.set(0);
+		dataRemovedInBytes.set(0);
 	}
 
 	/**
@@ -626,7 +649,6 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 		this.maxSize = new AtomicLong(bufferProperties.getInitialBufferSize());
 		this.evictionOccupancyPercentage = new AtomicInteger(Float.floatToIntBits(bufferProperties.getEvictionOccupancyPercentage()));
 		this.objectSizes.setObjectSecurityExpansionRate(bufferProperties.getObjectSecurityExpansionRate(maxSize.get()));
-		this.elementsCountForMaintenance = bufferProperties.getElementsCountForMaintenance();
 		this.first = new AtomicReference<IBufferElement<E>>(emptyBufferElement);
 		this.last = new AtomicReference<IBufferElement<E>>(emptyBufferElement);
 		this.nextForAnalysis = new AtomicReference<IBufferElement<E>>(emptyBufferElement);

@@ -21,6 +21,11 @@ import java.util.concurrent.ConcurrentHashMap;
  *            Element type that the leaf can index (and hold).
  */
 public class Leaf<E extends DefaultData> implements ITreeComponent<E> {
+	
+	/**
+	 * Initial concurrency level for the {@link ConcurrentHashMap}.
+	 */
+	private static final int CONCURRENCY_LEVEL = 4;
 
 	/**
 	 * Map for week references.
@@ -32,7 +37,7 @@ public class Leaf<E extends DefaultData> implements ITreeComponent<E> {
 	 */
 	public Leaf() {
 		super();
-		map = new ConcurrentHashMap<Long, WeakReference<E>>();
+		map = new ConcurrentHashMap<Long, WeakReference<E>>(1, 0.75f, CONCURRENCY_LEVEL);
 	}
 
 	/**
@@ -101,12 +106,13 @@ public class Leaf<E extends DefaultData> implements ITreeComponent<E> {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("rawtypes")
 	public long getComponentSize(IObjectSizes objectSizes) {
+		int mapSize = map.size();
 		long size = objectSizes.getSizeOfObject();
 		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 0, 0);
-		size += objectSizes.getSizeOf((ConcurrentHashMap) map);
-		size += map.size() * (16 + 16); // for Long and WeekReference in a Map.Entry
+		size += objectSizes.getSizeOfConcurrentHashMap(mapSize, CONCURRENCY_LEVEL);
+		// for Long and WeekReference in a Map.Entry
+		size += map.size() * (objectSizes.getSizeOfLongObject() + 16); 
 		return size;
 	}
 

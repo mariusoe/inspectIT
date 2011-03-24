@@ -51,7 +51,7 @@
 		<property name="minObjectExpansionRate" value="${buffer.minObjectExpansionRate}"/>
 		<property name="maxObjectExpansionRateActiveTillBufferSize" value="${buffer.maxObjectExpansionRateActiveTillBufferSize}"/>
 		<property name="minObjectExpansionRateActiveFromBufferSize" value="${buffer.minObjectExpansionRateActiveFromBufferSize}"/>
-		<property name="elementsCountForMaintenance" value="${buffer.elementsCountForMaintenance}"/>
+		<property name="flagsSetOnBytes" value="${buffer.flagsSetOnBytes}"/>
 		<property name="evictionFragmentSizePercentage" value="${buffer.evictionFragmentSizePercentage}"/>	
 	</bean>
 	<bean id="bufferBean" class="info.novatec.inspectit.cmr.cache.impl.AtomicBuffer" />

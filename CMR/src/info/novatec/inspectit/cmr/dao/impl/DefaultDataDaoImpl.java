@@ -75,7 +75,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	 * Logger for default data DAO.
 	 */
 	private static final Logger LOGGER = Logger.getLogger(DefaultDataDaoImpl.class);
-
+	
 	/**
 	 * {@inheritDoc}
 	 */

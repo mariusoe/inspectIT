@@ -146,7 +146,7 @@ public abstract class MethodSensorData extends DefaultData {
 		long size = super.getObjectSize(objectSizes);
 		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 1, 0);
 		if (null != parameterContentData && parameterContentData instanceof HashSet) {
-			size += objectSizes.getSizeOf((HashSet) parameterContentData);
+			size += objectSizes.getSizeOfHashSet(parameterContentData.size());
 			Iterator iterator = parameterContentData.iterator();
 			while (iterator.hasNext()) {
 				try {

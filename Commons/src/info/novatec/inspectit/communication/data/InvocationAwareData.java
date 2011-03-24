@@ -146,11 +146,12 @@ public abstract class InvocationAwareData extends MethodSensorData {
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
 		long size = super.getObjectSize(objectSizes);
-		size += objectSizes.getPrimitiveTypesSize(1, 1, 0, 0, 1, 0);
+		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 1, 0);
 		if (null != invocationParentsIdSet) {
 			// I don't calculate the size of the invocation objects in the list because these should
 			// be calculated separately
-			size += objectSizes.getSizeOf(invocationParentsIdSet);
+			size += objectSizes.getSizeOfHashSet(invocationParentsIdSet.size());
+			size += invocationParentsIdSet.size() * objectSizes.getSizeOfLongObject();
 		}
 		return objectSizes.alignTo8Bytes(size);
 	}
