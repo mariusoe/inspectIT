@@ -393,7 +393,11 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	private StyledString getStyledTextForColumn(ExceptionSensorData data, MethodIdent methodIdent, Column enumId) {
 		switch (enumId) {
 		case PACKAGE:
-			return new StyledString(methodIdent.getPackageName());
+			if (methodIdent.getPackageName() != null && !methodIdent.getPackageName().equals("")) {
+				return new StyledString(methodIdent.getPackageName());
+			} else {
+				return new StyledString("(default)");
+			}
 		case CLASS:
 			return new StyledString(methodIdent.getClassName());
 		case TIMESTAMP:

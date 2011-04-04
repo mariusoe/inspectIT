@@ -41,8 +41,13 @@ public final class TextFormatter {
 		StyledString styledString = new StyledString();
 
 		styledString.append(getMethodWithParameters(methodIdent));
-
-		String decoration = MessageFormat.format("- {0}.{1}", new Object[] { methodIdent.getPackageName(), methodIdent.getClassName() });
+		String decoration;
+		if (methodIdent.getPackageName() != null && !methodIdent.getPackageName().equals("")) {
+			decoration = MessageFormat.format("- {0}.{1}", new Object[] { methodIdent.getPackageName(), methodIdent.getClassName() });
+		} else {
+			decoration = MessageFormat.format("- {0}", new Object[] { methodIdent.getClassName() });
+		}
+		
 		styledString.append(decoration, StyledString.QUALIFIER_STYLER);
 
 		return styledString;

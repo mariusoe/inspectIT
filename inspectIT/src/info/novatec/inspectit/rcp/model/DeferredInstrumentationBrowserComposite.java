@@ -48,7 +48,12 @@ public class DeferredInstrumentationBrowserComposite extends DeferredComposite {
 			Map<String, DeferredPackageComposite> packageNames = new HashMap<String, DeferredPackageComposite>(methodIdents.size());
 
 			for (MethodIdent methodIdent : methodIdents) {
-				String packageName = methodIdent.getPackageName().trim();
+				String packageName = methodIdent.getPackageName();
+				if (packageName == null) {
+					packageName = "";
+				} else {
+					packageName.trim();
+				}
 				// check if the given package was already added.
 				if (!packageNames.containsKey(packageName)) {
 					DeferredPackageComposite composite = new DeferredPackageComposite();

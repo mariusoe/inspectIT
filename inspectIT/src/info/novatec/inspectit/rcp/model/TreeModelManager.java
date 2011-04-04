@@ -209,7 +209,11 @@ public class TreeModelManager {
 	 */
 	private Component getInvocationPackageTree(List<MethodIdent> methodIdents, RepositoryDefinition definition) {
 		Composite targetPackage = new Composite();
-		targetPackage.setName(methodIdents.get(0).getPackageName());
+		String packageName = methodIdents.get(0).getPackageName();
+		if (packageName == null || packageName.equals("")) {
+			packageName = "(default)";
+		}
+		targetPackage.setName(packageName);
 		targetPackage.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_PACKAGE));
 
 		Map<String, List<MethodIdent>> filter = new TreeMap<String, List<MethodIdent>>();

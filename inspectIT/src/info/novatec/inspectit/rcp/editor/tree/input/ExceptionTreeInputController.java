@@ -239,7 +239,11 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 
 			private void addText(Text text) {
 				String content;
-				content = "Package: " + methodIdent.getPackageName() + "\n";
+				if (methodIdent.getPackageName() != null && !methodIdent.getPackageName().equals("")) {
+					content = "Package: " + methodIdent.getPackageName() + "\n";
+				} else {
+					content = "Package: (default)\n";
+				}
 				content += "Class: " + methodIdent.getClassName() + "\n";
 				content += "Method: " + methodIdent.getMethodName() + "\n";
 				content += "Parameters: " + methodIdent.getParameters() + "\n\n";

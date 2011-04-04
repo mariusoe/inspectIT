@@ -350,7 +350,13 @@ public class TimerDataInputController extends AbstractTableInputController {
 
 			switch ((Column) getEnumSortColumn()) {
 			case PACKAGE:
-				return methodIdent1.getPackageName().compareTo(methodIdent2.getPackageName());
+				if (methodIdent1.getPackageName() == null || methodIdent1.getPackageName().equals("")) {
+					return -1;
+				} else if (methodIdent2.getPackageName() == null || methodIdent2.getPackageName().equals("")) {
+					return 1;
+				} else {
+					return methodIdent1.getPackageName().compareTo(methodIdent2.getPackageName());
+				}
 			case CLASS:
 				return methodIdent1.getClassName().compareTo(methodIdent2.getClassName());
 			case METHOD:
@@ -404,7 +410,11 @@ public class TimerDataInputController extends AbstractTableInputController {
 	private StyledString getStyledTextForColumn(TimerData data, MethodIdent methodIdent, Column enumId) {
 		switch (enumId) {
 		case PACKAGE:
-			return new StyledString(methodIdent.getPackageName());
+			if (methodIdent.getPackageName() != null && !methodIdent.getPackageName().equals("")) {
+				return new StyledString(methodIdent.getPackageName());
+			} else {
+				return new StyledString("(default)");
+			}
 		case CLASS:
 			return new StyledString(methodIdent.getClassName());
 		case METHOD:
