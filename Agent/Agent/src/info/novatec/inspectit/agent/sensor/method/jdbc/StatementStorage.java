@@ -2,14 +2,16 @@ package info.novatec.inspectit.agent.sensor.method.jdbc;
 
 import info.novatec.inspectit.util.ThreadLocalStack;
 
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Stores the mapping between statements and objects so that these statements
- * are later accessible.
+ * Stores the mapping between statements and objects so that these statements are later accessible.
  * 
  * @author Patrice Bouillet
  * 
@@ -27,8 +29,8 @@ public class StatementStorage {
 	private static final int MAP_SIZE = 50;
 
 	/**
-	 * The statement map contains a mapping between the prepared statement
-	 * objects and their created query string with parameter placeholders in it.
+	 * The statement map contains a mapping between the prepared statement objects and their created
+	 * query string with parameter placeholders in it.
 	 */
 	private Map preparedStatementMap = new WeakHashMap(MAP_SIZE);
 
@@ -128,11 +130,15 @@ public class StatementStorage {
 	protected void addParameter(Object preparedStatement, int index, Object value) {
 		String[] parameters = (String[]) parameterMap.get(preparedStatement);
 		if (null != parameters) {
-			if (null != value) { 
-				parameters[index] = value.toString(); 
-			} else { 
+			if (null != value) {
+				if (value instanceof String || value instanceof Date || value instanceof Time || value instanceof Timestamp) {
+					parameters[index] = "'" + value.toString() + "'";
+				} else {
+					parameters[index] = value.toString();
+				}
+			} else {
 				parameters[index] = "[null]";
-			} 
+			}
 
 			if (LOGGER.isLoggable(Level.FINE)) {
 				LOGGER.finer("Prepared Statement :: Added value:" + value.toString() + " with index:" + index + " to prepared statement:" + preparedStatement);
@@ -148,8 +154,7 @@ public class StatementStorage {
 	 * Clears all the parameters in the array.
 	 * 
 	 * @param preparedStatement
-	 *            The prepared statement for which all parameters are going to
-	 *            be cleared.
+	 *            The prepared statement for which all parameters are going to be cleared.
 	 */
 	protected void clearParameters(Object preparedStatement) {
 		if (parameterMap.containsKey(preparedStatement)) {
@@ -163,15 +168,13 @@ public class StatementStorage {
 	}
 
 	/**
-	 * This method adds an SQL String to the current thread local stack. This is
-	 * needed so that created prepared statements can be associated to the SQL
-	 * Strings.
+	 * This method adds an SQL String to the current thread local stack. This is needed so that
+	 * created prepared statements can be associated to the SQL Strings.
 	 * <p>
-	 * So if three times the prepared statement method is called with the same
-	 * string, the stack contains the string three times. Now the Prepared
-	 * Statement is created which results in calling the
-	 * {@link #addPreparedStatement(Object, String)} method. The last added
-	 * String is taken and associated with the object.
+	 * So if three times the prepared statement method is called with the same string, the stack
+	 * contains the string three times. Now the Prepared Statement is created which results in
+	 * calling the {@link #addPreparedStatement(Object, String)} method. The last added String is
+	 * taken and associated with the object.
 	 * 
 	 * @param sql
 	 *            The SQL String.
@@ -181,8 +184,7 @@ public class StatementStorage {
 	}
 
 	/**
-	 * Removes the last added sql from the thread local stack. We don't need the
-	 * String object here.
+	 * Removes the last added sql from the thread local stack. We don't need the String object here.
 	 */
 	protected void removeSql() {
 		sqlThreadLocalStack.pop();
