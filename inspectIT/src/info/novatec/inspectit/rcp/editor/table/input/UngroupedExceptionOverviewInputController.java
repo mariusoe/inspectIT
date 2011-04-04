@@ -278,9 +278,9 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 		} else {
 			exData = dataAccessService.getUngroupedExceptionOverview(template, limit);
 		}
-
+		exceptionSensorData.clear();
+		
 		if ((null != exData)) {
-			exceptionSensorData.clear();
 			monitor.subTask("Displaying the Exception Tree Overview");
 			exceptionSensorData.addAll(exData);
 		}

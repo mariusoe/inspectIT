@@ -240,9 +240,9 @@ public class SqlInputController extends AbstractTableInputController {
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Getting SQL information from the CMR", IProgressMonitor.UNKNOWN);
 		List<SqlStatementData> invocData = dataAccessService.getAggregatedSqlStatements(template);
-
+		sqlData.clear();
+		
 		if (invocData.size() > 0) {
-			sqlData.clear();
 			sqlData.addAll(invocData);
 		}
 

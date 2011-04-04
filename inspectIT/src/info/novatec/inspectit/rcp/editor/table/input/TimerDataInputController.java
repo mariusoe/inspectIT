@@ -221,9 +221,9 @@ public class TimerDataInputController extends AbstractTableInputController {
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Getting timer data information from the CMR", IProgressMonitor.UNKNOWN);
 		List<TimerData> aggregatedTimerData = timerDataAccessService.getAggregatedTimerData(template);
-
+		timerDataList.clear();
+		
 		if (aggregatedTimerData.size() > 0) {
-			timerDataList.clear();
 			timerDataList.addAll(aggregatedTimerData);
 		}
 
