@@ -3,7 +3,9 @@
 <hibernate-mapping package="info.novatec.inspectit.communication">
 	<class name="DefaultData" abstract="true">
 		<id name="id" type="java.lang.Long" column="id">
-			<generator class="seqhilo" />
+			<generator class="seqhilo">
+				<param name="max_lo">1000</param>
+			</generator>
 		</id>
 
 		<property name="platformIdent" column="platform_ident" />
