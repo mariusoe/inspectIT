@@ -37,6 +37,11 @@ public class BufferElement<E extends DefaultData> implements IBufferElement<E> {
 	 * Is it evicted.
 	 */
 	private boolean evicted = false;
+	
+	/**
+	 * Is it indexed.
+	 */
+	private boolean indexed = false;
 
 	/**
 	 * Default constructor.
@@ -124,4 +129,18 @@ public class BufferElement<E extends DefaultData> implements IBufferElement<E> {
 		this.evicted = evicted;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isIndexed() {
+		return indexed;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setIndexed(boolean indexed) {
+		this.indexed = indexed;
+	}
+	
 }

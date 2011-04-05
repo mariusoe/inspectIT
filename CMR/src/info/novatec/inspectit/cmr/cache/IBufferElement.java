@@ -85,4 +85,19 @@ public interface IBufferElement<E> {
 	 *            Boolean that marks element as analyzed or not.
 	 */
 	void setEvicted(boolean evicted);
+
+	/**
+	 * Returns if the element has been indexed.
+	 * 
+	 * @return True if indexed, otherwise no.
+	 */
+	boolean isIndexed();
+
+	/**
+	 * Sets if the element has been indexed.
+	 * 
+	 * @param indexed
+	 *            True if indexed, otherwise no.
+	 */
+	void setIndexed(boolean indexed);
 }

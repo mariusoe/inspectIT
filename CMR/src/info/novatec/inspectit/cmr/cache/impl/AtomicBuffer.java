@@ -265,8 +265,14 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 			// iterate until size of the eviction fragment is reached
 			while (fragmentSize < evictionFragmentMaxSize) {
 				fragmentSize += newLastElement.getBufferElementSize();
+				newLastElement.setEvicted(true);
 				elementsInFragment++;
 				newLastElement = newLastElement.getNextElement();
+				
+				// break if we reach the end of queue
+				if (emptyBufferElement.equals(newLastElement)) {
+					break;
+				}
 			}
 
 			// change the last element to the right one
@@ -337,8 +343,11 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 						if (emptyBufferElement == nextForAnalysis.get()) {
 							nothingToAnalyze.await();
 							// when we are awake, next for analysis is now set to point to the next
-							// logically connected element
-							nextForAnalysis.compareAndSet(emptyBufferElement, elementToAnalyze.getNextElement());
+							// logically connected element that has not been analyzed
+							while (elementToAnalyze.isAnalyzed() && !emptyBufferElement.equals(elementToAnalyze)) {
+								elementToAnalyze = elementToAnalyze.getNextElement();
+							}
+							nextForAnalysis.compareAndSet(emptyBufferElement, elementToAnalyze);
 						}
 					} finally {
 						analyzeLock.unlock();
@@ -386,7 +395,8 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 				try {
 					// index element
 					indexingTree.put(elementToIndex.getObject());
-
+					elementToIndex.setIndexed(true);
+					
 					// increase number of indexed elements, and perform calculation of the indexing
 					// tree size if enough elements have been indexed
 					elementsIndexed.incrementAndGet();
@@ -428,7 +438,10 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 							nothingToIndex.await();
 							// when we are awake, next for indexing is now set to point to the next
 							// logically connected element
-							nextForIndexing.compareAndSet(emptyBufferElement, elementToIndex.getNextElement());
+							while (elementToIndex.isIndexed() && !emptyBufferElement.equals(elementToIndex)) {
+								elementToIndex = elementToIndex.getNextElement();
+							}
+							nextForIndexing.compareAndSet(emptyBufferElement, elementToIndex);
 						}
 					} finally {
 						indexingLock.unlock();
@@ -751,6 +764,15 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 
 		@Override
 		public void setEvicted(boolean evicted) {
+		}
+
+		@Override
+		public boolean isIndexed() {
+			return false;
+		}
+
+		@Override
+		public void setIndexed(boolean indexed) {
 		}
 
 	}
