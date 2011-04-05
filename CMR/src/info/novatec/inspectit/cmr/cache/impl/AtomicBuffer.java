@@ -168,6 +168,9 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	public void put(IBufferElement<E> element) {
 		// flag for notifying the sleeping thread that the new element is added
 		boolean notifyThreads = false;
+		
+		// the element that is now first has to have a empty buffer element as next one
+		element.setNextElement(emptyBufferElement);
 
 		while (true) {
 			// retrieving currently first element
@@ -178,9 +181,6 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 
 				// increment number of added elements
 				elementsAdded.incrementAndGet();
-
-				// the element that is now first has to have a empty buffer element as next one
-				element.setNextElement(emptyBufferElement);
 
 				// if currently first is not pointing to marker, it means that we already have
 				// elements in the buffer, so connect elements
