@@ -9,6 +9,8 @@ import info.novatec.inspectit.cmr.util.Converter;
 import info.novatec.inspectit.communication.DefaultData;
 
 import java.text.NumberFormat;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -133,6 +135,11 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	private AtomicLong indexingTreeSize = new AtomicLong();
 
 	/**
+	 * Executor service for cleaning the indexing tree.
+	 */
+	private ExecutorService indexingTreeCleaningExecutorService;
+
+	/**
 	 * Data added to the buffer in bytes.
 	 */
 	private AtomicLong dataAddedInBytes = new AtomicLong();
@@ -168,7 +175,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	public void put(IBufferElement<E> element) {
 		// flag for notifying the sleeping thread that the new element is added
 		boolean notifyThreads = false;
-		
+
 		// the element that is now first has to have a empty buffer element as next one
 		element.setNextElement(emptyBufferElement);
 
@@ -422,6 +429,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 						if (LOGGER.isDebugEnabled()) {
 							LOGGER.debug("Indexing tree size update duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
 							LOGGER.debug("Indexing tree delta: " + (newSize - oldSize));
+							LOGGER.debug("Indexing tree new size: " + newSize);
 						}
 					}
 				} catch (IndexingException e) {
@@ -462,7 +470,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 				time = System.nanoTime();
 			}
 
-			indexingTree.clean();
+			indexingTree.cleanWithRunnable(indexingTreeCleaningExecutorService);
 
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Indexing tree cleaning duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
@@ -666,7 +674,8 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 		this.last = new AtomicReference<IBufferElement<E>>(emptyBufferElement);
 		this.nextForAnalysis = new AtomicReference<IBufferElement<E>>(emptyBufferElement);
 		this.nextForIndexing = new AtomicReference<IBufferElement<E>>(emptyBufferElement);
-
+		this.indexingTreeCleaningExecutorService = Executors.newFixedThreadPool(bufferProperties.getIndexingTreeCleaningThreads());
+		
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("|-Using buffer with maximum size " + NumberFormat.getInstance().format(maxSize) + " bytes...");
 		}

@@ -7,6 +7,7 @@ import info.novatec.inspectit.communication.DefaultData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 /**
  * This type of branch also maps all elements that are belonging to its children, to a separate
@@ -123,6 +124,14 @@ public class LeafingBranch<E extends DefaultData> extends Branch<E> {
 	public void clearAll() {
 		leaf.clearAll();
 		super.clearAll();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void cleanWithRunnable(ExecutorService executorService) {
+		leaf.cleanWithRunnable(executorService);
+		super.cleanWithRunnable(executorService);
 	}
 
 	/**

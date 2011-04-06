@@ -5,12 +5,15 @@ import info.novatec.inspectit.cmr.cache.indexing.IIndexQuery;
 import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
 import info.novatec.inspectit.communication.DefaultData;
 
+import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * Leaf class is the one that holds the weak references to objects, thus last in tree structure.
@@ -21,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *            Element type that the leaf can index (and hold).
  */
 public class Leaf<E extends DefaultData> implements ITreeComponent<E> {
-	
+
 	/**
 	 * Initial concurrency level for the {@link ConcurrentHashMap}.
 	 */
@@ -30,21 +33,43 @@ public class Leaf<E extends DefaultData> implements ITreeComponent<E> {
 	/**
 	 * Map for week references.
 	 */
-	private Map<Long, WeakReference<E>> map;
+	private Map<Long, CustomWeakReference<E>> map;
+
+	/**
+	 * Reference queue where cleared Weak references are queued by garbage collection.
+	 */
+	private ReferenceQueue<E> referenceQueue;
+
+	/**
+	 * Clear runnable for this Leaf.
+	 */
+	private Runnable clearRunnable = new Runnable() {
+		
+		@Override
+		public void run() {
+			Leaf.this.clean();
+		}
+	};
+
+	/**
+	 * Future that holds state of clear runnable.
+	 */
+	private Future<?> clearFuture;
 
 	/**
 	 * Default constructor.
 	 */
 	public Leaf() {
 		super();
-		map = new ConcurrentHashMap<Long, WeakReference<E>>(1, 0.75f, CONCURRENCY_LEVEL);
+		map = new ConcurrentHashMap<Long, CustomWeakReference<E>>(1, 0.75f, CONCURRENCY_LEVEL);
+		referenceQueue = new ReferenceQueue<E>();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void put(E element) {
-		WeakReference<E> weakReference = new WeakReference<E>(element);
+		CustomWeakReference<E> weakReference = new CustomWeakReference<E>(element, referenceQueue);
 		map.put(element.getId(), weakReference);
 	}
 
@@ -64,7 +89,7 @@ public class Leaf<E extends DefaultData> implements ITreeComponent<E> {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -90,7 +115,7 @@ public class Leaf<E extends DefaultData> implements ITreeComponent<E> {
 	 */
 	public List<E> query(IIndexQuery query) {
 		List<E> results = new ArrayList<E>();
-		Iterator<WeakReference<E>> iterator = map.values().iterator();
+		Iterator<CustomWeakReference<E>> iterator = map.values().iterator();
 		while (iterator.hasNext()) {
 			WeakReference<E> weakReference = iterator.next();
 			if (null != weakReference) {
@@ -111,20 +136,24 @@ public class Leaf<E extends DefaultData> implements ITreeComponent<E> {
 		long size = objectSizes.getSizeOfObject();
 		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 0, 0);
 		size += objectSizes.getSizeOfConcurrentHashMap(mapSize, CONCURRENCY_LEVEL);
-		// for Long and WeekReference in a Map.Entry
-		size += map.size() * (objectSizes.getSizeOfLongObject() + 16); 
+		// for Long and CustomWeekReference in a Map.Entry
+		size += map.size() * (objectSizes.getSizeOfLongObject() + 24);
 		return size;
+		// the size of the reference queue, runnable and future and not included, because they are
+		// simply to small and its size is constant and does not depend on the number of elements in
+		// the leaf
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean clean() {
 		List<Long> toClean = new ArrayList<Long>();
-		for (Map.Entry<Long, WeakReference<E>> entry : map.entrySet()) {
-			if (null == entry.getValue() || null == entry.getValue().get()) {
-				toClean.add(entry.getKey());
-			}
+		CustomWeakReference<E> customWeakReference = (CustomWeakReference<E>) referenceQueue.poll();
+		while (customWeakReference != null) {
+			toClean.add(customWeakReference.getReferentId());
+			customWeakReference = (CustomWeakReference<E>) referenceQueue.poll();
 		}
 		for (Object key : toClean) {
 			map.remove(key);
@@ -141,12 +170,66 @@ public class Leaf<E extends DefaultData> implements ITreeComponent<E> {
 	public long getNumberOfElements() {
 		return map.size();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public void clearAll() {
 		map.clear();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void cleanWithRunnable(ExecutorService executorService) {
+		if (clearFuture == null || clearFuture.isDone()) {
+			clearFuture = executorService.submit(clearRunnable);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean clearEmptyComponents() {
+		return map.isEmpty();
+	}
+
+	/**
+	 * Custom extension of {@link WeakReference} that will additionally hold the id of the referent
+	 * {@link DefaultData} object.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 * @param <E>
+	 */
+	private class CustomWeakReference<T extends DefaultData> extends WeakReference<T> {
+
+		/**
+		 * Id of refering object.
+		 */
+		private long referentId;
+
+		/**
+		 * Default constructor.
+		 * 
+		 * @param referent
+		 *            Object to refer to.
+		 * @param q
+		 *            Reference queue to register Weak reference with.
+		 * @see WeakReference#WeakReference(Object, ReferenceQueue)
+		 */
+		public CustomWeakReference(T referent, ReferenceQueue<? super T> q) {
+			super(referent, q);
+			referentId = referent.getId();
+		}
+
+		/**
+		 * @return The ID of the {@link DefaultData} object {@link WeakReference} is refering to.
+		 */
+		public long getReferentId() {
+			return referentId;
+		}
+
 	}
 
 }

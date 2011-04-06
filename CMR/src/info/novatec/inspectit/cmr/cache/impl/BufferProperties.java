@@ -76,6 +76,11 @@ public class BufferProperties implements InitializingBean {
 	private long flagsSetOnBytes;
 
 	/**
+	 * Number of threads that are cleaning the indexing tree.
+	 */
+	private int indexingTreeCleaningThreads;
+
+	/**
 	 * Logger for buffer properties.
 	 */
 	private static final Logger LOGGER = Logger.getLogger(BufferProperties.class);
@@ -307,6 +312,21 @@ public class BufferProperties implements InitializingBean {
 	}
 
 	/**
+	 * @return Number of indexing tree cleaning threads.
+	 */
+	public int getIndexingTreeCleaningThreads() {
+		return indexingTreeCleaningThreads;
+	}
+
+	/**
+	 * @param indexingTreeCleaningThreads
+	 *            Number of indexing tree cleaning threads.
+	 */
+	public void setIndexingTreeCleaningThreads(int indexingTreeCleaningThreads) {
+		this.indexingTreeCleaningThreads = indexingTreeCleaningThreads;
+	}
+
+	/**
 	 * Returns the initial buffer size based on the property set.
 	 * 
 	 * @return Size in bytes.
@@ -378,6 +398,8 @@ public class BufferProperties implements InitializingBean {
 			LOGGER.info("||-Min object size expansion: " + NumberFormat.getInstance().format(minObjectExpansionRate * 100) + "%");
 			LOGGER.info("||-Max object size expansion active till buffer size: " + NumberFormat.getInstance().format(maxObjectExpansionRateActiveTillBufferSize) + " bytes");
 			LOGGER.info("||-Min object size expansion active from buffer size: " + NumberFormat.getInstance().format(minObjectExpansionRateActiveFromBufferSize) + " bytes");
+			LOGGER.info("||-Indexing tree cleaning threads: " + NumberFormat.getInstance().format(indexingTreeCleaningThreads));
+			
 		}
 		if (this.evictionOccupancyPercentage < 0 || this.evictionOccupancyPercentage > 1) {
 			throw new BeanInitializationException("Buffer properties initialization error: Eviction occupancy must be a percentage value between 0 and 1. Initialization value is: "
@@ -421,6 +443,11 @@ public class BufferProperties implements InitializingBean {
 			throw new BeanInitializationException(
 					"Buffer properties initialization error: The number of bytes that activate the clean and update of the indexing tree can not be less or equal than zero. Initialization value is: "
 							+ this.getFlagsSetOnBytes());
+		}
+		if (this.getIndexingTreeCleaningThreads() <= 0) {
+			throw new BeanInitializationException(
+					"Buffer properties initialization error: The number of indexing tree cleaning threads can not be less or equal than zero. Initialization value is: "
+							+ this.getIndexingTreeCleaningThreads());
 		}
 	}
 

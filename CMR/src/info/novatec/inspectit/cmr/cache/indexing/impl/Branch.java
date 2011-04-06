@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 
 /**
  * {@link Branch} is a {@link ITreeComponent} that holds references to other {@link ITreeComponent}
@@ -264,6 +265,36 @@ public class Branch<E extends DefaultData> implements ITreeComponent<E> {
 	 */
 	public void clearAll() {
 		map.clear();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void cleanWithRunnable(ExecutorService executorService) {
+		for (Map.Entry<Object, ITreeComponent<E>> entry : map.entrySet()) {
+			entry.getValue().cleanWithRunnable(executorService);
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean clearEmptyComponents() {
+		ArrayList<Object> keysToRemove = new ArrayList<Object>();
+		for (Map.Entry<Object, ITreeComponent<E>> entry : map.entrySet()) {
+			boolean toClear = entry.getValue().clearEmptyComponents();
+			if (toClear) {
+				keysToRemove.add(entry.getKey());
+			}
+		}
+		for (Object key : keysToRemove) {
+			map.remove(key);
+		}
+
+		if (map.isEmpty()) {
+			return true;
+		}
+		return false;
 	}
 
 }

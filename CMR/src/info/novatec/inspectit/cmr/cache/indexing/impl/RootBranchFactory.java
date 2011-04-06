@@ -4,7 +4,9 @@ import info.novatec.inspectit.cmr.cache.indexing.AbstractIndexer.ChildBranchType
 import info.novatec.inspectit.cmr.cache.indexing.IBranchIndexer;
 import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.communication.MethodSensorData;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import org.springframework.beans.factory.FactoryBean;
 
@@ -22,10 +24,7 @@ public class RootBranchFactory implements FactoryBean {
 	 */
 	@Override
 	public Object getObject() throws Exception {
-		return new RootBranch<MethodSensorData>(new PlatformIdentIndexer<MethodSensorData>(ChildBranchType.NORMAL_BRANCH, 
-				new ObjectTypeIndexer<MethodSensorData>(ChildBranchType.LEAFING_BRANCH,
-						new MethodIdentIndexer<MethodSensorData>(ChildBranchType.LEAFING_BRANCH, 
-								new TimestampIndexer<MethodSensorData>()))));
+		return new RootBranch<DefaultData>(new PlatformIdentIndexer<DefaultData>(ChildBranchType.NORMAL_BRANCH, new ObjectTypeIndexer<DefaultData>(ChildBranchType.NORMAL_BRANCH, new TimestampIndexer<DefaultData>())));
 	}
 
 	/**
@@ -45,14 +44,29 @@ public class RootBranchFactory implements FactoryBean {
 	}
 
 	/**
-	 * Root branch. It has additional functionality of generating IDs for the elements that
-	 * need to be put into the indexing tree.
+	 * Root branch. It has additional functionality of generating IDs for the elements that need to
+	 * be put into the indexing tree.
 	 * 
 	 * @author Ivan Senic
 	 * 
 	 */
 	private class RootBranch<E extends DefaultData> extends Branch<E> {
 
+		/**
+		 * Runnable for cutting the empty tree components.
+		 */
+		private Runnable clearEmptyComponentsRunnable = new Runnable() {
+
+			@Override
+			public void run() {
+				RootBranch.this.clearEmptyComponents();
+			}
+		};
+
+		/**
+		 * Future that holds state of clear empty components runnable.
+		 */
+		private Future<?> clearEmptyComponentsFuture;
 
 		/**
 		 * Default constructor.
@@ -76,8 +90,19 @@ public class RootBranchFactory implements FactoryBean {
 			}
 			super.put(element);
 		}
-		
-		
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void cleanWithRunnable(ExecutorService executorService) {
+			super.cleanWithRunnable(executorService);
+			if (clearEmptyComponentsFuture == null || clearEmptyComponentsFuture.isDone()) {
+				// Submit runnable only if the future is signaling that the last one was done.
+				clearEmptyComponentsFuture = executorService.submit(clearEmptyComponentsRunnable);
+			}
+		}
+
 	}
 
 }
