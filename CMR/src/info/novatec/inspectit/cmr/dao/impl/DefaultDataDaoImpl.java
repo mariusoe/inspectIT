@@ -19,7 +19,6 @@ import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.communication.data.VmArgumentData;
 
 import java.sql.Timestamp;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +26,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.hibernate.FetchMode;
-import org.hibernate.Query;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.DetachedCriteria;
@@ -72,10 +70,15 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	private CacheIdGenerator cacheIdGenerator;
 
 	/**
+	 * Timer data aggregator.
+	 */
+	private TimerDataAggregator timerDataAggregator;
+
+	/**
 	 * Logger for default data DAO.
 	 */
 	private static final Logger LOGGER = Logger.getLogger(DefaultDataDaoImpl.class);
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -121,7 +124,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 				buffer.put(new BufferElement<MethodSensorData>(exData));
 			} else if (element instanceof TimerData) {
 				TimerData timerData = (TimerData) element;
-				saveTimerData(session, timerData);
+				timerDataAggregator.processTimerData(timerData);
 				buffer.put(new BufferElement<MethodSensorData>(timerData));
 			} else {
 				session.insert(element);
@@ -206,7 +209,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 			invData.getTimerData().setExclusiveMin(exclusiveTime);
 			invData.getTimerData().setExclusiveMax(exclusiveTime);
 
-			saveTimerData(session, invData.getTimerData());
+			timerDataAggregator.processTimerData(invData.getTimerData());
 			cacheIdGenerator.assignObjectAnId(invData.getTimerData());
 			invData.getTimerData().addInvocationParentId(topInvocationParent.getId());
 			try {
@@ -265,118 +268,6 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 		if (null != child) {
 			child.setErrorMessage(exceptionSensorData.getErrorMessage());
 			connectErrorMessagesInExceptionData(child);
-		}
-	}
-
-	/**
-	 * Saves the timer data objects into the database.
-	 * 
-	 * @param session
-	 *            The current session.
-	 * @param timerData
-	 *            The timer data object.
-	 */
-	@SuppressWarnings("unchecked")
-	private void saveTimerData(StatelessSession session, TimerData timerData) {
-		Long id = (Long) session.insert(timerData);
-
-		Set<ParameterContentData> parameterContentData = timerData.getParameterContentData();
-		if (null != parameterContentData && !parameterContentData.isEmpty()) {
-			for (ParameterContentData content : parameterContentData) {
-				content.setMethodSensorId(id.longValue());
-				session.insert(content);
-			}
-		}
-	}
-
-	/**
-	 * Saves the {@link ExceptionSensorData} object into the database.
-	 * 
-	 * @param session
-	 *            The session used for db storage.
-	 * @param data
-	 *            The {@link ExceptionSensorData} object to persist.
-	 */
-	private void saveExceptionSensorData(StatelessSession session, ExceptionSensorData data) {
-		ExceptionSensorData child = data.getChild();
-		if (null != child) {
-			// we store in each object the error message from the root data object that has the
-			// CREATED event
-			if (!data.getErrorMessage().equals(child.getErrorMessage())) {
-				child.setErrorMessage(data.getErrorMessage());
-			}
-			// first save the lowermost child
-			saveExceptionSensorData(session, child);
-		}
-		session.insert(data);
-	}
-
-	/**
-	 * @param session
-	 * @param element
-	 */
-	@SuppressWarnings("unused")
-	private SqlStatementData saveSqlStatementData(StatelessSession session, SqlStatementData sql) {
-		Query sqlQuery = session.createQuery("from SqlStatementData data left join fetch data.parameterContentData where data.sql=:sql");
-		sqlQuery.setString("sql", sql.getSql());
-		SqlStatementData sqlDataInDb = (SqlStatementData) sqlQuery.uniqueResult();
-		if (null != sqlDataInDb) {
-			sqlDataInDb.addDuration(sql.getDuration());
-			sqlDataInDb.setCount(sqlDataInDb.getCount() + sql.getCount());
-			sqlDataInDb.setAverage(sqlDataInDb.getDuration() / sqlDataInDb.getCount());
-			if (sql.getMax() > sqlDataInDb.getMax()) {
-				sqlDataInDb.setMax(sql.getMax());
-			}
-			if (sql.getMin() < sqlDataInDb.getMin()) {
-				sqlDataInDb.setMin(sql.getMin());
-			}
-			session.update(sqlDataInDb);
-			return sqlDataInDb;
-		} else {
-			session.insert(sql);
-			return sql;
-		}
-	}
-
-	/**
-	 * Save the invocation to the db and maybe as a file.
-	 * 
-	 * @param invoc
-	 *            The invocation.
-	 * @param session
-	 *            The session used for db storage.
-	 * @param position
-	 *            The position.
-	 */
-	@SuppressWarnings("unchecked")
-	private void saveStrippedInvocationInDatabase(InvocationSequenceData invoc, StatelessSession session, boolean saveInDb) {
-		if (null != invoc.getTimerData()) {
-			session.insert(invoc.getTimerData());
-		}
-
-		if (null != invoc.getSqlStatementData()) {
-			session.insert(invoc.getSqlStatementData());
-		}
-
-		if (null != invoc.getExceptionSensorDataObjects() && !invoc.getExceptionSensorDataObjects().isEmpty()) {
-			for (Object object : invoc.getExceptionSensorDataObjects()) {
-				ExceptionSensorData exceptionSensorData = (ExceptionSensorData) object;
-				if (exceptionSensorData.getExceptionEvent().equals(ExceptionEventEnum.CREATED)) {
-					saveExceptionSensorData(session, exceptionSensorData);
-				}
-			}
-		}
-
-		List<InvocationSequenceData> nestedInvocs = invoc.getNestedSequences();
-		for (int i = 0; i < nestedInvocs.size(); i++) {
-			saveStrippedInvocationInDatabase(nestedInvocs.get(i), session, false);
-		}
-
-		if (saveInDb) {
-			// just store the root node
-			invoc.setNestedSequences(Collections.EMPTY_LIST);
-			invoc.setPosition(0);
-			session.insert(invoc);
 		}
 	}
 
@@ -461,7 +352,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List findByExampleSinceIdIgnoreMethodId(DefaultData template) {
 		DetachedCriteria defaultDataCriteria = DetachedCriteria.forClass(template.getClass());
 		defaultDataCriteria.add(Restrictions.gt("id", template.getId()));
@@ -556,6 +447,14 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	 */
 	public void setCacheIdGenerator(CacheIdGenerator cacheIdGenerator) {
 		this.cacheIdGenerator = cacheIdGenerator;
+	}
+
+	/**
+	 * @param timerDataAggregator
+	 *            the timerDataAggregator to set
+	 */
+	public void setTimerDataAggregator(TimerDataAggregator timerDataAggregator) {
+		this.timerDataAggregator = timerDataAggregator;
 	}
 
 }

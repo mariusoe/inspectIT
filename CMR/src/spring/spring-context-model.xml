@@ -39,6 +39,11 @@
 		class="info.novatec.inspectit.cmr.dao.ci.impl.PlatformSensorDefinitionDataDaoImpl" />
 	<bean id="timerDataDao" 
 		class="info.novatec.inspectit.cmr.dao.impl.BufferTimerDataDaoImpl" />
+	<bean id="timerDataAggregator" class="info.novatec.inspectit.cmr.dao.impl.TimerDataAggregator">
+		<property name="maxElements" value="200"/>
+		<property name="aggregationPeriod" value="10000"/>
+		<property name="cacheCleanSleepingPeriod" value="60000"/>
+	</bean>
 
 	<bean id="bufferProperties" class="info.novatec.inspectit.cmr.cache.impl.BufferProperties">
 		<property name="evictionOccupancyPercentage" value="${buffer.evictionOccupancyPercentage}"/>

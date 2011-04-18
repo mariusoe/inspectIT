@@ -19,4 +19,5 @@
 		<property name="exclusiveMin" column="exclusive_min"/>
 		<property name="exclusiveMax" column="exclusive_max"/>
 	</union-subclass>
+	<union-subclass name="DatabaseAggregatedTimerData" extends="TimerData" />
 </hibernate-mapping>

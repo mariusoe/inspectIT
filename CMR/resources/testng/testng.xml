@@ -58,4 +58,10 @@
 				name="info.novatec.inspectit.cmr.cache.indexing.restriction.test.IndexQueryRestrictionsTest" />
 		</classes>
 	</test>
+	<test name="Timer Data Aggregator">
+		<classes>
+			<class 
+				name="info.novatec.inspectit.cmr.dao.test.TimerDataAggregatorTest" />
+		</classes>
+	</test>
 </suite>
