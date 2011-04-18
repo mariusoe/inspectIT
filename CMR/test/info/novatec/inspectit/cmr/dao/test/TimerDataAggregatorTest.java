@@ -17,10 +17,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import junit.framework.Assert;
-
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -101,7 +102,9 @@ public class TimerDataAggregatorTest extends AbstractTransactionalTestNGLogSuppo
 		}
 
 		int totalCount = 0;
-		List<TimerData> persisted = aggregator.getHibernateTemplate().loadAll(TimerData.class);
+		DetachedCriteria timerDataCriteria = DetachedCriteria.forClass(TimerData.class);
+		timerDataCriteria.add(Restrictions.eq("platformIdent", platformIdent));
+		List<TimerData> persisted = aggregator.getHibernateTemplate().findByCriteria(timerDataCriteria);
 		for (TimerData persistedTimerData : persisted) {
 			if (persistedTimerData.getPlatformIdent() == platformIdent) {
 				Assert.assertEquals(0, persistedTimerData.getCount() % count);
