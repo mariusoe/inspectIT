@@ -194,6 +194,10 @@
             id="info.novatec.inspectit.rcp.commands.licenseInfo"
             name="License Information">
       </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.navigateToStartMethodInvocations"
+            name="Only This Method Invocations">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -505,6 +509,32 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.NavigateToStartMethodInvocationHandler"
+            commandId="info.novatec.inspectit.rcp.commands.navigateToStartMethodInvocations">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                  </instanceof>
+               </iterate>
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.activeSubView"
+                        value="tableSubView">
+                  </test>
+               </with>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -598,11 +628,51 @@
                   commandId="info.novatec.inspectit.rcp.commands.navigateToInvocations"
                   icon="icons/invocation.png"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <and>
+                     <iterate>
+                        <not>
+                           <instanceof
+                                 value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                           </instanceof>
+                        </not>
+                     </iterate>
+                  </and>
+               </visibleWhen>
             </command>
             <command
                   commandId="info.novatec.inspectit.rcp.commands.navigateToPlotting"
                   icon="icons/timer.png"
                   style="push">
+            </command>
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.navigateToStartMethodInvocations"
+                  icon="icons/invocation.png"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <and>
+                     <count
+                           value="1">
+                     </count>
+                     <iterate>
+                        <instanceof
+                              value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                        </instanceof>
+                     </iterate>
+                     <with
+                           variable="activeEditor">
+                        <instanceof
+                              value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                        </instanceof>
+                        <test
+                              property="info.novatec.inspectit.activeSubView"
+                              value="tableSubView">
+                        </test>
+                     </with>
+                  </and>
+               </visibleWhen>
             </command>
          </menu>
          <separator
