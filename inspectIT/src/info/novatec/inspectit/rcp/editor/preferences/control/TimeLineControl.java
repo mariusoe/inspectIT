@@ -224,15 +224,15 @@ public class TimeLineControl implements IPreferenceControl {
 				int daysAreaSize = daysValueMap.size();
 				int daysArea = daysAreaSize + hoursArea;
 
-				if (value <= minuteAreaSize) {
+				if (value < minuteAreaSize) {
 					spinnerMinutes.setSelection(mappingTable.get(value));
 					spinnerHours.setSelection(0);
 					spinnerDays.setSelection(0);
-				} else if ((value > minuteAreaSize) && (value <= hoursArea)) {
+				} else if ((value >= minuteAreaSize) && (value < hoursArea)) {
 					spinnerHours.setSelection(mappingTable.get(value));
 					spinnerMinutes.setSelection(0);
 					spinnerDays.setSelection(0);
-				} else if ((value > hoursArea) && (value <= daysArea)) {
+				} else if ((value >= hoursArea) && (value < daysArea)) {
 					spinnerDays.setSelection(mappingTable.get(value));
 					spinnerMinutes.setSelection(0);
 					spinnerHours.setSelection(0);
@@ -297,7 +297,7 @@ public class TimeLineControl implements IPreferenceControl {
 		Collections.addAll(hoursValueList, 1, 2, 4, 8, 11, 15, 18, 21, 23);
 
 		List<Integer> minutesValueList = new ArrayList<Integer>();
-		Collections.addAll(minutesValueList, 12, 24, 36, 48);
+		Collections.addAll(minutesValueList, 1, 12, 24, 36, 48);
 
 		daysValueMap = new HashMap<Integer, Integer>();
 		hoursValueMap = new HashMap<Integer, Integer>();
@@ -306,20 +306,20 @@ public class TimeLineControl implements IPreferenceControl {
 		int counter = 0;
 
 		for (Integer value : minutesValueList) {
-			++counter;
 			minutesValueMap.put(counter, value);
+			++counter;
 		}
 
 		counter = minutesValueList.size();
 		for (Integer value : hoursValueList) {
-			++counter;
 			hoursValueMap.put(counter, value);
+			++counter;
 		}
 
 		counter = minutesValueList.size() + hoursValueList.size();
 		for (Integer value : daysValueList) {
-			++counter;
 			daysValueMap.put(counter, value);
+			++counter;
 		}
 
 		mappingTable.putAll(minutesValueMap);
