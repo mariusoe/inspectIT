@@ -6,7 +6,9 @@ import info.novatec.inspectit.cmr.dao.TimerDataDao;
 import info.novatec.inspectit.cmr.util.IndexQueryProvider;
 import info.novatec.inspectit.communication.data.TimerData;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,9 +35,23 @@ public class BufferTimerDataDaoImpl implements TimerDataDao {
 	 * {@inheritDoc}
 	 */
 	public List<TimerData> getAggregatedTimerData(TimerData timerData) {
+		return this.getAggregatedTimerData(timerData, null, null);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<TimerData> getAggregatedTimerData(TimerData timerData, Date fromDate, Date toDate) {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
 		query.setPlatformIdent(timerData.getPlatformIdent());
 		query.setObjectClass(TimerData.class);
+		if (null != fromDate) {
+			query.setFromDate(new Timestamp(fromDate.getTime()));
+		}
+		if (null != toDate) {
+			query.setToDate(new Timestamp(toDate.getTime()));
+		}
+		
 		List<TimerData> allTimerData = indexingTree.query(query);
 		Map<Long, TimerData> aggregatedMap = new HashMap<Long, TimerData>();
 		List<TimerData> aggregatedResults = new ArrayList<TimerData>();

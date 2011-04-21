@@ -5,6 +5,7 @@ import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.rcp.InspectIT;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
@@ -61,4 +62,16 @@ public class SqlDataAccessService implements ISqlDataAccessService {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	public List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData template, Date fromDate, Date toDate) {
+		try {
+			return sqlDataAccessService.getAggregatedSqlStatements(template, fromDate, toDate);
+		} catch (Exception e) {
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the aggregated sql statements from the CMR!", e, -1);
+			return Collections.EMPTY_LIST;
+		}
+	}
 }

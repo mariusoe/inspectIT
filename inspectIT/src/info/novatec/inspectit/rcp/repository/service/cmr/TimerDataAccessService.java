@@ -5,6 +5,7 @@ import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
@@ -56,6 +57,19 @@ public class TimerDataAccessService implements ITimerDataAccessService {
 	public List getAggregatedTimerData(TimerData timerData) {
 		try {
 			return timerDataAccessService.getAggregatedTimerData(timerData);
+		} catch (Exception e) {
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the aggregated method timer data from the CMR!", e, -1);
+			return Collections.EMPTY_LIST;
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("rawtypes")
+	public List getAggregatedTimerData(TimerData timerData, Date fromDate, Date toDate) {
+		try {
+			return timerDataAccessService.getAggregatedTimerData(timerData, fromDate, toDate);
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog("There was an error retrieving the aggregated method timer data from the CMR!", e, -1);
 			return Collections.EMPTY_LIST;

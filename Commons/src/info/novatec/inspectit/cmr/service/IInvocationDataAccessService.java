@@ -3,6 +3,7 @@ package info.novatec.inspectit.cmr.service;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,6 +47,47 @@ public interface IInvocationDataAccessService {
 	 * @return Returns the list of invocation sequences.
 	 */
 	List getInvocationSequenceOverview(long platformId, int limit);
+
+	/**
+	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
+	 * other objects in given time frame. Thus this list can be used to get an overview of the
+	 * available invocation sequences. The limit defines the size of the list.
+	 * 
+	 * @param platformId
+	 *            The ID of the platform.
+	 * @param methodId
+	 *            The ID of the method.
+	 * @param limit
+	 *            The limit/size of the list.
+	 * @param fromDate
+	 *            Date include invocation from.
+	 * @param toDate
+	 *            Date include invocation to.
+	 * 
+	 * @return Returns the list of invocation sequences.
+	 */
+	List getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate);
+
+	/**
+	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
+	 * other objects in given time frame. Thus this list can be used to get an overview of the available invocation
+	 * sequences. The limit defines the size of the list.
+	 * <p>
+	 * Compared to the above method, this service method returns all invocations for a specific
+	 * agent, not only the invocations for specific methods.
+	 * 
+	 * @param platformId
+	 *            The ID of the platform.
+	 * @param limit
+	 *            The limit/size of the list.
+	 * @param fromDate
+	 *            Date include invocation from.
+	 * @param toDate
+	 *            Date include invocation to.
+	 * 
+	 * @return Returns the list of invocation sequences.
+	 */
+	List getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate);
 
 	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to

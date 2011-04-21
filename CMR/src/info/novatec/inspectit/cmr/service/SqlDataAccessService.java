@@ -4,6 +4,7 @@ import info.novatec.inspectit.cmr.dao.SqlDataDao;
 import info.novatec.inspectit.cmr.util.aop.Log;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -31,6 +32,15 @@ public class SqlDataAccessService implements ISqlDataAccessService, Initializing
 	@Log
 	public List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData sqlStatementData) {
 		List<SqlStatementData> result = sqlDataDao.getAggregatedSqlStatements(sqlStatementData);
+		return result;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Log
+	public List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData sqlStatementData, Date fromDate, Date toDate) {
+		List<SqlStatementData> result = sqlDataDao.getAggregatedSqlStatements(sqlStatementData, fromDate, toDate);
 		return result;
 	}
 

@@ -173,7 +173,16 @@ public class IndexQuery implements IIndexQuery {
 	 * {@inheritDoc}
 	 */
 	public boolean isIntervalSet() {
-		return ((null != fromDate) && (null != toDate) && fromDate.before(toDate));
+		if (null != fromDate) {
+			if (null == toDate) {
+				return true;
+			} else {
+				return fromDate.before(toDate);
+			}
+		} else if (null != toDate) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -184,10 +193,10 @@ public class IndexQuery implements IIndexQuery {
 			if (null == timestamp) {
 				return false;
 			} else {
-				if (fromDate.compareTo(timestamp) > 0) {
+				if (fromDate != null && fromDate.compareTo(timestamp) > 0) {
 					return false;
 				}
-				if (toDate.compareTo(timestamp) < 0) {
+				if (toDate != null && toDate.compareTo(timestamp) < 0) {
 					return false;
 				}
 				return true;

@@ -6,7 +6,9 @@ import info.novatec.inspectit.cmr.dao.SqlDataDao;
 import info.novatec.inspectit.cmr.util.IndexQueryProvider;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +36,23 @@ public class BufferSqlDataDaoImpl implements SqlDataDao {
 	 * {@inheritDoc}
 	 */
 	public List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData sqlStatementData) {
+		return this.getAggregatedSqlStatements(sqlStatementData, null, null);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData sqlStatementData, Date fromDate, Date toDate) {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
 		query.setPlatformIdent(sqlStatementData.getPlatformIdent());
 		query.setObjectClass(SqlStatementData.class);
+		if (null != fromDate) {
+			query.setFromDate(new Timestamp(fromDate.getTime()));
+		}
+		if (null != toDate) {
+			query.setToDate(new Timestamp(toDate.getTime()));
+		}
+		
 		List<SqlStatementData> allSqlStatements = indexingTree.query(query);
 		Map<Integer, SqlStatementData> aggregatedStatementsMap = new HashMap<Integer, SqlStatementData>();
 		List<SqlStatementData> aggregatedSqlStatements = new ArrayList<SqlStatementData>();

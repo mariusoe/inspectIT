@@ -10,6 +10,8 @@ import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceConstants;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
@@ -19,6 +21,7 @@ import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessServi
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -140,6 +143,21 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	private CachedGlobalDataAccessService globalDataAccessService;
 
 	/**
+	 * Date to display invocations from.
+	 */
+	private Date fromDate = null;
+
+	/**
+	 * Date to display invocations to.
+	 */
+	private Date toDate = null;
+
+	/**
+	 * Are we in live mode.
+	 */
+	private boolean autoUpdate = LiveMode.ACTIVE_DEFAULT;
+
+	/**
 	 * 
 	 * @return Returns list of invocation sequence data that represents a table input.
 	 */
@@ -239,11 +257,35 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	@Override
 	public Set<PreferenceId> getPreferenceIds() {
 		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
+		preferences.add(PreferenceId.TIMELINE);
 		preferences.add(PreferenceId.CLEAR_BUFFER);
 		preferences.add(PreferenceId.LIVEMODE);
 		preferences.add(PreferenceId.UPDATE);
 		preferences.add(PreferenceId.ITEMCOUNT);
 		return preferences;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
+		switch (preferenceEvent.getPreferenceId()) {
+		case TIMELINE:
+			if (preferenceEvent.getPreferenceMap().containsKey(PreferenceId.TimeLine.FROM_DATE_ID)) {
+				fromDate = (Date) preferenceEvent.getPreferenceMap().get(PreferenceId.TimeLine.FROM_DATE_ID);
+			}
+			if (preferenceEvent.getPreferenceMap().containsKey(PreferenceId.TimeLine.TO_DATE_ID)) {
+				toDate = (Date) preferenceEvent.getPreferenceMap().get(PreferenceId.TimeLine.TO_DATE_ID);
+			}
+			break;
+		case LIVEMODE:
+			if (preferenceEvent.getPreferenceMap().containsKey(PreferenceId.LiveMode.BUTTON_LIVE_ID)) {
+				autoUpdate = (Boolean) preferenceEvent.getPreferenceMap().get(PreferenceId.LiveMode.BUTTON_LIVE_ID);
+			}
+			break;
+		default:
+		}
 	}
 
 	/**
@@ -274,10 +316,19 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		monitor.beginTask("Updating Invocation Overview", IProgressMonitor.UNKNOWN);
 		monitor.subTask("Retrieving the Invocation Overview from the CMR");
 		List<InvocationSequenceData> invocData;
-		if (template.getMethodIdent() != IdDefinition.ID_NOT_USED) {
-			invocData = dataAccessService.getInvocationSequenceOverview(template.getPlatformIdent(), template.getMethodIdent(), limit);
+
+		if (!autoUpdate) {
+			if (template.getMethodIdent() != IdDefinition.ID_NOT_USED) {
+				invocData = dataAccessService.getInvocationSequenceOverview(template.getPlatformIdent(), template.getMethodIdent(), limit, fromDate, toDate);
+			} else {
+				invocData = dataAccessService.getInvocationSequenceOverview(template.getPlatformIdent(), limit, fromDate, toDate);
+			}
 		} else {
-			invocData = dataAccessService.getInvocationSequenceOverview(template.getPlatformIdent(), limit);
+			if (template.getMethodIdent() != IdDefinition.ID_NOT_USED) {
+				invocData = dataAccessService.getInvocationSequenceOverview(template.getPlatformIdent(), template.getMethodIdent(), limit);
+			} else {
+				invocData = dataAccessService.getInvocationSequenceOverview(template.getPlatformIdent(), limit);
+			}
 		}
 
 		// why this? so only update with new data if returned collection is not empty, i would say

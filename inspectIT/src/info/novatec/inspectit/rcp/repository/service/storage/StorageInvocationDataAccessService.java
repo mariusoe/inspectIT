@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -34,13 +35,26 @@ public class StorageInvocationDataAccessService implements IInvocationDataAccess
 	public StorageInvocationDataAccessService(StorageRepositoryDefinition storageRepositoryDefinition) {
 		this.storageRepositoryDefinition = storageRepositoryDefinition;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit) {
+		return this.getInvocationSequenceOverview(platformId, limit, null, null);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit) {
+		return this.getInvocationSequenceOverview(platformId, methodId, limit, null, null);
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	@Override
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit) {
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate) {
 		File file = new File(storageRepositoryDefinition.getPath() + File.separator + StorageNamingConstants.FILE_NAME_INVOCATION_OVERVIEW);
 		if (file.exists()) {
 			if (file.isFile()) {
@@ -51,6 +65,10 @@ public class StorageInvocationDataAccessService implements IInvocationDataAccess
 					for (Iterator<InvocationSequenceData> iterator = data.iterator(); iterator.hasNext();) {
 						InvocationSequenceData invocationSequenceData = iterator.next();
 						if (methodId != invocationSequenceData.getMethodIdent()) {
+							iterator.remove();
+						} else if (fromDate != null && invocationSequenceData.getTimeStamp().compareTo(fromDate) < 0) {
+							iterator.remove();
+						} else if (toDate != null && invocationSequenceData.getTimeStamp().compareTo(toDate) > 0) {
 							iterator.remove();
 						}
 					}
@@ -83,14 +101,23 @@ public class StorageInvocationDataAccessService implements IInvocationDataAccess
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	@Override
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit) {
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate) {
 		File file = new File(storageRepositoryDefinition.getPath() + File.separator + StorageNamingConstants.FILE_NAME_INVOCATION_OVERVIEW);
 		if (file.exists()) {
 			if (file.isFile()) {
 				try {
 					List<InvocationSequenceData> data = (List<InvocationSequenceData>) loadInvocationSequenceData(file);
 
+					// filter the collection
+					for (Iterator<InvocationSequenceData> iterator = data.iterator(); iterator.hasNext();) {
+						InvocationSequenceData invocationSequenceData = iterator.next();
+						if (fromDate != null && invocationSequenceData.getTimeStamp().compareTo(fromDate) < 0) {
+							iterator.remove();
+						} else if (toDate != null && invocationSequenceData.getTimeStamp().compareTo(toDate) > 0) {
+							iterator.remove();
+						}
+					}
+					
 					// sort the collection
 					if (data.size() > limit) {
 						Collections.sort(data, new Comparator<InvocationSequenceData>() {
@@ -121,7 +148,6 @@ public class StorageInvocationDataAccessService implements IInvocationDataAccess
 	 * Not supported for storage.
 	 */
 	@SuppressWarnings("rawtypes")
-	@Override
 	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection invocationIdCollection, int limit) {
 		return Collections.emptyList();
 	}
@@ -129,7 +155,6 @@ public class StorageInvocationDataAccessService implements IInvocationDataAccess
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public InvocationSequenceData getInvocationSequenceDetail(InvocationSequenceData template) {
 		String path = getFilenameForInvocation(template);
 		File file = new File(path);

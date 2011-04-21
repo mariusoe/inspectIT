@@ -6,6 +6,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -78,8 +79,36 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 		}
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate) {
+		try {
+			return invocationDataAccessService.getInvocationSequenceOverview(platformId, limit, fromDate, toDate);
+		} catch (Exception e) {
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the invocation sequence overview from the CMR!", e, -1);
+			return Collections.EMPTY_LIST;
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate) {
+		try {
+			return invocationDataAccessService.getInvocationSequenceOverview(platformId, methodId, limit, fromDate, toDate);
+		} catch (Exception e) {
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the invocation sequence overview from the CMR!", e, -1);
+			return Collections.EMPTY_LIST;
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
 	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection invocationIdCollection, int limit) {
 		try {
 			return invocationDataAccessService.getInvocationSequenceOverview(platformId, invocationIdCollection, limit);

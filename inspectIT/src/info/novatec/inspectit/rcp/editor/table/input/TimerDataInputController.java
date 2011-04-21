@@ -8,6 +8,8 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
@@ -15,6 +17,7 @@ import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -151,6 +154,21 @@ public class TimerDataInputController extends AbstractTableInputController {
 	private final StyledString emptyStyledString = new StyledString();
 
 	/**
+	 * Date to display invocations from.
+	 */
+	private Date fromDate = null;
+
+	/**
+	 * Date to display invocations to.
+	 */
+	private Date toDate = null;
+
+	/**
+	 * Are we in live mode.
+	 */
+	private boolean autoUpdate = LiveMode.ACTIVE_DEFAULT;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -188,12 +206,36 @@ public class TimerDataInputController extends AbstractTableInputController {
 	@Override
 	public Set<PreferenceId> getPreferenceIds() {
 		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
+		preferences.add(PreferenceId.TIMELINE);
 		preferences.add(PreferenceId.CLEAR_BUFFER);
 		preferences.add(PreferenceId.LIVEMODE);
 		preferences.add(PreferenceId.UPDATE);
 		return preferences;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
+		switch (preferenceEvent.getPreferenceId()) {
+		case TIMELINE:
+			if (preferenceEvent.getPreferenceMap().containsKey(PreferenceId.TimeLine.FROM_DATE_ID)) {
+				fromDate = (Date) preferenceEvent.getPreferenceMap().get(PreferenceId.TimeLine.FROM_DATE_ID);
+			}
+			if (preferenceEvent.getPreferenceMap().containsKey(PreferenceId.TimeLine.TO_DATE_ID)) {
+				toDate = (Date) preferenceEvent.getPreferenceMap().get(PreferenceId.TimeLine.TO_DATE_ID);
+			}
+			break;
+		case LIVEMODE:
+			if (preferenceEvent.getPreferenceMap().containsKey(PreferenceId.LiveMode.BUTTON_LIVE_ID)) {
+				autoUpdate = (Boolean) preferenceEvent.getPreferenceMap().get(PreferenceId.LiveMode.BUTTON_LIVE_ID);
+			}
+			break;
+		default:
+		}
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -220,9 +262,14 @@ public class TimerDataInputController extends AbstractTableInputController {
 	@SuppressWarnings("unchecked")
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Getting timer data information from the CMR", IProgressMonitor.UNKNOWN);
-		List<TimerData> aggregatedTimerData = timerDataAccessService.getAggregatedTimerData(template);
-		timerDataList.clear();
+		List<TimerData> aggregatedTimerData;
+		if (autoUpdate) {
+			aggregatedTimerData = timerDataAccessService.getAggregatedTimerData(template);
+		} else {
+			aggregatedTimerData = timerDataAccessService.getAggregatedTimerData(template, fromDate, toDate);
+		}
 		
+		timerDataList.clear();
 		if (aggregatedTimerData.size() > 0) {
 			timerDataList.addAll(aggregatedTimerData);
 		}

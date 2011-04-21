@@ -29,6 +29,16 @@ public class TimestampIndexer<E extends DefaultData> extends AbstractIndexer<E> 
 	 * Set of created time stamp keys.
 	 */
 	private Set<Long> createdKeysSet = new HashSet<Long>();
+	
+	/**
+	 * Min created key. Used for providing keys for queries.
+	 */
+	private long minCreatedKey = Long.MAX_VALUE;
+	
+	/**
+	 * Max created key. Used for providing keys for queries.
+	 */
+	private long maxCreatedKey = 0;
 
 	/**
 	 * Default constructor. No child indexer is set.
@@ -58,6 +68,12 @@ public class TimestampIndexer<E extends DefaultData> extends AbstractIndexer<E> 
 		}
 		long key = getKey(element.getTimeStamp());
 		createdKeysSet.add(key);
+		if (key < minCreatedKey) {
+			minCreatedKey = key;
+		}
+		if (key > maxCreatedKey) {
+			maxCreatedKey = key;
+		}
 		return key;
 	}
 
@@ -69,8 +85,23 @@ public class TimestampIndexer<E extends DefaultData> extends AbstractIndexer<E> 
 		if (!query.isIntervalSet()) {
 			return null;
 		}
-		long startKey = getKey(query.getFromDate());
-		long endKey = getKey(query.getToDate());
+		
+		long startKey = 0;
+		if (null != query.getFromDate()) {
+			startKey = getKey(query.getFromDate());
+		} 
+		if (startKey < minCreatedKey) {
+			startKey = minCreatedKey;
+		}
+		
+		long endKey = Long.MAX_VALUE;
+		if (null != query.getToDate()) {
+			endKey = getKey(query.getToDate());
+		} 
+		if (endKey > maxCreatedKey) {
+			endKey = maxCreatedKey;
+		}
+		
 		int size = (int) ((endKey - startKey) / INDEXING_PERIOD + 1);
 		ArrayList<Object> keysList = new ArrayList<Object>();
 		for (int i = 0; i < size; i++) {

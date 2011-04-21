@@ -8,10 +8,12 @@ import info.novatec.inspectit.cmr.util.IndexQueryProvider;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,10 +39,37 @@ public class BufferInvocationDataDaoImpl implements InvocationDataDao {
 	 * {@inheritDoc}
 	 */
 	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit) {
+		return this.getInvocationSequenceOverview(platformId, methodId, limit, null, null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit) {
+		return this.getInvocationSequenceOverview(platformId, 0, limit);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate) {
+		return this.getInvocationSequenceOverview(platformId, 0, limit, fromDate, toDate);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate) {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
 		query.setPlatformIdent(platformId);
 		query.setMethodIdent(methodId);
 		query.setObjectClass(InvocationSequenceData.class);
+		if (fromDate != null) {
+			query.setFromDate(new Timestamp(fromDate.getTime()));
+		}
+		if (toDate != null) {
+			query.setToDate(new Timestamp(toDate.getTime()));
+		}
 		List<InvocationSequenceData> results = indexingTree.query(query);
 		Collections.sort(results, new Comparator<DefaultData>() {
 			public int compare(DefaultData o1, DefaultData o2) {
@@ -58,13 +87,6 @@ public class BufferInvocationDataDaoImpl implements InvocationDataDao {
 			i++;
 		}
 		return returnList;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit) {
-		return this.getInvocationSequenceOverview(platformId, 0, limit);
 	}
 	
 	/**
