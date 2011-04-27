@@ -60,7 +60,7 @@ public final class CMR {
 				currentVersion = versioning.getVersion();
 			} catch (IOException e) {
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Versioning information could not be read", e);
+					LOGGER.debug("Versioning information could not be read");
 				}
 			}
 			LOGGER.info("Starting CMR in version " + currentVersion);
