@@ -323,6 +323,14 @@
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
 			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
 		</zip>
+		<zip destfile="${release.basedir}/dist/inspectit-linux.gtk.x86_64.zip" update="true">
+			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
+			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
+		</zip>
+		<zip destfile="${release.basedir}/dist/inspectit-macosx.carbon.ppc.zip" update="true">
+			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
+			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
+		</zip>
 	</target>
 
 	<target name="-create-thirdparty-notification">
@@ -339,7 +347,7 @@ GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), rm
 	<target name="integrate-version-information" description="Integrates the version information into the about box of the UI">
 		<property environment="env" />
 		<property name="version" value="${env.RELEASE_VERSION}.${env.BUILD_NUMBER}" />
-		<tstamp/>
+		<tstamp />
 
 		<echo message="Using version: ${version}" />
 
