@@ -75,6 +75,11 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	private TimerDataAggregator timerDataAggregator;
 
 	/**
+	 * Denotes if the {@link TimerData} objects have to be saved to database.
+	 */
+	private boolean saveTimerDataToDatabase;
+
+	/**
 	 * Logger for default data DAO.
 	 */
 	private static final Logger LOGGER = Logger.getLogger(DefaultDataDaoImpl.class);
@@ -124,7 +129,9 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 				buffer.put(new BufferElement<MethodSensorData>(exData));
 			} else if (element instanceof TimerData) {
 				TimerData timerData = (TimerData) element;
-				timerDataAggregator.processTimerData(timerData);
+				if (saveTimerDataToDatabase) {
+					timerDataAggregator.processTimerData(timerData);
+				}
 				buffer.put(new BufferElement<MethodSensorData>(timerData));
 			} else {
 				session.insert(element);
@@ -209,7 +216,9 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 			invData.getTimerData().setExclusiveMin(exclusiveTime);
 			invData.getTimerData().setExclusiveMax(exclusiveTime);
 
-			timerDataAggregator.processTimerData(invData.getTimerData());
+			if (saveTimerDataToDatabase) {
+				timerDataAggregator.processTimerData(invData.getTimerData());
+			}
 			cacheIdGenerator.assignObjectAnId(invData.getTimerData());
 			invData.getTimerData().addInvocationParentId(topInvocationParent.getId());
 			try {
@@ -455,6 +464,13 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	 */
 	public void setTimerDataAggregator(TimerDataAggregator timerDataAggregator) {
 		this.timerDataAggregator = timerDataAggregator;
+	}
+
+	/**
+	 * @param saveTimerDataToDatabase the saveTimerDataToDatabase to set
+	 */
+	public void setSaveTimerDataToDatabase(boolean saveTimerDataToDatabase) {
+		this.saveTimerDataToDatabase = saveTimerDataToDatabase;
 	}
 
 }

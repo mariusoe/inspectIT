@@ -12,7 +12,9 @@
 	<bean id="platformSensorTypeIdentDao"
 		class="info.novatec.inspectit.cmr.dao.impl.PlatformSensorTypeIdentDaoImpl" />
 
-	<bean id="defaultDataDao" class="info.novatec.inspectit.cmr.dao.impl.DefaultDataDaoImpl" />
+	<bean id="defaultDataDao" class="info.novatec.inspectit.cmr.dao.impl.DefaultDataDaoImpl" >
+		<property name="saveTimerDataToDatabase" value="${cmr.saveTimerDataToDatabase}" />
+	</bean>
 
 	<bean id="invocationDataDao"
 		class="info.novatec.inspectit.cmr.dao.impl.BufferInvocationDataDaoImpl" />

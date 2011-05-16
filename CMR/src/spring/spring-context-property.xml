@@ -11,7 +11,7 @@
 				<value>config/jdbc.properties</value>
 				<value>config/buffer.properties</value>
 				<value>config/jetty.properties</value>
-				<value>config/agent_storage_service.properties</value>
+				<value>config/cmr.properties</value>
 			</list>
 		</property>
 	</bean>

@@ -10,7 +10,7 @@
 	<bean id="registrationService" class="info.novatec.inspectit.cmr.service.RegistrationService" />
 
 	<bean id="agentStorageService" class="info.novatec.inspectit.cmr.service.AgentStorageService">
-		<property name="threadCount" value="${agent_storage_service.threadCount}"/>
+		<property name="threadCount" value="${cmr.agentStorageServiceThreadCount}"/>
 	</bean>
 
 	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
