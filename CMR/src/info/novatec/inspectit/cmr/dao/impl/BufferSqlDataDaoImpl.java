@@ -45,7 +45,9 @@ public class BufferSqlDataDaoImpl implements SqlDataDao {
 	public List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData sqlStatementData, Date fromDate, Date toDate) {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
 		query.setPlatformIdent(sqlStatementData.getPlatformIdent());
-		query.setObjectClass(SqlStatementData.class);
+		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
+		searchedClasses.add(SqlStatementData.class);
+		query.setObjectClasses(searchedClasses);
 		if (null != fromDate) {
 			query.setFromDate(new Timestamp(fromDate.getTime()));
 		}

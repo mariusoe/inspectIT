@@ -50,7 +50,9 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate) {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
 		query.setPlatformIdent(template.getPlatformIdent());
-		query.setObjectClass(ExceptionSensorData.class);
+		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
+		searchedClasses.add(ExceptionSensorData.class);
+		query.setObjectClasses(searchedClasses);
 		query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("exceptionEvent", ExceptionEventEnum.CREATED));
 		if (null != fromDate) {
 			query.setFromDate(new Timestamp(fromDate.getTime()));
@@ -95,7 +97,9 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 	 */
 	public List<ExceptionSensorData> getExceptionTree(ExceptionSensorData template) {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
-		query.setObjectClass(ExceptionSensorData.class);
+		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
+		searchedClasses.add(ExceptionSensorData.class);
+		query.setObjectClasses(searchedClasses);
 		query.setPlatformIdent(template.getPlatformIdent());
 		query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("throwableIdentityHashCode", template.getThrowableIdentityHashCode()));
 		List<ExceptionSensorData> results = indexingTree.query(query);
@@ -115,7 +119,9 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 	 */
 	public List<AggregatedExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
-		query.setObjectClass(ExceptionSensorData.class);
+		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
+		searchedClasses.add(ExceptionSensorData.class);
+		query.setObjectClasses(searchedClasses);
 		query.setPlatformIdent(template.getPlatformIdent());
 		if (null != fromDate) {
 			query.setFromDate(new Timestamp(fromDate.getTime()));
@@ -203,7 +209,9 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 	@Override
 	public List<ExceptionSensorData> getStackTraceMessagesForThrowableType(ExceptionSensorData template) {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
-		query.setObjectClass(ExceptionSensorData.class);
+		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
+		searchedClasses.add(ExceptionSensorData.class);
+		query.setObjectClasses(searchedClasses);
 		query.setPlatformIdent(template.getPlatformIdent());
 		query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("throwableType", template.getThrowableType()));
 		query.addIndexingRestriction(IndexQueryRestrictionFactory.isNotNull("stackTrace"));

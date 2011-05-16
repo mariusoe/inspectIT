@@ -40,7 +40,7 @@ public class IndexQuery implements IIndexQuery {
 	/**
 	 * Object class type.
 	 */
-	private Class<?> objectClass;
+	private List<Class<?>> objectClasses;
 
 	/**
 	 * From date.
@@ -90,7 +90,7 @@ public class IndexQuery implements IIndexQuery {
 	public void setPlatformIdent(long platformIdent) {
 		this.platformIdent = platformIdent;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -122,16 +122,16 @@ public class IndexQuery implements IIndexQuery {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Class<?> getObjectClass() {
-		return objectClass;
+	public List<Class<?>> getObjectClasses() {
+		return objectClasses;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("rawtypes")
-	public void setObjectClass(Class objectClass) {
-		this.objectClass = objectClass;
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void setObjectClasses(List objectClasses) {
+		this.objectClasses = objectClasses;
 	}
 
 	/**
@@ -215,10 +215,11 @@ public class IndexQuery implements IIndexQuery {
 
 	/**
 	 * 
-	 * @param restrictionProcessor Restriction processor to use.
+	 * @param restrictionProcessor
+	 *            Restriction processor to use.
 	 */
 	public void setRestrictionProcessor(IIndexQueryRestrictionProcessor restrictionProcessor) {
 		this.restrictionProcessor = restrictionProcessor;
 	}
-	
+
 }

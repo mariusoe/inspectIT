@@ -46,11 +46,14 @@ public class ObjectTypeIndexer<E extends DefaultData> extends AbstractIndexer<E>
 	 */
 
 	public Object[] getKeys(IIndexQuery query) {
-		if (null == query.getObjectClass()) {
+		if (null == query.getObjectClasses()) {
 			return null;
 		}
-		Object[] keys = new Object[1];
-		keys[0] = query.getObjectClass();
+		Object[] keys = new Object[query.getObjectClasses().size()];
+		int index = 0;
+		for (Object key : query.getObjectClasses()) {
+			keys[index++] = key;
+		}
 		return keys;
 	}
 

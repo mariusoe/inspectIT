@@ -44,7 +44,9 @@ public class BufferTimerDataDaoImpl implements TimerDataDao {
 	public List<TimerData> getAggregatedTimerData(TimerData timerData, Date fromDate, Date toDate) {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
 		query.setPlatformIdent(timerData.getPlatformIdent());
-		query.setObjectClass(TimerData.class);
+		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
+		searchedClasses.add(TimerData.class);
+		query.setObjectClasses(searchedClasses);
 		if (null != fromDate) {
 			query.setFromDate(new Timestamp(fromDate.getTime()));
 		}

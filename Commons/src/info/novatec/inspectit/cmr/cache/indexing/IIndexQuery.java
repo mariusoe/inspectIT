@@ -4,6 +4,7 @@ import info.novatec.inspectit.cmr.cache.indexing.restriction.IIndexQueryRestrict
 import info.novatec.inspectit.communication.DefaultData;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * Interface for query that queries the indexing tree.
@@ -75,21 +76,21 @@ public interface IIndexQuery {
 	void setMethodIdent(long methodIdent);
 
 	/**
-	 * Class of the objects returned by query. Query will only return objects that are of this
-	 * class, thus no objects that are of a class that is extending this class.
+	 * Classes of the objects returned by query. Query will only return objects that are of this
+	 * classes, thus no objects that are of a class that is extending one of the classes.
 	 * 
 	 * @return class
 	 */
-	Class getObjectClass();
+	List getObjectClasses();
 
 	/**
-	 * Set the class for objects to be returned by query. Only objects that are instances of
-	 * supplied class will be returned by query.
+	 * Set the classes for objects to be returned by query. Only objects that are instances of
+	 * supplied classes will be returned by query.
 	 * 
 	 * @param objectClass
 	 *            class or null for not including this property in the query
 	 */
-	void setObjectClass(Class objectClass);
+	void setObjectClasses(List objectClasses);
 
 	/**
 	 * Time stamp that represents date after which objects returned by query are created.

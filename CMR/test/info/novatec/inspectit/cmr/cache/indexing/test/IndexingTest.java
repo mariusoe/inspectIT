@@ -158,7 +158,9 @@ public class IndexingTest extends AbstractTestNGLogSupport {
 	@Test(dependsOnMethods = { "initElements" })
 	public void objectTypeTest() {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
-		query.setObjectClass(InvocationSequenceData.class);
+		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
+		searchedClasses.add(InvocationSequenceData.class);
+		query.setObjectClasses(searchedClasses);
 
 		List<MethodSensorData> results = rootBranch.query(query);
 		for (DefaultData result : results) {
@@ -212,7 +214,9 @@ public class IndexingTest extends AbstractTestNGLogSupport {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
 		query.setFromDate(minusHour);
 		query.setToDate(plusHour);
-		query.setObjectClass(InvocationSequenceData.class);
+		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
+		searchedClasses.add(InvocationSequenceData.class);
+		query.setObjectClasses(searchedClasses);
 		query.setMethodIdent(methodIdent);
 		query.setSensorTypeIdent(sensorTypeIdent);
 		query.setPlatformIdent(platformIdent);
@@ -276,7 +280,9 @@ public class IndexingTest extends AbstractTestNGLogSupport {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
 		query.setFromDate(minusHour);
 		query.setToDate(plusHour);
-		query.setObjectClass(InvocationSequenceData.class);
+		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
+		searchedClasses.add(InvocationSequenceData.class);
+		query.setObjectClasses(searchedClasses);
 
 		List<MethodSensorData> results = rootBranch.query(query);
 		for (DefaultData result : results) {

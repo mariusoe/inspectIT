@@ -183,7 +183,7 @@ public abstract class DefaultData implements Serializable {
 	 * @return True if the object is complied with query, otherwise false.
 	 */
 	public boolean isQueryComplied(IIndexQuery query) {
-		if (query.getObjectClass() != null && !query.getObjectClass().equals(this.getClass())) {
+		if (query.getObjectClasses() != null && !query.getObjectClasses().contains(this.getClass())) {
 			return false;
 		}
 		if (query.getMinId() > id) {

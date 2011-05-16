@@ -63,7 +63,9 @@ public class BufferInvocationDataDaoImpl implements InvocationDataDao {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
 		query.setPlatformIdent(platformId);
 		query.setMethodIdent(methodId);
-		query.setObjectClass(InvocationSequenceData.class);
+		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
+		searchedClasses.add(InvocationSequenceData.class);
+		query.setObjectClasses(searchedClasses);
 		if (fromDate != null) {
 			query.setFromDate(new Timestamp(fromDate.getTime()));
 		}
@@ -96,7 +98,9 @@ public class BufferInvocationDataDaoImpl implements InvocationDataDao {
 	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit) {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
 		query.setPlatformIdent(platformId);
-		query.setObjectClass(InvocationSequenceData.class);
+		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
+		searchedClasses.add(InvocationSequenceData.class);
+		query.setObjectClasses(searchedClasses);
 		query.addIndexingRestriction(IndexQueryRestrictionFactory.isInCollection("id", invocationIdCollection));
 		List<InvocationSequenceData> results = indexingTree.query(query);
 		Collections.sort(results, new Comparator<DefaultData>() {
