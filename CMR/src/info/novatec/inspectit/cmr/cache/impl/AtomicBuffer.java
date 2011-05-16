@@ -351,10 +351,13 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 							nothingToAnalyze.await();
 							// when we are awake, next for analysis is now set to point to the next
 							// logically connected element that has not been analyzed
-							while (elementToAnalyze.isAnalyzed() && !emptyBufferElement.equals(elementToAnalyze)) {
-								elementToAnalyze = elementToAnalyze.getNextElement();
+							IBufferElement<E> nextToBeAnalyzed = elementToAnalyze;
+							while (nextToBeAnalyzed.isAnalyzed() && !emptyBufferElement.equals(nextToBeAnalyzed.getNextElement())) {
+								nextToBeAnalyzed = nextToBeAnalyzed.getNextElement();
 							}
-							nextForAnalysis.compareAndSet(emptyBufferElement, elementToAnalyze);
+							if (!nextToBeAnalyzed.equals(elementToAnalyze)) {
+								nextForAnalysis.compareAndSet(emptyBufferElement, nextToBeAnalyzed);
+							}
 						}
 					} finally {
 						analyzeLock.unlock();
@@ -446,10 +449,13 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 							nothingToIndex.await();
 							// when we are awake, next for indexing is now set to point to the next
 							// logically connected element
-							while (elementToIndex.isIndexed() && !emptyBufferElement.equals(elementToIndex)) {
-								elementToIndex = elementToIndex.getNextElement();
+							IBufferElement<E> nextToBeIndexed = elementToIndex;
+							while (nextToBeIndexed.isIndexed() && !emptyBufferElement.equals(nextToBeIndexed.getNextElement())) {
+								nextToBeIndexed = nextToBeIndexed.getNextElement();
 							}
-							nextForIndexing.compareAndSet(emptyBufferElement, elementToIndex);
+							if (!nextToBeIndexed.equals(elementToIndex)) {
+								nextForIndexing.compareAndSet(emptyBufferElement, nextToBeIndexed);
+							}
 						}
 					} finally {
 						indexingLock.unlock();
