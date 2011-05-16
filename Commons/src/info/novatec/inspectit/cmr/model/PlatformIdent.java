@@ -114,4 +114,70 @@ public class PlatformIdent implements Serializable {
 	public void setVersion(String version) {
 		this.version = version;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((agentName == null) ? 0 : agentName.hashCode());
+		result = prime * result + ((definedIPs == null) ? 0 : definedIPs.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((timeStamp == null) ? 0 : timeStamp.hashCode());
+		result = prime * result + ((version == null) ? 0 : version.hashCode());
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		PlatformIdent other = (PlatformIdent) obj;
+		if (agentName == null) {
+			if (other.agentName != null) {
+				return false;
+			}
+		} else if (!agentName.equals(other.agentName)) {
+			return false;
+		}
+		if (definedIPs == null) {
+			if (other.definedIPs != null) {
+				return false;
+			}
+		} else if (!definedIPs.equals(other.definedIPs)) {
+			return false;
+		}
+		if (id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!id.equals(other.id)) {
+			return false;
+		}
+		if (timeStamp == null) {
+			if (other.timeStamp != null) {
+				return false;
+			}
+		} else if (!timeStamp.equals(other.timeStamp)) {
+			return false;
+		}
+		if (version == null) {
+			if (other.version != null) {
+				return false;
+			}
+		} else if (!version.equals(other.version)) {
+			return false;
+		}
+		return true;
+	}
 }

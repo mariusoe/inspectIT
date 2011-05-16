@@ -160,4 +160,90 @@ public class MethodIdent implements Serializable {
 		return packageName + "." + className + "#" + methodName + parameters + " : " + returnType;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((className == null) ? 0 : className.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((methodName == null) ? 0 : methodName.hashCode());
+		result = prime * result + modifiers;
+		result = prime * result + ((packageName == null) ? 0 : packageName.hashCode());
+		result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
+		result = prime * result + ((returnType == null) ? 0 : returnType.hashCode());
+		result = prime * result + ((timeStamp == null) ? 0 : timeStamp.hashCode());
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		MethodIdent other = (MethodIdent) obj;
+		if (className == null) {
+			if (other.className != null) {
+				return false;
+			}
+		} else if (!className.equals(other.className)) {
+			return false;
+		}
+		if (id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!id.equals(other.id)) {
+			return false;
+		}
+		if (methodName == null) {
+			if (other.methodName != null) {
+				return false;
+			}
+		} else if (!methodName.equals(other.methodName)) {
+			return false;
+		}
+		if (modifiers != other.modifiers) {
+			return false;
+		}
+		if (packageName == null) {
+			if (other.packageName != null) {
+				return false;
+			}
+		} else if (!packageName.equals(other.packageName)) {
+			return false;
+		}
+		if (parameters == null) {
+			if (other.parameters != null) {
+				return false;
+			}
+		} else if (!parameters.equals(other.parameters)) {
+			return false;
+		}
+		if (returnType == null) {
+			if (other.returnType != null) {
+				return false;
+			}
+		} else if (!returnType.equals(other.returnType)) {
+			return false;
+		}
+		if (timeStamp == null) {
+			if (other.timeStamp != null) {
+				return false;
+			}
+		} else if (!timeStamp.equals(other.timeStamp)) {
+			return false;
+		}
+		return true;
+	}
+
 }
