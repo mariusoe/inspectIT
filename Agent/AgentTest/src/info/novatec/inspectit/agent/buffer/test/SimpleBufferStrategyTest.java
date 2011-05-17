@@ -51,16 +51,10 @@ public class SimpleBufferStrategyTest {
 		bufferStrategy.addMeasurements(null);
 	}
 
-	@Test
-	public void addAndRemove() {
-		bufferStrategy.addMeasurements(Collections.EMPTY_LIST);
-		bufferStrategy.remove();
-	}
-
 	@Test(expectedExceptions = { NoSuchElementException.class })
-	public void exceptionAfterRemove() {
+	public void exceptionAfterDoubleRetrieve() {
 		bufferStrategy.addMeasurements(Collections.EMPTY_LIST);
-		bufferStrategy.remove();
+		bufferStrategy.next();
 		bufferStrategy.next();
 	}
 

@@ -35,7 +35,6 @@ public class SizeBufferStrategyTest {
 		List<Object> list = (List<Object>) bufferStrategy.next();
 		assertNotNull(list);
 		assertSame(list, Collections.EMPTY_LIST);
-		bufferStrategy.remove();
 
 		assertFalse(bufferStrategy.hasNext());
 	}
@@ -55,16 +54,10 @@ public class SizeBufferStrategyTest {
 		bufferStrategy.addMeasurements(null);
 	}
 
-	@Test
-	public void addAndRemove() {
-		bufferStrategy.addMeasurements(Collections.EMPTY_LIST);
-		bufferStrategy.remove();
-	}
-
 	@Test(expectedExceptions = { NoSuchElementException.class })
-	public void exceptionAfterRemove() {
+	public void exceptionAfterDoubleRetrieve() {
 		bufferStrategy.addMeasurements(Collections.EMPTY_LIST);
-		bufferStrategy.remove();
+		bufferStrategy.next();
 		bufferStrategy.next();
 	}
 
@@ -94,11 +87,8 @@ public class SizeBufferStrategyTest {
 		bufferStrategy.addMeasurements(listFive);
 
 		assertSame(bufferStrategy.next(), listFive);
-		bufferStrategy.remove();
 		assertSame(bufferStrategy.next(), listFour);
-		bufferStrategy.remove();
 		assertSame(bufferStrategy.next(), listThree);
-		bufferStrategy.remove();
 
 		assertFalse(bufferStrategy.hasNext());
 	}
