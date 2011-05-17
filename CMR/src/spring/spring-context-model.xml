@@ -58,7 +58,7 @@
 		<property name="minObjectExpansionRate" value="${buffer.minObjectExpansionRate}"/>
 		<property name="maxObjectExpansionRateActiveTillBufferSize" value="${buffer.maxObjectExpansionRateActiveTillBufferSize}"/>
 		<property name="minObjectExpansionRateActiveFromBufferSize" value="${buffer.minObjectExpansionRateActiveFromBufferSize}"/>
-		<property name="flagsSetOnBytes" value="${buffer.flagsSetOnBytes}"/>
+		<property name="bytesMaintenancePercentage" value="${buffer.bytesMaintenancePercentage}"/>
 		<property name="evictionFragmentSizePercentage" value="${buffer.evictionFragmentSizePercentage}"/>	
 		<property name="indexingTreeCleaningThreads" value="${buffer.indexingTreeCleaningThreads}"/>	
 	</bean>

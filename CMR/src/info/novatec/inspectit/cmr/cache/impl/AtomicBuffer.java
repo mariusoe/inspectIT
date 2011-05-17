@@ -160,6 +160,11 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 	private EmptyBufferElement emptyBufferElement = new EmptyBufferElement();
 
 	/**
+	 * Amount on bytes flags for tree clean and size update will be set.
+	 */
+	private long flagsSetOnBytes;
+
+	/**
 	 * Logger for buffer.
 	 */
 	private static final Logger LOGGER = Logger.getLogger(AtomicBuffer.class);
@@ -275,7 +280,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 				newLastElement.setEvicted(true);
 				elementsInFragment++;
 				newLastElement = newLastElement.getNextElement();
-				
+
 				// break if we reach the end of queue
 				if (emptyBufferElement.equals(newLastElement)) {
 					break;
@@ -406,12 +411,12 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 					// index element
 					indexingTree.put(elementToIndex.getObject());
 					elementToIndex.setIndexed(true);
-					
+
 					// increase number of indexed elements, and perform calculation of the indexing
 					// tree size if enough elements have been indexed
 					elementsIndexed.incrementAndGet();
 
-					if (dataAddedInBytes.get() > bufferProperties.getFlagsSetOnBytes()) {
+					if (dataAddedInBytes.get() > flagsSetOnBytes) {
 						dataAddedInBytes.set(0);
 						long time = 0;
 						if (LOGGER.isDebugEnabled()) {
@@ -469,7 +474,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 
 		// if clean flag is set thread should try to perform indexing tree cleaning
 		// only thread that successfully executes the compare and set will do the cleaning
-		if (dataRemovedInBytes.get() > bufferProperties.getFlagsSetOnBytes()) {
+		if (dataRemovedInBytes.get() > flagsSetOnBytes) {
 			dataRemovedInBytes.set(0);
 			long time = 0;
 			if (LOGGER.isDebugEnabled()) {
@@ -681,9 +686,11 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 		this.nextForAnalysis = new AtomicReference<IBufferElement<E>>(emptyBufferElement);
 		this.nextForIndexing = new AtomicReference<IBufferElement<E>>(emptyBufferElement);
 		this.indexingTreeCleaningExecutorService = Executors.newFixedThreadPool(bufferProperties.getIndexingTreeCleaningThreads());
-		
+		this.flagsSetOnBytes = bufferProperties.getFlagsSetOnBytes(this.maxSize.get());
+
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("|-Using buffer with maximum size " + NumberFormat.getInstance().format(maxSize) + " bytes...");
+			LOGGER.info("|-Indexing tree maintenance on " + NumberFormat.getInstance().format(flagsSetOnBytes) + " bytes added/removed...");
 		}
 	}
 

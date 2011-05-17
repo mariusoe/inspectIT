@@ -70,10 +70,10 @@ public class BufferProperties implements InitializingBean {
 	private float evictionFragmentSizePercentage;
 
 	/**
-	 * Number of bytes that need to be added or removed for the buffer so that update and clean of
-	 * the indexing tree is performed.
+	 * Number of bytes in % relative to the buffer size that need to be added or removed for the
+	 * buffer so that update and clean of the indexing tree is performed - 5%.
 	 */
-	private long flagsSetOnBytes;
+	private float bytesMaintenancePercentage;
 
 	/**
 	 * Number of threads that are cleaning the indexing tree.
@@ -295,20 +295,31 @@ public class BufferProperties implements InitializingBean {
 	}
 
 	/**
+	 * Number of bytes that need to be added or removed for the buffer so that update and clean of
+	 * the indexing tree is performed.
+	 * 
+	 * @param bufferSize
+	 *            Size of the buffer.
 	 * @return Number of bytes that need to be added or removed for the buffer so that update and
 	 *         clean of the indexing tree is performed.
 	 */
-	public long getFlagsSetOnBytes() {
-		return flagsSetOnBytes;
+	public long getFlagsSetOnBytes(long bufferSize) {
+		return (long) (bytesMaintenancePercentage * bufferSize);
 	}
 
 	/**
-	 * @param flagsSetOnBytes
-	 *            Number of bytes that need to be added or removed for the buffer so that update and
-	 *            clean of the indexing tree is performed.
+	 * @return the bytesMaintenancePercentage
 	 */
-	public void setFlagsSetOnBytes(long flagsSetOnBytes) {
-		this.flagsSetOnBytes = flagsSetOnBytes;
+	public float getBytesMaintenancePercentage() {
+		return bytesMaintenancePercentage;
+	}
+
+	/**
+	 * @param bytesMaintenancePercentage
+	 *            the bytesMaintenancePercentage to set
+	 */
+	public void setBytesMaintenancePercentage(float bytesMaintenancePercentage) {
+		this.bytesMaintenancePercentage = bytesMaintenancePercentage;
 	}
 
 	/**
@@ -399,7 +410,7 @@ public class BufferProperties implements InitializingBean {
 			LOGGER.info("||-Max object size expansion active till buffer size: " + NumberFormat.getInstance().format(maxObjectExpansionRateActiveTillBufferSize) + " bytes");
 			LOGGER.info("||-Min object size expansion active from buffer size: " + NumberFormat.getInstance().format(minObjectExpansionRateActiveFromBufferSize) + " bytes");
 			LOGGER.info("||-Indexing tree cleaning threads: " + NumberFormat.getInstance().format(indexingTreeCleaningThreads));
-			
+
 		}
 		if (this.evictionOccupancyPercentage < 0 || this.evictionOccupancyPercentage > 1) {
 			throw new BeanInitializationException("Buffer properties initialization error: Eviction occupancy must be a percentage value between 0 and 1. Initialization value is: "
@@ -439,15 +450,14 @@ public class BufferProperties implements InitializingBean {
 							+ maxObjectExpansionRateActiveTillBufferSize
 							+ " (buffer size for max object expansion rate)");
 		}
-		if (this.getFlagsSetOnBytes() <= 0) {
+		if (this.getBytesMaintenancePercentage() <= 0 && this.getBytesMaintenancePercentage() > this.getEvictionOccupancyPercentage()) {
 			throw new BeanInitializationException(
-					"Buffer properties initialization error: The number of bytes that activate the clean and update of the indexing tree can not be less or equal than zero. Initialization value is: "
-							+ this.getFlagsSetOnBytes());
+					"Buffer properties initialization error: The buffer bytes maintenance percentage that activate the clean and update of the indexing tree can not be less or equal than zero nor bigger that eviction occupancy percentage. Initialization value is: "
+							+ this.getBytesMaintenancePercentage());
 		}
 		if (this.getIndexingTreeCleaningThreads() <= 0) {
-			throw new BeanInitializationException(
-					"Buffer properties initialization error: The number of indexing tree cleaning threads can not be less or equal than zero. Initialization value is: "
-							+ this.getIndexingTreeCleaningThreads());
+			throw new BeanInitializationException("Buffer properties initialization error: The number of indexing tree cleaning threads can not be less or equal than zero. Initialization value is: "
+					+ this.getIndexingTreeCleaningThreads());
 		}
 	}
 
