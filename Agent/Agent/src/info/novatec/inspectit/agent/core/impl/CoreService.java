@@ -19,6 +19,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.picocontainer.Startable;
@@ -104,8 +105,13 @@ public class CoreService implements ICoreService, Startable {
 	private volatile PlatformSensorRefresher platformSensorRefresher;
 
 	/**
-	 * The sending thread used to execute the sending process of the measurement in a separate
+	 * The preparing thread used to execute the preparation of the measurement in a separate
 	 * process.
+	 */
+	private volatile PreparingThread preparingThread;
+
+	/**
+	 * The sending thread used to execute the sending of the measurement in a separate process.
 	 */
 	private volatile SendingThread sendingThread;
 
@@ -153,6 +159,9 @@ public class CoreService implements ICoreService, Startable {
 			strategy.start(this);
 		}
 
+		preparingThread = new PreparingThread();
+		preparingThread.start();
+
 		sendingThread = new SendingThread();
 		sendingThread.start();
 
@@ -167,6 +176,10 @@ public class CoreService implements ICoreService, Startable {
 		for (Iterator iterator = sendingStrategies.iterator(); iterator.hasNext();) {
 			ISendingStrategy strategy = (ISendingStrategy) iterator.next();
 			strategy.stop();
+		}
+
+		synchronized (preparingThread) {
+			preparingThread.interrupt();
 		}
 
 		synchronized (sendingThread) {
@@ -186,8 +199,8 @@ public class CoreService implements ICoreService, Startable {
 	public void sendData() {
 		// notify the sending thread. if it is currently sending something,
 		// nothing should happen
-		synchronized (sendingThread) {
-			sendingThread.notify();
+		synchronized (preparingThread) {
+			preparingThread.notify();
 		}
 	}
 
@@ -390,13 +403,17 @@ public class CoreService implements ICoreService, Startable {
 	}
 
 	/**
-	 * This implementation of a {@link Thread} is used to start the sending of the data and value
-	 * objects to the CMR.
+	 * This implementation of a {@link Thread} is used to prepare the data and value objects that
+	 * have to be sent to the CMR. Prepared data is put into {@link IBufferStrategy}.
+	 * <p>
+	 * Note that only one thread of this type can be started. Otherwise serious synchronization
+	 * problems can appear.
 	 * 
 	 * @author Patrice Bouillet
+	 * @author Ivan Senic
 	 * 
 	 */
-	private class SendingThread extends Thread {
+	private class PreparingThread extends Thread {
 		/**
 		 * {@inheritDoc}
 		 */
@@ -407,7 +424,7 @@ public class CoreService implements ICoreService, Startable {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						LOGGER.severe("Sending thread interrupted!");
+						LOGGER.severe("Preparing thread interrupted!");
 					}
 				}
 
@@ -442,14 +459,51 @@ public class CoreService implements ICoreService, Startable {
 					// Now give the strategy the list
 					bufferStrategy.addMeasurements(tempList);
 
-					try {
-						while (bufferStrategy.hasNext()) {
-							connection.sendDataObjects((List) bufferStrategy.next());
-							bufferStrategy.remove();
-						}
-					} catch (Throwable e) {
-						LOGGER.severe("Connection problem appeared, stopping sending actual data!");
+					// Notify sending thread
+					synchronized (sendingThread) {
+						sendingThread.notify();
 					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * This implementation of a {@link Thread} is taking the data from the {@link IBufferStrategy}
+	 * and sending it to the CMR.
+	 * <p>
+	 * Note that only one thread of this type can be started. Otherwise serious synchronization
+	 * problems can appear.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private class SendingThread extends Thread {
+		/**
+		 * {@inheritDoc}
+		 */
+		public void run() {
+			for (;;) {
+				// wait for activation if there is nothing to send
+				if (!bufferStrategy.hasNext()) {
+					synchronized (this) {
+						if (!bufferStrategy.hasNext()) {
+							try {
+								wait();
+							} catch (InterruptedException e) {
+								LOGGER.severe("Sending thread interrupted!");
+							}
+						}
+					}
+				}
+
+				try {
+					while (bufferStrategy.hasNext()) {
+						List dataToSend = (List) bufferStrategy.next();
+						connection.sendDataObjects(dataToSend);
+					}
+				} catch (Throwable e) {
+					LOGGER.log(Level.SEVERE, "Connection problem appeared, stopping sending actual data!", e);
 				}
 			}
 		}

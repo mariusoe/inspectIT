@@ -5,15 +5,21 @@ import info.novatec.inspectit.agent.buffer.IBufferStrategy;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.logging.Logger;
 
 /**
- * The simplest version of a buffer strategy contains just the reference to one
- * measurement list. Every time a new one is added, the old one is thrown away.
+ * The simplest version of a buffer strategy contains just the reference to one measurement list.
+ * Every time a new one is added, the old one is thrown away.
  * 
  * @author Patrice Bouillet
  * 
  */
 public class SimpleBufferStrategy implements IBufferStrategy {
+
+	/**
+	 * The logger of the class.
+	 */
+	private static final Logger LOGGER = Logger.getLogger(SimpleBufferStrategy.class.getName());
 
 	/**
 	 * Stores the reference to the last given measurements.
@@ -32,9 +38,16 @@ public class SimpleBufferStrategy implements IBufferStrategy {
 		if (null == measurements) {
 			throw new IllegalArgumentException("Measurements cannot be null!");
 		}
-
-		this.measurements = measurements;
-		newMeasurements = true;
+		synchronized (this) {
+			if (newMeasurements) {
+				// if the measurements already exist, this buffer strategy will simply drop the old
+				// ones, because we can not let the data pile up if the sending of the data is not fast
+				// enough
+				LOGGER.info("Possible data loss due to the excessive data creation on the Agent!");
+			}
+			this.measurements = measurements;
+			newMeasurements = true;
+		}
 	}
 
 	/**
@@ -48,11 +61,13 @@ public class SimpleBufferStrategy implements IBufferStrategy {
 	 * {@inheritDoc}
 	 */
 	public final Object next() {
-		if (newMeasurements) {
-			newMeasurements = false;
-			return measurements;
+		synchronized (this) {
+			if (newMeasurements) {
+				newMeasurements = false;
+				return measurements;
+			}
 		}
-
+		
 		throw new NoSuchElementException();
 	}
 
@@ -60,8 +75,7 @@ public class SimpleBufferStrategy implements IBufferStrategy {
 	 * {@inheritDoc}
 	 */
 	public final void remove() {
-		measurements = null;
-		newMeasurements = false;
+		throw new UnsupportedOperationException();
 	}
 
 	/**
