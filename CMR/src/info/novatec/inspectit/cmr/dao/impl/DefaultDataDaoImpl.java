@@ -158,12 +158,14 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 		double exclusiveDurationDelta = 0d;
 		Set<Long> identityHashCodeSet = new HashSet<Long>();
 		for (InvocationSequenceData child : (List<InvocationSequenceData>) invData.getNestedSequences()) {
+			boolean durationAddedToTheExclusive = false;
 			cacheIdGenerator.assignObjectAnId(child);
 			if (null != child.getTimerData()) {
 				// this object is now saved in the next recursion step when the exclusive duration
 				// is set
 				// thus just calculate the exclusive duration
 				exclusiveDurationDelta += child.getTimerData().getDuration();
+				durationAddedToTheExclusive = true;
 			}
 			if (null != child.getSqlStatementData()) {
 				if (null == child.getTimerData()) {
@@ -171,6 +173,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 					// invocation, but just to be sure I only include the time of the sql, if i did
 					// not already included the time of the timer before
 					exclusiveDurationDelta += child.getSqlStatementData().getDuration();
+					durationAddedToTheExclusive = true;
 				}
 
 				// for SQLs we know immediately that exclusive duration is as a duration
@@ -208,6 +211,9 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 				}
 			}
 			extractDataFromInvocation(session, child, topInvocationParent);
+			if (!durationAddedToTheExclusive) {
+				exclusiveDurationDelta += computeNestedDuration(child);
+			}
 		}
 		if (null != invData.getTimerData()) {
 			double exclusiveTime = invData.getTimerData().getDuration() - exclusiveDurationDelta;
@@ -228,6 +234,41 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 				LOGGER.error(e.getMessage(), e);
 			}
 		}
+	}
+	
+	/**
+	 * Computes the duration of the nested invocation elements.
+	 * 
+	 * @param data
+	 *            The data objects which is inspected for its nested elements.
+	 * @return The duration of all nested sequences (with their nested sequences as well).
+	 */
+	@SuppressWarnings("unchecked")
+	private double computeNestedDuration(InvocationSequenceData data) {
+		if (data.getNestedSequences().isEmpty()) {
+			return 0;
+		}
+
+		double nestedDuration = 0d;
+		boolean added = false;
+		for (InvocationSequenceData nestedData : (List<InvocationSequenceData>) data.getNestedSequences()) {
+			if (null != nestedData.getTimerData()) {
+				nestedDuration = nestedDuration + nestedData.getTimerData().getDuration();
+				added = true;
+			} else if (null != nestedData.getSqlStatementData() && 1 == nestedData.getSqlStatementData().getCount()) {
+				nestedDuration = nestedDuration + nestedData.getSqlStatementData().getDuration();
+				added = true;
+			} 
+			
+			if (!added && !nestedData.getNestedSequences().isEmpty()) {
+				// nothing was added, but there could be child elements with
+				// time measurements
+				nestedDuration = nestedDuration + computeNestedDuration(nestedData);
+			}
+			added = false;
+		}
+
+		return nestedDuration;
 	}
 
 	/**
