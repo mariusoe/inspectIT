@@ -52,7 +52,7 @@
 		<dependency org="org.testng" name="testng" rev="5.14.6" transitive="false" conf="test->default" />
 		<dependency org="org.mockito" name="mockito-all" rev="1.7" conf="test->default" />
 		<dependency org="net.sourceforge.cobertura" name="cobertura" rev="1.9.4.1" conf="test->default" />
-		<dependency org="apache-oro" name="jakarta-oro" rev="2.0.8" conf="test->default" />
+		<dependency org="oro" name="oro" rev="2.0.8" conf="test->default" />
 		<dependency org="com.beust" name="jcommander" rev="1.5" transitive="false" conf="test->default" />
 		<dependency org="org.beanshell" name="bsh" rev="2.0b4" transitive="false" conf="test->default" />
 				

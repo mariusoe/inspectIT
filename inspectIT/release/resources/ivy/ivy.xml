@@ -35,7 +35,7 @@
 		<dependency org="org.mockito" name="mockito-all" rev="1.7" conf="test->default" />
 		<dependency org="net.sourceforge.cobertura" name="cobertura" rev="1.9.4.1" conf="test->default" />
 		<dependency org="log4j" name="log4j" rev="1.2.9" conf="test->default" />
-		<dependency org="apache-oro" name="jakarta-oro" rev="2.0.8" conf="test->default" />
+		<dependency org="oro" name="oro" rev="2.0.8" conf="test->default" />
 		<dependency org="asm" name="asm" rev="3.0" conf="test->default" />
 		<dependency org="asm" name="asm-tree" rev="3.0" conf="test->default" />
 		<dependency org="com.beust" name="jcommander" rev="1.5" transitive="false" conf="test->default" />
