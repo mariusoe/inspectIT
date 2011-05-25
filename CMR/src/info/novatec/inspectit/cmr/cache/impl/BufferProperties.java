@@ -79,6 +79,11 @@ public class BufferProperties implements InitializingBean {
 	 * Number of threads that are cleaning the indexing tree.
 	 */
 	private int indexingTreeCleaningThreads;
+	
+	/**
+	 * Time in milliseconds that the indexing thread will wait for the object to be analyzed first.
+	 */
+	private long indexingWaitTime;
 
 	/**
 	 * Logger for buffer properties.
@@ -336,6 +341,20 @@ public class BufferProperties implements InitializingBean {
 	public void setIndexingTreeCleaningThreads(int indexingTreeCleaningThreads) {
 		this.indexingTreeCleaningThreads = indexingTreeCleaningThreads;
 	}
+	
+	/**
+	 * @return the indexingWaitTime
+	 */
+	public long getIndexingWaitTime() {
+		return indexingWaitTime;
+	}
+
+	/**
+	 * @param indexingWaitTime the indexingWaitTime to set
+	 */
+	public void setIndexingWaitTime(long indexingWaitTime) {
+		this.indexingWaitTime = indexingWaitTime;
+	}
 
 	/**
 	 * Returns the initial buffer size based on the property set.
@@ -410,7 +429,7 @@ public class BufferProperties implements InitializingBean {
 			LOGGER.info("||-Max object size expansion active till buffer size: " + NumberFormat.getInstance().format(maxObjectExpansionRateActiveTillBufferSize) + " bytes");
 			LOGGER.info("||-Min object size expansion active from buffer size: " + NumberFormat.getInstance().format(minObjectExpansionRateActiveFromBufferSize) + " bytes");
 			LOGGER.info("||-Indexing tree cleaning threads: " + NumberFormat.getInstance().format(indexingTreeCleaningThreads));
-
+			LOGGER.info("||-Indexing waiting time: " + NumberFormat.getInstance().format(indexingWaitTime) + " ms");
 		}
 		if (this.evictionOccupancyPercentage < 0 || this.evictionOccupancyPercentage > 1) {
 			throw new BeanInitializationException("Buffer properties initialization error: Eviction occupancy must be a percentage value between 0 and 1. Initialization value is: "
@@ -458,6 +477,10 @@ public class BufferProperties implements InitializingBean {
 		if (this.getIndexingTreeCleaningThreads() <= 0) {
 			throw new BeanInitializationException("Buffer properties initialization error: The number of indexing tree cleaning threads can not be less or equal than zero. Initialization value is: "
 					+ this.getIndexingTreeCleaningThreads());
+		}
+		if (this.indexingWaitTime <= 0) {
+			throw new BeanInitializationException("Buffer properties initialization error: The indexing wait time can not be less or equal than zero. Initialization value is: "
+					+ this.indexingWaitTime);
 		}
 	}
 

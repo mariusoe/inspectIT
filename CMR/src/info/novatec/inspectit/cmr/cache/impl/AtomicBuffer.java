@@ -2,6 +2,7 @@ package info.novatec.inspectit.cmr.cache.impl;
 
 import info.novatec.inspectit.cmr.cache.IBuffer;
 import info.novatec.inspectit.cmr.cache.IBufferElement;
+import info.novatec.inspectit.cmr.cache.IBufferElement.BufferElementState;
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
 import info.novatec.inspectit.cmr.cache.indexing.impl.IndexingException;
@@ -277,7 +278,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 			// iterate until size of the eviction fragment is reached
 			while (fragmentSize < evictionFragmentMaxSize) {
 				fragmentSize += newLastElement.getBufferElementSize();
-				newLastElement.setEvicted(true);
+				newLastElement.setBufferElementState(BufferElementState.EVICTED);
 				elementsInFragment++;
 				newLastElement = newLastElement.getNextElement();
 
@@ -343,7 +344,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 
 				// perform analysis
 				elementToAnalyze.calculateAndSetBufferElementSize(objectSizes);
-				elementToAnalyze.setAnalyzed(true);
+				elementToAnalyze.setBufferElementState(BufferElementState.ANALYZED);
 				addToCurrentSize(elementToAnalyze.getBufferElementSize(), true);
 				elementsAnalyzed.incrementAndGet();
 
@@ -405,12 +406,21 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 				break;
 			}
 
+			// we only index when the element has already been analyzed
+			while (!elementToIndex.isAnalyzed()) {
+				try {
+					Thread.sleep(bufferProperties.getIndexingWaitTime());
+				} catch (InterruptedException e) {
+					Thread.interrupted();
+				}
+			}
+
 			// only thread that execute compare and set successfully can perform changes
 			if (nextForIndexing.compareAndSet(elementToIndex, elementToIndex.getNextElement())) {
 				try {
 					// index element
 					indexingTree.put(elementToIndex.getObject());
-					elementToIndex.setIndexed(true);
+					elementToIndex.setBufferElementState(BufferElementState.INDEXED);
 
 					// increase number of indexed elements, and perform calculation of the indexing
 					// tree size if enough elements have been indexed
@@ -776,16 +786,8 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 		}
 
 		@Override
-		public void setAnalyzed(boolean analyzed) {
-		}
-
-		@Override
 		public boolean isEvicted() {
 			return false;
-		}
-
-		@Override
-		public void setEvicted(boolean evicted) {
 		}
 
 		@Override
@@ -794,7 +796,12 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 		}
 
 		@Override
-		public void setIndexed(boolean indexed) {
+		public info.novatec.inspectit.cmr.cache.IBufferElement.BufferElementState getBufferElementState() {
+			return null;
+		}
+
+		@Override
+		public void setBufferElementState(info.novatec.inspectit.cmr.cache.IBufferElement.BufferElementState bufferElementState) {
 		}
 
 	}

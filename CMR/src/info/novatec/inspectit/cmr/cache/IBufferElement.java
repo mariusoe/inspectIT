@@ -64,27 +64,11 @@ public interface IBufferElement<E> {
 	boolean isAnalyzed();
 
 	/**
-	 * Sets if the element has been analyzed.
-	 * 
-	 * @param analyzed
-	 *            Boolean that marks element as analyzed or not.
-	 */
-	void setAnalyzed(boolean analyzed);
-
-	/**
 	 * Returns if the element has been evicted.
 	 * 
 	 * @return True if evicted, otherwise no.
 	 */
 	boolean isEvicted();
-
-	/**
-	 * Sets if the element has been evicted.
-	 * 
-	 * @param evicted
-	 *            Boolean that marks element as analyzed or not.
-	 */
-	void setEvicted(boolean evicted);
 
 	/**
 	 * Returns if the element has been indexed.
@@ -94,10 +78,45 @@ public interface IBufferElement<E> {
 	boolean isIndexed();
 
 	/**
-	 * Sets if the element has been indexed.
+	 * Returns buffer element state, as defined by {@link BufferElementState}.
 	 * 
-	 * @param indexed
-	 *            True if indexed, otherwise no.
+	 * @return Buffer element state, as defined by {@link BufferElementState}.
 	 */
-	void setIndexed(boolean indexed);
+	BufferElementState getBufferElementState();
+
+	/**
+	 * 
+	 * @param bufferElementState
+	 *            Sets buffer element state, as defined by {@link BufferElementState}.
+	 */
+	void setBufferElementState(BufferElementState bufferElementState);
+
+	/**
+	 * {@link IBufferElement} state.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	public enum BufferElementState {
+
+		/**
+		 * Element is inserted into buffer.
+		 */
+		INSERTED,
+
+		/**
+		 * Element is analyzed.
+		 */
+		ANALYZED,
+
+		/**
+		 * Element is indexed.
+		 */
+		INDEXED,
+
+		/**
+		 * Element is evicted.
+		 */
+		EVICTED;
+	}
 }

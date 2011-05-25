@@ -18,6 +18,7 @@ public class BufferIndexer extends BufferWorker {
 	 */
 	public BufferIndexer(IBuffer<?> buffer) {
 		super(buffer);
+		setPriority(NORM_PRIORITY);
 	}
 
 	/**

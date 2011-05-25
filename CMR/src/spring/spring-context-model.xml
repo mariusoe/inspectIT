@@ -61,6 +61,7 @@
 		<property name="bytesMaintenancePercentage" value="${buffer.bytesMaintenancePercentage}"/>
 		<property name="evictionFragmentSizePercentage" value="${buffer.evictionFragmentSizePercentage}"/>	
 		<property name="indexingTreeCleaningThreads" value="${buffer.indexingTreeCleaningThreads}"/>	
+		<property name="indexingWaitTime" value="${buffer.indexingWaitTime}" />
 	</bean>
 	<bean id="bufferBean" class="info.novatec.inspectit.cmr.cache.impl.AtomicBuffer" />
 	<bean id="bufferEvictor" class="info.novatec.inspectit.cmr.cache.impl.BufferEvictor" init-method="start"/>

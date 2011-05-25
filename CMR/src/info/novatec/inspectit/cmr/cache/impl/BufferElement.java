@@ -29,19 +29,9 @@ public class BufferElement<E extends DefaultData> implements IBufferElement<E> {
 	private long bufferElementSize;
 
 	/**
-	 * Is it analyzed.
+	 * Buffer element state.
 	 */
-	private boolean analyzed = false;
-
-	/**
-	 * Is it evicted.
-	 */
-	private boolean evicted = false;
-	
-	/**
-	 * Is it indexed.
-	 */
-	private boolean indexed = false;
+	private BufferElementState bufferElementState;
 
 	/**
 	 * Default constructor.
@@ -52,6 +42,7 @@ public class BufferElement<E extends DefaultData> implements IBufferElement<E> {
 	public BufferElement(E object) {
 		super();
 		this.object = object;
+		this.bufferElementState = BufferElementState.INSERTED;
 	}
 
 	/**
@@ -105,42 +96,35 @@ public class BufferElement<E extends DefaultData> implements IBufferElement<E> {
 	 * {@inheritDoc}
 	 */
 	public boolean isAnalyzed() {
-		return analyzed;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void setAnalyzed(boolean analyzed) {
-		this.analyzed = analyzed;
+		return bufferElementState.compareTo(BufferElementState.ANALYZED) >= 0;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public boolean isEvicted() {
-		return evicted;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void setEvicted(boolean evicted) {
-		this.evicted = evicted;
+		return bufferElementState.compareTo(BufferElementState.EVICTED) >= 0;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public boolean isIndexed() {
-		return indexed;
+		return bufferElementState.compareTo(BufferElementState.INDEXED) >= 0;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setIndexed(boolean indexed) {
-		this.indexed = indexed;
+	public BufferElementState getBufferElementState() {
+		return bufferElementState;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setBufferElementState(BufferElementState bufferElementState) {
+		this.bufferElementState = bufferElementState;
+	}
+
 }
