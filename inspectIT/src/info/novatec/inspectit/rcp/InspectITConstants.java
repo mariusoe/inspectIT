@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp;
 
+
 /**
  * Defines all the constants for the InspectIT UI.
  * 
@@ -62,8 +63,11 @@ public interface InspectITConstants {
 	String IMG_NEXT = "next.png"; //$NON-NLS-1$
 	String IMG_PREVIOUS = "previous.png"; //$NON-NLS-1$
 	String IMG_RIGHT_DOWN_ARROW = "right_down.png"; //$NON-NLS-1$
+	String IMG_TRASH = "trash.png"; //$NON-NLS-1$
 
 	String OVERLAY_PRIORITY = "overlay_priority.gif"; //$NON-NLS-1$
 	String OVERLAY_UP = "overlay_up.png"; //$NON-NLS-1$
 	String OVERLAY_ERROR = "overlay_error.gif"; //$NON-NLS-1$
+
+	
 }

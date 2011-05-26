@@ -275,6 +275,11 @@ public class SteppingTreeSubView extends TreeSubView {
 		private Button previous;
 
 		/**
+		 * Clear all button.
+		 */
+		private Button clearAll;
+
+		/**
 		 * Information label.
 		 */
 		private Label info;
@@ -365,6 +370,11 @@ public class SteppingTreeSubView extends TreeSubView {
 			gd.widthHint = 0;
 			helpComposite.setLayoutData(gd);
 
+			clearAll = toolkit.createButton(mainComposite, "", SWT.PUSH | SWT.NO_BACKGROUND);
+			clearAll.setEnabled(false);
+			clearAll.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_TRASH));
+			clearAll.setToolTipText("Empty steppable objects list");
+
 			objectSelection.addListener(SWT.Modify, new Listener() {
 				@Override
 				public void handleEvent(Event event) {
@@ -426,7 +436,27 @@ public class SteppingTreeSubView extends TreeSubView {
 					updateInfoBox();
 				}
 			});
+
+			clearAll.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(Event event) {
+					clearAll();
+				}
+			});
+
 			controlShown = true;
+		}
+
+		/**
+		 * Clears all objects from the list.
+		 */
+		private void clearAll() {
+			steppableObjects.clear();
+			objectSelection.removeAll();
+			objectsInCombo.clear();
+			selectedObject = null;
+			occurrence = 0;
+			inputChanged();
 		}
 
 		/**
@@ -496,6 +526,7 @@ public class SteppingTreeSubView extends TreeSubView {
 					objectsInCombo = steppableObjects;
 					objectSelection.removeAll();
 					if (!objectsInCombo.isEmpty()) {
+						clearAll.setEnabled(true);
 						for (Object object : objectsInCombo) {
 							objectSelection.add(getTextualString(object));
 						}
@@ -508,6 +539,7 @@ public class SteppingTreeSubView extends TreeSubView {
 					} else {
 						next.setEnabled(false);
 						previous.setEnabled(false);
+						clearAll.setEnabled(false);
 						updateInfoBox();
 					}
 				} else {
