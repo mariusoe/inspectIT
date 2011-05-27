@@ -78,7 +78,7 @@ public class TableSubView extends AbstractSubView {
 	public void createPartControl(Composite parent, FormToolkit toolkit) {
 		tableInputController.setInputDefinition(getRootEditor().getInputDefinition());
 
-		Table table = toolkit.createTable(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		Table table = toolkit.createTable(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
