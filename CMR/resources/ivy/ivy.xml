@@ -29,8 +29,8 @@
 		<dependency org="dom4j" name="dom4j" rev="1.6.1" transitive="false" conf="prod->default"/>
 		<dependency org="org.quartz-scheduler" name="quartz" rev="1.8.5" transitive="false" conf="prod->default"/>
 		
-		<dependency org="org.mortbay.jetty" name="jetty" rev="6.1.16" transitive="false" conf="prod->default"/>
-		<dependency org="org.mortbay.jetty" name="jetty-util" rev="6.1.16" transitive="false" conf="prod->default"/>
+		<dependency org="org.mortbay.jetty" name="jetty" rev="6.1.26" transitive="false" conf="prod->default"/>
+		<dependency org="org.mortbay.jetty" name="jetty-util" rev="6.1.26" transitive="false" conf="prod->default"/>
 		
 		<dependency org="org.hibernate" name="hibernate-core" rev="3.5.3-Final" transitive="false" conf="prod->default"/>
 		<dependency org="javassist" name="javassist" rev="3.12.0.GA" transitive="false" conf="prod->default"/>
