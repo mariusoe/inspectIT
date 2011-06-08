@@ -423,10 +423,10 @@ public class VmSummaryInputController extends AbstractTextInputController {
 
 			// token delimiter can be : or ; 
 			// thus checking the provided class-path to see which one fits 
-			String tokenDelimiter = ":";
+			String tokenDelimiter = ";";
 			String classPath = data.getClassPath();
 			if (classPath.indexOf(tokenDelimiter) == -1) {
-				tokenDelimiter = ";";
+				tokenDelimiter = ":";
 			}
 			
 			// some classpath informations with formatting
