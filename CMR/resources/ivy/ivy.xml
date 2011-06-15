@@ -27,7 +27,7 @@
 		<dependency org="commons-collections" name="commons-collections" rev="3.2" transitive="false" conf="prod->default"/>
 		<dependency org="cglib" name="cglib-nodep" rev="2.1_3" transitive="false" conf="prod->default"/>
 		<dependency org="dom4j" name="dom4j" rev="1.6.1" transitive="false" conf="prod->default"/>
-		<dependency org="quartz" name="quartz" rev="1.5.2" transitive="false" conf="prod->default"/>
+		<dependency org="org.quartz-scheduler" name="quartz" rev="1.8.5" transitive="false" conf="prod->default"/>
 		
 		<dependency org="org.mortbay.jetty" name="jetty" rev="6.1.16" transitive="false" conf="prod->default"/>
 		<dependency org="org.mortbay.jetty" name="jetty-util" rev="6.1.16" transitive="false" conf="prod->default"/>
