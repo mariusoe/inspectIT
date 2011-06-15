@@ -57,16 +57,39 @@ public class AgentStorageService implements IAgentStorageService, InitializingBe
 	private int threadCount;
 
 	/**
+	 * Count of dropped data due to high volume of incoming data objects.
+	 */
+	private int droppedDataCount = 0;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void addDataObjects(final List dataObjects) throws RemoteException {
 		SoftReference<List<DefaultData>> softReference = new SoftReference<List<DefaultData>>(dataObjects);
 		try {
-			dataObjectsBlockingQueue.offer(softReference, DATA_THROW_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+			boolean added = dataObjectsBlockingQueue.offer(softReference, DATA_THROW_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+			if (!added) {
+				int droppedSize = dataObjects.size();
+				if (LOGGER.isTraceEnabled()) {
+					LOGGER.trace("Data dropped on the CMR due to the high volume of incoming data from Agent(s). Dropped data objects count: " + droppedSize);
+				}
+				droppedDataCount += droppedSize;
+			}
 		} catch (InterruptedException e) {
 			return;
 		}
+	}
+
+	/**
+	 * Returns the number of data objects that have been dropped on the CMR, due to the high
+	 * incoming load.
+	 * 
+	 * @return Returns the number of data objects that have been dropped on the CMR, due to the high
+	 *         incoming load.
+	 */
+	public int getDroppedDataCount() {
+		return droppedDataCount;
 	}
 
 	public void setDefaultDataDao(DefaultDataDao defaultDataDao) {

@@ -1,6 +1,7 @@
 package info.novatec.inspectit.cmr.util;
 
 import info.novatec.inspectit.cmr.cache.IBuffer;
+import info.novatec.inspectit.cmr.service.AgentStorageService;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
@@ -62,6 +63,11 @@ public class HealthStatus {
 	private IBuffer<?> buffer;
 
 	/**
+	 * {@link AgentStorageService} for reporting the amount of dropped data on the CMR.
+	 */
+	private AgentStorageService agentStorageService;
+
+	/**
 	 * Log all the statistics.
 	 */
 	public void logStatistics() {
@@ -70,6 +76,7 @@ public class HealthStatus {
 			logRuntimeStatistics();
 			logMemoryStatistics();
 			logThreadStatistics();
+			logDroppedData();
 			logBufferStatistics();
 			LOGGER.info("\n");
 		}
@@ -119,7 +126,7 @@ public class HealthStatus {
 		double value = (double) WIDTH / availCpus;
 		long load = Math.round(loadAverage * value);
 		if (load > WIDTH) {
-			//Necessary so that we don't brake the limit in graphical representation
+			// Necessary so that we don't brake the limit in graphical representation
 			load = WIDTH;
 		}
 		String title = "CPU load";
@@ -202,12 +209,13 @@ public class HealthStatus {
 	 * 
 	 * @param memoryUsage
 	 *            The memory usage object to log.
-	 * @param title Title of graphical box.
+	 * @param title
+	 *            Title of graphical box.
 	 * 
 	 * @see MemoryUsage
 	 */
 	private void logGraphicalMemoryUsage(MemoryUsage memoryUsage, String title) {
-		double value =  (double) WIDTH / memoryUsage.getMax();
+		double value = (double) WIDTH / memoryUsage.getMax();
 		long used = Math.round(memoryUsage.getUsed() * value);
 		long committed = Math.round(memoryUsage.getCommitted() * value);
 
@@ -243,8 +251,8 @@ public class HealthStatus {
 		for (long i = pos; i < WIDTH; i++) {
 			sb.append(" ");
 		}
-		
-		//only print last char if committed is smaller
+
+		// only print last char if committed is smaller
 		if (committed < WIDTH) {
 			sb.append(START_END_CHAR);
 		}
@@ -330,6 +338,13 @@ public class HealthStatus {
 	}
 
 	/**
+	 * Logs the amount of dropped data on CMR.
+	 */
+	private void logDroppedData() {
+		LOGGER.info("Dropped elements due to the high load on the CMR (total count): " + agentStorageService.getDroppedDataCount());
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public void afterPropertiesSet() throws Exception {
@@ -345,6 +360,13 @@ public class HealthStatus {
 	 */
 	public void setBuffer(IBuffer<?> buffer) {
 		this.buffer = buffer;
+	}
+
+	/**
+	 * @param agentStorageService the agentStorageService to set
+	 */
+	public void setAgentStorageService(AgentStorageService agentStorageService) {
+		this.agentStorageService = agentStorageService;
 	}
 
 }
