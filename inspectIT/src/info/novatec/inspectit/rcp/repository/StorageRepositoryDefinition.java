@@ -4,6 +4,7 @@ import info.novatec.inspectit.cmr.service.IBufferService;
 import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
+import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
@@ -17,6 +18,9 @@ import info.novatec.inspectit.rcp.repository.service.storage.StorageNamingConsta
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
+/**
+ * ...
+ */
 public class StorageRepositoryDefinition implements RepositoryDefinition {
 
 	/**
@@ -141,6 +145,14 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	 */
 	@Override
 	public ITimerDataAccessService getTimerDataAccessService() {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Not supported.
+	 */
+	@Override
+	public IHttpTimerDataAccessService getHttpTimerDataAccessService() {
 		throw new UnsupportedOperationException();
 	}
 

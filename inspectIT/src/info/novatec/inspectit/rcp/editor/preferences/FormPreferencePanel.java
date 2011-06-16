@@ -35,7 +35,7 @@ import org.eclipse.ui.forms.widgets.Section;
  * 
  * @author Eduard Tudenhoefner
  * @author Patrice Bouillet
- * 
+ * @author Stefan Siegl
  */
 public class FormPreferencePanel implements IPreferencePanel {
 
@@ -194,7 +194,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 			switchSteppingControl.setChecked(checked);
 		}
 	}
-	
+
 	/**
 	 * Creates the preference controls in the preference control panel.
 	 * 
@@ -226,7 +226,12 @@ public class FormPreferencePanel implements IPreferencePanel {
 		MenuAction menuAction = new MenuAction();
 		menuAction.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_TOOL));
 		menuAction.setToolTipText("Preferences");
-		
+
+		if (preferenceSet.contains(PreferenceId.HTTP_AGGREGATION_REQUESTMETHOD)) {
+			toolBarManager.add(new Separator());
+			toolBarManager.add(new SwitchHttpCategorizationRequestMethod("Include Request Method in Categorization"));
+			toolBarManager.add(new Separator());
+		}
 		if (preferenceSet.contains(PreferenceId.SAMPLINGRATE) || preferenceSet.contains(PreferenceId.TIMELINE)) {
 			toolBarManager.add(switchPreferences);
 		}
@@ -322,7 +327,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 			timeMenuManager.add(new FilterByTotalTimeAction("5 s", 5000.0));
 			menuAction.addContributionItem(timeMenuManager);
 		}
-		
+
 		if (preferenceSet.contains(PreferenceId.TIME_RESOLUTION)) {
 			MenuManager timeMenuManager = new MenuManager("Time Decimal Places");
 			timeMenuManager.add(new SetTimeDecimalPlaces("0", 0, true));
@@ -486,13 +491,37 @@ public class FormPreferencePanel implements IPreferencePanel {
 
 	}
 
+	/**
+	 * Filters by the maximum number of elements shown.
+	 * 
+	 * @author Stefan Siegl
+	 */
 	private final class SetItemCountAction extends Action {
+		/** the maximum number of elements shown. */
 		private int limit;
 
+		/**
+		 * Constructor, setting checked to false.
+		 * 
+		 * @param text
+		 *            the text
+		 * @param limit
+		 *            the maximum number of elements shown.
+		 */
 		public SetItemCountAction(String text, int limit) {
 			this(text, limit, false);
 		}
 
+		/**
+		 * Constructor.
+		 * 
+		 * @param text
+		 *            the text
+		 * @param limit
+		 *            the maximum number of elements shown.
+		 * @param isChecked
+		 *            whether this option is set
+		 */
 		public SetItemCountAction(String text, int limit, boolean isChecked) {
 			super(text, Action.AS_RADIO_BUTTON);
 			this.limit = limit;
@@ -514,13 +543,37 @@ public class FormPreferencePanel implements IPreferencePanel {
 		}
 	}
 
+	/**
+	 * Filters by sensor type.
+	 * 
+	 * @author Stefan Siegl
+	 */
 	private final class FilterBySensorTypeAction extends Action {
+		/** The sensor type. */
 		private SensorTypeEnum sensorType;
 
+		/**
+		 * Constructor, setting checked to false.
+		 * 
+		 * @param text
+		 *            the text
+		 * @param sensorType
+		 *            the sensor type
+		 */
 		public FilterBySensorTypeAction(String text, SensorTypeEnum sensorType) {
 			this(text, sensorType, true);
 		}
 
+		/**
+		 * Constructor.
+		 * 
+		 * @param text
+		 *            the text
+		 * @param sensorType
+		 *            the sensor type
+		 * @param isChecked
+		 *            if this option is checked
+		 */
 		public FilterBySensorTypeAction(String text, SensorTypeEnum sensorType, boolean isChecked) {
 			super(text, Action.AS_CHECK_BOX);
 			this.sensorType = sensorType;
@@ -540,13 +593,37 @@ public class FormPreferencePanel implements IPreferencePanel {
 		}
 	}
 
+	/**
+	 * Filters by exclusive time.
+	 * 
+	 * @author Stefan Siegl
+	 */
 	private final class FilterByExclusiveTimeAction extends Action {
+		/** the time. */
 		private double time;
 
+		/**
+		 * Constructor, setting checked to false.
+		 * 
+		 * @param text
+		 *            the text
+		 * @param time
+		 *            the time
+		 */
 		public FilterByExclusiveTimeAction(String text, double time) {
 			this(text, time, false);
 		}
 
+		/**
+		 * Constructor.
+		 * 
+		 * @param text
+		 *            the text
+		 * @param time
+		 *            the time
+		 * @param isChecked
+		 *            if this option is checked
+		 */
 		public FilterByExclusiveTimeAction(String text, double time, boolean isChecked) {
 			super(text, Action.AS_RADIO_BUTTON);
 			this.time = time;
@@ -568,13 +645,37 @@ public class FormPreferencePanel implements IPreferencePanel {
 		}
 	}
 
+	/**
+	 * Filters by total time.
+	 * 
+	 * @author Stefan Siegl
+	 */
 	private final class FilterByTotalTimeAction extends Action {
+		/** the time. */
 		private double time;
 
+		/**
+		 * Constructor, setting checked to false.
+		 * 
+		 * @param text
+		 *            the text
+		 * @param time
+		 *            the time
+		 */
 		public FilterByTotalTimeAction(String text, double time) {
 			this(text, time, false);
 		}
 
+		/**
+		 * Constructor.
+		 * 
+		 * @param text
+		 *            the text
+		 * @param time
+		 *            the time
+		 * @param isChecked
+		 *            if this option is checked
+		 */
 		public FilterByTotalTimeAction(String text, double time, boolean isChecked) {
 			super(text, Action.AS_RADIO_BUTTON);
 			this.time = time;
@@ -596,13 +697,37 @@ public class FormPreferencePanel implements IPreferencePanel {
 		}
 	}
 
+	/**
+	 * Sets the automatic refresh rate.
+	 * 
+	 * @author Stefan Siegl
+	 */
 	private final class SetRefreshRateAction extends Action {
+		/** refresh rate in ms. */
 		private int rate;
 
+		/**
+		 * Constructor, setting checked to false.
+		 * 
+		 * @param text
+		 *            the text
+		 * @param rate
+		 *            the refresh rate
+		 */
 		public SetRefreshRateAction(String text, int rate) {
 			this(text, rate, false);
 		}
 
+		/**
+		 * Constructor.
+		 * 
+		 * @param text
+		 *            the text
+		 * @param rate
+		 *            the refresh rate
+		 * @param isChecked
+		 *            whether or not this option is active.
+		 */
 		public SetRefreshRateAction(String text, int rate, boolean isChecked) {
 			super(text, Action.AS_RADIO_BUTTON);
 			this.rate = rate;
@@ -679,14 +804,41 @@ public class FormPreferencePanel implements IPreferencePanel {
 		}
 
 	}
-	
+
+	/**
+	 * Sets the decimal places.
+	 * 
+	 * @author Stefan Siegl
+	 * 
+	 */
 	private final class SetTimeDecimalPlaces extends Action {
+		/** The number of decimal places. */
 		private int decimalPlaces;
 
+		/**
+		 * Default constructor.
+		 * 
+		 * @param text
+		 *            the action's text, or <code>null</code> if there is no text
+		 * @param decimalPlaces
+		 *            the number of decimal places
+		 * @see Action
+		 */
 		public SetTimeDecimalPlaces(String text, int decimalPlaces) {
 			this(text, decimalPlaces, false);
 		}
 
+		/**
+		 * Default constructor.
+		 * 
+		 * @param text
+		 *            the action's text, or <code>null</code> if there is no text
+		 * @param decimalPlaces
+		 *            the number of decimal places
+		 * @param isChecked
+		 *            whether or not this option is enabled
+		 * @see Action
+		 */
 		public SetTimeDecimalPlaces(String text, int decimalPlaces, boolean isChecked) {
 			super(text, Action.AS_RADIO_BUTTON);
 			this.decimalPlaces = decimalPlaces;
@@ -705,6 +857,40 @@ public class FormPreferencePanel implements IPreferencePanel {
 				event.setPreferenceMap(decimalPlacesPreference);
 				fireEvent(event);
 			}
+		}
+	}
+
+	/**
+	 * Option to switch between categorization based on request method or not.
+	 * 
+	 * @author Stefan Siegl
+	 */
+	private final class SwitchHttpCategorizationRequestMethod extends Action {
+
+		/**
+		 * Default Constructor.
+		 * 
+		 * @param text
+		 *            the action's text, or <code>null</code> if there is no text
+		 */
+		public SwitchHttpCategorizationRequestMethod(String text) {
+			super(text, AS_CHECK_BOX);
+			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_HTTP_AGGREGATION_REQUESTMESSAGE));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void run() {
+			PreferenceEvent event = new PreferenceEvent(PreferenceId.HTTP_AGGREGATION_REQUESTMETHOD);
+			Map<IPreferenceGroup, Object> httpCategoriation = new HashMap<IPreferenceGroup, Object>();
+			httpCategoriation.put(PreferenceId.HttpAggregationRequestMethod.BUTTON_HTTP_AGGREGATION_REQUESTMETHOD_ID, this.isChecked());
+			event.setPreferenceMap(httpCategoriation);
+			fireEvent(event);
+
+			// perform a refresh
+			update();
 		}
 	}
 

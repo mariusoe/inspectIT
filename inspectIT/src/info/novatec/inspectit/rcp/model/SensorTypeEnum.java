@@ -40,6 +40,10 @@ public enum SensorTypeEnum {
 	EXCEPTION_SENSOR_GROUPED("info.novatec.inspectit.agent.sensor.exception.ExceptionSensorOverview", InspectITConstants.IMG_FILTER),
 	/** The combined metrics sensor type. */
 	MARVIN_WORKFLOW("info.novatec.inspectit.agent.sensor.method.marvintimer.MarvinWorkflowSensor", InspectITConstants.IMG_INVOCATION),
+	/** The Http timer sensor type. */
+	HTTP_TIMER_SENSOR("info.novatec.inspectit.agent.sensor.method.http.HttpSensor", InspectITConstants.IMG_HTTP_AGGREGATE),
+	/** The Http timer sensor type. */
+	TAGGED_HTTP_TIMER_SENSOR("info.novatec.inspectit.agent.sensor.method.http.HttpSensor", InspectITConstants.IMG_HTTP_TAGGED),
 
 	/** The classloading information sensor type. */
 	CLASSLOADING_INFORMATION("info.novatec.inspectit.agent.sensor.platform.ClassLoadingInformation", InspectITConstants.IMG_CLASS_OVERVIEW),

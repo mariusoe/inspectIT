@@ -30,6 +30,9 @@
 		
 	<bean id="timerDataAccessService"
 		class="info.novatec.inspectit.cmr.service.TimerDataAccessService" />
+		
+	<bean id="httpTimerDataAccessService"
+		class="info.novatec.inspectit.cmr.service.HttpTimerDataAccessService" />
 
 	<bean name="globalDataAccessExporter"
 		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
@@ -99,6 +102,13 @@
 		<property name="service" ref="timerDataAccessService" />
 		<property name="serviceInterface"
 			value="info.novatec.inspectit.cmr.service.ITimerDataAccessService" />
+	</bean>
+	
+	<bean name="httpTimerDataAccessServiceExporter"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
+		<property name="service" ref="httpTimerDataAccessService" />
+		<property name="serviceInterface"
+			value="info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService" />
 	</bean>
 	
 </beans>

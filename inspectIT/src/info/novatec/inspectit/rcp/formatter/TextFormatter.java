@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.formatter;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
+import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationAwareData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
@@ -113,6 +114,8 @@ public final class TextFormatter {
 	 * 
 	 * @param percentage
 	 *            Percentage.
+	 * @param invocationsNumber
+	 *            the number of invocation in total
 	 * @return Styled string.
 	 */
 	public static StyledString getInvocationAffilliationPercentageString(int percentage, int invocationsNumber) {
@@ -154,15 +157,23 @@ public final class TextFormatter {
 		if (invAwareData instanceof SqlStatementData) {
 			SqlStatementData sqlData = (SqlStatementData) invAwareData;
 			return "SQL: " + sqlData.getSql();
+		} else if (invAwareData instanceof HttpTimerData) {
+			HttpTimerData timerData = (HttpTimerData) invAwareData;
+			// Print either URI or Usecase (tagged value) depending on the situation (which is
+			// filled, that is)
+			if (!HttpTimerData.UNDEFINED.equals(timerData.getUri())) {
+				return "URI: " + timerData.getUri();
+			} else {
+				return "Usecase: " + timerData.getInspectItTaggingHeaderValue();
+			}
+		} else if (invAwareData instanceof ExceptionSensorData) {
+			ExceptionSensorData exData = (ExceptionSensorData) invAwareData;
+			return "Exception: " + exData.getThrowableType();
 		} else if (invAwareData instanceof TimerData) {
 			TimerData timerData = (TimerData) invAwareData;
 			MethodIdent methodIdent = repositoryDefinition.getGlobalDataAccessService().getMethodIdentForId(timerData.getMethodIdent());
 			return TextFormatter.getMethodString(methodIdent);
-		} else if (invAwareData instanceof ExceptionSensorData) {
-			ExceptionSensorData exData = (ExceptionSensorData) invAwareData;
-			return "Exception: " + exData.getThrowableType();
 		}
 		return "";
 	}
-
 }

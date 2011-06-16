@@ -5,6 +5,7 @@ import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
+import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
@@ -26,11 +27,10 @@ import java.util.TreeMap;
 import org.eclipse.core.runtime.Assert;
 
 /**
- * The manager is used to create a tree model currently used by the
- * {@link ServerView}.
+ * The manager is used to create a tree model currently used by the {@link ServerView}.
  * 
  * @author Patrice Bouillet
- * @author Eduard Tudenhöfner
+ * @author Eduard Tudenh��fner
  * @author Stefan Siegl
  */
 public class TreeModelManager {
@@ -46,8 +46,8 @@ public class TreeModelManager {
 	private static final String METHOD_FORMAT = "%s(%s)";
 
 	/**
-	 * Every tree model manager needs a reference to a
-	 * {@link RepositoryDefinition} which reflects a CMR.
+	 * Every tree model manager needs a reference to a {@link RepositoryDefinition} which reflects a
+	 * CMR.
 	 * 
 	 * @param repositoryDefinition
 	 *            The definition of the repository / CMR.
@@ -93,6 +93,7 @@ public class TreeModelManager {
 			agentTree.addChild(getInvocationSequenceTree(platformIdent, repositoryDefinition));
 			agentTree.addChild(getSqlTree(platformIdent, repositoryDefinition));
 			agentTree.addChild(getTimerTree(platformIdent, repositoryDefinition));
+			agentTree.addChild(getHttpTimerTree(platformIdent, repositoryDefinition));
 			agentTree.addChild(getSystemOverviewTree(platformIdent, repositoryDefinition));
 			agentTree.addChild(getExceptionSensorTree(platformIdent, repositoryDefinition));
 			agentTree.addChild(getCombinedMetricsTree(platformIdent, repositoryDefinition));
@@ -111,8 +112,8 @@ public class TreeModelManager {
 	 *            The platform ID used to create the sub-tree.
 	 * @param definition
 	 *            The {@link RepositoryDefinition} object.
-	 * @return a list containing the root and all children representing the
-	 *         instrumented methods in the target VM.
+	 * @return a list containing the root and all children representing the instrumented methods in
+	 *         the target VM.
 	 */
 	protected Component getInstrumentedMethodsTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		DeferredInstrumentationBrowserComposite instrumentedMethods = new DeferredInstrumentationBrowserComposite();
@@ -158,9 +159,11 @@ public class TreeModelManager {
 		inputDefinition.setIdDefinition(idDefinition);
 		showAll.setInputDefinition(inputDefinition);
 
-		/*Component search = new Leaf();
-		search.setName("Search");
-		search.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_SEARCH));*/
+		/*
+		 * Component search = new Leaf(); search.setName("Search");
+		 * search.setImageDescriptor(InspectIT
+		 * .getDefault().getImageDescriptor(InspectITConstants.IMG_SEARCH));
+		 */
 
 		Composite browser = new Composite();
 		browser.setName("Browser");
@@ -192,7 +195,7 @@ public class TreeModelManager {
 		}
 
 		invocationSequence.addChild(showAll);
-		/*invocationSequence.addChild(search);*/
+		/* invocationSequence.addChild(search); */
 		invocationSequence.addChild(browser);
 
 		return invocationSequence;
@@ -301,14 +304,12 @@ public class TreeModelManager {
 	}
 
 	/**
-	 * Checks if the {@link SensorTypeEnum} is used for this {@link MethodIdent}
-	 * .
+	 * Checks if the {@link SensorTypeEnum} is used for this {@link MethodIdent} .
 	 * 
 	 * @param sensorType
 	 *            The {@link SensorTypeEnum} object to compare to.
 	 * @param methodIdent
-	 *            The {@link MethodIdent} object from the server to check
-	 *            against the sensor type.
+	 *            The {@link MethodIdent} object from the server to check against the sensor type.
 	 * @return Returns the value of the sensor type ID.
 	 */
 	@SuppressWarnings("unchecked")
@@ -355,33 +356,29 @@ public class TreeModelManager {
 		inputDefinition.setIdDefinition(idDefinition);
 		showAll.setInputDefinition(inputDefinition);
 
-		/*Composite filters = new Composite();
-		filters.setName("Predefined Filters");
-		filters.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_FILTER));
-
-		Component lastHour = new Leaf();
-		lastHour.setName("Last Hour");
-		lastHour.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_LAST_HOUR));
-
-		Component thisDay = new Leaf();
-		thisDay.setName("This Day");
-		thisDay.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_THIS_DAY));
-
-		Component lastWeek = new Leaf();
-		lastWeek.setName("Last Week");
-		lastWeek.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_LAST_WEEK));
-
-		filters.addChild(lastHour);
-		filters.addChild(thisDay);
-		filters.addChild(lastWeek);
-
-		Component search = new Leaf();
-		search.setName("Search");
-		search.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_SEARCH));*/
+		/*
+		 * Composite filters = new Composite(); filters.setName("Predefined Filters");
+		 * filters.setImageDescriptor
+		 * (InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_FILTER)); Component
+		 * lastHour = new Leaf(); lastHour.setName("Last Hour");
+		 * lastHour.setImageDescriptor(InspectIT
+		 * .getDefault().getImageDescriptor(InspectITConstants.IMG_LAST_HOUR)); Component thisDay =
+		 * new Leaf(); thisDay.setName("This Day");
+		 * thisDay.setImageDescriptor(InspectIT.getDefault()
+		 * .getImageDescriptor(InspectITConstants.IMG_THIS_DAY)); Component lastWeek = new Leaf();
+		 * lastWeek.setName("Last Week");
+		 * lastWeek.setImageDescriptor(InspectIT.getDefault().getImageDescriptor
+		 * (InspectITConstants.IMG_LAST_WEEK)); filters.addChild(lastHour);
+		 * filters.addChild(thisDay); filters.addChild(lastWeek); Component search = new Leaf();
+		 * search.setName("Search");
+		 * search.setImageDescriptor(InspectIT.getDefault().getImageDescriptor
+		 * (InspectITConstants.IMG_SEARCH));
+		 */
 
 		invocationSequence.addChild(showAll);
-		/*invocationSequence.addChild(filters);
-		invocationSequence.addChild(search);*/
+		/*
+		 * invocationSequence.addChild(filters); invocationSequence.addChild(search);
+		 */
 
 		return invocationSequence;
 	}
@@ -801,7 +798,7 @@ public class TreeModelManager {
 
 		return combinedMetrics;
 	}
-	
+
 	/**
 	 * Returns the Timer data tree.
 	 * 
@@ -836,6 +833,69 @@ public class TreeModelManager {
 		showAll.setInputDefinition(inputDefinition);
 
 		timerDataComposite.addChild(showAll);
+
+		return timerDataComposite;
+	}
+
+	/**
+	 * Returns the Http Timer data tree.
+	 * 
+	 * @param platformIdent
+	 *            The platform ident used to create the tree.
+	 * @param definition
+	 *            The {@link RepositoryDefinition} object.
+	 * @return The timer data tree.
+	 */
+	private Component getHttpTimerTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
+		Composite timerDataComposite = new Composite();
+		timerDataComposite.setName("Http Timer Data");
+		timerDataComposite.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_HTTP));
+
+		Component urlAggregationView = new Leaf();
+		urlAggregationView.setName("URI Aggregation");
+		urlAggregationView.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_HTTP_AGGREGATE));
+		urlAggregationView.setTooltip("Aggregates all http requests that are currently in the buffer based on its URI");
+
+		InputDefinition inputDefinition = new InputDefinition();
+		inputDefinition.setRepositoryDefinition(definition);
+		inputDefinition.setId(SensorTypeEnum.HTTP_TIMER_SENSOR);
+		inputDefinition.setPartName("Http (" + platformIdent.getAgentName() + ")");
+		inputDefinition.setPartTooltip("Aggregates all http requests that are currently in the buffer based on its URI");
+		inputDefinition.setImageDescriptor(SensorTypeEnum.HTTP_TIMER_SENSOR.getImageDescriptor());
+		inputDefinition.setHeaderText("URI based aggregation");
+		inputDefinition.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+
+		IdDefinition idDefinition = new IdDefinition();
+		idDefinition.setPlatformId(platformIdent.getId());
+
+		inputDefinition.setIdDefinition(idDefinition);
+		urlAggregationView.setInputDefinition(inputDefinition);
+
+		timerDataComposite.addChild(urlAggregationView);
+
+		Component taggedView = new Leaf();
+		taggedView.setName("Use Case Aggregation");
+		taggedView.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_HTTP_TAGGED));
+		taggedView.setTooltip("Aggregates all http request that are currently in the buffer based on a the concrete value of the inspectIT Tag Header (called \""
+				+ HttpTimerData.INSPECTIT_TAGGING_HEADER + "\")");
+
+		inputDefinition = new InputDefinition();
+		inputDefinition.setRepositoryDefinition(definition);
+		inputDefinition.setId(SensorTypeEnum.TAGGED_HTTP_TIMER_SENSOR);
+		inputDefinition.setPartName("Use Case Http (" + platformIdent.getAgentName() + ")");
+		inputDefinition.setPartTooltip("Aggregates all http request that are currently in the buffer based on a the concrete value of the inspectIT Tag Header (called \""
+				+ HttpTimerData.INSPECTIT_TAGGING_HEADER + "\")");
+		inputDefinition.setImageDescriptor(SensorTypeEnum.TAGGED_HTTP_TIMER_SENSOR.getImageDescriptor());
+		inputDefinition.setHeaderText("Use Case based aggregation");
+		inputDefinition.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+
+		idDefinition = new IdDefinition();
+		idDefinition.setPlatformId(platformIdent.getId());
+
+		inputDefinition.setIdDefinition(idDefinition);
+		taggedView.setInputDefinition(inputDefinition);
+
+		timerDataComposite.addChild(taggedView);
 
 		return timerDataComposite;
 	}

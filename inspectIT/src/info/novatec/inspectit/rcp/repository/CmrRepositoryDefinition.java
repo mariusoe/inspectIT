@@ -4,6 +4,7 @@ import info.novatec.inspectit.cmr.service.IBufferService;
 import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
+import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
@@ -13,6 +14,7 @@ import info.novatec.inspectit.rcp.repository.service.cmr.BufferService;
 import info.novatec.inspectit.rcp.repository.service.cmr.CombinedMetricsDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.cmr.ExceptionDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.cmr.GlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.cmr.HttpTimerDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.cmr.InvocationDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.cmr.LicenseService;
 import info.novatec.inspectit.rcp.repository.service.cmr.ServerStatusService;
@@ -84,14 +86,19 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	 * The buffer data access service.
 	 */
 	private IBufferService bufferService;
-	
+
 	/**
 	 * The timer data access service.
 	 */
 	private ITimerDataAccessService timerDataAccessService;
+
 	/**
-	 * The only constructor of this class. The ip and port is mandatory to
-	 * create the connection.
+	 * The http timer data access service.
+	 */
+	private IHttpTimerDataAccessService httpTimerDataAccessService;
+
+	/**
+	 * The only constructor of this class. The ip and port is mandatory to create the connection.
 	 * 
 	 * @param ip
 	 *            The ip of the CMR.
@@ -112,6 +119,7 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 		configurationInterfaceDataAccessService = new ConfigurationInterfaceDataAccessService(ip, port);
 		bufferService = new BufferService(ip, port);
 		timerDataAccessService = new TimerDataAccessService(ip, port);
+		httpTimerDataAccessService = new HttpTimerDataAccessService(ip, port);
 	}
 
 	/**
@@ -174,7 +182,7 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	public ILicenseService getLicenseService() {
 		return licenseService;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -182,13 +190,21 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	public IBufferService getBufferService() {
 		return bufferService;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public ITimerDataAccessService getTimerDataAccessService() {
 		return timerDataAccessService;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public IHttpTimerDataAccessService getHttpTimerDataAccessService() {
+		return httpTimerDataAccessService;
 	}
 
 	/**
@@ -214,5 +230,4 @@ public class CmrRepositoryDefinition implements RepositoryDefinition {
 	public String toString() {
 		return "Repository definition :: IP=" + ip + " Port=" + port;
 	}
-
 }

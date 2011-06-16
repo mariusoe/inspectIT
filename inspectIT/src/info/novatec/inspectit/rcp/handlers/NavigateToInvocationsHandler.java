@@ -3,6 +3,7 @@ package info.novatec.inspectit.rcp.handlers;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.ExceptionEventEnum;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
+import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationAwareData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
@@ -126,7 +127,7 @@ public class NavigateToInvocationsHandler extends AbstractHandler {
 				template.setSql(((SqlStatementData) invocationAwareData).getSql());
 				template.setMethodIdent(((SqlStatementData) invocationAwareData).getMethodIdent());
 				steppableTemplates.add(template);
-			} else if (invocationAwareData instanceof TimerData) {
+			} else if (invocationAwareData instanceof TimerData && !invocationAwareData.getClass().equals(HttpTimerData.class)) {
 				TimerData template = OccurrenceFinderFactory.getEmptyTemplate((TimerData) invocationAwareData);
 				template.setMethodIdent(((TimerData) invocationAwareData).getMethodIdent());
 				steppableTemplates.add(template);

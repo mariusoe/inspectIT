@@ -82,13 +82,13 @@ public interface IObjectSizes {
 	long getSizeOfHashMap(int hashMapSize);
 
 	/**
-	 * Calculates the approximate size of the {@link ConcurrentHashMap} object. The calculation does
-	 * not include the size of elements that are in the map. The calculation may not be correct for
+	 * Calculates the approximate size of the ConcurrentHashMap object. The calculation does not
+	 * include the size of elements that are in the map. The calculation may not be correct for
 	 * other map types.
 	 * 
 	 * @param hashMap
 	 *            Concurrent HashMap size that has to be calculated.
-	 * @return Size of {@link ConcurrentHashMap} object in bytes.
+	 * @return Size of ConcurrentHashMap object in bytes.
 	 */
 	long getSizeOfConcurrentHashMap(int mapSize, int concurrencyLevel);
 
@@ -144,4 +144,14 @@ public interface IObjectSizes {
 	 *            0.2.
 	 */
 	void setObjectSecurityExpansionRate(float objectSecurityExpansionRate);
+
+	/**
+	 * Calculates the size of the array with out objects in the array - <b> Can only be used on
+	 * non-primitive arrays </b>.
+	 * 
+	 * @param arraySize
+	 *            Size of array (length).
+	 * @return Size in bytes.
+	 */
+	public long getSizeOfArray(int arraySize);
 }

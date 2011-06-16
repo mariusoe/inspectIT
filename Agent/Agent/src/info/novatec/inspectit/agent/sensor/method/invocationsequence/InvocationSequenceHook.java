@@ -16,6 +16,7 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.SystemSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
+import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
@@ -294,8 +295,15 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 			}
 		}
 
+		if (dataObject.getClass().equals(HttpTimerData.class)) {
+			// don't overwrite ourself but overwrite timers
+			if (null == invocationSequenceData.getTimerData() || invocationSequenceData.getTimerData().getClass().equals(TimerData.class)) {
+				invocationSequenceData.setTimerData((HttpTimerData) dataObject);
+			}
+		}
+
 		if (dataObject.getClass().equals(TimerData.class)) {
-			// don't overwrite an already existing timerdata object.
+			// don't overwrite an already existing timerdata or httptimerdata object.
 			if (null == invocationSequenceData.getTimerData()) {
 				invocationSequenceData.setTimerData((TimerData) dataObject);
 			}

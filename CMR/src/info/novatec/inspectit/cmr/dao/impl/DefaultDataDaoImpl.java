@@ -45,7 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Patrice Bouillet
  * @author Eduard Tudenhoefner
  * @author Ivan Senic
- * 
+ * @author Stefan Siegl
  */
 public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDataDao {
 
@@ -212,19 +212,22 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 		}
 
 		if (null != invData.getTimerData()) {
+			TimerData data = invData.getTimerData();
 			double exclusiveTime = invData.getTimerData().getDuration() - exclusiveDurationDelta;
-			invData.getTimerData().setExclusiveCount(1L);
-			invData.getTimerData().setExclusiveDuration(exclusiveTime);
-			invData.getTimerData().calculateExclusiveMax(exclusiveTime);
-			invData.getTimerData().calculateExclusiveMin(exclusiveTime);
+			data.setExclusiveCount(1L);
+			data.setExclusiveDuration(exclusiveTime);
+			data.calculateExclusiveMax(exclusiveTime);
+			data.calculateExclusiveMin(exclusiveTime);
 
-			if (saveTimerDataToDatabase) {
-				timerDataAggregator.processTimerData(invData.getTimerData());
+			// Ensure not to save HttpTimerData!
+			if (saveTimerDataToDatabase && data.getClass().equals(TimerData.class)) {
+				timerDataAggregator.processTimerData(data);
+
 			}
-			cacheIdGenerator.assignObjectAnId(invData.getTimerData());
-			invData.getTimerData().addInvocationParentId(topInvocationParent.getId());
+			cacheIdGenerator.assignObjectAnId(data);
+			data.addInvocationParentId(topInvocationParent.getId());
 			try {
-				indexingTree.put(invData.getTimerData());
+				indexingTree.put(data);
 			} catch (IndexingException e) {
 				// indexing exception should not happen
 				LOGGER.error(e.getMessage(), e);

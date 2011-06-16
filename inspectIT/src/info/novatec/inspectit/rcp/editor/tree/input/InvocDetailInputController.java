@@ -4,6 +4,7 @@ import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
+import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
@@ -23,8 +24,10 @@ import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessServi
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jface.dialogs.PopupDialog;
@@ -251,7 +254,24 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Sorts a given collection. As the JDK Collections class only provides to sort for
+	 * <code>List</code> classes we initially create a list based on the given collection, sort this
+	 * list and return it.
+	 * 
+	 * @param <T>
+	 *            The type
+	 * @param c
+	 *            The collection to be sorted
+	 * @return a sorted <code>ArrayList</code> of the elements contained in the given collection.
+	 */
+	private <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {
+		List<T> list = new ArrayList<T>(c);
+		java.util.Collections.sort(list);
+		return list;
+	}
+
+	/**
+	 * shows the details of an invocation sequence.
 	 */
 	public void showDetails(Shell parent, Object element) {
 		final InvocationSequenceData data = (InvocationSequenceData) element;
@@ -316,9 +336,81 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 				content += "Parameters: " + methodIdent.getParameters() + "\n";
 
 				if (null != data.getTimerData()) {
-					TimerData timer = data.getTimerData();
-					content += "\n";
-					content += "Method duration: " + timer.getDuration() + "\n";
+					if (data.getTimerData().getClass().equals(HttpTimerData.class)) {
+						HttpTimerData httpData = (HttpTimerData) data.getTimerData();
+						content += "\n";
+						content += "URI: " + httpData.getUri() + "\n";
+						content += "Request-method: " + httpData.getRequestMethod() + "\n";
+
+						// -- Parameters
+						content += "Parameters:";
+						Map<String, String[]> paramMap = httpData.getParameters();
+						if (null == paramMap) {
+							content += " <none>\n";
+						} else {
+							content += "\n";
+							List<String> paramKeys = asSortedList(paramMap.keySet());
+							for (String string : paramKeys) {
+								String[] value = paramMap.get(string);
+								String paramValueDisplay = "";
+								for (int i = 0; i < value.length; i++) {
+									paramValueDisplay += "[" + value[i] + "]";
+									if (i + 1 < value.length) {
+										paramValueDisplay += ", ";
+									}
+								}
+								content += "  " + string + ": " + paramValueDisplay + "\n";
+							}
+						}
+
+						// -- Attributes
+						content += "Attributes:";
+						Map<String, String> attrMap = httpData.getAttributes();
+						if (null == attrMap) {
+							content += " <none>\n";
+						} else {
+							content += "\n";
+							List<String> attrKeys = asSortedList(attrMap.keySet());
+							for (String string : attrKeys) {
+								content += "  " + string + ": " + attrMap.get(string) + "\n";
+							}
+						}
+
+						// -- Headers
+						content += "Headers:";
+						Map<String, String> headerMap = httpData.getHeaders();
+						if (null == headerMap) {
+							content += " <none>\n";
+						} else {
+							content += "\n";
+							List<String> headerKeys = asSortedList(headerMap.keySet());
+							for (String string : headerKeys) {
+								content += "  " + string + ": " + headerMap.get(string) + "\n";
+							}
+						}
+
+						// -- Session Attributes
+						content += "Session Attributes:";
+						Map<String, Object> sessionAttributeMap = httpData.getSessionAttributes();
+						if (null == sessionAttributeMap) {
+							content += " <none>\n";
+						} else {
+							content += "\n";
+							List<String> sessionAttKeys = asSortedList(sessionAttributeMap.keySet());
+							for (String string : sessionAttKeys) {
+								content += "  " + string + ": " + sessionAttributeMap.get(string) + "\n";
+							}
+						}
+
+						content += "\n";
+					} else if (data.getTimerData().getClass().equals(TimerData.class)) {
+						TimerData timer = data.getTimerData();
+						content += "\n";
+						content += "Method duration: " + timer.getDuration() + "\n";
+					} else {
+						// Fail fast and hard!
+						InspectIT.getDefault().createErrorDialog("Invalid timer data realization " + data.getClass(), -1);
+					}
 				} else if (null == data.getParentSequence()) {
 					content += "\n";
 					content += "Invocation duration: " + data.getDuration() + "\n";
@@ -561,6 +653,16 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			return styledString;
 		case PARAMETER:
 			styledString = new StyledString();
+
+			if (null != data.getTimerData() && data.getTimerData().getClass().equals(HttpTimerData.class)) {
+				HttpTimerData httpTimer = (HttpTimerData) data.getTimerData();
+				if (null != httpTimer.getUri()) {
+					styledString.append("URI: ");
+					styledString.append(httpTimer.getUri());
+					styledString.append(" | ");
+				}
+			}
+
 			if (null != data.getParameterContentData()) {
 				@SuppressWarnings("unchecked")
 				Set<ParameterContentData> parameters = data.getParameterContentData();

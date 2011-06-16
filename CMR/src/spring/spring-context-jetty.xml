@@ -197,6 +197,25 @@
 		<property name="servletName" value="timerDataAccessServiceExporter" />
 		<property name="pathSpec" value="/remoting/TimerDataAccessService" />
 	</bean>
+	
+	
+	<!-- HTTP Timer Data Access Service -->
+	<bean name="httpTimerDataAccessServiceRequestHandlerServlet"
+		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
+	</bean>
+
+	<bean id="httpTimerDataAccessServiceServletHolder"
+		class="org.mortbay.jetty.servlet.ServletHolder">
+		<property name="name" value="httpTimerDataAccessServiceExporter" />
+		<property name="servlet" ref="httpTimerDataAccessServiceRequestHandlerServlet" />
+	</bean>
+	
+	
+	<bean id="httpTimerDataAccessServiceServiceMapping"
+		class="org.mortbay.jetty.servlet.ServletMapping">
+		<property name="servletName" value="httpTimerDataAccessServiceExporter" />
+		<property name="pathSpec" value="/remoting/HttpTimerDataAccessService" />
+	</bean>
 	<!-- END -->
 
 	<bean id="servletHandler" class="org.mortbay.jetty.servlet.ServletHandler">
@@ -212,6 +231,7 @@
 				<ref bean="configurationInterfaceDataAccessServletHolder" />
 				<ref bean="bufferServiceServletHolder" />
 				<ref bean="timerDataAccessServiceServletHolder" />
+				<ref bean="httpTimerDataAccessServiceServletHolder" />
 			</list>
 		</property>
 		<property name="servletMappings">
@@ -226,6 +246,7 @@
 				<ref bean="configurationInterfaceDataAccessServiceMapping" />
 				<ref bean="bufferServiceServiceMapping" />
 				<ref bean="timerDataAccessServiceServiceMapping" />
+				<ref bean="httpTimerDataAccessServiceServiceMapping" />
 			</list>
 		</property>
 	</bean>

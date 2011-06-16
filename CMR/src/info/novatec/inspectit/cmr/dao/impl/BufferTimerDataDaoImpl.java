@@ -37,7 +37,7 @@ public class BufferTimerDataDaoImpl implements TimerDataDao {
 	public List<TimerData> getAggregatedTimerData(TimerData timerData) {
 		return this.getAggregatedTimerData(timerData, null, null);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -45,7 +45,11 @@ public class BufferTimerDataDaoImpl implements TimerDataDao {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
 		query.setPlatformIdent(timerData.getPlatformIdent());
 		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
+		// we need to add the subclasses that are timers manually as the search will not include
+		// subclasses by default
 		searchedClasses.add(TimerData.class);
+		// HttpTimerData will not be shown in the timer data view (we also do not show SQL data).
+		// searchedClasses.add(HttpTimerData.class);
 		query.setObjectClasses(searchedClasses);
 		if (null != fromDate) {
 			query.setFromDate(new Timestamp(fromDate.getTime()));
@@ -53,7 +57,7 @@ public class BufferTimerDataDaoImpl implements TimerDataDao {
 		if (null != toDate) {
 			query.setToDate(new Timestamp(toDate.getTime()));
 		}
-		
+
 		List<TimerData> allTimerData = indexingTree.query(query);
 		Map<Long, TimerData> aggregatedMap = new HashMap<Long, TimerData>();
 		List<TimerData> aggregatedResults = new ArrayList<TimerData>();

@@ -482,6 +482,11 @@
                                  value="info.novatec.inspectit.communication.data.SqlStatementData">
                            </instanceof>
                         </not>
+                        <not>
+                           <instanceof
+                                 value="info.novatec.inspectit.communication.data.HttpTimerData">
+                           </instanceof>
+                        </not>
                      </and>
                      <instanceof
                            value="info.novatec.inspectit.communication.data.InvocationSequenceData">
@@ -574,9 +579,16 @@
                   </or>
                </with>
                <iterate>
-                  <instanceof
-                        value="info.novatec.inspectit.communication.MethodSensorData">
-                  </instanceof>
+                  <and>
+                     <instanceof
+                           value="info.novatec.inspectit.communication.MethodSensorData">
+                     </instanceof>
+                     <not>
+                        <instanceof
+                              value="info.novatec.inspectit.communication.data.HttpTimerData">
+                        </instanceof>
+                     </not>
+                  </and>
                </iterate>
             </and>
          </activeWhen>

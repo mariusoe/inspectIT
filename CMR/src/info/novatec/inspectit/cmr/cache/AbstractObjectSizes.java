@@ -2,7 +2,6 @@ package info.novatec.inspectit.cmr.cache;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This is an abstract class that holds general calculations and object sizes that are equal in both
@@ -107,11 +106,11 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 		size += this.getSizeOfHashMapFrontCache(hashMapSize);
 
 		// To each hash map I add 16 bytes because keySet, entrySet and values fields, that can each
-		// hold 16 bytes 
+		// hold 16 bytes
 		// These fields are null until these sets are requested by user.
 		// Thus I add for one
 		size += 16;
-		
+
 		return alignTo8Bytes(size);
 	}
 
@@ -172,20 +171,21 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	}
 
 	/**
-	 * Calculates the size of the array with out objects in the array.
+	 * Calculates the size of the array with out objects in the array - <b> Can only be used on
+	 * non-primitive arrays </b>.
 	 * 
 	 * @param arraySize
 	 *            Size of array (length).
 	 * @return Size in bytes.
 	 */
-	private long getSizeOfArray(int arraySize) {
+	public long getSizeOfArray(int arraySize) {
 		long size = this.getSizeOfObject();
-		size += this.getPrimitiveTypesSize(1 + arraySize, 0, 0, 0, 0, 0);
+		size += this.getPrimitiveTypesSize(arraySize, 0, 1, 0, 0, 0);
 		return alignTo8Bytes(size);
 	}
 
 	/**
-	 * Calculates the size of the {@link ConcurrentHashMap} seqment.
+	 * Calculates the size of the ConcurrentHashMap seqment.
 	 * 
 	 * @return Size in bytes.
 	 */

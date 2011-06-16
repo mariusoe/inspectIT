@@ -4,6 +4,7 @@ import info.novatec.inspectit.cmr.service.IBufferService;
 import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
+import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
@@ -102,4 +103,11 @@ public interface RepositoryDefinition {
 	 * @return The timer data access service.
 	 */
 	ITimerDataAccessService getTimerDataAccessService();
+
+	/**
+	 * Returns the http timer data access service for this repository definition.
+	 * 
+	 * @return The http timer data access service.
+	 */
+	IHttpTimerDataAccessService getHttpTimerDataAccessService();
 }

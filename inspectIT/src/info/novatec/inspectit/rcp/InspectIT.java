@@ -53,6 +53,12 @@ public class InspectIT extends AbstractUIPlugin {
 
 	/**
 	 * This method is called upon plug-in activation.
+	 * 
+	 * @param context
+	 *            the Context.
+	 * 
+	 * @throws Exception
+	 *             in case of error.
 	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
@@ -67,6 +73,12 @@ public class InspectIT extends AbstractUIPlugin {
 
 	/**
 	 * This method is called when the plug-in is stopped.
+	 * 
+	 * @param context
+	 *            the Context.
+	 * 
+	 * @throws Exception
+	 *             in case of error.
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
@@ -76,6 +88,8 @@ public class InspectIT extends AbstractUIPlugin {
 
 	/**
 	 * Returns the shared instance.
+	 * 
+	 * @return the default.
 	 */
 	public static InspectIT getDefault() {
 		return plugin;
@@ -155,6 +169,10 @@ public class InspectIT extends AbstractUIPlugin {
 		addImageToRegistry(reg, InspectITConstants.IMG_RIGHT_DOWN_ARROW);
 		addImageToRegistry(reg, InspectITConstants.IMG_TRASH);
 		addImageToRegistry(reg, InspectITConstants.IMG_TOOL);
+		addImageToRegistry(reg, InspectITConstants.IMG_HTTP);
+		addImageToRegistry(reg, InspectITConstants.IMG_HTTP_AGGREGATE);
+		addImageToRegistry(reg, InspectITConstants.IMG_HTTP_TAGGED);
+		addImageToRegistry(reg, InspectITConstants.IMG_HTTP_AGGREGATION_REQUESTMESSAGE);
 	}
 
 	/**
@@ -232,6 +250,20 @@ public class InspectIT extends AbstractUIPlugin {
 	 */
 	public void createErrorDialog(String message, Throwable throwable, int code) {
 		IStatus status = new Status(IStatus.ERROR, ID, code, message, throwable);
+		StatusManager.getManager().handle(status, StatusManager.SHOW);
+	}
+
+	/**
+	 * Creates a simple error dialog without exception.
+	 * 
+	 * @param message
+	 *            The message of the dialog.
+	 * @param code
+	 *            The code of the error. <b>-1</b> is a marker that the code has to be added later.
+	 */
+	public void createErrorDialog(String message, int code) {
+		// Status sets exception to <code>null</code> internally.
+		IStatus status = new Status(IStatus.ERROR, ID, code, message, null);
 		StatusManager.getManager().handle(status, StatusManager.SHOW);
 	}
 

@@ -6,6 +6,12 @@
 				name="info.novatec.inspectit.agent.sensor.method.timer.test.TimerHookTest" />
 		</classes>
 	</test>
+	<test name="HTTP Timer Hook">
+		<classes>
+			<class
+				name="info.novatec.inspectit.agent.sensor.method.http.test.HttpHookTest" />
+		</classes>
+	</test>
 	<test name="ClassLoading Sensor Test">
 		<classes>
 			<class

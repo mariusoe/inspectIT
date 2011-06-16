@@ -66,6 +66,11 @@ public interface InspectITConstants {
 	String IMG_TRASH = "trash.png"; //$NON-NLS-1$
 	String IMG_TOOL = "tool.png"; //$NON-NLS-1$
 
+	String IMG_HTTP = "http_clean.png"; //$NON-NLS-1$
+	String IMG_HTTP_AGGREGATE = "http_network.png"; //$NON-NLS-1$
+	String IMG_HTTP_TAGGED = "http_screwdriver.png"; //$NON-NLS-1$
+	String IMG_HTTP_AGGREGATION_REQUESTMESSAGE = "http_aggregation_request_method.png"; //$NON-NLS-1$
+
 	String OVERLAY_PRIORITY = "overlay_priority.gif"; //$NON-NLS-1$
 	String OVERLAY_UP = "overlay_up.png"; //$NON-NLS-1$
 	String OVERLAY_ERROR = "overlay_error.gif"; //$NON-NLS-1$

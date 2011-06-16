@@ -11,11 +11,13 @@ import info.novatec.inspectit.rcp.editor.table.input.AggregatedTimerSummaryInput
 import info.novatec.inspectit.rcp.editor.table.input.CombinedMetricsInputController;
 import info.novatec.inspectit.rcp.editor.table.input.ExceptionSensorInvocInputController;
 import info.novatec.inspectit.rcp.editor.table.input.GroupedExceptionOverviewInputController;
+import info.novatec.inspectit.rcp.editor.table.input.HttpTimerDataInputController;
 import info.novatec.inspectit.rcp.editor.table.input.InvocOverviewInputController;
 import info.novatec.inspectit.rcp.editor.table.input.MethodInvocInputController;
 import info.novatec.inspectit.rcp.editor.table.input.NavigationInvocOverviewInputController;
 import info.novatec.inspectit.rcp.editor.table.input.SqlInputController;
 import info.novatec.inspectit.rcp.editor.table.input.SqlInvocInputController;
+import info.novatec.inspectit.rcp.editor.table.input.TaggedHttpTimerDataInputController;
 import info.novatec.inspectit.rcp.editor.table.input.TimerDataInputController;
 import info.novatec.inspectit.rcp.editor.table.input.UngroupedExceptionOverviewInputController;
 import info.novatec.inspectit.rcp.editor.text.TextSubView;
@@ -29,7 +31,6 @@ import info.novatec.inspectit.rcp.editor.tree.SteppingTreeSubView;
 import info.novatec.inspectit.rcp.editor.tree.TreeSubView;
 import info.novatec.inspectit.rcp.editor.tree.input.ExceptionMessagesTreeInputController;
 import info.novatec.inspectit.rcp.editor.tree.input.ExceptionTreeInputController;
-import info.novatec.inspectit.rcp.editor.tree.input.InvocDetailInputController;
 import info.novatec.inspectit.rcp.editor.tree.input.SteppingInvocDetailInputController;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 
@@ -52,12 +53,10 @@ public final class SubViewFactory {
 	}
 
 	/**
-	 * Creates a default {@link ISubView} object based on the passed
-	 * {@link SensorTypeEnum}.
+	 * Creates a default {@link ISubView} object based on the passed {@link SensorTypeEnum}.
 	 * 
 	 * @param sensorTypeEnum
-	 *            The sensor type on which the default view controller is based
-	 *            on.
+	 *            The sensor type on which the default view controller is based on.
 	 * @return An instance of a {@link ISubView}.
 	 */
 	public static ISubView createSubView(SensorTypeEnum sensorTypeEnum) {
@@ -100,7 +99,7 @@ public final class SubViewFactory {
 			ISubView invocSql = new TableSubView(new SqlInvocInputController());
 			ISubView invocMethods = new TableSubView(new MethodInvocInputController());
 			ISubView invocExceptions = new TableSubView(new ExceptionSensorInvocInputController());
-//			ISubView traceInspector = new TraceInspectorSubView();
+			// ISubView traceInspector = new TraceInspectorSubView();
 
 			invocTabbedSubView.addSubView(invocDetails, "Call Hierarchy", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CALL_HIERARCHY));
 			invocTabbedSubView.addSubView(invocSql, "SQL", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_DATABASE));
@@ -153,7 +152,7 @@ public final class SubViewFactory {
 			ISubView invocSql1 = new TableSubView(new SqlInvocInputController());
 			ISubView invocMethods1 = new TableSubView(new MethodInvocInputController());
 			ISubView invocExceptions1 = new TableSubView(new ExceptionSensorInvocInputController());
-//			ISubView traceInspector = new TraceInspectorSubView();
+			// ISubView traceInspector = new TraceInspectorSubView();
 
 			invocTabbedSubView1.addSubView(invocDetails1, "Call Hierarchy", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CALL_HIERARCHY));
 			invocTabbedSubView1.addSubView(invocSql1, "SQL", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_DATABASE));
@@ -166,10 +165,18 @@ public final class SubViewFactory {
 			invocSubView1.addSubView(invocTabbedSubView1, 2);
 
 			return invocSubView1;
-		case AGGREGATED_TIMER_DATA: 
+		case AGGREGATED_TIMER_DATA:
 			SashCompositeSubView timerSashSubView = new SashCompositeSubView();
 			timerSashSubView.addSubView(new TableSubView(new TimerDataInputController()));
 			return timerSashSubView;
+		case HTTP_TIMER_SENSOR:
+			SashCompositeSubView httpSashSubView = new SashCompositeSubView();
+			httpSashSubView.addSubView(new TableSubView(new HttpTimerDataInputController()));
+			return httpSashSubView;
+		case TAGGED_HTTP_TIMER_SENSOR:
+			SashCompositeSubView taggedHttpSashSubView = new SashCompositeSubView();
+			taggedHttpSashSubView.addSubView(new TableSubView(new TaggedHttpTimerDataInputController()));
+			return taggedHttpSashSubView;
 		default:
 			throw new IllegalArgumentException("Could not create sub-view. Not supported: " + sensorTypeEnum.toString());
 		}

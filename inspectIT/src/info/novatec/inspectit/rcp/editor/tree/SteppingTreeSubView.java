@@ -86,7 +86,7 @@ public class SteppingTreeSubView extends TreeSubView {
 			steppingControl = new SteppingControl(subComposite, toolkit, steppingTreeInputController.getSteppingObjectList());
 		}
 
-		if (steppingTreeInputController.initSteppingControlVisible()) {
+		if (steppingTreeInputController.initSteppingControlVisible() && null != steppingTreeInputController.getSteppingObjectList() && !steppingTreeInputController.getSteppingObjectList().isEmpty()) {
 			steppingControl.showControl();
 		}
 

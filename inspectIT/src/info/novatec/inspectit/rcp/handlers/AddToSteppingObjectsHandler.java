@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.handlers;
 
 import info.novatec.inspectit.communication.ExceptionEventEnum;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
+import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
@@ -50,7 +51,9 @@ public class AddToSteppingObjectsHandler extends AbstractHandler {
 						if (invData.getSqlStatementData() != null) {
 							steppingTreeSubView.addObjectToSteppingControl(createTemplate(invData.getSqlStatementData()));
 							steppingTreeSubView.addObjectToSteppingControl(createTemplate(getTimerDataFromSql(invData.getSqlStatementData())));
-						} else if (invData.getTimerData() != null) {
+							// HttpTimerData elements should not be added to the list of locate-able
+							// elements.
+						} else if (invData.getTimerData() != null && !invData.getTimerData().getClass().equals(HttpTimerData.class)) {
 							steppingTreeSubView.addObjectToSteppingControl(createTemplate(invData.getTimerData()));
 						} else if (invData.getExceptionSensorDataObjects() != null && invData.getExceptionSensorDataObjects().isEmpty()) {
 							steppingTreeSubView.addObjectToSteppingControl(createTemplate(invData.getExceptionSensorDataObjects().get(0)));
