@@ -18,8 +18,8 @@
 		<property name="service" ref="registrationService" />
 		<property name="serviceInterface"
 			value="info.novatec.inspectit.cmr.service.IRegistrationService" />
-		<property name="registryPort" value="1099" />
-		<property name="servicePort" value="1100" />
+		<property name="registryPort" value="9070" />
+		<property name="servicePort" value="9071" />
 	</bean>
 
 	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
@@ -27,8 +27,8 @@
 		<property name="service" ref="agentStorageService" />
 		<property name="serviceInterface"
 			value="info.novatec.inspectit.cmr.service.IAgentStorageService" />
-		<property name="registryPort" value="1099" />
-		<property name="servicePort" value="1100" />
+		<property name="registryPort" value="9070" />
+		<property name="servicePort" value="9071" />
 	</bean>
 
 </beans>
