@@ -52,7 +52,7 @@ public class DeferredInstrumentationBrowserComposite extends DeferredComposite {
 				if (packageName == null) {
 					packageName = "";
 				} else {
-					packageName.trim();
+					packageName = packageName.trim();
 				}
 				// check if the given package was already added.
 				if (!packageNames.containsKey(packageName)) {
