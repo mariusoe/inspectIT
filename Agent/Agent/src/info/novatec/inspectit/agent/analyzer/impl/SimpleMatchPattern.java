@@ -3,17 +3,15 @@ package info.novatec.inspectit.agent.analyzer.impl;
 import info.novatec.inspectit.agent.analyzer.IMatchPattern;
 
 import java.util.ArrayList;
-
+import java.util.List;
 
 /**
- * Pattern matcher for simple strings with '*' wildcard characters. The supplied
- * template may take the form "xxx" for an exact match, "xxx*" for a match on
- * leading characters only, "*xxx" to match on trailing characters only, or
- * "xxx*yyy" to match on both leading and trailing. It can also include multiple
- * '*' characters when more than one part of the match is wildcarded.
+ * Pattern matcher for simple strings with '*' wildcard characters. The supplied template may take
+ * the form "xxx" for an exact match, "xxx*" for a match on leading characters only, "*xxx" to match
+ * on trailing characters only, or "xxx*yyy" to match on both leading and trailing. It can also
+ * include multiple '*' characters when more than one part of the match is wildcarded.
  * 
- * This code is copied from
- * http://www.ibm.com/developerworks/java/library/j-dyn0203.html.
+ * This code is copied from http://www.ibm.com/developerworks/java/library/j-dyn0203.html.
  * 
  * @author Dennis Sosnoski
  */
@@ -40,8 +38,8 @@ public class SimpleMatchPattern implements IMatchPattern {
 	private String template;
 
 	/**
-	 * Is set to true if the template equals '*'. As this matches everything, we
-	 * skip the whole compare process.
+	 * Is set to true if the template equals '*'. As this matches everything, we skip the whole
+	 * compare process.
 	 */
 	private boolean everything = false;
 
@@ -52,7 +50,7 @@ public class SimpleMatchPattern implements IMatchPattern {
 	 *            match text template
 	 */
 	public SimpleMatchPattern(final String template) {
-		if (template.equals("*")) {
+		if ("*".equals(template)) {
 			everything = true;
 			isLeadText = false;
 			isTrailText = false;
@@ -60,16 +58,14 @@ public class SimpleMatchPattern implements IMatchPattern {
 		}
 
 		int mark = template.indexOf('*');
-		ArrayList comps = new ArrayList();
-		if (mark < 0) {
+		List<String> comps = new ArrayList<String>();
 
+		if (mark < 0) {
 			// set up for exact match
 			comps.add(template);
 			isLeadText = true;
 			isTrailText = true;
-
 		} else {
-
 			// handle leading wildcard
 			int base = 0;
 			if (mark == 0) {
@@ -79,7 +75,6 @@ public class SimpleMatchPattern implements IMatchPattern {
 			} else {
 				isLeadText = true;
 			}
-
 			// loop for all text components to be matched
 			int limit = template.length() - 1;
 			while (mark > 0) {
@@ -92,7 +87,6 @@ public class SimpleMatchPattern implements IMatchPattern {
 			}
 			comps.add(template.substring(base));
 			isTrailText = mark != limit;
-
 		}
 
 		// save array of text components to be matched
@@ -163,6 +157,6 @@ public class SimpleMatchPattern implements IMatchPattern {
 	 * @return Returns if the supplied String is a pattern.
 	 */
 	public static boolean isPattern(String txt) {
-		return txt.indexOf("*") > -1;
+		return txt.indexOf('*') > -1;
 	}
 }

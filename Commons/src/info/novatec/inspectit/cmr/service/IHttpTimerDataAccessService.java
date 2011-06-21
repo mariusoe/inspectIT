@@ -22,7 +22,7 @@ public interface IHttpTimerDataAccessService {
 	 *            whether or not the request method should be include in the categorization.
 	 * @return The list of the timer data object.
 	 */
-	List getAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod);
+	List<HttpTimerData> getAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod);
 
 	/**
 	 * Returns a list of the http timer data for a given template. In this template, only the
@@ -38,7 +38,7 @@ public interface IHttpTimerDataAccessService {
 	 *            Date to include data to.
 	 * @return The list of the timer data object.
 	 */
-	List getAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod, Date fromDate, Date toDate);
+	List<HttpTimerData> getAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod, Date fromDate, Date toDate);
 
 	/**
 	 * Returns a list of http timer data that is aggregated the value of the given http request
@@ -52,7 +52,7 @@ public interface IHttpTimerDataAccessService {
 	 * 
 	 * @return The list of the timer data objects that are aggregated by the tagged value.
 	 */
-	List getTaggedAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod);
+	List<HttpTimerData> getTaggedAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod);
 
 	/**
 	 * Returns a list of http timer data that is aggregated the value of the given http request
@@ -70,6 +70,6 @@ public interface IHttpTimerDataAccessService {
 	 * 
 	 * @return The list of the timer data objects that are aggregated by the tagged value.
 	 */
-	List getTaggedAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod, Date fromDate, Date toDate);
+	List<HttpTimerData> getTaggedAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod, Date fromDate, Date toDate);
 
 }

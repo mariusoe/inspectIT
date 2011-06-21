@@ -5,12 +5,10 @@ import info.novatec.inspectit.communication.SystemSensorData;
 
 import java.sql.Timestamp;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Here are the static informations of a system. These informations don't change
- * at runtime.
+ * Here are the static informations of a system. These informations don't change at runtime.
  * 
  * @author Eduard Tudenhöfner
  * 
@@ -25,7 +23,7 @@ public class SystemInformationData extends SystemSensorData {
 	/**
 	 * The one-to-many association to {@link VmArgumentData}.
 	 */
-	private Set vmSet = new HashSet();
+	private Set<VmArgumentData> vmSet = new HashSet<VmArgumentData>();
 
 	/**
 	 * The total amount of physical memory.
@@ -63,14 +61,12 @@ public class SystemInformationData extends SystemSensorData {
 	private String osVersion;
 
 	/**
-	 * The java class path, that is used by the system class loader to search
-	 * for class files.
+	 * The java class path, that is used by the system class loader to search for class files.
 	 */
 	private String classPath;
 
 	/**
-	 * The boot class path that is used by the bootstrap class loader to search
-	 * for class files.
+	 * The boot class path that is used by the bootstrap class loader to search for class files.
 	 */
 	private String bootClassPath;
 
@@ -90,8 +86,7 @@ public class SystemInformationData extends SystemSensorData {
 	private String vmName;
 
 	/**
-	 * The name representing the running virtual machine. for example:
-	 * 12456@pc-name.
+	 * The name representing the running virtual machine. for example: 12456@pc-name.
 	 */
 	private String vmSpecName;
 
@@ -101,8 +96,8 @@ public class SystemInformationData extends SystemSensorData {
 	private String vmVersion;
 
 	/**
-	 * The initial amount of memory that the virtual machine requests from the
-	 * operating system for heap memory management during startup.
+	 * The initial amount of memory that the virtual machine requests from the operating system for
+	 * heap memory management during startup.
 	 */
 	private long initHeapMemorySize = 0;
 
@@ -112,14 +107,13 @@ public class SystemInformationData extends SystemSensorData {
 	private long maxHeapMemorySize = 0;
 
 	/**
-	 * The initial amount of memory that the virtual machine requests from the
-	 * operating system for non-heap memory management during startup.
+	 * The initial amount of memory that the virtual machine requests from the operating system for
+	 * non-heap memory management during startup.
 	 */
 	private long initNonHeapMemorySize = 0;
 
 	/**
-	 * The maximum amount of memory that can be used for non-heap memory
-	 * management.
+	 * The maximum amount of memory that can be used for non-heap memory management.
 	 */
 	private long maxNonHeapMemorySize = 0;
 
@@ -287,11 +281,11 @@ public class SystemInformationData extends SystemSensorData {
 		this.maxNonHeapMemorySize = maxNonHeapMemorySize;
 	}
 
-	public Set getVmSet() {
+	public Set<VmArgumentData> getVmSet() {
 		return vmSet;
 	}
 
-	public void setVmSet(Set vmSet) {
+	public void setVmSet(Set<VmArgumentData> vmSet) {
 		this.vmSet = vmSet;
 	}
 
@@ -449,12 +443,12 @@ public class SystemInformationData extends SystemSensorData {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
-		long size =  super.getObjectSize(objectSizes);
+		long size = super.getObjectSize(objectSizes);
 		size += objectSizes.getPrimitiveTypesSize(12, 0, 1, 0, 6, 0);
 		size += objectSizes.getSizeOf(architecture);
 		size += objectSizes.getSizeOf(bootClassPath);
@@ -467,17 +461,10 @@ public class SystemInformationData extends SystemSensorData {
 		size += objectSizes.getSizeOf(vmSpecName);
 		size += objectSizes.getSizeOf(vmVendor);
 		size += objectSizes.getSizeOf(vmVersion);
-		if (null != vmSet && vmSet instanceof HashSet) {
+		if (null != vmSet) {
 			size += objectSizes.getSizeOfHashSet(vmSet.size());
-			Iterator iterator = vmSet.iterator();
-			while (iterator.hasNext()) {
-				try{
-					VmArgumentData vmArgumentData = (VmArgumentData) iterator.next();
-					size += vmArgumentData.getObjectSize(objectSizes);
-				}
-				catch (Exception exception) {
-					exception.printStackTrace();
-				}
+			for (VmArgumentData vmArgumentData : vmSet) {
+				size += vmArgumentData.getObjectSize(objectSizes);
 			}
 		}
 		return objectSizes.alignTo8Bytes(size);

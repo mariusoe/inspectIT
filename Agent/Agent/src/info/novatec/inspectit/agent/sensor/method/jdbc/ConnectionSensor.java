@@ -7,8 +7,8 @@ import java.sql.PreparedStatement;
 import java.util.Map;
 
 /**
- * This sensor initializes the {@link ConnectionHook} to intercept the creation
- * of {@link PreparedStatement} classes.
+ * This sensor initializes the {@link ConnectionHook} to intercept the creation of
+ * {@link PreparedStatement} classes.
  * 
  * @author Patrice Bouillet
  * 
@@ -45,7 +45,7 @@ public class ConnectionSensor implements IMethodSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void init(Map parameter) {
+	public void init(Map<String, Object> parameter) {
 		connectionHook = new ConnectionHook(statementStorage);
 	}
 

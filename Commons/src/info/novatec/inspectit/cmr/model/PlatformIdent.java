@@ -7,9 +7,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * The Platform Ident class is used to store the unique information of an Agent,
- * so every Agent in different JVMs on the same target server receives a
- * different one.
+ * The Platform Ident class is used to store the unique information of an Agent, so every Agent in
+ * different JVMs on the same target server receives a different one.
  * 
  * @author Patrice Bouillet
  * 
@@ -17,7 +16,7 @@ import java.util.Set;
 public class PlatformIdent implements Serializable {
 
 	/**
-	 * 
+	 * The serial version UID.
 	 */
 	private static final long serialVersionUID = 8501768676196666426L;
 
@@ -34,23 +33,23 @@ public class PlatformIdent implements Serializable {
 	/**
 	 * The many-to-many association to the {@link SensorTypeIdent} objects.
 	 */
-	private Set sensorTypeIdents = new HashSet(0);
+	private Set<SensorTypeIdent> sensorTypeIdents = new HashSet<SensorTypeIdent>(0);
 
 	/**
 	 * The one-to-many association to the {@link MethodIdent} objects.
 	 */
-	private Set methodIdents = new HashSet(0);
+	private Set<MethodIdent> methodIdents = new HashSet<MethodIdent>(0);
 
 	/**
 	 * The list of ip's of the target system (including v4 and v6).
 	 */
-	private List definedIPs;
+	private List<String> definedIPs;
 
 	/**
 	 * The self-defined name of the inspectIT Agent.
 	 */
 	private String agentName = "Agent";
-	
+
 	/**
 	 * the current version of the agent
 	 */
@@ -59,19 +58,19 @@ public class PlatformIdent implements Serializable {
 	public PlatformIdent() {
 	}
 
-	public Set getSensorTypeIdents() {
+	public Set<SensorTypeIdent> getSensorTypeIdents() {
 		return sensorTypeIdents;
 	}
 
-	public void setSensorTypeIdents(Set platformSensorTypeIdents) {
+	public void setSensorTypeIdents(Set<SensorTypeIdent> platformSensorTypeIdents) {
 		this.sensorTypeIdents = platformSensorTypeIdents;
 	}
 
-	public Set getMethodIdents() {
+	public Set<MethodIdent> getMethodIdents() {
 		return methodIdents;
 	}
 
-	public void setMethodIdents(Set methodIdents) {
+	public void setMethodIdents(Set<MethodIdent> methodIdents) {
 		this.methodIdents = methodIdents;
 	}
 
@@ -91,11 +90,11 @@ public class PlatformIdent implements Serializable {
 		this.timeStamp = timeStamp;
 	}
 
-	public List getDefinedIPs() {
+	public List<String> getDefinedIPs() {
 		return definedIPs;
 	}
 
-	public void setDefinedIPs(List definedIPs) {
+	public void setDefinedIPs(List<String> definedIPs) {
 		this.definedIPs = definedIPs;
 	}
 

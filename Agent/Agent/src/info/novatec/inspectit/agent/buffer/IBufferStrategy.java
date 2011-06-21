@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A BufferStrategy is used to define the behavior of the value objects once a
- * connection problem appears.
+ * A BufferStrategy is used to define the behavior of the value objects once a connection problem
+ * appears.
  * 
  * @author Patrice Bouillet
  * 
  */
-public interface IBufferStrategy extends Iterator {
+public interface IBufferStrategy<E> extends Iterator<List<E>> {
 
 	/**
 	 * Adds a list of measurements.
@@ -19,7 +19,7 @@ public interface IBufferStrategy extends Iterator {
 	 * @param measurements
 	 *            The measurements to add.
 	 */
-	void addMeasurements(List measurements);
+	void addMeasurements(List<E> measurements);
 
 	/**
 	 * Initializes the buffer strategy with the given {@link Map}.
@@ -27,6 +27,6 @@ public interface IBufferStrategy extends Iterator {
 	 * @param settings
 	 *            The settings as a {@link Map}.
 	 */
-	void init(Map settings);
+	void init(Map<String, String> settings);
 
 }

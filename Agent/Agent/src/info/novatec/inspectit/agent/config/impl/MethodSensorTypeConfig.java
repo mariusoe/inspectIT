@@ -3,8 +3,8 @@ package info.novatec.inspectit.agent.config.impl;
 import info.novatec.inspectit.agent.config.PriorityEnum;
 
 /**
- * Container for the values of a sensor type configuration. stores all the
- * values defined in a config file for later access.
+ * Container for the values of a sensor type configuration. stores all the values defined in a
+ * config file for later access.
  * 
  * @author Patrice Bouillet
  */
@@ -40,10 +40,13 @@ public class MethodSensorTypeConfig extends AbstractSensorTypeConfig {
 	}
 
 	/**
-	 * Returns the priority of this sensor type. Important for time or memory
-	 * sensors. Can return one of:<br> {@link PriorityEnum#MAX}<br>
-	 * {@link PriorityEnum#HIGH}<br> {@link PriorityEnum#NORMAL}<br>
-	 * {@link PriorityEnum#LOW}<br> {@link PriorityEnum#MIN}<br>
+	 * Returns the priority of this sensor type. Important for time or memory sensors. Can return
+	 * one of:<br>
+	 * {@link PriorityEnum#MAX}<br>
+	 * {@link PriorityEnum#HIGH}<br>
+	 * {@link PriorityEnum#NORMAL}<br>
+	 * {@link PriorityEnum#LOW}<br>
+	 * {@link PriorityEnum#MIN}<br>
 	 * 
 	 * @return The priority of the sensor type.
 	 */
@@ -57,7 +60,7 @@ public class MethodSensorTypeConfig extends AbstractSensorTypeConfig {
 	 * @param priority
 	 *            The priority.
 	 */
-	public void setPriority(final PriorityEnum priority) {
+	public void setPriority(PriorityEnum priority) {
 		this.priority = priority;
 	}
 
@@ -65,7 +68,7 @@ public class MethodSensorTypeConfig extends AbstractSensorTypeConfig {
 	 * {@inheritDoc}
 	 */
 	public String toString() {
-		return getId() + " :: name: " + name + " (" + PriorityEnum.names().get(priority.getValue()) + ")";
+		return getId() + " :: name: " + name + " (" + priority + ")";
 	}
 
 }

@@ -4,10 +4,9 @@ import info.novatec.inspectit.agent.sending.AbstractSendingStrategy;
 
 import java.util.Map;
 
-
 /**
- * Implements a strategy to wait a specific (user-defined) time and then
- * executes the sending of the data.
+ * Implements a strategy to wait a specific (user-defined) time and then executes the sending of the
+ * data.
  * 
  * @author Patrice Bouillet
  * 
@@ -55,8 +54,8 @@ public class TimeStrategy extends AbstractSendingStrategy {
 	}
 
 	/**
-	 * The Trigger class is basically a {@link Thread} which starts the sending
-	 * process once the specified time is passed by.
+	 * The Trigger class is basically a {@link Thread} which starts the sending process once the
+	 * specified time is passed by.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
@@ -88,8 +87,8 @@ public class TimeStrategy extends AbstractSendingStrategy {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void init(Map settings) {
-		this.time = Long.parseLong((String) settings.get("time"));
+	public void init(Map<String, String> settings) {
+		this.time = Long.parseLong(settings.get("time"));
 	}
 
 }

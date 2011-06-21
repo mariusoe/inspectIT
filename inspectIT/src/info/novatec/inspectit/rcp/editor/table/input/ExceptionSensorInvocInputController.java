@@ -304,7 +304,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		if (null == data) {
 			return false;
 		}
-		
+
 		if (data.isEmpty()) {
 			return true;
 		}
@@ -351,7 +351,6 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 			return exceptionSensorDataList.toArray();
 		}
 
-		@SuppressWarnings("unchecked")
 		private List<ExceptionSensorData> extractExceptionSensorData(List<InvocationSequenceData> invocationSequenceDataList, ArrayList<ExceptionSensorData> exceptionSensorDataList) {
 			for (InvocationSequenceData invocationSequenceData : invocationSequenceDataList) {
 				if (null != invocationSequenceData.getExceptionSensorDataObjects() && !invocationSequenceData.getExceptionSensorDataObjects().isEmpty()) {
@@ -599,7 +598,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	public void dispose() {
 		resourceManager.dispose();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

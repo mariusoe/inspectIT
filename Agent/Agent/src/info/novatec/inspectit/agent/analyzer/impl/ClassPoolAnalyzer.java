@@ -32,12 +32,12 @@ public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 	/**
 	 * A weak list to save references to the class loaders.
 	 */
-	private static WeakList classLoaders = new WeakList();
+	private static WeakList<ClassLoader> classLoaders = new WeakList<ClassLoader>();
 
 	/**
 	 * Contains a mapping from the {@link ClassPool} to the {@link ClassLoader} objects.
 	 */
-	private static Map map = new WeakHashMap();
+	private static Map<ClassLoader, ClassPool> map = new WeakHashMap<ClassLoader, ClassPool>();
 
 	/**
 	 * {@inheritDoc}
@@ -66,7 +66,7 @@ public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 	public CtConstructor[] getConstructorsForClassName(ClassLoader classLoader, String className) {
 		try {
 			CtClass cc = this.getClassPool(classLoader).get(className);
-			List constructorList = new ArrayList();
+			List<CtConstructor> constructorList = new ArrayList<CtConstructor>();
 
 			// exclude interface classes, cannot instrument them!
 			if (!Modifier.isInterface(cc.getModifiers())) {
@@ -78,7 +78,7 @@ public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 						constructorList.add(ctConstructor);
 					}
 				}
-				return (CtConstructor[]) constructorList.toArray(new CtConstructor[constructorList.size()]);
+				return constructorList.toArray(new CtConstructor[constructorList.size()]);
 			}
 		} catch (NotFoundException e) {
 			LOGGER.severe("NotFoundException caught for class: " + className);
@@ -101,7 +101,7 @@ public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 			return this.copyHierarchy(classLoader);
 		}
 
-		return (ClassPool) map.get(classLoader);
+		return map.get(classLoader);
 	}
 
 	/**
@@ -109,10 +109,10 @@ public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 	 */
 	public ClassPool getClassPool(ClassLoader classLoader) {
 		if (null == classLoader) {
+			// Return the default classpool if we don't have the mapping yet.
 			return ClassPool.getDefault();
 		}
 		ClassPool cp = (ClassPool) map.get(classLoader);
-		// Return the default classpool if we don't have the mapping yet.
 		if (null == cp) {
 			cp = this.addClassLoader(classLoader);
 		}
@@ -140,7 +140,7 @@ public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 		} else if (null != classLoader.getParent()) {
 			// Parent class loader was seen and initialized before, we only care
 			// about the current one and set the parent class loader.
-			cp = new ClassPool((ClassPool) map.get(classLoader.getParent()));
+			cp = new ClassPool(map.get(classLoader.getParent()));
 		} else {
 			// Class loader has got no parent ( bootstrap class loader )
 			cp = new ClassPool(ClassPool.getDefault());

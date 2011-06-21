@@ -37,42 +37,42 @@ public class HttpTimerDataAccessService implements IHttpTimerDataAccessService {
 	}
 
 	@Override
-	public List getAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod) {
+	public List<HttpTimerData> getAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod) {
 		try {
 			return httptimerDataAccessService.getAggregatedTimerData(timerData, includeRequestMethod);
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog("There was an error retrieving the aggregated method http timer data from the CMR!", e, -1);
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 	}
 
 	@Override
-	public List getAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod, Date fromDate, Date toDate) {
+	public List<HttpTimerData> getAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod, Date fromDate, Date toDate) {
 		try {
 			return httptimerDataAccessService.getAggregatedTimerData(timerData, includeRequestMethod, fromDate, toDate);
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog("There was an error retrieving the aggregated method http timer data from the CMR!", e, -1);
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 	}
 
 	@Override
-	public List getTaggedAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod) {
+	public List<HttpTimerData> getTaggedAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod) {
 		try {
 			return httptimerDataAccessService.getTaggedAggregatedTimerData(timerData, includeRequestMethod);
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog("There was an error retrieving the tagged aggregated method http timer data from the CMR!", e, -1);
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 	}
 
 	@Override
-	public List getTaggedAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod, Date fromDate, Date toDate) {
+	public List<HttpTimerData> getTaggedAggregatedTimerData(HttpTimerData timerData, boolean includeRequestMethod, Date fromDate, Date toDate) {
 		try {
 			return httptimerDataAccessService.getTaggedAggregatedTimerData(timerData, includeRequestMethod, fromDate, toDate);
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog("There was an error retrieving the tagged aggregated method http timer data from the CMR!", e, -1);
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 	}
 

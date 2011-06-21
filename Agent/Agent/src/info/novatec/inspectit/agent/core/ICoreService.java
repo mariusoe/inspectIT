@@ -5,8 +5,8 @@ import info.novatec.inspectit.communication.SystemSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 
 /**
- * Interface definition for the core service. The core service is the central
- * point of the Agent where all data is collected, triggered etc.
+ * Interface definition for the core service. The core service is the central point of the Agent
+ * where all data is collected, triggered etc.
  * 
  * @author Patrice Bouillet
  * @author Eduard Tudenhoefner
@@ -54,17 +54,15 @@ public interface ICoreService {
 	 * @param sensorTypeIdent
 	 *            The id of the sensor type.
 	 * @param throwableIdentityHashCode
-	 *            The identityHashCode of the {@link ExceptionSensorData}
-	 *            object.
+	 *            The identityHashCode of the {@link ExceptionSensorData} object.
 	 * @param exceptionSensorData
 	 *            The exception sensor data.
 	 */
 	void addExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode, ExceptionSensorData exceptionSensorData);
 
 	/**
-	 * Adds a new object storage to the value storage. An object storage
-	 * contains an instance of {@link IObjectStorage} which serves as a wrapper
-	 * around a value object.
+	 * Adds a new object storage to the value storage. An object storage contains an instance of
+	 * {@link IObjectStorage} which serves as a wrapper around a value object.
 	 * 
 	 * @param sensorTypeId
 	 *            The id of the sensor type.
@@ -83,8 +81,7 @@ public interface ICoreService {
 	void sendData();
 
 	/**
-	 * Returns a saved measurement ({@link MethodSensorData}) for further
-	 * processing.
+	 * Returns a saved measurement ({@link MethodSensorData}) for further processing.
 	 * 
 	 * @param sensorTypeIdent
 	 *            The id of the sensor type to retrieve the measurement.
@@ -135,7 +132,7 @@ public interface ICoreService {
 	 * @param listener
 	 *            The listener to add.
 	 */
-	void addListListener(ListListener listener);
+	void addListListener(ListListener<?> listener);
 
 	/**
 	 * Removes a list listener.
@@ -143,6 +140,6 @@ public interface ICoreService {
 	 * @param listener
 	 *            The listener to remove.
 	 */
-	void removeListListener(ListListener listener);
+	void removeListListener(ListListener<?> listener);
 
 }

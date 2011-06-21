@@ -8,8 +8,8 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
 /**
- * This editor input is used for all views and can only be set in the composite
- * view controller as this is the only one which can be set with an input.
+ * This editor input is used for all views and can only be set in the composite view controller as
+ * this is the only one which can be set with an input.
  * 
  * @author Patrice Bouillet
  * 
@@ -17,8 +17,7 @@ import org.eclipse.ui.IPersistableElement;
 public class RootEditorInput implements IEditorInput {
 
 	/**
-	 * The input definition which holds everything a view needs to create the
-	 * content.
+	 * The input definition which holds everything a view needs to create the content.
 	 */
 	private InputDefinition inputDefinition;
 
@@ -72,7 +71,6 @@ public class RootEditorInput implements IEditorInput {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	public Object getAdapter(Class adapter) {
 		if (InputDefinition.class == adapter) {
 			return this.inputDefinition;

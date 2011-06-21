@@ -16,7 +16,6 @@ import info.novatec.inspectit.javassist.NotFoundException;
 import info.novatec.inspectit.javassist.expr.ExprEditor;
 import info.novatec.inspectit.javassist.expr.Handler;
 
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -98,8 +97,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 
 		final long methodId = idManager.registerMethod(rsc);
 
-		for (Iterator iterator = rsc.getSensorTypeConfigs().iterator(); iterator.hasNext();) {
-			MethodSensorTypeConfig config = (MethodSensorTypeConfig) iterator.next();
+		for (MethodSensorTypeConfig config : rsc.getSensorTypeConfigs()) {
 			long sensorTypeId = config.getId();
 			idManager.addSensorTypeToMethod(sensorTypeId, methodId);
 		}
@@ -159,8 +157,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 
 		long constructorId = idManager.registerMethod(rsc);
 
-		for (Iterator iterator = rsc.getSensorTypeConfigs().iterator(); iterator.hasNext();) {
-			MethodSensorTypeConfig config = (MethodSensorTypeConfig) iterator.next();
+		for (MethodSensorTypeConfig config : rsc.getSensorTypeConfigs()) {
 			long sensorTypeId = config.getId();
 			idManager.addSensorTypeToMethod(sensorTypeId, constructorId);
 		}
@@ -273,12 +270,6 @@ public class HookInstrumenter implements IHookInstrumenter {
 		private long id = 0;
 
 		/**
-		 * The default constructor.
-		 */
-		public MethodExprEditor() {
-		}
-
-		/**
 		 * Sets the method id.
 		 * 
 		 * @param id
@@ -318,12 +309,6 @@ public class HookInstrumenter implements IHookInstrumenter {
 		 * The id of the constructor which is instrumented with the ExpressionEditor.
 		 */
 		private long id = 0;
-
-		/**
-		 * The default constructor.
-		 */
-		public ConstructorExprEditor() {
-		}
 
 		/**
 		 * Sets the constructor id.

@@ -1,9 +1,7 @@
 package info.novatec.inspectit.agent.sensor.exception;
 
-import info.novatec.inspectit.agent.config.IPropertyAccessor;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.hooking.IHook;
-import info.novatec.inspectit.util.Timer;
 
 import java.util.Map;
 
@@ -31,7 +29,7 @@ public class ExceptionSensor implements IExceptionSensor {
 	 * @param idManager
 	 *            The ID manager.
 	 */
-	public ExceptionSensor(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor) {
+	public ExceptionSensor(IIdManager idManager) {
 		this.idManager = idManager;
 	}
 
@@ -45,7 +43,7 @@ public class ExceptionSensor implements IExceptionSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void init(Map parameter) {
+	public void init(Map<String, Object> parameter) {
 		exceptionSensorHook = new ExceptionSensorHook(idManager, parameter);
 	}
 

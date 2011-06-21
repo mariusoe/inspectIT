@@ -41,7 +41,7 @@ public final class OccurrenceFinderFactory {
 	/**
 	 * List used buy templates to denote a List that will not be checked when matching.
 	 */
-	private static final List<Object> TEMPLATE_LIST = new ArrayList<Object>(0);
+	private static final List<String> TEMPLATE_LIST = new ArrayList<String>(0);
 
 	/**
 	 * Set used buy templates to denote a Set that will not be checked when matching. Currently not
@@ -172,7 +172,6 @@ public final class OccurrenceFinderFactory {
 		 *            Element occurrence count.
 		 * @return Number of children in invocation that have template data set.
 		 */
-		@SuppressWarnings("unchecked")
 		public ElementOccurrenceCount getOccurrenceCount(InvocationSequenceData invocationData, E template, ViewerFilter[] filters, ElementOccurrenceCount elementOccurrence) {
 			if (!getConcreteClass().isAssignableFrom(template.getClass())) {
 				return null;
@@ -223,7 +222,6 @@ public final class OccurrenceFinderFactory {
 		 * @return Invocation sequence that has the Exception data set in Exceptions list and is
 		 *         same as template data.
 		 */
-		@SuppressWarnings("unchecked")
 		public InvocationSequenceData getOccurrence(InvocationSequenceData invocationData, E template, MutableInt occurrencesLeft, ViewerFilter[] filters) {
 			if (!getConcreteClass().isAssignableFrom(template.getClass())) {
 				return null;
@@ -309,7 +307,6 @@ public final class OccurrenceFinderFactory {
 		/**
 		 * {@inheritDoc}
 		 */
-		@SuppressWarnings("unchecked")
 		@Override
 		public boolean occurrenceFound(InvocationSequenceData invocationData, ExceptionSensorData template) {
 			if (invocationData.getExceptionSensorDataObjects() != null) {

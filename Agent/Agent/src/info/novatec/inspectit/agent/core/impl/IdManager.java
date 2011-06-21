@@ -16,7 +16,6 @@ import info.novatec.inspectit.versioning.IVersioningService;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.Level;
@@ -62,12 +61,12 @@ public class IdManager implements IIdManager, Startable {
 	/**
 	 * The mapping between the local and remote method ids.
 	 */
-	private Map methodIdMap = new HashMap();
+	private Map<Long, Long> methodIdMap = new HashMap<Long, Long>();
 
 	/**
 	 * The mapping between the local and remote sensor type ids.
 	 */
-	private Map sensorTypeIdMap = new HashMap();
+	private Map<Long, Long> sensorTypeIdMap = new HashMap<Long, Long>();
 
 	/**
 	 * The {@link Thread} used to register the outstanding methods, sensor types etc.
@@ -77,17 +76,17 @@ public class IdManager implements IIdManager, Startable {
 	/**
 	 * The methods to register at the server.
 	 */
-	private LinkedList methodsToRegister = new LinkedList();
+	private LinkedList<RegisteredSensorConfig> methodsToRegister = new LinkedList<RegisteredSensorConfig>();
 
 	/**
 	 * The sensor types to register at the server.
 	 */
-	private LinkedList sensorTypesToRegister = new LinkedList();
+	private LinkedList<AbstractSensorTypeConfig> sensorTypesToRegister = new LinkedList<AbstractSensorTypeConfig>();
 
 	/**
 	 * The mapping between the sensor types and methods to register at the server.
 	 */
-	private LinkedList sensorTypeToMethodRegister = new LinkedList();
+	private LinkedList<SensorTypeToMethodMapping> sensorTypeToMethodRegister = new LinkedList<SensorTypeToMethodMapping>();
 
 	/**
 	 * If set to <code>true</code>, the connection to server created an exception.
@@ -102,6 +101,8 @@ public class IdManager implements IIdManager, Startable {
 	 *            The configuration storage.
 	 * @param connection
 	 *            The connection to the server.
+	 * @param versioning
+	 *            The versioning service.
 	 */
 	public IdManager(IConfigurationStorage configurationStorage, IConnection connection, IVersioningService versioning) {
 		this.configurationStorage = configurationStorage;
@@ -119,14 +120,12 @@ public class IdManager implements IIdManager, Startable {
 		}
 
 		// register all method sensor types saved in the configuration storage
-		for (Iterator iterator = configurationStorage.getMethodSensorTypes().iterator(); iterator.hasNext();) {
-			MethodSensorTypeConfig config = (MethodSensorTypeConfig) iterator.next();
+		for (MethodSensorTypeConfig config : configurationStorage.getMethodSensorTypes()) {
 			this.registerMethodSensorType(config);
 		}
 
 		// register all platform sensor types saved in the configuration storage
-		for (Iterator iterator = configurationStorage.getPlatformSensorTypes().iterator(); iterator.hasNext();) {
-			PlatformSensorTypeConfig config = (PlatformSensorTypeConfig) iterator.next();
+		for (PlatformSensorTypeConfig config : configurationStorage.getPlatformSensorTypes()) {
 			this.registerPlatformSensorType(config);
 		}
 	}
@@ -192,7 +191,7 @@ public class IdManager implements IIdManager, Startable {
 	 * {@inheritDoc}
 	 */
 	public long getRegisteredMethodId(long methodId) throws IdNotAvailableException {
-		Long methodIdentifier = new Long(methodId);
+		Long methodIdentifier = Long.valueOf(methodId);
 
 		// do not enter the block if the method ID map already contains this
 		// identifier (which means that it is already registered).
@@ -209,7 +208,7 @@ public class IdManager implements IIdManager, Startable {
 	 */
 	public long getRegisteredSensorTypeId(long sensorTypeId) throws IdNotAvailableException {
 		// same procedure here as in the #getRegisteredMethodId(...) method.
-		Long sensorTypeIdentifier = new Long(sensorTypeId);
+		Long sensorTypeIdentifier = Long.valueOf(sensorTypeId);
 
 		if (!sensorTypeIdMap.containsKey(sensorTypeIdentifier)) {
 			throw new IdNotAvailableException("Sensor Type ID '" + sensorTypeId + "' is not mapped");
@@ -305,7 +304,7 @@ public class IdManager implements IIdManager, Startable {
 					getPlatformId();
 				}
 
-				registrationThread.addSensorTypeToMethod(new Long(sensorTypeId), new Long(methodId));
+				registrationThread.addSensorTypeToMethod(Long.valueOf(sensorTypeId), Long.valueOf(methodId));
 			} catch (Throwable throwable) {
 				synchronized (sensorTypeToMethodRegister) {
 					sensorTypeToMethodRegister.addLast(new SensorTypeToMethodMapping(sensorTypeId, methodId));
@@ -493,7 +492,6 @@ public class IdManager implements IIdManager, Startable {
 		 *             appears.
 		 */
 		private void registerPlatform() throws ServerUnavailableException, RegistrationException {
-
 			platformId = connection.registerPlatform(configurationStorage.getAgentName(), getVersion());
 
 			if (LOGGER.isLoggable(Level.FINE)) {
@@ -531,8 +529,8 @@ public class IdManager implements IIdManager, Startable {
 				SensorTypeToMethodMapping mapping;
 				mapping = (SensorTypeToMethodMapping) sensorTypeToMethodRegister.getFirst();
 
-				Long sensorTypeId = new Long(mapping.getSensorTypeId());
-				Long methodId = new Long(mapping.getMethodId());
+				Long sensorTypeId = Long.valueOf(mapping.getSensorTypeId());
+				Long methodId = Long.valueOf(mapping.getMethodId());
 
 				this.addSensorTypeToMethod(sensorTypeId, methodId);
 				synchronized (sensorTypeToMethodRegister) {
@@ -584,8 +582,7 @@ public class IdManager implements IIdManager, Startable {
 		 */
 		private void registerSensorTypes() throws ServerUnavailableException, RegistrationException {
 			while (!sensorTypesToRegister.isEmpty()) {
-				AbstractSensorTypeConfig astc;
-				astc = (AbstractSensorTypeConfig) sensorTypesToRegister.getFirst();
+				AbstractSensorTypeConfig astc = sensorTypesToRegister.getFirst();
 
 				this.registerSensorType(astc);
 				synchronized (sensorTypesToRegister) {
@@ -660,8 +657,8 @@ public class IdManager implements IIdManager, Startable {
 		private void registerMethod(RegisteredSensorConfig rsc) throws ServerUnavailableException, RegistrationException {
 			long registeredId = connection.registerMethod(platformId, rsc);
 			synchronized (methodsToRegister) {
-				Long localId = new Long(methodIdMap.size());
-				methodIdMap.put(localId, new Long(registeredId));
+				Long localId = Long.valueOf(methodIdMap.size());
+				methodIdMap.put(localId, Long.valueOf(registeredId));
 
 				if (LOGGER.isLoggable(Level.FINE)) {
 					LOGGER.fine("Method " + rsc.toString() + " registered. ID (local/global): " + localId + "/" + registeredId);

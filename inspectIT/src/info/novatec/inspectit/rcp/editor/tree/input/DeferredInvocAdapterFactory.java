@@ -6,8 +6,8 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ui.progress.IDeferredWorkbenchAdapter;
 
 /**
- * Adapter Factory which is used to create the {@link DeferredInvoc} objects if
- * the adaptable object is of type {@link InvocationSequenceData}.
+ * Adapter Factory which is used to create the {@link DeferredInvoc} objects if the adaptable object
+ * is of type {@link InvocationSequenceData}.
  * 
  * @author Patrice Bouillet
  * 
@@ -17,7 +17,7 @@ public class DeferredInvocAdapterFactory implements IAdapterFactory {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (IDeferredWorkbenchAdapter.class == adapterType) {
 			if (adaptableObject instanceof InvocationSequenceData) {
@@ -30,7 +30,7 @@ public class DeferredInvocAdapterFactory implements IAdapterFactory {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Class[] getAdapterList() {
 		return new Class[] { IDeferredWorkbenchAdapter.class };
 	}

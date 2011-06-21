@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * The Method Ident class is used to store the information of the Agent(s) about
- * an instrumented method into the database.
+ * The Method Ident class is used to store the information of the Agent(s) about an instrumented
+ * method into the database.
  * 
  * @author Patrice Bouillet
  * 
@@ -32,10 +32,9 @@ public class MethodIdent implements Serializable {
 	private Timestamp timeStamp;
 
 	/**
-	 * The many-to-many association to the {@link MethodSensorTypeIdent}
-	 * objects.
+	 * The many-to-many association to the {@link MethodSensorTypeIdent} objects.
 	 */
-	private Set methodSensorTypeIdents = new HashSet(0);
+	private Set<MethodSensorTypeIdent> methodSensorTypeIdents = new HashSet<MethodSensorTypeIdent>(0);
 
 	/**
 	 * The many-to-one association to the {@link PlatformIdent} object.
@@ -58,10 +57,10 @@ public class MethodIdent implements Serializable {
 	private String methodName;
 
 	/**
-	 * All method parameters stored in a List, converted to a VARCHAR column in
-	 * the database via ListStringType.
+	 * All method parameters stored in a List, converted to a VARCHAR column in the database via
+	 * ListStringType.
 	 */
-	private List parameters = new ArrayList(0);
+	private List<String> parameters = new ArrayList<String>(0);
 
 	/**
 	 * The return type.
@@ -92,11 +91,11 @@ public class MethodIdent implements Serializable {
 		this.timeStamp = timeStamp;
 	}
 
-	public Set getMethodSensorTypeIdents() {
+	public Set<MethodSensorTypeIdent> getMethodSensorTypeIdents() {
 		return methodSensorTypeIdents;
 	}
 
-	public void setMethodSensorTypeIdents(Set methodSensorTypeIdents) {
+	public void setMethodSensorTypeIdents(Set<MethodSensorTypeIdent> methodSensorTypeIdents) {
 		this.methodSensorTypeIdents = methodSensorTypeIdents;
 	}
 
@@ -108,11 +107,11 @@ public class MethodIdent implements Serializable {
 		this.platformIdent = platformIdent;
 	}
 
-	public List getParameters() {
+	public List<String> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(List parameters) {
+	public void setParameters(List<String> parameters) {
 		this.parameters = parameters;
 	}
 

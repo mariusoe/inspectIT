@@ -83,13 +83,13 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 
 		if (null != platformIdent.getDefinedIPs()) {
 			int charNum = 0;
-			List<Object> newDefinedIPs = new ArrayList<Object>();
-			for (Object item : platformIdent.getDefinedIPs()) {
+			List<String> newDefinedIPs = new ArrayList<String>();
+			for (String item : platformIdent.getDefinedIPs()) {
 				// if it is too long, we stop adding
-				if (charNum + item.toString().length() <= maxDefIPsSize) {
+				if (charNum + item.length() <= maxDefIPsSize) {
 					newDefinedIPs.add(item);
 					// we add 1 also for the white space
-					charNum += item.toString().length() + 1;
+					charNum += item.length() + 1;
 				} else {
 					break;
 				}

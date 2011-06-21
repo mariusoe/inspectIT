@@ -9,8 +9,8 @@ import info.novatec.inspectit.util.Timer;
 import java.util.Map;
 
 /**
- * The invocation sequence sensor which initializes and returns the
- * {@link InvocationSequenceHook} class.
+ * The invocation sequence sensor which initializes and returns the {@link InvocationSequenceHook}
+ * class.
  * 
  * @author Patrice Bouillet
  * 
@@ -63,7 +63,7 @@ public class InvocationSequenceSensor implements IMethodSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void init(Map parameter) {
+	public void init(Map<String, Object> parameter) {
 		invocationSequenceHook = new InvocationSequenceHook(timer, idManager, propertyAccessor, parameter);
 	}
 

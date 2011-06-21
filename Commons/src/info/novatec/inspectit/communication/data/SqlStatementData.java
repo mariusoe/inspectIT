@@ -3,8 +3,6 @@ package info.novatec.inspectit.communication.data;
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class SqlStatementData extends TimerData {
@@ -27,7 +25,7 @@ public class SqlStatementData extends TimerData {
 	/**
 	 * Contains the list of the parameter value objects.
 	 */
-	private List parameterValues;
+	private List<String> parameterValues;
 
 	/**
 	 * Default no-args constructor.
@@ -60,11 +58,11 @@ public class SqlStatementData extends TimerData {
 		return preparedStatement;
 	}
 
-	public void setParameterValues(List parameterValues) {
+	public void setParameterValues(List<String> parameterValues) {
 		this.parameterValues = parameterValues;
 	}
 
-	public List getParameterValues() {
+	public List<String> getParameterValues() {
 		return parameterValues;
 	}
 
@@ -105,25 +103,18 @@ public class SqlStatementData extends TimerData {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
-		long size =  super.getObjectSize(objectSizes);
+		long size = super.getObjectSize(objectSizes);
 		size += objectSizes.getPrimitiveTypesSize(2, 1, 0, 0, 0, 0);
 		size += objectSizes.getSizeOf(sql);
-		if (parameterValues != null && parameterValues instanceof ArrayList) {
-			size += objectSizes.getSizeOf((ArrayList)parameterValues);
-			Iterator iterator = parameterValues.iterator();
-			while (iterator.hasNext()) {
-				try {
-					String str = (String) iterator.next();
-					size += objectSizes.getSizeOf(str);
-				}
-				catch (Exception exception) {
-					exception.printStackTrace();
-				}
+		if (parameterValues != null) {
+			size += objectSizes.getSizeOf(parameterValues);
+			for (String str : parameterValues) {
+				size += objectSizes.getSizeOf(str);
 			}
 		}
 		return objectSizes.alignTo8Bytes(size);

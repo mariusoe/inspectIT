@@ -1,6 +1,8 @@
 package info.novatec.inspectit.rcp.repository.service.storage;
 
+import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
+import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -21,19 +23,19 @@ public class StoragePlatformIdent extends PlatformIdent {
 		this.folderName = folderName;
 	}
 
-	public Set getSensorTypeIdents() {
+	public Set<SensorTypeIdent> getSensorTypeIdents() {
 		return platformIdent.getSensorTypeIdents();
 	}
 
-	public void setSensorTypeIdents(Set platformSensorTypeIdents) {
+	public void setSensorTypeIdents(Set<SensorTypeIdent> platformSensorTypeIdents) {
 		platformIdent.setSensorTypeIdents(platformSensorTypeIdents);
 	}
 
-	public Set getMethodIdents() {
+	public Set<MethodIdent> getMethodIdents() {
 		return platformIdent.getMethodIdents();
 	}
 
-	public void setMethodIdents(Set methodIdents) {
+	public void setMethodIdents(Set<MethodIdent> methodIdents) {
 		platformIdent.setMethodIdents(methodIdents);
 	}
 
@@ -57,11 +59,11 @@ public class StoragePlatformIdent extends PlatformIdent {
 		platformIdent.setTimeStamp(timeStamp);
 	}
 
-	public List getDefinedIPs() {
+	public List<String> getDefinedIPs() {
 		return platformIdent.getDefinedIPs();
 	}
 
-	public void setDefinedIPs(List definedIPs) {
+	public void setDefinedIPs(List<String> definedIPs) {
 		platformIdent.setDefinedIPs(definedIPs);
 	}
 

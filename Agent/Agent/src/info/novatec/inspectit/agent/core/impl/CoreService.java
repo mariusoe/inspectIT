@@ -9,16 +9,17 @@ import info.novatec.inspectit.agent.core.IObjectStorage;
 import info.novatec.inspectit.agent.core.ListListener;
 import info.novatec.inspectit.agent.sending.ISendingStrategy;
 import info.novatec.inspectit.agent.sensor.platform.IPlatformSensor;
+import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.ExceptionEventEnum;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.SystemSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,42 +52,42 @@ public class CoreService implements ICoreService, Startable {
 	/**
 	 * Already used data objects which can be used directly on the CMR to persist.
 	 */
-	private Map sensorDataObjects = new Hashtable();
+	private Map<String, DefaultData> sensorDataObjects = new ConcurrentHashMap<String, DefaultData>();
 
 	/**
 	 * Contains object storage instances which will be initialized when sending.
 	 */
-	private Map objectStorages = new Hashtable();
+	private Map<String, IObjectStorage> objectStorages = new ConcurrentHashMap<String, IObjectStorage>();
 
 	/**
 	 * Used as second hash table for the measurements when processed before sending.
 	 */
-	private Map measurementsProcessing = new Hashtable();
+	private Map<String, DefaultData> measurementsProcessing = new ConcurrentHashMap<String, DefaultData>();
 
 	/**
 	 * Used as second hash table for the object storages when processed before sending.
 	 */
-	private Map objectStoragesProcessing = new Hashtable();
+	private Map<String, IObjectStorage> objectStoragesProcessing = new ConcurrentHashMap<String, IObjectStorage>();
 
 	/**
 	 * Temporary Map to switch the references of the active hash table with the processed one.
 	 */
-	private Map temp;
+	private Map<String, ?> temp;
 
 	/**
 	 * The registered list listeners.
 	 */
-	private List listListeners = new ArrayList();
+	private List<ListListener<?>> listListeners = new ArrayList<ListListener<?>>();
 
 	/**
 	 * The available and registered sending strategies.
 	 */
-	private List sendingStrategies = new ArrayList();
+	private List<ISendingStrategy> sendingStrategies = new ArrayList<ISendingStrategy>();
 
 	/**
 	 * The selected buffer strategy to store the list of value objects.
 	 */
-	private IBufferStrategy bufferStrategy;
+	private IBufferStrategy<DefaultData> bufferStrategy;
 
 	/**
 	 * The default refresh time.
@@ -127,7 +128,7 @@ public class CoreService implements ICoreService, Startable {
 	 * @param sendingStrategies
 	 *            The {@link List} of sending strategies.
 	 */
-	public CoreService(IConfigurationStorage configurationStorage, IConnection connection, IBufferStrategy bufferStrategy, List sendingStrategies) {
+	public CoreService(IConfigurationStorage configurationStorage, IConnection connection, IBufferStrategy<DefaultData> bufferStrategy, List<ISendingStrategy> sendingStrategies) {
 		if (null == configurationStorage) {
 			throw new IllegalArgumentException("Configuration Storage cannot be null!");
 		}
@@ -154,8 +155,7 @@ public class CoreService implements ICoreService, Startable {
 	 * {@inheritDoc}
 	 */
 	public void start() {
-		for (Iterator iterator = sendingStrategies.iterator(); iterator.hasNext();) {
-			ISendingStrategy strategy = (ISendingStrategy) iterator.next();
+		for (ISendingStrategy strategy : sendingStrategies) {
 			strategy.start(this);
 		}
 
@@ -173,8 +173,7 @@ public class CoreService implements ICoreService, Startable {
 	 * {@inheritDoc}
 	 */
 	public void stop() {
-		for (Iterator iterator = sendingStrategies.iterator(); iterator.hasNext();) {
-			ISendingStrategy strategy = (ISendingStrategy) iterator.next();
+		for (ISendingStrategy strategy : sendingStrategies) {
 			strategy.stop();
 		}
 
@@ -200,7 +199,7 @@ public class CoreService implements ICoreService, Startable {
 		// notify the sending thread. if it is currently sending something,
 		// nothing should happen
 		synchronized (preparingThread) {
-			preparingThread.notify();
+			preparingThread.notifyAll();
 		}
 	}
 
@@ -211,10 +210,10 @@ public class CoreService implements ICoreService, Startable {
 		StringBuffer buffer = new StringBuffer();
 		if (null != prefix) {
 			buffer.append(prefix);
-			buffer.append(".");
+			buffer.append('.');
 		}
 		buffer.append(methodIdent);
-		buffer.append(".");
+		buffer.append('.');
 		buffer.append(sensorTypeIdent);
 		sensorDataObjects.put(buffer.toString(), methodSensorData);
 		notifyListListeners();
@@ -227,10 +226,10 @@ public class CoreService implements ICoreService, Startable {
 		StringBuffer buffer = new StringBuffer();
 		if (null != prefix) {
 			buffer.append(prefix);
-			buffer.append(".");
+			buffer.append('.');
 		}
 		buffer.append(methodIdent);
-		buffer.append(".");
+		buffer.append('.');
 		buffer.append(sensorTypeIdent);
 		return (MethodSensorData) sensorDataObjects.get(buffer.toString());
 	}
@@ -239,7 +238,7 @@ public class CoreService implements ICoreService, Startable {
 	 * {@inheritDoc}
 	 */
 	public void addPlatformSensorData(long sensorTypeIdent, SystemSensorData systemSensorData) {
-		sensorDataObjects.put(new Long(sensorTypeIdent), systemSensorData);
+		sensorDataObjects.put(Long.toString(sensorTypeIdent), systemSensorData);
 		notifyListListeners();
 	}
 
@@ -247,7 +246,7 @@ public class CoreService implements ICoreService, Startable {
 	 * {@inheritDoc}
 	 */
 	public SystemSensorData getPlatformSensorData(long sensorTypeIdent) {
-		return (SystemSensorData) sensorDataObjects.get(new Long(sensorTypeIdent));
+		return (SystemSensorData) sensorDataObjects.get(Long.toString(sensorTypeIdent));
 	}
 
 	/**
@@ -294,10 +293,10 @@ public class CoreService implements ICoreService, Startable {
 		StringBuffer buffer = new StringBuffer();
 		if (null != prefix) {
 			buffer.append(prefix);
-			buffer.append(".");
+			buffer.append('.');
 		}
 		buffer.append(methodIdent);
-		buffer.append(".");
+		buffer.append('.');
 		buffer.append(sensorTypeIdent);
 		objectStorages.put(buffer.toString(), objectStorage);
 		notifyListListeners();
@@ -310,10 +309,10 @@ public class CoreService implements ICoreService, Startable {
 		StringBuffer buffer = new StringBuffer();
 		if (null != prefix) {
 			buffer.append(prefix);
-			buffer.append(".");
+			buffer.append('.');
 		}
 		buffer.append(methodIdent);
-		buffer.append(".");
+		buffer.append('.');
 		buffer.append(sensorTypeIdent);
 		return (IObjectStorage) objectStorages.get(buffer.toString());
 	}
@@ -321,7 +320,7 @@ public class CoreService implements ICoreService, Startable {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addListListener(ListListener listener) {
+	public void addListListener(ListListener<?> listener) {
 		if (!listListeners.contains(listener)) {
 			listListeners.add(listener);
 		}
@@ -330,19 +329,19 @@ public class CoreService implements ICoreService, Startable {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeListListener(ListListener listener) {
+	public void removeListListener(ListListener<?> listener) {
 		listListeners.remove(listener);
 	}
 
 	/**
 	 * Notify all registered listeners that a change occurred in the lists.
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void notifyListListeners() {
 		if (listListeners.size() > 0) {
 			List temp = new ArrayList(sensorDataObjects.values());
 			temp.addAll(objectStorages.values());
-			for (int i = 0; i < listListeners.size(); i++) {
-				ListListener listListener = (ListListener) listListeners.get(i);
+			for (ListListener<?> listListener : listListeners) {
 				listListener.contentChanged(temp);
 			}
 		}
@@ -372,8 +371,7 @@ public class CoreService implements ICoreService, Startable {
 				}
 
 				// iterate the platformSensors and update the information
-				for (Iterator iterator = configurationStorage.getPlatformSensorTypes().iterator(); iterator.hasNext();) {
-					PlatformSensorTypeConfig platformSensorTypeConfig = (PlatformSensorTypeConfig) iterator.next();
+				for (PlatformSensorTypeConfig platformSensorTypeConfig : configurationStorage.getPlatformSensorTypes()) {
 					IPlatformSensor platformSensor = (IPlatformSensor) platformSensorTypeConfig.getSensorType();
 					if (platformSensor.automaticUpdate()) {
 						platformSensor.update(CoreService.this, platformSensorTypeConfig.getId());
@@ -417,6 +415,7 @@ public class CoreService implements ICoreService, Startable {
 		/**
 		 * {@inheritDoc}
 		 */
+		@SuppressWarnings("unchecked")
 		public void run() {
 			for (;;) {
 				// wait for activation
@@ -438,20 +437,20 @@ public class CoreService implements ICoreService, Startable {
 					// while sending
 					temp = sensorDataObjects;
 					sensorDataObjects = measurementsProcessing;
-					measurementsProcessing = temp;
+					measurementsProcessing = (Map<String, DefaultData>) temp;
 
 					temp = objectStorages;
 					objectStorages = objectStoragesProcessing;
-					objectStoragesProcessing = temp;
+					objectStoragesProcessing = (Map<String, IObjectStorage>) temp;
 
 					// copy the measurements values to a new list
-					List tempList = new ArrayList(measurementsProcessing.values());
+					List<DefaultData> tempList = new ArrayList<DefaultData>(measurementsProcessing.values());
 					measurementsProcessing.clear();
 
 					// iterate the object storages and get the value
 					// objects which will be stored in the same list.
-					for (Iterator i = objectStoragesProcessing.values().iterator(); i.hasNext();) {
-						IObjectStorage objectStorage = (IObjectStorage) i.next();
+					for (Iterator<IObjectStorage> i = objectStoragesProcessing.values().iterator(); i.hasNext();) {
+						IObjectStorage objectStorage = i.next();
 						tempList.add(objectStorage.finalizeDataObject());
 					}
 					objectStoragesProcessing.clear();
@@ -499,7 +498,7 @@ public class CoreService implements ICoreService, Startable {
 
 				try {
 					while (bufferStrategy.hasNext()) {
-						List dataToSend = (List) bufferStrategy.next();
+						List<DefaultData> dataToSend = bufferStrategy.next();
 						connection.sendDataObjects(dataToSend);
 					}
 				} catch (Throwable e) {

@@ -32,17 +32,17 @@ public class StatementStorage {
 	 * The statement map contains a mapping between the prepared statement objects and their created
 	 * query string with parameter placeholders in it.
 	 */
-	private Map preparedStatementMap = new WeakHashMap(MAP_SIZE);
+	private Map<Object, String> preparedStatementMap = new WeakHashMap<Object, String>(MAP_SIZE);
 
 	/**
 	 * Stores the parameters of prepared statements.
 	 */
-	private Map parameterMap = new WeakHashMap(MAP_SIZE);
+	private Map<Object, String[]> parameterMap = new WeakHashMap<Object, String[]>(MAP_SIZE);
 
 	/**
 	 * Returns the sql thread local stack.
 	 */
-	private ThreadLocalStack sqlThreadLocalStack = new ThreadLocalStack();
+	private ThreadLocalStack<String> sqlThreadLocalStack = new ThreadLocalStack<String>();
 
 	/**
 	 * Adds a prepared statement to this storage for later retrieval.
@@ -50,8 +50,8 @@ public class StatementStorage {
 	 * @param object
 	 *            The object which will be the key of the mapping.
 	 */
-	protected void addPreparedStatement(Object object) {
-		String sql = (String) sqlThreadLocalStack.getLast();
+	public void addPreparedStatement(Object object) {
+		String sql = sqlThreadLocalStack.getLast();
 
 		synchronized (this) {
 			preparedStatementMap.put(object, sql);
@@ -82,10 +82,10 @@ public class StatementStorage {
 	 */
 	protected String getPreparedStatement(Object object) {
 		if (preparedStatementMap.containsKey(object)) {
-			String sql = (String) preparedStatementMap.get(object);
+			String sql = preparedStatementMap.get(object);
 
 			if (parameterMap.containsKey(object)) {
-				String[] parameters = (String[]) parameterMap.get(object);
+				String[] parameters = parameterMap.get(object);
 				char[] sqlChars = sql.toCharArray();
 				int index = 0;
 				// TODO compute size of string buffer
@@ -128,7 +128,7 @@ public class StatementStorage {
 	 *            The value to be inserted.
 	 */
 	protected void addParameter(Object preparedStatement, int index, Object value) {
-		String[] parameters = (String[]) parameterMap.get(preparedStatement);
+		String[] parameters = parameterMap.get(preparedStatement);
 		if (null != parameters) {
 			if (null != value) {
 				if (value instanceof String || value instanceof Date || value instanceof Time || value instanceof Timestamp) {
@@ -158,7 +158,7 @@ public class StatementStorage {
 	 */
 	protected void clearParameters(Object preparedStatement) {
 		if (parameterMap.containsKey(preparedStatement)) {
-			String[] parameters = (String[]) parameterMap.get(preparedStatement);
+			String[] parameters = parameterMap.get(preparedStatement);
 			parameterMap.put(preparedStatement, new String[parameters.length]);
 		} else {
 			if (LOGGER.isLoggable(Level.FINE)) {

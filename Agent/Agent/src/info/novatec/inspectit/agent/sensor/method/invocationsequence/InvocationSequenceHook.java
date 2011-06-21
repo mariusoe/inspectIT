@@ -28,8 +28,6 @@ import info.novatec.inspectit.util.Timer;
 import java.net.ConnectException;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -68,19 +66,19 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * The {@link ThreadLocal} object which holds an {@link InvocationSequenceData} object if an
 	 * invocation record is started.
 	 */
-	private final ThreadLocal threadLocalInvocationData = new ThreadLocal();
+	private final ThreadLocal<InvocationSequenceData> threadLocalInvocationData = new ThreadLocal<InvocationSequenceData>();
 
 	/**
 	 * Stores the value of the method ID in the {@link ThreadLocal} object. Used to identify the
 	 * correct start and end of the record.
 	 */
-	private final ThreadLocal invocationStartId = new ThreadLocal();
+	private final ThreadLocal<Long> invocationStartId = new ThreadLocal<Long>();
 
 	/**
 	 * Stores the count of the of the starting method being called in the same invocation sequence
 	 * so that closing is done on the right end.
 	 */
-	private final ThreadLocal invocationStartIdCount = new ThreadLocal();
+	private final ThreadLocal<Long> invocationStartIdCount = new ThreadLocal<Long>();
 
 	/**
 	 * The timer used for accurate measuring.
@@ -90,13 +88,13 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	/**
 	 * The stack containing the start time values.
 	 */
-	private final ThreadLocalStack timeStack = new ThreadLocalStack();
+	private final ThreadLocalStack<Double> timeStack = new ThreadLocalStack<Double>();
 
 	/**
 	 * Saves the min duration for faster access of the values.
 	 */
-	private Map minDurationMap = new HashMap();
-	
+	private Map<Long, Double> minDurationMap = new HashMap<Long, Double>();
+
 	/**
 	 * The StringConstraint to ensure a maximum length of strings.
 	 */
@@ -115,7 +113,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * @param param
 	 *            Additional parameters.
 	 */
-	public InvocationSequenceHook(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor, Map param) {
+	public InvocationSequenceHook(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor, Map<String, Object> param) {
 		this.timer = timer;
 		this.idManager = idManager;
 		this.propertyAccessor = propertyAccessor;
@@ -143,16 +141,16 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 				InvocationSequenceData invocationSequenceData = new InvocationSequenceData(timestamp, platformId, registeredSensorTypeId, registeredMethodId);
 				threadLocalInvocationData.set(invocationSequenceData);
 
-				invocationStartId.set(new Long(methodId));
-				invocationStartIdCount.set(new Long(1));
+				invocationStartId.set(Long.valueOf(methodId));
+				invocationStartIdCount.set(Long.valueOf(1));
 			} else {
-				if (methodId == ((Long) invocationStartId.get()).longValue()) {
-					long count = ((Long) invocationStartIdCount.get()).longValue();
-					invocationStartIdCount.set(new Long(count + 1));
+				if (methodId == invocationStartId.get().longValue()) {
+					long count = invocationStartIdCount.get().longValue();
+					invocationStartIdCount.set(Long.valueOf(count + 1));
 				}
 				// A subsequent call to the before body method where an
 				// invocation tracer is already started.
-				InvocationSequenceData invocationSequenceData = (InvocationSequenceData) threadLocalInvocationData.get();
+				InvocationSequenceData invocationSequenceData = threadLocalInvocationData.get();
 				invocationSequenceData.setChildCount(invocationSequenceData.getChildCount() + 1L);
 
 				InvocationSequenceData nestedInvocationSequenceData = new InvocationSequenceData(timestamp, platformId, invocationSequenceData.getSensorTypeIdent(), registeredMethodId);
@@ -174,12 +172,12 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * {@inheritDoc}
 	 */
 	public void firstAfterBody(long methodId, long sensorTypeId, Object object, Object[] parameters, Object result, RegisteredSensorConfig rsc) {
-		InvocationSequenceData invocationSequenceData = (InvocationSequenceData) threadLocalInvocationData.get();
+		InvocationSequenceData invocationSequenceData = threadLocalInvocationData.get();
 
 		if (null != invocationSequenceData) {
-			if (methodId == ((Long) invocationStartId.get()).longValue()) {
-				long count = ((Long) invocationStartIdCount.get()).longValue();
-				invocationStartIdCount.set(new Long(count - 1));
+			if (methodId == invocationStartId.get().longValue()) {
+				long count = invocationStartIdCount.get().longValue();
+				invocationStartIdCount.set(Long.valueOf(count - 1));
 
 				if (0 == count - 1) {
 					timeStack.push(new Double(timer.getCurrentTime()));
@@ -192,24 +190,22 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * {@inheritDoc}
 	 */
 	public void secondAfterBody(ICoreService coreService, long methodId, long sensorTypeId, Object object, Object[] parameters, Object result, RegisteredSensorConfig rsc) {
-		InvocationSequenceData invocationSequenceData = (InvocationSequenceData) threadLocalInvocationData.get();
+		InvocationSequenceData invocationSequenceData = threadLocalInvocationData.get();
 
 		if (null != invocationSequenceData) {
 			// check if some properties need to be accessed and saved
 			if (rsc.isPropertyAccess()) {
-				List parameterContentData = propertyAccessor.getParameterContentData(rsc.getPropertyAccessorList(), object, parameters);
-				
+				List<ParameterContentData> parameterContentData = propertyAccessor.getParameterContentData(rsc.getPropertyAccessorList(), object, parameters);
+
 				// crop the content strings of all ParameterContentData
-				for (Iterator iterator = parameterContentData.iterator(); iterator.hasNext();) {
-					ParameterContentData contentData = (ParameterContentData) iterator.next();
+				for (ParameterContentData contentData : parameterContentData) {
 					contentData.setContent(strConstraint.cropKeepFinalCharacter(contentData.getContent(), '\''));
 				}
-				invocationSequenceData.setParameterContentData(new HashSet(parameterContentData));
 			}
 
-			if ((methodId == ((Long) invocationStartId.get()).longValue()) && (0 == ((Long) invocationStartIdCount.get()).longValue())) {
-				double endTime = ((Double) timeStack.pop()).doubleValue();
-				double startTime = ((Double) timeStack.pop()).doubleValue();
+			if ((methodId == invocationStartId.get().longValue()) && (0 == invocationStartIdCount.get().longValue())) {
+				double endTime = timeStack.pop().doubleValue();
+				double startTime = timeStack.pop().doubleValue();
 				double duration = endTime - startTime;
 
 				// complete the sequence and store the data object in the 'true'
@@ -259,12 +255,16 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 *            executed method.
 	 * @param invocationSequenceData
 	 *            The invocation sequence data object.
+	 * @param startTime
+	 *            The start time.
+	 * @param endTime
+	 *            The end time.
 	 * @param duration
 	 *            The actual duration.
 	 */
 	private void checkForSavingOrNot(ICoreService coreService, long methodId, long sensorTypeId, RegisteredSensorConfig rsc, InvocationSequenceData invocationSequenceData, double startTime,
 			double endTime, double duration) {
-		double minduration = ((Double) minDurationMap.get(invocationStartId.get())).doubleValue();
+		double minduration = minDurationMap.get(invocationStartId.get()).doubleValue();
 		if (duration >= minduration) {
 			if (LOGGER.isLoggable(Level.FINE)) {
 				LOGGER.fine("Saving invocation. " + duration + " > " + minduration + " ID(local): " + rsc.getId());
@@ -303,7 +303,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 *            The data object to save.
 	 */
 	private void saveDataObject(DefaultData dataObject) {
-		InvocationSequenceData invocationSequenceData = (InvocationSequenceData) threadLocalInvocationData.get();
+		InvocationSequenceData invocationSequenceData = threadLocalInvocationData.get();
 
 		if (dataObject.getClass().equals(SqlStatementData.class)) {
 			// don't overwrite an already existing sql statement data object.
@@ -413,7 +413,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	// All unsupported methods are below from here //
 	// //////////////////////////////////////////////
 
-	public void addListListener(ListListener listener) {
+	public void addListListener(ListListener<?> listener) {
 		throw new UnsupportedMethodException();
 	}
 
@@ -425,7 +425,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 		throw new UnsupportedMethodException();
 	}
 
-	public void removeListListener(ListListener listener) {
+	public void removeListListener(ListListener<?> listener) {
 		throw new UnsupportedMethodException();
 	}
 
@@ -433,7 +433,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 		throw new UnsupportedMethodException();
 	}
 
-	public void setBufferStrategy(IBufferStrategy bufferStrategy) {
+	public void setBufferStrategy(IBufferStrategy<DefaultData> bufferStrategy) {
 		throw new UnsupportedMethodException();
 	}
 

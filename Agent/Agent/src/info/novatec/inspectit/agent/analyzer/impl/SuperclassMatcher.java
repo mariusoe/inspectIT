@@ -4,19 +4,20 @@ import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatcher;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
+import info.novatec.inspectit.javassist.CtBehavior;
 import info.novatec.inspectit.javassist.CtClass;
+import info.novatec.inspectit.javassist.CtConstructor;
+import info.novatec.inspectit.javassist.CtMethod;
 import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.util.Iterator;
 import java.util.List;
 
-
 /**
- * The super class matcher implementation is used to check if the class name of
- * the configuration is equal to one of the super classes of the passed class.
- * All of the calls to these methods are mainly delegated to either an
- * {@link DirectMatcher} or an {@link IndirectMatcher}, depending if the
- * configuration is virtual (contains a pattern).
+ * The super class matcher implementation is used to check if the class name of the configuration is
+ * equal to one of the super classes of the passed class. All of the calls to these methods are
+ * mainly delegated to either an {@link DirectMatcher} or an {@link IndirectMatcher}, depending if
+ * the configuration is virtual (contains a pattern).
  * 
  * @author Patrice Bouillet
  * 
@@ -29,15 +30,13 @@ public class SuperclassMatcher extends AbstractMatcher {
 	private final IInheritanceAnalyzer inheritanceAnalyzer;
 
 	/**
-	 * The {@link IMatcher} delegator object to route the calls of all methods
-	 * to.
+	 * The {@link IMatcher} delegator object to route the calls of all methods to.
 	 */
 	private IMatcher delegateMatcher;
 
 	/**
-	 * The only constructor which needs a reference to the
-	 * {@link UnregisteredSensorConfig} instance of the corresponding
-	 * configuration.
+	 * The only constructor which needs a reference to the {@link UnregisteredSensorConfig} instance
+	 * of the corresponding configuration.
 	 * 
 	 * @param inheritanceAnalyzer
 	 *            The inheritance analyzer.
@@ -63,9 +62,9 @@ public class SuperclassMatcher extends AbstractMatcher {
 	 * {@inheritDoc}
 	 */
 	public boolean compareClassName(ClassLoader classLoader, String className) throws NotFoundException {
-		Iterator i = inheritanceAnalyzer.getSuperclassIterator(classLoader, className);
+		Iterator<CtClass> i = inheritanceAnalyzer.getSuperclassIterator(classLoader, className);
 		while (i.hasNext()) {
-			CtClass clazz = (CtClass) i.next();
+			CtClass clazz = i.next();
 			if (delegateMatcher.compareClassName(classLoader, clazz.getName())) {
 				return true;
 			}
@@ -77,21 +76,21 @@ public class SuperclassMatcher extends AbstractMatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException {
+	public List<CtMethod> getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException {
 		return delegateMatcher.getMatchingMethods(classLoader, className);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException {
+	public List<CtConstructor> getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException {
 		return delegateMatcher.getMatchingConstructors(classLoader, className);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void checkParameters(List methods) throws NotFoundException {
+	public void checkParameters(List<? extends CtBehavior> methods) throws NotFoundException {
 		delegateMatcher.checkParameters(methods);
 	}
 

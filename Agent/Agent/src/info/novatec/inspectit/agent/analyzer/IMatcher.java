@@ -1,16 +1,16 @@
 package info.novatec.inspectit.agent.analyzer;
 
+import info.novatec.inspectit.javassist.CtBehavior;
 import info.novatec.inspectit.javassist.CtConstructor;
 import info.novatec.inspectit.javassist.CtMethod;
 import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.util.List;
 
-
 /**
- * This interface is used for all implementations of the configuration matching
- * system. There are different ones available because of the possibility to
- * define sensors as superclasses or having a wildcard expression in its string.
+ * This interface is used for all implementations of the configuration matching system. There are
+ * different ones available because of the possibility to define sensors as superclasses or having a
+ * wildcard expression in its string.
  * 
  * @author Patrice Bouillet
  * 
@@ -18,18 +18,16 @@ import java.util.List;
 public interface IMatcher {
 
 	/**
-	 * This method compares the class name. Returns <code>true</code> if the
-	 * comparison is successful.
+	 * This method compares the class name. Returns <code>true</code> if the comparison is
+	 * successful.
 	 * 
 	 * @param classLoader
 	 *            The class loader of the given class.
 	 * @param className
 	 *            The name of the class to load.
-	 * @return <code>true</code> if the passed class name matches the defined
-	 *         one.
+	 * @return <code>true</code> if the passed class name matches the defined one.
 	 * @throws NotFoundException
-	 *             This exception is thrown if a class is not found from within
-	 *             Javassist.
+	 *             This exception is thrown if a class is not found from within Javassist.
 	 */
 	boolean compareClassName(ClassLoader classLoader, String className) throws NotFoundException;
 
@@ -40,13 +38,12 @@ public interface IMatcher {
 	 *            The class loader of the given class.
 	 * @param className
 	 *            The name of the class to load.
-	 * @return A {@link List} containing all the {@link CtMethod} objects which
-	 *         matched successfully to this implementation.
+	 * @return A {@link List} containing all the {@link CtMethod} objects which matched successfully
+	 *         to this implementation.
 	 * @throws NotFoundException
-	 *             This exception is thrown if a class is not found from within
-	 *             Javassist.
+	 *             This exception is thrown if a class is not found from within Javassist.
 	 */
-	List getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException;
+	List<CtMethod> getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException;
 
 	/**
 	 * Returns all the matching constructors of the passed class.
@@ -55,26 +52,23 @@ public interface IMatcher {
 	 *            The class loader of the given class.
 	 * @param className
 	 *            The name of the class to load.
-	 * @return A {@link List} containing all the {@link CtConstructor} objects
-	 *         which matched successfully to this implementation.
+	 * @return A {@link List} containing all the {@link CtConstructor} objects which matched
+	 *         successfully to this implementation.
 	 * @throws NotFoundException
-	 *             This exception is thrown if a class is not found from within
-	 *             Javassist.
+	 *             This exception is thrown if a class is not found from within Javassist.
 	 */
-	List getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException;
+	List<CtConstructor> getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException;
 
 	/**
-	 * This method checks all the parameters of the given {@link List} of
-	 * {@link CtMethod} objects if they match the configuration. If one method
-	 * object is found which has parameters not matching to the configuration,
-	 * it is removed from the list.
+	 * This method checks all the parameters of the given {@link List} of {@link CtBehavior} objects
+	 * if they match the configuration. If one method object is found which has parameters not
+	 * matching to the configuration, it is removed from the list.
 	 * 
 	 * @param methods
-	 *            The {@link List} of {@link CtMethod} objects to check.
+	 *            The {@link List} of {@link CtBehavior} objects to check.
 	 * @throws NotFoundException
-	 *             This exception is thrown if a class is not found from within
-	 *             Javassist.
+	 *             This exception is thrown if a class is not found from within Javassist.
 	 */
-	void checkParameters(List methods) throws NotFoundException;
+	void checkParameters(List<? extends CtBehavior> methods) throws NotFoundException;
 
 }

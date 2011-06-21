@@ -28,7 +28,7 @@ public class BufferHttpTimerDataDaoTest extends AbstractTestNGLogSupport {
 		// boolean includeRequestMethod) {
 
 		final HttpTimerData data = new HttpTimerData();
-		data.setHeaders(new HashMap<String, Object>() {
+		data.setHeaders(new HashMap<String, String>() {
 			{
 				put("inspectit", "tag1");
 			}
@@ -37,7 +37,7 @@ public class BufferHttpTimerDataDaoTest extends AbstractTestNGLogSupport {
 		data.setRequestMethod("GET");
 
 		final HttpTimerData data2 = new HttpTimerData();
-		data2.setHeaders(new HashMap<String, Object>() {
+		data2.setHeaders(new HashMap<String, String>() {
 			{
 				put("inspectit", "tag2");
 			}
@@ -64,7 +64,7 @@ public class BufferHttpTimerDataDaoTest extends AbstractTestNGLogSupport {
 		// boolean includeRequestMethod) {
 
 		final HttpTimerData data = new HttpTimerData();
-		data.setHeaders(new HashMap<String, Object>() {
+		data.setHeaders(new HashMap<String, String>() {
 			{
 				put("inspectit", "tag1");
 			}
@@ -78,7 +78,7 @@ public class BufferHttpTimerDataDaoTest extends AbstractTestNGLogSupport {
 		data.setCpuDuration(10d);
 
 		final HttpTimerData data2 = new HttpTimerData();
-		data2.setHeaders(new HashMap<String, Object>() {
+		data2.setHeaders(new HashMap<String, String>() {
 			{
 				put("inspectit", "tag1");
 			}

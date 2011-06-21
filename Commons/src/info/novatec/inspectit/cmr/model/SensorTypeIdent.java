@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The Sensor Type Ident class is the abstract base class for the
- * {@link MethodSensorTypeIdent} and {@link PlatformSensorTypeIdent} classes.
+ * The Sensor Type Ident class is the abstract base class for the {@link MethodSensorTypeIdent} and
+ * {@link PlatformSensorTypeIdent} classes.
  * 
  * @author Patrice Bouillet
  * 
@@ -26,7 +26,7 @@ public abstract class SensorTypeIdent implements Serializable {
 	/**
 	 * The many-to-many association to the {@link PlatformIdent} objects.
 	 */
-	private Set platformIdents = new HashSet(0);
+	private Set<PlatformIdent> platformIdents = new HashSet<PlatformIdent>(0);
 
 	/**
 	 * The fully qualified class name of the sensor type.
@@ -36,11 +36,11 @@ public abstract class SensorTypeIdent implements Serializable {
 	public SensorTypeIdent() {
 	}
 
-	public Set getPlatformIdents() {
+	public Set<PlatformIdent> getPlatformIdents() {
 		return platformIdents;
 	}
 
-	public void setPlatformIdents(Set platformIdents) {
+	public void setPlatformIdents(Set<PlatformIdent> platformIdents) {
 		this.platformIdents = platformIdents;
 	}
 

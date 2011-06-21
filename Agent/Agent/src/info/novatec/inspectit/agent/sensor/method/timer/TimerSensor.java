@@ -6,6 +6,7 @@ import info.novatec.inspectit.agent.hooking.IHook;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 import info.novatec.inspectit.util.Timer;
 
+import java.lang.management.ManagementFactory;
 import java.util.Map;
 
 /**
@@ -62,8 +63,8 @@ public class TimerSensor implements IMethodSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void init(Map parameter) {
-		timerHook = new TimerHook(timer, idManager, propertyAccessor, parameter);
+	public void init(Map<String, Object> parameter) {
+		timerHook = new TimerHook(timer, idManager, propertyAccessor, parameter, ManagementFactory.getThreadMXBean());
 	}
 
 }

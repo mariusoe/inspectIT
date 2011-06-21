@@ -5,6 +5,7 @@ import info.novatec.inspectit.agent.analyzer.IMatchPattern;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
 import info.novatec.inspectit.javassist.CtBehavior;
 import info.novatec.inspectit.javassist.CtClass;
+import info.novatec.inspectit.javassist.CtConstructor;
 import info.novatec.inspectit.javassist.CtMethod;
 import info.novatec.inspectit.javassist.Modifier;
 import info.novatec.inspectit.javassist.NotFoundException;
@@ -16,11 +17,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-
 /**
- * The indirect matcher is used for a sensor configuration which contains a
- * pattern somewhere in the class name, method name or one of the parameter
- * types.
+ * The indirect matcher is used for a sensor configuration which contains a pattern somewhere in the
+ * class name, method name or one of the parameter types.
  * 
  * @author Patrice Bouillet
  * 
@@ -28,9 +27,8 @@ import java.util.Map;
 public class IndirectMatcher extends AbstractMatcher {
 
 	/**
-	 * The {@link DirectMatcher} object is needed for Strings which are not
-	 * containing a pattern. Hence a small gain in performance should be
-	 * accomplished.
+	 * The {@link DirectMatcher} object is needed for Strings which are not containing a pattern.
+	 * Hence a small gain in performance should be accomplished.
 	 */
 	private DirectMatcher directMatcher;
 
@@ -45,15 +43,13 @@ public class IndirectMatcher extends AbstractMatcher {
 	private IMatchPattern methodNamePattern = null;
 
 	/**
-	 * All patterns of the parameters. Only maps those parameters which are
-	 * really a pattern.
+	 * All patterns of the parameters. Only maps those parameters which are really a pattern.
 	 */
-	private Map parameterTypesPatterns = new HashMap();
+	private Map<String, SimpleMatchPattern> parameterTypesPatterns = new HashMap<String, SimpleMatchPattern>();
 
 	/**
-	 * The only constructor which needs a reference to the
-	 * {@link UnregisteredSensorConfig} instance of the corresponding
-	 * configuration.
+	 * The only constructor which needs a reference to the {@link UnregisteredSensorConfig} instance
+	 * of the corresponding configuration.
 	 * 
 	 * @param classPoolAnalyzer
 	 *            The class pool analyzer.
@@ -75,9 +71,7 @@ public class IndirectMatcher extends AbstractMatcher {
 		}
 
 		if (null != unregisteredSensorConfig.getParameterTypes()) {
-			Iterator i = unregisteredSensorConfig.getParameterTypes().iterator();
-			while (i.hasNext()) {
-				String parameter = (String) i.next();
+			for (String parameter : unregisteredSensorConfig.getParameterTypes()) {
 				if (SimpleMatchPattern.isPattern(parameter)) {
 					parameterTypesPatterns.put(parameter, new SimpleMatchPattern(parameter));
 				}
@@ -99,7 +93,7 @@ public class IndirectMatcher extends AbstractMatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException {
+	public List<CtMethod> getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException {
 		if (null == methodNamePattern) {
 			return directMatcher.getMatchingMethods(classLoader, className);
 		}
@@ -107,10 +101,9 @@ public class IndirectMatcher extends AbstractMatcher {
 		CtMethod[] methods = classPoolAnalyzer.getMethodsForClassName(classLoader, className);
 
 		if ((null != methods) && (methods.length > 0)) {
-			List matchingMethods = new ArrayList();
+			List<CtMethod> matchingMethods = new ArrayList<CtMethod>();
 
-			for (int i = 0; i < methods.length; i++) {
-				CtMethod method = methods[i];
+			for (CtMethod method : methods) {
 				// skip abstract and native methods
 				if (!Modifier.isAbstract(method.getModifiers()) && !Modifier.isNative(method.getModifiers())) {
 					if (methodNamePattern.match(method.getName())) {
@@ -122,18 +115,18 @@ public class IndirectMatcher extends AbstractMatcher {
 			return matchingMethods;
 		}
 
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException {
+	public List<CtConstructor> getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException {
 		// no pattern allowed for the constructor, has to be specified directly.
 		// That is to disallow something like *init* (which would include the
 		// constructor).
 		if (null != methodNamePattern) {
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 
 		return directMatcher.getMatchingConstructors(classLoader, className);
@@ -142,14 +135,14 @@ public class IndirectMatcher extends AbstractMatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void checkParameters(List methods) throws NotFoundException {
+	public void checkParameters(List<? extends CtBehavior> methods) throws NotFoundException {
 		if (!unregisteredSensorConfig.isIgnoreSignature()) {
-			List parameterTypes = unregisteredSensorConfig.getParameterTypes();
+			List<String> parameterTypes = unregisteredSensorConfig.getParameterTypes();
 			if (0 == parameterTypesPatterns.size()) {
 				directMatcher.checkParameters(methods);
 			} else if (null != parameterTypes) {
-				for (Iterator iterator = methods.iterator(); iterator.hasNext();) {
-					CtBehavior behaviour = (CtBehavior) iterator.next();
+				for (Iterator<? extends CtBehavior> iterator = methods.iterator(); iterator.hasNext();) {
+					CtBehavior behaviour = iterator.next();
 					// get all the parameter types from the behaviour
 					CtClass[] ctClasses = behaviour.getParameterTypes();
 

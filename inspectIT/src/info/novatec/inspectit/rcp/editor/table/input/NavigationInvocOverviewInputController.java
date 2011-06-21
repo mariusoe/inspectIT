@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * 
  */
 public class NavigationInvocOverviewInputController extends InvocOverviewInputController {
-	
+
 	/**
 	 * The ID of this subview / controller.
 	 */
@@ -56,7 +56,6 @@ public class NavigationInvocOverviewInputController extends InvocOverviewInputCo
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Updating Invocation Overview", IProgressMonitor.UNKNOWN);

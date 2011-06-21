@@ -7,10 +7,9 @@ import info.novatec.inspectit.agent.hooking.IMethodHook;
 import java.util.List;
 
 /**
- * This hook is intended to intercept the methods which are used to set some
- * specific parameter values on the prepared statements so that the final
- * prepared statement with all inserted values can be generated in the user
- * interface.
+ * This hook is intended to intercept the methods which are used to set some specific parameter
+ * values on the prepared statements so that the final prepared statement with all inserted values
+ * can be generated in the user interface.
  * 
  * @author Patrice Bouillet
  * 
@@ -23,10 +22,10 @@ public class PreparedStatementParameterHook implements IMethodHook {
 	private StatementStorage statementStorage;
 
 	/**
-	 * The ThreadLocal for a boolean value so only the last before and first
-	 * after hook of an invocation is measured.
+	 * The ThreadLocal for a boolean value so only the last before and first after hook of an
+	 * invocation is measured.
 	 */
-	private static ThreadLocal threadLast = new ThreadLocal();
+	private static ThreadLocal<Boolean> threadLast = new ThreadLocal<Boolean>();
 
 	/**
 	 * Default constructor which needs a reference to the statement storage.
@@ -56,10 +55,10 @@ public class PreparedStatementParameterHook implements IMethodHook {
 	 * {@inheritDoc}
 	 */
 	public void secondAfterBody(ICoreService coreService, long methodId, long sensorTypeId, Object object, Object[] parameters, Object result, RegisteredSensorConfig rsc) {
-		if (((Boolean) threadLast.get()).booleanValue()) {
+		if (threadLast.get().booleanValue()) {
 			threadLast.set(Boolean.FALSE);
 
-			List parameterTypes = rsc.getParameterTypes();
+			List<String> parameterTypes = rsc.getParameterTypes();
 			if ((parameterTypes.size() >= 2) && "int".equals(parameterTypes.get(0))) {
 				// subtract one as the index starts at 1, and not at 0
 				int index = ((Integer) parameters[0]).intValue() - 1;

@@ -1,6 +1,7 @@
 package info.novatec.inspectit.agent.buffer.impl;
 
 import info.novatec.inspectit.agent.buffer.IBufferStrategy;
+import info.novatec.inspectit.communication.MethodSensorData;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
  * @author Patrice Bouillet
  * 
  */
-public class SizeBufferStrategy implements IBufferStrategy {
+public class SizeBufferStrategy implements IBufferStrategy<MethodSensorData> {
 
 	/**
 	 * The logger of the class.
@@ -29,7 +30,7 @@ public class SizeBufferStrategy implements IBufferStrategy {
 	/**
 	 * The linked list containing the FILO stack.
 	 */
-	private LinkedList stack;
+	private LinkedList<List<MethodSensorData>> stack;
 
 	/**
 	 * The stack size.
@@ -51,13 +52,13 @@ public class SizeBufferStrategy implements IBufferStrategy {
 	 */
 	public SizeBufferStrategy(int size) {
 		this.size = size;
-		stack = new LinkedList();
+		stack = new LinkedList<List<MethodSensorData>>();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addMeasurements(List measurements) {
+	public void addMeasurements(List<MethodSensorData> measurements) {
 		if (null == measurements) {
 			throw new IllegalArgumentException("Measurements cannot be null!");
 		}
@@ -66,16 +67,16 @@ public class SizeBufferStrategy implements IBufferStrategy {
 			// as we can only add one element at the time, we only have to delete
 			// the oldest element.
 			if (stack.size() >= size) {
-				// if the measurements stack size is reached, this buffer strategy will simply drop the
-				// old ones, because we can not let the data pile up if the sending of the data is not
-				// fast enough
+				// if the measurements stack size is reached, this buffer strategy will simply drop
+				// the old ones, because we can not let the data pile up if the sending of the data
+				// is not fast enough
 				stack.removeFirst();
 				LOGGER.info("Possible data loss due to the excessive data creation on the Agent!");
 			}
 
 			stack.addLast(measurements);
 		}
-			
+
 	}
 
 	/**
@@ -88,7 +89,7 @@ public class SizeBufferStrategy implements IBufferStrategy {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object next() {
+	public List<MethodSensorData> next() {
 		synchronized (this) {
 			return stack.removeLast();
 		}
@@ -104,7 +105,7 @@ public class SizeBufferStrategy implements IBufferStrategy {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void init(Map settings) {
+	public void init(Map<String, String> settings) {
 		if (settings.containsKey("size")) {
 			this.size = Integer.parseInt((String) settings.get("size"));
 		}

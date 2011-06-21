@@ -1,7 +1,5 @@
 package info.novatec.inspectit.rcp.repository.service.cmr;
 
-import java.util.Collections;
-
 import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.communication.data.LicenseInfoData;
 import info.novatec.inspectit.rcp.InspectIT;
@@ -20,8 +18,7 @@ public class LicenseService implements ILicenseService {
 	private static final String LICENSE_SERVICE = "LicenseService";
 
 	/**
-	 * The proxy factory bean by Spring which initializes the data access
-	 * service.
+	 * The proxy factory bean by Spring which initializes the data access service.
 	 */
 	private final HttpInvokerProxyFactoryBean httpInvokerProxyFactoryBean;
 
@@ -53,7 +50,7 @@ public class LicenseService implements ILicenseService {
 	public void receiveLicenseContent(byte[] licenseContent) throws Exception {
 		licenseService.receiveLicenseContent(licenseContent);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

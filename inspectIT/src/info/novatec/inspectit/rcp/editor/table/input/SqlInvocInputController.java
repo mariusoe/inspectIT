@@ -288,7 +288,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		if (null == data) {
 			return false;
 		}
-		
+
 		if (data.isEmpty()) {
 			return true;
 		}
@@ -335,7 +335,6 @@ public class SqlInvocInputController extends AbstractTableInputController {
 			return sqlStatementDataList.toArray();
 		}
 
-		@SuppressWarnings("unchecked")
 		private List<SqlStatementData> extractSqlData(List<InvocationSequenceData> invocationSequenceDataList, ArrayList<SqlStatementData> sqlStatementDataList) {
 			for (InvocationSequenceData invocationSequenceData : invocationSequenceDataList) {
 				if (null != invocationSequenceData.getSqlStatementData()) {
@@ -464,7 +463,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		}
 		throw new RuntimeException("Could not create the human readable string!");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

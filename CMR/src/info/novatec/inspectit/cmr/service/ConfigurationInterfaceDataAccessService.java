@@ -61,7 +61,6 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Log
 	public long addEnvironment(EnvironmentData environmentData) {
 		long result = environmentDataDao.addEnvironment(environmentData);
@@ -106,7 +105,6 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Log
 	public long addProfile(ProfileData profileData) {
 		long result = profileDataDao.addProfile(profileData);

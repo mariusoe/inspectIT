@@ -1,12 +1,14 @@
 package info.novatec.inspectit.agent.sensor.method.timer;
 
+import info.novatec.inspectit.communication.data.ParameterContentData;
+
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Factory for creating storage objects for the Timer sensor according to the
- * definition in the configuration.
+ * Factory for creating storage objects for the Timer sensor according to the definition in the
+ * configuration.
  * 
  * @author Patrice Bouillet
  * 
@@ -45,8 +47,7 @@ public final class TimerStorageFactory {
 	}
 
 	/**
-	 * Multiple instances of a factory aren't needed, so return a singleton of
-	 * this class.
+	 * Multiple instances of a factory aren't needed, so return a singleton of this class.
 	 * 
 	 * @return The singleton.
 	 */
@@ -58,13 +59,13 @@ public final class TimerStorageFactory {
 	}
 
 	/**
-	 * If given {@link Map} contains a key named <b>mode</b>, it is checked
-	 * against the keywords <b>raw</b>, <b>aggregate</b> and <b>optimized</b>.
+	 * If given {@link Map} contains a key named <b>mode</b>, it is checked against the keywords
+	 * <b>raw</b>, <b>aggregate</b> and <b>optimized</b>.
 	 * 
 	 * @param parameters
 	 *            The parameters.
 	 */
-	public void setParameters(final Map parameters) {
+	public void setParameters(final Map<String, Object> parameters) {
 		String mode = (String) parameters.get("mode");
 
 		if (null != mode) {
@@ -92,8 +93,8 @@ public final class TimerStorageFactory {
 	}
 
 	/**
-	 * Returns a new implementation of the {@link ITimerStorage} interface.
-	 * Depends on the current mode which is set through {@link #setMode(int)}.
+	 * Returns a new implementation of the {@link ITimerStorage} interface. Depends on the current
+	 * mode which is set through {@link #setMode(int)}.
 	 * 
 	 * @param timeStamp
 	 *            The time stamp.
@@ -104,11 +105,10 @@ public final class TimerStorageFactory {
 	 * @param methodIdent
 	 *            The id of the method.
 	 * @param parameterContentData
-	 *            The contents of some additional parameters. Can be
-	 *            <code>null</code>.
+	 *            The contents of some additional parameters. Can be <code>null</code>.
 	 * @return A new {@link ITimerStorage} implementation object.
 	 */
-	public ITimerStorage newStorage(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List parameterContentData) {
+	public ITimerStorage newStorage(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData) {
 		switch (mode) {
 		case RAW_DATA_TRANSMISSION:
 			return new PlainTimerStorage(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);

@@ -13,7 +13,6 @@ import info.novatec.inspectit.agent.analyzer.impl.SuperclassMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.ThrowableMatcher;
 import info.novatec.inspectit.javassist.Modifier;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -121,13 +120,11 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setParameterTypes(List parameterTypes) {
+	public void setParameterTypes(List<String> parameterTypes) {
 		if (null != parameterTypes) {
 			super.setParameterTypes(parameterTypes);
 
-			Iterator i = parameterTypes.iterator();
-			while (i.hasNext()) {
-				String parameter = (String) i.next();
+			for (String parameter : parameterTypes) {
 				if (SimpleMatchPattern.isPattern(parameter)) {
 					setVirtual(true);
 				}
@@ -242,8 +239,9 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
-	 * Returns the integer value that defines the modifiers of methods to be instrumented. The values
-	 * are defined in {@link Modifier} class. Default value is 0, and this means no modifiers are set.
+	 * Returns the integer value that defines the modifiers of methods to be instrumented. The
+	 * values are defined in {@link Modifier} class. Default value is 0, and this means no modifiers
+	 * are set.
 	 * 
 	 * @return the modifiers int value
 	 */
@@ -253,7 +251,8 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 
 	/**
 	 * Sets the integer value that defines the modifiers of methods to be instrumented. The values
-	 * are defined in {@link Modifier} class. Default value is 0, and this means no modifiers are set.
+	 * are defined in {@link Modifier} class. Default value is 0, and this means no modifiers are
+	 * set.
 	 * 
 	 * @param modifiers
 	 *            the modifier int value
@@ -304,7 +303,7 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 		} else if (virtual && !superclass && !interf) {
 			matcher = new IndirectMatcher(classPoolAnalyzer, this);
 		}
-		
+
 		if (null != annotationClassName) {
 			matcher = new AnnotationMatcher(inheritanceAnalyzer, classPoolAnalyzer, this, matcher);
 		}

@@ -69,7 +69,7 @@ public interface IConfigurationStorage {
 	 *             This exception is thrown if something unexpected happens while initializing the
 	 *             buffer strategy.
 	 */
-	void setBufferStrategy(String clazzName, Map settings) throws StorageException;
+	void setBufferStrategy(String clazzName, Map<String, String> settings) throws StorageException;
 
 	/**
 	 * Returns a {@link StrategyConfig} instance containing the buffer strategy information.
@@ -89,7 +89,7 @@ public interface IConfigurationStorage {
 	 *             This exception is thrown if something unexpected happens while initializing the
 	 *             buffer strategy.
 	 */
-	void addSendingStrategy(String clazzName, Map settings) throws StorageException;
+	void addSendingStrategy(String clazzName, Map<String, String> settings) throws StorageException;
 
 	/**
 	 * Returns a {@link List} of {@link StrategyConfig} instances containing the sending strategy
@@ -97,7 +97,7 @@ public interface IConfigurationStorage {
 	 * 
 	 * @return A {@link List} of {@link StrategyConfig} instances.
 	 */
-	List getSendingStrategyConfigs();
+	List<StrategyConfig> getSendingStrategyConfigs();
 
 	/**
 	 * Creates and initializes a {@link MethodSensorTypeConfig} out of the given parameters. A
@@ -117,21 +117,21 @@ public interface IConfigurationStorage {
 	 *             This exception is thrown if something unexpected happens while initializing the
 	 *             buffer strategy.
 	 */
-	void addMethodSensorType(String sensorTypeName, String sensorTypeClass, PriorityEnum priority, Map settings) throws StorageException;
+	void addMethodSensorType(String sensorTypeName, String sensorTypeClass, PriorityEnum priority, Map<String, Object> settings) throws StorageException;
 
 	/**
 	 * Returns a {@link List} of the {@link MethodSensorTypeConfig} classes.
 	 * 
 	 * @return A {@link List} of {@link MethodSensorTypeConfig} classes.
 	 */
-	List getMethodSensorTypes();
+	List<MethodSensorTypeConfig> getMethodSensorTypes();
 
 	/**
 	 * Returns a {@link List} of {@link MethodSensorTypeConfig} classes.
 	 * 
 	 * @return A {@link List} of {@link MethodSensorTypeConfig} classes.
 	 */
-	List getExceptionSensorTypes();
+	List<MethodSensorTypeConfig> getExceptionSensorTypes();
 
 	/**
 	 * Creates and initializes a {@link MethodSensorTypeConfig} out of the given parameters. A
@@ -147,7 +147,7 @@ public interface IConfigurationStorage {
 	 *             This exception is thrown if something unexpected happens while initializing the
 	 *             buffer strategy.
 	 */
-	void addExceptionSensorType(String sensorTypeClass, Map settings) throws StorageException;
+	void addExceptionSensorType(String sensorTypeClass, Map<String, Object> settings) throws StorageException;
 
 	/**
 	 * Adds a new parameter for the exception sensor definition.
@@ -168,7 +168,7 @@ public interface IConfigurationStorage {
 	 *             This exception is thrown if something unexpected happens while initializing the
 	 *             buffer strategy.
 	 */
-	void addExceptionSensorTypeParameter(String sensorTypeName, String targetClassName, boolean isVirtual, Map settings) throws StorageException;
+	void addExceptionSensorTypeParameter(String sensorTypeName, String targetClassName, boolean isVirtual, Map<String, Object> settings) throws StorageException;
 
 	/**
 	 * Creates and initializes a {@link MethodSensorTypeConfig} out of the given parameters. A
@@ -184,14 +184,14 @@ public interface IConfigurationStorage {
 	 *             This exception is thrown if something unexpected happens while initializing the
 	 *             buffer strategy.
 	 */
-	void addPlatformSensorType(String sensorTypeClass, Map settings) throws StorageException;
+	void addPlatformSensorType(String sensorTypeClass, Map<String, Object> settings) throws StorageException;
 
 	/**
 	 * Returns a {@link List} of the {@link PlatformSensorTypeConfig} classes.
 	 * 
 	 * @return A {@link List} of {@link PlatformSensorTypeConfig} classes.
 	 */
-	List getPlatformSensorTypes();
+	List<PlatformSensorTypeConfig> getPlatformSensorTypes();
 
 	/**
 	 * Adds a new sensor definition.
@@ -217,14 +217,14 @@ public interface IConfigurationStorage {
 	 *             This exception is thrown if something unexpected happens while initializing the
 	 *             buffer strategy.
 	 */
-	void addSensor(String sensorTypeName, String targetClassName, String targetMethodName, List parameterList, boolean ignoreSignature, Map settings) throws StorageException;
+	void addSensor(String sensorTypeName, String targetClassName, String targetMethodName, List<String> parameterList, boolean ignoreSignature, Map<String, Object> settings) throws StorageException;
 
 	/**
 	 * Returns a {@link List} of the {@link UnregisteredSensorConfig} classes.
 	 * 
 	 * @return A {@link List} of {@link UnregisteredSensorConfig} classes.
 	 */
-	List getUnregisteredSensorConfigs();
+	List<UnregisteredSensorConfig> getUnregisteredSensorConfigs();
 
 	/**
 	 * Returns whether the {@link IExceptionSensor} is activated.

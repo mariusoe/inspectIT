@@ -181,7 +181,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 					processExceptionSensorTypeLine(tokenizer);
 					continue;
 				}
-				
+
 				// check for exception sensor line
 				if (discriminator.equalsIgnoreCase(CONFIG_EXCEPTION_SENSOR)) {
 					processExceptionSensorLine(tokenizer);
@@ -217,7 +217,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	private void processExceptionSensorTypeLine(StringTokenizer tokenizer) throws ParserException {
 		String sensorTypeClass = tokenizer.nextToken();
 
-		Map settings = new HashMap();
+		Map<String, Object> settings = new HashMap<String, Object>();
 		while (tokenizer.hasMoreTokens()) {
 			String parameterToken = tokenizer.nextToken();
 			StringTokenizer parameterTokenizer = new StringTokenizer(parameterToken, "=");
@@ -225,14 +225,14 @@ public class FileConfigurationReader implements IConfigurationReader {
 			String rightSide = parameterTokenizer.nextToken();
 			settings.put(leftSide, rightSide);
 		}
-		
+
 		Object mode = settings.get("mode");
 		if (null != mode && "enhanced".equals(mode)) {
 			configurationStorage.setEnhancedExceptionSensorActivated(true);
 		} else {
 			configurationStorage.setEnhancedExceptionSensorActivated(false);
 		}
-		
+
 		try {
 			configurationStorage.addExceptionSensorType(sensorTypeClass, settings);
 		} catch (StorageException e) {
@@ -259,7 +259,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 			isVirtual = true;
 		}
 
-		Map settings = new HashMap();
+		Map<String, Object> settings = new HashMap<String, Object>();
 		while (tokenizer.hasMoreTokens()) {
 			String parameterToken = tokenizer.nextToken();
 			StringTokenizer parameterTokenizer = new StringTokenizer(parameterToken, "=");
@@ -287,9 +287,9 @@ public class FileConfigurationReader implements IConfigurationReader {
 		String sensorTypeName = tokenizer.nextToken();
 		String sensorTypeClass = tokenizer.nextToken();
 		String priorityString = tokenizer.nextToken();
-		PriorityEnum priority = PriorityEnum.fromInt(PriorityEnum.names().indexOf(priorityString));
+		PriorityEnum priority = PriorityEnum.valueOf(priorityString);
 
-		Map settings = new HashMap();
+		Map<String, Object> settings = new HashMap<String, Object>();
 		while (tokenizer.hasMoreTokens()) {
 			String parameterToken = tokenizer.nextToken();
 			StringTokenizer parameterTokenizer = new StringTokenizer(parameterToken, "=");
@@ -316,7 +316,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	private void processPlatformSensorTypeLine(StringTokenizer tokenizer) throws ParserException {
 		String sensorTypeClass = tokenizer.nextToken();
 
-		Map settings = new HashMap();
+		Map<String, Object> settings = new HashMap<String, Object>();
 		while (tokenizer.hasMoreTokens()) {
 			String parameterToken = tokenizer.nextToken();
 			StringTokenizer parameterTokenizer = new StringTokenizer(parameterToken, "=");
@@ -347,13 +347,13 @@ public class FileConfigurationReader implements IConfigurationReader {
 
 		// Trying to match the parameter types (if there are any)
 		Matcher m = methodSignature.matcher(targetMethodName);
-		List parameterList = Collections.EMPTY_LIST;
+		List<String> parameterList = Collections.emptyList();
 		if (m.matches()) {
 			String[] classes = m.group(1).split(",");
-			parameterList = new ArrayList(classes.length);
+			parameterList = new ArrayList<String>(classes.length);
 
-			for (int i = 0; i < classes.length; i++) {
-				parameterList.add((classes[i]).trim());
+			for (String clazz : classes) {
+				parameterList.add(clazz.trim());
 			}
 			targetMethodName = targetMethodName.split("\\(")[0];
 		} else if (emptyMethodSignature.matcher(targetMethodName).matches()) {
@@ -362,7 +362,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 			ignoreSignature = true;
 		}
 
-		Map settings = new HashMap();
+		Map<String, Object> settings = new HashMap<String, Object>();
 		while (tokenizer.hasMoreTokens()) {
 			String parameterToken = tokenizer.nextToken();
 			if (parameterToken.charAt(0) == '@') {
@@ -373,16 +373,18 @@ public class FileConfigurationReader implements IConfigurationReader {
 				String rightSide = parameterTokenizer.nextToken();
 
 				if ("property".equals(leftSide) || "p".equals(leftSide)) {
-					List propertyAccessorList = (List) settings.get("property");
+					@SuppressWarnings("unchecked")
+					List<String> propertyAccessorList = (List<String>) settings.get("property");
 					if (null == propertyAccessorList) {
-						propertyAccessorList = new ArrayList();
+						propertyAccessorList = new ArrayList<String>();
 						settings.put("property", propertyAccessorList);
 					}
 					propertyAccessorList.add(rightSide);
 				} else if ("field".equals(leftSide) || "f".equals(leftSide)) {
-					List propertyAccessorList = (List) settings.get("field");
+					@SuppressWarnings("unchecked")
+					List<String> propertyAccessorList = (List<String>) settings.get("field");
 					if (null == propertyAccessorList) {
-						propertyAccessorList = new ArrayList();
+						propertyAccessorList = new ArrayList<String>();
 						settings.put("field", propertyAccessorList);
 					}
 					propertyAccessorList.add(rightSide);
@@ -431,7 +433,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	private void processSendStrategyLine(StringTokenizer tokenizer) throws ParserException {
 		String sendStrategyClass = tokenizer.nextToken();
 
-		Map settings = new HashMap();
+		Map<String, String> settings = new HashMap<String, String>();
 		while (tokenizer.hasMoreTokens()) {
 			String parameterToken = tokenizer.nextToken();
 			StringTokenizer parameterTokenizer = new StringTokenizer(parameterToken, "=");
@@ -457,7 +459,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	private void processBufferStrategyLine(StringTokenizer tokenizer) throws ParserException {
 		String bufferStrategyClass = tokenizer.nextToken();
 
-		Map settings = new HashMap();
+		Map<String, String> settings = new HashMap<String, String>();
 		while (tokenizer.hasMoreTokens()) {
 			String parameterToken = tokenizer.nextToken();
 			StringTokenizer parameterTokenizer = new StringTokenizer(parameterToken, "=");

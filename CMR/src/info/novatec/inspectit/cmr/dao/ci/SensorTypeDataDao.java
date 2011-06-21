@@ -1,6 +1,5 @@
 package info.novatec.inspectit.cmr.dao.ci;
 
-import info.novatec.inspectit.communication.data.ci.ProfileData;
 import info.novatec.inspectit.communication.data.ci.SensorTypeData;
 import info.novatec.inspectit.communication.exception.EntityNotFoundException;
 
@@ -27,8 +26,7 @@ public interface SensorTypeDataDao {
 	 * @param sensorTypeId
 	 *            The id of the {@link SensorTypeData} object to delete.
 	 * @throws EntityNotFoundException
-	 *             If no {@link SensorTypeData} object matching the given id could
-	 *             be found.
+	 *             If no {@link SensorTypeData} object matching the given id could be found.
 	 */
 	void deleteSensorType(long sensorTypeId) throws EntityNotFoundException;
 

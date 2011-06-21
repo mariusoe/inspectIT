@@ -4,8 +4,10 @@ import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatcher;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
+import info.novatec.inspectit.javassist.CtBehavior;
 import info.novatec.inspectit.javassist.CtClass;
 import info.novatec.inspectit.javassist.CtConstructor;
+import info.novatec.inspectit.javassist.CtMethod;
 import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.util.ArrayList;
@@ -63,27 +65,27 @@ public class ThrowableMatcher extends AbstractMatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException {
+	public List<CtMethod> getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException {
 		return delegateMatcher.getMatchingMethods(classLoader, className);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException {
-		List matchingConstructors = delegateMatcher.getMatchingConstructors(classLoader, className);
+	public List<CtConstructor> getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException {
+		List<CtConstructor> matchingConstructors = delegateMatcher.getMatchingConstructors(classLoader, className);
 
 		if (isThrowable(classLoader, className)) {
 			if (matchingConstructors.isEmpty()) {
-				matchingConstructors = new ArrayList();
+				matchingConstructors = new ArrayList<CtConstructor>();
 			}
 
 			// add the throwable constructors to the other constructors
 			CtClass clazz = classPoolAnalyzer.getClassPool(classLoader).get(className);
 			CtConstructor[] constructors = clazz.getConstructors();
-			for (int j = 0; j < constructors.length; j++) {
-				if (!matchingConstructors.contains(constructors[j])) {
-					matchingConstructors.add(constructors[j]);
+			for (CtConstructor constructor : constructors) {
+				if (!matchingConstructors.contains(constructor)) {
+					matchingConstructors.add(constructor);
 				}
 			}
 		}
@@ -94,7 +96,7 @@ public class ThrowableMatcher extends AbstractMatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void checkParameters(List methods) throws NotFoundException {
+	public void checkParameters(List<? extends CtBehavior> methods) throws NotFoundException {
 		delegateMatcher.checkParameters(methods);
 	}
 
@@ -110,4 +112,5 @@ public class ThrowableMatcher extends AbstractMatcher {
 	private boolean isThrowable(ClassLoader classLoader, String className) {
 		return inheritanceAnalyzer.subclassOf(className, "java.lang.Throwable", classPoolAnalyzer.getClassPool(classLoader));
 	}
+
 }

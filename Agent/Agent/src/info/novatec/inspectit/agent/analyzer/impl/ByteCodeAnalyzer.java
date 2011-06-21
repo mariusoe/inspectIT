@@ -24,7 +24,6 @@ import info.novatec.inspectit.javassist.NotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -108,7 +107,7 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 			classPool.insertClassPath(classPath);
 
 			byte[] instrumentedByteCode = null;
-			Map behaviorToConfigMap = analyze(className, classLoader);
+			Map<CtBehavior, List<UnregisteredSensorConfig>> behaviorToConfigMap = analyze(className, classLoader);
 
 			if (!behaviorToConfigMap.isEmpty()) {
 				instrumentedByteCode = instrument(behaviorToConfigMap);
@@ -158,17 +157,15 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 	 * @throws StorageException
 	 *             Sensor could not be added.
 	 */
-	private Map analyze(String className, ClassLoader classLoader) throws NotFoundException, StorageException {
-		Map behaviorToConfigMap = new HashMap();
+	private Map<CtBehavior, List<UnregisteredSensorConfig>> analyze(String className, ClassLoader classLoader) throws NotFoundException, StorageException {
+		Map<CtBehavior, List<UnregisteredSensorConfig>> behaviorToConfigMap = new HashMap<CtBehavior, List<UnregisteredSensorConfig>>();
 
 		// Iterating over all stored unregistered sensor configurations
-		for (Iterator iterator = configurationStorage.getUnregisteredSensorConfigs().iterator(); iterator.hasNext();) {
-			UnregisteredSensorConfig unregisteredSensorConfig = (UnregisteredSensorConfig) iterator.next();
-
+		for (UnregisteredSensorConfig unregisteredSensorConfig : configurationStorage.getUnregisteredSensorConfigs()) {
 			// try to match the class name first
 			IMatcher matcher = unregisteredSensorConfig.getMatcher();
 			if (matcher.compareClassName(classLoader, className)) {
-				List behaviors;
+				List<? extends CtBehavior> behaviors;
 				// differentiate between constructors and methods.
 				if (unregisteredSensorConfig.isConstructor()) {
 					// the constructors
@@ -180,17 +177,16 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 				matcher.checkParameters(behaviors);
 
 				// iterating over all methods which passed the matcher
-				for (Iterator behaviorIterator = behaviors.iterator(); behaviorIterator.hasNext();) {
-					CtBehavior behavior = (CtBehavior) behaviorIterator.next();
+				for (CtBehavior behavior : behaviors) {
 					if (behaviorToConfigMap.containsKey(behavior)) {
 						// access the already initialized list and store the
 						// unregistered sensor configuration in it.
-						List configs = (List) behaviorToConfigMap.get(behavior);
+						List<UnregisteredSensorConfig> configs = behaviorToConfigMap.get(behavior);
 						configs.add(unregisteredSensorConfig);
 					} else {
 						// key does not exist already, thus we have to
 						// create the list first.
-						List configs = new ArrayList();
+						List<UnregisteredSensorConfig> configs = new ArrayList<UnregisteredSensorConfig>();
 						configs.add(unregisteredSensorConfig);
 						behaviorToConfigMap.put(behavior, configs);
 					}
@@ -218,14 +214,13 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 	 * @throws CannotCompileException
 	 *             The byte code could not be generated.
 	 */
-	private byte[] instrument(Map methodToConfigMap) throws NotFoundException, HookException, IOException, CannotCompileException {
+	private byte[] instrument(Map<CtBehavior, List<UnregisteredSensorConfig>> methodToConfigMap) throws NotFoundException, HookException, IOException, CannotCompileException {
 		CtBehavior ctBehavior = null;
-		for (Iterator iterator = methodToConfigMap.entrySet().iterator(); iterator.hasNext();) {
-			Map.Entry entry = (Map.Entry) iterator.next();
-			ctBehavior = (CtBehavior) entry.getKey();
-			List configs = (List) entry.getValue();
+		for (Map.Entry<CtBehavior, List<UnregisteredSensorConfig>> entry : methodToConfigMap.entrySet()) {
+			ctBehavior = entry.getKey();
+			List<UnregisteredSensorConfig> configs = entry.getValue();
 
-			List parameterTypes = new ArrayList();
+			List<String> parameterTypes = new ArrayList<String>();
 			CtClass[] parameterClasses = ctBehavior.getParameterTypes();
 			for (int pos = 0; pos < parameterClasses.length; pos++) {
 				parameterTypes.add((parameterClasses[pos]).getName());
@@ -239,8 +234,7 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 			rsc.setModifiers(ctBehavior.getModifiers());
 			rsc.setCtBehavior(ctBehavior);
 
-			for (Iterator configsIterator = configs.iterator(); configsIterator.hasNext();) {
-				UnregisteredSensorConfig usc = (UnregisteredSensorConfig) configsIterator.next();
+			for (UnregisteredSensorConfig usc : configs) {
 				rsc.addSensorTypeConfig(usc.getSensorTypeConfig());
 				rsc.getSettings().putAll(usc.getSettings());
 
@@ -257,8 +251,7 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 			// only when there is an enhanced Exception Sensor defined
 			if (configurationStorage.isExceptionSensorActivated() && configurationStorage.isEnhancedExceptionSensorActivated()) {
 				// iterate over the exception sensor types - currently there is only one
-				for (Iterator configsIterator = configurationStorage.getExceptionSensorTypes().iterator(); configsIterator.hasNext();) {
-					MethodSensorTypeConfig config = (MethodSensorTypeConfig) configsIterator.next();
+				for (MethodSensorTypeConfig config : configurationStorage.getExceptionSensorTypes()) {
 					// need to add the exception sensor config separately, because otherwise it
 					// would be added to the other method hooks, but the exception sensor is a
 					// constructor hook

@@ -1,5 +1,6 @@
 package info.novatec.inspectit.agent.config.impl;
 
+import info.novatec.inspectit.agent.hooking.IHook;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 import info.novatec.inspectit.javassist.CtBehavior;
@@ -9,8 +10,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -46,7 +45,7 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	/**
 	 * This list contains all configurations of the sensor types for this sensor configuration.
 	 */
-	private List sensorTypeConfigs = new ArrayList();
+	private List<MethodSensorTypeConfig> sensorTypeConfigs = new ArrayList<MethodSensorTypeConfig>();
 
 	/**
 	 * The sensor type configuration object of the invocation sequence tracer.
@@ -61,13 +60,13 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	/**
 	 * The map used by the hooks in the source code to execute the after methods.
 	 */
-	private Map methodHookMap = new LinkedHashMap();
+	private Map<Long, IHook> methodHookMap = new LinkedHashMap<Long, IHook>();
 
 	/**
 	 * The map used by the hooks in the source code to execute the before method. For that hook, it
 	 * has to be reversed.
 	 */
-	private Map reverseMethodHookMap = new LinkedHashMap();
+	private Map<Long, IHook> reverseMethodHookMap = new LinkedHashMap<Long, IHook>();
 
 	/**
 	 * The method visibility.
@@ -136,7 +135,7 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	 * 
 	 * @return The list of sensor type configurations.
 	 */
-	public List getSensorTypeConfigs() {
+	public List<MethodSensorTypeConfig> getSensorTypeConfigs() {
 		return sensorTypeConfigs;
 	}
 
@@ -188,7 +187,7 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	 * The sensor comparator is used to sort the sensor type configurations according to their
 	 * priority.
 	 */
-	private Comparator sensorTypeConfigComparator = new SensorTypeConfigComparator();
+	private Comparator<MethodSensorTypeConfig> sensorTypeConfigComparator = new SensorTypeConfigComparator();
 
 	/**
 	 * Sort the sensor type configurations according to their priority.
@@ -212,7 +211,7 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	 * 
 	 * @return The sorted map of method hooks.
 	 */
-	public Map getMethodHooks() {
+	public Map<Long, IHook> getMethodHooks() {
 		return methodHookMap;
 	}
 
@@ -221,7 +220,7 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	 * 
 	 * @return The reverse sorted map of method hooks.
 	 */
-	public Map getReverseMethodHooks() {
+	public Map<Long, IHook> getReverseMethodHooks() {
 		return reverseMethodHookMap;
 	}
 
@@ -230,17 +229,16 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	 */
 	private void sortMethodHooks() {
 		methodHookMap.clear();
-		for (Iterator iterator = sensorTypeConfigs.iterator(); iterator.hasNext();) {
-			MethodSensorTypeConfig sensorTypeConfig = (MethodSensorTypeConfig) iterator.next();
+		for (MethodSensorTypeConfig sensorTypeConfig : sensorTypeConfigs) {
 			IMethodSensor methodSensor = (IMethodSensor) sensorTypeConfig.getSensorType();
-			methodHookMap.put(new Long(sensorTypeConfig.getId()), methodSensor.getHook());
+			methodHookMap.put(Long.valueOf(sensorTypeConfig.getId()), methodSensor.getHook());
 		}
 
 		reverseMethodHookMap.clear();
-		for (ListIterator iterator = sensorTypeConfigs.listIterator(sensorTypeConfigs.size()); iterator.hasPrevious();) {
-			MethodSensorTypeConfig sensorTypeConfig = (MethodSensorTypeConfig) iterator.previous();
+		for (ListIterator<MethodSensorTypeConfig> iterator = sensorTypeConfigs.listIterator(sensorTypeConfigs.size()); iterator.hasPrevious();) {
+			MethodSensorTypeConfig sensorTypeConfig = iterator.previous();
 			IMethodSensor methodSensor = (IMethodSensor) sensorTypeConfig.getSensorType();
-			reverseMethodHookMap.put(new Long(sensorTypeConfig.getId()), methodSensor.getHook());
+			reverseMethodHookMap.put(Long.valueOf(sensorTypeConfig.getId()), methodSensor.getHook());
 		}
 	}
 
@@ -250,7 +248,7 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private static class SensorTypeConfigComparator implements Comparator, Serializable {
+	private static class SensorTypeConfigComparator implements Comparator<MethodSensorTypeConfig>, Serializable {
 
 		/**
 		 * The generated serial version UID.
@@ -260,19 +258,8 @@ public class RegisteredSensorConfig extends AbstractSensorConfig {
 		/**
 		 * {@inheritDoc}
 		 */
-		public int compare(Object sensorTypeConfig1, Object sensorTypeConfig2) {
-			int prio1 = ((MethodSensorTypeConfig) sensorTypeConfig1).getPriority().getValue();
-			int prio2 = ((MethodSensorTypeConfig) sensorTypeConfig2).getPriority().getValue();
-
-			if (prio1 < prio2) {
-				return 1;
-			}
-
-			if (prio1 > prio2) {
-				return -1;
-			}
-
-			return 0;
+		public int compare(MethodSensorTypeConfig sensorTypeConfig1, MethodSensorTypeConfig sensorTypeConfig2) {
+			return sensorTypeConfig2.getPriority().compareTo(sensorTypeConfig1.getPriority());
 		}
 
 	}

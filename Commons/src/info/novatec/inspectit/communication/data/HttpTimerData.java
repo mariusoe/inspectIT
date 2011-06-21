@@ -4,7 +4,6 @@ import info.novatec.inspectit.cmr.cache.IObjectSizes;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -28,13 +27,13 @@ public class HttpTimerData extends TimerData {
 	/** The uri */
 	private String uri = UNDEFINED;
 	/** Map is String-String[] */
-	private Map parameters = null;
+	private Map<String, String[]> parameters = null;
 	/** Map is String-String */
-	private Map attributes = null;
+	private Map<String, String> attributes = null;
 	/** Map is String-String */
-	private Map headers = null;
+	private Map<String, String> headers = null;
 	/** Map is String-String */
-	private Map sessionAttributes = null;
+	private Map<String, String> sessionAttributes = null;
 	/** The request method */
 	private String requestMethod = UNDEFINED;
 
@@ -95,7 +94,7 @@ public class HttpTimerData extends TimerData {
 	 */
 	public void setInspectITTaggingHeaderValue(String value) {
 		if (null == headers) {
-			headers = new HashMap(1);
+			headers = new HashMap<String, String>(1);
 		}
 		headers.put(INSPECTIT_TAGGING_HEADER, value);
 	}
@@ -110,19 +109,19 @@ public class HttpTimerData extends TimerData {
 		}
 	}
 
-	public Map getParameters() {
+	public Map<String, String[]> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(Map parameters) {
+	public void setParameters(Map<String, String[]> parameters) {
 		this.parameters = parameters;
 	}
 
-	public Map getAttributes() {
+	public Map<String, String> getAttributes() {
 		return attributes;
 	}
 
-	public void setAttributes(Map attributes) {
+	public void setAttributes(Map<String, String> attributes) {
 		this.attributes = attributes;
 	}
 
@@ -134,19 +133,19 @@ public class HttpTimerData extends TimerData {
 		this.requestMethod = requestMethod;
 	}
 
-	public Map getHeaders() {
+	public Map<String, String> getHeaders() {
 		return headers;
 	}
 
-	public void setHeaders(Map headers) {
+	public void setHeaders(Map<String, String> headers) {
 		this.headers = headers;
 	}
 
-	public Map getSessionAttributes() {
+	public Map<String, String> getSessionAttributes() {
 		return sessionAttributes;
 	}
 
-	public void setSessionAttributes(Map sessionAttributes) {
+	public void setSessionAttributes(Map<String, String> sessionAttributes) {
 		this.sessionAttributes = sessionAttributes;
 	}
 
@@ -161,11 +160,9 @@ public class HttpTimerData extends TimerData {
 
 		if (null != parameters) {
 			size += objectSizes.getSizeOfHashMap(parameters.size());
-			for (Iterator it = parameters.entrySet().iterator(); it.hasNext();) {
-				Map.Entry entry = (Map.Entry) it.next();
-				size += objectSizes.getSizeOf((String) entry.getKey());
-
-				String[] values = (String[]) entry.getValue();
+			for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
+				size += objectSizes.getSizeOf(entry.getKey());
+				String[] values = entry.getValue();
 				size += objectSizes.getSizeOfArray(values.length);
 				for (int i = 0; i < values.length; i++) {
 					size += objectSizes.getSizeOf(values[i]);
@@ -175,28 +172,25 @@ public class HttpTimerData extends TimerData {
 
 		if (null != attributes) {
 			size += objectSizes.getSizeOfHashMap(attributes.size());
-			for (Iterator it = attributes.entrySet().iterator(); it.hasNext();) {
-				Map.Entry entry = (Map.Entry) it.next();
-				size += objectSizes.getSizeOf((String) entry.getKey());
-				size += objectSizes.getSizeOf((String) entry.getValue());
+			for (Map.Entry<String, String> entry : attributes.entrySet()) {
+				size += objectSizes.getSizeOf(entry.getKey());
+				size += objectSizes.getSizeOf(entry.getValue());
 			}
 		}
 
 		if (null != headers) {
 			size += objectSizes.getSizeOfHashMap(headers.size());
-			for (Iterator it = headers.entrySet().iterator(); it.hasNext();) {
-				Map.Entry entry = (Map.Entry) it.next();
-				size += objectSizes.getSizeOf((String) entry.getKey());
-				size += objectSizes.getSizeOf((String) entry.getValue());
+			for (Map.Entry<String, String> entry : headers.entrySet()) {
+				size += objectSizes.getSizeOf(entry.getKey());
+				size += objectSizes.getSizeOf(entry.getValue());
 			}
 		}
 
 		if (null != sessionAttributes) {
 			size += objectSizes.getSizeOfHashMap(sessionAttributes.size());
-			for (Iterator it = sessionAttributes.entrySet().iterator(); it.hasNext();) {
-				Map.Entry entry = (Map.Entry) it.next();
-				size += objectSizes.getSizeOf((String) entry.getKey());
-				size += objectSizes.getSizeOf((String) entry.getValue());
+			for (Map.Entry<String, String> entry : sessionAttributes.entrySet()) {
+				size += objectSizes.getSizeOf(entry.getKey());
+				size += objectSizes.getSizeOf(entry.getValue());
 			}
 		}
 

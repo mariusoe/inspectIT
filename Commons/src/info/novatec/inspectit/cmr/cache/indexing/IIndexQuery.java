@@ -81,7 +81,7 @@ public interface IIndexQuery {
 	 * 
 	 * @return class
 	 */
-	List getObjectClasses();
+	List<Class<?>> getObjectClasses();
 
 	/**
 	 * Set the classes for objects to be returned by query. Only objects that are instances of
@@ -90,7 +90,7 @@ public interface IIndexQuery {
 	 * @param objectClass
 	 *            class or null for not including this property in the query
 	 */
-	void setObjectClasses(List objectClasses);
+	void setObjectClasses(List<Class<?>> objectClasses);
 
 	/**
 	 * Time stamp that represents date after which objects returned by query are created.

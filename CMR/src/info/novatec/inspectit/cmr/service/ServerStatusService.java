@@ -1,17 +1,15 @@
 package info.novatec.inspectit.cmr.service;
 
-import java.io.IOException;
-
-import info.novatec.inspectit.cmr.service.IServerStatusService;
-import info.novatec.inspectit.versioning.FileBasedVersioningServiceImpl;
 import info.novatec.inspectit.versioning.IVersioningService;
+
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
- * Implementation of the {@link IServerStatusService} interface to provide
- * information about the current status of the CMR.
+ * Implementation of the {@link IServerStatusService} interface to provide information about the
+ * current status of the CMR.
  * 
  * @author Patrice Bouillet
  * 
@@ -27,9 +25,9 @@ public class ServerStatusService implements IServerStatusService, InitializingBe
 	 * The status of the CMR.
 	 */
 	private int status = IServerStatusService.SERVER_STARTING;
-	
+
 	/**
-	 * The versioning Service
+	 * The versioning Service.
 	 */
 	private IVersioningService versioning;
 
@@ -62,8 +60,8 @@ public class ServerStatusService implements IServerStatusService, InitializingBe
 			return "n/a";
 		}
 	}
-	
-	public void setVersioning (IVersioningService service) {
+
+	public void setVersioning(IVersioningService service) {
 		this.versioning = service;
 	}
 

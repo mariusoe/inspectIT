@@ -3,4 +3,7 @@
 	<Match>
 		<Package name="~.*\.javassist*.*" />
 	</Match>
+	<Match>
+		<Package name="~.*\.test" />
+	</Match>
 </FindBugsFilter>

@@ -10,6 +10,7 @@ import info.novatec.inspectit.agent.connection.ServerUnavailableException;
 import info.novatec.inspectit.cmr.service.IAgentStorageService;
 import info.novatec.inspectit.cmr.service.IRegistrationService;
 import info.novatec.inspectit.cmr.service.LicenseException;
+import info.novatec.inspectit.communication.DefaultData;
 
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -118,12 +119,12 @@ public class RMIConnection implements IConnection {
 		try {
 			// Enumerations aren't serializable. So we convert it into a
 			// list
-			Enumeration interfaces = NetworkInterface.getNetworkInterfaces();
-			List networkInterfaces = new ArrayList();
+			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+			List<String> networkInterfaces = new ArrayList<String>();
 
 			while (interfaces.hasMoreElements()) {
 				NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
-				Enumeration addresses = networkInterface.getInetAddresses();
+				Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
 				while (addresses.hasMoreElements()) {
 					InetAddress address = (InetAddress) addresses.nextElement();
 					networkInterfaces.add(address.getHostAddress());
@@ -147,12 +148,12 @@ public class RMIConnection implements IConnection {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void sendDataObjects(List measurements) throws ServerUnavailableException {
+	public void sendDataObjects(List<? extends DefaultData> measurements) throws ServerUnavailableException {
 		if (!connected) {
 			throw new ServerUnavailableException();
 		}
 
-		if (null != measurements && 0 != measurements.size()) {
+		if (null != measurements && !measurements.isEmpty()) {
 			try {
 				AbstractRemoteMethodCall remote = new AddDataObjects(agentStorageService, measurements);
 				remote.makeCall();

@@ -1,14 +1,15 @@
 package info.novatec.inspectit.agent.sensor.method.timer;
 
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.valueobject.TimerRawVO;
 
 import java.sql.Timestamp;
 import java.util.List;
 
 /**
- * Class which stores the data as they arrive without further processing. This
- * will increase memory usage by a high amount but should reduces CPU usage.
+ * Class which stores the data as they arrive without further processing. This will increase memory
+ * usage by a high amount but should reduces CPU usage.
  * 
  * @author Patrice Bouillet
  * 
@@ -34,15 +35,19 @@ public class PlainTimerStorage implements ITimerStorage {
 	 * @param parameterContentData
 	 *            The content of the parameter/fields.
 	 */
-	public PlainTimerStorage(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List parameterContentData) {
+	public PlainTimerStorage(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData) {
 		timerRawVO = new TimerRawVO(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addData(double time) {
-		timerRawVO.add(time);
+	public void addData(double time, double cpuTime) {
+		if (cpuTime < 0) {
+			timerRawVO.add(time);
+		} else {
+			timerRawVO.add(time, cpuTime);
+		}
 	}
 
 	/**

@@ -48,14 +48,12 @@
 	<target name="clean" description="--> Cleans the project">
 		<delete dir="${build.root}" />
 		<delete dir="${dist.root}" />
-		<delete dir="${src.generated.root}" />
 		<delete dir="${lib.root}/prod" />
 		<delete dir="${lib.root}/test" />
 	</target>
 
 	<target name="init" description="--> Creates necessary folder structure">
 		<mkdir dir="${build.root}" />
-		<mkdir dir="${src.generated.root}" />
 		<antcall target="init-ivy" />
 
 		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
@@ -99,24 +97,13 @@
 	<target name="build-commons" description="--> builds a clean distribution of the commons project and copies the classes to the local build folder">
 		<mkdir dir="${build.commons.classes}" />
 
-		<javac source="1.4" target="1.4" debug="true" fork="true" includeAntRuntime="no" destdir="${build.commons.classes}" srcdir="${src.commons}">
-			<compilerarg value="-Xlint:unchecked" />
-		</javac>
+		<javac source="1.5" target="1.5" debug="true" fork="true" destdir="${build.commons.classes}" srcdir="${src.commons}" includeAntRuntime="no"/>
 	</target>
 
 	<target name="build" depends="init, build-commons" description="--> Compiles the sources">
-		<mkdir dir="${build.cmr.generated.classes}" />
 		<mkdir dir="${build.cmr.classes}" />
 
-		<javac source="1.5" target="1.5" debug="true" debuglevel="lines,vars,source" includeAntRuntime="no" destdir="${build.cmr.generated.classes}" srcdir="${src.generated.root}" classpathref="compile.classpath">
-			<compilerarg value="-Xlint:unchecked" />
-		</javac>
-		<javac source="1.5" target="1.5" debug="true" debuglevel="lines,vars,source" includeAntRuntime="no" destdir="${build.cmr.classes}" srcdir="${src.root}" classpathref="compile.classpath">
-			<compilerarg value="-Xlint:unchecked" />
-		</javac>
-
-		<rmic stubversion="1.2" base="${build.cmr.generated.classes}" classpathref="complete.classpath" classname="info.novatec.inspectit.cmr.service.AgentStorageService" sourcebase="${src.generated.root}" />
-		<rmic stubversion="1.2" base="${build.cmr.generated.classes}" classpathref="complete.classpath" classname="info.novatec.inspectit.cmr.service.RegistrationService" sourcebase="${src.generated.root}" />
+		<javac source="1.5" target="1.5" debug="true" debuglevel="lines,vars,source" destdir="${build.cmr.classes}" srcdir="${src.root}" classpathref="compile.classpath" includeAntRuntime="no"/>
 	</target>
 
 
@@ -260,7 +247,6 @@
 		<mkdir dir="${build.scripts}" />
 
 		<jar destfile="${build.release.root.cmr}/${dist.jar.name}" manifest="${basedir}/resources/META-INF/MANIFEST.MF">
-			<fileset dir="${build.cmr.generated.classes}" includes="**/*.class" />
 			<fileset dir="${build.cmr.classes}" includes="**/*.class" />
 			<fileset dir="${src.root}" includes="**/*.xml" />
 			<fileset dir="${src.root}" includes="**/*.properties" />
@@ -379,7 +365,7 @@
 						<!-- rename the file to indicate that it is a newer version -->
 						<antcall target="-notify-about-jre-update" />
 						<echo message="Downloading ${zip.file}" />
-						<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5"  passive="true">
+						<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
 							<fileset dir="${jvm.root}/tmp">
 								<include name="${zip.file}" />
 							</fileset>

@@ -28,14 +28,12 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	private static final String CONFIGURATION_INTERFACE_DATA_ACCESS_SERVICE = "ConfigurationInterfaceDataAccessService";
 
 	/**
-	 * The proxy factory bean by Spring which initializes the data access
-	 * service.
+	 * The proxy factory bean by Spring which initializes the data access service.
 	 */
 	private final HttpInvokerProxyFactoryBean httpInvokerProxyFactoryBean;
 
 	/**
-	 * The configuration interface data access service exposed by the CMR and
-	 * initialized by Spring.
+	 * The configuration interface data access service exposed by the CMR and initialized by Spring.
 	 */
 	private final IConfigurationInterfaceDataAccessService configurationInterfaceDataAccessService;
 
@@ -50,12 +48,10 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	public ConfigurationInterfaceDataAccessService(String ip, int port) {
 		httpInvokerProxyFactoryBean = new HttpInvokerProxyFactoryBean();
 		httpInvokerProxyFactoryBean.setServiceInterface(IConfigurationInterfaceDataAccessService.class);
-		httpInvokerProxyFactoryBean.setServiceUrl("http://" + ip + ":" + port + "/remoting/"
-				+ CONFIGURATION_INTERFACE_DATA_ACCESS_SERVICE);
+		httpInvokerProxyFactoryBean.setServiceUrl("http://" + ip + ":" + port + "/remoting/" + CONFIGURATION_INTERFACE_DATA_ACCESS_SERVICE);
 		httpInvokerProxyFactoryBean.afterPropertiesSet();
 
-		configurationInterfaceDataAccessService = (IConfigurationInterfaceDataAccessService) httpInvokerProxyFactoryBean
-				.getObject();
+		configurationInterfaceDataAccessService = (IConfigurationInterfaceDataAccessService) httpInvokerProxyFactoryBean.getObject();
 	}
 
 	/**
@@ -78,8 +74,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 		try {
 			return configurationInterfaceDataAccessService.addExceptionSensorDefinition(exceptionSensorDefinitionData);
 		} catch (Exception e) {
-			InspectIT.getDefault().createErrorDialog("There was an error adding of the exception sensor definition", e,
-					-1);
+			InspectIT.getDefault().createErrorDialog("There was an error adding of the exception sensor definition", e, -1);
 			// TODO MH: exception handling
 			return -1;
 		}
@@ -92,8 +87,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 		try {
 			return configurationInterfaceDataAccessService.addMethodSensorDefinition(methodSensorDefinitionData);
 		} catch (Exception e) {
-			InspectIT.getDefault()
-					.createErrorDialog("There was an error adding of the method sensor definition", e, -1);
+			InspectIT.getDefault().createErrorDialog("There was an error adding of the method sensor definition", e, -1);
 			// TODO MH: exception handling
 			return -1;
 		}
@@ -106,8 +100,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 		try {
 			return configurationInterfaceDataAccessService.addPlatformSensorDefinition(platformSensorDefinitionData);
 		} catch (Exception e) {
-			InspectIT.getDefault().createErrorDialog("There was an during adding of the platform sensor definitions",
-					e, -1);
+			InspectIT.getDefault().createErrorDialog("There was an during adding of the platform sensor definitions", e, -1);
 			// TODO MH: exception handling
 			return -1;
 		}
@@ -147,10 +140,9 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 		try {
 			configurationInterfaceDataAccessService.deleteExceptionSensorDefinition(exceptionSensorDefinitionId);
 		} catch (EntityNotFoundException e) {
-			InspectIT.getDefault().createErrorDialog("The exception sensor definition you want to delete could not be found", e, -1);		
+			InspectIT.getDefault().createErrorDialog("The exception sensor definition you want to delete could not be found", e, -1);
 		} catch (Exception e) {
-			InspectIT.getDefault().createErrorDialog("There was an error deleting the exception sensor definition", e,
-					-1);
+			InspectIT.getDefault().createErrorDialog("There was an error deleting the exception sensor definition", e, -1);
 		}
 		// TODO MH: handle EntityNotFoundException
 	}
@@ -162,7 +154,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 		try {
 			configurationInterfaceDataAccessService.deleteMethodSensorDefinition(methodSensorDefinitionId);
 		} catch (EntityNotFoundException e) {
-			InspectIT.getDefault().createErrorDialog("The method sensor definition you want to delete could not be found", e, -1);		
+			InspectIT.getDefault().createErrorDialog("The method sensor definition you want to delete could not be found", e, -1);
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog("There was an error deleting the method sensor definition", e, -1);
 		}
@@ -176,10 +168,9 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 		try {
 			configurationInterfaceDataAccessService.deletePlatformSensorDefinition(platformSensorDefinitionId);
 		} catch (EntityNotFoundException e) {
-			InspectIT.getDefault().createErrorDialog("The platform sensor definition you want to delete could not be found", e, -1);		
+			InspectIT.getDefault().createErrorDialog("The platform sensor definition you want to delete could not be found", e, -1);
 		} catch (Exception e) {
-			InspectIT.getDefault().createErrorDialog("There was an error deleting the platform sensor definition", e,
-					-1);
+			InspectIT.getDefault().createErrorDialog("There was an error deleting the platform sensor definition", e, -1);
 		}
 		// TODO MH: handle EntityNotFoundException
 	}
@@ -191,7 +182,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 		try {
 			configurationInterfaceDataAccessService.deleteProfile(profileId);
 		} catch (EntityNotFoundException e) {
-			InspectIT.getDefault().createErrorDialog("The profile you want to delete could not be found", e, -1);		
+			InspectIT.getDefault().createErrorDialog("The profile you want to delete could not be found", e, -1);
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog("There was an error deleting the profile!", e, -1);
 		}
@@ -215,14 +206,12 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * @see IConfigurationInterfaceDataAccessService#getEnvironments()
 	 */
-	@SuppressWarnings("unchecked")
-	public List getEnvironments() {
+	public List<EnvironmentData> getEnvironments() {
 		try {
 			return configurationInterfaceDataAccessService.getEnvironments();
 		} catch (Exception e) {
-			InspectIT.getDefault().createErrorDialog("There was an error retrieving the environments from the CMR!", e,
-					-1);
-			return Collections.EMPTY_LIST;
+			InspectIT.getDefault().createErrorDialog("There was an error retrieving the environments from the CMR!", e, -1);
+			return Collections.emptyList();
 		}
 	}
 
@@ -256,8 +245,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 		try {
 			configurationInterfaceDataAccessService.updateExceptionSensorDefinition(exceptionSensorDefinitionData);
 		} catch (Exception e) {
-			InspectIT.getDefault().createErrorDialog("There was an error updating the Exception Sensor Definition!", e,
-					-1);
+			InspectIT.getDefault().createErrorDialog("There was an error updating the Exception Sensor Definition!", e, -1);
 		}
 	}
 
@@ -268,8 +256,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 		try {
 			configurationInterfaceDataAccessService.updateMethodSensorDefinition(methodSensorDefinitionData);
 		} catch (Exception e) {
-			InspectIT.getDefault()
-					.createErrorDialog("There was an error updating the Method Sensor Definition!", e, -1);
+			InspectIT.getDefault().createErrorDialog("There was an error updating the Method Sensor Definition!", e, -1);
 		}
 	}
 
@@ -280,8 +267,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 		try {
 			configurationInterfaceDataAccessService.updatePlatformSensorDefinition(platformSensorDefinitionData);
 		} catch (Exception e) {
-			InspectIT.getDefault().createErrorDialog("There was an error updating the Platform Sensor Definition!", e,
-					-1);
+			InspectIT.getDefault().createErrorDialog("There was an error updating the Platform Sensor Definition!", e, -1);
 		}
 	}
 
@@ -304,6 +290,6 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 			configurationInterfaceDataAccessService.updateSensorType(sensorTypeData);
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog("There was an error updating the Sensor Type", e, -1);
-		}		
+		}
 	}
 }

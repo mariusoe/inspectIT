@@ -7,15 +7,7 @@
 	<description> 
 		Build file for the agent component. This build provides build code for the
 		agent project (contains all features that the agent release shares for java
-		version 1.4 and upward). 
-		
-		In addition to that the agent provides the release process for the agent 
-		components. The agent component is made up out of different projects
-		depending on the target environment and the target java version:
-	
-		As an example: For Java 1.5 the projects Agent, JavaAgent and Agent5.0 need
-		to be merged into the resulting component. For Java 1.4 the projects
-		Agent and 1.4Classloader needs to be merged.
+		version 5 and upward). 
 	</description>
 
 
@@ -30,17 +22,12 @@
 		<pathelement location="${build.agent.classes}" />
 	</path>
 
-	<path id="path.agent50.classes">
-		<pathelement location="${build.agent50.classes}" />
+	<path id="path.agent.test.classes">
+		<pathelement location="${build.agent.test.classes}" />
 	</path>
 
 	<path id="path.common.classes">
 		<pathelement location="${build.commons.classes}" />
-	</path>
-
-	<path id="path.agent.test.classes">
-		<pathelement location="${build.agent.test.classes}" />
-		<pathelement location="${build.agent50.test.classes}" />
 	</path>
 
 	<!-- classpath for findbugs is needed because it enables to run findbugs without having a local installation-->
@@ -85,9 +72,6 @@
 		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="path.libs" />
 		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs" />
 		<taskdef resource="checkstyletask.properties" classpathref="path.libs" />
-
-		<available file="java-exec.properties" property="java-exec.present" />
-		<property file="java-exec.properties" />
 	</target>
 
 
@@ -100,56 +84,28 @@
 	<!-- environment in which the agent should be applied                -->
 	<!-- *************************************************************** -->
 
-	<target name="build-agent" depends="init, build-commons" description="--> Compiles the sources of the agent itself">
+	<target name="build-agent" depends="init, build-commons">
 		<mkdir dir="${build.agent.classes}" />
 
-		<!-- we are using the compiler for java 1.4 as this project contains all features of the agent that can be achieved -->
-		<!-- with any Java version starting from 1.4 upwards. Thus we must ensure that we use the 1.4 compiler here! -->
-		<javac compiler="javac1.4" source="1.4" target="1.4" debug="true" includeAntRuntime="no" destdir="${build.agent.classes}" srcdir="${src.root}">
+		<javac source="1.5" target="1.5" debug="true" nowarn="off" destdir="${build.agent.classes}" srcdir="${src.root}" includeAntRuntime="no">
 			<classpath refid="path.libs" />
+			<classpath refid="path.agent.classes" />
 			<classpath refid="path.common.classes" />
-			<compilerarg value="-Xlint:unchecked" />
+			<compilerarg compiler="org.eclipse.jdt.core.JDTCompilerAdapter" line="-warn:${list.warning.options},+unused -Xemacs" />
 		</javac>
 	</target>
-
 
 	<target name="build-commons" description="--> builds a clean distribution of the commons project and copies the classes to the local build folder">
 		<mkdir dir="${build.commons.classes}" />
 
-		<javac source="1.4" target="1.4" debug="true" fork="true" includeAntRuntime="no" destdir="${build.commons.classes}" srcdir="${commons.src}">
-			<compilerarg value="-Xlint:unchecked" />
-		</javac>
+		<javac source="1.5" target="1.5" debug="true" fork="true" destdir="${build.commons.classes}" srcdir="${commons.src}" includeAntRuntime="no"/>
 
 		<jar destfile="${build.commons.classes}/commons.jar">
 			<fileset dir="${build.commons.classes}" includes="**/*.class" />
 		</jar>
 	</target>
 
-	<target name="build-javaagent" depends="build-agent">
-		<mkdir dir="${build.javaagent.classes}" />
 
-		<javac target="1.5" source="1.5" debug="true" includeAntRuntime="no" destdir="${build.javaagent.classes}" srcdir="${javaagent.src}" classpathref="path.agent.classes">
-			<compilerarg compiler="org.eclipse.jdt.core.JDTCompilerAdapter" line="-warn:${list.warning.options}" />
-			<compilerarg value="-Xlint:unchecked" />
-		</javac>
-	</target>
-
-	<target name="build-14classloader" if="java-exec.present" depends="build-agent">
-		<mkdir dir="${build.classloader.classes}" />
-
-		<javac target="1.4" source="1.4" fork="true" debug="true" includeAntRuntime="no" destdir="${build.classloader.classes}" srcdir="${classloader.src}" classpathref="path.agent.classes" executable="${java14.javac.exec}"/>
-	</target>
-
-	<target name="build-agent5.0" depends="build-agent">
-		<mkdir dir="${build.agent50.classes}" />
-
-		<javac source="1.5" target="1.5" debug="true" nowarn="off" includeAntRuntime="no" destdir="${build.agent50.classes}" srcdir="${agent50.src}">
-			<classpath refid="path.agent.classes" />
-			<classpath refid="path.common.classes" />
-			<compilerarg compiler="org.eclipse.jdt.core.JDTCompilerAdapter" line="-warn:${list.warning.options},+unused -Xemacs" />
-			<compilerarg value="-Xlint:unchecked" />
-		</javac>
-	</target>
 
 	<!-- *************************************************************** -->
 	<!--                Q U A L I T Y     T A R G E T S                  -->
@@ -158,38 +114,24 @@
 	<!-- component.                                                      -->
 	<!-- *************************************************************** -->
 
-	<target name="functional-tests" depends="build-agent, build-agent5.0">
+	<target name="functional-tests" depends="build-agent">
 		<mkdir dir="${build.agent.test.classes}" />
-		<mkdir dir="${build.agent50.test.classes}" />
 		<mkdir dir="${build.qa.test.testdata}" />
 		<mkdir dir="${build.qa.test.coveragedata}" />
 
-		<javac compiler="javac1.4" debug="true" includeAntRuntime="no" destdir="${build.agent.test.classes}" srcdir="${agenttest.src}">
+		<javac source="1.5" target="1.5" debug="true" nowarn="off" destdir="${build.agent.test.classes}" srcdir="${src.test.root}" includeAntRuntime="no">
 			<classpath refid="path.libs" />
 			<classpath refid="path.agent.classes" />
 			<classpath refid="path.common.classes" />
-			<compilerarg value="-Xlint:unchecked" />
-		</javac>
-
-		<javac source="1.5" target="1.5" debug="true" nowarn="off" includeAntRuntime="no" destdir="${build.agent50.test.classes}" srcdir="${agent50test.src}">
-			<classpath refid="path.libs" />
-			<classpath refid="path.agent50.classes" />
-			<classpath refid="path.agent.classes" />
-			<classpath refid="path.common.classes" />
-			<compilerarg value="-Xlint:unchecked" />
 		</javac>
 
 		<!-- instrument the classes that should be included in test coverage -->
 		<mkdir dir="${build.agent.instrumented.classes}" />
-		<mkdir dir="${build.agent50.instrumented.classes}" />
 
 		<!-- ensure that the original class files are not touched as we do not want to -->
 		<!-- ship classes that are instrumented with cobertura to the customer -->
 		<copy todir="${build.agent.instrumented.classes}">
 			<fileset dir="${build.agent.classes}" />
-		</copy>
-		<copy todir="${build.agent50.instrumented.classes}">
-			<fileset dir="${build.agent50.classes}" />
 		</copy>
 
 		<cobertura-instrument datafile="${build.qa.test.coveragedata}/cobertura.ser">
@@ -200,12 +142,10 @@
 			<excludeClasses regex="info.novatec.inspectit.communication.*" />
 			<instrumentationClasspath>
 				<path location="${build.agent.instrumented.classes}" />
-				<path location="${build.agent50.instrumented.classes}" />
 			</instrumentationClasspath>
 			<classpath refid="path.libs" />
 			<classpath refid="path.common.classes" />
 			<classpath location="${build.agent.instrumented.classes}" />
-			<classpath location="${build.agent50.instrumented.classes}" />
 		</cobertura-instrument>
 
 		<testng failureproperty="error.test.agent" outputdir="${build.qa.test.testdata}" haltonfailure="${testng.haltonfailure}">
@@ -213,22 +153,18 @@
 			<classpath refid="path.libs" />
 			<classpath refid="path.common.classes" />
 			<classpath location="${build.agent.instrumented.classes}" />
-			<classpath location="${build.agent50.instrumented.classes}" />
 
 			<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${build.qa.test.coveragedata}/cobertura.ser" />
 
-			<xmlfileset file="${agenttest.ressources.testng}/testng.xml" />
-			<xmlfileset file="${agent50test.ressources.testng}/testng.xml" />
+			<xmlfileset file="${testng.file}" />
 		</testng>
 
 		<!-- create cobertura html and xml reports and link to the interesting parts -->
 		<cobertura-report format="html" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
 			<fileset dir="${src.root}" includes="**/*.java" excludes="**/javassist/**" />
-			<fileset dir="${agent50.src}" includes="**/*.java" />
 		</cobertura-report>
 		<cobertura-report format="xml" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
 			<fileset dir="${src.root}" includes="**/*.java" excludes="**/javassist/**" />
-			<fileset dir="${agent50.src}" includes="**/*.java" />
 		</cobertura-report>
 		<echo file="${build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >" />
 
@@ -238,7 +174,7 @@
 	</target>
 
 
-	<target name="static-analysis" depends="init, build-agent, build-agent5.0">
+	<target name="static-analysis" depends="init, build-agent">
 		<mkdir dir="${build.qa.analysis}" />
 		<mkdir dir="${build.qa.analysis.pmd}" />
 		<mkdir dir="${build.qa.analysis.checkstyle}" />
@@ -252,9 +188,7 @@
 			<fileset dir="${src.root}">
 				<include name="info/novatec/inspectit/**/*.java" />
 				<exclude name="**/javassist/**" />
-			</fileset>
-			<fileset dir="${agent50.src}">
-				<include name="info/novatec/inspectit/**/*.java" />
+				<exclude name="info/novatec/inspectit/**/test/**" />
 			</fileset>
 			<fileset dir="${commons.src}">
 				<include name="info/novatec/inspectit/**/*.java" />
@@ -271,9 +205,7 @@
 			<fileset dir="${src.root}">
 				<include name="info/novatec/inspectit/**/*.java" />
 				<exclude name="**/javassist/**" />
-			</fileset>
-			<fileset dir="${agent50.src}">
-				<include name="info/novatec/inspectit/**/*.java" />
+				<exclude name="info/novatec/inspectit/**/test/**" />
 			</fileset>
 		</checkstyle>
 
@@ -301,9 +233,7 @@
 			<fileset dir="${src.root}">
 				<include name="info/novatec/inspectit/**/*.java" />
 				<exclude name="**/javassist/**" />
-			</fileset>
-			<fileset dir="${agent50.src}">
-				<include name="info/novatec/inspectit/**/*.java" />
+				<exclude name="info/novatec/inspectit/**/test/**" />
 			</fileset>
 		</cpd>
 	</target>
@@ -332,7 +262,7 @@ BSD License : PicoContainer (1.3) ${line.separator}
 Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA)" />
 	</target>
 
-	<target name="release-sun1.5" depends="build-agent, build-agent5.0, build-javaagent, unpack-dependencies" description="--> make a jar file for the whole project containing all dependencies">
+	<target name="release-sun1.5" depends="build-agent, unpack-dependencies" description="--> make a jar file for the whole project containing all dependencies">
 		<mkdir dir="${build.release}" />
 		<delete dir="${build.release}/sun1.5-data" />
 		<mkdir dir="${build.release}/sun1.5-data" />
@@ -349,11 +279,9 @@ Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA)" />
 			<fileset dir="${build.release}" includes="thirdparty.txt" />
 		</copy>
 
-		<jar destfile="${build.release}/sun1.5-data/agent/${dist.jar.name}" manifest="${javaagent.basedir}/META-INF/MANIFEST.MF">
+		<jar destfile="${build.release}/sun1.5-data/agent/${dist.jar.name}" manifest="${basedir}/META-INF/MANIFEST.MF">
 			<fileset dir="${build.agent.classes}" includes="**/*.class" />
-			<fileset dir="${build.agent50.classes}" includes="**/*.class" />
 			<fileset dir="${build.commons.classes}" includes="**/*.class" />
-			<fileset dir="${build.javaagent.classes}" includes="**/*.class" />
 			<fileset dir="${build.extract.root}" includes="**/*.class" />
 			<fileset dir="${commons.src}" includes="version.log" />
 		</jar>
@@ -364,56 +292,7 @@ Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA)" />
 		</zip>
 	</target>
 
-	<target name="release-sun1.4" depends="release-sun1.4-execute, release-sun1.4-missing-java-exec" />
-
-	<target name="release-sun1.4-missing-java-exec" unless="java-exec.present" depends="release-sun1.4-execute">
-		<echo message="-------------------------------------------------------------" />
-		<echo message="WARNING: No release for java 1.4 is built!" />
-		<echo message="--------------------------------------------------------------" />
-		<echo message="Cause: You did not specify the file 'java-exec.properties' within " />
-		<echo message="the Agent project. This file is necessary as it defines the " />
-		<echo message="location of the java 1.4 executable. The definition of this location " />
-		<echo message="is essential to the build of the project classloader 1.4! Please " />
-		<echo message="ensure that this file is created. You can use the template file within " />
-		<echo message="the Agent folder 'java-exec.properties.template' as a start, rename it " />
-		<echo message="to 'java-exec.properties' and adapt the file to your system." />
-	</target>
-
-	<target name="release-sun1.4-execute" if="java-exec.present" depends="build-agent, build-14classloader, unpack-dependencies" description="--> make a jar file for the whole project containing all dependencies">
-		<mkdir dir="${build.release}" />
-		<delete dir="${build.release}/sun1.4-data" />
-		<mkdir dir="${build.release}/sun1.4-data" />
-		<mkdir dir="${build.release}/sun1.4-data/agent" />
-		<mkdir dir="${build.release}/sun1.4-data/agent/config" />
-
-		<antcall target="-create-thirdparty-contributions" />
-
-		<copy todir="${build.release}/sun1.4-data/agent/config">
-			<fileset dir="${config.root}" includes="**/*.cfg" />
-			<fileset dir="${config.root}" includes="**/*.dll" />
-			<fileset dir="${config.root}" includes="**/*.so" />
-		</copy>
-
-		<copy todir="${build.release}/sun1.4-data/agent">
-			<fileset dir="${build.release}" includes="thirdparty.txt" />
-		</copy>
-
-		<jar destfile="${build.release}/sun1.4-data/agent/${dist.jar.name}">
-			<fileset dir="${build.agent.classes}" includes="**/*.class" />
-			<fileset dir="${build.commons.classes}" includes="**/*.class" />
-			<fileset dir="${build.classloader.classes}" includes="**/*.class" />
-			<fileset dir="${build.extract.root}" includes="**/*.class" />
-			<fileset dir="${commons.src}" includes="version.log" />
-			<fileset dir="${build.release}" includes="thirdparty.txt" />
-		</jar>
-
-		<zip destfile="${release.root}/${release.name.sun14}" basedir="${build.release}/sun1.4-data" />
-		<zip destfile="${release.root}/${release.name.sun14}" update="true">
-			<zipfileset dir="${commons.basedir}/resources" prefix="agent" includes="inspectIT-licence.pdf" />
-		</zip>
-	</target>
-
-	<target name="release-all" depends="release-sun1.4, release-sun1.5" description="--> releases the agent for all versions" />
+	<target name="release-all" depends="release-sun1.5" description="--> releases the agent for all versions" />
 
 	<target name="integrate-version-information" description="This target creates a version.log file in the commons directory.">
 		<property environment="env" />

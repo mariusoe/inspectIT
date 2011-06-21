@@ -57,9 +57,9 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	public static final String ID = "inspectit.subview.table.ungroupedexceptionoverview";
 
 	/**
-	 * The private inner enumeration used to define the used IDs which are
-	 * mapped into the columns. The order in this enumeration represents the
-	 * order of the columns. If it is reordered, nothing else has to be changed.
+	 * The private inner enumeration used to define the used IDs which are mapped into the columns.
+	 * The order in this enumeration represents the order of the columns. If it is reordered,
+	 * nothing else has to be changed.
 	 * 
 	 * @author Eduard Tudenhoefner
 	 * 
@@ -87,8 +87,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in
-		 *            {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITConstants}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;
@@ -221,7 +220,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 		preferences.add(PreferenceId.TIMELINE);
 		return preferences;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -265,7 +264,6 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Updating the Ungrouped Exception Overview", IProgressMonitor.UNKNOWN);
 		monitor.subTask("Retrieving the Ungrouped Exception Overview");
@@ -279,7 +277,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 			exData = dataAccessService.getUngroupedExceptionOverview(template, limit);
 		}
 		exceptionSensorData.clear();
-		
+
 		if ((null != exData)) {
 			monitor.subTask("Displaying the Exception Tree Overview");
 			exceptionSensorData.addAll(exData);
@@ -297,7 +295,6 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 		if (!selection.isEmpty()) {
 			try {
 				PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
-					@SuppressWarnings("unchecked")
 					public void run(final IProgressMonitor monitor) {
 						monitor.beginTask("Retrieving Exception Tree", IProgressMonitor.UNKNOWN);
 						ExceptionSensorData data = (ExceptionSensorData) selection.getFirstElement();
@@ -387,8 +384,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	 *            The method ident object.
 	 * @param enumId
 	 *            The enumeration ID.
-	 * @return The styled string containing the information from the data
-	 *         object.
+	 * @return The styled string containing the information from the data object.
 	 */
 	private StyledString getStyledTextForColumn(ExceptionSensorData data, MethodIdent methodIdent, Column enumId) {
 		switch (enumId) {

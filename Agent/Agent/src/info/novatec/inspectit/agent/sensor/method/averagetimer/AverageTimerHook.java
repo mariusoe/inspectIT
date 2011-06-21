@@ -15,7 +15,6 @@ import info.novatec.inspectit.util.ThreadLocalStack;
 import info.novatec.inspectit.util.Timer;
 
 import java.sql.Timestamp;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -40,7 +39,7 @@ public class AverageTimerHook implements IMethodHook, IConstructorHook {
 	/**
 	 * The stack containing the start time values.
 	 */
-	private ThreadLocalStack timeStack = new ThreadLocalStack();
+	private ThreadLocalStack<Double> timeStack = new ThreadLocalStack<Double>();
 
 	/**
 	 * The timer used for accurate measuring.
@@ -56,7 +55,7 @@ public class AverageTimerHook implements IMethodHook, IConstructorHook {
 	 * The property accessor.
 	 */
 	private final IPropertyAccessor propertyAccessor;
-	
+
 	/**
 	 * The StringConstraint to ensure a maximum length of strings.
 	 */
@@ -74,7 +73,7 @@ public class AverageTimerHook implements IMethodHook, IConstructorHook {
 	 * @param param
 	 *            Additional parameters.
 	 */
-	public AverageTimerHook(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor, Map param) {
+	public AverageTimerHook(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor, Map<String, Object> param) {
 		this.timer = timer;
 		this.idManager = idManager;
 		this.propertyAccessor = propertyAccessor;
@@ -99,24 +98,23 @@ public class AverageTimerHook implements IMethodHook, IConstructorHook {
 	 * {@inheritDoc}
 	 */
 	public void secondAfterBody(ICoreService coreService, long methodId, long sensorTypeId, Object object, Object[] parameters, Object result, RegisteredSensorConfig rsc) {
-		double endTime = ((Double) timeStack.pop()).doubleValue();
-		double startTime = ((Double) timeStack.pop()).doubleValue();
+		double endTime = timeStack.pop().doubleValue();
+		double startTime = timeStack.pop().doubleValue();
 		double duration = endTime - startTime;
 
-		List parameterContentData = null;
+		List<ParameterContentData> parameterContentData = null;
 		String prefix = null;
 		// check if some properties need to be accessed and saved
 		if (rsc.isPropertyAccess()) {
 			parameterContentData = propertyAccessor.getParameterContentData(rsc.getPropertyAccessorList(), object, parameters);
 			prefix = parameterContentData.toString();
-			
+
 			// crop the content strings of all ParameterContentData but leave the prefix as it is
-			for (Iterator iterator = parameterContentData.iterator(); iterator.hasNext();) {
-				ParameterContentData contentData = (ParameterContentData) iterator.next();
+			for (ParameterContentData contentData : parameterContentData) {
 				contentData.setContent(strConstraint.cropKeepFinalCharacter(contentData.getContent(), '\''));
 			}
 		}
-		
+
 		TimerData timerData = (TimerData) coreService.getMethodSensorData(sensorTypeId, methodId, prefix);
 
 		if (null == timerData) {

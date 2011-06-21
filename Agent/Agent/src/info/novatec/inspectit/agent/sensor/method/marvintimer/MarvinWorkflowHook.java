@@ -9,6 +9,7 @@ import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
 import info.novatec.inspectit.agent.sensor.method.averagetimer.AverageTimerHook;
+import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.util.ThreadLocalStack;
 import info.novatec.inspectit.util.Timer;
@@ -16,7 +17,6 @@ import info.novatec.inspectit.util.Timer;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -38,7 +38,7 @@ public class MarvinWorkflowHook implements IMethodHook {
 	/**
 	 * The stack containing the start time values.
 	 */
-	private ThreadLocalStack timeStack = new ThreadLocalStack();
+	private ThreadLocalStack<Double> timeStack = new ThreadLocalStack<Double>();
 
 	/**
 	 * The timer used for accurate measuring.
@@ -66,7 +66,7 @@ public class MarvinWorkflowHook implements IMethodHook {
 	 * The <b>key</b> is the instance of the class being called, and the <b>value</b> is the
 	 * TimerData object.
 	 */
-	private Map dataStorage = Collections.synchronizedMap(new IdentityHashMap());
+	private Map<Object, TimerData> dataStorage = Collections.synchronizedMap(new IdentityHashMap<Object, TimerData>());
 
 	/**
 	 * This method ID is the local id for our own combined method sensor.
@@ -74,7 +74,7 @@ public class MarvinWorkflowHook implements IMethodHook {
 	private long marvinMethodId;
 
 	/**
-	 * Defines if the initialization was already done
+	 * Defines if the initialization was already done.
 	 */
 	private volatile boolean initialized = false;
 
@@ -100,9 +100,8 @@ public class MarvinWorkflowHook implements IMethodHook {
 		marvinMethodId = idManager.registerMethod(rsc);
 		// map the sensor type with the method
 		long sensorTypeId = -1L;
-		List methodSensorTypes = configurationStorage.getMethodSensorTypes();
-		for (Iterator iterator = methodSensorTypes.iterator(); iterator.hasNext();) {
-			MethodSensorTypeConfig methodSensorType = (MethodSensorTypeConfig) iterator.next();
+		List<MethodSensorTypeConfig> methodSensorTypes = configurationStorage.getMethodSensorTypes();
+		for (MethodSensorTypeConfig methodSensorType : methodSensorTypes) {
 			if (MarvinWorkflowSensor.class.getName().equals(methodSensorType.getClassName())) {
 				sensorTypeId = methodSensorType.getId();
 				break;
@@ -129,8 +128,8 @@ public class MarvinWorkflowHook implements IMethodHook {
 	 * {@inheritDoc}
 	 */
 	public void secondAfterBody(ICoreService coreService, long methodId, long sensorTypeId, Object object, Object[] parameters, Object result, RegisteredSensorConfig rsc) {
-		double endTime = ((Double) timeStack.pop()).doubleValue();
-		double startTime = ((Double) timeStack.pop()).doubleValue();
+		double endTime = timeStack.pop().doubleValue();
+		double startTime = timeStack.pop().doubleValue();
 		double duration = endTime - startTime;
 
 		// initialize our sensor if not already done
@@ -146,7 +145,7 @@ public class MarvinWorkflowHook implements IMethodHook {
 				long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
 				long registeredMethodId = idManager.getRegisteredMethodId(marvinMethodId);
 
-				List parameterContentData = propertyAccessor.getParameterContentData(rsc.getPropertyAccessorList(), object, parameters);
+				List<ParameterContentData> parameterContentData = propertyAccessor.getParameterContentData(rsc.getPropertyAccessorList(), object, parameters);
 
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 				TimerData timerData = new TimerData(timestamp, platformId, registeredSensorTypeId, registeredMethodId, parameterContentData);
@@ -159,7 +158,7 @@ public class MarvinWorkflowHook implements IMethodHook {
 				}
 			}
 		} else if ("getChangedData".equals(methodName)) {
-			TimerData timerData = (TimerData) dataStorage.remove(object);
+			TimerData timerData = dataStorage.remove(object);
 
 			// could be null in case of exception thrown before in the method
 			// and so the timerdata object is not initialized

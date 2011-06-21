@@ -19,7 +19,7 @@ public interface ISqlDataAccessService {
 	 *            The template containing the platform id.
 	 * @return The list of the SQL statements.
 	 */
-	List getAggregatedSqlStatements(SqlStatementData sqlStatementData);
+	List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData sqlStatementData);
 
 	/**
 	 * Returns a list of the SQL statements for a given template in a time frame. In this template,
@@ -33,5 +33,5 @@ public interface ISqlDataAccessService {
 	 *            Date to include data to.
 	 * @return The list of the SQL statements.
 	 */
-	List getAggregatedSqlStatements(SqlStatementData sqlStatementData, Date fromDate, Date toDate);
+	List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData sqlStatementData, Date fromDate, Date toDate);
 }

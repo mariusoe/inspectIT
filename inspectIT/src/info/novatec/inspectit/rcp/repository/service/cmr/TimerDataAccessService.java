@@ -53,26 +53,24 @@ public class TimerDataAccessService implements ITimerDataAccessService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("rawtypes")
-	public List getAggregatedTimerData(TimerData timerData) {
+	public List<TimerData> getAggregatedTimerData(TimerData timerData) {
 		try {
 			return timerDataAccessService.getAggregatedTimerData(timerData);
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog("There was an error retrieving the aggregated method timer data from the CMR!", e, -1);
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("rawtypes")
-	public List getAggregatedTimerData(TimerData timerData, Date fromDate, Date toDate) {
+	public List<TimerData> getAggregatedTimerData(TimerData timerData, Date fromDate, Date toDate) {
 		try {
 			return timerDataAccessService.getAggregatedTimerData(timerData, fromDate, toDate);
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog("There was an error retrieving the aggregated method timer data from the CMR!", e, -1);
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 	}
 

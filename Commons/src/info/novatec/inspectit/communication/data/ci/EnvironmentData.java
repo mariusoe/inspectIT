@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The environment data object is used to store all information relating to an
- * 'Environment' defined via the configuration interface.
+ * The environment data object is used to store all information relating to an 'Environment' defined
+ * via the configuration interface.
  * 
  * @author Matthias Huber
  * 
@@ -46,12 +46,12 @@ public class EnvironmentData implements Serializable {
 	/**
 	 * The one-to-many association to the {@link ProfileData} objects.
 	 */
-	private Set profiles = new HashSet(0);
+	private Set<ProfileData> profiles = new HashSet<ProfileData>(0);
 
 	/**
 	 * The one-to-many association to the {@link SensorTypeData} objects.
 	 */
-	private Set sensorTypes = new HashSet(0);
+	private Set<SensorTypeData> sensorTypes = new HashSet<SensorTypeData>(0);
 
 	/**
 	 * Default no-args constructor.
@@ -99,19 +99,19 @@ public class EnvironmentData implements Serializable {
 		this.sendStrategy = sendStrategy;
 	}
 
-	public Set getProfiles() {
+	public Set<ProfileData> getProfiles() {
 		return profiles;
 	}
 
-	public void setProfiles(Set profiles) {
+	public void setProfiles(Set<ProfileData> profiles) {
 		this.profiles = profiles;
 	}
 
-	public Set getSensorTypes() {
+	public Set<SensorTypeData> getSensorTypes() {
 		return sensorTypes;
 	}
 
-	public void setSensorTypes(Set sensorTypes) {
+	public void setSensorTypes(Set<SensorTypeData> sensorTypes) {
 		this.sensorTypes = sensorTypes;
 	}
 

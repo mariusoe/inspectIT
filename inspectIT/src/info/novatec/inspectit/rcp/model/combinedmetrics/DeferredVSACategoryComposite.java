@@ -47,7 +47,6 @@ public class DeferredVSACategoryComposite extends DeferredComposite {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void fetchDeferredChildren(Object object, IElementCollector collector, IProgressMonitor monitor) {
 		try {

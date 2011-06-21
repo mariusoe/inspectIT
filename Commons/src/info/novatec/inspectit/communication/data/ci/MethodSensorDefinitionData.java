@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The method sensor definition data object is used to store the information
- * about an method sensor definition.
+ * The method sensor definition data object is used to store the information about an method sensor
+ * definition.
  * 
  * @author Matthias Huber
  * 
@@ -66,16 +66,14 @@ public class MethodSensorDefinitionData implements Serializable {
 	/**
 	 * Indicates which additional sensor option is used for this definition.
 	 * 
-	 * 0: no sensor option is set
-	 * 1: the flag 'superclass' is set
-	 * 2: the flag 'interface' is set
+	 * 0: no sensor option is set 1: the flag 'superclass' is set 2: the flag 'interface' is set
 	 */
 	private int sensorOption = NO_SENSOR_OPTION;
 
 	/**
 	 * The many-to-many association to the {@link SensorTypeData} objects.
 	 */
-	private Set sensorTypes = new HashSet(0);
+	private Set<SensorTypeData> sensorTypes = new HashSet<SensorTypeData>(0);
 
 	/**
 	 * Default no-args constructor.
@@ -139,11 +137,11 @@ public class MethodSensorDefinitionData implements Serializable {
 		this.sensorOption = sensorOption;
 	}
 
-	public Set getSensorTypes() {
+	public Set<SensorTypeData> getSensorTypes() {
 		return sensorTypes;
 	}
 
-	public void setSensorTypes(Set sensorTypes) {
+	public void setSensorTypes(Set<SensorTypeData> sensorTypes) {
 		this.sensorTypes = sensorTypes;
 	}
 

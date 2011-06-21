@@ -15,11 +15,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-
 /**
- * This implementation compares directly the class name, method name and
- * parameter types. 'Direct' denotes comparing them by calling the
- * <code>equals</code> method of the String objects.
+ * This implementation compares directly the class name, method name and parameter types. 'Direct'
+ * denotes comparing them by calling the <code>equals</code> method of the String objects.
  * 
  * @author Patrice Bouillet
  * 
@@ -27,9 +25,8 @@ import java.util.List;
 public class DirectMatcher extends AbstractMatcher {
 
 	/**
-	 * The only constructor which needs a reference to the
-	 * {@link UnregisteredSensorConfig} instance of the corresponding
-	 * configuration.
+	 * The only constructor which needs a reference to the {@link UnregisteredSensorConfig} instance
+	 * of the corresponding configuration.
 	 * 
 	 * @param classPoolAnalyzer
 	 *            The class pool analyzer.
@@ -51,15 +48,13 @@ public class DirectMatcher extends AbstractMatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException {
+	public List<CtMethod> getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException {
 		CtMethod[] methods = classPoolAnalyzer.getMethodsForClassName(classLoader, className);
 
 		if (methods.length > 0) {
-			List matchingMethods = new ArrayList();
+			List<CtMethod> matchingMethods = new ArrayList<CtMethod>();
 
-			CtMethod method;
-			for (int i = 0; i < methods.length; i++) {
-				method = methods[i];
+			for (CtMethod method : methods) {
 				// skip abstract and native methods
 				if (!Modifier.isAbstract(method.getModifiers()) && !Modifier.isNative(method.getModifiers())) {
 					if (method.getName().equals(unregisteredSensorConfig.getTargetMethodName())) {
@@ -71,38 +66,38 @@ public class DirectMatcher extends AbstractMatcher {
 			return matchingMethods;
 		}
 
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException {
+	public List<CtConstructor> getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException {
 		CtConstructor[] constructors = classPoolAnalyzer.getConstructorsForClassName(classLoader, className);
 
 		if (constructors.length > 0) {
 			// if the name of the target method name is '<init>', every
 			// constructor will be added and checked
 			if ("<init>".equals(unregisteredSensorConfig.getTargetMethodName())) {
-				List constructorList = Arrays.asList(constructors);
+				List<CtConstructor> constructorList = Arrays.asList(constructors);
 				// we have to create a new arraylist here, as the list created
 				// the line above does not support the remove operator in the
 				// returned iterator...
-				return new ArrayList(constructorList);
+				return new ArrayList<CtConstructor>(constructorList);
 			}
 		}
 
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void checkParameters(List methods) throws NotFoundException {
+	public void checkParameters(List<? extends CtBehavior> methods) throws NotFoundException {
 		if (!unregisteredSensorConfig.isIgnoreSignature()) {
-			List parameterTypes = unregisteredSensorConfig.getParameterTypes();
-			for (Iterator iterator = methods.iterator(); iterator.hasNext();) {
-				CtBehavior behaviour = (CtBehavior) iterator.next();
+			List<String> parameterTypes = unregisteredSensorConfig.getParameterTypes();
+			for (Iterator<? extends CtBehavior> iterator = methods.iterator(); iterator.hasNext();) {
+				CtBehavior behaviour = iterator.next();
 
 				// get all the parameter types from the method
 				CtClass[] args = behaviour.getParameterTypes();

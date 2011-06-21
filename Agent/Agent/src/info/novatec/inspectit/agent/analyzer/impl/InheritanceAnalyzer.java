@@ -33,7 +33,7 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 	 * Set of logged classes for which the interfaces can not be found in
 	 * {@link #addInterfaceExtends(List, CtClass)}.
 	 */
-	private Set loggedClassesSet = new HashSet();
+	private Set<String> loggedClassesSet = new HashSet<String>();
 
 	/**
 	 * The class pool analyzer is used by the {@link #getSuperclassIterator(ClassLoader, String)}
@@ -54,7 +54,7 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Iterator getSuperclassIterator(ClassLoader classLoader, String className) throws NotFoundException {
+	public Iterator<CtClass> getSuperclassIterator(ClassLoader classLoader, String className) throws NotFoundException {
 		// retrieve the correct class pool
 		ClassPool classPool = classPoolAnalyzer.getClassPool(classLoader);
 		CtClass clazz = classPool.get(className);
@@ -67,7 +67,7 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private static class SuperclassIterator implements Iterator {
+	private static class SuperclassIterator implements Iterator<CtClass> {
 
 		/**
 		 * The current super class.
@@ -101,7 +101,7 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 		/**
 		 * {@inheritDoc}
 		 */
-		public Object next() {
+		public CtClass next() {
 			try {
 				superClass = superClass.getSuperclass();
 			} catch (NotFoundException e) {
@@ -127,12 +127,12 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Iterator getInterfaceIterator(ClassLoader classLoader, String className) throws NotFoundException {
+	public Iterator<CtClass> getInterfaceIterator(ClassLoader classLoader, String className) throws NotFoundException {
 		// retrieve the correct class pool
 		ClassPool classPool = classPoolAnalyzer.getClassPool(classLoader);
 		CtClass ctClass = classPool.get(className);
 
-		List interfaces = new ArrayList();
+		List<CtClass> interfaces = new ArrayList<CtClass>();
 		while (null != ctClass) {
 			addInterfaceExtends(interfaces, ctClass);
 			ctClass = ctClass.getSuperclass();
@@ -151,7 +151,7 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 	 * @throws NotFoundException
 	 *             This exception is thrown if a class is not found from within Javassist.
 	 */
-	private void addInterfaceExtends(List interfaces, CtClass ctClass) throws NotFoundException {
+	private void addInterfaceExtends(List<CtClass> interfaces, CtClass ctClass) throws NotFoundException {
 		String[] ifs = null;
 		try {
 			ifs = ctClass.getClassFile2().getInterfaces();
@@ -199,8 +199,8 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 	 */
 	public boolean implementsInterface(String className, ClassLoader classLoader, String interfaceName) {
 		try {
-			for (Iterator interfaceIterator = getInterfaceIterator(classLoader, className); interfaceIterator.hasNext();) {
-				CtClass ctInterface = (CtClass) interfaceIterator.next();
+			for (Iterator<CtClass> interfaceIterator = getInterfaceIterator(classLoader, className); interfaceIterator.hasNext();) {
+				CtClass ctInterface = interfaceIterator.next();
 				String name = ctInterface.getName();
 				if (name.equalsIgnoreCase(interfaceName)) {
 					return true;

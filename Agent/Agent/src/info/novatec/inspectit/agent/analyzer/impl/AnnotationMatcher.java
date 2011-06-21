@@ -4,12 +4,16 @@ import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatcher;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
+import info.novatec.inspectit.javassist.CtBehavior;
 import info.novatec.inspectit.javassist.CtClass;
 import info.novatec.inspectit.javassist.CtConstructor;
 import info.novatec.inspectit.javassist.CtMethod;
 import info.novatec.inspectit.javassist.NotFoundException;
 import info.novatec.inspectit.javassist.bytecode.AnnotationsAttribute;
 import info.novatec.inspectit.javassist.bytecode.AttributeInfo;
+import info.novatec.inspectit.javassist.bytecode.ClassFile;
+import info.novatec.inspectit.javassist.bytecode.FieldInfo;
+import info.novatec.inspectit.javassist.bytecode.MethodInfo;
 import info.novatec.inspectit.javassist.bytecode.annotation.Annotation;
 
 import java.util.ArrayList;
@@ -69,21 +73,20 @@ public class AnnotationMatcher extends AbstractMatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException {
-		List matchingMethods = delegateMatcher.getMatchingMethods(classLoader, className);
+	public List<CtMethod> getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException {
+		List<CtMethod> matchingMethods = delegateMatcher.getMatchingMethods(classLoader, className);
 
 		boolean classHasAnnotation = checkClassForAnnotation(classLoader, className, unregisteredSensorConfig.getAnnotationClassName());
 
 		if (!classHasAnnotation) {
-			List notMatchingMethods = null;
-			Iterator iterator = matchingMethods.iterator();
-			while (iterator.hasNext()) {
-				CtMethod method = (CtMethod) iterator.next();
-				List methodAttributesList = method.getMethodInfo2().getAttributes();
+			List<CtMethod> notMatchingMethods = null;
+			for (CtMethod method : matchingMethods) {
+				@SuppressWarnings("unchecked")
+				List<AttributeInfo> methodAttributesList = method.getMethodInfo2().getAttributes();
 				boolean methodHasAnnotation = checkForAnnotation(methodAttributesList, unregisteredSensorConfig.getAnnotationClassName());
 				if (!methodHasAnnotation) {
 					if (null == notMatchingMethods) {
-						notMatchingMethods = new ArrayList();
+						notMatchingMethods = new ArrayList<CtMethod>();
 					}
 					notMatchingMethods.add(method);
 				}
@@ -93,7 +96,7 @@ public class AnnotationMatcher extends AbstractMatcher {
 					matchingMethods.removeAll(notMatchingMethods);
 				} catch (UnsupportedOperationException exception) {
 					// list not supporting remove, do manually
-					List returnList = new ArrayList();
+					List<CtMethod> returnList = new ArrayList<CtMethod>();
 					returnList.addAll(matchingMethods);
 					returnList.removeAll(notMatchingMethods);
 					return returnList;
@@ -107,21 +110,20 @@ public class AnnotationMatcher extends AbstractMatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException {
-		List matchingConstructors = delegateMatcher.getMatchingConstructors(classLoader, className);
+	public List<CtConstructor> getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException {
+		List<CtConstructor> matchingConstructors = delegateMatcher.getMatchingConstructors(classLoader, className);
 
 		boolean classHasAnnotation = checkClassForAnnotation(classLoader, className, unregisteredSensorConfig.getAnnotationClassName());
 
 		if (!classHasAnnotation) {
-			List notMatchingConstructors = null;
-			Iterator iterator = matchingConstructors.iterator();
-			while (iterator.hasNext()) {
-				CtConstructor constructor = (CtConstructor) iterator.next();
-				List constructorAttributesList = constructor.getMethodInfo2().getAttributes();
+			List<CtConstructor> notMatchingConstructors = null;
+			for (CtConstructor constructor : matchingConstructors) {
+				@SuppressWarnings("unchecked")
+				List<AttributeInfo> constructorAttributesList = constructor.getMethodInfo2().getAttributes();
 				boolean constructorHasAnnotation = checkForAnnotation(constructorAttributesList, unregisteredSensorConfig.getAnnotationClassName());
 				if (!constructorHasAnnotation) {
 					if (null == notMatchingConstructors) {
-						notMatchingConstructors = new ArrayList();
+						notMatchingConstructors = new ArrayList<CtConstructor>();
 					}
 					notMatchingConstructors.add(constructor);
 				}
@@ -131,7 +133,7 @@ public class AnnotationMatcher extends AbstractMatcher {
 					matchingConstructors.removeAll(notMatchingConstructors);
 				} catch (UnsupportedOperationException exception) {
 					// list not supporting remove, do manually
-					List returnList = new ArrayList();
+					List<CtConstructor> returnList = new ArrayList<CtConstructor>();
 					returnList.addAll(matchingConstructors);
 					returnList.removeAll(notMatchingConstructors);
 					return returnList;
@@ -158,17 +160,18 @@ public class AnnotationMatcher extends AbstractMatcher {
 	 */
 	private boolean checkClassForAnnotation(ClassLoader classLoader, String className, String annotationClassName) throws NotFoundException {
 		CtClass clazz = classPoolAnalyzer.getClassPool(classLoader).get(className);
-		List classAttributesList = clazz.getClassFile2().getAttributes();
+		@SuppressWarnings("unchecked")
+		List<AttributeInfo> classAttributesList = clazz.getClassFile2().getAttributes();
 		if (checkForAnnotation(classAttributesList, annotationClassName)) {
 			return true;
 		}
 
 		// check every super class
 		try {
-			Iterator iterator = inheritanceAnalyzer.getSuperclassIterator(classLoader, className);
+			Iterator<CtClass> iterator = inheritanceAnalyzer.getSuperclassIterator(classLoader, className);
 			while (iterator.hasNext()) {
-				CtClass superClass = (CtClass) iterator.next();
-				List superClassAttributeList = superClass.getClassFile2().getAttributes();
+				@SuppressWarnings("unchecked")
+				List<AttributeInfo> superClassAttributeList = iterator.next().getClassFile2().getAttributes();
 				if (checkForAnnotation(superClassAttributeList, annotationClassName)) {
 					return true;
 				}
@@ -179,10 +182,10 @@ public class AnnotationMatcher extends AbstractMatcher {
 
 		// check every interface class
 		try {
-			Iterator iterator = inheritanceAnalyzer.getInterfaceIterator(classLoader, className);
+			Iterator<CtClass> iterator = inheritanceAnalyzer.getInterfaceIterator(classLoader, className);
 			while (iterator.hasNext()) {
-				CtClass interfaceClass = (CtClass) iterator.next();
-				List interfaceClassAttributeList = interfaceClass.getClassFile2().getAttributes();
+				@SuppressWarnings("unchecked")
+				List<AttributeInfo> interfaceClassAttributeList = iterator.next().getClassFile2().getAttributes();
 				if (checkForAnnotation(interfaceClassAttributeList, annotationClassName)) {
 					return true;
 				}
@@ -206,7 +209,7 @@ public class AnnotationMatcher extends AbstractMatcher {
 	 *            Name of the annotation to find.
 	 * @return True if annotation could be located, false otherwise.
 	 */
-	private boolean checkForAnnotation(List attributesList, String annotationClassName) {
+	private boolean checkForAnnotation(List<AttributeInfo> attributesList, String annotationClassName) {
 		for (int i = 0; i < attributesList.size(); i++) {
 			AttributeInfo attributeInfo = (AttributeInfo) attributesList.get(i);
 			if (attributeInfo instanceof AnnotationsAttribute) {
@@ -226,7 +229,7 @@ public class AnnotationMatcher extends AbstractMatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void checkParameters(List methods) throws NotFoundException {
+	public void checkParameters(List<? extends CtBehavior> methods) throws NotFoundException {
 		delegateMatcher.checkParameters(methods);
 	}
 

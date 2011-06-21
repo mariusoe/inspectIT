@@ -1,5 +1,6 @@
 package info.novatec.inspectit.cmr.dao;
 
+import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.TimerData;
 
 import java.util.Date;
@@ -33,14 +34,14 @@ public interface CombinedMetricsDataDao {
 	 * @param toDate
 	 * @return
 	 */
-	List getCombinedMetricsFromToDate(TimerData template, String workflowName, String activityName, Date fromDate, Date toDate);
+	List<TimerData> getCombinedMetricsFromToDate(TimerData template, String workflowName, String activityName, Date fromDate, Date toDate);
 
 	/**
 	 * 
 	 * @param template
 	 * @return
 	 */
-	List getWorkflows(TimerData template);
+	List<ParameterContentData> getWorkflows(TimerData template);
 
 	/**
 	 * 
@@ -48,6 +49,6 @@ public interface CombinedMetricsDataDao {
 	 * @param workflow
 	 * @return
 	 */
-	List getActivities(TimerData template, String workflow);
+	List<ParameterContentData> getActivities(TimerData template, String workflow);
 
 }

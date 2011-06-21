@@ -2,6 +2,7 @@ package info.novatec.inspectit.communication.valueobject;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.MethodSensorData;
+import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.TimerData;
 
 import java.io.Serializable;
@@ -9,7 +10,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -29,7 +29,7 @@ public class TimerRawVO extends MethodSensorData {
 	 * The list which is holding one or more data container for the raw data. If the current data
 	 * container is full a new one is created and added to the list.
 	 */
-	private List data = new ArrayList();
+	private List<TimerRawContainer> data = new ArrayList<TimerRawContainer>();
 
 	/**
 	 * The current data container which is filled with raw data.
@@ -50,7 +50,7 @@ public class TimerRawVO extends MethodSensorData {
 	 * @param parameterContentData
 	 *            The parameter content data. Can be <code>null</code>.
 	 */
-	public TimerRawVO(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List parameterContentData) {
+	public TimerRawVO(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData) {
 		super(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);
 
 		container = new TimerRawContainer();
@@ -96,7 +96,7 @@ public class TimerRawVO extends MethodSensorData {
 	 * 
 	 * @return The list with {@link TimerRawContainer} objects.
 	 */
-	public List getData() {
+	public List<TimerRawContainer> getData() {
 		return Collections.unmodifiableList(data);
 	}
 
@@ -119,8 +119,7 @@ public class TimerRawVO extends MethodSensorData {
 		double cpuMax = 0.0d;
 		double cpuDuration = 0.0d;
 
-		for (Iterator i = data.iterator(); i.hasNext();) {
-			TimerRawContainer container = (TimerRawContainer) i.next();
+		for (TimerRawContainer container : data) {
 			values = container.getData();
 			for (int j = 0; j < container.getCount(); j++) {
 				value = values[j];

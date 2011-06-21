@@ -95,13 +95,11 @@ public class InvocationSequenceTraceInspectorDecorator extends InvocationSequenc
 		return subject.getMethodIdent();
 	}
 
-	@SuppressWarnings("rawtypes")
-	public List getNestedSequences() {
+	public List<InvocationSequenceData> getNestedSequences() {
 		return subject.getNestedSequences();
 	}
 
-	@SuppressWarnings("rawtypes")
-	public Set getParameterContentData() {
+	public Set<ParameterContentData> getParameterContentData() {
 		return subject.getParameterContentData();
 	}
 
@@ -161,13 +159,11 @@ public class InvocationSequenceTraceInspectorDecorator extends InvocationSequenc
 		subject.setMethodIdent(methodIdent);
 	}
 
-	@SuppressWarnings("rawtypes")
-	public void setNestedSequences(List nestedSequences) {
+	public void setNestedSequences(List<InvocationSequenceData> nestedSequences) {
 		subject.setNestedSequences(nestedSequences);
 	}
 
-	@SuppressWarnings("rawtypes")
-	public void setParameterContentData(Set parameterContentData) {
+	public void setParameterContentData(Set<ParameterContentData> parameterContentData) {
 		subject.setParameterContentData(parameterContentData);
 	}
 

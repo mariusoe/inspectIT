@@ -282,7 +282,6 @@ public class TimerDataInputController extends AbstractTableInputController {
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Getting timer data information", IProgressMonitor.UNKNOWN);
 		List<TimerData> aggregatedTimerData;

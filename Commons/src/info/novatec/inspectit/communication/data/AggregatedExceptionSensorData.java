@@ -2,7 +2,6 @@ package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.communication.ExceptionEventEnum;
 
-import java.util.Iterator;
 
 /**
  * Aggregated exception sensor data. This objects are used for the purpose of grouping the
@@ -73,9 +72,8 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData {
 			handled++;
 		}
 		if (null != exceptionData.getInvocationParentsIdSet()) {
-			Iterator iterator = exceptionData.getInvocationParentsIdSet().iterator();
-			while (iterator.hasNext()) {
-				this.addInvocationParentId((Long) iterator.next());
+			for (Long parentId : exceptionData.getInvocationParentsIdSet()) {
+				this.addInvocationParentId(parentId);
 			}
 		}
 	}

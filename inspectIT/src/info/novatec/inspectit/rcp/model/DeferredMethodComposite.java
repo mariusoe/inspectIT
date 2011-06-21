@@ -36,7 +36,6 @@ public class DeferredMethodComposite extends DeferredComposite {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void fetchDeferredChildren(Object object, IElementCollector collector, IProgressMonitor monitor) {
 		try {

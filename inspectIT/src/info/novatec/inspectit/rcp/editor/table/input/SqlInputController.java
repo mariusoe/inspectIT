@@ -7,8 +7,8 @@ import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.TimeResolution;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
@@ -146,7 +146,7 @@ public class SqlInputController extends AbstractTableInputController {
 	 * This data access service is needed because of the ID mappings.
 	 */
 	private CachedGlobalDataAccessService globalDataAccessService;
-	
+
 	/**
 	 * Date to display invocations from.
 	 */
@@ -166,7 +166,7 @@ public class SqlInputController extends AbstractTableInputController {
 	 * Decimal places.
 	 */
 	private int timeDecimalPlaces = TimeResolution.DECIMAL_PLACES_DEFAULT;
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -246,7 +246,7 @@ public class SqlInputController extends AbstractTableInputController {
 		preferences.add(PreferenceId.TIME_RESOLUTION);
 		return preferences;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -290,7 +290,6 @@ public class SqlInputController extends AbstractTableInputController {
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Getting SQL information", IProgressMonitor.UNKNOWN);
 		List<SqlStatementData> invocData;
@@ -299,7 +298,7 @@ public class SqlInputController extends AbstractTableInputController {
 		} else {
 			invocData = dataAccessService.getAggregatedSqlStatements(template, fromDate, toDate);
 		}
-		
+
 		sqlData.clear();
 		if (invocData.size() > 0) {
 			sqlData.addAll(invocData);
@@ -423,6 +422,7 @@ public class SqlInputController extends AbstractTableInputController {
 	/**
 	 * {@inheritDoc}.
 	 * <p>
+	 * 
 	 * @see TableInputController#showDetails(Shell, Object)
 	 */
 	public void showDetails(Shell parent, Object element) {

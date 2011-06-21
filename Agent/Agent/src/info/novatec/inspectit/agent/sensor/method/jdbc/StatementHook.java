@@ -1,6 +1,5 @@
 package info.novatec.inspectit.agent.sensor.method.jdbc;
 
-import info.novatec.inspectit.agent.config.IPropertyAccessor;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
@@ -38,7 +37,7 @@ public class StatementHook implements IMethodHook {
 	/**
 	 * The stack containing the start time values.
 	 */
-	private final ThreadLocalStack timeStack = new ThreadLocalStack();
+	private final ThreadLocalStack<Double> timeStack = new ThreadLocalStack<Double>();
 
 	/**
 	 * The timer used for accurate measuring.
@@ -54,8 +53,8 @@ public class StatementHook implements IMethodHook {
 	 * The ThreadLocal for a boolean value so only the last before and first after hook of an
 	 * invocation is measured.
 	 */
-	private ThreadLocal threadLast = new ThreadLocal();
-	
+	private ThreadLocal<Boolean> threadLast = new ThreadLocal<Boolean>();
+
 	/**
 	 * The StringConstraint to ensure a maximum length of strings.
 	 */
@@ -68,12 +67,10 @@ public class StatementHook implements IMethodHook {
 	 *            The timer.
 	 * @param idManager
 	 *            The ID manager.
-	 * @param propertyAccessor
-	 *            The property accessor.
 	 * @param parameter
 	 *            Additional parameters.
 	 */
-	public StatementHook(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor, Map parameter) {
+	public StatementHook(Timer timer, IIdManager idManager, Map<String, Object> parameter) {
 		this.timer = timer;
 		this.idManager = idManager;
 		this.strConstraint = new StringConstraint(parameter);
@@ -98,10 +95,10 @@ public class StatementHook implements IMethodHook {
 	 * {@inheritDoc}
 	 */
 	public void secondAfterBody(ICoreService coreService, long methodId, long sensorTypeId, Object object, Object[] parameters, Object result, RegisteredSensorConfig rsc) {
-		double endTime = ((Double) timeStack.pop()).doubleValue();
-		double startTime = ((Double) timeStack.pop()).doubleValue();
+		double endTime = timeStack.pop().doubleValue();
+		double startTime = timeStack.pop().doubleValue();
 
-		if (((Boolean) threadLast.get()).booleanValue()) {
+		if (threadLast.get().booleanValue()) {
 			threadLast.set(Boolean.FALSE);
 
 			double duration = endTime - startTime;

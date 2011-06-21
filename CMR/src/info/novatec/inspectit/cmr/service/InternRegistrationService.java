@@ -58,7 +58,7 @@ public class InternRegistrationService {
 	 * {@inheritDoc}
 	 */
 	@Transactional
-	public synchronized long registerPlatformIdent(List definedIPs, String agentName, String version) {
+	public synchronized long registerPlatformIdent(List<String> definedIPs, String agentName, String version) {
 		PlatformIdent platformIdent = new PlatformIdent();
 		platformIdent.setDefinedIPs(definedIPs);
 		platformIdent.setAgentName(agentName);
@@ -96,7 +96,7 @@ public class InternRegistrationService {
 	 * {@inheritDoc}
 	 */
 	@Transactional
-	public long registerMethodIdent(long platformId, String packageName, String className, String methodName, List parameterTypes, String returnType, int modifiers) {
+	public long registerMethodIdent(long platformId, String packageName, String className, String methodName, List<String> parameterTypes, String returnType, int modifiers) {
 		PlatformIdent platformIdent = platformIdentDao.load(platformId);
 
 		MethodIdent methodIdent = new MethodIdent();
@@ -104,7 +104,7 @@ public class InternRegistrationService {
 		methodIdent.setClassName(className);
 		methodIdent.setMethodName(methodName);
 		if (null == parameterTypes) {
-			parameterTypes = Collections.EMPTY_LIST;
+			parameterTypes = Collections.emptyList();
 		}
 		methodIdent.setParameters(parameterTypes);
 		methodIdent.setReturnType(returnType);
@@ -128,7 +128,6 @@ public class InternRegistrationService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Transactional
 	public long registerMethodSensorTypeIdent(long platformId, String fullyQualifiedClassName) throws RemoteException {
 		PlatformIdent platformIdent = platformIdentDao.load(platformId);
@@ -153,7 +152,6 @@ public class InternRegistrationService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Transactional
 	public void addSensorTypeToMethod(long methodSensorTypeId, long methodId) throws RemoteException {
 		MethodIdent methodIdent = methodIdentDao.load(methodId);
@@ -169,7 +167,6 @@ public class InternRegistrationService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Transactional
 	public long registerPlatformSensorTypeIdent(long platformId, String fullyQualifiedClassName) {
 		PlatformIdent platformIdent = platformIdentDao.load(platformId);

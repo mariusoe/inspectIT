@@ -134,7 +134,6 @@ public class TreeModelManager {
 	 *            The {@link RepositoryDefinition} object.
 	 * @return The invocation sequence tree.
 	 */
-	@SuppressWarnings("unchecked")
 	protected Component getInvocationSequenceTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Composite invocationSequence = new Composite();
 		invocationSequence.setName("Invocation Sequences");
@@ -312,7 +311,6 @@ public class TreeModelManager {
 	 *            The {@link MethodIdent} object from the server to check against the sensor type.
 	 * @return Returns the value of the sensor type ID.
 	 */
-	@SuppressWarnings("unchecked")
 	private long checkSensorTypeExistence(SensorTypeEnum sensorType, MethodIdent methodIdent) {
 		for (MethodSensorTypeIdent methodSensorTypeIdent : (Set<MethodSensorTypeIdent>) methodIdent.getMethodSensorTypeIdents()) {
 			SensorTypeEnum methodsensorType = SensorTypeEnum.get(methodSensorTypeIdent.getFullyQualifiedClassName());
@@ -392,7 +390,6 @@ public class TreeModelManager {
 	 *            The {@link RepositoryDefinition} object.
 	 * @return An instance of {@link Component}.
 	 */
-	@SuppressWarnings("unchecked")
 	private Component getSystemOverviewTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Composite systemOverview = new Composite();
 		systemOverview.setName("System Overview");
@@ -691,7 +688,6 @@ public class TreeModelManager {
 	 *            The {@link RepositoryDefinition} object.
 	 * @return The exception sensor tree.
 	 */
-	@SuppressWarnings("unchecked")
 	private Component getExceptionSensorTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Composite exceptionSensor = new Composite();
 		exceptionSensor.setName("Exceptions");

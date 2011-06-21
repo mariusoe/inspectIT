@@ -104,11 +104,11 @@ public class PropertyAccessor implements IPropertyAccessor {
 			return object.toString();
 		}
 
-		Class c;
+		Class<?> c;
 		if (object instanceof Class) {
 			// This check is needed when a static class is passed to this
 			// method.
-			c = (Class) object;
+			c = (Class<?>) object;
 		} else {
 			c = object.getClass();
 		}
@@ -131,7 +131,7 @@ public class PropertyAccessor implements IPropertyAccessor {
 			// special handling for the length method of Array objects
 			// Array objects do not inherit from the static Array class, thus
 			// trying to retrieve the method by reflection is not possible
-			if (methodName.equals("length")) {
+			if ("length".equals(methodName)) {
 				if (object.getClass().isArray()) { // ensure that we are really
 					// dealing with an array
 					return getPropertyContent(propertyPath.getPathToContinue(), new Integer(Array.getLength(object)));
@@ -161,7 +161,7 @@ public class PropertyAccessor implements IPropertyAccessor {
 						}
 
 						try {
-							Object result = method.invoke(object, null);
+							Object result = method.invoke(object, (Object[]) null);
 							return getPropertyContent(propertyPath.getPathToContinue(), result);
 						} catch (IllegalArgumentException e) {
 							LOGGER.severe(e.getMessage());
@@ -214,10 +214,10 @@ public class PropertyAccessor implements IPropertyAccessor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getParameterContentData(List propertyAccessorList, Object clazz, Object[] parameters) {
-		List parameterContentData = new ArrayList();
-		for (Iterator iterator = propertyAccessorList.iterator(); iterator.hasNext();) {
-			PropertyPathStart start = (PropertyPathStart) iterator.next();
+	public List<ParameterContentData> getParameterContentData(List<PropertyPathStart> propertyAccessorList, Object clazz, Object[] parameters) {
+		List<ParameterContentData> parameterContentData = new ArrayList<ParameterContentData>();
+		for (Iterator<PropertyPathStart> iterator = propertyAccessorList.iterator(); iterator.hasNext();) {
+			PropertyPathStart start = iterator.next();
 			try {
 				String content = this.getPropertyContent(start, clazz, parameters);
 				ParameterContentData paramContentData = new ParameterContentData();

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import info.novatec.inspectit.cmr.dao.impl.TimerDataAggregator;
 import info.novatec.inspectit.cmr.test.AbstractTransactionalTestNGLogSupport;
+import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.TimerData;
 
 import java.sql.Timestamp;
@@ -173,7 +174,7 @@ public class TimerDataAggregatorTest extends AbstractTransactionalTestNGLogSuppo
 		verify(timerData, times(0)).calculateMax(anyDouble());
 		verify(timerData, times(0)).setMethodIdent(anyLong());
 		verify(timerData, times(0)).calculateMin(anyDouble());
-		verify(timerData, times(0)).setParameterContentData((Set<?>) anyObject());
+		verify(timerData, times(0)).setParameterContentData((Set<ParameterContentData>) anyObject());
 		verify(timerData, times(0)).setPlatformIdent(anyLong());
 		verify(timerData, times(0)).setSensorTypeIdent(anyLong());
 		verify(timerData, times(0)).setTimeStamp((Timestamp) anyObject());

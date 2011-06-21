@@ -1,11 +1,9 @@
 package info.novatec.inspectit.util;
 
-import com.vladium.utils.timing.ITimer;
-import com.vladium.utils.timing.TimerFactory;
-
 /**
- * Timer utility class which is basically a wrapper around the Timer returned by
- * the {@link TimerFactory}.
+ * Class which was used as a wrapper arount a timer factory. As the move to Java 5 was done, the
+ * factory is currently not needed anymore, but this class stays if some new timer implementations
+ * will be needed in the future (higher precision, performance, ...).
  * 
  * @author Patrice Bouillet
  * 
@@ -13,26 +11,12 @@ import com.vladium.utils.timing.TimerFactory;
 public class Timer {
 
 	/**
-	 * The native timer.
-	 */
-	private final ITimer nativeTimer;
-
-	/**
-	 * Initializes this class and retrieves a new timer from the
-	 * {@link TimerFactory}.
-	 */
-	public Timer() {
-		nativeTimer = TimerFactory.newTimer();
-	}
-
-	/**
-	 * Returns the current time.
+	 * Returns the current time in milliseconds.
 	 * 
-	 * @see ITimer#getCurrentTime().
 	 * @return The time as a double value.
 	 */
 	public double getCurrentTime() {
-		return nativeTimer.getCurrentTime();
+		return System.nanoTime() / 1000000.0d;
 	}
 
 }

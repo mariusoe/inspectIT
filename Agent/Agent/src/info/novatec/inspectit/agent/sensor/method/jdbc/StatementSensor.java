@@ -1,6 +1,5 @@
 package info.novatec.inspectit.agent.sensor.method.jdbc;
 
-import info.novatec.inspectit.agent.config.IPropertyAccessor;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.hooking.IHook;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
@@ -9,8 +8,7 @@ import info.novatec.inspectit.util.Timer;
 import java.util.Map;
 
 /**
- * The SQL timer sensor which initializes and returns the {@link StatementHook}
- * class.
+ * The SQL timer sensor which initializes and returns the {@link StatementHook} class.
  * 
  * @author Christian Herzog
  * 
@@ -28,11 +26,6 @@ public class StatementSensor implements IMethodSensor {
 	private final IIdManager idManager;
 
 	/**
-	 * The property accessor.
-	 */
-	private final IPropertyAccessor propertyAccessor;
-
-	/**
 	 * The used statement hook.
 	 */
 	private StatementHook statementHook = null;
@@ -44,13 +37,10 @@ public class StatementSensor implements IMethodSensor {
 	 *            The timer used for accurate measuring.
 	 * @param idManager
 	 *            The ID manager.
-	 * @param propertyAccessor
-	 *            The property accessor.
 	 */
-	public StatementSensor(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor) {
+	public StatementSensor(Timer timer, IIdManager idManager) {
 		this.timer = timer;
 		this.idManager = idManager;
-		this.propertyAccessor = propertyAccessor;
 	}
 
 	/**
@@ -65,8 +55,8 @@ public class StatementSensor implements IMethodSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void init(Map parameter) {
-		statementHook = new StatementHook(timer, idManager, propertyAccessor, parameter);
+	public void init(Map<String, Object> parameter) {
+		statementHook = new StatementHook(timer, idManager, parameter);
 	}
 
 }

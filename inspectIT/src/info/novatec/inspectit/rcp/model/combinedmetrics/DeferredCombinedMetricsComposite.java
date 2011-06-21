@@ -17,9 +17,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.progress.IElementCollector;
 
 /**
- * This class only initializes the sub-tree if it is requested. Furthermore, the
- * creation of the objects is done piece after piece, so that an immediate
- * visualization can be seen (important for sub-trees which are very large).
+ * This class only initializes the sub-tree if it is requested. Furthermore, the creation of the
+ * objects is done piece after piece, so that an immediate visualization can be seen (important for
+ * sub-trees which are very large).
  * 
  * @author Eduard Tudenhoefner
  * @author Patrice Bouillet
@@ -28,8 +28,7 @@ import org.eclipse.ui.progress.IElementCollector;
 public class DeferredCombinedMetricsComposite extends DeferredComposite {
 
 	/**
-	 * The platform ident is used to create the package elements in the
-	 * sub-tree.
+	 * The platform ident is used to create the package elements in the sub-tree.
 	 */
 	private PlatformIdent platformIdent;
 
@@ -41,7 +40,6 @@ public class DeferredCombinedMetricsComposite extends DeferredComposite {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void fetchDeferredChildren(Object object, IElementCollector collector, IProgressMonitor monitor) {
 		try {

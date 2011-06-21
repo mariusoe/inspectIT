@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The profile data object is used to store the information about a profile,
- * e.g. all sensor definitions defined within a profile.
+ * The profile data object is used to store the information about a profile, e.g. all sensor
+ * definitions defined within a profile.
  * 
  * @author Matthias Huber
  * 
@@ -39,27 +39,24 @@ public class ProfileData implements Serializable {
 	private EnvironmentData environmentData;
 
 	/**
-	 * The one-to-many association to the {@link MethodSensorDefinitionData}
-	 * objects.
+	 * The one-to-many association to the {@link MethodSensorDefinitionData} objects.
 	 */
-	private Set methodSensorDefinitions = new HashSet(0);
+	private Set<MethodSensorDefinitionData> methodSensorDefinitions = new HashSet<MethodSensorDefinitionData>(0);
 
 	/**
-	 * The one-to-many association to the {@link PlatformSensorDefinitionData}
-	 * objects.
+	 * The one-to-many association to the {@link PlatformSensorDefinitionData} objects.
 	 */
-	private Set platformSensorDefinitions = new HashSet(0);
+	private Set<PlatformSensorDefinitionData> platformSensorDefinitions = new HashSet<PlatformSensorDefinitionData>(0);
 
 	/**
-	 * The one-to-many association to the {@link ExceptionSensorDefinitionData}
-	 * objects.
+	 * The one-to-many association to the {@link ExceptionSensorDefinitionData} objects.
 	 */
-	private Set exceptionSensorDefinitions = new HashSet(0);
+	private Set<ExceptionSensorDefinitionData> exceptionSensorDefinitions = new HashSet<ExceptionSensorDefinitionData>(0);
 
 	/**
-	 * This boolean flag is used only by the client side to distinguish if a
-	 * profile is completely loaded or not (all sensor definition loaded).
-	 * Therefore this value is not stored into the database.
+	 * This boolean flag is used only by the client side to distinguish if a profile is completely
+	 * loaded or not (all sensor definition loaded). Therefore this value is not stored into the
+	 * database.
 	 */
 	private boolean isInitialized = false;
 
@@ -101,27 +98,27 @@ public class ProfileData implements Serializable {
 		this.description = description;
 	}
 
-	public Set getMethodSensorDefinitions() {
+	public Set<MethodSensorDefinitionData> getMethodSensorDefinitions() {
 		return methodSensorDefinitions;
 	}
 
-	public void setMethodSensorDefinitions(Set methodSensorDefinitions) {
+	public void setMethodSensorDefinitions(Set<MethodSensorDefinitionData> methodSensorDefinitions) {
 		this.methodSensorDefinitions = methodSensorDefinitions;
 	}
 
-	public Set getPlatformSensorDefinitions() {
+	public Set<PlatformSensorDefinitionData> getPlatformSensorDefinitions() {
 		return platformSensorDefinitions;
 	}
 
-	public void setPlatformSensorDefinitions(Set platformSensorDefinitions) {
+	public void setPlatformSensorDefinitions(Set<PlatformSensorDefinitionData> platformSensorDefinitions) {
 		this.platformSensorDefinitions = platformSensorDefinitions;
 	}
 
-	public Set getExceptionSensorDefinitions() {
+	public Set<ExceptionSensorDefinitionData> getExceptionSensorDefinitions() {
 		return exceptionSensorDefinitions;
 	}
 
-	public void setExceptionSensorDefinitions(Set exceptionSensorDefinitions) {
+	public void setExceptionSensorDefinitions(Set<ExceptionSensorDefinitionData> exceptionSensorDefinitions) {
 		this.exceptionSensorDefinitions = exceptionSensorDefinitions;
 	}
 

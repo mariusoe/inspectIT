@@ -1,5 +1,6 @@
 package info.novatec.inspectit.cmr.service;
 
+import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 
 import java.util.Date;
@@ -25,7 +26,7 @@ public interface IExceptionDataAccessService {
 	 * @return A list of {@link ExceptionSensorData} objects. This list can be used to get an
 	 *         overview over recorded Exceptions in a target application.
 	 */
-	List getUngroupedExceptionOverview(ExceptionSensorData template, int limit);
+	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects which are between the from and to
@@ -43,7 +44,7 @@ public interface IExceptionDataAccessService {
 	 * @return List of {@link ExceptionSensorData} objects to get an overview of recorded
 	 *         Exceptions.
 	 */
-	List getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate);
+	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects. This list can be used to get an
@@ -54,7 +55,7 @@ public interface IExceptionDataAccessService {
 	 * @return A list of {@link ExceptionSensorData} objects. This list can be used to get an
 	 *         overview over recorded Exceptions in a target application.
 	 */
-	List getUngroupedExceptionOverview(ExceptionSensorData template);
+	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects which are between the from and to
@@ -70,7 +71,7 @@ public interface IExceptionDataAccessService {
 	 * @return List of {@link ExceptionSensorData} objects to get an overview of recorded
 	 *         Exceptions.
 	 */
-	List getUngroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate);
+	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects containing all details of a specific
@@ -81,7 +82,7 @@ public interface IExceptionDataAccessService {
 	 * @return List of {@link ExceptionSensorData} objects containing all details of a specific
 	 *         Exception class.
 	 */
-	List getExceptionTree(ExceptionSensorData template);
+	List<ExceptionSensorData> getExceptionTree(ExceptionSensorData template);
 
 	/**
 	 * Returns a list of {@link AggregatedExceptionSensorData} objects that is used to show an
@@ -92,7 +93,7 @@ public interface IExceptionDataAccessService {
 	 * @return A list of {@link AggregatedExceptionSensorData} objects with additional information
 	 *         about how often a specific eventType was caused.
 	 */
-	List getDataForGroupedExceptionOverview(ExceptionSensorData template);
+	List<AggregatedExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template);
 
 	/**
 	 * Returns a list of {@link AggregatedExceptionSensorData} objects that is used to show an
@@ -108,14 +109,15 @@ public interface IExceptionDataAccessService {
 	 * @return A list of {@link AggregatedExceptionSensorData} objects with additional information
 	 *         about how often a specific eventType was caused.
 	 */
-	List getDataForGroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate);
+	List<AggregatedExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate);
 
 	/**
 	 * Returns the exception sensor data list for all error and stack message combinations for the
 	 * throwable type defined in the template.
 	 * 
-	 * @param template template with throwable type set
+	 * @param template
+	 *            template with throwable type set
 	 * @return {@link ExceptionSensorData} list.
 	 */
-	List getStackTraceMessagesForThrowableType(ExceptionSensorData template);
+	List<ExceptionSensorData> getStackTraceMessagesForThrowableType(ExceptionSensorData template);
 }

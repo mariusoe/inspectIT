@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * The handler to save invocation sequences
+ * The handler to save invocation sequences.
  * 
  * @author Patrice Bouillet
  * 
@@ -60,7 +60,7 @@ public class SaveInvocationsHandler extends AbstractStorageHandler {
 
 			// inefficient, should be replaced by just getting the correct
 			// PlatformIdent object to save
-			List<PlatformIdent> platformIdents = repositoryDefinition.getGlobalDataAccessService().getConnectedAgents();
+			List<PlatformIdent> platformIdents = (List<PlatformIdent>) repositoryDefinition.getGlobalDataAccessService().getConnectedAgents();
 			Long platformId = Long.valueOf(((InvocationSequenceData) selection.getFirstElement()).getPlatformIdent());
 
 			for (PlatformIdent platformIdent : platformIdents) {

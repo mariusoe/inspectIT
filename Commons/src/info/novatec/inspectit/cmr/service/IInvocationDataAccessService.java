@@ -29,7 +29,7 @@ public interface IInvocationDataAccessService {
 	 * 
 	 * @return Returns the list of invocation sequences.
 	 */
-	List getInvocationSequenceOverview(long platformId, long methodId, int limit);
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit);
 
 	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
@@ -46,7 +46,7 @@ public interface IInvocationDataAccessService {
 	 * 
 	 * @return Returns the list of invocation sequences.
 	 */
-	List getInvocationSequenceOverview(long platformId, int limit);
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit);
 
 	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
@@ -66,12 +66,12 @@ public interface IInvocationDataAccessService {
 	 * 
 	 * @return Returns the list of invocation sequences.
 	 */
-	List getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate);
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate);
 
 	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
-	 * other objects in given time frame. Thus this list can be used to get an overview of the available invocation
-	 * sequences. The limit defines the size of the list.
+	 * other objects in given time frame. Thus this list can be used to get an overview of the
+	 * available invocation sequences. The limit defines the size of the list.
 	 * <p>
 	 * Compared to the above method, this service method returns all invocations for a specific
 	 * agent, not only the invocations for specific methods.
@@ -87,7 +87,7 @@ public interface IInvocationDataAccessService {
 	 * 
 	 * @return Returns the list of invocation sequences.
 	 */
-	List getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate);
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate);
 
 	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
@@ -106,7 +106,7 @@ public interface IInvocationDataAccessService {
 	 *            The limit/size of the list.
 	 * @return Returns the list of invocation sequences.
 	 */
-	List getInvocationSequenceOverview(long platformId, Collection invocationIdCollection, int limit);
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit);
 
 	/**
 	 * This service method is used to get all the details of a specific invocation sequence.

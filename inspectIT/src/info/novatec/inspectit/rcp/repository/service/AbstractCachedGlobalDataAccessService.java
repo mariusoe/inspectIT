@@ -1,18 +1,17 @@
 package info.novatec.inspectit.rcp.repository.service;
 
+import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.cmr.model.PlatformIdent;
+import info.novatec.inspectit.cmr.model.SensorTypeIdent;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import info.novatec.inspectit.cmr.model.MethodIdent;
-import info.novatec.inspectit.cmr.model.PlatformIdent;
-import info.novatec.inspectit.cmr.model.SensorTypeIdent;
-
 /**
- * The default implementation of the cached ident objects. Provides a
- * protected-visible method to analyze and put a list of platform ident objects
- * into the cache.
+ * The default implementation of the cached ident objects. Provides a protected-visible method to
+ * analyze and put a list of platform ident objects into the cache.
  * 
  * @author Patrice Bouillet
  * 
@@ -20,34 +19,30 @@ import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 public abstract class AbstractCachedGlobalDataAccessService implements CachedGlobalDataAccessService {
 
 	/**
-	 * This map is needed to store the mapping between the ID's and the
-	 * {@link PlatformIdent} objects. Some views / editors need this information
-	 * because they can only access the ID.
+	 * This map is needed to store the mapping between the ID's and the {@link PlatformIdent}
+	 * objects. Some views / editors need this information because they can only access the ID.
 	 */
 	private Map<Long, PlatformIdent> platformMap = new ConcurrentHashMap<Long, PlatformIdent>();
 
 	/**
-	 * This map is needed to store the mapping between the ID's and the
-	 * {@link SensorTypeIdent} objects. Some views / editors need this
-	 * information because they can only access the ID.
+	 * This map is needed to store the mapping between the ID's and the {@link SensorTypeIdent}
+	 * objects. Some views / editors need this information because they can only access the ID.
 	 */
 	private Map<Long, SensorTypeIdent> sensorTypeMap = new ConcurrentHashMap<Long, SensorTypeIdent>();
 
 	/**
-	 * This map is needed to store the mapping between the ID's and the
-	 * {@link MethodIdent} objects. Some views / editors need this information
-	 * because they can only access the ID.
+	 * This map is needed to store the mapping between the ID's and the {@link MethodIdent} objects.
+	 * Some views / editors need this information because they can only access the ID.
 	 */
 	private Map<Long, MethodIdent> methodMap = new ConcurrentHashMap<Long, MethodIdent>();
 
 	/**
-	 * Analyzes the platform ident objects and puts these into a cache for
-	 * faster retrieval of ID->ident objects.
+	 * Analyzes the platform ident objects and puts these into a cache for faster retrieval of
+	 * ID->ident objects.
 	 * 
 	 * @param platformIdents
 	 *            The list of platform ident objects to cache.
 	 */
-	@SuppressWarnings("unchecked")
 	protected void putIntoCache(List<PlatformIdent> platformIdents) {
 		platformMap.clear();
 		methodMap.clear();
@@ -71,8 +66,7 @@ public abstract class AbstractCachedGlobalDataAccessService implements CachedGlo
 	}
 
 	/**
-	 * Returns the mapped {@link PlatformIdent} object for the passed platform
-	 * id.
+	 * Returns the mapped {@link PlatformIdent} object for the passed platform id.
 	 * 
 	 * @param platformId
 	 *            The long value.
@@ -89,8 +83,7 @@ public abstract class AbstractCachedGlobalDataAccessService implements CachedGlo
 	}
 
 	/**
-	 * Returns the mapped {@link SensorTypeIdent} object for the passed sensor
-	 * type id.
+	 * Returns the mapped {@link SensorTypeIdent} object for the passed sensor type id.
 	 * 
 	 * @param sensorTypeId
 	 *            The long value.

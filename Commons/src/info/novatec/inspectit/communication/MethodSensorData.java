@@ -6,15 +6,13 @@ import info.novatec.inspectit.communication.data.ParameterContentData;
 
 import java.sql.Timestamp;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 /**
- * The {@link MethodSensorData} abstract class is extended by all data & value
- * objects which are used for gathered measurements from instrumented methods.
- * Thus an additional identifier is necessary to store the unique method
- * identifier.
+ * The {@link MethodSensorData} abstract class is extended by all data & value objects which are
+ * used for gathered measurements from instrumented methods. Thus an additional identifier is
+ * necessary to store the unique method identifier.
  * 
  * @author Patrice Bouillet
  * 
@@ -32,10 +30,9 @@ public abstract class MethodSensorData extends DefaultData {
 	private long methodIdent;
 
 	/**
-	 * Contains optional information about the contents of some fields /
-	 * parameters etc.
+	 * Contains optional information about the contents of some fields / parameters etc.
 	 */
-	private Set parameterContentData = new HashSet(0);
+	private Set<ParameterContentData> parameterContentData = new HashSet<ParameterContentData>(0);
 
 	/**
 	 * Default no-args constructor.
@@ -73,11 +70,11 @@ public abstract class MethodSensorData extends DefaultData {
 	 * @param methodIdent
 	 *            The unique identifier of the method.
 	 */
-	public MethodSensorData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List parameterContentData) {
+	public MethodSensorData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData) {
 		this(timeStamp, platformIdent, sensorTypeIdent, methodIdent);
 
 		if (null != parameterContentData) {
-			this.parameterContentData = new HashSet(parameterContentData);
+			this.parameterContentData = new HashSet<ParameterContentData>(parameterContentData);
 		}
 	}
 
@@ -93,11 +90,11 @@ public abstract class MethodSensorData extends DefaultData {
 		parameterContentData.add(parameterContent);
 	}
 
-	public Set getParameterContentData() {
+	public Set<ParameterContentData> getParameterContentData() {
 		return parameterContentData;
 	}
 
-	public void setParameterContentData(Set parameterContentData) {
+	public void setParameterContentData(Set<ParameterContentData> parameterContentData) {
 		this.parameterContentData = parameterContentData;
 	}
 
@@ -138,7 +135,7 @@ public abstract class MethodSensorData extends DefaultData {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -147,19 +144,13 @@ public abstract class MethodSensorData extends DefaultData {
 		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 1, 0);
 		if (null != parameterContentData && parameterContentData instanceof HashSet) {
 			size += objectSizes.getSizeOfHashSet(parameterContentData.size());
-			Iterator iterator = parameterContentData.iterator();
-			while (iterator.hasNext()) {
-				try {
-					ParameterContentData parameterContentData = (ParameterContentData) iterator.next();
-					size += parameterContentData.getObjectSize(objectSizes);
-				} catch (Exception exception) {
-					exception.printStackTrace();
-				}
+			for (ParameterContentData paramContentData : parameterContentData) {
+				size += paramContentData.getObjectSize(objectSizes);
 			}
 		}
 		return objectSizes.alignTo8Bytes(size);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

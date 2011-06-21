@@ -1,6 +1,7 @@
 package info.novatec.inspectit.agent.sensor.method.timer;
 
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.TimerData;
 
 import java.sql.Timestamp;
@@ -34,18 +35,27 @@ public class OptimizedTimerStorage implements ITimerStorage {
 	 * @param parameterContentData
 	 *            The content of the parameter/fields.
 	 */
-	public OptimizedTimerStorage(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List parameterContentData) {
+	public OptimizedTimerStorage(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData) {
 		timerData = new TimerData(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addData(double time) {
+	public void addData(double time, double cpuTime) {
 		timerData.increaseCount();
 		timerData.addDuration(time);
+
 		timerData.calculateMax(time);
 		timerData.calculateMin(time);
+
+		// only add the cpu time if it greater than zero
+		if (cpuTime >= 0) {
+			timerData.addCpuDuration(cpuTime);
+
+			timerData.calculateCpuMax(cpuTime);
+			timerData.calculateCpuMin(cpuTime);
+		}
 	}
 
 	/**

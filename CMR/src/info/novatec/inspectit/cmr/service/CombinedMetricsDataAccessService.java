@@ -50,7 +50,6 @@ public class CombinedMetricsDataAccessService implements ICombinedMetricsDataAcc
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Log
 	public List<TimerData> getCombinedMetricsFromToDate(TimerData template, Date fromDate, Date toDate, String workflowName, String activityName) {
 		if (fromDate.after(toDate)) {
@@ -64,7 +63,6 @@ public class CombinedMetricsDataAccessService implements ICombinedMetricsDataAcc
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Log
 	public List<ParameterContentData> getWorkflows(TimerData template) {
 		List<ParameterContentData> result = combinedMetricsDataDao.getWorkflows(template);
@@ -74,7 +72,6 @@ public class CombinedMetricsDataAccessService implements ICombinedMetricsDataAcc
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Log
 	public List<ParameterContentData> getActivities(TimerData template, String workflow) {
 		List<ParameterContentData> result = combinedMetricsDataDao.getActivities(template, workflow);

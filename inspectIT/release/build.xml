@@ -76,9 +76,7 @@
 	<target name="dist-commons">
 		<mkdir dir="${basedir}/build" />
 		<mkdir dir="${build.common.classes}" />
-		<javac source="1.4" target="1.4" debug="true" fork="true" includeAntRuntime="no" destdir="${build.common.classes}" srcdir="../../Commons">
-			<compilerarg value="-Xlint:unchecked" />
-		</javac>
+		<javac source="1.5" target="1.5" debug="true" fork="true" destdir="${build.common.classes}" srcdir="../../Commons" includeAntRuntime="no"/>
 	</target>
 
 	<target name="init" depends="dist-commons">

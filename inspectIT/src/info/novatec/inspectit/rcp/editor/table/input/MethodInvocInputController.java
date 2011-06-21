@@ -235,7 +235,6 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		 *            Map for caching. Usually empty map should be supplied.
 		 * @return List of aggregated timer data.
 		 */
-		@SuppressWarnings("unchecked")
 		private List<TimerData> aggregateTimerData(List<InvocationSequenceData> invocationList, List<TimerData> timerDataList, Map<Long, TimerData> cacheMap) {
 			for (InvocationSequenceData invocationData : invocationList) {
 				TimerData timerData = null;
@@ -298,7 +297,6 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		 *            The data objects which is inspected for its nested elements.
 		 * @return The duration of all nested sequences (with their nested sequences as well).
 		 */
-		@SuppressWarnings("unchecked")
 		private static double computeNestedDuration(InvocationSequenceData data) {
 			if (data.getNestedSequences().isEmpty()) {
 				return 0;

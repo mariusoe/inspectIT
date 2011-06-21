@@ -39,12 +39,12 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	/**
 	 * The thread local containing the {@link IdentityHashToDataObject} object.
 	 */
-	private ThreadLocal exceptionDataHolder = new ThreadLocal();
+	private ThreadLocal<IdentityHashToDataObject> exceptionDataHolder = new ThreadLocal<IdentityHashToDataObject>();
 
 	/**
 	 * The thread local containing the id of the method where the exception was handled.
 	 */
-	private ThreadLocal exceptionHandlerId = new ThreadLocal();
+	private ThreadLocal<Long> exceptionHandlerId = new ThreadLocal<Long>();
 
 	/**
 	 * The StringConstraint to ensure a maximum length of strings.
@@ -59,7 +59,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	 * @param parameter
 	 *            Additional parameters.
 	 */
-	public ExceptionSensorHook(IIdManager idManager, Map parameter) {
+	public ExceptionSensorHook(IIdManager idManager, Map<String, Object> parameter) {
 		this.idManager = idManager;
 		this.strConstraint = new StringConstraint(parameter);
 	}
@@ -120,7 +120,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	 */
 	public void dispatchOnThrowInBody(ICoreService coreService, long id, long sensorTypeId, Object object, Object exceptionObject, Object[] parameters, RegisteredSensorConfig rsc) {
 		// get the mapping object
-		IdentityHashToDataObject mappingObject = (IdentityHashToDataObject) exceptionDataHolder.get();
+		IdentityHashToDataObject mappingObject = exceptionDataHolder.get();
 
 		if (null != mappingObject) {
 			try {
@@ -142,7 +142,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 				if (mappingObject.getIdentityHash().equals(identityHash)) {
 					// we have to check whether the Throwable object is just passed or explicitly
 					// rethrown
-					if ((null != exceptionHandlerId.get()) && (registeredMethodId == ((Long) exceptionHandlerId.get()).longValue())) {
+					if ((null != exceptionHandlerId.get()) && (registeredMethodId == exceptionHandlerId.get().longValue())) {
 						// the Throwable object is explicitly rethrown
 						data.setExceptionEvent(ExceptionEventEnum.RETHROWN);
 					} else {
@@ -182,7 +182,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	 */
 	public void dispatchBeforeCatchBody(ICoreService coreService, long id, long sensorTypeId, Object exceptionObject, RegisteredSensorConfig rsc) {
 		// get the mapping object
-		IdentityHashToDataObject mappingObject = (IdentityHashToDataObject) exceptionDataHolder.get();
+		IdentityHashToDataObject mappingObject = exceptionDataHolder.get();
 
 		if (null != mappingObject) {
 			try {
@@ -193,7 +193,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 				Long identityHash = new Long(System.identityHashCode(exceptionObject));
 
 				// save id of the method where the exception is catched
-				exceptionHandlerId.set(new Long(registeredMethodId));
+				exceptionHandlerId.set(Long.valueOf(registeredMethodId));
 
 				// getting the actual object with information
 				Throwable throwable = (Throwable) exceptionObject;

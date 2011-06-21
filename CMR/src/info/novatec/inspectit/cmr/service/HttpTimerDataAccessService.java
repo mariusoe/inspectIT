@@ -15,7 +15,7 @@ import org.springframework.beans.factory.InitializingBean;
  * @author Stefan Siegl
  */
 public class HttpTimerDataAccessService implements IHttpTimerDataAccessService, InitializingBean {
-	
+
 	/**
 	 * The logger of this class.
 	 */
@@ -29,36 +29,32 @@ public class HttpTimerDataAccessService implements IHttpTimerDataAccessService, 
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("rawtypes")
 	@Override
-	public List getAggregatedTimerData(HttpTimerData httpData, boolean includeRequestMethod) {
+	public List<HttpTimerData> getAggregatedTimerData(HttpTimerData httpData, boolean includeRequestMethod) {
 		return dao.getAggregatedHttpTimerData(httpData, includeRequestMethod);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("rawtypes")
 	@Override
-	public List getAggregatedTimerData(HttpTimerData httpData, boolean includeRequestMethod, Date fromDate, Date toDate) {
+	public List<HttpTimerData> getAggregatedTimerData(HttpTimerData httpData, boolean includeRequestMethod, Date fromDate, Date toDate) {
 		return dao.getAggregatedHttpTimerData(httpData, includeRequestMethod, fromDate, toDate);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("rawtypes")
 	@Override
-	public List getTaggedAggregatedTimerData(HttpTimerData httpData, boolean includeRequestMethod) {
+	public List<HttpTimerData> getTaggedAggregatedTimerData(HttpTimerData httpData, boolean includeRequestMethod) {
 		return dao.getTaggedAggregatedHttpTimerData(httpData, includeRequestMethod);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("rawtypes")
 	@Override
-	public List getTaggedAggregatedTimerData(HttpTimerData httpData, boolean includeRequestMethod, Date fromDate, Date toDate) {
+	public List<HttpTimerData> getTaggedAggregatedTimerData(HttpTimerData httpData, boolean includeRequestMethod, Date fromDate, Date toDate) {
 		return dao.getTaggedAggregatedHttpTimerData(httpData, includeRequestMethod, fromDate, toDate);
 	}
 

@@ -6,7 +6,6 @@ import info.novatec.inspectit.communication.MethodSensorData;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -26,7 +25,7 @@ public class InvocationSequenceData extends MethodSensorData {
 	/**
 	 * The nested invocation traces are stored in this list.
 	 */
-	private List nestedSequences = new ArrayList(0);
+	private List<InvocationSequenceData> nestedSequences = new ArrayList<InvocationSequenceData>(0);
 
 	/**
 	 * The parent sequence of this sequence if there is any.
@@ -46,7 +45,7 @@ public class InvocationSequenceData extends MethodSensorData {
 	/**
 	 * The associated exception sensor data object. Can be <code>null</code>.
 	 */
-	private List exceptionSensorDataObjects;
+	private List<ExceptionSensorData> exceptionSensorDataObjects;
 
 	/**
 	 * The position if parent sequence is not <code>null</code>.
@@ -83,11 +82,11 @@ public class InvocationSequenceData extends MethodSensorData {
 		super(timeStamp, platformIdent, sensorTypeIdent, methodIdent);
 	}
 
-	public List getNestedSequences() {
+	public List<InvocationSequenceData> getNestedSequences() {
 		return nestedSequences;
 	}
 
-	public void setNestedSequences(List nestedSequences) {
+	public void setNestedSequences(List<InvocationSequenceData> nestedSequences) {
 		this.nestedSequences = nestedSequences;
 	}
 
@@ -169,17 +168,17 @@ public class InvocationSequenceData extends MethodSensorData {
 		return end;
 	}
 
-	public List getExceptionSensorDataObjects() {
+	public List<ExceptionSensorData> getExceptionSensorDataObjects() {
 		return exceptionSensorDataObjects;
 	}
 
-	public void setExceptionSensorDataObjects(List exceptionSensorDataObjects) {
+	public void setExceptionSensorDataObjects(List<ExceptionSensorData> exceptionSensorDataObjects) {
 		this.exceptionSensorDataObjects = exceptionSensorDataObjects;
 	}
 
 	public void addExceptionSensorData(ExceptionSensorData data) {
 		if (null == exceptionSensorDataObjects) {
-			exceptionSensorDataObjects = new ArrayList();
+			exceptionSensorDataObjects = new ArrayList<ExceptionSensorData>();
 		}
 		exceptionSensorDataObjects.add(data);
 	}
@@ -265,35 +264,23 @@ public class InvocationSequenceData extends MethodSensorData {
 			size += sqlStatementData.getObjectSize(objectSizes);
 		}
 		if (null != nestedSequences && nestedSequences instanceof ArrayList) {
-			size += objectSizes.getSizeOf((ArrayList) nestedSequences);
-			Iterator iterator = nestedSequences.iterator();
-			while (iterator.hasNext()) {
-				try {
-					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) iterator.next();
-					size += invocationSequenceData.getObjectSize(objectSizes);
-				} catch (Exception exception) {
-					exception.printStackTrace();
-				}
+			size += objectSizes.getSizeOf(nestedSequences);
+			for (InvocationSequenceData invocationSequenceData : nestedSequences) {
+				size += invocationSequenceData.getObjectSize(objectSizes);
 			}
 		}
 		if (null != exceptionSensorDataObjects) {
 			size += objectSizes.getSizeOf(exceptionSensorDataObjects);
-			Iterator iterator = exceptionSensorDataObjects.iterator();
-			while (iterator.hasNext()) {
-				try {
-					ExceptionSensorData exceptionSensorData = (ExceptionSensorData) iterator.next();
-					size += exceptionSensorData.getObjectSize(objectSizes);
-				} catch (Exception exception) {
-					exception.printStackTrace();
-				}
+			for (ExceptionSensorData exceptionSensorData : exceptionSensorDataObjects) {
+				size += exceptionSensorData.getObjectSize(objectSizes);
 			}
 		}
 		return objectSizes.alignTo8Bytes(size);
 	}
-	
+
 	/**
-	 * Clones invocation sequence. This method returns new object exactly same as the original object,
-	 * but with out nested sequences set.
+	 * Clones invocation sequence. This method returns new object exactly same as the original
+	 * object, but with out nested sequences set.
 	 * 
 	 * @return Cloned invocation sequence.
 	 */
@@ -303,7 +290,7 @@ public class InvocationSequenceData extends MethodSensorData {
 		clone.setChildCount(this.getChildCount());
 		clone.setDuration(this.getDuration());
 		clone.setEnd(this.getEnd());
-		clone.setNestedSequences(Collections.EMPTY_LIST);
+		clone.setNestedSequences(Collections.<InvocationSequenceData> emptyList());
 		clone.setParameterContentData(this.getParameterContentData());
 		clone.setParentSequence(this.getParentSequence());
 		clone.setPosition(this.getPosition());

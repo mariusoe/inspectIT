@@ -87,7 +87,6 @@ public final class TextFormatter {
 	 *            The object which contains the information to create the styled method string.
 	 * @return The created method + parameters string.
 	 */
-	@SuppressWarnings("unchecked")
 	public static String getMethodWithParameters(MethodIdent methodIdent) {
 		StringBuilder builder = new StringBuilder();
 		String parameterText = "";

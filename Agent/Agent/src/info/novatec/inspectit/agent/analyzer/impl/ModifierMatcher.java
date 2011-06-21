@@ -3,13 +3,13 @@ package info.novatec.inspectit.agent.analyzer.impl;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatcher;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
+import info.novatec.inspectit.javassist.CtBehavior;
 import info.novatec.inspectit.javassist.CtConstructor;
 import info.novatec.inspectit.javassist.CtMethod;
 import info.novatec.inspectit.javassist.Modifier;
 import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -61,13 +61,11 @@ public class ModifierMatcher extends AbstractMatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException {
-		List matchingMethods = delegateMatcher.getMatchingMethods(classLoader, className);
-		List notMatchingMethods = null;
+	public List<CtMethod> getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException {
+		List<CtMethod> matchingMethods = delegateMatcher.getMatchingMethods(classLoader, className);
+		List<CtMethod> notMatchingMethods = null;
 
-		Iterator iterator = matchingMethods.iterator();
-		while (iterator.hasNext()) {
-			CtMethod method = (CtMethod) iterator.next();
+		for (CtMethod method : matchingMethods) {
 			boolean modiferMatched = false;
 			if (method.getModifiers() == unregisteredSensorConfig.getModifiers()) {
 				modiferMatched = true;
@@ -83,7 +81,7 @@ public class ModifierMatcher extends AbstractMatcher {
 
 			if (!modiferMatched) {
 				if (null == notMatchingMethods) {
-					notMatchingMethods = new ArrayList();
+					notMatchingMethods = new ArrayList<CtMethod>();
 				}
 				notMatchingMethods.add(method);
 			}
@@ -94,7 +92,7 @@ public class ModifierMatcher extends AbstractMatcher {
 				matchingMethods.removeAll(notMatchingMethods);
 			} catch (UnsupportedOperationException exception) {
 				// if list can not perform remove do it manually
-				List returnList = new ArrayList();
+				List<CtMethod> returnList = new ArrayList<CtMethod>();
 				returnList.addAll(matchingMethods);
 				returnList.removeAll(notMatchingMethods);
 				return returnList;
@@ -107,13 +105,11 @@ public class ModifierMatcher extends AbstractMatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException {
-		List matchingConstructors = delegateMatcher.getMatchingConstructors(classLoader, className);
-		List notMatchingConstructors = null;
+	public List<CtConstructor> getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException {
+		List<CtConstructor> matchingConstructors = delegateMatcher.getMatchingConstructors(classLoader, className);
+		List<CtConstructor> notMatchingConstructors = null;
 
-		Iterator iterator = matchingConstructors.iterator();
-		while (iterator.hasNext()) {
-			CtConstructor constructor = (CtConstructor) iterator.next();
+		for (CtConstructor constructor : matchingConstructors) {
 			boolean modiferMatched = false;
 			if (constructor.getModifiers() == unregisteredSensorConfig.getModifiers()) {
 				modiferMatched = true;
@@ -129,7 +125,7 @@ public class ModifierMatcher extends AbstractMatcher {
 
 			if (!modiferMatched) {
 				if (null == notMatchingConstructors) {
-					notMatchingConstructors = new ArrayList();
+					notMatchingConstructors = new ArrayList<CtConstructor>();
 				}
 				notMatchingConstructors.add(constructor);
 			}
@@ -140,7 +136,7 @@ public class ModifierMatcher extends AbstractMatcher {
 				matchingConstructors.removeAll(notMatchingConstructors);
 			} catch (UnsupportedOperationException exception) {
 				// if list can not perform remove do it manually
-				List returnList = new ArrayList();
+				List<CtConstructor> returnList = new ArrayList<CtConstructor>();
 				returnList.addAll(matchingConstructors);
 				returnList.removeAll(notMatchingConstructors);
 				return returnList;
@@ -153,7 +149,7 @@ public class ModifierMatcher extends AbstractMatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void checkParameters(List methods) throws NotFoundException {
+	public void checkParameters(List<? extends CtBehavior> methods) throws NotFoundException {
 		delegateMatcher.checkParameters(methods);
 	}
 

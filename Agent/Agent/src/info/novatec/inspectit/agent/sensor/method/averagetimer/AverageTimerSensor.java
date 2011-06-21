@@ -9,8 +9,7 @@ import info.novatec.inspectit.util.Timer;
 import java.util.Map;
 
 /**
- * The average timer sensor which initializes and returns the
- * {@link AverageTimerHook} class.
+ * The average timer sensor which initializes and returns the {@link AverageTimerHook} class.
  * 
  * @author Patrice Bouillet
  * 
@@ -50,7 +49,7 @@ public class AverageTimerSensor implements IMethodSensor {
 	public AverageTimerSensor(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor) {
 		this.timer = timer;
 		this.idManager = idManager;
-		this.propertyAccessor = propertyAccessor;		
+		this.propertyAccessor = propertyAccessor;
 	}
 
 	/**
@@ -63,7 +62,7 @@ public class AverageTimerSensor implements IMethodSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void init(Map parameter) {
+	public void init(Map<String, Object> parameter) {
 		averageTimerHook = new AverageTimerHook(timer, idManager, propertyAccessor, parameter);
 	}
 

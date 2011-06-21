@@ -41,7 +41,7 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 	/**
 	 * The stack containing the start time values.
 	 */
-	private final ThreadLocalStack timeStack = new ThreadLocalStack();
+	private final ThreadLocalStack<Double> timeStack = new ThreadLocalStack<Double>();
 
 	/**
 	 * The timer used for accurate measuring.
@@ -62,7 +62,7 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 	 * The ThreadLocal for a boolean value so only the last before and first after hook of an
 	 * invocation is measured.
 	 */
-	private ThreadLocal threadLast = new ThreadLocal();
+	private ThreadLocal<Boolean> threadLast = new ThreadLocal<Boolean>();
 
 	/**
 	 * The StringConstraint to ensure a maximum length of strings.
@@ -74,7 +74,7 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 	 * SQL statement. Using this structure we can ensure that we do not throw the exception always
 	 * again.
 	 */
-	private static List preparedStatementsWithExceptions = new ArrayList(0);
+	private static List<Long> preparedStatementsWithExceptions = new ArrayList<Long>(0);
 
 	/**
 	 * The only constructor which needs the {@link Timer}.
@@ -88,7 +88,7 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 	 * @param parameter
 	 *            Additional parameters.
 	 */
-	public PreparedStatementHook(Timer timer, IIdManager idManager, StatementStorage statementStorage, Map parameter) {
+	public PreparedStatementHook(Timer timer, IIdManager idManager, StatementStorage statementStorage, Map<String, Object> parameter) {
 		this.timer = timer;
 		this.idManager = idManager;
 		this.statementStorage = statementStorage;
@@ -114,10 +114,10 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 	 * {@inheritDoc}
 	 */
 	public void secondAfterBody(ICoreService coreService, long methodId, long sensorTypeId, Object object, Object[] parameters, Object result, RegisteredSensorConfig rsc) {
-		double endTime = ((Double) timeStack.pop()).doubleValue();
-		double startTime = ((Double) timeStack.pop()).doubleValue();
+		double endTime = timeStack.pop().doubleValue();
+		double startTime = timeStack.pop().doubleValue();
 
-		if (((Boolean) threadLast.get()).booleanValue()) {
+		if (threadLast.get().booleanValue()) {
 			threadLast.set(Boolean.FALSE);
 
 			String sql = statementStorage.getPreparedStatement(object);
@@ -174,7 +174,7 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 		} catch (NoSuchElementException e) {
 			// Ensure that a problem with this statement is only thrown once to not spam the log
 			// file. It is possible that we hide exceptions.
-			Long methodIdLong = new Long(methodId);
+			Long methodIdLong = Long.valueOf(methodId);
 			if (preparedStatementsWithExceptions.contains(methodIdLong)) {
 				// we already logged this exception...
 				return;
@@ -190,7 +190,7 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 			// we need to ensure thread safety for the list and do not care for lost updates, so
 			// we simply create a new list based on the old list and change references after we
 			// finished building it.
-			List clonedList = new ArrayList(preparedStatementsWithExceptions);
+			List<Long> clonedList = new ArrayList<Long>(preparedStatementsWithExceptions);
 			clonedList.add(methodIdLong);
 			preparedStatementsWithExceptions = clonedList;
 		}

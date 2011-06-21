@@ -29,8 +29,8 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 
 /**
- * This class represents the textual view of all platform-sensor-types. The
- * shown informations are static and dynamic
+ * This class represents the textual view of all platform-sensor-types. The shown informations are
+ * static and dynamic
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -222,7 +222,7 @@ public class VmSummaryInputController extends AbstractTextInputController {
 	 */
 	public void setInputDefinition(InputDefinition inputDefinition) {
 		super.setInputDefinition(inputDefinition);
-		
+
 		long platformId = inputDefinition.getIdDefinition().getPlatformId();
 
 		systemObj = new SystemInformationData();
@@ -262,8 +262,7 @@ public class VmSummaryInputController extends AbstractTextInputController {
 	}
 
 	/**
-	 * Returns the new composite with initialized input and sections with text
-	 * labels.
+	 * Returns the new composite with initialized input and sections with text labels.
 	 * 
 	 * @param parent
 	 *            The parent used to draw the elements to.
@@ -372,7 +371,6 @@ public class VmSummaryInputController extends AbstractTextInputController {
 	 * @param toolkit
 	 *            The form toolkit.
 	 */
-	@SuppressWarnings("unchecked")
 	private void addStaticInformations(Composite parent, FormToolkit toolkit) {
 		SystemInformationData data = (SystemInformationData) dataAccessService.getLastDataObject(systemObj);
 		int minTitleColumnWidth = 170;
@@ -421,14 +419,14 @@ public class VmSummaryInputController extends AbstractTextInputController {
 			addItemToSection(toolkit, SECTION_OS, "Architecture: ", minTitleColumnWidth);
 			addItemToSection(toolkit, SECTION_OS, data.getArchitecture(), minInformationColumnWidth);
 
-			// token delimiter can be : or ; 
-			// thus checking the provided class-path to see which one fits 
+			// token delimiter can be : or ;
+			// thus checking the provided class-path to see which one fits
 			String tokenDelimiter = ";";
 			String classPath = data.getClassPath();
 			if (classPath.indexOf(tokenDelimiter) == -1) {
 				tokenDelimiter = ":";
 			}
-			
+
 			// some classpath informations with formatting
 			addItemToMinimizedSection(toolkit, SECTION_CLASSPATH, "Class path: ");
 			StringTokenizer classpathTokenizer = new StringTokenizer(data.getClassPath(), tokenDelimiter);
@@ -572,8 +570,7 @@ public class VmSummaryInputController extends AbstractTextInputController {
 	}
 
 	/**
-	 * Adds a section which is not available due to not activated platform
-	 * sensor types.
+	 * Adds a section which is not available due to not activated platform sensor types.
 	 * 
 	 * @param parent
 	 *            The parent used to draw the elements to.
@@ -637,23 +634,17 @@ public class VmSummaryInputController extends AbstractTextInputController {
 	 * Updates the labels with the dynamic informations.
 	 * 
 	 * @param classLoadingData
-	 *            The {@link List} containing the
-	 *            {@link ClassLoadingInformationData} objects.
+	 *            The {@link List} containing the {@link ClassLoadingInformationData} objects.
 	 * @param cpuData
-	 *            The {@link List} containing the {@link CpuInformationData}
-	 *            objects.
+	 *            The {@link List} containing the {@link CpuInformationData} objects.
 	 * @param compilationData
-	 *            The {@link List} containing the
-	 *            {@link CompilationInformationData} objects.
+	 *            The {@link List} containing the {@link CompilationInformationData} objects.
 	 * @param memoryData
-	 *            The {@link List} containing the {@link MemoryInformationData}
-	 *            objects.
+	 *            The {@link List} containing the {@link MemoryInformationData} objects.
 	 * @param runtimeData
-	 *            The {@link List} containing the {@link RuntimeInformationData}
-	 *            objects.
+	 *            The {@link List} containing the {@link RuntimeInformationData} objects.
 	 * @param threadData
-	 *            The {@link List} containing the {@link ThreadInformationData}
-	 *            objects.
+	 *            The {@link List} containing the {@link ThreadInformationData} objects.
 	 */
 	private void updateLabels(ClassLoadingInformationData classLoadingData, CpuInformationData cpuData, CompilationInformationData compilationData, MemoryInformationData memoryData,
 			RuntimeInformationData runtimeData, ThreadInformationData threadData) {

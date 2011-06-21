@@ -10,7 +10,6 @@ import info.novatec.inspectit.javassist.Modifier;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -64,7 +63,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 * The list of sending strategies. Default size is set to 1 as it's unlikely that more than one
 	 * is defined.
 	 */
-	private List sendingStrategies = new ArrayList(1);
+	private List<StrategyConfig> sendingStrategies = new ArrayList<StrategyConfig>(1);
 
 	/**
 	 * The default size of the method sensor type list.
@@ -74,7 +73,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	/**
 	 * The list of method sensor types. Contains objects of type {@link MethodSensorTypeConfig}.
 	 */
-	private List methodSensorTypes = new ArrayList(METHOD_LIST_SIZE);
+	private List<MethodSensorTypeConfig> methodSensorTypes = new ArrayList<MethodSensorTypeConfig>(METHOD_LIST_SIZE);
 
 	/**
 	 * The default size of the platform sensor type list.
@@ -84,12 +83,12 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	/**
 	 * The list of platform sensor types. Contains objects of type {@link PlatformSensorTypeConfig}.
 	 */
-	private List platformSensorTypes = new ArrayList(PLATFORM_LIST_SIZE);
+	private List<PlatformSensorTypeConfig> platformSensorTypes = new ArrayList<PlatformSensorTypeConfig>(PLATFORM_LIST_SIZE);
 
 	/**
 	 * A list containing all the sensor definitions from the configuration.
 	 */
-	private List unregisteredSensorConfigs = new ArrayList();
+	private List<UnregisteredSensorConfig> unregisteredSensorConfigs = new ArrayList<UnregisteredSensorConfig>();
 
 	/**
 	 * Indicates whether the exception sensor is activated or not.
@@ -165,13 +164,13 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setBufferStrategy(String clazzName, Map settings) throws StorageException {
+	public void setBufferStrategy(String clazzName, Map<String, String> settings) throws StorageException {
 		if ((null == clazzName) || "".equals(clazzName)) {
 			throw new StorageException("Buffer strategy class name cannot be null or empty!");
 		}
 
 		if (null == settings) {
-			settings = Collections.EMPTY_MAP;
+			settings = Collections.emptyMap();
 		}
 
 		this.bufferStrategy = new StrategyConfig(clazzName, settings);
@@ -191,20 +190,19 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addSendingStrategy(String clazzName, Map settings) throws StorageException {
+	public void addSendingStrategy(String clazzName, Map<String, String> settings) throws StorageException {
 		if ((null == clazzName) || "".equals(clazzName)) {
 			throw new StorageException("Sending strategy class name cannot be null or empty!");
 		}
 
-		for (Iterator iterator = sendingStrategies.iterator(); iterator.hasNext();) {
-			StrategyConfig config = (StrategyConfig) iterator.next();
+		for (StrategyConfig config : sendingStrategies) {
 			if (clazzName.equals(config.getClazzName())) {
 				throw new StorageException("Sending strategy class is already registered!");
 			}
 		}
 
 		if (null == settings) {
-			settings = Collections.EMPTY_MAP;
+			settings = Collections.emptyMap();
 		}
 
 		sendingStrategies.add(new StrategyConfig(clazzName, settings));
@@ -217,14 +215,14 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getSendingStrategyConfigs() {
+	public List<StrategyConfig> getSendingStrategyConfigs() {
 		return Collections.unmodifiableList(sendingStrategies);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addMethodSensorType(String sensorTypeName, String sensorTypeClass, PriorityEnum priority, Map settings) throws StorageException {
+	public void addMethodSensorType(String sensorTypeName, String sensorTypeClass, PriorityEnum priority, Map<String, Object> settings) throws StorageException {
 		if ((null == sensorTypeName) || "".equals(sensorTypeName)) {
 			throw new StorageException("Method sensor type name cannot be null or empty!");
 		}
@@ -238,7 +236,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		}
 
 		if (null == settings) {
-			settings = Collections.EMPTY_MAP;
+			settings = Collections.emptyMap();
 		}
 
 		MethodSensorTypeConfig sensorTypeConfig = new MethodSensorTypeConfig();
@@ -250,27 +248,27 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		methodSensorTypes.add(sensorTypeConfig);
 
 		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.fine("Method sensor type added: " + sensorTypeName + " prio: " + priority.getValue());
+			LOGGER.fine("Method sensor type added: " + sensorTypeName + " prio: " + priority);
 		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getMethodSensorTypes() {
+	public List<MethodSensorTypeConfig> getMethodSensorTypes() {
 		return Collections.unmodifiableList(methodSensorTypes);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addPlatformSensorType(String sensorTypeClass, Map settings) throws StorageException {
+	public void addPlatformSensorType(String sensorTypeClass, Map<String, Object> settings) throws StorageException {
 		if ((null == sensorTypeClass) || "".equals(sensorTypeClass)) {
 			throw new StorageException("Platform sensor type class name cannot be null or empty!");
 		}
 
 		if (null == settings) {
-			settings = Collections.EMPTY_MAP;
+			settings = Collections.emptyMap();
 		}
 
 		PlatformSensorTypeConfig sensorTypeConfig = new PlatformSensorTypeConfig();
@@ -287,14 +285,15 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getPlatformSensorTypes() {
+	public List<PlatformSensorTypeConfig> getPlatformSensorTypes() {
 		return Collections.unmodifiableList(platformSensorTypes);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addSensor(String sensorTypeName, String targetClassName, String targetMethodName, List parameterList, boolean ignoreSignature, Map settings) throws StorageException {
+	public void addSensor(String sensorTypeName, String targetClassName, String targetMethodName, List<String> parameterList, boolean ignoreSignature, Map<String, Object> settings)
+			throws StorageException {
 		if ((null == sensorTypeName) || "".equals(sensorTypeName)) {
 			throw new StorageException("Sensor type name for the sensor cannot be null or empty!");
 		}
@@ -308,7 +307,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		}
 
 		if (null == settings) {
-			settings = Collections.EMPTY_MAP;
+			settings = Collections.emptyMap();
 		}
 
 		UnregisteredSensorConfig sensorConfig = new UnregisteredSensorConfig(classPoolAnalyzer, inheritanceAnalyzer);
@@ -356,10 +355,11 @@ public class ConfigurationStorage implements IConfigurationStorage {
 
 		if (settings.containsKey("field")) {
 			sensorConfig.setPropertyAccess(true);
-			List fieldAccessorList = (List) settings.get("field");
 
-			for (Iterator iterator = fieldAccessorList.iterator(); iterator.hasNext();) {
-				String fieldDefinition = (String) iterator.next();
+			@SuppressWarnings("unchecked")
+			List<String> fieldAccessorList = (List<String>) settings.get("field");
+
+			for (String fieldDefinition : fieldAccessorList) {
 				String[] fieldDefinitionParts = fieldDefinition.split(";");
 				String name = fieldDefinitionParts[0];
 				PropertyAccessor.PropertyPathStart start = new PropertyAccessor.PropertyPathStart();
@@ -368,8 +368,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 
 				String[] steps = fieldDefinitionParts[1].split("\\.");
 				PropertyAccessor.PropertyPath parentPath = start;
-				for (int i = 0; i < steps.length; i++) {
-					String step = steps[i];
+				for (String step : steps) {
 					PropertyAccessor.PropertyPath path = new PropertyAccessor.PropertyPath();
 					path.setName(step);
 					parentPath.setPathToContinue(path);
@@ -382,10 +381,11 @@ public class ConfigurationStorage implements IConfigurationStorage {
 
 		if (settings.containsKey("property")) {
 			sensorConfig.setPropertyAccess(true);
-			List propertyAccessorList = (List) settings.get("property");
 
-			for (Iterator iterator = propertyAccessorList.iterator(); iterator.hasNext();) {
-				String fieldDefinition = (String) iterator.next();
+			@SuppressWarnings("unchecked")
+			List<String> propertyAccessorList = (List<String>) settings.get("property");
+
+			for (String fieldDefinition : propertyAccessorList) {
 				String[] fieldDefinitionParts = fieldDefinition.split(";");
 				int position = Integer.parseInt(fieldDefinitionParts[0]);
 				String name = fieldDefinitionParts[1];
@@ -396,8 +396,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 				if (3 == fieldDefinitionParts.length) {
 					String[] steps = fieldDefinitionParts[2].split("\\.");
 					PropertyAccessor.PropertyPath parentPath = start;
-					for (int i = 0; i < steps.length; i++) {
-						String step = steps[i];
+					for (String step : steps) {
 						PropertyAccessor.PropertyPath path = new PropertyAccessor.PropertyPath();
 						path.setName(step);
 						parentPath.setPathToContinue(path);
@@ -439,8 +438,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 *             Throws the storage exception if no method sensor type configuration can be found.
 	 */
 	private MethodSensorTypeConfig getMethodSensorTypeConfigForName(String sensorTypeName) throws StorageException {
-		for (Iterator iterator = methodSensorTypes.iterator(); iterator.hasNext();) {
-			MethodSensorTypeConfig config = (MethodSensorTypeConfig) iterator.next();
+		for (MethodSensorTypeConfig config : methodSensorTypes) {
 			if (config.getName().equals(sensorTypeName)) {
 				return config;
 			}
@@ -461,8 +459,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 *             Throws the storage exception if no method sensor type configuration can be found.
 	 */
 	private MethodSensorTypeConfig getExceptionSensorTypeConfigForName(String sensorTypeName) throws StorageException {
-		for (Iterator iterator = methodSensorTypes.iterator(); iterator.hasNext();) {
-			MethodSensorTypeConfig config = (MethodSensorTypeConfig) iterator.next();
+		for (MethodSensorTypeConfig config : methodSensorTypes) {
 			if (config.getName().equals(sensorTypeName)) {
 				return config;
 			}
@@ -474,19 +471,18 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getUnregisteredSensorConfigs() {
+	public List<UnregisteredSensorConfig> getUnregisteredSensorConfigs() {
 		return Collections.unmodifiableList(unregisteredSensorConfigs);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List getExceptionSensorTypes() {
+	public List<MethodSensorTypeConfig> getExceptionSensorTypes() {
 		// TODO ET: could also be improved by adding the configs directly to exceptionSensorTypes
 		// when they are added to the methodSensorTypes
-		List exceptionSensorTypes = new ArrayList();
-		for (Iterator iterator = methodSensorTypes.iterator(); iterator.hasNext();) {
-			MethodSensorTypeConfig config = (MethodSensorTypeConfig) iterator.next();
+		List<MethodSensorTypeConfig> exceptionSensorTypes = new ArrayList<MethodSensorTypeConfig>();
+		for (MethodSensorTypeConfig config : methodSensorTypes) {
 			if (config.getName().equals("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor")) {
 				exceptionSensorTypes.add(config);
 			}
@@ -498,13 +494,13 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addExceptionSensorType(String sensorTypeClass, Map settings) throws StorageException {
+	public void addExceptionSensorType(String sensorTypeClass, Map<String, Object> settings) throws StorageException {
 		if ((null == sensorTypeClass) || "".equals(sensorTypeClass)) {
 			throw new StorageException("Exception sensor type class name cannot be null or empty!");
 		}
 
 		if (null == settings) {
-			settings = Collections.EMPTY_MAP;
+			settings = Collections.emptyMap();
 		}
 
 		MethodSensorTypeConfig sensorTypeConfig = new MethodSensorTypeConfig();
@@ -522,7 +518,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addExceptionSensorTypeParameter(String sensorTypeName, String targetClassName, boolean isVirtual, Map settings) throws StorageException {
+	public void addExceptionSensorTypeParameter(String sensorTypeName, String targetClassName, boolean isVirtual, Map<String, Object> settings) throws StorageException {
 		if ((null == sensorTypeName) || "".equals(sensorTypeName)) {
 			throw new StorageException("Sensor type name for the sensor cannot be null or empty!");
 		}
@@ -532,7 +528,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		}
 
 		if (null == settings) {
-			settings = Collections.EMPTY_MAP;
+			settings = Collections.emptyMap();
 		}
 
 		UnregisteredSensorConfig sensorConfig = new UnregisteredSensorConfig(classPoolAnalyzer, inheritanceAnalyzer);
@@ -555,7 +551,6 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		sensorConfig.setSensorTypeConfig(getExceptionSensorTypeConfigForName(sensorTypeName));
 		sensorConfig.setTargetMethodName("");
 		sensorConfig.setConstructor(true);
-		sensorConfig.setSettings(settings);
 		sensorConfig.setExceptionSensorActivated(true);
 		sensorConfig.setIgnoreSignature(true);
 		sensorConfig.completeConfiguration();

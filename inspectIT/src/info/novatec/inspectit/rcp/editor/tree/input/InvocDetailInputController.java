@@ -323,7 +323,6 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 				return text;
 			}
 
-			@SuppressWarnings("unchecked")
 			private void addText(Text text) {
 				String content;
 				if (methodIdent.getPackageName() != null && !methodIdent.getPackageName().equals("")) {
@@ -391,7 +390,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 
 						// -- Session Attributes
 						content += "Session Attributes:";
-						Map<String, Object> sessionAttributeMap = httpData.getSessionAttributes();
+						Map<String, String> sessionAttributeMap = httpData.getSessionAttributes();
 						if (null == sessionAttributeMap) {
 							content += " <none>\n";
 						} else {
@@ -664,7 +663,6 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			}
 
 			if (null != data.getParameterContentData()) {
-				@SuppressWarnings("unchecked")
 				Set<ParameterContentData> parameters = data.getParameterContentData();
 				for (ParameterContentData parameterContentData : parameters) {
 					if (parameterContentData.isMethodParameter()) {
@@ -694,7 +692,6 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	 *            The data objects which is inspected for its nested elements.
 	 * @return The duration of all nested sequences (with their nested sequences as well).
 	 */
-	@SuppressWarnings("unchecked")
 	private static double computeNestedDuration(InvocationSequenceData data) {
 		if (data.getNestedSequences().isEmpty()) {
 			return 0;
@@ -809,7 +806,6 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	@Override
 	public ViewerFilter[] getFilters() {
 		ViewerFilter sensorTypeFilter = new InvocationViewerFilter() {
-			@SuppressWarnings("unchecked")
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				if (element instanceof InvocationSequenceData) {
@@ -888,7 +884,6 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		};
 		// TODO this filter must be removed in the future!
 		ViewerFilter wrapperFilter = new InvocationViewerFilter() {
-			@SuppressWarnings("unchecked")
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				if (element instanceof InvocationSequenceData) {

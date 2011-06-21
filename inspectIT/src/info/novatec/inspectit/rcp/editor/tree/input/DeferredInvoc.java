@@ -11,8 +11,8 @@ import org.eclipse.ui.progress.IDeferredWorkbenchAdapter;
 import org.eclipse.ui.progress.IElementCollector;
 
 /**
- * This class is used to create the UI elements of tree-based views only if the
- * parent element is said to be opened.
+ * This class is used to create the UI elements of tree-based views only if the parent element is
+ * said to be opened.
  * 
  * @author Patrice Bouillet
  * 
@@ -27,7 +27,6 @@ public class DeferredInvoc implements IDeferredWorkbenchAdapter {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	public void fetchDeferredChildren(Object object, IElementCollector collector, IProgressMonitor monitor) {
 		InvocationSequenceData parentData = (InvocationSequenceData) object;
 		List<InvocationSequenceData> nestedSequences = parentData.getNestedSequences();
@@ -69,7 +68,6 @@ public class DeferredInvoc implements IDeferredWorkbenchAdapter {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	public Object[] getChildren(Object o) {
 		InvocationSequenceData invocationSequenceData = (InvocationSequenceData) o;
 		List<InvocationSequenceData> nestedSequences = invocationSequenceData.getNestedSequences();

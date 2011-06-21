@@ -5,8 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The sensor type data object is used to store the information about a sensor
- * type.
+ * The sensor type data object is used to store the information about a sensor type.
  * 
  * @author Matthias Huber
  * 
@@ -47,7 +46,7 @@ public class SensorTypeData implements Serializable {
 	 * This constant defines that the priority 'min' is set.
 	 */
 	public static final int MIN = 1;
-	
+
 	/**
 	 * This constant defines that the priority 'low' is set.
 	 */
@@ -62,12 +61,12 @@ public class SensorTypeData implements Serializable {
 	 * This constant defines that the priority 'high' is set.
 	 */
 	public static final int HIGH = 4;
-	
+
 	/**
 	 * This constant defines that the priority 'max' is set.
 	 */
 	public static final int MAX = 5;
-	
+
 	/**
 	 * The id of this instance.
 	 */
@@ -77,10 +76,10 @@ public class SensorTypeData implements Serializable {
 	 * The many-to-one association to the {@link EnvironmentData} object.
 	 */
 	private EnvironmentData environmentData;
-	
+
 	/**
-	 * The sensor type name. This name will be displayed to the user instead of
-	 * the fully qualified name of the sensor type.
+	 * The sensor type name. This name will be displayed to the user instead of the fully qualified
+	 * name of the sensor type.
 	 */
 	private String name;
 
@@ -102,18 +101,15 @@ public class SensorTypeData implements Serializable {
 	/**
 	 * The additional option for this sensor type.
 	 * 
-	 * 0: no additional option is set
-	 * 1: option 'aggregate' is set
-	 * 2: option 'optimized' is set
-	 * 3: option 'raw' is set
+	 * 0: no additional option is set 1: option 'aggregate' is set 2: option 'optimized' is set 3:
+	 * option 'raw' is set
 	 */
 	private int typeOption = NO_TYPE_OPTION;
 
 	/**
-	 * The many-to-many association to the {@link MethodSensorDefinitionData}
-	 * objects.
+	 * The many-to-many association to the {@link MethodSensorDefinitionData} objects.
 	 */
-	private Set methodSensorDefinitions = new HashSet(0);
+	private Set<MethodSensorDefinitionData> methodSensorDefinitions = new HashSet<MethodSensorDefinitionData>(0);
 
 	/**
 	 * Default no-args constructor.
@@ -128,7 +124,7 @@ public class SensorTypeData implements Serializable {
 	public void setId(long id) {
 		this.id = id;
 	}
-	
+
 	public EnvironmentData getEnvironmentData() {
 		return environmentData;
 	}
@@ -177,11 +173,11 @@ public class SensorTypeData implements Serializable {
 		this.typeOption = typeOptionData;
 	}
 
-	public Set getMethodSensorDefinitions() {
+	public Set<MethodSensorDefinitionData> getMethodSensorDefinitions() {
 		return methodSensorDefinitions;
 	}
 
-	public void setMethodSensorDefinitions(Set methodSensorDefinitions) {
+	public void setMethodSensorDefinitions(Set<MethodSensorDefinitionData> methodSensorDefinitions) {
 		this.methodSensorDefinitions = methodSensorDefinitions;
 	}
 

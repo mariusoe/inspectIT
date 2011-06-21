@@ -56,7 +56,7 @@ public class MarvinWorkflowSensor implements IMethodSensor {
 		return marvinWorkflowHook;
 	}
 
-	public void init(Map parameter) {
+	public void init(Map<String, Object> parameter) {
 		marvinWorkflowHook = new MarvinWorkflowHook(timer, idManager, propertyAccessor, configurationStorage);
 	}
 

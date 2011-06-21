@@ -70,7 +70,6 @@ public class TraceInspectorController {
 		int width = (int) Math.round(i.getDuration() * xResolution);
 		int height = (int) Math.round(blockHeight * yResolution);
 		int xoffset = (int) ((i.getStart() - topSequence.getStart()) * xResolution);
-		MethodIdent methodIdent = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService().getMethodIdentForId(i.getMethodIdent());
 
 		InvocationBlock invocationBlock = i.getInvocationBlock();
 		invocationBlock.setArea(new Rectangle(xoffset, yoffset, width, height));
@@ -95,21 +94,20 @@ public class TraceInspectorController {
 	}
 
 	/**
-	 * Inserts the InvocationBlock into the clickmap, according to the resulting
-	 * xy coordinates, the height and the width of the invocationblock.
+	 * Inserts the InvocationBlock into the clickmap, according to the resulting xy coordinates, the
+	 * height and the width of the invocationblock.
 	 * 
 	 * @param invocationBlock
 	 *            The invocationBlock which should be inserted to the clickmap
 	 * @param xoffset
-	 *            The drawing x-offset of the block. This is the first key
-	 *            identifying the invocationblock in the x treemap.
+	 *            The drawing x-offset of the block. This is the first key identifying the
+	 *            invocationblock in the x treemap.
 	 * @param width
-	 *            offset+width is the second key which identifies the
-	 *            invocationblock in the x treemap
+	 *            offset+width is the second key which identifies the invocationblock in the x
+	 *            treemap
 	 * @param yoffset
-	 *            The first key identifying the invocationblock in y treemap.
-	 *            The second key is calculated from y+blockheight. The
-	 *            blockheight is the same for all blocks.
+	 *            The first key identifying the invocationblock in y treemap. The second key is
+	 *            calculated from y+blockheight. The blockheight is the same for all blocks.
 	 */
 	private void feedClickMap(InvocationBlock invocationBlock, int xoffset, int yoffset, int width, int height) {
 		SortedMap<Integer, TreeMap<Integer, InvocationBlock>> yMap = clickMap.tailMap(yoffset);

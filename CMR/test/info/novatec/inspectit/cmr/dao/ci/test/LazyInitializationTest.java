@@ -24,8 +24,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 /**
- * This class provides test method which are testing the lazy loading behavior
- * among objects.
+ * This class provides test method which are testing the lazy loading behavior among objects.
  * 
  * @author Matthias Huber
  * 
@@ -66,8 +65,8 @@ public class LazyInitializationTest extends AbstractTransactionalTestNGLogSuppor
 	private long environmentId;
 
 	/**
-	 * This method prepares the database so that all needed data for the test is
-	 * already stored. Also the variables used for testing are initialized.
+	 * This method prepares the database so that all needed data for the test is already stored.
+	 * Also the variables used for testing are initialized.
 	 * 
 	 * @throws Exception
 	 */
@@ -106,10 +105,9 @@ public class LazyInitializationTest extends AbstractTransactionalTestNGLogSuppor
 	}
 
 	/**
-	 * The list containing sensor types of a {@link EnvironmentData} object are
-	 * retrieved too with the {@link EnvironmentData} object. So no
-	 * {@link LazyInitializationException} should be thrown and the list should
-	 * be empty.
+	 * The list containing sensor types of a {@link EnvironmentData} object are retrieved too with
+	 * the {@link EnvironmentData} object. So no {@link LazyInitializationException} should be
+	 * thrown and the list should be empty.
 	 */
 	@Test
 	public void getSensorTypes() {
@@ -123,10 +121,9 @@ public class LazyInitializationTest extends AbstractTransactionalTestNGLogSuppor
 	}
 
 	/**
-	 * The list containing the profiles of a {@link EnvironmentData} object are
-	 * retrieved too with the {@link EnvironmentData} object. So no
-	 * {@link LazyInitializationException} should be thrown and the Set should
-	 * not be empty.
+	 * The list containing the profiles of a {@link EnvironmentData} object are retrieved too with
+	 * the {@link EnvironmentData} object. So no {@link LazyInitializationException} should be
+	 * thrown and the Set should not be empty.
 	 */
 	@Test
 	public void getProfiles() {
@@ -139,9 +136,8 @@ public class LazyInitializationTest extends AbstractTransactionalTestNGLogSuppor
 	}
 
 	/**
-	 * Exception sensor definitions should not be loaded with an environment. So
-	 * the test is successful if a {@link LazyInitializationException} is
-	 * thrown.
+	 * Exception sensor definitions should not be loaded with an environment. So the test is
+	 * successful if a {@link LazyInitializationException} is thrown.
 	 */
 	@Test(expectedExceptions = LazyInitializationException.class)
 	public void getExceptionSensorDefinitionsFromEnvironmentProfile() {
@@ -154,9 +150,8 @@ public class LazyInitializationTest extends AbstractTransactionalTestNGLogSuppor
 	}
 
 	/**
-	 * Method sensor definitions should not be loaded with an environment. So
-	 * the test is successful if a {@link LazyInitializationException} is
-	 * thrown.
+	 * Method sensor definitions should not be loaded with an environment. So the test is successful
+	 * if a {@link LazyInitializationException} is thrown.
 	 */
 	@Test(expectedExceptions = LazyInitializationException.class)
 	public void getMethodSensorDefinitionsFromEnvironmentProfile() {
@@ -169,9 +164,8 @@ public class LazyInitializationTest extends AbstractTransactionalTestNGLogSuppor
 	}
 
 	/**
-	 * Platform sensor definitions should not be loaded with an environment. So
-	 * the test is successful if a {@link LazyInitializationException} is
-	 * thrown.
+	 * Platform sensor definitions should not be loaded with an environment. So the test is
+	 * successful if a {@link LazyInitializationException} is thrown.
 	 */
 	@Test(expectedExceptions = LazyInitializationException.class)
 	public void getPlatformSensorDefinitionsFromEnvironmentProfile() {
@@ -184,9 +178,9 @@ public class LazyInitializationTest extends AbstractTransactionalTestNGLogSuppor
 	}
 
 	/**
-	 * Exception sensor definitions should be loaded with a profile. So the test
-	 * is successful if during the call of the method @see {@link Set#isEmpty()}
-	 * no {@link LazyInitializationException} is thrown and the set is empty.
+	 * Exception sensor definitions should be loaded with a profile. So the test is successful if
+	 * during the call of the method @see {@link Set#isEmpty()} no
+	 * {@link LazyInitializationException} is thrown and the set is empty.
 	 */
 	@Test
 	public void getExceptionSensorDefinitionsFromProfile() {
@@ -195,8 +189,8 @@ public class LazyInitializationTest extends AbstractTransactionalTestNGLogSuppor
 	}
 
 	/**
-	 * Method sensor definitions should be loaded with a profile. So the test is
-	 * successful if during the call of the method @see {@link Set#isEmpty()} no
+	 * Method sensor definitions should be loaded with a profile. So the test is successful if
+	 * during the call of the method @see {@link Set#isEmpty()} no
 	 * {@link LazyInitializationException} is thrown and the set is empty.
 	 */
 	@Test
@@ -206,19 +200,18 @@ public class LazyInitializationTest extends AbstractTransactionalTestNGLogSuppor
 	}
 
 	/**
-	 * Platform sensor definitions should be loaded with a profile. So the test
-	 * is successful if during the call of the method @see {@link Set#isEmpty()}
-	 * no {@link LazyInitializationException} is thrown and the set is empty.
+	 * Platform sensor definitions should be loaded with a profile. So the test is successful if
+	 * during the call of the method @see {@link Set#isEmpty()} no
+	 * {@link LazyInitializationException} is thrown and the set is empty.
 	 */
 	@Test
 	public void getPlatformSensorDefinitionsFromProfile() {
-		Set<ExceptionSensorDefinitionData> platformSensorDefinitions = profileWithSensorDefinitions.getPlatformSensorDefinitions();
+		Set<PlatformSensorDefinitionData> platformSensorDefinitions = profileWithSensorDefinitions.getPlatformSensorDefinitions();
 		assertTrue(platformSensorDefinitions.isEmpty());
 	}
 
 	/**
-	 * Deletes the initially added {@link EnvironmentDataDao} and
-	 * {@link ProfileDataDao} object.
+	 * Deletes the initially added {@link EnvironmentDataDao} and {@link ProfileDataDao} object.
 	 * 
 	 * @throws EntityNotFoundException
 	 *             If the object is not found.

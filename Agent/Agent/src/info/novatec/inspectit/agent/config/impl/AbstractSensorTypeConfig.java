@@ -2,13 +2,12 @@ package info.novatec.inspectit.agent.config.impl;
 
 import info.novatec.inspectit.agent.sensor.ISensor;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 
-
 /**
- * Abstract sensor type configuration class which is used by the
- * {@link MethodSensorTypeConfig} and the {@link PlatformSensorTypeConfig}.
+ * Abstract sensor type configuration class which is used by the {@link MethodSensorTypeConfig} and
+ * the {@link PlatformSensorTypeConfig}.
  * 
  * @author Patrice Bouillet
  * @see MethodSensorTypeConfig
@@ -35,7 +34,7 @@ public abstract class AbstractSensorTypeConfig {
 	/**
 	 * Some additional parameters.
 	 */
-	private Map parameters = new Hashtable();
+	private Map<String, Object> parameters = new HashMap<String, Object>();
 
 	/**
 	 * Returns the id.
@@ -52,7 +51,7 @@ public abstract class AbstractSensorTypeConfig {
 	 * @param id
 	 *            The id to set.
 	 */
-	public void setId(final long id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -71,7 +70,7 @@ public abstract class AbstractSensorTypeConfig {
 	 * @param sensorType
 	 *            The sensor type.
 	 */
-	public void setSensorType(final ISensor sensorType) {
+	public void setSensorType(ISensor sensorType) {
 		this.sensorType = sensorType;
 	}
 
@@ -85,34 +84,33 @@ public abstract class AbstractSensorTypeConfig {
 	}
 
 	/**
-	 * The class name has to be stored as fully qualified, example:
-	 * <code>java.lang.String</code>.
+	 * The class name has to be stored as fully qualified, example: <code>java.lang.String</code>.
 	 * 
 	 * @param className
 	 *            The class name.
 	 */
-	public void setClassName(final String className) {
+	public void setClassName(String className) {
 		this.className = className;
 	}
 
 	/**
-	 * Returns a {@link Map} of optional parameters. Is never null, but the size
-	 * of the map could be 0.
+	 * Returns a {@link Map} of optional parameters. Is never null, but the size of the map could be
+	 * 0.
 	 * 
 	 * @return A map of parameters.
 	 */
-	public Map getParameters() {
+	public Map<String, Object> getParameters() {
 		return parameters;
 	}
 
 	/**
-	 * The {@link Map} of parameters stores additional information about the
-	 * sensor type. Key and value should be both Strings.
+	 * The {@link Map} of parameters stores additional information about the sensor type. Key and
+	 * value should be both Strings.
 	 * 
 	 * @param parameters
 	 *            The parameters.
 	 */
-	public void setParameters(final Map parameters) {
+	public void setParameters(Map<String, Object> parameters) {
 		this.parameters = parameters;
 	}
 

@@ -31,12 +31,12 @@ import info.novatec.inspectit.agent.sending.ISendingStrategy;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 import info.novatec.inspectit.agent.sensor.method.jdbc.StatementStorage;
 import info.novatec.inspectit.agent.sensor.platform.IPlatformSensor;
+import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.util.Timer;
 import info.novatec.inspectit.versioning.FileBasedVersioningServiceImpl;
 import info.novatec.inspectit.versioning.IVersioningService;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -144,23 +144,20 @@ public class PicoAgent {
 			// configuration storage, otherwise it won't be available in the
 			// container for other components.
 			IConfigurationStorage configurationStorage = (IConfigurationStorage) pico.getComponentInstance(IConfigurationStorage.class);
-			IBufferStrategy bufferStrategy = this.initBufferStrategy(configurationStorage.getBufferStrategyConfig());
+			IBufferStrategy<MethodSensorData> bufferStrategy = this.initBufferStrategy(configurationStorage.getBufferStrategyConfig());
 			pico.registerComponentInstance(IBufferStrategy.class, bufferStrategy);
 
-			for (Iterator iterator = configurationStorage.getSendingStrategyConfigs().iterator(); iterator.hasNext();) {
-				StrategyConfig config = (StrategyConfig) iterator.next();
+			for (StrategyConfig config : configurationStorage.getSendingStrategyConfigs()) {
 				ISendingStrategy sendingStrategy = this.initSendingStrategy(config);
 				pico.registerComponentInstance(sendingStrategy);
 			}
 
-			for (Iterator iterator = configurationStorage.getPlatformSensorTypes().iterator(); iterator.hasNext();) {
-				PlatformSensorTypeConfig config = (PlatformSensorTypeConfig) iterator.next();
+			for (PlatformSensorTypeConfig config : configurationStorage.getPlatformSensorTypes()) {
 				IPlatformSensor platformSensor = this.initPlatformSensor(config);
 				config.setSensorType(platformSensor);
 			}
 
-			for (Iterator iterator = configurationStorage.getMethodSensorTypes().iterator(); iterator.hasNext();) {
-				MethodSensorTypeConfig config = (MethodSensorTypeConfig) iterator.next();
+			for (MethodSensorTypeConfig config : configurationStorage.getMethodSensorTypes()) {
 				IMethodSensor methodSensor = this.initMethodSensor(config);
 				config.setSensorType(methodSensor);
 			}
@@ -212,9 +209,10 @@ public class PicoAgent {
 	 *             Root exception thrown if something happens while trying to instantiate the buffer
 	 *             strategy.
 	 */
-	private IBufferStrategy initBufferStrategy(StrategyConfig bufferStrategyConfig) throws Exception {
-		Class clazz = Class.forName(bufferStrategyConfig.getClazzName());
-		IBufferStrategy bufferStrategy = (IBufferStrategy) clazz.newInstance();
+	private IBufferStrategy<MethodSensorData> initBufferStrategy(StrategyConfig bufferStrategyConfig) throws Exception {
+		Class<?> clazz = Class.forName(bufferStrategyConfig.getClazzName());
+		@SuppressWarnings("unchecked")
+		IBufferStrategy<MethodSensorData> bufferStrategy = (IBufferStrategy<MethodSensorData>) clazz.newInstance();
 		bufferStrategy.init(bufferStrategyConfig.getSettings());
 
 		return bufferStrategy;
@@ -231,7 +229,7 @@ public class PicoAgent {
 	 *             sending strategy.
 	 */
 	private ISendingStrategy initSendingStrategy(StrategyConfig sendingStrategyConfig) throws Exception {
-		Class clazz = Class.forName(sendingStrategyConfig.getClazzName());
+		Class<?> clazz = Class.forName(sendingStrategyConfig.getClazzName());
 		ISendingStrategy sendingStrategy = (ISendingStrategy) clazz.newInstance();
 		sendingStrategy.init(sendingStrategyConfig.getSettings());
 
@@ -249,7 +247,7 @@ public class PicoAgent {
 	 *             platform sensor type.
 	 */
 	private IPlatformSensor initPlatformSensor(PlatformSensorTypeConfig config) throws Exception {
-		Class platformSensorClass = Class.forName(config.getClassName());
+		Class<?> platformSensorClass = Class.forName(config.getClassName());
 
 		// Workaround to instantiate the class with the correct parameters
 		pico.registerComponentImplementation(platformSensorClass);
@@ -270,7 +268,7 @@ public class PicoAgent {
 	 *             sensor type.
 	 */
 	private IMethodSensor initMethodSensor(MethodSensorTypeConfig config) throws Exception {
-		Class methodSensorClass = Class.forName(config.getClassName());
+		Class<?> methodSensorClass = Class.forName(config.getClassName());
 
 		// Workaround to instantiate the class with the correct parameters
 		pico.registerComponentImplementation(methodSensorClass);

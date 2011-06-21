@@ -11,9 +11,8 @@ import info.novatec.inspectit.communication.exception.EntityNotFoundException;
 import java.util.List;
 
 /**
- * The configuration interface data access service is used and called by all
- * configuration interfaces. It provides methods to retrieve or send data
- * objects.
+ * The configuration interface data access service is used and called by all configuration
+ * interfaces. It provides methods to retrieve or send data objects.
  * 
  * @author Matthias Huber
  * 
@@ -21,8 +20,8 @@ import java.util.List;
 public interface IConfigurationInterfaceDataAccessService {
 
 	/**
-	 * This method adds an {@link EnvironmentData} object. The
-	 * {@link EnvironmentData} object is the root of the data model.
+	 * This method adds an {@link EnvironmentData} object. The {@link EnvironmentData} object is the
+	 * root of the data model.
 	 * 
 	 * @param environmentData
 	 *            The {@link EnvironmentData} object to add.
@@ -32,8 +31,7 @@ public interface IConfigurationInterfaceDataAccessService {
 	long addEnvironment(EnvironmentData environmentData);
 
 	/**
-	 * This method adds an {@link ExceptionSensorDefinitionData} object to a
-	 * profile.
+	 * This method adds an {@link ExceptionSensorDefinitionData} object to a profile.
 	 * 
 	 * @param exceptionSensorDefinitionData
 	 *            The {@link ExceptionSensorDefinitionData} object to add.
@@ -42,8 +40,7 @@ public interface IConfigurationInterfaceDataAccessService {
 	long addExceptionSensorDefinition(ExceptionSensorDefinitionData exceptionSensorDefinitionData);
 
 	/**
-	 * This method adds a {@link MethodSensorDefinitionData} object to a
-	 * profile.
+	 * This method adds a {@link MethodSensorDefinitionData} object to a profile.
 	 * 
 	 * @param methodSensorDefinitionData
 	 *            The {@link MethodSensorDefinitionData} object to add.
@@ -52,13 +49,11 @@ public interface IConfigurationInterfaceDataAccessService {
 	long addMethodSensorDefinition(MethodSensorDefinitionData methodSensorDefinitionData);
 
 	/**
-	 * This method adds a {@link PlatformSensorDefinitionData} object to a
-	 * profile.
+	 * This method adds a {@link PlatformSensorDefinitionData} object to a profile.
 	 * 
 	 * @param platformSensorDefinitionData
 	 *            The {@link PlatformSensorDefinitionData} object to add.
-	 * @return the id of the added or updated
-	 *         {@link PlatformSensorDefinitionData} object.
+	 * @return the id of the added or updated {@link PlatformSensorDefinitionData} object.
 	 */
 	long addPlatformSensorDefinition(PlatformSensorDefinitionData platformSensorDefinitionData);
 
@@ -77,8 +72,7 @@ public interface IConfigurationInterfaceDataAccessService {
 	 * @param environmentId
 	 *            The id of the {@link EnvironmentData} object to delete.
 	 * @throws EntityNotFoundException
-	 *             If no {@link EnvironmentData} according to the id can be
-	 *             found.
+	 *             If no {@link EnvironmentData} according to the id can be found.
 	 */
 	void deleteEnvironment(long environmentId) throws EntityNotFoundException;
 
@@ -86,11 +80,10 @@ public interface IConfigurationInterfaceDataAccessService {
 	 * Deletes an Exception Sensor Definition.
 	 * 
 	 * @param exceptionSensorDefinitionId
-	 *            The id of the {@link ExceptionSensorDefinitionData} object to
-	 *            delete.
+	 *            The id of the {@link ExceptionSensorDefinitionData} object to delete.
 	 * @throws EntityNotFoundException
-	 *             If no {@link ExceptionSensorDefinitionData} object according
-	 *             to the id can be found.
+	 *             If no {@link ExceptionSensorDefinitionData} object according to the id can be
+	 *             found.
 	 */
 	void deleteExceptionSensorDefinition(long exceptionSensorDefinitionId) throws EntityNotFoundException;
 
@@ -98,11 +91,9 @@ public interface IConfigurationInterfaceDataAccessService {
 	 * Deletes a Method Sensor Definition.
 	 * 
 	 * @param methodSensorDefinitionId
-	 *            The id of the {@link MethodSensorDefinitionData} object to
-	 *            delete.
+	 *            The id of the {@link MethodSensorDefinitionData} object to delete.
 	 * @throws EntityNotFoundException
-	 *             If no {@link MethodSensorDefinitionData} object according to
-	 *             the id can be found.
+	 *             If no {@link MethodSensorDefinitionData} object according to the id can be found.
 	 */
 	void deleteMethodSensorDefinition(long methodSensorDefinitionId) throws EntityNotFoundException;
 
@@ -110,11 +101,10 @@ public interface IConfigurationInterfaceDataAccessService {
 	 * Deletes a Platform Sensor Definition.
 	 * 
 	 * @param platformSensorDefinitionId
-	 *            The id of the {@link PlatformSensorDefinitionData} object to
-	 *            delete.
+	 *            The id of the {@link PlatformSensorDefinitionData} object to delete.
 	 * @throws EntityNotFoundException
-	 *             If no {@link PlatformSensorDefinitionData} object according
-	 *             to the id can be found.
+	 *             If no {@link PlatformSensorDefinitionData} object according to the id can be
+	 *             found.
 	 */
 	void deletePlatformSensorDefinition(long platformSensorDefinitionId) throws EntityNotFoundException;
 
@@ -124,8 +114,7 @@ public interface IConfigurationInterfaceDataAccessService {
 	 * @param profileId
 	 *            The id of the {@link ProfileData} object to delete.
 	 * @throws EntityNotFoundException
-	 *             If no {@link ProfileData} object according to the id can be
-	 *             found.
+	 *             If no {@link ProfileData} object according to the id can be found.
 	 */
 	void deleteProfile(long profileId) throws EntityNotFoundException;
 
@@ -135,32 +124,28 @@ public interface IConfigurationInterfaceDataAccessService {
 	 * @param sensorTypeId
 	 *            The id of the {@link SensorTypeData} object to delete.
 	 * @throws EntityNotFoundException
-	 *             If no {@link SensorTypeData} object according to the id can
-	 *             be found.
+	 *             If no {@link SensorTypeData} object according to the id can be found.
 	 */
 	void deleteSensorType(long sensorTypeId) throws EntityNotFoundException;
 
 	/**
-	 * Returns a list of {@link EnvironmentData} objects which also have details
-	 * about profiles belonging to the environments. This list can be used to
-	 * get an overview over defined environments and profiles within the
-	 * configuration.
+	 * Returns a list of {@link EnvironmentData} objects which also have details about profiles
+	 * belonging to the environments. This list can be used to get an overview over defined
+	 * environments and profiles within the configuration.
 	 * 
-	 * @return A list of {@link EnvironmentData] objects. This list can be used
-	 *         to get an overview over defined environments and profiles within
-	 *         the configuration.
+	 * @return A list of {@link EnvironmentData] objects. This list can be used to get an overview
+	 *         over defined environments and profiles within the configuration.
 	 */
-	List getEnvironments();
+	List<EnvironmentData> getEnvironments();
 
 	/**
-	 * Returns a {@link ProfileData} object with all sensor definitions included
-	 * ({@link MethodSensorDefinitionData}, {@link PlatformSensorDefinitionData}
-	 * and {@link ExceptionSensorDefinitionData}).
+	 * Returns a {@link ProfileData} object with all sensor definitions included (
+	 * {@link MethodSensorDefinitionData}, {@link PlatformSensorDefinitionData} and
+	 * {@link ExceptionSensorDefinitionData}).
 	 * 
 	 * @param profileId
 	 *            The id of the {@link ProfileData} object.
-	 * @return The {@link ProfileData} object or null if no object could be
-	 *         found.
+	 * @return The {@link ProfileData} object or null if no object could be found.
 	 */
 	ProfileData getProfile(long profileId);
 
@@ -173,8 +158,7 @@ public interface IConfigurationInterfaceDataAccessService {
 	void updateEnvironmentSettings(EnvironmentData environmentData);
 
 	/**
-	 * This method updates an existing {@link ExceptionSensorDefinitionData}
-	 * object.
+	 * This method updates an existing {@link ExceptionSensorDefinitionData} object.
 	 * 
 	 * @param exceptionSensorDefinitionData
 	 *            The {@link ExceptionSensorDefinitionData} object to update.
@@ -182,8 +166,7 @@ public interface IConfigurationInterfaceDataAccessService {
 	void updateExceptionSensorDefinition(ExceptionSensorDefinitionData exceptionSensorDefinitionData);
 
 	/**
-	 * This method updates an existing {@link MethodSensorDefinitionData}
-	 * object.
+	 * This method updates an existing {@link MethodSensorDefinitionData} object.
 	 * 
 	 * @param methodSensorDefinitionData
 	 *            The {@link MethodSensorDefinitionData} object to update.
@@ -191,8 +174,7 @@ public interface IConfigurationInterfaceDataAccessService {
 	void updateMethodSensorDefinition(MethodSensorDefinitionData methodSensorDefinitionData);
 
 	/**
-	 * This method updates an existing {@link PlatformSensorDefinitionData}
-	 * object.
+	 * This method updates an existing {@link PlatformSensorDefinitionData} object.
 	 * 
 	 * @param platformSensorDefinitionData
 	 *            The {@link PlatformSensorDefinitionData} object to update.
@@ -200,8 +182,8 @@ public interface IConfigurationInterfaceDataAccessService {
 	void updatePlatformSensorDefinition(PlatformSensorDefinitionData platformSensorDefinitionData);
 
 	/**
-	 * This method updates an existing {@link ProfileData} object, more precise
-	 * only the two attributes name and description.
+	 * This method updates an existing {@link ProfileData} object, more precise only the two
+	 * attributes name and description.
 	 * 
 	 * @param profileData
 	 *            The {@link ProfileData} object to update.

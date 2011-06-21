@@ -102,7 +102,7 @@ public class TimerData extends InvocationAwareData {
 		super(timeStamp, platformIdent, sensorTypeIdent, methodIdent);
 	}
 
-	public TimerData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List parameterContentData) {
+	public TimerData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData) {
 		super(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);
 	}
 
@@ -350,26 +350,32 @@ public class TimerData extends InvocationAwareData {
 
 	// Private setters for hibernate. Users should use the calculate methods.
 
+	@SuppressWarnings("unused")
 	private void setMin(double min) {
 		this.min = min;
 	}
 
+	@SuppressWarnings("unused")
 	private void setMax(double max) {
 		this.max = max;
 	}
 
+	@SuppressWarnings("unused")
 	private void setCpuMin(double cpuMin) {
 		this.cpuMin = cpuMin;
 	}
 
+	@SuppressWarnings("unused")
 	private void setCpuMax(double cpuMax) {
 		this.cpuMax = cpuMax;
 	}
 
+	@SuppressWarnings("unused")
 	private void setExclusiveMax(double exclusiveMax) {
 		this.exclusiveMax = exclusiveMax;
 	}
 
+	@SuppressWarnings("unused")
 	private void setExclusiveMin(double exclusiveMin) {
 		this.exclusiveMin = exclusiveMin;
 	}

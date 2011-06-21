@@ -3,7 +3,7 @@ package info.novatec.inspectit.agent.config.impl;
 import info.novatec.inspectit.agent.config.impl.PropertyAccessor.PropertyPathStart;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,12 +34,12 @@ public abstract class AbstractSensorConfig {
 	/**
 	 * The parameter types (as the fully qualified name) of the method.
 	 */
-	private List parameterTypes = new ArrayList();
+	private List<String> parameterTypes = new ArrayList<String>();
 
 	/**
 	 * Additional settings are stored in this map.
 	 */
-	private Map settings = new Hashtable();
+	private Map<String, Object> settings = new HashMap<String, Object>();
 
 	/**
 	 * Defines if this sensor configuration contains one or many definitions for a property access
@@ -51,7 +51,7 @@ public abstract class AbstractSensorConfig {
 	 * If <code>propertyAccess</code> is set to true, then this list contains at least one element.
 	 * The contents is of type {@link PropertyPathStart}.
 	 */
-	private List propertyAccessorList = new ArrayList(0);
+	private List<PropertyPathStart> propertyAccessorList = new ArrayList<PropertyPathStart>(0);
 
 	/**
 	 * If this config defines a constructor.
@@ -63,7 +63,7 @@ public abstract class AbstractSensorConfig {
 	 * 
 	 * @return The map of settings.
 	 */
-	public Map getSettings() {
+	public Map<String, Object> getSettings() {
 		return settings;
 	}
 
@@ -73,7 +73,7 @@ public abstract class AbstractSensorConfig {
 	 * @param settings
 	 *            The map of settings.
 	 */
-	public void setSettings(Map settings) {
+	public void setSettings(Map<String, Object> settings) {
 		this.settings = settings;
 	}
 
@@ -151,7 +151,7 @@ public abstract class AbstractSensorConfig {
 	 * 
 	 * @return The {@link List} of parameter types.
 	 */
-	public List getParameterTypes() {
+	public List<String> getParameterTypes() {
 		return parameterTypes;
 	}
 
@@ -161,7 +161,7 @@ public abstract class AbstractSensorConfig {
 	 * @param parameterTypes
 	 *            The {@link List} of parameter types.
 	 */
-	public void setParameterTypes(List parameterTypes) {
+	public void setParameterTypes(List<String> parameterTypes) {
 		this.parameterTypes = parameterTypes;
 	}
 
@@ -190,7 +190,7 @@ public abstract class AbstractSensorConfig {
 	 * 
 	 * @return The {@link List} of {@link PropertyPathStart} objects.
 	 */
-	public List getPropertyAccessorList() {
+	public List<PropertyPathStart> getPropertyAccessorList() {
 		return propertyAccessorList;
 	}
 
@@ -200,15 +200,8 @@ public abstract class AbstractSensorConfig {
 	 * @param propertyAccessorList
 	 *            The {@link List} of {@link PropertyPathStart} objects to set.
 	 */
-	public void setPropertyAccessorList(List propertyAccessorList) {
+	public void setPropertyAccessorList(List<PropertyPathStart> propertyAccessorList) {
 		this.propertyAccessorList = propertyAccessorList;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public String toString() {
-		return targetClassName + "#" + targetMethodName + parameterTypes;
 	}
 
 	/**
@@ -228,6 +221,13 @@ public abstract class AbstractSensorConfig {
 	 */
 	public boolean isConstructor() {
 		return isConstructor;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString() {
+		return targetClassName + "#" + targetMethodName + parameterTypes;
 	}
 
 }

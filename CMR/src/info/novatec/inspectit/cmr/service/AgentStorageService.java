@@ -49,7 +49,7 @@ public class AgentStorageService implements IAgentStorageService, InitializingBe
 	/**
 	 * Queue to store and remove list of data that has to be processed.
 	 */
-	private ArrayBlockingQueue<SoftReference<List<DefaultData>>> dataObjectsBlockingQueue = new ArrayBlockingQueue<SoftReference<List<DefaultData>>>(QUEUE_CAPACITY);
+	private ArrayBlockingQueue<SoftReference<List<? extends DefaultData>>> dataObjectsBlockingQueue = new ArrayBlockingQueue<SoftReference<List<? extends DefaultData>>>(QUEUE_CAPACITY);
 
 	/**
 	 * Count of thread to process data.
@@ -64,9 +64,8 @@ public class AgentStorageService implements IAgentStorageService, InitializingBe
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void addDataObjects(final List dataObjects) throws RemoteException {
-		SoftReference<List<DefaultData>> softReference = new SoftReference<List<DefaultData>>(dataObjects);
+	public void addDataObjects(final List<? extends DefaultData> dataObjects) throws RemoteException {
+		SoftReference<List<? extends DefaultData>> softReference = new SoftReference<List<? extends DefaultData>>(dataObjects);
 		try {
 			boolean added = dataObjectsBlockingQueue.offer(softReference, DATA_THROW_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
 			if (!added) {
@@ -92,6 +91,12 @@ public class AgentStorageService implements IAgentStorageService, InitializingBe
 		return droppedDataCount;
 	}
 
+	/**
+	 * Sets the default data dao bean.
+	 * 
+	 * @param defaultDataDao
+	 *            the dao bean.
+	 */
 	public void setDefaultDataDao(DefaultDataDao defaultDataDao) {
 		this.defaultDataDao = defaultDataDao;
 	}
@@ -146,7 +151,7 @@ public class AgentStorageService implements IAgentStorageService, InitializingBe
 		@Override
 		public void run() {
 			while (true) {
-				SoftReference<List<DefaultData>> softReference = null;
+				SoftReference<List<? extends DefaultData>> softReference = null;
 				try {
 					softReference = dataObjectsBlockingQueue.take();
 				} catch (InterruptedException e) {
@@ -154,7 +159,7 @@ public class AgentStorageService implements IAgentStorageService, InitializingBe
 					return;
 				}
 
-				List<DefaultData> defaultDataList = softReference.get();
+				List<? extends DefaultData> defaultDataList = softReference.get();
 				if (defaultDataList != null) {
 					for (DefaultData data : defaultDataList) {
 						data.finalizeData();

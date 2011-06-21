@@ -26,14 +26,12 @@ public class GlobalDataAccessService extends AbstractCachedGlobalDataAccessServi
 	private static final String GLOBAL_DATA_ACCESS_SERVICE = "GlobalDataAccessService";
 
 	/**
-	 * The proxy factory bean by Spring which initializes the data access
-	 * service.
+	 * The proxy factory bean by Spring which initializes the data access service.
 	 */
 	private final HttpInvokerProxyFactoryBean httpInvokerProxyFactoryBean;
 
 	/**
-	 * The global data access service exposed by the CMR and initialized by
-	 * Spring.
+	 * The global data access service exposed by the CMR and initialized by Spring.
 	 */
 	private final IGlobalDataAccessService globalDataAccessService;
 
@@ -60,7 +58,7 @@ public class GlobalDataAccessService extends AbstractCachedGlobalDataAccessServi
 	@SuppressWarnings("unchecked")
 	public List<PlatformIdent> getConnectedAgents() {
 		try {
-			final List<PlatformIdent> platformIdents = globalDataAccessService.getConnectedAgents();
+			final List<PlatformIdent> platformIdents = (List<PlatformIdent>) globalDataAccessService.getConnectedAgents();
 
 			putIntoCache(platformIdents);
 

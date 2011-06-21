@@ -57,7 +57,7 @@ public interface IObjectSizes {
 	 *            ArrayList which size has to be calculated.
 	 * @return Size of {@link ArrayList} object in bytes, or 0 if passed object is null.
 	 */
-	long getSizeOf(List arrayList);
+	long getSizeOf(List<?> arrayList);
 
 	/**
 	 * Calculates the approximate size of the {@link HashSet} object. The calculation does not

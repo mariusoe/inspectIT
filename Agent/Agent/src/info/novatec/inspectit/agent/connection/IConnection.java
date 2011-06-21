@@ -3,14 +3,13 @@ package info.novatec.inspectit.agent.connection;
 import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
 import info.novatec.inspectit.agent.config.impl.PlatformSensorTypeConfig;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
+import info.novatec.inspectit.communication.DefaultData;
 
 import java.net.ConnectException;
 import java.util.List;
 
-
 /**
- * The connection interface to implement different connection types, like RMI,
- * Corba, etc.
+ * The connection interface to implement different connection types, like RMI, Corba, etc.
  * 
  * @author Patrice Bouillet
  * 
@@ -25,8 +24,7 @@ public interface IConnection {
 	 * @param port
 	 *            The port of the server.
 	 * @exception ConnectException
-	 *                Throws a ConnectException if there was a problem
-	 *                connecting to the repository.
+	 *                Throws a ConnectException if there was a problem connecting to the repository.
 	 */
 	void connect(String host, int port) throws ConnectException;
 
@@ -48,14 +46,14 @@ public interface IConnection {
 	 * @param dataObjects
 	 *            The measurements to send.
 	 * @throws ServerUnavailableException
-	 *             If the sending wasn't successful in any way, a
-	 *             {@link ServerUnavailableException} exception is thrown.
+	 *             If the sending wasn't successful in any way, a {@link ServerUnavailableException}
+	 *             exception is thrown.
 	 */
-	void sendDataObjects(List dataObjects) throws ServerUnavailableException;
+	void sendDataObjects(List<? extends DefaultData> dataObjects) throws ServerUnavailableException;
 
 	/**
-	 * Registers the current platform (composed of the network interface with
-	 * the Agent name) in the CMR and returns a unique value for this platform.
+	 * Registers the current platform (composed of the network interface with the Agent name) in the
+	 * CMR and returns a unique value for this platform.
 	 * 
 	 * @param agentName
 	 *            The name of the agent.
@@ -63,17 +61,16 @@ public interface IConnection {
 	 *            The version of the agent.
 	 * @return The unique id for this platform.
 	 * @throws ServerUnavailableException
-	 *             If the sending wasn't successful in any way, a
-	 *             {@link ServerUnavailableException} exception is thrown.
+	 *             If the sending wasn't successful in any way, a {@link ServerUnavailableException}
+	 *             exception is thrown.
 	 * @throws RegistrationException
-	 *             This exception is thrown when a problem with the registration
-	 *             process appears.
+	 *             This exception is thrown when a problem with the registration process appears.
 	 */
 	long registerPlatform(String agentName, String version) throws ServerUnavailableException, RegistrationException;
 
 	/**
-	 * Registers the specified parameters at the server and returns a unique
-	 * identifier which will be used throughout the sensors.
+	 * Registers the specified parameters at the server and returns a unique identifier which will
+	 * be used throughout the sensors.
 	 * 
 	 * @param platformId
 	 *            The unique id for this platform.
@@ -82,11 +79,10 @@ public interface IConnection {
 	 * 
 	 * @return Returns the unique identifier.
 	 * @throws ServerUnavailableException
-	 *             If the sending wasn't successful in any way, a
-	 *             {@link ServerUnavailableException} exception is thrown.
+	 *             If the sending wasn't successful in any way, a {@link ServerUnavailableException}
+	 *             exception is thrown.
 	 * @throws RegistrationException
-	 *             This exception is thrown when a problem with the registration
-	 *             process appears.
+	 *             This exception is thrown when a problem with the registration process appears.
 	 */
 	long registerMethod(long platformId, RegisteredSensorConfig sensorConfig) throws ServerUnavailableException, RegistrationException;
 
@@ -100,11 +96,10 @@ public interface IConnection {
 	 * 
 	 * @return Returns the unique identifier.
 	 * @throws ServerUnavailableException
-	 *             If the sending wasn't successful in any way, a
-	 *             {@link ServerUnavailableException} exception is thrown.
+	 *             If the sending wasn't successful in any way, a {@link ServerUnavailableException}
+	 *             exception is thrown.
 	 * @throws RegistrationException
-	 *             This exception is thrown when a problem with the registration
-	 *             process appears.
+	 *             This exception is thrown when a problem with the registration process appears.
 	 */
 	long registerMethodSensorType(long platformId, MethodSensorTypeConfig methodSensorTypeConfig) throws ServerUnavailableException, RegistrationException;
 
@@ -118,11 +113,10 @@ public interface IConnection {
 	 * 
 	 * @return Returns the unique identifier.
 	 * @throws ServerUnavailableException
-	 *             If the sending wasn't successful in any way, a
-	 *             {@link ServerUnavailableException} exception is thrown.
+	 *             If the sending wasn't successful in any way, a {@link ServerUnavailableException}
+	 *             exception is thrown.
 	 * @throws RegistrationException
-	 *             This exception is thrown when a problem with the registration
-	 *             process appears.
+	 *             This exception is thrown when a problem with the registration process appears.
 	 */
 	long registerPlatformSensorType(long platformId, PlatformSensorTypeConfig platformSensorTypeConfig) throws ServerUnavailableException, RegistrationException;
 
@@ -134,11 +128,10 @@ public interface IConnection {
 	 * @param methodId
 	 *            The id of the method.
 	 * @throws ServerUnavailableException
-	 *             If the sending wasn't successful in any way, a
-	 *             {@link ServerUnavailableException} exception is thrown.
+	 *             If the sending wasn't successful in any way, a {@link ServerUnavailableException}
+	 *             exception is thrown.
 	 * @throws RegistrationException
-	 *             This exception is thrown when a problem with the registration
-	 *             process appears.
+	 *             This exception is thrown when a problem with the registration process appears.
 	 */
 	void addSensorTypeToMethod(long sensorTypeId, long methodId) throws ServerUnavailableException, RegistrationException;
 

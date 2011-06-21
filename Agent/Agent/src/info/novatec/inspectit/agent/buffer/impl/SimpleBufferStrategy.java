@@ -1,6 +1,7 @@
 package info.novatec.inspectit.agent.buffer.impl;
 
 import info.novatec.inspectit.agent.buffer.IBufferStrategy;
+import info.novatec.inspectit.communication.MethodSensorData;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
  * @author Patrice Bouillet
  * 
  */
-public class SimpleBufferStrategy implements IBufferStrategy {
+public class SimpleBufferStrategy implements IBufferStrategy<MethodSensorData> {
 
 	/**
 	 * The logger of the class.
@@ -24,7 +25,7 @@ public class SimpleBufferStrategy implements IBufferStrategy {
 	/**
 	 * Stores the reference to the last given measurements.
 	 */
-	private List measurements;
+	private List<MethodSensorData> measurements;
 
 	/**
 	 * True if measurements were added and available.
@@ -34,14 +35,15 @@ public class SimpleBufferStrategy implements IBufferStrategy {
 	/**
 	 * {@inheritDoc}
 	 */
-	public final void addMeasurements(final List measurements) {
+	public final void addMeasurements(final List<MethodSensorData> measurements) {
 		if (null == measurements) {
 			throw new IllegalArgumentException("Measurements cannot be null!");
 		}
 		synchronized (this) {
 			if (newMeasurements) {
 				// if the measurements already exist, this buffer strategy will simply drop the old
-				// ones, because we can not let the data pile up if the sending of the data is not fast
+				// ones, because we can not let the data pile up if the sending of the data is not
+				// fast
 				// enough
 				LOGGER.info("Possible data loss due to the excessive data creation on the Agent!");
 			}
@@ -60,14 +62,14 @@ public class SimpleBufferStrategy implements IBufferStrategy {
 	/**
 	 * {@inheritDoc}
 	 */
-	public final Object next() {
+	public final List<MethodSensorData> next() {
 		synchronized (this) {
 			if (newMeasurements) {
 				newMeasurements = false;
 				return measurements;
 			}
 		}
-		
+
 		throw new NoSuchElementException();
 	}
 
@@ -81,7 +83,7 @@ public class SimpleBufferStrategy implements IBufferStrategy {
 	/**
 	 * {@inheritDoc}
 	 */
-	public final void init(final Map settings) {
+	public final void init(final Map<String, String> settings) {
 		// nothing to do
 	}
 

@@ -3,8 +3,8 @@ package info.novatec.inspectit.agent.config.impl;
 import java.util.Map;
 
 /**
- * Class used by the {@link ConfigurationStorage} to store the information of
- * sending strategies or the buffer strategy.
+ * Class used by the {@link ConfigurationStorage} to store the information of sending strategies or
+ * the buffer strategy.
  * 
  * @author Patrice Bouillet
  * 
@@ -19,7 +19,7 @@ public class StrategyConfig {
 	/**
 	 * Additional settings stored in a map.
 	 */
-	private Map settings;
+	private Map<String, String> settings;
 
 	/**
 	 * Default constructor accepting 2 parameters.
@@ -29,7 +29,7 @@ public class StrategyConfig {
 	 * @param settings
 	 *            Additional settings stored in a map.
 	 */
-	public StrategyConfig(String clazzName, Map settings) {
+	public StrategyConfig(String clazzName, Map<String, String> settings) {
 		this.clazzName = clazzName;
 		this.settings = settings;
 	}
@@ -48,7 +48,7 @@ public class StrategyConfig {
 	 * 
 	 * @return The settings of this configuration.
 	 */
-	public Map getSettings() {
+	public Map<String, String> getSettings() {
 		return settings;
 	}
 

@@ -1,7 +1,5 @@
 package info.novatec.inspectit.cmr.service;
 
-import info.novatec.inspectit.cmr.service.IRegistrationService;
-import info.novatec.inspectit.cmr.service.LicenseException;
 import info.novatec.inspectit.cmr.util.LicenseUtil;
 
 import java.rmi.RemoteException;
@@ -41,8 +39,7 @@ public class RegistrationService implements IRegistrationService, InitializingBe
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
-	public long registerPlatformIdent(List definedIPs, String agentName, String version) throws RemoteException {
+	public long registerPlatformIdent(List<String> definedIPs, String agentName, String version) throws RemoteException {
 		try {
 			if (LOGGER.isInfoEnabled()) {
 				LOGGER.info("Trying to register Agent '" + agentName + "'");
@@ -65,7 +62,7 @@ public class RegistrationService implements IRegistrationService, InitializingBe
 	/**
 	 * {@inheritDoc}
 	 */
-	public long registerMethodIdent(long platformId, String packageName, String className, String methodName, List parameterTypes, String returnType, int modifiers) {
+	public long registerMethodIdent(long platformId, String packageName, String className, String methodName, List<String> parameterTypes, String returnType, int modifiers) {
 		return internRegistrationService.registerMethodIdent(platformId, packageName, className, methodName, parameterTypes, returnType, modifiers);
 	}
 

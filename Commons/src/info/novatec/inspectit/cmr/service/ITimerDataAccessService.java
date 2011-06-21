@@ -21,7 +21,7 @@ public interface ITimerDataAccessService {
 	 *            The template containing the platform id.
 	 * @return The list of the timer data object.
 	 */
-	List getAggregatedTimerData(TimerData timerData);
+	List<TimerData> getAggregatedTimerData(TimerData timerData);
 
 	/**
 	 * Returns a list of the timer data for a given template for a time frame. In this template,
@@ -35,5 +35,5 @@ public interface ITimerDataAccessService {
 	 *            Date to include data to.
 	 * @return The list of the timer data object.
 	 */
-	List getAggregatedTimerData(TimerData timerData, Date fromDate, Date toDate);
+	List<TimerData> getAggregatedTimerData(TimerData timerData, Date fromDate, Date toDate);
 }

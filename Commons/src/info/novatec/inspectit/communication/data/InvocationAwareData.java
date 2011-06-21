@@ -7,10 +7,8 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -31,7 +29,7 @@ public abstract class InvocationAwareData extends MethodSensorData {
 	 * Map<Long, MutableInt> that contains the ID of invocation as a key and numbers of object
 	 * appearances in this invocation.
 	 */
-	private Map invocationsParentsIdMap;
+	private Map<Long, MutableInt> invocationsParentsIdMap;
 
 	/**
 	 * Default no-args constructor.
@@ -43,7 +41,7 @@ public abstract class InvocationAwareData extends MethodSensorData {
 		super(timeStamp, platformIdent, sensorTypeIdent, methodIdent);
 	}
 
-	public InvocationAwareData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List parameterContentData) {
+	public InvocationAwareData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData) {
 		super(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);
 	}
 
@@ -56,7 +54,7 @@ public abstract class InvocationAwareData extends MethodSensorData {
 	public void addInvocationParentId(Long id) {
 		if (null != id) {
 			if (null == invocationsParentsIdMap) {
-				invocationsParentsIdMap = new HashMap();
+				invocationsParentsIdMap = new HashMap<Long, MutableInt>();
 			}
 			MutableInt count = (MutableInt) invocationsParentsIdMap.get(id);
 			if (null != count) {
@@ -72,18 +70,18 @@ public abstract class InvocationAwareData extends MethodSensorData {
 	 * 
 	 * @return Returns set of invocation parents IDS.
 	 */
-	public Set getInvocationParentsIdSet() {
+	public Set<Long> getInvocationParentsIdSet() {
 		if (null != invocationsParentsIdMap) {
-			return invocationsParentsIdMap.keySet(); 
+			return invocationsParentsIdMap.keySet();
 		} else {
-			return Collections.EMPTY_SET;
+			return Collections.emptySet();
 		}
 	}
 
 	/**
 	 * @return the invocationsParentsIdMap
 	 */
-	protected Map getInvocationsParentsIdMap() {
+	protected Map<Long, MutableInt> getInvocationsParentsIdMap() {
 		return invocationsParentsIdMap;
 	}
 
@@ -95,9 +93,8 @@ public abstract class InvocationAwareData extends MethodSensorData {
 	public int getObjectsInInvocationsCount() {
 		int count = 0;
 		if (null != invocationsParentsIdMap) {
-			Iterator it = invocationsParentsIdMap.values().iterator();
-			while (it.hasNext()) {
-				count += ((MutableInt) it.next()).getValue();
+			for (MutableInt parentId : invocationsParentsIdMap.values()) {
+				count += parentId.getValue();
 			}
 		}
 		return count;
@@ -113,16 +110,14 @@ public abstract class InvocationAwareData extends MethodSensorData {
 	public void aggregateInvocationAwareData(InvocationAwareData invocationAwareData) {
 		if (null != invocationAwareData.getInvocationsParentsIdMap()) {
 			if (null == invocationsParentsIdMap) {
-				invocationsParentsIdMap = new HashMap();
+				invocationsParentsIdMap = new HashMap<Long, MutableInt>();
 			}
-			Iterator it = invocationAwareData.getInvocationsParentsIdMap().entrySet().iterator();
-			while (it.hasNext()) {
-				Map.Entry entry = (Entry) it.next();
-				MutableInt count = (MutableInt) invocationsParentsIdMap.get(entry.getKey());
+			for (Map.Entry<Long, MutableInt> entry : invocationAwareData.getInvocationsParentsIdMap().entrySet()) {
+				MutableInt count = invocationsParentsIdMap.get(entry.getKey());
 				if (null != count) {
-					count.add(((MutableInt) entry.getValue()).getValue());
+					count.add(entry.getValue().getValue());
 				} else {
-					invocationsParentsIdMap.put(entry.getKey(), new MutableInt(((MutableInt) entry.getValue()).getValue()));
+					invocationsParentsIdMap.put(entry.getKey(), new MutableInt(entry.getValue().getValue()));
 				}
 			}
 		}
@@ -210,7 +205,7 @@ public abstract class InvocationAwareData extends MethodSensorData {
 		 * Generated UID.
 		 */
 		private static final long serialVersionUID = -2367937702260302863L;
-		
+
 		/**
 		 * Value.
 		 */
@@ -239,10 +234,12 @@ public abstract class InvocationAwareData extends MethodSensorData {
 		public void increase() {
 			value++;
 		}
-		
+
 		/**
 		 * Adds delta to the value.
-		 * @param delta Delta.
+		 * 
+		 * @param delta
+		 *            Delta.
 		 */
 		public void add(int delta) {
 			value += delta;

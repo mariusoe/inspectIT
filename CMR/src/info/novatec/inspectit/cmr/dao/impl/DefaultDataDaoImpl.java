@@ -89,8 +89,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
-	public void saveAll(final List<DefaultData> defaultDataCollection) {
+	public void saveAll(List<? extends DefaultData> defaultDataCollection) {
 		StatelessSession session = getHibernateTemplate().getSessionFactory().openStatelessSession();
 		Transaction tx = session.beginTransaction();
 		for (DefaultData element : defaultDataCollection) {
@@ -147,7 +146,6 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	 *            Top invocation object.
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
 	private void extractDataFromInvocation(StatelessSession session, InvocationSequenceData invData, InvocationSequenceData topInvocationParent) {
 		double exclusiveDurationDelta = 0d;
 		Collection<InvocationSequenceData> childRemoveCollection = null;
@@ -260,7 +258,6 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	 *            The data objects which is inspected for its nested elements.
 	 * @return The duration of all nested sequences (with their nested sequences as well).
 	 */
-	@SuppressWarnings("unchecked")
 	private double computeNestedDuration(InvocationSequenceData data) {
 		if (data.getNestedSequences().isEmpty()) {
 			return 0;
@@ -300,7 +297,6 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	 *            Collection where invocation children for removal will be added.
 	 * @return Exception data to be indexed.
 	 */
-	@SuppressWarnings("unchecked")
 	private ExceptionSensorData manageExceptionConstructorDelegation(InvocationSequenceData parent, ExceptionSensorData firstExceptionData, Collection<InvocationSequenceData> childremoveCollection) {
 		InvocationSequenceData lastInvocationChild = null;
 		ExceptionSensorData lastExceptionData = null;

@@ -3,21 +3,20 @@ package info.novatec.inspectit.util;
 import java.util.LinkedList;
 
 /**
- * The ThreadLocalStack class extends {@link ThreadLocal} to have a
- * {@link LinkedList} to be used as a stack. Extending {@link ThreadLocal} and
- * using the {@link #initialValue()} method helps to keep the variable private
- * to the actual {@link Thread}. A {@link LinkedList} is used because it can be
+ * The ThreadLocalStack class extends {@link ThreadLocal} to have a {@link LinkedList} to be used as
+ * a stack. Extending {@link ThreadLocal} and using the {@link #initialValue()} method helps to keep
+ * the variable private to the actual {@link Thread}. A {@link LinkedList} is used because it can be
  * easily used as a FIFO stack.
  * 
  * @author Patrice Bouillet
  */
-public class ThreadLocalStack extends ThreadLocal {
+public class ThreadLocalStack<E> extends ThreadLocal<LinkedList<E>> {
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object initialValue() {
-		return new LinkedList();
+	public LinkedList<E> initialValue() {
+		return new LinkedList<E>();
 	}
 
 	/**
@@ -26,8 +25,8 @@ public class ThreadLocalStack extends ThreadLocal {
 	 * @param value
 	 *            the value to push onto the stack.
 	 */
-	public void push(Object value) {
-		((LinkedList) super.get()).addLast(value);
+	public void push(E value) {
+		super.get().addLast(value);
 	}
 
 	/**
@@ -35,8 +34,8 @@ public class ThreadLocalStack extends ThreadLocal {
 	 * 
 	 * @return The last pushed value.
 	 */
-	public Object pop() {
-		return ((LinkedList) super.get()).removeLast();
+	public E pop() {
+		return super.get().removeLast();
 	}
 
 	/**
@@ -44,8 +43,8 @@ public class ThreadLocalStack extends ThreadLocal {
 	 * 
 	 * @return The last pushed value.
 	 */
-	public Object getLast() {
-		return ((LinkedList) super.get()).getLast();
+	public E getLast() {
+		return super.get().getLast();
 	}
 
 	/**
@@ -53,8 +52,8 @@ public class ThreadLocalStack extends ThreadLocal {
 	 * 
 	 * @return The first value pushed onto the stack.
 	 */
-	public Object getAndRemoveFirst() {
-		return ((LinkedList) super.get()).removeFirst();
+	public E getAndRemoveFirst() {
+		return super.get().removeFirst();
 	}
 
 }

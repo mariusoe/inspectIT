@@ -101,7 +101,7 @@ public class ExceptionEventEnum implements Serializable {
 	 * @return A List containing the actual literals defined by this enumeration, this list can not
 	 *         be modified.
 	 */
-	public static java.util.List literals() {
+	public static java.util.List<Integer> literals() {
 		return literals;
 	}
 
@@ -112,7 +112,7 @@ public class ExceptionEventEnum implements Serializable {
 	 * @return A List containing the actual names of the literals defined by this enumeration, this
 	 *         list can not be modified.
 	 */
-	public static java.util.List names() {
+	public static java.util.List<String> names() {
 		return names;
 	}
 
@@ -149,9 +149,9 @@ public class ExceptionEventEnum implements Serializable {
 		return ExceptionEventEnum.fromInt(this.value);
 	}
 
-	private transient static final java.util.Map VALUES = new java.util.HashMap(5, 1);
-	private transient static java.util.List literals = new java.util.ArrayList(5);
-	private transient static java.util.List names = new java.util.ArrayList(5);
+	private transient static final java.util.Map<Integer, ExceptionEventEnum> VALUES = new java.util.HashMap<Integer, ExceptionEventEnum>(5, 1);
+	private transient static java.util.List<Integer> literals = new java.util.ArrayList<Integer>(5);
+	private transient static java.util.List<String> names = new java.util.ArrayList<String>(5);
 
 	/**
 	 * Initializes the values.
