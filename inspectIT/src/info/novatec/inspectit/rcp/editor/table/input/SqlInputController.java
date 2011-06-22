@@ -10,6 +10,7 @@ import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.TimeResolution;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
@@ -162,6 +163,11 @@ public class SqlInputController extends AbstractTableInputController {
 	private boolean autoUpdate = LiveMode.ACTIVE_DEFAULT;
 
 	/**
+	 * Decimal places.
+	 */
+	private int timeDecimalPlaces = TimeResolution.DECIMAL_PLACES_DEFAULT;
+	
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -237,6 +243,7 @@ public class SqlInputController extends AbstractTableInputController {
 		preferences.add(PreferenceId.CLEAR_BUFFER);
 		preferences.add(PreferenceId.LIVEMODE);
 		preferences.add(PreferenceId.UPDATE);
+		preferences.add(PreferenceId.TIME_RESOLUTION);
 		return preferences;
 	}
 	
@@ -257,6 +264,11 @@ public class SqlInputController extends AbstractTableInputController {
 		case LIVEMODE:
 			if (preferenceEvent.getPreferenceMap().containsKey(PreferenceId.LiveMode.BUTTON_LIVE_ID)) {
 				autoUpdate = (Boolean) preferenceEvent.getPreferenceMap().get(PreferenceId.LiveMode.BUTTON_LIVE_ID);
+			}
+			break;
+		case TIME_RESOLUTION:
+			if (preferenceEvent.getPreferenceMap().containsKey(PreferenceId.TimeResolution.TIME_DECIMAL_PLACES_ID)) {
+				timeDecimalPlaces = (Integer) preferenceEvent.getPreferenceMap().get(PreferenceId.TimeResolution.TIME_DECIMAL_PLACES_ID);
 			}
 			break;
 		default:
@@ -534,16 +546,16 @@ public class SqlInputController extends AbstractTableInputController {
 		case COUNT:
 			return new StyledString(Long.toString(data.getCount()));
 		case AVERAGE:
-			return new StyledString(NumberFormatter.formatDouble(data.getAverage()));
+			return new StyledString(NumberFormatter.formatDouble(data.getAverage(), timeDecimalPlaces));
 		case MIN:
-			return new StyledString(NumberFormatter.formatDouble(data.getMin()));
+			return new StyledString(NumberFormatter.formatDouble(data.getMin(), timeDecimalPlaces));
 		case MAX:
-			return new StyledString(NumberFormatter.formatDouble(data.getMax()));
+			return new StyledString(NumberFormatter.formatDouble(data.getMax(), timeDecimalPlaces));
 		case METHOD:
 			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
 			return TextFormatter.getStyledMethodString(methodIdent);
 		case DURATION:
-			return new StyledString(NumberFormatter.formatDouble(data.getDuration()));
+			return new StyledString(NumberFormatter.formatDouble(data.getDuration(), timeDecimalPlaces));
 		default:
 			return new StyledString("error");
 		}

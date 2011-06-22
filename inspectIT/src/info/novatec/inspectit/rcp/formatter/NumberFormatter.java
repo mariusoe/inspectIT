@@ -16,7 +16,7 @@ public final class NumberFormatter {
 	/**
 	 * Formats a decimal number with the specific pattern.
 	 */
-	private static DecimalFormat decFormat = new DecimalFormat("#,##0.##");
+	private static DecimalFormat decFormat = new DecimalFormat("###0.##");
 
 	/**
 	 * Formats a decimal number and returns it in milliseconds format.
@@ -41,7 +41,12 @@ public final class NumberFormatter {
 	/**
 	 * Formats a decimal number with the specified pattern.
 	 */
-	private static DecimalFormat doubleFormat = new DecimalFormat("#.###");
+	private static DecimalFormat doubleFormat = new DecimalFormat("0.000");
+	
+	/**
+	 * Formats a decimal number without the specified pattern.
+	 */
+	private static DecimalFormat doubleUnspecificFormat = new DecimalFormat();
 
 	/**
 	 * Formats a date/time value with the specified pattern.
@@ -53,6 +58,10 @@ public final class NumberFormatter {
 	 */
 	private static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
+	static {
+		doubleUnspecificFormat.setGroupingSize(0);
+	}
+	
 	/**
 	 * The default private constructor.
 	 */
@@ -210,6 +219,20 @@ public final class NumberFormatter {
 	 */
 	public static String formatDouble(double number) {
 		return doubleFormat.format(number);
+	}
+	
+	/**
+	 * Formats a double value based on the number of decimal places.
+	 * 
+	 * @param number
+	 *            The value to format.
+	 * @param decimalPlaces Number of decimal places.
+	 * @return The formatted string.
+	 */
+	public static String formatDouble(double number, int decimalPlaces) {
+		doubleUnspecificFormat.setMaximumFractionDigits(decimalPlaces);
+		doubleUnspecificFormat.setMinimumFractionDigits(decimalPlaces);
+		return doubleUnspecificFormat.format(number);
 	}
 
 }

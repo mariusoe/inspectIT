@@ -202,8 +202,9 @@ public class TableSubView extends AbstractSubView {
 
 		tableInputController.preferenceEventFired(preferenceEvent);
 		switch (preferenceEvent.getPreferenceId()) {
-		case CLEAR_BUFFER:
-			if (tableInputController.getPreferenceIds().contains(PreferenceId.CLEAR_BUFFER)) {
+		case CLEAR_BUFFER: 
+		case TIME_RESOLUTION:
+			if (tableInputController.getPreferenceIds().contains(PreferenceId.CLEAR_BUFFER) || tableInputController.getPreferenceIds().contains(PreferenceId.TIME_RESOLUTION)) {
 				tableViewer.refresh();
 			}
 			break;

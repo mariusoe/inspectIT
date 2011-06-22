@@ -15,7 +15,7 @@ public enum PreferenceId {
 	/**
 	 * The identifiers of the different control groups.
 	 */
-	TIMELINE, SAMPLINGRATE, LIVEMODE, UPDATE, ITEMCOUNT, FILTERSENSORTYPE, INVOCFILTEREXCLUSIVETIME, INVOCFILTERTOTALTIME, CLEAR_BUFFER, STEPPABLE_CONTROL;
+	TIMELINE, SAMPLINGRATE, LIVEMODE, UPDATE, ITEMCOUNT, FILTERSENSORTYPE, INVOCFILTEREXCLUSIVETIME, INVOCFILTERTOTALTIME, CLEAR_BUFFER, STEPPABLE_CONTROL, TIME_RESOLUTION;
 
 	/**
 	 * Inner enumeration for TIMELINE.
@@ -124,6 +124,24 @@ public enum PreferenceId {
 		 * The identifier for the switch stepping control button.
 		 */
 		BUTTON_STEPPABLE_CONTROL_ID;
+	}
+
+	/**
+	 * Inner enumeration for TIME_RESOLUTION.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	public enum TimeResolution implements IPreferenceGroup {
+		/**
+		 * The identifier for the definition of decimal places.
+		 */
+		TIME_DECIMAL_PLACES_ID;
+		
+		/**
+		 * Defines if the live mode is active by default.
+		 */
+		public static final int DECIMAL_PLACES_DEFAULT = 0;
 	}
 
 }

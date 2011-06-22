@@ -4,6 +4,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.TimeResolution;
 import info.novatec.inspectit.rcp.editor.preferences.control.IPreferenceControl;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 
@@ -317,6 +318,15 @@ public class FormPreferencePanel implements IPreferencePanel {
 			timeMenuManager.add(new FilterByTotalTimeAction("1.5 s", 1500.0));
 			timeMenuManager.add(new FilterByTotalTimeAction("2 s", 2000.0));
 			timeMenuManager.add(new FilterByTotalTimeAction("5 s", 5000.0));
+			menuAction.addContributionItem(timeMenuManager);
+		}
+		
+		if (preferenceSet.contains(PreferenceId.TIME_RESOLUTION)) {
+			MenuManager timeMenuManager = new MenuManager("Time Decimal Places");
+			timeMenuManager.add(new SetTimeDecimalPlaces("0", 0, true));
+			timeMenuManager.add(new SetTimeDecimalPlaces("1", 1));
+			timeMenuManager.add(new SetTimeDecimalPlaces("2", 2));
+			timeMenuManager.add(new SetTimeDecimalPlaces("3", 3));
 			menuAction.addContributionItem(timeMenuManager);
 		}
 
@@ -666,6 +676,34 @@ public class FormPreferencePanel implements IPreferencePanel {
 			fireEvent(event);
 		}
 
+	}
+	
+	private final class SetTimeDecimalPlaces extends Action {
+		private int decimalPlaces;
+
+		public SetTimeDecimalPlaces(String text, int decimalPlaces) {
+			this(text, decimalPlaces, false);
+		}
+
+		public SetTimeDecimalPlaces(String text, int decimalPlaces, boolean isChecked) {
+			super(text, Action.AS_RADIO_BUTTON);
+			this.decimalPlaces = decimalPlaces;
+			setChecked(isChecked);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void run() {
+			if (isChecked()) {
+				Map<IPreferenceGroup, Object> decimalPlacesPreference = new HashMap<IPreferenceGroup, Object>();
+				decimalPlacesPreference.put(TimeResolution.TIME_DECIMAL_PLACES_ID, decimalPlaces);
+				PreferenceEvent event = new PreferenceEvent(PreferenceId.TIME_RESOLUTION);
+				event.setPreferenceMap(decimalPlacesPreference);
+				fireEvent(event);
+			}
+		}
 	}
 
 }
