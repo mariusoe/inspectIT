@@ -70,6 +70,7 @@
 
 		<!-- clean the PDE build environment -->
 		<delete dir="${buildDirectory}" />
+		<delete dir="${basedir}/runtime" />
 	</target>
 
 	<target name="dist-commons">
