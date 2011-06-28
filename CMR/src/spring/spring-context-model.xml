@@ -8,9 +8,11 @@
 	<bean id="methodSensorTypeIdentDao"
 		class="info.novatec.inspectit.cmr.dao.impl.MethodSensorTypeIdentDaoImpl" />
 	<bean id="platformIdentDao"
-		class="info.novatec.inspectit.cmr.dao.impl.PlatformIdentDaoImpl" />
+		class="info.novatec.inspectit.cmr.dao.impl.PlatformIdentDaoImpl" init-method="initPlatformIdentCache"/>
 	<bean id="platformSensorTypeIdentDao"
 		class="info.novatec.inspectit.cmr.dao.impl.PlatformSensorTypeIdentDaoImpl" />
+	<bean id="platformIdentCache"
+		class="info.novatec.inspectit.cmr.util.PlatformIdentCache" />
 
 	<bean id="defaultDataDao" class="info.novatec.inspectit.cmr.dao.impl.DefaultDataDaoImpl" >
 		<property name="saveTimerDataToDatabase" value="${cmr.saveTimerDataToDatabase}" />

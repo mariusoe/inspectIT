@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
-
 /**
  * This DAO is used to handle all {@link PlatformIdent} objects.
  * 
@@ -16,8 +15,7 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 public interface PlatformIdentDao {
 
 	/**
-	 * Load a specific {@link PlatformIdent} from the underlying storage by
-	 * passing the id.
+	 * Load a specific {@link PlatformIdent} from the underlying storage by passing the id.
 	 * 
 	 * @param id
 	 *            The id of the object.
@@ -30,8 +28,8 @@ public interface PlatformIdentDao {
 	 * 
 	 * @param platformIdent
 	 *            The {@link PlatformIdent} object which serves as the example.
-	 * @return The list of {@link PlatformIdent} objects which have the same
-	 *         contents as the passed example object.
+	 * @return The list of {@link PlatformIdent} objects which have the same contents as the passed
+	 *         example object.
 	 * @see HibernateTemplate#findByExample(Object)
 	 */
 	List<PlatformIdent> findByExample(PlatformIdent platformIdent);
@@ -53,18 +51,15 @@ public interface PlatformIdentDao {
 	void delete(PlatformIdent platformIdent);
 
 	/**
-	 * Deletes all {@link PlatformIdent} objects which are stored in the passed
-	 * list.
+	 * Deletes all {@link PlatformIdent} objects which are stored in the passed list.
 	 * 
 	 * @param platformIdents
-	 *            The list containing the {@link PlatformIdent} objects to
-	 *            delete.
+	 *            The list containing the {@link PlatformIdent} objects to delete.
 	 */
 	void deleteAll(List<PlatformIdent> platformIdents);
 
 	/**
-	 * Returns all {@link PlatformIdent} objects which are saved in the
-	 * underlying storage.
+	 * Returns all {@link PlatformIdent} objects which are saved in the underlying storage.
 	 * 
 	 * @return Returns all stored {@link PlatformIdent} objects.
 	 */
@@ -82,17 +77,15 @@ public interface PlatformIdentDao {
 	 * Evicts all {@link PlatformIdent} objects from the session.
 	 * 
 	 * @param platformIdents
-	 *            The list of {@link PlatformIdent} objects to evict from the
-	 *            session.
+	 *            The list of {@link PlatformIdent} objects to evict from the session.
 	 */
 	void evictAll(List<PlatformIdent> platformIdents);
 
 	/**
-	 * Executes the same query as {@link #findAll()} but initialized the lazy
-	 * collections afterwards.
+	 * Executes the same query as {@link #findAll()} but initialized the lazy collections
+	 * afterwards.
 	 * 
-	 * @return Returns all stored {@link PlatformIdent} objects and initializes
-	 *         the collections.
+	 * @return Returns all stored {@link PlatformIdent} objects and initializes the collections.
 	 */
 	List<PlatformIdent> findAllInitialized();
 

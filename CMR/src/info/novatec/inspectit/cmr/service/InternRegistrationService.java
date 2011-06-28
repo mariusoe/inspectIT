@@ -9,7 +9,6 @@ import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
-import info.novatec.inspectit.cmr.service.IRegistrationService;
 
 import java.rmi.RemoteException;
 import java.sql.Timestamp;

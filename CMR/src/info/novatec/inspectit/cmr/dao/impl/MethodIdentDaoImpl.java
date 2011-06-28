@@ -3,6 +3,7 @@ package info.novatec.inspectit.cmr.dao.impl;
 import info.novatec.inspectit.cmr.dao.MethodIdentDao;
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
+import info.novatec.inspectit.cmr.util.PlatformIdentCache;
 
 import java.util.List;
 
@@ -23,6 +24,11 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * 
  */
 public class MethodIdentDaoImpl extends HibernateDaoSupport implements MethodIdentDao {
+	
+	/**
+	 * {@link PlatformIdent} cache.
+	 */
+	private PlatformIdentCache platformIdentCache;
 
 	/**
 	 * {@inheritDoc}
@@ -66,6 +72,7 @@ public class MethodIdentDaoImpl extends HibernateDaoSupport implements MethodIde
 	 */
 	public void saveOrUpdate(MethodIdent methodIdent) {
 		getHibernateTemplate().saveOrUpdate(methodIdent);
+		platformIdentCache.markDirty(methodIdent.getPlatformIdent());
 	}
 
 	/**
@@ -86,4 +93,12 @@ public class MethodIdentDaoImpl extends HibernateDaoSupport implements MethodIde
 
 		return getHibernateTemplate().findByCriteria(methodCriteria);
 	}
+
+	/**
+	 * @param platformIdentCache the platformIdentCache to set
+	 */
+	public void setPlatformIdentCache(PlatformIdentCache platformIdentCache) {
+		this.platformIdentCache = platformIdentCache;
+	}
+	
 }
