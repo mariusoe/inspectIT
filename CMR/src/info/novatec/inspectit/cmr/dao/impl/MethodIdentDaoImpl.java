@@ -14,11 +14,11 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
- * The default implementation of the {@link MethodIdentDao} interface by using
- * the {@link HibernateDaoSupport} from Spring.
+ * The default implementation of the {@link MethodIdentDao} interface by using the
+ * {@link HibernateDaoSupport} from Spring.
  * <p>
- * Delegates many calls to the {@link HibernateTemplate} returned by the
- * {@link HibernateDaoSupport} class.
+ * Delegates many calls to the {@link HibernateTemplate} returned by the {@link HibernateDaoSupport}
+ * class.
  * 
  * @author Patrice Bouillet
  * 
@@ -81,7 +81,11 @@ public class MethodIdentDaoImpl extends HibernateDaoSupport implements MethodIde
 	@SuppressWarnings("unchecked")
 	public List<MethodIdent> findForPlatformIdent(PlatformIdent platformIdent, MethodIdent methodIdentExample) {
 		DetachedCriteria methodCriteria = DetachedCriteria.forClass(MethodIdent.class);
-		methodCriteria.add(Restrictions.eq("packageName", methodIdentExample.getPackageName()));
+		if (null == methodIdentExample.getPackageName()) {
+			methodCriteria.add(Restrictions.isNull("packageName"));
+		} else {
+			methodCriteria.add(Restrictions.eq("packageName", methodIdentExample.getPackageName()));
+		}
 		methodCriteria.add(Restrictions.eq("className", methodIdentExample.getClassName()));
 		methodCriteria.add(Restrictions.eq("methodName", methodIdentExample.getMethodName()));
 		methodCriteria.add(Restrictions.eq("parameters", methodIdentExample.getParameters()));
