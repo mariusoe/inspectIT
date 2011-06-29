@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.layout.GridLayout;
@@ -15,8 +17,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
- * This implementation of a composite sub view uses the {@link GridLayout} to
- * layout the associated children.
+ * This implementation of a composite sub view uses the {@link GridLayout} to layout the associated
+ * children.
  * 
  * @author Patrice Bouillet
  * 
@@ -40,17 +42,15 @@ public class GridCompositeSubView extends AbstractCompositeSubView {
 
 	/**
 	 * Default constructor which calls
-	 * {@link GridCompositeSubView#GridCompositeSubView(int, boolean)} with
-	 * values <code>1</code> for the number of columns and <code>false</code> if
-	 * the columns should have an equal width.
+	 * {@link GridCompositeSubView#GridCompositeSubView(int, boolean)} with values <code>1</code>
+	 * for the number of columns and <code>false</code> if the columns should have an equal width.
 	 */
 	public GridCompositeSubView() {
 		this(1, false);
 	}
 
 	/**
-	 * Constructor which constructs the {@link GridLayout} object with the
-	 * passed values.
+	 * Constructor which constructs the {@link GridLayout} object with the passed values.
 	 * 
 	 * @param numColumns
 	 *            The number of columns.
@@ -63,8 +63,7 @@ public class GridCompositeSubView extends AbstractCompositeSubView {
 	}
 
 	/**
-	 * Adds a new sub-view with the specified layout data to this composite
-	 * view.
+	 * Adds a new sub-view with the specified layout data to this composite view.
 	 * 
 	 * @param subView
 	 *            The {@link ISubView} which will be added.
@@ -101,6 +100,12 @@ public class GridCompositeSubView extends AbstractCompositeSubView {
 
 			if (null != subView.getSelectionProvider()) {
 				ISelectionProvider prov = subView.getSelectionProvider();
+				prov.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
+					public void selectionChanged(SelectionChangedEvent event) {
+						getRootEditor().setSelection(event.getSelection());
+					}
+				});
 				prov.addSelectionChangedListener(getRootEditor().getSelectionChangedListener());
 				if (prov instanceof IPostSelectionProvider) {
 					((IPostSelectionProvider) prov).addPostSelectionChangedListener(getRootEditor().getPostSelectionChangedListener());

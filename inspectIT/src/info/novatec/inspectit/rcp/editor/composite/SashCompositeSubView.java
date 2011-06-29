@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.FocusAdapter;
@@ -19,10 +21,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
- * The sash composite can create a composite sub-view which lays out its
- * children either vertical or horizontal. The behaviour can be set by passing
- * the style {@link SWT#HORIZONTAL} or {@link SWT#VERTICAL} to the constructor.
- * The default is {@link SWT#VERTICAL} + {@link SWT#SMOOTH};
+ * The sash composite can create a composite sub-view which lays out its children either vertical or
+ * horizontal. The behaviour can be set by passing the style {@link SWT#HORIZONTAL} or
+ * {@link SWT#VERTICAL} to the constructor. The default is {@link SWT#VERTICAL} + {@link SWT#SMOOTH}
+ * ;
  * 
  * @author Patrice Bouillet
  * 
@@ -90,6 +92,12 @@ public class SashCompositeSubView extends AbstractCompositeSubView {
 
 			if (null != subView.getSelectionProvider()) {
 				ISelectionProvider prov = subView.getSelectionProvider();
+				prov.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
+					public void selectionChanged(SelectionChangedEvent event) {
+						getRootEditor().setSelection(event.getSelection());
+					}
+				});
 				prov.addSelectionChangedListener(getRootEditor().getSelectionChangedListener());
 				if (prov instanceof IPostSelectionProvider) {
 					((IPostSelectionProvider) prov).addPostSelectionChangedListener(getRootEditor().getPostSelectionChangedListener());

@@ -9,6 +9,7 @@ import info.novatec.inspectit.rcp.editor.preferences.IPreferencePanel;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
+import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Timer;
@@ -16,9 +17,11 @@ import java.util.TimerTask;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
@@ -94,6 +97,11 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 	 * The post selection changed listener.
 	 */
 	private ISelectionChangedListener postSelectionChangedListener = null;
+
+	/**
+	 * The selection object. Needed for comparison with the new one.
+	 */
+	private ISelection selection;
 
 	/**
 	 * {@inheritDoc}
@@ -292,17 +300,33 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 	public void setActiveSubView(ISubView subView) {
 		Assert.isNotNull(subView);
 
-		this.activeSubView = subView;
+		if (!ObjectUtils.equals(activeSubView, subView)) {
+			this.activeSubView = subView;
 
-		ISelectionProvider selectionProvider = activeSubView.getSelectionProvider();
-		if (selectionProvider != null) {
-			ISelectionProvider outerProvider = getSite().getSelectionProvider();
-			if (outerProvider instanceof MultiSubViewSelectionProvider) {
-				SelectionChangedEvent event = new SelectionChangedEvent(selectionProvider, selectionProvider.getSelection());
-				MultiSubViewSelectionProvider provider = (MultiSubViewSelectionProvider) outerProvider;
+			ISelectionProvider selectionProvider = activeSubView.getSelectionProvider();
+			if (selectionProvider != null) {
+				ISelectionProvider outerProvider = getSite().getSelectionProvider();
+				if (outerProvider instanceof MultiSubViewSelectionProvider) {
+					ISelection newSelection = selectionProvider.getSelection();
+					MultiSubViewSelectionProvider provider = (MultiSubViewSelectionProvider) outerProvider;
 
-				provider.fireSelectionChanged(event);
-				provider.firePostSelectionChanged(event);
+					if (ObjectUtils.equals(selection, newSelection)) {
+						// The selection object didn't change, but the selection area did, thus we
+						// have to simulate a little bit. Problem is due to TreeSelection#equals
+						// passing equal comparison to the parent class (which means that a
+						// treeselection and a structuredselection are equal if they refer to the
+						// same selection). See bug at
+						// https://bugs.eclipse.org/bugs/show_bug.cgi?id=135837
+						SelectionChangedEvent event = new SelectionChangedEvent(selectionProvider, StructuredSelection.EMPTY);
+						provider.fireSelectionChanged(event);
+						provider.firePostSelectionChanged(event);
+					}
+					// now the real event
+					selection = newSelection;
+					SelectionChangedEvent event = new SelectionChangedEvent(selectionProvider, selection);
+					provider.fireSelectionChanged(event);
+					provider.firePostSelectionChanged(event);
+				}
 			}
 		}
 	}
@@ -388,6 +412,16 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 
 			prov.firePostSelectionChanged(newEvent);
 		}
+	}
+
+	/**
+	 * Sets the current selection object.
+	 * 
+	 * @param selection
+	 *            the selection object to set.
+	 */
+	public void setSelection(ISelection selection) {
+		this.selection = selection;
 	}
 
 	/**

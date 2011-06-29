@@ -9,7 +9,9 @@ import java.util.Map;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -20,8 +22,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
- * This implementation of a composite view lays out its children in its own
- * tabs. Every tab can be given a name.
+ * This implementation of a composite view lays out its children in its own tabs. Every tab can be
+ * given a name.
  * 
  * @author Patrice Bouillet
  * 
@@ -69,6 +71,12 @@ public class TabbedCompositeSubView extends AbstractCompositeSubView {
 
 			if (null != subView.getSelectionProvider()) {
 				ISelectionProvider prov = subView.getSelectionProvider();
+				prov.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
+					public void selectionChanged(SelectionChangedEvent event) {
+						getRootEditor().setSelection(event.getSelection());
+					}
+				});
 				prov.addSelectionChangedListener(getRootEditor().getSelectionChangedListener());
 				if (prov instanceof IPostSelectionProvider) {
 					((IPostSelectionProvider) prov).addPostSelectionChangedListener(getRootEditor().getPostSelectionChangedListener());
