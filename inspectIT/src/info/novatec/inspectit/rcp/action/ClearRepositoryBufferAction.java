@@ -1,14 +1,14 @@
 package info.novatec.inspectit.rcp.action;
 
-import java.util.Collection;
-import java.util.Collections;
-
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.view.server.ServerView;
+
+import java.util.Collections;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -56,7 +56,10 @@ public class ClearRepositoryBufferAction implements IWorkbenchWindowActionDelega
 						IRootEditor rootEditor = (IRootEditor) editor.getEditor(false);
 						if (null != rootEditor.getPreferencePanel()) {
 							if (rootEditor.getSubView().getPreferenceIds().contains(PreferenceId.CLEAR_BUFFER)) {
-								rootEditor.getSubView().setDataInput(Collections.EMPTY_LIST);
+								InputDefinition inputDefinition = rootEditor.getInputDefinition();
+								if (inputDefinition.getRepositoryDefinition().equals(repositoryDefinition)) {
+									rootEditor.getSubView().setDataInput(Collections.<DefaultData>emptyList());
+								}
 							}
 						}
 					}
