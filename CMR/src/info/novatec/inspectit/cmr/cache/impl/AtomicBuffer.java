@@ -407,12 +407,15 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, Initiali
 			}
 
 			// we only index when the element has already been analyzed
-			while (!elementToIndex.isAnalyzed()) {
+			if (!elementToIndex.isAnalyzed()) {
 				try {
 					Thread.sleep(bufferProperties.getIndexingWaitTime());
 				} catch (InterruptedException e) {
 					Thread.interrupted();
 				}
+				// we go back to the while loop, because we want to check if the nextForIndexing
+				// element has changed
+				continue;
 			}
 
 			// only thread that execute compare and set successfully can perform changes
