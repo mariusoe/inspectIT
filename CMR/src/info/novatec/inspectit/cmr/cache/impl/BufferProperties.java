@@ -1,6 +1,10 @@
 package info.novatec.inspectit.cmr.cache.impl;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryPoolMXBean;
+import java.lang.management.MemoryUsage;
 import java.text.NumberFormat;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -15,34 +19,20 @@ import org.springframework.beans.factory.InitializingBean;
 public class BufferProperties implements InitializingBean {
 
 	/**
+	 * Name of the memory pool for old generation.
+	 */
+	private static final String OLD_GEN_POOL_NAME = "Old Gen";
+
+	/**
+	 * Name of the memory pool for tenured generation. Some JVM name like this the old generation
+	 * space.
+	 */
+	private static final String TENURED_GEN_POOL_NAME = "Tenured";
+
+	/**
 	 * Buffer eviction occupancy percentage.
 	 */
 	private float evictionOccupancyPercentage;
-
-	/**
-	 * Maximum heap occupancy percentage.
-	 */
-	private float maxHeapSizeOccupancy;
-
-	/**
-	 * Minimum heap occupancy percentage.
-	 */
-	private float minHeapSizeOccupancy;
-
-	/**
-	 * Maximum heap occupancy percentage active from this heap size.
-	 */
-	private long maxHeapSizeOccupancyActiveFromHeapSize;
-
-	/**
-	 * Minimum heap occupancy percentage active till this heap size.
-	 */
-	private long minHeapSizeOccupancyActiveTillHeapSize;
-
-	/**
-	 * Minimum memory size that needs always to be available to CMR regardless of buffer.
-	 */
-	private long minMemoryDelta;
 
 	/**
 	 * Maximum security object expansion rate in percentages.
@@ -79,11 +69,31 @@ public class BufferProperties implements InitializingBean {
 	 * Number of threads that are cleaning the indexing tree.
 	 */
 	private int indexingTreeCleaningThreads;
-	
+
 	/**
 	 * Time in milliseconds that the indexing thread will wait for the object to be analyzed first.
 	 */
 	private long indexingWaitTime;
+
+	/**
+	 * Size of old space occupancy till which min occupancy will be active.
+	 */
+	private long minOldSpaceOccupancyActiveTillOldGenSize;
+
+	/**
+	 * Size of old space occupancy from which max occupancy will be active.
+	 */
+	private long maxOldSpaceOccupancyActiveFromOldGenSize;
+
+	/**
+	 * Percentage of the min old generation heap space buffer can occupy.
+	 */
+	private float minOldSpaceOccupancy;
+
+	/**
+	 * Percentage of the max old generation heap space buffer can occupy.
+	 */
+	private float maxOldSpaceOccupancy;
 
 	/**
 	 * Logger for buffer properties.
@@ -107,101 +117,6 @@ public class BufferProperties implements InitializingBean {
 	 */
 	public void setEvictionOccupancyPercentage(float evictionOccupancyPercentage) {
 		this.evictionOccupancyPercentage = evictionOccupancyPercentage;
-	}
-
-	/**
-	 * Returns maximum heap occupancy percentage.
-	 * 
-	 * @return Maximum heap occupancy percentage as float.
-	 */
-	public float getMaxHeapSizeOccupancy() {
-		return maxHeapSizeOccupancy;
-	}
-
-	/**
-	 * Sets maximum heap occupancy percentage.
-	 * 
-	 * @param maxHeapSizeOccupancy
-	 *            Maximum heap occupancy percentage as float.
-	 */
-	public void setMaxHeapSizeOccupancy(float maxHeapSizeOccupancy) {
-		this.maxHeapSizeOccupancy = maxHeapSizeOccupancy;
-	}
-
-	/**
-	 * Returns minimum heap occupancy percentage.
-	 * 
-	 * @return Minimum heap occupancy percentage as float.
-	 */
-	public float getMinHeapSizeOccupancy() {
-		return minHeapSizeOccupancy;
-	}
-
-	/**
-	 * Sets minimum heap occupancy percentage.
-	 * 
-	 * @param minHeapSizeOccupancy
-	 *            Minimum heap occupancy percentage as float.
-	 */
-	public void setMinHeapSizeOccupancy(float minHeapSizeOccupancy) {
-		this.minHeapSizeOccupancy = minHeapSizeOccupancy;
-	}
-
-	/**
-	 * Returns the heap size from which maximum heap occupancy percentage is active.
-	 * 
-	 * @return Heap size in bytes.
-	 */
-	public long getMaxHeapSizeOccupancyActiveFromHeapSize() {
-		return maxHeapSizeOccupancyActiveFromHeapSize;
-	}
-
-	/**
-	 * Sets the heap size from which maximum heap occupancy percentage is active.
-	 * 
-	 * @param maxHeapSizeOccupancyActiveFromHeapSize
-	 *            Heap size in bytes.
-	 */
-	public void setMaxHeapSizeOccupancyActiveFromHeapSize(long maxHeapSizeOccupancyActiveFromHeapSize) {
-		this.maxHeapSizeOccupancyActiveFromHeapSize = maxHeapSizeOccupancyActiveFromHeapSize;
-	}
-
-	/**
-	 * Returns the heap size till which minimum heap occupancy percentage is active.
-	 * 
-	 * @return Heap size in bytes.
-	 */
-	public long getMinHeapSizeOccupancyActiveTillHeapSize() {
-		return minHeapSizeOccupancyActiveTillHeapSize;
-	}
-
-	/**
-	 * Sets the heap size till which minimum heap occupancy percentage is active.
-	 * 
-	 * @param minHeapSizeOccupancyActiveTillHeapSize
-	 *            Heap size in bytes.
-	 */
-	public void setMinHeapSizeOccupancyActiveTillHeapSize(long minHeapSizeOccupancyActiveTillHeapSize) {
-		this.minHeapSizeOccupancyActiveTillHeapSize = minHeapSizeOccupancyActiveTillHeapSize;
-	}
-
-	/**
-	 * Returns minimum memory size that needs always to be available to CMR regardless of buffer.
-	 * 
-	 * @return Memory size in bytes.
-	 */
-	public long getMinMemoryDelta() {
-		return minMemoryDelta;
-	}
-
-	/**
-	 * Sets minimum memory size that needs always to be available to CMR regardless of buffer.
-	 * 
-	 * @param minMemoryDelta
-	 *            memory size in bytes.
-	 */
-	public void setMinMemoryDelta(long minMemoryDelta) {
-		this.minMemoryDelta = minMemoryDelta;
 	}
 
 	/**
@@ -341,7 +256,7 @@ public class BufferProperties implements InitializingBean {
 	public void setIndexingTreeCleaningThreads(int indexingTreeCleaningThreads) {
 		this.indexingTreeCleaningThreads = indexingTreeCleaningThreads;
 	}
-	
+
 	/**
 	 * @return the indexingWaitTime
 	 */
@@ -350,10 +265,71 @@ public class BufferProperties implements InitializingBean {
 	}
 
 	/**
-	 * @param indexingWaitTime the indexingWaitTime to set
+	 * @param indexingWaitTime
+	 *            the indexingWaitTime to set
 	 */
 	public void setIndexingWaitTime(long indexingWaitTime) {
 		this.indexingWaitTime = indexingWaitTime;
+	}
+
+	/**
+	 * @return the minOldSpaceOccupancyActiveTillOldGenSize
+	 */
+	public long getMinOldSpaceOccupancyActiveTillOldGenSize() {
+		return minOldSpaceOccupancyActiveTillOldGenSize;
+	}
+
+	/**
+	 * @param minOldSpaceOccupancyActiveTillOldGenSize
+	 *            the minOldSpaceOccupancyActiveTillOldGenSize to set
+	 */
+	public void setMinOldSpaceOccupancyActiveTillOldGenSize(long minOldSpaceOccupancyActiveTillOldGenSize) {
+		this.minOldSpaceOccupancyActiveTillOldGenSize = minOldSpaceOccupancyActiveTillOldGenSize;
+	}
+
+	/**
+	 * @return the maxOldSpaceOccupancyActiveFromOldGenSize
+	 */
+	public long getMaxOldSpaceOccupancyActiveFromOldGenSize() {
+		return maxOldSpaceOccupancyActiveFromOldGenSize;
+	}
+
+	/**
+	 * @param maxOldSpaceOccupancyActiveFromOldGenSize
+	 *            the maxOldSpaceOccupancyActiveFromOldGenSize to set
+	 */
+	public void setMaxOldSpaceOccupancyActiveFromOldGenSize(long maxOldSpaceOccupancyActiveFromOldGenSize) {
+		this.maxOldSpaceOccupancyActiveFromOldGenSize = maxOldSpaceOccupancyActiveFromOldGenSize;
+	}
+
+	/**
+	 * @return the minOldSpaceOccupancy
+	 */
+	public float getMinOldSpaceOccupancy() {
+		return minOldSpaceOccupancy;
+	}
+
+	/**
+	 * @param minOldSpaceOccupancy
+	 *            the minOldSpaceOccupancy to set
+	 */
+	public void setMinOldSpaceOccupancy(float minOldSpaceOccupancy) {
+		this.minOldSpaceOccupancy = minOldSpaceOccupancy;
+	}
+
+	/**
+	 * @return the oldSpaceOccupancy
+	 */
+	public float getMaxOldSpaceOccupancy() {
+		return maxOldSpaceOccupancy;
+	}
+
+	/**
+	 * @param oldSpaceOccupancy
+	 *            the oldSpaceOccupancy to set
+	 */
+	public void setMaxOldSpaceOccupancy(float oldSpaceOccupancy) {
+		this.maxOldSpaceOccupancy = oldSpaceOccupancy;
 	}
 
 	/**
@@ -362,31 +338,35 @@ public class BufferProperties implements InitializingBean {
 	 * @return Size in bytes.
 	 */
 	public long getInitialBufferSize() {
-		long maxMemory = Runtime.getRuntime().maxMemory();
 		long bufferSize = 0;
-		if (maxMemory > maxHeapSizeOccupancyActiveFromHeapSize) {
-			bufferSize = (long) (maxMemory * maxHeapSizeOccupancy);
-		} else if (maxMemory < minHeapSizeOccupancyActiveTillHeapSize) {
-			bufferSize = (long) (maxMemory * minHeapSizeOccupancy);
-		} else {
-			// delta is the value that defines how much we can extend the minimum heap occupancy
-			// percentage by analyzing the max memory size
-			// delta is actually representing additional percentage of heap we can take
-			// it is always thru that: minHeapSizeOccupancy + delta < maxHeapSizeOccupancy
-			float delta = (maxHeapSizeOccupancy - minHeapSizeOccupancy)
-					* ((float) (maxMemory - minHeapSizeOccupancyActiveTillHeapSize) / (maxHeapSizeOccupancyActiveFromHeapSize - minHeapSizeOccupancyActiveTillHeapSize));
-			bufferSize = (long) (maxMemory * (minHeapSizeOccupancy + delta));
-		}
-
-		if (bufferSize + minMemoryDelta < maxMemory) {
-			return bufferSize;
-		} else {
-			bufferSize = maxMemory - minMemoryDelta;
-			if (bufferSize < 0) {
-				bufferSize = 0;
+		try {
+			List<MemoryPoolMXBean> memBeans = ManagementFactory.getMemoryPoolMXBeans();
+			for (MemoryPoolMXBean memBean : memBeans) {
+				if (memBean.getName().indexOf(OLD_GEN_POOL_NAME) != -1 || memBean.getName().indexOf(TENURED_GEN_POOL_NAME) != -1) {
+					MemoryUsage memUsage = memBean.getUsage();
+					long oldGenMax = memUsage.getMax();
+					if (oldGenMax > maxOldSpaceOccupancyActiveFromOldGenSize) {
+						bufferSize = (long) (oldGenMax * maxOldSpaceOccupancy);
+					} else if (oldGenMax < minOldSpaceOccupancyActiveTillOldGenSize) {
+						bufferSize = (long) (oldGenMax * minOldSpaceOccupancy);
+					} else {
+						// delta is the value that defines how much we can extend the minimum heap
+						// occupancy
+						// percentage by analyzing the max memory size
+						// delta is actually representing additional percentage of heap we can take
+						// it is always thru that: minHeapSizeOccupancy + delta <
+						// maxHeapSizeOccupancy
+						float delta = (maxOldSpaceOccupancy - minOldSpaceOccupancy)
+								* ((float) (oldGenMax - minOldSpaceOccupancyActiveTillOldGenSize) / (maxOldSpaceOccupancyActiveFromOldGenSize - minOldSpaceOccupancyActiveTillOldGenSize));
+						bufferSize = (long) (oldGenMax * (minOldSpaceOccupancy + delta));
+					}
+					return bufferSize;
+				}
 			}
-			return bufferSize;
+		} catch (Exception e) {
+			throw new RuntimeException("Could not calculate the old generation heap space. Please make sure CMR is running on the provided JVM.", e);
 		}
+		throw new RuntimeException("Could not calculate the old generation heap space. Please make sure CMR is running on the provided JVM.");
 	}
 
 	/**
@@ -420,16 +400,16 @@ public class BufferProperties implements InitializingBean {
 			LOGGER.info("|-Buffer properties initialized with following values:");
 			LOGGER.info("||-Eviction occupancy percentage: " + NumberFormat.getInstance().format(evictionOccupancyPercentage * 100) + "%");
 			LOGGER.info("||-Eviction fragment size percentage: " + NumberFormat.getInstance().format(evictionFragmentSizePercentage * 100) + "%");
-			LOGGER.info("||-Max heap size occupancy: " + NumberFormat.getInstance().format(maxHeapSizeOccupancy * 100) + "%");
-			LOGGER.info("||-Min heap size occupancy: " + NumberFormat.getInstance().format(minHeapSizeOccupancy * 100) + "%");
-			LOGGER.info("||-Max heap size occupancy active from heap size: " + NumberFormat.getInstance().format(maxHeapSizeOccupancyActiveFromHeapSize) + " bytes");
-			LOGGER.info("||-Min heap size occupancy active till heap size: " + NumberFormat.getInstance().format(minHeapSizeOccupancyActiveTillHeapSize) + " bytes");
 			LOGGER.info("||-Max object size expansion: " + NumberFormat.getInstance().format(maxObjectExpansionRate * 100) + "%");
 			LOGGER.info("||-Min object size expansion: " + NumberFormat.getInstance().format(minObjectExpansionRate * 100) + "%");
 			LOGGER.info("||-Max object size expansion active till buffer size: " + NumberFormat.getInstance().format(maxObjectExpansionRateActiveTillBufferSize) + " bytes");
 			LOGGER.info("||-Min object size expansion active from buffer size: " + NumberFormat.getInstance().format(minObjectExpansionRateActiveFromBufferSize) + " bytes");
 			LOGGER.info("||-Indexing tree cleaning threads: " + NumberFormat.getInstance().format(indexingTreeCleaningThreads));
 			LOGGER.info("||-Indexing waiting time: " + NumberFormat.getInstance().format(indexingWaitTime) + " ms");
+			LOGGER.info("||-Min old generation occupancy percentage active till: " + NumberFormat.getInstance().format(minOldSpaceOccupancyActiveTillOldGenSize) + " bytes");
+			LOGGER.info("||-Max old generation occupancy percentage active from: " + NumberFormat.getInstance().format(maxOldSpaceOccupancyActiveFromOldGenSize) + " bytes");
+			LOGGER.info("||-Min old generation occupancy percentage: " + NumberFormat.getInstance().format(minOldSpaceOccupancy * 100) + "%");
+			LOGGER.info("||-Max old generation occupancy percentage: " + NumberFormat.getInstance().format(maxOldSpaceOccupancy * 100) + "%");
 		}
 		if (this.evictionOccupancyPercentage < 0 || this.evictionOccupancyPercentage > 1) {
 			throw new BeanInitializationException("Buffer properties initialization error: Eviction occupancy must be a percentage value between 0 and 1. Initialization value is: "
@@ -438,28 +418,6 @@ public class BufferProperties implements InitializingBean {
 		if (this.evictionFragmentSizePercentage < 0.01 || this.evictionFragmentSizePercentage > 0.5) {
 			throw new BeanInitializationException("Buffer properties initialization error: Eviction fragment size must be a percentage value between 0.01 and 0.5. Initialization value is: "
 					+ evictionFragmentSizePercentage);
-		}
-		if (this.minHeapSizeOccupancy < 0 || this.minHeapSizeOccupancy > 1) {
-			throw new BeanInitializationException("Buffer properties initialization error: Minimum heap size occupancy must be a percentage value between 0 and 1. Initialization value is: "
-					+ minHeapSizeOccupancy);
-		}
-		if (this.maxHeapSizeOccupancy < 0 || this.maxHeapSizeOccupancy > 1) {
-			throw new BeanInitializationException("Buffer properties initialization error: Maximum heap size occupancy must be a percentage value between 0 and 1. Initialization value is: "
-					+ maxHeapSizeOccupancy);
-		}
-		if (this.maxHeapSizeOccupancy < this.minHeapSizeOccupancy) {
-			throw new BeanInitializationException("Buffer properties initialization error: Maximum heap size occupancy can not be lower than minimum heap size occupancy. Initialization values are: "
-					+ maxHeapSizeOccupancy + " (max) and " + minHeapSizeOccupancy + " (min)");
-		}
-		if (this.maxObjectExpansionRate < this.minObjectExpansionRate) {
-			throw new BeanInitializationException(
-					"Buffer properties initialization error: Maximum object expansion rate can not be lower than minimum object expansion rate. Initialization values are: " + maxObjectExpansionRate
-							+ " (max) and " + minObjectExpansionRate + " (min)");
-		}
-		if (this.maxHeapSizeOccupancyActiveFromHeapSize < this.minHeapSizeOccupancyActiveTillHeapSize) {
-			throw new BeanInitializationException(
-					"Buffer properties initialization error: Heap size from which maximum heap occupancy is active can not be lower than heap size till which minimum heap occupancy is active. Initialization values are: "
-							+ maxHeapSizeOccupancyActiveFromHeapSize + " (heap size for max heap occupancy) and " + minHeapSizeOccupancyActiveTillHeapSize + " (heap size for min heap occupancy)");
 		}
 		if (this.minObjectExpansionRateActiveFromBufferSize < this.maxObjectExpansionRateActiveTillBufferSize) {
 			throw new BeanInitializationException(
@@ -481,6 +439,31 @@ public class BufferProperties implements InitializingBean {
 		if (this.indexingWaitTime <= 0) {
 			throw new BeanInitializationException("Buffer properties initialization error: The indexing wait time can not be less or equal than zero. Initialization value is: "
 					+ this.indexingWaitTime);
+		}
+		if (this.minOldSpaceOccupancyActiveTillOldGenSize <= 0) {
+			throw new BeanInitializationException(
+					"Buffer properties initialization error: The min buffer occupancy percentage of the old generation heap space active till old generation size value can not be less or equal than zero. Initialization value is: "
+							+ this.minOldSpaceOccupancyActiveTillOldGenSize);
+		}
+		if (this.maxOldSpaceOccupancyActiveFromOldGenSize <= 0) {
+			throw new BeanInitializationException(
+					"Buffer properties initialization error: The max buffer occupancy percentage of the old generation heap space active till old generation size value can not be less or equal than zero. Initialization value is: "
+							+ this.maxOldSpaceOccupancyActiveFromOldGenSize);
+		}
+		if (this.minOldSpaceOccupancy > this.maxOldSpaceOccupancy) {
+			throw new BeanInitializationException(
+					"Buffer properties initialization error: The min buffer occupancy percentage of the old generation heap space can not be higer than max buffer occupancy percentage of the old generation. Initialization values are: "
+							+ this.minOldSpaceOccupancy + "(min), " + this.maxOldSpaceOccupancy + "(max)");
+		}
+		if (this.minOldSpaceOccupancy <= 0 || this.minOldSpaceOccupancy > 1) {
+			throw new BeanInitializationException(
+					"Buffer properties initialization error: The min buffer occupancy percentage of the old generation heap space can not be less or equal than zero, nor greater that one. Initialization value is: "
+							+ this.minOldSpaceOccupancy);
+		}
+		if (this.maxOldSpaceOccupancy <= 0 || this.maxOldSpaceOccupancy > 1) {
+			throw new BeanInitializationException(
+					"Buffer properties initialization error: The max buffer occupancy percentage of the old generation heap space can not be less or equal than zero, nor greater that one. Initialization value is: "
+							+ this.maxOldSpaceOccupancy);
 		}
 	}
 

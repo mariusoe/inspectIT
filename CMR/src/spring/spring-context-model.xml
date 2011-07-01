@@ -51,11 +51,6 @@
 
 	<bean id="bufferProperties" class="info.novatec.inspectit.cmr.cache.impl.BufferProperties">
 		<property name="evictionOccupancyPercentage" value="${buffer.evictionOccupancyPercentage}"/>
-		<property name="maxHeapSizeOccupancy" value="${buffer.maxHeapSizeOccupancy}"/>
-		<property name="minHeapSizeOccupancy" value="${buffer.minHeapSizeOccupancy}"/>
-		<property name="maxHeapSizeOccupancyActiveFromHeapSize" value="${buffer.maxHeapSizeOccupancyActiveFromHeapSize}"/>
-		<property name="minHeapSizeOccupancyActiveTillHeapSize" value="${buffer.minHeapSizeOccupancyActiveTillHeapSize}"/>
-		<property name="minMemoryDelta" value="${buffer.minMemoryDelta}"/>
 		<property name="maxObjectExpansionRate" value="${buffer.maxObjectExpansionRate}"/>
 		<property name="minObjectExpansionRate" value="${buffer.minObjectExpansionRate}"/>
 		<property name="maxObjectExpansionRateActiveTillBufferSize" value="${buffer.maxObjectExpansionRateActiveTillBufferSize}"/>
@@ -64,6 +59,10 @@
 		<property name="evictionFragmentSizePercentage" value="${buffer.evictionFragmentSizePercentage}"/>	
 		<property name="indexingTreeCleaningThreads" value="${buffer.indexingTreeCleaningThreads}"/>	
 		<property name="indexingWaitTime" value="${buffer.indexingWaitTime}" />
+		<property name="minOldSpaceOccupancyActiveTillOldGenSize" value="${buffer.minOldSpaceOccupancyActiveTillOldGenSize}" />
+		<property name="maxOldSpaceOccupancyActiveFromOldGenSize" value="${buffer.maxOldSpaceOccupancyActiveFromOldGenSize}" />
+		<property name="minOldSpaceOccupancy" value="${buffer.minOldSpaceOccupancy}" />
+		<property name="maxOldSpaceOccupancy" value="${buffer.maxOldSpaceOccupancy}" />
 	</bean>
 	<bean id="bufferBean" class="info.novatec.inspectit.cmr.cache.impl.AtomicBuffer" />
 	<bean id="bufferEvictor" class="info.novatec.inspectit.cmr.cache.impl.BufferEvictor" init-method="start"/>
