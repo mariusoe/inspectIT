@@ -9,8 +9,12 @@ import info.novatec.inspectit.javassist.CtMethod;
 import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * This matcher filers that classes and methods based on the annotation class name defined in the
@@ -23,12 +27,22 @@ import java.util.List;
  * 
  */
 public class AnnotationMatcher extends AbstractMatcher {
+	
+	/**
+	 * The logger of the class.
+	 */
+	private static final Logger LOGGER = Logger.getLogger(AnnotationMatcher.class.getName());
 
+	/**
+	 * Set of annotation names that have already been logged to the user.
+	 */
+	private static Set loggedUnavailableAnnotations = new HashSet();
+	
 	/**
 	 * The {@link IMatcher} delegator object to route the calls of all methods to.
 	 */
 	private IMatcher delegateMatcher;
-
+	
 	/**
 	 * The only constructor which needs a reference to the {@link UnregisteredSensorConfig} instance
 	 * of the corresponding configuration.
@@ -62,7 +76,10 @@ public class AnnotationMatcher extends AbstractMatcher {
 		try {
 			annotationClass = classLoader.loadClass(unregisteredSensorConfig.getAnnotationClassName());
 		} catch (ClassNotFoundException exception) {
-			return delegateMatcher.getMatchingMethods(classLoader, className);
+			if (loggedUnavailableAnnotations.add(unregisteredSensorConfig.getAnnotationClassName())) {
+				LOGGER.warning("Annotation " + unregisteredSensorConfig.getAnnotationClassName() + " can not be found on the classpath. Underlying instrumentation will be skipped.");
+			}
+			return Collections.EMPTY_LIST;
 		}
 
 		CtClass clazz = classPoolAnalyzer.getClassPool(classLoader).get(className);
@@ -104,7 +121,10 @@ public class AnnotationMatcher extends AbstractMatcher {
 		try {
 			annotationClass = classLoader.loadClass(unregisteredSensorConfig.getAnnotationClassName());
 		} catch (ClassNotFoundException exception) {
-			return delegateMatcher.getMatchingConstructors(classLoader, className);
+			if (loggedUnavailableAnnotations.add(unregisteredSensorConfig.getAnnotationClassName())) {
+				LOGGER.warning("Annotation " + unregisteredSensorConfig.getAnnotationClassName() + " can not be found on the classpath. Underlying instrumentation will be skipped.");
+			}
+			return Collections.EMPTY_LIST;
 		}
 
 		CtClass clazz = classPoolAnalyzer.getClassPool(classLoader).get(className);
