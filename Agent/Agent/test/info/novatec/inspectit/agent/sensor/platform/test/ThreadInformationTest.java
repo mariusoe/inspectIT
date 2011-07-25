@@ -10,11 +10,11 @@ import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.sensor.platform.ThreadInformation;
+import info.novatec.inspectit.agent.sensor.platform.provider.ThreadInfoProvider;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.SystemSensorData;
 import info.novatec.inspectit.communication.data.ThreadInformationData;
 
-import java.lang.management.ThreadMXBean;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 
@@ -28,7 +28,7 @@ public class ThreadInformationTest extends AbstractLogSupport {
 	private ThreadInformation threadInfo;
 
 	@Mock
-	private ThreadMXBean threadObj;
+	private ThreadInfoProvider threadBean;
 
 	@Mock
 	private IIdManager idManager;
@@ -40,10 +40,11 @@ public class ThreadInformationTest extends AbstractLogSupport {
 	public void initTestClass() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		threadInfo = new ThreadInformation(idManager);
 
-		// we have to set the real threadObj on the mocked one
-		Field field = threadInfo.getClass().getDeclaredField("threadObj");
+		// we have to replace the real threadBean by the mocked one, so that we don't retrieve the
+		// info from the underlying JVM
+		Field field = threadInfo.getClass().getDeclaredField("threadBean");
 		field.setAccessible(true);
-		field.set(threadInfo, threadObj);
+		field.set(threadInfo, threadBean);
 	}
 
 	@Test
@@ -55,10 +56,10 @@ public class ThreadInformationTest extends AbstractLogSupport {
 		long sensorTypeIdent = 13L;
 		long platformIdent = 11L;
 
-		when(threadObj.getDaemonThreadCount()).thenReturn(daemonThreadCount);
-		when(threadObj.getThreadCount()).thenReturn(threadCount);
-		when(threadObj.getPeakThreadCount()).thenReturn(peakThreadCount);
-		when(threadObj.getTotalStartedThreadCount()).thenReturn(totalStartedThreadCount);
+		when(threadBean.getDaemonThreadCount()).thenReturn(daemonThreadCount);
+		when(threadBean.getThreadCount()).thenReturn(threadCount);
+		when(threadBean.getPeakThreadCount()).thenReturn(peakThreadCount);
+		when(threadBean.getTotalStartedThreadCount()).thenReturn(totalStartedThreadCount);
 
 		when(idManager.getPlatformId()).thenReturn(platformIdent);
 		when(idManager.getRegisteredSensorTypeId(sensorTypeIdent)).thenReturn(sensorTypeIdent);
@@ -98,7 +99,7 @@ public class ThreadInformationTest extends AbstractLogSupport {
 		assertEquals(threadData.getMaxTotalStartedThreadCount(), totalStartedThreadCount);
 		assertEquals(threadData.getTotalTotalStartedThreadCount(), totalStartedThreadCount);
 	}
-	
+
 	@Test
 	public void twoDataSets() throws IdNotAvailableException {
 		int daemonThreadCount = 5;
@@ -118,11 +119,11 @@ public class ThreadInformationTest extends AbstractLogSupport {
 		// ------------------------
 		// FIRST UPDATE CALL
 		// ------------------------
-		when(threadObj.getDaemonThreadCount()).thenReturn(daemonThreadCount);
-		when(threadObj.getThreadCount()).thenReturn(threadCount);
-		when(threadObj.getPeakThreadCount()).thenReturn(peakThreadCount);
-		when(threadObj.getTotalStartedThreadCount()).thenReturn(totalStartedThreadCount);
-		
+		when(threadBean.getDaemonThreadCount()).thenReturn(daemonThreadCount);
+		when(threadBean.getThreadCount()).thenReturn(threadCount);
+		when(threadBean.getPeakThreadCount()).thenReturn(peakThreadCount);
+		when(threadBean.getTotalStartedThreadCount()).thenReturn(totalStartedThreadCount);
+
 		// there is no current data object available
 		when(coreService.getPlatformSensorData(sensorTypeIdent)).thenReturn(null);
 		threadInfo.update(coreService, sensorTypeIdent);
@@ -157,15 +158,15 @@ public class ThreadInformationTest extends AbstractLogSupport {
 		assertEquals(threadData.getMinTotalStartedThreadCount(), totalStartedThreadCount);
 		assertEquals(threadData.getMaxTotalStartedThreadCount(), totalStartedThreadCount);
 		assertEquals(threadData.getTotalTotalStartedThreadCount(), totalStartedThreadCount);
-		
+
 		// ------------------------
 		// SECOND UPDATE CALL
 		// ------------------------
-		when(threadObj.getDaemonThreadCount()).thenReturn(daemonThreadCount2);
-		when(threadObj.getThreadCount()).thenReturn(threadCount2);
-		when(threadObj.getPeakThreadCount()).thenReturn(peakThreadCount2);
-		when(threadObj.getTotalStartedThreadCount()).thenReturn(totalStartedThreadCount2);
-		
+		when(threadBean.getDaemonThreadCount()).thenReturn(daemonThreadCount2);
+		when(threadBean.getThreadCount()).thenReturn(threadCount2);
+		when(threadBean.getPeakThreadCount()).thenReturn(peakThreadCount2);
+		when(threadBean.getTotalStartedThreadCount()).thenReturn(totalStartedThreadCount2);
+
 		when(coreService.getPlatformSensorData(sensorTypeIdent)).thenReturn(threadData);
 
 		threadInfo.update(coreService, sensorTypeIdent);
@@ -204,10 +205,10 @@ public class ThreadInformationTest extends AbstractLogSupport {
 		long totalStartedThreadCount = 55L;
 		long sensorTypeIdent = 13L;
 
-		when(threadObj.getDaemonThreadCount()).thenReturn(daemonThreadCount);
-		when(threadObj.getThreadCount()).thenReturn(threadCount);
-		when(threadObj.getPeakThreadCount()).thenReturn(peakThreadCount);
-		when(threadObj.getTotalStartedThreadCount()).thenReturn(totalStartedThreadCount);
+		when(threadBean.getDaemonThreadCount()).thenReturn(daemonThreadCount);
+		when(threadBean.getThreadCount()).thenReturn(threadCount);
+		when(threadBean.getPeakThreadCount()).thenReturn(peakThreadCount);
+		when(threadBean.getTotalStartedThreadCount()).thenReturn(totalStartedThreadCount);
 
 		when(idManager.getPlatformId()).thenThrow(new IdNotAvailableException("expected"));
 		when(idManager.getRegisteredSensorTypeId(sensorTypeIdent)).thenThrow(new IdNotAvailableException("expected"));

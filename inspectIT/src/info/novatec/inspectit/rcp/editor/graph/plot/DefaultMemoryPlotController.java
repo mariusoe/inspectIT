@@ -262,8 +262,11 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 			} else {
 				maxNonHeapUpperRange = 128 * 1024 * 1024;
 			}
-			rangeAxis.setRange(0, maxNonHeapUpperRange);
-			rangeAxis.setAutoRangeMinimumSize(maxNonHeapUpperRange);
+
+			if (maxNonHeapUpperRange > 0) {
+				rangeAxis.setRange(0, maxNonHeapUpperRange);
+				rangeAxis.setAutoRangeMinimumSize(maxNonHeapUpperRange);
+			}
 		}
 
 		final XYPlot subplot = new XYPlot(yIntervalSeriesCollection, null, rangeAxis, renderer);

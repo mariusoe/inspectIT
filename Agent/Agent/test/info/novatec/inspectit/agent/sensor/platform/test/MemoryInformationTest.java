@@ -10,11 +10,12 @@ import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.sensor.platform.MemoryInformation;
+import info.novatec.inspectit.agent.sensor.platform.provider.MemoryInfoProvider;
+import info.novatec.inspectit.agent.sensor.platform.provider.OperatingSystemInfoProvider;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.SystemSensorData;
 import info.novatec.inspectit.communication.data.MemoryInformationData;
 
-import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
@@ -24,17 +25,15 @@ import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.sun.management.OperatingSystemMXBean;
-
 public class MemoryInformationTest extends AbstractLogSupport {
 
 	private MemoryInformation memoryInfo;
 
 	@Mock
-	private MemoryMXBean memoryObj;
+	private MemoryInfoProvider memoryBean;
 
 	@Mock
-	private OperatingSystemMXBean osObj;
+	private OperatingSystemInfoProvider osBean;
 
 	@Mock
 	private MemoryUsage heapMemoryUsage;
@@ -52,15 +51,17 @@ public class MemoryInformationTest extends AbstractLogSupport {
 	public void initTestClass() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		memoryInfo = new MemoryInformation(idManager);
 
-		// we have to set the real memoryObj on the mocked one
-		Field field = memoryInfo.getClass().getDeclaredField("memoryObj");
+		// we have to replace the real osBean by the mocked one, so that we don't retrieve the
+		// info from the underlying JVM
+		Field field = memoryInfo.getClass().getDeclaredField("osBean");
 		field.setAccessible(true);
-		field.set(memoryInfo, memoryObj);
+		field.set(memoryInfo, osBean);
 
-		// we have to set the real osObj on the mocked one
-		field = memoryInfo.getClass().getDeclaredField("osObj");
+		// we have to replace the real memoryBean by the mocked one, so that we don't retrieve the
+		// info from the underlying JVM
+		field = memoryInfo.getClass().getDeclaredField("memoryBean");
 		field.setAccessible(true);
-		field.set(memoryInfo, osObj);
+		field.set(memoryInfo, memoryBean);
 	}
 
 	@Test
@@ -75,18 +76,18 @@ public class MemoryInformationTest extends AbstractLogSupport {
 		long sensorTypeIdent = 13L;
 		long platformIdent = 11L;
 
-		when(memoryObj.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
-		when(memoryObj.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
+		when(memoryBean.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
+		when(memoryBean.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
 		when(idManager.getPlatformId()).thenReturn(platformIdent);
 		when(idManager.getRegisteredSensorTypeId(sensorTypeIdent)).thenReturn(sensorTypeIdent);
 
-		when(osObj.getFreePhysicalMemorySize()).thenReturn(freePhysicalMemory);
-		when(osObj.getFreeSwapSpaceSize()).thenReturn(freeSwapSpace);
-		when(osObj.getCommittedVirtualMemorySize()).thenReturn(committedVirtualMemorySize);
-		when(memoryObj.getHeapMemoryUsage().getCommitted()).thenReturn(committedHeapMemorySize);
-		when(memoryObj.getHeapMemoryUsage().getUsed()).thenReturn(usedHeapMemorySize);
-		when(memoryObj.getNonHeapMemoryUsage().getCommitted()).thenReturn(committedNonHeapMemorySize);
-		when(memoryObj.getNonHeapMemoryUsage().getUsed()).thenReturn(usedNonHeapMemorySize);
+		when(osBean.getFreePhysicalMemorySize()).thenReturn(freePhysicalMemory);
+		when(osBean.getFreeSwapSpaceSize()).thenReturn(freeSwapSpace);
+		when(osBean.getCommittedVirtualMemorySize()).thenReturn(committedVirtualMemorySize);
+		when(memoryBean.getHeapMemoryUsage().getCommitted()).thenReturn(committedHeapMemorySize);
+		when(memoryBean.getHeapMemoryUsage().getUsed()).thenReturn(usedHeapMemorySize);
+		when(memoryBean.getNonHeapMemoryUsage().getCommitted()).thenReturn(committedNonHeapMemorySize);
+		when(memoryBean.getNonHeapMemoryUsage().getUsed()).thenReturn(usedNonHeapMemorySize);
 
 		// there is no current data object available
 		when(coreService.getPlatformSensorData(sensorTypeIdent)).thenReturn(null);
@@ -155,21 +156,21 @@ public class MemoryInformationTest extends AbstractLogSupport {
 		long sensorTypeIdent = 13L;
 		long platformIdent = 11L;
 
-		when(memoryObj.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
-		when(memoryObj.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
+		when(memoryBean.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
+		when(memoryBean.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
 		when(idManager.getPlatformId()).thenReturn(platformIdent);
 		when(idManager.getRegisteredSensorTypeId(sensorTypeIdent)).thenReturn(sensorTypeIdent);
 
 		// ------------------------
 		// FIRST UPDATE CALL
 		// ------------------------
-		when(osObj.getFreePhysicalMemorySize()).thenReturn(freePhysicalMemory);
-		when(osObj.getFreeSwapSpaceSize()).thenReturn(freeSwapSpace);
-		when(osObj.getCommittedVirtualMemorySize()).thenReturn(committedVirtualMemorySize);
-		when(memoryObj.getHeapMemoryUsage().getCommitted()).thenReturn(committedHeapMemorySize);
-		when(memoryObj.getHeapMemoryUsage().getUsed()).thenReturn(usedHeapMemorySize);
-		when(memoryObj.getNonHeapMemoryUsage().getCommitted()).thenReturn(committedNonHeapMemorySize);
-		when(memoryObj.getNonHeapMemoryUsage().getUsed()).thenReturn(usedNonHeapMemorySize);
+		when(osBean.getFreePhysicalMemorySize()).thenReturn(freePhysicalMemory);
+		when(osBean.getFreeSwapSpaceSize()).thenReturn(freeSwapSpace);
+		when(osBean.getCommittedVirtualMemorySize()).thenReturn(committedVirtualMemorySize);
+		when(memoryBean.getHeapMemoryUsage().getCommitted()).thenReturn(committedHeapMemorySize);
+		when(memoryBean.getHeapMemoryUsage().getUsed()).thenReturn(usedHeapMemorySize);
+		when(memoryBean.getNonHeapMemoryUsage().getCommitted()).thenReturn(committedNonHeapMemorySize);
+		when(memoryBean.getNonHeapMemoryUsage().getUsed()).thenReturn(usedNonHeapMemorySize);
 
 		// there is no current data object available
 		when(coreService.getPlatformSensorData(sensorTypeIdent)).thenReturn(null);
@@ -221,13 +222,13 @@ public class MemoryInformationTest extends AbstractLogSupport {
 		// ------------------------
 		// SECOND UPDATE CALL
 		// ------------------------
-		when(osObj.getFreePhysicalMemorySize()).thenReturn(freePhysicalMemory2);
-		when(osObj.getFreeSwapSpaceSize()).thenReturn(freeSwapSpace2);
-		when(osObj.getCommittedVirtualMemorySize()).thenReturn(committedVirtualMemorySize2);
-		when(memoryObj.getHeapMemoryUsage().getCommitted()).thenReturn(committedHeapMemorySize2);
-		when(memoryObj.getHeapMemoryUsage().getUsed()).thenReturn(usedHeapMemorySize2);
-		when(memoryObj.getNonHeapMemoryUsage().getCommitted()).thenReturn(committedNonHeapMemorySize2);
-		when(memoryObj.getNonHeapMemoryUsage().getUsed()).thenReturn(usedNonHeapMemorySize2);
+		when(osBean.getFreePhysicalMemorySize()).thenReturn(freePhysicalMemory2);
+		when(osBean.getFreeSwapSpaceSize()).thenReturn(freeSwapSpace2);
+		when(osBean.getCommittedVirtualMemorySize()).thenReturn(committedVirtualMemorySize2);
+		when(memoryBean.getHeapMemoryUsage().getCommitted()).thenReturn(committedHeapMemorySize2);
+		when(memoryBean.getHeapMemoryUsage().getUsed()).thenReturn(usedHeapMemorySize2);
+		when(memoryBean.getNonHeapMemoryUsage().getCommitted()).thenReturn(committedNonHeapMemorySize2);
+		when(memoryBean.getNonHeapMemoryUsage().getUsed()).thenReturn(usedNonHeapMemorySize2);
 
 		// there is no current data object available
 		when(coreService.getPlatformSensorData(sensorTypeIdent)).thenReturn(memoryData);
@@ -275,7 +276,7 @@ public class MemoryInformationTest extends AbstractLogSupport {
 		assertEquals(memoryData.getMaxUsedNonHeapMemorySize(), usedNonHeapMemorySize2);
 		assertEquals(memoryData.getTotalUsedNonHeapMemorySize(), usedNonHeapMemorySize + usedNonHeapMemorySize2);
 	}
-	
+
 	@Test
 	public void idNotAvailableTest() throws IdNotAvailableException {
 		long freePhysicalMemory = 37566L;
@@ -287,16 +288,16 @@ public class MemoryInformationTest extends AbstractLogSupport {
 		long committedNonHeapMemorySize = 14016L;
 		long sensorTypeIdent = 13L;
 
-		when(memoryObj.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
-		when(memoryObj.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
-		
-		when(osObj.getFreePhysicalMemorySize()).thenReturn(freePhysicalMemory);
-		when(osObj.getFreeSwapSpaceSize()).thenReturn(freeSwapSpace);
-		when(osObj.getCommittedVirtualMemorySize()).thenReturn(committedVirtualMemorySize);
-		when(memoryObj.getHeapMemoryUsage().getCommitted()).thenReturn(committedHeapMemorySize);
-		when(memoryObj.getHeapMemoryUsage().getUsed()).thenReturn(usedHeapMemorySize);
-		when(memoryObj.getNonHeapMemoryUsage().getCommitted()).thenReturn(committedNonHeapMemorySize);
-		when(memoryObj.getNonHeapMemoryUsage().getUsed()).thenReturn(usedNonHeapMemorySize);
+		when(memoryBean.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
+		when(memoryBean.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
+
+		when(osBean.getFreePhysicalMemorySize()).thenReturn(freePhysicalMemory);
+		when(osBean.getFreeSwapSpaceSize()).thenReturn(freeSwapSpace);
+		when(osBean.getCommittedVirtualMemorySize()).thenReturn(committedVirtualMemorySize);
+		when(memoryBean.getHeapMemoryUsage().getCommitted()).thenReturn(committedHeapMemorySize);
+		when(memoryBean.getHeapMemoryUsage().getUsed()).thenReturn(usedHeapMemorySize);
+		when(memoryBean.getNonHeapMemoryUsage().getCommitted()).thenReturn(committedNonHeapMemorySize);
+		when(memoryBean.getNonHeapMemoryUsage().getUsed()).thenReturn(usedNonHeapMemorySize);
 
 		when(idManager.getPlatformId()).thenThrow(new IdNotAvailableException("expected"));
 		when(idManager.getRegisteredSensorTypeId(sensorTypeIdent)).thenThrow(new IdNotAvailableException("expected"));

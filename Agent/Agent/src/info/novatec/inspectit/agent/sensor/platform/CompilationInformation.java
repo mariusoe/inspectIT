@@ -3,10 +3,10 @@ package info.novatec.inspectit.agent.sensor.platform;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
+import info.novatec.inspectit.agent.sensor.platform.provider.RuntimeInfoProvider;
+import info.novatec.inspectit.agent.sensor.platform.provider.factory.PlatformSensorInfoProviderFactory;
 import info.novatec.inspectit.communication.data.CompilationInformationData;
 
-import java.lang.management.CompilationMXBean;
-import java.lang.management.ManagementFactory;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 import java.util.Map;
@@ -32,9 +32,9 @@ public class CompilationInformation implements IPlatformSensor {
 	private final IIdManager idManager;
 
 	/**
-	 * The MXBean used to retrieve information from the compilation system.
+	 * The {@link RuntimeInfoProvider} used to retrieve information from the compilation system.
 	 */
-	private CompilationMXBean compilationObj = ManagementFactory.getCompilationMXBean();
+	private RuntimeInfoProvider runtimeBean = PlatformSensorInfoProviderFactory.getPlatformSensorInfoProvider().getRuntimeInfoProvider();
 
 	/**
 	 * The default constructor which needs one parameter.
@@ -52,11 +52,7 @@ public class CompilationInformation implements IPlatformSensor {
 	 * @return The compilation time in milliseconds.
 	 */
 	public long getTotalCompilationTime() {
-		try {
-			return compilationObj.getTotalCompilationTime();
-		} catch (UnsupportedOperationException ex) {
-			return 0;
-		}
+		return runtimeBean.getTotalCompilationTime();
 	}
 
 	/**

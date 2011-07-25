@@ -3,10 +3,10 @@ package info.novatec.inspectit.agent.sensor.platform;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
+import info.novatec.inspectit.agent.sensor.platform.provider.RuntimeInfoProvider;
+import info.novatec.inspectit.agent.sensor.platform.provider.factory.PlatformSensorInfoProviderFactory;
 import info.novatec.inspectit.communication.data.RuntimeInformationData;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 import java.util.Map;
@@ -32,10 +32,9 @@ public class RuntimeInformation implements IPlatformSensor {
 	private final IIdManager idManager;
 
 	/**
-	 * The MXBean used to retrieve information from the runtime system of the underlying Virtual
-	 * Machine.
+	 * The {@link RuntimeInfoProvider} used to retrieve information from the runtime.
 	 */
-	private RuntimeMXBean runtimeObj = ManagementFactory.getRuntimeMXBean();
+	private RuntimeInfoProvider runtimeBean = PlatformSensorInfoProviderFactory.getPlatformSensorInfoProvider().getRuntimeInfoProvider();
 
 	/**
 	 * The default constructor which needs one parameter.
@@ -53,7 +52,7 @@ public class RuntimeInformation implements IPlatformSensor {
 	 * @return the uptime in milliseconds.
 	 */
 	public long getUptime() {
-		return runtimeObj.getUptime();
+		return runtimeBean.getUptime();
 	}
 
 	/**

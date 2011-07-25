@@ -3,10 +3,10 @@ package info.novatec.inspectit.agent.sensor.platform;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
+import info.novatec.inspectit.agent.sensor.platform.provider.ThreadInfoProvider;
+import info.novatec.inspectit.agent.sensor.platform.provider.factory.PlatformSensorInfoProviderFactory;
 import info.novatec.inspectit.communication.data.ThreadInformationData;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 import java.util.Map;
@@ -32,9 +32,9 @@ public class ThreadInformation implements IPlatformSensor {
 	private final IIdManager idManager;
 
 	/**
-	 * The MXBean used to retrieve information from the thread system.
+	 * The {@link ThreadInfoProvider} used to retrieve information from the thread system.
 	 */
-	private ThreadMXBean threadObj = ManagementFactory.getThreadMXBean();
+	private ThreadInfoProvider threadBean = PlatformSensorInfoProviderFactory.getPlatformSensorInfoProvider().getThreadInfoProvider();
 
 	/**
 	 * The default constructor which needs one parameter.
@@ -52,7 +52,7 @@ public class ThreadInformation implements IPlatformSensor {
 	 * @return The daemon thread count.
 	 */
 	public int getDaemonThreadCount() {
-		return threadObj.getDaemonThreadCount();
+		return threadBean.getDaemonThreadCount();
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class ThreadInformation implements IPlatformSensor {
 	 * @return The peak thread count.
 	 */
 	public int getPeakThreadCount() {
-		return threadObj.getPeakThreadCount();
+		return threadBean.getPeakThreadCount();
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class ThreadInformation implements IPlatformSensor {
 	 * @return The thread count.
 	 */
 	public int getThreadCount() {
-		return threadObj.getThreadCount();
+		return threadBean.getThreadCount();
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class ThreadInformation implements IPlatformSensor {
 	 * @return The total started thread count.
 	 */
 	public long getTotalStartedThreadCount() {
-		return threadObj.getTotalStartedThreadCount();
+		return threadBean.getTotalStartedThreadCount();
 	}
 
 	/**

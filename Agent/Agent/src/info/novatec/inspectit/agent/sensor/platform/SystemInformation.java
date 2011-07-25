@@ -3,20 +3,18 @@ package info.novatec.inspectit.agent.sensor.platform;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
+import info.novatec.inspectit.agent.sensor.platform.provider.MemoryInfoProvider;
+import info.novatec.inspectit.agent.sensor.platform.provider.OperatingSystemInfoProvider;
+import info.novatec.inspectit.agent.sensor.platform.provider.RuntimeInfoProvider;
+import info.novatec.inspectit.agent.sensor.platform.provider.factory.PlatformSensorInfoProviderFactory;
 import info.novatec.inspectit.communication.data.SystemInformationData;
 
-import java.lang.management.CompilationMXBean;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.RuntimeMXBean;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.sun.management.OperatingSystemMXBean;
 
 /**
  * This class provides static information about heap memory/operating system/runtime through
@@ -49,25 +47,20 @@ public class SystemInformation implements IPlatformSensor {
 	private boolean updateRequested = true;
 
 	/**
-	 * The MXBean used to retrieve information from the operating system.
+	 * The {@link OperatingSystemInfoProvider} used to retrieve information from the operating
+	 * system.
 	 */
-	private OperatingSystemMXBean osObj = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+	private OperatingSystemInfoProvider osBean = PlatformSensorInfoProviderFactory.getPlatformSensorInfoProvider().getOperatingSystemInfoProvider();
 
 	/**
-	 * The MXBean used to retrieve heap memory information.
+	 * The {@link MemoryInfoProvider} used to retrieve heap memory information.
 	 */
-	private MemoryMXBean memoryObj = ManagementFactory.getMemoryMXBean();
+	private MemoryInfoProvider memoryBean = PlatformSensorInfoProviderFactory.getPlatformSensorInfoProvider().getMemoryInfoProvider();
 
 	/**
-	 * The MXBean used to retrieve information from the runtime system of the underlying Virtual
-	 * Machine.
+	 * The {@link RuntimeInfoProvider} used to retrieve information from the runtime VM.
 	 */
-	private RuntimeMXBean runtimeObj = ManagementFactory.getRuntimeMXBean();
-
-	/**
-	 * The MXBean used to retrieve information from the compilation system.
-	 */
-	private CompilationMXBean compilationObj = ManagementFactory.getCompilationMXBean();
+	private RuntimeInfoProvider runtimeBean = PlatformSensorInfoProviderFactory.getPlatformSensorInfoProvider().getRuntimeInfoProvider();
 
 	/**
 	 * The default constructor which needs one parameter.
@@ -85,7 +78,7 @@ public class SystemInformation implements IPlatformSensor {
 	 * @return The total amount of physical memory.
 	 */
 	public long getTotalPhysMemory() {
-		return osObj.getTotalPhysicalMemorySize();
+		return osBean.getTotalPhysicalMemorySize();
 	}
 
 	/**
@@ -94,7 +87,7 @@ public class SystemInformation implements IPlatformSensor {
 	 * @return The total amount of swap space.
 	 */
 	public long getTotalSwapSpace() {
-		return osObj.getTotalSwapSpaceSize();
+		return osBean.getTotalSwapSpaceSize();
 	}
 
 	/**
@@ -103,7 +96,7 @@ public class SystemInformation implements IPlatformSensor {
 	 * @return The number of processors available to the virtual machine.
 	 */
 	public int getAvailableProcessors() {
-		return osObj.getAvailableProcessors();
+		return osBean.getAvailableProcessors();
 	}
 
 	/**
@@ -112,11 +105,7 @@ public class SystemInformation implements IPlatformSensor {
 	 * @return The operating system architecture.
 	 */
 	public String getArchitecture() {
-		try {
-			return osObj.getArch();
-		} catch (SecurityException ex) {
-			return "";
-		}
+		return osBean.getArch();
 	}
 
 	/**
@@ -125,11 +114,7 @@ public class SystemInformation implements IPlatformSensor {
 	 * @return The name of the operating system.
 	 */
 	public String getOsName() {
-		try {
-			return osObj.getName();
-		} catch (SecurityException ex) {
-			return "";
-		}
+		return osBean.getName();
 	}
 
 	/**
@@ -138,11 +123,7 @@ public class SystemInformation implements IPlatformSensor {
 	 * @return The version of the operating system.
 	 */
 	public String getOsVersion() {
-		try {
-			return osObj.getVersion();
-		} catch (SecurityException ex) {
-			return "";
-		}
+		return osBean.getVersion();
 	}
 
 	/**
@@ -151,7 +132,7 @@ public class SystemInformation implements IPlatformSensor {
 	 * @return The name of the Just-in-time (JIT) compiler.
 	 */
 	public String getJitCompilerName() {
-		return compilationObj.getName();
+		return runtimeBean.getJitCompilerName();
 	}
 
 	/**
@@ -162,11 +143,7 @@ public class SystemInformation implements IPlatformSensor {
 	 *         files.
 	 */
 	public String getClassPath() {
-		try {
-			return runtimeObj.getClassPath();
-		} catch (SecurityException ex) {
-			return "";
-		}
+		return runtimeBean.getClassPath();
 	}
 
 	/**
@@ -177,13 +154,7 @@ public class SystemInformation implements IPlatformSensor {
 	 *         files.
 	 */
 	public String getBootClassPath() {
-		try {
-			return runtimeObj.getBootClassPath();
-		} catch (UnsupportedOperationException ex) {
-			return "";
-		} catch (SecurityException ex) {
-			return "";
-		}
+		return runtimeBean.getBootClassPath();
 	}
 
 	/**
@@ -192,11 +163,7 @@ public class SystemInformation implements IPlatformSensor {
 	 * @return The java library path.
 	 */
 	public String getLibraryPath() {
-		try {
-			return runtimeObj.getLibraryPath();
-		} catch (SecurityException ex) {
-			return "";
-		}
+		return runtimeBean.getLibraryPath();
 	}
 
 	/**
@@ -205,11 +172,7 @@ public class SystemInformation implements IPlatformSensor {
 	 * @return The vendor of the virtual machine.
 	 */
 	public String getVmVendor() {
-		try {
-			return runtimeObj.getVmVendor();
-		} catch (SecurityException ex) {
-			return "";
-		}
+		return runtimeBean.getVmVendor();
 	}
 
 	/**
@@ -218,7 +181,7 @@ public class SystemInformation implements IPlatformSensor {
 	 * @return The name of the virtual machine.
 	 */
 	public String getVmName() {
-		return runtimeObj.getName();
+		return runtimeBean.getVmName();
 	}
 
 	/**
@@ -227,11 +190,7 @@ public class SystemInformation implements IPlatformSensor {
 	 * @return The version of the virtual machine.
 	 */
 	public String getVmVersion() {
-		try {
-			return runtimeObj.getVmVersion();
-		} catch (SecurityException ex) {
-			return "";
-		}
+		return runtimeBean.getVmVersion();
 	}
 
 	/**
@@ -240,11 +199,7 @@ public class SystemInformation implements IPlatformSensor {
 	 * @return The name representing the running virtual machine.
 	 */
 	public String getVmSpecName() {
-		try {
-			return runtimeObj.getSpecName();
-		} catch (SecurityException ex) {
-			return "";
-		}
+		return runtimeBean.getSpecName();
 	}
 
 	/**
@@ -255,7 +210,7 @@ public class SystemInformation implements IPlatformSensor {
 	 *         system for heap memory management during startup.
 	 */
 	public long getInitHeapMemorySize() {
-		return memoryObj.getHeapMemoryUsage().getInit();
+		return memoryBean.getHeapMemoryUsage().getInit();
 	}
 
 	/**
@@ -264,7 +219,7 @@ public class SystemInformation implements IPlatformSensor {
 	 * @return The maximum amount of memory that can be used for heap memory management.
 	 */
 	public long getMaxHeapMemorySize() {
-		return memoryObj.getHeapMemoryUsage().getMax();
+		return memoryBean.getHeapMemoryUsage().getMax();
 	}
 
 	/**
@@ -275,7 +230,7 @@ public class SystemInformation implements IPlatformSensor {
 	 *         system for non-heap memory management during startup.
 	 */
 	public long getInitNonHeapMemorySize() {
-		return memoryObj.getNonHeapMemoryUsage().getInit();
+		return memoryBean.getNonHeapMemoryUsage().getInit();
 	}
 
 	/**
@@ -284,7 +239,7 @@ public class SystemInformation implements IPlatformSensor {
 	 * @return The maximum amount of memory that can be used for non-heap memory management.
 	 */
 	public long getMaxNonHeapMemorySize() {
-		return memoryObj.getNonHeapMemoryUsage().getMax();
+		return memoryBean.getNonHeapMemoryUsage().getMax();
 	}
 
 	/**

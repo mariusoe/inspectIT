@@ -10,11 +10,12 @@ import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.sensor.platform.CpuInformation;
+import info.novatec.inspectit.agent.sensor.platform.provider.OperatingSystemInfoProvider;
+import info.novatec.inspectit.agent.sensor.platform.provider.RuntimeInfoProvider;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.SystemSensorData;
 import info.novatec.inspectit.communication.data.CpuInformationData;
 
-import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 
@@ -23,17 +24,15 @@ import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.sun.management.OperatingSystemMXBean;
-
 public class CpuInformationTest extends AbstractLogSupport {
 
 	private CpuInformation cpuInfo;
 
 	@Mock
-	private OperatingSystemMXBean osObj;
+	private OperatingSystemInfoProvider osBean;
 
 	@Mock
-	private RuntimeMXBean runtimeObj;
+	private RuntimeInfoProvider runtimeBean;
 
 	@Mock
 	private IIdManager idManager;
@@ -45,28 +44,24 @@ public class CpuInformationTest extends AbstractLogSupport {
 	public void initTestClass() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		cpuInfo = new CpuInformation(idManager);
 
-		// we have to set the real memoryObj on the mocked one
-		Field field = cpuInfo.getClass().getDeclaredField("runtimeObj");
+		// we have to replace the real osBean by the mocked one, so that we
+		// don't retrieve the info from the underlying JVM
+		Field field = cpuInfo.getClass().getDeclaredField("osBean");
 		field.setAccessible(true);
-		field.set(cpuInfo, runtimeObj);
-
-		// we have to set the real osObj on the mocked one
-		field = cpuInfo.getClass().getDeclaredField("osObj");
-		field.setAccessible(true);
-		field.set(cpuInfo, osObj);
+		field.set(cpuInfo, osBean);
 	}
 
 	@Test
 	public void oneDataSet() throws IdNotAvailableException {
 		int availableProc = 1;
 		long processCpuTime = 2L;
-		long uptime = 5L;
 		long sensorType = 13L;
 		long platformIdent = 11L;
+		float cpuUsage = 0.0f;
 
-		when(runtimeObj.getUptime()).thenReturn(uptime);
-		when(osObj.getAvailableProcessors()).thenReturn(availableProc);
-		when(osObj.getProcessCpuTime()).thenReturn(processCpuTime);
+		when(osBean.getAvailableProcessors()).thenReturn(availableProc);
+		when(osBean.getProcessCpuTime()).thenReturn(processCpuTime);
+		when(osBean.retrieveCpuUsage()).thenReturn(cpuUsage);
 
 		when(idManager.getPlatformId()).thenReturn(platformIdent);
 		when(idManager.getRegisteredSensorTypeId(sensorType)).thenReturn(sensorType);
@@ -111,14 +106,17 @@ public class CpuInformationTest extends AbstractLogSupport {
 		long uptime2 = 1100L; // 1100ms
 		long sensorType = 13L;
 		long platformIdent = 11L;
+		float cpuUsage1 = 0.0f;
+		float cpuUsage2 = 50.0f;
 
 		// We use an argument capturer to further inspect the given argument.
 		ArgumentCaptor<SystemSensorData> sensorDataCaptor = ArgumentCaptor.forClass(SystemSensorData.class);
 		SystemSensorData parameter = null;
 
-		when(runtimeObj.getUptime()).thenReturn(uptime1).thenReturn(uptime2);
-		when(osObj.getAvailableProcessors()).thenReturn(availableProc);
-		when(osObj.getProcessCpuTime()).thenReturn(processCpuTime1).thenReturn(processCpuTime2);
+		when(runtimeBean.getUptime()).thenReturn(uptime1).thenReturn(uptime2);
+		when(osBean.getAvailableProcessors()).thenReturn(availableProc);
+		when(osBean.getProcessCpuTime()).thenReturn(processCpuTime1).thenReturn(processCpuTime2);
+		when(osBean.retrieveCpuUsage()).thenReturn(cpuUsage1).thenReturn(cpuUsage2);
 
 		when(idManager.getPlatformId()).thenReturn(platformIdent);
 		when(idManager.getRegisteredSensorTypeId(sensorType)).thenReturn(sensorType);
@@ -145,9 +143,9 @@ public class CpuInformationTest extends AbstractLogSupport {
 		assertEquals(data.getCount(), 1);
 
 		// CPU usage can only be deduced after two sets of data are captured
-		assertEquals(data.getMaxCpuUsage(), 0f, 0.01f);
-		assertEquals(data.getMinCpuUsage(), 0f, 0.01f);
-		assertEquals(data.getTotalCpuUsage(), 0f, 0.01f);
+		assertEquals(data.getMaxCpuUsage(), 0.0f, 0.01f);
+		assertEquals(data.getMinCpuUsage(), 0.0f, 0.01f);
+		assertEquals(data.getTotalCpuUsage(), 0.0f, 0.01f);
 
 		assertEquals(data.getProcessCpuTime(), processCpuTime1);
 
@@ -168,14 +166,11 @@ public class CpuInformationTest extends AbstractLogSupport {
 		assertEquals(data.getCount(), 2);
 
 		// CPU usage can only be deduced after two sets of data are captured
-		long process = (processCpuTime2 - processCpuTime1);
-		long upAsNano = ((uptime2 - uptime1) * 1000 * 1000);
-		float expectedUsage = (float) process / upAsNano * 100;
-		assertEquals(data.getMaxCpuUsage(), expectedUsage, 0.01f);
+		assertEquals(data.getMaxCpuUsage(), cpuUsage2, 0.01f);
 
 		// the first data set was 0
 		assertEquals(data.getMinCpuUsage(), 0, 0.01f);
-		assertEquals(data.getTotalCpuUsage(), expectedUsage, 0.01f);
+		assertEquals(data.getTotalCpuUsage(), cpuUsage2, 0.01f);
 
 		assertEquals(data.getProcessCpuTime(), processCpuTime2);
 	}
@@ -187,9 +182,9 @@ public class CpuInformationTest extends AbstractLogSupport {
 		long uptime = 5L;
 		long sensorType = 13L;
 
-		when(runtimeObj.getUptime()).thenReturn(uptime);
-		when(osObj.getAvailableProcessors()).thenReturn(availableProc);
-		when(osObj.getProcessCpuTime()).thenReturn(processCpuTime);
+		when(runtimeBean.getUptime()).thenReturn(uptime);
+		when(osBean.getAvailableProcessors()).thenReturn(availableProc);
+		when(osBean.getProcessCpuTime()).thenReturn(processCpuTime);
 
 		when(idManager.getPlatformId()).thenThrow(new IdNotAvailableException("expected"));
 		when(idManager.getRegisteredSensorTypeId(sensorType)).thenThrow(new IdNotAvailableException("expected"));

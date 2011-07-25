@@ -222,4 +222,9 @@
 			<class name="info.novatec.inspectit.agent.util.test.StringConstraintTest" />
 		</classes>
 	</test>
+	<test name="CPU Usage calculator test">
+		<classes>
+			<class name="info.novatec.inspectit.agent.sensor.platform.test.CpuUsageCalculatorTest" />
+		</classes>
+	</test>
 </suite>

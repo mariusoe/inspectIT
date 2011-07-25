@@ -3,10 +3,10 @@ package info.novatec.inspectit.agent.sensor.platform;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
+import info.novatec.inspectit.agent.sensor.platform.provider.RuntimeInfoProvider;
+import info.novatec.inspectit.agent.sensor.platform.provider.factory.PlatformSensorInfoProviderFactory;
 import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
 
-import java.lang.management.ClassLoadingMXBean;
-import java.lang.management.ManagementFactory;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 import java.util.Map;
@@ -32,9 +32,9 @@ public class ClassLoadingInformation implements IPlatformSensor {
 	private final IIdManager idManager;
 
 	/**
-	 * The MXBean used to retrieve information from the class loading system.
+	 * The {@link RuntimeInfoProvider} used to retrieve information from the class loading system.
 	 */
-	private ClassLoadingMXBean classLoadingObj = ManagementFactory.getClassLoadingMXBean();
+	private RuntimeInfoProvider runtimeBean = PlatformSensorInfoProviderFactory.getPlatformSensorInfoProvider().getRuntimeInfoProvider();
 
 	/**
 	 * The default constructor which needs one parameter.
@@ -52,7 +52,7 @@ public class ClassLoadingInformation implements IPlatformSensor {
 	 * @return The number of loaded classes.
 	 */
 	public int getLoadedClassCount() {
-		return classLoadingObj.getLoadedClassCount();
+		return runtimeBean.getLoadedClassCount();
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class ClassLoadingInformation implements IPlatformSensor {
 	 * @return The total number of loaded classes.
 	 */
 	public long getTotalLoadedClassCount() {
-		return classLoadingObj.getTotalLoadedClassCount();
+		return runtimeBean.getTotalLoadedClassCount();
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class ClassLoadingInformation implements IPlatformSensor {
 	 * @return The number of unloaded classes.
 	 */
 	public long getUnloadedClassCount() {
-		return classLoadingObj.getUnloadedClassCount();
+		return runtimeBean.getUnloadedClassCount();
 	}
 
 	/**

@@ -1,10 +1,8 @@
 package info.novatec.inspectit.cmr.cache.impl;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
-
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
-import java.util.List;
+import info.novatec.inspectit.util.UnderlyingSystemInfo;
+import info.novatec.inspectit.util.UnderlyingSystemInfo.JvmProvider;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.stereotype.Component;
@@ -27,27 +25,9 @@ public class ObjectSizesFactory implements FactoryBean<IObjectSizes> {
 	 */
 	@Override
 	public IObjectSizes getObject() throws Exception {
-		boolean isIbm = System.getProperty("java.vendor").indexOf("IBM") != -1;
-
-		boolean is64Bit = false;
-		if (!isIbm) {
-			is64Bit = System.getProperty("sun.arch.data.model").indexOf("64") != -1;
-		} else {
-			is64Bit = System.getProperty("java.fullversion").indexOf("x64") != -1;
-		}
-
-		boolean compresedOops = false;
-		if (is64Bit) {
-			RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-			List<String> arguments = runtimeMXBean.getInputArguments();
-			for (String argument : arguments) {
-				if (argument.indexOf("+UseCompressedOops") != -1 || argument.indexOf("compressedrefs") != -1) {
-					compresedOops = true;
-					break;
-				}
-			}
-		}
-
+		boolean isIbm = UnderlyingSystemInfo.JVM_PROVIDER == JvmProvider.IBM;
+		boolean is64Bit = UnderlyingSystemInfo.IS_64BIT;
+		boolean compresedOops = UnderlyingSystemInfo.IS_COMPRESSED_OOPS;
 		if (is64Bit && !compresedOops) {
 			if (isIbm) {
 				return new ObjectSizes64BitsIbm();

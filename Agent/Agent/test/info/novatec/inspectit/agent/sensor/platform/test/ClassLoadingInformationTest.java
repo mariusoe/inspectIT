@@ -10,11 +10,11 @@ import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.sensor.platform.ClassLoadingInformation;
+import info.novatec.inspectit.agent.sensor.platform.provider.RuntimeInfoProvider;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.SystemSensorData;
 import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
 
-import java.lang.management.ClassLoadingMXBean;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 
@@ -24,11 +24,11 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class ClassLoadingInformationTest extends AbstractLogSupport {
-	
+
 	private ClassLoadingInformation classLoadingInfo;
 
 	@Mock
-	ClassLoadingMXBean classLoadingObj;
+	RuntimeInfoProvider runtimeBean;
 
 	@Mock
 	private IIdManager idManager;
@@ -40,10 +40,11 @@ public class ClassLoadingInformationTest extends AbstractLogSupport {
 	public void initTestClass() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		classLoadingInfo = new ClassLoadingInformation(idManager);
 
-		// we have to set the real classLoadingObj on the mocked one
-		Field field = classLoadingInfo.getClass().getDeclaredField("classLoadingObj");
+		// we have to replace the real runtimeBean by the mocked one, so that we don't retrieve the
+		// info from the underlying JVM
+		Field field = classLoadingInfo.getClass().getDeclaredField("runtimeBean");
 		field.setAccessible(true);
-		field.set(classLoadingInfo, classLoadingObj);
+		field.set(classLoadingInfo, runtimeBean);
 	}
 
 	@Test
@@ -57,9 +58,9 @@ public class ClassLoadingInformationTest extends AbstractLogSupport {
 		when(idManager.getPlatformId()).thenReturn(platformIdent);
 		when(idManager.getRegisteredSensorTypeId(sensorTypeIdent)).thenReturn(sensorTypeIdent);
 
-		when(classLoadingObj.getLoadedClassCount()).thenReturn(loadedClassCount);
-		when(classLoadingObj.getTotalLoadedClassCount()).thenReturn(totalLoadedClassCount);
-		when(classLoadingObj.getUnloadedClassCount()).thenReturn(unloadedClassCount);
+		when(runtimeBean.getLoadedClassCount()).thenReturn(loadedClassCount);
+		when(runtimeBean.getTotalLoadedClassCount()).thenReturn(totalLoadedClassCount);
+		when(runtimeBean.getUnloadedClassCount()).thenReturn(unloadedClassCount);
 
 		// there is no current data object available
 		when(coreService.getPlatformSensorData(sensorTypeIdent)).thenReturn(null);
@@ -110,9 +111,9 @@ public class ClassLoadingInformationTest extends AbstractLogSupport {
 		// ------------------------
 		// FIRST UPDATE CALL
 		// ------------------------
-		when(classLoadingObj.getLoadedClassCount()).thenReturn(loadedClassCount);
-		when(classLoadingObj.getTotalLoadedClassCount()).thenReturn(totalLoadedClassCount);
-		when(classLoadingObj.getUnloadedClassCount()).thenReturn(unloadedClassCount);
+		when(runtimeBean.getLoadedClassCount()).thenReturn(loadedClassCount);
+		when(runtimeBean.getTotalLoadedClassCount()).thenReturn(totalLoadedClassCount);
+		when(runtimeBean.getUnloadedClassCount()).thenReturn(unloadedClassCount);
 
 		// there is no current data object available
 		when(coreService.getPlatformSensorData(sensorTypeIdent)).thenReturn(null);
@@ -148,8 +149,8 @@ public class ClassLoadingInformationTest extends AbstractLogSupport {
 		// ------------------------
 		// SECOND UPDATE CALL
 		// ------------------------
-		when(classLoadingObj.getLoadedClassCount()).thenReturn(loadedClassCount2);
-		when(classLoadingObj.getTotalLoadedClassCount()).thenReturn(totalLoadedClassCount2);
+		when(runtimeBean.getLoadedClassCount()).thenReturn(loadedClassCount2);
+		when(runtimeBean.getTotalLoadedClassCount()).thenReturn(totalLoadedClassCount2);
 
 		when(coreService.getPlatformSensorData(sensorTypeIdent)).thenReturn(classLoadingData);
 		classLoadingInfo.update(coreService, sensorTypeIdent);
@@ -186,9 +187,9 @@ public class ClassLoadingInformationTest extends AbstractLogSupport {
 		long unloadedClassCount = 2L;
 		long sensorTypeIdent = 13L;
 
-		when(classLoadingObj.getLoadedClassCount()).thenReturn(loadedClassCount);
-		when(classLoadingObj.getTotalLoadedClassCount()).thenReturn(totalLoadedClassCount);
-		when(classLoadingObj.getUnloadedClassCount()).thenReturn(unloadedClassCount);
+		when(runtimeBean.getLoadedClassCount()).thenReturn(loadedClassCount);
+		when(runtimeBean.getTotalLoadedClassCount()).thenReturn(totalLoadedClassCount);
+		when(runtimeBean.getUnloadedClassCount()).thenReturn(unloadedClassCount);
 
 		when(idManager.getPlatformId()).thenThrow(new IdNotAvailableException("expected"));
 		when(idManager.getRegisteredSensorTypeId(sensorTypeIdent)).thenThrow(new IdNotAvailableException("expected"));

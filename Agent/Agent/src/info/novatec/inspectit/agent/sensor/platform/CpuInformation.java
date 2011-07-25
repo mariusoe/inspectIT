@@ -3,17 +3,15 @@ package info.novatec.inspectit.agent.sensor.platform;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
+import info.novatec.inspectit.agent.sensor.platform.provider.OperatingSystemInfoProvider;
+import info.novatec.inspectit.agent.sensor.platform.provider.factory.PlatformSensorInfoProviderFactory;
 import info.novatec.inspectit.communication.data.CpuInformationData;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.sun.management.OperatingSystemMXBean;
 
 /**
  * This class provides dynamic information about the underlying operating system through MXBeans.
@@ -34,34 +32,10 @@ public class CpuInformation implements IPlatformSensor {
 	private final IIdManager idManager;
 
 	/**
-	 * Reference for cpu calculation stuff.
+	 * The {@link OperatingSystemInfoProvider} used to retrieve information from the operating
+	 * system.
 	 */
-	private CpuCalculation cpuCalc = new CpuCalculation();
-
-	/**
-	 * The previous uptime of the Virtual Machine.
-	 */
-	private long prevUptime = 0;
-
-	/**
-	 * The previous processCpuTime.
-	 */
-	private long prevProcessCpuTime = 0;
-
-	/**
-	 * The cpu usage.
-	 */
-	private float cpuUsage = 0;
-
-	/**
-	 * The MXBean used to retrieve information from the operating system.
-	 */
-	private OperatingSystemMXBean osObj = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-
-	/**
-	 * The MXBean for runtime information.
-	 */
-	private RuntimeMXBean runtimeObj = ManagementFactory.getRuntimeMXBean();
+	private OperatingSystemInfoProvider osBean = PlatformSensorInfoProviderFactory.getPlatformSensorInfoProvider().getOperatingSystemInfoProvider();
 
 	/**
 	 * The default constructor which needs one parameter.
@@ -79,16 +53,7 @@ public class CpuInformation implements IPlatformSensor {
 	 * @return the process cpu time.
 	 */
 	public long getProcessCpuTime() {
-		return osObj.getProcessCpuTime();
-	}
-
-	/**
-	 * Returns the cpu usage of the Virtual Machine.
-	 * 
-	 * @return the cpu usage.
-	 */
-	public float getCpuUsage() {
-		return cpuUsage;
+		return osBean.getProcessCpuTime();
 	}
 
 	/**
@@ -101,12 +66,8 @@ public class CpuInformation implements IPlatformSensor {
 	 *            The sensorTypeIdent.
 	 */
 	public void update(ICoreService coreService, long sensorTypeIdent) {
-		cpuCalc.uptime = runtimeObj.getUptime();
 		long processCpuTime = this.getProcessCpuTime();
-		cpuCalc.processCpuTime = processCpuTime;
-		cpuCalc.availableProcessors = osObj.getAvailableProcessors();
-		this.updateCpuInfo(cpuCalc);
-		float cpuUsage = this.getCpuUsage();
+		float cpuUsage = osBean.retrieveCpuUsage();
 
 		CpuInformationData osData = (CpuInformationData) coreService.getPlatformSensorData(sensorTypeIdent);
 
@@ -157,49 +118,4 @@ public class CpuInformation implements IPlatformSensor {
 	public boolean automaticUpdate() {
 		return true;
 	}
-
-	/**
-	 * Inner Class used to calculate the cpu usage of the underlying Virtual Machine.
-	 * 
-	 * @author Eduard Tudenhoefner
-	 */
-	private static class CpuCalculation {
-		/**
-		 * The uptime.
-		 */
-		private long uptime = -1L;
-
-		/**
-		 * The process cpu time.
-		 */
-		private long processCpuTime = -1L;
-
-		/**
-		 * The available processors.
-		 */
-		private int availableProcessors = 0;
-	}
-
-	/**
-	 * Calculates the current cpuUsage in percent.
-	 * 
-	 * elapsedCpu is in ns and elapsedTime is in ms. cpuUsage could go higher than 100% because
-	 * elapsedTime and elapsedCpu are not fetched simultaneously. Limit to 99% to avoid showing a
-	 * scale from 0% to 200%.
-	 * 
-	 * @param cpuCalc
-	 *            The object holding the needed information to calculate the cpu usage.
-	 */
-	private void updateCpuInfo(CpuCalculation cpuCalc) {
-		if (prevUptime > 0L && cpuCalc.uptime > prevUptime) {
-
-			long elapsedCpu = cpuCalc.processCpuTime - prevProcessCpuTime;
-			long elapsedTime = cpuCalc.uptime - prevUptime;
-
-			cpuUsage = Math.min(99F, elapsedCpu / (elapsedTime * 10000F * cpuCalc.availableProcessors));
-		}
-		this.prevUptime = cpuCalc.uptime;
-		this.prevProcessCpuTime = cpuCalc.processCpuTime;
-	}
-
 }

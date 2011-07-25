@@ -10,11 +10,11 @@ import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.sensor.platform.RuntimeInformation;
+import info.novatec.inspectit.agent.sensor.platform.provider.RuntimeInfoProvider;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.SystemSensorData;
 import info.novatec.inspectit.communication.data.RuntimeInformationData;
 
-import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 
@@ -24,11 +24,11 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class RuntimeInformationTest extends AbstractLogSupport {
-	
+
 	private RuntimeInformation runtimeInfo;
 
 	@Mock
-	private RuntimeMXBean runtimeObj;
+	private RuntimeInfoProvider runtimeBean;
 
 	@Mock
 	private IIdManager idManager;
@@ -40,10 +40,11 @@ public class RuntimeInformationTest extends AbstractLogSupport {
 	public void initTestClass() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		runtimeInfo = new RuntimeInformation(idManager);
 
-		// we have to set the real runtimeObj on the mocked one
-		Field field = runtimeInfo.getClass().getDeclaredField("runtimeObj");
+		// we have to replace the real runtimeBean by the mocked one, so that we don't retrieve the
+		// info from the underlying JVM
+		Field field = runtimeInfo.getClass().getDeclaredField("runtimeBean");
 		field.setAccessible(true);
-		field.set(runtimeInfo, runtimeObj);
+		field.set(runtimeInfo, runtimeBean);
 	}
 
 	@Test
@@ -52,7 +53,7 @@ public class RuntimeInformationTest extends AbstractLogSupport {
 		long sensorTypeIdent = 13L;
 		long platformIdent = 11L;
 
-		when(runtimeObj.getUptime()).thenReturn(uptime);
+		when(runtimeBean.getUptime()).thenReturn(uptime);
 
 		when(idManager.getPlatformId()).thenReturn(platformIdent);
 		when(idManager.getRegisteredSensorTypeId(sensorTypeIdent)).thenReturn(sensorTypeIdent);
@@ -94,7 +95,7 @@ public class RuntimeInformationTest extends AbstractLogSupport {
 		// ------------------------
 		// FIRST UPDATE CALL
 		// ------------------------
-		when(runtimeObj.getUptime()).thenReturn(uptime);
+		when(runtimeBean.getUptime()).thenReturn(uptime);
 
 		// there is no current data object available
 		when(coreService.getPlatformSensorData(sensorTypeIdent)).thenReturn(null);
@@ -122,7 +123,7 @@ public class RuntimeInformationTest extends AbstractLogSupport {
 		// ------------------------
 		// SECOND UPDATE CALL
 		// ------------------------
-		when(runtimeObj.getUptime()).thenReturn(uptime2);
+		when(runtimeBean.getUptime()).thenReturn(uptime2);
 		when(coreService.getPlatformSensorData(sensorTypeIdent)).thenReturn(runtimeData);
 
 		runtimeInfo.update(coreService, sensorTypeIdent);
@@ -146,7 +147,7 @@ public class RuntimeInformationTest extends AbstractLogSupport {
 		long uptime = 12345L;
 		long sensorTypeIdent = 13L;
 
-		when(runtimeObj.getUptime()).thenReturn(uptime);
+		when(runtimeBean.getUptime()).thenReturn(uptime);
 
 		when(idManager.getPlatformId()).thenThrow(new IdNotAvailableException("expected"));
 		when(idManager.getRegisteredSensorTypeId(sensorTypeIdent)).thenThrow(new IdNotAvailableException("expected"));

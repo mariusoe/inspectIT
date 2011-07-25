@@ -10,14 +10,14 @@ import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.sensor.platform.SystemInformation;
+import info.novatec.inspectit.agent.sensor.platform.provider.MemoryInfoProvider;
+import info.novatec.inspectit.agent.sensor.platform.provider.OperatingSystemInfoProvider;
+import info.novatec.inspectit.agent.sensor.platform.provider.RuntimeInfoProvider;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.SystemSensorData;
 import info.novatec.inspectit.communication.data.SystemInformationData;
 
-import java.lang.management.CompilationMXBean;
-import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
-import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 
@@ -26,23 +26,18 @@ import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.sun.management.OperatingSystemMXBean;
-
 public class SystemInformationTest extends AbstractLogSupport {
 
 	private SystemInformation systemInfo;
 
 	@Mock
-	private MemoryMXBean memoryObj;
+	private MemoryInfoProvider memoryBean;
 
 	@Mock
-	private OperatingSystemMXBean osObj;
+	private OperatingSystemInfoProvider osBean;
 
 	@Mock
-	private RuntimeMXBean runtimeObj;
-
-	@Mock
-	private CompilationMXBean compilationObj;
+	private RuntimeInfoProvider runtimeBean;
 
 	@Mock
 	private MemoryUsage heapMemoryUsage;
@@ -60,22 +55,23 @@ public class SystemInformationTest extends AbstractLogSupport {
 	public void initTestClass() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		systemInfo = new SystemInformation(idManager);
 
-		// we have to set the real objects on the mocked one
-		Field field = systemInfo.getClass().getDeclaredField("memoryObj");
+		// we have to replace the real osBean by the mocked one, so that we don't retrieve the
+		// info from the underlying JVM
+		Field field = systemInfo.getClass().getDeclaredField("osBean");
 		field.setAccessible(true);
-		field.set(systemInfo, memoryObj);
+		field.set(systemInfo, osBean);
 
-		field = systemInfo.getClass().getDeclaredField("osObj");
+		// we have to replace the real memoryBean by the mocked one, so that we don't retrieve the
+		// info from the underlying JVM
+		field = systemInfo.getClass().getDeclaredField("memoryBean");
 		field.setAccessible(true);
-		field.set(systemInfo, osObj);
+		field.set(systemInfo, memoryBean);
 
-		field = systemInfo.getClass().getDeclaredField("runtimeObj");
+		// we have to replace the real runtimeBean by the mocked one, so that we don't retrieve the
+		// info from the underlying JVM
+		field = systemInfo.getClass().getDeclaredField("runtimeBean");
 		field.setAccessible(true);
-		field.set(systemInfo, runtimeObj);
-
-		field = systemInfo.getClass().getDeclaredField("compilationObj");
-		field.setAccessible(true);
-		field.set(systemInfo, compilationObj);
+		field.set(systemInfo, runtimeBean);
 	}
 
 	@Test
@@ -103,27 +99,27 @@ public class SystemInformationTest extends AbstractLogSupport {
 
 		when(idManager.getPlatformId()).thenReturn(platformIdent);
 		when(idManager.getRegisteredSensorTypeId(sensorTypeIdent)).thenReturn(sensorTypeIdent);
-		when(memoryObj.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
-		when(memoryObj.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
+		when(memoryBean.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
+		when(memoryBean.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
 
-		when(osObj.getArch()).thenReturn(architecture);
-		when(osObj.getAvailableProcessors()).thenReturn(availableProcessors);
-		when(osObj.getTotalPhysicalMemorySize()).thenReturn(totalPhysMemory);
-		when(osObj.getTotalSwapSpaceSize()).thenReturn(totalSwapSpace);
-		when(osObj.getVersion()).thenReturn(osVersion);
-		when(osObj.getName()).thenReturn(osName);
-		when(compilationObj.getName()).thenReturn(jitCompilerName);
-		when(runtimeObj.getClassPath()).thenReturn(classPath);
-		when(runtimeObj.getBootClassPath()).thenReturn(bootClassPath);
-		when(runtimeObj.getLibraryPath()).thenReturn(libraryPath);
-		when(runtimeObj.getName()).thenReturn(vmName);
-		when(runtimeObj.getVmVendor()).thenReturn(vmVendor);
-		when(runtimeObj.getVmVersion()).thenReturn(vmVersion);
-		when(runtimeObj.getSpecName()).thenReturn(vmSpecName);
-		when(memoryObj.getHeapMemoryUsage().getInit()).thenReturn(initHeapMemorySize);
-		when(memoryObj.getHeapMemoryUsage().getMax()).thenReturn(maxHeapMemorySize);
-		when(memoryObj.getNonHeapMemoryUsage().getInit()).thenReturn(initNonHeapMemorySize);
-		when(memoryObj.getNonHeapMemoryUsage().getMax()).thenReturn(maxNonHeapMemorySize);
+		when(osBean.getArch()).thenReturn(architecture);
+		when(osBean.getAvailableProcessors()).thenReturn(availableProcessors);
+		when(osBean.getTotalPhysicalMemorySize()).thenReturn(totalPhysMemory);
+		when(osBean.getTotalSwapSpaceSize()).thenReturn(totalSwapSpace);
+		when(osBean.getVersion()).thenReturn(osVersion);
+		when(osBean.getName()).thenReturn(osName);
+		when(runtimeBean.getJitCompilerName()).thenReturn(jitCompilerName);
+		when(runtimeBean.getClassPath()).thenReturn(classPath);
+		when(runtimeBean.getBootClassPath()).thenReturn(bootClassPath);
+		when(runtimeBean.getLibraryPath()).thenReturn(libraryPath);
+		when(runtimeBean.getVmName()).thenReturn(vmName);
+		when(runtimeBean.getVmVendor()).thenReturn(vmVendor);
+		when(runtimeBean.getVmVersion()).thenReturn(vmVersion);
+		when(runtimeBean.getSpecName()).thenReturn(vmSpecName);
+		when(memoryBean.getHeapMemoryUsage().getInit()).thenReturn(initHeapMemorySize);
+		when(memoryBean.getHeapMemoryUsage().getMax()).thenReturn(maxHeapMemorySize);
+		when(memoryBean.getNonHeapMemoryUsage().getInit()).thenReturn(initNonHeapMemorySize);
+		when(memoryBean.getNonHeapMemoryUsage().getMax()).thenReturn(maxNonHeapMemorySize);
 
 		// there is no current data object available
 		when(coreService.getPlatformSensorData(sensorTypeIdent)).thenReturn(null);
@@ -165,9 +161,11 @@ public class SystemInformationTest extends AbstractLogSupport {
 	}
 
 	/**
-	 * This testcase combines different testcases that simulate the absense of
-	 * static information. Realizing each case separately would require many
-	 * code with almost no additional value.
+	 * This testcase combines different testcases that simulate the absense of static information.
+	 * Realizing each case separately would require many code with almost no additional value.
+	 * 
+	 * Maybe this test is obsolete because we don't expect an exception to be thrown directly in
+	 * {@link SystemInformation} but only in the getter methods of {@link DefaultRuntimeMXBean}
 	 * 
 	 * @throws IdNotAvailableException
 	 */
@@ -188,27 +186,27 @@ public class SystemInformationTest extends AbstractLogSupport {
 
 		when(idManager.getPlatformId()).thenReturn(platformIdent);
 		when(idManager.getRegisteredSensorTypeId(sensorTypeIdent)).thenReturn(sensorTypeIdent);
-		when(memoryObj.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
-		when(memoryObj.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
+		when(memoryBean.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
+		when(memoryBean.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
 
-		when(osObj.getArch()).thenThrow(new SecurityException("expected"));
-		when(osObj.getAvailableProcessors()).thenReturn(availableProcessors);
-		when(osObj.getTotalPhysicalMemorySize()).thenReturn(totalPhysMemory);
-		when(osObj.getTotalSwapSpaceSize()).thenReturn(totalSwapSpace);
-		when(osObj.getVersion()).thenThrow(new SecurityException("expected"));
-		when(osObj.getName()).thenThrow(new SecurityException("expected"));
-		when(compilationObj.getName()).thenReturn(jitCompilerName);
-		when(runtimeObj.getClassPath()).thenThrow(new SecurityException("expected"));
-		when(runtimeObj.getBootClassPath()).thenThrow(new SecurityException("expected"));
-		when(runtimeObj.getLibraryPath()).thenThrow(new SecurityException("expected"));
-		when(runtimeObj.getName()).thenReturn(vmName);
-		when(runtimeObj.getVmVendor()).thenThrow(new SecurityException("expected"));
-		when(runtimeObj.getVmVersion()).thenThrow(new SecurityException("expected"));
-		when(runtimeObj.getSpecName()).thenThrow(new SecurityException("expected"));
-		when(memoryObj.getHeapMemoryUsage().getInit()).thenReturn(initHeapMemorySize);
-		when(memoryObj.getHeapMemoryUsage().getMax()).thenReturn(maxHeapMemorySize);
-		when(memoryObj.getNonHeapMemoryUsage().getInit()).thenReturn(initNonHeapMemorySize);
-		when(memoryObj.getNonHeapMemoryUsage().getMax()).thenReturn(maxNonHeapMemorySize);
+		when(osBean.getArch()).thenReturn("");
+		when(osBean.getAvailableProcessors()).thenReturn(availableProcessors);
+		when(osBean.getTotalPhysicalMemorySize()).thenReturn(totalPhysMemory);
+		when(osBean.getTotalSwapSpaceSize()).thenReturn(totalSwapSpace);
+		when(osBean.getVersion()).thenReturn("");
+		when(osBean.getName()).thenReturn("");
+		when(runtimeBean.getJitCompilerName()).thenReturn(jitCompilerName);
+		when(runtimeBean.getClassPath()).thenReturn("");
+		when(runtimeBean.getBootClassPath()).thenReturn("");
+		when(runtimeBean.getLibraryPath()).thenReturn("");
+		when(runtimeBean.getVmName()).thenReturn(vmName);
+		when(runtimeBean.getVmVendor()).thenReturn("");
+		when(runtimeBean.getVmVersion()).thenReturn("");
+		when(runtimeBean.getSpecName()).thenReturn("");
+		when(memoryBean.getHeapMemoryUsage().getInit()).thenReturn(initHeapMemorySize);
+		when(memoryBean.getHeapMemoryUsage().getMax()).thenReturn(maxHeapMemorySize);
+		when(memoryBean.getNonHeapMemoryUsage().getInit()).thenReturn(initNonHeapMemorySize);
+		when(memoryBean.getNonHeapMemoryUsage().getMax()).thenReturn(maxNonHeapMemorySize);
 
 		// there is no current data object available
 		when(coreService.getPlatformSensorData(sensorTypeIdent)).thenReturn(null);
@@ -248,6 +246,13 @@ public class SystemInformationTest extends AbstractLogSupport {
 		assertEquals(systemData.getVmVersion(), empty);
 	}
 
+	/**
+	 * Maybe this test is obsolete because we don't expect an exception to be thrown directly in
+	 * {@link SystemInformation#getBootClassPath()} but only in
+	 * {@link DefaultRuntimeMXBean#getBootClassPath()}
+	 * 
+	 * @throws IdNotAvailableException
+	 */
 	@Test
 	public void bootClassPathNotSupported() throws IdNotAvailableException {
 		long totalPhysMemory = 775000L;
@@ -273,27 +278,27 @@ public class SystemInformationTest extends AbstractLogSupport {
 
 		when(idManager.getPlatformId()).thenReturn(platformIdent);
 		when(idManager.getRegisteredSensorTypeId(sensorTypeIdent)).thenReturn(sensorTypeIdent);
-		when(memoryObj.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
-		when(memoryObj.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
+		when(memoryBean.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
+		when(memoryBean.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
 
-		when(osObj.getArch()).thenReturn(architecture);
-		when(osObj.getAvailableProcessors()).thenReturn(availableProcessors);
-		when(osObj.getTotalPhysicalMemorySize()).thenReturn(totalPhysMemory);
-		when(osObj.getTotalSwapSpaceSize()).thenReturn(totalSwapSpace);
-		when(osObj.getVersion()).thenReturn(osVersion);
-		when(osObj.getName()).thenReturn(osName);
-		when(compilationObj.getName()).thenReturn(jitCompilerName);
-		when(runtimeObj.getClassPath()).thenReturn(classPath);
-		when(runtimeObj.getBootClassPath()).thenThrow(new UnsupportedOperationException("expected"));
-		when(runtimeObj.getLibraryPath()).thenReturn(libraryPath);
-		when(runtimeObj.getName()).thenReturn(vmName);
-		when(runtimeObj.getVmVendor()).thenReturn(vmVendor);
-		when(runtimeObj.getVmVersion()).thenReturn(vmVersion);
-		when(runtimeObj.getSpecName()).thenReturn(vmSpecName);
-		when(memoryObj.getHeapMemoryUsage().getInit()).thenReturn(initHeapMemorySize);
-		when(memoryObj.getHeapMemoryUsage().getMax()).thenReturn(maxHeapMemorySize);
-		when(memoryObj.getNonHeapMemoryUsage().getInit()).thenReturn(initNonHeapMemorySize);
-		when(memoryObj.getNonHeapMemoryUsage().getMax()).thenReturn(maxNonHeapMemorySize);
+		when(osBean.getArch()).thenReturn(architecture);
+		when(osBean.getAvailableProcessors()).thenReturn(availableProcessors);
+		when(osBean.getTotalPhysicalMemorySize()).thenReturn(totalPhysMemory);
+		when(osBean.getTotalSwapSpaceSize()).thenReturn(totalSwapSpace);
+		when(osBean.getVersion()).thenReturn(osVersion);
+		when(osBean.getName()).thenReturn(osName);
+		when(runtimeBean.getJitCompilerName()).thenReturn(jitCompilerName);
+		when(runtimeBean.getClassPath()).thenReturn(classPath);
+		when(runtimeBean.getBootClassPath()).thenReturn("");
+		when(runtimeBean.getLibraryPath()).thenReturn(libraryPath);
+		when(runtimeBean.getVmName()).thenReturn(vmName);
+		when(runtimeBean.getVmVendor()).thenReturn(vmVendor);
+		when(runtimeBean.getVmVersion()).thenReturn(vmVersion);
+		when(runtimeBean.getSpecName()).thenReturn(vmSpecName);
+		when(memoryBean.getHeapMemoryUsage().getInit()).thenReturn(initHeapMemorySize);
+		when(memoryBean.getHeapMemoryUsage().getMax()).thenReturn(maxHeapMemorySize);
+		when(memoryBean.getNonHeapMemoryUsage().getInit()).thenReturn(initNonHeapMemorySize);
+		when(memoryBean.getNonHeapMemoryUsage().getMax()).thenReturn(maxNonHeapMemorySize);
 
 		// there is no current data object available
 		when(coreService.getPlatformSensorData(sensorTypeIdent)).thenReturn(null);
@@ -358,27 +363,27 @@ public class SystemInformationTest extends AbstractLogSupport {
 
 		when(idManager.getPlatformId()).thenReturn(platformIdent);
 		when(idManager.getRegisteredSensorTypeId(sensorTypeIdent)).thenReturn(sensorTypeIdent);
-		when(memoryObj.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
-		when(memoryObj.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
+		when(memoryBean.getHeapMemoryUsage()).thenReturn(heapMemoryUsage);
+		when(memoryBean.getNonHeapMemoryUsage()).thenReturn(nonHeapMemoryUsage);
 
-		when(osObj.getArch()).thenReturn(architecture);
-		when(osObj.getAvailableProcessors()).thenReturn(availableProcessors);
-		when(osObj.getTotalPhysicalMemorySize()).thenReturn(totalPhysMemory);
-		when(osObj.getTotalSwapSpaceSize()).thenReturn(totalSwapSpace);
-		when(osObj.getVersion()).thenReturn(osVersion);
-		when(osObj.getName()).thenReturn(osName);
-		when(compilationObj.getName()).thenReturn(jitCompilerName);
-		when(runtimeObj.getClassPath()).thenReturn(tooLong);
-		when(runtimeObj.getBootClassPath()).thenReturn(tooLong);
-		when(runtimeObj.getLibraryPath()).thenReturn(tooLong);
-		when(runtimeObj.getName()).thenReturn(vmName);
-		when(runtimeObj.getVmVendor()).thenReturn(vmVendor);
-		when(runtimeObj.getVmVersion()).thenReturn(vmVersion);
-		when(runtimeObj.getSpecName()).thenReturn(vmSpecName);
-		when(memoryObj.getHeapMemoryUsage().getInit()).thenReturn(initHeapMemorySize);
-		when(memoryObj.getHeapMemoryUsage().getMax()).thenReturn(maxHeapMemorySize);
-		when(memoryObj.getNonHeapMemoryUsage().getInit()).thenReturn(initNonHeapMemorySize);
-		when(memoryObj.getNonHeapMemoryUsage().getMax()).thenReturn(maxNonHeapMemorySize);
+		when(osBean.getArch()).thenReturn(architecture);
+		when(osBean.getAvailableProcessors()).thenReturn(availableProcessors);
+		when(osBean.getTotalPhysicalMemorySize()).thenReturn(totalPhysMemory);
+		when(osBean.getTotalSwapSpaceSize()).thenReturn(totalSwapSpace);
+		when(osBean.getVersion()).thenReturn(osVersion);
+		when(osBean.getName()).thenReturn(osName);
+		when(runtimeBean.getJitCompilerName()).thenReturn(jitCompilerName);
+		when(runtimeBean.getClassPath()).thenReturn(tooLong);
+		when(runtimeBean.getBootClassPath()).thenReturn(tooLong);
+		when(runtimeBean.getLibraryPath()).thenReturn(tooLong);
+		when(runtimeBean.getVmName()).thenReturn(vmName);
+		when(runtimeBean.getVmVendor()).thenReturn(vmVendor);
+		when(runtimeBean.getVmVersion()).thenReturn(vmVersion);
+		when(runtimeBean.getSpecName()).thenReturn(vmSpecName);
+		when(memoryBean.getHeapMemoryUsage().getInit()).thenReturn(initHeapMemorySize);
+		when(memoryBean.getHeapMemoryUsage().getMax()).thenReturn(maxHeapMemorySize);
+		when(memoryBean.getNonHeapMemoryUsage().getInit()).thenReturn(initNonHeapMemorySize);
+		when(memoryBean.getNonHeapMemoryUsage().getMax()).thenReturn(maxNonHeapMemorySize);
 
 		// there is no current data object available
 		when(coreService.getPlatformSensorData(sensorTypeIdent)).thenReturn(null);

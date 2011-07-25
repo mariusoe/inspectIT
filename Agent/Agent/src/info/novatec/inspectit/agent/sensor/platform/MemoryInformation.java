@@ -3,17 +3,16 @@ package info.novatec.inspectit.agent.sensor.platform;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
+import info.novatec.inspectit.agent.sensor.platform.provider.MemoryInfoProvider;
+import info.novatec.inspectit.agent.sensor.platform.provider.OperatingSystemInfoProvider;
+import info.novatec.inspectit.agent.sensor.platform.provider.factory.PlatformSensorInfoProviderFactory;
 import info.novatec.inspectit.communication.data.MemoryInformationData;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.sun.management.OperatingSystemMXBean;
 
 /**
  * This class provides dynamic information about the memory system through MXBeans.
@@ -34,14 +33,14 @@ public class MemoryInformation implements IPlatformSensor {
 	private final IIdManager idManager;
 
 	/**
-	 * The MXBean used to retrieve heap memory information.
+	 * The {@link MemoryInfoProvider} used to retrieve heap memory information.
 	 */
-	private MemoryMXBean memoryObj = ManagementFactory.getMemoryMXBean();
+	private MemoryInfoProvider memoryBean = PlatformSensorInfoProviderFactory.getPlatformSensorInfoProvider().getMemoryInfoProvider();
 
 	/**
-	 * The MXBean used to retrieve physical memory information.
+	 * The {@link OperatingSystemInfoProvider} used to retrieve physical memory information.
 	 */
-	private OperatingSystemMXBean osObj = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+	private OperatingSystemInfoProvider osBean = PlatformSensorInfoProviderFactory.getPlatformSensorInfoProvider().getOperatingSystemInfoProvider();
 
 	/**
 	 * The default constructor which needs one parameter.
@@ -59,7 +58,7 @@ public class MemoryInformation implements IPlatformSensor {
 	 * @return the free physical memory.
 	 */
 	public long getFreePhysMemory() {
-		return osObj.getFreePhysicalMemorySize();
+		return osBean.getFreePhysicalMemorySize();
 	}
 
 	/**
@@ -68,7 +67,7 @@ public class MemoryInformation implements IPlatformSensor {
 	 * @return the free swap space.
 	 */
 	public long getFreeSwapSpace() {
-		return osObj.getFreeSwapSpaceSize();
+		return osBean.getFreeSwapSpaceSize();
 	}
 
 	/**
@@ -78,7 +77,7 @@ public class MemoryInformation implements IPlatformSensor {
 	 * @return the virtual memory size.
 	 */
 	public long getComittedVirtualMemSize() {
-		return osObj.getCommittedVirtualMemorySize();
+		return osBean.getCommittedVirtualMemorySize();
 	}
 
 	/**
@@ -87,7 +86,7 @@ public class MemoryInformation implements IPlatformSensor {
 	 * @return the memory usage of the heap for object allocation.
 	 */
 	public long getUsedHeapMemorySize() {
-		return memoryObj.getHeapMemoryUsage().getUsed();
+		return memoryBean.getHeapMemoryUsage().getUsed();
 	}
 
 	/**
@@ -97,7 +96,7 @@ public class MemoryInformation implements IPlatformSensor {
 	 * @return the amount of guaranteed to be available memory for heap memory usage.
 	 */
 	public long getComittedHeapMemorySize() {
-		return memoryObj.getHeapMemoryUsage().getCommitted();
+		return memoryBean.getHeapMemoryUsage().getCommitted();
 	}
 
 	/**
@@ -106,7 +105,7 @@ public class MemoryInformation implements IPlatformSensor {
 	 * @return the amount of memory for non-heap memory usage.
 	 */
 	public long getUsedNonHeapMemorySize() {
-		return memoryObj.getNonHeapMemoryUsage().getUsed();
+		return memoryBean.getNonHeapMemoryUsage().getUsed();
 	}
 
 	/**
@@ -116,7 +115,7 @@ public class MemoryInformation implements IPlatformSensor {
 	 * @return the guaranteed to be available memory for non-heap memory usage.
 	 */
 	public long getComittedNonHeapMemoryUsage() {
-		return memoryObj.getNonHeapMemoryUsage().getCommitted();
+		return memoryBean.getNonHeapMemoryUsage().getCommitted();
 	}
 
 	/**
