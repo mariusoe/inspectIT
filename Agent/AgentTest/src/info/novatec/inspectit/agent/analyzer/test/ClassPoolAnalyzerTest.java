@@ -15,10 +15,8 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 
-
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
 
 public class ClassPoolAnalyzerTest extends AbstractLogSupport {
 
@@ -48,7 +46,7 @@ public class ClassPoolAnalyzerTest extends AbstractLogSupport {
 	public void getMethodsForClassNameNullClassLoader() {
 		CtMethod[] ctMethods = classPoolAnalyzer.getMethodsForClassName(null, TestClass.class.getName());
 		assertNotNull(ctMethods);
-		assertEquals(ctMethods.length, 0);
+		assertEquals(ctMethods.length, TestClass.class.getDeclaredMethods().length);
 	}
 
 	@Test

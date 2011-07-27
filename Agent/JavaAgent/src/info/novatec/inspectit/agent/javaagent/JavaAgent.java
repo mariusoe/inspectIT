@@ -1,11 +1,18 @@
 package info.novatec.inspectit.agent.javaagent;
 
 import info.novatec.inspectit.agent.PicoAgent;
+import info.novatec.inspectit.javassist.ClassPool;
 
+import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
+import java.lang.instrument.UnmodifiableClassException;
+import java.lang.management.ManagementFactory;
+import java.lang.reflect.Method;
 import java.security.ProtectionDomain;
+import java.util.List;
+import java.util.jar.JarFile;
 import java.util.logging.Logger;
 
 /**
@@ -26,16 +33,20 @@ public class JavaAgent implements ClassFileTransformer {
 	private static final Logger LOGGER = Logger.getLogger(JavaAgent.class.getName());
 
 	/**
-	 * The start patterns to ignore. This will prevent the agent from loading while core java
-	 * classes are loaded.
-	 */
-	private static final String[] IGNORE_START_PATTERNS = new String[] { "java/", "javax/", "sun/" };
-
-	/**
 	 * In case that multiple classes are loaded at the same time, which happens in some cases, even
 	 * though the JVM specification prohibits that (the case at hand was starting ant)
 	 */
 	private static volatile boolean operationInProgress = false;
+
+	/**
+	 * The reference to the instrumentation class.
+	 */
+	private static Instrumentation instrumentation;
+
+	/**
+	 * Defines if we can instrument core classes.
+	 */
+	private static boolean instrumentCoreClasses = false;
 
 	/**
 	 * The premain method will be executed before anything else.
@@ -47,31 +58,37 @@ public class JavaAgent implements ClassFileTransformer {
 	 *            instrumentation.
 	 */
 	public static void premain(String agentArgs, Instrumentation inst) {
+		instrumentation = inst;
+
+		LOGGER.info("inspectIT Agent: Starting initialization...");
+		checkForCorrectSetup();
+
+		// Starting up the real agent
+		PicoAgent.getInstance();
+		LOGGER.info("inspectIT Agent: Initialization complete...");
+
+		// now we are analysing the already loaded classes by the jvm to instrument those classes,
+		// too
+		analyzeAlreadyLoadedClasses();
 		inst.addTransformer(new JavaAgent());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public byte[] transform(final ClassLoader classLoader, final String className, final Class<?> clazz, final ProtectionDomain pd, final byte[] data) throws IllegalClassFormatException {
+	public byte[] transform(ClassLoader classLoader, String className, Class<?> clazz, ProtectionDomain pd, byte[] data) throws IllegalClassFormatException {
 		try {
 			// early return if some conditions fail
-			if (null == data || data.length == 0 || null == className || "".equals(className) || null == classLoader) {
+			if (null == data || data.length == 0 || null == className || "".equals(className)) {
 				// - no data = we cannot construct the class and analyze it
 				// - no class name = we don't know how the name of the class is and so the whole
 				// analysis will fail
-				// - no classloader = the bootstrap classloader tries to load something, we don't
-				// care about these classes for now
 				return data;
 			}
 
-			// ignore all classes which fit to these patterns, prevents the
-			// early loading of the inspectit agent.
-			for (int i = 0; i < IGNORE_START_PATTERNS.length; i++) {
-				String ignorePattern = IGNORE_START_PATTERNS[i];
-				if (className.startsWith(ignorePattern)) {
-					return data;
-				}
+			// skip analyzing if we cannot instrument core classes.
+			if (instrumentCoreClasses == false & null == classLoader) {
+				return data;
 			}
 
 			// now the real inspectit agent will handle this class
@@ -90,4 +107,95 @@ public class JavaAgent implements ClassFileTransformer {
 			return null;
 		}
 	}
+
+	/**
+	 * Checks for the correct setup of the jvm parameters or tries to append the inspectit agent to
+	 * the bootstrap class loader search automatically (Java 6+ required).
+	 */
+	private static void checkForCorrectSetup() {
+		try {
+			// we can utilize the mechanism to add the inspectit-agent to the bootstrap classloader
+			// through the instrumentation api.
+			Method append = instrumentation.getClass().getDeclaredMethod("appendToBootstrapClassLoaderSearch", JarFile.class);
+			LOGGER.info("inspectIT Agent: Advanced instrumentation capabilities detected...");
+
+			JarFile jarFile = new JarFile(JavaAgent.class.getProtectionDomain().getCodeSource().getLocation().getFile());
+			append.setAccessible(true);
+			append.invoke(instrumentation, jarFile);
+
+			instrumentCoreClasses = true;
+		} catch (NoSuchMethodException e) {
+			LOGGER.info("inspectIT Agent: Advanced instrumentation capabilities not detected...");
+		} catch (SecurityException e) {
+			LOGGER.info("inspectIT Agent: Advanced instrumentation capabilities not detected due to security constraints...");
+		} catch (Exception e) {
+			LOGGER.severe("Something unexpected happened while trying to get advanced instrumentation capabilities!");
+			e.printStackTrace();
+		}
+		if (!instrumentCoreClasses) {
+			// 2. try
+			// find out if the bootclasspath option is set
+			List<String> inputArgs = ManagementFactory.getRuntimeMXBean().getInputArguments();
+			for (String arg : inputArgs) {
+				if (arg.contains("Xbootclasspath") && arg.contains("inspectit-agent.jar")) {
+					instrumentCoreClasses = true;
+					break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Analyzes all the classes which are already loaded by the jvm. This only works if the
+	 * -Xbootclasspath option is being set in addition as we are instrumenting core classes which
+	 * are directly connected to the bootstrap classloader.
+	 */
+	private static void analyzeAlreadyLoadedClasses() {
+		if (instrumentCoreClasses) {
+			for (Class<?> loadedClass : instrumentation.getAllLoadedClasses()) {
+				String clazzName = loadedClass.getCanonicalName();
+				if (null != clazzName) {
+					try {
+						clazzName = getClassNameForJavassist(loadedClass);
+						byte[] modified = PicoAgent.getInstance().inspectByteCode(null, clazzName, loadedClass.getClassLoader());
+						if (null != modified) {
+							ClassDefinition classDefinition = new ClassDefinition(loadedClass, modified);
+							instrumentation.redefineClasses(classDefinition);
+						}
+					} catch (ClassNotFoundException e) {
+						LOGGER.severe(e.getMessage());
+					} catch (UnmodifiableClassException e) {
+						LOGGER.severe(e.getMessage());
+					}
+				}
+			}
+			LOGGER.info("inspectIT Agent: Instrumentation of core classes finished...");
+		} else {
+			LOGGER.info("inspectIT Agent: Core classes cannot be instrumented, please add -Xbootclasspath/a:<path_to_agent.jar> to the JVM parameters!");
+		}
+	}
+
+	/**
+	 * See {@link ClassPool#get(String)} why it is needed to replace the '.' with '$' for inner
+	 * classes.
+	 * 
+	 * @param clazz
+	 *            The class to get the name from.
+	 * @return the name to be passed to javassist.
+	 */
+	private static String getClassNameForJavassist(Class<?> clazz) {
+		String clazzName = clazz.getCanonicalName();
+		while (null != clazz.getEnclosingClass()) {
+			clazz = clazz.getEnclosingClass();
+		}
+
+		if (!clazzName.equals(clazz.getCanonicalName())) {
+			String enclosingClasses = clazzName.substring(clazz.getCanonicalName().length());
+			enclosingClasses = enclosingClasses.replaceAll("\\.", "\\$");
+			clazzName = clazz.getCanonicalName() + enclosingClasses;
+		}
+
+		return clazzName;
+	}
+
 }

@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
-
 /**
  * This class provides some methods to help to work with the {@link ClassPool}.
  * 
@@ -36,8 +35,7 @@ public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 	private static WeakList classLoaders = new WeakList();
 
 	/**
-	 * Contains a mapping from the {@link ClassPool} to the {@link ClassLoader}
-	 * objects.
+	 * Contains a mapping from the {@link ClassPool} to the {@link ClassLoader} objects.
 	 */
 	private static Map map = new WeakHashMap();
 
@@ -116,8 +114,7 @@ public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 	}
 
 	/**
-	 * Copy the hierarchy from the given classloader and build new classpool
-	 * objects.
+	 * Copy the hierarchy from the given classloader and build new classpool objects.
 	 * 
 	 * @param classLoader
 	 *            The class loader.
@@ -130,21 +127,22 @@ public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 		}
 
 		ClassPool cp = null;
-		if (null != classLoader.getParent() && !classLoaders.contains(classLoader.getParent())) {
+		if (null == classLoader) {
+			cp = ClassPool.getDefault();
+		} else if (null != classLoader.getParent() && !classLoaders.contains(classLoader.getParent())) {
 			// If the class loader has got a parent one and was not seen before
 			// -> initialize that one first
 			cp = new ClassPool(this.copyHierarchy(classLoader.getParent()));
+			cp.insertClassPath(new LoaderClassPath(classLoader));
 		} else if (null != classLoader.getParent()) {
 			// Parent class loader was seen and initialized before, we only care
 			// about the current one and set the parent class loader.
 			cp = new ClassPool((ClassPool) map.get(classLoader.getParent()));
+			cp.insertClassPath(new LoaderClassPath(classLoader));
 		} else {
 			// Class loader has got no parent ( bootstrap class loader )
-			cp = new ClassPool(ClassPool.getDefault());
+			cp = ClassPool.getDefault();
 		}
-		// Create a ClassPath object to the class loader and insert it in the
-		// ClassPool
-		cp.insertClassPath(new LoaderClassPath(classLoader));
 
 		// Map the class loader to the ClassPool
 		map.put(classLoader, cp);

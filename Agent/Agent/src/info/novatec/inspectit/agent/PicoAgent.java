@@ -75,13 +75,13 @@ public class PicoAgent {
 	 * These patterns are checked in the {@link #inspectByteCode(byte[], String, ClassLoader)}
 	 * method to ignore them.
 	 */
-	private static final String[] IGNORE_START_PATTERNS = new String[] { "info.novatec.inspectit.", "sun.misc.reflect", "$Proxy" };
+	private static final String[] IGNORE_START_PATTERNS = new String[] { "info.novatec.inspectit.", "sun.misc.reflect", "$Proxy", "sun.reflect." };
 
 	/**
 	 * These patterns are checked in the {@link #inspectByteCode(byte[], String, ClassLoader)}
 	 * method to ignore them.
 	 */
-	private static final String[] IGNORE_END_PATTERNS = new String[] { "_WLStub" };
+	private static final String[] IGNORE_END_PATTERNS = new String[] { "_WLStub", "[]" };
 
 	/**
 	 * The pico container.
@@ -298,14 +298,6 @@ public class PicoAgent {
 		// if an error in the init method was caught, we'll do nothing here.
 		// This prevents further errors.
 		if (initializationError) {
-			return null;
-		}
-
-		// if the classloader is equal to null, it means that it's the
-		// bootstrap classloader. We currently don't care about this classes
-		// (as there would be some errors anyway because there's no
-		// classloader).
-		if (null == classLoader) {
 			return null;
 		}
 
