@@ -8,6 +8,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
+import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -298,32 +299,27 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 		 */
 		@SuppressWarnings("unchecked")
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-			try {
-				List<AggregatedExceptionSensorData> input = (List<AggregatedExceptionSensorData>) newInput;
-				if (input != null && !input.isEmpty()) {
-					// we can get any one because all the ones in the list have the same throwable
-					// type
-					ExceptionSensorData template = input.get(0);
-					List<ExceptionSensorData> exceptionStackTraceObjects = dataAccessService.getStackTraceMessagesForThrowableType(template);
-					parentChildrenMap = new HashMap<AggregatedExceptionSensorData, List<ExceptionSensorData>>();
-					int i = 1;
-					for (AggregatedExceptionSensorData aggExceptionSensorData : input) {
-						// id has to be set because if the hash value of the object in the map
-						// otherwise there is a chance of the same hash values
-						aggExceptionSensorData.setId(i++);
-						List<ExceptionSensorData> children = new ArrayList<ExceptionSensorData>();
-						for (ExceptionSensorData exData : exceptionStackTraceObjects) {
-							if (exData.getErrorMessage().equals(aggExceptionSensorData.getErrorMessage())) {
-								children.add(exData);
-							}
+			List<AggregatedExceptionSensorData> input = (List<AggregatedExceptionSensorData>) newInput;
+			if (input != null && !input.isEmpty()) {
+				// we can get any one because all the ones in the list have the same throwable
+				// type
+				ExceptionSensorData template = input.get(0);
+				List<ExceptionSensorData> exceptionStackTraceObjects = dataAccessService.getStackTraceMessagesForThrowableType(template);
+				parentChildrenMap = new HashMap<AggregatedExceptionSensorData, List<ExceptionSensorData>>();
+				int i = 1;
+				for (AggregatedExceptionSensorData aggExceptionSensorData : input) {
+					// id has to be set because if the hash value of the object in the map
+					// otherwise there is a chance of the same hash values
+					aggExceptionSensorData.setId(i++);
+					List<ExceptionSensorData> children = new ArrayList<ExceptionSensorData>();
+					for (ExceptionSensorData exData : exceptionStackTraceObjects) {
+						if (ObjectUtils.equals(exData.getErrorMessage(), aggExceptionSensorData.getErrorMessage())) {
+							children.add(exData);
 						}
-						parentChildrenMap.put(aggExceptionSensorData, children);
 					}
+					parentChildrenMap.put(aggExceptionSensorData, children);
 				}
-			} catch (Exception e) {
-				parentChildrenMap = null;
 			}
-
 		}
 
 		/**
