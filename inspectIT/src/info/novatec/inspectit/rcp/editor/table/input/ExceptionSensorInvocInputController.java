@@ -15,6 +15,7 @@ import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.ExceptionImageFactory;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
 import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
+import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -396,7 +397,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 			if (null != child) {
 				// we store in each object the error message from the root data object that has the
 				// CREATED event
-				if (!data.getErrorMessage().equals(child.getErrorMessage())) {
+				if (!ObjectUtils.equals(data.getErrorMessage(), child.getErrorMessage())) {
 					child.setErrorMessage(data.getErrorMessage());
 				}
 				updateErrorMessage(child);
