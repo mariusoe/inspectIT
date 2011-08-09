@@ -17,6 +17,8 @@ import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.communication.data.VmArgumentData;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -143,6 +145,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	@SuppressWarnings("unchecked")
 	private void extractDataFromInvocation(StatelessSession session, InvocationSequenceData invData, InvocationSequenceData topInvocationParent) {
 		double exclusiveDurationDelta = 0d;
+		Collection<InvocationSequenceData> childRemoveCollection = null;
 		Set<Long> identityHashCodeSet = new HashSet<Long>();
 		for (InvocationSequenceData child : (List<InvocationSequenceData>) invData.getNestedSequences()) {
 			boolean durationAddedToTheExclusive = false;
@@ -184,14 +187,19 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 					if (exceptionData.getExceptionEvent() == ExceptionEventEnum.CREATED) {
 						connectErrorMessagesInExceptionData(exceptionData);
 						if (identityHashCodeSet.add(exceptionData.getThrowableIdentityHashCode())) {
-							ExceptionSensorData dataToIndex = manageExceptionConstructorDelegation(invData, exceptionData);
-							cacheIdGenerator.assignObjectAnId(dataToIndex);
-							dataToIndex.addInvocationParentId(topInvocationParent.getId());
-							try {
-								indexingTree.put(dataToIndex);
-							} catch (IndexingException e) {
-								// indexing exception should not happen
-								LOGGER.error(e.getMessage(), e);
+							if (null == childRemoveCollection) {
+								childRemoveCollection = new ArrayList<InvocationSequenceData>();
+							}
+							ExceptionSensorData dataToIndex = manageExceptionConstructorDelegation(invData, exceptionData, childRemoveCollection);
+							if (null != dataToIndex) {
+								cacheIdGenerator.assignObjectAnId(dataToIndex);
+								dataToIndex.addInvocationParentId(topInvocationParent.getId());
+								try {
+									indexingTree.put(dataToIndex);
+								} catch (IndexingException e) {
+									// indexing exception should not happen
+									LOGGER.error(e.getMessage(), e);
+								}
 							}
 						}
 					}
@@ -202,6 +210,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 				exclusiveDurationDelta += computeNestedDuration(child);
 			}
 		}
+
 		if (null != invData.getTimerData()) {
 			double exclusiveTime = invData.getTimerData().getDuration() - exclusiveDurationDelta;
 			invData.getTimerData().setExclusiveCount(1L);
@@ -221,8 +230,21 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 				LOGGER.error(e.getMessage(), e);
 			}
 		}
+
+		if (null != childRemoveCollection && !childRemoveCollection.isEmpty()) {
+			int oldChildrenListSize = invData.getNestedSequences().size();
+			invData.getNestedSequences().removeAll(childRemoveCollection);
+			int newChildrenListSize = invData.getNestedSequences().size();
+			
+			InvocationSequenceData alterChildCountInvocation = invData;
+			int alterSize = oldChildrenListSize - newChildrenListSize;
+			while (null != alterChildCountInvocation) {
+				alterChildCountInvocation.setChildCount(alterChildCountInvocation.getChildCount() - alterSize);
+				alterChildCountInvocation = alterChildCountInvocation.getParentSequence();
+			}
+		}
 	}
-	
+
 	/**
 	 * Computes the duration of the nested invocation elements.
 	 * 
@@ -245,8 +267,8 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 			} else if (null != nestedData.getSqlStatementData() && 1 == nestedData.getSqlStatementData().getCount()) {
 				nestedDuration = nestedDuration + nestedData.getSqlStatementData().getDuration();
 				added = true;
-			} 
-			
+			}
+
 			if (!added && !nestedData.getNestedSequences().isEmpty()) {
 				// nothing was added, but there could be child elements with
 				// time measurements
@@ -259,21 +281,27 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	}
 
 	/**
-	 * Deals with the constructor delegation in the invocation sequence data.
+	 * Deals with the constructor delegation in the invocation sequence data. This method has side
+	 * effects.
 	 * 
 	 * @param parent
 	 *            Invocation parent where the exception data is found.
 	 * @param firstExceptionData
 	 *            Exception that needs to be handled.
-	 * @return Exception data that will be indexed.
+	 * @param childremoveCollection
+	 *            Collection where invocation children for removal will be added.
+	 * @return Exception data to be indexed.
 	 */
 	@SuppressWarnings("unchecked")
-	private ExceptionSensorData manageExceptionConstructorDelegation(InvocationSequenceData parent, ExceptionSensorData firstExceptionData) {
+	private ExceptionSensorData manageExceptionConstructorDelegation(InvocationSequenceData parent, ExceptionSensorData firstExceptionData, Collection<InvocationSequenceData> childremoveCollection) {
 		InvocationSequenceData lastInvocationChild = null;
 		ExceptionSensorData lastExceptionData = null;
 		long identityHashCode = firstExceptionData.getThrowableIdentityHashCode();
+		long sensorTypeIdent = -1;
+		int lastExceptionDataChildIndex = -1;
 
-		for (InvocationSequenceData invData : (List<InvocationSequenceData>) parent.getNestedSequences()) {
+		for (int i = 0, j = parent.getNestedSequences().size(); i < j; i++) {
+			InvocationSequenceData invData = (InvocationSequenceData) parent.getNestedSequences().get(i);
 			if (null != invData.getExceptionSensorDataObjects()) {
 				for (ExceptionSensorData exData : (List<ExceptionSensorData>) invData.getExceptionSensorDataObjects()) {
 					if (exData.getThrowableIdentityHashCode() == identityHashCode) {
@@ -282,9 +310,21 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 						}
 						lastInvocationChild = invData;
 						lastExceptionData = exData;
+						lastExceptionDataChildIndex = i;
+						sensorTypeIdent = invData.getSensorTypeIdent();
 					}
 				}
 			}
+		}
+
+		lastExceptionDataChildIndex--;
+		while (lastExceptionDataChildIndex >= 0) {
+			InvocationSequenceData invData = (InvocationSequenceData) parent.getNestedSequences().get(lastExceptionDataChildIndex);
+			if (invData.getSensorTypeIdent() != sensorTypeIdent || null != invData.getTimerData() || null != invData.getSqlStatementData() || null != invData.getExceptionSensorDataObjects()) {
+				break;
+			}
+			childremoveCollection.add(invData);
+			lastExceptionDataChildIndex--;
 		}
 
 		if (null != lastExceptionData) {
@@ -449,7 +489,8 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	}
 
 	/**
-	 * @param saveTimerDataToDatabase the saveTimerDataToDatabase to set
+	 * @param saveTimerDataToDatabase
+	 *            the saveTimerDataToDatabase to set
 	 */
 	public void setSaveTimerDataToDatabase(boolean saveTimerDataToDatabase) {
 		this.saveTimerDataToDatabase = saveTimerDataToDatabase;
