@@ -8,10 +8,6 @@
 
 	<bean id="healthStatus" class="info.novatec.inspectit.cmr.util.HealthStatus" />
 
-	<bean id="configuration" class="info.novatec.inspectit.cmr.util.Configuration">
-		<property name="enhancedInvocationStorageMode" value="true" />
-	</bean>
-
 	<bean id="versioning"
 		class="info.novatec.inspectit.versioning.FileBasedVersioningServiceImpl" />
 	

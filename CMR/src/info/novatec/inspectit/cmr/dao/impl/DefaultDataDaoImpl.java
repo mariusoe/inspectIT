@@ -6,13 +6,11 @@ import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
 import info.novatec.inspectit.cmr.cache.indexing.impl.IndexingException;
 import info.novatec.inspectit.cmr.dao.DefaultDataDao;
 import info.novatec.inspectit.cmr.util.CacheIdGenerator;
-import info.novatec.inspectit.cmr.util.Configuration;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.ExceptionEventEnum;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
-import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.SystemInformationData;
 import info.novatec.inspectit.communication.data.TimerData;
@@ -48,11 +46,6 @@ import org.springframework.transaction.annotation.Transactional;
  * 
  */
 public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDataDao {
-
-	/**
-	 * The configuration bean.
-	 */
-	private Configuration configuration;
 
 	/**
 	 * The buffer to put invocation sequences in.
@@ -102,14 +95,8 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 			cacheIdGenerator.assignObjectAnId(element);
 			if (element instanceof InvocationSequenceData) {
 				InvocationSequenceData invoc = (InvocationSequenceData) element;
-				if (configuration.isEnhancedInvocationStorageMode()) {
-					extractDataFromInvocation(session, invoc, invoc);
-					buffer.put(new BufferElement<MethodSensorData>(invoc));
-					// commented out because we don't save anything anymore to the database!
-					// saveStrippedInvocationInDatabase(invoc, session, true);
-				} else {
-					saveInvocationInDatabase(invoc, session, 0);
-				}
+				extractDataFromInvocation(session, invoc, invoc);
+				buffer.put(new BufferElement<MethodSensorData>(invoc));
 			} else if (element instanceof SqlStatementData) {
 				// saveSqlStatementData(session, (SqlStatementData) element);
 				// session.insert(element);
@@ -322,44 +309,6 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	}
 
 	/**
-	 * Save the invocation to the db and maybe as a file.
-	 * 
-	 * @param invoc
-	 *            The invocation.
-	 * @param session
-	 *            The session used for db storage.
-	 * @param position
-	 *            The position.
-	 */
-	@SuppressWarnings("unchecked")
-	private void saveInvocationInDatabase(InvocationSequenceData invoc, StatelessSession session, int position) {
-		if (null != invoc.getTimerData()) {
-			session.insert(invoc.getTimerData());
-		}
-
-		if (null != invoc.getSqlStatementData()) {
-			session.insert(invoc.getSqlStatementData());
-		}
-
-		// store everything.
-		invoc.setPosition(position);
-		Long id = (Long) session.insert(invoc);
-
-		if (null != invoc.getParameterContentData()) {
-			Set<ParameterContentData> contents = invoc.getParameterContentData();
-			for (ParameterContentData content : contents) {
-				content.setMethodSensorId(id.longValue());
-				session.insert(content);
-			}
-		}
-
-		List<InvocationSequenceData> nestedInvocs = invoc.getNestedSequences();
-		for (int i = 0; i < nestedInvocs.size(); i++) {
-			saveInvocationInDatabase(nestedInvocs.get(i), session, i);
-		}
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
@@ -462,14 +411,6 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 		} else {
 			return null;
 		}
-	}
-
-	/**
-	 * @param configuration
-	 *            the configuration to set
-	 */
-	public void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
 	}
 
 	/**
