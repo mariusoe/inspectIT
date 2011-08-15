@@ -10,6 +10,7 @@ import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
+import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.List;
 import java.util.jar.JarFile;
@@ -117,13 +118,17 @@ public class JavaAgent implements ClassFileTransformer {
 			// we can utilize the mechanism to add the inspectit-agent to the bootstrap classloader
 			// through the instrumentation api.
 			Method append = instrumentation.getClass().getDeclaredMethod("appendToBootstrapClassLoaderSearch", JarFile.class);
-			LOGGER.info("inspectIT Agent: Advanced instrumentation capabilities detected...");
+			CodeSource cs = JavaAgent.class.getProtectionDomain().getCodeSource();
+			if (null != cs) {
+				LOGGER.info("inspectIT Agent: Advanced instrumentation capabilities detected...");
+				JarFile jarFile = new JarFile(cs.getLocation().getFile());
+				append.setAccessible(true);
+				append.invoke(instrumentation, jarFile);
 
-			JarFile jarFile = new JarFile(JavaAgent.class.getProtectionDomain().getCodeSource().getLocation().getFile());
-			append.setAccessible(true);
-			append.invoke(instrumentation, jarFile);
-
-			instrumentCoreClasses = true;
+				instrumentCoreClasses = true;
+			} else {
+				LOGGER.info("inspectIT Agent: Advanced instrumentation capabilities not detected due to missing code source...");
+			}
 		} catch (NoSuchMethodException e) {
 			LOGGER.info("inspectIT Agent: Advanced instrumentation capabilities not detected...");
 		} catch (SecurityException e) {
@@ -139,6 +144,7 @@ public class JavaAgent implements ClassFileTransformer {
 			for (String arg : inputArgs) {
 				if (arg.contains("Xbootclasspath") && arg.contains("inspectit-agent.jar")) {
 					instrumentCoreClasses = true;
+					LOGGER.info("inspectIT Agent: Xbootclasspath setting found, activating core class instrumentation...");
 					break;
 				}
 			}
