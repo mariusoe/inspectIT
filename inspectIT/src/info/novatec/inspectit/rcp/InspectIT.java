@@ -6,11 +6,13 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
@@ -43,6 +45,11 @@ public class InspectIT extends AbstractUIPlugin {
 	 * CMR.
 	 */
 	private volatile RepositoryManager repositoryManager;
+
+	/**
+	 * Preferences store for the plug-in.
+	 */
+	private volatile ScopedPreferenceStore preferenceStore;
 
 	/**
 	 * This method is called upon plug-in activation.
@@ -196,6 +203,20 @@ public class InspectIT extends AbstractUIPlugin {
 			}
 		}
 		return repositoryManager;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public ScopedPreferenceStore getPreferenceStore() {
+		if (null == preferenceStore) {
+			synchronized (this) {
+				if (null == preferenceStore) {
+					preferenceStore = new ScopedPreferenceStore(new ConfigurationScope(), ID);
+				}
+			}
+		}
+		return preferenceStore;
 	}
 
 	/**

@@ -1,19 +1,11 @@
 package info.novatec.inspectit.rcp.repository;
 
-import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 import info.novatec.inspectit.rcp.util.ListenerList;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.ConfigurationScope;
-import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
-import org.osgi.service.prefs.BackingStoreException;
-import org.osgi.service.prefs.Preferences;
 
 /**
  * The repository manager stores all the repository definitions.
@@ -22,16 +14,6 @@ import org.osgi.service.prefs.Preferences;
  * 
  */
 public class RepositoryManager {
-
-	/**
-	 * The preference value for the host.
-	 */
-	private static final String HOST = "server_host_";
-
-	/**
-	 * The preference value for the port.
-	 */
-	private static final String PORT = "server_port_";
 
 	/**
 	 * The list containing the available {@link RepositoryDefinition} objects.
@@ -47,21 +29,8 @@ public class RepositoryManager {
 	 * Starts the repository manager (e.g. loads all the saved data).
 	 */
 	public void startup() {
-		IPreferencesService service = Platform.getPreferencesService();
-		Preferences configurationNode = new ConfigurationScope().getNode(InspectIT.ID);
-		Preferences defaultNode = new DefaultScope().getNode(InspectIT.ID);
-		Preferences[] nodes = new Preferences[] { configurationNode, defaultNode };
-
-		// load existing definitions
-		for (int i = 1; i < Integer.MAX_VALUE; i++) {
-			String ip = service.get(HOST + i, null, nodes);
-			int port = Integer.parseInt(service.get(PORT + i, "8182", nodes));
-			if (null != ip) {
-				repositoryDefinitions.add(new CmrRepositoryDefinition(ip, port));
-			} else {
-				break;
-			}
-		}
+		List<CmrRepositoryDefinition> savedCmrs = PreferencesUtils.getCmrRepositoryDefinitions();
+		repositoryDefinitions.addAll(savedCmrs);
 	}
 
 	/**
@@ -153,30 +122,13 @@ public class RepositoryManager {
 	 * Save the preferences to the backend store.
 	 */
 	private void savePreference() {
-		IEclipsePreferences node = new ConfigurationScope().getNode(InspectIT.ID);
-		// first, remove all existing preferences
-		for (int i = 1; i < Integer.MAX_VALUE; i++) {
-			String ip = node.get(HOST + i, null);
-			if (null != ip) {
-				node.remove(HOST + i);
-				node.remove(PORT + i);
-			} else {
-				break;
+		List<CmrRepositoryDefinition> toSave = new ArrayList<CmrRepositoryDefinition>();
+		for (RepositoryDefinition repositoryDefinition : repositoryDefinitions) {
+			if (repositoryDefinition instanceof CmrRepositoryDefinition) {
+				toSave.add((CmrRepositoryDefinition) repositoryDefinition);
 			}
 		}
-		// second, add the details again
-		int id = 1;
-		for (RepositoryDefinition repositoryDefinition : repositoryDefinitions) {
-			node.put(HOST + id, repositoryDefinition.getIp());
-			node.putInt(PORT + id, repositoryDefinition.getPort());
-			id++;
-		}
-		// last, flush/save the settings
-		try {
-			node.flush();
-		} catch (BackingStoreException e) {
-			InspectIT.getDefault().createErrorDialog("Could not save the preferences to the backing store!", e, -1);
-		}
+		PreferencesUtils.saveCmrRepositoryDefinitions(toSave, false);
 	}
 
 }

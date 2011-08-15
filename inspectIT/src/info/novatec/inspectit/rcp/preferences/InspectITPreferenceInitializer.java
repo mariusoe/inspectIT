@@ -1,11 +1,11 @@
 package info.novatec.inspectit.rcp.preferences;
 
-import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.ConfigurationScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * Initializes the default preferences.
@@ -15,22 +15,24 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class InspectITPreferenceInitializer extends AbstractPreferenceInitializer {
 
-	public InspectITPreferenceInitializer() {
-	}
+	/**
+	 * Default CMR ip address.
+	 */
+	private static final String DEFAULT_IP = "localhost";
+
+	/**
+	 * Default CMR port.
+	 */
+	private static final int DEFAULT_PORT = 8182;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void initializeDefaultPreferences() {
-		IEclipsePreferences node = new ConfigurationScope().getNode(InspectIT.ID);
-		node.put("server_host_1", "localhost");
-		node.putInt("server_port_1", 8182);
-		try {
-			node.flush();
-		} catch (BackingStoreException e) {
-			InspectIT.getDefault().createErrorDialog("Could not save default server settings!", e, -1);
-		}
+		List<CmrRepositoryDefinition> defaultCmrList = new ArrayList<CmrRepositoryDefinition>(1);
+		defaultCmrList.add(new CmrRepositoryDefinition(DEFAULT_IP, DEFAULT_PORT));
+		PreferencesUtils.saveCmrRepositoryDefinitions(defaultCmrList, true);
 	}
 
 }
