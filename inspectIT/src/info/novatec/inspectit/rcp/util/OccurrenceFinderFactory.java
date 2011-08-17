@@ -94,7 +94,7 @@ public final class OccurrenceFinderFactory {
 			return sqlOccurrenceFinder;
 		} else if (element.getClass().equals(TimerData.class)) {
 			return timerOccurrenceFinder;
-		} else if (element.getClass().equals(ExceptionSensorData.class)) {
+		} else if (ExceptionSensorData.class.isAssignableFrom(element.getClass())) {
 			return exceptionOccurrenceFinder;
 		}
 		RuntimeException exception = new  RuntimeException("Occurrence finder factory was not able to supply the correct occurrence finder for the object of class " + element.getClass().getName() + ".");
@@ -129,7 +129,7 @@ public final class OccurrenceFinderFactory {
 		 */
 		@SuppressWarnings("unchecked")
 		public ElementOccurrenceCount getOccurrenceCount(InvocationSequenceData invocationData, E template, ViewerFilter[] filters, ElementOccurrenceCount elementOccurrence) {
-			if (!template.getClass().equals(getConcreteClass())) {
+			if (!getConcreteClass().isAssignableFrom(template.getClass())) {
 				return null;
 			}
 			ElementOccurrenceCount occurrenceCount;
@@ -173,7 +173,7 @@ public final class OccurrenceFinderFactory {
 		 */
 		@SuppressWarnings("unchecked")
 		public InvocationSequenceData getOccurrence(InvocationSequenceData invocationData, E template, MutableInt occurrencesLeft, ViewerFilter[] filters) {
-			if (!template.getClass().equals(getConcreteClass())) {
+			if (!getConcreteClass().isAssignableFrom(template.getClass())) {
 				return null;
 			}
 			if (occurrenceFound(invocationData, template) && filtersPassed(invocationData, filters)) {
