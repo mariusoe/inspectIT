@@ -54,6 +54,12 @@ public class HookDispatcher implements IHookDispatcher {
 	private ThreadLocal invocationSequenceHolder = new ThreadLocal();
 
 	/**
+	 * If an execution of the dispatching is already in progress, we don't dispatch anything else
+	 * for this thread.
+	 */
+	private ExecutionMarker executionMarker = new ExecutionMarker();
+
+	/**
 	 * Default constructor which needs a reference to the core service. This is needed for the
 	 * invocation sensor.
 	 * 
@@ -82,40 +88,48 @@ public class HookDispatcher implements IHookDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchMethodBeforeBody(long id, Object object, Object[] parameters) {
-		try {
-			RegisteredSensorConfig rsc = (RegisteredSensorConfig) methodHooks.get(new Long(id));
+		if (!executionMarker.isActive()) {
+			try {
+				executionMarker.active();
 
-			if (rsc.startsInvocationSequence()) {
-				// The sensor configuration contains an invocation sequence
-				// sensor. We have to set it on the thread local map for later
-				// access. Additionally, we need to save the count of the called
-				// invocation sensors, as another nested one could be started,
-				// too.
-				invocationSequenceCount.increment();
+				try {
+					RegisteredSensorConfig rsc = (RegisteredSensorConfig) methodHooks.get(new Long(id));
 
-				if (null == invocationSequenceHolder.get()) {
-					invocationSequenceHolder.set(((IMethodSensor) rsc.getInvocationSequenceSensorTypeConfig().getSensorType()).getHook());
+					if (rsc.startsInvocationSequence()) {
+						// The sensor configuration contains an invocation sequence
+						// sensor. We have to set it on the thread local map for later
+						// access. Additionally, we need to save the count of the called
+						// invocation sensors, as another nested one could be started,
+						// too.
+						invocationSequenceCount.increment();
+
+						if (null == invocationSequenceHolder.get()) {
+							invocationSequenceHolder.set(((IMethodSensor) rsc.getInvocationSequenceSensorTypeConfig().getSensorType()).getHook());
+						}
+					} else if (null != invocationSequenceHolder.get()) {
+						// We are executing the following sensor types in an invocation
+						// sequence context, thus we have to execute the before body
+						// method of the invocation sequence hook manually.
+						IMethodHook invocationHook = (IMethodHook) invocationSequenceHolder.get();
+
+						// The sensor type ID is not important here, thus we are passing
+						// a -1. It is already stored in the data object
+						invocationHook.beforeBody(id, -1, object, parameters, rsc);
+					}
+
+					// Now iterate over all registered sensor types and execute them
+					for (Iterator i = rsc.getReverseMethodHooks().entrySet().iterator(); i.hasNext();) {
+						Map.Entry entry = (Map.Entry) i.next();
+						IMethodHook methodHook = (IMethodHook) entry.getValue();
+						methodHook.beforeBody(id, ((Long) entry.getKey()).longValue(), object, parameters, rsc);
+					}
+				} catch (Throwable throwable) {
+					LOGGER.severe("An error happened in the Hook Dispatcher! (before body)");
+					throwable.printStackTrace();
 				}
-			} else if (null != invocationSequenceHolder.get()) {
-				// We are executing the following sensor types in an invocation
-				// sequence context, thus we have to execute the before body
-				// method of the invocation sequence hook manually.
-				IMethodHook invocationHook = (IMethodHook) invocationSequenceHolder.get();
-
-				// The sensor type ID is not important here, thus we are passing
-				// a -1. It is already stored in the data object
-				invocationHook.beforeBody(id, -1, object, parameters, rsc);
+			} finally {
+				executionMarker.deactive();
 			}
-
-			// Now iterate over all registered sensor types and execute them
-			for (Iterator i = rsc.getReverseMethodHooks().entrySet().iterator(); i.hasNext();) {
-				Map.Entry entry = (Map.Entry) i.next();
-				IMethodHook methodHook = (IMethodHook) entry.getValue();
-				methodHook.beforeBody(id, ((Long) entry.getKey()).longValue(), object, parameters, rsc);
-			}
-		} catch (Throwable throwable) {
-			LOGGER.severe("An error happened in the Hook Dispatcher! (before body)");
-			throwable.printStackTrace();
 		}
 	}
 
@@ -123,16 +137,24 @@ public class HookDispatcher implements IHookDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchFirstMethodAfterBody(long id, Object object, Object[] parameters, Object returnValue) {
-		try {
-			RegisteredSensorConfig rsc = (RegisteredSensorConfig) methodHooks.get(new Long(id));
-			for (Iterator i = rsc.getMethodHooks().entrySet().iterator(); i.hasNext();) {
-				Map.Entry entry = (Map.Entry) i.next();
-				IMethodHook methodHook = (IMethodHook) entry.getValue();
-				methodHook.firstAfterBody(id, ((Long) entry.getKey()).longValue(), object, parameters, returnValue, rsc);
+		if (!executionMarker.isActive()) {
+			try {
+				executionMarker.active();
+
+				try {
+					RegisteredSensorConfig rsc = (RegisteredSensorConfig) methodHooks.get(new Long(id));
+					for (Iterator i = rsc.getMethodHooks().entrySet().iterator(); i.hasNext();) {
+						Map.Entry entry = (Map.Entry) i.next();
+						IMethodHook methodHook = (IMethodHook) entry.getValue();
+						methodHook.firstAfterBody(id, ((Long) entry.getKey()).longValue(), object, parameters, returnValue, rsc);
+					}
+				} catch (Throwable throwable) {
+					LOGGER.severe("An error happened in the Hook Dispatcher! (after body)");
+					throwable.printStackTrace();
+				}
+			} finally {
+				executionMarker.deactive();
 			}
-		} catch (Throwable throwable) {
-			LOGGER.severe("An error happened in the Hook Dispatcher! (after body)");
-			throwable.printStackTrace();
 		}
 	}
 
@@ -140,50 +162,59 @@ public class HookDispatcher implements IHookDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchSecondMethodAfterBody(long id, Object object, Object[] parameters, Object returnValue) {
-		try {
-			RegisteredSensorConfig rsc = (RegisteredSensorConfig) methodHooks.get(new Long(id));
+		if (!executionMarker.isActive()) {
+			try {
+				executionMarker.active();
 
-			if (null != invocationSequenceHolder.get()) {
-				// Need to replace the core service with the one from the invocation sequence so
-				// that all data objects can be associated to that invocation record.
-				ICoreService invocCoreService = (ICoreService) invocationSequenceHolder.get();
+				try {
+					RegisteredSensorConfig rsc = (RegisteredSensorConfig) methodHooks.get(new Long(id));
 
-				for (Iterator i = rsc.getMethodHooks().entrySet().iterator(); i.hasNext();) {
-					Map.Entry entry = (Map.Entry) i.next();
-					IMethodHook methodHook = (IMethodHook) entry.getValue();
-					// the invocation sequence sensor needs the original core service!
-					if (invocCoreService == methodHook) {
-						methodHook.secondAfterBody(coreService, id, ((Long) entry.getKey()).longValue(), object, parameters, returnValue, rsc);
+					if (null != invocationSequenceHolder.get()) {
+						// Need to replace the core service with the one from the invocation
+						// sequence so
+						// that all data objects can be associated to that invocation record.
+						ICoreService invocCoreService = (ICoreService) invocationSequenceHolder.get();
+
+						for (Iterator i = rsc.getMethodHooks().entrySet().iterator(); i.hasNext();) {
+							Map.Entry entry = (Map.Entry) i.next();
+							IMethodHook methodHook = (IMethodHook) entry.getValue();
+							// the invocation sequence sensor needs the original core service!
+							if (invocCoreService == methodHook) {
+								methodHook.secondAfterBody(coreService, id, ((Long) entry.getKey()).longValue(), object, parameters, returnValue, rsc);
+							} else {
+								methodHook.secondAfterBody(invocCoreService, id, ((Long) entry.getKey()).longValue(), object, parameters, returnValue, rsc);
+							}
+						}
 					} else {
-						methodHook.secondAfterBody(invocCoreService, id, ((Long) entry.getKey()).longValue(), object, parameters, returnValue, rsc);
+						for (Iterator i = rsc.getMethodHooks().entrySet().iterator(); i.hasNext();) {
+							Map.Entry entry = (Map.Entry) i.next();
+							IMethodHook methodHook = (IMethodHook) entry.getValue();
+							methodHook.secondAfterBody(coreService, id, ((Long) entry.getKey()).longValue(), object, parameters, returnValue, rsc);
+						}
 					}
+
+					if (rsc.startsInvocationSequence()) {
+						invocationSequenceCount.decrement();
+
+						if (0 == invocationSequenceCount.getCount()) {
+							invocationSequenceHolder.set(null);
+						}
+					} else if (null != invocationSequenceHolder.get()) {
+						// We have to execute the after body method of the invocation sequence hook
+						// manually.
+						IMethodHook invocationHook = (IMethodHook) invocationSequenceHolder.get();
+
+						// The sensor type ID is not important here, thus we are passing a -1. It is
+						// already stored in the data object
+						invocationHook.secondAfterBody(coreService, id, -1, object, parameters, returnValue, rsc);
+					}
+				} catch (Throwable throwable) {
+					LOGGER.severe("An error happened in the Hook Dispatcher! (second after body)");
+					throwable.printStackTrace();
 				}
-			} else {
-				for (Iterator i = rsc.getMethodHooks().entrySet().iterator(); i.hasNext();) {
-					Map.Entry entry = (Map.Entry) i.next();
-					IMethodHook methodHook = (IMethodHook) entry.getValue();
-					methodHook.secondAfterBody(coreService, id, ((Long) entry.getKey()).longValue(), object, parameters, returnValue, rsc);
-				}
+			} finally {
+				executionMarker.deactive();
 			}
-
-			if (rsc.startsInvocationSequence()) {
-				invocationSequenceCount.decrement();
-
-				if (0 == invocationSequenceCount.getCount()) {
-					invocationSequenceHolder.set(null);
-				}
-			} else if (null != invocationSequenceHolder.get()) {
-				// We have to execute the after body method of the invocation sequence hook
-				// manually.
-				IMethodHook invocationHook = (IMethodHook) invocationSequenceHolder.get();
-
-				// The sensor type ID is not important here, thus we are passing a -1. It is already
-				// stored in the data object
-				invocationHook.secondAfterBody(coreService, id, -1, object, parameters, returnValue, rsc);
-			}
-		} catch (Throwable throwable) {
-			LOGGER.severe("An error happened in the Hook Dispatcher! (second after body)");
-			throwable.printStackTrace();
 		}
 	}
 
@@ -191,23 +222,31 @@ public class HookDispatcher implements IHookDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchOnThrowInBody(long id, Object object, Object[] parameters, Object exceptionObject) {
-		// rsc contains the settings for the actual method where the exception was thrown.
-		RegisteredSensorConfig rsc = (RegisteredSensorConfig) methodHooks.get(new Long(id));
-		long sensorTypeId = rsc.getExceptionSensorTypeConfig().getId();
+		if (!executionMarker.isActive()) {
+			try {
+				executionMarker.active();
 
-		ICoreService invocCoreService = null;
-		if (null != invocationSequenceHolder.get()) {
-			// Need to replace the core service with the one from the invocation sequence so
-			// that all data objects can be associated to that invocation record.
-			invocCoreService = (ICoreService) invocationSequenceHolder.get();
-		}
+				// rsc contains the settings for the actual method where the exception was thrown.
+				RegisteredSensorConfig rsc = (RegisteredSensorConfig) methodHooks.get(new Long(id));
+				long sensorTypeId = rsc.getExceptionSensorTypeConfig().getId();
 
-		IExceptionSensorHook exceptionHook = (IExceptionSensorHook) ((IMethodSensor) rsc.getExceptionSensorTypeConfig().getSensorType()).getHook();
+				ICoreService invocCoreService = null;
+				if (null != invocationSequenceHolder.get()) {
+					// Need to replace the core service with the one from the invocation sequence so
+					// that all data objects can be associated to that invocation record.
+					invocCoreService = (ICoreService) invocationSequenceHolder.get();
+				}
 
-		if (null != invocCoreService) {
-			exceptionHook.dispatchOnThrowInBody(invocCoreService, id, sensorTypeId, object, exceptionObject, parameters, rsc);
-		} else {
-			exceptionHook.dispatchOnThrowInBody(coreService, id, sensorTypeId, object, exceptionObject, parameters, rsc);
+				IExceptionSensorHook exceptionHook = (IExceptionSensorHook) ((IMethodSensor) rsc.getExceptionSensorTypeConfig().getSensorType()).getHook();
+
+				if (null != invocCoreService) {
+					exceptionHook.dispatchOnThrowInBody(invocCoreService, id, sensorTypeId, object, exceptionObject, parameters, rsc);
+				} else {
+					exceptionHook.dispatchOnThrowInBody(coreService, id, sensorTypeId, object, exceptionObject, parameters, rsc);
+				}
+			} finally {
+				executionMarker.deactive();
+			}
 		}
 	}
 
@@ -215,23 +254,31 @@ public class HookDispatcher implements IHookDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchBeforeCatch(long id, Object exceptionObject) {
-		// rsc contains the settings of the actual method where the exception is catched.
-		RegisteredSensorConfig rsc = (RegisteredSensorConfig) methodHooks.get(new Long(id));
-		long sensorTypeId = rsc.getExceptionSensorTypeConfig().getId();
+		if (!executionMarker.isActive()) {
+			try {
+				executionMarker.active();
 
-		ICoreService invocCoreService = null;
-		if (null != invocationSequenceHolder.get()) {
-			// Need to replace the core service with the one from the invocation sequence so
-			// that all data objects can be associated to that invocation record.
-			invocCoreService = (ICoreService) invocationSequenceHolder.get();
-		}
+				// rsc contains the settings of the actual method where the exception is catched.
+				RegisteredSensorConfig rsc = (RegisteredSensorConfig) methodHooks.get(new Long(id));
+				long sensorTypeId = rsc.getExceptionSensorTypeConfig().getId();
 
-		IExceptionSensorHook exceptionHook = (IExceptionSensorHook) ((IMethodSensor) rsc.getExceptionSensorTypeConfig().getSensorType()).getHook();
+				ICoreService invocCoreService = null;
+				if (null != invocationSequenceHolder.get()) {
+					// Need to replace the core service with the one from the invocation sequence so
+					// that all data objects can be associated to that invocation record.
+					invocCoreService = (ICoreService) invocationSequenceHolder.get();
+				}
 
-		if (null != invocCoreService) {
-			exceptionHook.dispatchBeforeCatchBody(invocCoreService, id, sensorTypeId, exceptionObject, rsc);
-		} else {
-			exceptionHook.dispatchBeforeCatchBody(coreService, id, sensorTypeId, exceptionObject, rsc);
+				IExceptionSensorHook exceptionHook = (IExceptionSensorHook) ((IMethodSensor) rsc.getExceptionSensorTypeConfig().getSensorType()).getHook();
+
+				if (null != invocCoreService) {
+					exceptionHook.dispatchBeforeCatchBody(invocCoreService, id, sensorTypeId, exceptionObject, rsc);
+				} else {
+					exceptionHook.dispatchBeforeCatchBody(coreService, id, sensorTypeId, exceptionObject, rsc);
+				}
+			} finally {
+				executionMarker.deactive();
+			}
 		}
 	}
 
@@ -239,23 +286,32 @@ public class HookDispatcher implements IHookDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchConstructorOnThrowInBody(long id, Object object, Object[] parameters, Object exceptionObject) {
-		// rsc contains the settings for the actual constructor where the exception was thrown.
-		RegisteredSensorConfig rsc = (RegisteredSensorConfig) constructorHooks.get(new Long(id));
-		long sensorTypeId = rsc.getExceptionSensorTypeConfig().getId();
+		if (!executionMarker.isActive()) {
+			try {
+				executionMarker.active();
 
-		ICoreService invocCoreService = null;
-		if (null != invocationSequenceHolder.get()) {
-			// Need to replace the core service with the one from the invocation sequence so
-			// that all data objects can be associated to that invocation record.
-			invocCoreService = (ICoreService) invocationSequenceHolder.get();
-		}
+				// rsc contains the settings for the actual constructor where the exception was
+				// thrown.
+				RegisteredSensorConfig rsc = (RegisteredSensorConfig) constructorHooks.get(new Long(id));
+				long sensorTypeId = rsc.getExceptionSensorTypeConfig().getId();
 
-		IExceptionSensorHook exceptionHook = (IExceptionSensorHook) ((IMethodSensor) rsc.getExceptionSensorTypeConfig().getSensorType()).getHook();
+				ICoreService invocCoreService = null;
+				if (null != invocationSequenceHolder.get()) {
+					// Need to replace the core service with the one from the invocation sequence so
+					// that all data objects can be associated to that invocation record.
+					invocCoreService = (ICoreService) invocationSequenceHolder.get();
+				}
 
-		if (null != invocCoreService) {
-			exceptionHook.dispatchOnThrowInBody(invocCoreService, id, sensorTypeId, object, exceptionObject, parameters, rsc);
-		} else {
-			exceptionHook.dispatchOnThrowInBody(coreService, id, sensorTypeId, object, exceptionObject, parameters, rsc);
+				IExceptionSensorHook exceptionHook = (IExceptionSensorHook) ((IMethodSensor) rsc.getExceptionSensorTypeConfig().getSensorType()).getHook();
+
+				if (null != invocCoreService) {
+					exceptionHook.dispatchOnThrowInBody(invocCoreService, id, sensorTypeId, object, exceptionObject, parameters, rsc);
+				} else {
+					exceptionHook.dispatchOnThrowInBody(coreService, id, sensorTypeId, object, exceptionObject, parameters, rsc);
+				}
+			} finally {
+				executionMarker.deactive();
+			}
 		}
 	}
 
@@ -263,23 +319,32 @@ public class HookDispatcher implements IHookDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchConstructorBeforeCatch(long id, Object exceptionObject) {
-		// rsc contains the settings of the actual constructor where the exception is catched.
-		RegisteredSensorConfig rsc = (RegisteredSensorConfig) constructorHooks.get(new Long(id));
-		long sensorTypeId = rsc.getExceptionSensorTypeConfig().getId();
+		if (!executionMarker.isActive()) {
+			try {
+				executionMarker.active();
 
-		ICoreService invocCoreService = null;
-		if (null != invocationSequenceHolder.get()) {
-			// Need to replace the core service with the one from the invocation sequence so
-			// that all data objects can be associated to that invocation record.
-			invocCoreService = (ICoreService) invocationSequenceHolder.get();
-		}
+				// rsc contains the settings of the actual constructor where the exception is
+				// catched.
+				RegisteredSensorConfig rsc = (RegisteredSensorConfig) constructorHooks.get(new Long(id));
+				long sensorTypeId = rsc.getExceptionSensorTypeConfig().getId();
 
-		IExceptionSensorHook exceptionHook = (IExceptionSensorHook) ((IMethodSensor) rsc.getExceptionSensorTypeConfig().getSensorType()).getHook();
+				ICoreService invocCoreService = null;
+				if (null != invocationSequenceHolder.get()) {
+					// Need to replace the core service with the one from the invocation sequence so
+					// that all data objects can be associated to that invocation record.
+					invocCoreService = (ICoreService) invocationSequenceHolder.get();
+				}
 
-		if (null != invocCoreService) {
-			exceptionHook.dispatchBeforeCatchBody(invocCoreService, id, sensorTypeId, exceptionObject, rsc);
-		} else {
-			exceptionHook.dispatchBeforeCatchBody(coreService, id, sensorTypeId, exceptionObject, rsc);
+				IExceptionSensorHook exceptionHook = (IExceptionSensorHook) ((IMethodSensor) rsc.getExceptionSensorTypeConfig().getSensorType()).getHook();
+
+				if (null != invocCoreService) {
+					exceptionHook.dispatchBeforeCatchBody(invocCoreService, id, sensorTypeId, exceptionObject, rsc);
+				} else {
+					exceptionHook.dispatchBeforeCatchBody(coreService, id, sensorTypeId, exceptionObject, rsc);
+				}
+			} finally {
+				executionMarker.deactive();
+			}
 		}
 	}
 
@@ -287,38 +352,52 @@ public class HookDispatcher implements IHookDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchConstructorBeforeBody(long id, Object object, Object[] parameters) {
-		try {
-			RegisteredSensorConfig rsc = (RegisteredSensorConfig) constructorHooks.get(new Long(id));
+		if (!executionMarker.isActive()) {
+			try {
+				executionMarker.active();
 
-			if (rsc.startsInvocationSequence()) {
-				// The sensor configuration contains an invocation sequence sensor. We have to set
-				// it on the thread local map for later access. Additionally, we need to save the
-				// count of the called invocation sensors, as another nested one could be started,
-				// too.
-				invocationSequenceCount.increment();
-				if (null == invocationSequenceHolder.get()) {
-					invocationSequenceHolder.set(((IMethodSensor) rsc.getInvocationSequenceSensorTypeConfig().getSensorType()).getHook());
+				try {
+					RegisteredSensorConfig rsc = (RegisteredSensorConfig) constructorHooks.get(new Long(id));
+
+					if (rsc.startsInvocationSequence()) {
+						// The sensor configuration contains an invocation sequence sensor. We have
+						// to set
+						// it on the thread local map for later access. Additionally, we need to
+						// save the
+						// count of the called invocation sensors, as another nested one could be
+						// started,
+						// too.
+						invocationSequenceCount.increment();
+						if (null == invocationSequenceHolder.get()) {
+							invocationSequenceHolder.set(((IMethodSensor) rsc.getInvocationSequenceSensorTypeConfig().getSensorType()).getHook());
+						}
+					} else if (null != invocationSequenceHolder.get()) {
+						// We are executing the following sensor types in an invocation sequence
+						// context,
+						// thus we have to execute the before body method of the invocation sequence
+						// hook
+						// manually.
+						IConstructorHook invocationHook = (IConstructorHook) invocationSequenceHolder.get();
+
+						// The sensor type ID is not important here, thus we are passing a -1. It is
+						// already
+						// stored in the data object
+						invocationHook.beforeConstructor(id, -1, object, parameters, rsc);
+					}
+
+					// Now iterate over all registered sensor types and execute them
+					for (Iterator i = rsc.getReverseMethodHooks().entrySet().iterator(); i.hasNext();) {
+						Map.Entry entry = (Map.Entry) i.next();
+						IConstructorHook constructorHook = (IConstructorHook) entry.getValue();
+						constructorHook.beforeConstructor(id, ((Long) entry.getKey()).longValue(), object, parameters, rsc);
+					}
+				} catch (Throwable throwable) {
+					LOGGER.severe("An error happened in the Hook Dispatcher! (before constructor)");
+					throwable.printStackTrace();
 				}
-			} else if (null != invocationSequenceHolder.get()) {
-				// We are executing the following sensor types in an invocation sequence context,
-				// thus we have to execute the before body method of the invocation sequence hook
-				// manually.
-				IConstructorHook invocationHook = (IConstructorHook) invocationSequenceHolder.get();
-
-				// The sensor type ID is not important here, thus we are passing a -1. It is already
-				// stored in the data object
-				invocationHook.beforeConstructor(id, -1, object, parameters, rsc);
+			} finally {
+				executionMarker.deactive();
 			}
-
-			// Now iterate over all registered sensor types and execute them
-			for (Iterator i = rsc.getReverseMethodHooks().entrySet().iterator(); i.hasNext();) {
-				Map.Entry entry = (Map.Entry) i.next();
-				IConstructorHook constructorHook = (IConstructorHook) entry.getValue();
-				constructorHook.beforeConstructor(id, ((Long) entry.getKey()).longValue(), object, parameters, rsc);
-			}
-		} catch (Throwable throwable) {
-			LOGGER.severe("An error happened in the Hook Dispatcher! (before constructor)");
-			throwable.printStackTrace();
 		}
 	}
 
@@ -326,52 +405,62 @@ public class HookDispatcher implements IHookDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchConstructorAfterBody(long id, Object object, Object[] parameters) {
-		try {
-			RegisteredSensorConfig rsc = (RegisteredSensorConfig) constructorHooks.get(new Long(id));
+		if (!executionMarker.isActive()) {
+			try {
+				executionMarker.active();
 
-			if (null != invocationSequenceHolder.get()) {
-				// Need to replace the core service with the one from the invocation sequence so
-				// that all data objects can be associated to that invocation record.
-				ICoreService invocCoreService = (ICoreService) invocationSequenceHolder.get();
+				try {
+					RegisteredSensorConfig rsc = (RegisteredSensorConfig) constructorHooks.get(new Long(id));
 
-				for (Iterator i = rsc.getMethodHooks().entrySet().iterator(); i.hasNext();) {
-					Map.Entry entry = (Map.Entry) i.next();
-					IConstructorHook constructorHook = (IConstructorHook) entry.getValue();
-					// the invocation sequence sensor and the exception sensor need the original
-					// core service!
+					if (null != invocationSequenceHolder.get()) {
+						// Need to replace the core service with the one from the invocation
+						// sequence so
+						// that all data objects can be associated to that invocation record.
+						ICoreService invocCoreService = (ICoreService) invocationSequenceHolder.get();
 
-					if (invocCoreService == constructorHook) {
-						constructorHook.afterConstructor(coreService, id, ((Long) entry.getKey()).longValue(), object, parameters, rsc);
+						for (Iterator i = rsc.getMethodHooks().entrySet().iterator(); i.hasNext();) {
+							Map.Entry entry = (Map.Entry) i.next();
+							IConstructorHook constructorHook = (IConstructorHook) entry.getValue();
+							// the invocation sequence sensor and the exception sensor need the
+							// original
+							// core service!
+
+							if (invocCoreService == constructorHook) {
+								constructorHook.afterConstructor(coreService, id, ((Long) entry.getKey()).longValue(), object, parameters, rsc);
+							} else {
+								constructorHook.afterConstructor(invocCoreService, id, ((Long) entry.getKey()).longValue(), object, parameters, rsc);
+							}
+						}
 					} else {
-						constructorHook.afterConstructor(invocCoreService, id, ((Long) entry.getKey()).longValue(), object, parameters, rsc);
+						for (Iterator i = rsc.getMethodHooks().entrySet().iterator(); i.hasNext();) {
+							Map.Entry entry = (Map.Entry) i.next();
+							IConstructorHook constructorHook = (IConstructorHook) entry.getValue();
+							constructorHook.afterConstructor(coreService, id, ((Long) entry.getKey()).longValue(), object, parameters, rsc);
+						}
 					}
+
+					if (rsc.startsInvocationSequence()) {
+						invocationSequenceCount.decrement();
+
+						if (0 == invocationSequenceCount.getCount()) {
+							invocationSequenceHolder.set(null);
+						}
+					} else if (null != invocationSequenceHolder.get()) {
+						// We have to execute the after body method of the invocation
+						// sequence hook manually.
+						IConstructorHook invocationHook = (IConstructorHook) invocationSequenceHolder.get();
+
+						// The sensor type ID is not important here, thus we are passing
+						// a -1. It is already stored in the data object
+						invocationHook.afterConstructor(coreService, id, -1, object, parameters, rsc);
+					}
+				} catch (Throwable throwable) {
+					LOGGER.severe("An error happened in the Hook Dispatcher! (after constructor)");
+					throwable.printStackTrace();
 				}
-			} else {
-				for (Iterator i = rsc.getMethodHooks().entrySet().iterator(); i.hasNext();) {
-					Map.Entry entry = (Map.Entry) i.next();
-					IConstructorHook constructorHook = (IConstructorHook) entry.getValue();
-					constructorHook.afterConstructor(coreService, id, ((Long) entry.getKey()).longValue(), object, parameters, rsc);
-				}
+			} finally {
+				executionMarker.deactive();
 			}
-
-			if (rsc.startsInvocationSequence()) {
-				invocationSequenceCount.decrement();
-
-				if (0 == invocationSequenceCount.getCount()) {
-					invocationSequenceHolder.set(null);
-				}
-			} else if (null != invocationSequenceHolder.get()) {
-				// We have to execute the after body method of the invocation
-				// sequence hook manually.
-				IConstructorHook invocationHook = (IConstructorHook) invocationSequenceHolder.get();
-
-				// The sensor type ID is not important here, thus we are passing
-				// a -1. It is already stored in the data object
-				invocationHook.afterConstructor(coreService, id, -1, object, parameters, rsc);
-			}
-		} catch (Throwable throwable) {
-			LOGGER.severe("An error happened in the Hook Dispatcher! (after constructor)");
-			throwable.printStackTrace();
 		}
 	}
 
@@ -415,4 +504,47 @@ public class HookDispatcher implements IHookDispatcher {
 		}
 
 	}
+
+	/**
+	 * ThreadLocal execution marker which is used to mark executions as already in progress to not
+	 * dispatch over and over again.
+	 * 
+	 * @author Patrice Bouillet
+	 * 
+	 */
+	private static class ExecutionMarker extends ThreadLocal {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		protected Object initialValue() {
+			return Boolean.FALSE;
+		}
+
+		/**
+		 * Execution is active.
+		 */
+		public void active() {
+			super.set(Boolean.TRUE);
+		}
+
+		/**
+		 * Execution is deactive.
+		 */
+		public void deactive() {
+			super.set(Boolean.FALSE);
+		}
+
+		/**
+		 * Defines if our own execution is active, and thus we have to skip the whole processing
+		 * (because it could happen, that we'll never end then).
+		 * 
+		 * @return if own execution is active.
+		 */
+		public boolean isActive() {
+			return ((Boolean) super.get()).booleanValue();
+		}
+
+	}
+
 }

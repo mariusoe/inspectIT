@@ -78,11 +78,6 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 *            The configuration storage where all definitions of the user are stored.
 	 */
 	public HookInstrumenter(IHookDispatcher hookDispatcher, IIdManager idManager, IConfigurationStorage configurationStorage) {
-		// This will set the useContextClassLoader parameter to true to resolve
-		// the current class of static methods. The standard method of looking
-		// for a class via Class.forName(...) does not work!
-		info.novatec.inspectit.javassist.runtime.Desc.useContextClassLoader = true;
-
 		this.hookDispatcher = hookDispatcher;
 		this.idManager = idManager;
 		this.configurationStorage = configurationStorage;
@@ -113,9 +108,9 @@ public class HookInstrumenter implements IHookInstrumenter {
 			boolean asFinally = !configurationStorage.isExceptionSensorActivated();
 			if (Modifier.isStatic(method.getModifiers())) {
 				// static method
-				method.insertBefore(hookDispatcherTarget + ".dispatchMethodBeforeBody(" + methodId + "l, $class, $args);");
-				method.insertAfter(hookDispatcherTarget + ".dispatchFirstMethodAfterBody(" + methodId + "l, $class, $args, ($w)$_);", asFinally);
-				method.insertAfter(hookDispatcherTarget + ".dispatchSecondMethodAfterBody(" + methodId + "l, $class, $args, ($w)$_);", asFinally);
+				method.insertBefore(hookDispatcherTarget + ".dispatchMethodBeforeBody(" + methodId + "l, null, $args);");
+				method.insertAfter(hookDispatcherTarget + ".dispatchFirstMethodAfterBody(" + methodId + "l, null, $args, ($w)$_);", asFinally);
+				method.insertAfter(hookDispatcherTarget + ".dispatchSecondMethodAfterBody(" + methodId + "l, null, $args, ($w)$_);", asFinally);
 
 				if (!asFinally) {
 					// the exception sensor is activated, so instrument the
@@ -217,8 +212,8 @@ public class HookInstrumenter implements IHookInstrumenter {
 					+ "l, $0, $args, null);" + hookDispatcherTarget + ".dispatchSecondMethodAfterBody(" + methodId + "l, $0, $args, null);" + "throw $e; ", type);
 		} else {
 			// static method
-			method.addCatch(hookDispatcherTarget + ".dispatchOnThrowInBody(" + methodId + "l, $class, $args, $e);" + hookDispatcherTarget + ".dispatchFirstMethodAfterBody(" + methodId
-					+ "l, $class, $args, null);" + hookDispatcherTarget + ".dispatchSecondMethodAfterBody(" + methodId + "l, $class, $args, null);" + "throw $e; ", type);
+			method.addCatch(hookDispatcherTarget + ".dispatchOnThrowInBody(" + methodId + "l, null, $args, $e);" + hookDispatcherTarget + ".dispatchFirstMethodAfterBody(" + methodId
+					+ "l, null, $args, null);" + hookDispatcherTarget + ".dispatchSecondMethodAfterBody(" + methodId + "l, null, $args, null);" + "throw $e; ", type);
 		}
 	}
 

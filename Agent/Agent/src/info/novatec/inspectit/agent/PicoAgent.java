@@ -75,7 +75,7 @@ public class PicoAgent {
 	 * These patterns are checked in the {@link #inspectByteCode(byte[], String, ClassLoader)}
 	 * method to ignore them.
 	 */
-	private static final String[] IGNORE_START_PATTERNS = new String[] { "info.novatec.inspectit.", "sun.misc.reflect", "$Proxy", "sun.reflect." };
+	private static final String[] IGNORE_START_PATTERNS = new String[] { "info.novatec.inspectit.", "$Proxy", "sun.", "java.lang.ThreadLocal", "java.lang.ref.Reference" };
 
 	/**
 	 * These patterns are checked in the {@link #inspectByteCode(byte[], String, ClassLoader)}

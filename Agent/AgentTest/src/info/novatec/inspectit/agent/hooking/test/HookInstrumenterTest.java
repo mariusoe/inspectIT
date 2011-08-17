@@ -3,6 +3,7 @@ package info.novatec.inspectit.agent.hooking.test;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -177,9 +178,9 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		// exception by casting to the concrete class.
 		this.callMethod(testClass, methodName, null);
 
-		verify(hookDispatcher).dispatchMethodBeforeBody(methodId, testClass.getClass(), new Object[0]);
-		verify(hookDispatcher).dispatchFirstMethodAfterBody(methodId, testClass.getClass(), new Object[0], null);
-		verify(hookDispatcher).dispatchSecondMethodAfterBody(methodId, testClass.getClass(), new Object[0], null);
+		verify(hookDispatcher).dispatchMethodBeforeBody(methodId, null, new Object[0]);
+		verify(hookDispatcher).dispatchFirstMethodAfterBody(methodId, null, new Object[0], null);
+		verify(hookDispatcher).dispatchSecondMethodAfterBody(methodId, null, new Object[0], null);
 		verifyNoMoreInteractions(idManager, hookDispatcher);
 	}
 
@@ -421,9 +422,9 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		Object testClass = this.createInstance(loader, ctMethod);
 		this.callMethod(testClass, methodName, null);
 
-		verify(hookDispatcher).dispatchMethodBeforeBody(methodId, testClass.getClass(), new Object[0]);
-		verify(hookDispatcher).dispatchFirstMethodAfterBody(methodId, testClass.getClass(), new Object[0], null);
-		verify(hookDispatcher).dispatchSecondMethodAfterBody(methodId, testClass.getClass(), new Object[0], null);
+		verify(hookDispatcher).dispatchMethodBeforeBody(methodId, null, new Object[0]);
+		verify(hookDispatcher).dispatchFirstMethodAfterBody(methodId, null, new Object[0], null);
+		verify(hookDispatcher).dispatchSecondMethodAfterBody(methodId, null, new Object[0], null);
 	}
 
 	@Test
@@ -441,9 +442,9 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		Object testClass = this.createInstance(loader, ctMethod);
 		this.callMethod(testClass, methodName, null);
 
-		verify(hookDispatcher).dispatchMethodBeforeBody(methodId, testClass.getClass(), new Object[0]);
-		verify(hookDispatcher).dispatchFirstMethodAfterBody(methodId, testClass.getClass(), new Object[0], "stringNullParameterStatic");
-		verify(hookDispatcher).dispatchSecondMethodAfterBody(methodId, testClass.getClass(), new Object[0], "stringNullParameterStatic");
+		verify(hookDispatcher).dispatchMethodBeforeBody(methodId, null, new Object[0]);
+		verify(hookDispatcher).dispatchFirstMethodAfterBody(methodId, null, new Object[0], "stringNullParameterStatic");
+		verify(hookDispatcher).dispatchSecondMethodAfterBody(methodId, null, new Object[0], "stringNullParameterStatic");
 	}
 
 	@Test
@@ -1135,18 +1136,18 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		this.callMethod(testClass, methodName, null);
 
 		// first method
-		verify(hookDispatcher).dispatchMethodBeforeBody(methodId, testClass.getClass(), new Object[0]);
-		verify(hookDispatcher).dispatchFirstMethodAfterBody(methodId, testClass.getClass(), new Object[0], null);
-		verify(hookDispatcher).dispatchSecondMethodAfterBody(methodId, testClass.getClass(), new Object[0], null);
+		verify(hookDispatcher).dispatchMethodBeforeBody(methodId, null, new Object[0]);
+		verify(hookDispatcher).dispatchFirstMethodAfterBody(methodId, null, new Object[0], null);
+		verify(hookDispatcher).dispatchSecondMethodAfterBody(methodId, null, new Object[0], null);
 
 		// inner method
-		verify(hookDispatcher).dispatchMethodBeforeBody(innerMethodId, testClass.getClass(), new Object[0]);
-		verify(hookDispatcher).dispatchFirstMethodAfterBody(innerMethodId, testClass.getClass(), new Object[0], null);
-		verify(hookDispatcher).dispatchSecondMethodAfterBody(innerMethodId, testClass.getClass(), new Object[0], null);
+		verify(hookDispatcher).dispatchMethodBeforeBody(innerMethodId, null, new Object[0]);
+		verify(hookDispatcher).dispatchFirstMethodAfterBody(innerMethodId, null, new Object[0], null);
+		verify(hookDispatcher).dispatchSecondMethodAfterBody(innerMethodId, null, new Object[0], null);
 
 		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
 		verify(hookDispatcher).dispatchConstructorAfterBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
-		verify(hookDispatcher).dispatchOnThrowInBody(eq(innerMethodId), eq(testClass.getClass()), (Object[]) anyObject(), argThat(new ThrowableVerifier(exceptionObject)));
+		verify(hookDispatcher).dispatchOnThrowInBody(eq(innerMethodId), isNull(), (Object[]) anyObject(), argThat(new ThrowableVerifier(exceptionObject)));
 		verify(hookDispatcher).dispatchBeforeCatch(eq(methodId), argThat(new ThrowableVerifier(exceptionObject)));
 		verifyNoMoreInteractions(hookDispatcher);
 	}
