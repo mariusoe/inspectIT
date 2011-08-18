@@ -1,13 +1,18 @@
 package info.novatec.inspectit.rcp.util;
 
-import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.mutable.MutableInt;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -20,6 +25,30 @@ import org.eclipse.jface.viewers.ViewerFilter;
  * 
  */
 public final class OccurrenceFinderFactory {
+
+	/**
+	 * String used buy templates to denote a String that will not be checked when matching.
+	 */
+	private static final String TEMPLATE_STRING = "TEMPLATE_STRING";
+
+	/**
+	 * Map used by templates to denote a Map that will not be checked when matching. Currently not
+	 * in use, but in future it might be needed.
+	 */
+	@SuppressWarnings("unused")
+	private static final Map<Object, Object> TEMPLATE_MAP = new HashMap<Object, Object>(0);
+
+	/**
+	 * List used buy templates to denote a List that will not be checked when matching.
+	 */
+	private static final List<Object> TEMPLATE_LIST = new ArrayList<Object>(0);
+
+	/**
+	 * Set used buy templates to denote a Set that will not be checked when matching. Currently not
+	 * in use, but in future it might be needed.
+	 */
+	@SuppressWarnings("unused")
+	private static final Set<Object> TEMPLATE_SET = new HashSet<Object>(0);
 
 	/**
 	 * Private constructor because of the factory.
@@ -81,6 +110,21 @@ public final class OccurrenceFinderFactory {
 	}
 
 	/**
+	 * Returns empty template.
+	 * 
+	 * @param <E>
+	 *            Type of template.
+	 * @param element
+	 *            For element.
+	 * @return Template to be used.
+	 */
+	@SuppressWarnings({ "unchecked" })
+	public static <E> E getEmptyTemplate(E element) {
+		OccurrenceFinder<E> finder = getOccurrenceFinder(element);
+		return finder.getEmptyTemplate();
+	}
+
+	/**
 	 * Returns the proper {@link OccurrenceFinder} for the given element, based on elements class.
 	 * 
 	 * @param element
@@ -97,7 +141,8 @@ public final class OccurrenceFinderFactory {
 		} else if (ExceptionSensorData.class.isAssignableFrom(element.getClass())) {
 			return exceptionOccurrenceFinder;
 		}
-		RuntimeException exception = new  RuntimeException("Occurrence finder factory was not able to supply the correct occurrence finder for the object of class " + element.getClass().getName() + ".");
+		RuntimeException exception = new RuntimeException("Occurrence finder factory was not able to supply the correct occurrence finder for the object of class " + element.getClass().getName()
+				+ ".");
 		InspectIT.getDefault().createErrorDialog("Exception thrown during locating of stepping object.", exception, -1);
 		throw exception;
 	}
@@ -155,6 +200,13 @@ public final class OccurrenceFinderFactory {
 		}
 
 		/**
+		 * Get empty template.
+		 * 
+		 * @return Empty template.
+		 */
+		public abstract E getEmptyTemplate();
+
+		/**
 		 * Returns the {@link InvocationSequenceData} object that has the wanted template data
 		 * object defined. The wanted occurrence of E object is defined via {@link #occurrencesLeft}
 		 * , before this method is called. This method is recursive, and stops traversing the
@@ -205,11 +257,22 @@ public final class OccurrenceFinderFactory {
 		public abstract boolean occurrenceFound(InvocationSequenceData invocationData, E template);
 
 		/**
+		 * Compares if the template equals the element from the view of the finder.
+		 * 
+		 * @param template
+		 *            Template.
+		 * @param element
+		 *            Element.
+		 * @return True if templates are equal.
+		 */
+		public abstract boolean doesTemplateEqualsElement(E template, E element);
+
+		/**
 		 * Returns the concrete class that finder is working with.
 		 * 
 		 * @return Returns the concrete class that finder is working with.
 		 */
-		public abstract Class<E> getConcreteClass();
+		public abstract Class<? extends E> getConcreteClass();
 
 		/**
 		 * Returns if the invocation data object is passing all given filters.
@@ -248,20 +311,74 @@ public final class OccurrenceFinderFactory {
 		 */
 		@SuppressWarnings("unchecked")
 		@Override
-		public boolean occurrenceFound(InvocationSequenceData invocationData, ExceptionSensorData exceptionSensorData) {
+		public boolean occurrenceFound(InvocationSequenceData invocationData, ExceptionSensorData template) {
 			if (invocationData.getExceptionSensorDataObjects() != null) {
 				for (ExceptionSensorData exData : (List<ExceptionSensorData>) invocationData.getExceptionSensorDataObjects()) {
-					if (exData.getExceptionEvent().equals(ExceptionEventEnum.CREATED) && exData.getThrowableType().equals(exceptionSensorData.getThrowableType())) {
-						return true;
-					}
+					return doesTemplateEqualsElement(template, exData);
 				}
 			}
 			return false;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public Class<ExceptionSensorData> getConcreteClass() {
 			return ExceptionSensorData.class;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean doesTemplateEqualsElement(ExceptionSensorData template, ExceptionSensorData element) {
+			if (TEMPLATE_STRING != template.getCause()) {
+				if (!ObjectUtils.equals(template.getCause(), element.getCause())) {
+					return false;
+				}
+			}
+			if (TEMPLATE_STRING != template.getErrorMessage()) {
+				if (!ObjectUtils.equals(template.getErrorMessage(), element.getErrorMessage())) {
+					return false;
+				}
+			}
+			if (TEMPLATE_STRING != template.getStackTrace()) {
+				if (!ObjectUtils.equals(template.getStackTrace(), element.getStackTrace())) {
+					return false;
+				}
+			}
+			if (TEMPLATE_STRING != template.getThrowableType()) {
+				if (!ObjectUtils.equals(template.getThrowableType(), element.getThrowableType())) {
+					return false;
+				}
+			}
+			if (0 != template.getThrowableIdentityHashCode()) {
+				if (template.getThrowableIdentityHashCode() != element.getThrowableIdentityHashCode()) {
+					return false;
+				}
+			}
+			if (null != template.getExceptionEvent()) {
+				if (!ObjectUtils.equals(template.getExceptionEvent(), element.getExceptionEvent())) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public ExceptionSensorData getEmptyTemplate() {
+			ExceptionSensorData exceptionSensorData = new ExceptionSensorData();
+			exceptionSensorData.setCause(TEMPLATE_STRING);
+			exceptionSensorData.setErrorMessage(TEMPLATE_STRING);
+			exceptionSensorData.setStackTrace(TEMPLATE_STRING);
+			exceptionSensorData.setThrowableType(TEMPLATE_STRING);
+			exceptionSensorData.setThrowableIdentityHashCode(0);
+			exceptionSensorData.setExceptionEvent(null);
+			return exceptionSensorData;
 		}
 
 	}
@@ -278,21 +395,54 @@ public final class OccurrenceFinderFactory {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean occurrenceFound(InvocationSequenceData invocationData, SqlStatementData sqlStatementData) {
+		public boolean occurrenceFound(InvocationSequenceData invocationData, SqlStatementData template) {
 			if (invocationData.getSqlStatementData() != null) {
-				if (invocationData.getSqlStatementData().getMethodIdent() == sqlStatementData.getMethodIdent() && invocationData.getSqlStatementData().getSql().equals(sqlStatementData.getSql())) {
-					return true;
-				}
+				return doesTemplateEqualsElement(template, invocationData.getSqlStatementData());
 			}
 			return false;
 		}
-		
+
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public Class<SqlStatementData> getConcreteClass() {
 			return SqlStatementData.class;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean doesTemplateEqualsElement(SqlStatementData template, SqlStatementData element) {
+			if (TEMPLATE_STRING != template.getSql()) {
+				if (!ObjectUtils.equals(template.getSql(), element.getSql())) {
+					return false;
+				}
+			}
+			if (TEMPLATE_LIST != template.getParameterValues()) {
+				if (!ObjectUtils.equals(template.getParameterValues(), element.getParameterValues())) {
+					return false;
+				}
+			}
+			if (0 != template.getMethodIdent()) {
+				if (template.getMethodIdent() != element.getMethodIdent()) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public SqlStatementData getEmptyTemplate() {
+			SqlStatementData sqlStatementData = new SqlStatementData();
+			sqlStatementData.setSql(TEMPLATE_STRING);
+			sqlStatementData.setParameterValues(TEMPLATE_LIST);
+			sqlStatementData.setMethodIdent(0);
+			return sqlStatementData;
 		}
 
 	}
@@ -303,31 +453,49 @@ public final class OccurrenceFinderFactory {
 	 * @author Ivan Senic
 	 * 
 	 */
-	private static class TimerOccurrenceFinder extends OccurrenceFinder<TimerData> {
+	private static class TimerOccurrenceFinder extends OccurrenceFinder<MethodSensorData> {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean occurrenceFound(InvocationSequenceData invocationData, TimerData timerData) {
+		public boolean occurrenceFound(InvocationSequenceData invocationData, MethodSensorData template) {
 			if (invocationData.getTimerData() != null) {
-				if (invocationData.getTimerData().getMethodIdent() == timerData.getMethodIdent()) {
-					return true;
-				}
+				return doesTemplateEqualsElement(template, invocationData.getTimerData());
 			} else {
-				if (invocationData.getMethodIdent() == timerData.getMethodIdent()) {
-					return true;
-				}
+				return doesTemplateEqualsElement(template, invocationData);
 			}
-			return false;
 		}
-		
+
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public Class<TimerData> getConcreteClass() {
 			return TimerData.class;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean doesTemplateEqualsElement(MethodSensorData template, MethodSensorData element) {
+			if (0 != template.getMethodIdent()) {
+				if (template.getMethodIdent() != element.getMethodIdent()) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public MethodSensorData getEmptyTemplate() {
+			TimerData timerData = new TimerData();
+			timerData.setMethodIdent(0);
+			return timerData;
 		}
 
 	}

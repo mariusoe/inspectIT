@@ -67,12 +67,13 @@ public class SteppingInvocDetailInputController extends InvocDetailInputControll
 	@Override
 	public void setInputDefinition(InputDefinition inputDefinition) {
 		super.setInputDefinition(inputDefinition);
-
+		steppingObjectsList = new ArrayList<Object>();
+		
 		Object steppingObj = inputDefinition.getAdditionalOption("steppingObjects");
 		if (null != steppingObj) {
-			steppingObjectsList = (List<Object>) steppingObj;
-		} else {
-			steppingObjectsList = new ArrayList<Object>();
+			for (Object object : (List<Object>) steppingObj) {
+				addObjectToSteppingObjectList(object);
+			}
 		}
 
 		globalDataAccessService = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService();
@@ -100,9 +101,9 @@ public class SteppingInvocDetailInputController extends InvocDetailInputControll
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void addObjectToSteppingObjectList(Object element) {
-		if (!steppingObjectsList.contains(element)) {
-			steppingObjectsList.add(element);
+	public void addObjectToSteppingObjectList(Object template) {
+		if (!steppingObjectsList.contains(template)) {
+			steppingObjectsList.add(template);
 		}
 	}
 

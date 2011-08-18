@@ -1,7 +1,11 @@
 package info.novatec.inspectit.rcp.handlers;
 
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationAwareData;
+import info.novatec.inspectit.communication.data.SqlStatementData;
+import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.InputDefinition.IdDefinition;
@@ -9,6 +13,7 @@ import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
+import info.novatec.inspectit.rcp.util.OccurrenceFinderFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -82,11 +87,11 @@ public class NavigateToInvocationsHandler extends AbstractHandler {
 				inputDefinition.setHeaderDescription("Show One  (that contains " + textualDesc + ")");
 			}
 			inputDefinition.addAdditionalOption("invocationAwareDataList", invocationAwareDataList);
-			inputDefinition.addAdditionalOption("steppingObjects", invocationAwareDataList);
+			inputDefinition.addAdditionalOption("steppingObjects", getTemplates(invocationAwareDataList));
 			IdDefinition idDefinition = new IdDefinition();
 			idDefinition.setPlatformId(platformIdent);
 			inputDefinition.setIdDefinition(idDefinition);
-			
+
 			// open the view via command
 			IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
 			ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
@@ -104,6 +109,35 @@ public class NavigateToInvocationsHandler extends AbstractHandler {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Creates a steppable template from a list of {@link InvocationAwareData}.
+	 * 
+	 * @param invocationAwareDataList
+	 *            {@link InvocationAwareData} list.
+	 * @return Templates to be used as steppable objects.
+	 */
+	private List<Object> getTemplates(List<InvocationAwareData> invocationAwareDataList) {
+		List<Object> steppableTemplates = new ArrayList<Object>();
+		for (InvocationAwareData invocationAwareData : invocationAwareDataList) {
+			if (invocationAwareData instanceof SqlStatementData) {
+				SqlStatementData template = OccurrenceFinderFactory.getEmptyTemplate((SqlStatementData) invocationAwareData);
+				template.setSql(((SqlStatementData) invocationAwareData).getSql());
+				template.setMethodIdent(((SqlStatementData) invocationAwareData).getMethodIdent());
+				steppableTemplates.add(template);
+			} else if (invocationAwareData instanceof TimerData) {
+				TimerData template = OccurrenceFinderFactory.getEmptyTemplate((TimerData) invocationAwareData);
+				template.setMethodIdent(((TimerData) invocationAwareData).getMethodIdent());
+				steppableTemplates.add(template);
+			} else if (invocationAwareData instanceof ExceptionSensorData) {
+				ExceptionSensorData template = OccurrenceFinderFactory.getEmptyTemplate((ExceptionSensorData) invocationAwareData);
+				template.setExceptionEvent(ExceptionEventEnum.CREATED);
+				template.setThrowableType(((ExceptionSensorData) invocationAwareData).getThrowableType());
+				steppableTemplates.add(template);
+			}
+		}
+		return steppableTemplates;
 	}
 
 	/**

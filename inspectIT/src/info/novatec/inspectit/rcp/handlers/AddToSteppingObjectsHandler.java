@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.handlers;
 
-import java.util.Iterator;
-
+import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
@@ -10,6 +10,9 @@ import info.novatec.inspectit.rcp.editor.composite.AbstractCompositeSubView;
 import info.novatec.inspectit.rcp.editor.composite.TabbedCompositeSubView;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.editor.tree.SteppingTreeSubView;
+import info.novatec.inspectit.rcp.util.OccurrenceFinderFactory;
+
+import java.util.Iterator;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -17,8 +20,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -47,24 +48,24 @@ public class AddToSteppingObjectsHandler extends AbstractHandler {
 					if (element instanceof InvocationSequenceData) {
 						InvocationSequenceData invData = (InvocationSequenceData) element;
 						if (invData.getSqlStatementData() != null) {
-							steppingTreeSubView.addObjectToSteppingControl(invData.getSqlStatementData());
-							steppingTreeSubView.addObjectToSteppingControl(getTimerDataFromSql(invData.getSqlStatementData()));
+							steppingTreeSubView.addObjectToSteppingControl(createTemplate(invData.getSqlStatementData()));
+							steppingTreeSubView.addObjectToSteppingControl(createTemplate(getTimerDataFromSql(invData.getSqlStatementData())));
 						} else if (invData.getTimerData() != null) {
-							steppingTreeSubView.addObjectToSteppingControl(invData.getTimerData());
+							steppingTreeSubView.addObjectToSteppingControl(createTemplate(invData.getTimerData()));
 						} else if (invData.getExceptionSensorDataObjects() != null && invData.getExceptionSensorDataObjects().isEmpty()) {
-							steppingTreeSubView.addObjectToSteppingControl(invData.getExceptionSensorDataObjects().get(0));
+							steppingTreeSubView.addObjectToSteppingControl(createTemplate(invData.getExceptionSensorDataObjects().get(0)));
 						}
 
 					} else {
-						steppingTreeSubView.addObjectToSteppingControl(element);
+						steppingTreeSubView.addObjectToSteppingControl(createTemplate(element));
 					}
 
 				}
-				
-				//switch this to tree tab
+
+				// switch this to tree tab
 				ISubView sashSubView = rootEditor.getSubView();
 				if (sashSubView instanceof AbstractCompositeSubView) {
-					for (ISubView subView : ((AbstractCompositeSubView)sashSubView).getSubViews()) {
+					for (ISubView subView : ((AbstractCompositeSubView) sashSubView).getSubViews()) {
 						if (subView instanceof TabbedCompositeSubView) {
 							CTabFolder tabFolder = (CTabFolder) subView.getControl();
 							for (CTabItem tabItem : tabFolder.getItems()) {
@@ -77,6 +78,32 @@ public class AddToSteppingObjectsHandler extends AbstractHandler {
 					}
 				}
 			}
+		}
+		return null;
+	}
+
+	/**
+	 * Creates a steppable template from a {@link Object}.
+	 * 
+	 * @param invocationAwareData
+	 *            {@link Object}
+	 * @return Templates to be used as steppable object.
+	 */
+	private Object createTemplate(Object invocationAwareData) {
+		if (invocationAwareData instanceof SqlStatementData) {
+			SqlStatementData template = OccurrenceFinderFactory.getEmptyTemplate((SqlStatementData) invocationAwareData);
+			template.setSql(((SqlStatementData) invocationAwareData).getSql());
+			template.setMethodIdent(((SqlStatementData) invocationAwareData).getMethodIdent());
+			return template;
+		} else if (invocationAwareData instanceof TimerData) {
+			TimerData template = OccurrenceFinderFactory.getEmptyTemplate((TimerData) invocationAwareData);
+			template.setMethodIdent(((TimerData) invocationAwareData).getMethodIdent());
+			return template;
+		} else if (invocationAwareData instanceof ExceptionSensorData) {
+			ExceptionSensorData template = OccurrenceFinderFactory.getEmptyTemplate((ExceptionSensorData) invocationAwareData);
+			template.setExceptionEvent(ExceptionEventEnum.CREATED);
+			template.setThrowableType(((ExceptionSensorData) invocationAwareData).getThrowableType());
+			return template;
 		}
 		return null;
 	}
