@@ -64,6 +64,7 @@ public interface InspectITConstants {
 	String IMG_PREVIOUS = "previous.png"; //$NON-NLS-1$
 	String IMG_RIGHT_DOWN_ARROW = "right_down.png"; //$NON-NLS-1$
 	String IMG_TRASH = "trash.png"; //$NON-NLS-1$
+	String IMG_TOOL = "tool.png"; //$NON-NLS-1$
 
 	String OVERLAY_PRIORITY = "overlay_priority.gif"; //$NON-NLS-1$
 	String OVERLAY_UP = "overlay_up.png"; //$NON-NLS-1$

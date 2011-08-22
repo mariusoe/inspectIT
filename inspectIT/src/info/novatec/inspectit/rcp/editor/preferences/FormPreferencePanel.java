@@ -222,9 +222,11 @@ public class FormPreferencePanel implements IPreferencePanel {
 	 */
 	private void createButtons(Set<PreferenceId> preferenceSet, IToolBarManager toolBarManager) {
 		switchLiveMode = new SwitchLiveMode("Live");
-		switchPreferences = new SwitchPreferences("Preferences");
+		switchPreferences = new SwitchPreferences("Additional options");
 		MenuAction menuAction = new MenuAction();
-
+		menuAction.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_TOOL));
+		menuAction.setToolTipText("Preferences");
+		
 		if (preferenceSet.contains(PreferenceId.SAMPLINGRATE) || preferenceSet.contains(PreferenceId.TIMELINE)) {
 			toolBarManager.add(switchPreferences);
 		}

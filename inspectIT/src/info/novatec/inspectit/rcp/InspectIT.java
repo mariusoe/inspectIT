@@ -154,6 +154,7 @@ public class InspectIT extends AbstractUIPlugin {
 		addImageToRegistry(reg, InspectITConstants.IMG_PREVIOUS);
 		addImageToRegistry(reg, InspectITConstants.IMG_RIGHT_DOWN_ARROW);
 		addImageToRegistry(reg, InspectITConstants.IMG_TRASH);
+		addImageToRegistry(reg, InspectITConstants.IMG_TOOL);
 	}
 
 	/**
