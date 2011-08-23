@@ -11,16 +11,29 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.preference.JFacePreferences;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.TextStyle;
 
 /**
  * This class provides some static methods to create some common {@link String} and
  * {@link StyledString} objects.
  * 
  * @author Patrice Bouillet
- * 
+ * @author Stefan Siegl
  */
 public final class TextFormatter {
+
+	/** Logical Name for the font used for the error marker. */
+	public static final String FONT_ERROR_MARKER = "de.inspectit.font.errormarker";
+
+	static {
+		JFaceResources.getFontRegistry().put(FONT_ERROR_MARKER, new FontData[] { new FontData("Arial", 14, SWT.BOLD | SWT.ITALIC) });
+	}
 
 	/**
 	 * Private constructor. Prevent instantiation.
@@ -47,7 +60,7 @@ public final class TextFormatter {
 		} else {
 			decoration = MessageFormat.format("- {0}", new Object[] { methodIdent.getClassName() });
 		}
-		
+
 		styledString.append(decoration, StyledString.QUALIFIER_STYLER);
 
 		return styledString;
@@ -111,7 +124,23 @@ public final class TextFormatter {
 		styledString.append(" inv)", StyledString.QUALIFIER_STYLER);
 		return styledString;
 	}
-	
+
+	/**
+	 * Creates a <code>StyledString</code> containing a warning.
+	 * 
+	 * @return a <code>StyledString</code> containing a warning.
+	 */
+	public static StyledString getWarningSign() {
+		return new StyledString(" !", new Styler() {
+
+			@Override
+			public void applyStyles(TextStyle textStyle) {
+				textStyle.foreground = JFaceResources.getColorRegistry().get(JFacePreferences.ERROR_COLOR);
+				textStyle.font = JFaceResources.getFont(TextFormatter.FONT_ERROR_MARKER);
+			}
+		});
+	}
+
 	/**
 	 * Get the textual representation of objects that will be displayed in the new view.
 	 * 

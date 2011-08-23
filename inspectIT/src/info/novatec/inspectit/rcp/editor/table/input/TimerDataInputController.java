@@ -7,8 +7,8 @@ import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.TimeResolution;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
@@ -80,6 +80,8 @@ public class TimerDataInputController extends AbstractTableInputController {
 		EXCLUSIVEMIN("Exc. Min (ms)", 80, null),
 		/** The max exclusive duration column. */
 		EXCLUSIVEMAX("Exc. Max (ms)", 80, null),
+		/** The total exclusive duration column. */
+		EXCLUSIVESUM("Exc. duration (ms)", 80, null),
 		/** The cpu average column. */
 		CPUAVERAGE("Cpu Avg (ms)", 60, null),
 		/** The cpu minimum column. */
@@ -199,6 +201,15 @@ public class TimerDataInputController extends AbstractTableInputController {
 			viewerColumn.getColumn().setResizable(true);
 			viewerColumn.getColumn().setText(column.name);
 			viewerColumn.getColumn().setWidth(column.width);
+			if (Column.EXCLUSIVEAVERAGE.equals(column) || Column.EXCLUSIVESUM.equals(column) || Column.EXCLUSIVEMIN.equals(column) || Column.EXCLUSIVEMAX.equals(column)) {
+				// TODO: Remove this tooltip and add it to the cell as soon as the image bug is
+				// fixed in Eclipse.
+				viewerColumn.getColumn().setToolTipText(
+						"Exclusive times can only be calculated correctly if the timer is within an invocation sequence. "
+								+ "A warning marker is provided if not all timers are run within an invocation sequence. Please be aware that "
+								+ "avg, sum, min and max calculations are reflecting only the timers inside an invocation sequence.");
+			}
+
 			if (null != column.imageDescriptor) {
 				viewerColumn.getColumn().setImage(column.imageDescriptor.createImage());
 			}
@@ -448,6 +459,8 @@ public class TimerDataInputController extends AbstractTableInputController {
 				return Double.compare(timer1.getExclusiveMax(), timer2.getExclusiveMax());
 			case EXCLUSIVEMIN:
 				return Double.compare(timer1.getExclusiveMin(), timer2.getExclusiveMin());
+			case EXCLUSIVESUM:
+				return Double.compare(timer1.getExclusiveDuration(), timer2.getExclusiveDuration());
 			default:
 				return 0;
 			}
@@ -488,7 +501,6 @@ public class TimerDataInputController extends AbstractTableInputController {
 		case COUNT:
 			return new StyledString(String.valueOf(data.getCount()));
 		case AVERAGE:
-			// check if it is a valid data (or if timer data was available)
 			if (data.getMin() != Double.MAX_VALUE) {
 				return new StyledString(NumberFormatter.formatDouble(data.getAverage(), timeDecimalPlaces));
 			} else {
@@ -513,7 +525,6 @@ public class TimerDataInputController extends AbstractTableInputController {
 				return emptyStyledString;
 			}
 		case CPUAVERAGE:
-			// check if it is a valid data (or if timer data was available)
 			if (data.getCpuMin() != -1 && Double.MAX_VALUE != data.getCpuMin()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getCpuAverage(), timeDecimalPlaces));
 			} else {
@@ -539,19 +550,69 @@ public class TimerDataInputController extends AbstractTableInputController {
 			}
 		case EXCLUSIVEAVERAGE:
 			if (data.getExclusiveAverage() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
-				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveAverage(), timeDecimalPlaces));
+				StyledString res = new StyledString(NumberFormatter.formatDouble(data.getExclusiveAverage(), timeDecimalPlaces));
+
+				int affPercentage = (int) (data.getInvocationAffiliationPercentage() * 100);
+				if (affPercentage < 100) {
+					// TODO: Use an image instead of the String to signal errors. This is currently
+					// not done as there is a bug in the table representation in SWT which will add
+					// the same space the image needs to the first column. Having an image would
+					// also allow to set a tooltip!
+					return res.append(TextFormatter.getWarningSign());
+				} else {
+					return res;
+				}
 			} else {
 				return emptyStyledString;
 			}
 		case EXCLUSIVEMAX:
 			if (data.getExclusiveMax() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
-				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveMax(), timeDecimalPlaces));
+				StyledString res = new StyledString(NumberFormatter.formatDouble(data.getExclusiveMax(), timeDecimalPlaces));
+
+				int affPercentage = (int) (data.getInvocationAffiliationPercentage() * 100);
+				if (affPercentage < 100) {
+					// TODO: Use an image instead of the String to signal errors. This is currently
+					// not done as there is a bug in the table representation in SWT which will add
+					// the same space the image needs to the first column. Having an image would
+					// also allow to set a tooltip!
+					return res.append(TextFormatter.getWarningSign());
+				} else {
+					return res;
+				}
 			} else {
 				return emptyStyledString;
 			}
 		case EXCLUSIVEMIN:
 			if (data.getExclusiveMin() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
-				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveMin(), timeDecimalPlaces));
+				StyledString res = new StyledString(NumberFormatter.formatDouble(data.getExclusiveMin(), timeDecimalPlaces));
+
+				int affPercentage = (int) (data.getInvocationAffiliationPercentage() * 100);
+				if (affPercentage < 100) {
+					// TODO: Use an image instead of the String to signal errors. This is currently
+					// not done as there is a bug in the table representation in SWT which will add
+					// the same space the image needs to the first column. Having an image would
+					// also allow to set a tooltip!
+					return res.append(TextFormatter.getWarningSign());
+				} else {
+					return res;
+				}
+			} else {
+				return emptyStyledString;
+			}
+		case EXCLUSIVESUM:
+			if (data.getExclusiveDuration() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+				StyledString exklSumString = new StyledString(NumberFormatter.formatDouble(data.getExclusiveDuration(), timeDecimalPlaces));
+
+				int affPercentage = (int) (data.getInvocationAffiliationPercentage() * 100);
+				if (affPercentage < 100) {
+					// TODO: Use an image instead of the String to signal errors. This is currently
+					// not done as there is a bug in the table representation in SWT which will add
+					// the same space the image needs to the first column. Having an image would
+					// also allow to set a tooltip!
+					return exklSumString.append(TextFormatter.getWarningSign());
+				} else {
+					return exklSumString;
+				}
 			} else {
 				return emptyStyledString;
 			}
@@ -559,5 +620,4 @@ public class TimerDataInputController extends AbstractTableInputController {
 			return new StyledString("error");
 		}
 	}
-
 }
