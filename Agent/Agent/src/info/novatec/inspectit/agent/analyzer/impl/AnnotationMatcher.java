@@ -7,19 +7,18 @@ import info.novatec.inspectit.javassist.CtClass;
 import info.novatec.inspectit.javassist.CtConstructor;
 import info.novatec.inspectit.javassist.CtMethod;
 import info.novatec.inspectit.javassist.NotFoundException;
+import info.novatec.inspectit.javassist.bytecode.AnnotationsAttribute;
+import info.novatec.inspectit.javassist.bytecode.AttributeInfo;
+import info.novatec.inspectit.javassist.bytecode.annotation.Annotation;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * This matcher filers that classes and methods based on the annotation class name defined in the
  * {@link UnregisteredSensorConfig}. If the annotation supplied is targeting a Class, then all
- * methods that are provided by deletage matchers of a Class that has annotation will be
+ * methods that are provided by delegate matchers of a Class that has annotation will be
  * instrumented. Otherwise, if the Annotation is targeting the method, only methods that have this
  * annotation will be instrumented.
  * 
@@ -27,22 +26,12 @@ import java.util.logging.Logger;
  * 
  */
 public class AnnotationMatcher extends AbstractMatcher {
-	
-	/**
-	 * The logger of the class.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(AnnotationMatcher.class.getName());
 
-	/**
-	 * Set of annotation names that have already been logged to the user.
-	 */
-	private static Set loggedUnavailableAnnotations = new HashSet();
-	
 	/**
 	 * The {@link IMatcher} delegator object to route the calls of all methods to.
 	 */
 	private IMatcher delegateMatcher;
-	
+
 	/**
 	 * The only constructor which needs a reference to the {@link UnregisteredSensorConfig} instance
 	 * of the corresponding configuration.
@@ -72,25 +61,20 @@ public class AnnotationMatcher extends AbstractMatcher {
 	 * {@inheritDoc}
 	 */
 	public List getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException {
-		Class annotationClass;
-		try {
-			annotationClass = classLoader.loadClass(unregisteredSensorConfig.getAnnotationClassName());
-		} catch (ClassNotFoundException exception) {
-			if (loggedUnavailableAnnotations.add(unregisteredSensorConfig.getAnnotationClassName())) {
-				LOGGER.warning("Annotation " + unregisteredSensorConfig.getAnnotationClassName() + " can not be found on the classpath. Underlying instrumentation will be skipped.");
-			}
-			return Collections.EMPTY_LIST;
-		}
-
 		CtClass clazz = classPoolAnalyzer.getClassPool(classLoader).get(className);
 		List matchingMethods = delegateMatcher.getMatchingMethods(classLoader, className);
 
-		if (!clazz.hasAnnotation(annotationClass)) {
+		List classAttributesList = clazz.getClassFile().getAttributes();
+		boolean classHasAnnotation = checkForAnnotation(classAttributesList, unregisteredSensorConfig.getAnnotationClassName());
+
+		if (!classHasAnnotation) {
 			List notMatchingMethods = null;
 			Iterator iterator = matchingMethods.iterator();
 			while (iterator.hasNext()) {
 				CtMethod method = (CtMethod) iterator.next();
-				if (!method.hasAnnotation(annotationClass)) {
+				List methodAttributesList = method.getMethodInfo().getAttributes();
+				boolean methodHasAnnotation = checkForAnnotation(methodAttributesList, unregisteredSensorConfig.getAnnotationClassName());
+				if (!methodHasAnnotation) {
 					if (null == notMatchingMethods) {
 						notMatchingMethods = new ArrayList();
 					}
@@ -117,25 +101,20 @@ public class AnnotationMatcher extends AbstractMatcher {
 	 * {@inheritDoc}
 	 */
 	public List getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException {
-		Class annotationClass;
-		try {
-			annotationClass = classLoader.loadClass(unregisteredSensorConfig.getAnnotationClassName());
-		} catch (ClassNotFoundException exception) {
-			if (loggedUnavailableAnnotations.add(unregisteredSensorConfig.getAnnotationClassName())) {
-				LOGGER.warning("Annotation " + unregisteredSensorConfig.getAnnotationClassName() + " can not be found on the classpath. Underlying instrumentation will be skipped.");
-			}
-			return Collections.EMPTY_LIST;
-		}
-
 		CtClass clazz = classPoolAnalyzer.getClassPool(classLoader).get(className);
 		List matchingConstructors = delegateMatcher.getMatchingConstructors(classLoader, className);
 
-		if (!clazz.hasAnnotation(annotationClass)) {
+		List classAttributesList = clazz.getClassFile().getAttributes();
+		boolean classHasAnnotation = checkForAnnotation(classAttributesList, unregisteredSensorConfig.getAnnotationClassName());
+
+		if (!classHasAnnotation) {
 			List notMatchingConstructors = null;
 			Iterator iterator = matchingConstructors.iterator();
 			while (iterator.hasNext()) {
 				CtConstructor constructor = (CtConstructor) iterator.next();
-				if (!constructor.hasAnnotation(annotationClass)) {
+				List constructorAttributesList = constructor.getMethodInfo().getAttributes();
+				boolean constructorHasAnnotation = checkForAnnotation(constructorAttributesList, unregisteredSensorConfig.getAnnotationClassName());
+				if (!constructorHasAnnotation) {
 					if (null == notMatchingConstructors) {
 						notMatchingConstructors = new ArrayList();
 					}
@@ -156,6 +135,35 @@ public class AnnotationMatcher extends AbstractMatcher {
 		}
 
 		return matchingConstructors;
+	}
+
+	/**
+	 * Checks if in the list of {@link AttributeInfo} objects exists any
+	 * {@link AnnotationsAttribute} object that has information existence of the wanted annotation.
+	 * Note that the attribute list should be acquired by {@link ClassFile#getAttributes()},
+	 * {@link MethodInfo#getAttributes()} or {@link FieldInfo#getAttributes()} methods.
+	 * 
+	 * @param attributesList
+	 *            List of attributes.
+	 * @param annotationClassName
+	 *            Name of the annotation to find.
+	 * @return True if annotation could be located, false otherwise.
+	 */
+	private boolean checkForAnnotation(List attributesList, String annotationClassName) {
+		for (int i = 0; i < attributesList.size(); i++) {
+			AttributeInfo attributeInfo = (AttributeInfo) attributesList.get(i);
+			if (attributeInfo instanceof AnnotationsAttribute) {
+				AnnotationsAttribute annotationsAttribute = (AnnotationsAttribute) attributeInfo;
+				Annotation[] annotations = annotationsAttribute.getAnnotations();
+				for (int j = 0; j < annotations.length; j++) {
+					if (annotations[j].getTypeName().equals(annotationClassName)) {
+						return true;
+					}
+				}
+				break;
+			}
+		}
+		return false;
 	}
 
 	/**
