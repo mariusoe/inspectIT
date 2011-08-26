@@ -12,11 +12,13 @@ import info.novatec.inspectit.agent.hooking.IHookInstrumenter;
 import info.novatec.inspectit.agent.hooking.impl.HookException;
 import info.novatec.inspectit.javassist.ByteArrayClassPath;
 import info.novatec.inspectit.javassist.CannotCompileException;
+import info.novatec.inspectit.javassist.ClassPath;
 import info.novatec.inspectit.javassist.ClassPool;
 import info.novatec.inspectit.javassist.CtBehavior;
 import info.novatec.inspectit.javassist.CtClass;
 import info.novatec.inspectit.javassist.CtConstructor;
 import info.novatec.inspectit.javassist.CtMethod;
+import info.novatec.inspectit.javassist.LoaderClassPath;
 import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.io.IOException;
@@ -63,8 +65,6 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 	 *            The hook instrumenter reference.
 	 * @param classPoolAnalyzer
 	 *            The class pool analyzer reference.
-	 * @param inheritanceAnalyzer
-	 *            The inheritance analyzer reference.
 	 */
 	public ByteCodeAnalyzer(IConfigurationStorage configurationStorage, IHookInstrumenter hookInstrumenter, IClassPoolAnalyzer classPoolAnalyzer) {
 		if (null == configurationStorage) {
@@ -90,7 +90,8 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 		// libraries etc.) and to get the real content of that class (think of
 		// classes modified by other java agents before.)
 		ClassPool classPool = classPoolAnalyzer.getClassPool(classLoader);
-		ByteArrayClassPath classPath = null;
+		ClassPath classPath = null;
+		ClassPath loaderClassPath = null;
 		try {
 			if (null == byteCode) {
 				// this occurs if we are in the initialization phase and are instrumenting classes
@@ -99,6 +100,8 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 			}
 			classPath = new ByteArrayClassPath(className, byteCode);
 			classPool.insertClassPath(classPath);
+			loaderClassPath = new LoaderClassPath(Thread.currentThread().getContextClassLoader());
+			classPool.insertClassPath(loaderClassPath);
 
 			byte[] instrumentedByteCode = null;
 			Map behaviorToConfigMap = analyze(className, classLoader);
@@ -129,6 +132,9 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 			// through the standard way.
 			if (null != classPath) {
 				classPool.removeClassPath(classPath);
+			}
+			if (null != loaderClassPath) {
+				classPool.removeClassPath(loaderClassPath);
 			}
 		}
 	}

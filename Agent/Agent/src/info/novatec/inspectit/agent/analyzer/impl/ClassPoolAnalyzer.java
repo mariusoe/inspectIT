@@ -94,6 +94,9 @@ public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 	 * {@inheritDoc}
 	 */
 	public ClassPool addClassLoader(ClassLoader classLoader) {
+		if (null == classLoader) {
+			return ClassPool.getDefault();
+		}
 		if (!classLoaders.contains(classLoader)) {
 			return this.copyHierarchy(classLoader);
 		}
@@ -105,6 +108,9 @@ public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 	 * {@inheritDoc}
 	 */
 	public ClassPool getClassPool(ClassLoader classLoader) {
+		if (null == classLoader) {
+			return ClassPool.getDefault();
+		}
 		ClassPool cp = (ClassPool) map.get(classLoader);
 		// Return the default classpool if we don't have the mapping yet.
 		if (null == cp) {
@@ -127,23 +133,20 @@ public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 		}
 
 		ClassPool cp = null;
-		if (null == classLoader) {
-			cp = ClassPool.getDefault();
-		} else if (null != classLoader.getParent() && !classLoaders.contains(classLoader.getParent())) {
+		if (null != classLoader.getParent() && !classLoaders.contains(classLoader.getParent())) {
 			// If the class loader has got a parent one and was not seen before
 			// -> initialize that one first
 			cp = new ClassPool(this.copyHierarchy(classLoader.getParent()));
-			cp.insertClassPath(new LoaderClassPath(classLoader));
 		} else if (null != classLoader.getParent()) {
 			// Parent class loader was seen and initialized before, we only care
 			// about the current one and set the parent class loader.
 			cp = new ClassPool((ClassPool) map.get(classLoader.getParent()));
-			cp.insertClassPath(new LoaderClassPath(classLoader));
 		} else {
 			// Class loader has got no parent ( bootstrap class loader )
-			cp = ClassPool.getDefault();
+			cp = new ClassPool(ClassPool.getDefault());
 		}
 
+		cp.insertClassPath(new LoaderClassPath(classLoader));
 		// Map the class loader to the ClassPool
 		map.put(classLoader, cp);
 
