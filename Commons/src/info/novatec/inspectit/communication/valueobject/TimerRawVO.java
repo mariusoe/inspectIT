@@ -13,8 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * This value object is used to store the raw time measurements from the
- * executed methods.
+ * This value object is used to store the raw time measurements from the executed methods.
  * 
  * @author Patrice Bouillet
  * 
@@ -27,9 +26,8 @@ public class TimerRawVO extends MethodSensorData {
 	private static final long serialVersionUID = 6176694438175985136L;
 
 	/**
-	 * The list which is holding one or more data container for the raw data. If
-	 * the current data container is full a new one is created and added to the
-	 * list.
+	 * The list which is holding one or more data container for the raw data. If the current data
+	 * container is full a new one is created and added to the list.
 	 */
 	private List data = new ArrayList();
 
@@ -151,24 +149,17 @@ public class TimerRawVO extends MethodSensorData {
 			}
 		}
 
-		timerData.setMin(min);
-		timerData.setMax(max);
+		timerData.calculateMin(min);
+		timerData.calculateMax(max);
 		timerData.setCount(count);
 		timerData.setDuration(duration);
-		timerData.setAverage(duration / count);
 		// TODO compute the variance
 		timerData.setVariance(-1);
 
 		if (Double.MAX_VALUE != cpuMin) {
-			timerData.setCpuMin(cpuMin);
-			timerData.setCpuMax(cpuMax);
+			timerData.calculateCpuMin(cpuMin);
+			timerData.calculateCpuMax(cpuMax);
 			timerData.setCpuDuration(cpuDuration);
-			timerData.setCpuAverage(cpuDuration / count);
-		} else {
-			timerData.setCpuMin(-1.0d);
-			timerData.setCpuMax(-1.0d);
-			timerData.setCpuDuration(-1.0d);
-			timerData.setCpuAverage(-1.0d);
 		}
 
 		return timerData;
@@ -188,8 +179,8 @@ public class TimerRawVO extends MethodSensorData {
 		private static final long serialVersionUID = 7225384620786119269L;
 
 		/**
-		 * The max amount this container is saving until it is full and no data
-		 * can be accepted anymore.
+		 * The max amount this container is saving until it is full and no data can be accepted
+		 * anymore.
 		 */
 		private static final int MAX_SIZE = 50;
 

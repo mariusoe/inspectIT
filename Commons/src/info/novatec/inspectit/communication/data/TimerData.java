@@ -10,7 +10,20 @@ import java.util.List;
 /**
  * The timer data class stores information about the execution time of a java method.
  * 
+ * Notes
+ * <ul>
+ * <li>This class is used for multiple purposes over time. Be aware that altough this class provides
+ * exclusive timings these are only available if the timer is incluced in an invocation sequence and
+ * is calculated on the CMR NOT the agent.</li>
+ * <li>In order to check if certain information is available use the checking methods
+ * <code>isCpuMetricAvailable</code> and <code>isExclusiveMetricAvailable</code></li>
+ * <li>To change a minimum of maximum (normal time, exlusive, cpu) use the calculate methods as
+ * these deal with the internals in a correct way (we must initialize some fields seamingly in a
+ * strange way but we want to improve performance and size)</li>
+ * </ul>
+ * 
  * @author Patrice Bouillet
+ * @author Stefan Siegl
  * 
  */
 public class TimerData extends InvocationAwareData {
@@ -23,12 +36,12 @@ public class TimerData extends InvocationAwareData {
 	/**
 	 * The minimum value.
 	 */
-	private double min = Double.MAX_VALUE;
+	private double min = -1;
 
 	/**
 	 * The maximum value.
 	 */
-	private double max = 0;
+	private double max = -1;
 
 	/**
 	 * The count.
@@ -41,11 +54,6 @@ public class TimerData extends InvocationAwareData {
 	private double duration = 0;
 
 	/**
-	 * The average time.
-	 */
-	private double average = 0;
-
-	/**
 	 * The variance (optional parameter).
 	 */
 	private double variance;
@@ -53,22 +61,17 @@ public class TimerData extends InvocationAwareData {
 	/**
 	 * The cpu minimum value.
 	 */
-	private double cpuMin = Double.MAX_VALUE;
+	private double cpuMin = -1;
 
 	/**
 	 * The cpu maximum value.
 	 */
-	private double cpuMax = 0;
+	private double cpuMax = -1;
 
 	/**
 	 * The cpu complete duration.
 	 */
 	private double cpuDuration = 0;
-
-	/**
-	 * The cpu average time.
-	 */
-	private double cpuAverage = 0;
 
 	/**
 	 * Exclusive count. Needed because this count can be less than the total count.
@@ -83,12 +86,12 @@ public class TimerData extends InvocationAwareData {
 	/**
 	 * Exclusive max duration;
 	 */
-	private double exclusiveMax = 0;
+	private double exclusiveMax = -1;
 
 	/**
 	 * Exclusive min duration.
 	 */
-	private double exclusiveMin = Double.MAX_VALUE;
+	private double exclusiveMin = -1;
 
 	/**
 	 * Default no-args constructor.
@@ -104,20 +107,41 @@ public class TimerData extends InvocationAwareData {
 		super(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);
 	}
 
+	/**
+	 * <b> CAREFUL! min is initialized to -1 due to data transfer sizes! </b>
+	 * 
+	 * @return
+	 */
 	public double getMin() {
 		return min;
 	}
 
-	public void setMin(double min) {
-		this.min = min;
+	/**
+	 * Sets the minimum and deals with the -1 initialization!.
+	 * 
+	 * @param min
+	 *            the minimum value to be set to if it is smaller than the minimum.
+	 */
+	public void calculateMin(double min) {
+		if (this.min == -1) {
+			this.min = min;
+		} else {
+			this.min = Math.min(this.min, min);
+		}
 	}
 
 	public double getMax() {
 		return max;
 	}
 
-	public void setMax(double max) {
-		this.max = max;
+	/**
+	 * Sets the maximum if the given value is bigger than the current value.
+	 * 
+	 * @param max
+	 *            the maximum to be set
+	 */
+	public void calculateMax(double max) {
+		this.max = Math.max(this.max, max);
 	}
 
 	public long getCount() {
@@ -145,11 +169,7 @@ public class TimerData extends InvocationAwareData {
 	}
 
 	public double getAverage() {
-		return average;
-	}
-
-	public void setAverage(double average) {
-		this.average = average;
+		return duration / count;
 	}
 
 	public double getVariance() {
@@ -161,6 +181,33 @@ public class TimerData extends InvocationAwareData {
 	}
 
 	/**
+	 * Sets the minimum and deals with the -1 initialization!.
+	 * 
+	 * @param min
+	 *            the minimum value to be set to if it is smaller than the minimum.
+	 */
+	public void calculateCpuMin(double min) {
+		if (cpuMin == -1) {
+			cpuMin = min;
+		} else {
+			cpuMin = Math.min(cpuMin, min);
+		}
+	}
+
+	/**
+	 * Sets the maximum if the given value is bigger than the current value.
+	 * 
+	 * @param max
+	 *            the maximum to be set
+	 */
+	public void calculateCpuMax(double time) {
+		cpuMax = Math.max(cpuMax, time);
+	}
+
+	/**
+	 * <b> Notice: ensure to check using the <code> isCpuMetricDataAvailable() </code> if cpu metric
+	 * data is in fact available, otherwise you might get strange results </b>
+	 * 
 	 * @return the cpuMin
 	 */
 	public double getCpuMin() {
@@ -168,14 +215,9 @@ public class TimerData extends InvocationAwareData {
 	}
 
 	/**
-	 * @param cpuMin
-	 *            the cpuMin to set
-	 */
-	public void setCpuMin(double cpuMin) {
-		this.cpuMin = cpuMin;
-	}
-
-	/**
+	 * <b> Notice: ensure to check using the <code> isCpuMetricDataAvailable() </code> if cpu metric
+	 * data is in fact available, otherwise you might get strange results </b>
+	 * 
 	 * @return the cpuMax
 	 */
 	public double getCpuMax() {
@@ -183,14 +225,9 @@ public class TimerData extends InvocationAwareData {
 	}
 
 	/**
-	 * @param cpuMax
-	 *            the cpuMax to set
-	 */
-	public void setCpuMax(double cpuMax) {
-		this.cpuMax = cpuMax;
-	}
-
-	/**
+	 * <b> Notice: ensure to check using the <code> isCpuMetricDataAvailable() </code> if cpu metric
+	 * data is in fact available, otherwise you might get strange results </b>
+	 * 
 	 * @return the cpuDuration
 	 */
 	public double getCpuDuration() {
@@ -214,20 +251,21 @@ public class TimerData extends InvocationAwareData {
 	}
 
 	/**
+	 * <b> Notice: ensure to check using the <code> isCpuMetricDataAvailable() </code> if cpu metric
+	 * data is in fact available, otherwise you might get strange results </b>
+	 * 
 	 * @return the cpuAverage
 	 */
 	public double getCpuAverage() {
-		return cpuAverage;
+		return cpuDuration / count;
 	}
 
 	/**
-	 * @param cpuAverage
-	 *            the cpuAverage to set
+	 * <b> Notice: ensure to check using the <code> isExclusiveMetricDataAvailable() </code> if cpu
+	 * metric data is in fact available, otherwise you might get strange results </b>
+	 * 
+	 * @return exclusive count
 	 */
-	public void setCpuAverage(double cpuAverage) {
-		this.cpuAverage = cpuAverage;
-	}
-
 	public long getExclusiveCount() {
 		return exclusiveCount;
 	}
@@ -240,6 +278,12 @@ public class TimerData extends InvocationAwareData {
 		this.exclusiveCount++;
 	}
 
+	/**
+	 * <b> Notice: ensure to check using the <code> isExclusiveMetricDataAvailable() </code> if cpu
+	 * metric data is in fact available, otherwise you might get strange results </b>
+	 * 
+	 * @return duration
+	 */
 	public double getExclusiveDuration() {
 		return exclusiveDuration;
 	}
@@ -252,20 +296,48 @@ public class TimerData extends InvocationAwareData {
 		this.exclusiveDuration += exclusiveDuration;
 	}
 
+	/**
+	 * <b> Notice: ensure to check using the <code> isExclusiveMetricDataAvailable() </code> if cpu
+	 * metric data is in fact available, otherwise you might get strange results </b>
+	 * 
+	 * @return exlusivemax
+	 */
 	public double getExclusiveMax() {
 		return exclusiveMax;
 	}
 
-	public void setExclusiveMax(double exclusiveMax) {
-		this.exclusiveMax = exclusiveMax;
+	/**
+	 * Sets the maximum if the given value is bigger than the current value.
+	 * 
+	 * @param max
+	 *            the maximum to be set
+	 */
+	public void calculateExclusiveMax(double max) {
+		exclusiveMax = Math.max(exclusiveMax, max);
 	}
 
+	/**
+	 * <b> Notice: ensure to check using the <code> isExclusiveMetricDataAvailable() </code> if cpu
+	 * metric data is in fact available, otherwise you might get strange results </b>
+	 * 
+	 * @return
+	 */
 	public double getExclusiveMin() {
 		return exclusiveMin;
 	}
 
-	public void setExclusiveMin(double exclusiveMin) {
-		this.exclusiveMin = exclusiveMin;
+	/**
+	 * Sets the minimum and deals with the -1 initialization!.
+	 * 
+	 * @param min
+	 *            the minimum value to be set to if it is smaller than the minimum.
+	 */
+	public void calculateExclusiveMin(double min) {
+		if (exclusiveMin == -1) {
+			exclusiveMin = min;
+		} else {
+			exclusiveMin = Math.min(exclusiveMin, min);
+		}
 	}
 
 	/**
@@ -277,6 +349,32 @@ public class TimerData extends InvocationAwareData {
 		return exclusiveDuration / exclusiveCount;
 	}
 
+	// Private setters for hibernate. Users should use the calculate methods.
+
+	private void setMin(double min) {
+		this.min = min;
+	}
+
+	private void setMax(double max) {
+		this.max = max;
+	}
+
+	private void setCpuMin(double cpuMin) {
+		this.cpuMin = cpuMin;
+	}
+
+	private void setCpuMax(double cpuMax) {
+		this.cpuMax = cpuMax;
+	}
+
+	private void setExclusiveMax(double exclusiveMax) {
+		this.exclusiveMax = exclusiveMax;
+	}
+
+	private void setExclusiveMin(double exclusiveMin) {
+		this.exclusiveMin = exclusiveMin;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -284,11 +382,6 @@ public class TimerData extends InvocationAwareData {
 		final int prime = 31;
 		int result = super.hashCode();
 		long temp;
-		temp = Double.doubleToLongBits(average);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + (int) (count ^ (count >>> 32));
-		temp = Double.doubleToLongBits(cpuAverage);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
 		temp = Double.doubleToLongBits(cpuDuration);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		temp = Double.doubleToLongBits(cpuMax);
@@ -327,13 +420,7 @@ public class TimerData extends InvocationAwareData {
 			return false;
 		}
 		TimerData other = (TimerData) obj;
-		if (Double.doubleToLongBits(average) != Double.doubleToLongBits(other.average)) {
-			return false;
-		}
 		if (count != other.count) {
-			return false;
-		}
-		if (Double.doubleToLongBits(cpuAverage) != Double.doubleToLongBits(other.cpuAverage)) {
 			return false;
 		}
 		if (Double.doubleToLongBits(cpuDuration) != Double.doubleToLongBits(other.cpuDuration)) {
@@ -376,20 +463,7 @@ public class TimerData extends InvocationAwareData {
 	 * {@inheritDoc}
 	 */
 	public DefaultData finalizeData() {
-		average = duration / count;
-		if (Double.MAX_VALUE != cpuMin) {
-			cpuAverage = cpuDuration / count;
-		} else {
-			cpuAverage = -1.0d;
-			cpuMin = -1.0d;
-			cpuMax = -1.0d;
-			cpuDuration = -1.0d;
-		}
-		if (Double.MAX_VALUE == exclusiveMin) {
-			exclusiveDuration = -1.0d;
-			exclusiveMin = -1.0d;
-			exclusiveMax = -1.0d;
-		}
+		// no need
 		return this;
 	}
 
@@ -398,7 +472,7 @@ public class TimerData extends InvocationAwareData {
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
 		long size = super.getObjectSize(objectSizes);
-		size += objectSizes.getPrimitiveTypesSize(0, 0, 0, 0, 2, 12);
+		size += objectSizes.getPrimitiveTypesSize(0, 0, 0, 0, 2, 10);
 		return objectSizes.alignTo8Bytes(size);
 	}
 
@@ -410,6 +484,33 @@ public class TimerData extends InvocationAwareData {
 	}
 
 	/**
+	 * Whether or not this timer data contains cpu related metrics.
+	 * 
+	 * @return Whether or not this timer data contains cpu related metrics.
+	 */
+	public boolean isCpuMetricDataAvailable() {
+		return cpuDuration > 0;
+	}
+
+	/**
+	 * Whether or not this timer data contains exclusive time metrics.
+	 * 
+	 * @return Whether or not this timer data contains exclusive time metrics.
+	 */
+	public boolean isExclusiveTimeDataAvailable() {
+		return exclusiveDuration > 0;
+	}
+
+	/**
+	 * Whether or not this timer data contains time metrics.
+	 * 
+	 * @return Whether or not this timer data contains time metrics.
+	 */
+	public boolean isTimeDataAvailable() {
+		return duration > 0;
+	}
+
+	/**
 	 * Aggregates the values given in the supplied timer data parameter to the objects data.
 	 * 
 	 * @param timerData
@@ -418,15 +519,13 @@ public class TimerData extends InvocationAwareData {
 	public void aggregateTimerData(TimerData timerData) {
 		this.setCount(this.getCount() + timerData.getCount());
 		this.setDuration(this.getDuration() + timerData.getDuration());
-		this.setAverage(this.getDuration() / this.getCount());
-		this.setMax(Math.max(this.getMax(), timerData.getMax()));
-		this.setMin(Math.min(this.getMin(), timerData.getMin()));
+		this.calculateMax(timerData.getMax());
+		this.calculateMin(timerData.getMin());
 
-		if (-1 != timerData.getCpuDuration()) {
+		if (timerData.isCpuMetricDataAvailable()) {
 			this.setCpuDuration(this.getCpuDuration() + timerData.getCpuDuration());
-			this.setCpuAverage(this.getCpuDuration() / this.getCount());
-			this.setCpuMax(Math.max(this.getCpuMax(), timerData.getCpuMax()));
-			this.setCpuMin(Math.min(this.getCpuMin(), timerData.getCpuMin()));
+			this.calculateCpuMax(timerData.getCpuMax());
+			this.calculateCpuMin(timerData.getCpuMin());
 		}
 		if (null != timerData.getInvocationParentsIdSet()) {
 			Iterator it = timerData.getInvocationParentsIdSet().iterator();
@@ -434,12 +533,11 @@ public class TimerData extends InvocationAwareData {
 				this.addInvocationParentId((Long) it.next());
 			}
 		}
-		if (-1 != timerData.getExclusiveDuration()) {
+		if (timerData.isExclusiveTimeDataAvailable()) {
 			this.addExclusiveDuration(timerData.getExclusiveDuration());
 			this.setExclusiveCount(this.getExclusiveCount() + timerData.getExclusiveCount());
-			this.setExclusiveMax(Math.max(this.getExclusiveMax(), timerData.getExclusiveMax()));
-			this.setExclusiveMin(Math.min(this.getExclusiveMin(), timerData.getExclusiveMin()));
+			this.calculateExclusiveMax(timerData.getExclusiveMax());
+			this.calculateExclusiveMin(timerData.getExclusiveMin());
 		}
 	}
-
 }

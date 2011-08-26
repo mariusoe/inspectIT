@@ -279,13 +279,13 @@ public class MethodInvocInputController extends AbstractTableInputController {
 			timerData.setPlatformIdent(invocationData.getPlatformIdent());
 			timerData.setMethodIdent(invocationData.getMethodIdent());
 			timerData.setDuration(invocationData.getDuration());
-			timerData.setMax(invocationData.getDuration());
-			timerData.setMin(invocationData.getDuration());
+			timerData.calculateMax(invocationData.getDuration());
+			timerData.calculateMin(invocationData.getDuration());
 			timerData.increaseCount();
 			double exclusiveTime = invocationData.getDuration() - computeNestedDuration(invocationData);
 			timerData.setExclusiveDuration(exclusiveTime);
-			timerData.setExclusiveMax(exclusiveTime);
-			timerData.setExclusiveMin(exclusiveTime);
+			timerData.calculateExclusiveMax(exclusiveTime);
+			timerData.calculateExclusiveMin(exclusiveTime);
 			timerData.increaseExclusiveCount();
 			timerData.finalizeData();
 			return timerData;
@@ -388,7 +388,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 
 			switch ((Column) getEnumSortColumn()) {
 			case PACKAGE:
-				if (methodIdent1.getPackageName() == null  || methodIdent1.getPackageName().equals("")) {
+				if (methodIdent1.getPackageName() == null || methodIdent1.getPackageName().equals("")) {
 					return -1;
 				} else if (methodIdent2.getPackageName() == null || methodIdent1.getPackageName().equals("")) {
 					return 1;
@@ -448,7 +448,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	private StyledString getStyledTextForColumn(TimerData data, MethodIdent methodIdent, Column enumId) {
 		switch (enumId) {
 		case PACKAGE:
-			if (methodIdent.getPackageName() != null  && !methodIdent.getPackageName().equals("")) {
+			if (methodIdent.getPackageName() != null && !methodIdent.getPackageName().equals("")) {
 				return new StyledString(methodIdent.getPackageName());
 			} else {
 				return new StyledString("(default)");

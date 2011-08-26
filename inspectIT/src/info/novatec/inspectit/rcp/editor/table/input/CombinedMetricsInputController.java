@@ -144,18 +144,13 @@ public class CombinedMetricsInputController extends AbstractTableInputController
 		private Object[] aggregateData(List<TimerData> timerData) {
 			if (!timerData.isEmpty()) {
 				TimerData aggregatedData = new TimerData();
-				aggregatedData.setMax(0d);
-				aggregatedData.setMin(Double.MAX_VALUE);
-				aggregatedData.setDuration(0d);
-				aggregatedData.setCount(0L);
 
 				for (TimerData data : timerData) {
-					aggregatedData.setMax(Math.max(aggregatedData.getMax(), data.getMax()));
-					aggregatedData.setMin(Math.min(aggregatedData.getMin(), data.getMin()));
+					aggregatedData.calculateMax(data.getMax());
+					aggregatedData.calculateMin(data.getMin());
 					aggregatedData.addDuration(data.getDuration());
 					aggregatedData.setCount(aggregatedData.getCount() + data.getCount());
 				}
-				aggregatedData.setAverage(aggregatedData.getDuration() / aggregatedData.getCount());
 
 				Object[] result = new Object[1];
 				result[0] = aggregatedData;

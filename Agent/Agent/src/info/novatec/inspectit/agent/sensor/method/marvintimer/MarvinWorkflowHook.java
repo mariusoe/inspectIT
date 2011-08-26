@@ -23,8 +23,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Two information objects should be saved along with the {@link TimerData}
- * object to filter the objects in the user interface. <br>
+ * Two information objects should be saved along with the {@link TimerData} object to filter the
+ * objects in the user interface. <br>
  * <b>Workflow</b> : <instance>.workflowClassName <br>
  * <b>Activity</b> : <param1>.activityName
  */
@@ -61,11 +61,10 @@ public class MarvinWorkflowHook implements IMethodHook {
 	private final IConfigurationStorage configurationStorage;
 
 	/**
-	 * The data storage used to pass the timer data object from one method call
-	 * to the other. Synchronized because it can be accessed from several
-	 * threads at the same time.<br>
-	 * The <b>key</b> is the instance of the class being called, and the
-	 * <b>value</b> is the TimerData object.
+	 * The data storage used to pass the timer data object from one method call to the other.
+	 * Synchronized because it can be accessed from several threads at the same time.<br>
+	 * The <b>key</b> is the instance of the class being called, and the <b>value</b> is the
+	 * TimerData object.
 	 */
 	private Map dataStorage = Collections.synchronizedMap(new IdentityHashMap());
 
@@ -167,9 +166,8 @@ public class MarvinWorkflowHook implements IMethodHook {
 			if (null != timerData) {
 				double combinedDuration = timerData.getDuration() + duration;
 				timerData.setDuration(combinedDuration);
-				timerData.setMin(combinedDuration);
-				timerData.setMax(combinedDuration);
-				timerData.setAverage(combinedDuration);
+				timerData.calculateMin(combinedDuration);
+				timerData.calculateMax(combinedDuration);
 				timerData.setCount(1L);
 
 				// the sensor type and method id is not needed here as we don't

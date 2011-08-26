@@ -103,8 +103,8 @@ public class AverageTimerHookTest extends AbstractLogSupport {
 		timerData.setSensorTypeIdent(registeredSensorTypeId);
 		timerData.setCount(1L);
 		timerData.setDuration(secondTimerValue - firstTimerValue);
-		timerData.setMax(secondTimerValue - firstTimerValue);
-		timerData.setMin(secondTimerValue - firstTimerValue);
+		timerData.calculateMax(secondTimerValue - firstTimerValue);
+		timerData.calculateMin(secondTimerValue - firstTimerValue);
 		verify(coreService).addMethodSensorData(eq(sensorTypeId), eq(methodId), (String) eq(null), argThat(new TimerDataVerifier(timerData)));
 
 		verifyNoMoreInteractions(timer, idManager, coreService, registeredSensorConfig);
@@ -146,8 +146,8 @@ public class AverageTimerHookTest extends AbstractLogSupport {
 		timerDataTwo.setSensorTypeIdent(registeredSensorTypeId);
 		timerDataTwo.setCount(1L);
 		timerDataTwo.setDuration(thirdTimerValue - secondTimerValue);
-		timerDataTwo.setMax(thirdTimerValue - secondTimerValue);
-		timerDataTwo.setMin(thirdTimerValue - secondTimerValue);
+		timerDataTwo.calculateMax(thirdTimerValue - secondTimerValue);
+		timerDataTwo.calculateMin(thirdTimerValue - secondTimerValue);
 		verify(coreService).addMethodSensorData(eq(sensorTypeId), eq(methodIdTwo), (String) eq(null), argThat(new TimerDataVerifier(timerDataTwo)));
 
 		averageTimerHook.firstAfterBody(methodIdOne, sensorTypeId, object, parameters, result, registeredSensorConfig);
@@ -158,8 +158,8 @@ public class AverageTimerHookTest extends AbstractLogSupport {
 		timerDataOne.setSensorTypeIdent(registeredSensorTypeId);
 		timerDataOne.setCount(1L);
 		timerDataOne.setDuration(fourthTimerValue - firstTimerValue);
-		timerDataOne.setMax(fourthTimerValue - firstTimerValue);
-		timerDataOne.setMin(fourthTimerValue - firstTimerValue);
+		timerDataOne.calculateMax(fourthTimerValue - firstTimerValue);
+		timerDataOne.calculateMin(fourthTimerValue - firstTimerValue);
 		verify(coreService).addMethodSensorData(eq(sensorTypeId), eq(methodIdOne), (String) eq(null), argThat(new TimerDataVerifier(timerDataOne)));
 	}
 
@@ -205,8 +205,8 @@ public class AverageTimerHookTest extends AbstractLogSupport {
 		timerData.setSensorTypeIdent(registeredSensorTypeId);
 		timerData.setCount(1L);
 		timerData.setDuration(secondTimerValue - firstTimerValue);
-		timerData.setMax(secondTimerValue - firstTimerValue);
-		timerData.setMin(secondTimerValue - firstTimerValue);
+		timerData.calculateMax(secondTimerValue - firstTimerValue);
+		timerData.calculateMin(secondTimerValue - firstTimerValue);
 		verify(coreService).addMethodSensorData(eq(sensorTypeId), eq(methodId), (String) eq(null), argThat(new TimerDataVerifier(timerData)));
 
 		// second one
@@ -275,8 +275,8 @@ public class AverageTimerHookTest extends AbstractLogSupport {
 		timerData.setSensorTypeIdent(registeredSensorTypeId);
 		timerData.setCount(1L);
 		timerData.setDuration(secondTimerValue - firstTimerValue);
-		timerData.setMax(secondTimerValue - firstTimerValue);
-		timerData.setMin(secondTimerValue - firstTimerValue);
+		timerData.calculateMax(secondTimerValue - firstTimerValue);
+		timerData.calculateMin(secondTimerValue - firstTimerValue);
 		verify(coreService).addMethodSensorData(eq(sensorTypeId), eq(methodId), (String) eq(null), argThat(new TimerDataVerifier(timerData)));
 
 		// second one

@@ -18,10 +18,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * The hook implementation for the average timer sensor. It uses the
- * {@link ThreadLocalStack} class to save the time when the method was called.
- * After the complete original method was executed, it computes the how long the
- * method took to finish. Afterwards, the measurement is added to the
+ * The hook implementation for the average timer sensor. It uses the {@link ThreadLocalStack} class
+ * to save the time when the method was called. After the complete original method was executed, it
+ * computes the how long the method took to finish. Afterwards, the measurement is added to the
  * {@link CoreService}.
  * 
  * @author Patrice Bouillet
@@ -113,8 +112,8 @@ public class AverageTimerHook implements IMethodHook, IConstructorHook {
 				timerData = new TimerData(timestamp, platformId, registeredSensorTypeId, registeredMethodId, parameterContentData);
 				timerData.increaseCount();
 				timerData.addDuration(duration);
-				timerData.setMin(duration);
-				timerData.setMax(duration);
+				timerData.calculateMin(duration);
+				timerData.calculateMax(duration);
 
 				coreService.addMethodSensorData(sensorTypeId, methodId, prefix, timerData);
 			} catch (IdNotAvailableException e) {
@@ -126,13 +125,9 @@ public class AverageTimerHook implements IMethodHook, IConstructorHook {
 			timerData.increaseCount();
 			timerData.addDuration(duration);
 
-			if (duration < timerData.getMin()) {
-				timerData.setMin(duration);
-			}
+			timerData.calculateMin(duration);
+			timerData.calculateMax(duration);
 
-			if (duration > timerData.getMax()) {
-				timerData.setMax(duration);
-			}
 		}
 	}
 

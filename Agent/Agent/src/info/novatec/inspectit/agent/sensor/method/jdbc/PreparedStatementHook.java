@@ -116,8 +116,8 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 						sqlData.setPreparedStatement(true);
 						sqlData.setSql(sql);
 						sqlData.setDuration(duration);
-						sqlData.setMin(duration);
-						sqlData.setMax(duration);
+						sqlData.calculateMin(duration);
+						sqlData.calculateMax(duration);
 						sqlData.setCount(1L);
 						coreService.addMethodSensorData(sensorTypeId, methodId, sql, sqlData);
 					} catch (IdNotAvailableException e) {
@@ -129,13 +129,8 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 					sqlData.increaseCount();
 					sqlData.addDuration(duration);
 
-					if (duration < sqlData.getMin()) {
-						sqlData.setMin(duration);
-					}
-
-					if (duration > sqlData.getMax()) {
-						sqlData.setMax(duration);
-					}
+					sqlData.calculateMin(duration);
+					sqlData.calculateMax(duration);
 				}
 			} else {
 				// the sql was not found, we'll try again

@@ -530,7 +530,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			return styledString;
 		case CPUDURATION:
 			styledString = new StyledString();
-			if (null != data.getTimerData() && data.getTimerData().getCpuMin() != -1 && Double.MAX_VALUE != data.getTimerData().getCpuMin()) {
+			if (null != data.getTimerData() && data.getTimerData().isCpuMetricDataAvailable()) {
 				styledString.append(NumberFormatter.formatDouble(data.getTimerData().getCpuDuration()));
 			}
 			return styledString;

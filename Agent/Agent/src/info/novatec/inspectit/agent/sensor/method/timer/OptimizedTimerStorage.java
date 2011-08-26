@@ -7,8 +7,8 @@ import java.sql.Timestamp;
 import java.util.List;
 
 /**
- * The optimized timer storage instantly computes the new values and saves them
- * in the {@link TimerData}.
+ * The optimized timer storage instantly computes the new values and saves them in the
+ * {@link TimerData}.
  * 
  * @author Patrice Bouillet
  * 
@@ -44,14 +44,8 @@ public class OptimizedTimerStorage implements ITimerStorage {
 	public void addData(double time) {
 		timerData.increaseCount();
 		timerData.addDuration(time);
-
-		if (time < timerData.getMin()) {
-			timerData.setMin(time);
-		}
-
-		if (time > timerData.getMax()) {
-			timerData.setMax(time);
-		}
+		timerData.calculateMax(time);
+		timerData.calculateMin(time);
 	}
 
 	/**

@@ -38,11 +38,10 @@ public class TimerDataAggregator implements IDataAggregator {
 			TimerData data = new TimerData();
 			data.setSensorTypeIdent(sensorTypeIdent);
 			data.setPlatformIdent(platformIdent);
-			data.setMin(min);
-			data.setMax(max);
+			data.calculateMin(min);
+			data.calculateMax(max);
 			data.setDuration(duration);
 			data.setCount(totalCount);
-			data.setAverage(duration / totalCount);
 
 			return data;
 		}

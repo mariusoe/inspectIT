@@ -83,7 +83,7 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 		CacheCleaner cacheCleaner = new CacheCleaner();
 		cacheCleaner.start();
 	}
-	
+
 	/**
 	 * @return the aggregationPeriod
 	 */
@@ -92,7 +92,8 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 	}
 
 	/**
-	 * @param aggregationPeriod the aggregationPeriod to set
+	 * @param aggregationPeriod
+	 *            the aggregationPeriod to set
 	 */
 	public void setAggregationPeriod(long aggregationPeriod) {
 		this.aggregationPeriod = aggregationPeriod;
@@ -106,7 +107,8 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 	}
 
 	/**
-	 * @param maxElements the maxElements to set
+	 * @param maxElements
+	 *            the maxElements to set
 	 */
 	public void setMaxElements(int maxElements) {
 		this.maxElements = maxElements;
@@ -120,7 +122,8 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 	}
 
 	/**
-	 * @param cacheCleanSleepingPeriod the cacheCleanSleepingPeriod to set
+	 * @param cacheCleanSleepingPeriod
+	 *            the cacheCleanSleepingPeriod to set
 	 */
 	public void setCacheCleanSleepingPeriod(long cacheCleanSleepingPeriod) {
 		this.cacheCleanSleepingPeriod = cacheCleanSleepingPeriod;
@@ -141,7 +144,8 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 		try {
 			TimerData aggTimerData = map.get(cacheHash);
 			if (aggTimerData == null) {
-				// we create a DB aggregated timer data because we don't want to alter objects that are in the memory
+				// we create a DB aggregated timer data because we don't want to alter objects that
+				// are in the memory
 				aggTimerData = new DatabaseAggregatedTimerData(new Timestamp(aggregationTimestamp), timerData.getPlatformIdent(), timerData.getSensorTypeIdent(), timerData.getMethodIdent());
 				map.put(cacheHash, aggTimerData);
 				queue.add(aggTimerData);
@@ -171,7 +175,6 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 				TimerData oldest = queue.poll();
 				while (oldest != null) {
 					map.remove(getCacheHash(oldest.getPlatformIdent(), oldest.getMethodIdent(), oldest.getTimeStamp().getTime()));
-					oldest.finalizeData();
 					session.insert(oldest);
 					elementCount.decrementAndGet();
 

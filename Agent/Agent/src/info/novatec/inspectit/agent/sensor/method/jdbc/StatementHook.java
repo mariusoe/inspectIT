@@ -16,12 +16,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * The hook implementation for the statement sensor. It uses the
- * {@link ThreadLocalStack} class to know if some execute methods call each
- * other which would result in multiple data objects for only one query. After
- * the complete SQL method was executed, it computes how long the method took to
- * finish and saves the executed SQL Statement String. Afterwards, the
- * measurement is added to the {@link CoreService}.
+ * The hook implementation for the statement sensor. It uses the {@link ThreadLocalStack} class to
+ * know if some execute methods call each other which would result in multiple data objects for only
+ * one query. After the complete SQL method was executed, it computes how long the method took to
+ * finish and saves the executed SQL Statement String. Afterwards, the measurement is added to the
+ * {@link CoreService}.
  * 
  * @author Christian Herzog
  * @author Patrice Bouillet
@@ -50,8 +49,8 @@ public class StatementHook implements IMethodHook {
 	private final IIdManager idManager;
 
 	/**
-	 * The ThreadLocal for a boolean value so only the last before and first
-	 * after hook of an invocation is measured.
+	 * The ThreadLocal for a boolean value so only the last before and first after hook of an
+	 * invocation is measured.
 	 */
 	private ThreadLocal threadLast = new ThreadLocal();
 
@@ -110,8 +109,8 @@ public class StatementHook implements IMethodHook {
 					sqlData.setPreparedStatement(false);
 					sqlData.setSql(sql);
 					sqlData.setDuration(duration);
-					sqlData.setMin(duration);
-					sqlData.setMax(duration);
+					sqlData.calculateMin(duration);
+					sqlData.calculateMax(duration);
 					sqlData.setCount(1L);
 					coreService.addMethodSensorData(sensorTypeId, methodId, sql, sqlData);
 				} catch (IdNotAvailableException e) {
@@ -123,13 +122,8 @@ public class StatementHook implements IMethodHook {
 				sqlData.increaseCount();
 				sqlData.addDuration(duration);
 
-				if (duration < sqlData.getMin()) {
-					sqlData.setMin(duration);
-				}
-
-				if (duration > sqlData.getMax()) {
-					sqlData.setMax(duration);
-				}
+				sqlData.calculateMin(duration);
+				sqlData.calculateMax(duration);
 			}
 		}
 	}

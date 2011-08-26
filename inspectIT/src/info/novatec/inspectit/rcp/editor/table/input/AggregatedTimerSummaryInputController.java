@@ -249,19 +249,19 @@ public class AggregatedTimerSummaryInputController extends AbstractTableInputCon
 		case DURATION:
 			return new StyledString(NumberFormatter.formatDouble(data.getDuration()));
 		case EXCLUSIVEAVERAGE:
-			if (data.getExclusiveAverage() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+			if (data.isExclusiveTimeDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveAverage()));
 			} else {
 				return new StyledString("");
 			}
 		case EXCLUSIVEMAX:
-			if (data.getExclusiveMax() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+			if (data.isExclusiveTimeDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveMax()));
 			} else {
 				return new StyledString("");
 			}
 		case EXCLUSIVEMIN:
-			if (data.getExclusiveMin() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+			if (data.isExclusiveTimeDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveMin()));
 			} else {
 				return new StyledString("");

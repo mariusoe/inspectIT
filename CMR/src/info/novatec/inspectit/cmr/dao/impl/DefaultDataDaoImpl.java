@@ -169,8 +169,8 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 				// for SQLs we know immediately that exclusive duration is as a duration
 				child.getSqlStatementData().setExclusiveCount(1L);
 				child.getSqlStatementData().setExclusiveDuration(child.getSqlStatementData().getDuration());
-				child.getSqlStatementData().setExclusiveMax(child.getSqlStatementData().getDuration());
-				child.getSqlStatementData().setExclusiveMin(child.getSqlStatementData().getDuration());
+				child.getSqlStatementData().calculateExclusiveMax(child.getSqlStatementData().getDuration());
+				child.getSqlStatementData().calculateExclusiveMax(child.getSqlStatementData().getDuration());
 
 				cacheIdGenerator.assignObjectAnId(child.getSqlStatementData());
 				child.getSqlStatementData().addInvocationParentId(topInvocationParent.getId());
@@ -215,8 +215,8 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 			double exclusiveTime = invData.getTimerData().getDuration() - exclusiveDurationDelta;
 			invData.getTimerData().setExclusiveCount(1L);
 			invData.getTimerData().setExclusiveDuration(exclusiveTime);
-			invData.getTimerData().setExclusiveMin(exclusiveTime);
-			invData.getTimerData().setExclusiveMax(exclusiveTime);
+			invData.getTimerData().calculateExclusiveMax(exclusiveTime);
+			invData.getTimerData().calculateExclusiveMin(exclusiveTime);
 
 			if (saveTimerDataToDatabase) {
 				timerDataAggregator.processTimerData(invData.getTimerData());
@@ -235,7 +235,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 			int oldChildrenListSize = invData.getNestedSequences().size();
 			invData.getNestedSequences().removeAll(childRemoveCollection);
 			int newChildrenListSize = invData.getNestedSequences().size();
-			
+
 			InvocationSequenceData alterChildCountInvocation = invData;
 			int alterSize = oldChildrenListSize - newChildrenListSize;
 			while (null != alterChildCountInvocation) {

@@ -1,6 +1,5 @@
 package info.novatec.inspectit.agent.sensor.method.timer;
 
-import info.novatec.inspectit.agent.sensor.method.timer.ITimerStorage;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.TimerData;
@@ -9,8 +8,8 @@ import java.sql.Timestamp;
 import java.util.List;
 
 /**
- * The optimized timer storage instantly computes the new values and saves them
- * in the {@link TimerData}.
+ * The optimized timer storage instantly computes the new values and saves them in the
+ * {@link TimerData}.
  * 
  * @author Patrice Bouillet
  * 
@@ -47,25 +46,15 @@ public class OptimizedTimerStorage implements ITimerStorage {
 		timerData.increaseCount();
 		timerData.addDuration(time);
 
-		if (time < timerData.getMin()) {
-			timerData.setMin(time);
-		}
-
-		if (time > timerData.getMax()) {
-			timerData.setMax(time);
-		}
+		timerData.calculateMax(time);
+		timerData.calculateMin(time);
 
 		// only add the cpu time if it greater than zero
 		if (cpuTime >= 0) {
 			timerData.addCpuDuration(cpuTime);
 
-			if (cpuTime < timerData.getCpuMin()) {
-				timerData.setCpuMin(cpuTime);
-			}
-
-			if (cpuTime > timerData.getCpuMax()) {
-				timerData.setCpuMax(cpuTime);
-			}
+			timerData.calculateCpuMax(cpuTime);
+			timerData.calculateCpuMin(cpuTime);
 		}
 	}
 

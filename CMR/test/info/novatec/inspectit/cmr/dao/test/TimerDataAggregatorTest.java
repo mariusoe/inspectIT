@@ -53,10 +53,8 @@ public class TimerDataAggregatorTest extends AbstractTransactionalTestNGLogSuppo
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testAggregation() {
-		TimerData timerData = mock(TimerData.class);
 		long timestampValue = new Date().getTime();
 		long platformIdent = new Random().nextLong();
-		when(timerData.getPlatformIdent()).thenReturn(platformIdent);
 
 		final long count = 2;
 		final double min = 1;
@@ -64,34 +62,46 @@ public class TimerDataAggregatorTest extends AbstractTransactionalTestNGLogSuppo
 		final double average = 1.5;
 		final double duration = 3;
 
-		when(timerData.getCount()).thenReturn(count);
-		when(timerData.getAverage()).thenReturn(average);
-		when(timerData.getMin()).thenReturn(min);
-		when(timerData.getMax()).thenReturn(max);
-		when(timerData.getDuration()).thenReturn(duration);
+		TimerData timerData = new TimerData();
+		timerData.setTimeStamp(new Timestamp(timestampValue));
+		timerData.setPlatformIdent(platformIdent);
+		timerData.setCount(count);
+		timerData.setExclusiveCount(count);
+		timerData.setDuration(duration);
+		timerData.setCpuDuration(duration);
+		timerData.setExclusiveDuration(duration);
+		timerData.calculateMin(min);
+		timerData.calculateCpuMin(min);
+		timerData.calculateExclusiveMin(min);
+		timerData.calculateMax(max);
+		timerData.calculateCpuMax(max);
+		timerData.calculateExclusiveMax(max);
+		timerData.setMethodIdent(50L);
 
-		when(timerData.getCpuAverage()).thenReturn(average);
-		when(timerData.getCpuMin()).thenReturn(min);
-		when(timerData.getCpuMax()).thenReturn(max);
-		when(timerData.getCpuDuration()).thenReturn(duration);
-
-		when(timerData.getExclusiveCount()).thenReturn(count);
-		when(timerData.getExclusiveMin()).thenReturn(min);
-		when(timerData.getExclusiveMax()).thenReturn(max);
-		when(timerData.getExclusiveDuration()).thenReturn(duration);
+		TimerData timerData2 = new TimerData();
+		timerData2.setTimeStamp(new Timestamp(timestampValue * 2));
+		timerData2.setPlatformIdent(platformIdent);
+		timerData2.setCount(count);
+		timerData2.setExclusiveCount(count);
+		timerData2.setDuration(duration);
+		timerData2.setCpuDuration(duration);
+		timerData2.setExclusiveDuration(duration);
+		timerData2.calculateMin(min);
+		timerData2.calculateCpuMin(min);
+		timerData2.calculateExclusiveMin(min);
+		timerData2.calculateMax(max);
+		timerData2.calculateCpuMax(max);
+		timerData2.calculateExclusiveMax(max);
+		timerData2.setMethodIdent(100L);
 
 		final int elements = 1000;
 
-		when(timerData.getTimeStamp()).thenReturn(new Timestamp(timestampValue));
-		when(timerData.getMethodIdent()).thenReturn(50L);
 		for (int i = 0; i < elements / 2; i++) {
 			aggregator.processTimerData(timerData);
 		}
 
-		when(timerData.getTimeStamp()).thenReturn(new Timestamp(timestampValue * 2));
-		when(timerData.getMethodIdent()).thenReturn(100L);
 		for (int i = 0; i < elements / 2; i++) {
-			aggregator.processTimerData(timerData);
+			aggregator.processTimerData(timerData2);
 		}
 
 		// sleep until all objects are persisted
@@ -144,22 +154,20 @@ public class TimerDataAggregatorTest extends AbstractTransactionalTestNGLogSuppo
 
 		aggregator.processTimerData(timerData);
 
-		verify(timerData, times(0)).setAverage(anyDouble());
 		verify(timerData, times(0)).setCount(anyLong());
-		verify(timerData, times(0)).setCpuAverage(anyDouble());
 		verify(timerData, times(0)).setCpuDuration(anyDouble());
-		verify(timerData, times(0)).setCpuMax(anyDouble());
-		verify(timerData, times(0)).setCpuMin(anyDouble());
+		verify(timerData, times(0)).calculateCpuMax(anyDouble());
+		verify(timerData, times(0)).calculateCpuMin(anyDouble());
 		verify(timerData, times(0)).setDuration(anyDouble());
 		verify(timerData, times(0)).setExclusiveCount(anyLong());
 		verify(timerData, times(0)).setExclusiveDuration(anyDouble());
-		verify(timerData, times(0)).setExclusiveMax(anyDouble());
-		verify(timerData, times(0)).setExclusiveMin(anyDouble());
+		verify(timerData, times(0)).calculateExclusiveMax(anyDouble());
+		verify(timerData, times(0)).calculateExclusiveMin(anyDouble());
 		verify(timerData, times(0)).setId(anyLong());
 		verify(timerData, times(0)).setInvocationParentsIdSet((Set<?>) anyObject());
-		verify(timerData, times(0)).setMax(anyDouble());
+		verify(timerData, times(0)).calculateMax(anyDouble());
 		verify(timerData, times(0)).setMethodIdent(anyLong());
-		verify(timerData, times(0)).setMin(anyDouble());
+		verify(timerData, times(0)).calculateMin(anyDouble());
 		verify(timerData, times(0)).setObjectsInInvocationsCount(anyLong());
 		verify(timerData, times(0)).setParameterContentData((Set<?>) anyObject());
 		verify(timerData, times(0)).setPlatformIdent(anyLong());

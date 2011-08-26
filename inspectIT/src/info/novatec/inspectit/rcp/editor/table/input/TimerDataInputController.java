@@ -501,55 +501,55 @@ public class TimerDataInputController extends AbstractTableInputController {
 		case COUNT:
 			return new StyledString(String.valueOf(data.getCount()));
 		case AVERAGE:
-			if (data.getMin() != Double.MAX_VALUE) {
+			if (data.isTimeDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getAverage(), timeDecimalPlaces));
 			} else {
 				return emptyStyledString;
 			}
 		case MIN:
-			if (data.getMin() != Double.MAX_VALUE) {
+			if (data.isTimeDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getMin(), timeDecimalPlaces));
 			} else {
 				return emptyStyledString;
 			}
 		case MAX:
-			if (data.getMin() != Double.MAX_VALUE) {
+			if (data.isTimeDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getMax(), timeDecimalPlaces));
 			} else {
 				return emptyStyledString;
 			}
 		case DURATION:
-			if (data.getMin() != Double.MAX_VALUE) {
+			if (data.isTimeDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getDuration(), timeDecimalPlaces));
 			} else {
 				return emptyStyledString;
 			}
 		case CPUAVERAGE:
-			if (data.getCpuMin() != -1 && Double.MAX_VALUE != data.getCpuMin()) {
+			if (data.isCpuMetricDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getCpuAverage(), timeDecimalPlaces));
 			} else {
 				return emptyStyledString;
 			}
 		case CPUMIN:
-			if (data.getCpuMin() != -1 && Double.MAX_VALUE != data.getCpuMin()) {
+			if (data.isCpuMetricDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getCpuMin(), timeDecimalPlaces));
 			} else {
 				return emptyStyledString;
 			}
 		case CPUMAX:
-			if (data.getCpuMin() != -1 && Double.MAX_VALUE != data.getCpuMin()) {
+			if (data.isCpuMetricDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getCpuMax(), timeDecimalPlaces));
 			} else {
 				return emptyStyledString;
 			}
 		case CPUDURATION:
-			if (data.getCpuMin() != -1 && Double.MAX_VALUE != data.getCpuMin()) {
+			if (data.isCpuMetricDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getCpuDuration(), timeDecimalPlaces));
 			} else {
 				return emptyStyledString;
 			}
 		case EXCLUSIVEAVERAGE:
-			if (data.getExclusiveAverage() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+			if (data.isExclusiveTimeDataAvailable()) {
 				StyledString res = new StyledString(NumberFormatter.formatDouble(data.getExclusiveAverage(), timeDecimalPlaces));
 
 				int affPercentage = (int) (data.getInvocationAffiliationPercentage() * 100);
@@ -566,7 +566,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 				return emptyStyledString;
 			}
 		case EXCLUSIVEMAX:
-			if (data.getExclusiveMax() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+			if (data.isExclusiveTimeDataAvailable()) {
 				StyledString res = new StyledString(NumberFormatter.formatDouble(data.getExclusiveMax(), timeDecimalPlaces));
 
 				int affPercentage = (int) (data.getInvocationAffiliationPercentage() * 100);
@@ -583,7 +583,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 				return emptyStyledString;
 			}
 		case EXCLUSIVEMIN:
-			if (data.getExclusiveMin() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+			if (data.isExclusiveTimeDataAvailable()) {
 				StyledString res = new StyledString(NumberFormatter.formatDouble(data.getExclusiveMin(), timeDecimalPlaces));
 
 				int affPercentage = (int) (data.getInvocationAffiliationPercentage() * 100);
@@ -600,7 +600,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 				return emptyStyledString;
 			}
 		case EXCLUSIVESUM:
-			if (data.getExclusiveDuration() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+			if (data.isExclusiveTimeDataAvailable()) {
 				StyledString exklSumString = new StyledString(NumberFormatter.formatDouble(data.getExclusiveDuration(), timeDecimalPlaces));
 
 				int affPercentage = (int) (data.getInvocationAffiliationPercentage() * 100);
