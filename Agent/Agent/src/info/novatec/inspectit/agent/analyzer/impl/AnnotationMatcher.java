@@ -1,6 +1,7 @@
 package info.novatec.inspectit.agent.analyzer.impl;
 
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
+import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatcher;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
 import info.novatec.inspectit.javassist.CtClass;
@@ -33,9 +34,16 @@ public class AnnotationMatcher extends AbstractMatcher {
 	private IMatcher delegateMatcher;
 
 	/**
+	 * The inheritance checker used to check super-classes and interfaces.
+	 */
+	private IInheritanceAnalyzer inheritanceAnalyzer;
+
+	/**
 	 * The only constructor which needs a reference to the {@link UnregisteredSensorConfig} instance
 	 * of the corresponding configuration.
 	 * 
+	 * @param inheritanceAnalyzer
+	 *            Inheritance analyzer.
 	 * @param classPoolAnalyzer
 	 *            The class pool analyzer.
 	 * @param unregisteredSensorConfig
@@ -44,9 +52,10 @@ public class AnnotationMatcher extends AbstractMatcher {
 	 *            The {@link IMatcher} delegator object to route the calls of all methods to.
 	 * @see AbstractMatcher
 	 */
-	public AnnotationMatcher(IClassPoolAnalyzer classPoolAnalyzer, UnregisteredSensorConfig unregisteredSensorConfig, IMatcher delegateMatcher) {
+	public AnnotationMatcher(IInheritanceAnalyzer inheritanceAnalyzer, IClassPoolAnalyzer classPoolAnalyzer, UnregisteredSensorConfig unregisteredSensorConfig, IMatcher delegateMatcher) {
 		super(classPoolAnalyzer, unregisteredSensorConfig);
 
+		this.inheritanceAnalyzer = inheritanceAnalyzer;
 		this.delegateMatcher = delegateMatcher;
 	}
 
@@ -61,11 +70,9 @@ public class AnnotationMatcher extends AbstractMatcher {
 	 * {@inheritDoc}
 	 */
 	public List getMatchingMethods(ClassLoader classLoader, String className) throws NotFoundException {
-		CtClass clazz = classPoolAnalyzer.getClassPool(classLoader).get(className);
 		List matchingMethods = delegateMatcher.getMatchingMethods(classLoader, className);
 
-		List classAttributesList = clazz.getClassFile().getAttributes();
-		boolean classHasAnnotation = checkForAnnotation(classAttributesList, unregisteredSensorConfig.getAnnotationClassName());
+		boolean classHasAnnotation = checkClassForAnnotation(classLoader, className, unregisteredSensorConfig.getAnnotationClassName());
 
 		if (!classHasAnnotation) {
 			List notMatchingMethods = null;
@@ -101,11 +108,9 @@ public class AnnotationMatcher extends AbstractMatcher {
 	 * {@inheritDoc}
 	 */
 	public List getMatchingConstructors(ClassLoader classLoader, String className) throws NotFoundException {
-		CtClass clazz = classPoolAnalyzer.getClassPool(classLoader).get(className);
 		List matchingConstructors = delegateMatcher.getMatchingConstructors(classLoader, className);
 
-		List classAttributesList = clazz.getClassFile().getAttributes();
-		boolean classHasAnnotation = checkForAnnotation(classAttributesList, unregisteredSensorConfig.getAnnotationClassName());
+		boolean classHasAnnotation = checkClassForAnnotation(classLoader, className, unregisteredSensorConfig.getAnnotationClassName());
 
 		if (!classHasAnnotation) {
 			List notMatchingConstructors = null;
@@ -135,6 +140,58 @@ public class AnnotationMatcher extends AbstractMatcher {
 		}
 
 		return matchingConstructors;
+	}
+
+	/**
+	 * Checks if the class has the annotation with the given annotation name. This method will also
+	 * check all the superclass and interfaces.
+	 * 
+	 * @param classLoader
+	 *            Class loader.
+	 * @param className
+	 *            Name of the class to check.
+	 * @param annotationClassName
+	 *            Annotation name.
+	 * @return True if annotation if found, false otherwise.
+	 * @throws NotFoundException
+	 *             If type is not found.
+	 */
+	private boolean checkClassForAnnotation(ClassLoader classLoader, String className, String annotationClassName) throws NotFoundException {
+		CtClass clazz = classPoolAnalyzer.getClassPool(classLoader).get(className);
+		List classAttributesList = clazz.getClassFile().getAttributes();
+		if (checkForAnnotation(classAttributesList, annotationClassName)) {
+			return true;
+		}
+
+		// check every super class
+		try {
+			Iterator iterator = inheritanceAnalyzer.getSuperclassIterator(classLoader, className);
+			while (iterator.hasNext()) {
+				CtClass superClass = (CtClass) iterator.next();
+				List superClassAttributeList = superClass.getClassFile().getAttributes();
+				if (checkForAnnotation(superClassAttributeList, annotationClassName)) {
+					return true;
+				}
+			}
+		} catch (NotFoundException e) {
+			// ignore
+		}
+
+		// check every interface class
+		try {
+			Iterator iterator = inheritanceAnalyzer.getInterfaceIterator(classLoader, className);
+			while (iterator.hasNext()) {
+				CtClass interfaceClass = (CtClass) iterator.next();
+				List interfaceClassAttributeList = interfaceClass.getClassFile().getAttributes();
+				if (checkForAnnotation(interfaceClassAttributeList, annotationClassName)) {
+					return true;
+				}
+			}
+		} catch (NotFoundException e) {
+			// ignore
+		}
+
+		return false;
 	}
 
 	/**

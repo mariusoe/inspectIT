@@ -306,7 +306,7 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 		}
 		
 		if (null != annotationClassName) {
-			matcher = new AnnotationMatcher(classPoolAnalyzer, this, matcher);
+			matcher = new AnnotationMatcher(inheritanceAnalyzer, classPoolAnalyzer, this, matcher);
 		}
 
 		if (exceptionSensorActivated) {

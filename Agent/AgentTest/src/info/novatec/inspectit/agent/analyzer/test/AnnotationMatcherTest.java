@@ -16,8 +16,10 @@ import info.novatec.inspectit.javassist.CtConstructor;
 import info.novatec.inspectit.javassist.CtMethod;
 import info.novatec.inspectit.javassist.NotFoundException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.mockito.Mock;
@@ -28,6 +30,9 @@ public class AnnotationMatcherTest extends MockInit {
 
 	@Mock
 	private IClassPoolAnalyzer classPoolAnalyzer;
+	
+	@Mock
+	private IInheritanceAnalyzer inheritanceAnalyzer;
 
 	private UnregisteredSensorConfig unregisteredSensorConfig;
 
@@ -46,7 +51,7 @@ public class AnnotationMatcherTest extends MockInit {
 
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {
-		unregisteredSensorConfig = new UnregisteredSensorConfig(classPoolAnalyzer, mock(IInheritanceAnalyzer.class));
+		unregisteredSensorConfig = new UnregisteredSensorConfig(classPoolAnalyzer, inheritanceAnalyzer);
 		unregisteredSensorConfig.setIgnoreSignature(false);
 		unregisteredSensorConfig.setInterface(false);
 		unregisteredSensorConfig.setSuperclass(false);
@@ -58,7 +63,7 @@ public class AnnotationMatcherTest extends MockInit {
 		unregisteredSensorConfig.setSettings(Collections.EMPTY_MAP);
 
 		delegateMatcher = mock(IMatcher.class);
-		matcher = new AnnotationMatcher(classPoolAnalyzer, unregisteredSensorConfig, delegateMatcher);
+		matcher = new AnnotationMatcher(inheritanceAnalyzer, classPoolAnalyzer, unregisteredSensorConfig, delegateMatcher);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -73,6 +78,11 @@ public class AnnotationMatcherTest extends MockInit {
 		
 		when(delegateMatcher.getMatchingMethods(classLoader, this.getClass().getName())).thenReturn(Arrays.asList(ctMethods));
 		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(classPool);
+		
+		Iterator<?> iterator = mock(Iterator.class);
+		when(iterator.hasNext()).thenReturn(false);
+		when(inheritanceAnalyzer.getSuperclassIterator(classLoader,  this.getClass().getName())).thenReturn(iterator);
+		when(inheritanceAnalyzer.getInterfaceIterator(classLoader,  this.getClass().getName())).thenReturn(iterator);
 		
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, this.getClass().getName());
@@ -95,6 +105,11 @@ public class AnnotationMatcherTest extends MockInit {
 		
 		when(delegateMatcher.getMatchingConstructors(classLoader, this.getClass().getName())).thenReturn(Arrays.asList(ctConstructors));
 		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(classPool);
+		
+		Iterator<?> iterator = mock(Iterator.class);
+		when(iterator.hasNext()).thenReturn(false);
+		when(inheritanceAnalyzer.getSuperclassIterator(classLoader,  this.getClass().getName())).thenReturn(iterator);
+		when(inheritanceAnalyzer.getInterfaceIterator(classLoader,  this.getClass().getName())).thenReturn(iterator);
 		
 		// execute the test call
 		List<CtConstructor> ctConstructorList = matcher.getMatchingConstructors(classLoader, this.getClass().getName());
@@ -119,6 +134,11 @@ public class AnnotationMatcherTest extends MockInit {
 		when(delegateMatcher.getMatchingMethods(classLoader, TestClass.class.getName())).thenReturn(Arrays.asList(ctMethods));
 		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(classPool);
 		
+		Iterator<?> iterator = mock(Iterator.class);
+		when(iterator.hasNext()).thenReturn(false);
+		when(inheritanceAnalyzer.getSuperclassIterator(classLoader,  this.getClass().getName())).thenReturn(iterator);
+		when(inheritanceAnalyzer.getInterfaceIterator(classLoader,  this.getClass().getName())).thenReturn(iterator);
+		
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, TestClass.class.getName());
 		assertNotNull(ctMethodList);
@@ -132,6 +152,94 @@ public class AnnotationMatcherTest extends MockInit {
 		
 		// execute the test call
 		List<CtConstructor> ctConstructorList = matcher.getMatchingConstructors(classLoader, TestClass.class.getName());
+		assertNotNull(ctConstructorList);
+		assertTrue(!ctConstructorList.isEmpty());
+		assertTrue(ctConstructorList.size() == ctConstructors.length);
+	}
+	
+	@Test
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void testSuperclassAnnotation() throws NotFoundException {
+		unregisteredSensorConfig.setAnnotationClassName(TestAnnotation.class.getName());
+		
+		ClassLoader classLoader = this.getClass().getClassLoader();
+		ClassPool classPool = ClassPool.getDefault();
+		CtClass ctClass = classPool.get(ExtendedTestClass.class.getName());
+		
+		// test the methods of annotated class (all should be loaded)
+		CtMethod[] ctMethods = ctClass.getDeclaredMethods();
+		when(delegateMatcher.getMatchingMethods(classLoader, ExtendedTestClass.class.getName())).thenReturn(Arrays.asList(ctMethods));
+		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(classPool);
+		
+		Iterator iterator = mock(Iterator.class);
+		when(iterator.hasNext()).thenReturn(true).thenReturn(false);
+		when(iterator.next()).thenReturn(classPool.get(ExtendedTestClass.class.getSuperclass().getName()));
+		when(inheritanceAnalyzer.getSuperclassIterator(classLoader,  ExtendedTestClass.class.getName())).thenReturn(iterator);
+		when(inheritanceAnalyzer.getInterfaceIterator(classLoader,  ExtendedTestClass.class.getName())).thenReturn(new ArrayList().iterator());
+		
+		// execute the test call
+		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, ExtendedTestClass.class.getName());
+		assertNotNull(ctMethodList);
+		assertTrue(!ctMethodList.isEmpty());
+		assertTrue(ctMethodList.size() == ctMethods.length);
+		
+		// test the constructors of annotated class (all should be loaded)
+		CtConstructor[] ctConstructors = ctClass.getDeclaredConstructors();
+		when(delegateMatcher.getMatchingConstructors(classLoader, ExtendedTestClass.class.getName())).thenReturn(Arrays.asList(ctConstructors));
+		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(classPool);
+		
+		iterator = mock(Iterator.class);
+		when(iterator.hasNext()).thenReturn(true).thenReturn(false);
+		when(iterator.next()).thenReturn(classPool.get(ExtendedTestClass.class.getSuperclass().getName()));
+		when(inheritanceAnalyzer.getSuperclassIterator(classLoader,  ExtendedTestClass.class.getName())).thenReturn(iterator);
+		when(inheritanceAnalyzer.getInterfaceIterator(classLoader,  ExtendedTestClass.class.getName())).thenReturn(new ArrayList().iterator());
+		
+		// execute the test call
+		List<CtConstructor> ctConstructorList = matcher.getMatchingConstructors(classLoader, ExtendedTestClass.class.getName());
+		assertNotNull(ctConstructorList);
+		assertTrue(!ctConstructorList.isEmpty());
+		assertTrue(ctConstructorList.size() == ctConstructors.length);
+	}
+	
+	@Test
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void testInterfaceAnnotation() throws NotFoundException {
+		unregisteredSensorConfig.setAnnotationClassName(TestAnnotation.class.getName());
+		
+		ClassLoader classLoader = this.getClass().getClassLoader();
+		ClassPool classPool = ClassPool.getDefault();
+		CtClass ctClass = classPool.get(InterfaceImplTest.class.getName());
+		
+		// test the methods of annotated class (all should be loaded)
+		CtMethod[] ctMethods = ctClass.getDeclaredMethods();
+		when(delegateMatcher.getMatchingMethods(classLoader, InterfaceImplTest.class.getName())).thenReturn(Arrays.asList(ctMethods));
+		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(classPool);
+		
+		Iterator iterator = mock(Iterator.class);
+		when(iterator.hasNext()).thenReturn(true).thenReturn(false);
+		when(iterator.next()).thenReturn(classPool.get(TestInterface.class.getName()));
+		when(inheritanceAnalyzer.getSuperclassIterator(classLoader,  InterfaceImplTest.class.getName())).thenReturn(new ArrayList().iterator());
+		when(inheritanceAnalyzer.getInterfaceIterator(classLoader,  InterfaceImplTest.class.getName())).thenReturn(iterator);
+		
+		// execute the test call
+		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, InterfaceImplTest.class.getName());
+		assertNotNull(ctMethodList);
+		assertTrue(!ctMethodList.isEmpty());
+		assertTrue(ctMethodList.size() == ctMethods.length);
+		
+		// test the constructors of annotated class (all should be loaded)
+		CtConstructor[] ctConstructors = ctClass.getDeclaredConstructors();
+		when(delegateMatcher.getMatchingConstructors(classLoader, InterfaceImplTest.class.getName())).thenReturn(Arrays.asList(ctConstructors));
+		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(classPool);
+		
+		iterator = mock(Iterator.class);
+		when(iterator.hasNext()).thenReturn(true).thenReturn(false);
+		when(iterator.next()).thenReturn(classPool.get(TestInterface.class.getName()));
+		when(inheritanceAnalyzer.getSuperclassIterator(classLoader,  InterfaceImplTest.class.getName())).thenReturn(new ArrayList().iterator());
+		when(inheritanceAnalyzer.getInterfaceIterator(classLoader,  InterfaceImplTest.class.getName())).thenReturn(iterator);
+		
+		// execute the test call
+		List<CtConstructor> ctConstructorList = matcher.getMatchingConstructors(classLoader, InterfaceImplTest.class.getName());
 		assertNotNull(ctConstructorList);
 		assertTrue(!ctConstructorList.isEmpty());
 		assertTrue(ctConstructorList.size() == ctConstructors.length);
@@ -152,5 +260,22 @@ public class AnnotationMatcherTest extends MockInit {
 		public void dummyMethod() {
 		}
 		
+	}
+	
+	@TestAnnotation
+	public interface TestInterface {
+		
+	}
+	
+	public static class ExtendedTestClass extends TestClass {
+		
+		public void dummyMethod() {
+		}
+	}
+	
+	public static class InterfaceImplTest implements TestInterface {
+		
+		public void dummyMethod() {
+		}
 	}
 }
