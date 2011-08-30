@@ -70,4 +70,10 @@
 				name="info.novatec.inspectit.cmr.util.test.PlatformIdentCacheTest" />
 		</classes>
 	</test>
+	<test name="Object Sizes Primitive Types Size Test">
+		<classes>
+			<class 
+				name="info.novatec.inspectit.cmr.cache.test.ObjectSizesPrimitiveTypesSizeTest" />
+		</classes>
+	</test>
 </suite>

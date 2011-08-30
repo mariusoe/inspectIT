@@ -257,7 +257,7 @@ public class InvocationSequenceData extends MethodSensorData {
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
 		long size = super.getObjectSize(objectSizes);
-		size += objectSizes.getPrimitiveTypesSize(4, 0, 0, 0, 3, 2);
+		size += objectSizes.getPrimitiveTypesSize(5, 0, 0, 0, 2, 3);
 		if (null != timerData) {
 			size += timerData.getObjectSize(objectSizes);
 		}
