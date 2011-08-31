@@ -215,57 +215,82 @@ public class HealthStatus {
 	 * @see MemoryUsage
 	 */
 	private void logGraphicalMemoryUsage(MemoryUsage memoryUsage, String title) {
-		double value = (double) WIDTH / memoryUsage.getMax();
-		long used = Math.round(memoryUsage.getUsed() * value);
-		long committed = Math.round(memoryUsage.getCommitted() * value);
+		if (areMemoryUsageValuesCorrect(memoryUsage)) {
+			double value = (double) WIDTH / memoryUsage.getMax();
+			long used = Math.round(memoryUsage.getUsed() * value);
+			long committed = Math.round(memoryUsage.getCommitted() * value);
 
-		// print first line
-		StringBuilder sb = new StringBuilder();
-		sb.append(START_END_CHAR);
-		sb.append("-");
-		sb.append(title);
-		for (int i = title.length() + 1; i < WIDTH; i++) {
+			// print first line
+			StringBuilder sb = new StringBuilder();
+			sb.append(START_END_CHAR);
 			sb.append("-");
-		}
+			sb.append(title);
+			for (int i = title.length() + 1; i < WIDTH; i++) {
+				sb.append("-");
+			}
 
-		sb.append(START_END_CHAR);
-		LOGGER.info(sb.toString());
+			sb.append(START_END_CHAR);
+			LOGGER.info(sb.toString());
 
-		// now create the middle line with the status.
-		sb = new StringBuilder();
-		sb.append(START_END_CHAR);
-		for (int i = 0; i < used; i++) {
-			sb.append("/");
-		}
-		long pos = used;
-		if (pos <= committed) {
-			// only print the char if committed is greater or equal than the
-			// current position.
-			for (long i = pos; i < committed; i++) {
+			// now create the middle line with the status.
+			sb = new StringBuilder();
+			sb.append(START_END_CHAR);
+			for (int i = 0; i < used; i++) {
+				sb.append("/");
+			}
+			long pos = used;
+			if (pos <= committed) {
+				// only print the char if committed is greater or equal than the
+				// current position.
+				for (long i = pos; i < committed; i++) {
+					sb.append(" ");
+				}
+				sb.append("|");
+				pos = committed + 1L;
+			}
+			// now fill up the remaining space
+			for (long i = pos; i < WIDTH; i++) {
 				sb.append(" ");
 			}
-			sb.append("|");
-			pos = committed + 1L;
-		}
-		// now fill up the remaining space
-		for (long i = pos; i < WIDTH; i++) {
-			sb.append(" ");
-		}
 
-		// only print last char if committed is smaller
-		if (committed < WIDTH) {
+			// only print last char if committed is smaller
+			if (committed < WIDTH) {
+				sb.append(START_END_CHAR);
+			}
+			LOGGER.info(sb.toString());
+
+			// print last line
+			sb = new StringBuilder();
 			sb.append(START_END_CHAR);
+			for (int i = 0; i < WIDTH; i++) {
+				sb.append("-");
+			}
+			sb.append(START_END_CHAR);
+			LOGGER.info(sb.toString());
 		}
-		LOGGER.info(sb.toString());
+	}
 
-		// print last line
-		sb = new StringBuilder();
-		sb.append(START_END_CHAR);
-		for (int i = 0; i < WIDTH; i++) {
-			sb.append("-");
+	/**
+	 * Checks if the values in {@link MemoryUsage} are OK for the graphical memory logging.
+	 * 
+	 * @param memoryUsage
+	 *            {@link MemoryUsage}
+	 * @return True if values are OK.
+	 */
+	private boolean areMemoryUsageValuesCorrect(MemoryUsage memoryUsage) {
+		if (memoryUsage.getCommitted() < 0 || memoryUsage.getUsed() < 0 || memoryUsage.getMax() < 0) {
+			return false;
 		}
-		sb.append(START_END_CHAR);
-		LOGGER.info(sb.toString());
+		if (memoryUsage.getUsed() > memoryUsage.getMax()) {
+			return false;
+		}
+		if (memoryUsage.getUsed() > memoryUsage.getCommitted()) {
+			return false;
+		}
+		if (memoryUsage.getCommitted() > memoryUsage.getMax()) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -363,7 +388,8 @@ public class HealthStatus {
 	}
 
 	/**
-	 * @param agentStorageService the agentStorageService to set
+	 * @param agentStorageService
+	 *            the agentStorageService to set
 	 */
 	public void setAgentStorageService(AgentStorageService agentStorageService) {
 		this.agentStorageService = agentStorageService;

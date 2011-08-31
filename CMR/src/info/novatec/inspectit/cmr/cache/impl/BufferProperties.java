@@ -3,6 +3,7 @@ package info.novatec.inspectit.cmr.cache.impl;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
+import java.lang.management.RuntimeMXBean;
 import java.text.NumberFormat;
 import java.util.List;
 
@@ -339,34 +340,103 @@ public class BufferProperties implements InitializingBean {
 	 */
 	public long getInitialBufferSize() {
 		long bufferSize = 0;
+		long oldGenMax = 0;
+
+		// try with Memory pool beans
 		try {
 			List<MemoryPoolMXBean> memBeans = ManagementFactory.getMemoryPoolMXBeans();
 			for (MemoryPoolMXBean memBean : memBeans) {
 				if (memBean.getName().indexOf(OLD_GEN_POOL_NAME) != -1 || memBean.getName().indexOf(TENURED_GEN_POOL_NAME) != -1) {
 					MemoryUsage memUsage = memBean.getUsage();
-					long oldGenMax = memUsage.getMax();
-					if (oldGenMax > maxOldSpaceOccupancyActiveFromOldGenSize) {
-						bufferSize = (long) (oldGenMax * maxOldSpaceOccupancy);
-					} else if (oldGenMax < minOldSpaceOccupancyActiveTillOldGenSize) {
-						bufferSize = (long) (oldGenMax * minOldSpaceOccupancy);
-					} else {
-						// delta is the value that defines how much we can extend the minimum heap
-						// occupancy
-						// percentage by analyzing the max memory size
-						// delta is actually representing additional percentage of heap we can take
-						// it is always thru that: minHeapSizeOccupancy + delta <
-						// maxHeapSizeOccupancy
-						float delta = (maxOldSpaceOccupancy - minOldSpaceOccupancy)
-								* ((float) (oldGenMax - minOldSpaceOccupancyActiveTillOldGenSize) / (maxOldSpaceOccupancyActiveFromOldGenSize - minOldSpaceOccupancyActiveTillOldGenSize));
-						bufferSize = (long) (oldGenMax * (minOldSpaceOccupancy + delta));
-					}
-					return bufferSize;
+					oldGenMax = memUsage.getMax();
+					break;
 				}
 			}
 		} catch (Exception e) {
-			throw new RuntimeException("Could not calculate the old generation heap space. Please make sure CMR is running on the provided JVM.", e);
+			oldGenMax = 0;
 		}
-		throw new RuntimeException("Could not calculate the old generation heap space. Please make sure CMR is running on the provided JVM.");
+
+		// fall back to the Runtime bean for arguments
+		try {
+			if (oldGenMax == 0) {
+				long maxHeap = 0;
+				long newGen = 0;
+				RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+				List<String> arguments = runtimeMXBean.getInputArguments();
+				for (String arg : arguments) {
+					if (arg.length() > 4) {
+						String subedArg = arg.substring(0, 4);
+						if ("-Xmx".equalsIgnoreCase(subedArg)) {
+							maxHeap = getMemorySizeFromArgument(arg, subedArg);
+						}
+						if ("-Xmn".equalsIgnoreCase(subedArg)) {
+							newGen = getMemorySizeFromArgument(arg, subedArg);
+						}
+					}
+				}
+				if (maxHeap != 0 && newGen != 0 && maxHeap > newGen) {
+					oldGenMax = maxHeap - newGen;
+				}
+			}
+		} catch (Exception e) {
+			oldGenMax = 0;
+		}
+
+		// If we did not get the value, throw exception
+		if (oldGenMax == 0) {
+			throw new RuntimeException("Could not calculate the old generation heap space. Please make sure CMR is running on the provided JVM.");
+		}
+
+		// Otherwise calculate now
+		if (oldGenMax > maxOldSpaceOccupancyActiveFromOldGenSize) {
+			bufferSize = (long) (oldGenMax * maxOldSpaceOccupancy);
+		} else if (oldGenMax < minOldSpaceOccupancyActiveTillOldGenSize) {
+			bufferSize = (long) (oldGenMax * minOldSpaceOccupancy);
+		} else {
+			// delta is the value that defines how much we can extend the minimum heap
+			// occupancy
+			// percentage by analyzing the max memory size
+			// delta is actually representing additional percentage of heap we can take
+			// it is always thru that: minHeapSizeOccupancy + delta <
+			// maxHeapSizeOccupancy
+			float delta = (maxOldSpaceOccupancy - minOldSpaceOccupancy)
+					* ((float) (oldGenMax - minOldSpaceOccupancyActiveTillOldGenSize) / (maxOldSpaceOccupancyActiveFromOldGenSize - minOldSpaceOccupancyActiveTillOldGenSize));
+			bufferSize = (long) (oldGenMax * (minOldSpaceOccupancy + delta));
+		}
+		return bufferSize;
+	}
+
+	/**
+	 * Returns memory in bytes for the given argument.
+	 * 
+	 * @param argument
+	 *            Complete argument value.
+	 * @param memoryToken
+	 *            Memory token that is contained in argument. For example 'Xmx' or similar.
+	 * @return Memory value in bytes.
+	 */
+	private long getMemorySizeFromArgument(String argument, String memoryToken) {
+		try {
+			int index = argument.indexOf(memoryToken) + memoryToken.length();
+
+			String number = argument.substring(index, argument.length() - 1);
+			String typeOfMemory = argument.substring(index + number.length());
+
+			double value = Double.parseDouble(number);
+			if (typeOfMemory.equalsIgnoreCase("K")) {
+				value *= 1024;
+			} else if (typeOfMemory.equalsIgnoreCase("M")) {
+				value *= 1024 * 1024;
+			} else if (typeOfMemory.equalsIgnoreCase("G")) {
+				value *= 1024 * 1024 * 1024;
+			} else {
+				value *= 1;
+			}
+
+			return (long) value;
+		} catch (Exception e) {
+			return 0;
+		}
 	}
 
 	/**
