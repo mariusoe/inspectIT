@@ -461,74 +461,74 @@ public class MethodInvocInputController extends AbstractTableInputController {
 			return new StyledString(String.valueOf(data.getCount()));
 		case AVERAGE:
 			// check if it is a valid data (or if timer data was available)
-			if (data.getMin() != Double.MAX_VALUE) {
+			if (data.isTimeDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getAverage()));
 			} else {
 				return emptyStyledString;
 			}
 		case MIN:
-			if (data.getMin() != Double.MAX_VALUE) {
+			if (data.isTimeDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getMin()));
 			} else {
 				return emptyStyledString;
 			}
 		case MAX:
-			if (data.getMin() != Double.MAX_VALUE) {
+			if (data.isTimeDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getMax()));
 			} else {
 				return emptyStyledString;
 			}
 		case DURATION:
-			if (data.getMin() != Double.MAX_VALUE) {
+			if (data.isTimeDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getDuration()));
 			} else {
 				return emptyStyledString;
 			}
 		case CPUAVERAGE:
 			// check if it is a valid data (or if timer data was available)
-			if (data.getCpuMin() != -1 && Double.MAX_VALUE != data.getCpuMin()) {
+			if (data.isCpuMetricDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getCpuAverage()));
 			} else {
 				return emptyStyledString;
 			}
 		case CPUMIN:
-			if (data.getCpuMin() != -1 && Double.MAX_VALUE != data.getCpuMin()) {
+			if (data.isCpuMetricDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getCpuMin()));
 			} else {
 				return emptyStyledString;
 			}
 		case CPUMAX:
-			if (data.getCpuMin() != -1 && Double.MAX_VALUE != data.getCpuMin()) {
+			if (data.isCpuMetricDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getCpuMax()));
 			} else {
 				return emptyStyledString;
 			}
 		case CPUDURATION:
-			if (data.getCpuMin() != -1 && Double.MAX_VALUE != data.getCpuMin()) {
+			if (data.isCpuMetricDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getCpuDuration()));
 			} else {
 				return emptyStyledString;
 			}
 		case EXCLUSIVESUM:
-			if (data.getExclusiveDuration() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+			if (data.isExclusiveTimeDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveDuration()));
 			} else {
 				return emptyStyledString;
 			}
 		case EXCLUSIVEAVERAGE:
-			if (data.getExclusiveAverage() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+			if (data.isExclusiveTimeDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveAverage()));
 			} else {
 				return emptyStyledString;
 			}
 		case EXCLUSIVEMIN:
-			if (data.getExclusiveMin() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+			if (data.isExclusiveTimeDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveMin()));
 			} else {
 				return emptyStyledString;
 			}
 		case EXCLUSIVEMAX:
-			if (data.getExclusiveMax() != -1 && Double.MAX_VALUE != data.getExclusiveMin()) {
+			if (data.isExclusiveTimeDataAvailable()) {
 				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveMax()));
 			} else {
 				return emptyStyledString;
