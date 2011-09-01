@@ -489,7 +489,12 @@ public class TimerData extends InvocationAwareData {
 	 * @return Whether or not this timer data contains cpu related metrics.
 	 */
 	public boolean isCpuMetricDataAvailable() {
-		return cpuDuration > 0;
+		// cpu duration cannot be used as comparison, because:
+		// in the timer hook cpu time is calculated using an JVM JMX bean that only has a resolution
+		// of 10ms (or more depending on the system). Thus even though CPU times could be
+		// calculated, the time might be 0. So in this case 0 will be added to the duration. But
+		// still, yes, we do have cpu metric data available, but it is 0.
+		return cpuMin != -1;
 	}
 
 	/**
@@ -498,7 +503,7 @@ public class TimerData extends InvocationAwareData {
 	 * @return Whether or not this timer data contains exclusive time metrics.
 	 */
 	public boolean isExclusiveTimeDataAvailable() {
-		return exclusiveDuration > 0;
+		return exclusiveMin != -1;
 	}
 
 	/**
@@ -507,7 +512,7 @@ public class TimerData extends InvocationAwareData {
 	 * @return Whether or not this timer data contains time metrics.
 	 */
 	public boolean isTimeDataAvailable() {
-		return duration > 0;
+		return min != -1;
 	}
 
 	/**
