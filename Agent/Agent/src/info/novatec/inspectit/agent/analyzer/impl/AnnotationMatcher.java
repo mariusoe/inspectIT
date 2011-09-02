@@ -158,7 +158,7 @@ public class AnnotationMatcher extends AbstractMatcher {
 	 */
 	private boolean checkClassForAnnotation(ClassLoader classLoader, String className, String annotationClassName) throws NotFoundException {
 		CtClass clazz = classPoolAnalyzer.getClassPool(classLoader).get(className);
-		List classAttributesList = clazz.getClassFile().getAttributes();
+		List classAttributesList = clazz.getClassFile2().getAttributes();
 		if (checkForAnnotation(classAttributesList, annotationClassName)) {
 			return true;
 		}
@@ -168,7 +168,7 @@ public class AnnotationMatcher extends AbstractMatcher {
 			Iterator iterator = inheritanceAnalyzer.getSuperclassIterator(classLoader, className);
 			while (iterator.hasNext()) {
 				CtClass superClass = (CtClass) iterator.next();
-				List superClassAttributeList = superClass.getClassFile().getAttributes();
+				List superClassAttributeList = superClass.getClassFile2().getAttributes();
 				if (checkForAnnotation(superClassAttributeList, annotationClassName)) {
 					return true;
 				}
@@ -182,7 +182,7 @@ public class AnnotationMatcher extends AbstractMatcher {
 			Iterator iterator = inheritanceAnalyzer.getInterfaceIterator(classLoader, className);
 			while (iterator.hasNext()) {
 				CtClass interfaceClass = (CtClass) iterator.next();
-				List interfaceClassAttributeList = interfaceClass.getClassFile().getAttributes();
+				List interfaceClassAttributeList = interfaceClass.getClassFile2().getAttributes();
 				if (checkForAnnotation(interfaceClassAttributeList, annotationClassName)) {
 					return true;
 				}
