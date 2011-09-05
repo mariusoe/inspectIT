@@ -79,7 +79,7 @@ public class AnnotationMatcher extends AbstractMatcher {
 			Iterator iterator = matchingMethods.iterator();
 			while (iterator.hasNext()) {
 				CtMethod method = (CtMethod) iterator.next();
-				List methodAttributesList = method.getMethodInfo().getAttributes();
+				List methodAttributesList = method.getMethodInfo2().getAttributes();
 				boolean methodHasAnnotation = checkForAnnotation(methodAttributesList, unregisteredSensorConfig.getAnnotationClassName());
 				if (!methodHasAnnotation) {
 					if (null == notMatchingMethods) {
@@ -117,7 +117,7 @@ public class AnnotationMatcher extends AbstractMatcher {
 			Iterator iterator = matchingConstructors.iterator();
 			while (iterator.hasNext()) {
 				CtConstructor constructor = (CtConstructor) iterator.next();
-				List constructorAttributesList = constructor.getMethodInfo().getAttributes();
+				List constructorAttributesList = constructor.getMethodInfo2().getAttributes();
 				boolean constructorHasAnnotation = checkForAnnotation(constructorAttributesList, unregisteredSensorConfig.getAnnotationClassName());
 				if (!constructorHasAnnotation) {
 					if (null == notMatchingConstructors) {
