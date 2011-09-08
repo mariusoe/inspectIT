@@ -157,27 +157,37 @@ public class JavaAgent implements ClassFileTransformer {
 	 * are directly connected to the bootstrap classloader.
 	 */
 	private static void analyzeAlreadyLoadedClasses() {
-		if (instrumentCoreClasses) {
-			for (Class<?> loadedClass : instrumentation.getAllLoadedClasses()) {
-				String clazzName = loadedClass.getCanonicalName();
-				if (null != clazzName) {
-					try {
-						clazzName = getClassNameForJavassist(loadedClass);
-						byte[] modified = PicoAgent.getInstance().inspectByteCode(null, clazzName, loadedClass.getClassLoader());
-						if (null != modified) {
-							ClassDefinition classDefinition = new ClassDefinition(loadedClass, modified);
-							instrumentation.redefineClasses(classDefinition);
+		try {
+			if (instrumentation.isRedefineClassesSupported()) {
+				if (instrumentCoreClasses) {
+					for (Class<?> loadedClass : instrumentation.getAllLoadedClasses()) {
+						String clazzName = loadedClass.getCanonicalName();
+						if (null != clazzName) {
+							try {
+								clazzName = getClassNameForJavassist(loadedClass);
+								byte[] modified = PicoAgent.getInstance().inspectByteCode(null, clazzName, loadedClass.getClassLoader());
+								if (null != modified) {
+									ClassDefinition classDefinition = new ClassDefinition(loadedClass, modified);
+									instrumentation.redefineClasses(new ClassDefinition[] {classDefinition});
+								}
+							} catch (ClassNotFoundException e) {
+								LOGGER.severe(e.getMessage());
+							} catch (UnmodifiableClassException e) {
+								LOGGER.severe(e.getMessage());
+							}
 						}
-					} catch (ClassNotFoundException e) {
-						LOGGER.severe(e.getMessage());
-					} catch (UnmodifiableClassException e) {
-						LOGGER.severe(e.getMessage());
 					}
+					LOGGER.info("inspectIT Agent: Instrumentation of core classes finished...");
+				} else {
+					LOGGER.info("inspectIT Agent: Core classes cannot be instrumented, please add -Xbootclasspath/a:<path_to_agent.jar> to the JVM parameters!");
 				}
+			} else {
+				LOGGER.info("Redefinition of Classes is not support in this JVM!");
 			}
-			LOGGER.info("inspectIT Agent: Instrumentation of core classes finished...");
-		} else {
-			LOGGER.info("inspectIT Agent: Core classes cannot be instrumented, please add -Xbootclasspath/a:<path_to_agent.jar> to the JVM parameters!");
+		} catch (Throwable t) {
+			LOGGER.severe("The process of class redefinitions produced an error: " + t.getMessage());
+			LOGGER.severe("If you are running on an IBM JVM, please ignore this error as the JVM does not support this feature!");
+			LOGGER.throwing(JavaAgent.class.getCanonicalName(), "analyzeAlreadyLoadedClasses", t);
 		}
 	}
 
