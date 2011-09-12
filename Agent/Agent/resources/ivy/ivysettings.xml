@@ -1,17 +1,9 @@
 <ivysettings>
-	<settings defaultResolver="external-repository"/>
-	
-	<!-- http://www.jarvana.com/jarvana/ is a nice page for finding projects -->
-
-	<resolvers>	
-	<chain name="external-repository">
-		<ibiblio name="java.net2" root="http://download.java.net/maven/2/" m2compatible="true"/>
-		<ibiblio name="ibiblio"/>
-		<ibiblio name="maven" root="http://repo1.maven.org/maven2" m2compatible="true" usepoms="true"/>
-		<ibiblio name="javanet" root="http://download.java.net/maven/2/" m2compatible="true" usepoms="true"/>
-		<ibiblio name="jboss" root="http://repository.jboss.com/maven2/" m2compatible="true" usepoms="true"/>
-		<ibiblio name="maven" root="http://repo1.maven.org/maven2" m2compatible="true" usepoms="true"/>
-	</chain>
+	<settings defaultResolver="novatec-nexus" />
+	<resolvers>
+		<chain name="novatec-nexus">
+			<ibiblio name="Nexus@NT" m2compatible="true" root="http://nexus.novatec-gmbh.lan/content/groups/public/" usepoms="true" />
+		</chain>
 	</resolvers>
 </ivysettings>
 
