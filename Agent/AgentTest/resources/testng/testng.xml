@@ -157,4 +157,9 @@
 			<class name="info.novatec.inspectit.agent.util.test.WeakListTest" />
 		</classes>
 	</test>
+	<test name="String Constraint">
+		<classes>
+			<class name="info.novatec.inspectit.agent.util.test.StringConstraintTest" />
+		</classes>
+	</test>
 </suite>

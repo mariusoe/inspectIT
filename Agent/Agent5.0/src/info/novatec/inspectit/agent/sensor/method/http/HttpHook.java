@@ -7,6 +7,7 @@ import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
 import info.novatec.inspectit.agent.sensor.method.timer.TimerHook;
 import info.novatec.inspectit.communication.data.HttpTimerData;
+import info.novatec.inspectit.util.StringConstraint;
 import info.novatec.inspectit.util.ThreadLocalStack;
 import info.novatec.inspectit.util.Timer;
 
@@ -119,6 +120,11 @@ public class HttpHook implements IMethodHook {
 	 * Helps us to ensure that we only store on http metric per request.
 	 */
 	private final StartEndMarker refMarker = new StartEndMarker();
+	
+	/**
+	 * The StringConstraint to ensure a maximum length of strings.
+	 */
+	private StringConstraint strConstraint;
 
 	/**
 	 * Structure to store all necessary methods that we can invoke to get http information. These
@@ -171,6 +177,7 @@ public class HttpHook implements IMethodHook {
 		this.timer = timer;
 		this.idManager = idManager;
 		this.threadMXBean = threadMXBean;
+		this.strConstraint = new StringConstraint(parameters);
 
 		if (null != parameters && "true".equals(parameters.get("sessioncapture"))) {
 			LOGGER.finer("Enabling session capturing for the http sensor");
@@ -471,6 +478,10 @@ public class HttpHook implements IMethodHook {
 					// will check the cast
 					try {
 						convertedValue = (String[]) value;
+						// crop the strings
+						for (int i = 0; i < convertedValue.length; i++) {
+							convertedValue[i] = strConstraint.crop(convertedValue[i]);
+						}
 					} catch (ClassCastException cce) {
 						LOGGER.warning("Casting value of parameter map to String[] failed. Class is  " + value.getClass().getCanonicalName()
 								+ ". For you as user this means, that you do not get the attribute value of the attribute called " + entry.getKey()
@@ -522,7 +533,7 @@ public class HttpHook implements IMethodHook {
 				String attrName = params.nextElement();
 				Object value = attributeValue.invoke(httpServletRequest, new Object[] { attrName });
 				if (null != value) {
-					attributes.put(attrName, value.toString());
+					attributes.put(attrName, strConstraint.crop(value.toString()));
 				} else {
 					attributes.put(attrName, "<null>");
 				}
@@ -566,7 +577,7 @@ public class HttpHook implements IMethodHook {
 				while (headers.hasMoreElements()) {
 					String headerName = (String) headers.nextElement();
 					String headerValue = (String) headerValueMethod.invoke(httpServletRequest, new Object[] { headerName });
-					headersResult.put(headerName, headerValue);
+					headersResult.put(headerName, strConstraint.crop(headerValue));
 				}
 				data.setHeaders(headersResult);
 			}
@@ -634,7 +645,7 @@ public class HttpHook implements IMethodHook {
 					String sessionAtt = sessionAttr.nextElement();
 					Object sessionValue = (Object) getAttributeValueSession.invoke(httpSession, sessionAtt);
 					if (null != sessionValue) {
-						sessionAttributes.put(sessionAtt, sessionValue.toString());
+						sessionAttributes.put(sessionAtt, strConstraint.crop(sessionValue.toString()));
 					} else {
 						sessionAttributes.put(sessionAtt, "<notset>");
 					}

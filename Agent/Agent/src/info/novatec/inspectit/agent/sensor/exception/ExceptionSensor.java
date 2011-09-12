@@ -46,8 +46,7 @@ public class ExceptionSensor implements IExceptionSensor {
 	 * {@inheritDoc}
 	 */
 	public void init(Map parameter) {
-		// currently we need only the idManager.
-		exceptionSensorHook = new ExceptionSensorHook(idManager);
+		exceptionSensorHook = new ExceptionSensorHook(idManager, parameter);
 	}
 
 }

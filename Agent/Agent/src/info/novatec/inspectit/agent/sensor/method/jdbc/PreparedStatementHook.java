@@ -7,11 +7,13 @@ import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.hooking.IConstructorHook;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
 import info.novatec.inspectit.communication.data.SqlStatementData;
+import info.novatec.inspectit.util.StringConstraint;
 import info.novatec.inspectit.util.ThreadLocalStack;
 import info.novatec.inspectit.util.Timer;
 
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,6 +61,11 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 	 * invocation is measured.
 	 */
 	private ThreadLocal threadLast = new ThreadLocal();
+	
+	/**
+	 * The StringConstraint to ensure a maximum length of strings.
+	 */
+	private StringConstraint strConstraint;
 
 	/**
 	 * The only constructor which needs the {@link Timer}.
@@ -69,11 +76,14 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 	 *            The ID manager.
 	 * @param statementStorage
 	 *            The statement storage.
+	 * @param parameter
+	 *            Additional parameters.
 	 */
-	public PreparedStatementHook(Timer timer, IIdManager idManager, StatementStorage statementStorage) {
+	public PreparedStatementHook(Timer timer, IIdManager idManager, StatementStorage statementStorage, Map parameter) {
 		this.timer = timer;
 		this.idManager = idManager;
 		this.statementStorage = statementStorage;
+		this.strConstraint = new StringConstraint(parameter);
 	}
 
 	/**
@@ -114,7 +124,7 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 
 						sqlData = new SqlStatementData(timestamp, platformId, registeredSensorTypeId, registeredMethodId);
 						sqlData.setPreparedStatement(true);
-						sqlData.setSql(sql);
+						sqlData.setSql(strConstraint.crop(sql));
 						sqlData.setDuration(duration);
 						sqlData.calculateMin(duration);
 						sqlData.calculateMax(duration);

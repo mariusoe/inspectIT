@@ -64,7 +64,7 @@ public class AverageTimerSensor implements IMethodSensor {
 	 * {@inheritDoc}
 	 */
 	public void init(Map parameter) {
-		averageTimerHook = new AverageTimerHook(timer, idManager, propertyAccessor);
+		averageTimerHook = new AverageTimerHook(timer, idManager, propertyAccessor, parameter);
 	}
 
 }

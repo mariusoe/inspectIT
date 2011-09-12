@@ -6,11 +6,13 @@ import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.communication.ExceptionEventEnum;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
+import info.novatec.inspectit.util.StringConstraint;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.sql.Timestamp;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,26 +45,23 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	 * The thread local containing the id of the method where the exception was handled.
 	 */
 	private ThreadLocal exceptionHandlerId = new ThreadLocal();
-
+	
 	/**
-	 * The maximum length a value should have.
+	 * The StringConstraint to ensure a maximum length of strings.
 	 */
-	private static final int MAX_VALUE_LENGTH = 1000;
-
-	/**
-	 * The maximum length of the stacktrace.
-	 */
-	private static final int MAX_STACKTRACE_LENGTH = 10000;
+	private StringConstraint strConstraint;
 
 	/**
 	 * The default constructor which needs one parameter for initialization.
 	 * 
-	 * 
 	 * @param idManager
 	 *            The ID manager.
+	 * @param parameter
+	 *            Additional parameters.
 	 */
-	public ExceptionSensorHook(IIdManager idManager) {
+	public ExceptionSensorHook(IIdManager idManager, Map parameter) {
 		this.idManager = idManager;
+		this.strConstraint = new StringConstraint(parameter);
 	}
 
 	/**
@@ -239,18 +238,18 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	private void setStaticInformation(ExceptionSensorData exceptionSensorData, Throwable throwable) {
 		Throwable cause = throwable.getCause();
 		if (null != cause) {
-			exceptionSensorData.setCause(crop(cause.getClass().getName(), MAX_VALUE_LENGTH));
+			exceptionSensorData.setCause(strConstraint.crop(cause.getClass().getName()));
 		}
 
 		try {
 			// see INSPECTIT-378: This is only a quickfix for a NPE that is thrown when accessing
 			// the message. This should be removed later on because there should not be the
 			// intention of catching an exception here.
-			exceptionSensorData.setErrorMessage(crop(throwable.getMessage(), MAX_VALUE_LENGTH));
+			exceptionSensorData.setErrorMessage(strConstraint.crop(throwable.getMessage()));
 		} catch (Exception e) {
 			LOGGER.log(Level.FINER, "It was not possible to retrieve the Error Message from " + throwable.getClass().getName(), e);
 		}
-		exceptionSensorData.setStackTrace(crop(stackTraceToString(throwable), MAX_STACKTRACE_LENGTH));
+		exceptionSensorData.setStackTrace(strConstraint.crop(stackTraceToString(throwable)));
 		// exceptionSensorData.setStackTrace(getStackTrace(throwable));
 	}
 
@@ -266,21 +265,5 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 		PrintWriter writer = new PrintWriter(result);
 		throwable.printStackTrace(writer);
 		return result.toString();
-	}
-
-	/**
-	 * Crops a string if it is longer than the specified maxLength.
-	 * 
-	 * @param value
-	 *            The value to crop.
-	 * @param maxLength
-	 *            The maximum length of the string. All characters above maxLength will be cropped.
-	 * @return A cropped string which length is smaller than the maxLength.
-	 */
-	private String crop(String value, int maxLength) {
-		if (null != value && value.length() > maxLength) {
-			return value.substring(0, maxLength);
-		}
-		return value;
 	}
 }

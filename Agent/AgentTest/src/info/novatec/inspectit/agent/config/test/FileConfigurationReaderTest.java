@@ -96,6 +96,26 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		verify(configurationStorage, times(1)).addMethodSensorType(name, clazz, priority, Collections.EMPTY_MAP);
 		verifyNoMoreInteractions(configurationStorage);
 	}
+	
+	@Test
+	public void loadAndVerifyMethodSensorTypeWithParameter() throws ParserException, StorageException {
+		String name = "average-timer";
+		String clazz = "info.novatec.inspectit.agent.sensor.method.averagetimer.AverageTimerSensor";
+		PriorityEnum priority = PriorityEnum.HIGH;
+		String priorityString = (String) PriorityEnum.names().get(new Integer(priority.getValue()));
+		
+		Map<String, String> settings = new HashMap<String, String>();
+		settings.put("stringLength", "500");
+		String parameterString = "stringLength=500";
+		
+		writer.println("method-sensor-type " + name + " " + clazz + " " + priorityString + " " + parameterString);
+		writer.close();
+
+		fileConfigurationReader.load();
+
+		verify(configurationStorage, times(1)).addMethodSensorType(name, clazz, priority, settings);
+		verifyNoMoreInteractions(configurationStorage);
+	}
 
 	@Test
 	public void loadAndVerifyPlatformSensorType() throws ParserException, StorageException {
@@ -126,6 +146,26 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 	}
 	
 	@Test
+	public void loadAndVerifyExceptionSensorTypeAdvanced() throws ParserException, StorageException {
+		String name = "exception-sensor-type";
+		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionSensor";
+		
+		Map<String, String> settings = new HashMap<String, String>();
+		settings.put("mode", "enhanced");
+		settings.put("stringLength", "500");
+		String parameterString = "mode=enhanced stringLength=500";
+		
+		writer.println(name + " " + clazz + " " + parameterString);
+		writer.close();
+
+		fileConfigurationReader.load();
+		
+		verify(configurationStorage, times(1)).addExceptionSensorType(clazz, settings);
+		verify(configurationStorage, times(1)).setEnhancedExceptionSensorActivated(true);
+		verifyNoMoreInteractions(configurationStorage);
+	}
+	
+	@Test
 	public void loadAndVerifyExceptionSensorNoParameter() throws ParserException, StorageException {
 		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionSensor";
 		String name = "exception-sensor";
@@ -140,15 +180,17 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 	}
 
 	@Test
-	public void loadAndVerifyExceptionSensorOneParameter() throws ParserException, StorageException {
+	public void loadAndVerifyExceptionSensorWithParameter() throws ParserException, StorageException {
 		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionSensor";
 		String name = "exception-sensor";
-		String targetClass = "java.lang.Throwable superclass=true";
-		writer.println(name + " " + targetClass);
-		writer.close();
+		String targetClass = "java.lang.Throwable";
 
 		Map<String, String> settings = new HashMap<String, String>();
 		settings.put("superclass", "true");
+		String parameterString = "superclass=true";
+		
+		writer.println(name + " " + targetClass + " " + parameterString);
+		writer.close();
 
 		fileConfigurationReader.load();
 

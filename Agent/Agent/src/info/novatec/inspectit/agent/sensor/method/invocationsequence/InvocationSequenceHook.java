@@ -18,8 +18,10 @@ import info.novatec.inspectit.communication.SystemSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
+import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
+import info.novatec.inspectit.util.StringConstraint;
 import info.novatec.inspectit.util.ThreadLocalStack;
 import info.novatec.inspectit.util.Timer;
 
@@ -27,6 +29,7 @@ import java.net.ConnectException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -93,6 +96,11 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * Saves the min duration for faster access of the values.
 	 */
 	private Map minDurationMap = new HashMap();
+	
+	/**
+	 * The StringConstraint to ensure a maximum length of strings.
+	 */
+	private StringConstraint strConstraint;
 
 	/**
 	 * The default constructor is initialized with a reference to the original {@link ICoreService}
@@ -104,11 +112,14 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 *            The ID manager.
 	 * @param propertyAccessor
 	 *            The property accessor.
+	 * @param param
+	 *            Additional parameters.
 	 */
-	public InvocationSequenceHook(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor) {
+	public InvocationSequenceHook(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor, Map param) {
 		this.timer = timer;
 		this.idManager = idManager;
 		this.propertyAccessor = propertyAccessor;
+		this.strConstraint = new StringConstraint(param);
 	}
 
 	/**
@@ -187,6 +198,12 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 			// check if some properties need to be accessed and saved
 			if (rsc.isPropertyAccess()) {
 				List parameterContentData = propertyAccessor.getParameterContentData(rsc.getPropertyAccessorList(), object, parameters);
+				
+				// crop the content strings of all ParameterContentData
+				for (Iterator iterator = parameterContentData.iterator(); iterator.hasNext();) {
+					ParameterContentData contentData = (ParameterContentData) iterator.next();
+					contentData.setContent(strConstraint.cropKeepFinalCharacter(contentData.getContent(), '\''));
+				}
 				invocationSequenceData.setParameterContentData(new HashSet(parameterContentData));
 			}
 

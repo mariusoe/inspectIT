@@ -8,12 +8,16 @@ import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.core.impl.CoreService;
 import info.novatec.inspectit.agent.hooking.IConstructorHook;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
+import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.TimerData;
+import info.novatec.inspectit.util.StringConstraint;
 import info.novatec.inspectit.util.ThreadLocalStack;
 import info.novatec.inspectit.util.Timer;
 
 import java.sql.Timestamp;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,6 +56,11 @@ public class AverageTimerHook implements IMethodHook, IConstructorHook {
 	 * The property accessor.
 	 */
 	private final IPropertyAccessor propertyAccessor;
+	
+	/**
+	 * The StringConstraint to ensure a maximum length of strings.
+	 */
+	private StringConstraint strConstraint;
 
 	/**
 	 * The only constructor which needs the {@link Timer}.
@@ -62,11 +71,14 @@ public class AverageTimerHook implements IMethodHook, IConstructorHook {
 	 *            The ID manager.
 	 * @param propertyAccessor
 	 *            The property accessor.
+	 * @param param
+	 *            Additional parameters.
 	 */
-	public AverageTimerHook(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor) {
+	public AverageTimerHook(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor, Map param) {
 		this.timer = timer;
 		this.idManager = idManager;
 		this.propertyAccessor = propertyAccessor;
+		this.strConstraint = new StringConstraint(param);
 	}
 
 	/**
@@ -97,8 +109,14 @@ public class AverageTimerHook implements IMethodHook, IConstructorHook {
 		if (rsc.isPropertyAccess()) {
 			parameterContentData = propertyAccessor.getParameterContentData(rsc.getPropertyAccessorList(), object, parameters);
 			prefix = parameterContentData.toString();
+			
+			// crop the content strings of all ParameterContentData but leave the prefix as it is
+			for (Iterator iterator = parameterContentData.iterator(); iterator.hasNext();) {
+				ParameterContentData contentData = (ParameterContentData) iterator.next();
+				contentData.setContent(strConstraint.cropKeepFinalCharacter(contentData.getContent(), '\''));
+			}
 		}
-
+		
 		TimerData timerData = (TimerData) coreService.getMethodSensorData(sensorTypeId, methodId, prefix);
 
 		if (null == timerData) {

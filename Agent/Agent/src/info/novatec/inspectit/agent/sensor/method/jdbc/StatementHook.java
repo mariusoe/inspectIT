@@ -8,10 +8,12 @@ import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.core.impl.CoreService;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
 import info.novatec.inspectit.communication.data.SqlStatementData;
+import info.novatec.inspectit.util.StringConstraint;
 import info.novatec.inspectit.util.ThreadLocalStack;
 import info.novatec.inspectit.util.Timer;
 
 import java.sql.Timestamp;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,6 +55,11 @@ public class StatementHook implements IMethodHook {
 	 * invocation is measured.
 	 */
 	private ThreadLocal threadLast = new ThreadLocal();
+	
+	/**
+	 * The StringConstraint to ensure a maximum length of strings.
+	 */
+	private StringConstraint strConstraint;
 
 	/**
 	 * The only constructor which needs the {@link Timer}.
@@ -63,10 +70,13 @@ public class StatementHook implements IMethodHook {
 	 *            The ID manager.
 	 * @param propertyAccessor
 	 *            The property accessor.
+	 * @param parameter
+	 *            Additional parameters.
 	 */
-	public StatementHook(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor) {
+	public StatementHook(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor, Map parameter) {
 		this.timer = timer;
 		this.idManager = idManager;
+		this.strConstraint = new StringConstraint(parameter);
 	}
 
 	/**
@@ -107,7 +117,7 @@ public class StatementHook implements IMethodHook {
 
 					sqlData = new SqlStatementData(timestamp, platformId, registeredSensorTypeId, registeredMethodId);
 					sqlData.setPreparedStatement(false);
-					sqlData.setSql(sql);
+					sqlData.setSql(strConstraint.crop(sql));
 					sqlData.setDuration(duration);
 					sqlData.calculateMin(duration);
 					sqlData.calculateMax(duration);

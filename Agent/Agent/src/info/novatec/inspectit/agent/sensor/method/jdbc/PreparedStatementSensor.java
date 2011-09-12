@@ -60,7 +60,7 @@ public class PreparedStatementSensor implements IMethodSensor {
 	 * {@inheritDoc}
 	 */
 	public void init(Map parameter) {
-		preparedStatementHook = new PreparedStatementHook(timer, idManager, statementStorage);
+		preparedStatementHook = new PreparedStatementHook(timer, idManager, statementStorage, parameter);
 	}
 
 }

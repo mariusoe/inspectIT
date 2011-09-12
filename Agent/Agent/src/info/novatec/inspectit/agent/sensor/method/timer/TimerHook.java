@@ -8,10 +8,13 @@ import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.hooking.IConstructorHook;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
 import info.novatec.inspectit.agent.sensor.method.averagetimer.AverageTimerHook;
+import info.novatec.inspectit.communication.data.ParameterContentData;
+import info.novatec.inspectit.util.StringConstraint;
 import info.novatec.inspectit.util.ThreadLocalStack;
 import info.novatec.inspectit.util.Timer;
 
 import java.sql.Timestamp;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -62,6 +65,11 @@ public class TimerHook implements IMethodHook, IConstructorHook {
 	 * settings in the configuration file.
 	 */
 	private final TimerStorageFactory timerStorageFactory = TimerStorageFactory.getFactory();
+	
+	/**
+	 * The StringConstraint to ensure a maximum length of strings.
+	 */
+	private StringConstraint strConstraint;
 
 	/**
 	 * The only constructor which needs the used {@link ICoreService}
@@ -82,6 +90,7 @@ public class TimerHook implements IMethodHook, IConstructorHook {
 		this.idManager = idManager;
 		this.propertyAccessor = propertyAccessor;
 		timerStorageFactory.setParameters(param);
+		this.strConstraint = new StringConstraint(param);
 	}
 
 	/**
@@ -112,6 +121,12 @@ public class TimerHook implements IMethodHook, IConstructorHook {
 		if (rsc.isPropertyAccess()) {
 			parameterContentData = propertyAccessor.getParameterContentData(rsc.getPropertyAccessorList(), object, parameters);
 			prefix = parameterContentData.toString();
+			
+			// crop the content strings of all ParameterContentData but leave the prefix as it is
+			for (Iterator iterator = parameterContentData.iterator(); iterator.hasNext();) {
+				ParameterContentData contentData = (ParameterContentData) iterator.next();
+				contentData.setContent(strConstraint.cropKeepFinalCharacter(contentData.getContent(), '\''));
+			}
 		}
 
 		ITimerStorage storage = (ITimerStorage) coreService.getObjectStorage(sensorTypeId, methodId, prefix);

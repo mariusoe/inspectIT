@@ -66,7 +66,7 @@ public class StatementSensor implements IMethodSensor {
 	 * {@inheritDoc}
 	 */
 	public void init(Map parameter) {
-		statementHook = new StatementHook(timer, idManager, propertyAccessor);
+		statementHook = new StatementHook(timer, idManager, propertyAccessor, parameter);
 	}
 
 }

@@ -25,6 +25,7 @@ import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.util.Timer;
 
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.mockito.ArgumentMatcher;
@@ -48,6 +49,9 @@ public class AverageTimerHookTest extends AbstractLogSupport {
 
 	@Mock
 	private RegisteredSensorConfig registeredSensorConfig;
+	
+	@Mock
+	private Map<String, String> parameter;
 
 	private AverageTimerHook averageTimerHook;
 
@@ -61,7 +65,7 @@ public class AverageTimerHookTest extends AbstractLogSupport {
 
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {
-		averageTimerHook = new AverageTimerHook(timer, idManager, propertyAccessor);
+		averageTimerHook = new AverageTimerHook(timer, idManager, propertyAccessor, parameter);
 	}
 
 	@Test

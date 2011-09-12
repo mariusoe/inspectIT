@@ -64,7 +64,7 @@ public class InvocationSequenceSensor implements IMethodSensor {
 	 * {@inheritDoc}
 	 */
 	public void init(Map parameter) {
-		invocationSequenceHook = new InvocationSequenceHook(timer, idManager, propertyAccessor);
+		invocationSequenceHook = new InvocationSequenceHook(timer, idManager, propertyAccessor, parameter);
 	}
 
 }

@@ -28,6 +28,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.mockito.Mock;
@@ -51,6 +52,9 @@ public class StatementHookTest extends AbstractLogSupport {
 
 	@Mock
 	private RegisteredSensorConfig registeredSensorConfig;
+	
+	@Mock
+	private Map<String, String> parameter;
 
 	private StatementHook statementHook;
 
@@ -66,8 +70,8 @@ public class StatementHookTest extends AbstractLogSupport {
 
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {
-		statementHook = new StatementHook(timer, idManager, propertyAccessor);
-		statementHook2 = new StatementHook(timer, idManager, propertyAccessor);
+		statementHook = new StatementHook(timer, idManager, propertyAccessor, parameter);
+		statementHook2 = new StatementHook(timer, idManager, propertyAccessor, parameter);
 
 		List<String> list = new ArrayList<String>();
 		list.add("java.lang.String");
