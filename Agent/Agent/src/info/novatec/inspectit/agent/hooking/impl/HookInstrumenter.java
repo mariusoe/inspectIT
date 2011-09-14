@@ -105,7 +105,11 @@ public class HookInstrumenter implements IHookInstrumenter {
 		}
 
 		try {
-			boolean asFinally = !configurationStorage.isExceptionSensorActivated();
+			boolean exceptionSensorActivated = configurationStorage.isExceptionSensorActivated();
+			boolean exceptionSensorEnhanced = configurationStorage.isEnhancedExceptionSensorActivated();
+			// instrument as finally if exception sensor is deactivated or activated in simple mode
+			boolean asFinally = !(exceptionSensorActivated && exceptionSensorEnhanced);
+			
 			if (Modifier.isStatic(method.getModifiers())) {
 				// static method
 				method.insertBefore(hookDispatcherTarget + ".dispatchMethodBeforeBody(" + methodId + "l, null, $args);");
@@ -162,7 +166,11 @@ public class HookInstrumenter implements IHookInstrumenter {
 		}
 
 		try {
-			boolean asFinally = !configurationStorage.isExceptionSensorActivated();
+			boolean exceptionSensorActivated = configurationStorage.isExceptionSensorActivated();
+			boolean exceptionSensorEnhanced = configurationStorage.isEnhancedExceptionSensorActivated();
+			// instrument as finally if exception sensor is deactivated or activated in simple mode
+			boolean asFinally = !(exceptionSensorActivated && exceptionSensorEnhanced);
+			
 			constructor.insertBeforeBody(hookDispatcherTarget + ".dispatchConstructorBeforeBody(" + constructorId + "l, $0, $args);");
 			constructor.insertAfter(hookDispatcherTarget + ".dispatchConstructorAfterBody(" + constructorId + "l, $0, $args);", asFinally);
 

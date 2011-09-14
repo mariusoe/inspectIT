@@ -95,6 +95,11 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 * Indicates whether the exception sensor is activated or not.
 	 */
 	private boolean exceptionSensorActivated = false;
+	
+	/**
+	 * Indicates whether try/catch instrumentation should be used to handle all exception events.
+	 */
+	private boolean enhancedExceptionSensorActivated = false;
 
 	/**
 	 * Default constructor which takes 2 parameter.
@@ -564,5 +569,19 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 */
 	public boolean isExceptionSensorActivated() {
 		return exceptionSensorActivated;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setEnhancedExceptionSensorActivated(boolean enhancedEvents) {
+		this.enhancedExceptionSensorActivated = enhancedEvents;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isEnhancedExceptionSensorActivated() {
+		return enhancedExceptionSensorActivated;
 	}
 }

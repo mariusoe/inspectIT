@@ -743,6 +743,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(idManager.registerMethod(registeredSensorConfig)).thenReturn(methodId);
 		when(registeredSensorConfig.getId()).thenReturn(sensorTypeId);
 		when(configurationStorage.isExceptionSensorActivated()).thenReturn(true);
+		when(configurationStorage.isEnhancedExceptionSensorActivated()).thenReturn(true);
 
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
 		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
@@ -796,6 +797,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(idManager.registerMethod(registeredSensorConfig)).thenReturn(methodId);
 		when(registeredSensorConfig.getId()).thenReturn(sensorTypeId);
 		when(configurationStorage.isExceptionSensorActivated()).thenReturn(true);
+		when(configurationStorage.isEnhancedExceptionSensorActivated()).thenReturn(true);
 		when(registeredSensorConfig.getSensorTypeConfigs()).thenReturn(sensorTypeConfigs);
 		hookInstrumenter.addMethodHook(ctMethod, registeredSensorConfig);
 		verify(idManager, times(1)).addSensorTypeToMethod(sensorTypeId, methodId);
@@ -852,6 +854,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(idManager.registerMethod(registeredSensorConfig)).thenReturn(methodId);
 		when(idManager.registerMethod(innerRegisteredSensorConfig)).thenReturn(innerMethodId);
 		when(configurationStorage.isExceptionSensorActivated()).thenReturn(true);
+		when(configurationStorage.isEnhancedExceptionSensorActivated()).thenReturn(true);
 
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
 		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
@@ -927,6 +930,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(idManager.registerMethod(registeredSensorConfig)).thenReturn(methodId);
 		when(idManager.registerMethod(innerRegisteredSensorConfig)).thenReturn(innerMethodId);
 		when(configurationStorage.isExceptionSensorActivated()).thenReturn(true);
+		when(configurationStorage.isEnhancedExceptionSensorActivated()).thenReturn(true);
 
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
 		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
@@ -1015,6 +1019,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(idManager.registerMethod(registeredSensorConfig)).thenReturn(methodId);
 		when(idManager.registerMethod(innerRegisteredSensorConfig)).thenReturn(innerMethodId);
 		when(configurationStorage.isExceptionSensorActivated()).thenReturn(true);
+		when(configurationStorage.isEnhancedExceptionSensorActivated()).thenReturn(true);
 
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
 		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
@@ -1064,6 +1069,96 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		verify(hookDispatcher).dispatchBeforeCatch(eq(methodId), argThat(new MyTestExceptionVerifier(exceptionObject)));
 		verifyNoMoreInteractions(hookDispatcher);
 	}
+	
+	@Test
+	public void tryCatchNotInstrumentedBySimpleExceptionSensor() throws Exception {
+		String methodName = "callsMethodWithExceptionAndTryCatchFinally";
+		String innerMethodName = "throwsAnException";
+		// we need to create an new loader with a new classPool
+		Loader loader = this.createLoader();
+		ClassPool classPool = new ClassPool();
+		classPool.insertClassPath(new LoaderClassPath(loader));
+		loader.setClassPool(classPool);
+		CtMethod ctMethod = classPool.getMethod(ExceptionTestClass.class.getName(), methodName);
+		CtMethod innerCtMethod = classPool.getMethod(ExceptionTestClass.class.getName(), innerMethodName);
+		CtClass exceptionClazz = classPool.get(MyTestException.class.getName());
+
+		long methodId = 9L;
+		long innerMethodId = 11L;
+		long sensorTypeId = 10L;
+		long constructorId = 5L;
+
+		MyTestException exceptionObject = MyTestException.class.newInstance();
+
+		// initializing / mocking the RegisteredSensorConfig for the
+		// constructors and some needed variables
+		RegisteredSensorConfig registeredConstructorSensorConfig = mock(RegisteredSensorConfig.class);
+		when(registeredConstructorSensorConfig.getId()).thenReturn(sensorTypeId);
+		when(registeredConstructorSensorConfig.isConstructor()).thenReturn(true);
+		when(registeredConstructorSensorConfig.getTargetClassName()).thenReturn(exceptionClazz.getSimpleName());
+		when(registeredConstructorSensorConfig.getTargetMethodName()).thenReturn(exceptionClazz.getSimpleName());
+		when(registeredConstructorSensorConfig.getModifiers()).thenReturn(exceptionClazz.getModifiers());
+		when(idManager.registerMethod(registeredConstructorSensorConfig)).thenReturn(constructorId);
+
+		// stuff for the methods
+		RegisteredSensorConfig registeredSensorConfig = mock(RegisteredSensorConfig.class);
+		RegisteredSensorConfig innerRegisteredSensorConfig = mock(RegisteredSensorConfig.class);
+		when(registeredSensorConfig.getId()).thenReturn(sensorTypeId);
+		when(innerRegisteredSensorConfig.getId()).thenReturn(sensorTypeId);
+		when(idManager.registerMethod(registeredSensorConfig)).thenReturn(methodId);
+		when(idManager.registerMethod(innerRegisteredSensorConfig)).thenReturn(innerMethodId);
+		when(configurationStorage.isExceptionSensorActivated()).thenReturn(true);
+		when(configurationStorage.isEnhancedExceptionSensorActivated()).thenReturn(false);
+
+		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
+		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
+		when(sensorTypeConfig.getId()).thenReturn(sensorTypeId);
+		List<MethodSensorTypeConfig> sensorTypeConfigs = new ArrayList<MethodSensorTypeConfig>();
+		sensorTypeConfigs.add(sensorTypeConfig);
+
+		when(registeredSensorConfig.getSensorTypeConfigs()).thenReturn(sensorTypeConfigs);
+		when(innerRegisteredSensorConfig.getSensorTypeConfigs()).thenReturn(sensorTypeConfigs);
+		when(registeredConstructorSensorConfig.getSensorTypeConfigs()).thenReturn(sensorTypeConfigs);
+
+		// instrumenting the first method
+		hookInstrumenter.addMethodHook(ctMethod, registeredSensorConfig);
+		verify(idManager, times(1)).addSensorTypeToMethod(sensorTypeId, methodId);
+		verify(hookDispatcher, times(1)).addMethodMapping(methodId, registeredSensorConfig);
+
+		// instrumenting the called inner method
+		hookInstrumenter.addMethodHook(innerCtMethod, innerRegisteredSensorConfig);
+		verify(idManager, times(1)).addSensorTypeToMethod(sensorTypeId, innerMethodId);
+		verify(hookDispatcher, times(1)).addMethodMapping(innerMethodId, innerRegisteredSensorConfig);
+
+		// instrumenting the constructors
+		CtConstructor[] constructors = exceptionClazz.getConstructors();
+		for (int i = 0; i < constructors.length; i++) {
+			hookInstrumenter.addConstructorHook(constructors[i], registeredConstructorSensorConfig);
+		}
+
+		verify(idManager, times(3)).addSensorTypeToMethod(sensorTypeId, constructorId);
+		verify(hookDispatcher, times(3)).addConstructorMapping(constructorId, registeredConstructorSensorConfig);
+
+		Object testClass = this.createInstance(loader, ctMethod);
+		this.callMethod(testClass, methodName, null);
+
+		// first method
+		verify(hookDispatcher).dispatchMethodBeforeBody(methodId, testClass, new Object[0]);
+		verify(hookDispatcher).dispatchFirstMethodAfterBody(methodId, testClass, new Object[0], null);
+		verify(hookDispatcher).dispatchSecondMethodAfterBody(methodId, testClass, new Object[0], null);
+
+		// inner method
+		verify(hookDispatcher).dispatchMethodBeforeBody(innerMethodId, testClass, new Object[0]);
+		verify(hookDispatcher).dispatchFirstMethodAfterBody(innerMethodId, testClass, new Object[0], null);
+		verify(hookDispatcher).dispatchSecondMethodAfterBody(innerMethodId, testClass, new Object[0], null);
+
+		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
+		verify(hookDispatcher).dispatchConstructorAfterBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
+		// verify that no exception event is dispatched
+		verify(hookDispatcher, times(0)).dispatchOnThrowInBody(eq(innerMethodId), eq(testClass), (Object[]) anyObject(), argThat(new MyTestExceptionVerifier(exceptionObject)));
+		verify(hookDispatcher, times(0)).dispatchBeforeCatch(eq(methodId), argThat(new MyTestExceptionVerifier(exceptionObject)));
+		verifyNoMoreInteractions(hookDispatcher);
+	}
 
 	@Test
 	public void everythingInstrumentedByExceptionSensorWithStaticMethods() throws Exception {
@@ -1103,6 +1198,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		when(idManager.registerMethod(registeredSensorConfig)).thenReturn(methodId);
 		when(idManager.registerMethod(innerRegisteredSensorConfig)).thenReturn(innerMethodId);
 		when(configurationStorage.isExceptionSensorActivated()).thenReturn(true);
+		when(configurationStorage.isEnhancedExceptionSensorActivated()).thenReturn(true);
 
 		MethodSensorTypeConfig sensorTypeConfig = mock(MethodSensorTypeConfig.class);
 		when(sensorTypeConfig.getName()).thenReturn("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");

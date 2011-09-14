@@ -156,6 +156,32 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		verify(configurationStorage, times(1)).addExceptionSensorTypeParameter(clazz, targetClass, true, Collections.EMPTY_MAP);
 		verifyNoMoreInteractions(configurationStorage);
 	}
+	
+	@Test
+	public void loadAndVerifyExceptionSensorModeSimple() throws ParserException, StorageException {
+		String name = "exception-sensor-mode";
+		String mode = "simple";
+		writer.println(name + " " + mode);
+		writer.close();
+
+		fileConfigurationReader.load();
+
+		verify(configurationStorage, times(1)).setEnhancedExceptionSensorActivated(false);
+		verifyNoMoreInteractions(configurationStorage);
+	}
+	
+	@Test
+	public void loadAndVerifyExceptionSensorModeEnhanced() throws ParserException, StorageException {
+		String name = "exception-sensor-mode";
+		String mode = "enhanced";
+		writer.println(name + " " + mode);
+		writer.close();
+
+		fileConfigurationReader.load();
+
+		verify(configurationStorage, times(1)).setEnhancedExceptionSensorActivated(true);
+		verifyNoMoreInteractions(configurationStorage);
+	}
 
 	@Test
 	public void loadAndVerifyBufferStrategy() throws ParserException, StorageException {

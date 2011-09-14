@@ -61,6 +61,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	private static final String CONFIG_PLATFORM_SENSOR_TYPE = "platform-sensor-type";
 	private static final String CONFIG_SENSOR = "sensor";
 	private static final String CONFIG_EXCEPTION_SENSOR = "exception-sensor";
+	private static final String CONFIG_EXCEPTION_SENSOR_MODE = "exception-sensor-mode";
 	private static final String CONFIG_INCLUDE_FILE = "$include";
 
 	/**
@@ -185,6 +186,12 @@ public class FileConfigurationReader implements IConfigurationReader {
 					processExceptionSensorLine(tokenizer);
 					continue;
 				}
+				
+				// check for exception sensor mode
+				if (discriminator.equalsIgnoreCase(CONFIG_EXCEPTION_SENSOR_MODE)) {
+					processExceptionSensorModeLine(tokenizer);
+					continue;
+				}
 
 				// check for a sensor
 				if (discriminator.equalsIgnoreCase(CONFIG_SENSOR)) {
@@ -205,7 +212,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	}
 
 	/**
-	 * Processes a exception sensor line.
+	 * Processes an exception sensor line.
 	 * 
 	 * @param tokenizer
 	 *            The tokenizer which contains the strings to create a sensor type.
@@ -242,6 +249,21 @@ public class FileConfigurationReader implements IConfigurationReader {
 		} catch (StorageException e) {
 			throw new ParserException("Could not add the exception sensor type to the storage", e);
 		}
+	}
+	
+	/**
+	 * Processes an exception sensor mode line.
+	 * 
+	 * @param tokenizer
+	 *            The tokenizer which contains the strings to set the exception sensor mode.
+	 * @throws ParserException
+	 *            Thrown if there was an exception caught by parsing the config file.
+	 */
+	private void processExceptionSensorModeLine(StringTokenizer tokenizer) throws ParserException {
+		String exceptionSensorMode = tokenizer.nextToken();
+		
+		boolean enhanced = "enhanced".equalsIgnoreCase(exceptionSensorMode);
+		configurationStorage.setEnhancedExceptionSensorActivated(enhanced);
 	}
 
 	/**

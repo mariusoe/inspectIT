@@ -232,4 +232,19 @@ public interface IConfigurationStorage {
 	 * @return Whether the {@link IExceptionSensor} is activated.
 	 */
 	boolean isExceptionSensorActivated();
+	
+	/**
+	 * Activates or deactivates the instrumentation of enhanced exception events with try/catch.
+	 * 
+	 * @param enhancedEvent
+	 *            Boolean indicating whether to activate or deactivate enhanced events.
+	 */
+	void setEnhancedExceptionSensorActivated(boolean enhancedEvent);
+	
+	/**
+	 * Returns whether enhanced exception events are instrumented with try/catch.
+	 * 
+	 * @return Whether enhanced exception events are instrumented.
+	 */
+	boolean isEnhancedExceptionSensorActivated();
 }
