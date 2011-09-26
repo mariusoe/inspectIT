@@ -7,14 +7,22 @@ import info.novatec.inspectit.communication.data.TimerData;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.InitializingBean;
+
 /**
  * Timer data service.
  * 
  * @author Ivan Senic
  * 
  */
-public class TimerDataAccessService implements ITimerDataAccessService {
+public class TimerDataAccessService implements ITimerDataAccessService, InitializingBean {
 
+	/**
+	 * The logger of this class.
+	 */
+	private static final Logger LOGGER = Logger.getLogger(TimerDataAccessService.class);
+	
 	/**
 	 * Timer data dao.
 	 */
@@ -45,6 +53,15 @@ public class TimerDataAccessService implements ITimerDataAccessService {
 	 */
 	public void setTimerDataDao(TimerDataDao timerDataDao) {
 		this.timerDataDao = timerDataDao;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void afterPropertiesSet() throws Exception {
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("|-Timer Data Access Service active...");
+		}
 	}
 
 }

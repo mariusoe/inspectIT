@@ -36,7 +36,7 @@ public class BufferService implements IBufferService, InitializingBean {
 	 */
 	public void afterPropertiesSet() throws Exception {
 		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("|-Buffer Data Access Service active...");
+			LOGGER.info("|-Buffer Service active...");
 		}
 	}
 

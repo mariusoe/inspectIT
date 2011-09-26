@@ -6,12 +6,20 @@ import info.novatec.inspectit.communication.data.HttpTimerData;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.InitializingBean;
+
 /**
  * This class provides access to the http related data in the CMR.
  * 
  * @author Stefan Siegl
  */
-public class HttpTimerDataAccessService implements IHttpTimerDataAccessService {
+public class HttpTimerDataAccessService implements IHttpTimerDataAccessService, InitializingBean {
+	
+	/**
+	 * The logger of this class.
+	 */
+	private static final Logger LOGGER = Logger.getLogger(HttpTimerDataAccessService.class);
 
 	/**
 	 * The Dao.
@@ -62,6 +70,15 @@ public class HttpTimerDataAccessService implements IHttpTimerDataAccessService {
 	 */
 	public void setDao(HttpTimerDataDao dao) {
 		this.dao = dao;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void afterPropertiesSet() throws Exception {
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("|-Http Timer Data Access Service active...");
+		}
 	}
 
 }
