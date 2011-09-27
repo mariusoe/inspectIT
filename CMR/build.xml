@@ -417,7 +417,7 @@
 		          Targets for creating the final distributon containing the JRE.                     
 		         - - - - - - - - - - - - - - - - - -->
 	<target name="-linux-x86">
-		<echo file="${build.scripts}/startup.sh" message="${java.command.linux} ${java.memory.32bit} ${java.opts.32bit} ${java.locgc.linux} -jar ${dist.jar.name}" />
+		<echo file="${build.scripts}/startup.sh" message="${java.command.linux} ${java.memory.32bit} ${java.opts.32bit} ${java.opts.linux} ${java.locgc.linux} -jar ${dist.jar.name}" />
 		<tar destfile="${release.root}/inspectit-cmr.linux.x86.tar.gz" compression="gzip">
 			<fileset dir="${build.release.root}" />
 			<tarfileset file="${build.scripts}/startup.sh" prefix="CMR" filemode="755" />
@@ -428,7 +428,7 @@
 	</target>
 
 	<target name="-linux-x64">
-		<echo file="${build.scripts}/startup.sh" message="${java.command.linux} ${java.memory.64bit} ${java.opts.64bit} ${java.locgc.linux} -jar ${dist.jar.name}" />
+		<echo file="${build.scripts}/startup.sh" message="${java.command.linux} ${java.memory.64bit} ${java.opts.64bit} ${java.opts.linux} ${java.locgc.linux} -jar ${dist.jar.name}" />
 		<tar destfile="${release.root}/inspectit-cmr.linux.x64.tar.gz" compression="gzip">
 			<fileset dir="${build.release.root}" />
 			<tarfileset file="${build.scripts}/startup.sh" prefix="CMR" filemode="755" />
@@ -439,7 +439,7 @@
 	</target>
 
 	<target name="-windows-x86">
-		<echo file="${build.scripts}/startup.bat" message="${java.command.win} ${java.memory.32bit} ${java.opts.32bit} ${java.locgc.win} -jar ${dist.jar.name}" />
+		<echo file="${build.scripts}/startup.bat" message="${java.command.win} ${java.memory.32bit} ${java.opts.32bit} ${java.opts.win} ${java.locgc.win} -jar ${dist.jar.name}" />
 		<zip destfile="${release.root}/inspectit-cmr.windows.x86.zip">
 			<fileset dir="${build.release.root}" />
 			<zipfileset file="${build.scripts}/startup.bat" prefix="CMR" />
@@ -450,7 +450,7 @@
 	</target>
 
 	<target name="-windows-x64">
-		<echo file="${build.scripts}/startup.bat" message="${java.command.win} ${java.memory.64bit} ${java.opts.64bit} ${java.locgc.win} -jar ${dist.jar.name}" />
+		<echo file="${build.scripts}/startup.bat" message="${java.command.win} ${java.memory.64bit} ${java.opts.64bit} ${java.opts.win} ${java.locgc.win} -jar ${dist.jar.name}" />
 		<zip destfile="${release.root}/inspectit-cmr.windows.x64.zip">
 			<fileset dir="${build.release.root}" />
 			<zipfileset file="${build.scripts}/startup.bat" prefix="CMR" />
