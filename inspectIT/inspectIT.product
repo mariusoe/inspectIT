@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="inspectIT" uid="info.novatec.inspectit.rcp.product" id="info.novatec.inspectit.rcp.product" application="info.novatec.inspectit.rcp.application" version="1.2.0" useFeatures="false" includeLaunchers="true">
+<product name="inspectIT" uid="info.novatec.inspectit.rcp.product" id="info.novatec.inspectit.rcp.product" application="info.novatec.inspectit.rcp.application" version="1.3.0" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
-      <image path="/inspectIT/about.png"/>
+      <image path="about.png"/>
       <text>
          %aboutText
       </text>
