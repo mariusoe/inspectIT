@@ -95,7 +95,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 * Indicates whether the exception sensor is activated or not.
 	 */
 	private boolean exceptionSensorActivated = false;
-	
+
 	/**
 	 * Indicates whether try/catch instrumentation should be used to handle all exception events.
 	 */
@@ -327,7 +327,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		if (settings.containsKey("interface") && settings.get("interface").equals("true")) {
 			sensorConfig.setInterface(true);
 		}
-		
+
 		// check for annotation
 		if (settings.containsKey("annotation")) {
 			sensorConfig.setAnnotationClassName((String) settings.get("annotation"));
@@ -342,14 +342,14 @@ public class ConfigurationStorage implements IConfigurationStorage {
 			while (tokenizer.hasMoreTokens()) {
 				String modifier = tokenizer.nextToken().trim();
 				if (modifier != null && modifier.startsWith("pub")) {
-					modifiers |= Modifier.PUBLIC; 
+					modifiers |= Modifier.PUBLIC;
 				} else if (modifier != null && modifier.startsWith("priv")) {
 					modifiers |= Modifier.PRIVATE;
 				} else if (modifier != null && modifier.startsWith("prot")) {
 					modifiers |= Modifier.PROTECTED;
 				} else if (modifier != null && modifier.startsWith("def")) {
 					modifiers |= ModifierMatcher.DEFAULT;
-				} 
+				}
 			}
 			sensorConfig.setModifiers(modifiers);
 		}
@@ -570,14 +570,21 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	public boolean isExceptionSensorActivated() {
 		return exceptionSensorActivated;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setEnhancedExceptionSensorActivated(boolean enhancedEvents) {
-		this.enhancedExceptionSensorActivated = enhancedEvents;
+	public void setEnhancedExceptionSensorActivated(boolean isEnhanced) {
+		this.enhancedExceptionSensorActivated = isEnhanced;
+		if (LOGGER.isLoggable(Level.FINE)) {
+			if (isEnhanced) {
+				LOGGER.fine("Using enhanced exception sensor mode");
+			} else {
+				LOGGER.fine("Using simple exception sensor mode");
+			}
+		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

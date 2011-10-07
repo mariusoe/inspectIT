@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -108,7 +109,22 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		verify(configurationStorage, times(1)).addPlatformSensorType(clazz, Collections.EMPTY_MAP);
 		verifyNoMoreInteractions(configurationStorage);
 	}
+	
+	@Test
+	public void loadAndVerifyExceptionSensorType() throws ParserException, StorageException {
+		String name = "exception-sensor-type";
+		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionSensor";
+		
+		writer.println(name + " " + clazz);
+		writer.close();
 
+		fileConfigurationReader.load();
+		
+		verify(configurationStorage, times(1)).addExceptionSensorType(clazz, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).setEnhancedExceptionSensorActivated(false);
+		verifyNoMoreInteractions(configurationStorage);
+	}
+	
 	@Test
 	public void loadAndVerifyExceptionSensorNoParameter() throws ParserException, StorageException {
 		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionSensor";
@@ -119,7 +135,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		fileConfigurationReader.load();
 
-		verify(configurationStorage, times(1)).addExceptionSensorType(clazz, Collections.EMPTY_MAP);
 		verify(configurationStorage, times(1)).addExceptionSensorTypeParameter(clazz, targetClass, false, Collections.EMPTY_MAP);
 		verifyNoMoreInteractions(configurationStorage);
 	}
@@ -137,7 +152,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		fileConfigurationReader.load();
 
-		verify(configurationStorage, times(1)).addExceptionSensorType(clazz, settings);
 		verify(configurationStorage, times(1)).addExceptionSensorTypeParameter(clazz, "java.lang.Throwable", false, settings);
 		verifyNoMoreInteractions(configurationStorage);
 	}
@@ -152,34 +166,37 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		fileConfigurationReader.load();
 
-		verify(configurationStorage, times(1)).addExceptionSensorType(clazz, Collections.EMPTY_MAP);
 		verify(configurationStorage, times(1)).addExceptionSensorTypeParameter(clazz, targetClass, true, Collections.EMPTY_MAP);
 		verifyNoMoreInteractions(configurationStorage);
 	}
 	
 	@Test
 	public void loadAndVerifyExceptionSensorModeSimple() throws ParserException, StorageException {
-		String name = "exception-sensor-mode";
-		String mode = "simple";
-		writer.println(name + " " + mode);
+		String name = "exception-sensor-type";
+		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionSensor";
+		String mode = "mode=simple";
+		writer.println(name + " " + clazz + " " + mode);
 		writer.close();
 
 		fileConfigurationReader.load();
 
 		verify(configurationStorage, times(1)).setEnhancedExceptionSensorActivated(false);
+		verify(configurationStorage, times(1)).addExceptionSensorType(Mockito.anyString(), Mockito.anyMap());
 		verifyNoMoreInteractions(configurationStorage);
 	}
 	
 	@Test
 	public void loadAndVerifyExceptionSensorModeEnhanced() throws ParserException, StorageException {
-		String name = "exception-sensor-mode";
-		String mode = "enhanced";
-		writer.println(name + " " + mode);
+		String name = "exception-sensor-type";
+		String clazz = "info.novatec.inspectit.agent.sensor.exception.ExceptionSensor";
+		String mode = "mode=enhanced";
+		writer.println(name + " " + clazz + " " + mode);
 		writer.close();
 
 		fileConfigurationReader.load();
 
 		verify(configurationStorage, times(1)).setEnhancedExceptionSensorActivated(true);
+		verify(configurationStorage, times(1)).addExceptionSensorType(Mockito.anyString(), Mockito.anyMap());
 		verifyNoMoreInteractions(configurationStorage);
 	}
 
