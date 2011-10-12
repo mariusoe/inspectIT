@@ -32,8 +32,21 @@ public final class TextFormatter {
 	/** Logical Name for the font used for the error marker. */
 	public static final String FONT_ERROR_MARKER = "de.inspectit.font.errormarker";
 
+	/**
+	 * Default size of the font used in the error marker. This will be used if the size of default
+	 * system font can not be read.
+	 */
+	public static final int DEFAULT_FONT_ERROR_SIZE = 10;
+
 	static {
-		JFaceResources.getFontRegistry().put(FONT_ERROR_MARKER, new FontData[] { new FontData("Arial", 14, SWT.BOLD | SWT.ITALIC) });
+		FontData[] fontData = JFaceResources.getDefaultFontDescriptor().getFontData();
+		if (fontData.length > 0) {
+			FontData defaultFontData = fontData[0];
+			int height = (int) defaultFontData.height;
+			JFaceResources.getFontRegistry().put(FONT_ERROR_MARKER, new FontData[] { new FontData("Arial", height, SWT.BOLD | SWT.ITALIC) });
+		} else {
+			JFaceResources.getFontRegistry().put(FONT_ERROR_MARKER, new FontData[] { new FontData("Arial", DEFAULT_FONT_ERROR_SIZE, SWT.BOLD | SWT.ITALIC) });
+		}
 	}
 
 	/**
