@@ -1,6 +1,6 @@
-bin/
-dist/
-lib/
-test-output/
-build/
+/bin
+/dist
+/lib
+/test-output
+/build
 temp-testng-customsuite.xml
