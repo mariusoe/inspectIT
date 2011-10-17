@@ -7,11 +7,13 @@ import info.novatec.inspectit.javassist.CtClass;
 import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
 
 /**
  * The default implementation of the {@link IInheritanceAnalyzer} interface.
@@ -28,10 +30,14 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 	private static final Logger LOGGER = Logger.getLogger(InheritanceAnalyzer.class.getName());
 
 	/**
-	 * The class pool analyzer is used by the
-	 * {@link #getSuperclassIterator(ClassLoader, String)} and
-	 * {@link #getInterfaceIterator(ClassLoader, String)} methods to access the
-	 * right class.
+	 * Set of logged classes for which the interfaces can not be found in
+	 * {@link #addInterfaceExtends(List, CtClass)}.
+	 */
+	private Set loggedClassesSet = new HashSet();
+
+	/**
+	 * The class pool analyzer is used by the {@link #getSuperclassIterator(ClassLoader, String)}
+	 * and {@link #getInterfaceIterator(ClassLoader, String)} methods to access the right class.
 	 */
 	private final IClassPoolAnalyzer classPoolAnalyzer;
 
@@ -69,14 +75,13 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 		private CtClass superClass;
 
 		/**
-		 * The iterator has to be initialized with a {@link CtClass} object
-		 * where all super classes are taken from.
+		 * The iterator has to be initialized with a {@link CtClass} object where all super classes
+		 * are taken from.
 		 * 
 		 * @param clazz
 		 *            The root class.
 		 * @throws NotFoundException
-		 *             This exception is thrown if a class is not found from
-		 *             within Javassist.
+		 *             This exception is thrown if a class is not found from within Javassist.
 		 */
 		public SuperclassIterator(CtClass clazz) throws NotFoundException {
 			superClass = clazz;
@@ -137,34 +142,43 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 	}
 
 	/**
-	 * Adds all interfaces to this list, including the one which are extended by
-	 * other interfaces.
+	 * Adds all interfaces to this list, including the one which are extended by other interfaces.
 	 * 
 	 * @param interfaces
 	 *            The list to add the interfaces to.
 	 * @param ctClass
 	 *            The class to get the interfaces from.
 	 * @throws NotFoundException
-	 *             This exception is thrown if a class is not found from within
-	 *             Javassist.
+	 *             This exception is thrown if a class is not found from within Javassist.
 	 */
 	private void addInterfaceExtends(List interfaces, CtClass ctClass) throws NotFoundException {
-		String[] ifs = ctClass.getClassFile2().getInterfaces();
-		int num = ifs.length;
-		CtClass[] ctClasses = new CtClass[num];
-		for (int i = 0; i < num; ++i) {
-			try {
-				ctClasses[i] = ctClass.getClassPool().get(ifs[i]);
-			} catch (NotFoundException e) {
-//				LOGGER.severe("Interface not found: " + ifs[i] + " (of class: " + ctClass.getName() + ")");
+		String[] ifs = null;
+		try {
+			ifs = ctClass.getClassFile2().getInterfaces();
+		} catch (Exception e) {
+			String className = ctClass.getName();
+			if (loggedClassesSet.add(className)) {
+				LOGGER.log(Level.WARNING, "Not possible to load inetrafces for class " + className + ".");
 			}
 		}
+		if (null != ifs) {
+			int num = ifs.length;
+			CtClass[] ctClasses = new CtClass[num];
+			for (int i = 0; i < num; ++i) {
+				try {
+					ctClasses[i] = ctClass.getClassPool().get(ifs[i]);
+				} catch (NotFoundException e) {
+					// LOGGER.severe("Interface not found: " + ifs[i] + " (of class: " +
+					// ctClass.getName() + ")");
+				}
+			}
 
-		for (int i = 0; i < ctClasses.length; i++) {
-			if (null != ctClasses[i]) {
-				CtClass interfaceCtClass = ctClasses[i];
-				interfaces.add(interfaceCtClass);
-				addInterfaceExtends(interfaces, interfaceCtClass);
+			for (int i = 0; i < ctClasses.length; i++) {
+				if (null != ctClasses[i]) {
+					CtClass interfaceCtClass = ctClasses[i];
+					interfaces.add(interfaceCtClass);
+					addInterfaceExtends(interfaces, interfaceCtClass);
+				}
 			}
 		}
 	}
