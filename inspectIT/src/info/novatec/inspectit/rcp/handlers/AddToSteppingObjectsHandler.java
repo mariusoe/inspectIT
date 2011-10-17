@@ -55,8 +55,11 @@ public class AddToSteppingObjectsHandler extends AbstractHandler {
 							// elements.
 						} else if (invData.getTimerData() != null && !invData.getTimerData().getClass().equals(HttpTimerData.class)) {
 							steppingTreeSubView.addObjectToSteppingControl(createTemplate(invData.getTimerData()));
-						} else if (invData.getExceptionSensorDataObjects() != null && invData.getExceptionSensorDataObjects().isEmpty()) {
+						} else if (invData.getExceptionSensorDataObjects() != null && !invData.getExceptionSensorDataObjects().isEmpty()) {
 							steppingTreeSubView.addObjectToSteppingControl(createTemplate(invData.getExceptionSensorDataObjects().get(0)));
+						} else if (null == invData.getTimerData() && null == invData.getSqlStatementData()
+								&& (null == invData.getExceptionSensorDataObjects() || invData.getExceptionSensorDataObjects().isEmpty())) {
+							steppingTreeSubView.addObjectToSteppingControl(createTemplate(invData));
 						}
 
 					} else {
@@ -88,24 +91,28 @@ public class AddToSteppingObjectsHandler extends AbstractHandler {
 	/**
 	 * Creates a steppable template from a {@link Object}.
 	 * 
-	 * @param invocationAwareData
+	 * @param data
 	 *            {@link Object}
 	 * @return Templates to be used as steppable object.
 	 */
-	private Object createTemplate(Object invocationAwareData) {
-		if (invocationAwareData instanceof SqlStatementData) {
-			SqlStatementData template = OccurrenceFinderFactory.getEmptyTemplate((SqlStatementData) invocationAwareData);
-			template.setSql(((SqlStatementData) invocationAwareData).getSql());
-			template.setMethodIdent(((SqlStatementData) invocationAwareData).getMethodIdent());
+	private Object createTemplate(Object data) {
+		if (data instanceof SqlStatementData) {
+			SqlStatementData template = OccurrenceFinderFactory.getEmptyTemplate((SqlStatementData) data);
+			template.setSql(((SqlStatementData) data).getSql());
+			template.setMethodIdent(((SqlStatementData) data).getMethodIdent());
 			return template;
-		} else if (invocationAwareData instanceof TimerData) {
-			TimerData template = OccurrenceFinderFactory.getEmptyTemplate((TimerData) invocationAwareData);
-			template.setMethodIdent(((TimerData) invocationAwareData).getMethodIdent());
+		} else if (data instanceof TimerData) {
+			TimerData template = OccurrenceFinderFactory.getEmptyTemplate((TimerData) data);
+			template.setMethodIdent(((TimerData) data).getMethodIdent());
 			return template;
-		} else if (invocationAwareData instanceof ExceptionSensorData) {
-			ExceptionSensorData template = OccurrenceFinderFactory.getEmptyTemplate((ExceptionSensorData) invocationAwareData);
+		} else if (data instanceof ExceptionSensorData) {
+			ExceptionSensorData template = OccurrenceFinderFactory.getEmptyTemplate((ExceptionSensorData) data);
 			template.setExceptionEvent(ExceptionEvent.CREATED);
-			template.setThrowableType(((ExceptionSensorData) invocationAwareData).getThrowableType());
+			template.setThrowableType(((ExceptionSensorData) data).getThrowableType());
+			return template;
+		} else if (data instanceof InvocationSequenceData) {
+			InvocationSequenceData template = OccurrenceFinderFactory.getEmptyTemplate((InvocationSequenceData) data);
+			template.setMethodIdent(((InvocationSequenceData) data).getMethodIdent());
 			return template;
 		}
 		return null;

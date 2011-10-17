@@ -604,6 +604,13 @@
                      </not>
                   </and>
                </iterate>
+               <with
+                     variable="selection">
+                  <test
+                        property="info.novatec.inspectit.canAddToSteppingObjects"
+                        value="true">
+                  </test>
+               </with>
             </and>
          </activeWhen>
       </handler>
@@ -661,6 +668,13 @@
             id="info.novatec.inspectit.NavigateToPlottingTester"
             namespace="info.novatec.inspectit"
             properties="canNavigateToPlotting"
+            type="org.eclipse.jface.viewers.StructuredSelection">
+      </propertyTester>
+      <propertyTester
+            class="info.novatec.inspectit.rcp.editor.testers.AddToSteppingObjectsTester"
+            id="info.novatec.inspectit.AddToSteppingObjectsTester"
+            namespace="info.novatec.inspectit"
+            properties="canAddToSteppingObjects"
             type="org.eclipse.jface.viewers.StructuredSelection">
       </propertyTester>
    </extension>

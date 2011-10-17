@@ -72,6 +72,11 @@ public final class OccurrenceFinderFactory {
 	private static ExceptionOccurrenceFinder exceptionOccurrenceFinder = new ExceptionOccurrenceFinder();
 
 	/**
+	 * Occurrence finder for {@link InvocationSequenceData}.
+	 */
+	private static InvocationOccurenceFinder invocationOccurenceFinder = new InvocationOccurenceFinder();
+
+	/**
 	 * Counts number of occurrences of the element in the given invocation.
 	 * 
 	 * @param invocation
@@ -140,6 +145,8 @@ public final class OccurrenceFinderFactory {
 			return timerOccurrenceFinder;
 		} else if (ExceptionSensorData.class.isAssignableFrom(element.getClass())) {
 			return exceptionOccurrenceFinder;
+		} else if (InvocationSequenceData.class.isAssignableFrom(element.getClass())) {
+			return invocationOccurenceFinder;
 		}
 		RuntimeException exception = new RuntimeException("Occurrence finder factory was not able to supply the correct occurrence finder for the object of class " + element.getClass().getName()
 				+ ".");
@@ -493,6 +500,55 @@ public final class OccurrenceFinderFactory {
 			TimerData timerData = new TimerData();
 			timerData.setMethodIdent(0);
 			return timerData;
+		}
+
+	}
+
+	/**
+	 * Occurrence finder for {@link InvocationSequenceData}.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private static class InvocationOccurenceFinder extends OccurrenceFinder<InvocationSequenceData> {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public InvocationSequenceData getEmptyTemplate() {
+			InvocationSequenceData invocation = new InvocationSequenceData();
+			invocation.setMethodIdent(0);
+			return invocation;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean occurrenceFound(InvocationSequenceData invocationData, InvocationSequenceData template) {
+			return doesTemplateEqualsElement(template, invocationData);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean doesTemplateEqualsElement(InvocationSequenceData template, InvocationSequenceData element) {
+			if (0 != template.getMethodIdent()) {
+				if (template.getMethodIdent() != element.getMethodIdent()) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Class<? extends InvocationSequenceData> getConcreteClass() {
+			return InvocationSequenceData.class;
 		}
 
 	}
