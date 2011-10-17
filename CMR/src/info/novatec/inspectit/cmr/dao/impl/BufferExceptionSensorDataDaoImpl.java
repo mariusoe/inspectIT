@@ -50,6 +50,12 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate) {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
 		query.setPlatformIdent(template.getPlatformIdent());
+		if (template.getSensorTypeIdent() != -1) {
+			query.setSensorTypeIdent(template.getSensorTypeIdent());
+		}
+		if (template.getMethodIdent() != -1) {
+			query.setMethodIdent(template.getMethodIdent());
+		}
 		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
 		searchedClasses.add(ExceptionSensorData.class);
 		query.setObjectClasses(searchedClasses);
