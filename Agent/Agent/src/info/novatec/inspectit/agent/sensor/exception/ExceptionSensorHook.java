@@ -45,7 +45,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	 * The thread local containing the id of the method where the exception was handled.
 	 */
 	private ThreadLocal exceptionHandlerId = new ThreadLocal();
-	
+
 	/**
 	 * The StringConstraint to ensure a maximum length of strings.
 	 */
@@ -236,21 +236,33 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	 *            The current {@link Throwable} object where to get the information.
 	 */
 	private void setStaticInformation(ExceptionSensorData exceptionSensorData, Throwable throwable) {
-		Throwable cause = throwable.getCause();
-		if (null != cause) {
-			exceptionSensorData.setCause(strConstraint.crop(cause.getClass().getName()));
+		// see INSPECTIT-387
+		// getting the static content could not be always possible due to the fact that this method
+		// can be executed before the creation of the concrete exception object. Getting some
+		// of the information could be done by overriding, meaning that we are executing the
+		// methods on the object which creation is still not finished. This can cause exceptions
+		// that we need to handle properly
+
+		try {
+			Throwable cause = throwable.getCause();
+			if (null != cause) {
+				exceptionSensorData.setCause(strConstraint.crop(cause.getClass().getName()));
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.FINER, "It was not possible to retrieve the exception cause from " + throwable.getClass().getName(), e);
 		}
 
 		try {
-			// see INSPECTIT-378: This is only a quickfix for a NPE that is thrown when accessing
-			// the message. This should be removed later on because there should not be the
-			// intention of catching an exception here.
 			exceptionSensorData.setErrorMessage(strConstraint.crop(throwable.getMessage()));
 		} catch (Exception e) {
-			LOGGER.log(Level.FINER, "It was not possible to retrieve the Error Message from " + throwable.getClass().getName(), e);
+			LOGGER.log(Level.FINER, "It was not possible to retrieve the error message from " + throwable.getClass().getName(), e);
 		}
-		exceptionSensorData.setStackTrace(strConstraint.crop(stackTraceToString(throwable)));
-		// exceptionSensorData.setStackTrace(getStackTrace(throwable));
+
+		try {
+			exceptionSensorData.setStackTrace(strConstraint.crop(stackTraceToString(throwable)));
+		} catch (Exception e) {
+			LOGGER.log(Level.FINER, "It was not possible to retrieve the stack trace from " + throwable.getClass().getName(), e);
+		}
 	}
 
 	/**
