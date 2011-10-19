@@ -298,14 +298,14 @@ public class PicoAgent {
 		// if an error in the init method was caught, we'll do nothing here.
 		// This prevents further errors.
 		if (initializationError) {
-			return null;
+			return byteCode;
 		}
 
 		// ignore all classes which fit to these patterns
 		for (int i = 0; i < IGNORE_START_PATTERNS.length; i++) {
 			String ignorePattern = IGNORE_START_PATTERNS[i];
 			if (className.startsWith(ignorePattern)) {
-				return null;
+				return byteCode;
 			}
 		}
 
@@ -313,7 +313,7 @@ public class PicoAgent {
 		for (int i = 0; i < IGNORE_END_PATTERNS.length; i++) {
 			String ignorePattern = IGNORE_END_PATTERNS[i];
 			if (className.endsWith(ignorePattern)) {
-				return null;
+				return byteCode;
 			}
 		}
 
@@ -324,7 +324,7 @@ public class PicoAgent {
 		} catch (Throwable throwable) {
 			LOGGER.severe("Something unexpected happened while trying to analyze or instrument the bytecode with the class name: " + className);
 			throwable.printStackTrace();
-			return null;
+			return byteCode;
 		}
 	}
 

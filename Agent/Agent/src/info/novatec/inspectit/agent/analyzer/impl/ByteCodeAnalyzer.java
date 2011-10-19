@@ -98,10 +98,14 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 				// where we don't have the bytecode directly. Thus we try to load it.
 				byteCode = classPool.get(className).toBytecode();
 			}
+			if (null != Thread.currentThread().getContextClassLoader() && classLoader != Thread.currentThread().getContextClassLoader()) {
+				// only use the context class loader if it is even set and not the same as the classloader being passed to the instrumentation
+				loaderClassPath = new LoaderClassPath(Thread.currentThread().getContextClassLoader());
+				classPool.insertClassPath(loaderClassPath);
+			}
+			// the byte array classpath needs to be the last one to be the first for access
 			classPath = new ByteArrayClassPath(className, byteCode);
 			classPool.insertClassPath(classPath);
-			loaderClassPath = new LoaderClassPath(Thread.currentThread().getContextClassLoader());
-			classPool.insertClassPath(loaderClassPath);
 
 			byte[] instrumentedByteCode = null;
 			Map behaviorToConfigMap = analyze(className, classLoader);
