@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The abstract sensor configuration which is used by the registered and
- * unregistered sensor configuration classes.
+ * The abstract sensor configuration which is used by the registered and unregistered sensor
+ * configuration classes.
  * 
  * @author Patrice Bouillet
  * 
@@ -42,14 +42,14 @@ public abstract class AbstractSensorConfig {
 	private Map settings = new Hashtable();
 
 	/**
-	 * Defines if this sensor configuration contains one or many definitions for
-	 * a property access (class field / method paramater) to save.
+	 * Defines if this sensor configuration contains one or many definitions for a property access
+	 * (class field / method paramater) to save.
 	 */
 	private boolean propertyAccess = false;
 
 	/**
-	 * If <code>propertyAccess</code> is set to true, then this list contains at
-	 * least one element. The contents is of type {@link PropertyPathStart}.
+	 * If <code>propertyAccess</code> is set to true, then this list contains at least one element.
+	 * The contents is of type {@link PropertyPathStart}.
 	 */
 	private List propertyAccessorList = new ArrayList(0);
 
@@ -97,12 +97,21 @@ public abstract class AbstractSensorConfig {
 	}
 
 	/**
-	 * Returns the class name as a fully qualified string.
+	 * Returns the class name as a name only string.
 	 * 
-	 * @return The class name.
+	 * @return The class name. Example: String
 	 */
 	public String getTargetClassName() {
 		return targetClassName;
+	}
+
+	/**
+	 * Returns the fully qualified class name.
+	 * 
+	 * @return FQN of a class. Example: java.lang.String
+	 */
+	public String getQualifiedTargetClassName() {
+		return targetPackageName + '.' + targetClassName;
 	}
 
 	/**
@@ -126,9 +135,8 @@ public abstract class AbstractSensorConfig {
 	}
 
 	/**
-	 * Sets the method name. Has to be without the signature. So a defined
-	 * method in the config file as <code>test(java.lang.String)</code> has to
-	 * be extracted as just <code>test</code>.
+	 * Sets the method name. Has to be without the signature. So a defined method in the config file
+	 * as <code>test(java.lang.String)</code> has to be extracted as just <code>test</code>.
 	 * 
 	 * @param targetMethodName
 	 *            The method name.
@@ -138,9 +146,8 @@ public abstract class AbstractSensorConfig {
 	}
 
 	/**
-	 * The parameter types or the signature of the method. Returns a
-	 * {@link List} of {@link String} instances containing the fully qualified
-	 * name of the classes.
+	 * The parameter types or the signature of the method. Returns a {@link List} of {@link String}
+	 * instances containing the fully qualified name of the classes.
 	 * 
 	 * @return The {@link List} of parameter types.
 	 */
@@ -149,8 +156,7 @@ public abstract class AbstractSensorConfig {
 	}
 
 	/**
-	 * Sets the parameter types. The {@link List} contains just of
-	 * {@link String} instances.
+	 * Sets the parameter types. The {@link List} contains just of {@link String} instances.
 	 * 
 	 * @param parameterTypes
 	 *            The {@link List} of parameter types.
@@ -179,9 +185,8 @@ public abstract class AbstractSensorConfig {
 	}
 
 	/**
-	 * Returns the {@link List} containing {@link PropertyPathStart} objects.
-	 * Only contains something if {@link #isPropertyAccess()} returns
-	 * <code>true</code>.
+	 * Returns the {@link List} containing {@link PropertyPathStart} objects. Only contains
+	 * something if {@link #isPropertyAccess()} returns <code>true</code>.
 	 * 
 	 * @return The {@link List} of {@link PropertyPathStart} objects.
 	 */

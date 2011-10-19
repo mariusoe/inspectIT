@@ -75,36 +75,42 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	 * {@inheritDoc}
 	 */
 	public void afterConstructor(ICoreService coreService, long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc) {
-		try {
-			long platformId = idManager.getPlatformId();
-			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			long registeredConstructorId = idManager.getRegisteredMethodId(methodId);
-			long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
-			Long identityHash = new Long(System.identityHashCode(object));
+		// getting the actual object class and comparing to the registered sensor config target
+		// class
+		String throwableClass = object.getClass().getName();
+		String rscTragetClassname = rsc.getQualifiedTargetClassName();
+		if (throwableClass.equals(rscTragetClassname)) {
+			try {
+				long platformId = idManager.getPlatformId();
+				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+				long registeredConstructorId = idManager.getRegisteredMethodId(methodId);
+				long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
+				Long identityHash = new Long(System.identityHashCode(object));
 
-			// need to reset the exception handler id
-			exceptionHandlerId.set(null);
+				// need to reset the exception handler id
+				exceptionHandlerId.set(null);
 
-			// getting the actual object with information
-			Throwable throwable = (Throwable) object;
+				// getting the actual object with information
+				Throwable throwable = (Throwable) object;
 
-			// creating the data object
-			ExceptionSensorData data = new ExceptionSensorData(timestamp, platformId, registeredSensorTypeId, registeredConstructorId);
-			data.setThrowableIdentityHashCode(identityHash.longValue());
-			data.setExceptionEvent(ExceptionEventEnum.CREATED);
-			data.setThrowableType(throwable.getClass().getName());
+				// creating the data object
+				ExceptionSensorData data = new ExceptionSensorData(timestamp, platformId, registeredSensorTypeId, registeredConstructorId);
+				data.setThrowableIdentityHashCode(identityHash.longValue());
+				data.setExceptionEvent(ExceptionEventEnum.CREATED);
+				data.setThrowableType(throwable.getClass().getName());
 
-			// set the static information of the current object
-			setStaticInformation(data, throwable);
+				// set the static information of the current object
+				setStaticInformation(data, throwable);
 
-			// creating the mapping object and setting it on the thread local
-			exceptionDataHolder.set(new IdentityHashToDataObject(identityHash, data));
+				// creating the mapping object and setting it on the thread local
+				exceptionDataHolder.set(new IdentityHashToDataObject(identityHash, data));
 
-			// adding the data object to the core service
-			coreService.addExceptionSensorData(registeredSensorTypeId, data.getThrowableIdentityHashCode(), data);
-		} catch (IdNotAvailableException e) {
-			if (LOGGER.isLoggable(Level.FINER)) {
-				LOGGER.finer("Could not start exception sequence because of a (currently) not mapped ID");
+				// adding the data object to the core service
+				coreService.addExceptionSensorData(registeredSensorTypeId, data.getThrowableIdentityHashCode(), data);
+			} catch (IdNotAvailableException e) {
+				if (LOGGER.isLoggable(Level.FINER)) {
+					LOGGER.finer("Could not start exception sequence because of a (currently) not mapped ID");
+				}
 			}
 		}
 	}

@@ -80,6 +80,8 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		when(idManager.getRegisteredMethodId(constructorId)).thenReturn(registeredConstructorId);
 		when(idManager.getRegisteredSensorTypeId(sensorTypeId)).thenReturn(registeredSensorTypeId);
 		when(idManager.getPlatformId()).thenReturn(platformId);
+		
+		when(registeredSensorConfig.getQualifiedTargetClassName()).thenReturn(MyTestException.class.getName());
 
 		exceptionHook.afterConstructor(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
 		verify(idManager, times(1)).getRegisteredMethodId(constructorId);
@@ -88,6 +90,27 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 
 		verifyNoMoreInteractions(idManager);
 		// verify(coreService, never());
+	}
+	
+	@Test
+	public void throwableObjectDifferentThenRSCTargetClass() throws InstantiationException, IllegalAccessException, IdNotAvailableException {
+		long constructorId = 5L;
+		long sensorTypeId = 3L;
+		long platformId = 1L;
+		long registeredConstructorId = 15L;
+		long registeredSensorTypeId = 13L;
+
+		Object[] parameters = new Object[0];
+		Exception exceptionObject = Exception.class.newInstance();
+		when(idManager.getRegisteredMethodId(constructorId)).thenReturn(registeredConstructorId);
+		when(idManager.getRegisteredSensorTypeId(sensorTypeId)).thenReturn(registeredSensorTypeId);
+		when(idManager.getPlatformId()).thenReturn(platformId);
+		
+		when(registeredSensorConfig.getQualifiedTargetClassName()).thenReturn(MyTestException.class.getName());
+	
+		exceptionHook.afterConstructor(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
+
+		verifyNoMoreInteractions(idManager);
 	}
 
 	@Test
@@ -115,6 +138,8 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		when(idManager.getRegisteredMethodId(constructorId)).thenReturn(registeredConstructorId);
 		when(idManager.getRegisteredSensorTypeId(sensorTypeId)).thenReturn(registeredSensorTypeId);
 		when(idManager.getPlatformId()).thenReturn(platformId);
+		
+		when(registeredSensorConfig.getQualifiedTargetClassName()).thenReturn(MyTestException.class.getName());
 
 		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.CREATED);
 		exceptionHook.afterConstructor(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
@@ -162,6 +187,8 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		when(idManager.getRegisteredMethodId(constructorId)).thenReturn(registeredConstructorId);
 		when(idManager.getRegisteredSensorTypeId(sensorTypeId)).thenReturn(registeredSensorTypeId);
 		when(idManager.getPlatformId()).thenReturn(platformId);
+		
+		when(registeredSensorConfig.getQualifiedTargetClassName()).thenReturn(MyTestException.class.getName());
 
 		exceptionHook.afterConstructor(coreService, constructorId, sensorTypeId, firstExceptionObject, parameters, registeredSensorConfig);
 		verify(idManager, times(1)).getRegisteredMethodId(constructorId);
@@ -213,6 +240,8 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		when(idManager.getRegisteredMethodId(constructorId)).thenReturn(registeredConstructorId);
 		when(idManager.getRegisteredSensorTypeId(sensorTypeId)).thenReturn(registeredSensorTypeId);
 		when(idManager.getPlatformId()).thenReturn(platformId);
+		
+		when(registeredSensorConfig.getQualifiedTargetClassName()).thenReturn(MyTestException.class.getName());
 
 		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.CREATED);
 		exceptionHook.afterConstructor(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
@@ -271,6 +300,8 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		when(idManager.getRegisteredMethodId(constructorId)).thenReturn(registeredConstructorId);
 		when(idManager.getRegisteredSensorTypeId(sensorTypeId)).thenReturn(registeredSensorTypeId);
 		when(idManager.getPlatformId()).thenReturn(platformId);
+		
+		when(registeredSensorConfig.getQualifiedTargetClassName()).thenReturn(MyTestException.class.getName());
 
 		exceptionHook.afterConstructor(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
 		verify(idManager, times(1)).getRegisteredMethodId(constructorId);
