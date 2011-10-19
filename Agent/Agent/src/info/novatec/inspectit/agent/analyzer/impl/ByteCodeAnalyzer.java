@@ -254,16 +254,14 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 				}
 			}
 
-			// only when there is an Exception Sensor defined
-			if (configurationStorage.isExceptionSensorActivated()) {
-				// iterate over the exception sensor types - currently there is
-				// only one
+			// only when there is an enhanced Exception Sensor defined
+			if (configurationStorage.isExceptionSensorActivated() && configurationStorage.isEnhancedExceptionSensorActivated()) {
+				// iterate over the exception sensor types - currently there is only one
 				for (Iterator configsIterator = configurationStorage.getExceptionSensorTypes().iterator(); configsIterator.hasNext();) {
 					MethodSensorTypeConfig config = (MethodSensorTypeConfig) configsIterator.next();
 					// need to add the exception sensor config separately, because otherwise it
 					// would be added to the other method hooks, but the exception sensor is a
 					// constructor hook
-					// rsc.addSensorTypeConfig(config, config.getName());
 					rsc.setExceptionSensorTypeConfig(config);
 				}
 			}
