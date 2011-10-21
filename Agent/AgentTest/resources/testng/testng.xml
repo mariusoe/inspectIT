@@ -135,6 +135,12 @@
 				name="info.novatec.inspectit.agent.sensor.method.jdbc.test.StatementHookTest" />
 		</classes>
 	</test>
+	<test name="SQL Prepared Hook">
+		<classes>
+			<class
+				name="info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementHookTest" />
+		</classes>
+	</test>
 	<test name="SQL Sensor Hook">
 		<classes>
 			<class

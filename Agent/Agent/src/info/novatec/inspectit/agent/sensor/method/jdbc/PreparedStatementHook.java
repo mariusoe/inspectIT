@@ -12,7 +12,9 @@ import info.novatec.inspectit.util.ThreadLocalStack;
 import info.novatec.inspectit.util.Timer;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
@@ -61,11 +63,18 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 	 * invocation is measured.
 	 */
 	private ThreadLocal threadLast = new ThreadLocal();
-	
+
 	/**
 	 * The StringConstraint to ensure a maximum length of strings.
 	 */
 	private StringConstraint strConstraint;
+
+	/**
+	 * Contains all methodidents of all prepared statements that had a problem finding the stored
+	 * SQL statement. Using this structure we can ensure that we do not throw the exception always
+	 * again.
+	 */
+	private static List preparedStatementsWithExceptions = new ArrayList(0);
 
 	/**
 	 * The only constructor which needs the {@link Timer}.
@@ -163,13 +172,27 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 		try {
 			statementStorage.addPreparedStatement(object);
 		} catch (NoSuchElementException e) {
+			// Ensure that a problem with this statement is only thrown once to not spam the log
+			// file. It is possible that we hide exceptions.
+			Long methodIdLong = Long.valueOf(methodId);
+			if (preparedStatementsWithExceptions.contains(methodIdLong)) {
+				// we already logged this exception...
+				return;
+			}
+
 			// it is possible that this exception is thrown in a 'normal' way,
 			// as everyone could instantiate a prepared statement object without
 			// calling first a method on the connection (prepareStatement...)
 			LOGGER.info("Could not add prepared statement, no sql available! Method ID(local): " + methodId);
-			LOGGER.info("This is not an inspectIT issue, please consult the management of inspectIT and send the following stacktrace!");
+			LOGGER.info("This is not an inspectIT issue, but you forget to integrate the Connection creating the SQL statement in the configuration, please consult the management of inspectIT and send the following stacktrace!");
 			e.printStackTrace();
+
+			// we need to ensure thread safety for the list and do not care for lost updates, so
+			// we simply create a new list based on the old list and change references after we
+			// finished building it.
+			List clonedList = new ArrayList(preparedStatementsWithExceptions);
+			clonedList.add(methodIdLong);
+			preparedStatementsWithExceptions = clonedList;
 		}
 	}
-
 }
