@@ -11,6 +11,7 @@ import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * This service is used to check the health of the CMR in terms of cpu, memory, some overall
@@ -19,12 +20,17 @@ import org.apache.log4j.Logger;
  * @author Patrice Bouillet
  * 
  */
-public class HealthStatus {
+public class HealthStatus implements InitializingBean {
 
 	/**
 	 * The logger of this class.
 	 */
 	private static final Logger LOGGER = Logger.getLogger(HealthStatus.class);
+
+	/**
+	 * Are the beans that are responsible for creating the Health Status available.
+	 */
+	private boolean beansAvailable = false;
 
 	/**
 	 * The memory mx bean used to extract information about the memory of the system.
@@ -71,14 +77,18 @@ public class HealthStatus {
 	 * Log all the statistics.
 	 */
 	public void logStatistics() {
+		if (beansAvailable) {
+			if (LOGGER.isInfoEnabled()) {
+				logOperatingSystemStatistics();
+				logRuntimeStatistics();
+				logMemoryStatistics();
+				logThreadStatistics();
+				LOGGER.info("\n");
+			}
+		}
 		if (LOGGER.isInfoEnabled()) {
-			logOperatingSystemStatistics();
-			logRuntimeStatistics();
-			logMemoryStatistics();
-			logThreadStatistics();
 			logDroppedData();
 			logBufferStatistics();
-			LOGGER.info("\n");
 		}
 	}
 
@@ -370,11 +380,47 @@ public class HealthStatus {
 	}
 
 	/**
+	 * Checks if the beans are available and sets the {@link #beansAvailable} depending on the
+	 * result of check.
+	 */
+	private void startUpCheck() {
+		try {
+			operatingSystemMXBean.getArch();
+			operatingSystemMXBean.getName();
+			operatingSystemMXBean.getVersion();
+			operatingSystemMXBean.getAvailableProcessors();
+			operatingSystemMXBean.getSystemLoadAverage();
+
+			runtimeMXBean.getName();
+			runtimeMXBean.getUptime();
+			runtimeMXBean.getVmName();
+			runtimeMXBean.getVmVendor();
+
+			memoryMXBean.getHeapMemoryUsage();
+			memoryMXBean.getNonHeapMemoryUsage();
+
+			threadMXBean.getThreadCount();
+			threadMXBean.getTotalStartedThreadCount();
+
+			beansAvailable = true;
+		} catch (Exception e) {
+			beansAvailable = false;
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public void afterPropertiesSet() throws Exception {
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("Health Service active...");
+		startUpCheck();
+		if (beansAvailable) {
+			if (LOGGER.isInfoEnabled()) {
+				LOGGER.info("Health Service active...");
+			}
+		} else {
+			if (LOGGER.isInfoEnabled()) {
+				LOGGER.info("Health Service not active...");
+			}
 		}
 	}
 
