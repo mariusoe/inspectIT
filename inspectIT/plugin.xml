@@ -203,6 +203,10 @@
             name="Locate in Call Hierarchy">
       </command>
       <command
+            id="info.novatec.inspectit.rcp.commands.navigateToExceptionType"
+            name="Navigate To Exception Type">
+      </command>
+      <command
             id="info.novatec.inspectit.rcp.commands.showHideColumn"
             name="Show/Hide Column">
          <commandParameter
@@ -635,6 +639,33 @@
       <handler
             class="info.novatec.inspectit.rcp.handlers.FindHandler"
             commandId="org.eclipse.ui.edit.findReplace">
+      </handler>    
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.NavigateToExceptionTypeHandler"
+            commandId="info.novatec.inspectit.rcp.commands.navigateToExceptionType">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <or>
+                     <instanceof
+                           value="info.novatec.inspectit.communication.data.ExceptionSensorData">
+                     </instanceof>
+                     <instanceof
+                           value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                     </instanceof>
+                  </or>
+               </iterate>
+               <with
+                     variable="selection">
+                  <test
+                        property="info.novatec.inspectit.canNavigateToExceptionType">
+                  </test>
+               </with>
+            </and>
+         </activeWhen>
       </handler>
    </extension>
    <extension
@@ -654,13 +685,6 @@
             type="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
       </propertyTester>
       <propertyTester
-            class="info.novatec.inspectit.rcp.editor.testers.NavigateToInvocationsTester"
-            id="info.novatec.inspectit.NavigateToInvocations"
-            namespace="info.novatec.inspectit"
-            properties="canNavigateToInvocations"
-            type="org.eclipse.jface.viewers.StructuredSelection">
-      </propertyTester>
-      <propertyTester
             class="info.novatec.inspectit.rcp.editor.testers.SubViewClassificationTester"
             id="info.novatec.inspectit.SubViewClassificationTester"
             namespace="info.novatec.inspectit"
@@ -668,10 +692,10 @@
             type="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
       </propertyTester>
       <propertyTester
-            class="info.novatec.inspectit.rcp.editor.testers.NavigateToPlottingTester"
-            id="info.novatec.inspectit.NavigateToPlottingTester"
+            class="info.novatec.inspectit.rcp.editor.testers.NavigationTester"
+            id="info.novatec.inspectit.NavigationTester"
             namespace="info.novatec.inspectit"
-            properties="canNavigateToPlotting"
+            properties="canNavigateToPlotting, canNavigateToInvocations, canNavigateToExceptionType"
             type="org.eclipse.jface.viewers.StructuredSelection">
       </propertyTester>
       <propertyTester
@@ -701,6 +725,46 @@
                   commandId="info.novatec.inspectit.rcp.commands.navigateToPlotting"
                   icon="icons/timer.png"
                   style="push">
+            </command>
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.navigateToExceptionType"
+                  icon="icons/exceptiontracer.gif"
+                  label="This Exception Type"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <and>
+                     <count
+                           value="1">
+                     </count>
+                     <iterate>
+                        <or>
+                           <instanceof
+                                 value="info.novatec.inspectit.communication.data.ExceptionSensorData">
+                           </instanceof>
+                           <instanceof
+                                 value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                           </instanceof>
+                        </or>
+                     </iterate>
+                     <with
+                           variable="activeEditor">
+                        <instanceof
+                              value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                        </instanceof>
+                        <test
+                              property="info.novatec.inspectit.activeSubView"
+                              value="treeSubView">
+                        </test>
+                     </with>
+                     <with
+                           variable="selection">
+                        <test
+                              property="info.novatec.inspectit.canNavigateToExceptionType">
+                        </test>
+                     </with>
+                  </and>
+               </visibleWhen>
             </command>
          </menu>
          <command
@@ -798,6 +862,46 @@
                         <test
                               property="info.novatec.inspectit.activeSubView"
                               value="tableSubView">
+                        </test>
+                     </with>
+                  </and>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.navigateToExceptionType"
+                  icon="icons/exceptiontracer.gif"
+                  label="This Exception Type"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <and>
+                     <count
+                           value="1">
+                     </count>
+                     <iterate>
+                        <or>
+                           <instanceof
+                                 value="info.novatec.inspectit.communication.data.ExceptionSensorData">
+                           </instanceof>
+                           <instanceof
+                                 value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                           </instanceof>
+                        </or>
+                     </iterate>
+                     <with
+                           variable="activeEditor">
+                        <instanceof
+                              value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                        </instanceof>
+                        <test
+                              property="info.novatec.inspectit.activeSubView"
+                              value="tableSubView">
+                        </test>
+                     </with>
+                     <with
+                           variable="selection">
+                        <test
+                              property="info.novatec.inspectit.canNavigateToExceptionType">
                         </test>
                      </with>
                   </and>

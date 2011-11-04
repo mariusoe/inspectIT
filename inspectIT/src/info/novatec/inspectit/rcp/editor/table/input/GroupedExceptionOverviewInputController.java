@@ -328,6 +328,9 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		data.setThrowableType(throwableType);
 
 		for (AggregatedExceptionSensorData object : dataList) {
+			if (data.getPlatformIdent() == 0) {
+				data.setPlatformIdent(object.getPlatformIdent());
+			}
 			data.aggregateExceptionData(object);
 		}
 
@@ -465,7 +468,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		}
 		throw new RuntimeException("Could not create the human readable string!");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

@@ -39,6 +39,17 @@ public final class InputDefinitionExtrasMarkerFactory {
 	};
 
 	/**
+	 * Marker for {@link ExceptionTypeInputDefinitionExtra}.
+	 */
+	public static final InputDefinitionExtraMarker<ExceptionTypeInputDefinitionExtra> EXCEPTION_TYPE_EXTRAS_MARKER = new InputDefinitionExtraMarker<ExceptionTypeInputDefinitionExtra>() {
+		@Override
+		public Class<ExceptionTypeInputDefinitionExtra> getInputDefinitionExtraClass() {
+			return ExceptionTypeInputDefinitionExtra.class;
+		}
+
+	};
+
+	/**
 	 * Abstract class for input definition extras marker.
 	 * 
 	 * @author Ivan Senic

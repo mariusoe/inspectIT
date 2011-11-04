@@ -62,6 +62,9 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 		if (template.getMethodIdent() != -1) {
 			query.setMethodIdent(template.getMethodIdent());
 		}
+		if (null != template.getThrowableType()) {
+			query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("throwableType", template.getThrowableType()));
+		}
 		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
 		searchedClasses.add(ExceptionSensorData.class);
 		query.setObjectClasses(searchedClasses);
@@ -206,6 +209,7 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 	 */
 	private AggregatedExceptionSensorData cloneExceptionSensorData(ExceptionSensorData exceptionData) {
 		AggregatedExceptionSensorData clone = new AggregatedExceptionSensorData();
+		clone.setPlatformIdent(exceptionData.getPlatformIdent());
 		clone.setCause(exceptionData.getCause());
 		clone.setErrorMessage(exceptionData.getErrorMessage());
 		clone.setExceptionEvent(exceptionData.getExceptionEvent());
@@ -241,7 +245,7 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 					returnList.add(aggregatedExceptionSensorData);
 				}
 				aggregatedExceptionSensorData.aggregateExceptionData(dataToAggregate);
-				dataToAggregate =  dataToAggregate.getChild();
+				dataToAggregate = dataToAggregate.getChild();
 			}
 		}
 		return returnList;

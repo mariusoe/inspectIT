@@ -7,6 +7,7 @@ import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceConstants;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
@@ -156,6 +157,11 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 		template.setPlatformIdent(inputDefinition.getIdDefinition().getPlatformId());
 		template.setSensorTypeIdent(inputDefinition.getIdDefinition().getSensorTypeId());
 		template.setMethodIdent(inputDefinition.getIdDefinition().getMethodId());
+
+		if (inputDefinition.hasInputDefinitionExtra(InputDefinitionExtrasMarkerFactory.EXCEPTION_TYPE_EXTRAS_MARKER)) {
+			String throwableType = inputDefinition.getInputDefinitionExtra(InputDefinitionExtrasMarkerFactory.EXCEPTION_TYPE_EXTRAS_MARKER).getThrowableType();
+			template.setThrowableType(throwableType);
+		}
 
 		cachedDataService = inputDefinition.getRepositoryDefinition().getCachedDataService();
 		dataAccessService = inputDefinition.getRepositoryDefinition().getExceptionDataAccessService();
@@ -419,7 +425,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 		}
 		throw new RuntimeException("Could not create the human readable string!");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
