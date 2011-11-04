@@ -314,7 +314,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	@SuppressWarnings("unchecked")
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Updating Invocation Overview", IProgressMonitor.UNKNOWN);
-		monitor.subTask("Retrieving the Invocation Overview from the CMR");
+		monitor.subTask("Retrieving the Invocation Overview");
 		List<InvocationSequenceData> invocData;
 
 		if (!autoUpdate) {
@@ -355,7 +355,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 			try {
 				PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
 					public void run(final IProgressMonitor monitor) {
-						monitor.beginTask("Retrieving Invocation detail data from CMR", IProgressMonitor.UNKNOWN);
+						monitor.beginTask("Retrieving Invocation detail data", IProgressMonitor.UNKNOWN);
 						InvocationSequenceData invocationSequenceData = (InvocationSequenceData) selection.getFirstElement();
 						InvocationSequenceData data = (InvocationSequenceData) dataAccessService.getInvocationSequenceDetail(invocationSequenceData);
 						final List<InvocationSequenceData> invocationSequenceDataList = new ArrayList<InvocationSequenceData>();

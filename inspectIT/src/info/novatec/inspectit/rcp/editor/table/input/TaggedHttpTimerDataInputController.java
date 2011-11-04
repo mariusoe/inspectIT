@@ -121,7 +121,7 @@ public class TaggedHttpTimerDataInputController extends AbstractHttpInputControl
 	@Override
 	@SuppressWarnings("unchecked")
 	public void doRefresh(IProgressMonitor monitor) {
-		monitor.beginTask("Getting timer data information from the CMR", IProgressMonitor.UNKNOWN);
+		monitor.beginTask("Getting HTTP data information", IProgressMonitor.UNKNOWN);
 		List<HttpTimerData> aggregatedTimerData;
 
 		if (autoUpdate) {

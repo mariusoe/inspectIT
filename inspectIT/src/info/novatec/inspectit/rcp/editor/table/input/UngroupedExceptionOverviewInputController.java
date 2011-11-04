@@ -268,7 +268,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	@SuppressWarnings("unchecked")
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Updating the Ungrouped Exception Overview", IProgressMonitor.UNKNOWN);
-		monitor.subTask("Retrieving the Ungrouped Exception Overview from the CMR");
+		monitor.subTask("Retrieving the Ungrouped Exception Overview");
 		List<ExceptionSensorData> exData = null;
 
 		// if fromDate and toDate are set, then we retrieve only the data for
@@ -299,7 +299,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 				PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
 					@SuppressWarnings("unchecked")
 					public void run(final IProgressMonitor monitor) {
-						monitor.beginTask("Retrieving Exception Tree data from CMR", IProgressMonitor.UNKNOWN);
+						monitor.beginTask("Retrieving Exception Tree", IProgressMonitor.UNKNOWN);
 						ExceptionSensorData data = (ExceptionSensorData) selection.getFirstElement();
 						List<ExceptionSensorData> exceptionSensorDataList = dataAccessService.getExceptionTree(data);
 						final List<ExceptionSensorData> finalSensorDataList = new ArrayList<ExceptionSensorData>();

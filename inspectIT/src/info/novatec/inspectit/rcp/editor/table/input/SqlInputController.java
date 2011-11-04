@@ -292,7 +292,7 @@ public class SqlInputController extends AbstractTableInputController {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void doRefresh(IProgressMonitor monitor) {
-		monitor.beginTask("Getting SQL information from the CMR", IProgressMonitor.UNKNOWN);
+		monitor.beginTask("Getting SQL information", IProgressMonitor.UNKNOWN);
 		List<SqlStatementData> invocData;
 		if (autoUpdate) {
 			invocData = dataAccessService.getAggregatedSqlStatements(template);

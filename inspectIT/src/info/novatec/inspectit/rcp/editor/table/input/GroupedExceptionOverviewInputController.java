@@ -265,7 +265,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	@SuppressWarnings("unchecked")
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Updating Grouped Exception Overview", IProgressMonitor.UNKNOWN);
-		monitor.subTask("Retrieving the Grouped Exception Overview data from the CMR");
+		monitor.subTask("Retrieving the Grouped Exception Overview");
 		List<AggregatedExceptionSensorData> ungroupedList = null;
 
 		// if fromDate and toDate are set, then we retrieve only the data for
