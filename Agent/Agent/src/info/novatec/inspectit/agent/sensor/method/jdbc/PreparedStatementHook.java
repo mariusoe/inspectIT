@@ -174,7 +174,7 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 		} catch (NoSuchElementException e) {
 			// Ensure that a problem with this statement is only thrown once to not spam the log
 			// file. It is possible that we hide exceptions.
-			Long methodIdLong = Long.valueOf(methodId);
+			Long methodIdLong = new Long(methodId);
 			if (preparedStatementsWithExceptions.contains(methodIdLong)) {
 				// we already logged this exception...
 				return;
