@@ -100,9 +100,14 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 				extractDataFromInvocation(session, invoc, invoc);
 				buffer.put(new BufferElement<MethodSensorData>(invoc));
 			} else if (element instanceof SqlStatementData) {
-				// saveSqlStatementData(session, (SqlStatementData) element);
-				// session.insert(element);
-				buffer.put(new BufferElement<MethodSensorData>((SqlStatementData) element));
+				// create the exclusive times for SQLs, because we know that exclusive time equals
+				// the total duration
+				SqlStatementData sqlStatementData = (SqlStatementData) element;
+				sqlStatementData.setExclusiveCount(1L);
+				sqlStatementData.setExclusiveDuration(sqlStatementData.getDuration());
+				sqlStatementData.calculateExclusiveMax(sqlStatementData.getDuration());
+				sqlStatementData.calculateExclusiveMin(sqlStatementData.getDuration());
+				buffer.put(new BufferElement<MethodSensorData>(sqlStatementData));
 			} else if (element instanceof SystemInformationData) {
 				SystemInformationData info = (SystemInformationData) element;
 				long systemInformationId = ((Long) session.insert(info)).longValue();
@@ -170,7 +175,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 				child.getSqlStatementData().setExclusiveCount(1L);
 				child.getSqlStatementData().setExclusiveDuration(child.getSqlStatementData().getDuration());
 				child.getSqlStatementData().calculateExclusiveMax(child.getSqlStatementData().getDuration());
-				child.getSqlStatementData().calculateExclusiveMax(child.getSqlStatementData().getDuration());
+				child.getSqlStatementData().calculateExclusiveMin(child.getSqlStatementData().getDuration());
 
 				cacheIdGenerator.assignObjectAnId(child.getSqlStatementData());
 				child.getSqlStatementData().addInvocationParentId(topInvocationParent.getId());
