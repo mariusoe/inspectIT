@@ -4,7 +4,6 @@ import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.communication.DefaultData;
 
 import java.sql.Timestamp;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -522,6 +521,7 @@ public class TimerData extends InvocationAwareData {
 	 *            Data to be aggregated into current object.
 	 */
 	public void aggregateTimerData(TimerData timerData) {
+		super.aggregateInvocationAwareData(timerData);
 		this.setCount(this.getCount() + timerData.getCount());
 		this.setDuration(this.getDuration() + timerData.getDuration());
 		this.calculateMax(timerData.getMax());
@@ -531,12 +531,6 @@ public class TimerData extends InvocationAwareData {
 			this.setCpuDuration(this.getCpuDuration() + timerData.getCpuDuration());
 			this.calculateCpuMax(timerData.getCpuMax());
 			this.calculateCpuMin(timerData.getCpuMin());
-		}
-		if (null != timerData.getInvocationParentsIdSet()) {
-			Iterator it = timerData.getInvocationParentsIdSet().iterator();
-			while (it.hasNext()) {
-				this.addInvocationParentId((Long) it.next());
-			}
 		}
 		if (timerData.isExclusiveTimeDataAvailable()) {
 			this.addExclusiveDuration(timerData.getExclusiveDuration());

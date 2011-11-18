@@ -3,9 +3,14 @@ package info.novatec.inspectit.communication.data;
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.communication.MethodSensorData;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -23,16 +28,10 @@ public abstract class InvocationAwareData extends MethodSensorData {
 	private static final long serialVersionUID = 1321146768671989693L;
 
 	/**
-	 * Count of how many times this object is found in invocations. Note that this number can be
-	 * larger than the number of invocations parents in the {@link #invocationParentsList} while
-	 * this list contains only distinct invocation objects.
+	 * Map<Long, MutableInt> that contains the ID of invocation as a key and numbers of object
+	 * appearances in this invocation.
 	 */
-	private long objectsInInvocationsCount;
-
-	/**
-	 * Set of invocation IDs that contain this object.
-	 */
-	private Set invocationParentsIdSet;
+	private Map invocationsParentsIdMap;
 
 	/**
 	 * Default no-args constructor.
@@ -56,28 +55,77 @@ public abstract class InvocationAwareData extends MethodSensorData {
 	 */
 	public void addInvocationParentId(Long id) {
 		if (null != id) {
-			objectsInInvocationsCount++;
-			if (null == invocationParentsIdSet) {
-				invocationParentsIdSet = new HashSet();
+			if (null == invocationsParentsIdMap) {
+				invocationsParentsIdMap = new HashMap();
 			}
-			invocationParentsIdSet.add(id);
+			MutableInt count = (MutableInt) invocationsParentsIdMap.get(id);
+			if (null != count) {
+				count.increase();
+			} else {
+				invocationsParentsIdMap.put(id, new MutableInt(1));
+			}
 		}
 	}
 
+	/**
+	 * Returns set of invocation parents IDS.
+	 * 
+	 * @return Returns set of invocation parents IDS.
+	 */
 	public Set getInvocationParentsIdSet() {
-		return invocationParentsIdSet;
+		if (null != invocationsParentsIdMap) {
+			return invocationsParentsIdMap.keySet(); 
+		} else {
+			return Collections.EMPTY_SET;
+		}
 	}
 
-	public void setInvocationParentsIdSet(Set invocationParentsIdSet) {
-		this.invocationParentsIdSet = invocationParentsIdSet;
+	/**
+	 * @return the invocationsParentsIdMap
+	 */
+	protected Map getInvocationsParentsIdMap() {
+		return invocationsParentsIdMap;
 	}
 
-	public long getObjectsInInvocationsCount() {
-		return objectsInInvocationsCount;
+	/**
+	 * Returns how much objects are contained in the invocation parents.
+	 * 
+	 * @return Returns how much objects are contained in the invocation parents.
+	 */
+	public int getObjectsInInvocationsCount() {
+		int count = 0;
+		if (null != invocationsParentsIdMap) {
+			Iterator it = invocationsParentsIdMap.values().iterator();
+			while (it.hasNext()) {
+				count += ((MutableInt) it.next()).getValue();
+			}
+		}
+		return count;
 	}
 
-	public void setObjectsInInvocationsCount(long objectsInInvocationsCount) {
-		this.objectsInInvocationsCount = objectsInInvocationsCount;
+	/**
+	 * Aggregates the data correlated to the invocation parents. Note that this method has to be
+	 * called from the subclasses when they implement any kind of aggregation.
+	 * 
+	 * @param invocationAwareData
+	 *            Data to aggregate to current object.
+	 */
+	public void aggregateInvocationAwareData(InvocationAwareData invocationAwareData) {
+		if (null != invocationAwareData.getInvocationsParentsIdMap()) {
+			if (null == invocationsParentsIdMap) {
+				invocationsParentsIdMap = new HashMap();
+			}
+			Iterator it = invocationAwareData.getInvocationsParentsIdMap().entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry entry = (Entry) it.next();
+				MutableInt count = (MutableInt) invocationsParentsIdMap.get(entry.getKey());
+				if (null != count) {
+					count.add(((MutableInt) entry.getValue()).getValue());
+				} else {
+					invocationsParentsIdMap.put(entry.getKey(), new MutableInt(((MutableInt) entry.getValue()).getValue()));
+				}
+			}
+		}
 	}
 
 	/**
@@ -107,8 +155,7 @@ public abstract class InvocationAwareData extends MethodSensorData {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((invocationParentsIdSet == null) ? 0 : invocationParentsIdSet.hashCode());
-		result = prime * result + (int) (objectsInInvocationsCount ^ (objectsInInvocationsCount >>> 32));
+		result = prime * result + ((invocationsParentsIdMap == null) ? 0 : invocationsParentsIdMap.hashCode());
 		return result;
 	}
 
@@ -125,18 +172,13 @@ public abstract class InvocationAwareData extends MethodSensorData {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		InvocationAwareData invocationAwareData = (InvocationAwareData) obj;
-		if (objectsInInvocationsCount != invocationAwareData.getObjectsInInvocationsCount()) {
+		InvocationAwareData other = (InvocationAwareData) obj;
+		if (invocationsParentsIdMap == null) {
+			if (other.invocationsParentsIdMap != null) {
+				return false;
+			}
+		} else if (!invocationsParentsIdMap.equals(other.invocationsParentsIdMap)) {
 			return false;
-		}
-		if (null == invocationParentsIdSet) {
-			if (null != invocationAwareData.getInvocationParentsIdSet()) {
-				return false;
-			}
-		} else {
-			if (!invocationParentsIdSet.equals(invocationAwareData.getInvocationParentsIdSet())) {
-				return false;
-			}
 		}
 		return true;
 	}
@@ -146,13 +188,65 @@ public abstract class InvocationAwareData extends MethodSensorData {
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
 		long size = super.getObjectSize(objectSizes);
-		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 1, 0);
-		if (null != invocationParentsIdSet) {
-			// I don't calculate the size of the invocation objects in the list because these should
-			// be calculated separately
-			size += objectSizes.getSizeOfHashSet(invocationParentsIdSet.size());
-			size += invocationParentsIdSet.size() * objectSizes.getSizeOfLongObject();
+		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 0, 0);
+		if (null != invocationsParentsIdMap) {
+			size += objectSizes.getSizeOfHashMap(invocationsParentsIdMap.size());
+			size += invocationsParentsIdMap.size() * objectSizes.getSizeOfLongObject();
+			long sizeOfMutableInt = objectSizes.alignTo8Bytes(objectSizes.getSizeOfObject() + objectSizes.getPrimitiveTypesSize(0, 0, 1, 0, 0, 0));
+			size += invocationsParentsIdMap.size() * sizeOfMutableInt;
 		}
 		return objectSizes.alignTo8Bytes(size);
+	}
+
+	/**
+	 * Simple mutable integer class for internal purposes.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private static class MutableInt implements Serializable {
+
+		/**
+		 * Generated UID.
+		 */
+		private static final long serialVersionUID = -2367937702260302863L;
+		
+		/**
+		 * Value.
+		 */
+		private int value;
+
+		/**
+		 * Constructor that sets initial value.
+		 * 
+		 * @param value
+		 *            Initial value.
+		 */
+		public MutableInt(int value) {
+			this.value = value;
+		}
+
+		/**
+		 * @return the value
+		 */
+		public int getValue() {
+			return value;
+		}
+
+		/**
+		 * Increases the value.
+		 */
+		public void increase() {
+			value++;
+		}
+		
+		/**
+		 * Adds delta to the value.
+		 * @param delta Delta.
+		 */
+		public void add(int delta) {
+			value += delta;
+		}
+
 	}
 }

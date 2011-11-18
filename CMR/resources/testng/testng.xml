@@ -76,4 +76,10 @@
 				name="info.novatec.inspectit.cmr.cache.test.ObjectSizesPrimitiveTypesSizeTest" />
 		</classes>
 	</test>
+	<test name="Invocation Aware Data Test">
+		<classes>
+			<class 
+				name="info.novatec.inspectit.communication.data.test.InvocationAwareDataTest" />
+		</classes>
+	</test>
 </suite>

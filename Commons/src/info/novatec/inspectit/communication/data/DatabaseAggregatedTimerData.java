@@ -30,6 +30,9 @@ public class DatabaseAggregatedTimerData extends TimerData {
 
 	/**
 	 * {@inheritDoc}
+	 * <p>
+	 * This method does not aggregate the {@link InvocationAwareData} because it is not needed in
+	 * the database.
 	 */
 	public void aggregateTimerData(TimerData timerData) {
 		this.setCount(this.getCount() + timerData.getCount());

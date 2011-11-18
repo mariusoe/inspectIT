@@ -2,9 +2,7 @@ package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.communication.ExceptionEventEnum;
 
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 /**
  * Aggregated exception sensor data. This objects are used for the purpose of grouping the
@@ -65,8 +63,7 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData {
 	public double getInvocationAffiliationPercentage() {
 		return (double) getObjectsInInvocationsCount() / created;
 	}
-	
-	
+
 	public void aggregateExceptionData(ExceptionSensorData exceptionData) {
 		if (exceptionData.getExceptionEvent() == ExceptionEventEnum.CREATED) {
 			created++;
@@ -82,21 +79,17 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData {
 			}
 		}
 	}
-	
+
+	/**
+	 * Aggregates the exception data.
+	 * 
+	 * @param aggregatedExceptionData
+	 */
 	public void aggregateExceptionData(AggregatedExceptionSensorData aggregatedExceptionData) {
+		super.aggregateInvocationAwareData(aggregatedExceptionData);
 		this.setCreated(this.getCreated() + aggregatedExceptionData.getCreated());
 		this.setHandled(this.getHandled() + aggregatedExceptionData.getHandled());
 		this.setPassed(this.getPassed() + aggregatedExceptionData.getPassed());
-		if (null != aggregatedExceptionData.getInvocationParentsIdSet()) {
-			if (null == this.getInvocationParentsIdSet()) {
-				Set set = new HashSet();
-				set.addAll(aggregatedExceptionData.getInvocationParentsIdSet());
-				this.setInvocationParentsIdSet(set);
-			} else {
-				this.getInvocationParentsIdSet().addAll(aggregatedExceptionData.getInvocationParentsIdSet());
-			}
-			this.setObjectsInInvocationsCount(this.getObjectsInInvocationsCount() + aggregatedExceptionData.getObjectsInInvocationsCount());
-		}
 	}
 
 	/**

@@ -170,11 +170,9 @@ public class TimerDataAggregatorTest extends AbstractTransactionalTestNGLogSuppo
 		verify(timerData, times(0)).calculateExclusiveMax(anyDouble());
 		verify(timerData, times(0)).calculateExclusiveMin(anyDouble());
 		verify(timerData, times(0)).setId(anyLong());
-		verify(timerData, times(0)).setInvocationParentsIdSet((Set<?>) anyObject());
 		verify(timerData, times(0)).calculateMax(anyDouble());
 		verify(timerData, times(0)).setMethodIdent(anyLong());
 		verify(timerData, times(0)).calculateMin(anyDouble());
-		verify(timerData, times(0)).setObjectsInInvocationsCount(anyLong());
 		verify(timerData, times(0)).setParameterContentData((Set<?>) anyObject());
 		verify(timerData, times(0)).setPlatformIdent(anyLong());
 		verify(timerData, times(0)).setSensorTypeIdent(anyLong());
