@@ -3,8 +3,8 @@ package info.novatec.inspectit.rcp.repository;
 import java.util.EventListener;
 
 /**
- * The repository change listener which passes the following events:
- * <b>added</b>, <b>removed</b>, <b>updated</b>.
+ * The repository change listener which passes the following events: <b>added</b>, <b>removed</b>,
+ * <b>updated</b>.
  * 
  * @author Patrice Bouillet
  * 
@@ -26,6 +26,7 @@ public interface RepositoryChangeListener extends EventListener {
 	 *            the repository definition.
 	 */
 	void repositoryRemoved(RepositoryDefinition repositoryDefinition);
+
 
 	/**
 	 * If a repository has been updated.

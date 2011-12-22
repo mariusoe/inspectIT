@@ -14,7 +14,7 @@ import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.ExceptionImageFactory;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
-import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.util.ArrayList;
@@ -133,7 +133,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	/**
 	 * This data access service is needed because of the ID mappings.
 	 */
-	private CachedGlobalDataAccessService dataAccessService;
+	private CachedDataService cachedDataService;
 
 	/**
 	 * {@inheritDoc}
@@ -142,7 +142,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	public void setInputDefinition(InputDefinition inputDefinition) {
 		super.setInputDefinition(inputDefinition);
 
-		dataAccessService = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService();
+		cachedDataService = inputDefinition.getRepositoryDefinition().getCachedDataService();
 	}
 
 	/**
@@ -180,7 +180,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	@Override
 	public void showDetails(Shell parent, Object element) {
 		final ExceptionSensorData data = (ExceptionSensorData) element;
-		final MethodIdent methodIdent = dataAccessService.getMethodIdentForId(data.getMethodIdent());
+		final MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 
 		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
 		boolean takeFocusOnOpen = true;
@@ -250,7 +250,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 
 					for (ExceptionSensorData exceptionSensorData : exceptionDetails) {
 						content.append(exceptionSensorData.getExceptionEvent().toString().toLowerCase() + " in "
-								+ TextFormatter.getMethodWithParameters(dataAccessService.getMethodIdentForId(exceptionSensorData.getMethodIdent())));
+								+ TextFormatter.getMethodWithParameters(cachedDataService.getMethodIdentForId(exceptionSensorData.getMethodIdent())));
 						content.append("\n");
 					}
 				}
@@ -466,7 +466,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		public StyledString getStyledText(Object element, int index) {
 			ExceptionSensorData data = (ExceptionSensorData) element;
 			Column enumId = Column.fromOrd(index);
-			MethodIdent methodIdent = dataAccessService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 
 			return getStyledTextForColumn(data, methodIdent, enumId);
 		}
@@ -483,7 +483,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		@Override
 		public Image getColumnImage(Object element, int index) {
 			ExceptionSensorData data = (ExceptionSensorData) element;
-			MethodIdent methodIdent = dataAccessService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			Column enumId = Column.fromOrd(index);
 
 			switch (enumId) {
@@ -520,8 +520,8 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		 */
 		@Override
 		protected int compareElements(Viewer viewer, ExceptionSensorData data1, ExceptionSensorData data2) {
-			MethodIdent methodIdent1 = dataAccessService.getMethodIdentForId(data1.getMethodIdent());
-			MethodIdent methodIdent2 = dataAccessService.getMethodIdentForId(data2.getMethodIdent());
+			MethodIdent methodIdent1 = cachedDataService.getMethodIdentForId(data1.getMethodIdent());
+			MethodIdent methodIdent2 = cachedDataService.getMethodIdentForId(data2.getMethodIdent());
 
 			switch ((Column) getEnumSortColumn()) {
 			case TIMESTAMP:
@@ -581,7 +581,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		if (object instanceof ExceptionSensorData) {
 			ExceptionSensorData data = (ExceptionSensorData) object;
 			StringBuilder sb = new StringBuilder();
-			MethodIdent methodIdent = dataAccessService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			for (Column column : Column.values()) {
 				sb.append(getStyledTextForColumn(data, methodIdent, column).toString());
 				sb.append("\t");

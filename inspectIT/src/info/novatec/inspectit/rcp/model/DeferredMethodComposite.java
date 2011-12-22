@@ -58,7 +58,7 @@ public class DeferredMethodComposite extends DeferredComposite {
 					inputDefinition.setPartTooltip(sensorTypeEnum.getDisplayName());
 					inputDefinition.setImageDescriptor(sensorTypeEnum.getImageDescriptor());
 					inputDefinition.setHeaderText(method.getPlatformIdent().getAgentName());
-					MethodIdent methodIdent = repositoryDefinition.getGlobalDataAccessService().getMethodIdentForId(method.getId());
+					MethodIdent methodIdent = repositoryDefinition.getCachedDataService().getMethodIdentForId(method.getId());
 					inputDefinition.setHeaderDescription(TextFormatter.getMethodString(methodIdent));
 
 					IdDefinition idDefinition = new IdDefinition();

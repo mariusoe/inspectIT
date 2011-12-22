@@ -1,10 +1,10 @@
 package info.novatec.inspectit.rcp.editor.text.input;
 
+import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.communication.data.MemoryInformationData;
 import info.novatec.inspectit.communication.data.SystemInformationData;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
-import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -84,7 +84,7 @@ public class MemoryInputController extends AbstractTextInputController {
 	/**
 	 * The global data access service.
 	 */
-	private CachedGlobalDataAccessService dataAccessService;
+	private IGlobalDataAccessService dataAccessService;
 
 	/**
 	 * {@inheritDoc}

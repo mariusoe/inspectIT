@@ -26,5 +26,6 @@ Bundle-ClassPath: .,
  lib/prod/jfreechart.jar,
  lib/prod/spring.jar,
  lib/prod/swtgraphics2d.jar,
- lib/prod/xstream.jar
+ lib/prod/xstream.jar,
+ lib/prod/cglib-nodep.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

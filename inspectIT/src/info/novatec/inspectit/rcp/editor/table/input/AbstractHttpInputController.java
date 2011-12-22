@@ -8,7 +8,7 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.Pre
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.TimeResolution;
-import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,7 +37,7 @@ public abstract class AbstractHttpInputController extends AbstractTableInputCont
 	/**
 	 * Global data access service.
 	 */
-	protected CachedGlobalDataAccessService dataAccessService;
+	protected CachedDataService cachedDataService;
 
 	/**
 	 * List of Timer data to be displayed.
@@ -90,7 +90,7 @@ public abstract class AbstractHttpInputController extends AbstractTableInputCont
 		template.setPlatformIdent(inputDefinition.getIdDefinition().getPlatformId());
 
 		httptimerDataAccessService = inputDefinition.getRepositoryDefinition().getHttpTimerDataAccessService();
-		dataAccessService = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService();
+		cachedDataService = inputDefinition.getRepositoryDefinition().getCachedDataService();
 	}
 
 	/**

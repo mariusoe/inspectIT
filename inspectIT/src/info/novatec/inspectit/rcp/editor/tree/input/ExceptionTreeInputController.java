@@ -10,7 +10,7 @@ import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.ExceptionImageFactory;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
-import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,16 +118,16 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 	}
 
 	/**
-	 * This data access service is needed because of the ID mappings.
+	 * The cached service is needed because of the ID mappings.
 	 */
-	private CachedGlobalDataAccessService globalDataAccessService;
+	private CachedDataService cachedDataService;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setInputDefinition(InputDefinition inputDefinition) {
 		super.setInputDefinition(inputDefinition);
-		globalDataAccessService = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService();
+		cachedDataService = inputDefinition.getRepositoryDefinition().getCachedDataService();
 	}
 
 	/**
@@ -181,7 +181,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 	 */
 	public void showDetails(Shell parent, Object element) {
 		final ExceptionSensorData data = (ExceptionSensorData) element;
-		final MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
+		final MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 
 		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
 		boolean takeFocusOnOpen = true;
@@ -296,7 +296,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 		@Override
 		public StyledString getStyledText(Object element, int index) {
 			ExceptionSensorData data = (ExceptionSensorData) element;
-			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			Column enumId = Column.fromOrd(index);
 
 			return getStyledTextForColumn(data, methodIdent, enumId);
@@ -314,7 +314,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 		@Override
 		public Image getColumnImage(Object element, int index) {
 			ExceptionSensorData data = (ExceptionSensorData) element;
-			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			Column enumId = Column.fromOrd(index);
 
 			switch (enumId) {
@@ -453,7 +453,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 		if (object instanceof ExceptionSensorData) {
 			ExceptionSensorData data = (ExceptionSensorData) object;
 			StringBuilder sb = new StringBuilder();
-			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			for (Column column : Column.values()) {
 				sb.append(getStyledTextForColumn(data, methodIdent, column).toString());
 				sb.append("\t");

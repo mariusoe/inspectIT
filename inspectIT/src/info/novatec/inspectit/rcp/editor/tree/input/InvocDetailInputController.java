@@ -20,7 +20,7 @@ import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.ExceptionImageFactory;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
-import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -161,9 +161,9 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	}
 
 	/**
-	 * This data access service is needed because of the ID mappings.
+	 * The cached service is needed because of the ID mappings.
 	 */
-	private CachedGlobalDataAccessService globalDataAccessService;
+	private CachedDataService cachedDataService;
 
 	/**
 	 * Current input of the tree.
@@ -175,7 +175,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	 */
 	public void setInputDefinition(InputDefinition inputDefinition) {
 		super.setInputDefinition(inputDefinition);
-		globalDataAccessService = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService();
+		cachedDataService = inputDefinition.getRepositoryDefinition().getCachedDataService();
 	}
 
 	/**
@@ -275,7 +275,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	 */
 	public void showDetails(Shell parent, Object element) {
 		final InvocationSequenceData data = (InvocationSequenceData) element;
-		final MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
+		final MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 
 		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
 		boolean takeFocusOnOpen = true;
@@ -502,7 +502,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		@Override
 		public StyledString getStyledText(Object element, int index) {
 			InvocationSequenceData data = (InvocationSequenceData) element;
-			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			Column enumId = Column.fromOrd(index);
 
 			return getStyledTextForColumn(data, methodIdent, enumId);
@@ -520,7 +520,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		@Override
 		public Image getColumnImage(Object element, int index) {
 			InvocationSequenceData data = (InvocationSequenceData) element;
-			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			Column enumId = Column.fromOrd(index);
 
 			switch (enumId) {
@@ -810,7 +810,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				if (element instanceof InvocationSequenceData) {
 					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) element;
-					MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(invocationSequenceData.getMethodIdent());
+					MethodIdent methodIdent = cachedDataService.getMethodIdentForId(invocationSequenceData.getMethodIdent());
 					Set<MethodSensorTypeIdent> methodSensorTypes = methodIdent.getMethodSensorTypeIdents();
 					Set<SensorTypeEnum> sensorTypes = SensorTypeEnum.getAllOf(methodSensorTypes);
 					sensorTypes.retainAll(selectedSensorTypes);
@@ -888,7 +888,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				if (element instanceof InvocationSequenceData) {
 					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) element;
-					MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(invocationSequenceData.getMethodIdent());
+					MethodIdent methodIdent = cachedDataService.getMethodIdentForId(invocationSequenceData.getMethodIdent());
 					Set<MethodSensorTypeIdent> methodSensorTypes = methodIdent.getMethodSensorTypeIdents();
 					Set<SensorTypeEnum> sensorTypes = SensorTypeEnum.getAllOf(methodSensorTypes);
 					if (sensorTypes.contains(SensorTypeEnum.JDBC_PREPARED_STATEMENT)) {
@@ -955,7 +955,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		if (object instanceof InvocationSequenceData) {
 			InvocationSequenceData data = (InvocationSequenceData) object;
 			StringBuilder sb = new StringBuilder();
-			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			for (Column column : Column.values()) {
 				sb.append(getStyledTextForColumn(data, methodIdent, column).toString());
 				sb.append("\t");

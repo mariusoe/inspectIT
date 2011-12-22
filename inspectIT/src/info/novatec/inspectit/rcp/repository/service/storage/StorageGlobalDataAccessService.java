@@ -1,9 +1,9 @@
 package info.novatec.inspectit.rcp.repository.service.storage;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
+import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
-import info.novatec.inspectit.rcp.repository.service.AbstractCachedGlobalDataAccessService;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -21,12 +21,13 @@ import java.util.zip.GZIPInputStream;
  * @author Patrice Bouillet
  * 
  */
-public class StorageGlobalDataAcessService extends AbstractCachedGlobalDataAccessService {
+public class StorageGlobalDataAccessService implements IGlobalDataAccessService {
 
 	/**
 	 * The definition.
 	 */
 	private StorageRepositoryDefinition storageRepositoryDefinition;
+	
 
 	/**
 	 * Only constructor which needs a root path to be passed.
@@ -34,7 +35,7 @@ public class StorageGlobalDataAcessService extends AbstractCachedGlobalDataAcces
 	 * @param storageRepositoryDefinition
 	 *            the root path.
 	 */
-	public StorageGlobalDataAcessService(StorageRepositoryDefinition storageRepositoryDefinition) {
+	public StorageGlobalDataAccessService(StorageRepositoryDefinition storageRepositoryDefinition) {
 		this.storageRepositoryDefinition = storageRepositoryDefinition;
 	}
 
@@ -52,8 +53,6 @@ public class StorageGlobalDataAcessService extends AbstractCachedGlobalDataAcces
 				throw new RuntimeException("Path is not a folder: " + storageRepositoryDefinition.getPath());
 			}
 		}
-
-		putIntoCache(platformIdents);
 
 		return platformIdents;
 	}
@@ -134,7 +133,6 @@ public class StorageGlobalDataAcessService extends AbstractCachedGlobalDataAcces
 	/**
 	 * Not supported.
 	 */
-	@Override
 	public List<? extends DefaultData> getLastDataObjects(DefaultData template, long timeInterval) {
 		throw new UnsupportedOperationException();
 	}
@@ -142,7 +140,6 @@ public class StorageGlobalDataAcessService extends AbstractCachedGlobalDataAcces
 	/**
 	 * Not supported.
 	 */
-	@Override
 	public DefaultData getLastDataObject(DefaultData template) {
 		throw new UnsupportedOperationException();
 	}
@@ -150,7 +147,6 @@ public class StorageGlobalDataAcessService extends AbstractCachedGlobalDataAcces
 	/**
 	 * Not supported.
 	 */
-	@Override
 	public List<? extends DefaultData> getDataObjectsSinceId(DefaultData template) {
 		throw new UnsupportedOperationException();
 	}
@@ -158,7 +154,6 @@ public class StorageGlobalDataAcessService extends AbstractCachedGlobalDataAcces
 	/**
 	 * Not supported.
 	 */
-	@Override
 	public List<? extends DefaultData> getDataObjectsSinceIdIgnoreMethodId(DefaultData template) {
 		throw new UnsupportedOperationException();
 	}
@@ -166,7 +161,6 @@ public class StorageGlobalDataAcessService extends AbstractCachedGlobalDataAcces
 	/**
 	 * Not supported.
 	 */
-	@Override
 	public List<? extends DefaultData> getDataObjectsFromToDate(DefaultData template, Date fromDate, Date toDate) {
 		throw new UnsupportedOperationException();
 	}

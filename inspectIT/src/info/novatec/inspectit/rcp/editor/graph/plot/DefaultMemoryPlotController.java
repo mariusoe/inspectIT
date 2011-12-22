@@ -1,10 +1,10 @@
 package info.novatec.inspectit.rcp.editor.graph.plot;
 
+import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.communication.data.MemoryInformationData;
 import info.novatec.inspectit.communication.data.SystemInformationData;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
-import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -91,7 +91,7 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 	/**
 	 * The data access service to access the data on the CMR.
 	 */
-	private CachedGlobalDataAccessService dataAccessService;
+	private IGlobalDataAccessService dataAccessService;
 
 	/**
 	 * Old list containing some data objects which could be reused.

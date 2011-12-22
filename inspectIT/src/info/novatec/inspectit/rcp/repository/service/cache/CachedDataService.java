@@ -1,14 +1,16 @@
-package info.novatec.inspectit.rcp.repository.service;
+package info.novatec.inspectit.rcp.repository.service.cache;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
+import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.core.runtime.Assert;
 /**
  * The default implementation of the cached ident objects. Provides a protected-visible method to
  * analyze and put a list of platform ident objects into the cache.
@@ -16,7 +18,22 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Patrice Bouillet
  * 
  */
-public abstract class AbstractCachedGlobalDataAccessService implements CachedGlobalDataAccessService {
+public class CachedDataService {
+
+	/**
+	 * Delegated service.
+	 */
+	private IGlobalDataAccessService globalDataAccessService;
+
+	/**
+	 * @param globalDataAccessService
+	 *            Delegated service.
+	 */
+	public CachedDataService(IGlobalDataAccessService globalDataAccessService) {
+		super();
+		Assert.isNotNull(globalDataAccessService);
+		this.globalDataAccessService = globalDataAccessService;
+	}
 
 	/**
 	 * This map is needed to store the mapping between the ID's and the {@link PlatformIdent}
@@ -40,15 +57,15 @@ public abstract class AbstractCachedGlobalDataAccessService implements CachedGlo
 	 * Analyzes the platform ident objects and puts these into a cache for faster retrieval of
 	 * ID->ident objects.
 	 * 
-	 * @param platformIdents
+	 * @param agents
 	 *            The list of platform ident objects to cache.
 	 */
-	protected void putIntoCache(List<PlatformIdent> platformIdents) {
+	public void putIntoCache(List<? extends PlatformIdent> agents) {
 		platformMap.clear();
 		methodMap.clear();
 		sensorTypeMap.clear();
 
-		for (PlatformIdent platformIdent : platformIdents) {
+		for (PlatformIdent platformIdent : agents) {
 			platformMap.put(platformIdent.getId(), platformIdent);
 
 			for (MethodIdent methodIdent : (Set<MethodIdent>) platformIdent.getMethodIdents()) {
@@ -72,7 +89,6 @@ public abstract class AbstractCachedGlobalDataAccessService implements CachedGlo
 	 *            The long value.
 	 * @return The {@link PlatformIdent} object.
 	 */
-	@Override
 	public PlatformIdent getPlatformIdentForId(long platformId) {
 		Long id = Long.valueOf(platformId);
 		if (!platformMap.containsKey(id)) {
@@ -89,7 +105,6 @@ public abstract class AbstractCachedGlobalDataAccessService implements CachedGlo
 	 *            The long value.
 	 * @return The {@link SensorTypeIdent} object.
 	 */
-	@Override
 	public SensorTypeIdent getSensorTypeIdentForId(long sensorTypeId) {
 		Long id = Long.valueOf(sensorTypeId);
 		if (!sensorTypeMap.containsKey(id)) {
@@ -106,7 +121,6 @@ public abstract class AbstractCachedGlobalDataAccessService implements CachedGlo
 	 *            The long value.
 	 * @return The {@link MethodIdent} object.
 	 */
-	@Override
 	public MethodIdent getMethodIdentForId(long methodId) {
 		Long id = Long.valueOf(methodId);
 		if (!methodMap.containsKey(id)) {
@@ -120,7 +134,8 @@ public abstract class AbstractCachedGlobalDataAccessService implements CachedGlo
 	 * Internal refresh of the idents. Currently everything is loaded again.
 	 */
 	private void refreshIdents() {
-		getConnectedAgents();
+		List<? extends PlatformIdent> agents = globalDataAccessService.getConnectedAgents();
+		putIntoCache(agents);
 	}
 
 }

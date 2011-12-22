@@ -15,7 +15,7 @@ import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
-import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -143,9 +143,9 @@ public class SqlInputController extends AbstractTableInputController {
 	private ISqlDataAccessService dataAccessService;
 
 	/**
-	 * This data access service is needed because of the ID mappings.
+	 * The cached service is needed because of the ID mappings.
 	 */
-	private CachedGlobalDataAccessService globalDataAccessService;
+	private CachedDataService cachedDataService;
 
 	/**
 	 * Date to display invocations from.
@@ -179,7 +179,7 @@ public class SqlInputController extends AbstractTableInputController {
 		template.setId(-1);
 
 		dataAccessService = inputDefinition.getRepositoryDefinition().getSqlDataAccessService();
-		globalDataAccessService = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService();
+		cachedDataService = inputDefinition.getRepositoryDefinition().getCachedDataService();
 	}
 
 	/**
@@ -427,7 +427,7 @@ public class SqlInputController extends AbstractTableInputController {
 	 */
 	public void showDetails(Shell parent, Object element) {
 		final SqlStatementData data = (SqlStatementData) element;
-		final MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
+		final MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 
 		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
 		boolean takeFocusOnOpen = true;
@@ -552,7 +552,7 @@ public class SqlInputController extends AbstractTableInputController {
 		case MAX:
 			return new StyledString(NumberFormatter.formatDouble(data.getMax(), timeDecimalPlaces));
 		case METHOD:
-			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			return TextFormatter.getStyledMethodString(methodIdent);
 		case DURATION:
 			return new StyledString(NumberFormatter.formatDouble(data.getDuration(), timeDecimalPlaces));

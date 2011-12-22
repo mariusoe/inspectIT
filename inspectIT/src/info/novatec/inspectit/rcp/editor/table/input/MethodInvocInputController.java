@@ -11,7 +11,7 @@ import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
-import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -119,9 +119,9 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	}
 
 	/**
-	 * This data access service is needed because of the ID mappings.
+	 * The cached service is needed because of the ID mappings.
 	 */
-	private CachedGlobalDataAccessService dataAccessService;
+	private CachedDataService cachedDataService;
 
 	/**
 	 * Empty styled string.
@@ -135,7 +135,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	public void setInputDefinition(InputDefinition inputDefinition) {
 		super.setInputDefinition(inputDefinition);
 
-		dataAccessService = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService();
+		cachedDataService = inputDefinition.getRepositoryDefinition().getCachedDataService();
 	}
 
 	/**
@@ -360,7 +360,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		@Override
 		public StyledString getStyledText(Object element, int index) {
 			TimerData data = (TimerData) element;
-			MethodIdent methodIdent = dataAccessService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			Column enumId = Column.fromOrd(index);
 
 			return getStyledTextForColumn(data, methodIdent, enumId);
@@ -381,8 +381,8 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		 */
 		@Override
 		protected int compareElements(Viewer viewer, TimerData timer1, TimerData timer2) {
-			MethodIdent methodIdent1 = dataAccessService.getMethodIdentForId(timer1.getMethodIdent());
-			MethodIdent methodIdent2 = dataAccessService.getMethodIdentForId(timer2.getMethodIdent());
+			MethodIdent methodIdent1 = cachedDataService.getMethodIdentForId(timer1.getMethodIdent());
+			MethodIdent methodIdent2 = cachedDataService.getMethodIdentForId(timer2.getMethodIdent());
 
 			switch ((Column) getEnumSortColumn()) {
 			case PACKAGE:
@@ -543,7 +543,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		if (object instanceof TimerData) {
 			TimerData data = (TimerData) object;
 			StringBuilder sb = new StringBuilder();
-			MethodIdent methodIdent = dataAccessService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			for (Column column : Column.values()) {
 				sb.append(getStyledTextForColumn(data, methodIdent, column).toString());
 				sb.append("\t");

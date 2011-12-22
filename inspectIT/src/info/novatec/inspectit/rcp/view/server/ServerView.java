@@ -6,22 +6,22 @@ import info.novatec.inspectit.rcp.handlers.OpenViewHandler;
 import info.novatec.inspectit.rcp.model.Component;
 import info.novatec.inspectit.rcp.model.StorageTreeModelManager;
 import info.novatec.inspectit.rcp.model.TreeModelManager;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryChangeListener;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
-import info.novatec.inspectit.rcp.repository.RepositoryChangeListener;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.RepositoryManager;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.expressions.IEvaluationContext;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -55,9 +55,10 @@ import org.eclipse.ui.part.ViewPart;
  * server contains a separate tree view which displays the information of this specific server.
  * 
  * @author Patrice Bouillet
+ * @author Ivan Senic
  * 
  */
-public class ServerView extends ViewPart implements RepositoryChangeListener {
+public class ServerView extends ViewPart implements CmrRepositoryChangeListener {
 
 	/**
 	 * The ID of this view.
@@ -94,6 +95,24 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	 */
 	private List<TreeViewer> treeViewers = new ArrayList<TreeViewer>();
 
+	/**
+	 * Map of repositry definitions and selfs.
+	 */
+	private Map<RepositoryDefinition, CmrRepositoryShelfItem> repositoryShelfMap = new ConcurrentHashMap<RepositoryDefinition, CmrRepositoryShelfItem>();
+
+	/**
+	 * Map of online repositories and their statuses.
+	 */
+	private Map<CmrRepositoryDefinition, OnlineStatus> repositoryStatusMap = new ConcurrentHashMap<CmrRepositoryDefinition, CmrRepositoryDefinition.OnlineStatus>();
+
+	/**
+	 * Storage shelf.
+	 */
+	private PShelfItem storageShelf;
+
+	/**
+	 * Selection provider.
+	 */
 	private SelectionProviderIntermediate selectionProviderIntermediate = new SelectionProviderIntermediate();
 
 	/**
@@ -118,8 +137,11 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 
 		// create all items
 		RepositoryManager repositoryManager = InspectIT.getDefault().getRepositoryManager();
+		repositoryManager.addRepositoryChangeListener(this);
 		for (RepositoryDefinition repositoryDefinition : repositoryManager.getRepositoryDefinitions()) {
-			createServerItem(pShelf, repositoryDefinition, pShelf.getItems().length);
+			if (repositoryDefinition instanceof CmrRepositoryDefinition) {
+				createServerItem(pShelf, (CmrRepositoryDefinition) repositoryDefinition, pShelf.getItems().length);
+			}
 		}
 
 		// create the storage area
@@ -145,7 +167,6 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 			}
 		});
 
-		repositoryManager.addRepositoryChangeListener(this);
 	}
 
 	/**
@@ -172,39 +193,26 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	 *            The container for the item.
 	 * @param repositoryDefinition
 	 *            The repository definition for this item.
+	 * @param index
+	 *            Index of shelf.
 	 */
-	private void createServerItem(PShelf pShelf, final RepositoryDefinition repositoryDefinition, int index) {
-		final PShelfItem item = new PShelfItem(pShelf, SWT.NONE, index);
-
-		UpdateRepositoryJob updateRepositoryJob = new UpdateRepositoryJob(item, repositoryDefinition);
-		updateRepositoryJob.schedule();
+	private void createServerItem(PShelf pShelf, final CmrRepositoryDefinition repositoryDefinition, int index) {
+		CmrRepositoryShelfItem cmrRepositoryShelfItem = new CmrRepositoryShelfItem(pShelf, index, repositoryDefinition);
+		repositoryShelfMap.put(repositoryDefinition, cmrRepositoryShelfItem);
+		cmrRepositoryShelfItem.updateCmrRepresentation();
 	}
 
 	/**
 	 * Deletes an already existing server item.
 	 * 
-	 * @param shelf
-	 *            The container for the item.
 	 * @param repositoryDefinition
 	 *            The repository definition which is contained in one of the items.
 	 */
-	private void deleteServerItem(PShelf shelf, RepositoryDefinition repositoryDefinition) {
-		PShelfItem[] items = shelf.getItems();
-
-		// search for the corresponding item which holds this repo definition.
-		for (PShelfItem shelfItem : items) {
-			if (shelfItem.getData().equals(repositoryDefinition)) {
-				if (shelfItem.getBody().getChildren().length > 0) {
-					if (shelfItem.getBody().getChildren()[0] instanceof Tree) {
-						Tree tree = (Tree) shelfItem.getBody().getChildren()[0];
-						TreeViewer treeViewer = findTreeViewer(tree);
-						treeViewers.remove(treeViewer);
-					}
-					selectionProviderIntermediate.setSelectionProviderDelegate(null);
-				}
-				shelfItem.dispose();
-				break;
-			}
+	private void deleteServerItem(CmrRepositoryDefinition repositoryDefinition) {
+		CmrRepositoryShelfItem shelfItem = repositoryShelfMap.remove(repositoryDefinition);
+		repositoryStatusMap.remove(repositoryDefinition);
+		if (null != shelfItem) {
+			shelfItem.dispose();
 		}
 	}
 
@@ -265,79 +273,77 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	 * {@inheritDoc}
 	 */
 	public void repositoryAdded(RepositoryDefinition repositoryDefinition) {
-		createServerItem(pShelf, repositoryDefinition, pShelf.getItems().length - 1);
+		if (repositoryDefinition instanceof CmrRepositoryDefinition) {
+			createServerItem(pShelf, (CmrRepositoryDefinition) repositoryDefinition, pShelf.getItems().length - 1);
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void repositoryRemoved(RepositoryDefinition repositoryDefinition) {
-		deleteServerItem(pShelf, repositoryDefinition);
+		if (repositoryDefinition instanceof CmrRepositoryDefinition) {
+			deleteServerItem((CmrRepositoryDefinition) repositoryDefinition);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void repositoryOnlineStatusUpdated(CmrRepositoryDefinition repositoryDefinition, OnlineStatus oldStatus, OnlineStatus newStatus) {
+		final CmrRepositoryShelfItem shelfItem = repositoryShelfMap.get(repositoryDefinition);
+		if (null != shelfItem) {
+			Display.getDefault().syncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					shelfItem.updateStatusImage();
+				}
+			});
+			OnlineStatus oldKnownStatus = repositoryStatusMap.get(repositoryDefinition);
+			if (null == oldKnownStatus || (oldKnownStatus == OnlineStatus.OFFLINE && newStatus == OnlineStatus.ONLINE)) {
+				Display.getDefault().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						shelfItem.updateCmrRepresentation();
+					}
+				});
+			}
+			if (newStatus == OnlineStatus.ONLINE || newStatus == OnlineStatus.OFFLINE) {
+				repositoryStatusMap.put(repositoryDefinition, newStatus);
+			}
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void updateRepository(RepositoryDefinition repositoryDefinition) {
-		PShelfItem[] items = pShelf.getItems();
-
-		// search for the corresponding item which holds this repository
-		// definition.
-		for (final PShelfItem shelfItem : items) {
-			if (shelfItem.getData().equals(repositoryDefinition)) {
-				Control[] controls = shelfItem.getBody().getChildren();
-				for (Control control : controls) {
-					if (control instanceof Tree) {
-						TreeViewer viewer = findTreeViewer((Tree) control);
-						if (null != viewer) {
-							treeViewers.remove(viewer);
-						}
-					}
-					control.dispose();
-				}
-
-				// always clear the selection provider
-				selectionProviderIntermediate.setSelectionProviderDelegate(null);
-
-				if (repositoryDefinition instanceof CmrRepositoryDefinition) {
-					UpdateRepositoryJob updateRepositoryJob = new UpdateRepositoryJob(shelfItem, repositoryDefinition);
-					updateRepositoryJob.schedule();
-
-				} else if (repositoryDefinition instanceof StorageRepositoryDefinition) {
-					updateStorageArea(shelfItem, repositoryDefinition);
-				}
-				shelfItem.getBody().layout();
-				break;
-			}
+		if (repositoryDefinition instanceof StorageRepositoryDefinition) {
+			updateStorageRepository();
 		}
 	}
 
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public void updateStorageRepository() {
-		PShelfItem[] items = pShelf.getItems();
-
-		// search for the corresponding item which holds this repository
-		// definition.
-		for (PShelfItem shelfItem : items) {
-			if (shelfItem.getData() instanceof StorageRepositoryDefinition) {
-				Control[] controls = shelfItem.getBody().getChildren();
-				for (Control control : controls) {
-					if (control instanceof Tree) {
-						TreeViewer viewer = findTreeViewer((Tree) control);
-						if (null != viewer) {
-							treeViewers.remove(viewer);
-							if (viewer.equals(selectionProviderIntermediate.getSelectionProviderDelegate())) {
-								selectionProviderIntermediate.setSelectionProviderDelegate(null);
-							}
-						}
+		Control[] controls = storageShelf.getBody().getChildren();
+		for (Control control : controls) {
+			if (control instanceof Tree) {
+				TreeViewer viewer = findTreeViewer((Tree) control);
+				if (null != viewer) {
+					treeViewers.remove(viewer);
+					if (viewer.equals(selectionProviderIntermediate.getSelectionProviderDelegate())) {
+						selectionProviderIntermediate.setSelectionProviderDelegate(null);
 					}
-					control.dispose();
 				}
-				updateStorageArea(shelfItem, (StorageRepositoryDefinition) shelfItem.getData());
-				shelfItem.getBody().layout();
-				break;
 			}
+			control.dispose();
 		}
+		updateStorageArea(storageShelf, (StorageRepositoryDefinition) storageShelf.getData());
+		storageShelf.getBody().layout();
 	}
 
 	/**
@@ -350,23 +356,38 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 		return (RepositoryDefinition) pShelf.getSelection().getData();
 	}
 
+	/**
+	 * Creates storage area.
+	 * 
+	 * @param pShelf
+	 *            {@link PShelf}.
+	 */
 	private void createStorageArea(PShelf pShelf) {
-		PShelfItem item = new PShelfItem(pShelf, SWT.NONE);
+		storageShelf = new PShelfItem(pShelf, SWT.NONE);
 
 		RepositoryDefinition repositoryDefinition = new StorageRepositoryDefinition();
 
 		// Check the version of the CMR
-		item.setText("Storage Area");
-		item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_DATABASE));
-		item.getBody().setLayout(new FillLayout());
-		item.setData(repositoryDefinition);
+		storageShelf.setText("Storage Area");
+		storageShelf.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_DATABASE));
+		storageShelf.getBody().setLayout(new FillLayout());
+		storageShelf.setData(repositoryDefinition);
 
-		updateStorageArea(item, repositoryDefinition);
+		updateStorageArea(storageShelf, repositoryDefinition);
 	}
 
+	/**
+	 * Updates storage area.
+	 * 
+	 * @param item
+	 *            Storage shelf.
+	 * @param repositoryDefinition
+	 *            {@link RepositoryDefinition}.
+	 */
 	private void updateStorageArea(PShelfItem item, RepositoryDefinition repositoryDefinition) {
 		Tree tree = toolkit.createTree(item.getBody(), SWT.V_SCROLL | SWT.H_SCROLL);
-		final TreeViewer treeViewer = new TreeViewer(tree);
+
+		TreeViewer treeViewer = new TreeViewer(tree);
 		treeViewer.setContentProvider(new ServerViewContentProvider());
 		treeViewer.setLabelProvider(serverViewLabelProvider);
 		treeViewer.setComparator(serverViewSorter);
@@ -400,12 +421,12 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 	}
 
 	/**
-	 * Updates the repository in one {@link PShelfItem}.
+	 * {@link PShelfItem} for displaying {@link CmrRepositoryDefinition}.
 	 * 
 	 * @author Ivan Senic
 	 * 
 	 */
-	private class UpdateRepositoryJob extends Job {
+	private class CmrRepositoryShelfItem {
 
 		/**
 		 * Shelf.
@@ -415,7 +436,7 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 		/**
 		 * Repository.
 		 */
-		private RepositoryDefinition repositoryDefinition;
+		private CmrRepositoryDefinition repositoryDefinition;
 
 		/**
 		 * Info label.
@@ -423,89 +444,107 @@ public class ServerView extends ViewPart implements RepositoryChangeListener {
 		private Label infoLabel;
 
 		/**
-		 * Constructor with repository to update and shelf.
+		 * Default constructor.
 		 * 
-		 * @param item
-		 *            Shelf that needs to be update.
-		 * @param repositoryDefinition
-		 *            Repository that needs to be displayed in a shelf.
+		 * @param shelf
+		 *            {@link PShelf}
+		 * @param index
+		 *            Index.
+		 * @param cmrRepositoryDefinition
+		 *            {@link CmrRepositoryDefinition}.
 		 */
-		public UpdateRepositoryJob(PShelfItem item, RepositoryDefinition repositoryDefinition) {
-			super("Update Repository Job");
-			this.item = item;
-			this.repositoryDefinition = repositoryDefinition;
-			initializeUpdate();
+		public CmrRepositoryShelfItem(PShelf shelf, int index, CmrRepositoryDefinition cmrRepositoryDefinition) {
+			Assert.isNotNull(cmrRepositoryDefinition);
+			this.repositoryDefinition = cmrRepositoryDefinition;
+			this.item = new PShelfItem(shelf, SWT.NONE, index);
+			this.item.setData(cmrRepositoryDefinition);
 		}
 
 		/**
-		 * Set up the loading message.
+		 * Updates only the online status image.
 		 */
-		private void initializeUpdate() {
-			Display.getDefault().asyncExec(new Runnable() {
-
-				@Override
-				public void run() {
-					item.setText(repositoryDefinition.getIp() + " : " + repositoryDefinition.getPort() + " [v.  ? ]");
-					item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_REFRESH));
-					item.getBody().setLayout(new FillLayout());
-					item.setData(repositoryDefinition);
-
-					infoLabel = toolkit.createLabel(item.getBody(), "Loading repository...", SWT.WRAP | SWT.READ_ONLY);
-					item.getBody().layout();
-				}
-			});
-
-		}
-
-		/**
-		 * {@inheritDoc}
-		 * <p>
-		 * Performs the update of repository.
-		 */
-		@Override
-		protected IStatus run(IProgressMonitor monitor) {
-			if (repositoryDefinition.getServerStatusService().isOnline()) {
-				Display.getDefault().asyncExec(new Runnable() {
-
-					@Override
-					public void run() {
-						infoLabel.dispose();
-						item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_ONLINE));
-						item.setText(repositoryDefinition.getIp() + " : " + repositoryDefinition.getPort() + " [v. " + repositoryDefinition.getServerStatusService().getVersion() + " ]");
-
-						Tree tree = toolkit.createTree(item.getBody(), SWT.V_SCROLL | SWT.H_SCROLL);
-						final TreeViewer treeViewer = new TreeViewer(tree);
-						treeViewer.setContentProvider(new ServerViewContentProvider());
-						treeViewer.setLabelProvider(serverViewLabelProvider);
-						treeViewer.setComparator(serverViewSorter);
-						treeViewer.addDoubleClickListener(treeViewDoubleClickListener);
-						treeViewer.setInput(new TreeModelManager(repositoryDefinition));
-						treeViewer.expandToLevel(2);
-
-						ColumnViewerToolTipSupport.enableFor(treeViewer, ToolTip.NO_RECREATE);
-
-						treeViewers.add(treeViewer);
-
-						if (null == selectionProviderIntermediate.getSelectionProviderDelegate()) {
-							selectionProviderIntermediate.setSelectionProviderDelegate(treeViewer);
-						}
-						item.getBody().layout();
-					}
-				});
-			} else {
-				Display.getDefault().asyncExec(new Runnable() {
-
-					@Override
-					public void run() {
-						item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_OFFLINE));
-
-						infoLabel.setText("CMR is currently not online, please try again later!");
-						item.getBody().layout();
-					}
-				});
-
+		public void updateStatusImage() {
+			switch (repositoryDefinition.getOnlineStatus()) {
+			case ONLINE:
+				item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_ONLINE));
+				break;
+			case OFFLINE:
+				item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_OFFLINE));
+				break;
+			case CHECKING:
+				item.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_REFRESH));
+			default:
+				break;
 			}
-			return Status.OK_STATUS;
+		}
+
+		/**
+		 * update the shelf based on the CMR online status.
+		 */
+		public void updateCmrRepresentation() {
+			// dispose anything that was there before
+			disposeControls();
+			item.setText(repositoryDefinition.getIp() + " : " + repositoryDefinition.getPort() + " [v.  ? ]");
+			item.getBody().setLayout(new FillLayout());
+			updateStatusImage();
+			switch (repositoryDefinition.getOnlineStatus()) {
+			case ONLINE:
+				if (null != infoLabel && !infoLabel.isDisposed()) {
+					infoLabel.dispose();
+				}
+				item.setText(repositoryDefinition.getIp() + " : " + repositoryDefinition.getPort() + " [v. " + repositoryDefinition.getServerStatusService().getVersion() + " ]");
+
+				Tree tree = toolkit.createTree(item.getBody(), SWT.V_SCROLL | SWT.H_SCROLL);
+				final TreeViewer treeViewer = new TreeViewer(tree);
+				treeViewer.setContentProvider(new ServerViewContentProvider());
+				treeViewer.setLabelProvider(serverViewLabelProvider);
+				treeViewer.setComparator(serverViewSorter);
+				treeViewer.addDoubleClickListener(treeViewDoubleClickListener);
+				treeViewer.setInput(new TreeModelManager(repositoryDefinition));
+				treeViewer.expandToLevel(2);
+
+				ColumnViewerToolTipSupport.enableFor(treeViewer, ToolTip.NO_RECREATE);
+
+				treeViewers.add(treeViewer);
+
+				if (null == selectionProviderIntermediate.getSelectionProviderDelegate()) {
+					selectionProviderIntermediate.setSelectionProviderDelegate(treeViewer);
+				}
+				break;
+			case OFFLINE:
+				infoLabel = toolkit.createLabel(item.getBody(), "CMR is currently not online, please try again later!", SWT.WRAP | SWT.READ_ONLY);
+				break;
+			case CHECKING:
+				infoLabel = toolkit.createLabel(item.getBody(), "Loading repository...", SWT.WRAP | SWT.READ_ONLY);
+				break;
+			default:
+				break;
+			}
+
+			item.getBody().layout(true);
+		}
+
+		/**
+		 * Dispose it self.
+		 */
+		public void dispose() {
+			disposeControls();
+			selectionProviderIntermediate.setSelectionProviderDelegate(null);
+			item.dispose();
+		}
+
+		/**
+		 * Dispose all controls.
+		 */
+		private void disposeControls() {
+			for (Control control : item.getBody().getChildren()) {
+				if (control instanceof Tree) {
+					Tree tree = (Tree) item.getBody().getChildren()[0];
+					TreeViewer treeViewer = findTreeViewer(tree);
+					treeViewers.remove(treeViewer);
+				}
+				control.dispose();
+			}
 		}
 
 	}

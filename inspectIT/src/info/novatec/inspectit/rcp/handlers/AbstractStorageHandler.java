@@ -3,7 +3,6 @@ package info.novatec.inspectit.rcp.handlers;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
-import info.novatec.inspectit.rcp.repository.service.cmr.InvocationDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.storage.StorageInvocationDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.storage.StorageNamingConstants;
 
@@ -80,12 +79,7 @@ public abstract class AbstractStorageHandler extends AbstractHandler {
 				gzip = new GZIPOutputStream(bos);
 
 				// Now load the whole tree for each one and save it
-				if (dataAccessService instanceof InvocationDataAccessService) {
-					InvocationDataAccessService service = (InvocationDataAccessService) dataAccessService;
-					InvocationSequenceData invoc = (InvocationSequenceData) service.getInvocationSequenceDetail(invocationSequenceData);
-					xstream.toXML(invoc, gzip);
-					gzip.flush();
-				} else if (dataAccessService instanceof StorageInvocationDataAccessService) {
+				if (dataAccessService instanceof StorageInvocationDataAccessService) {
 					StorageInvocationDataAccessService service = (StorageInvocationDataAccessService) dataAccessService;
 					input = service.getStreamForInvocationSequence(invocationSequenceData);
 					byte[] b = new byte[4096];
@@ -97,8 +91,12 @@ public abstract class AbstractStorageHandler extends AbstractHandler {
 						bos.write(b, 0, read);
 					}
 					bos.flush();
+				} else if (dataAccessService instanceof IInvocationDataAccessService) {
+					IInvocationDataAccessService service = (IInvocationDataAccessService) dataAccessService;
+					InvocationSequenceData invoc = service.getInvocationSequenceDetail(invocationSequenceData);
+					xstream.toXML(invoc, gzip);
+					gzip.flush();
 				}
-
 			} catch (FileNotFoundException e) {
 				throw new ExecutionException("File not found while saving invocation sequences!", e);
 			} catch (IOException e) {

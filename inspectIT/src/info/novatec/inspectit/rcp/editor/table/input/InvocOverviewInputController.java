@@ -17,7 +17,7 @@ import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
-import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -138,9 +138,9 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	private IInvocationDataAccessService dataAccessService;
 
 	/**
-	 * This data access service is needed because of the ID mappings.
+	 * The cached service is needed because of the ID mappings.
 	 */
-	private CachedGlobalDataAccessService globalDataAccessService;
+	private CachedDataService cachedDataService;
 
 	/**
 	 * Date to display invocations from.
@@ -196,7 +196,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		template.setMethodIdent(inputDefinition.getIdDefinition().getMethodId());
 
 		dataAccessService = inputDefinition.getRepositoryDefinition().getInvocationDataAccessService();
-		globalDataAccessService = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService();
+		cachedDataService = inputDefinition.getRepositoryDefinition().getCachedDataService();
 	}
 
 	/**
@@ -392,7 +392,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		@Override
 		protected StyledString getStyledText(Object element, int index) {
 			InvocationSequenceData data = (InvocationSequenceData) element;
-			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			Column enumId = Column.fromOrd(index);
 
 			return getStyledTextForColumn(data, methodIdent, enumId);
@@ -509,7 +509,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		if (object instanceof InvocationSequenceData) {
 			InvocationSequenceData data = (InvocationSequenceData) object;
 			StringBuilder sb = new StringBuilder();
-			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			for (Column column : Column.values()) {
 				sb.append(getStyledTextForColumn(data, methodIdent, column).toString());
 				sb.append("\t");

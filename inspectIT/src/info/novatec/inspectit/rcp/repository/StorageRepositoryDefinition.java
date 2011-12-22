@@ -4,14 +4,15 @@ import info.novatec.inspectit.cmr.service.IBufferService;
 import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
+import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
+import info.novatec.inspectit.cmr.service.IServerStatusService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
-import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
-import info.novatec.inspectit.rcp.repository.service.cmr.ServerStatusService;
-import info.novatec.inspectit.rcp.repository.service.storage.StorageGlobalDataAcessService;
+import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
+import info.novatec.inspectit.rcp.repository.service.storage.StorageGlobalDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.storage.StorageInvocationDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.storage.StorageNamingConstants;
 
@@ -34,10 +35,28 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	private XStream xstream = new XStream(new JettisonMappedXmlDriver());
 
 	/**
+	 * {@link IInvocationDataAccessService} service.
+	 */
+	private IInvocationDataAccessService invocationDataAccessService;
+
+	/**
+	 * {@link IGlobalDataAccessService} service.
+	 */
+	private IGlobalDataAccessService globalDataAccessService;
+
+	/**
+	 * Caching component.
+	 */
+	private CachedDataService cachedDataService;
+
+	/**
 	 * The default constructor will use the default storage directory.
 	 */
 	public StorageRepositoryDefinition() {
 		this(StorageNamingConstants.DEFAULT_STORAGE_DIRECTORY);
+		invocationDataAccessService = new StorageInvocationDataAccessService(this);
+		globalDataAccessService = new StorageGlobalDataAccessService(this);
+		cachedDataService = new CachedDataService(globalDataAccessService);
 	}
 
 	/**
@@ -51,13 +70,18 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	}
 
 	@Override
-	public CachedGlobalDataAccessService getGlobalDataAccessService() {
-		return new StorageGlobalDataAcessService(this);
+	public CachedDataService getCachedDataService() {
+		return cachedDataService;
 	}
 
 	@Override
 	public IInvocationDataAccessService getInvocationDataAccessService() {
-		return new StorageInvocationDataAccessService(this);
+		return invocationDataAccessService;
+	}
+	
+	@Override
+	public IGlobalDataAccessService getGlobalDataAccessService() {
+		return globalDataAccessService;
 	}
 
 	public String getPath() {
@@ -96,7 +120,7 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	 * Not supported.
 	 */
 	@Override
-	public ServerStatusService getServerStatusService() {
+	public IServerStatusService getServerStatusService() {
 		throw new UnsupportedOperationException();
 	}
 

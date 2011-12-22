@@ -183,7 +183,7 @@ public final class TextFormatter {
 			return "Exception: " + exData.getThrowableType();
 		} else if (invAwareData instanceof TimerData) {
 			TimerData timerData = (TimerData) invAwareData;
-			MethodIdent methodIdent = repositoryDefinition.getGlobalDataAccessService().getMethodIdentForId(timerData.getMethodIdent());
+			MethodIdent methodIdent = repositoryDefinition.getCachedDataService().getMethodIdentForId(timerData.getMethodIdent());
 			return TextFormatter.getMethodString(methodIdent);
 		}
 		return "";

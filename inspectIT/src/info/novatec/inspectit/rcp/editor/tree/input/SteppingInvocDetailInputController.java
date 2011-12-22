@@ -9,7 +9,7 @@ import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.tree.SteppingTreeSubView;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
-import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
+import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 import info.novatec.inspectit.rcp.util.ElementOccurrenceCount;
 import info.novatec.inspectit.rcp.util.OccurrenceFinderFactory;
 
@@ -41,7 +41,7 @@ public class SteppingInvocDetailInputController extends InvocDetailInputControll
 	/**
 	 * Global data access service.
 	 */
-	private CachedGlobalDataAccessService globalDataAccessService;
+	private CachedDataService cachedDataService;
 
 	/**
 	 * Is stepping control be initially visible.
@@ -76,7 +76,7 @@ public class SteppingInvocDetailInputController extends InvocDetailInputControll
 			}
 		}
 
-		globalDataAccessService = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService();
+		cachedDataService = inputDefinition.getRepositoryDefinition().getCachedDataService();
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class SteppingInvocDetailInputController extends InvocDetailInputControll
 			return "SQL: " + sqlData.getSql();
 		} else if (invAwareData instanceof TimerData) {
 			TimerData timerData = (TimerData) invAwareData;
-			MethodIdent methodIdent = globalDataAccessService.getMethodIdentForId(timerData.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(timerData.getMethodIdent());
 			return TextFormatter.getMethodString(methodIdent);
 		} else if (invAwareData instanceof ExceptionSensorData) {
 			ExceptionSensorData exData = (ExceptionSensorData) invAwareData;

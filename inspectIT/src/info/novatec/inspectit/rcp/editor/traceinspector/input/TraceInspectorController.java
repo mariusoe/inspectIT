@@ -183,7 +183,7 @@ public class TraceInspectorController {
 			subSequence.setParentSequence(decorator);
 		}
 
-		MethodIdent methodIdent = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService().getMethodIdentForId(invocationSequence.getMethodIdent());
+		MethodIdent methodIdent = inputDefinition.getRepositoryDefinition().getCachedDataService().getMethodIdentForId(invocationSequence.getMethodIdent());
 		invocationBlock.setMethodIdent(methodIdent);
 		invocationBlock.setInvocationSequence(decorator);
 		return decorator;

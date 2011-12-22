@@ -43,7 +43,7 @@ public class NavigateToStartMethodInvocationHandler extends AbstractHandler {
 		if (selectedObject instanceof InvocationSequenceData) {
 			InvocationSequenceData invocationSequenceData = (InvocationSequenceData) selectedObject;
 
-			MethodIdent methodIdent = repositoryDefinition.getGlobalDataAccessService().getMethodIdentForId(invocationSequenceData.getMethodIdent());
+			MethodIdent methodIdent = repositoryDefinition.getCachedDataService().getMethodIdentForId(invocationSequenceData.getMethodIdent());
 
 			InputDefinition inputDefinition = new InputDefinition();
 			inputDefinition.setRepositoryDefinition(repositoryDefinition);

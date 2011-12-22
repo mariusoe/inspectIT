@@ -168,7 +168,7 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 			@Override
 			public StyledString getStyledText(Object element, int index) {
 				HttpTimerData data = (HttpTimerData) element;
-				MethodIdent methodIdent = dataAccessService.getMethodIdentForId(data.getMethodIdent());
+				MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 				Column enumId = Column.fromOrd(index);
 
 				return getStyledTextForColumn(data, methodIdent, enumId);
@@ -247,7 +247,7 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 		if (object instanceof HttpTimerData) {
 			HttpTimerData data = (HttpTimerData) object;
 			StringBuilder sb = new StringBuilder();
-			MethodIdent methodIdent = dataAccessService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			for (Column column : Column.values()) {
 				sb.append(getStyledTextForColumn(data, methodIdent, column).toString());
 				sb.append("\t");

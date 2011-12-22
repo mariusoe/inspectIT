@@ -4,13 +4,14 @@ import info.novatec.inspectit.cmr.service.IBufferService;
 import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
+import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
+import info.novatec.inspectit.cmr.service.IServerStatusService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
-import info.novatec.inspectit.rcp.repository.service.CachedGlobalDataAccessService;
-import info.novatec.inspectit.rcp.repository.service.cmr.ServerStatusService;
+import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 /**
  * The interface to the repository definition. A repository can be anywhere and anything, the
@@ -46,7 +47,7 @@ public interface RepositoryDefinition {
 	 * 
 	 * @return The server status service.
 	 */
-	ServerStatusService getServerStatusService();
+	IServerStatusService getServerStatusService();
 
 	/**
 	 * Returns the combined metrics data access service for this repository definition.
@@ -81,7 +82,7 @@ public interface RepositoryDefinition {
 	 * 
 	 * @return The global data access service.
 	 */
-	CachedGlobalDataAccessService getGlobalDataAccessService();
+	CachedDataService getCachedDataService();
 
 	/**
 	 * Returns the configuration interface data access service for this repository definition.
@@ -110,4 +111,11 @@ public interface RepositoryDefinition {
 	 * @return The http timer data access service.
 	 */
 	IHttpTimerDataAccessService getHttpTimerDataAccessService();
+
+	/**
+	 * Returns the {@link IGlobalDataAccessService}.
+	 * 
+	 * @return Returns the {@link IGlobalDataAccessService}.
+	 */
+	IGlobalDataAccessService getGlobalDataAccessService();
 }

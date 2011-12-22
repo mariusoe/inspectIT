@@ -5,6 +5,11 @@
 
 	<bean id="ctx"
 		class="org.springframework.context.support.ClassPathXmlApplicationContext">
+		<constructor-arg>
+			<list>
+				<value>spring/spring-context-model.xml</value>
+			</list>
+		</constructor-arg>
 	</bean>
 
 </beans>

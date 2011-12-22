@@ -4,6 +4,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
+import info.novatec.inspectit.rcp.repository.RepositoryManager;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.graphics.Image;
@@ -34,7 +35,12 @@ public class NewRepositoryDefinitionWizard extends Wizard {
 		int port = Integer.parseInt(newRepositoryDefinitionPage.getPort());
 
 		RepositoryDefinition repositoryDefinition = new CmrRepositoryDefinition(ip, port);
-		InspectIT.getDefault().getRepositoryManager().addRepositoryDefinition(repositoryDefinition);
+		RepositoryManager repositoryManager = InspectIT.getDefault().getRepositoryManager();
+		if (!repositoryManager.getRepositoryDefinitions().contains(repositoryDefinition)) {
+			repositoryManager.addRepositoryDefinition(repositoryDefinition);
+		} else {
+			InspectIT.getDefault().createInfoDialog("The repository definition: " + repositoryDefinition.getIp() + ":" + repositoryDefinition.getPort() + " already exists.", -1);
+		}
 
 		return true;
 	}

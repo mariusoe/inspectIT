@@ -20,6 +20,7 @@
 	<dependencies>
 		<dependency org="commons-logging" name="commons-logging" rev="1.0.3" conf="prod->default" />
 		<dependency org="org.springframework" name="spring" rev="2.5.5" transitive="false" conf="prod->default" />
+		<dependency org="cglib" name="cglib-nodep" rev="2.1_3" transitive="false" conf="prod->default"/>
 		<dependency org="org.codehaus.jettison" name="jettison" rev="1.1" transitive="false" conf="prod->default" />
 		<dependency org="org.hibernate" name="hibernate-core" rev="3.5.3-Final" transitive="false" conf="prod->default" />
 		<dependency org="org.codehaus.jettison" name="jettison" rev="1.2" transitive="false" conf="prod->default" />

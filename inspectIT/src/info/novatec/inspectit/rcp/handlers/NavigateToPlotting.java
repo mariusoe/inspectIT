@@ -56,7 +56,7 @@ public class NavigateToPlotting extends AbstractHandler {
 			return null;
 		}
 
-		MethodIdent methodIdent = repositoryDefinition.getGlobalDataAccessService().getMethodIdentForId(timerData.getMethodIdent());
+		MethodIdent methodIdent = repositoryDefinition.getCachedDataService().getMethodIdentForId(timerData.getMethodIdent());
 		inputDefinition = new InputDefinition();
 		inputDefinition.setRepositoryDefinition(repositoryDefinition);
 		inputDefinition.setId(SensorTypeEnum.TIMER);
