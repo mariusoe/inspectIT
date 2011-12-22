@@ -31,20 +31,26 @@ import org.testng.annotations.Test;
  * @author Ivan Senic
  * 
  */
-@ContextConfiguration(locations = { "classpath:spring/spring-context-property.xml", "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
+@ContextConfiguration(locations = { "classpath:spring/spring-context-property.xml", "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model-test.xml" })
 public class TimerDataAggregatorTest extends AbstractTransactionalTestNGLogSupport {
 
-	private static final int CLEANING_PERIOD = 10000;
-
+	/**
+	 * Inital sleep period.
+	 */
 	private long initCleanPeriod;
 
+	/**
+	 * {@link TimerDataAggregator} to test.
+	 */
 	@Autowired
 	private TimerDataAggregator aggregator;
 
+	/**
+	 * Initialize.
+	 */
 	@BeforeClass
 	public void initOwnValues() {
 		initCleanPeriod = aggregator.getCacheCleanSleepingPeriod();
-		aggregator.setCacheCleanSleepingPeriod(CLEANING_PERIOD);
 	}
 
 	/**
@@ -106,7 +112,7 @@ public class TimerDataAggregatorTest extends AbstractTransactionalTestNGLogSuppo
 
 		// sleep until all objects are persisted
 		try {
-			Thread.sleep(initCleanPeriod + CLEANING_PERIOD * 2);
+			Thread.sleep(initCleanPeriod * 3);
 		} catch (InterruptedException e) {
 			Thread.interrupted();
 		}
