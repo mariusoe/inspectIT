@@ -1,6 +1,6 @@
 package info.novatec.inspectit.rcp.handlers;
 
-import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
@@ -104,7 +104,7 @@ public class AddToSteppingObjectsHandler extends AbstractHandler {
 			return template;
 		} else if (invocationAwareData instanceof ExceptionSensorData) {
 			ExceptionSensorData template = OccurrenceFinderFactory.getEmptyTemplate((ExceptionSensorData) invocationAwareData);
-			template.setExceptionEvent(ExceptionEventEnum.CREATED);
+			template.setExceptionEvent(ExceptionEvent.CREATED);
 			template.setThrowableType(((ExceptionSensorData) invocationAwareData).getThrowableType());
 			return template;
 		}

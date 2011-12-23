@@ -2,7 +2,7 @@ package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.rcp.InspectIT;
@@ -381,7 +381,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 				Collections.reverse(result);
 				// update the error message on each object
 				for (ExceptionSensorData data : result) {
-					if (ExceptionEventEnum.CREATED.equals(data.getExceptionEvent())) {
+					if (ExceptionEvent.CREATED.equals(data.getExceptionEvent())) {
 						updateErrorMessage(data);
 					}
 				}
@@ -413,7 +413,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		private List<ExceptionSensorData> extractOverviewAndUpdateDetails(List<ExceptionSensorData> exceptionSensorDataList) {
 			List<ExceptionSensorData> overviewObjects = new ArrayList<ExceptionSensorData>();
 			for (ExceptionSensorData exceptionSensorData : exceptionSensorDataList) {
-				if (exceptionSensorData.getExceptionEvent().equals(ExceptionEventEnum.CREATED)) {
+				if (exceptionSensorData.getExceptionEvent().equals(ExceptionEvent.CREATED)) {
 					overviewObjects.add(exceptionSensorData);
 				}
 

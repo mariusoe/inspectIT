@@ -40,7 +40,7 @@ public class CombinedMetricsDataDaoImpl extends HibernateDaoSupport implements C
 	public CombinedMetricsDataDaoImpl(SessionFactory sessionFactory) {
 		setSessionFactory(sessionFactory);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

@@ -31,23 +31,20 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 	 * Period of time in which all timer data should be aggregated. In milliseconds.
 	 */
 	@Value("${cmr.aggregationPeriod}")
-	private long aggregationPeriod;
+	long aggregationPeriod;
 
 	/**
 	 * Max elements in the cache.
 	 */
 	@Value("${cmr.maxElements}")
-	private int maxElements;
+	int maxElements;
 
 	/**
 	 * Sleeping period for thread that is cleaning the cache (persisting the objects). In
 	 * milliseconds.
-	 * 
-	 * This field is protected during the need that the testcase {@link TimerDataAggregatorTest}
-	 * have to overwrite it.
 	 */
 	@Value("${cmr.cacheCleanSleepingPeriod}")
-	protected long cacheCleanSleepingPeriod;
+	long cacheCleanSleepingPeriod;
 
 	/**
 	 * Current element count in cache.
@@ -101,7 +98,7 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 
 		CacheCleaner cacheCleaner = new CacheCleaner();
 		cacheCleaner.start();
-		
+
 		setSessionFactory(sessionFactory);
 	}
 

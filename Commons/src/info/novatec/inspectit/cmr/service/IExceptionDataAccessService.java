@@ -13,6 +13,7 @@ import java.util.List;
  * @author Eduard Tudenhoefner
  * 
  */
+@ServiceInterface(exporter = ServiceExporterType.HTTP)
 public interface IExceptionDataAccessService {
 
 	/**

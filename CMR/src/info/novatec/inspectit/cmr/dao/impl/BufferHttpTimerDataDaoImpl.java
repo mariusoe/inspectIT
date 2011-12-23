@@ -13,21 +13,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
 /**
  * Provides <code>HttpTimerData</code> information from the CMR internal in memory buffer.
  * 
  * @author Stefan Siegl
  */
+@Repository
 public class BufferHttpTimerDataDaoImpl implements HttpTimerDataDao {
 
 	/**
 	 * Indexing tree to search for data.
 	 */
+	@Autowired
 	private ITreeComponent<HttpTimerData> indexingTree;
 
 	/**
 	 * Index query provider.
 	 */
+	@Autowired
 	private IndexQueryProvider indexQueryProvider;
 
 	/**
@@ -202,26 +208,6 @@ public class BufferHttpTimerDataDaoImpl implements HttpTimerDataDao {
 		}
 		clone.setRequestMethod(data.getRequestMethod());
 		return clone;
-	}
-
-	/**
-	 * Setter for dependency injection.
-	 * 
-	 * @param indexingTree
-	 *            indexingTree
-	 */
-	public void setIndexingTree(ITreeComponent<HttpTimerData> indexingTree) {
-		this.indexingTree = indexingTree;
-	}
-
-	/**
-	 * Setter for dependency injection.
-	 * 
-	 * @param indexQueryProvider
-	 *            indexQueryProvider
-	 */
-	public void setIndexQueryProvider(IndexQueryProvider indexQueryProvider) {
-		this.indexQueryProvider = indexQueryProvider;
 	}
 
 	/**

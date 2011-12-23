@@ -2,6 +2,14 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
+	<classpathentry exported="true" kind="lib" path="lib/prod/aopalliance.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/prod/spring-aop.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/prod/spring-expression.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/prod/spring-asm.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/prod/spring-beans.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/prod/spring-context.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/prod/spring-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/prod/spring-web.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.nebula.cwt_0.9.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.nebula.widgets.cdatetime_0.14.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.nebula.widgets.pshelf_1.0.0.jar"/>

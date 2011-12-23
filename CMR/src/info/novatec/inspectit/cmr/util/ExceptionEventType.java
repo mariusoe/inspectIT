@@ -1,6 +1,6 @@
 package info.novatec.inspectit.cmr.util;
 
-import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.ExceptionEvent;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;
@@ -12,7 +12,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.usertype.UserType;
 
 /**
- * User type for Hibernate to map the {@link ExceptionEventEnum} class into the database.
+ * User type for Hibernate to map the {@link ExceptionEvent} class into the database.
  * 
  * @author Patrice Bouillet
  * 
@@ -53,10 +53,10 @@ public class ExceptionEventType implements UserType {
 	 */
 	@Override
 	public Object nullSafeGet(ResultSet resultSet, String[] names, Object owner) throws HibernateException, SQLException {
-		ExceptionEventEnum result = null;
+		ExceptionEvent result = null;
 		int dbValue = resultSet.getInt(names[0]);
 		if (dbValue != -1) {
-			result = ExceptionEventEnum.fromInt(dbValue);
+			result = ExceptionEvent.fromOrd(dbValue);
 		}
 		return result;
 	}
@@ -69,8 +69,8 @@ public class ExceptionEventType implements UserType {
 		if (null == value) {
 			statement.setInt(index, -1);
 		} else {
-			ExceptionEventEnum event = (ExceptionEventEnum) value;
-			int dbValue = event.getValue();
+			ExceptionEvent event = (ExceptionEvent) value;
+			int dbValue = event.ordinal();
 			statement.setInt(index, dbValue);
 		}
 	}
@@ -87,8 +87,8 @@ public class ExceptionEventType implements UserType {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Class<ExceptionEventEnum> returnedClass() {
-		return ExceptionEventEnum.class;
+	public Class<ExceptionEvent> returnedClass() {
+		return ExceptionEvent.class;
 	}
 
 	/**

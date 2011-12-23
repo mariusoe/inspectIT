@@ -1,12 +1,14 @@
 package info.novatec.inspectit.cmr.service;
 
+import info.novatec.inspectit.cmr.spring.aop.MethodLog;
+import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.versioning.IVersioningService;
-
-import javax.annotation.PostConstruct;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +22,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class ServerStatusService implements IServerStatusService {
 
-	/**
-	 * The logger of this class.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(ServerStatusService.class);
+	/** The logger of this class. */
+	@Logger
+	Log log;
 
 	/**
 	 * The status of the CMR.
@@ -39,6 +40,7 @@ public class ServerStatusService implements IServerStatusService {
 	/**
 	 * {@inheritDoc}
 	 */
+	@MethodLog
 	public int getServerStatus() {
 		return status;
 	}
@@ -46,14 +48,15 @@ public class ServerStatusService implements IServerStatusService {
 	/**
 	 * Is executed after dependency injection is done to perform any initialization.
 	 * 
-	 * @throws Exception if an error occurs during {@link PostConstruct}
+	 * @throws Exception
+	 *             if an error occurs during {@link PostConstruct}
 	 */
 	@PostConstruct
 	public void postConstruct() throws Exception {
 		status = IServerStatusService.SERVER_ONLINE;
 
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("|-Server Status Service active...");
+		if (log.isInfoEnabled()) {
+			log.info("|-Server Status Service active...");
 		}
 	}
 
@@ -62,8 +65,8 @@ public class ServerStatusService implements IServerStatusService {
 		try {
 			return versioning.getVersion();
 		} catch (IOException e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Cannot obtain current version", e);
+			if (log.isDebugEnabled()) {
+				log.debug("Cannot obtain current version", e);
 			}
 			return "n/a";
 		}

@@ -41,12 +41,12 @@ public class RMIConnection implements IConnection {
 	/**
 	 * The name of the repository service.
 	 */
-	private String agentStorageName = "inspectITAgentStorageService";
+	private String agentStorageName = IAgentStorageService.class.getCanonicalName();
 
 	/**
 	 * The name of the registration service.
 	 */
-	private String registrationName = "inspectITRegistrationService";
+	private String registrationName = IRegistrationService.class.getCanonicalName();
 
 	/**
 	 * The RMI registry.

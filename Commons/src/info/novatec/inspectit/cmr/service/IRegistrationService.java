@@ -18,6 +18,7 @@ import java.util.List;
  * @author Patrice Bouillet
  * 
  */
+@ServiceInterface(exporter = ServiceExporterType.RMI, registryPort = "cmr.registryPort", servicePort = "cmr.servicePort")
 public interface IRegistrationService extends Remote {
 
 	/**
@@ -35,13 +36,12 @@ public interface IRegistrationService extends Remote {
 	 * @param version
 	 *            The version the agent is currently running with.
 	 * @return Returns the unique platform identifier.
-	 * @throws RemoteException
-	 *             Throws a RemoteException if an error occurs in the registering process.
 	 * @throws LicenseException
-	 *             Throws a {@link LicenseException} to indicate some problems with the licensing
-	 *             process.
+	 *             if the registration was not successful because the registration failed.
+	 * @throws RemoteException
+	 *             If a remote exception occurs somewhere.
 	 */
-	long registerPlatformIdent(List<String> definedIPs, String agentName, String version) throws RemoteException;
+	long registerPlatformIdent(List<String> definedIPs, String agentName, String version) throws LicenseException, RemoteException;
 
 	/**
 	 * Every instrumented method has to be registered from every Agent. This method returns a unique
@@ -64,7 +64,7 @@ public interface IRegistrationService extends Remote {
 	 *            The modifiers.
 	 * @return Returns the unique method identifier.
 	 * @throws RemoteException
-	 *             Throws a RemoteException if an error occurs in the registering process.
+	 *             If a remote exception occurs somewhere.
 	 */
 	long registerMethodIdent(long platformIdent, String packageName, String className, String methodName, List<String> parameterTypes, String returnType, int modifiers) throws RemoteException;
 
@@ -78,7 +78,7 @@ public interface IRegistrationService extends Remote {
 	 *            The fully qualified class name of the sensor type.
 	 * @return Returns the unique method sensor type identifier.
 	 * @throws RemoteException
-	 *             Throws a RemoteException if an error occurs in the registering process.
+	 *             If a remote exception occurs somewhere.
 	 */
 	long registerMethodSensorTypeIdent(long platformIdent, String fullyQualifiedClassName) throws RemoteException;
 
@@ -90,7 +90,7 @@ public interface IRegistrationService extends Remote {
 	 * @param methodIdent
 	 *            The unique identifier of the method.
 	 * @throws RemoteException
-	 *             Throws a RemoteException if an error occurs in the registering process.
+	 *             If a remote exception occurs somewhere.
 	 */
 	void addSensorTypeToMethod(long methodSensorTypeIdent, long methodIdent) throws RemoteException;
 
@@ -104,7 +104,7 @@ public interface IRegistrationService extends Remote {
 	 *            The fully qualified class name of the sensor type.
 	 * @return Returns the unique platform sensor type identifier.
 	 * @throws RemoteException
-	 *             Throws a RemoteException if an error occurs in the registering process.
+	 *             If a remote exception occurs somewhere.
 	 */
 	long registerPlatformSensorTypeIdent(long platformIdent, String fullyQualifiedClassName) throws RemoteException;
 

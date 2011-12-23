@@ -9,13 +9,29 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 /**
  * {@link IndexQuery} represent an object that is used in querying the tree structure of the buffer.
  * 
  * @author Ivan Senic
  * 
  */
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Lazy
 public class IndexQuery implements IIndexQuery {
+
+	/**
+	 * Processor that checks if the given restrictions that are set in the query are fulfilled for
+	 * any object.
+	 */
+	@Autowired
+	IIndexQueryRestrictionProcessor restrictionProcessor;
 
 	/**
 	 * Minimum id that returned objects should have.
@@ -56,12 +72,6 @@ public class IndexQuery implements IIndexQuery {
 	 * List of restrictions for this query.
 	 */
 	private List<IIndexQueryRestriction> indexingRestrictionList = new ArrayList<IIndexQueryRestriction>();
-
-	/**
-	 * Processor that checks if the given restrictions that are set in the query are fulfilled for
-	 * any object.
-	 */
-	private IIndexQueryRestrictionProcessor restrictionProcessor;
 
 	/**
 	 * {@inheritDoc}
@@ -211,15 +221,6 @@ public class IndexQuery implements IIndexQuery {
 	 */
 	public boolean areAllRestrictionsFulfilled(DefaultData defaultData) {
 		return restrictionProcessor.areAllRestrictionsFulfilled(defaultData, indexingRestrictionList);
-	}
-
-	/**
-	 * 
-	 * @param restrictionProcessor
-	 *            Restriction processor to use.
-	 */
-	public void setRestrictionProcessor(IIndexQueryRestrictionProcessor restrictionProcessor) {
-		this.restrictionProcessor = restrictionProcessor;
 	}
 
 }

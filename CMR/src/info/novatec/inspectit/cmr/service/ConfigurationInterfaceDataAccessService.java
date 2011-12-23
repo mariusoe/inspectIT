@@ -6,7 +6,7 @@ import info.novatec.inspectit.cmr.dao.ci.MethodSensorDefinitionDataDao;
 import info.novatec.inspectit.cmr.dao.ci.PlatformSensorDefinitionDataDao;
 import info.novatec.inspectit.cmr.dao.ci.ProfileDataDao;
 import info.novatec.inspectit.cmr.dao.ci.SensorTypeDataDao;
-import info.novatec.inspectit.cmr.util.aop.Log;
+import info.novatec.inspectit.cmr.spring.aop.MethodLog;
 import info.novatec.inspectit.communication.data.ci.EnvironmentData;
 import info.novatec.inspectit.communication.data.ci.ExceptionSensorDefinitionData;
 import info.novatec.inspectit.communication.data.ci.MethodSensorDefinitionData;
@@ -69,7 +69,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public long addEnvironment(EnvironmentData environmentData) {
 		long result = environmentDataDao.addEnvironment(environmentData);
 
@@ -86,7 +86,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public long addExceptionSensorDefinition(ExceptionSensorDefinitionData exceptionSensorDefinitionData) {
 		long result = exceptionSensorDefinitionDataDao.addExceptionSensorDefinition(exceptionSensorDefinitionData);
 		return result;
@@ -95,7 +95,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public long addMethodSensorDefinition(MethodSensorDefinitionData methodSensorDefinitionData) {
 		long result = methodSensorDefinitionDataDao.addMethodSensorDefinition(methodSensorDefinitionData);
 		return result;
@@ -104,7 +104,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public long addPlatformSensorDefinition(PlatformSensorDefinitionData platformSensorDefinitionData) {
 		long result = platformSensorDefinitionDataDao.addPlatformSensorDefinition(platformSensorDefinitionData);
 		return result;
@@ -113,7 +113,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public long addProfile(ProfileData profileData) {
 		long result = profileDataDao.addProfile(profileData);
 
@@ -130,7 +130,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public void deleteEnvironment(long environmentId) throws EntityNotFoundException {
 		environmentDataDao.deleteEnvironment(environmentId);
 	}
@@ -138,7 +138,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public void deleteExceptionSensorDefinition(long exceptionSensorDefinitionId) throws EntityNotFoundException {
 		exceptionSensorDefinitionDataDao.deleteExceptionSensorDefinition(exceptionSensorDefinitionId);
 	}
@@ -146,7 +146,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public void deleteMethodSensorDefinition(long methodSensorDefinitionId) throws EntityNotFoundException {
 		methodSensorDefinitionDataDao.deleteMethodSensorDefinition(methodSensorDefinitionId);
 	}
@@ -154,7 +154,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public void deletePlatformSensorDefinition(long platformSensorDefinitionId) throws EntityNotFoundException {
 		platformSensorDefinitionDataDao.deletePlatformSensorDefinition(platformSensorDefinitionId);
 	}
@@ -162,7 +162,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public void deleteProfile(long profileId) throws EntityNotFoundException {
 		profileDataDao.deleteProfile(profileId);
 	}
@@ -170,7 +170,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public void deleteSensorType(long sensorTypeId) throws EntityNotFoundException {
 		sensorTypeDataDao.deleteSensorType(sensorTypeId);
 	}
@@ -178,7 +178,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<EnvironmentData> getEnvironments() {
 		List<EnvironmentData> result = environmentDataDao.getEnvironments();
 		return result;
@@ -187,7 +187,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public ProfileData getProfile(long profileId) {
 		ProfileData result = profileDataDao.getProfile(profileId);
 		return result;
@@ -196,7 +196,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public void updateEnvironmentSettings(EnvironmentData environmentData) {
 		environmentDataDao.updateEnvironmentSettings(environmentData);
 	}
@@ -204,7 +204,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public void updateExceptionSensorDefinition(ExceptionSensorDefinitionData exceptionSensorDefinitionData) {
 		exceptionSensorDefinitionDataDao.updateExceptionSensorDefinition(exceptionSensorDefinitionData);
 	}
@@ -212,7 +212,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public void updateMethodSensorDefinition(MethodSensorDefinitionData methodSensorDefinitionData) {
 		methodSensorDefinitionDataDao.updateMethodSensorDefinition(methodSensorDefinitionData);
 	}
@@ -220,7 +220,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public void updatePlatformSensorDefinition(PlatformSensorDefinitionData platformSensorDefinitionData) {
 		platformSensorDefinitionDataDao.updatePlatformSensorDefinition(platformSensorDefinitionData);
 	}
@@ -228,7 +228,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public void updateProfileSettings(ProfileData profileData) {
 		profileDataDao.updateProfile(profileData);
 	}
@@ -236,7 +236,7 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public void updateSensorType(SensorTypeData sensorTypeData) {
 		sensorTypeDataDao.updateSensorType(sensorTypeData);
 	}

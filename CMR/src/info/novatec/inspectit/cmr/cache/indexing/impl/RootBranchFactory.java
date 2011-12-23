@@ -3,12 +3,14 @@ package info.novatec.inspectit.cmr.cache.indexing.impl;
 import info.novatec.inspectit.cmr.cache.indexing.AbstractIndexer.ChildBranchType;
 import info.novatec.inspectit.cmr.cache.indexing.IBranchIndexer;
 import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
+import info.novatec.inspectit.cmr.cache.indexing.impl.RootBranchFactory.RootBranch;
 import info.novatec.inspectit.communication.DefaultData;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.stereotype.Component;
 
 /**
  * Factory that creates the root branch for indexing tree. This root branch will be injected in
@@ -17,14 +19,16 @@ import org.springframework.beans.factory.FactoryBean;
  * @author Ivan Senic
  * 
  */
-public class RootBranchFactory implements FactoryBean {
+@Component
+public class RootBranchFactory implements FactoryBean<RootBranch<DefaultData>> {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object getObject() throws Exception {
-		return new RootBranch<DefaultData>(new PlatformIdentIndexer<DefaultData>(ChildBranchType.NORMAL_BRANCH, new ObjectTypeIndexer<DefaultData>(ChildBranchType.NORMAL_BRANCH, new TimestampIndexer<DefaultData>())));
+	public RootBranch<DefaultData> getObject() throws Exception {
+		return new RootBranch<DefaultData>(new PlatformIdentIndexer<DefaultData>(ChildBranchType.NORMAL_BRANCH, new ObjectTypeIndexer<DefaultData>(ChildBranchType.NORMAL_BRANCH,
+				new TimestampIndexer<DefaultData>())));
 	}
 
 	/**
@@ -50,7 +54,7 @@ public class RootBranchFactory implements FactoryBean {
 	 * @author Ivan Senic
 	 * 
 	 */
-	private class RootBranch<E extends DefaultData> extends Branch<E> {
+	public class RootBranch<E extends DefaultData> extends Branch<E> {
 
 		/**
 		 * Runnable for cutting the empty tree components.

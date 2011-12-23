@@ -2,6 +2,7 @@ package info.novatec.inspectit.cmr.util;
 
 import info.novatec.inspectit.cmr.cache.IBuffer;
 import info.novatec.inspectit.cmr.service.AgentStorageService;
+import info.novatec.inspectit.cmr.spring.logger.Logger;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
@@ -12,8 +13,9 @@ import java.lang.management.ThreadMXBean;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -27,10 +29,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class HealthStatus {
 
-	/**
-	 * The logger of this class.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(HealthStatus.class);
+	/** The logger of this class. */
+	@Logger
+	Log log;
 
 	/**
 	 * Are the beans that are responsible for creating the Health Status available.
@@ -69,6 +70,12 @@ public class HealthStatus {
 	private static final int WIDTH = 30;
 
 	/**
+	 * The fixed rate of the refresh rate for gathering the statistics.
+	 */
+	@Value("${cmr.statusRefreshRate}")
+	private static final int FIXED_RATE = 60000;
+
+	/**
 	 * Buffer that reports status.
 	 */
 	@Autowired
@@ -83,18 +90,18 @@ public class HealthStatus {
 	/**
 	 * Log all the statistics.
 	 */
-	@Scheduled(fixedRate=60000)
+	@Scheduled(fixedRate = FIXED_RATE)
 	public void logStatistics() {
 		if (beansAvailable) {
-			if (LOGGER.isInfoEnabled()) {
+			if (log.isInfoEnabled()) {
 				logOperatingSystemStatistics();
 				logRuntimeStatistics();
 				logMemoryStatistics();
 				logThreadStatistics();
-				LOGGER.info("\n");
+				log.info("\n");
 			}
 		}
-		if (LOGGER.isInfoEnabled()) {
+		if (log.isInfoEnabled()) {
 			logDroppedData();
 			logBufferStatistics();
 		}
@@ -121,7 +128,7 @@ public class HealthStatus {
 		sb.append(availCpus);
 		sb.append(" cpu(s) load average: ");
 		sb.append(loadAverage);
-		LOGGER.info(sb.toString());
+		log.info(sb.toString());
 
 		logGraphicalLoadAverage(loadAverage, availCpus);
 	}
@@ -158,7 +165,7 @@ public class HealthStatus {
 			sb.append("-");
 		}
 		sb.append(START_END_CHAR);
-		LOGGER.info(sb.toString());
+		log.info(sb.toString());
 
 		// now create the middle line with the status.
 		sb = new StringBuilder();
@@ -171,7 +178,7 @@ public class HealthStatus {
 			sb.append(" ");
 		}
 		sb.append(START_END_CHAR);
-		LOGGER.info(sb.toString());
+		log.info(sb.toString());
 
 		// print last line
 		sb = new StringBuilder();
@@ -180,7 +187,7 @@ public class HealthStatus {
 			sb.append("-");
 		}
 		sb.append(START_END_CHAR);
-		LOGGER.info(sb.toString());
+		log.info(sb.toString());
 	}
 
 	/**
@@ -205,7 +212,7 @@ public class HealthStatus {
 		sb.append(" uptime: ");
 		sb.append(uptime);
 		sb.append(" ms");
-		LOGGER.info(sb.toString());
+		log.info(sb.toString());
 	}
 
 	/**
@@ -215,11 +222,11 @@ public class HealthStatus {
 		MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
 		MemoryUsage nonHeapMemoryUsage = memoryMXBean.getNonHeapMemoryUsage();
 
-		LOGGER.info("Heap: " + heapMemoryUsage);
+		log.info("Heap: " + heapMemoryUsage);
 		logGraphicalMemoryUsage(heapMemoryUsage, "Heap");
-		LOGGER.info("Non Heap: " + nonHeapMemoryUsage);
+		log.info("Non Heap: " + nonHeapMemoryUsage);
 		logGraphicalMemoryUsage(nonHeapMemoryUsage, "Non-Heap");
-		LOGGER.info("Pending finalizations: " + memoryMXBean.getObjectPendingFinalizationCount());
+		log.info("Pending finalizations: " + memoryMXBean.getObjectPendingFinalizationCount());
 	}
 
 	/**
@@ -248,7 +255,7 @@ public class HealthStatus {
 			}
 
 			sb.append(START_END_CHAR);
-			LOGGER.info(sb.toString());
+			log.info(sb.toString());
 
 			// now create the middle line with the status.
 			sb = new StringBuilder();
@@ -275,7 +282,7 @@ public class HealthStatus {
 			if (committed < WIDTH) {
 				sb.append(START_END_CHAR);
 			}
-			LOGGER.info(sb.toString());
+			log.info(sb.toString());
 
 			// print last line
 			sb = new StringBuilder();
@@ -284,7 +291,7 @@ public class HealthStatus {
 				sb.append("-");
 			}
 			sb.append(START_END_CHAR);
-			LOGGER.info(sb.toString());
+			log.info(sb.toString());
 		}
 	}
 
@@ -323,7 +330,7 @@ public class HealthStatus {
 		sb.append(threadCount);
 		sb.append(" total started: ");
 		sb.append(totalStartedThreads);
-		LOGGER.info(sb.toString());
+		log.info(sb.toString());
 	}
 
 	/**
@@ -332,7 +339,7 @@ public class HealthStatus {
 	private void logBufferStatistics() {
 		String[] lines = buffer.toString().split("\n");
 		for (String str : lines) {
-			LOGGER.info(str);
+			log.info(str);
 		}
 		logGraphicalBufferOccupancy(buffer.getOccupancyPercentage());
 	}
@@ -356,7 +363,7 @@ public class HealthStatus {
 			sb.append("-");
 		}
 		sb.append(START_END_CHAR);
-		LOGGER.info(sb.toString());
+		log.info(sb.toString());
 
 		// now create the middle line with the status.
 		sb = new StringBuilder();
@@ -368,7 +375,7 @@ public class HealthStatus {
 			sb.append(" ");
 		}
 		sb.append(START_END_CHAR);
-		LOGGER.info(sb.toString());
+		log.info(sb.toString());
 
 		// print last line
 		sb = new StringBuilder();
@@ -377,14 +384,14 @@ public class HealthStatus {
 			sb.append("-");
 		}
 		sb.append(START_END_CHAR);
-		LOGGER.info(sb.toString());
+		log.info(sb.toString());
 	}
 
 	/**
 	 * Logs the amount of dropped data on CMR.
 	 */
 	private void logDroppedData() {
-		LOGGER.info("Dropped elements due to the high load on the CMR (total count): " + agentStorageService.getDroppedDataCount());
+		log.info("Dropped elements due to the high load on the CMR (total count): " + agentStorageService.getDroppedDataCount());
 	}
 
 	/**
@@ -421,14 +428,14 @@ public class HealthStatus {
 	 */
 	@PostConstruct
 	public void postConstruct() throws Exception {
-	startUpCheck();
+		startUpCheck();
 		if (beansAvailable) {
-			if (LOGGER.isInfoEnabled()) {
-				LOGGER.info("Health Service active...");
+			if (log.isInfoEnabled()) {
+				log.info("Health Service active...");
 			}
 		} else {
-			if (LOGGER.isInfoEnabled()) {
-				LOGGER.info("Health Service not active...");
+			if (log.isInfoEnabled()) {
+				log.info("Health Service not active...");
 			}
 		}
 	}

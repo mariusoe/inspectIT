@@ -5,9 +5,10 @@ import info.novatec.inspectit.cmr.cache.impl.BufferElement;
 import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
 import info.novatec.inspectit.cmr.cache.indexing.impl.IndexingException;
 import info.novatec.inspectit.cmr.dao.DefaultDataDao;
+import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.cmr.util.CacheIdGenerator;
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
@@ -24,15 +25,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 import org.hibernate.FetchMode;
+import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -47,37 +52,57 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Ivan Senic
  * @author Stefan Siegl
  */
+@Repository
 public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDataDao {
+
+	/** The logger of this class. */
+	@Logger
+	Log log;
 
 	/**
 	 * The buffer to put invocation sequences in.
 	 */
+	@Autowired
 	private IBuffer<MethodSensorData> buffer;
 
 	/**
 	 * The indexing tree for direct object indexing.
 	 */
+	@Autowired
 	private ITreeComponent<MethodSensorData> indexingTree;
 
 	/**
 	 * Id generator for the objects that are going to the cache.
 	 */
+	@Autowired
 	private CacheIdGenerator cacheIdGenerator;
 
 	/**
 	 * Timer data aggregator.
 	 */
+	@Autowired
 	private TimerDataAggregator timerDataAggregator;
 
 	/**
 	 * Denotes if the {@link TimerData} objects have to be saved to database.
 	 */
+	@Value(value = "${cmr.saveTimerDataToDatabase}")
 	private boolean saveTimerDataToDatabase;
 
 	/**
-	 * Logger for default data DAO.
+	 * This constructor is used to set the {@link SessionFactory} that is needed by
+	 * {@link HibernateDaoSupport}. In a future version it may be useful to go away from the
+	 * {@link HibernateDaoSupport} and directly use the {@link SessionFactory}. This is described
+	 * here:
+	 * http://blog.springsource.com/2007/06/26/so-should-you-still-use-springs-hibernatetemplate
+	 * -andor-jpatemplate
+	 * 
+	 * @param sessionFactory
 	 */
-	private static final Logger LOGGER = Logger.getLogger(DefaultDataDaoImpl.class);
+	@Autowired
+	public DefaultDataDaoImpl(SessionFactory sessionFactory) {
+		setSessionFactory(sessionFactory);
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -181,13 +206,13 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 					indexingTree.put(child.getSqlStatementData());
 				} catch (IndexingException e) {
 					// indexing exception should not happen
-					LOGGER.error(e.getMessage(), e);
+					log.error(e.getMessage(), e);
 				}
 			}
 			if (null != child.getExceptionSensorDataObjects()) {
 				for (Object data : child.getExceptionSensorDataObjects()) {
 					ExceptionSensorData exceptionData = (ExceptionSensorData) data;
-					if (exceptionData.getExceptionEvent() == ExceptionEventEnum.CREATED) {
+					if (exceptionData.getExceptionEvent() == ExceptionEvent.CREATED) {
 						connectErrorMessagesInExceptionData(exceptionData);
 						if (identityHashCodeSet.add(exceptionData.getThrowableIdentityHashCode())) {
 							if (null == childRemoveCollection) {
@@ -201,7 +226,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 									indexingTree.put(dataToIndex);
 								} catch (IndexingException e) {
 									// indexing exception should not happen
-									LOGGER.error(e.getMessage(), e);
+									log.error(e.getMessage(), e);
 								}
 							}
 						}
@@ -233,7 +258,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 				indexingTree.put(data);
 			} catch (IndexingException e) {
 				// indexing exception should not happen
-				LOGGER.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		}
 
@@ -455,49 +480,6 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 		} else {
 			return null;
 		}
-	}
-
-	/**
-	 * 
-	 * @param buffer
-	 *            buffer to set
-	 */
-	public void setBuffer(IBuffer<MethodSensorData> buffer) {
-		this.buffer = buffer;
-	}
-
-	/**
-	 * 
-	 * @param indexingTree
-	 *            indexing tree to see
-	 */
-	public void setIndexingTree(ITreeComponent<MethodSensorData> indexingTree) {
-		this.indexingTree = indexingTree;
-	}
-
-	/**
-	 * 
-	 * @param cacheIdGenerator
-	 *            cache id generator
-	 */
-	public void setCacheIdGenerator(CacheIdGenerator cacheIdGenerator) {
-		this.cacheIdGenerator = cacheIdGenerator;
-	}
-
-	/**
-	 * @param timerDataAggregator
-	 *            the timerDataAggregator to set
-	 */
-	public void setTimerDataAggregator(TimerDataAggregator timerDataAggregator) {
-		this.timerDataAggregator = timerDataAggregator;
-	}
-
-	/**
-	 * @param saveTimerDataToDatabase
-	 *            the saveTimerDataToDatabase to set
-	 */
-	public void setSaveTimerDataToDatabase(boolean saveTimerDataToDatabase) {
-		this.saveTimerDataToDatabase = saveTimerDataToDatabase;
 	}
 
 }

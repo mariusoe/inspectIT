@@ -1,6 +1,7 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.DefaultDataDao;
+import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.cmr.util.Converter;
 import info.novatec.inspectit.communication.DefaultData;
 
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,10 +28,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class AgentStorageService implements IAgentStorageService {
 
-	/**
-	 * The logger of this class.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(AgentStorageService.class);
+	/** The logger of this class. */
+	@Logger
+	Log log;
 
 	/**
 	 * Maximum number of threads working, so we protect against bad configuration.
@@ -46,7 +46,7 @@ public class AgentStorageService implements IAgentStorageService {
 	 * Amount of milliseconds after which the data is thrown away if queue is full.
 	 */
 	private static final long DATA_THROW_TIMEOUT_MILLIS = 10;
-	
+
 	/**
 	 * The default data DAO.
 	 */
@@ -78,8 +78,8 @@ public class AgentStorageService implements IAgentStorageService {
 			boolean added = dataObjectsBlockingQueue.offer(softReference, DATA_THROW_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
 			if (!added) {
 				int droppedSize = dataObjects.size();
-				if (LOGGER.isTraceEnabled()) {
-					LOGGER.trace("Data dropped on the CMR due to the high volume of incoming data from Agent(s). Dropped data objects count: " + droppedSize);
+				if (log.isTraceEnabled()) {
+					log.trace("Data dropped on the CMR due to the high volume of incoming data from Agent(s). Dropped data objects count: " + droppedSize);
 				}
 				droppedDataCount += droppedSize;
 			}
@@ -102,7 +102,8 @@ public class AgentStorageService implements IAgentStorageService {
 	/**
 	 * Is executed after dependency injection is done to perform any initialization.
 	 * 
-	 * @throws Exception if an error occurs during {@link PostConstruct}
+	 * @throws Exception
+	 *             if an error occurs during {@link PostConstruct}
 	 */
 	@PostConstruct
 	public void postConstruct() throws Exception {
@@ -116,8 +117,8 @@ public class AgentStorageService implements IAgentStorageService {
 			new ProcessDataThread().start();
 		}
 
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("|-Agent Storage Service active...");
+		if (log.isInfoEnabled()) {
+			log.info("|-Agent Storage Service active...");
 		}
 
 	}
@@ -159,14 +160,14 @@ public class AgentStorageService implements IAgentStorageService {
 					}
 
 					long time = 0;
-					if (LOGGER.isDebugEnabled()) {
+					if (log.isDebugEnabled()) {
 						time = System.nanoTime();
 					}
 
 					defaultDataDao.saveAll(defaultDataList);
 
-					if (LOGGER.isDebugEnabled()) {
-						LOGGER.debug("Data Objects count: " + defaultDataList.size() + " Save duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+					if (log.isDebugEnabled()) {
+						log.debug("Data Objects count: " + defaultDataList.size() + " Save duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
 					}
 				}
 			}

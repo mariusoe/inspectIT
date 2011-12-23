@@ -17,6 +17,7 @@ import java.util.List;
  * @author Matthias Huber
  * 
  */
+@ServiceInterface(exporter = ServiceExporterType.HTTP)
 public interface IConfigurationInterfaceDataAccessService {
 
 	/**

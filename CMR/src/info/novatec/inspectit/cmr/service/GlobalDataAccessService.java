@@ -3,7 +3,8 @@ package info.novatec.inspectit.cmr.service;
 import info.novatec.inspectit.cmr.dao.DefaultDataDao;
 import info.novatec.inspectit.cmr.dao.PlatformIdentDao;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
-import info.novatec.inspectit.cmr.util.aop.Log;
+import info.novatec.inspectit.cmr.spring.aop.MethodLog;
+import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.communication.DefaultData;
 
 import java.util.Collections;
@@ -12,7 +13,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +24,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class GlobalDataAccessService implements IGlobalDataAccessService {
 
-	/**
-	 * The logger of this class.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(GlobalDataAccessService.class);
+	/** The logger of this class. */
+	@Logger
+	Log log;
 
 	/**
 	 * The platform ident DAO.
@@ -43,7 +43,7 @@ public class GlobalDataAccessService implements IGlobalDataAccessService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<PlatformIdent> getConnectedAgents() {
 		// only load the ones which are currently connected
 		List<PlatformIdent> result = platformIdentDao.findAllInitialized();
@@ -53,7 +53,7 @@ public class GlobalDataAccessService implements IGlobalDataAccessService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<DefaultData> getLastDataObjects(DefaultData template, long timeInterval) {
 		List<DefaultData> result = defaultDataDao.findByExampleWithLastInterval(template, timeInterval);
 		return result;
@@ -62,7 +62,7 @@ public class GlobalDataAccessService implements IGlobalDataAccessService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public DefaultData getLastDataObject(DefaultData template) {
 		DefaultData result = defaultDataDao.findByExampleLastData(template);
 		return result;
@@ -71,7 +71,7 @@ public class GlobalDataAccessService implements IGlobalDataAccessService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<DefaultData> getDataObjectsFromToDate(DefaultData template, Date fromDate, Date toDate) {
 		if (fromDate.after(toDate)) {
 			return Collections.emptyList();
@@ -84,7 +84,7 @@ public class GlobalDataAccessService implements IGlobalDataAccessService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<DefaultData> getDataObjectsSinceId(DefaultData template) {
 		List<DefaultData> result = defaultDataDao.findByExampleSinceId(template);
 		return result;
@@ -93,7 +93,7 @@ public class GlobalDataAccessService implements IGlobalDataAccessService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<DefaultData> getDataObjectsSinceIdIgnoreMethodId(DefaultData template) {
 		List<DefaultData> result = defaultDataDao.findByExampleSinceIdIgnoreMethodId(template);
 		return result;
@@ -102,12 +102,13 @@ public class GlobalDataAccessService implements IGlobalDataAccessService {
 	/**
 	 * Is executed after dependency injection is done to perform any initialization.
 	 * 
-	 * @throws Exception if an error occurs during {@link PostConstruct}
+	 * @throws Exception
+	 *             if an error occurs during {@link PostConstruct}
 	 */
 	@PostConstruct
 	public void postConstruct() throws Exception {
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("|-Global Data Access Service active...");
+		if (log.isInfoEnabled()) {
+			log.info("|-Global Data Access Service active...");
 		}
 	}
 

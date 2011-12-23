@@ -24,8 +24,15 @@ Bundle-ClassPath: .,
  lib/prod/jfreechart-experimental.jar,
  lib/prod/jfreechart-swt.jar,
  lib/prod/jfreechart.jar,
- lib/prod/spring.jar,
  lib/prod/swtgraphics2d.jar,
  lib/prod/xstream.jar,
- lib/prod/cglib-nodep.jar
+ lib/prod/cglib-nodep.jar,
+ lib/prod/spring-beans.jar,
+ lib/prod/spring-context.jar,
+ lib/prod/spring-core.jar,
+ lib/prod/spring-web.jar,
+ lib/prod/spring-asm.jar,
+ lib/prod/spring-expression.jar,
+ lib/prod/spring-aop.jar,
+ lib/prod/aopalliance.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

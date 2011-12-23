@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.springframework.test.context.ContextConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -16,17 +15,12 @@ import org.testng.annotations.Test;
  * 
  * @author Stefan Siegl
  */
-@ContextConfiguration(locations = { "classpath:spring/spring-context-property.xml", "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model.xml" })
 public class BufferHttpTimerDataDaoTest extends AbstractTestNGLogSupport {
 
 	private BufferHttpTimerDataDaoImpl underTest = new BufferHttpTimerDataDaoImpl();
 
 	@Test
 	public void aggregationWithInspectITHeaderTwoDifferent() {
-
-		// protected List<HttpTimerData> aggregate(List<HttpTimerData> input, boolean uriBased,
-		// boolean includeRequestMethod) {
-
 		final HttpTimerData data = new HttpTimerData();
 		data.setHeaders(new HashMap<String, String>() {
 			{
@@ -59,10 +53,6 @@ public class BufferHttpTimerDataDaoTest extends AbstractTestNGLogSupport {
 
 	@Test
 	public void aggregationWithInspectITHeader() {
-
-		// protected List<HttpTimerData> aggregate(List<HttpTimerData> input, boolean uriBased,
-		// boolean includeRequestMethod) {
-
 		final HttpTimerData data = new HttpTimerData();
 		data.setHeaders(new HashMap<String, String>() {
 			{
@@ -112,10 +102,6 @@ public class BufferHttpTimerDataDaoTest extends AbstractTestNGLogSupport {
 
 	@Test
 	public void aggregationURI() {
-
-		// protected List<HttpTimerData> aggregate(List<HttpTimerData> input, boolean uriBased,
-		// boolean includeRequestMethod) {
-
 		final HttpTimerData data = new HttpTimerData();
 		data.setUri("URI");
 		data.setRequestMethod("GET");
@@ -152,10 +138,6 @@ public class BufferHttpTimerDataDaoTest extends AbstractTestNGLogSupport {
 
 	@Test
 	public void aggregationURIRequestMethods() {
-
-		// protected List<HttpTimerData> aggregate(List<HttpTimerData> input, boolean uriBased,
-		// boolean includeRequestMethod) {
-
 		final HttpTimerData data = new HttpTimerData();
 		data.setUri("URI");
 		data.setRequestMethod("GET");
@@ -184,4 +166,5 @@ public class BufferHttpTimerDataDaoTest extends AbstractTestNGLogSupport {
 		Assert.assertNotNull(output);
 		Assert.assertEquals(output.size(), 2);
 	}
+
 }

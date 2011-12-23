@@ -1,6 +1,6 @@
 package info.novatec.inspectit.communication.data;
 
-import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.ExceptionEvent;
 
 
 /**
@@ -64,11 +64,11 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData {
 	}
 
 	public void aggregateExceptionData(ExceptionSensorData exceptionData) {
-		if (exceptionData.getExceptionEvent() == ExceptionEventEnum.CREATED) {
+		if (exceptionData.getExceptionEvent() == ExceptionEvent.CREATED) {
 			created++;
-		} else if (exceptionData.getExceptionEvent() == ExceptionEventEnum.PASSED) {
+		} else if (exceptionData.getExceptionEvent() == ExceptionEvent.PASSED) {
 			passed++;
-		} else if (exceptionData.getExceptionEvent() == ExceptionEventEnum.HANDLED) {
+		} else if (exceptionData.getExceptionEvent() == ExceptionEvent.HANDLED) {
 			handled++;
 		}
 		if (null != exceptionData.getInvocationParentsIdSet()) {

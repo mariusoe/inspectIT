@@ -1,7 +1,8 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.ExceptionSensorDataDao;
-import info.novatec.inspectit.cmr.util.aop.Log;
+import info.novatec.inspectit.cmr.spring.aop.MethodLog;
+import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 
@@ -10,7 +11,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +24,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExceptionDataAccessService implements IExceptionDataAccessService {
 
-	/**
-	 * The logger of this class.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(ExceptionDataAccessService.class);
+	/** The logger of this class. */
+	@Logger
+	Log log;
 
 	/**
 	 * The exception sensor DAO.
@@ -37,7 +37,7 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit) {
 		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template, limit);
 		return result;
@@ -46,7 +46,7 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate) {
 		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template, limit, fromDate, toDate);
 		return result;
@@ -55,7 +55,7 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template) {
 		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template);
 		return result;
@@ -64,7 +64,7 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
 		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template, fromDate, toDate);
 		return result;
@@ -73,7 +73,7 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<ExceptionSensorData> getExceptionTree(ExceptionSensorData template) {
 		List<ExceptionSensorData> result = exceptionSensorDataDao.getExceptionTree(template);
 		return result;
@@ -82,7 +82,7 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<AggregatedExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template) {
 		List<AggregatedExceptionSensorData> result = exceptionSensorDataDao.getDataForGroupedExceptionOverview(template);
 		return result;
@@ -91,16 +91,16 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<AggregatedExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
 		List<AggregatedExceptionSensorData> result = exceptionSensorDataDao.getDataForGroupedExceptionOverview(template, fromDate, toDate);
 		return result;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<ExceptionSensorData> getStackTraceMessagesForThrowableType(ExceptionSensorData template) {
 		List<ExceptionSensorData> result = exceptionSensorDataDao.getStackTraceMessagesForThrowableType(template);
 		return result;
@@ -109,12 +109,13 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	/**
 	 * Is executed after dependency injection is done to perform any initialization.
 	 * 
-	 * @throws Exception if an error occurs during {@link PostConstruct}
+	 * @throws Exception
+	 *             if an error occurs during {@link PostConstruct}
 	 */
 	@PostConstruct
 	public void postConstruct() throws Exception {
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("|-Exception Sensor Data Access Service active...");
+		if (log.isInfoEnabled()) {
+			log.info("|-Exception Sensor Data Access Service active...");
 		}
 	}
 }

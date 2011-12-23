@@ -7,14 +7,10 @@
 		class="org.springframework.context.support.ClassPathXmlApplicationContext">
 		<constructor-arg>
 			<list>
-				<value>spring/spring-context-property.xml</value>
-				<value>spring/spring-context-aop.xml</value>
+				<value>spring/spring-context-global.xml</value>
 				<value>spring/spring-context-database.xml</value>
-				<value>spring/spring-context-model.xml</value>
-				<value>spring/spring-context-util.xml</value>
-				<value>spring/spring-context-service.xml</value>
+				<value>spring/spring-context-beans.xml</value>
 				<value>spring/spring-context-jetty.xml</value>
-				<value>spring/spring-context-jetty-service-exporter.xml</value>
 			</list>
 		</constructor-arg>
 	</bean>

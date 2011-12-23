@@ -4,7 +4,7 @@ import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
-import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.util.StringConstraint;
 
@@ -96,7 +96,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 				// creating the data object
 				ExceptionSensorData data = new ExceptionSensorData(timestamp, platformId, registeredSensorTypeId, registeredConstructorId);
 				data.setThrowableIdentityHashCode(identityHash.longValue());
-				data.setExceptionEvent(ExceptionEventEnum.CREATED);
+				data.setExceptionEvent(ExceptionEvent.CREATED);
 				data.setThrowableType(throwable.getClass().getName());
 
 				// set the static information of the current object
@@ -144,11 +144,11 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 					// rethrown
 					if ((null != exceptionHandlerId.get()) && (registeredMethodId == exceptionHandlerId.get().longValue())) {
 						// the Throwable object is explicitly rethrown
-						data.setExceptionEvent(ExceptionEventEnum.RETHROWN);
+						data.setExceptionEvent(ExceptionEvent.RETHROWN);
 					} else {
 						// the Throwable object is thrown the first time or just passed by the JVM,
 						// so it's a PASSED event
-						data.setExceptionEvent(ExceptionEventEnum.PASSED);
+						data.setExceptionEvent(ExceptionEvent.PASSED);
 					}
 
 					// current object is the child of the previous object
@@ -160,7 +160,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 					exceptionDataHolder.set(mappingObject);
 				} else {
 					// it's a new Throwable object, that we didn't recognize earlier
-					data.setExceptionEvent(ExceptionEventEnum.UNREGISTERED_PASSED);
+					data.setExceptionEvent(ExceptionEvent.UNREGISTERED_PASSED);
 					setStaticInformation(data, throwable);
 
 					// we are creating a new mapping object and setting it on the thread local
@@ -202,7 +202,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 				ExceptionSensorData data = new ExceptionSensorData(timestamp, platformId, registeredSensorTypeId, registeredMethodId);
 				data.setThrowableIdentityHashCode(identityHash.longValue());
 				data.setThrowableType(throwable.getClass().getName());
-				data.setExceptionEvent(ExceptionEventEnum.HANDLED);
+				data.setExceptionEvent(ExceptionEvent.HANDLED);
 
 				// check whether it's the same Throwable object as before
 				if (mappingObject.getIdentityHash().equals(identityHash)) {
@@ -215,7 +215,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 					exceptionDataHolder.set(mappingObject);
 				} else {
 					// it's a Throwable object, that we didn't recognize earlier
-					data.setExceptionEvent(ExceptionEventEnum.UNREGISTERED_PASSED);
+					data.setExceptionEvent(ExceptionEvent.UNREGISTERED_PASSED);
 					setStaticInformation(data, throwable);
 
 					// we are creating a new mapping object and setting it on the thread local

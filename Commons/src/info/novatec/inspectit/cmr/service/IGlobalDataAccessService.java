@@ -13,6 +13,7 @@ import java.util.List;
  * @author Patrice Bouillet
  * 
  */
+@ServiceInterface(exporter = ServiceExporterType.HTTP)
 public interface IGlobalDataAccessService {
 
 	/**

@@ -11,6 +11,7 @@ import java.util.List;
  * @author Ivan Senic
  * 
  */
+@ServiceInterface(exporter = ServiceExporterType.HTTP)
 public interface ITimerDataAccessService {
 
 	/**

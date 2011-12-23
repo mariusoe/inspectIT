@@ -10,7 +10,7 @@ import info.novatec.inspectit.agent.core.ListListener;
 import info.novatec.inspectit.agent.sending.ISendingStrategy;
 import info.novatec.inspectit.agent.sensor.platform.IPlatformSensor;
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.SystemSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
@@ -261,7 +261,7 @@ public class CoreService implements ICoreService, Startable {
 
 		// we always only save the first data object, because this object contains the nested
 		// objects to create the whole exception tree
-		if (exceptionSensorData.getExceptionEvent().equals(ExceptionEventEnum.CREATED)) {
+		if (exceptionSensorData.getExceptionEvent().equals(ExceptionEvent.CREATED)) {
 			// if a data object with the same hash code was already created, then it has to be
 			// removed, because it was created from a constructor delegation. For us only the
 			// last-most data object is relevant

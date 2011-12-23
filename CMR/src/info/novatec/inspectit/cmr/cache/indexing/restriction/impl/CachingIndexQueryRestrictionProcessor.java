@@ -2,6 +2,7 @@ package info.novatec.inspectit.cmr.cache.indexing.restriction.impl;
 
 import info.novatec.inspectit.cmr.cache.indexing.restriction.IIndexQueryRestriction;
 import info.novatec.inspectit.cmr.cache.indexing.restriction.IIndexQueryRestrictionProcessor;
+import info.novatec.inspectit.cmr.spring.logger.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -9,7 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.springframework.stereotype.Component;
 
 /**
  * This restriction processor caches the methods of each class that needs to be invoke. It also
@@ -19,7 +21,12 @@ import org.apache.log4j.Logger;
  * @author Ivan Senic
  * 
  */
+@Component
 public class CachingIndexQueryRestrictionProcessor implements IIndexQueryRestrictionProcessor {
+
+	/** The logger of this class. */
+	@Logger
+	Log log;
 
 	/**
 	 * Map for caching methods.
@@ -30,11 +37,6 @@ public class CachingIndexQueryRestrictionProcessor implements IIndexQueryRestric
 	 * Marker method.
 	 */
 	private Method markerMethod;
-	
-	/**
-	 * Logger for restriction processor.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(CachingIndexQueryRestrictionProcessor.class);
 
 	/**
 	 * Default constructor. Sets {@link #markerMethod} to refer to {@link Object#toString()}.
@@ -46,9 +48,9 @@ public class CachingIndexQueryRestrictionProcessor implements IIndexQueryRestric
 			// setting marker method to point to Object.toString()
 			markerMethod = Object.class.getMethod("toString", new Class[0]);
 		} catch (SecurityException e) {
-			LOGGER.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		} catch (NoSuchMethodException e) {
-			LOGGER.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 
@@ -68,16 +70,16 @@ public class CachingIndexQueryRestrictionProcessor implements IIndexQueryRestric
 						return false;
 					}
 				} catch (SecurityException e) {
-					LOGGER.error(e.getMessage(), e);
+					log.error(e.getMessage(), e);
 				} catch (NoSuchMethodException e) {
 					// not found, put marker method at this place in map
 					cacheMap.put(cacheKey, markerMethod);
 				} catch (IllegalArgumentException e) {
-					LOGGER.error(e.getMessage(), e);
+					log.error(e.getMessage(), e);
 				} catch (IllegalAccessException e) {
-					LOGGER.error(e.getMessage(), e);
+					log.error(e.getMessage(), e);
 				} catch (InvocationTargetException e) {
-					LOGGER.error(e.getMessage(), e);
+					log.error(e.getMessage(), e);
 				}
 			} else {
 				if (markerMethod.equals(method)) { // such method does not exists for this class
@@ -89,11 +91,11 @@ public class CachingIndexQueryRestrictionProcessor implements IIndexQueryRestric
 							return false;
 						}
 					} catch (IllegalArgumentException e) {
-						LOGGER.error(e.getMessage(), e);
+						log.error(e.getMessage(), e);
 					} catch (IllegalAccessException e) {
-						LOGGER.error(e.getMessage(), e);
+						log.error(e.getMessage(), e);
 					} catch (InvocationTargetException e) {
-						LOGGER.error(e.getMessage(), e);
+						log.error(e.getMessage(), e);
 					}
 				}
 			}

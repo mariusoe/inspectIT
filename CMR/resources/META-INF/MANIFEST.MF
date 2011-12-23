@@ -1,3 +1,0 @@
-Main-Class: info.novatec.inspectit.cmr.CMR
-Class-Path: lib/antlr.jar lib/c3p0.jar lib/cglib-nodep.jar lib/commons-codec.jar lib/commons-collections.jar lib/commons-logging.jar lib/dom4j.jar lib/h2.jar lib/hessian.jar lib/hibernate-core.jar lib/javassist.jar lib/jettison.jar lib/jetty-util.jar lib/jetty.jar lib/jta.jar 
- lib/log4j.jar lib/inspectit-commons.jar lib/quartz.jar lib/servlet-api.jar lib/slf4j-api.jar lib/slf4j-log4j12.jar lib/spring-web.jar lib/spring.jar lib/truelicense.jar lib/truexml.jar lib/xstream.jar

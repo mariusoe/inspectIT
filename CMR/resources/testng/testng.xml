@@ -1,85 +1,46 @@
 <!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
 <suite name="CMRTest">
-	<test name="Environment Data Dao">
+	<test name="Cache">
 		<classes>
-			<class
-				name="info.novatec.inspectit.cmr.dao.ci.test.EnvironmentDataDaoTest" />
+			<class name="info.novatec.inspectit.cmr.cache.impl.BufferPropertiesTest" />
+			<class name="info.novatec.inspectit.cmr.cache.impl.ObjectSizesPrimitiveTypesSizeTest" />
 		</classes>
 	</test>
-	<test name="Profile Data Dao">
+	<test name="IndexingRestriction">
 		<classes>
-			<class name="info.novatec.inspectit.cmr.dao.ci.test.ProfileDataDaoTest" />
+			<class name="info.novatec.inspectit.cmr.cache.indexing.restriction.impl.IndexQueryRestrictionProcessorTest" />
 		</classes>
 	</test>
-	<test name="Sensor Type Data Dao">
+	<test name="Indexing">
 		<classes>
-			<class name="info.novatec.inspectit.cmr.dao.ci.test.SensorTypeDataDaoTest" />
+			<class name="info.novatec.inspectit.cmr.cache.indexing.impl.IndexingTest" />
 		</classes>
 	</test>
-	<test name="Exception Sensor Definition Dao">
+	<!-- test name="Configuration Interface">
 		<classes>
-			<class
-				name="info.novatec.inspectit.cmr.dao.ci.test.ExceptionSensorDefinitionDataDaoTest" />
+			<class name="info.novatec.inspectit.cmr.dao.ci.impl.EnvironmentDataDaoTest" />
+			<class name="info.novatec.inspectit.cmr.dao.ci.impl.ExceptionSensorDefinitionDataDaoTest" />
+			<class name="info.novatec.inspectit.cmr.dao.ci.impl.MethodSensorDefinitionDataDaoTest" />
+			<class name="info.novatec.inspectit.cmr.dao.ci.impl.PlatformSensorDefinitionDataDaoTest" />
+			<class name="info.novatec.inspectit.cmr.dao.ci.impl.ProfileDataDaoTest" />
+			<class name="info.novatec.inspectit.cmr.dao.ci.impl.SensorTypeDataDaoTest" />
+			<class name="info.novatec.inspectit.cmr.dao.ci.impl.LazyInitializationTest" />
+		</classes>
+	</test-->
+	<test name="Dao">
+		<classes>
+			<class name="info.novatec.inspectit.cmr.dao.impl.BufferHttpTimerDataDaoTest" />
+			<class name="info.novatec.inspectit.cmr.dao.impl.TimerDataAggregatorTest" />
 		</classes>
 	</test>
-	<test name="Method Sensor Definition Dao">
+	<test name="Util">
 		<classes>
-			<class
-				name="info.novatec.inspectit.cmr.dao.ci.test.MethodSensorDefinitionDataDaoTest" />
+			<class name="info.novatec.inspectit.cmr.util.PlatformIdentCacheTest" />
 		</classes>
 	</test>
-	<test name="Platform Sensor Definition Dao">
+	<test name="Data">
 		<classes>
-			<class
-				name="info.novatec.inspectit.cmr.dao.ci.test.PlatformSensorDefinitionDataDaoTest" />
-		</classes>
-	</test>
-	<test name="Lazy Initilization">
-		<classes>
-			<class
-				name="info.novatec.inspectit.cmr.dao.ci.test.LazyInitializationTest" />
-		</classes>
-	</test>
-	<test name="Buffer Properties">
-		<classes>
-			<class 
-				name="info.novatec.inspectit.cmr.cache.test.BufferPropertiesTest" />
-		</classes>
-	</test>
-	<test name="Indexing Tree">
-		<classes>
-			<class 
-				name="info.novatec.inspectit.cmr.cache.indexing.test.IndexingTest" />
-		</classes>
-	</test>
-	<test name="Index Query Restrictions">
-		<classes>
-			<class 
-				name="info.novatec.inspectit.cmr.cache.indexing.restriction.test.IndexQueryRestrictionsTest" />
-		</classes>
-	</test>
-	<test name="Timer Data Aggregator">
-		<classes>
-			<class 
-				name="info.novatec.inspectit.cmr.dao.impl.TimerDataAggregatorTest" />
-		</classes>
-	</test>
-	<test name="Platform Ident Cache">
-		<classes>
-			<class 
-				name="info.novatec.inspectit.cmr.util.test.PlatformIdentCacheTest" />
-		</classes>
-	</test>
-	<test name="Object Sizes Primitive Types Size Test">
-		<classes>
-			<class 
-				name="info.novatec.inspectit.cmr.cache.test.ObjectSizesPrimitiveTypesSizeTest" />
-		</classes>
-	</test>
-	<test name="Invocation Aware Data Test">
-		<classes>
-			<class 
-				name="info.novatec.inspectit.communication.data.test.InvocationAwareDataTest" />
+			<class name="info.novatec.inspectit.communication.data.InvocationAwareDataTest" />
 		</classes>
 	</test>
 </suite>

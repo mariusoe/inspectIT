@@ -8,6 +8,7 @@ import info.novatec.inspectit.communication.data.LicenseInfoData;
  * 
  * @author Dirk Maucher
  */
+@ServiceInterface(exporter = ServiceExporterType.HTTP)
 public interface ILicenseService {
 
 	/**

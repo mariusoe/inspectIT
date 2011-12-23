@@ -1,7 +1,8 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.SqlDataDao;
-import info.novatec.inspectit.cmr.util.aop.Log;
+import info.novatec.inspectit.cmr.spring.aop.MethodLog;
+import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 
 import java.util.Date;
@@ -9,7 +10,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +21,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class SqlDataAccessService implements ISqlDataAccessService {
 
-	/**
-	 * The logger of this class.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(SqlDataAccessService.class);
+	/** The logger of this class. */
+	@Logger
+	Log log;
 
 	/**
 	 * The sql DAO.
@@ -34,16 +34,16 @@ public class SqlDataAccessService implements ISqlDataAccessService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData sqlStatementData) {
 		List<SqlStatementData> result = sqlDataDao.getAggregatedSqlStatements(sqlStatementData);
 		return result;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
-	@Log
+	@MethodLog
 	public List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData sqlStatementData, Date fromDate, Date toDate) {
 		List<SqlStatementData> result = sqlDataDao.getAggregatedSqlStatements(sqlStatementData, fromDate, toDate);
 		return result;
@@ -52,12 +52,13 @@ public class SqlDataAccessService implements ISqlDataAccessService {
 	/**
 	 * Is executed after dependency injection is done to perform any initialization.
 	 * 
-	 * @throws Exception if an error occurs during {@link PostConstruct}
+	 * @throws Exception
+	 *             if an error occurs during {@link PostConstruct}
 	 */
 	@PostConstruct
 	public void postConstruct() throws Exception {
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("|-SQL Data Access Service active...");
+		if (log.isInfoEnabled()) {
+			log.info("|-SQL Data Access Service active...");
 		}
 	}
 

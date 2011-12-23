@@ -6,7 +6,7 @@ import info.novatec.inspectit.cmr.cache.indexing.restriction.impl.IndexQueryRest
 import info.novatec.inspectit.cmr.dao.ExceptionSensorDataDao;
 import info.novatec.inspectit.cmr.util.IndexQueryProvider;
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 
@@ -65,7 +65,7 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
 		searchedClasses.add(ExceptionSensorData.class);
 		query.setObjectClasses(searchedClasses);
-		query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("exceptionEvent", ExceptionEventEnum.CREATED));
+		query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("exceptionEvent", ExceptionEvent.CREATED));
 		if (null != fromDate) {
 			query.setFromDate(new Timestamp(fromDate.getTime()));
 		}

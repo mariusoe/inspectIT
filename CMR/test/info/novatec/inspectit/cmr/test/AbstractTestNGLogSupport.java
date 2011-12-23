@@ -5,19 +5,17 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeSuite;
 
 /**
- * This abstract class provides general logging support for the test classes that need normal
- * spring context.
+ * This abstract class provides general logging support for the test classes that need normal spring
+ * context.
  * 
  * @author Ivan Senic
- *
+ * 
  */
-public abstract class AbstractTestNGLogSupport extends AbstractTestNGSpringContextTests {
-	
-	
+public abstract class AbstractTestNGLogSupport {
+
 	/**
 	 * The logger of this class.
 	 */

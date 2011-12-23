@@ -20,12 +20,16 @@
 	<dependencies>
 		<dependency org="commons-logging" name="commons-logging" rev="1.0.3" conf="prod->default" />
 		
+		<dependency org="org.springframework" name="spring-core" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
+		<dependency org="org.springframework" name="spring-context" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
+		<dependency org="org.springframework" name="spring-beans" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>		
+		<dependency org="org.springframework" name="spring-web" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
+		<dependency org="org.springframework" name="spring-asm" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
+		<dependency org="org.springframework" name="spring-expression" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
+		<dependency org="org.springframework" name="spring-aop" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
+		<dependency org="aopalliance" name="aopalliance" rev="1.0" transitive="false" conf="prod->default"/>
 		<dependency org="cglib" name="cglib-nodep" rev="2.1_3" transitive="false" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-core" rev="3.1.0.M2" transitive="false" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-context" rev="3.1.0.M2" transitive="false" conf="prod->default"/>
-        <dependency org="org.springframework" name="spring-beans" rev="3.1.0.M2" transitive="false" conf="prod->default"/>		
-        <dependency org="org.springframework" name="spring-web" rev="3.1.0.M2" transitive="false" conf="prod->default"/>
-        		
+
 		<dependency org="org.codehaus.jettison" name="jettison" rev="1.1" transitive="false" conf="prod->default" />
 		<dependency org="org.hibernate" name="hibernate-core" rev="3.5.3-Final" transitive="false" conf="prod->default" />
 		<dependency org="org.codehaus.jettison" name="jettison" rev="1.2" transitive="false" conf="prod->default" />
@@ -38,7 +42,7 @@
 		<dependency org="commons-lang" name="commons-lang" rev="2.4" conf="prod->default"/>
 
 		<dependency org="org.testng" name="testng" rev="5.14.6" transitive="false" conf="test->default" />
-		<dependency org="org.mockito" name="mockito-all" rev="1.7" conf="test->default" />
+		<dependency org="org.mockito" name="mockito-all" rev="1.9.0" conf="test->default" />
 		<dependency org="net.sourceforge.cobertura" name="cobertura" rev="1.9.4.1" conf="test->default" />
 		<dependency org="log4j" name="log4j" rev="1.2.9" conf="test->default" />
 		<dependency org="oro" name="oro" rev="2.0.8" conf="test->default" />

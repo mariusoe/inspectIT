@@ -6,6 +6,7 @@ import info.novatec.inspectit.cmr.cache.IBufferElement.BufferElementState;
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.cmr.cache.indexing.ITreeComponent;
 import info.novatec.inspectit.cmr.cache.indexing.impl.IndexingException;
+import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.cmr.util.Converter;
 import info.novatec.inspectit.communication.DefaultData;
 
@@ -20,7 +21,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Buffer uses atomic variables and references to handle the synchronization. Thus, non of its
@@ -32,12 +35,30 @@ import org.apache.log4j.Logger;
  * @param <E>
  *            Parameterized type of elements buffer can hold.
  */
+@Component
 public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
+
+	/** The logger of this class. */
+	@Logger
+	Log log;
 
 	/**
 	 * Buffer properties.
 	 */
+	@Autowired
 	private BufferProperties bufferProperties;
+
+	/**
+	 * Correct interface for calculating object sizes.
+	 */
+	@Autowired
+	private IObjectSizes objectSizes;
+
+	/**
+	 * Indexing tree where the elements will be indexed.
+	 */
+	@Autowired
+	private ITreeComponent<E> indexingTree;
 
 	/**
 	 * Max size of the buffer in atomic long.
@@ -127,11 +148,6 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	private Condition nothingToIndex = indexingLock.newCondition();
 
 	/**
-	 * Indexing tree where the elements will be indexed.
-	 */
-	private ITreeComponent<E> indexingTree;
-
-	/**
 	 * Size of the indexing tree.
 	 */
 	private AtomicLong indexingTreeSize = new AtomicLong();
@@ -152,11 +168,6 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	private AtomicLong dataRemovedInBytes = new AtomicLong();
 
 	/**
-	 * Correct interface for calculating object sizes.
-	 */
-	private IObjectSizes objectSizes;
-
-	/**
 	 * Marker for empty buffer element.
 	 */
 	private EmptyBufferElement emptyBufferElement = new EmptyBufferElement();
@@ -165,11 +176,6 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	 * Amount on bytes flags for tree clean and size update will be set.
 	 */
 	private long flagsSetOnBytes;
-
-	/**
-	 * Logger for buffer.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(AtomicBuffer.class);
 
 	/**
 	 * {@inheritDoc}
@@ -433,7 +439,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 					if (dataAddedInBytes.get() > flagsSetOnBytes) {
 						dataAddedInBytes.set(0);
 						long time = 0;
-						if (LOGGER.isDebugEnabled()) {
+						if (log.isDebugEnabled()) {
 							time = System.nanoTime();
 						}
 
@@ -448,15 +454,15 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 							}
 						}
 
-						if (LOGGER.isDebugEnabled()) {
-							LOGGER.debug("Indexing tree size update duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
-							LOGGER.debug("Indexing tree delta: " + (newSize - oldSize));
-							LOGGER.debug("Indexing tree new size: " + newSize);
+						if (log.isDebugEnabled()) {
+							log.debug("Indexing tree size update duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+							log.debug("Indexing tree delta: " + (newSize - oldSize));
+							log.debug("Indexing tree new size: " + newSize);
 						}
 					}
 				} catch (IndexingException e) {
 					// indexing exception should not happen
-					LOGGER.error(e.getMessage(), e);
+					log.error(e.getMessage(), e);
 				}
 
 				// if now we are pointing to the marker we go to sleep until we are informed that
@@ -491,14 +497,14 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 		if (dataRemovedInBytes.get() > flagsSetOnBytes) {
 			dataRemovedInBytes.set(0);
 			long time = 0;
-			if (LOGGER.isDebugEnabled()) {
+			if (log.isDebugEnabled()) {
 				time = System.nanoTime();
 			}
 
 			indexingTree.cleanWithRunnable(indexingTreeCleaningExecutorService);
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Indexing tree cleaning duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+			if (log.isDebugEnabled()) {
+				log.debug("Indexing tree cleaning duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
 			}
 		}
 
@@ -656,39 +662,10 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	}
 
 	/**
-	 * Setter for object sizes.
-	 * 
-	 * @param objectSizes
-	 *            Proper {@link IObjectSizes} instance.
-	 */
-	public void setObjectSizes(IObjectSizes objectSizes) {
-		this.objectSizes = objectSizes;
-	}
-
-	/**
-	 * Setter for buffer properties.
-	 * 
-	 * @param bufferProperties
-	 *            Set of properties for this buffer.
-	 */
-	public void setBufferProperties(BufferProperties bufferProperties) {
-		this.bufferProperties = bufferProperties;
-	}
-
-	/**
-	 * Setter for the root branch for the indexing tree.
-	 * 
-	 * @param indexingTree
-	 *            Root branch.
-	 */
-	public void setIndexingTree(ITreeComponent<E> indexingTree) {
-		this.indexingTree = indexingTree;
-	}
-
-	/**
 	 * Is executed after dependency injection is done to perform any initialization.
 	 * 
-	 * @throws Exception if an error occurs during {@link PostConstruct}
+	 * @throws Exception
+	 *             if an error occurs during {@link PostConstruct}
 	 */
 	@PostConstruct
 	public void postConstruct() throws Exception {
@@ -702,9 +679,9 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 		this.indexingTreeCleaningExecutorService = Executors.newFixedThreadPool(bufferProperties.getIndexingTreeCleaningThreads());
 		this.flagsSetOnBytes = bufferProperties.getFlagsSetOnBytes(this.maxSize.get());
 
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("|-Using buffer with maximum size " + NumberFormat.getInstance().format(maxSize) + " bytes...");
-			LOGGER.info("|-Indexing tree maintenance on " + NumberFormat.getInstance().format(flagsSetOnBytes) + " bytes added/removed...");
+		if (log.isInfoEnabled()) {
+			log.info("|-Using buffer with maximum size " + NumberFormat.getInstance().format(maxSize) + " bytes...");
+			log.info("|-Indexing tree maintenance on " + NumberFormat.getInstance().format(flagsSetOnBytes) + " bytes added/removed...");
 		}
 	}
 

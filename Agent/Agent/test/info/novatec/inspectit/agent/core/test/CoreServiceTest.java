@@ -20,7 +20,7 @@ import info.novatec.inspectit.agent.sending.ISendingStrategy;
 import info.novatec.inspectit.agent.sensor.method.timer.PlainTimerStorage;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.SystemSensorData;
 import info.novatec.inspectit.communication.data.CpuInformationData;
@@ -258,7 +258,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		ExceptionSensorData exceptionSensorData = new ExceptionSensorData();
 		exceptionSensorData.setThrowableType("MyException");
 		exceptionSensorData.setThrowableIdentityHashCode(1234);
-		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.CREATED);
+		exceptionSensorData.setExceptionEvent(ExceptionEvent.CREATED);
 		List<ExceptionSensorData> dataList = new ArrayList<ExceptionSensorData>();
 		dataList.add(exceptionSensorData);
 
@@ -332,7 +332,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		ExceptionSensorData exceptionSensorData = new ExceptionSensorData();
 		exceptionSensorData.setThrowableType("MyException");
 		exceptionSensorData.setThrowableIdentityHashCode(1234);
-		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.CREATED);
+		exceptionSensorData.setExceptionEvent(ExceptionEvent.CREATED);
 
 		coreService.addExceptionSensorData(sensorTypeId, exceptionSensorData.getThrowableIdentityHashCode(), exceptionSensorData);
 

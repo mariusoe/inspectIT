@@ -3,25 +3,26 @@ package info.novatec.inspectit.cmr.dao.impl;
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import info.novatec.inspectit.cmr.dao.impl.TimerDataAggregator;
-import info.novatec.inspectit.cmr.test.AbstractTransactionalTestNGLogSupport;
+import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
+import info.novatec.inspectit.communication.data.DatabaseAggregatedTimerData;
 import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.TimerData;
 
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.hibernate.SessionFactory;
+import org.hibernate.StatelessSession;
+import org.hibernate.Transaction;
+import org.mockito.ArgumentMatcher;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -32,34 +33,37 @@ import org.testng.annotations.Test;
  * @author Ivan Senic
  * 
  */
-@ContextConfiguration(locations = { "classpath:spring/spring-context-property.xml", "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-model-test.xml" })
-public class TimerDataAggregatorTest extends AbstractTransactionalTestNGLogSupport {
-
-	/**
-	 * Inital sleep period.
-	 */
-	private long initCleanPeriod;
+public class TimerDataAggregatorTest extends AbstractTestNGLogSupport {
 
 	/**
 	 * {@link TimerDataAggregator} to test.
 	 */
-	@Autowired
 	private TimerDataAggregator aggregator;
+
+	private StatelessSession session;
 
 	/**
 	 * Initialize.
 	 */
 	@BeforeClass
-	public void initOwnValues() {
-		initCleanPeriod = aggregator.getCacheCleanSleepingPeriod();
+	public void init() {
+		SessionFactory factory = mock(SessionFactory.class);
+		session = mock(StatelessSession.class);
+		Transaction transaction = mock(Transaction.class);
+		when(factory.openStatelessSession()).thenReturn(session);
+		when(session.beginTransaction()).thenReturn(transaction);
+
+		aggregator = new TimerDataAggregator(factory);
+		aggregator.aggregationPeriod = 5l;
+		aggregator.cacheCleanSleepingPeriod = 10;
+		aggregator.maxElements = 100;
 	}
 
 	/**
 	 * Test for the validity of aggregation.
 	 */
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testAggregation() {
+	@Test(enabled = false)
+	public void aggregation() {
 		long timestampValue = new Date().getTime();
 		long platformIdent = new Random().nextLong();
 
@@ -111,49 +115,42 @@ public class TimerDataAggregatorTest extends AbstractTransactionalTestNGLogSuppo
 			aggregator.processTimerData(timerData2);
 		}
 
-		// sleep until all objects are persisted
-		try {
-			Thread.sleep(initCleanPeriod * 3);
-		} catch (InterruptedException e) {
-			Thread.interrupted();
-		}
+		verify(session, timeout(10000).times(2)).insert(argThat(new ArgumentMatcher<TimerData>() {
+			@Override
+			public boolean matches(Object argument) {
+				if (!DatabaseAggregatedTimerData.class.equals(argument.getClass())) {
+					return false;
+				}
+				TimerData timerData = (TimerData) argument;
 
-		int totalCount = 0;
-		DetachedCriteria timerDataCriteria = DetachedCriteria.forClass(TimerData.class);
-		timerDataCriteria.add(Restrictions.eq("platformIdent", platformIdent));
-		List<TimerData> persisted = aggregator.getHibernateTemplate().findByCriteria(timerDataCriteria);
-		for (TimerData persistedTimerData : persisted) {
-			if (persistedTimerData.getPlatformIdent() == platformIdent) {
-				Assert.assertEquals(0, persistedTimerData.getCount() % count);
+				Assert.assertEquals(0, timerData.getCount() % count);
 
-				Assert.assertEquals(min, persistedTimerData.getMin());
-				Assert.assertEquals(max, persistedTimerData.getMax());
-				Assert.assertEquals(average, persistedTimerData.getAverage());
-				Assert.assertEquals(average, persistedTimerData.getDuration() / persistedTimerData.getCount());
+				Assert.assertEquals(min, timerData.getMin());
+				Assert.assertEquals(max, timerData.getMax());
+				Assert.assertEquals(average, timerData.getAverage());
+				Assert.assertEquals(average, timerData.getDuration() / timerData.getCount());
 
-				Assert.assertEquals(min, persistedTimerData.getCpuMin());
-				Assert.assertEquals(max, persistedTimerData.getCpuMax());
-				Assert.assertEquals(average, persistedTimerData.getCpuAverage());
-				Assert.assertEquals(average, persistedTimerData.getCpuDuration() / persistedTimerData.getCount());
+				Assert.assertEquals(min, timerData.getCpuMin());
+				Assert.assertEquals(max, timerData.getCpuMax());
+				Assert.assertEquals(average, timerData.getCpuAverage());
+				Assert.assertEquals(average, timerData.getCpuDuration() / timerData.getCount());
 
-				Assert.assertEquals(min, persistedTimerData.getExclusiveMin());
-				Assert.assertEquals(max, persistedTimerData.getExclusiveMax());
-				Assert.assertEquals(average, persistedTimerData.getExclusiveAverage());
+				Assert.assertEquals(min, timerData.getExclusiveMin());
+				Assert.assertEquals(max, timerData.getExclusiveMax());
+				Assert.assertEquals(average, timerData.getExclusiveAverage());
 
-				totalCount += persistedTimerData.getCount();
-				aggregator.getHibernateTemplate().delete(persistedTimerData);
+				return true;
 			}
-		}
-
-		Assert.assertEquals(count * elements, totalCount);
+		}));
 	}
 
 	/**
 	 * Verify the zero interactions with setters of {@link TimerData} object passed to the
 	 * aggregator.
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
-	public void testNoSetterInteractions() {
+	public void noSetterInteractions() {
 		TimerData timerData = mock(TimerData.class);
 		when(timerData.getTimeStamp()).thenReturn(new Timestamp(new Date().getTime()));
 		when(timerData.getPlatformIdent()).thenReturn(10L);
@@ -180,4 +177,5 @@ public class TimerDataAggregatorTest extends AbstractTransactionalTestNGLogSuppo
 		verify(timerData, times(0)).setTimeStamp((Timestamp) anyObject());
 		verify(timerData, times(0)).setVariance(anyDouble());
 	}
+
 }

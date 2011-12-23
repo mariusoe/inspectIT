@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
-<!-- ====================================================================== 
-     inspectIT - CMR    
-     Sophisticated Monitoring tool by NovaTec GmbH
-     ====================================================================== -->
+<!-- ======================================================================
+		inspectIT - CMR
+		Sophisticated Monitoring tool by NovaTec GmbH
+		====================================================================== -->
 <project xmlns:ivy="antlib:org.apache.ivy.ant" name="inspectIT - CMR" default="release" basedir=".">
 	<description>
-            Sophisticated Monitoring tool by NovaTec GmbH
-    </description>
+		Sophisticated Monitoring tool by NovaTec GmbH
+	</description>
 
 	<property file="${basedir}/build.properties" />
 
@@ -246,18 +246,44 @@
 		<mkdir dir="${build.release.root.cmr}" />
 		<mkdir dir="${build.scripts}" />
 
-		<jar destfile="${build.release.root.cmr}/${dist.jar.name}" manifest="${basedir}/resources/META-INF/MANIFEST.MF">
-			<fileset dir="${build.cmr.classes}" includes="**/*.class" />
-			<fileset dir="${src.root}" includes="**/*.xml" />
-			<fileset dir="${src.root}" includes="**/*.properties" />
-			<fileset dir="${src.commons}" includes="version.log" />
-		</jar>
-
 		<copy todir="${build.release.root.cmr}/lib">
 			<fileset dir="${lib.root}/prod" includes="**/*.jar" />
 		</copy>
 
 		<jar destfile="${build.release.root.cmr}/lib/inspectit-commons.jar" basedir="${build.commons.classes}" />
+
+		<!-- create a property containing all .jar files, prefix lib/, and seperated with a space -->
+		<pathconvert property="libs.project" pathsep=" ">
+			<mapper>
+				<chainedmapper>
+					<!-- remove absolute path -->
+					<flattenmapper />
+
+					<!-- add lib/ prefix -->
+					<globmapper from="*" to="lib/*" />
+				</chainedmapper>
+			</mapper>
+
+			<path>
+				<!-- lib.home contains all jar files -->
+				<fileset dir="${build.release.root.cmr}/lib/">
+					<include name="**/*.jar" />
+				</fileset>
+			</path>
+		</pathconvert>
+
+		<jar destfile="${build.release.root.cmr}/${dist.jar.name}">
+			<fileset dir="${build.cmr.classes}" includes="**/*.class" />
+			<fileset dir="${src.root}" includes="**/*.xml" />
+			<fileset dir="${src.root}" includes="**/*.properties" />
+			<fileset dir="${src.commons}" includes="version.log" />
+
+			<!-- define MANIFEST.MF -->
+			<manifest>
+				<attribute name="Main-Class" value="info.novatec.inspectit.cmr.CMR" />
+				<attribute name="Class-Path" value="${libs.project}" />
+			</manifest>
+		</jar>
 
 		<mkdir dir="${build.release.root.cmr}/license" />
 		<copy todir="${build.release.root.cmr}/license" file="${basedir}/license/publicCerts.store" />
@@ -399,9 +425,9 @@
 		<input>Press Return key to continue and to overwrite the JRE: ${file}</input>
 	</target>
 
-	<!-- - - - - - - - - - - - - - - - - - 
-		          Targets for creating the final distributon containing the JRE.                     
-		         - - - - - - - - - - - - - - - - - -->
+	<!-- - - - - - - - - - - - - - - - - -
+							Targets for creating the final distributon containing the JRE.
+						- - - - - - - - - - - - - - - - - -->
 	<target name="-linux-x86">
 		<echo file="${build.scripts}/startup.sh" message="${java.command.linux} ${java.memory.32bit} ${java.opts.32bit} ${java.opts.linux} ${java.locgc.linux} -jar ${dist.jar.name}" />
 		<tar destfile="${release.root}/inspectit-cmr.linux.x86.tar.gz" compression="gzip">

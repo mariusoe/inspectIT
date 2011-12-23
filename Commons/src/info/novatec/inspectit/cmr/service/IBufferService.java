@@ -6,11 +6,12 @@ package info.novatec.inspectit.cmr.service;
  * @author Ivan Senic
  * 
  */
+@ServiceInterface(exporter = ServiceExporterType.HTTP)
 public interface IBufferService {
 
 	/**
 	 * Clear whole buffer.
 	 */
 	void clearBuffer();
-	
+
 }

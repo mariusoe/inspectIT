@@ -20,7 +20,7 @@ import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.sensor.exception.ExceptionSensorHook;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
-import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.util.StringConstraint;
 
@@ -141,7 +141,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 
 		when(registeredSensorConfig.getQualifiedTargetClassName()).thenReturn(MyTestException.class.getName());
 
-		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.CREATED);
+		exceptionSensorData.setExceptionEvent(ExceptionEvent.CREATED);
 		exceptionHook.afterConstructor(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
 		verify(idManager, times(1)).getRegisteredMethodId(constructorId);
 		verify(idManager, times(1)).getRegisteredSensorTypeId(sensorTypeId);
@@ -149,7 +149,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addExceptionSensorData(eq(registeredSensorTypeId), eq(exceptionSensorData.getThrowableIdentityHashCode()),
 				argThat(new ExceptionSensorDataVerifier(exceptionSensorData)));
 
-		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.PASSED);
+		exceptionSensorData.setExceptionEvent(ExceptionEvent.PASSED);
 		exceptionHook.dispatchOnThrowInBody(coreService, methodId, sensorTypeId, object, exceptionObject, parameters, registeredSensorConfig);
 		verify(idManager, times(1)).getRegisteredMethodId(methodId);
 		verify(idManager, times(2)).getRegisteredSensorTypeId(sensorTypeId);
@@ -157,7 +157,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addExceptionSensorData(eq(registeredSensorTypeId), eq(exceptionSensorData.getThrowableIdentityHashCode()),
 				argThat(new ExceptionSensorDataVerifier(exceptionSensorData)));
 
-		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.HANDLED);
+		exceptionSensorData.setExceptionEvent(ExceptionEvent.HANDLED);
 		exceptionHook.dispatchBeforeCatchBody(coreService, methodIdTwo, sensorTypeId, exceptionObject, registeredSensorConfig);
 		verify(idManager, times(1)).getRegisteredMethodId(methodIdTwo);
 		verify(idManager, times(3)).getRegisteredSensorTypeId(sensorTypeId);
@@ -243,7 +243,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 
 		when(registeredSensorConfig.getQualifiedTargetClassName()).thenReturn(MyTestException.class.getName());
 
-		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.CREATED);
+		exceptionSensorData.setExceptionEvent(ExceptionEvent.CREATED);
 		exceptionHook.afterConstructor(coreService, constructorId, sensorTypeId, exceptionObject, parameters, registeredSensorConfig);
 		verify(idManager, times(1)).getRegisteredMethodId(constructorId);
 		verify(idManager, times(1)).getRegisteredSensorTypeId(sensorTypeId);
@@ -256,7 +256,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		// data object
 		exceptionSensorData.setCause(null);
 
-		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.PASSED);
+		exceptionSensorData.setExceptionEvent(ExceptionEvent.PASSED);
 		exceptionHook.dispatchOnThrowInBody(coreService, methodId, sensorTypeId, object, exceptionObject, parameters, registeredSensorConfig);
 		verify(idManager, times(1)).getRegisteredMethodId(methodId);
 		verify(idManager, times(2)).getRegisteredSensorTypeId(sensorTypeId);
@@ -264,7 +264,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addExceptionSensorData(eq(registeredSensorTypeId), eq(exceptionSensorData.getThrowableIdentityHashCode()),
 				argThat(new ExceptionSensorDataVerifier(exceptionSensorData)));
 
-		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.HANDLED);
+		exceptionSensorData.setExceptionEvent(ExceptionEvent.HANDLED);
 		exceptionHook.dispatchBeforeCatchBody(coreService, methodIdTwo, sensorTypeId, exceptionObject, registeredSensorConfig);
 		verify(idManager, times(1)).getRegisteredMethodId(methodIdTwo);
 		verify(idManager, times(3)).getRegisteredSensorTypeId(sensorTypeId);
@@ -291,7 +291,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		MyTestException exceptionObject = new MyTestException(exceptionMessage);
 
 		ExceptionSensorData exceptionSensorData = new ExceptionSensorData(new Timestamp(System.currentTimeMillis()), platformId, registeredSensorTypeId, registeredConstructorId);
-		exceptionSensorData.setExceptionEvent(ExceptionEventEnum.CREATED);
+		exceptionSensorData.setExceptionEvent(ExceptionEvent.CREATED);
 		exceptionSensorData.setThrowableIdentityHashCode(System.identityHashCode(exceptionObject));
 
 		// the actual error message to be verified against

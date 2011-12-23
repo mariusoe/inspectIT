@@ -11,7 +11,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;

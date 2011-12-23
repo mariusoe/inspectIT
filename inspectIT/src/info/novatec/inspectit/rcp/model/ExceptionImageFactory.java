@@ -1,6 +1,6 @@
 package info.novatec.inspectit.rcp.model;
 
-import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
@@ -46,16 +46,16 @@ public class ExceptionImageFactory {
 	 */
 	public static ImageDescriptor getImageDescriptor(ExceptionSensorData data) {
 		if (null != data) {
-			ExceptionEventEnum event = data.getExceptionEvent();
-			if (ExceptionEventEnum.CREATED.equals(event)) {
+			ExceptionEvent event = data.getExceptionEvent();
+			if (ExceptionEvent.CREATED.equals(event)) {
 				return OVERLAY_ERROR;
-			} else if (ExceptionEventEnum.HANDLED.equals(event)) {
+			} else if (ExceptionEvent.HANDLED.equals(event)) {
 				return OVERLAY_PRIORITY;
-			} else if (ExceptionEventEnum.PASSED.equals(event)) {
+			} else if (ExceptionEvent.PASSED.equals(event)) {
 				return OVERLAY_UP;
-			} else if (ExceptionEventEnum.RETHROWN.equals(event)) {
+			} else if (ExceptionEvent.RETHROWN.equals(event)) {
 				return OVERLAY_ERROR;
-			} else if (ExceptionEventEnum.UNREGISTERED_PASSED.equals(event)) {
+			} else if (ExceptionEvent.UNREGISTERED_PASSED.equals(event)) {
 				return OVERLAY_UP;
 			}
 		}

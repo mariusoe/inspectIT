@@ -6,6 +6,7 @@ package info.novatec.inspectit.cmr.service;
  * @author Patrice Bouillet
  * 
  */
+@ServiceInterface(exporter = ServiceExporterType.HTTP)
 public interface IServerStatusService {
 
 	int SERVER_OFFLINE = 0;

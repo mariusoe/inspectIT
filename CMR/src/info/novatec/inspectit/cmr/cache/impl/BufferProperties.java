@@ -1,5 +1,7 @@
 package info.novatec.inspectit.cmr.cache.impl;
 
+import info.novatec.inspectit.cmr.spring.logger.Logger;
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
@@ -9,8 +11,10 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.BeanInitializationException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Set of properties for one buffer.
@@ -18,7 +22,12 @@ import org.springframework.beans.factory.BeanInitializationException;
  * @author Ivan Senic
  * 
  */
+@Component
 public class BufferProperties {
+
+	/** The logger of this class. */
+	@Logger
+	Log log;
 
 	/**
 	 * Name of the memory pool for old generation.
@@ -34,73 +43,81 @@ public class BufferProperties {
 	/**
 	 * Buffer eviction occupancy percentage.
 	 */
-	private float evictionOccupancyPercentage;
+	@Value(value = "${buffer.evictionOccupancyPercentage}")
+	float evictionOccupancyPercentage;
 
 	/**
 	 * Maximum security object expansion rate in percentages.
 	 */
-	private float maxObjectExpansionRate;
+	@Value(value = "${buffer.maxObjectExpansionRate}")
+	float maxObjectExpansionRate;
 
 	/**
 	 * Minimum security object expansion rate in percentages.
 	 */
-	private float minObjectExpansionRate;
+	@Value(value = "${buffer.minObjectExpansionRate}")
+	float minObjectExpansionRate;
 
 	/**
 	 * Maximum security object expansion rate active till this buffer size.
 	 */
-	private long maxObjectExpansionRateActiveTillBufferSize;
+	@Value(value = "${buffer.maxObjectExpansionRateActiveTillBufferSize}")
+	long maxObjectExpansionRateActiveTillBufferSize;
 
 	/**
 	 * Minimum security object expansion rate active from this buffer size.
 	 */
-	private long minObjectExpansionRateActiveFromBufferSize;
+	@Value(value = "${buffer.minObjectExpansionRateActiveFromBufferSize}")
+	long minObjectExpansionRateActiveFromBufferSize;
 
 	/**
 	 * Size of the eviction fragment in percentages, in relation to the max buffer size.
 	 */
-	private float evictionFragmentSizePercentage;
+	@Value(value = "${buffer.evictionFragmentSizePercentage}")
+	float evictionFragmentSizePercentage;
 
 	/**
 	 * Number of bytes in % relative to the buffer size that need to be added or removed for the
 	 * buffer so that update and clean of the indexing tree is performed - 5%.
 	 */
-	private float bytesMaintenancePercentage;
+	@Value(value = "${buffer.bytesMaintenancePercentage}")
+	float bytesMaintenancePercentage;
 
 	/**
 	 * Number of threads that are cleaning the indexing tree.
 	 */
-	private int indexingTreeCleaningThreads;
+	@Value(value = "${buffer.indexingTreeCleaningThreads}")
+	int indexingTreeCleaningThreads;
 
 	/**
 	 * Time in milliseconds that the indexing thread will wait for the object to be analyzed first.
 	 */
-	private long indexingWaitTime;
+	@Value(value = "${buffer.indexingWaitTime}")
+	long indexingWaitTime;
 
 	/**
 	 * Size of old space occupancy till which min occupancy will be active.
 	 */
-	private long minOldSpaceOccupancyActiveTillOldGenSize;
+	@Value(value = "${buffer.minOldSpaceOccupancyActiveTillOldGenSize}")
+	long minOldSpaceOccupancyActiveTillOldGenSize;
 
 	/**
 	 * Size of old space occupancy from which max occupancy will be active.
 	 */
-	private long maxOldSpaceOccupancyActiveFromOldGenSize;
+	@Value(value = "${buffer.maxOldSpaceOccupancyActiveFromOldGenSize}")
+	long maxOldSpaceOccupancyActiveFromOldGenSize;
 
 	/**
 	 * Percentage of the min old generation heap space buffer can occupy.
 	 */
-	private float minOldSpaceOccupancy;
+	@Value(value = "${buffer.minOldSpaceOccupancy}")
+	float minOldSpaceOccupancy;
 
 	/**
 	 * Percentage of the max old generation heap space buffer can occupy.
 	 */
-	private float maxOldSpaceOccupancy;
-
-	/**
-	 * Logger for buffer properties.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(BufferProperties.class);
+	@Value(value = "${buffer.maxOldSpaceOccupancy}")
+	float maxOldSpaceOccupancy;
 
 	/**
 	 * Returns buffer eviction occupancy percentage.
@@ -109,16 +126,6 @@ public class BufferProperties {
 	 */
 	public float getEvictionOccupancyPercentage() {
 		return evictionOccupancyPercentage;
-	}
-
-	/**
-	 * Sets buffer eviction occupancy percentage.
-	 * 
-	 * @param evictionOccupancyPercentage
-	 *            Buffer eviction occupancy percentage as float.
-	 */
-	public void setEvictionOccupancyPercentage(float evictionOccupancyPercentage) {
-		this.evictionOccupancyPercentage = evictionOccupancyPercentage;
 	}
 
 	/**
@@ -131,32 +138,12 @@ public class BufferProperties {
 	}
 
 	/**
-	 * Sets maximum security object expansion rate in percentages.
-	 * 
-	 * @param maxObjectExpansionRate
-	 *            Maximum security object expansion rate in percentages as float.
-	 */
-	public void setMaxObjectExpansionRate(float maxObjectExpansionRate) {
-		this.maxObjectExpansionRate = maxObjectExpansionRate;
-	}
-
-	/**
 	 * Returns minimum security object expansion rate in percentages.
 	 * 
 	 * @return Minimum security object expansion rate in percentages as float.
 	 */
 	public float getMinObjectExpansionRate() {
 		return minObjectExpansionRate;
-	}
-
-	/**
-	 * Sets minimum security object expansion rate in percentages.
-	 * 
-	 * @param minObjectExpansionRate
-	 *            Minimum security object expansion rate in percentages as float.
-	 */
-	public void setMinObjectExpansionRate(float minObjectExpansionRate) {
-		this.minObjectExpansionRate = minObjectExpansionRate;
 	}
 
 	/**
@@ -169,16 +156,6 @@ public class BufferProperties {
 	}
 
 	/**
-	 * Sets buffer size till which maximum object expansion rate is active.
-	 * 
-	 * @param maxObjectExpansionRateActiveTillBufferSize
-	 *            Buffer size in bytes.
-	 */
-	public void setMaxObjectExpansionRateActiveTillBufferSize(long maxObjectExpansionRateActiveTillBufferSize) {
-		this.maxObjectExpansionRateActiveTillBufferSize = maxObjectExpansionRateActiveTillBufferSize;
-	}
-
-	/**
 	 * Returns buffer size from which minimum object expansion rate is active.
 	 * 
 	 * @return Buffer size in bytes.
@@ -188,32 +165,12 @@ public class BufferProperties {
 	}
 
 	/**
-	 * Sets buffer size from which minimum object expansion rate is active.
-	 * 
-	 * @param minObjectExpansionRateActiveFromBufferSize
-	 *            Buffer size in bytes.
-	 */
-	public void setMinObjectExpansionRateActiveFromBufferSize(long minObjectExpansionRateActiveFromBufferSize) {
-		this.minObjectExpansionRateActiveFromBufferSize = minObjectExpansionRateActiveFromBufferSize;
-	}
-
-	/**
 	 * Returns size of the eviction fragment in percentages, in relation to the max buffer size.
 	 * 
 	 * @return Eviction fragment in percentages as float.
 	 */
 	public float getEvictionFragmentSizePercentage() {
 		return evictionFragmentSizePercentage;
-	}
-
-	/**
-	 * Sets size of the eviction fragment in percentages, in relation to the max buffer size.
-	 * 
-	 * @param evictionFragmentSizePercentage
-	 *            Eviction fragment in percentages as float.
-	 */
-	public void setEvictionFragmentSizePercentage(float evictionFragmentSizePercentage) {
-		this.evictionFragmentSizePercentage = evictionFragmentSizePercentage;
 	}
 
 	/**
@@ -237,26 +194,10 @@ public class BufferProperties {
 	}
 
 	/**
-	 * @param bytesMaintenancePercentage
-	 *            the bytesMaintenancePercentage to set
-	 */
-	public void setBytesMaintenancePercentage(float bytesMaintenancePercentage) {
-		this.bytesMaintenancePercentage = bytesMaintenancePercentage;
-	}
-
-	/**
 	 * @return Number of indexing tree cleaning threads.
 	 */
 	public int getIndexingTreeCleaningThreads() {
 		return indexingTreeCleaningThreads;
-	}
-
-	/**
-	 * @param indexingTreeCleaningThreads
-	 *            Number of indexing tree cleaning threads.
-	 */
-	public void setIndexingTreeCleaningThreads(int indexingTreeCleaningThreads) {
-		this.indexingTreeCleaningThreads = indexingTreeCleaningThreads;
 	}
 
 	/**
@@ -267,26 +208,10 @@ public class BufferProperties {
 	}
 
 	/**
-	 * @param indexingWaitTime
-	 *            the indexingWaitTime to set
-	 */
-	public void setIndexingWaitTime(long indexingWaitTime) {
-		this.indexingWaitTime = indexingWaitTime;
-	}
-
-	/**
 	 * @return the minOldSpaceOccupancyActiveTillOldGenSize
 	 */
 	public long getMinOldSpaceOccupancyActiveTillOldGenSize() {
 		return minOldSpaceOccupancyActiveTillOldGenSize;
-	}
-
-	/**
-	 * @param minOldSpaceOccupancyActiveTillOldGenSize
-	 *            the minOldSpaceOccupancyActiveTillOldGenSize to set
-	 */
-	public void setMinOldSpaceOccupancyActiveTillOldGenSize(long minOldSpaceOccupancyActiveTillOldGenSize) {
-		this.minOldSpaceOccupancyActiveTillOldGenSize = minOldSpaceOccupancyActiveTillOldGenSize;
 	}
 
 	/**
@@ -297,14 +222,6 @@ public class BufferProperties {
 	}
 
 	/**
-	 * @param maxOldSpaceOccupancyActiveFromOldGenSize
-	 *            the maxOldSpaceOccupancyActiveFromOldGenSize to set
-	 */
-	public void setMaxOldSpaceOccupancyActiveFromOldGenSize(long maxOldSpaceOccupancyActiveFromOldGenSize) {
-		this.maxOldSpaceOccupancyActiveFromOldGenSize = maxOldSpaceOccupancyActiveFromOldGenSize;
-	}
-
-	/**
 	 * @return the minOldSpaceOccupancy
 	 */
 	public float getMinOldSpaceOccupancy() {
@@ -312,26 +229,10 @@ public class BufferProperties {
 	}
 
 	/**
-	 * @param minOldSpaceOccupancy
-	 *            the minOldSpaceOccupancy to set
-	 */
-	public void setMinOldSpaceOccupancy(float minOldSpaceOccupancy) {
-		this.minOldSpaceOccupancy = minOldSpaceOccupancy;
-	}
-
-	/**
 	 * @return the oldSpaceOccupancy
 	 */
 	public float getMaxOldSpaceOccupancy() {
 		return maxOldSpaceOccupancy;
-	}
-
-	/**
-	 * @param oldSpaceOccupancy
-	 *            the oldSpaceOccupancy to set
-	 */
-	public void setMaxOldSpaceOccupancy(float oldSpaceOccupancy) {
-		this.maxOldSpaceOccupancy = oldSpaceOccupancy;
 	}
 
 	/**
@@ -465,24 +366,25 @@ public class BufferProperties {
 	/**
 	 * Is executed after dependency injection is done to perform any initialization.
 	 * 
-	 * @throws Exception if an error occurs during {@link PostConstruct}
+	 * @throws Exception
+	 *             if an error occurs during {@link PostConstruct}
 	 */
 	@PostConstruct
 	public void postConstruct() throws Exception {
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("|-Buffer properties initialized with following values:");
-			LOGGER.info("||-Eviction occupancy percentage: " + NumberFormat.getInstance().format(evictionOccupancyPercentage * 100) + "%");
-			LOGGER.info("||-Eviction fragment size percentage: " + NumberFormat.getInstance().format(evictionFragmentSizePercentage * 100) + "%");
-			LOGGER.info("||-Max object size expansion: " + NumberFormat.getInstance().format(maxObjectExpansionRate * 100) + "%");
-			LOGGER.info("||-Min object size expansion: " + NumberFormat.getInstance().format(minObjectExpansionRate * 100) + "%");
-			LOGGER.info("||-Max object size expansion active till buffer size: " + NumberFormat.getInstance().format(maxObjectExpansionRateActiveTillBufferSize) + " bytes");
-			LOGGER.info("||-Min object size expansion active from buffer size: " + NumberFormat.getInstance().format(minObjectExpansionRateActiveFromBufferSize) + " bytes");
-			LOGGER.info("||-Indexing tree cleaning threads: " + NumberFormat.getInstance().format(indexingTreeCleaningThreads));
-			LOGGER.info("||-Indexing waiting time: " + NumberFormat.getInstance().format(indexingWaitTime) + " ms");
-			LOGGER.info("||-Min old generation occupancy percentage active till: " + NumberFormat.getInstance().format(minOldSpaceOccupancyActiveTillOldGenSize) + " bytes");
-			LOGGER.info("||-Max old generation occupancy percentage active from: " + NumberFormat.getInstance().format(maxOldSpaceOccupancyActiveFromOldGenSize) + " bytes");
-			LOGGER.info("||-Min old generation occupancy percentage: " + NumberFormat.getInstance().format(minOldSpaceOccupancy * 100) + "%");
-			LOGGER.info("||-Max old generation occupancy percentage: " + NumberFormat.getInstance().format(maxOldSpaceOccupancy * 100) + "%");
+		if (log.isInfoEnabled()) {
+			log.info("|-Buffer properties initialized with following values:");
+			log.info("||-Eviction occupancy percentage: " + NumberFormat.getInstance().format(evictionOccupancyPercentage * 100) + "%");
+			log.info("||-Eviction fragment size percentage: " + NumberFormat.getInstance().format(evictionFragmentSizePercentage * 100) + "%");
+			log.info("||-Max object size expansion: " + NumberFormat.getInstance().format(maxObjectExpansionRate * 100) + "%");
+			log.info("||-Min object size expansion: " + NumberFormat.getInstance().format(minObjectExpansionRate * 100) + "%");
+			log.info("||-Max object size expansion active till buffer size: " + NumberFormat.getInstance().format(maxObjectExpansionRateActiveTillBufferSize) + " bytes");
+			log.info("||-Min object size expansion active from buffer size: " + NumberFormat.getInstance().format(minObjectExpansionRateActiveFromBufferSize) + " bytes");
+			log.info("||-Indexing tree cleaning threads: " + NumberFormat.getInstance().format(indexingTreeCleaningThreads));
+			log.info("||-Indexing waiting time: " + NumberFormat.getInstance().format(indexingWaitTime) + " ms");
+			log.info("||-Min old generation occupancy percentage active till: " + NumberFormat.getInstance().format(minOldSpaceOccupancyActiveTillOldGenSize) + " bytes");
+			log.info("||-Max old generation occupancy percentage active from: " + NumberFormat.getInstance().format(maxOldSpaceOccupancyActiveFromOldGenSize) + " bytes");
+			log.info("||-Min old generation occupancy percentage: " + NumberFormat.getInstance().format(minOldSpaceOccupancy * 100) + "%");
+			log.info("||-Max old generation occupancy percentage: " + NumberFormat.getInstance().format(maxOldSpaceOccupancy * 100) + "%");
 		}
 		if (this.evictionOccupancyPercentage < 0 || this.evictionOccupancyPercentage > 1) {
 			throw new BeanInitializationException("Buffer properties initialization error: Eviction occupancy must be a percentage value between 0 and 1. Initialization value is: "

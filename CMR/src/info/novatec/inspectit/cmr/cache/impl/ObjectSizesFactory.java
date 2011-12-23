@@ -7,6 +7,7 @@ import java.lang.management.RuntimeMXBean;
 import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.stereotype.Component;
 
 /**
  * Factory for returning the correct instance of {@link IObjectSizes} for Spring initialization. The
@@ -18,13 +19,14 @@ import org.springframework.beans.factory.FactoryBean;
  * @author Ivan Senic
  * 
  */
-public class ObjectSizesFactory implements FactoryBean {
+@Component
+public class ObjectSizesFactory implements FactoryBean<IObjectSizes> {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object getObject() throws Exception {
+	public IObjectSizes getObject() throws Exception {
 		boolean isIbm = System.getProperty("java.vendor").indexOf("IBM") != -1;
 
 		boolean is64Bit = false;

@@ -1,6 +1,7 @@
 package info.novatec.inspectit.cmr.util;
 
 import info.novatec.inspectit.cmr.CMR;
+import info.novatec.inspectit.cmr.spring.logger.Logger;
 import info.novatec.inspectit.communication.data.LicenseInfoData;
 
 import java.io.File;
@@ -15,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.prefs.Preferences;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 import org.springframework.stereotype.Component;
 
 import de.schlichtherle.license.CipherParam;
@@ -27,8 +28,8 @@ import de.schlichtherle.license.LicenseParam;
 import de.schlichtherle.util.ObfuscatedString;
 
 /**
- * This license util holds the informations about the license file, license
- * manager, license content, license extras and the registered agents.
+ * This license util holds the informations about the license file, license manager, license
+ * content, license extras and the registered agents.
  * 
  * @author Dirk Maucher
  * @author Patrice Bouillet
@@ -37,20 +38,19 @@ import de.schlichtherle.util.ObfuscatedString;
 @Component
 public class LicenseUtil {
 
-	/**
-	 * The logger of this class.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(LicenseUtil.class);
+	/** The logger of this class. */
+	@Logger
+	Log log;
 
 	/**
-	 * The license file which should be read. This will also accessed by other
-	 * classes who need that information.
+	 * The license file which should be read. This will also accessed by other classes who need that
+	 * information.
 	 */
 	public static final String LICENSE_FILE = "license/license.lic";
 
 	/**
-	 * The public key store file which should be used. This will also accessed
-	 * by other classes who need that information.
+	 * The public key store file which should be used. This will also accessed by other classes who
+	 * need that information.
 	 */
 	public static final String PUBLIC_KEY_STORE = "license/publicCerts.store";
 
@@ -70,14 +70,13 @@ public class LicenseUtil {
 	private LicenseContent licenseContent;
 
 	/**
-	 * Additional parameters of the license. In this case the key "AGENTS" with
-	 * the value of the allowed agent amount.
+	 * Additional parameters of the license. In this case the key "AGENTS" with the value of the
+	 * allowed agent amount.
 	 */
 	private Map<String, String> licenseExtras;
 
 	/**
-	 * A set of currently registered agents that are covered by the license and
-	 * allowed to run.
+	 * A set of currently registered agents that are covered by the license and allowed to run.
 	 */
 	private Set<LicenseUtilData> registeredAgents = new HashSet<LicenseUtilData>();
 
@@ -126,7 +125,7 @@ public class LicenseUtil {
 			// this is the subject which MUST be exactly the same than in the
 			// license file - if not the license file is not valid. This subject
 			// is also obfuscated
-			return new ObfuscatedString(new long[] {0x7BE0D7A91744BA11L, 0x8EE7897329DAD231L, 0xB882D9CD8679FBC0L, 0xE3EDA6F30961559FL, 0xC86442D44DD50199L, 0xD0B0285B561195C5L}).toString() ;
+			return new ObfuscatedString(new long[] { 0x7BE0D7A91744BA11L, 0x8EE7897329DAD231L, 0xB882D9CD8679FBC0L, 0xE3EDA6F30961559FL, 0xC86442D44DD50199L, 0xD0B0285B561195C5L }).toString();
 		}
 
 		public Preferences getPreferences() {
@@ -150,18 +149,16 @@ public class LicenseUtil {
 	private LicenseManager licenseManager = new LicenseManager(licenseParam);
 
 	/**
-	 * Responsible for installing the license file and verify if it is valid or
-	 * not.
+	 * Responsible for installing the license file and verify if it is valid or not.
 	 * 
 	 * @throws Exception
-	 *             Exceptions like FileNotFoundException or
-	 *             LicenseContentNotValidException
+	 *             Exceptions like FileNotFoundException or LicenseContentNotValidException
 	 */
 	@SuppressWarnings("unchecked")
 	public void initializeLicense() throws Exception {
 		if (!(new File(PUBLIC_KEY_STORE)).exists()) {
-			LOGGER.error("||-No public key file available at location '" + PUBLIC_KEY_STORE + "', shutting down CMR!");
-			LOGGER.error("||-Please contact NovaTec Support or visit http://www.inspectit.eu to receive your own key file!");
+			log.error("||-No public key file available at location '" + PUBLIC_KEY_STORE + "', shutting down CMR!");
+			log.error("||-Please contact NovaTec Support or visit http://www.inspectit.eu to receive your own key file!");
 			System.exit(-1);
 		}
 		// uninstall first the license on the pc, we always want a fresh one
@@ -170,15 +167,15 @@ public class LicenseUtil {
 		licenseContent = licenseManager.verify();
 		licenseExtras = (HashMap<String, String>) licenseContent.getExtra();
 
-		LOGGER.info("||-# of concurrent Agents allowed: " + licenseExtras.get(ALLOWED_AGENT_AMOUNT_KEY));
-		LOGGER.info("||-# license holder: " + licenseContent.getHolder());
-		LOGGER.info("||-# license issuer: " + licenseContent.getIssuer());
-		LOGGER.info("||-# license issued on: " + DateFormat.getDateInstance().format(licenseContent.getIssued()));
-		LOGGER.info("||-# license valid from: " + DateFormat.getDateInstance().format(licenseContent.getNotBefore()));
-		LOGGER.info("||-# license valid until: " + DateFormat.getDateInstance().format(licenseContent.getNotAfter()));
-		LOGGER.info("||-# license consumer type: " + licenseContent.getConsumerType());
-		LOGGER.info("||-# license consumer amount: " + licenseContent.getConsumerAmount());
-		LOGGER.info("||-# license additional info: " + licenseContent.getInfo());
+		log.info("||-# of concurrent Agents allowed: " + licenseExtras.get(ALLOWED_AGENT_AMOUNT_KEY));
+		log.info("||-# license holder: " + licenseContent.getHolder());
+		log.info("||-# license issuer: " + licenseContent.getIssuer());
+		log.info("||-# license issued on: " + DateFormat.getDateInstance().format(licenseContent.getIssued()));
+		log.info("||-# license valid from: " + DateFormat.getDateInstance().format(licenseContent.getNotBefore()));
+		log.info("||-# license valid until: " + DateFormat.getDateInstance().format(licenseContent.getNotAfter()));
+		log.info("||-# license consumer type: " + licenseContent.getConsumerType());
+		log.info("||-# license consumer amount: " + licenseContent.getConsumerAmount());
+		log.info("||-# license additional info: " + licenseContent.getInfo());
 	}
 
 	/**
@@ -190,8 +187,8 @@ public class LicenseUtil {
 	 *            the name of the connecting agent
 	 * 
 	 * @throws LicenseContentException
-	 *             Every problem regarding reading or processing the license
-	 *             file is reported to the caller.
+	 *             Every problem regarding reading or processing the license file is reported to the
+	 *             caller.
 	 */
 	public void validateLicense(List<String> definedIPs, String agentName) throws LicenseContentException {
 		try {
@@ -229,10 +226,10 @@ public class LicenseUtil {
 			throw new LicenseContentException("Maximum agent count of " + licenseExtras.get(ALLOWED_AGENT_AMOUNT_KEY) + " allowed agent(s) is reached");
 		}
 
-		LOGGER.info("Valid license for Agent '" + agentName + "'");
-		LOGGER.info("Remaining Agent slots: " + (Integer.parseInt(licenseExtras.get(ALLOWED_AGENT_AMOUNT_KEY)) - registeredAgents.size()));
+		log.info("Valid license for Agent '" + agentName + "'");
+		log.info("Remaining Agent slots: " + (Integer.parseInt(licenseExtras.get(ALLOWED_AGENT_AMOUNT_KEY)) - registeredAgents.size()));
 	}
-	
+
 	/**
 	 * 
 	 * @return Returns the license information for the CMR.

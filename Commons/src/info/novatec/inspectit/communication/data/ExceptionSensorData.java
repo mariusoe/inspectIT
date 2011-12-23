@@ -1,7 +1,7 @@
 package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
-import info.novatec.inspectit.communication.ExceptionEventEnum;
+import info.novatec.inspectit.communication.ExceptionEvent;
 
 import java.sql.Timestamp;
 
@@ -36,9 +36,9 @@ public class ExceptionSensorData extends InvocationAwareData {
 	private String stackTrace;
 
 	/**
-	 * The {@link ExceptionEventEnum} indicating by which event this object was created.
+	 * The {@link ExceptionEvent} indicating by which event this object was created.
 	 */
-	private ExceptionEventEnum exceptionEvent;
+	private ExceptionEvent exceptionEvent;
 
 	/**
 	 * The detailed name of the {@link Throwable} object.
@@ -97,11 +97,11 @@ public class ExceptionSensorData extends InvocationAwareData {
 		this.stackTrace = stackTrace;
 	}
 
-	public ExceptionEventEnum getExceptionEvent() {
+	public ExceptionEvent getExceptionEvent() {
 		return exceptionEvent;
 	}
 
-	public void setExceptionEvent(ExceptionEventEnum exceptionEvent) {
+	public void setExceptionEvent(ExceptionEvent exceptionEvent) {
 		this.exceptionEvent = exceptionEvent;
 	}
 
