@@ -1,5 +1,6 @@
 package info.novatec.inspectit.util;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -81,6 +82,73 @@ public class StringConstraint {
 			cropped = appendTrailingDots(cropped);
 		}
 		return cropped;
+	}
+
+	/**
+	 * Analyzes the given map and tries to re-use the values in String arrays and the string arrays
+	 * themself to converse memory. A new String array for values is only created if one entry in
+	 * the values needed cropping to ensure that the original map is not changed.
+	 * 
+	 * @param original
+	 *            the Map<String, String[]> that potentially needs cropping
+	 * @return a new Map<String, String[]> that contains cropped Strings that potentially re-use the
+	 *         String references of the initial Map if the Strings did not change.
+	 */
+	public Map<String, String[]> crop(final Map<String, String[]> original) {
+		Map<String, String[]> result = new HashMap<String, String[]>(original.size());
+
+		for (Map.Entry<String, String[]> entry : original.entrySet()) {
+			String key = entry.getKey();
+			if (null == key) {
+				continue;
+			}
+
+			String[] value = entry.getValue();
+
+			String[] convertedValue = null;
+			if (null == value) {
+				convertedValue = new String[1];
+				convertedValue[0] = "<notset>";
+			} else {
+				boolean croppingWasNeeded = false;
+				convertedValue = value;
+
+				for (int i = 0, l = value.length; i < l; i++) {
+					String curValue = value[i];
+					String croppingResult = crop(curValue);
+
+					// Identity comparison is on purpose
+					if (curValue != croppingResult & !croppingWasNeeded) { // NOPMD
+						// The string reference was changed and thus cropped
+						croppingWasNeeded = true;
+
+						// we need to change to an own array as we cannot reuse the
+						// existing array as we would change strings of the application
+						convertedValue = new String[value.length];
+
+						// and add all current data to it
+						for (int j = 0; j < i; j++) {
+							convertedValue[j] = value[j];
+						}
+
+						// and add the one we are currently dealing with
+						convertedValue[i] = croppingResult;
+					}
+
+					if (croppingWasNeeded) {
+						// we already have a copied array so we can add to this.
+						convertedValue[i] = croppingResult;
+					}
+
+					// if we do not find anything that needed cropping we just re-use
+					// the old representation.
+				}
+			}
+
+			result.put(key, convertedValue);
+		}
+
+		return result;
 	}
 
 	/**
