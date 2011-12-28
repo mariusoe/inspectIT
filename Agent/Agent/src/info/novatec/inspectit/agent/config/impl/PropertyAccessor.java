@@ -137,7 +137,7 @@ public class PropertyAccessor implements IPropertyAccessor {
 					return getPropertyContent(propertyPath.getPathToContinue(), new Integer(Array.getLength(object)));
 				} else {
 					LOGGER.severe("Trying to access the lenght() method for a non array type");
-					throw new PropertyAccessException("Trying to access the lenght() method for a non array type");
+					throw new PropertyAccessException("Trying to access the length() method for a non array type");
 				}
 			}
 
@@ -208,7 +208,7 @@ public class PropertyAccessor implements IPropertyAccessor {
 			} while (c != Object.class);
 		}
 
-		throw new PropertyAccessException("Property or method " + propertyPath.getName() + " can not be found!");
+		throw new PropertyAccessException("Property or method " + propertyPath.getName() + " cannot be found in class " + object.getClass() + "!");
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class PropertyAccessor implements IPropertyAccessor {
 				parameterContentData.add(paramContentData);
 			} catch (PropertyAccessException e) {
 				if (LOGGER.isLoggable(Level.SEVERE)) {
-					LOGGER.severe("Cannot access the property: " + start + " . Will be removed from the list to prevent further errors! (" + e.getMessage() + ")");
+					LOGGER.severe("Cannot access the property: " + start + " for class " + clazz.getClass() + ". Will be removed from the list to prevent further errors! (" + e.getMessage() + ")");
 				}
 				iterator.remove();
 			}
