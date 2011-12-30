@@ -73,7 +73,7 @@
    <!-- rule ref="rulesets/strictexception.xml/SignatureDeclareThrowsException"/-->
    <rule ref="rulesets/strictexception.xml/ExceptionAsFlowControl"/>
    <rule ref="rulesets/strictexception.xml/AvoidCatchingNPE"/>
-   <rule ref="rulesets/strictexception.xml/AvoidThrowingRawExceptionTypes"/>
+   <!--  <rule ref="rulesets/strictexception.xml/AvoidThrowingRawExceptionTypes"/> -->
    <rule ref="rulesets/strictexception.xml/AvoidThrowingNullPointerException"/>
    <rule ref="rulesets/strictexception.xml/AvoidRethrowingException"/>
    <rule ref="rulesets/strictexception.xml/DoNotExtendJavaLangError"/>
@@ -93,7 +93,7 @@
    <rule ref="rulesets/design.xml/SimplifyBooleanExpressions"/>
    <rule ref="rulesets/design.xml/SwitchStmtsShouldHaveDefault"/>
    <rule ref="rulesets/design.xml/AvoidDeeplyNestedIfStmts"/>
-   <rule ref="rulesets/design.xml/AvoidReassigningParameters"/>
+   <!--  <rule ref="rulesets/design.xml/AvoidReassigningParameters"/> -->
    <rule ref="rulesets/design.xml/SwitchDensity"/>
    <rule ref="rulesets/design.xml/ConstructorCallsOverridableMethod"/>
    <rule ref="rulesets/design.xml/AccessorClassGeneration"/>

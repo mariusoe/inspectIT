@@ -8,6 +8,9 @@ import java.util.LinkedList;
  * the variable private to the actual {@link Thread}. A {@link LinkedList} is used because it can be
  * easily used as a FIFO stack.
  * 
+ * @param <E>
+ *            elements of the linked list.
+ * 
  * @author Patrice Bouillet
  */
 public class ThreadLocalStack<E> extends ThreadLocal<LinkedList<E>> {
@@ -15,7 +18,7 @@ public class ThreadLocalStack<E> extends ThreadLocal<LinkedList<E>> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public LinkedList<E> initialValue() {
+	public LinkedList<E> initialValue() { // NOPMD
 		return new LinkedList<E>();
 	}
 

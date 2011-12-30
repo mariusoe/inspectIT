@@ -107,14 +107,14 @@ public class HttpHook implements IMethodHook {
 	 * HttpServletMetrics and do. We are talking about the class of the ServletRequest here. This
 	 * list is extended if a new Class that provides this interface is found.
 	 */
-	private static final CopyOnWriteArrayList<Class<?>> whitelist = new CopyOnWriteArrayList<Class<?>>();
+	private static final CopyOnWriteArrayList<Class<?>> WHITE_LIST = new CopyOnWriteArrayList<Class<?>>();
 
 	/**
 	 * Blacklist that contains all classes that we already checked if they provide
 	 * HttpServletMetrics and do not. We are talking about the class of the ServletRequest here.
 	 * This list is extended if a new Class that does not provides this interface is found.
 	 */
-	private static final CopyOnWriteArrayList<Class<?>> blacklist = new CopyOnWriteArrayList<Class<?>>();
+	private static final CopyOnWriteArrayList<Class<?>> BLACK_LIST = new CopyOnWriteArrayList<Class<?>>();
 
 	/**
 	 * Helps us to ensure that we only store on http metric per request.
@@ -329,17 +329,17 @@ public class HttpHook implements IMethodHook {
 	 * @return whether or not the HttpServletRequest interface is realized.
 	 */
 	private boolean providesHttpMetrics(Class<?> c) {
-		if (whitelist.contains(c)) {
+		if (WHITE_LIST.contains(c)) {
 			return true;
 		}
-		if (blacklist.contains(c)) {
+		if (BLACK_LIST.contains(c)) {
 			return false;
 		}
 		boolean realizesInterface = checkForInterface(c, HTTP_SERVLET_REQUEST_CLASS);
 		if (realizesInterface) {
-			whitelist.add(c);
+			WHITE_LIST.add(c);
 		} else {
-			blacklist.add(c);
+			BLACK_LIST.add(c);
 		}
 		return realizesInterface;
 	}

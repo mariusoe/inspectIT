@@ -65,18 +65,18 @@ public class LoggingInterceptor implements MethodInterceptor {
 	 * This map holds the mapping between the log levels defined in the aop log and the log4j log
 	 * level. Please look at class {@link Log} for the reason for this.
 	 */
-	private static final Map<Log.Level, Level> levels = new HashMap<Log.Level, Level>(8, 1.0f);
+	private static final Map<Log.Level, Level> LEVELS = new HashMap<Log.Level, Level>(8, 1.0f);
 
 	static {
 		// initialize all the available levels
-		levels.put(Log.Level.ALL, Level.ALL);
-		levels.put(Log.Level.DEBUG, Level.DEBUG);
-		levels.put(Log.Level.ERROR, Level.ERROR);
-		levels.put(Log.Level.FATAL, Level.FATAL);
-		levels.put(Log.Level.INFO, Level.INFO);
-		levels.put(Log.Level.OFF, Level.OFF);
-		levels.put(Log.Level.TRACE, Level.TRACE);
-		levels.put(Log.Level.WARN, Level.WARN);
+		LEVELS.put(Log.Level.ALL, Level.ALL);
+		LEVELS.put(Log.Level.DEBUG, Level.DEBUG);
+		LEVELS.put(Log.Level.ERROR, Level.ERROR);
+		LEVELS.put(Log.Level.FATAL, Level.FATAL);
+		LEVELS.put(Log.Level.INFO, Level.INFO);
+		LEVELS.put(Log.Level.OFF, Level.OFF);
+		LEVELS.put(Log.Level.TRACE, Level.TRACE);
+		LEVELS.put(Log.Level.WARN, Level.WARN);
 	}
 
 	/**
@@ -87,8 +87,8 @@ public class LoggingInterceptor implements MethodInterceptor {
 		Method mostSpecificMethod = AopUtils.getMostSpecificMethod(invoc.getMethod(), invoc.getThis().getClass());
 		Log log = mostSpecificMethod.getAnnotation(Log.class);
 		Logger logger = Logger.getLogger(invoc.getThis().getClass());
-		Level timeLogLevel = levels.get(log.timeLogLevel());
-		Level traceLogLevel = levels.get(log.traceLogLevel());
+		Level timeLogLevel = LEVELS.get(log.timeLogLevel());
+		Level traceLogLevel = LEVELS.get(log.traceLogLevel());
 
 		if (logger.isEnabledFor(traceLogLevel)) {
 			logger.log(traceLogLevel, String.format(TRACE_ENTER_FORMAT, mostSpecificMethod.getDeclaringClass().getName(), mostSpecificMethod.getName()));

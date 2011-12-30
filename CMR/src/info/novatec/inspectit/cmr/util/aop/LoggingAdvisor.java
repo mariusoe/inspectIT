@@ -25,19 +25,19 @@ public class LoggingAdvisor extends AbstractPointcutAdvisor {
 	 * The used pointcut. It will intercept all method calls which are annotated with the
 	 * {@link Log} annotation.
 	 */
-	private static final Pointcut pointcut = new AnnotationMatchingPointcut(null, Log.class);
+	private static final Pointcut POINTCUT = new AnnotationMatchingPointcut(null, Log.class);
 
 	/**
 	 * The interceptor which will print some useful logging output if the log level permits.
 	 */
-	private static final Advice advice = new LoggingInterceptor();
+	private static final Advice ADVICE = new LoggingInterceptor();
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public Pointcut getPointcut() {
-		return pointcut;
+		return POINTCUT;
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class LoggingAdvisor extends AbstractPointcutAdvisor {
 	 */
 	@Override
 	public Advice getAdvice() {
-		return advice;
+		return ADVICE;
 	}
 
 }

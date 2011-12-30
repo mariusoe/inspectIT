@@ -1,5 +1,6 @@
 /bin
 /test-output
+/reports
 temp-testng-customsuite.xml
 /lib/inspectit-commons.jar
 /lib/prod

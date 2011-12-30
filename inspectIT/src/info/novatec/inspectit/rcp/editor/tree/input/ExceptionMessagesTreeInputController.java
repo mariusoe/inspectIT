@@ -332,7 +332,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 				}
 			}
 
-			return null;
+			return null; // NOPMD
 		}
 
 		/**

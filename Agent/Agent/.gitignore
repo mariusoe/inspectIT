@@ -6,3 +6,5 @@ java-exec.properties
 /resources/ivy/install/
 version.properties
 /release
+/test-output
+/reports

@@ -12,3 +12,4 @@ temp-testng-customsuite.xml
 /resources/ivy/install
 /license/license.lic
 resources/jvm
+/reports

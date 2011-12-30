@@ -2,8 +2,8 @@ package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
 
 import java.util.Collections;
@@ -19,8 +19,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * The abstract class of the {@link TreeInputController} interface to provide
- * some standard methods.
+ * The abstract class of the {@link TreeInputController} interface to provide some standard methods.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -101,7 +100,7 @@ public class AbstractTreeInputController implements TreeInputController {
 	 * Return <code>null</code> by default, sub-classes may override.
 	 */
 	public ViewerFilter[] getFilters() {
-		return null;
+		return null; // NOPMD
 	}
 
 	/**
@@ -172,7 +171,7 @@ public class AbstractTreeInputController implements TreeInputController {
 	 */
 	public void dispose() {
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * <p>
