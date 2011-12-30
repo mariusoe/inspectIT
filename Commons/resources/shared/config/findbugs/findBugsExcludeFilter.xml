@@ -1,0 +1,11 @@
+<FindBugsFilter>
+     <Match>
+       <Package name="~info\.novatec\.inspectit\.javassist.*" />
+     </Match>
+     <Match>
+	<Class name="~.*\.*Test" />
+     </Match>
+     <Match>
+       <Package name="~.*\.test\..*" />
+     </Match>
+</FindBugsFilter>

@@ -10,6 +10,8 @@
 
 	<property file="${basedir}/build.properties" />
 
+	<import file="${build.common-targets.file}" />
+
 	<path id="path.test.class">
 		<pathelement location="${build.test.classes}" />
 	</path>
@@ -24,55 +26,12 @@
 	<target name="init" description="--> Creates necessary folder structure">
 		<mkdir dir="${build.root}" />
 		<antcall target="init-ivy" />
+		<antcall target="init-antcontrib" />
 
-		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+		<ivy:settings file="${ivy.settings.file}" />
 		<ivy:resolve file="${ivy.file}" />
 		<ivy:cachepath pathid="lib.prod" conf="prod" />
 		<ivy:cachepath pathid="lib.test" conf="test" />
-
-		<ivy:cachepath pathid="path.antcontrib" organisation="ant-contrib" module="ant-contrib" revision="1.0b3" conf="default" inline="true" />
-		<taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="path.antcontrib" />
-	</target>
-
-	<target name="init-static-analysis">
-		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
-		<!-- needed for Checkstyle, PMD & Findbugs -->
-		<ivy:cachepath pathid="path.checkstyle" organisation="com.puppycrawl.tools" module="checkstyle" revision="5.5" conf="default" inline="true" />
-		<ivy:cachepath pathid="path.pmd" organisation="pmd" module="pmd" revision="4.3" conf="default" inline="true" />
-		<ivy:cachepath pathid="path.findbugs" organisation="com.google.code.findbugs" module="findbugs-ant" revision="2.0.0" conf="default" inline="true" />
-		<!-- Ingnore path missing warnings -->
-		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.pmd" />
-		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="path.pmd" />
-		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.findbugs" />
-		<taskdef resource="checkstyletask.properties" classpathref="path.checkstyle" />
-	</target>
-
-	<target name="init-functional-tests">
-		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
-		<!-- needed for TestNG & Cobertura -->
-		<ivy:cachepath pathid="path.testng" organisation="org.testng" module="testng" revision="6.3.1" conf="default" inline="true" />
-		<ivy:cachepath pathid="path.cobertura" organisation="net.sourceforge.cobertura" module="cobertura" revision="1.9.4.1" conf="default" inline="true" />
-
-		<taskdef name="testng" classpathref="path.testng" classname="org.testng.TestNGAntTask" />
-		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="path.cobertura" />
-		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.cobertura" />
-		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.cobertura" />
-	</target>
-
-	<target name="init-ftp-task">
-		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
-		<ivy:cachepath pathid="path.commonsnet" organisation="commons-net" module="commons-net" revision="2.0" conf="default" inline="true" />
-		<ivy:cachepath pathid="path.oro" organisation="oro" module="oro" revision="2.0.8" conf="default" inline="true" />
-
-		<!-- This is a workaround to fix the problem that the FTP task is loaded by a different classloader. -->
-		<!-- This must not be changed, unless you know what you are doing. -->
-		<path id="wptg.classpath">
-			<path refid="path.commonsnet" />
-			<path refid="path.oro" />
-			<fileset dir="${ant.library.dir}" includes="ant-commons-net.jar" />
-		</path>
-		<classloader classpathref="wptg.classpath" parentFirst="false" />
-		<taskdef name="wptg-ftp" classname="org.apache.tools.ant.taskdefs.optional.net.FTP" loaderref="ant.coreLoader" />
 	</target>
 
 	<!-- *************************************************************** -->
@@ -185,63 +144,29 @@
 
 
 	<!-- Depends on release, because the compiled classes are needed for the analysis -->
-	<target name="static-analysis" depends="init-static-analysis, build">
-		<mkdir dir="${build.qa.analysis}" />
-		<mkdir dir="${build.qa.analysis.pmd}" />
-		<mkdir dir="${build.qa.analysis.checkstyle}" />
-		<mkdir dir="${build.qa.analysis.findbugs}" />
-		<mkdir dir="${build.qa.analysis.cpd}" />
+	<target name="static-analysis" depends="build">
+		<!-- Call PDM -->
+		<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" id="pmd.fileset" />
+		<antcall target="pmd" inheritrefs="true"/>
 
-		<echo message="Analyse Code with tool: PMD" level="info" />
-		<pmd maxRuleViolations="${pmd.maximum.violations}" rulesetfiles="${pmd.rules.file}" classpath="path.pmd">
-			<formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true" />
-			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true" />
-			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml" />
-			<fileset dir="${src.root}">
-				<include name="info/novatec/inspectit/**/*.java" />
-				<exclude name="**/*_Stub.java" />
-			</fileset>
-			<fileset dir="${src.commons}">
-				<include name="info/novatec/inspectit/**/*.java" />
-				<exclude name="**/*_Stub.java" />
-			</fileset>
-		</pmd>
-		<xslt in="${build.qa.analysis.pmd}/pmd_results.xml" style="${pmd.config.root}/pmd-report.xslt" out="${build.qa.analysis.pmd}/sortable_report.html" />
-		<copy todir="${build.qa.analysis.pmd}" file="${pmd.config.root}/sorttable.js" />
-		<!-- this js is used for the sortable report -->
-		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >" />
+		<!-- Call Checkstyle -->
+		<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" id="checkstyle.fileset"/>
+		<antcall target="checkstyle" inheritrefs="true"/>
 
-		<echo message="Analyse Code with tool: Checkstyle" level="info" />
-		<checkstyle classpath="path.checkstyle" config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
-			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
-			<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" />
-		</checkstyle>
+		<!-- Call FindBugs -->
+		<property name="findbugs.sourcepath" value="${src.root}" />
+		<property name="findbugs.classlocation" value="${build.cmr.classes}" />
+		<path id="findbugs.path" >
+			<pathelement path="${build.commons.classes}" />
+			<pathelement path="${build.commonscs.classes}" />
+			<path refid="lib.prod"/>
+			<path refid="lib.test"/>
+		</path>
+		<antcall target="findbugs" inheritrefs="true"/>
 
-		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.config.root}/checkstyle.xsl" />
-		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >" />
-
-		<echo message="Analyse Code with tool: FindBugs" level="info" />
-		<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
-		<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
-		<pathconvert property="findbugs.classpath">
-			<path refid="path.findbugs" />
-		</pathconvert>
-
-		<findbugs output="xml" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="findbugs.jar">
-			<sourcePath path="${src.root}" />
-			<class location="${build.cmr.classes}" />
-			<auxClasspath>
-				<pathelement path="${build.commons.classes}" />
-				<path refid="lib.prod"/>
-				<path refid="lib.test"/>
-			</auxClasspath>
-		</findbugs>
-		<xslt in="${build.qa.analysis.findbugs}/findbugs.xml" style="${basedir}/resources/findbugs/fancy-hist.xsl" out="${build.qa.analysis}/findbugs.html" />
-
-		<echo message="Analyse Code with tool: CPD" level="info" />
-		<cpd format="xml" language="java" minimumTokenCount="100" outputFile="${build.qa.analysis.cpd}/cpd.xml">
-			<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" />
-		</cpd>
+		<!-- Call CPD -->
+		<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" id="cpd.fileset"/>
+		<antcall target="cpd" inheritrefs="true"/>
 	</target>
 
 
@@ -320,128 +245,7 @@
 	<!-- *************************************************************** -->
 	<!--           P R I V A T E    B U I L D     T A R G E T S          -->
 	<!-- *************************************************************** -->
-	<target name="-retrieve-jre-installations" depends="init-ftp-task" unless="skip.jre.download">
-		<foreach list="${jvm.list}" param="file" target="checkFile" />
 
-		<!-- delete tmp folder -->
-		<delete dir="${jvm.root}/tmp" failonerror="false" />
-	</target>
-
-	<target name="checkFile" depends="check.download,check.md5" if="file" />
-
-	<target name="check.download" unless="download-ok" depends="check.init">
-		<echo message="Downloading ${md5.file}" />
-		<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
-			<fileset dir="${jvm.root}/tmp">
-				<include name="${md5.file}" />
-			</fileset>
-		</wptg-ftp>
-
-		<!-- download the JRE only if it is not already locally available -->
-		<available file="${jvm.root}/${zip.file}" property="download-jre" value="true" />
-		<if>
-			<isfalse value="${download-jre}" />
-			<then>
-				<echo message="Downloading ${zip.file}" />
-				<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
-					<fileset dir="${jvm.root}/tmp">
-						<include name="${zip.file}" />
-					</fileset>
-				</wptg-ftp>
-			</then>
-			<else>
-				<echo message="${zip.file} already locally available, so skipping download." />
-			</else>
-		</if>
-	</target>
-
-	<target name="check.init">
-		<property name="zip.file" value="${file}.zip" />
-		<property name="md5.file" value="${file}.md5" />
-		<condition property="md5-ok">
-			<isset property="${zip.file}.isValid" />
-		</condition>
-		<condition property="download-ok">
-			<and>
-				<available file="${jvm.root}/${zip.file}" />
-				<available file="${jvm.root}/${md5.file}" />
-			</and>
-		</condition>
-	</target>
-
-	<target name="check.md5" unless="md5-ok" depends="check.init">
-		<trycatch>
-			<try>
-				<!-- the valid md5 value specified in the md5 file -->
-				<loadfile srcFile="${jvm.root}/tmp/${md5.file}" property="md5.valid">
-					<!-- need to filter whitespace in the md5sum -->
-					<filterchain>
-						<striplinebreaks />
-						<tokenfilter>
-							<stringtokenizer />
-							<replaceregex pattern="${zip.file}" replace="" />
-						</tokenfilter>
-						<tokenfilter>
-							<trim />
-						</tokenfilter>
-					</filterchain>
-				</loadfile>
-
-				<!-- the actual md5 value -->
-				<checksum file="${jvm.root}/${zip.file}" property="md5.actual" />
-				<!-- compare them -->
-				<condition property="md5.isValid">
-					<equals arg1="${md5.valid}" arg2="${md5.actual}" />
-				</condition>
-
-				<if>
-					<istrue value="${md5.isValid}" />
-					<then />
-					<else>
-						<!-- updates where found, so notify the user -->
-						<echo message="${zip.file}: Different MD5 checksum !!!" />
-						<echo message="-> expected: ${md5.valid}" />
-						<echo message="-> actual  : ${md5.actual}" />
-						<!-- rename the file to indicate that it is a newer version -->
-						<antcall target="-notify-about-jre-update" />
-						<echo message="Downloading ${zip.file}" />
-						<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
-							<fileset dir="${jvm.root}/tmp">
-								<include name="${zip.file}" />
-							</fileset>
-						</wptg-ftp>
-						<move file="${jvm.root}/tmp/${zip.file}" tofile="${jvm.root}/tmp/${file}.newer-version.zip" overwrite="true" failonerror="true" />
-						<delete dir="${jvm.root}/${zip.file}" failonerror="false" />
-						<move file="${jvm.root}/tmp/${file}.newer-version.zip" tofile="${jvm.root}/${zip.file}" failonerror="true" />
-					</else>
-				</if>
-			</try>
-			<catch>
-				<!-- the file was not there in the first place, so just put it into the correct folder -->
-				<echo message="${zip.file} was not available, so moving it to the correct location." />
-				<move file="${jvm.root}/tmp/${zip.file}" tofile="${jvm.root}/${zip.file}" overwrite="true" failonerror="true" />
-			</catch>
-		</trycatch>
-		<!-- now just delete the MD5 file -->
-		<delete dir="${jvm.root}/tmp/${md5.file}" failonerror="false" />
-	</target>
-
-	<target name="-notify-about-jre-update">
-		<echo message="-------------------------------------------------------------" />
-		<echo message="INFO: A newer JRE Version was found than currently available." />
-		<echo message="--------------------------------------------------------------" />
-		<echo message="The old version is going to be deleted and updated with the " />
-		<echo message="newer version found on the FTP server." />
-		<echo message="In case you don't want to update the JRE, you can skip " />
-		<echo message="the whole update process by starting the Build again with the " />
-		<echo message="option: -Dskip.jre.download=true" />
-		<echo message="-------------------------------------------------------------" />
-		<input>Press Return key to continue and to overwrite the JRE: ${file}</input>
-	</target>
-
-	<!-- - - - - - - - - - - - - - - - - -
-							Targets for creating the final distributon containing the JRE.
-						- - - - - - - - - - - - - - - - - -->
 	<target name="-linux-x86">
 		<echo file="${build.scripts}/startup.sh" message="${java.command.linux} ${java.memory.32bit} ${java.opts.32bit} ${java.opts.linux} ${java.locgc.linux} -jar ${dist.jar.name}" />
 		<tar destfile="${release.root}/inspectit-cmr.linux.x86.tar.gz" compression="gzip">
@@ -497,31 +301,4 @@ MIT License : slf4j-api (1.5.6), slf4j-log4j12 (1.5.6) ${line.separator}
 Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA), h2 (1.2.148)" />
 	</target>
 
-
-	<!-- *************************************************************** -->
-	<!--                I V Y     T A R G E T S   		                 -->
-	<!-- *************************************************************** -->
-	<target name="checkForIvy">
-		<condition property="skipIvyDownload">
-			<available file="${ivy.jar.file}" property="skipIvyDownload" />
-		</condition>
-	</target>
-
-	<target name="init-ivy" depends="checkForIvy" unless="skipIvyDownload">
-		<mkdir dir="${ivy.jar.dir}" />
-		<!-- download Ivy from web site so that it can be used even without any special installation -->
-		<echo message="Installing ivy version: ${ivy.install.version}" />
-		<get src="${ivy.download.url}" dest="${ivy.jar.file}" usetimestamp="true" />
-
-		<path id="ivy.lib.path">
-			<fileset dir="${ivy.jar.dir}" includes="*.jar" />
-		</path>
-		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
-	</target>
-
-	<target name="clean-ivy" depends="init-ivy" description="--> clean the ivy installation and the ivy cache">
-		<!--  The ivy cache is cleaned and the install directory is deleted -->
-		<ivy:cleancache />
-		<delete dir="${ivy.jar.dir}" failonerror="false" />
-	</target>
 </project>

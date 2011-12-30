@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pmd>
+    <workingSet>PMD WorkingSet</workingSet>
     <useProjectRuleSet>true</useProjectRuleSet>
-    <ruleSetFile>shared/config/pmd/pmd_rules.xml</ruleSetFile>
+    <ruleSetFile>resources/shared/config/pmd/pmd_rules.xml</ruleSetFile>
     <includeDerivedFiles>false</includeDerivedFiles>
     <violationsAsErrors>false</violationsAsErrors>
 </pmd>

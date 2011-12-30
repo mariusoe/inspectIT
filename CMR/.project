@@ -27,4 +27,17 @@
 		<nature>net.sf.eclipsecs.core.CheckstyleNature</nature>
 		<nature>org.apache.ivyde.eclipse.ivynature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>shared</name>
+			<type>2</type>
+			<locationURI>shared</locationURI>
+		</link>
+	</linkedResources>
+	<variableList>
+		<variable>
+			<name>shared</name>
+			<value>$%7BPARENT-1-PROJECT_LOC%7D/Commons/resources/shared</value>
+		</variable>
+	</variableList>
 </projectDescription>

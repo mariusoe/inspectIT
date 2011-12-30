@@ -1,0 +1,337 @@
+<?xml version="1.0"?>
+<!-- ======================================================================
+		inspectIT - Commons Build Targets
+		Sophisticated Monitoring tool by NovaTec GmbH
+		====================================================================== -->
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="CommonTargets" basedir=".">
+	<description>
+		This build file has the common targets used by all other inspectIT components
+	</description>
+
+	<dirname property="commontargets.basedir" file="${ant.file.CommonTargets}" />
+	<property file="${commontargets.basedir}/common-targets.properties" />
+
+	<!-- *************************************************************** -->
+	<!--                I N I T     T A R G E T S  	                     -->
+	<!-- *************************************************************** -->
+
+	<target name="init-static-analysis" if="build.qa.analysis" depends="init-ivy">
+		<mkdir dir="${build.qa.analysis}" />
+
+		<ivy:settings file="${ivy.settings.file}" />
+		<!-- needed for Checkstyle, PMD & Findbugs -->
+		<ivy:cachepath pathid="path.checkstyle" organisation="com.puppycrawl.tools" module="checkstyle" revision="5.5" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.pmd" organisation="pmd" module="pmd" revision="4.3" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.findbugs" organisation="com.google.code.findbugs" module="findbugs-ant" revision="2.0.0" conf="default" inline="true" />
+		<!-- Ingnore path missing warnings -->
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.pmd" />
+		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="path.pmd" />
+		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.findbugs" />
+		<taskdef resource="checkstyletask.properties" classpathref="path.checkstyle" />
+	</target>
+
+	<target name="init-ftp-task" depends="init-ivy">
+		<ivy:settings file="${ivy.settings.file}" />
+		<ivy:cachepath pathid="path.commonsnet" organisation="commons-net" module="commons-net" revision="2.0" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.oro" organisation="oro" module="oro" revision="2.0.8" conf="default" inline="true" />
+
+		<!-- This is a workaround to fix the problem that the FTP task is loaded by a different classloader. -->
+		<!-- This must not be changed, unless you know what you are doing. -->
+		<path id="wptg.classpath">
+			<path refid="path.commonsnet" />
+			<path refid="path.oro" />
+			<fileset dir="${ant.library.dir}" includes="ant-commons-net.jar" />
+		</path>
+		<classloader classpathref="wptg.classpath" parentFirst="false" />
+		<taskdef name="wptg-ftp" classname="org.apache.tools.ant.taskdefs.optional.net.FTP" loaderref="ant.coreLoader" />
+	</target>
+
+	<target name="init-antcontrib" depends="init-ivy">
+		<!-- This is a workaround to fix the problem that the all ant-contrlib tasks are loaded by a different classloader. -->
+		<!-- This must not be changed, unless you know what you are doing. -->
+
+		<ivy:cachepath pathid="path.antcontrib" organisation="ant-contrib" module="ant-contrib" revision="1.0b3" conf="default" inline="true" />
+		<path id="ant-contrib.classpath">
+			<path refid="path.antcontrib" />
+		</path>
+		<classloader classpathref="ant-contrib.classpath" parentFirst="false" />
+		<taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="ant-contrib.classpath" />
+	</target>
+
+	<target name="init-functional-tests">
+		<ivy:settings file="${ivy.settings.file}" />
+		<!-- needed for TestNG & Cobertura -->
+		<ivy:cachepath pathid="path.testng" organisation="org.testng" module="testng" revision="6.3.1" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.cobertura" organisation="net.sourceforge.cobertura" module="cobertura" revision="1.9.4.1" conf="default" inline="true" />
+
+		<taskdef name="testng" classpathref="path.testng" classname="org.testng.TestNGAntTask" />
+		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="path.cobertura" />
+		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.cobertura" />
+		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.cobertura" />
+	</target>
+
+	<!-- *************************************************************** -->
+	<!--                I V Y     T A R G E T S   		                 -->
+	<!-- *************************************************************** -->
+
+	<target name="checkForIvy">
+		<condition property="skipIvyDownload">
+			<available file="${ivy.jar.file}" property="skipIvyDownload" />
+		</condition>
+	</target>
+
+	<target name="init-ivy" depends="checkForIvy" unless="skipIvyDownload">
+		<mkdir dir="${ivy.jar.dir}" />
+		<!-- download Ivy from web site so that it can be used even without any special installation -->
+		<echo message="Installing ivy version: ${ivy.install.version}" />
+		<get src="${ivy.download.url}" dest="${ivy.jar.file}" usetimestamp="true" />
+
+		<path id="ivy.lib.path">
+			<fileset dir="${ivy.jar.dir}" includes="*.jar" />
+		</path>
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
+	</target>
+
+	<target name="clean-ivy" depends="init-ivy" description="--> clean the ivy installation and the ivy cache">
+		<!--  The ivy cache is cleaned and the install directory is deleted -->
+		<ivy:cleancache />
+		<delete dir="${ivy.jar.dir}" />
+	</target>
+
+	<!-- *************************************************************** -->
+	<!--         S T A T I C     A N A L Y S I S     T A R G E T S  	 -->
+	<!-- *************************************************************** -->
+
+	<!-- P M D -->
+	<target name="check-pmd-settings">
+		<condition property="can-run-pmd">
+			<and>
+				<isset property="build.qa.analysis" />
+				<isset property="build.qa.analysis.pmd" />
+				<isreference refid="pmd.fileset" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="pmd" description="--> analyses the code with PDM" depends="init-static-analysis,check-pmd-settings" if="can-run-pmd">
+		<echo message="Analyse Code with tool: PMD" level="info" />
+		<mkdir dir="${build.qa.analysis.pmd}" />
+		<pmd maxRuleViolations="${pmd.maximum.violations}" rulesetfiles="${pmd.rules.file}">
+			<formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true" />
+			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true" />
+			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml" />
+			<fileset refid="pmd.fileset" />
+		</pmd>
+		<xslt in="${build.qa.analysis.pmd}/pmd_results.xml" style="${pmd.report.file}" out="${build.qa.analysis.pmd}/sortable_report.html" />
+		<copy todir="${build.qa.analysis.pmd}" file="${pmd.sortable.file}" />
+		<!-- this js is used for the sortable report -->
+		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >" />
+	</target>
+
+	<!-- C h e c k s t y l e -->
+	<target name="check-checkstyle-settings">
+		<condition property="can-run-checkstyle">
+			<and>
+				<isset property="build.qa.analysis" />
+				<isset property="build.qa.analysis.checkstyle" />
+				<isreference refid="checkstyle.fileset" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="checkstyle" description="--> analyses the code with Checkstyle" depends="init-static-analysis,check-checkstyle-settings" if="can-run-checkstyle">
+		<echo message="Analyse Code with tool: Checkstyle" level="info" />
+		<mkdir dir="${build.qa.analysis.checkstyle}" />
+		<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
+			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
+			<fileset refid="checkstyle.fileset" />
+		</checkstyle>
+
+		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.report.file}" />
+		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >" />
+	</target>
+
+	<!-- F i n d B u g s -->
+	<target name="check-findbugs-settings">
+		<condition property="can-run-findbugs">
+			<and>
+				<isset property="build.qa.analysis" />
+				<isset property="build.qa.analysis.findbugs" />
+				<isset property="findbugs.sourcepath" />
+				<isset property="findbugs.classlocation" />
+				<isreference refid="findbugs.path" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="findbugs" description="--> analyses the code with Findbugs" depends="init-static-analysis,check-findbugs-settings" if="can-run-findbugs">
+		<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
+		<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
+		<pathconvert property="findbugs.classpath">
+			<path refid="path.findbugs" />
+		</pathconvert>
+
+		<echo message="Analyse Code with tool: FindBugs" level="info" />
+		<mkdir dir="${build.qa.analysis.findbugs}" />
+		<findbugs output="xml" classpath="${findbugs.classpath}" includefilter="${findbugs.config.include}" excludefilter="${findbugs.config.exclude}" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="findbugs.jar">
+			<sourcePath path="${findbugs.sourcepath}" />
+			<class location="${findbugs.classlocation}" />
+			<auxClasspath>
+				<path refid="findbugs.path" />
+			</auxClasspath>
+		</findbugs>
+		<xslt in="${build.qa.analysis.findbugs}/findbugs.xml" style="${findbugs.config.fancy-hist}" out="${build.qa.analysis}/findbugs.html" />
+	</target>
+
+
+	<!-- C P D -->
+	<target name="check-cpd-settings">
+		<condition property="can-run-cpd">
+			<and>
+				<isset property="build.qa.analysis.cpd" />
+				<isreference refid="cpd.fileset" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="cpd" description="--> analyses the code with CPD" depends="init-static-analysis,check-cpd-settings" if="can-run-cpd">
+		<echo message="Analyse Code with tool: CPD" level="info" />
+		<mkdir dir="${build.qa.analysis.cpd}" />
+		<cpd format="xml" language="java" minimumTokenCount="100" outputFile="${build.qa.analysis.cpd}/cpd.xml">
+			<fileset refid="cpd.fileset" />
+		</cpd>
+	</target>
+
+	<!-- *************************************************************** -->
+	<!--           			J V M    T A R G E T S      			     -->
+	<!-- *************************************************************** -->
+
+	<target name="check-retrieve-jre-installations">
+		<condition property="can-retrieve-jre-installations">
+			<and>
+				<isset property="jvm.list" />
+				<isset property="jvm.root" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="-retrieve-jre-installations" depends="init-antcontrib,init-ftp-task,check-retrieve-jre-installations" unless="skip.jre.download" if="can-retrieve-jre-installations">
+		<foreach list="${jvm.list}" param="file" target="checkFile" />
+
+		<!-- delete tmp folder -->
+		<delete dir="${jvm.root}/tmp" failonerror="false" />
+	</target>
+
+	<target name="checkFile" depends="check.download,check.md5" if="file" />
+
+	<target name="check.download" unless="download-ok" depends="check.init">
+		<echo message="Downloading ${md5.file}" />
+		<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
+			<fileset dir="${jvm.root}/tmp">
+				<include name="${md5.file}" />
+			</fileset>
+		</wptg-ftp>
+
+		<!-- download the JRE only if it is not already locally available -->
+		<available file="${jvm.root}/${zip.file}" property="download-jre" value="true" />
+		<if>
+			<isfalse value="${download-jre}" />
+			<then>
+				<echo message="Downloading ${zip.file}" />
+				<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
+					<fileset dir="${jvm.root}/tmp">
+						<include name="${zip.file}" />
+					</fileset>
+				</wptg-ftp>
+			</then>
+			<else>
+				<echo message="${zip.file} already locally available, so skipping download." />
+			</else>
+		</if>
+	</target>
+
+	<target name="check.init">
+		<property name="zip.file" value="${file}.zip" />
+		<property name="md5.file" value="${file}.md5" />
+		<condition property="md5-ok">
+			<isset property="${zip.file}.isValid" />
+		</condition>
+		<condition property="download-ok">
+			<and>
+				<available file="${jvm.root}/${zip.file}" />
+				<available file="${jvm.root}/${md5.file}" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="check.md5" unless="md5-ok" depends="check.init">
+		<trycatch>
+			<try>
+				<!-- the valid md5 value specified in the md5 file -->
+				<loadfile srcFile="${jvm.root}/tmp/${md5.file}" property="md5.valid">
+					<!-- need to filter whitespace in the md5sum -->
+					<filterchain>
+						<striplinebreaks />
+						<tokenfilter>
+							<stringtokenizer />
+							<replaceregex pattern="${zip.file}" replace="" />
+						</tokenfilter>
+						<tokenfilter>
+							<trim />
+						</tokenfilter>
+					</filterchain>
+				</loadfile>
+
+				<!-- the actual md5 value -->
+				<checksum file="${jvm.root}/${zip.file}" property="md5.actual" />
+				<!-- compare them -->
+				<condition property="md5.isValid">
+					<equals arg1="${md5.valid}" arg2="${md5.actual}" />
+				</condition>
+
+				<if>
+					<istrue value="${md5.isValid}" />
+					<then />
+					<else>
+						<!-- updates where found, so notify the user -->
+						<echo message="${zip.file}: Different MD5 checksum !!!" />
+						<echo message="-> expected: ${md5.valid}" />
+						<echo message="-> actual  : ${md5.actual}" />
+						<!-- rename the file to indicate that it is a newer version -->
+						<antcall target="-notify-about-jre-update" />
+						<echo message="Downloading ${zip.file}" />
+						<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
+							<fileset dir="${jvm.root}/tmp">
+								<include name="${zip.file}" />
+							</fileset>
+						</wptg-ftp>
+						<move file="${jvm.root}/tmp/${zip.file}" tofile="${jvm.root}/tmp/${file}.newer-version.zip" overwrite="true" failonerror="true" />
+						<delete dir="${jvm.root}/${zip.file}" failonerror="false" />
+						<move file="${jvm.root}/tmp/${file}.newer-version.zip" tofile="${jvm.root}/${zip.file}" failonerror="true" />
+					</else>
+				</if>
+			</try>
+			<catch>
+				<!-- the file was not there in the first place, so just put it into the correct folder -->
+				<echo message="${zip.file} was not available, so moving it to the correct location." />
+				<move file="${jvm.root}/tmp/${zip.file}" tofile="${jvm.root}/${zip.file}" overwrite="true" failonerror="true" />
+			</catch>
+		</trycatch>
+		<!-- now just delete the MD5 file -->
+		<delete dir="${jvm.root}/tmp/${md5.file}" failonerror="false" />
+	</target>
+
+	<target name="-notify-about-jre-update">
+		<echo message="-------------------------------------------------------------" />
+		<echo message="INFO: A newer JRE Version was found than currently available." />
+		<echo message="--------------------------------------------------------------" />
+		<echo message="The old version is going to be deleted and updated with the " />
+		<echo message="newer version found on the FTP server." />
+		<echo message="In case you don't want to update the JRE, you can skip " />
+		<echo message="the whole update process by starting the Build again with the " />
+		<echo message="option: -Dskip.jre.download=true" />
+		<echo message="-------------------------------------------------------------" />
+		<input>Press Return key to continue and to overwrite the JRE: ${file}</input>
+	</target>
+
+</project>
