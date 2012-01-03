@@ -216,6 +216,7 @@ public class DefaultTimerPlotController extends AbstractPlotController {
 
 		XYBarRenderer renderer = new XYBarRenderer();
 		renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator());
+		renderer.setShadowVisible(false);
 
 		NumberAxis rangeAxis = new NumberAxis("Count");
 		rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
