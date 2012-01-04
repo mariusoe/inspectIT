@@ -180,6 +180,15 @@ public class TimerData extends InvocationAwareData {
 	}
 
 	/**
+	 * Checks if this data object contains captured parameters.
+	 * 
+	 * @return if this data object contains captured parameters.
+	 */
+	public boolean providesCapturedParameters() {
+		return null != getParameterContentData() && !getParameterContentData().isEmpty();
+	}
+
+	/**
 	 * Sets the minimum and deals with the -1 initialization!.
 	 * 
 	 * @param min

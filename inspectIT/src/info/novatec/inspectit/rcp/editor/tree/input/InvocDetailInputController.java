@@ -6,6 +6,7 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
+import info.novatec.inspectit.communication.data.InvocationSequenceDataHelper;
 import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
@@ -334,8 +335,8 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 				content += "Method: " + methodIdent.getMethodName() + "\n";
 				content += "Parameters: " + methodIdent.getParameters() + "\n";
 
-				if (null != data.getTimerData()) {
-					if (data.getTimerData().getClass().equals(HttpTimerData.class)) {
+				if (InvocationSequenceDataHelper.hasTimerData(data)) {
+					if (InvocationSequenceDataHelper.hasHttpTimerData(data)) {
 						HttpTimerData httpData = (HttpTimerData) data.getTimerData();
 						content += "\n";
 						content += "URI: " + httpData.getUri() + "\n";
@@ -402,30 +403,30 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 						}
 
 						content += "\n";
-					} else if (data.getTimerData().getClass().equals(TimerData.class)) {
-						TimerData timer = data.getTimerData();
-						content += "\n";
-						content += "Method duration: " + timer.getDuration() + "\n";
-					} else {
-						// Fail fast and hard!
-						InspectIT.getDefault().createErrorDialog("Invalid timer data realization " + data.getClass(), -1);
 					}
-				} else if (null == data.getParentSequence()) {
+
+					// add data for the "normal" timer data
+					TimerData timer = data.getTimerData();
+					content += "\n";
+					content += "Method duration: " + timer.getDuration() + "\n";
+				} else if (InvocationSequenceDataHelper.isRootElementInSequence(data)) {
 					content += "\n";
 					content += "Invocation duration: " + data.getDuration() + "\n";
 				}
 
-				if (null != data.getSqlStatementData()) {
+				if (InvocationSequenceDataHelper.hasSQLData(data)) {
 					SqlStatementData sql = data.getSqlStatementData();
 					Formatter sqlFormatter = FormatStyle.BASIC.getFormatter();
 					content += "\n";
 					content += "SQL: " + sqlFormatter.format(sql.getSql()) + "\n";
 				}
 
-				if (null != data.getParameterContentData() && !data.getParameterContentData().isEmpty()) {
+				// Integrate parameter information from both invocation sequence and timer data
+				if (InvocationSequenceDataHelper.hasCapturedParameters(data)) {
 					content += "\n";
-					content += "Parameter Contents:\n";
-					Set<ParameterContentData> parameterContents = data.getParameterContentData();
+					content += "Captured parameters:\n";
+					Set<ParameterContentData> parameterContents = InvocationSequenceDataHelper.getCapturedParameters(data);
+
 					for (ParameterContentData parameterContentData : parameterContents) {
 						if (parameterContentData.isMethodParameter()) {
 							content += "Method Parameter #" + parameterContentData.getSignaturePosition() + " '" + parameterContentData.getName() + "': " + parameterContentData.getContent() + "\n";
@@ -435,11 +436,10 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 					}
 				}
 
-				if (null != data.getExceptionSensorDataObjects() && !data.getExceptionSensorDataObjects().isEmpty()) {
+				if (InvocationSequenceDataHelper.hasExceptionData(data)) {
 					content += "\n";
 					content += "Exception Details:\n";
-					for (Object object : data.getExceptionSensorDataObjects()) {
-						ExceptionSensorData exceptionSensorData = (ExceptionSensorData) object;
+					for (ExceptionSensorData exceptionSensorData : data.getExceptionSensorDataObjects()) {
 						content += exceptionSensorData.getExceptionEvent().toString().toLowerCase() + " " + exceptionSensorData.getThrowableType() + "\n";
 
 						String stackTrace = exceptionSensorData.getStackTrace();
@@ -529,8 +529,8 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers());
 				Image image = resourceManager.createImage(imageDescriptor);
 
-				if (null != data.getExceptionSensorDataObjects() && !data.getExceptionSensorDataObjects().isEmpty()) {
-					exceptionSensorData = (ExceptionSensorData) data.getExceptionSensorDataObjects().get(data.getExceptionSensorDataObjects().size() - 1);
+				if (InvocationSequenceDataHelper.hasExceptionData(data)) {
+					exceptionSensorData = data.getExceptionSensorDataObjects().get(data.getExceptionSensorDataObjects().size() - 1);
 					image = ExceptionImageFactory.decorateImageWithException(image, exceptionSensorData);
 				}
 
@@ -556,18 +556,10 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		@Override
 		protected Color getBackground(Object element, int index) {
 			InvocationSequenceData data = (InvocationSequenceData) element;
-			double duration = -1.0d;
+			double duration = InvocationSequenceDataHelper.calculateDuration(data);
 
-			if (null != data.getTimerData()) {
-				duration = data.getTimerData().getDuration();
-			} else if (null != data.getSqlStatementData() && 1 == data.getSqlStatementData().getCount()) {
-				duration = data.getSqlStatementData().getDuration();
-			} else if (null == data.getParentSequence()) {
-				duration = data.getDuration();
-			}
-
-			if (-1.0d != duration) {
-				double exclusiveTime = duration - (computeNestedDuration(data));
+			if (-1.0d != duration) { // no duration?
+				double exclusiveTime = duration - (InvocationSequenceDataHelper.computeNestedDuration(data));
 
 				// compute the correct color
 				int colorValue = 255 - (int) ((exclusiveTime / invocationDuration) * 100);
@@ -604,48 +596,37 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			return TextFormatter.getStyledMethodString(methodIdent);
 		case START_DELTA:
 			InvocationSequenceData root = data;
-			while (root.getParentSequence() != null) {
+			while (!InvocationSequenceDataHelper.isRootElementInSequence(root)) {
 				root = root.getParentSequence();
 			}
 			long delta = data.getTimeStamp().getTime() - root.getTimeStamp().getTime();
 			return new StyledString(NumberFormatter.formatLong(delta));
 		case DURATION:
 			styledString = new StyledString();
-			if (null != data.getTimerData()) {
-				styledString.append(NumberFormatter.formatDouble(data.getTimerData().getDuration()));
-			} else if (null != data.getSqlStatementData() && 1 == data.getSqlStatementData().getCount()) {
-				styledString.append(NumberFormatter.formatDouble(data.getSqlStatementData().getDuration()));
-			} else if (null == data.getParentSequence()) {
-				styledString.append(NumberFormatter.formatDouble(data.getDuration()));
+			double duration = InvocationSequenceDataHelper.calculateDuration(data);
+			if (-1.0d != duration) {
+				styledString.append(NumberFormatter.formatDouble(duration));
 			}
 			return styledString;
 		case CPUDURATION:
 			styledString = new StyledString();
-			if (null != data.getTimerData() && data.getTimerData().isCpuMetricDataAvailable()) {
+			if (InvocationSequenceDataHelper.hasTimerData(data) && data.getTimerData().isCpuMetricDataAvailable()) {
 				styledString.append(NumberFormatter.formatDouble(data.getTimerData().getCpuDuration()));
 			}
 			return styledString;
 		case EXCLUSIVE:
 			styledString = new StyledString();
-			double duration = -1.0d;
+			double dur = InvocationSequenceDataHelper.calculateDuration(data);
 
-			if (null != data.getTimerData()) {
-				duration = data.getTimerData().getDuration();
-			} else if (null != data.getSqlStatementData() && 1 == data.getSqlStatementData().getCount()) {
-				duration = data.getSqlStatementData().getDuration();
-			} else if (null == data.getParentSequence()) {
-				duration = data.getDuration();
-			}
-
-			if (-1.0d != duration) {
-				double exclusiveTime = duration - (computeNestedDuration(data));
+			if (-1.0d != dur) {
+				double exclusiveTime = dur - (InvocationSequenceDataHelper.computeNestedDuration(data));
 				styledString.append(NumberFormatter.formatDouble(exclusiveTime));
 			}
 
 			return styledString;
 		case SQL:
 			styledString = new StyledString();
-			if (null != data.getSqlStatementData()) {
+			if (InvocationSequenceDataHelper.hasSQLData(data)) {
 				String sql = data.getSqlStatementData().getSql().replaceAll("[\r\n]+", " ");
 				styledString.append(sql);
 			}
@@ -653,7 +634,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		case PARAMETER:
 			styledString = new StyledString();
 
-			if (null != data.getTimerData() && data.getTimerData().getClass().equals(HttpTimerData.class)) {
+			if (InvocationSequenceDataHelper.hasHttpTimerData(data)) {
 				HttpTimerData httpTimer = (HttpTimerData) data.getTimerData();
 				if (null != httpTimer.getUri()) {
 					styledString.append("URI: ");
@@ -662,63 +643,26 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 				}
 			}
 
-			if (null != data.getParameterContentData()) {
-				Set<ParameterContentData> parameters = data.getParameterContentData();
-				for (ParameterContentData parameterContentData : parameters) {
-					if (parameterContentData.isMethodParameter()) {
-						styledString.append("Method Parameter #");
-						styledString.append(String.valueOf(parameterContentData.getSignaturePosition()));
-					} else {
-						styledString.append("Parameter");
+			if (InvocationSequenceDataHelper.hasCapturedParameters(data)) {
+				Set<ParameterContentData> parameters = InvocationSequenceDataHelper.getCapturedParameters(data);
 
-					}
-					styledString.append(" '");
+				for (ParameterContentData parameterContentData : parameters) {
+					// shorten the representation here.
+					styledString.append("'");
 					styledString.append(parameterContentData.getName());
 					styledString.append("': ");
+					// substring(1) is added because the agent adds ‘ at the
+					// beginning of each string, there was an issue with hibernate handling
+					// some text strings not correctly, that’s why this is prepended
 					styledString.append(parameterContentData.getContent().substring(1));
 					styledString.append(", ");
 				}
 			}
+
 			return styledString;
 		default:
 			return styledString;
 		}
-	}
-
-	/**
-	 * Computes the duration of the nested invocation elements.
-	 * 
-	 * @param data
-	 *            The data objects which is inspected for its nested elements.
-	 * @return The duration of all nested sequences (with their nested sequences as well).
-	 */
-	private static double computeNestedDuration(InvocationSequenceData data) {
-		if (data.getNestedSequences().isEmpty()) {
-			return 0;
-		}
-
-		double nestedDuration = 0d;
-		boolean added = false;
-		for (InvocationSequenceData nestedData : (List<InvocationSequenceData>) data.getNestedSequences()) {
-			if (null != nestedData.getTimerData()) {
-				nestedDuration = nestedDuration + nestedData.getTimerData().getDuration();
-				added = true;
-			} else if (null != nestedData.getSqlStatementData() && 1 == nestedData.getSqlStatementData().getCount()) {
-				nestedDuration = nestedDuration + nestedData.getSqlStatementData().getDuration();
-				added = true;
-			} else if (null == nestedData.getParentSequence()) {
-				nestedDuration = nestedDuration + nestedData.getDuration();
-				added = true;
-			}
-			if (!added && !nestedData.getNestedSequences().isEmpty()) {
-				// nothing was added, but there could be child elements with
-				// time measurements
-				nestedDuration = nestedDuration + computeNestedDuration(nestedData);
-			}
-			added = false;
-		}
-
-		return nestedDuration;
 	}
 
 	/**
@@ -833,13 +777,13 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 
 					// filter by the exclusive duration
 					double duration = Double.NaN;
-					if (null != invocationSequenceData.getSqlStatementData() && 1 == invocationSequenceData.getSqlStatementData().getCount()) {
+					if (InvocationSequenceDataHelper.hasSQLData(invocationSequenceData)) {
 						duration = invocationSequenceData.getSqlStatementData().getDuration();
-					} else if (null != invocationSequenceData.getTimerData()) {
+					} else if (InvocationSequenceDataHelper.hasTimerData(invocationSequenceData)) {
 						double totalDuration = invocationSequenceData.getTimerData().getDuration();
-						duration = totalDuration - (computeNestedDuration(invocationSequenceData));
-					} else if (null == invocationSequenceData.getParentSequence()) {
-						duration = invocationSequenceData.getDuration() - (computeNestedDuration(invocationSequenceData));
+						duration = totalDuration - (InvocationSequenceDataHelper.computeNestedDuration(invocationSequenceData));
+					} else if (InvocationSequenceDataHelper.isRootElementInSequence(invocationSequenceData)) {
+						duration = invocationSequenceData.getDuration() - (InvocationSequenceDataHelper.computeNestedDuration(invocationSequenceData));
 					}
 
 					if (!Double.isNaN(duration) && duration <= defaultExclusiveFilterTime) {
@@ -860,29 +804,15 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) element;
 
 					// filter by the exclusive duration
-					double duration = Double.NaN;
-					if (null != invocationSequenceData.getSqlStatementData() && 1 == invocationSequenceData.getSqlStatementData().getCount()) {
-						if (invocationSequenceData.getSqlStatementData().getDuration() <= defaultTotalFilterTime) {
-							return false;
-						}
-					} else if (null != invocationSequenceData.getTimerData()) {
-						if (invocationSequenceData.getTimerData().getDuration() <= defaultTotalFilterTime) {
-							return false;
-						}
-					} else if (null == invocationSequenceData.getParentSequence()) {
-						if (invocationSequenceData.getDuration() <= defaultTotalFilterTime) {
-							return false;
-						}
-					}
-
-					if (!Double.isNaN(duration) && duration <= defaultExclusiveFilterTime) {
+					double duration = InvocationSequenceDataHelper.calculateDuration(invocationSequenceData);
+					if (duration != -1.0d && duration <= defaultExclusiveFilterTime) {
 						return false;
 					}
 				}
 				return true;
 			}
 		};
-		// TODO this filter must be removed in the future!
+		// TODO this filter must be removed in the future! ... edit SSL: why?
 		ViewerFilter wrapperFilter = new InvocationViewerFilter() {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {

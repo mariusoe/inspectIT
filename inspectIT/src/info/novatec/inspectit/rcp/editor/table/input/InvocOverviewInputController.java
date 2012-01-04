@@ -5,6 +5,7 @@ import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
+import info.novatec.inspectit.communication.data.InvocationSequenceDataHelper;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
@@ -466,7 +467,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 				String text2 = invocLabelProvider.getStyledText(invoc2, Column.METHOD.ordinal()).getString();
 				return text1.compareTo(text2);
 			case DURATION:
-				if (null != invoc1.getTimerData() && null != invoc2.getTimerData()) {
+				if (InvocationSequenceDataHelper.hasTimerData(invoc1) && InvocationSequenceDataHelper.hasTimerData(invoc2)) {
 					return Double.compare(invoc1.getTimerData().getDuration(), invoc2.getTimerData().getDuration());
 				} else {
 					return Double.compare(invoc1.getDuration(), invoc2.getDuration());
@@ -522,7 +523,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		case METHOD:
 			return TextFormatter.getStyledMethodString(methodIdent);
 		case DURATION:
-			if (null != data.getTimerData()) {
+			if (InvocationSequenceDataHelper.hasTimerData(data)) {
 				return new StyledString(NumberFormatter.formatDouble(data.getTimerData().getDuration()));
 			} else {
 				// this duration is always available but could differ from

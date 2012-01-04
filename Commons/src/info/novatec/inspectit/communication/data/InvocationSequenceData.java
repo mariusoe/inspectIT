@@ -12,8 +12,11 @@ import java.util.List;
  * The invocation sequence data object which is used to store the path of method invocations from
  * instrumented methods.
  * 
- * @author Patrice Bouillet
+ * Notice that the <code>InvocationSequenceDataHelper</code> class provides utility methods to query
+ * <code>InvocationSequenceData</code> instances.
  * 
+ * @author Patrice Bouillet
+ * @see InvocationSequenceDataHelper
  */
 public class InvocationSequenceData extends MethodSensorData {
 
