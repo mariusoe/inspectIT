@@ -54,19 +54,26 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	 */
 	public StorageRepositoryDefinition() {
 		this(StorageNamingConstants.DEFAULT_STORAGE_DIRECTORY);
-		invocationDataAccessService = new StorageInvocationDataAccessService(this);
-		globalDataAccessService = new StorageGlobalDataAccessService(this);
-		cachedDataService = new CachedDataService(globalDataAccessService);
 	}
 
 	/**
 	 * The storage directory can be specified here.
-	 * 
+	 *
 	 * @param path
 	 *            the path to the storage area.
 	 */
 	public StorageRepositoryDefinition(String path) {
 		this.path = path;
+		initServices();
+	}
+
+	/**
+	 * Initializes the services.
+	 */
+	private void initServices() {
+		invocationDataAccessService = new StorageInvocationDataAccessService(this);
+		globalDataAccessService = new StorageGlobalDataAccessService(this);
+		cachedDataService = new CachedDataService(globalDataAccessService);
 	}
 
 	@Override
@@ -78,7 +85,7 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	public IInvocationDataAccessService getInvocationDataAccessService() {
 		return invocationDataAccessService;
 	}
-	
+
 	@Override
 	public IGlobalDataAccessService getGlobalDataAccessService() {
 		return globalDataAccessService;
