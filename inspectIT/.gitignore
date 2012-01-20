@@ -7,6 +7,7 @@ temp-testng-customsuite.xml
 /lib/test
 /release/build
 /release/dist
+/release/jvm
 /release/pdebuild
 /release/runtime
 /release/resources/ivy/install

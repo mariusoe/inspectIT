@@ -131,7 +131,19 @@
 		</path>
 		<classloader classpathref="wptg.classpath" parentFirst="false" />
 		<taskdef name="wptg-ftp" classname="org.apache.tools.ant.taskdefs.optional.net.FTP" loaderref="ant.coreLoader" />
+	</target>
 
+	<target name="init-ant-contrib-tasks">
+		<get src="${ftp.ant-contrib.url}" dest="${user.home}/.ant/lib/${ftp.ant-contrib.jar}" usetimestamp="true" />
+
+		<!-- This is a workaround to fix the problem that the all ant-contrlib tasks are loaded by a different classloader. -->
+		<!-- This must not be changed, unless you know what you are doing. -->
+		<path id="ant-contrib.classpath">
+			<fileset dir="${user.home}/.ant/lib" includes="${ftp.ant-contrib.jar}" />
+		</path>
+
+		<classloader classpathref="ant-contrib.classpath" parentFirst="false" />
+		<taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="ant-contrib.classpath" />
 	</target>
 
 
@@ -149,7 +161,7 @@
 
 	<target name="retrieve-eclipse" depends="checkForEclipse" unless="isEclipsePresent" description="Downloads Eclipse from the FTP and unpacks it.">
 		<echo message="Downloading Eclipse from ${ftp.server}" />
-		<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
+		<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.eclipsedir}" newer="true" retriesAllowed="5" passive="true">
 			<fileset dir="${release.basedir}/runtime">
 				<include name="${eclipse.zip}" />
 			</fileset>
@@ -316,22 +328,29 @@
 		</copy>
 
 		<!-- integrate the thirdparty contributions to the release -->
+		<!-- copy the jvms -->
 		<antcall target="-create-thirdparty-notification" />
+		<antcall target="-retrieve-jre-installations" />
+
 		<zip destfile="${release.basedir}/dist/inspectit-win32.win32.x86.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
 			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
+			<zipfileset src="${jvm.root}/jre6-windows-x86.zip" prefix="inspectit/jre" filemode="775" />
 		</zip>
 		<zip destfile="${release.basedir}/dist/inspectit-win32.win32.x86_64.zip" update="true">
-				<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
-				<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
+			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
+			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
+			<zipfileset src="${jvm.root}/jre6-windows-x64.zip" prefix="inspectit/jre" filemode="775" />
 		</zip>
 		<zip destfile="${release.basedir}/dist/inspectit-linux.gtk.x86.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
 			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
+			<zipfileset src="${jvm.root}/jre6-linux-x86.zip" prefix="inspectit/jre" filemode="775" />
 		</zip>
 		<zip destfile="${release.basedir}/dist/inspectit-linux.gtk.x86_64.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
 			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
+			<zipfileset src="${jvm.root}/jre6-linux-x64.zip" prefix="inspectit/jre" filemode="775"/>
 		</zip>
 		<zip destfile="${release.basedir}/dist/inspectit-macosx.cocoa.x86.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
@@ -369,6 +388,129 @@ GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), rm
 			Build ID: ${DSTAMP}${TSTAMP}
 			" />
 		<echo message="Wrote plugin.properties to inspectIT project" />
+	</target>
+
+	<!-- *************************************************************** -->
+	<!--           P R I V A T E    B U I L D     T A R G E T S          -->
+	<!-- *************************************************************** -->
+	<target name="-retrieve-jre-installations" depends="init-ftp-task, init-ant-contrib-tasks" unless="skip.jre.download">
+
+		<foreach list="${jvm.list}" param="file" target="checkFile" />
+
+		<!-- delete tmp folder -->
+		<delete dir="${jvm.root}/tmp" />
+	</target>
+
+	<target name="checkFile" depends="check.download,check.md5" if="file" />
+
+	<target name="check.download" unless="download-ok" depends="check.init">
+		<echo message="Downloading ${md5.file}" />
+		<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.jvmdir}" newer="true" retriesAllowed="5" passive="true">
+			<fileset dir="${jvm.root}/tmp">
+				<include name="${md5.file}" />
+			</fileset>
+		</wptg-ftp>
+
+		<!-- download the JRE only if it is not already locally available -->
+		<available file="${jvm.root}/${zip.file}" property="download-jre" value="true" />
+		<if>
+			<isfalse value="${download-jre}" />
+			<then>
+				<echo message="Downloading ${zip.file}" />
+				<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.jvmdir}" newer="true" retriesAllowed="5" passive="true">
+					<fileset dir="${jvm.root}/tmp">
+						<include name="${zip.file}" />
+					</fileset>
+				</wptg-ftp>
+			</then>
+			<else>
+				<echo message="${zip.file} already locally available, so skipping download." />
+			</else>
+		</if>
+	</target>
+
+	<target name="check.init">
+		<property name="zip.file" value="${file}.zip" />
+		<property name="md5.file" value="${file}.md5" />
+		<condition property="md5-ok">
+			<isset property="${zip.file}.isValid" />
+		</condition>
+		<condition property="download-ok">
+			<and>
+				<available file="${jvm.root}/${zip.file}" />
+				<available file="${jvm.root}/${md5.file}" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="check.md5" unless="md5-ok" depends="check.init">
+		<trycatch>
+			<try>
+				<!-- the valid md5 value specified in the md5 file -->
+				<loadfile srcFile="${jvm.root}/tmp/${md5.file}" property="md5.valid">
+					<!-- need to filter whitespace in the md5sum -->
+					<filterchain>
+						<striplinebreaks />
+						<tokenfilter>
+							<stringtokenizer />
+							<replaceregex pattern="${zip.file}" replace="" />
+						</tokenfilter>
+						<tokenfilter>
+							<trim />
+						</tokenfilter>
+					</filterchain>
+				</loadfile>
+
+				<!-- the actual md5 value -->
+				<checksum file="${jvm.root}/${zip.file}" property="md5.actual" />
+				<!-- compare them -->
+				<condition property="md5.isValid">
+					<equals arg1="${md5.valid}" arg2="${md5.actual}" />
+				</condition>
+
+				<if>
+					<istrue value="${md5.isValid}" />
+					<then />
+					<else>
+						<!-- updates where found, so notify the user -->
+						<echo message="${zip.file}: Different MD5 checksum !!!" />
+						<echo message="-> expected: ${md5.valid}" />
+						<echo message="-> actual  : ${md5.actual}" />
+						<!-- rename the file to indicate that it is a newer version -->
+						<antcall target="-notify-about-jre-update" />
+						<echo message="Downloading ${zip.file}" />
+						<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.jvmdir}" newer="true" retriesAllowed="5" passive="true">
+							<fileset dir="${jvm.root}/tmp">
+								<include name="${zip.file}" />
+							</fileset>
+						</wptg-ftp>
+						<move file="${jvm.root}/tmp/${zip.file}" tofile="${jvm.root}/tmp/${file}.newer-version.zip" overwrite="true" failonerror="true" />
+						<delete dir="${jvm.root}/${zip.file}" />
+						<move file="${jvm.root}/tmp/${file}.newer-version.zip" tofile="${jvm.root}/${zip.file}" failonerror="true" />
+					</else>
+				</if>
+			</try>
+			<catch>
+				<!-- the file was not there in the first place, so just put it into the correct folder -->
+				<echo message="${zip.file} was not available, so moving it to the correct location." />
+				<move file="${jvm.root}/tmp/${zip.file}" tofile="${jvm.root}/${zip.file}" overwrite="true" failonerror="true" />
+			</catch>
+		</trycatch>
+		<!-- now just delete the MD5 file -->
+		<delete dir="${jvm.root}/tmp/${md5.file}" />
+	</target>
+
+	<target name="-notify-about-jre-update">
+		<echo message="-------------------------------------------------------------" />
+		<echo message="INFO: A newer JRE Version was found than currently available." />
+		<echo message="--------------------------------------------------------------" />
+		<echo message="The old version is going to be deleted and updated with the " />
+		<echo message="newer version found on the FTP server." />
+		<echo message="In case you don't want to update the JRE, you can skip " />
+		<echo message="the whole update process by starting the Build again with the " />
+		<echo message="option: -Dskip.jre.download=true" />
+		<echo message="-------------------------------------------------------------" />
+		<input>Press Return key to continue and to overwrite the JRE: ${file}</input>
 	</target>
 
 

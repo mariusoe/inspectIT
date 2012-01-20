@@ -433,7 +433,7 @@
 		<tar destfile="${release.root}/inspectit-cmr.linux.x86.tar.gz" compression="gzip">
 			<fileset dir="${build.release.root}" />
 			<tarfileset file="${build.scripts}/startup.sh" prefix="CMR" filemode="755" />
-			<zipfileset src="${jvm.root}/jre-linux-x86.zip" prefix="CMR/jre" filemode="755" />
+			<zipfileset src="${jvm.root}/jre6-linux-x86.zip" prefix="CMR/jre" filemode="755" />
 			<zipfileset dir="${commons.basedir}/resources" prefix="CMR" includes="inspectIT-licence.pdf" />
 		</tar>
 		<delete file="${build.scripts}/startup.sh" />
@@ -444,7 +444,7 @@
 		<tar destfile="${release.root}/inspectit-cmr.linux.x64.tar.gz" compression="gzip">
 			<fileset dir="${build.release.root}" />
 			<tarfileset file="${build.scripts}/startup.sh" prefix="CMR" filemode="755" />
-			<zipfileset src="${jvm.root}/jre-linux-x64.zip" prefix="CMR/jre" filemode="755" />
+			<zipfileset src="${jvm.root}/jre6-linux-x64.zip" prefix="CMR/jre" filemode="755" />
 			<zipfileset dir="${commons.basedir}/resources" prefix="CMR" includes="inspectIT-licence.pdf" />
 		</tar>
 		<delete file="${build.scripts}/startup.sh" />
@@ -455,7 +455,7 @@
 		<zip destfile="${release.root}/inspectit-cmr.windows.x86.zip">
 			<fileset dir="${build.release.root}" />
 			<zipfileset file="${build.scripts}/startup.bat" prefix="CMR" />
-			<zipfileset src="${jvm.root}/jre-windows-x86.zip" prefix="CMR/jre" />
+			<zipfileset src="${jvm.root}/jre6-windows-x86.zip" prefix="CMR/jre" />
 			<zipfileset dir="${commons.basedir}/resources" prefix="CMR" includes="inspectIT-licence.pdf" />
 		</zip>
 		<delete file="${build.scripts}/startup.bat" />
@@ -466,7 +466,7 @@
 		<zip destfile="${release.root}/inspectit-cmr.windows.x64.zip">
 			<fileset dir="${build.release.root}" />
 			<zipfileset file="${build.scripts}/startup.bat" prefix="CMR" />
-			<zipfileset src="${jvm.root}/jre-windows-x64.zip" prefix="CMR/jre" />
+			<zipfileset src="${jvm.root}/jre6-windows-x64.zip" prefix="CMR/jre" />
 			<zipfileset dir="${commons.basedir}/resources" prefix="CMR" includes="inspectIT-licence.pdf" />
 		</zip>
 		<delete file="${build.scripts}/startup.bat" />
