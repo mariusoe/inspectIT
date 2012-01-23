@@ -65,6 +65,7 @@ public interface InspectITConstants {
 	String IMG_RIGHT_DOWN_ARROW = "right_down.png"; //$NON-NLS-1$
 	String IMG_TRASH = "trash.png"; //$NON-NLS-1$
 	String IMG_TOOL = "tool.png"; //$NON-NLS-1$
+	String IMG_CHECKMARK = "checkmark.png"; //$NON-NLS-1$
 
 	String IMG_HTTP = "http_clean.png"; //$NON-NLS-1$
 	String IMG_HTTP_AGGREGATE = "http_network.png"; //$NON-NLS-1$
@@ -75,5 +76,4 @@ public interface InspectITConstants {
 	String OVERLAY_UP = "overlay_up.png"; //$NON-NLS-1$
 	String OVERLAY_ERROR = "overlay_error.gif"; //$NON-NLS-1$
 
-	
 }

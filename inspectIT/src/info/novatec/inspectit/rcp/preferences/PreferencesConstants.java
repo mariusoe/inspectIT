@@ -23,4 +23,19 @@ public interface PreferencesConstants {
 	 */
 	String CMR_REPOSITORY_DEFINITIONS = "CMR_REPOSITORY_DEFINITIONS";
 
+	/**
+	 * Preference key for columns size of our tables.
+	 */
+	String TABLE_COLUMN_SIZE_CACHE = "TABLE_COLUMN_SIZE_CACHE";
+
+	/**
+	 * Preference key for hidden columns of our tables.
+	 */
+	String HIDDEN_TABLE_COLUMN_CACHE = "HIDDEN_TABLE_COLUMN_CACHE";
+
+	/**
+	 * Preference key for columns order of our tables.
+	 */
+	String TABLE_COLUMN_ORDER_CACHE = "TABLE_COLUMN_ORDER_CACHE";
+
 }

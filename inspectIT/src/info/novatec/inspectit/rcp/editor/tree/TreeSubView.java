@@ -6,6 +6,8 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.Pre
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.FormRootEditor;
 import info.novatec.inspectit.rcp.editor.tree.input.TreeInputController;
+import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
+import info.novatec.inspectit.rcp.menu.ShowHideMenuManager;
 
 import java.util.List;
 import java.util.Set;
@@ -19,10 +21,17 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
@@ -30,9 +39,9 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * Sub-view which is used to create a tree.
- * 
+ *
  * @author Patrice Bouillet
- * 
+ *
  */
 public class TreeSubView extends AbstractSubView {
 
@@ -48,7 +57,7 @@ public class TreeSubView extends AbstractSubView {
 
 	/**
 	 * Default constructor which needs a tree input controller to create all the content etc.
-	 * 
+	 *
 	 * @param treeInputController
 	 *            The tree input controller.
 	 */
@@ -64,7 +73,7 @@ public class TreeSubView extends AbstractSubView {
 	public void createPartControl(Composite parent, FormToolkit toolkit) {
 		treeInputController.setInputDefinition(getRootEditor().getInputDefinition());
 
-		Tree tree = toolkit.createTree(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.VIRTUAL | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		final Tree tree = toolkit.createTree(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.VIRTUAL | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		tree.setHeaderVisible(true);
 
 		treeViewer = new DeferredTreeViewer(tree);
@@ -102,16 +111,90 @@ public class TreeSubView extends AbstractSubView {
 			treeViewer.setFilters(treeInputController.getFilters());
 		}
 
-		MenuManager menuManager = new MenuManager();
-		menuManager.setRemoveAllWhenShown(true);
-		getRootEditor().getSite().registerContextMenu(FormRootEditor.ID + ".treesubview", menuManager, treeViewer);
+		// add show hide columns support
+		MenuManager headerMenuManager = new ShowHideMenuManager(treeViewer, treeInputController.getClass());
+		headerMenuManager.setRemoveAllWhenShown(false);
 
-		Control control = treeViewer.getControl();
-		Menu menu = menuManager.createContextMenu(control);
-		control.setMenu(menu);
+		// normal selection menu manager
+		MenuManager selectionMenuManager = new MenuManager();
+		selectionMenuManager.setRemoveAllWhenShown(true);
+		getRootEditor().getSite().registerContextMenu(FormRootEditor.ID + ".treesubview", selectionMenuManager, treeViewer);
+
+		final Menu selectionMenu = selectionMenuManager.createContextMenu(tree);
+		final Menu headerMenu = headerMenuManager.createContextMenu(tree);
+
+		tree.addListener(SWT.MenuDetect, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				Point pt = Display.getDefault().map(null, tree, new Point(event.x, event.y));
+				Rectangle clientArea = tree.getClientArea();
+				boolean header = clientArea.y <= pt.y && pt.y < (clientArea.y + tree.getHeaderHeight());
+				if (header) {
+					tree.setMenu(headerMenu);
+				} else {
+					tree.setMenu(selectionMenu);
+				}
+			}
+		});
+
+		/**
+		 * IMPORTANT: Only the menu set in the setMenu() will be disposed automatically.
+		 */
+		tree.addListener(SWT.Dispose, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				if (!headerMenu.isDisposed()) {
+					headerMenu.dispose();
+				}
+				if (!selectionMenu.isDisposed()) {
+					selectionMenu.dispose();
+				}
+			}
+		});
 
 		Object input = treeInputController.getTreeInput();
 		treeViewer.setInput(input);
+
+		ControlAdapter columnResizeListener = new ControlAdapter() {
+			@Override
+			public void controlResized(ControlEvent e) {
+				if (e.widget instanceof TreeColumn) {
+					TreeColumn column = (TreeColumn) e.widget;
+					if (column.getWidth() > 0) {
+						ShowHideColumnsHandler.registerNewColumnWidth(treeInputController.getClass(), column.getText(), column.getWidth());
+					}
+				}
+			}
+
+			@Override
+			public void controlMoved(ControlEvent e) {
+				ShowHideColumnsHandler.setColumnOrder(treeInputController.getClass(), treeViewer.getTree().getColumnOrder());
+			}
+		};
+
+		for (TreeColumn column : tree.getColumns()) {
+			Integer rememberedWidth = ShowHideColumnsHandler.getRememberedColumnWidth(treeInputController.getClass(), column.getText());
+			boolean isColumnHidden = ShowHideColumnsHandler.isColumnHidden(treeInputController.getClass(), column.getText());
+
+			if (rememberedWidth != null && !isColumnHidden) {
+				column.setWidth(rememberedWidth.intValue());
+				column.setResizable(true);
+			} else if (isColumnHidden) {
+				column.setWidth(0);
+				column.setResizable(false);
+			}
+
+			column.addControlListener(columnResizeListener);
+		}
+
+		// update the order of columns if the order was defined for the class, and no new columns were added
+		int[] columnOrder = ShowHideColumnsHandler.getColumnOrder(treeInputController.getClass());
+		if (null != columnOrder && columnOrder.length == tree.getColumns().length) {
+			tree.setColumnOrder(columnOrder);
+		} else if (null != columnOrder) {
+			//if the order exists, but length is not same, then update with the default order
+			ShowHideColumnsHandler.setColumnOrder(treeInputController.getClass(), tree.getColumnOrder());
+		}
 	}
 
 	/**
@@ -177,7 +260,7 @@ public class TreeSubView extends AbstractSubView {
 
 	/**
 	 * Returns the tree viewer.
-	 * 
+	 *
 	 * @return The tree viewer.
 	 */
 	public TreeViewer getTreeViewer() {
@@ -186,7 +269,7 @@ public class TreeSubView extends AbstractSubView {
 
 	/**
 	 * Returns the tree input controller.
-	 * 
+	 *
 	 * @return The tree input controller.
 	 */
 	public TreeInputController getTreeInputController() {

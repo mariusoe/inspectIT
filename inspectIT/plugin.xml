@@ -202,6 +202,20 @@
             id="info.novatec.inspectit.rcp.commands.addToSteppingObjects"
             name="Locate in Call Hierarchy">
       </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.showHideColumn"
+            name="Show/Hide Column">
+         <commandParameter
+               id="info.novatec.inspectit.rcp.commands.showHideColumn.Column"
+               name="Column"
+               optional="false">
+         </commandParameter>
+         <commandParameter
+               id="info.novatec.inspectit.rcp.commands.showHideColumn.Visible"
+               name="Visible"
+               optional="false">
+         </commandParameter>
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -606,6 +620,10 @@
                </with>
             </and>
          </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler"
+            commandId="info.novatec.inspectit.rcp.commands.showHideColumn">
       </handler>
    </extension>
    <extension

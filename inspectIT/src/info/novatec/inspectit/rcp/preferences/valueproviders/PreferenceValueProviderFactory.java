@@ -28,6 +28,9 @@ public final class PreferenceValueProviderFactory {
 	static {
 		preferenceValueProviders = new HashMap<String, PreferenceValueProvider<?>>();
 		preferenceValueProviders.put(PreferencesConstants.CMR_REPOSITORY_DEFINITIONS, new CmrRepositoryPreferenceValueProvider());
+		preferenceValueProviders.put(PreferencesConstants.TABLE_COLUMN_SIZE_CACHE, new MapPreferenceValueProvider());
+		preferenceValueProviders.put(PreferencesConstants.HIDDEN_TABLE_COLUMN_CACHE, new CollectionPreferenceValueProvider());
+		preferenceValueProviders.put(PreferencesConstants.TABLE_COLUMN_ORDER_CACHE, new ColumnOrderPreferenceValueProvider());
 	}
 
 	/**

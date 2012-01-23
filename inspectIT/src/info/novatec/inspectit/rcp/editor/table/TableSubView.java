@@ -10,6 +10,8 @@ import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.editor.root.FormRootEditor;
 import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController.SubViewClassification;
 import info.novatec.inspectit.rcp.editor.table.input.TableInputController;
+import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
+import info.novatec.inspectit.rcp.menu.ShowHideMenuManager;
 
 import java.util.List;
 import java.util.Map;
@@ -26,11 +28,17 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -39,9 +47,9 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * Sub-view which is used to create a table.
- * 
+ *
  * @author Patrice Bouillet
- * 
+ *
  */
 public class TableSubView extends AbstractSubView {
 
@@ -62,7 +70,7 @@ public class TableSubView extends AbstractSubView {
 
 	/**
 	 * Default constructor which needs a tree input controller to create all the content etc.
-	 * 
+	 *
 	 * @param tableInputController
 	 *            The table input controller.
 	 */
@@ -78,7 +86,7 @@ public class TableSubView extends AbstractSubView {
 	public void createPartControl(Composite parent, FormToolkit toolkit) {
 		tableInputController.setInputDefinition(getRootEditor().getInputDefinition());
 
-		Table table = toolkit.createTable(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL);
+		final Table table = toolkit.createTable(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
@@ -105,18 +113,92 @@ public class TableSubView extends AbstractSubView {
 			}
 		}
 
-		MenuManager menuManager = new MenuManager();
-		menuManager.setRemoveAllWhenShown(true);
-		getRootEditor().getSite().registerContextMenu(FormRootEditor.ID + ".tablesubview", menuManager, tableViewer);
-		Control control = tableViewer.getControl();
-		Menu menu = menuManager.createContextMenu(control);
-		control.setMenu(menu);
+		// add show hide columns support
+		MenuManager headerMenuManager = new ShowHideMenuManager(tableViewer, tableInputController.getClass());
+		headerMenuManager.setRemoveAllWhenShown(false);
+
+		// normal selection menu manager
+		MenuManager selectionMenuManager = new MenuManager();
+		selectionMenuManager.setRemoveAllWhenShown(true);
+		getRootEditor().getSite().registerContextMenu(FormRootEditor.ID + ".tablesubview", selectionMenuManager, tableViewer);
+
+		final Menu selectionMenu = selectionMenuManager.createContextMenu(table);
+		final Menu headerMenu = headerMenuManager.createContextMenu(table);
+
+		table.addListener(SWT.MenuDetect, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				Point pt = Display.getDefault().map(null, table, new Point(event.x, event.y));
+				Rectangle clientArea = table.getClientArea();
+				boolean header = clientArea.y <= pt.y && pt.y < (clientArea.y + table.getHeaderHeight());
+				if (header) {
+					table.setMenu(headerMenu);
+				} else {
+					table.setMenu(selectionMenu);
+				}
+			}
+		});
+
+		/**
+		 * IMPORTANT: Only the menu set in the setMenu() will be disposed automatically.
+		 */
+		table.addListener(SWT.Dispose, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				if (!headerMenu.isDisposed()) {
+					headerMenu.dispose();
+				}
+				if (!selectionMenu.isDisposed()) {
+					selectionMenu.dispose();
+				}
+			}
+		});
 
 		Object input = tableInputController.getTableInput();
 		tableViewer.setInput(input);
 
 		if (getPreferenceIds().contains(PreferenceId.ITEMCOUNT)) {
 			updateCountItemsMessage(PreferenceConstants.DEFAULT_ITEM_COUNT);
+		}
+
+		ControlAdapter columnResizeListener = new ControlAdapter() {
+			@Override
+			public void controlResized(ControlEvent e) {
+				if (e.widget instanceof TableColumn) {
+					TableColumn column = (TableColumn) e.widget;
+					if (column.getWidth() > 0) {
+						ShowHideColumnsHandler.registerNewColumnWidth(tableInputController.getClass(), column.getText(), column.getWidth());
+					}
+				}
+			}
+			@Override
+			public void controlMoved(ControlEvent e) {
+				ShowHideColumnsHandler.setColumnOrder(tableInputController.getClass(), tableViewer.getTable().getColumnOrder());
+			}
+		};
+
+		for (TableColumn column : table.getColumns()) {
+			Integer rememberedWidth = ShowHideColumnsHandler.getRememberedColumnWidth(tableInputController.getClass(), column.getText());
+			boolean isColumnHidden = ShowHideColumnsHandler.isColumnHidden(tableInputController.getClass(), column.getText());
+
+			if (rememberedWidth != null && !isColumnHidden) {
+				column.setWidth(rememberedWidth.intValue());
+				column.setResizable(true);
+			} else if (isColumnHidden) {
+				column.setWidth(0);
+				column.setResizable(false);
+			}
+
+			column.addControlListener(columnResizeListener);
+		}
+
+		// update the order of columns if the order was defined for the class, and no new columns were added
+		int[] columnOrder = ShowHideColumnsHandler.getColumnOrder(tableInputController.getClass());
+		if (null != columnOrder && columnOrder.length == table.getColumns().length) {
+			table.setColumnOrder(columnOrder);
+		} else if (null != columnOrder) {
+			//if the order exists, but length is not same, then update with the default order
+			ShowHideColumnsHandler.setColumnOrder(tableInputController.getClass(), table.getColumnOrder());
 		}
 	}
 
@@ -202,7 +284,7 @@ public class TableSubView extends AbstractSubView {
 
 		tableInputController.preferenceEventFired(preferenceEvent);
 		switch (preferenceEvent.getPreferenceId()) {
-		case CLEAR_BUFFER: 
+		case CLEAR_BUFFER:
 		case TIME_RESOLUTION:
 			if (tableInputController.getPreferenceIds().contains(PreferenceId.CLEAR_BUFFER) || tableInputController.getPreferenceIds().contains(PreferenceId.TIME_RESOLUTION)) {
 				tableViewer.refresh();
@@ -215,7 +297,7 @@ public class TableSubView extends AbstractSubView {
 
 	/**
 	 * Returns the table input controller.
-	 * 
+	 *
 	 * @return The table input controller.
 	 */
 	public TableInputController getTableInputController() {
@@ -233,8 +315,9 @@ public class TableSubView extends AbstractSubView {
 	/**
 	 * Updates the message on the editor's form header, based on the number of items displayed
 	 * Currently. Message will be displayed only for master views.
-	 * 
-	 * @param limit Number of items displayed. -1 for all.
+	 *
+	 * @param limit
+	 *            Number of items displayed. -1 for all.
 	 */
 	private void updateCountItemsMessage(int limit) {
 		if (getTableInputController().getSubViewClassification().equals(SubViewClassification.MASTER)) {
