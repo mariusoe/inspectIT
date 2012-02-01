@@ -4,19 +4,29 @@ import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.TimerData;
+import info.novatec.inspectit.indexing.aggregation.impl.AggregationPerformer;
+import info.novatec.inspectit.indexing.aggregation.impl.TimerDataAggregator;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
+import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
 import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -27,6 +37,7 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * This input controller displays details of all methods involved in an invocation sequence.
@@ -45,38 +56,40 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	 * 
 	 */
 	private static enum Column {
+		/** The timestamp column. */
+		TIMESTAMP("Timestamp", 130, InspectITConstants.IMG_TIMER, false, true),
 		/** The package column. */
-		PACKAGE("Package", 200, InspectITConstants.IMG_PACKAGE),
+		PACKAGE("Package", 200, InspectITConstants.IMG_PACKAGE, true, true),
 		/** The class column. */
-		CLASS("Class", 200, InspectITConstants.IMG_CLASS),
+		CLASS("Class", 200, InspectITConstants.IMG_CLASS, true, true),
 		/** The method column. */
-		METHOD("Method", 300, InspectITConstants.IMG_METHOD_PUBLIC),
+		METHOD("Method", 300, InspectITConstants.IMG_METHOD_PUBLIC, true, true),
 		/** The count column. */
-		COUNT("Count", 60, null),
+		COUNT("Count", 60, null, true, false),
 		/** The average column. */
-		AVERAGE("Avg (ms)", 60, null),
+		AVERAGE("Avg (ms)", 60, null, true, false),
 		/** The minimum column. */
-		MIN("Min (ms)", 60, null),
+		MIN("Min (ms)", 60, null, true, false),
 		/** The maximum column. */
-		MAX("Max (ms)", 60, null),
+		MAX("Max (ms)", 60, null, true, false),
 		/** The duration column. */
-		DURATION("Duration (ms)", 70, null),
+		DURATION("Duration (ms)", 70, null, true, true),
 		/** The average exclusive duration column. */
-		EXCLUSIVEAVERAGE("Exc. Avg (ms)", 80, null),
+		EXCLUSIVEAVERAGE("Exc. Avg (ms)", 80, null, true, false),
 		/** The min exclusive duration column. */
-		EXCLUSIVEMIN("Exc. Min (ms)", 80, null),
+		EXCLUSIVEMIN("Exc. Min (ms)", 80, null, true, false),
 		/** The max exclusive duration column. */
-		EXCLUSIVEMAX("Exc. Max (ms)", 80, null),
+		EXCLUSIVEMAX("Exc. Max (ms)", 80, null, true, false),
 		/** The total exclusive duration column. */
-		EXCLUSIVESUM("Exc. duration (ms)", 80, null),
+		EXCLUSIVESUM("Exc. duration (ms)", 80, null, true, true),
 		/** The cpu average column. */
-		CPUAVERAGE("Cpu Avg (ms)", 60, null),
+		CPUAVERAGE("Cpu Avg (ms)", 60, null, true, false),
 		/** The cpu minimum column. */
-		CPUMIN("Cpu Min (ms)", 60, null),
+		CPUMIN("Cpu Min (ms)", 60, null, true, false),
 		/** The cpu maximum column. */
-		CPUMAX("Cpu Max (ms)", 60, null),
+		CPUMAX("Cpu Max (ms)", 60, null, true, false),
 		/** The cpu duration column. */
-		CPUDURATION("Cpu Duration (ms)", 70, null);
+		CPUDURATION("Cpu Duration (ms)", 70, null, true, true);
 
 		/** The real viewer column. */
 		private TableViewerColumn column;
@@ -86,6 +99,10 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
 		private Image image;
+		/** If the column should be shown in aggregated mode. */
+		private boolean showInAggregatedMode;
+		/** If the column should be shown in raw mode. */
+		private boolean showInRawMode;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -96,11 +113,18 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		 *            The width of the column.
 		 * @param imageName
 		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 * @param showInAggregatedMode
+		 *            If the column should be shown in aggregated mode.
+		 * @param showInRawMode
+		 *            If the column should be shown in raw mode.
+		 * 
 		 */
-		private Column(String name, int width, String imageName) {
+		private Column(String name, int width, String imageName, boolean showInAggregatedMode, boolean showInRawMode) {
 			this.name = name;
 			this.width = width;
 			this.image = InspectIT.getDefault().getImage(imageName);
+			this.showInAggregatedMode = showInAggregatedMode;
+			this.showInRawMode = showInRawMode;
 		}
 
 		/**
@@ -134,6 +158,11 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	public List<TimerData> timerDataList;
 
 	/**
+	 * Should view display raw mode or not.
+	 */
+	private boolean rawMode = false;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -152,11 +181,79 @@ public class MethodInvocInputController extends AbstractTableInputController {
 			viewerColumn.getColumn().setMoveable(true);
 			viewerColumn.getColumn().setResizable(true);
 			viewerColumn.getColumn().setText(column.name);
-			viewerColumn.getColumn().setWidth(column.width);
+			if (column.showInAggregatedMode) {
+				viewerColumn.getColumn().setWidth(column.width);
+			} else {
+				viewerColumn.getColumn().setWidth(0);
+			}
 			if (null != column.image) {
 				viewerColumn.getColumn().setImage(column.image);
 			}
 			column.column = viewerColumn;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean canAlterColumnWidth(TableColumn tableColumn) {
+		for (Column column : Column.values()) {
+			if (Objects.equals(column.column.getColumn(), tableColumn)) {
+				return (column.showInRawMode && rawMode) || (column.showInAggregatedMode && !rawMode);
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<PreferenceId> getPreferenceIds() {
+		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
+		preferences.add(PreferenceId.INVOCATION_SUBVIEW_MODE);
+		return preferences;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
+		if (PreferenceId.INVOCATION_SUBVIEW_MODE.equals(preferenceEvent.getPreferenceId())) {
+			Map<IPreferenceGroup, Object> preferenceMap = preferenceEvent.getPreferenceMap();
+			if (null != preferenceMap && preferenceMap.containsKey(PreferenceId.InvocationSubviewMode.RAW)) {
+				Boolean isRawMode = (Boolean) preferenceMap.get(PreferenceId.InvocationSubviewMode.RAW);
+				rawMode = isRawMode.booleanValue();
+				handleRawAggregatedColumnVisibility(rawMode);
+			}
+		}
+	}
+
+	/**
+	 * Handles the raw and aggregated columns hiding/showing.
+	 * 
+	 * @param rawMode
+	 *            Is raw mode active.
+	 */
+	private void handleRawAggregatedColumnVisibility(boolean rawMode) {
+		for (Column column : Column.values()) {
+			if (rawMode) {
+				if (column.showInRawMode && !column.showInAggregatedMode && !ShowHideColumnsHandler.isColumnHidden(this.getClass(), column.name)) {
+					Integer width = ShowHideColumnsHandler.getRememberedColumnWidth(this.getClass(), column.name);
+					column.column.getColumn().setWidth((null != width) ? width.intValue() : column.width);
+				} else if (!column.showInRawMode && column.showInAggregatedMode) {
+					column.column.getColumn().setWidth(0);
+				}
+			} else {
+				if (!column.showInRawMode && column.showInAggregatedMode && !ShowHideColumnsHandler.isColumnHidden(this.getClass(), column.name)) {
+					Integer width = ShowHideColumnsHandler.getRememberedColumnWidth(this.getClass(), column.name);
+					column.column.getColumn().setWidth((null != width) ? width.intValue() : column.width);
+				} else if (column.showInRawMode && !column.showInAggregatedMode) {
+					column.column.getColumn().setWidth(0);
+				}
+			}
 		}
 	}
 
@@ -224,50 +321,62 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		@SuppressWarnings("unchecked")
 		public Object[] getElements(Object inputElement) {
 			List<InvocationSequenceData> invocationSequenceDataList = (List<InvocationSequenceData>) inputElement;
-			timerDataList = aggregateTimerData(invocationSequenceDataList, new ArrayList<TimerData>(), new HashMap<Long, TimerData>());
+			timerDataList = getRawInputList(invocationSequenceDataList, new ArrayList<TimerData>());
+			if (!rawMode) {
+				AggregationPerformer<TimerData> aggregationPerformer = new AggregationPerformer<TimerData>(new TimerDataAggregator(true));
+				aggregationPerformer.processCollection(timerDataList);
+				timerDataList = aggregationPerformer.getResultList();
+			} else {
+				Collections.sort(timerDataList, new Comparator<TimerData>() {
+					@Override
+					public int compare(TimerData o1, TimerData o2) {
+						return o1.getTimeStamp().compareTo(o2.getTimeStamp());
+					}
+				});
+			}
 			return timerDataList.toArray();
 		}
 
 		/**
-		 * Creates a list of aggregated timer data from the invocation data list.
+		 * Creates the raw input list of timers from a list of invocations.
 		 * 
-		 * @param invocationList
-		 *            Invocation list.
-		 * @param timerDataList
-		 *            List where results will be store (same list is returned). Usually empty list
-		 *            should be supplied.
-		 * @param cacheMap
-		 *            Map for caching. Usually empty map should be supplied.
-		 * @return List of aggregated timer data.
+		 * @param invocationSequenceDataList
+		 *            List of invocations to check.
+		 * @param resultList
+		 *            List where results will be stored. Needed because of reflection. Note that
+		 *            this list will be returned as the result.
+		 * @return List of raw order timer data.
 		 */
-		private List<TimerData> aggregateTimerData(List<InvocationSequenceData> invocationList, List<TimerData> timerDataList, Map<Long, TimerData> cacheMap) {
-			for (InvocationSequenceData invocationData : invocationList) {
-				TimerData timerData = null;
-				if (null != invocationData.getTimerData()) {
-					timerData = invocationData.getTimerData();
-				} else if (null != invocationData.getSqlStatementData()) {
-					timerData = invocationData.getSqlStatementData();
-				} else if (null == invocationData.getParentSequence()) {
-					timerData = createTimerDataForRootInvocation(invocationData);
-				}
+		public List<TimerData> getRawInputList(List<InvocationSequenceData> invocationSequenceDataList, List<TimerData> resultList) {
+			for (InvocationSequenceData invocationSequenceData : invocationSequenceDataList) {
+				TimerData timerData = getTimerData(invocationSequenceData);
 				if (null != timerData) {
-					TimerData aggregatedTimerData = cacheMap.get(timerData.getMethodIdent());
-					if (null != aggregatedTimerData) {
-						aggregatedTimerData.aggregateTimerData(timerData);
-					} else {
-						TimerData clone = new TimerData();
-						clone.setPlatformIdent(timerData.getPlatformIdent());
-						clone.setMethodIdent(timerData.getMethodIdent());
-						clone.setSensorTypeIdent(timerData.getSensorTypeIdent());
-						clone.aggregateTimerData(timerData);
-						cacheMap.put(timerData.getMethodIdent(), clone);
-						timerDataList.add(clone);
-					}
+					resultList.add(timerData);
 				}
-				aggregateTimerData(invocationData.getNestedSequences(), timerDataList, cacheMap);
+
+				getRawInputList(invocationSequenceData.getNestedSequences(), resultList);
 			}
 
-			return timerDataList;
+			return resultList;
+		}
+
+		/**
+		 * Returns the extracted timer data from the invocation.
+		 * 
+		 * @param invocationData
+		 *            {@link InvocationSequenceData}.
+		 * @return Timer data or null if it can not be created.
+		 */
+		private TimerData getTimerData(InvocationSequenceData invocationData) {
+			TimerData timerData = null;
+			if (null != invocationData.getTimerData()) {
+				timerData = invocationData.getTimerData();
+			} else if (null != invocationData.getSqlStatementData()) {
+				timerData = invocationData.getSqlStatementData();
+			} else if (null == invocationData.getParentSequence()) {
+				timerData = createTimerDataForRootInvocation(invocationData);
+			}
+			return timerData;
 		}
 
 		/**
@@ -282,6 +391,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 			TimerData timerData = new TimerData();
 			timerData.setPlatformIdent(invocationData.getPlatformIdent());
 			timerData.setMethodIdent(invocationData.getMethodIdent());
+			timerData.setTimeStamp(invocationData.getTimeStamp());
 			timerData.setDuration(invocationData.getDuration());
 			timerData.calculateMax(invocationData.getDuration());
 			timerData.calculateMin(invocationData.getDuration());
@@ -390,6 +500,12 @@ public class MethodInvocInputController extends AbstractTableInputController {
 			MethodIdent methodIdent2 = cachedDataService.getMethodIdentForId(timer2.getMethodIdent());
 
 			switch ((Column) getEnumSortColumn()) {
+			case TIMESTAMP:
+				if (rawMode) {
+					return timer1.getTimeStamp().compareTo(timer2.getTimeStamp());
+				} else {
+					return 0;
+				}
 			case PACKAGE:
 				if (methodIdent1.getPackageName() == null || methodIdent1.getPackageName().equals("")) {
 					return -1;
@@ -450,6 +566,12 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	 */
 	private StyledString getStyledTextForColumn(TimerData data, MethodIdent methodIdent, Column enumId) {
 		switch (enumId) {
+		case TIMESTAMP:
+			if (rawMode) {
+				return new StyledString(NumberFormatter.formatTimeWithMillis(data.getTimeStamp()));
+			} else {
+				return emptyStyledString;
+			}
 		case PACKAGE:
 			if (methodIdent.getPackageName() != null && !methodIdent.getPackageName().equals("")) {
 				return new StyledString(methodIdent.getPackageName());

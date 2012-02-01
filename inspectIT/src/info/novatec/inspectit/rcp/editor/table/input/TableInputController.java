@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * The interface for all table input controller.
@@ -42,6 +43,18 @@ public interface TableInputController extends SubViewClassificationController {
 	 *            The table viewer.
 	 */
 	void createColumns(TableViewer tableViewer);
+
+	/**
+	 * The {@link TableSubView} might need to alter the column width/visibility if the column has
+	 * the remembered size. With this method the controller gives or denies the {@link TableSubView}
+	 * to alter the column width.
+	 * 
+	 * @param tableColumn
+	 *            {@link TableColumn}
+	 * 
+	 * @return Returns true if the {@link TableColumn} can be altered.
+	 */
+	boolean canAlterColumnWidth(TableColumn tableColumn);
 
 	/**
 	 * Generates and returns the input for the table. Returning <code>null</code> is possible and

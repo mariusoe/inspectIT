@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * The abstract class of the {@link TableInputController} interface to provide some standard
@@ -154,6 +155,16 @@ public abstract class AbstractTableInputController implements TableInputControll
 	@Override
 	public SubViewClassification getSubViewClassification() {
 		return SubViewClassification.MASTER;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Returns true, classes may override.
+	 */
+	@Override
+	public boolean canAlterColumnWidth(TableColumn tableColumn) {
+		return true;
 	}
 
 }

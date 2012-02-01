@@ -4,17 +4,29 @@ import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
+import info.novatec.inspectit.indexing.aggregation.impl.AggregationPerformer;
+import info.novatec.inspectit.indexing.aggregation.impl.SqlStatementDataAggregator;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
+import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
 import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
@@ -35,6 +47,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.hibernate.jdbc.util.FormatStyle;
@@ -64,13 +77,21 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	 */
 	private static enum Column {
 		/** The timestamp column. */
-		TIMESTAMP("Timestamp", 130, InspectITConstants.IMG_TIMER),
-		/** The duration column. */
-		DURATION("Duration (ms)", 70, InspectITConstants.IMG_LAST_HOUR),
-		/** The prepared column. */
-		PREPARED("Prepared?", 60, null),
+		TIMESTAMP("Timestamp", 130, InspectITConstants.IMG_TIMER, false, true),
 		/** The statement column. */
-		STATEMENT("Statement", 800, InspectITConstants.IMG_DATABASE);
+		STATEMENT("Statement", 600, InspectITConstants.IMG_DATABASE, true, true),
+		/** The count column. */
+		COUNT("Count", 80, null, true, false),
+		/** The average column. */
+		AVERAGE("Avg (ms)", 80, null, true, false),
+		/** The min column. */
+		MIN("Min (ms)", 80, null, true, false),
+		/** The max column. */
+		MAX("Max (ms)", 80, null, true, false),
+		/** The duration column. */
+		DURATION("Duration (ms)", 80, null, true, true),
+		/** The prepared column. */
+		PREPARED("Prepared?", 60, null, false, true);
 
 		/** The real viewer column. */
 		private TableViewerColumn column;
@@ -80,6 +101,10 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
 		private Image image;
+		/** If the column should be shown in aggregated mode. */
+		private boolean showInAggregatedMode;
+		/** If the column should be shown in raw mode. */
+		private boolean showInRawMode;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -90,11 +115,18 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		 *            The width of the column.
 		 * @param imageName
 		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 * @param showInAggregatedMode
+		 *            If the column should be shown in aggregated mode.
+		 * @param showInRawMode
+		 *            If the column should be shown in raw mode.
+		 * 
 		 */
-		private Column(String name, int width, String imageName) {
+		private Column(String name, int width, String imageName, boolean showInAggregatedMode, boolean showInRawMode) {
 			this.name = name;
 			this.width = width;
 			this.image = InspectIT.getDefault().getImage(imageName);
+			this.showInAggregatedMode = showInAggregatedMode;
+			this.showInRawMode = showInRawMode;
 		}
 
 		/**
@@ -123,6 +155,16 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	private List<SqlStatementData> sqlStatementDataList;
 
 	/**
+	 * Empty styled string.
+	 */
+	private final StyledString emptyStyledString = new StyledString();
+
+	/**
+	 * Should view display raw mode or not.
+	 */
+	private boolean rawMode = false;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -141,11 +183,79 @@ public class SqlInvocInputController extends AbstractTableInputController {
 			viewerColumn.getColumn().setMoveable(true);
 			viewerColumn.getColumn().setResizable(true);
 			viewerColumn.getColumn().setText(column.name);
-			viewerColumn.getColumn().setWidth(column.width);
+			if (column.showInAggregatedMode) {
+				viewerColumn.getColumn().setWidth(column.width);
+			} else {
+				viewerColumn.getColumn().setWidth(0);
+			}
 			if (null != column.image) {
 				viewerColumn.getColumn().setImage(column.image);
 			}
 			column.column = viewerColumn;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean canAlterColumnWidth(TableColumn tableColumn) {
+		for (Column column : Column.values()) {
+			if (Objects.equals(column.column.getColumn(), tableColumn)) {
+				return (column.showInRawMode && rawMode) || (column.showInAggregatedMode && !rawMode);
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<PreferenceId> getPreferenceIds() {
+		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
+		preferences.add(PreferenceId.INVOCATION_SUBVIEW_MODE);
+		return preferences;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
+		if (PreferenceId.INVOCATION_SUBVIEW_MODE.equals(preferenceEvent.getPreferenceId())) {
+			Map<IPreferenceGroup, Object> preferenceMap = preferenceEvent.getPreferenceMap();
+			if (null != preferenceMap && preferenceMap.containsKey(PreferenceId.InvocationSubviewMode.RAW)) {
+				Boolean isRawMode = (Boolean) preferenceMap.get(PreferenceId.InvocationSubviewMode.RAW);
+				rawMode = isRawMode.booleanValue();
+				handleRawAggregatedColumnVisibility(rawMode);
+			}
+		}
+	}
+
+	/**
+	 * Handles the raw and aggregated columns hiding/showing.
+	 * 
+	 * @param rawMode
+	 *            Is raw mode active.
+	 */
+	private void handleRawAggregatedColumnVisibility(boolean rawMode) {
+		for (Column column : Column.values()) {
+			if (rawMode) {
+				if (column.showInRawMode && !column.showInAggregatedMode && !ShowHideColumnsHandler.isColumnHidden(this.getClass(), column.name)) {
+					Integer width = ShowHideColumnsHandler.getRememberedColumnWidth(this.getClass(), column.name);
+					column.column.getColumn().setWidth((null != width) ? width.intValue() : column.width);
+				} else if (!column.showInRawMode && column.showInAggregatedMode) {
+					column.column.getColumn().setWidth(0);
+				}
+			} else {
+				if (!column.showInRawMode && column.showInAggregatedMode && !ShowHideColumnsHandler.isColumnHidden(this.getClass(), column.name)) {
+					Integer width = ShowHideColumnsHandler.getRememberedColumnWidth(this.getClass(), column.name);
+					column.column.getColumn().setWidth((null != width) ? width.intValue() : column.width);
+				} else if (column.showInRawMode && !column.showInAggregatedMode) {
+					column.column.getColumn().setWidth(0);
+				}
+			}
 		}
 	}
 
@@ -242,7 +352,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 				content += "Total duration (ms): " + data.getDuration() + "\n";
 
 				content += "\n";
-				content += "Is Prepared Statement: " + data.isPreparedStatement() + "\n";
+				content += "Is Prepared Statement: " + (rawMode ? data.isPreparedStatement() : "") + "\n";
 
 				Formatter sqlFormatter = FormatStyle.BASIC.getFormatter();
 				content += "\n";
@@ -336,17 +446,40 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		@SuppressWarnings("unchecked")
 		public Object[] getElements(Object inputElement) {
 			List<InvocationSequenceData> invocationSequenceDataList = (List<InvocationSequenceData>) inputElement;
-			sqlStatementDataList = extractSqlData(invocationSequenceDataList, new ArrayList<SqlStatementData>());
+			sqlStatementDataList = getRawInputList(invocationSequenceDataList, new ArrayList<SqlStatementData>());
+			if (!rawMode) {
+				AggregationPerformer<SqlStatementData> aggregationPerformer = new AggregationPerformer<SqlStatementData>(new SqlStatementDataAggregator(true));
+				aggregationPerformer.processCollection(sqlStatementDataList);
+				sqlStatementDataList = aggregationPerformer.getResultList();
+			} else {
+				Collections.sort(sqlStatementDataList, new Comparator<SqlStatementData>() {
+					@Override
+					public int compare(SqlStatementData o1, SqlStatementData o2) {
+						return o1.getTimeStamp().compareTo(o2.getTimeStamp());
+					}
+				});
+			}
+
 			return sqlStatementDataList.toArray();
 		}
 
-		private List<SqlStatementData> extractSqlData(List<InvocationSequenceData> invocationSequenceDataList, ArrayList<SqlStatementData> sqlStatementDataList) {
+		/**
+		 * Returns the raw list, with no aggregation.
+		 * 
+		 * @param invocationSequenceDataList
+		 *            Input as list of invocations
+		 * @param sqlStatementDataList
+		 *            List where results will be stored. Needed because of reflection. Note that
+		 *            this list will be returned as the result.
+		 * @return List of raw order SQL data.
+		 */
+		private List<SqlStatementData> getRawInputList(List<InvocationSequenceData> invocationSequenceDataList, List<SqlStatementData> sqlStatementDataList) {
 			for (InvocationSequenceData invocationSequenceData : invocationSequenceDataList) {
 				if (null != invocationSequenceData.getSqlStatementData()) {
 					sqlStatementDataList.add(invocationSequenceData.getSqlStatementData());
 				}
 				if (null != invocationSequenceData.getNestedSequences() && !invocationSequenceData.getNestedSequences().isEmpty()) {
-					extractSqlData(invocationSequenceData.getNestedSequences(), sqlStatementDataList);
+					getRawInputList(invocationSequenceData.getNestedSequences(), sqlStatementDataList);
 				}
 			}
 
@@ -401,7 +534,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private static final class SqlInputViewerComparator extends TableViewerComparator<SqlStatementData> {
+	private final class SqlInputViewerComparator extends TableViewerComparator<SqlStatementData> {
 
 		/**
 		 * {@inheritDoc}
@@ -410,13 +543,29 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		protected int compareElements(Viewer viewer, SqlStatementData sql1, SqlStatementData sql2) {
 			switch ((Column) getEnumSortColumn()) {
 			case TIMESTAMP:
-				return sql1.getTimeStamp().compareTo(sql2.getTimeStamp());
+				if (rawMode) {
+					return sql1.getTimeStamp().compareTo(sql2.getTimeStamp());
+				} else {
+					return 0;
+				}
+			case STATEMENT:
+				return sql1.getSql().compareTo(sql2.getSql());
+			case COUNT:
+				return Long.valueOf(sql1.getCount()).compareTo(Long.valueOf(sql2.getCount()));
+			case AVERAGE:
+				return Double.compare(sql1.getAverage(), sql2.getAverage());
+			case MIN:
+				return Double.compare(sql1.getMin(), sql2.getMin());
+			case MAX:
+				return Double.compare(sql1.getMax(), sql2.getMax());
 			case DURATION:
 				return Double.compare(sql1.getDuration(), sql2.getDuration());
 			case PREPARED:
-				return Boolean.valueOf(sql1.isPreparedStatement()).compareTo(Boolean.valueOf(sql2.isPreparedStatement()));
-			case STATEMENT:
-				return sql1.getSql().compareTo(sql2.getSql());
+				if (rawMode) {
+					return Boolean.compare(sql1.isPreparedStatement(), sql2.isPreparedStatement());
+				} else {
+					return 0;
+				}
 			default:
 				return 0;
 			}
@@ -436,18 +585,30 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	private StyledString getStyledTextForColumn(SqlStatementData data, Column enumId) {
 		switch (enumId) {
 		case TIMESTAMP:
-			return new StyledString(NumberFormatter.formatTimeWithMillis(data.getTimeStamp()));
-		case DURATION:
-			if (data.getCount() == 1) {
-				return new StyledString(NumberFormatter.formatDouble(data.getDuration()));
+			if (rawMode) {
+				return new StyledString(NumberFormatter.formatTimeWithMillis(data.getTimeStamp()));
 			} else {
-				return new StyledString();
+				return emptyStyledString;
 			}
-		case PREPARED:
-			return new StyledString(Boolean.toString(data.isPreparedStatement()));
 		case STATEMENT:
 			String sql = data.getSql().replaceAll("[\r\n]+", " ");
 			return new StyledString(sql);
+		case COUNT:
+			return new StyledString(Long.toString(data.getCount()));
+		case AVERAGE:
+			return new StyledString(NumberFormatter.formatDouble(data.getAverage()));
+		case MIN:
+			return new StyledString(NumberFormatter.formatDouble(data.getMin()));
+		case MAX:
+			return new StyledString(NumberFormatter.formatDouble(data.getMax()));
+		case DURATION:
+			return new StyledString(NumberFormatter.formatDouble(data.getDuration()));
+		case PREPARED:
+			if (rawMode) {
+				return new StyledString(Boolean.toString(data.isPreparedStatement()));
+			} else {
+				return emptyStyledString;
+			}
 		default:
 			return new StyledString("error");
 		}

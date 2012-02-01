@@ -251,20 +251,24 @@ public class FormPreferencePanel implements IPreferencePanel {
 		menuAction.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_TOOL));
 		menuAction.setToolTipText("Preferences");
 
+		// add the maximize to all forms, let eclipse hide it as declared in plugin.xml
+		IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		params.put(MaximizeActiveViewHandler.PREFERENCE_PANEL_ID_PARAMETER, id);
+		CommandContributionItemParameter contributionParameters = new CommandContributionItemParameter(workbenchWindow, null, MaximizeActiveViewHandler.COMMAND_ID, params, InspectIT.getDefault()
+				.getImageDescriptor(InspectITConstants.IMG_WINDOW), null, null, null, null, getTooltipTextForMaximizeContributionItem(), SWT.CHECK, null, false);
+		CommandContributionItem maximizeCommandContribution = new CommandContributionItem(contributionParameters);
+		toolBarManager.add(maximizeCommandContribution);
+
 		if (preferenceSet.contains(PreferenceId.HTTP_AGGREGATION_REQUESTMETHOD)) {
 			toolBarManager.add(new Separator());
 			toolBarManager.add(new SwitchHttpCategorizationRequestMethod("Include Request Method in Categorization"));
 			toolBarManager.add(new Separator());
 		}
 
-		// add the maximize to all forms, let eclipse hide it as declared in plugin.xml
-		IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(MaximizeActiveViewHandler.PREFERENCE_PANEL_ID_PARAMETER, id);
-		CommandContributionItemParameter contributionParameters = new CommandContributionItemParameter(workbenchWindow, null, MaximizeActiveViewHandler.COMMAND_ID, params, InspectIT.getDefault()
-				.getImageDescriptor(InspectITConstants.IMG_WINDOW), null, null, null, null, getTooltipTextForMaximizeContributionItem(), SWT.CHECK, null, true);
-		CommandContributionItem maximizeCommandContribution = new CommandContributionItem(contributionParameters);
-		toolBarManager.add(maximizeCommandContribution);
+		if (preferenceSet.contains(PreferenceId.INVOCATION_SUBVIEW_MODE)) {
+			toolBarManager.add(new SwitchInvocationSubviewMode("Switch the tabbed views mode from/to aggregated/raw"));
+		}
 
 		if (preferenceSet.contains(PreferenceId.SAMPLINGRATE) || preferenceSet.contains(PreferenceId.TIMELINE)) {
 			toolBarManager.add(switchPreferences);
@@ -898,6 +902,38 @@ public class FormPreferencePanel implements IPreferencePanel {
 
 			// perform a refresh
 			update();
+		}
+	}
+
+	/**
+	 * Action for switching the mode of the invocation subviews from/to raw/aggregated.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private final class SwitchInvocationSubviewMode extends Action {
+
+		/**
+		 * Default constructor.
+		 * 
+		 * @param text
+		 *            Text on the action.
+		 */
+		public SwitchInvocationSubviewMode(String text) {
+			super(text, AS_CHECK_BOX);
+			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_HTTP_AGGREGATION_REQUESTMESSAGE));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void run() {
+			PreferenceEvent event = new PreferenceEvent(PreferenceId.INVOCATION_SUBVIEW_MODE);
+			Map<IPreferenceGroup, Object> httpCategoriation = new HashMap<IPreferenceGroup, Object>();
+			httpCategoriation.put(PreferenceId.InvocationSubviewMode.RAW, this.isChecked());
+			event.setPreferenceMap(httpCategoriation);
+			fireEvent(event);
 		}
 	}
 

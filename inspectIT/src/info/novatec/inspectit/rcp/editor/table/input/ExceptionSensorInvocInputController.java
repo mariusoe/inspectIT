@@ -3,25 +3,34 @@ package info.novatec.inspectit.rcp.editor.table.input;
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.ExceptionEvent;
+import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
+import info.novatec.inspectit.indexing.aggregation.impl.AggregationPerformer;
+import info.novatec.inspectit.indexing.aggregation.impl.ExceptionDataAggregator;
+import info.novatec.inspectit.indexing.aggregation.impl.ExceptionDataAggregator.ExceptionAggregationType;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
+import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
 import info.novatec.inspectit.rcp.model.ExceptionImageFactory;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
 import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
@@ -44,6 +53,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -67,11 +77,6 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	private LocalResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources());
 
 	/**
-	 * This map holds the details that are shown in the popup.
-	 */
-	private Map<String, List<ExceptionSensorData>> exceptionDetailsMap = new HashMap<String, List<ExceptionSensorData>>();
-
-	/**
 	 * The private inner enumeration used to define the used IDs which are mapped into the columns.
 	 * The order in this enumeration represents the order of the columns. If it is reordered,
 	 * nothing else has to be changed.
@@ -81,13 +86,19 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	 */
 	private static enum Column {
 		/** The timestamp column. */
-		TIMESTAMP("Timestamp", 150, InspectITConstants.IMG_TIMER),
+		TIMESTAMP("Timestamp", 150, InspectITConstants.IMG_TIMER, false, true),
 		/** The fqn column. */
-		FQN("Fully-Qualified Name", 400, InspectITConstants.IMG_CLASS),
+		FQN("Fully-Qualified Name", 400, InspectITConstants.IMG_CLASS, true, true),
+		/** The count column. */
+		CREATED("Created", 60, null, true, false),
+		/** The RETHROWN column. */
+		RETHROWN("Rethrown", 60, null, true, false),
+		/** The HANDLED column. */
+		HANDLED("Handled", 60, null, true, false),
 		/** The constructor column. */
-		CONSTRUCTOR("Constructor", 250, InspectITConstants.IMG_METHOD_PUBLIC),
+		CONSTRUCTOR("Constructor", 250, InspectITConstants.IMG_METHOD_PUBLIC, false, true),
 		/** The error message column. */
-		ERROR_MESSAGE("Error Message", 250, null);
+		ERROR_MESSAGE("Error Message", 250, null, false, true);
 
 		/** The real viewer column. */
 		private TableViewerColumn column;
@@ -97,6 +108,10 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
 		private Image image;
+		/** If the column should be shown in aggregated mode. */
+		private boolean showInAggregatedMode;
+		/** If the column should be shown in raw mode. */
+		private boolean showInRawMode;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -107,11 +122,18 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		 *            The width of the column.
 		 * @param imageName
 		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 * @param showInAggregatedMode
+		 *            If the column should be shown in aggregated mode.
+		 * @param showInRawMode
+		 *            If the column should be shown in raw mode.
+		 * 
 		 */
-		private Column(String name, int width, String imageName) {
+		private Column(String name, int width, String imageName, boolean showInAggregatedMode, boolean showInRawMode) {
 			this.name = name;
 			this.width = width;
 			this.image = InspectIT.getDefault().getImage(imageName);
+			this.showInAggregatedMode = showInAggregatedMode;
+			this.showInRawMode = showInRawMode;
 		}
 
 		/**
@@ -140,6 +162,16 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	private List<ExceptionSensorData> exceptionSensorDataList;
 
 	/**
+	 * Empty styled string.
+	 */
+	private final StyledString emptyStyledString = new StyledString();
+
+	/**
+	 * Should view display raw mode or not.
+	 */
+	private boolean rawMode = false;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -158,11 +190,79 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 			viewerColumn.getColumn().setMoveable(true);
 			viewerColumn.getColumn().setResizable(true);
 			viewerColumn.getColumn().setText(column.name);
-			viewerColumn.getColumn().setWidth(column.width);
+			if (column.showInAggregatedMode) {
+				viewerColumn.getColumn().setWidth(column.width);
+			} else {
+				viewerColumn.getColumn().setWidth(0);
+			}
 			if (null != column.image) {
 				viewerColumn.getColumn().setImage(column.image);
 			}
 			column.column = viewerColumn;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean canAlterColumnWidth(TableColumn tableColumn) {
+		for (Column column : Column.values()) {
+			if (Objects.equals(column.column.getColumn(), tableColumn)) {
+				return (column.showInRawMode && rawMode) || (column.showInAggregatedMode && !rawMode);
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<PreferenceId> getPreferenceIds() {
+		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
+		preferences.add(PreferenceId.INVOCATION_SUBVIEW_MODE);
+		return preferences;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
+		if (PreferenceId.INVOCATION_SUBVIEW_MODE.equals(preferenceEvent.getPreferenceId())) {
+			Map<IPreferenceGroup, Object> preferenceMap = preferenceEvent.getPreferenceMap();
+			if (null != preferenceMap && preferenceMap.containsKey(PreferenceId.InvocationSubviewMode.RAW)) {
+				Boolean isRawMode = (Boolean) preferenceMap.get(PreferenceId.InvocationSubviewMode.RAW);
+				rawMode = isRawMode.booleanValue();
+				handleRawAggregatedColumnVisibility(rawMode);
+			}
+		}
+	}
+
+	/**
+	 * Handles the raw and aggregated columns hiding/showing.
+	 * 
+	 * @param rawMode
+	 *            Is raw mode active.
+	 */
+	private void handleRawAggregatedColumnVisibility(boolean rawMode) {
+		for (Column column : Column.values()) {
+			if (rawMode) {
+				if (column.showInRawMode && !column.showInAggregatedMode && !ShowHideColumnsHandler.isColumnHidden(this.getClass(), column.name)) {
+					Integer width = ShowHideColumnsHandler.getRememberedColumnWidth(this.getClass(), column.name);
+					column.column.getColumn().setWidth((null != width) ? width.intValue() : column.width);
+				} else if (!column.showInRawMode && column.showInAggregatedMode) {
+					column.column.getColumn().setWidth(0);
+				}
+			} else {
+				if (!column.showInRawMode && column.showInAggregatedMode && !ShowHideColumnsHandler.isColumnHidden(this.getClass(), column.name)) {
+					Integer width = ShowHideColumnsHandler.getRememberedColumnWidth(this.getClass(), column.name);
+					column.column.getColumn().setWidth((null != width) ? width.intValue() : column.width);
+				} else if (column.showInRawMode && !column.showInAggregatedMode) {
+					column.column.getColumn().setWidth(0);
+				}
+			}
 		}
 	}
 
@@ -242,27 +342,32 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 
 			private void addText(Text text) {
 				StringBuffer content = new StringBuffer("Fully-Qualified Name: " + data.getThrowableType() + "\n");
-				content.append("Constructor: " + TextFormatter.getMethodWithParameters(methodIdent));
-				content.append("\n");
+				if (rawMode) {
+					content.append("Constructor: " + TextFormatter.getMethodWithParameters(methodIdent));
+					content.append("\n");
+				}
+
 				content.append("Error Message: " + data.getErrorMessage());
 				content.append("\n");
 
-				if (null != exceptionDetailsMap && !exceptionDetailsMap.isEmpty()) {
+				if (rawMode) {
 					content.append("\n");
 					content.append("Exception Hierarchy:\n");
-					List<ExceptionSensorData> exceptionDetails = exceptionDetailsMap.get(data.getThrowableType());
+					ExceptionSensorData child = data;
 
-					for (ExceptionSensorData exceptionSensorData : exceptionDetails) {
-						content.append(exceptionSensorData.getExceptionEvent().toString().toLowerCase() + " in "
-								+ TextFormatter.getMethodWithParameters(cachedDataService.getMethodIdentForId(exceptionSensorData.getMethodIdent())));
+					while (null != child) {
+						content.append(child.getExceptionEvent().toString().toLowerCase() + " in "
+								+ TextFormatter.getMethodWithParameters(cachedDataService.getMethodIdentForId(child.getMethodIdent())));
 						content.append("\n");
+						child = child.getChild();
 					}
-				}
-				content.append("\n");
-				content.append("Stack Trace: ");
-				content.append("\n");
-				content.append(data.getStackTrace());
 
+					content.append("\n");
+					content.append("Stack Trace: ");
+					content.append("\n");
+					content.append(data.getStackTrace());
+
+				}
 				text.setText(content.toString());
 			}
 		};
@@ -271,7 +376,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 
 	@Override
 	public boolean canShowDetails() {
-		return true;
+		return rawMode;
 	}
 
 	/**
@@ -351,88 +456,40 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		@SuppressWarnings("unchecked")
 		public Object[] getElements(Object inputElement) {
 			List<InvocationSequenceData> invocationSequenceDataList = (List<InvocationSequenceData>) inputElement;
-			exceptionSensorDataList = updateErrorMessagesAndExtractOverview(extractExceptionSensorData(invocationSequenceDataList, new ArrayList<ExceptionSensorData>()));
+			exceptionSensorDataList = getRawExceptionSensorDataList(invocationSequenceDataList, new ArrayList<ExceptionSensorData>());
+			if (!rawMode) {
+				AggregationPerformer<ExceptionSensorData> aggregationPerformer = new AggregationPerformer<ExceptionSensorData>(new ExceptionDataAggregator(
+						ExceptionAggregationType.GROUP_EXCEPTION_OVERVIEW));
+				aggregationPerformer.processCollection(exceptionSensorDataList);
+				exceptionSensorDataList = aggregationPerformer.getResultList();
+			}
 			return exceptionSensorDataList.toArray();
 		}
 
-		private List<ExceptionSensorData> extractExceptionSensorData(List<InvocationSequenceData> invocationSequenceDataList, ArrayList<ExceptionSensorData> exceptionSensorDataList) {
+		/**
+		 * Returns raw list of exceptions.
+		 * 
+		 * @param invocationSequenceDataList
+		 *            Invocations.
+		 * @param exceptionSensorDataList
+		 *            Result list.
+		 * @return List of exceptions for raw display.
+		 */
+		private List<ExceptionSensorData> getRawExceptionSensorDataList(List<InvocationSequenceData> invocationSequenceDataList, List<ExceptionSensorData> exceptionSensorDataList) {
 			for (InvocationSequenceData invocationSequenceData : invocationSequenceDataList) {
 				if (null != invocationSequenceData.getExceptionSensorDataObjects() && !invocationSequenceData.getExceptionSensorDataObjects().isEmpty()) {
-					for (Object object : invocationSequenceData.getExceptionSensorDataObjects()) {
-						exceptionSensorDataList.add((ExceptionSensorData) object);
+					for (ExceptionSensorData object : invocationSequenceData.getExceptionSensorDataObjects()) {
+						if (ObjectUtils.equals(object.getExceptionEvent(), ExceptionEvent.CREATED)) {
+							exceptionSensorDataList.add((ExceptionSensorData) object);
+						}
 					}
 				}
 				if (null != invocationSequenceData.getNestedSequences() && !invocationSequenceData.getNestedSequences().isEmpty()) {
-					extractExceptionSensorData(invocationSequenceData.getNestedSequences(), exceptionSensorDataList);
+					getRawExceptionSensorDataList(invocationSequenceData.getNestedSequences(), exceptionSensorDataList);
 				}
 			}
 
 			return exceptionSensorDataList;
-		}
-
-		/**
-		 * Need to update the error message on each data object, because the error message is not
-		 * saved in the invocation file.
-		 * 
-		 * @param exceptionSensorDataList
-		 *            The list containing the data objects to be updated.
-		 * @return A list where the objects' error message is updated.
-		 */
-		private List<ExceptionSensorData> updateErrorMessagesAndExtractOverview(List<ExceptionSensorData> exceptionSensorDataList) {
-			if (null != exceptionSensorDataList && !exceptionSensorDataList.isEmpty()) {
-				List<ExceptionSensorData> result = new ArrayList<ExceptionSensorData>();
-				result.addAll(exceptionSensorDataList);
-				Collections.reverse(result);
-				// update the error message on each object
-				for (ExceptionSensorData data : result) {
-					if (ExceptionEvent.CREATED.equals(data.getExceptionEvent())) {
-						updateErrorMessage(data);
-					}
-				}
-
-				return extractOverviewAndUpdateDetails(result);
-			}
-			return Collections.emptyList();
-		}
-
-		private void updateErrorMessage(ExceptionSensorData data) {
-			ExceptionSensorData child = data.getChild();
-			if (null != child) {
-				// we store in each object the error message from the root data object that has the
-				// CREATED event
-				if (!ObjectUtils.equals(data.getErrorMessage(), child.getErrorMessage())) {
-					child.setErrorMessage(data.getErrorMessage());
-				}
-				updateErrorMessage(child);
-			}
-		}
-
-		/**
-		 * Extracts the objects for the overview and refreshes the exceptionDetailsMap.
-		 * 
-		 * @param exceptionSensorDataList
-		 *            The list where to retrieve the information from.
-		 * @return A list containing all objects for the overview.
-		 */
-		private List<ExceptionSensorData> extractOverviewAndUpdateDetails(List<ExceptionSensorData> exceptionSensorDataList) {
-			List<ExceptionSensorData> overviewObjects = new ArrayList<ExceptionSensorData>();
-			for (ExceptionSensorData exceptionSensorData : exceptionSensorDataList) {
-				if (exceptionSensorData.getExceptionEvent().equals(ExceptionEvent.CREATED)) {
-					overviewObjects.add(exceptionSensorData);
-				}
-
-				List<ExceptionSensorData> nestedObjects = null;
-				String throwableType = exceptionSensorData.getThrowableType();
-				if (!exceptionDetailsMap.containsKey(throwableType)) {
-					nestedObjects = new ArrayList<ExceptionSensorData>();
-					nestedObjects.add(exceptionSensorData);
-					exceptionDetailsMap.put(throwableType, nestedObjects);
-				} else {
-					nestedObjects = exceptionDetailsMap.get(throwableType);
-					nestedObjects.add(exceptionSensorData);
-				}
-			}
-			return overviewObjects;
 		}
 
 		/**
@@ -486,26 +543,22 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		 */
 		@Override
 		public Image getColumnImage(Object element, int index) {
-			ExceptionSensorData data = (ExceptionSensorData) element;
-			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
-			Column enumId = Column.fromOrd(index);
-
-			switch (enumId) {
-			case CONSTRUCTOR:
-				Image image = ModifiersImageFactory.getImage(methodIdent.getModifiers());
-				image = ExceptionImageFactory.decorateImageWithException(image, data, resourceManager);
-				return image;
-			case ERROR_MESSAGE:
-				return null;
-			case TIMESTAMP:
-				return null;
-			case FQN:
-				return null;
-			default:
+			if (rawMode) {
+				Column enumId = Column.fromOrd(index);
+				switch (enumId) {
+				case CONSTRUCTOR:
+					ExceptionSensorData data = (ExceptionSensorData) element;
+					MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
+					Image image = ModifiersImageFactory.getImage(methodIdent.getModifiers());
+					image = ExceptionImageFactory.decorateImageWithException(image, data, resourceManager);
+					return image;
+				default:
+					return null;
+				}
+			} else {
 				return null;
 			}
 		}
-
 	}
 
 	/**
@@ -527,15 +580,39 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 
 			switch ((Column) getEnumSortColumn()) {
 			case TIMESTAMP:
-				return data1.getTimeStamp().compareTo(data2.getTimeStamp());
+				if (rawMode) {
+					return data1.getTimeStamp().compareTo(data2.getTimeStamp());
+				}
+				return 0;
 			case FQN:
 				return data1.getThrowableType().compareTo(data2.getThrowableType());
+			case CREATED:
+				if (!rawMode && data1 instanceof AggregatedExceptionSensorData && data2 instanceof AggregatedExceptionSensorData) {
+					return Long.compare(((AggregatedExceptionSensorData) data1).getCreated(), ((AggregatedExceptionSensorData) data2).getCreated());
+				}
+				return 0;
+			case RETHROWN:
+				if (!rawMode && data1 instanceof AggregatedExceptionSensorData && data2 instanceof AggregatedExceptionSensorData) {
+					return Long.compare(((AggregatedExceptionSensorData) data1).getPassed(), ((AggregatedExceptionSensorData) data2).getPassed());
+				}
+				return 0;
+			case HANDLED:
+				if (!rawMode && data1 instanceof AggregatedExceptionSensorData && data2 instanceof AggregatedExceptionSensorData) {
+					return Long.compare(((AggregatedExceptionSensorData) data1).getHandled(), ((AggregatedExceptionSensorData) data2).getHandled());
+				}
+				return 0;
 			case CONSTRUCTOR:
-				String method1 = TextFormatter.getMethodWithParameters(methodIdent1);
-				String method2 = TextFormatter.getMethodWithParameters(methodIdent2);
-				return method1.compareTo(method2);
+				if (rawMode) {
+					String method1 = TextFormatter.getMethodWithParameters(methodIdent1);
+					String method2 = TextFormatter.getMethodWithParameters(methodIdent2);
+					return method1.compareTo(method2);
+				}
+				return 0;
 			case ERROR_MESSAGE:
-				return data1.getErrorMessage().compareTo(data1.getErrorMessage());
+				if (rawMode) {
+					return data1.getErrorMessage().compareTo(data1.getErrorMessage());
+				}
+				return 0;
 			default:
 				return 0;
 			}
@@ -558,17 +635,53 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		if (null != data) {
 			switch (enumId) {
 			case TIMESTAMP:
-				return new StyledString(NumberFormatter.formatTimeWithMillis(data.getTimeStamp()));
+				if (rawMode) {
+					return new StyledString(NumberFormatter.formatTimeWithMillis(data.getTimeStamp()));
+				} else {
+					return emptyStyledString;
+				}
 			case FQN:
 				return new StyledString(data.getThrowableType());
-			case CONSTRUCTOR:
-				return new StyledString(TextFormatter.getMethodWithParameters(methodIdent));
-			case ERROR_MESSAGE:
-				StyledString styledString = new StyledString();
-				if (null != data.getErrorMessage()) {
-					styledString.append(data.getErrorMessage());
+			case CREATED:
+				if (!rawMode && data instanceof AggregatedExceptionSensorData) {
+					return new StyledString(NumberFormatter.formatLong(((AggregatedExceptionSensorData) data).getCreated()));
+				} else if (ExceptionEvent.CREATED.equals(data.getExceptionEvent())) {
+					return new StyledString("Yes");
+				} else {
+					return emptyStyledString;
 				}
-				return styledString;
+			case RETHROWN:
+				if (!rawMode && data instanceof AggregatedExceptionSensorData) {
+					return new StyledString(NumberFormatter.formatLong(((AggregatedExceptionSensorData) data).getPassed()));
+				} else if (ExceptionEvent.PASSED.equals(data.getExceptionEvent())) {
+					return new StyledString("Yes");
+				} else {
+					return emptyStyledString;
+				}
+			case HANDLED:
+				if (!rawMode && data instanceof AggregatedExceptionSensorData) {
+					return new StyledString(NumberFormatter.formatLong(((AggregatedExceptionSensorData) data).getHandled()));
+				} else if (ExceptionEvent.HANDLED.equals(data.getExceptionEvent())) {
+					return new StyledString("Yes");
+				} else {
+					return emptyStyledString;
+				}
+			case CONSTRUCTOR:
+				if (rawMode) {
+					return new StyledString(TextFormatter.getMethodWithParameters(methodIdent));
+				} else {
+					return emptyStyledString;
+				}
+			case ERROR_MESSAGE:
+				if (rawMode) {
+					StyledString styledString = new StyledString();
+					if (null != data.getErrorMessage()) {
+						styledString.append(data.getErrorMessage());
+					}
+					return styledString;
+				} else {
+					return emptyStyledString;
+				}
 			default:
 				return new StyledString("error");
 			}

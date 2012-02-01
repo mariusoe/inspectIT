@@ -199,7 +199,7 @@ public abstract class AbstractSearchHelper implements ISearchExecutor {
 	 * @return True if the input did not change, false otherwise.
 	 */
 	private boolean checkInput() {
-		int inputHash = getViewer().getInput().hashCode();
+		int inputHash = getAllObjects().hashCode();
 		if (oldInputHash != inputHash) {
 			oldInputHash = inputHash;
 			return false;

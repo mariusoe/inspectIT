@@ -195,15 +195,17 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 		};
 
 		for (TableColumn column : table.getColumns()) {
-			Integer rememberedWidth = ShowHideColumnsHandler.getRememberedColumnWidth(tableInputController.getClass(), column.getText());
-			boolean isColumnHidden = ShowHideColumnsHandler.isColumnHidden(tableInputController.getClass(), column.getText());
+			if (tableInputController.canAlterColumnWidth(column)) {
+				Integer rememberedWidth = ShowHideColumnsHandler.getRememberedColumnWidth(tableInputController.getClass(), column.getText());
+				boolean isColumnHidden = ShowHideColumnsHandler.isColumnHidden(tableInputController.getClass(), column.getText());
 
-			if (rememberedWidth != null && !isColumnHidden) {
-				column.setWidth(rememberedWidth.intValue());
-				column.setResizable(true);
-			} else if (isColumnHidden) {
-				column.setWidth(0);
-				column.setResizable(false);
+				if (rememberedWidth != null && !isColumnHidden) {
+					column.setWidth(rememberedWidth.intValue());
+					column.setResizable(true);
+				} else if (isColumnHidden) {
+					column.setWidth(0);
+					column.setResizable(false);
+				}
 			}
 
 			column.addControlListener(columnResizeListener);
@@ -305,8 +307,17 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 		tableInputController.preferenceEventFired(preferenceEvent);
 		switch (preferenceEvent.getPreferenceId()) {
 		case CLEAR_BUFFER:
+			if (tableInputController.getPreferenceIds().contains(PreferenceId.CLEAR_BUFFER)) {
+				tableViewer.refresh();
+			}
+			break;
 		case TIME_RESOLUTION:
-			if (tableInputController.getPreferenceIds().contains(PreferenceId.CLEAR_BUFFER) || tableInputController.getPreferenceIds().contains(PreferenceId.TIME_RESOLUTION)) {
+			if (tableInputController.getPreferenceIds().contains(PreferenceId.TIME_RESOLUTION)) {
+				tableViewer.refresh();
+			}
+			break;
+		case INVOCATION_SUBVIEW_MODE:
+			if (tableInputController.getPreferenceIds().contains(PreferenceId.INVOCATION_SUBVIEW_MODE)) {
 				tableViewer.refresh();
 			}
 			break;
