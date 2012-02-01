@@ -13,11 +13,16 @@ import java.util.List;
 
 /**
  * {@link ITimerDataAccessService} for storage purposes.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class StorageTimerDataAccessService extends AbstractStorageService<TimerData> implements ITimerDataAccessService {
+
+	/**
+	 * {@link IAggregator} used for {@link TimerData}.
+	 */
+	private static final TimerDataAggregator TIMER_DATA_AGGREGATOR = new TimerDataAggregator(false);
 
 	/**
 	 * Indexing tree.
@@ -28,11 +33,6 @@ public class StorageTimerDataAccessService extends AbstractStorageService<TimerD
 	 * Index query provider.
 	 */
 	private TimerDataQueryFactory<StorageIndexQuery> timerDataQueryFactory;
-
-	/**
-	 * {IAggregator}.
-	 */
-	private IAggregator<TimerData> aggregator = new TimerDataAggregator(false);
 
 	/**
 	 * {@inheritDoc}
@@ -46,7 +46,7 @@ public class StorageTimerDataAccessService extends AbstractStorageService<TimerD
 	 */
 	public List<TimerData> getAggregatedTimerData(TimerData timerData, Date fromDate, Date toDate) {
 		StorageIndexQuery query = timerDataQueryFactory.getAggregatedTimerDataQuery(timerData, fromDate, toDate);
-		return super.executeQuery(query, aggregator);
+		return super.executeQuery(query, TIMER_DATA_AGGREGATOR);
 	}
 
 	/**
@@ -65,7 +65,8 @@ public class StorageTimerDataAccessService extends AbstractStorageService<TimerD
 	}
 
 	/**
-	 * @param timerDataQueryFactory the timerDataQueryFactory to set
+	 * @param timerDataQueryFactory
+	 *            the timerDataQueryFactory to set
 	 */
 	public void setTimerDataQueryFactory(TimerDataQueryFactory<StorageIndexQuery> timerDataQueryFactory) {
 		this.timerDataQueryFactory = timerDataQueryFactory;

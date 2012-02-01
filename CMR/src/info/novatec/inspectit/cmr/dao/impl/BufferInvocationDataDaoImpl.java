@@ -1,15 +1,13 @@
 package info.novatec.inspectit.cmr.dao.impl;
 
 import info.novatec.inspectit.cmr.dao.InvocationDataDao;
-import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.indexing.IIndexQuery;
-import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
 import info.novatec.inspectit.indexing.query.factory.impl.InvocationSequenceDataQueryFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -20,24 +18,27 @@ import org.springframework.stereotype.Repository;
 /**
  * Implementation of {@link InvocationDataDao} that works with the data from the buffer indexing
  * tree.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 @Repository
-public class BufferInvocationDataDaoImpl implements InvocationDataDao {
-
-	/**
-	 * Tree to look for data.
-	 */
-	@Autowired
-	private IBufferTreeComponent<InvocationSequenceData> indexingTree;
+public class BufferInvocationDataDaoImpl extends AbstractBufferDataDao<InvocationSequenceData> implements InvocationDataDao {
 
 	/**
 	 * Index query provider.
 	 */
 	@Autowired
 	private InvocationSequenceDataQueryFactory<IIndexQuery> invocationDataQueryFactory;
+
+	/**
+	 * Comparator used for comparing the time stamps of {@link ExceptionSensorData}.
+	 */
+	private static final Comparator<InvocationSequenceData> TIMESTAMP_COMPARATOR = new Comparator<InvocationSequenceData>() {
+		public int compare(InvocationSequenceData o1, InvocationSequenceData o2) {
+			return o2.getTimeStamp().compareTo(o1.getTimeStamp());
+		}
+	};
 
 	/**
 	 * {@inheritDoc}
@@ -65,23 +66,13 @@ public class BufferInvocationDataDaoImpl implements InvocationDataDao {
 	 */
 	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate) {
 		IIndexQuery query = invocationDataQueryFactory.getInvocationSequenceOverview(platformId, methodId, limit, fromDate, toDate);
-		List<InvocationSequenceData> results = indexingTree.query(query);
-		Collections.sort(results, new Comparator<DefaultData>() {
-			public int compare(DefaultData o1, DefaultData o2) {
-				return o2.getTimeStamp().compareTo(o1.getTimeStamp());
-			}
-		});
-		List<InvocationSequenceData> returnList = new ArrayList<InvocationSequenceData>();
-		int i = 0;
-		for (InvocationSequenceData data : results) {
-			if (i < limit || -1 == limit) {
-				returnList.add(data.getClonedInvocationSequence());
-			} else {
-				break;
-			}
-			i++;
+		List<InvocationSequenceData> resultWithChildren = super.executeQuery(query, TIMESTAMP_COMPARATOR, limit);
+		List<InvocationSequenceData> realResults = new ArrayList<InvocationSequenceData>();
+		for (InvocationSequenceData invocationSequenceData : resultWithChildren) {
+			realResults.add(invocationSequenceData.getClonedInvocationSequence());
 		}
-		return returnList;
+		return realResults;
+
 	}
 
 	/**
@@ -90,30 +81,19 @@ public class BufferInvocationDataDaoImpl implements InvocationDataDao {
 	@Override
 	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit) {
 		IIndexQuery query = invocationDataQueryFactory.getInvocationSequenceOverview(platformId, invocationIdCollection, limit);
-		List<InvocationSequenceData> results = indexingTree.query(query);
-		Collections.sort(results, new Comparator<DefaultData>() {
-			public int compare(DefaultData o1, DefaultData o2) {
-				return o2.getTimeStamp().compareTo(o1.getTimeStamp());
-			}
-		});
-		List<InvocationSequenceData> returnList = new ArrayList<InvocationSequenceData>();
-		int i = 0;
-		for (InvocationSequenceData data : results) {
-			if (i < limit || -1 == limit) {
-				returnList.add(data.getClonedInvocationSequence());
-			} else {
-				break;
-			}
-			i++;
+		List<InvocationSequenceData> resultWithChildren = super.executeQuery(query, TIMESTAMP_COMPARATOR, limit);
+		List<InvocationSequenceData> realResults = new ArrayList<InvocationSequenceData>();
+		for (InvocationSequenceData invocationSequenceData : resultWithChildren) {
+			realResults.add(invocationSequenceData.getClonedInvocationSequence());
 		}
-		return returnList;
+		return realResults;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public InvocationSequenceData getInvocationSequenceDetail(InvocationSequenceData template) {
-		return indexingTree.get(template);
+		return super.getIndexingTree().get(template);
 	}
 
 }

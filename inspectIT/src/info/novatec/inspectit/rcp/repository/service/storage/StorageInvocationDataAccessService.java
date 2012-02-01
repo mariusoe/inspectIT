@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.repository.service.storage;
 
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
-import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.indexing.query.factory.impl.InvocationSequenceDataQueryFactory;
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
@@ -10,16 +10,15 @@ import info.novatec.inspectit.indexing.storage.impl.StorageIndexQuery;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
 /**
  * {@link IInvocationDataAccessService} for storage purposes.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class StorageInvocationDataAccessService extends AbstractStorageService<InvocationSequenceData> implements IInvocationDataAccessService {
 
@@ -32,6 +31,15 @@ public class StorageInvocationDataAccessService extends AbstractStorageService<I
 	 * Index query provider.
 	 */
 	private InvocationSequenceDataQueryFactory<StorageIndexQuery> invocationDataQueryFactory;
+
+	/**
+	 * Comparator used for comparing the time stamps of {@link ExceptionSensorData}.
+	 */
+	private static final Comparator<InvocationSequenceData> TIMESTAMP_COMPARATOR = new Comparator<InvocationSequenceData>() {
+		public int compare(InvocationSequenceData o1, InvocationSequenceData o2) {
+			return o2.getTimeStamp().compareTo(o1.getTimeStamp());
+		}
+	};
 
 	/**
 	 * {@inheritDoc}
@@ -53,24 +61,7 @@ public class StorageInvocationDataAccessService extends AbstractStorageService<I
 	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate) {
 		StorageIndexQuery query = invocationDataQueryFactory.getInvocationSequenceOverview(platformId, methodId, limit, fromDate, toDate);
 		query.setOnlyInvocationsWithoutChildren(true);
-		List<InvocationSequenceData> results = super.executeQuery(query, null);
-
-		Collections.sort(results, new Comparator<DefaultData>() {
-			public int compare(DefaultData o1, DefaultData o2) {
-				return o2.getTimeStamp().compareTo(o1.getTimeStamp());
-			}
-		});
-		List<InvocationSequenceData> returnList = new ArrayList<InvocationSequenceData>();
-		int i = 0;
-		for (InvocationSequenceData data : results) {
-			if (i < limit || -1 == limit) {
-				returnList.add(data.getClonedInvocationSequence());
-			} else {
-				break;
-			}
-			i++;
-		}
-		return returnList;
+		return super.executeQuery(query, TIMESTAMP_COMPARATOR, limit);
 	}
 
 	/**
@@ -86,24 +77,7 @@ public class StorageInvocationDataAccessService extends AbstractStorageService<I
 	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit) {
 		StorageIndexQuery query = invocationDataQueryFactory.getInvocationSequenceOverview(platformId, invocationIdCollection, limit);
 		query.setOnlyInvocationsWithoutChildren(true);
-		List<InvocationSequenceData> results = super.executeQuery(query, null);
-
-		Collections.sort(results, new Comparator<DefaultData>() {
-			public int compare(DefaultData o1, DefaultData o2) {
-				return o2.getTimeStamp().compareTo(o1.getTimeStamp());
-			}
-		});
-		List<InvocationSequenceData> returnList = new ArrayList<InvocationSequenceData>();
-		int i = 0;
-		for (InvocationSequenceData data : results) {
-			if (i < limit || -1 == limit) {
-				returnList.add(data.getClonedInvocationSequence());
-			} else {
-				break;
-			}
-			i++;
-		}
-		return returnList;
+		return super.executeQuery(query, TIMESTAMP_COMPARATOR, limit);
 	}
 
 	/**
@@ -138,14 +112,16 @@ public class StorageInvocationDataAccessService extends AbstractStorageService<I
 	}
 
 	/**
-	 * @param indexingTree the indexingTree to set
+	 * @param indexingTree
+	 *            the indexingTree to set
 	 */
 	public void setIndexingTree(IStorageTreeComponent<InvocationSequenceData> indexingTree) {
 		this.indexingTree = indexingTree;
 	}
 
 	/**
-	 * @param invocationDataQueryFactory the invocationDataQueryFactory to set
+	 * @param invocationDataQueryFactory
+	 *            the invocationDataQueryFactory to set
 	 */
 	public void setInvocationDataQueryFactory(InvocationSequenceDataQueryFactory<StorageIndexQuery> invocationDataQueryFactory) {
 		this.invocationDataQueryFactory = invocationDataQueryFactory;

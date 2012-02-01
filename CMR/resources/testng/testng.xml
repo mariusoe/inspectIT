@@ -27,9 +27,9 @@
 			<class name="info.novatec.inspectit.cmr.dao.ci.impl.LazyInitializationTest" />
 		</classes>
 	</test-->
-	<test name="Dao">
+	<test name="Dao/Aggregators">
 		<classes>
-			<class name="info.novatec.inspectit.cmr.dao.impl.BufferHttpTimerDataDaoTest" />
+			<class name="info.novatec.inspectit.indexing.aggregation.impl.HttpDataAggregatorTest" />
 			<class name="info.novatec.inspectit.cmr.dao.impl.TimerDataAggregatorTest" />
 		</classes>
 	</test>

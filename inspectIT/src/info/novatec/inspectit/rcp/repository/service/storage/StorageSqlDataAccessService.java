@@ -13,11 +13,16 @@ import java.util.List;
 
 /**
  * {@link ISqlDataAccessService} for storage purposes.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class StorageSqlDataAccessService extends AbstractStorageService<SqlStatementData> implements ISqlDataAccessService {
+
+	/**
+	 * {@link IAggregator} used for {@link SqlStatementData}.
+	 */
+	private static final SqlStatementDataAggregator SQL_STATEMENT_DATA_AGGREGATOR = new SqlStatementDataAggregator(false);
 
 	/**
 	 * Indexing tree.
@@ -28,11 +33,6 @@ public class StorageSqlDataAccessService extends AbstractStorageService<SqlState
 	 * Index query provider.
 	 */
 	private SqlStatementDataQueryFactory<StorageIndexQuery> sqlDataQueryFactory;
-
-	/**
-	 * {@link IAggregator}.
-	 */
-	private IAggregator<SqlStatementData> aggregator = new SqlStatementDataAggregator(false);
 
 	/**
 	 * {@inheritDoc}
@@ -46,9 +46,8 @@ public class StorageSqlDataAccessService extends AbstractStorageService<SqlState
 	 */
 	public List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData sqlStatementData, Date fromDate, Date toDate) {
 		StorageIndexQuery query = sqlDataQueryFactory.getAggregatedSqlStatementsQuery(sqlStatementData, fromDate, toDate);
-		return super.executeQuery(query, aggregator);
+		return super.executeQuery(query, SQL_STATEMENT_DATA_AGGREGATOR);
 	}
-
 
 	/**
 	 * {@inheritDoc}
@@ -58,14 +57,16 @@ public class StorageSqlDataAccessService extends AbstractStorageService<SqlState
 	}
 
 	/**
-	 * @param indexingTree the indexingTree to set
+	 * @param indexingTree
+	 *            the indexingTree to set
 	 */
 	public void setIndexingTree(IStorageTreeComponent<SqlStatementData> indexingTree) {
 		this.indexingTree = indexingTree;
 	}
 
 	/**
-	 * @param sqlDataQueryFactory the sqlDataQueryFactory to set
+	 * @param sqlDataQueryFactory
+	 *            the sqlDataQueryFactory to set
 	 */
 	public void setSqlDataQueryFactory(SqlStatementDataQueryFactory<StorageIndexQuery> sqlDataQueryFactory) {
 		this.sqlDataQueryFactory = sqlDataQueryFactory;

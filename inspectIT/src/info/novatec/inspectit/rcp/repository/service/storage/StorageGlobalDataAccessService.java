@@ -84,7 +84,7 @@ public class StorageGlobalDataAccessService extends AbstractStorageService<Defau
 			}
 		}
 
-		return super.executeQuery(query, null);
+		return super.executeQuery(query);
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class StorageGlobalDataAccessService extends AbstractStorageService<Defau
 		query.setObjectClasses(searchClasses);
 		query.setPlatformIdent(template.getPlatformIdent());
 
-		return super.executeQuery(query, null);
+		return super.executeQuery(query);
 	}
 
 	/**
@@ -135,7 +135,7 @@ public class StorageGlobalDataAccessService extends AbstractStorageService<Defau
 			}
 		}
 
-		List<DefaultData> returnList = super.executeQuery(query, null);
+		List<DefaultData> returnList = super.executeQuery(query);
 		Collections.sort(returnList, new Comparator<DefaultData>() {
 
 			@Override
@@ -143,7 +143,7 @@ public class StorageGlobalDataAccessService extends AbstractStorageService<Defau
 				return o1.getTimeStamp().compareTo(o2.getTimeStamp());
 			}
 		});
-		
+
 		return returnList;
 	}
 
@@ -154,7 +154,7 @@ public class StorageGlobalDataAccessService extends AbstractStorageService<Defau
 	public void setAgents(List<PlatformIdent> agents) {
 		this.agents = agents;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -177,5 +177,5 @@ public class StorageGlobalDataAccessService extends AbstractStorageService<Defau
 	public void setStorageIndexQueryProvider(StorageIndexQueryProvider storageIndexQueryProvider) {
 		this.storageIndexQueryProvider = storageIndexQueryProvider;
 	}
-	
+
 }

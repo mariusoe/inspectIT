@@ -1,4 +1,4 @@
-package info.novatec.inspectit.cmr.dao.impl;
+package info.novatec.inspectit.indexing.aggregation.impl;
 
 import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.communication.data.HttpTimerData;
@@ -12,12 +12,10 @@ import org.testng.annotations.Test;
 
 /**
  * Tests the buffer aggregation of <code>HttpTimerData</code> elements.
- * 
+ *
  * @author Stefan Siegl
  */
-public class BufferHttpTimerDataDaoTest extends AbstractTestNGLogSupport {
-
-	private BufferHttpTimerDataDaoImpl underTest = new BufferHttpTimerDataDaoImpl();
+public class HttpDataAggregatorTest extends AbstractTestNGLogSupport {
 
 	@Test
 	public void aggregationWithInspectITHeaderTwoDifferent() {
@@ -46,7 +44,9 @@ public class BufferHttpTimerDataDaoTest extends AbstractTestNGLogSupport {
 			}
 		};
 
-		final List<HttpTimerData> output = underTest.aggregate(input, false, false);
+		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(true, false, false));
+		aggregationPerformer.processCollection(input);
+		final List<HttpTimerData> output = aggregationPerformer.getResultList();
 		Assert.assertNotNull(output);
 		Assert.assertEquals(output.size(), 2);
 	}
@@ -87,7 +87,10 @@ public class BufferHttpTimerDataDaoTest extends AbstractTestNGLogSupport {
 			}
 		};
 
-		final List<HttpTimerData> output = underTest.aggregate(input, false, false);
+		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(true, false, false));
+		aggregationPerformer.processCollection(input);
+		final List<HttpTimerData> output = aggregationPerformer.getResultList();
+
 		Assert.assertNotNull(output);
 		Assert.assertEquals(output.size(), 1);
 		HttpTimerData result = output.get(0);
@@ -126,7 +129,10 @@ public class BufferHttpTimerDataDaoTest extends AbstractTestNGLogSupport {
 			}
 		};
 
-		final List<HttpTimerData> output = underTest.aggregate(input, true, false);
+		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(true, true, false));
+		aggregationPerformer.processCollection(input);
+		final List<HttpTimerData> output = aggregationPerformer.getResultList();
+
 		Assert.assertNotNull(output);
 		Assert.assertEquals(output.size(), 1);
 		HttpTimerData result = output.get(0);
@@ -162,7 +168,10 @@ public class BufferHttpTimerDataDaoTest extends AbstractTestNGLogSupport {
 			}
 		};
 
-		final List<HttpTimerData> output = underTest.aggregate(input, true, true);
+		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(true, true, true));
+		aggregationPerformer.processCollection(input);
+		final List<HttpTimerData> output = aggregationPerformer.getResultList();
+
 		Assert.assertNotNull(output);
 		Assert.assertEquals(output.size(), 2);
 	}

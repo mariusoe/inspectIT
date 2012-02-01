@@ -11,6 +11,8 @@ import info.novatec.inspectit.rcp.storage.util.HttpDataRetriever;
 import info.novatec.inspectit.storage.IStorageIdProvider;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -96,6 +98,108 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 	protected abstract IStorageTreeComponent<E> getIndexingTree();
 
 	/**
+	 * Executes the query on the indexing tree.
+	 * 
+	 * @param storageIndexQuery
+	 *            Index query to execute.
+	 * 
+	 * @return Result list.
+	 */
+	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery) {
+		return this.executeQuery(storageIndexQuery, null, null, -1);
+	}
+
+	/**
+	 * Executes the query on the indexing tree. If the {@link IAggregator} is not <code>null</code>
+	 * then the results will be aggregated based on the given {@link IAggregator}.
+	 * 
+	 * @param storageIndexQuery
+	 *            Index query to execute.
+	 * @param aggregator
+	 *            {@link IAggregator}. Pass <code>null</code> if no aggregation is needed.
+	 * @return Result list.
+	 */
+	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, IAggregator<E> aggregator) {
+		return this.executeQuery(storageIndexQuery, aggregator, null, -1);
+	}
+
+	/**
+	 * Executes the query on the indexing tree. Results can be sorted by comparator.
+	 * 
+	 * @param storageIndexQuery
+	 *            Index query to execute.
+	 * @param comparator
+	 *            If supplied the final result list will be sorted by this comparator.
+	 * @return Result list.
+	 */
+	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, Comparator<E> comparator) {
+		return this.executeQuery(storageIndexQuery, null, comparator, -1);
+	}
+
+	/**
+	 * Executes the query on the indexing tree. Furthermore the result list can be limited.
+	 * 
+	 * @param storageIndexQuery
+	 *            Index query to execute.
+	 * @param limit
+	 *            Limit the number of results by given number. Value <code>-1</code> means no limit.
+	 * @return Result list.
+	 */
+	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, int limit) {
+		return this.executeQuery(storageIndexQuery, null, null, limit);
+	}
+
+	/**
+	 * Executes the query on the indexing tree. If the {@link IAggregator} is not <code>null</code>
+	 * then the results will be aggregated based on the given {@link IAggregator}.
+	 * 
+	 * @param storageIndexQuery
+	 *            Index query to execute.
+	 * @param aggregator
+	 *            {@link IAggregator}. Pass <code>null</code> if no aggregation is needed.
+	 * @param comparator
+	 *            If supplied the final result list will be sorted by this comparator.
+	 * @return Result list.
+	 */
+	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, IAggregator<E> aggregator, Comparator<E> comparator) {
+		return this.executeQuery(storageIndexQuery, aggregator, comparator, -1);
+	}
+
+	/**
+	 * Executes the query on the indexing tree. If the {@link IAggregator} is not <code>null</code>
+	 * then the results will be aggregated based on the given {@link IAggregator}. Furthermore the
+	 * result list can be limited.
+	 * 
+	 * @param storageIndexQuery
+	 *            Index query to execute.
+	 * @param aggregator
+	 *            {@link IAggregator}. Pass <code>null</code> if no aggregation is needed.
+	 * @param limit
+	 *            Limit the number of results by given number. Value <code>-1</code> means no limit.
+	 * @return Result list.
+	 */
+	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, IAggregator<E> aggregator, int limit) {
+		return this.executeQuery(storageIndexQuery, aggregator, null, limit);
+	}
+
+	/**
+	 * Executes the query on the indexing tree. Results can be sorted by comparator. Furthermore the
+	 * result list can be limited.
+	 * 
+	 * @param storageIndexQuery
+	 *            Index query to execute.
+	 * 
+	 * @param comparator
+	 *            If supplied the final result list will be sorted by this comparator.
+	 * @param limit
+	 *            Limit the number of results by given number. Value <code>-1</code> means no limit.
+	 * @return Result list.
+	 */
+	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, Comparator<E> comparator, int limit) {
+		return this.executeQuery(storageIndexQuery, null, comparator, limit);
+	}
+
+	/**
 	 * This method has the ability to load the data via the HTTP and aggregate the data if the
 	 * {@link IAggregator} is provided. If the {@link IAggregator} is not provided, the data will be
 	 * returned not aggregated.
@@ -107,9 +211,13 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 	 *            Query.
 	 * @param aggregator
 	 *            {@link IAggregator}
+	 * @param comparator
+	 *            If supplied the final result list will be sorted by this comparator.
+	 * @param limit
+	 *            Limit the number of results by given number. Value <code>-1</code> means no limit.
 	 * @return Return results of a query.
 	 */
-	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, IAggregator<E> aggregator) {
+	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, IAggregator<E> aggregator, Comparator<E> comparator, int limit) {
 		List<IStorageDescriptor> descriptors = getIndexingTree().query(storageIndexQuery);
 		AggregationPerformer<E> aggregationPerformer = null;
 		if (null != aggregator) {
@@ -145,13 +253,24 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 			}
 		}
 
+		// aggregate if needed
 		if (null != aggregator) {
-			return aggregationPerformer.getResultList();
-		} else {
-			return returnList;
+			returnList = aggregationPerformer.getResultList();
 		}
+
+		// sort if needed
+		if (null != comparator) {
+			Collections.sort(returnList, comparator);
+		}
+
+		// limit the size if needed
+		if (limit > -1 && returnList.size() > limit) {
+			returnList = returnList.subList(0, limit);
+		}
+
+		return returnList;
 	}
-	
+
 	/**
 	 * This utility method is used to create a list of elements that pass all the restrictions in
 	 * the {@link StorageIndexQuery}.
