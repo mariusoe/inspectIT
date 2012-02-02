@@ -6,7 +6,6 @@ import info.novatec.inspectit.indexing.buffer.IBufferBranchIndexer;
 import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
 import info.novatec.inspectit.indexing.buffer.impl.Branch;
 import info.novatec.inspectit.indexing.buffer.impl.BufferBranchIndexer;
-import info.novatec.inspectit.indexing.buffer.impl.BufferBranchIndexer.ChildBranchType;
 import info.novatec.inspectit.indexing.impl.IndexingException;
 import info.novatec.inspectit.indexing.indexer.impl.ObjectTypeIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.PlatformIdentIndexer;
@@ -34,8 +33,8 @@ public class RootBranchFactory implements FactoryBean<RootBranch<DefaultData>> {
 	@Override
 	public RootBranch<DefaultData> getObject() throws Exception {
 		IBufferBranchIndexer<DefaultData> timestampIndexer = new BufferBranchIndexer<DefaultData>(new TimestampIndexer<DefaultData>());
-		IBufferBranchIndexer<DefaultData> objectTypeIndexer = new BufferBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>(), ChildBranchType.NORMAL_BRANCH, timestampIndexer);
-		IBufferBranchIndexer<DefaultData> platformIndexer = new BufferBranchIndexer<DefaultData>(new PlatformIdentIndexer<DefaultData>(), ChildBranchType.NORMAL_BRANCH, objectTypeIndexer);
+		IBufferBranchIndexer<DefaultData> objectTypeIndexer = new BufferBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>(), timestampIndexer);
+		IBufferBranchIndexer<DefaultData> platformIndexer = new BufferBranchIndexer<DefaultData>(new PlatformIdentIndexer<DefaultData>(), objectTypeIndexer);
 		return new RootBranch<DefaultData>(platformIndexer);
 	}
 

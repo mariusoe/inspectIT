@@ -11,46 +11,18 @@ import info.novatec.inspectit.indexing.indexer.IBranchIndexer;
 /**
  * Implementation of branch indexer for the {@link IBufferTreeComponent}. This indexer is
  * delegatinggeneration of the indexing keys to the {@link IBranchIndexer}.
- * 
+ *
  * @author Ivan Senic
- * 
+ *
  * @param <E>
  *            Type of the elements indexed.
  */
 public class BufferBranchIndexer<E extends DefaultData> implements IBufferBranchIndexer<E> {
 
 	/**
-	 * Enum describing the child branch type.
-	 * 
-	 * @author Ivan Senic
-	 * 
-	 */
-	public enum ChildBranchType {
-
-		/**
-		 * Normal branch.
-		 * 
-		 * @see Branch
-		 */
-		NORMAL_BRANCH,
-
-		/**
-		 * Leafing branch.
-		 * 
-		 * @see LeafingBranch
-		 */
-		LEAFING_BRANCH
-	}
-
-	/**
 	 * Delegate indexer.
 	 */
 	private IBranchIndexer<E> delegateIndexer;
-
-	/**
-	 * Type of the child branch.
-	 */
-	private ChildBranchType childBranchType;
 
 	/**
 	 * Child indexer.
@@ -59,27 +31,24 @@ public class BufferBranchIndexer<E extends DefaultData> implements IBufferBranch
 
 	/**
 	 * Default constructor.
-	 * 
+	 *
 	 * @param delegateIndexer
 	 *            Delegate indexer that should generate keys.
 	 */
 	public BufferBranchIndexer(IBranchIndexer<E> delegateIndexer) {
-		this(delegateIndexer, null, null);
+		this(delegateIndexer, null);
 	}
 
 	/**
 	 * Secondary constructor.
-	 * 
+	 *
 	 * @param delegateIndexer
 	 *            Type of the delegate indexer that will actually generate keys for objects.
-	 * @param childBranchType
-	 *            Type of the child branch.
 	 * @param childBufferIndexer
 	 *            Indexer to be used in the child branch.
 	 */
-	public BufferBranchIndexer(IBranchIndexer<E> delegateIndexer, ChildBranchType childBranchType, IBufferBranchIndexer<E> childBufferIndexer) {
+	public BufferBranchIndexer(IBranchIndexer<E> delegateIndexer, IBufferBranchIndexer<E> childBufferIndexer) {
 		this.delegateIndexer = delegateIndexer;
-		this.childBranchType = childBranchType;
 		this.childBufferIndexer = childBufferIndexer;
 	}
 
@@ -116,7 +85,7 @@ public class BufferBranchIndexer<E extends DefaultData> implements IBufferBranch
 	 */
 	public IBufferBranchIndexer<E> getNewInstance() {
 		if (!sharedInstance()) {
-			BufferBranchIndexer<E> bufferBranchIndexer = new BufferBranchIndexer<E>(delegateIndexer.getNewInstance(), childBranchType, childBufferIndexer);
+			BufferBranchIndexer<E> bufferBranchIndexer = new BufferBranchIndexer<E>(delegateIndexer.getNewInstance(), childBufferIndexer);
 			return bufferBranchIndexer;
 		} else {
 			throw new UnsupportedOperationException("Method getNewInstance() called on the Indexer that has a shared instance.");
@@ -129,24 +98,15 @@ public class BufferBranchIndexer<E extends DefaultData> implements IBufferBranch
 	public IBufferTreeComponent<E> getNextTreeComponent() {
 		if (null != childBufferIndexer) {
 			if (sharedInstance()) {
-				if (childBranchType == ChildBranchType.NORMAL_BRANCH) {
-					return new Branch<E>(childBufferIndexer);
-				} else if (childBranchType == ChildBranchType.LEAFING_BRANCH) {
-					return new LeafingBranch<E>(childBufferIndexer);
-				}
+				return new Branch<E>(childBufferIndexer);
 			} else {
-				if (childBranchType == ChildBranchType.NORMAL_BRANCH) {
-					return new Branch<E>(getNewInstance());
-				} else if (childBranchType == ChildBranchType.LEAFING_BRANCH) {
-					return new LeafingBranch<E>(getNewInstance());
-				}
+				return new Branch<E>(getNewInstance());
 			}
 		} else {
 			return new Leaf<E>();
 		}
-		return null;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -154,7 +114,6 @@ public class BufferBranchIndexer<E extends DefaultData> implements IBufferBranch
 	public String toString() {
 		ToStringBuilder toStringBuilder = new ToStringBuilder(this);
 		toStringBuilder.append("delegateIndexer", delegateIndexer);
-		toStringBuilder.append("childBranchType", childBranchType);
 		return toStringBuilder.toString();
 	}
 
