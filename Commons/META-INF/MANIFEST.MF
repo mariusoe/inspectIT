@@ -49,7 +49,6 @@ Export-Package: info.novatec.inspectit.cmr.model,
    info.novatec.inspectit.storage.serializer.schema,
    com.esotericsoftware.kryo",
  info.novatec.inspectit.storage.serializer.schema,
- info.novatec.inspectit.storage.serializer.util;uses:="info.novatec.inspectit.cmr.model",
  schema
 Bundle-Vendor: NovaTec GmbH
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

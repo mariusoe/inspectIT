@@ -5,7 +5,7 @@ import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.storage.StorageFileExtensions;
 import info.novatec.inspectit.storage.StorageWriter;
-import info.novatec.inspectit.storage.serializer.util.SerializationUtil;
+import info.novatec.inspectit.storage.util.PersistentObjectCloner;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -42,6 +42,12 @@ public class CmrStorageWriter extends StorageWriter {
 	private PlatformIdentDaoImpl platformIdentDao;
 
 	/**
+	 * Cloner for transforming the agent data.
+	 */
+	@Autowired
+	private PersistentObjectCloner persistentObjectCloner;
+
+	/**
 	 * Logger for buffer.
 	 */
 	private static final Logger LOGGER = Logger.getLogger(CmrStorageWriter.class);
@@ -63,7 +69,7 @@ public class CmrStorageWriter extends StorageWriter {
 	protected void writeAgentData() throws IOException {
 		List<PlatformIdent> involvedPlatformIdents = platformIdentDao.findAllInitialized(involvedAgentsSet);
 		for (PlatformIdent agent : involvedPlatformIdents) {
-			SerializationUtil.makePlatformIdentSerializable(agent);
+			agent = persistentObjectCloner.clone(agent);
 			super.writeNonDefaultDataObject(agent, agent.getId() + StorageFileExtensions.AGENT_FILE_EXT);
 		}
 	}
