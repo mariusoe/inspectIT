@@ -8,6 +8,8 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.geom.Ellipse2D;
+import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -147,7 +149,7 @@ public class DefaultClassesPlotController extends AbstractPlotController {
 		renderer.setSeriesFillPaint(0, new Color(255, 200, 200));
 		renderer.setSeriesOutlineStroke(0, new BasicStroke(2.0f));
 		renderer.setSeriesShape(0, new Ellipse2D.Double(-2.5, -2.5, 5.0, 5.0));
-		renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator());
+		renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator(StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT, DateFormat.getDateTimeInstance(), NumberFormat.getNumberInstance()));
 
 		final NumberAxis rangeAxis = new NumberAxis("Classes");
 		rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
