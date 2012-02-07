@@ -3,6 +3,7 @@ package info.novatec.inspectit.rcp.editor.table.input;
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
@@ -18,6 +19,7 @@ import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
+import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -71,11 +73,15 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		/** The time column. */
 		TIME("Start Time", 150, InspectITConstants.IMG_TIMER),
 		/** The method column. */
-		METHOD("Method", 600, InspectITConstants.IMG_METHOD_PUBLIC),
+		METHOD("Method", 550, InspectITConstants.IMG_METHOD_PUBLIC),
 		/** The duration column. */
-		DURATION("Duration (ms)", 120, InspectITConstants.IMG_LAST_HOUR),
+		DURATION("Duration (ms)", 100, InspectITConstants.IMG_LAST_HOUR),
 		/** The count column. */
-		COUNT("Child Count", 100, null);
+		COUNT("Child Count", 100, null),
+		/** The URI column. */
+		URI("URI", 150, null),
+		/** The Use case column. */
+		USE_CASE("Use case", 100, null);
 
 		/** The real viewer column. */
 		private TableViewerColumn column;
@@ -156,6 +162,11 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 * Are we in live mode.
 	 */
 	private boolean autoUpdate = LiveMode.ACTIVE_DEFAULT;
+
+	/**
+	 * Empty styled string.
+	 */
+	private final StyledString emptyStyledString = new StyledString();
 
 	/**
 	 * 
@@ -462,6 +473,30 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 				}
 			case COUNT:
 				return Long.valueOf(invoc1.getChildCount()).compareTo(Long.valueOf(invoc2.getChildCount()));
+			case URI:
+				if (isHttpDataBounded(invoc1) && isHttpDataBounded(invoc2)) {
+					String uri1 = ((HttpTimerData) invoc1.getTimerData()).getUri();
+					String uri2 = ((HttpTimerData) invoc2.getTimerData()).getUri();
+					return ObjectUtils.compare(uri1, uri2);
+				} else if (isHttpDataBounded(invoc1)) {
+					return 1;
+				} else if (isHttpDataBounded(invoc2)) {
+					return -1;
+				} else {
+					return 0;
+				}
+			case USE_CASE:
+				if (isHttpDataBounded(invoc1) && isHttpDataBounded(invoc2)) {
+					String useCase1 = ((HttpTimerData) invoc1.getTimerData()).getInspectItTaggingHeaderValue();
+					String useCase2 = ((HttpTimerData) invoc2.getTimerData()).getInspectItTaggingHeaderValue();
+					return ObjectUtils.compare(useCase1, useCase2);
+				} else if (isHttpDataBounded(invoc1)) {
+					return 1;
+				} else if (isHttpDataBounded(invoc2)) {
+					return -1;
+				} else {
+					return 0;
+				}
 			default:
 				return 0;
 			}
@@ -497,6 +532,28 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 			}
 		case COUNT:
 			return new StyledString(NumberFormatter.formatLong(data.getChildCount()));
+		case URI:
+			if (isHttpDataBounded(data)) {
+				String uri = ((HttpTimerData) data.getTimerData()).getUri();
+				if (null != uri) {
+					return new StyledString(uri);
+				} else {
+					return emptyStyledString;
+				}
+			} else {
+				return emptyStyledString;
+			}
+		case USE_CASE:
+			if (isHttpDataBounded(data)) {
+				String useCase = ((HttpTimerData) data.getTimerData()).getInspectItTaggingHeaderValue();
+				if (null != useCase) {
+					return new StyledString(useCase);
+				} else {
+					return emptyStyledString;
+				}
+			} else {
+				return emptyStyledString;
+			}
 		default:
 			return new StyledString("error");
 		}
@@ -517,6 +574,17 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 			return sb.toString();
 		}
 		throw new RuntimeException("Could not create the human readable string!");
+	}
+
+	/**
+	 * Returns if the given invocation sequence has {@link HttpTimerData} bounded.
+	 *
+	 * @param invocationSequenceData
+	 *            Invocation to check.
+	 * @return True if {@link HttpTimerData} is available.
+	 */
+	private static boolean isHttpDataBounded(InvocationSequenceData invocationSequenceData) {
+		return invocationSequenceData.getTimerData() instanceof HttpTimerData;
 	}
 
 }

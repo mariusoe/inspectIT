@@ -48,4 +48,33 @@ public final class ObjectUtils {
 		return object1.equals(object2);
 	}
 
+	/**
+	 * Null safe compare. Returns following results:
+	 *
+	 * ObjectUtils.equals(Comparable, Object) = Comparable.compareTo(object)
+	 * ObjectUtils.equals(null, Object) = -1
+	 * ObjectUtils.equals(Comparable, null) = 1
+	 * ObjectUtils.equals(null, null) = 0
+	 *
+	 * @param <T> Type of comparing objects.
+	 * @param object1
+	 *            Object1
+	 * @param object2
+	 *            Object2
+	 * @return a negative integer, zero, or a positive integer as this object is less than, equal
+	 *         to, or greater than the specified object.
+	 * @see Comparable#compareTo(Object)
+	 */
+	public static <T> int compare(Comparable<T> object1, T object2) {
+		if (null != object1 && null != object2) {
+			return object1.compareTo(object2);
+		} else if (null != object1) {
+			return 1;
+		} else if (null != object2) {
+			return -1;
+		} else {
+			return 0;
+		}
+	}
+
 }
