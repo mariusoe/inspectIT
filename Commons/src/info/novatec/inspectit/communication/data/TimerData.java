@@ -298,7 +298,7 @@ public class TimerData extends InvocationAwareData {
 	/**
 	 * <b> Notice: ensure to check using the <code> isExclusiveMetricDataAvailable() </code> if cpu
 	 * metric data is in fact available, otherwise you might get strange results </b>
-	 * 
+	 *
 	 * @return exlusivemax
 	 */
 	public double getExclusiveMax() {
@@ -383,90 +383,6 @@ public class TimerData extends InvocationAwareData {
 	/**
 	 * {@inheritDoc}
 	 */
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		long temp;
-		temp = Double.doubleToLongBits(cpuDuration);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(cpuMax);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(cpuMin);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(duration);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + (int) (exclusiveCount ^ (exclusiveCount >>> 32));
-		temp = Double.doubleToLongBits(exclusiveDuration);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(exclusiveMax);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(exclusiveMin);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(max);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(min);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(variance);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		return result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (!super.equals(obj)) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		TimerData other = (TimerData) obj;
-		if (count != other.count) {
-			return false;
-		}
-		if (Double.doubleToLongBits(cpuDuration) != Double.doubleToLongBits(other.cpuDuration)) {
-			return false;
-		}
-		if (Double.doubleToLongBits(cpuMax) != Double.doubleToLongBits(other.cpuMax)) {
-			return false;
-		}
-		if (Double.doubleToLongBits(cpuMin) != Double.doubleToLongBits(other.cpuMin)) {
-			return false;
-		}
-		if (Double.doubleToLongBits(duration) != Double.doubleToLongBits(other.duration)) {
-			return false;
-		}
-		if (exclusiveCount != other.exclusiveCount) {
-			return false;
-		}
-		if (Double.doubleToLongBits(exclusiveDuration) != Double.doubleToLongBits(other.exclusiveDuration)) {
-			return false;
-		}
-		if (Double.doubleToLongBits(exclusiveMax) != Double.doubleToLongBits(other.exclusiveMax)) {
-			return false;
-		}
-		if (Double.doubleToLongBits(exclusiveMin) != Double.doubleToLongBits(other.exclusiveMin)) {
-			return false;
-		}
-		if (Double.doubleToLongBits(max) != Double.doubleToLongBits(other.max)) {
-			return false;
-		}
-		if (Double.doubleToLongBits(min) != Double.doubleToLongBits(other.min)) {
-			return false;
-		}
-		if (Double.doubleToLongBits(variance) != Double.doubleToLongBits(other.variance)) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public DefaultData finalizeData() {
 		// no need
 		return this;
@@ -545,4 +461,92 @@ public class TimerData extends InvocationAwareData {
 			this.calculateExclusiveMin(timerData.getExclusiveMin());
 		}
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + (int) (count ^ (count >>> 32));
+		long temp;
+		temp = Double.doubleToLongBits(cpuDuration);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(cpuMax);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(cpuMin);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(duration);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + (int) (exclusiveCount ^ (exclusiveCount >>> 32));
+		temp = Double.doubleToLongBits(exclusiveDuration);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(exclusiveMax);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(exclusiveMin);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(max);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(min);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(variance);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		TimerData other = (TimerData) obj;
+		if (count != other.count) {
+			return false;
+		}
+		if (Double.doubleToLongBits(cpuDuration) != Double.doubleToLongBits(other.cpuDuration)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(cpuMax) != Double.doubleToLongBits(other.cpuMax)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(cpuMin) != Double.doubleToLongBits(other.cpuMin)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(duration) != Double.doubleToLongBits(other.duration)) {
+			return false;
+		}
+		if (exclusiveCount != other.exclusiveCount) {
+			return false;
+		}
+		if (Double.doubleToLongBits(exclusiveDuration) != Double.doubleToLongBits(other.exclusiveDuration)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(exclusiveMax) != Double.doubleToLongBits(other.exclusiveMax)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(exclusiveMin) != Double.doubleToLongBits(other.exclusiveMin)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(max) != Double.doubleToLongBits(other.max)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(min) != Double.doubleToLongBits(other.min)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(variance) != Double.doubleToLongBits(other.variance)) {
+			return false;
+		}
+		return true;
+	}
+
 }

@@ -54,7 +54,7 @@ public class ExceptionSensorData extends InvocationAwareData {
 	 * The identity hash code of the thrown {@link Throwable} object.
 	 */
 	private long throwableIdentityHashCode;
-	
+
 	/**
 	 * Default no-args constructor.
 	 */
@@ -121,10 +121,33 @@ public class ExceptionSensorData extends InvocationAwareData {
 		this.throwableIdentityHashCode = throwableIdentityHashCode;
 	}
 
-	public String toString() {
-		return throwableType + "@" + throwableIdentityHashCode + " :: " + exceptionEvent.toString();
+	public double getInvocationAffiliationPercentage() {
+		return (double) getObjectsInInvocationsCount() / 1d;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public long getObjectSize(IObjectSizes objectSizes) {
+		long size = super.getObjectSize(objectSizes);
+		size += objectSizes.getPrimitiveTypesSize(6, 0, 0, 0, 1, 0);
+		size += objectSizes.getSizeOf(errorMessage);
+		size += objectSizes.getSizeOf(cause);
+		size += objectSizes.getSizeOf(stackTrace);
+		size += objectSizes.getSizeOf(throwableType);
+		if (null != exceptionEvent) {
+			size += exceptionEvent.getObjectSize(objectSizes);
+		}
+		if (null != child) {
+			size += child.getObjectSize(objectSizes);
+		}
+		return objectSizes.alignTo8Bytes(size);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
@@ -137,6 +160,10 @@ public class ExceptionSensorData extends InvocationAwareData {
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -192,24 +219,10 @@ public class ExceptionSensorData extends InvocationAwareData {
 	/**
 	 * {@inheritDoc}
 	 */
-	public long getObjectSize(IObjectSizes objectSizes) {
-		long size = super.getObjectSize(objectSizes);
-		size += objectSizes.getPrimitiveTypesSize(6, 0, 0, 0, 1, 0);
-		size += objectSizes.getSizeOf(errorMessage);
-		size += objectSizes.getSizeOf(cause);
-		size += objectSizes.getSizeOf(stackTrace);
-		size += objectSizes.getSizeOf(throwableType);
-		if (null != exceptionEvent) {
-			size += exceptionEvent.getObjectSize(objectSizes);
-		}
-		if (null != child) {
-			size += child.getObjectSize(objectSizes);
-		}
-		return objectSizes.alignTo8Bytes(size);
+	@Override
+	public String toString() {
+		return throwableType + "@" + throwableIdentityHashCode;
 	}
-	
-	public double getInvocationAffiliationPercentage() {
-		return (double) getObjectsInInvocationsCount() / 1d;
-	}
+
 
 }

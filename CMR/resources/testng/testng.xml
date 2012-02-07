@@ -43,4 +43,9 @@
 			<class name="info.novatec.inspectit.communication.data.InvocationAwareDataTest" />
 		</classes>
 	</test>
+	<test name="EqualsVerifier">
+		<classes>
+			<class name="info.novatec.inspectit.communication.EqualsVerifierTest" />
+		</classes>
+	</test>
 </suite>

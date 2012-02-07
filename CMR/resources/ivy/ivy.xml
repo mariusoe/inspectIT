@@ -35,7 +35,7 @@
 		<dependency org="javax.servlet" name="servlet-api" rev="2.5" transitive="false" conf="prod->default"/>
 		<dependency org="javax.transaction" name="jta" rev="1.0.1B" transitive="false" conf="prod->default"/>
 		<dependency org="commons-collections" name="commons-collections" rev="3.2" transitive="false" conf="prod->default"/>
-		<dependency org="cglib" name="cglib-nodep" rev="2.1_3" transitive="false" conf="prod->default"/>
+		<dependency org="cglib" name="cglib-nodep" rev="2.2.2" transitive="false" conf="prod->default"/>
 		<dependency org="dom4j" name="dom4j" rev="1.6.1" transitive="false" conf="prod->default"/>
 		
 		<dependency org="org.mortbay.jetty" name="jetty" rev="6.1.26" transitive="false" conf="prod->default"/>
@@ -85,5 +85,8 @@
 		<dependency org="asm" name="asm-all" rev="3.0" conf="test->default"/>
 		<dependency org="commons-lang" name="commons-lang" rev="2.4" conf="test->default"/>
 		<dependency org="ant-contrib" name="ant-contrib" rev="1.0b3" transitive="false" conf="test->default"/>
+
+		<dependency org="nl.jqno.equalsverifier" name="equalsverifier" rev="1.0.2" transitive="false" conf="test->default"/>
+		<dependency org="org.objenesis" name="objenesis" rev="1.2" transitive="false" conf="test->default"/>
 	</dependencies>
 </ivy-module>
