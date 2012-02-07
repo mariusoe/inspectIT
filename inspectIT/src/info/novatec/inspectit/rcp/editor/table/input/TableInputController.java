@@ -142,7 +142,18 @@ public interface TableInputController extends SubViewClassificationController {
 	 *            The object to create the string from.
 	 * @return The created human readable string.
 	 */
-	Object getReadableString(Object object);
+	String getReadableString(Object object);
+
+	/**
+	 * Return the values of all columns in the table for the given object. Not visible columns
+	 * values will also be included. The order of the values will be same to the initial table
+	 * column order, thus not reflecting the current state of the table if the columns were moved.
+	 *
+	 * @param object
+	 *            Object to get values for.
+	 * @return List of string representing the values.
+	 */
+	List<String> getColumnValues(Object object);
 
 	/**
 	 * Show some details in a pop-up to the user about the selected element.

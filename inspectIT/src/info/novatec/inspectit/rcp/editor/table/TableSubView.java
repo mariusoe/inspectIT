@@ -13,6 +13,7 @@ import info.novatec.inspectit.rcp.editor.table.input.TableInputController;
 import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
 import info.novatec.inspectit.rcp.menu.ShowHideMenuManager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -171,6 +172,7 @@ public class TableSubView extends AbstractSubView {
 					}
 				}
 			}
+
 			@Override
 			public void controlMoved(ControlEvent e) {
 				ShowHideColumnsHandler.setColumnOrder(tableInputController.getClass(), tableViewer.getTable().getColumnOrder());
@@ -192,12 +194,13 @@ public class TableSubView extends AbstractSubView {
 			column.addControlListener(columnResizeListener);
 		}
 
-		// update the order of columns if the order was defined for the class, and no new columns were added
+		// update the order of columns if the order was defined for the class, and no new columns
+		// were added
 		int[] columnOrder = ShowHideColumnsHandler.getColumnOrder(tableInputController.getClass());
 		if (null != columnOrder && columnOrder.length == table.getColumns().length) {
 			table.setColumnOrder(columnOrder);
 		} else if (null != columnOrder) {
-			//if the order exists, but length is not same, then update with the default order
+			// if the order exists, but length is not same, then update with the default order
 			ShowHideColumnsHandler.setColumnOrder(tableInputController.getClass(), table.getColumnOrder());
 		}
 	}
@@ -302,6 +305,38 @@ public class TableSubView extends AbstractSubView {
 	 */
 	public TableInputController getTableInputController() {
 		return tableInputController;
+	}
+
+	/**
+	 * Return the names of all columns in the table. Not visible columns names will also be
+	 * included. The order of the names will be same to the initial table column order, thus not
+	 * reflecting the current state of the table if the columns were moved.
+	 *
+	 * @return List of column names.
+	 */
+	public List<String> getColumnNames() {
+		List<String> names = new ArrayList<String>();
+		for (TableColumn column : tableViewer.getTable().getColumns()) {
+			names.add(column.getText());
+		}
+		return names;
+	}
+
+	/**
+	 *
+	 * @return The list of integers representing the column order in the table. Note that only
+	 *         columns that are currently visible will be included in the list.
+	 * @see Table#getColumnOrder()
+	 */
+	public List<Integer> getColumnOrder() {
+		int[] order = tableViewer.getTable().getColumnOrder();
+		List<Integer> orderWithoutHidden = new ArrayList<Integer>();
+		for (int index : order) {
+			if (tableViewer.getTable().getColumns()[index].getWidth() > 0) {
+				orderWithoutHidden.add(index);
+			}
+		}
+		return orderWithoutHidden;
 	}
 
 	/**

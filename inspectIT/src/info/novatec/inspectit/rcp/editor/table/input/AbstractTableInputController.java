@@ -2,8 +2,8 @@ package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 
 import java.util.Collections;
 import java.util.List;

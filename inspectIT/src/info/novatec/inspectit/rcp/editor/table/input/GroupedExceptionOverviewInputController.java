@@ -453,7 +453,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object getReadableString(Object object) {
+	public String getReadableString(Object object) {
 		if (object instanceof AggregatedExceptionSensorData) {
 			AggregatedExceptionSensorData data = (AggregatedExceptionSensorData) object;
 			StringBuilder sb = new StringBuilder();
@@ -464,6 +464,22 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 			return sb.toString();
 		}
 		throw new RuntimeException("Could not create the human readable string!");
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<String> getColumnValues(Object object) {
+		if (object instanceof AggregatedExceptionSensorData) {
+			AggregatedExceptionSensorData data = (AggregatedExceptionSensorData) object;
+			List<String> values = new ArrayList<String>();
+			for (Column column : Column.values()) {
+				values.add(getStyledTextForColumn(data, column).toString());
+			}
+			return values;
+		}
+		throw new RuntimeException("Could not create the column values!");
 	}
 
 	/**

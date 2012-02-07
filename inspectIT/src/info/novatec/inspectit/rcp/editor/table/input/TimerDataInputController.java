@@ -332,7 +332,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object getReadableString(Object object) {
+	public String getReadableString(Object object) {
 		if (object instanceof TimerData) {
 			TimerData data = (TimerData) object;
 			StringBuilder sb = new StringBuilder();
@@ -344,6 +344,23 @@ public class TimerDataInputController extends AbstractTableInputController {
 			return sb.toString();
 		}
 		throw new RuntimeException("Could not create the human readable string!");
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<String> getColumnValues(Object object) {
+		if (object instanceof TimerData) {
+			TimerData data = (TimerData) object;
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
+			List<String> values = new ArrayList<String>();
+			for (Column column : Column.values()) {
+				values.add(getStyledTextForColumn(data, methodIdent, column).toString());
+			}
+			return values;
+		}
+		throw new RuntimeException("Could not create the column values!");
 	}
 
 	/**
@@ -396,7 +413,33 @@ public class TimerDataInputController extends AbstractTableInputController {
 			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			Column enumId = Column.fromOrd(index);
 
-			return getStyledTextForColumn(data, methodIdent, enumId);
+			StyledString styledString = getStyledTextForColumn(data, methodIdent, enumId);
+			if (addWarnSign(data, enumId)) {
+				styledString.append(TextFormatter.getWarningSign());
+			}
+			return styledString;
+		}
+
+		/**
+		 * Decides if the warn sign should be added for the specific column.
+		 *
+		 * @param data
+		 *            TimerData
+		 * @param column
+		 *            Column to check.
+		 * @return True if warn sign should be added.
+		 */
+		private boolean addWarnSign(TimerData data, Column column) {
+			switch (column) {
+			case EXCLUSIVEAVERAGE:
+			case EXCLUSIVEMAX:
+			case EXCLUSIVEMIN:
+			case EXCLUSIVESUM:
+				int affPercentage = (int) (data.getInvocationAffiliationPercentage() * 100);
+				return data.isExclusiveTimeDataAvailable() && affPercentage < 100;
+			default:
+				return false;
+			}
 		}
 	}
 
@@ -549,69 +592,25 @@ public class TimerDataInputController extends AbstractTableInputController {
 			}
 		case EXCLUSIVEAVERAGE:
 			if (data.isExclusiveTimeDataAvailable()) {
-				StyledString res = new StyledString(NumberFormatter.formatDouble(data.getExclusiveAverage(), timeDecimalPlaces));
-
-				int affPercentage = (int) (data.getInvocationAffiliationPercentage() * 100);
-				if (affPercentage < 100) {
-					// TODO: Use an image instead of the String to signal errors. This is currently
-					// not done as there is a bug in the table representation in SWT which will add
-					// the same space the image needs to the first column. Having an image would
-					// also allow to set a tooltip!
-					return res.append(TextFormatter.getWarningSign());
-				} else {
-					return res;
-				}
+				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveAverage(), timeDecimalPlaces));
 			} else {
 				return emptyStyledString;
 			}
 		case EXCLUSIVEMAX:
 			if (data.isExclusiveTimeDataAvailable()) {
-				StyledString res = new StyledString(NumberFormatter.formatDouble(data.getExclusiveMax(), timeDecimalPlaces));
-
-				int affPercentage = (int) (data.getInvocationAffiliationPercentage() * 100);
-				if (affPercentage < 100) {
-					// TODO: Use an image instead of the String to signal errors. This is currently
-					// not done as there is a bug in the table representation in SWT which will add
-					// the same space the image needs to the first column. Having an image would
-					// also allow to set a tooltip!
-					return res.append(TextFormatter.getWarningSign());
-				} else {
-					return res;
-				}
+				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveMax(), timeDecimalPlaces));
 			} else {
 				return emptyStyledString;
 			}
 		case EXCLUSIVEMIN:
 			if (data.isExclusiveTimeDataAvailable()) {
-				StyledString res = new StyledString(NumberFormatter.formatDouble(data.getExclusiveMin(), timeDecimalPlaces));
-
-				int affPercentage = (int) (data.getInvocationAffiliationPercentage() * 100);
-				if (affPercentage < 100) {
-					// TODO: Use an image instead of the String to signal errors. This is currently
-					// not done as there is a bug in the table representation in SWT which will add
-					// the same space the image needs to the first column. Having an image would
-					// also allow to set a tooltip!
-					return res.append(TextFormatter.getWarningSign());
-				} else {
-					return res;
-				}
+				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveMin(), timeDecimalPlaces));
 			} else {
 				return emptyStyledString;
 			}
 		case EXCLUSIVESUM:
 			if (data.isExclusiveTimeDataAvailable()) {
-				StyledString exklSumString = new StyledString(NumberFormatter.formatDouble(data.getExclusiveDuration(), timeDecimalPlaces));
-
-				int affPercentage = (int) (data.getInvocationAffiliationPercentage() * 100);
-				if (affPercentage < 100) {
-					// TODO: Use an image instead of the String to signal errors. This is currently
-					// not done as there is a bug in the table representation in SWT which will add
-					// the same space the image needs to the first column. Having an image would
-					// also allow to set a tooltip!
-					return exklSumString.append(TextFormatter.getWarningSign());
-				} else {
-					return exklSumString;
-				}
+				return new StyledString(NumberFormatter.formatDouble(data.getExclusiveDuration(), timeDecimalPlaces));
 			} else {
 				return emptyStyledString;
 			}

@@ -539,7 +539,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object getReadableString(Object object) {
+	public String getReadableString(Object object) {
 		if (object instanceof TimerData) {
 			TimerData data = (TimerData) object;
 			StringBuilder sb = new StringBuilder();
@@ -551,6 +551,23 @@ public class MethodInvocInputController extends AbstractTableInputController {
 			return sb.toString();
 		}
 		throw new RuntimeException("Could not create the human readable string!");
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<String> getColumnValues(Object object) {
+		if (object instanceof TimerData) {
+			TimerData data = (TimerData) object;
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
+			List<String> values = new ArrayList<String>();
+			for (Column column : Column.values()) {
+				values.add(getStyledTextForColumn(data, methodIdent, column).toString());
+			}
+			return values;
+		}
+		throw new RuntimeException("Could not create the column values!");
 	}
 
 	/**

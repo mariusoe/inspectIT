@@ -128,6 +128,17 @@ public interface TreeInputController extends SubViewClassificationController {
 	String getReadableString(Object object);
 
 	/**
+	 * Return the values of all columns in the tree for the given object. Not visible columns values
+	 * will also be included. The order of the values will be same to the initial tree column order,
+	 * thus not reflecting the current state of the tree if the columns were moved.
+	 *
+	 * @param object
+	 *            Object to get values for.
+	 * @return List of string representing the values.
+	 */
+	List<String> getColumnValues(Object object);
+
+	/**
 	 * Returns an optional filter for this tree.
 	 * 
 	 * @return the filter array.

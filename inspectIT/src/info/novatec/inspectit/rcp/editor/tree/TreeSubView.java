@@ -9,6 +9,7 @@ import info.novatec.inspectit.rcp.editor.tree.input.TreeInputController;
 import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
 import info.novatec.inspectit.rcp.menu.ShowHideMenuManager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -33,6 +34,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -274,6 +276,38 @@ public class TreeSubView extends AbstractSubView {
 	 */
 	public TreeInputController getTreeInputController() {
 		return treeInputController;
+	}
+
+	/**
+	 * Return the names of all columns in the tree. Not visible columns names will also be
+	 * included. The order of the names will be same to the initial tree column order, thus not
+	 * reflecting the current state of the table if the columns were moved.
+	 *
+	 * @return List of column names.
+	 */
+	public List<String> getColumnNames() {
+		List<String> names = new ArrayList<String>();
+		for (TreeColumn column : treeViewer.getTree().getColumns()) {
+			names.add(column.getText());
+		}
+		return names;
+	}
+
+	/**
+	 *
+	 * @return The list of integers representing the column order in the tree. Note that only
+	 *         columns that are currently visible will be included in the list.
+	 * @see Table#getColumnOrder()
+	 */
+	public List<Integer> getColumnOrder() {
+		int[] order = treeViewer.getTree().getColumnOrder();
+		List<Integer> orderWithoutHidden = new ArrayList<Integer>();
+		for (int index : order) {
+			if (treeViewer.getTree().getColumns()[index].getWidth() > 0) {
+				orderWithoutHidden.add(index);
+			}
+		}
+		return orderWithoutHidden;
 	}
 
 	/**

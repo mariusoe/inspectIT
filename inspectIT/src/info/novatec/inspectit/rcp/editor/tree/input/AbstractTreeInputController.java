@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Shell;
  * @author Eduard Tudenhoefner
  * 
  */
-public class AbstractTreeInputController implements TreeInputController {
+public abstract class AbstractTreeInputController implements TreeInputController {
 
 	/**
 	 * The input definition.
@@ -181,4 +181,5 @@ public class AbstractTreeInputController implements TreeInputController {
 	public SubViewClassification getSubViewClassification() {
 		return SubViewClassification.MASTER;
 	}
+
 }

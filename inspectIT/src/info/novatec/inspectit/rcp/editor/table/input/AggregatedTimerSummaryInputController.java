@@ -8,6 +8,7 @@ import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -274,7 +275,7 @@ public class AggregatedTimerSummaryInputController extends AbstractTableInputCon
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object getReadableString(Object object) {
+	public String getReadableString(Object object) {
 		if (object instanceof TimerData) {
 			TimerData data = (TimerData) object;
 			StringBuilder sb = new StringBuilder();
@@ -285,6 +286,22 @@ public class AggregatedTimerSummaryInputController extends AbstractTableInputCon
 			return sb.toString();
 		}
 		throw new RuntimeException("Could not create the human readable string!");
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<String> getColumnValues(Object object) {
+		if (object instanceof TimerData) {
+			TimerData data = (TimerData) object;
+			List<String> values = new ArrayList<String>();
+			for (Column column : Column.values()) {
+				values.add(getStyledTextForColumn(data, column).toString());
+			}
+			return values;
+		}
+		throw new RuntimeException("Could not create the column values!");
 	}
 
 	/**
