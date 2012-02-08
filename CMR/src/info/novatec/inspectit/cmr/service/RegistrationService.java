@@ -48,32 +48,32 @@ public class RegistrationService implements IRegistrationService {
 	 * The platform ident DAO.
 	 */
 	@Autowired
-	private PlatformIdentDao platformIdentDao;
+	PlatformIdentDao platformIdentDao;
 
 	/**
 	 * The method ident DAO.
 	 */
 	@Autowired
-	private MethodIdentDao methodIdentDao;
+	MethodIdentDao methodIdentDao;
 
 	/**
 	 * The method sensor type ident DAO.
 	 */
 	@Autowired
-	private MethodSensorTypeIdentDao methodSensorTypeIdentDao;
+	MethodSensorTypeIdentDao methodSensorTypeIdentDao;
 
 	/**
 	 * The platform sensor type ident DAO.
 	 */
 	@Autowired
-	private PlatformSensorTypeIdentDao platformSensorTypeIdentDao;
+	PlatformSensorTypeIdentDao platformSensorTypeIdentDao;
 
 	/**
 	 * The license utility to check for a valid license and abort the registration of the agent if
 	 * necessary.
 	 */
 	@Autowired
-	private LicenseUtil licenseUtil;
+	LicenseUtil licenseUtil;
 
 	/**
 	 * {@inheritDoc}

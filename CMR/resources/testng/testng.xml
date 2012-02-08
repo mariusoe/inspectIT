@@ -33,6 +33,12 @@
 			<class name="info.novatec.inspectit.cmr.dao.impl.TimerDataAggregatorTest" />
 		</classes>
 	</test>
+	<test name="Service">
+		<classes>
+			<class name="info.novatec.inspectit.cmr.service.RegistrationServiceTest" />
+			<class name="info.novatec.inspectit.cmr.service.AgentStorageServiceTest" />
+		</classes>
+	</test>
 	<test name="Util">
 		<classes>
 			<class name="info.novatec.inspectit.cmr.util.PlatformIdentCacheTest" />

@@ -70,6 +70,21 @@ public class AgentStorageService implements IAgentStorageService {
 	private int droppedDataCount = 0;
 
 	/**
+	 * Default constructor.
+	 */
+	public AgentStorageService() {
+	}
+
+	/**
+	 * Constructor that can be used in testing for suppling the queue.
+	 * 
+	 * @param dataObjectsBlockingQueue Queue.
+	 */
+	AgentStorageService(ArrayBlockingQueue<SoftReference<List<? extends DefaultData>>> dataObjectsBlockingQueue) {
+		this.dataObjectsBlockingQueue = dataObjectsBlockingQueue;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public void addDataObjects(final List<? extends DefaultData> dataObjects) throws RemoteException {
