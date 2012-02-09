@@ -15,9 +15,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.progress.IElementCollector;
 
 /**
- * This class only initializes the sub-tree if it is requested. Furthermore, the
- * creation of the objects is done piece after piece, so that an immediate
- * visualization can be seen (important for sub-trees which are very large).
+ * This class only initializes the sub-tree if it is requested. Furthermore, the creation of the
+ * objects is done piece after piece, so that an immediate visualization can be seen (important for
+ * sub-trees which are very large).
  * 
  * @author Patrice Bouillet
  * 
@@ -45,20 +45,21 @@ public class DeferredPackageComposite extends DeferredComposite {
 			Map<String, DeferredClassComposite> classNames = new HashMap<String, DeferredClassComposite>(classes.size());
 
 			for (MethodIdent clazz : classes) {
-				String className = clazz.getClassName();
-				if (!classNames.containsKey(className)) {
-					DeferredClassComposite composite = new DeferredClassComposite();
-					composite.setRepositoryDefinition(repositoryDefinition);
-					composite.setName(className);
+				if (select(clazz)) {
+					String className = clazz.getClassName();
+					if (!classNames.containsKey(className)) {
+						DeferredClassComposite composite = getNewChild();
+						composite.setRepositoryDefinition(repositoryDefinition);
+						composite.setName(className);
 
-					collector.add(composite, monitor);
-					packageComposite.addChild(composite);
-					classNames.put(className, composite);
+						collector.add(composite, monitor);
+						packageComposite.addChild(composite);
+						classNames.put(className, composite);
+					}
+
+					DeferredClassComposite composite = classNames.get(className);
+					composite.addMethodToDisplay(clazz);
 				}
-
-				DeferredClassComposite composite = classNames.get(className);
-				composite.addMethodToDisplay(clazz);
-
 				if (monitor.isCanceled()) {
 					break;
 				}
@@ -67,6 +68,25 @@ public class DeferredPackageComposite extends DeferredComposite {
 		} finally {
 			monitor.done();
 		}
+	}
+
+	/**
+	 * @return Returns the right implementation of the {@link DeferredClassComposite} to use for the
+	 *         child.
+	 */
+	protected DeferredClassComposite getNewChild() {
+		return new DeferredClassComposite();
+	}
+
+	/**
+	 * Should this method ident pass the selection process.
+	 * 
+	 * @param methodIdent
+	 *            {@link MethodIdent}.
+	 * @return Should this method ident pass the selection process.
+	 */
+	protected boolean select(MethodIdent methodIdent) {
+		return true;
 	}
 
 	/**

@@ -30,7 +30,7 @@ public class DeferredClassComposite extends DeferredComposite {
 	/**
 	 * The format string of the output.
 	 */
-	private static final String METHOD_FORMAT = "%s(%s)";
+	protected static final String METHOD_FORMAT = "%s(%s)";
 
 	/**
 	 * The repository definition.
@@ -107,4 +107,11 @@ public class DeferredClassComposite extends DeferredComposite {
 		return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CLASS);
 	}
 
+	/**
+	 * @return the methods
+	 */
+	protected List<MethodIdent> getMethods() {
+		return methods;
+	}
+	
 }

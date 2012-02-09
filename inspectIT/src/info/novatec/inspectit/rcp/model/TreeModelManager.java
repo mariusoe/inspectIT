@@ -1,7 +1,5 @@
 package info.novatec.inspectit.rcp.model;
 
-import info.novatec.inspectit.cmr.model.MethodIdent;
-import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
@@ -11,7 +9,6 @@ import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.formatter.SensorTypeAvailabilityEnum;
-import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.combinedmetrics.DeferredCombinedMetricsComposite;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.view.server.ServerView;
@@ -20,9 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.eclipse.core.runtime.Assert;
 
@@ -116,7 +111,7 @@ public class TreeModelManager {
 	 *         the target VM.
 	 */
 	protected Component getInstrumentedMethodsTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
-		DeferredInstrumentationBrowserComposite instrumentedMethods = new DeferredInstrumentationBrowserComposite();
+		DeferredBrowserComposite instrumentedMethods = new DeferredBrowserComposite();
 		instrumentedMethods.setName("Instrumentation Browser");
 		instrumentedMethods.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_INSTRUMENTATION_BROWSER));
 		instrumentedMethods.setPlatformIdent(platformIdent);
@@ -158,167 +153,16 @@ public class TreeModelManager {
 		inputDefinition.setIdDefinition(idDefinition);
 		showAll.setInputDefinition(inputDefinition);
 
-		/*
-		 * Component search = new Leaf(); search.setName("Search");
-		 * search.setImageDescriptor(InspectIT
-		 * .getDefault().getImageDescriptor(InspectITConstants.IMG_SEARCH));
-		 */
-
-		Composite browser = new Composite();
+		FilteredDeferredBrowserComposite browser = new FilteredDeferredBrowserComposite(SensorTypeEnum.INVOCATION_SEQUENCE);
+		browser.setPlatformIdent(platformIdent);
+		browser.setRepositoryDefinition(repositoryDefinition);
 		browser.setName("Browser");
 		browser.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_INSTRUMENTATION_BROWSER));
 
-		Set<MethodIdent> methodIdents = platformIdent.getMethodIdents();
-		Map<String, List<MethodIdent>> filteredMap = new TreeMap<String, List<MethodIdent>>();
-		for (MethodIdent methodIdent : methodIdents) {
-			long invocationSensorTypeId = checkSensorTypeExistence(SensorTypeEnum.INVOCATION_SEQUENCE, methodIdent);
-			if (invocationSensorTypeId != -1) {
-				// first sort and filter the method ident list
-				String packageName = methodIdent.getPackageName();
-				if (null == packageName || "".equals(packageName)) {
-					if (!filteredMap.containsKey("(default)")) {
-						filteredMap.put("(default)", new ArrayList<MethodIdent>());
-					}
-					filteredMap.get("(default)").add(methodIdent);
-				} else {
-					if (!filteredMap.containsKey(packageName)) {
-						filteredMap.put(packageName, new ArrayList<MethodIdent>());
-					}
-					filteredMap.get(packageName).add(methodIdent);
-				}
-			}
-		}
-
-		for (Map.Entry<String, List<MethodIdent>> entry : filteredMap.entrySet()) {
-			browser.addChild(getInvocationPackageTree(entry.getValue(), definition));
-		}
-
 		invocationSequence.addChild(showAll);
-		/* invocationSequence.addChild(search); */
 		invocationSequence.addChild(browser);
 
 		return invocationSequence;
-	}
-
-	/**
-	 * Returns the invocation package sub-tree.
-	 * 
-	 * @param methodIdents
-	 *            The {@link MethodIdent} objects to create this sub-tree.
-	 * @param definition
-	 *            The {@link RepositoryDefinition} object.
-	 * @return The invocation package sub-tree.
-	 */
-	private Component getInvocationPackageTree(List<MethodIdent> methodIdents, RepositoryDefinition definition) {
-		Composite targetPackage = new Composite();
-		String packageName = methodIdents.get(0).getPackageName();
-		if (packageName == null || packageName.equals("")) {
-			packageName = "(default)";
-		}
-		targetPackage.setName(packageName);
-		targetPackage.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_PACKAGE));
-
-		Map<String, List<MethodIdent>> filter = new TreeMap<String, List<MethodIdent>>();
-		for (MethodIdent methodIdent : methodIdents) {
-			// first sort and filter the method ident list
-			if (!filter.containsKey(methodIdent.getClassName())) {
-				filter.put(methodIdent.getClassName(), new ArrayList<MethodIdent>());
-			}
-			filter.get(methodIdent.getClassName()).add(methodIdent);
-		}
-
-		for (Map.Entry<String, List<MethodIdent>> entry : filter.entrySet()) {
-			targetPackage.addChild(getInvocationClassTree(entry.getValue(), definition));
-		}
-
-		return targetPackage;
-	}
-
-	/**
-	 * Returns the invocation class sub-tree.
-	 * 
-	 * @param methodIdents
-	 *            The {@link MethodIdent} objects to create this sub-tree.
-	 * @param definition
-	 *            The {@link RepositoryDefinition} object.
-	 * @return The invocation class sub-tree.
-	 */
-	private Component getInvocationClassTree(List<MethodIdent> methodIdents, RepositoryDefinition definition) {
-		Composite targetClass = new Composite();
-		targetClass.setName(methodIdents.get(0).getClassName());
-		targetClass.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CLASS));
-
-		for (MethodIdent methodIdent : methodIdents) {
-			targetClass.addChild(getInvocationMethodTree(methodIdent, definition));
-		}
-
-		Collections.sort(targetClass.getChildren(), new Comparator<Component>() {
-			public int compare(Component componentOne, Component componentTwo) {
-				return componentOne.getName().compareTo(componentTwo.getName());
-			}
-		});
-
-		return targetClass;
-	}
-
-	/**
-	 * Returns the invocation method sub-tree.
-	 * 
-	 * @param methodIdent
-	 *            The {@link MethodIdent} object to create this sub-tree.
-	 * @param definition
-	 *            The {@link RepositoryDefinition} object.
-	 * @return The invocation method sub-tree.
-	 */
-	private Component getInvocationMethodTree(MethodIdent methodIdent, RepositoryDefinition definition) {
-		Component targetMethod = new Leaf();
-		if (null != methodIdent.getParameters()) {
-			String parameters = methodIdent.getParameters().toString();
-			parameters = parameters.substring(1, parameters.length() - 1);
-
-			targetMethod.setName(String.format(METHOD_FORMAT, methodIdent.getMethodName(), parameters));
-		} else {
-			targetMethod.setName(String.format(METHOD_FORMAT, methodIdent.getMethodName(), ""));
-		}
-		targetMethod.setImageDescriptor(ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers()));
-
-		InputDefinition inputDefinition = new InputDefinition();
-		inputDefinition.setRepositoryDefinition(definition);
-		inputDefinition.setId(SensorTypeEnum.INVOCATION_SEQUENCE);
-		inputDefinition.setPartName("Invocation Sequence");
-		inputDefinition.setPartTooltip("Invocation Sequence");
-		inputDefinition.setImageDescriptor(SensorTypeEnum.INVOCATION_SEQUENCE.getImageDescriptor());
-		inputDefinition.setHeaderText("Invocation Sequence");
-		inputDefinition.setHeaderDescription(TextFormatter.getMethodWithParameters(methodIdent));
-
-		IdDefinition idDefinition = new IdDefinition();
-		idDefinition.setPlatformId(methodIdent.getPlatformIdent().getId());
-		idDefinition.setMethodId(methodIdent.getId());
-		idDefinition.setSensorTypeId(checkSensorTypeExistence(SensorTypeEnum.INVOCATION_SEQUENCE, methodIdent));
-
-		inputDefinition.setIdDefinition(idDefinition);
-		targetMethod.setInputDefinition(inputDefinition);
-
-		return targetMethod;
-	}
-
-	/**
-	 * Checks if the {@link SensorTypeEnum} is used for this {@link MethodIdent} .
-	 * 
-	 * @param sensorType
-	 *            The {@link SensorTypeEnum} object to compare to.
-	 * @param methodIdent
-	 *            The {@link MethodIdent} object from the server to check against the sensor type.
-	 * @return Returns the value of the sensor type ID.
-	 */
-	private long checkSensorTypeExistence(SensorTypeEnum sensorType, MethodIdent methodIdent) {
-		for (MethodSensorTypeIdent methodSensorTypeIdent : (Set<MethodSensorTypeIdent>) methodIdent.getMethodSensorTypeIdents()) {
-			SensorTypeEnum methodsensorType = SensorTypeEnum.get(methodSensorTypeIdent.getFullyQualifiedClassName());
-			if (sensorType.equals(methodsensorType)) {
-				return methodSensorTypeIdent.getId();
-			}
-		}
-		return -1;
 	}
 
 	/**
@@ -828,7 +672,14 @@ public class TreeModelManager {
 		inputDefinition.setIdDefinition(idDefinition);
 		showAll.setInputDefinition(inputDefinition);
 
+		FilteredDeferredBrowserComposite browser = new FilteredDeferredBrowserComposite(SensorTypeEnum.TIMER);
+		browser.setPlatformIdent(platformIdent);
+		browser.setRepositoryDefinition(repositoryDefinition);
+		browser.setName("Browser");
+		browser.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_INSTRUMENTATION_BROWSER));
+
 		timerDataComposite.addChild(showAll);
+		timerDataComposite.addChild(browser);
 
 		return timerDataComposite;
 	}

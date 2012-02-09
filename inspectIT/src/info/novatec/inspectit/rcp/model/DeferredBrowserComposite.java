@@ -22,7 +22,7 @@ import org.eclipse.ui.progress.IElementCollector;
  * @author Patrice Bouillet
  * 
  */
-public class DeferredInstrumentationBrowserComposite extends DeferredComposite {
+public class DeferredBrowserComposite extends DeferredComposite {
 
 	/**
 	 * The platform ident is used to create the package elements in the sub-tree.
@@ -46,30 +46,32 @@ public class DeferredInstrumentationBrowserComposite extends DeferredComposite {
 			Map<String, DeferredPackageComposite> packageNames = new HashMap<String, DeferredPackageComposite>(methodIdents.size());
 
 			for (MethodIdent methodIdent : methodIdents) {
-				String packageName = methodIdent.getPackageName();
-				if (packageName == null) {
-					packageName = "";
-				} else {
-					packageName = packageName.trim();
-				}
-				// check if the given package was already added.
-				if (!packageNames.containsKey(packageName)) {
-					DeferredPackageComposite composite = new DeferredPackageComposite();
-					composite.setRepositoryDefinition(repositoryDefinition);
-					if (packageName.equals("")) {
-						composite.setName("(default)");
+				if (select(methodIdent)) {
+					String packageName = methodIdent.getPackageName();
+					if (packageName == null) {
+						packageName = "";
 					} else {
-						composite.setName(packageName);
+						packageName = packageName.trim();
+					}
+					// check if the given package was already added.
+					if (!packageNames.containsKey(packageName)) {
+						DeferredPackageComposite composite = getNewChild();
+						composite.setRepositoryDefinition(repositoryDefinition);
+						if (packageName.equals("")) {
+							composite.setName("(default)");
+						} else {
+							composite.setName(packageName);
+						}
+
+						collector.add(composite, monitor);
+						browserComposite.addChild(composite);
+						packageNames.put(packageName, composite);
 					}
 
-					collector.add(composite, monitor);
-					browserComposite.addChild(composite);
-					packageNames.put(packageName, composite);
+					DeferredPackageComposite composite = packageNames.get(packageName);
+					composite.addClassToDisplay(methodIdent);
 				}
-
-				DeferredPackageComposite composite = packageNames.get(packageName);
-				composite.addClassToDisplay(methodIdent);
-
+				
 				if (monitor.isCanceled()) {
 					break;
 				}
@@ -77,6 +79,24 @@ public class DeferredInstrumentationBrowserComposite extends DeferredComposite {
 		} finally {
 			monitor.done();
 		}
+	}
+
+	/**
+	 * @return Returns the right implementation of the {@link DeferredPackageComposite} to use for
+	 *         the child.
+	 */
+	protected DeferredPackageComposite getNewChild() {
+		return new DeferredPackageComposite();
+	}
+
+	/**
+	 * Should this method ident pass the selection process.
+	 * 
+	 * @param methodIdent {@link MethodIdent}.
+	 * @return Should this method ident pass the selection process.
+	 */
+	protected boolean select(MethodIdent methodIdent) {
+		return true;
 	}
 
 	/**
