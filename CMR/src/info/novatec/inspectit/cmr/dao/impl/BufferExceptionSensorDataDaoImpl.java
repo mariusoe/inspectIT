@@ -144,6 +144,9 @@ public class BufferExceptionSensorDataDaoImpl implements ExceptionSensorDataDao 
 		if (null != toDate) {
 			query.setToDate(new Timestamp(toDate.getTime()));
 		}
+		if (null != template.getThrowableType()) {
+			query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("throwableType", template.getThrowableType()));
+		}
 		List<ExceptionSensorData> results = indexingTree.query(query);
 		Map<Integer, AggregatedExceptionSensorData> aggregatedMap = new HashMap<Integer, AggregatedExceptionSensorData>();
 		List<AggregatedExceptionSensorData> aggregatedResults = new ArrayList<AggregatedExceptionSensorData>();

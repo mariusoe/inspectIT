@@ -205,6 +205,11 @@
       <command
             id="info.novatec.inspectit.rcp.commands.navigateToExceptionType"
             name="Navigate To Exception Type">
+         <commandParameter
+               id="info.novatec.inspectit.rcp.commands.navigateToExceptionType.ViewType"
+               name="View Type"
+               optional="true">
+         </commandParameter>
       </command>
       <command
             id="info.novatec.inspectit.rcp.commands.showHideColumn"
@@ -765,6 +770,54 @@
                      </with>
                   </and>
                </visibleWhen>
+               <parameter
+                     name="info.novatec.inspectit.rcp.commands.navigateToExceptionType.ViewType"
+                     value="single">
+               </parameter>
+            </command>
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.navigateToExceptionType"
+                  icon="icons/exceptiontracer.gif"
+                  label="Grouped Exception View"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <and>
+                     <count
+                           value="1">
+                     </count>
+                     <iterate>
+                        <or>
+                           <instanceof
+                                 value="info.novatec.inspectit.communication.data.ExceptionSensorData">
+                           </instanceof>
+                           <instanceof
+                                 value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                           </instanceof>
+                        </or>
+                     </iterate>
+                     <with
+                           variable="activeEditor">
+                        <instanceof
+                              value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                        </instanceof>
+                        <test
+                              property="info.novatec.inspectit.activeSubView"
+                              value="tableSubView">
+                        </test>
+                     </with>
+                     <with
+                           variable="selection">
+                        <test
+                              property="info.novatec.inspectit.canNavigateToExceptionType">
+                        </test>
+                     </with>
+                  </and>
+               </visibleWhen>
+               <parameter
+                     name="info.novatec.inspectit.rcp.commands.navigateToExceptionType.ViewType"
+                     value="grouped">
+               </parameter>
             </command>
          </menu>
          <command
@@ -906,6 +959,54 @@
                      </with>
                   </and>
                </visibleWhen>
+               <parameter
+                     name="info.novatec.inspectit.rcp.commands.navigateToExceptionType.ViewType"
+                     value="single">
+               </parameter>
+            </command>
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.navigateToExceptionType"
+                  icon="icons/exceptiontracer.gif"
+                  label="Grouped Exception View"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <and>
+                     <count
+                           value="1">
+                     </count>
+                     <iterate>
+                        <or>
+                           <instanceof
+                                 value="info.novatec.inspectit.communication.data.ExceptionSensorData">
+                           </instanceof>
+                           <instanceof
+                                 value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                           </instanceof>
+                        </or>
+                     </iterate>
+                     <with
+                           variable="activeEditor">
+                        <instanceof
+                              value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                        </instanceof>
+                        <test
+                              property="info.novatec.inspectit.activeSubView"
+                              value="tableSubView">
+                        </test>
+                     </with>
+                     <with
+                           variable="selection">
+                        <test
+                              property="info.novatec.inspectit.canNavigateToExceptionType">
+                        </test>
+                     </with>
+                  </and>
+               </visibleWhen>
+               <parameter
+                     name="info.novatec.inspectit.rcp.commands.navigateToExceptionType.ViewType"
+                     value="grouped">
+               </parameter>
             </command>
          </menu>
          <command

@@ -36,10 +36,17 @@ import org.eclipse.ui.handlers.IHandlerService;
 public class NavigateToExceptionTypeHandler extends AbstractHandler implements IHandler {
 
 	/**
+	 * Parameter that defines if view should be single or grouped.
+	 */
+	private static final String VIEW_PARAM_ID = "info.novatec.inspectit.rcp.commands.navigateToExceptionType.ViewType";
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
+		String viewType = event.getParameter(VIEW_PARAM_ID);
+
 		StructuredSelection selection = (StructuredSelection) HandlerUtil.getCurrentSelectionChecked(event);
 		AbstractRootEditor rootEditor = (AbstractRootEditor) HandlerUtil.getActiveEditor(event);
 		RepositoryDefinition repositoryDefinition = rootEditor.getInputDefinition().getRepositoryDefinition();
@@ -70,23 +77,43 @@ public class NavigateToExceptionTypeHandler extends AbstractHandler implements I
 
 			InputDefinition inputDefinition = new InputDefinition();
 			inputDefinition.setRepositoryDefinition(repositoryDefinition);
-			inputDefinition.setId(SensorTypeEnum.EXCEPTION_SENSOR);
+			if ("single".equals(viewType)) {
+				inputDefinition.setId(SensorTypeEnum.EXCEPTION_SENSOR);
 
-			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-			editorPropertiesData.setPartName("Exception Sensor");
-			editorPropertiesData.setPartTooltip("Exception Sensor");
-			editorPropertiesData.setImageDescriptor(SensorTypeEnum.EXCEPTION_SENSOR.getImageDescriptor());
-			editorPropertiesData.setHeaderText("Throwable type");
-			editorPropertiesData.setHeaderDescription(exceptionSensorData.getThrowableType());
-			inputDefinition.setEditorPropertiesData(editorPropertiesData);
+				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+				editorPropertiesData.setPartName("Exception Sensor");
+				editorPropertiesData.setPartTooltip("Exception Sensor");
+				editorPropertiesData.setImageDescriptor(SensorTypeEnum.EXCEPTION_SENSOR.getImageDescriptor());
+				editorPropertiesData.setHeaderText("Throwable type");
+				editorPropertiesData.setHeaderDescription(exceptionSensorData.getThrowableType());
+				inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
-			IdDefinition idDefinition = new IdDefinition();
-			idDefinition.setPlatformId(exceptionSensorData.getPlatformIdent());
-			inputDefinition.setIdDefinition(idDefinition);
+				IdDefinition idDefinition = new IdDefinition();
+				idDefinition.setPlatformId(exceptionSensorData.getPlatformIdent());
+				inputDefinition.setIdDefinition(idDefinition);
 
-			ExceptionTypeInputDefinitionExtra exceptionTypeInputDefinitionExtra = new ExceptionTypeInputDefinitionExtra();
-			exceptionTypeInputDefinitionExtra.setThrowableType(exceptionSensorData.getThrowableType());
-			inputDefinition.addInputDefinitonExtra(InputDefinitionExtrasMarkerFactory.EXCEPTION_TYPE_EXTRAS_MARKER, exceptionTypeInputDefinitionExtra);
+				ExceptionTypeInputDefinitionExtra exceptionTypeInputDefinitionExtra = new ExceptionTypeInputDefinitionExtra();
+				exceptionTypeInputDefinitionExtra.setThrowableType(exceptionSensorData.getThrowableType());
+				inputDefinition.addInputDefinitonExtra(InputDefinitionExtrasMarkerFactory.EXCEPTION_TYPE_EXTRAS_MARKER, exceptionTypeInputDefinitionExtra);
+			} else if ("grouped".equals(viewType)) {
+				inputDefinition.setId(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED);
+
+				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+				editorPropertiesData.setPartName("Exceptions (Grouped)");
+				editorPropertiesData.setPartTooltip("Exceptions (Grouped)");
+				editorPropertiesData.setImageDescriptor(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED.getImageDescriptor());
+				editorPropertiesData.setHeaderText("Throwable type");
+				editorPropertiesData.setHeaderDescription(exceptionSensorData.getThrowableType());
+				inputDefinition.setEditorPropertiesData(editorPropertiesData);
+
+				IdDefinition idDefinition = new IdDefinition();
+				idDefinition.setPlatformId(exceptionSensorData.getPlatformIdent());
+				inputDefinition.setIdDefinition(idDefinition);
+
+				ExceptionTypeInputDefinitionExtra exceptionTypeInputDefinitionExtra = new ExceptionTypeInputDefinitionExtra();
+				exceptionTypeInputDefinitionExtra.setThrowableType(exceptionSensorData.getThrowableType());
+				inputDefinition.addInputDefinitonExtra(InputDefinitionExtrasMarkerFactory.EXCEPTION_TYPE_EXTRAS_MARKER, exceptionTypeInputDefinitionExtra);
+			}
 
 			// open the view via command
 			IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
@@ -105,5 +132,4 @@ public class NavigateToExceptionTypeHandler extends AbstractHandler implements I
 		}
 		return null;
 	}
-
 }

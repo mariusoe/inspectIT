@@ -7,6 +7,7 @@ import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
@@ -158,6 +159,11 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		template.setPlatformIdent(inputDefinition.getIdDefinition().getPlatformId());
 		template.setSensorTypeIdent(inputDefinition.getIdDefinition().getSensorTypeId());
 		template.setMethodIdent(inputDefinition.getIdDefinition().getMethodId());
+
+		if (inputDefinition.hasInputDefinitionExtra(InputDefinitionExtrasMarkerFactory.EXCEPTION_TYPE_EXTRAS_MARKER)) {
+			String throwableType = inputDefinition.getInputDefinitionExtra(InputDefinitionExtrasMarkerFactory.EXCEPTION_TYPE_EXTRAS_MARKER).getThrowableType();
+			template.setThrowableType(throwableType);
+		}
 
 		dataAccessService = inputDefinition.getRepositoryDefinition().getExceptionDataAccessService();
 	}
