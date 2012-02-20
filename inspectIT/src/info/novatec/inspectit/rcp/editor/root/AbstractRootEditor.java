@@ -3,8 +3,8 @@ package info.novatec.inspectit.rcp.editor.root;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.editor.ISubView;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
 import info.novatec.inspectit.rcp.editor.SubViewFactory;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferencePanel;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
@@ -168,7 +168,7 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 		// set site and input
 		setSite(editorSite);
 		setInput(editorInput);
-		setTitleImage(getInputDefinition().getImageDescriptor().createImage());
+		setTitleImage(getInputDefinition().getEditorPropertiesData().getImageDescriptor().createImage());
 
 		this.subView = SubViewFactory.createSubView(getInputDefinition().getId());
 		this.subView.setRootEditor(this);
@@ -180,8 +180,8 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 	 */
 	@Override
 	public final void createPartControl(Composite parent) {
-		setPartName(getInputDefinition().getPartName());
-		setTitleToolTip(getInputDefinition().getPartTooltip());
+		setPartName(getInputDefinition().getEditorPropertiesData().getPartName());
+		setTitleToolTip(getInputDefinition().getEditorPropertiesData().getPartTooltip());
 
 		// fill the view with content.
 		createView(parent);

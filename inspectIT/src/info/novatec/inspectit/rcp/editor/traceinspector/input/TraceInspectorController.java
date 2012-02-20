@@ -3,7 +3,7 @@ package info.novatec.inspectit.rcp.editor.traceinspector.input;
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.rcp.editor.AbstractSubView;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 
 import java.util.List;
 import java.util.SortedMap;

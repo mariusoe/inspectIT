@@ -7,8 +7,11 @@ import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.InputDefinition.IdDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.extra.CombinedMetricsInputDefinitionExtra;
+import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.model.Component;
 import info.novatec.inspectit.rcp.model.Composite;
 import info.novatec.inspectit.rcp.model.DeferredComposite;
@@ -85,13 +88,19 @@ public class DeferredVSAWorkflowComposite extends DeferredComposite {
 				InputDefinition inputDefinition = new InputDefinition();
 				inputDefinition.setRepositoryDefinition(repositoryDefinition);
 				inputDefinition.setId(SensorTypeEnum.MARVIN_WORKFLOW);
-				inputDefinition.setPartName("VSA Marvin (" + workflowName + " :: " + activity + ")");
-				inputDefinition.setPartTooltip("VSA Marvin (" + workflowName + " :: " + activity + ")");
-				inputDefinition.setImageDescriptor(SensorTypeEnum.MARVIN_WORKFLOW.getImageDescriptor());
-				inputDefinition.setHeaderText("VSA Marvin (" + workflowName + " :: " + activity + ")");
-				inputDefinition.setHeaderDescription(activity);
-				inputDefinition.addAdditionalOption("Workflow", workflowName);
-				inputDefinition.addAdditionalOption("Activity", activity);
+
+				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+				editorPropertiesData.setPartName("VSA Marvin (" + workflowName + " :: " + activity + ")");
+				editorPropertiesData.setPartTooltip("VSA Marvin (" + workflowName + " :: " + activity + ")");
+				editorPropertiesData.setImageDescriptor(SensorTypeEnum.MARVIN_WORKFLOW.getImageDescriptor());
+				editorPropertiesData.setHeaderText("VSA Marvin (" + workflowName + " :: " + activity + ")");
+				editorPropertiesData.setHeaderDescription(activity);
+				inputDefinition.setEditorPropertiesData(editorPropertiesData);
+
+				CombinedMetricsInputDefinitionExtra combinedMetricsExtra = new CombinedMetricsInputDefinitionExtra();
+				combinedMetricsExtra.setWorkflow(workflowName);
+				combinedMetricsExtra.setActivity(activity);
+				inputDefinition.addInputDefinitonExtra(InputDefinitionExtrasMarkerFactory.COMBINED_METRICS_EXTRAS_MARKER, combinedMetricsExtra);
 
 				IdDefinition idDefinition = new IdDefinition();
 				idDefinition.setPlatformId(platformIdent.getId());

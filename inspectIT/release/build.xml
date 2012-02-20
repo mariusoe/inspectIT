@@ -3,10 +3,6 @@
 	<property name="release.basedir" value="${basedir}" />
 	<property file="build.properties" />
 
-	<path id="path.libs">
-		<fileset dir="${lib.root}" includes="**/*.jar" />
-	</path>
-
 	<path id="path.test.class">
 		<pathelement location="${build.test.classes}" />
 	</path>
@@ -19,39 +15,34 @@
 		<pathelement location="${build.rcp.classes}" />
 	</path>
 
-	<!-- classpath for findbugs is needed because it enables to run findbugs without having a local installation-->
-	<path id="findbugs.classpath">
-		<fileset dir="${lib.root}" includes="**/*.jar" />
-	</path>
-
 	<!--
         PDE Build expects that the build directory contains a "plugins"
         directory and a "features" directory. These directories should contain
         the various plug-ins and features to be built.
-       
+
         This build copies the necessary projects as plugins to the build
         folder. It is very important to note that the eclipse build will
         only recognize that the folders are in fact plugins by the manifest
         that is provided.
-        
+
         The PDE build is hard to understand as there is unfortunately little
         documentation available. I migrated the build to our new structure, there
         are still a few things that had me puzzling:
          - we need two different eclipse installations (i used the old ones)
            using only one of them will lead to errors
-        
+
         Process:
         1) This build file is called and integrated the build.properties
-        2) This build creates everything that is necessary and puts it in the 
+        2) This build creates everything that is necessary and puts it in the
            location that the build.properties defines.
         3) The PDE build is called. This build also implicitly include the
            build.properties file and read the information from there.
-           
+
         Note that the release.basedir property was used in order to be able
         to pass the basedir of this build execution to the ANT PDE build
         process in order to be able to set the output folder correctly
         (basedir will be reset as we invoke a new ant build)
-        
+
         Please see the inspectit Wiki for a more thourough documentation!
     -->
 
@@ -64,7 +55,6 @@
 		<delete file="../lib/inspectit-commons.jar" />
 		<delete dir="${basedir}/build" />
 		<delete dir="${basedir}/dist" />
-
 		<delete dir="${lib.root}/prod" />
 		<delete dir="${lib.root}/test" />
 
@@ -76,7 +66,7 @@
 	<target name="dist-commons">
 		<mkdir dir="${basedir}/build" />
 		<mkdir dir="${build.common.classes}" />
-		<javac source="1.5" target="1.5" debug="true" fork="true" destdir="${build.common.classes}" srcdir="../../Commons" includeAntRuntime="no"/>
+		<javac source="1.5" target="1.5" debug="true" fork="true" destdir="${build.common.classes}" srcdir="../../Commons" includeAntRuntime="no" />
 	</target>
 
 	<target name="init" depends="dist-commons">
@@ -89,7 +79,10 @@
 		<!-- ivy properties -->
 		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
 		<ivy:resolve file="${ivy.file}" />
+		<!-- because of the RCP build we still need to have the lib folder -->
 		<ivy:retrieve pattern="${basedir}/../lib/[conf]/[artifact].[ext]" />
+		<ivy:cachepath pathid="lib.prod" conf="prod" />
+		<ivy:cachepath pathid="lib.test" conf="test" />
 
 		<!-- Commons plugin -->
 		<!-- Currently I would say this is not even necessary! as the lib is integrated with the RCP product -->
@@ -108,40 +101,49 @@
 		</copy>
 
 		<!-- Task Definitions -->
-		<taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="path.libs" />
-		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="path.libs" />
-		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.libs" />
-		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.libs" />
-		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.libs" />
-		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="path.libs" />
-		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs" />
-		<taskdef resource="checkstyletask.properties" classpathref="path.libs" />
+		<taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="lib.test" />
+		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="lib.test" />
+		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="lib.test" />
+		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="lib.test" />
+	</target>
+
+	<target name="init-static-analysis">
+		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+		<!-- needed for Checkstyle, PMD & Findbugs -->
+		<ivy:cachepath pathid="path.checkstyle" organisation="com.puppycrawl.tools" module="checkstyle" revision="5.5" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.pmd" organisation="pmd" module="pmd" revision="4.3" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.findbugs" organisation="com.google.code.findbugs" module="findbugs-ant" revision="2.0.0" conf="default" inline="true" />
+		<!-- Ingnore path missing warnings -->
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.pmd" />
+		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="path.pmd" />
+		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.findbugs" />
+		<taskdef resource="checkstyletask.properties" classpathref="path.checkstyle" />
 	</target>
 
 	<target name="init-ftp-task">
-		<get src="${ftp.commonsnet.url}" dest="${ivy.jar.dir}/${ftp.commonsnet.jar}" usetimestamp="true" />
-		<get src="${ftp.jakartaoro.url}" dest="${ivy.jar.dir}/${ftp.jakartaoro.jar}" usetimestamp="true" />
+		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+		<ivy:cachepath pathid="path.commonsnet" organisation="commons-net" module="commons-net" revision="2.0" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.oro" organisation="oro" module="oro" revision="2.0.8" conf="default" inline="true" />
 
 		<!-- This is a workaround to fix the problem that the FTP task is loaded by a different classloader. -->
 		<!-- This must not be changed, unless you know what you are doing. -->
 		<path id="wptg.classpath">
-			<fileset dir="${user.home}/.ant/lib" includes="${ftp.commonsnet.jar}" />
-			<fileset dir="${user.home}/.ant/lib" includes="${ftp.jakartaoro.jar}" />
+			<path refid="path.commonsnet" />
+			<path refid="path.oro" />
 			<fileset dir="${ant.library.dir}" includes="ant-commons-net.jar" />
 		</path>
 		<classloader classpathref="wptg.classpath" parentFirst="false" />
 		<taskdef name="wptg-ftp" classname="org.apache.tools.ant.taskdefs.optional.net.FTP" loaderref="ant.coreLoader" />
 	</target>
 
-	<target name="init-ant-contrib-tasks">
-		<get src="${ftp.ant-contrib.url}" dest="${user.home}/.ant/lib/${ftp.ant-contrib.jar}" usetimestamp="true" />
-
+	<target name="init-ant-contrib-tasks" depends="init">
 		<!-- This is a workaround to fix the problem that the all ant-contrlib tasks are loaded by a different classloader. -->
 		<!-- This must not be changed, unless you know what you are doing. -->
-		<path id="ant-contrib.classpath">
-			<fileset dir="${user.home}/.ant/lib" includes="${ftp.ant-contrib.jar}" />
-		</path>
 
+		<ivy:cachepath pathid="path.antcontrib" organisation="ant-contrib" module="ant-contrib" revision="1.0b3" conf="default" inline="true" />
+		<path id="ant-contrib.classpath">
+			<path refid="path.antcontrib" />
+		</path>
 		<classloader classpathref="ant-contrib.classpath" parentFirst="false" />
 		<taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="ant-contrib.classpath" />
 	</target>
@@ -183,7 +185,8 @@
 		<mkdir dir="${build.test.classes}" />
 
 		<javac source="1.6" target="1.6" debug="true" nowarn="off" includeAntRuntime="no" destdir="${build.test.classes}" srcdir="${test.root}">
-			<classpath refid="path.libs" />
+			<classpath refid="lib.prod" />
+			<classpath refid="lib.test" />
 			<classpath refid="path.rcp" />
 			<classpath refid="path.commons.classes" />
 			<compilerarg value="-Xlint:unchecked" />
@@ -208,12 +211,14 @@
 			<!--instrumentationClasspath>
 				<path location="${build.instrumented.classes}" />
 			</instrumentationClasspath-->
-			<classpath refid="path.libs" />
+			<classpath refid="lib.prod" />
+			<classpath refid="lib.test" />
 			<classpath location="${build.instrumented.classes}" />
 		</cobertura-instrument>
 
 		<testng outputdir="${build.qa.test.testdata}" haltonfailure="${testng.haltonfailure}">
-			<classpath refid="path.libs" />
+			<classpath refid="lib.prod" />
+			<classpath refid="lib.test" />
 			<classpath refid="path.commons.classes" />
 			<classpath refid="path.test.class" />
 			<classpath location="${build.instrumented.classes}" />
@@ -243,7 +248,7 @@
 
 
 	<!--  It depends on the release target, because we need the compiled class files from the PDE Build-->
-	<target name="static-analysis" depends="release">
+	<target name="static-analysis" depends="init-static-analysis, release">
 		<mkdir dir="${build.qa.analysis}" />
 		<mkdir dir="${build.qa.analysis.pmd}" />
 		<mkdir dir="${build.qa.analysis.checkstyle}" />
@@ -251,7 +256,7 @@
 		<mkdir dir="${build.qa.analysis.cpd}" />
 
 		<echo message="Analyse Code with tool: PMD" level="info" />
-		<pmd maxRuleViolations="${pmd.maximum.violations}" rulesetfiles="${pmd.rules.file}">
+		<pmd maxRuleViolations="${pmd.maximum.violations}" rulesetfiles="${pmd.rules.file}" classpath="path.pmd">
 			<formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true" />
 			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true" />
 			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml" />
@@ -265,7 +270,7 @@
 		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >" />
 
 		<echo message="Analyse Code with tool: Checkstyle" level="info" />
-		<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
+		<checkstyle classpath="path.checkstyle" config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
 			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
 			<fileset dir="${src.root}" includes="**/*.java" />
 		</checkstyle>
@@ -277,15 +282,16 @@
 		<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
 		<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
 		<pathconvert property="findbugs.classpath">
-			<path refid="findbugs.classpath" />
+			<path refid="path.findbugs" />
 		</pathconvert>
 
-		<findbugs output="xml" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="${lib.root}/test/findbugs.jar">
+		<findbugs output="xml" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="findbugs.jar">
 			<sourcePath path="${src.root}" />
 			<class location="${buildDirectory}/plugins/info.novatec.inspectit.rcp/@dot" />
 			<auxClasspath>
 				<pathelement path="${build.common.classes}" />
-				<fileset dir="${lib.root}" includes="**/*.jar" />
+				<path refid="lib.prod" />
+				<path refid="lib.test" />
 			</auxClasspath>
 		</findbugs>
 		<xslt in="${build.qa.analysis.findbugs}/findbugs.xml" style="${release.basedir}/resources/findbugs/fancy-hist.xsl" out="${build.qa.analysis}/findbugs.html" />
@@ -350,7 +356,7 @@
 		<zip destfile="${release.basedir}/dist/inspectit-linux.gtk.x86_64.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
 			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
-			<zipfileset src="${jvm.root}/jre6-linux-x64.zip" prefix="inspectit/jre" filemode="775"/>
+			<zipfileset src="${jvm.root}/jre6-linux-x64.zip" prefix="inspectit/jre" filemode="775" />
 		</zip>
 		<zip destfile="${release.basedir}/dist/inspectit-macosx.cocoa.x86.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
@@ -366,7 +372,7 @@
 		<echo file="${release.basedir}/thirdparty.txt" message="The inspectIT UI uses the following third party libraries: ${line.separator}
 Apache Software License, 2.0 : commons-logging (1.0.3), spring (2.5.5), jettison (1.1)${line.separator}
 BSD License : xstream (1.3.1)${line.separator}
-Eclipse Public License (EPL), 1.0 : nebula-cwt (0.9.0), nebula-cdatetime (0.14.0), nebula-pshelf (1.0.0)${line.separator} 
+Eclipse Public License (EPL), 1.0 : nebula-cwt (0.9.0), nebula-cdatetime (0.14.0), nebula-pshelf (1.0.0)${line.separator}
 GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), rmiio (2.0.2), jcommon (1.0.15), jfreechart (1.0.10), jfreechart-swt (1.0.10), jfreechart-experimental (1.0.10)" />
 	</target>
 

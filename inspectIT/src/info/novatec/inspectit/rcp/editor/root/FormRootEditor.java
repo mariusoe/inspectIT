@@ -48,9 +48,9 @@ public class FormRootEditor extends AbstractRootEditor {
 
 		// create the form
 		form = toolkit.createForm(parent);
-		form.setImage(getInputDefinition().getImageDescriptor().createImage());
-		form.setText(getInputDefinition().getHeaderText());
-		form.setMessage(getInputDefinition().getHeaderDescription());
+		form.setImage(getInputDefinition().getEditorPropertiesData().getImageDescriptor().createImage());
+		form.setText(getInputDefinition().getEditorPropertiesData().getHeaderText());
+		form.setMessage(getInputDefinition().getEditorPropertiesData().getHeaderDescription());
 		form.getBody().setLayout(new GridLayout());
 		// decorate the heading to make it look better
 		toolkit.decorateFormHeading(form);
@@ -80,7 +80,5 @@ public class FormRootEditor extends AbstractRootEditor {
 	public Form getForm() {
 		return form;
 	}
-	
-	
 
 }

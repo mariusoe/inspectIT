@@ -2,7 +2,9 @@ package info.novatec.inspectit.rcp.editor.graph.plot;
 
 import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.communication.data.TimerData;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.extra.CombinedMetricsInputDefinitionExtra;
+import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 
 import java.awt.BasicStroke;
@@ -288,8 +290,14 @@ public class DefaultCombinedMetricsPlotController extends AbstractPlotController
 
 		List<TimerData> adjustedTimerData = Collections.emptyList();
 
-		String workflowName = (String) getInputDefinition().getAdditionalOption("Workflow");
-		String activityName = (String) getInputDefinition().getAdditionalOption("Activity");
+		InputDefinition inputDefinition = getInputDefinition();
+		String workflowName = "";
+		String activityName = "";
+		if (inputDefinition.hasInputDefinitionExtra(InputDefinitionExtrasMarkerFactory.COMBINED_METRICS_EXTRAS_MARKER)) {
+			CombinedMetricsInputDefinitionExtra combinedMetricsExtra = inputDefinition.getInputDefinitionExtra(InputDefinitionExtrasMarkerFactory.COMBINED_METRICS_EXTRAS_MARKER);
+			workflowName = combinedMetricsExtra.getWorkflow();
+			activityName = combinedMetricsExtra.getActivity();
+		}
 
 		if (oldTimerData.isEmpty() || to.before(oldFromDate) || from.after(dataNewestDate)) {
 			// the old data is empty or the range does not fit, thus we need

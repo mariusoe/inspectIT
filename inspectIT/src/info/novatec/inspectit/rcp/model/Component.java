@@ -1,6 +1,6 @@
 package info.novatec.inspectit.rcp.model;
 
-import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 

@@ -1,6 +1,6 @@
 package info.novatec.inspectit.rcp.editor.root;
 
-import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -65,7 +65,7 @@ public class RootEditorInput implements IEditorInput {
 	 * {@inheritDoc}
 	 */
 	public String getToolTipText() {
-		return inputDefinition.getPartTooltip();
+		return inputDefinition.getEditorPropertiesData().getPartTooltip();
 	}
 
 	/**

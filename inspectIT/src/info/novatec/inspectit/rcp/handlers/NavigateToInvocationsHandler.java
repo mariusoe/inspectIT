@@ -8,8 +8,11 @@ import info.novatec.inspectit.communication.data.InvocationAwareData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.InputDefinition.IdDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
+import info.novatec.inspectit.rcp.editor.inputdefinition.extra.NavigationSteppingInputDefinitionExtra;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
@@ -78,20 +81,27 @@ public class NavigateToInvocationsHandler extends AbstractHandler {
 			inputDefinition = new InputDefinition();
 			inputDefinition.setRepositoryDefinition(repositoryDefinition);
 			inputDefinition.setId(SensorTypeEnum.NAVIGATION_INVOCATION);
-			inputDefinition.setPartName("Invocation Sequences");
-			inputDefinition.setPartTooltip("Invocation Sequences (that contain " + textualDesc + ")");
-			inputDefinition.setImageDescriptor(SensorTypeEnum.INVOCATION_SEQUENCE.getImageDescriptor());
-			inputDefinition.setHeaderText("Invocation Sequences");
+
+			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+			editorPropertiesData.setPartName("Invocation Sequences");
+			editorPropertiesData.setPartTooltip("Invocation Sequences (that contain " + textualDesc + ")");
+			editorPropertiesData.setImageDescriptor(SensorTypeEnum.INVOCATION_SEQUENCE.getImageDescriptor());
+			editorPropertiesData.setHeaderText("Invocation Sequences");
 			if (invocationsCount > 1) {
-				inputDefinition.setHeaderDescription("Show All  (that contain " + textualDesc + ")");
+				editorPropertiesData.setHeaderDescription("Show All  (that contain " + textualDesc + ")");
 			} else if (invocationsCount == 1) {
-				inputDefinition.setHeaderDescription("Show One  (that contains " + textualDesc + ")");
+				editorPropertiesData.setHeaderDescription("Show One  (that contains " + textualDesc + ")");
 			}
-			inputDefinition.addAdditionalOption("invocationAwareDataList", invocationAwareDataList);
-			inputDefinition.addAdditionalOption("steppingObjects", getTemplates(invocationAwareDataList));
+			inputDefinition.setEditorPropertiesData(editorPropertiesData);
+
 			IdDefinition idDefinition = new IdDefinition();
 			idDefinition.setPlatformId(platformIdent);
 			inputDefinition.setIdDefinition(idDefinition);
+
+			NavigationSteppingInputDefinitionExtra navigationSteppingExtra = new NavigationSteppingInputDefinitionExtra();
+			navigationSteppingExtra.setInvocationAwareDataList(invocationAwareDataList);
+			navigationSteppingExtra.setSteppingTemplateList(getTemplates(invocationAwareDataList));
+			inputDefinition.addInputDefinitonExtra(InputDefinitionExtrasMarkerFactory.NAVIGATION_STEPPING_EXTRAS_MARKER, navigationSteppingExtra);
 
 			// open the view via command
 			IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
@@ -119,8 +129,8 @@ public class NavigateToInvocationsHandler extends AbstractHandler {
 	 *            {@link InvocationAwareData} list.
 	 * @return Templates to be used as steppable objects.
 	 */
-	private List<Object> getTemplates(List<InvocationAwareData> invocationAwareDataList) {
-		List<Object> steppableTemplates = new ArrayList<Object>();
+	private List<DefaultData> getTemplates(List<InvocationAwareData> invocationAwareDataList) {
+		List<DefaultData> steppableTemplates = new ArrayList<DefaultData>();
 		for (InvocationAwareData invocationAwareData : invocationAwareDataList) {
 			if (invocationAwareData instanceof SqlStatementData) {
 				SqlStatementData template = OccurrenceFinderFactory.getEmptyTemplate((SqlStatementData) invocationAwareData);

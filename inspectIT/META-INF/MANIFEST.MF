@@ -34,5 +34,6 @@ Bundle-ClassPath: .,
  lib/prod/spring-asm.jar,
  lib/prod/spring-expression.jar,
  lib/prod/spring-aop.jar,
- lib/prod/aopalliance.jar
+ lib/prod/aopalliance.jar,
+ lib/prod/guava.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

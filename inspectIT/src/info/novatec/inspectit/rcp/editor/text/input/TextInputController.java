@@ -3,7 +3,7 @@ package info.novatec.inspectit.rcp.editor.text.input;
 import java.util.List;
 
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.text.TextSubView;
 
 import org.eclipse.swt.widgets.Composite;

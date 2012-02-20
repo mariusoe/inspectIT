@@ -10,39 +10,12 @@
 
 	<property file="${basedir}/build.properties" />
 
-	<!-- classpath settings -->
-	<path id="compile.classpath">
-		<fileset dir="${lib.root}" includes="**/*.jar" />
-		<pathelement location="${build.commons.classes}" />
-	</path>
-
-	<path id="complete.classpath">
-		<!--path refid="${classpath_ref}" /-->
-		<pathelement location="${build.cmr.classes}" />
-		<pathelement location="${build.commons.classes}" />
-		<fileset dir="${lib.root}" includes="**/*.jar" />
-	</path>
-
-	<path id="cmr.classpath">
-		<fileset dir="${build.release.root.cmr}" includes="**/*.jar" />
-	</path>
-
 	<path id="path.test.class">
 		<pathelement location="${build.test.classes}" />
 	</path>
 
 	<path id="path.common.classes">
 		<pathelement location="${build.commons.classes}" />
-	</path>
-
-	<!-- classpath for findbugs is needed because it enables to run findbugs without having a local installation -->
-	<path id="findbugs.classpath">
-		<fileset dir="${lib.root}" includes="**/*.jar" />
-	</path>
-
-	<!-- will be available after all dependencies are retrieved by the init target -->
-	<path id="path.libs">
-		<fileset dir="${lib.root}" includes="**/*.jar" />
 	</path>
 
 	<target name="clean" description="--> Cleans the project">
@@ -58,28 +31,41 @@
 
 		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
 		<ivy:resolve file="${ivy.file}" />
-		<ivy:retrieve pattern="${lib.root}/[conf]/[artifact].[ext]" />
+		<ivy:cachepath pathid="lib.prod" conf="prod" />
+		<ivy:cachepath pathid="lib.test" conf="test" />
 
-		<taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="path.libs" />
-		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="path.libs" />
-		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.libs" />
-		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.libs" />
-		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.libs" />
-		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="path.libs" />
-		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.libs" />
-		<taskdef resource="checkstyletask.properties" classpathref="path.libs" />
-		<taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="path.libs" />
+		<taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="lib.test" />
+		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="lib.test" />
+		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="lib.test" />
+		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="lib.test" />
+
+		<ivy:cachepath pathid="path.antcontrib" organisation="ant-contrib" module="ant-contrib" revision="1.0b3" conf="default" inline="true" />
+		<taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="path.antcontrib" />
+	</target>
+
+	<target name="init-static-analysis">
+		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+		<!-- needed for Checkstyle, PMD & Findbugs -->
+		<ivy:cachepath pathid="path.checkstyle" organisation="com.puppycrawl.tools" module="checkstyle" revision="5.5" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.pmd" organisation="pmd" module="pmd" revision="4.3" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.findbugs" organisation="com.google.code.findbugs" module="findbugs-ant" revision="2.0.0" conf="default" inline="true" />
+		<!-- Ingnore path missing warnings -->
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.pmd" />
+		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="path.pmd" />
+		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.findbugs" />
+		<taskdef resource="checkstyletask.properties" classpathref="path.checkstyle" />
 	</target>
 
 	<target name="init-ftp-task">
-		<get src="${ftp.commonsnet.url}" dest="${ivy.jar.dir}/${ftp.commonsnet.jar}" usetimestamp="true" />
-		<get src="${ftp.jakartaoro.url}" dest="${ivy.jar.dir}/${ftp.jakartaoro.jar}" usetimestamp="true" />
+		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+		<ivy:cachepath pathid="path.commonsnet" organisation="commons-net" module="commons-net" revision="2.0" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.oro" organisation="oro" module="oro" revision="2.0.8" conf="default" inline="true" />
 
 		<!-- This is a workaround to fix the problem that the FTP task is loaded by a different classloader. -->
 		<!-- This must not be changed, unless you know what you are doing. -->
 		<path id="wptg.classpath">
-			<fileset dir="${user.home}/.ant/lib" includes="${ftp.commonsnet.jar}" />
-			<fileset dir="${user.home}/.ant/lib" includes="${ftp.jakartaoro.jar}" />
+			<path refid="path.commonsnet" />
+			<path refid="path.oro" />
 			<fileset dir="${ant.library.dir}" includes="ant-commons-net.jar" />
 		</path>
 		<classloader classpathref="wptg.classpath" parentFirst="false" />
@@ -97,13 +83,18 @@
 	<target name="build-commons" description="--> builds a clean distribution of the commons project and copies the classes to the local build folder">
 		<mkdir dir="${build.commons.classes}" />
 
-		<javac source="1.5" target="1.5" debug="true" fork="true" destdir="${build.commons.classes}" srcdir="${src.commons}" includeAntRuntime="no"/>
+		<javac source="1.5" target="1.5" debug="true" fork="true" destdir="${build.commons.classes}" srcdir="${src.commons}" includeAntRuntime="no" />
 	</target>
 
 	<target name="build" depends="init, build-commons" description="--> Compiles the sources">
 		<mkdir dir="${build.cmr.classes}" />
 
-		<javac source="1.5" target="1.5" debug="true" debuglevel="lines,vars,source" destdir="${build.cmr.classes}" srcdir="${src.root}" classpathref="compile.classpath" includeAntRuntime="no"/>
+		<path id="compile.classpath">
+			<pathelement location="${build.commons.classes}" />
+			<path refid="lib.prod" />
+		</path>
+
+		<javac source="1.5" target="1.5" debug="true" debuglevel="lines,vars,source" destdir="${build.cmr.classes}" srcdir="${src.root}" classpathref="compile.classpath" includeAntRuntime="no" />
 	</target>
 
 
@@ -119,6 +110,13 @@
 		<mkdir dir="${build.qa.test.testdata}" />
 		<mkdir dir="${build.qa.test.coveragedata}" />
 		<mkdir dir="${build.test.classes}" />
+
+		<path id="complete.classpath">
+			<pathelement location="${build.cmr.classes}" />
+			<pathelement location="${build.commons.classes}" />
+			<path refid="lib.prod" />
+			<path refid="lib.test" />
+		</path>
 
 		<javac source="1.6" target="1.6" debug="true" debuglevel="lines,vars,source" nowarn="off" includeAntRuntime="no" destdir="${build.test.classes}" srcdir="${test.root}">
 			<classpath refid="complete.classpath" />
@@ -177,7 +175,7 @@
 
 
 	<!-- Depends on release, because the compiled classes are needed for the analysis -->
-	<target name="static-analysis" depends="build">
+	<target name="static-analysis" depends="init-static-analysis, build">
 		<mkdir dir="${build.qa.analysis}" />
 		<mkdir dir="${build.qa.analysis.pmd}" />
 		<mkdir dir="${build.qa.analysis.checkstyle}" />
@@ -185,7 +183,7 @@
 		<mkdir dir="${build.qa.analysis.cpd}" />
 
 		<echo message="Analyse Code with tool: PMD" level="info" />
-		<pmd maxRuleViolations="${pmd.maximum.violations}" rulesetfiles="${pmd.rules.file}">
+		<pmd maxRuleViolations="${pmd.maximum.violations}" rulesetfiles="${pmd.rules.file}" classpath="path.pmd">
 			<formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true" />
 			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true" />
 			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml" />
@@ -204,7 +202,7 @@
 		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >" />
 
 		<echo message="Analyse Code with tool: Checkstyle" level="info" />
-		<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
+		<checkstyle classpath="path.checkstyle" config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
 			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
 			<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" />
 		</checkstyle>
@@ -216,15 +214,16 @@
 		<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
 		<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
 		<pathconvert property="findbugs.classpath">
-			<path refid="findbugs.classpath" />
+			<path refid="path.findbugs" />
 		</pathconvert>
 
-		<findbugs output="xml" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="${lib.root}/test/findbugs.jar">
+		<findbugs output="xml" classpath="${findbugs.classpath}" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="findbugs.jar">
 			<sourcePath path="${src.root}" />
 			<class location="${build.cmr.classes}" />
 			<auxClasspath>
 				<pathelement path="${build.commons.classes}" />
-				<fileset dir="${lib.root}" includes="**/*.jar" />
+				<path refid="lib.prod"/>
+				<path refid="lib.test"/>
 			</auxClasspath>
 		</findbugs>
 		<xslt in="${build.qa.analysis.findbugs}/findbugs.xml" style="${basedir}/resources/findbugs/fancy-hist.xsl" out="${build.qa.analysis}/findbugs.html" />
@@ -246,8 +245,8 @@
 		<mkdir dir="${build.release.root.cmr}" />
 		<mkdir dir="${build.scripts}" />
 
-		<copy todir="${build.release.root.cmr}/lib">
-			<fileset dir="${lib.root}/prod" includes="**/*.jar" />
+		<copy todir="${build.release.root.cmr}/lib" flatten="true">
+			<path refid="lib.prod" />
 		</copy>
 
 		<jar destfile="${build.release.root.cmr}/lib/inspectit-commons.jar" basedir="${build.commons.classes}" />

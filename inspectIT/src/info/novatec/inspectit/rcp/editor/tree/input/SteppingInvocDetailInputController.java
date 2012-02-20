@@ -1,11 +1,13 @@
 package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.tree.SteppingTreeSubView;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
@@ -48,10 +50,8 @@ public class SteppingInvocDetailInputController extends InvocDetailInputControll
 	 */
 	private boolean initVisible;
 
-
 	/**
-	 * {@link DefaultAbsoluteLocationPath} construct that defines if the stepping control is visible
-	 * or not.
+	 * Constructor that defines if the stepping control is visible or not.
 	 * 
 	 * @param initVisible
 	 *            Should stepping control be initially visible.
@@ -63,16 +63,17 @@ public class SteppingInvocDetailInputController extends InvocDetailInputControll
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void setInputDefinition(InputDefinition inputDefinition) {
 		super.setInputDefinition(inputDefinition);
 		steppingObjectsList = new ArrayList<Object>();
-		
-		Object steppingObj = inputDefinition.getAdditionalOption("steppingObjects");
-		if (null != steppingObj) {
-			for (Object object : (List<Object>) steppingObj) {
-				addObjectToSteppingObjectList(object);
+
+		if (inputDefinition.hasInputDefinitionExtra(InputDefinitionExtrasMarkerFactory.NAVIGATION_STEPPING_EXTRAS_MARKER)) {
+			List<DefaultData> steppingObj = inputDefinition.getInputDefinitionExtra(InputDefinitionExtrasMarkerFactory.NAVIGATION_STEPPING_EXTRAS_MARKER).getSteppingTemplateList();
+			if (null != steppingObj) {
+				for (DefaultData object : steppingObj) {
+					addObjectToSteppingObjectList(object);
+				}
 			}
 		}
 

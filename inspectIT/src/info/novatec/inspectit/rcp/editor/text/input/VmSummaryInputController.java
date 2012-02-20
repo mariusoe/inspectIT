@@ -9,7 +9,7 @@ import info.novatec.inspectit.communication.data.RuntimeInformationData;
 import info.novatec.inspectit.communication.data.SystemInformationData;
 import info.novatec.inspectit.communication.data.ThreadInformationData;
 import info.novatec.inspectit.communication.data.VmArgumentData;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 
 import java.util.Comparator;

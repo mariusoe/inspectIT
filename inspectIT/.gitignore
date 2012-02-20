@@ -2,9 +2,7 @@
 /test-output
 /reports
 temp-testng-customsuite.xml
-/lib/inspectit-commons.jar
-/lib/prod
-/lib/test
+/lib
 /release/build
 /release/dist
 /release/jvm

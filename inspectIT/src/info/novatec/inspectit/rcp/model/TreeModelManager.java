@@ -6,8 +6,9 @@ import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.InputDefinition.IdDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.formatter.SensorTypeAvailabilityEnum;
 import info.novatec.inspectit.rcp.model.combinedmetrics.DeferredCombinedMetricsComposite;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
@@ -141,11 +142,14 @@ public class TreeModelManager {
 		InputDefinition inputDefinition = new InputDefinition();
 		inputDefinition.setRepositoryDefinition(definition);
 		inputDefinition.setId(SensorTypeEnum.INVOCATION_SEQUENCE);
-		inputDefinition.setPartName("Invocation Sequences (Show All)");
-		inputDefinition.setPartTooltip("Invocation Sequences (Show All)");
-		inputDefinition.setImageDescriptor(SensorTypeEnum.INVOCATION_SEQUENCE.getImageDescriptor());
-		inputDefinition.setHeaderText("Invocation Sequences");
-		inputDefinition.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+
+		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+		editorPropertiesData.setPartName("Invocation Sequences (Show All)");
+		editorPropertiesData.setPartTooltip("Invocation Sequences (Show All)");
+		editorPropertiesData.setImageDescriptor(SensorTypeEnum.INVOCATION_SEQUENCE.getImageDescriptor());
+		editorPropertiesData.setHeaderText("Invocation Sequences");
+		editorPropertiesData.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+		inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();
 		idDefinition.setPlatformId(platformIdent.getId());
@@ -166,6 +170,7 @@ public class TreeModelManager {
 	}
 
 	/**
+
 	 * Returns the SQL tree.
 	 * 
 	 * @param platformIdent
@@ -186,11 +191,14 @@ public class TreeModelManager {
 		InputDefinition inputDefinition = new InputDefinition();
 		inputDefinition.setRepositoryDefinition(definition);
 		inputDefinition.setId(SensorTypeEnum.SQL);
-		inputDefinition.setPartName("SQL Statements (Show All)");
-		inputDefinition.setPartTooltip("SQL Statements (Show All)");
-		inputDefinition.setImageDescriptor(SensorTypeEnum.SQL.getImageDescriptor());
-		inputDefinition.setHeaderText("SQL Statements");
-		inputDefinition.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+
+		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+		editorPropertiesData.setPartName("SQL Statements (Show All)");
+		editorPropertiesData.setPartTooltip("SQL Statements (Show All)");
+		editorPropertiesData.setImageDescriptor(SensorTypeEnum.SQL.getImageDescriptor());
+		editorPropertiesData.setHeaderText("SQL Statements");
+		editorPropertiesData.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+		inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();
 		idDefinition.setPlatformId(platformIdent.getId());
@@ -299,11 +307,14 @@ public class TreeModelManager {
 				InputDefinition inputDefinition = new InputDefinition();
 				inputDefinition.setRepositoryDefinition(definition);
 				inputDefinition.setId(SensorTypeEnum.CPU_INFORMATION);
-				inputDefinition.setPartName("CPU");
-				inputDefinition.setPartTooltip("CPU");
-				inputDefinition.setImageDescriptor(SensorTypeEnum.CPU_INFORMATION.getImageDescriptor());
-				inputDefinition.setHeaderText("CPU Information");
-				inputDefinition.setHeaderDescription(platformIdent.getAgentName());
+
+				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+				editorPropertiesData.setPartName("CPU");
+				editorPropertiesData.setPartTooltip("CPU");
+				editorPropertiesData.setImageDescriptor(SensorTypeEnum.CPU_INFORMATION.getImageDescriptor());
+				editorPropertiesData.setHeaderText("CPU Information");
+				editorPropertiesData.setHeaderDescription(platformIdent.getAgentName());
+				inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 				IdDefinition idDefinition = new IdDefinition();
 				idDefinition.setPlatformId(platformIdent.getId());
@@ -348,11 +359,14 @@ public class TreeModelManager {
 				InputDefinition inputDefinition = new InputDefinition();
 				inputDefinition.setRepositoryDefinition(definition);
 				inputDefinition.setId(SensorTypeEnum.CLASSLOADING_INFORMATION);
-				inputDefinition.setPartName("Class Loading");
-				inputDefinition.setPartTooltip("Class Loading");
-				inputDefinition.setImageDescriptor(SensorTypeEnum.CLASSLOADING_INFORMATION.getImageDescriptor());
-				inputDefinition.setHeaderText("Class Loading Information");
-				inputDefinition.setHeaderDescription(platformIdent.getAgentName());
+
+				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+				editorPropertiesData.setPartName("Class Loading");
+				editorPropertiesData.setPartTooltip("Class Loading");
+				editorPropertiesData.setImageDescriptor(SensorTypeEnum.CLASSLOADING_INFORMATION.getImageDescriptor());
+				editorPropertiesData.setHeaderText("Class Loading Information");
+				editorPropertiesData.setHeaderDescription(platformIdent.getAgentName());
+				inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 				IdDefinition idDefinition = new IdDefinition();
 				idDefinition.setPlatformId(platformIdent.getId());
@@ -405,11 +419,14 @@ public class TreeModelManager {
 				InputDefinition inputDefinition = new InputDefinition();
 				inputDefinition.setRepositoryDefinition(definition);
 				inputDefinition.setId(SensorTypeEnum.MEMORY_INFORMATION);
-				inputDefinition.setPartName("Memory");
-				inputDefinition.setPartTooltip("Memory");
-				inputDefinition.setImageDescriptor(SensorTypeEnum.MEMORY_INFORMATION.getImageDescriptor());
-				inputDefinition.setHeaderText("Memory Information");
-				inputDefinition.setHeaderDescription(platformIdent.getAgentName());
+
+				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+				editorPropertiesData.setPartName("Memory");
+				editorPropertiesData.setPartTooltip("Memory");
+				editorPropertiesData.setImageDescriptor(SensorTypeEnum.MEMORY_INFORMATION.getImageDescriptor());
+				editorPropertiesData.setHeaderText("Memory Information");
+				editorPropertiesData.setHeaderDescription(platformIdent.getAgentName());
+				inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 				IdDefinition idDefinition = new IdDefinition();
 				idDefinition.setPlatformId(platformIdent.getId());
@@ -454,11 +471,14 @@ public class TreeModelManager {
 				InputDefinition inputDefinition = new InputDefinition();
 				inputDefinition.setRepositoryDefinition(definition);
 				inputDefinition.setId(SensorTypeEnum.THREAD_INFORMATION);
-				inputDefinition.setPartName("Threads");
-				inputDefinition.setPartTooltip("Threads");
-				inputDefinition.setImageDescriptor(SensorTypeEnum.THREAD_INFORMATION.getImageDescriptor());
-				inputDefinition.setHeaderText("Thread Information");
-				inputDefinition.setHeaderDescription(platformIdent.getAgentName());
+
+				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+				editorPropertiesData.setPartName("Threads");
+				editorPropertiesData.setPartTooltip("Threads");
+				editorPropertiesData.setImageDescriptor(SensorTypeEnum.THREAD_INFORMATION.getImageDescriptor());
+				editorPropertiesData.setHeaderText("Thread Information");
+				editorPropertiesData.setHeaderDescription(platformIdent.getAgentName());
+				inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 				IdDefinition idDefinition = new IdDefinition();
 				idDefinition.setPlatformId(platformIdent.getId());
@@ -502,11 +522,14 @@ public class TreeModelManager {
 			InputDefinition inputDefinition = new InputDefinition();
 			inputDefinition.setRepositoryDefinition(definition);
 			inputDefinition.setId(SensorTypeEnum.SYSTEM_INFORMATION);
-			inputDefinition.setPartName("System Information");
-			inputDefinition.setPartTooltip("System Information");
-			inputDefinition.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_INFORMATION));
-			inputDefinition.setHeaderText("System Information");
-			inputDefinition.setHeaderDescription(platformIdent.getAgentName());
+
+			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+			editorPropertiesData.setPartName("System Information");
+			editorPropertiesData.setPartTooltip("System Information");
+			editorPropertiesData.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_INFORMATION));
+			editorPropertiesData.setHeaderText("System Information");
+			editorPropertiesData.setHeaderDescription(platformIdent.getAgentName());
+			inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 			IdDefinition idDefinition = new IdDefinition();
 			idDefinition.setPlatformId(platformIdent.getId());
@@ -574,11 +597,14 @@ public class TreeModelManager {
 		InputDefinition ungroupedExceptionOverviewInputDefinition = new InputDefinition();
 		ungroupedExceptionOverviewInputDefinition.setRepositoryDefinition(definition);
 		ungroupedExceptionOverviewInputDefinition.setId(SensorTypeEnum.EXCEPTION_SENSOR);
-		ungroupedExceptionOverviewInputDefinition.setPartName("Exceptions (Show All)");
-		ungroupedExceptionOverviewInputDefinition.setPartTooltip("Exceptions (Show All)");
-		ungroupedExceptionOverviewInputDefinition.setImageDescriptor(SensorTypeEnum.EXCEPTION_SENSOR.getImageDescriptor());
-		ungroupedExceptionOverviewInputDefinition.setHeaderText("Exceptions");
-		ungroupedExceptionOverviewInputDefinition.setHeaderDescription("Exceptions (" + platformIdent.getAgentName() + ")");
+
+		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+		editorPropertiesData.setPartName("Exceptions (Show All)");
+		editorPropertiesData.setPartTooltip("Exceptions (Show All)");
+		editorPropertiesData.setImageDescriptor(SensorTypeEnum.EXCEPTION_SENSOR.getImageDescriptor());
+		editorPropertiesData.setHeaderText("Exceptions");
+		editorPropertiesData.setHeaderDescription("Exceptions (" + platformIdent.getAgentName() + ")");
+		ungroupedExceptionOverviewInputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();
 		idDefinition.setPlatformId(platformIdent.getId());
@@ -606,11 +632,14 @@ public class TreeModelManager {
 		InputDefinition groupedExceptionOverviewInputDefinition = new InputDefinition();
 		groupedExceptionOverviewInputDefinition.setRepositoryDefinition(definition);
 		groupedExceptionOverviewInputDefinition.setId(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED);
-		groupedExceptionOverviewInputDefinition.setPartName("Exceptions (Grouped)");
-		groupedExceptionOverviewInputDefinition.setPartTooltip("Exceptions (Grouped)");
-		groupedExceptionOverviewInputDefinition.setImageDescriptor(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED.getImageDescriptor());
-		groupedExceptionOverviewInputDefinition.setHeaderText("Exceptions");
-		groupedExceptionOverviewInputDefinition.setHeaderDescription("Exceptions (" + platformIdent.getAgentName() + ")");
+
+		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+		editorPropertiesData.setPartName("Exceptions (Grouped)");
+		editorPropertiesData.setPartTooltip("Exceptions (Grouped)");
+		editorPropertiesData.setImageDescriptor(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED.getImageDescriptor());
+		editorPropertiesData.setHeaderText("Exceptions");
+		editorPropertiesData.setHeaderDescription("Exceptions (" + platformIdent.getAgentName() + ")");
+		groupedExceptionOverviewInputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();
 		idDefinition.setPlatformId(platformIdent.getId());
@@ -660,11 +689,14 @@ public class TreeModelManager {
 		InputDefinition inputDefinition = new InputDefinition();
 		inputDefinition.setRepositoryDefinition(definition);
 		inputDefinition.setId(SensorTypeEnum.AGGREGATED_TIMER_DATA);
-		inputDefinition.setPartName("Aggregated Timer Data (Show All)");
-		inputDefinition.setPartTooltip("Aggregated Timer Data (Show All)");
-		inputDefinition.setImageDescriptor(SensorTypeEnum.AGGREGATED_TIMER_DATA.getImageDescriptor());
-		inputDefinition.setHeaderText("Aggregated Timer Data");
-		inputDefinition.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+
+		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+		editorPropertiesData.setPartName("Aggregated Timer Data (Show All)");
+		editorPropertiesData.setPartTooltip("Aggregated Timer Data (Show All)");
+		editorPropertiesData.setImageDescriptor(SensorTypeEnum.AGGREGATED_TIMER_DATA.getImageDescriptor());
+		editorPropertiesData.setHeaderText("Aggregated Timer Data");
+		editorPropertiesData.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+		inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();
 		idDefinition.setPlatformId(platformIdent.getId());
@@ -706,11 +738,14 @@ public class TreeModelManager {
 		InputDefinition inputDefinition = new InputDefinition();
 		inputDefinition.setRepositoryDefinition(definition);
 		inputDefinition.setId(SensorTypeEnum.HTTP_TIMER_SENSOR);
-		inputDefinition.setPartName("Http (" + platformIdent.getAgentName() + ")");
-		inputDefinition.setPartTooltip("Aggregates all http requests that are currently in the buffer based on its URI");
-		inputDefinition.setImageDescriptor(SensorTypeEnum.HTTP_TIMER_SENSOR.getImageDescriptor());
-		inputDefinition.setHeaderText("URI based aggregation");
-		inputDefinition.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+
+		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+		editorPropertiesData.setPartName("Http (" + platformIdent.getAgentName() + ")");
+		editorPropertiesData.setPartTooltip("Aggregates all http requests that are currently in the buffer based on its URI");
+		editorPropertiesData.setImageDescriptor(SensorTypeEnum.HTTP_TIMER_SENSOR.getImageDescriptor());
+		editorPropertiesData.setHeaderText("URI based aggregation");
+		editorPropertiesData.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+		inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();
 		idDefinition.setPlatformId(platformIdent.getId());
@@ -729,12 +764,15 @@ public class TreeModelManager {
 		inputDefinition = new InputDefinition();
 		inputDefinition.setRepositoryDefinition(definition);
 		inputDefinition.setId(SensorTypeEnum.TAGGED_HTTP_TIMER_SENSOR);
-		inputDefinition.setPartName("Use Case Http (" + platformIdent.getAgentName() + ")");
-		inputDefinition.setPartTooltip("Aggregates all http request that are currently in the buffer based on a the concrete value of the inspectIT Tag Header (called \""
+
+		editorPropertiesData = new EditorPropertiesData();
+		editorPropertiesData.setPartName("Use Case Http (" + platformIdent.getAgentName() + ")");
+		editorPropertiesData.setPartTooltip("Aggregates all http request that are currently in the buffer based on a the concrete value of the inspectIT Tag Header (called \""
 				+ HttpTimerData.INSPECTIT_TAGGING_HEADER + "\")");
-		inputDefinition.setImageDescriptor(SensorTypeEnum.TAGGED_HTTP_TIMER_SENSOR.getImageDescriptor());
-		inputDefinition.setHeaderText("Use Case based aggregation");
-		inputDefinition.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+		editorPropertiesData.setImageDescriptor(SensorTypeEnum.TAGGED_HTTP_TIMER_SENSOR.getImageDescriptor());
+		editorPropertiesData.setHeaderText("Use Case based aggregation");
+		editorPropertiesData.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+		inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		idDefinition = new IdDefinition();
 		idDefinition.setPlatformId(platformIdent.getId());

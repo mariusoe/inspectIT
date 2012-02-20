@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.action;
 
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;

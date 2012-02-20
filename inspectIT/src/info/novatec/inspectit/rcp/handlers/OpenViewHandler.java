@@ -1,6 +1,6 @@
 package info.novatec.inspectit.rcp.handlers;
 
-import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.root.FormRootEditor;
 import info.novatec.inspectit.rcp.editor.root.RootEditorInput;
 

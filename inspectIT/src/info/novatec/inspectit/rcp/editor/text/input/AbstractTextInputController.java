@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.editor.text.input;
 
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 
 import java.util.List;
 

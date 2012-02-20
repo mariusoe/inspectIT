@@ -4,8 +4,9 @@ import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.InputDefinition.IdDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
@@ -60,11 +61,14 @@ public class NavigateToPlotting extends AbstractHandler {
 		inputDefinition = new InputDefinition();
 		inputDefinition.setRepositoryDefinition(repositoryDefinition);
 		inputDefinition.setId(SensorTypeEnum.TIMER);
-		inputDefinition.setPartName(SensorTypeEnum.TIMER.getDisplayName());
-		inputDefinition.setPartTooltip(SensorTypeEnum.TIMER.getDisplayName());
-		inputDefinition.setImageDescriptor(SensorTypeEnum.TIMER.getImageDescriptor());
-		inputDefinition.setHeaderText(methodIdent.getPlatformIdent().getAgentName());
-		inputDefinition.setHeaderDescription(TextFormatter.getMethodString(methodIdent));
+
+		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+		editorPropertiesData.setPartName(SensorTypeEnum.TIMER.getDisplayName());
+		editorPropertiesData.setPartTooltip(SensorTypeEnum.TIMER.getDisplayName());
+		editorPropertiesData.setImageDescriptor(SensorTypeEnum.TIMER.getImageDescriptor());
+		editorPropertiesData.setHeaderText(methodIdent.getPlatformIdent().getAgentName());
+		editorPropertiesData.setHeaderDescription(TextFormatter.getMethodString(methodIdent));
+		inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();
 		idDefinition.setPlatformId(timerData.getPlatformIdent());

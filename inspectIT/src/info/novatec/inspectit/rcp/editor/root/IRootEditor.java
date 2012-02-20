@@ -2,7 +2,7 @@ package info.novatec.inspectit.rcp.editor.root;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.ISubView;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferencePanel;
 
 import java.util.List;

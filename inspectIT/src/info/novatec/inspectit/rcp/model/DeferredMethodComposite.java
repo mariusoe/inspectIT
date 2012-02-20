@@ -2,8 +2,9 @@ package info.novatec.inspectit.rcp.model;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.InputDefinition.IdDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
@@ -54,12 +55,15 @@ public class DeferredMethodComposite extends DeferredComposite {
 					InputDefinition inputDefinition = new InputDefinition();
 					inputDefinition.setRepositoryDefinition(repositoryDefinition);
 					inputDefinition.setId(sensorTypeEnum);
-					inputDefinition.setPartName(sensorTypeEnum.getDisplayName());
-					inputDefinition.setPartTooltip(sensorTypeEnum.getDisplayName());
-					inputDefinition.setImageDescriptor(sensorTypeEnum.getImageDescriptor());
-					inputDefinition.setHeaderText(method.getPlatformIdent().getAgentName());
+
+					EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+					editorPropertiesData.setPartName(sensorTypeEnum.getDisplayName());
+					editorPropertiesData.setPartTooltip(sensorTypeEnum.getDisplayName());
+					editorPropertiesData.setImageDescriptor(sensorTypeEnum.getImageDescriptor());
+					editorPropertiesData.setHeaderText(method.getPlatformIdent().getAgentName());
 					MethodIdent methodIdent = repositoryDefinition.getCachedDataService().getMethodIdentForId(method.getId());
-					inputDefinition.setHeaderDescription(TextFormatter.getMethodString(methodIdent));
+					editorPropertiesData.setHeaderDescription(TextFormatter.getMethodString(methodIdent));
+					inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 					IdDefinition idDefinition = new IdDefinition();
 					idDefinition.setPlatformId(method.getPlatformIdent().getId());

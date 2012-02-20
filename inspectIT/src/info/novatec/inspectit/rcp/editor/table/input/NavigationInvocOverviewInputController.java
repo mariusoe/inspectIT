@@ -2,7 +2,8 @@ package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.communication.data.InvocationAwareData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 
 import java.util.EnumSet;
@@ -34,10 +35,11 @@ public class NavigationInvocOverviewInputController extends InvocOverviewInputCo
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void setInputDefinition(InputDefinition inputDefinition) {
-		invocationAwareDataList = (List<InvocationAwareData>) inputDefinition.getAdditionalOption("invocationAwareDataList");
+		if (inputDefinition.hasInputDefinitionExtra(InputDefinitionExtrasMarkerFactory.NAVIGATION_STEPPING_EXTRAS_MARKER)) {
+			invocationAwareDataList = inputDefinition.getInputDefinitionExtra(InputDefinitionExtrasMarkerFactory.NAVIGATION_STEPPING_EXTRAS_MARKER).getInvocationAwareDataList();
+		}
 
 		super.setInputDefinition(inputDefinition);
 	}

@@ -359,7 +359,7 @@ public class TableSubView extends AbstractSubView {
 			AbstractRootEditor editor = this.getRootEditor();
 			if (editor instanceof FormRootEditor) {
 				Form form = ((FormRootEditor) editor).getForm();
-				StringBuilder message = new StringBuilder(editor.getInputDefinition().getHeaderDescription() + " - ");
+				StringBuilder message = new StringBuilder(editor.getInputDefinition().getEditorPropertiesData().getHeaderDescription() + " - ");
 				if (limit == -1) {
 					message.append("all displayed");
 				} else {

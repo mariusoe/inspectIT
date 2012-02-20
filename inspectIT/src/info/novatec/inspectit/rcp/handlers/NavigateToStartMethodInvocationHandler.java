@@ -3,8 +3,9 @@ package info.novatec.inspectit.rcp.handlers;
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.editor.InputDefinition;
-import info.novatec.inspectit.rcp.editor.InputDefinition.IdDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
@@ -48,11 +49,14 @@ public class NavigateToStartMethodInvocationHandler extends AbstractHandler {
 			InputDefinition inputDefinition = new InputDefinition();
 			inputDefinition.setRepositoryDefinition(repositoryDefinition);
 			inputDefinition.setId(SensorTypeEnum.INVOCATION_SEQUENCE);
-			inputDefinition.setPartName("Invocation Sequence");
-			inputDefinition.setPartTooltip("Invocation Sequence");
-			inputDefinition.setImageDescriptor(SensorTypeEnum.INVOCATION_SEQUENCE.getImageDescriptor());
-			inputDefinition.setHeaderText("Invocation Sequence");
-			inputDefinition.setHeaderDescription(TextFormatter.getMethodWithParameters(methodIdent));
+
+			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+			editorPropertiesData.setPartName("Invocation Sequence");
+			editorPropertiesData.setPartTooltip("Invocation Sequence");
+			editorPropertiesData.setImageDescriptor(SensorTypeEnum.INVOCATION_SEQUENCE.getImageDescriptor());
+			editorPropertiesData.setHeaderText("Invocation Sequence");
+			editorPropertiesData.setHeaderDescription(TextFormatter.getMethodWithParameters(methodIdent));
+			inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 			IdDefinition idDefinition = new IdDefinition();
 			idDefinition.setPlatformId(invocationSequenceData.getPlatformIdent());
