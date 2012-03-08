@@ -1,6 +1,5 @@
 package info.novatec.inspectit.rcp;
 
-
 /**
  * Defines all the constants for the InspectIT UI.
  * 
@@ -66,6 +65,8 @@ public interface InspectITConstants {
 	String IMG_TRASH = "trash.png"; //$NON-NLS-1$
 	String IMG_TOOL = "tool.png"; //$NON-NLS-1$
 	String IMG_CHECKMARK = "checkmark.png"; //$NON-NLS-1$
+	String IMG_CLOSE = "close.png";
+	String IMG_FONT = "font.png";
 
 	String IMG_HTTP = "http_clean.png"; //$NON-NLS-1$
 	String IMG_HTTP_AGGREGATE = "http_network.png"; //$NON-NLS-1$

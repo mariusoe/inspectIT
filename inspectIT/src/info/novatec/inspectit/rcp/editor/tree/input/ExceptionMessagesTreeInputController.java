@@ -436,7 +436,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 		}
 		throw new RuntimeException("Could not create the human readable string!");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -451,6 +451,24 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 			return values;
 		}
 		throw new RuntimeException("Could not create the column values!");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public Object[] getObjectsToSearch(Object treeInput) {
+		List<Object> allObjects = new ArrayList<Object>();
+		List<AggregatedExceptionSensorData> exceptionSensorDataList = (List<AggregatedExceptionSensorData>) treeInput;
+		for (AggregatedExceptionSensorData exData : exceptionSensorDataList) {
+			allObjects.add(exData);
+			List<ExceptionSensorData> messageObjects = parentChildrenMap.get(exData);
+			if (null != messageObjects) {
+				allObjects.addAll(messageObjects);
+			}
+		}
+		return allObjects.toArray();
 	}
 
 	/**

@@ -129,6 +129,11 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	private final StyledString emptyStyledString = new StyledString();
 
 	/**
+	 * List that is displayed after processing the invocation.
+	 */
+	public List<TimerData> timerDataList;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -211,7 +216,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private static final class MethodInvocContentProvider implements IStructuredContentProvider {
+	private final class MethodInvocContentProvider implements IStructuredContentProvider {
 
 		/**
 		 * {@inheritDoc}
@@ -219,7 +224,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		@SuppressWarnings("unchecked")
 		public Object[] getElements(Object inputElement) {
 			List<InvocationSequenceData> invocationSequenceDataList = (List<InvocationSequenceData>) inputElement;
-			List<TimerData> timerDataList = aggregateTimerData(invocationSequenceDataList, new ArrayList<TimerData>(), new HashMap<Long, TimerData>());
+			timerDataList = aggregateTimerData(invocationSequenceDataList, new ArrayList<TimerData>(), new HashMap<Long, TimerData>());
 			return timerDataList.toArray();
 		}
 
@@ -297,7 +302,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		 *            The data objects which is inspected for its nested elements.
 		 * @return The duration of all nested sequences (with their nested sequences as well).
 		 */
-		private static double computeNestedDuration(InvocationSequenceData data) {
+		private double computeNestedDuration(InvocationSequenceData data) {
 			if (data.getNestedSequences().isEmpty()) {
 				return 0;
 			}
@@ -552,7 +557,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		}
 		throw new RuntimeException("Could not create the human readable string!");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -568,6 +573,14 @@ public class MethodInvocInputController extends AbstractTableInputController {
 			return values;
 		}
 		throw new RuntimeException("Could not create the column values!");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Object[] getObjectsToSearch(Object tableInput) {
+		return timerDataList.toArray();
 	}
 
 	/**

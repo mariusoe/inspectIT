@@ -44,14 +44,12 @@ public interface TreeInputController extends SubViewClassificationController {
 	void createColumns(TreeViewer treeViewer);
 
 	/**
-	 * Generates and returns the input for the tree. Returning <code>null</code>
-	 * is possible and indicates most of the time that there is no default list
-	 * or object to display in the table. For some {@link DefaultData} objects,
-	 * the method {@link #canOpenInput(List)} should return true so that the
-	 * input object is set by the {@link TreeSubView}.
+	 * Generates and returns the input for the tree. Returning <code>null</code> is possible and
+	 * indicates most of the time that there is no default list or object to display in the table.
+	 * For some {@link DefaultData} objects, the method {@link #canOpenInput(List)} should return
+	 * true so that the input object is set by the {@link TreeSubView}.
 	 * 
-	 * @return The tree input or <code>null</code> if nothing to display for
-	 *         default.
+	 * @return The tree input or <code>null</code> if nothing to display for default.
 	 */
 	Object getTreeInput();
 
@@ -72,17 +70,15 @@ public interface TreeInputController extends SubViewClassificationController {
 	IBaseLabelProvider getLabelProvider();
 
 	/**
-	 * Returns the comparator for the {@link TreeViewer}. Can be
-	 * <code>null</code> to indicate that no sorting of the elements should be
-	 * done.
+	 * Returns the comparator for the {@link TreeViewer}. Can be <code>null</code> to indicate that
+	 * no sorting of the elements should be done.
 	 * 
 	 * @return The tree viewer comparator.
 	 */
 	TreeViewerComparator<? extends DefaultData> getComparator();
 
 	/**
-	 * Refreshes the current data and updates the tree input if new items are
-	 * available.
+	 * Refreshes the current data and updates the tree input if new items are available.
 	 * 
 	 * @param monitor
 	 *            The progress monitor.
@@ -90,8 +86,8 @@ public interface TreeInputController extends SubViewClassificationController {
 	void doRefresh(IProgressMonitor monitor);
 
 	/**
-	 * Returns <code>true</code> if the controller can open the input which
-	 * consists of one or several {@link DefaultData} objects.
+	 * Returns <code>true</code> if the controller can open the input which consists of one or
+	 * several {@link DefaultData} objects.
 	 * 
 	 * @param data
 	 *            The data which is checked if the controller can open it.
@@ -102,15 +98,13 @@ public interface TreeInputController extends SubViewClassificationController {
 	/**
 	 * Returns all needed preference IDs.
 	 * 
-	 * @return A {@link Set} containing all {@link PreferenceId}. Returning
-	 *         <code>null</code> is not permitted here. At least a
-	 *         {@link Collections#EMPTY_SET} should be returned.
+	 * @return A {@link Set} containing all {@link PreferenceId}. Returning <code>null</code> is not
+	 *         permitted here. At least a {@link Collections#EMPTY_SET} should be returned.
 	 */
 	Set<PreferenceId> getPreferenceIds();
 
 	/**
-	 * This method is called whenever something is changed in one of the
-	 * preferences.
+	 * This method is called whenever something is changed in one of the preferences.
 	 * 
 	 * @param preferenceEvent
 	 *            The event object containing the changed objects.
@@ -118,8 +112,8 @@ public interface TreeInputController extends SubViewClassificationController {
 	void preferenceEventFired(PreferenceEvent preferenceEvent);
 
 	/**
-	 * This method creates a human readable string out of the given object
-	 * (which is object from the tree model).
+	 * This method creates a human readable string out of the given object (which is object from the
+	 * tree model).
 	 * 
 	 * @param object
 	 *            The object to create the string from.
@@ -131,7 +125,7 @@ public interface TreeInputController extends SubViewClassificationController {
 	 * Return the values of all columns in the tree for the given object. Not visible columns values
 	 * will also be included. The order of the values will be same to the initial tree column order,
 	 * thus not reflecting the current state of the tree if the columns were moved.
-	 *
+	 * 
 	 * @param object
 	 *            Object to get values for.
 	 * @return List of string representing the values.
@@ -156,6 +150,16 @@ public interface TreeInputController extends SubViewClassificationController {
 	 * @return The level to which the viewer's tree should be expanded.
 	 */
 	int getExpandLevel();
+
+	/**
+	 * Returns the list of the objects that should be searched.
+	 * 
+	 * @param treeInput
+	 *            Current input of the table. The {@link TreeInputController} is responsible to
+	 *            modify the input if necessary.
+	 * @return Returns the list of the objects that should be searched.
+	 */
+	Object[] getObjectsToSearch(Object treeInput);
 
 	/**
 	 * Disposes the tree input.

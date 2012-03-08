@@ -2,8 +2,8 @@ package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController;
 import info.novatec.inspectit.rcp.editor.table.TableSubView;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
@@ -44,15 +44,12 @@ public interface TableInputController extends SubViewClassificationController {
 	void createColumns(TableViewer tableViewer);
 
 	/**
-	 * Generates and returns the input for the table. Returning
-	 * <code>null</code> is possible and indicates most of the time that there
-	 * is no default list or object to display in the table. For some
-	 * {@link DefaultData} objects, the method {@link #canOpenInput(List)}
-	 * should return true so that the input object is set by the
-	 * {@link TableSubView}.
+	 * Generates and returns the input for the table. Returning <code>null</code> is possible and
+	 * indicates most of the time that there is no default list or object to display in the table.
+	 * For some {@link DefaultData} objects, the method {@link #canOpenInput(List)} should return
+	 * true so that the input object is set by the {@link TableSubView}.
 	 * 
-	 * @return The table input or <code>null</code> if nothing to display for
-	 *         default.
+	 * @return The table input or <code>null</code> if nothing to display for default.
 	 */
 	Object getTableInput();
 
@@ -73,9 +70,8 @@ public interface TableInputController extends SubViewClassificationController {
 	IBaseLabelProvider getLabelProvider();
 
 	/**
-	 * Returns the comparator for the {@link TableViewer}. Can be
-	 * <code>null</code> to indicate that no sorting of the elements should be
-	 * done.
+	 * Returns the comparator for the {@link TableViewer}. Can be <code>null</code> to indicate that
+	 * no sorting of the elements should be done.
 	 * 
 	 * @return The table viewer comparator.
 	 */
@@ -90,8 +86,7 @@ public interface TableInputController extends SubViewClassificationController {
 	void setLimit(int limit);
 
 	/**
-	 * Refreshes the current data and updates the table input if new items are
-	 * available.
+	 * Refreshes the current data and updates the table input if new items are available.
 	 * 
 	 * @param monitor
 	 *            The progress monitor.
@@ -107,8 +102,8 @@ public interface TableInputController extends SubViewClassificationController {
 	void doubleClick(DoubleClickEvent event);
 
 	/**
-	 * Returns <code>true</code> if the controller can open the input which
-	 * consists of one or several {@link DefaultData} objects.
+	 * Returns <code>true</code> if the controller can open the input which consists of one or
+	 * several {@link DefaultData} objects.
 	 * 
 	 * @param data
 	 *            The data which is checked if the controller can open it.
@@ -119,15 +114,13 @@ public interface TableInputController extends SubViewClassificationController {
 	/**
 	 * Returns all needed preference IDs.
 	 * 
-	 * @return A {@link Set} containing all {@link PreferenceId}. Returning
-	 *         <code>null</code> is not permitted here. At least a
-	 *         {@link Collections#EMPTY_SET} should be returned.
+	 * @return A {@link Set} containing all {@link PreferenceId}. Returning <code>null</code> is not
+	 *         permitted here. At least a {@link Collections#EMPTY_SET} should be returned.
 	 */
 	Set<PreferenceId> getPreferenceIds();
 
 	/**
-	 * This method is called whenever something is changed in one of the
-	 * preferences.
+	 * This method is called whenever something is changed in one of the preferences.
 	 * 
 	 * @param preferenceEvent
 	 *            The event object containing the changed objects.
@@ -135,8 +128,8 @@ public interface TableInputController extends SubViewClassificationController {
 	void preferenceEventFired(PreferenceEvent preferenceEvent);
 
 	/**
-	 * This method creates a human readable string out of the given object
-	 * (which is object from the table model).
+	 * This method creates a human readable string out of the given object (which is object from the
+	 * table model).
 	 * 
 	 * @param object
 	 *            The object to create the string from.
@@ -148,7 +141,7 @@ public interface TableInputController extends SubViewClassificationController {
 	 * Return the values of all columns in the table for the given object. Not visible columns
 	 * values will also be included. The order of the values will be same to the initial table
 	 * column order, thus not reflecting the current state of the table if the columns were moved.
-	 *
+	 * 
 	 * @param object
 	 *            Object to get values for.
 	 * @return List of string representing the values.
@@ -166,6 +159,16 @@ public interface TableInputController extends SubViewClassificationController {
 	 * @return <code>true</code> if shome details can be shown.
 	 */
 	boolean canShowDetails();
+
+	/**
+	 * Returns the list of the objects that should be searched.
+	 * 
+	 * @param tableInput
+	 *            Current input of the table. The {@link TableInputController} is responsible to
+	 *            modify the input if necessary.
+	 * @return Returns the list of the objects that should be searched.
+	 */
+	Object[] getObjectsToSearch(Object tableInput);
 
 	/**
 	 * Disposes the table input.

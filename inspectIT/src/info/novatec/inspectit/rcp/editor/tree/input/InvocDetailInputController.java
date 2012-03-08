@@ -964,7 +964,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		}
 		throw new RuntimeException("Could not create the human readable string!");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -985,6 +985,38 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public Object[] getObjectsToSearch(Object treeInput) {
+		List<InvocationSequenceData> invocationSequenceDataList = (List<InvocationSequenceData>) treeInput;
+		if (!invocationSequenceDataList.isEmpty()) {
+			InvocationSequenceData invocation = invocationSequenceDataList.get(0);
+			List<InvocationSequenceData> allObjects = new ArrayList<InvocationSequenceData>((int) invocation.getChildCount());
+			extractAllChildren(allObjects, invocation);
+			return allObjects.toArray();
+		}
+		return new Object[0];
+
+	}
+
+	/**
+	 * Extracts all invocations inside the invocation in one list via reflection.
+	 * 
+	 * @param resultList
+	 *            List to contain all the extracted data.
+	 * @param invocation
+	 *            Invocation to extract.
+	 */
+	private void extractAllChildren(List<InvocationSequenceData> resultList, InvocationSequenceData invocation) {
+		resultList.add(invocation);
+		for (InvocationSequenceData child : invocation.getNestedSequences()) {
+			extractAllChildren(resultList, child);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void dispose() {
 		resourceManager.dispose();
@@ -997,4 +1029,5 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	public SubViewClassification getSubViewClassification() {
 		return SubViewClassification.SLAVE;
 	}
+
 }

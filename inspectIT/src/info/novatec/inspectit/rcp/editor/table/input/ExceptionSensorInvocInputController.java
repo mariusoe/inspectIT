@@ -136,6 +136,11 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	private CachedDataService cachedDataService;
 
 	/**
+	 * List that is displayed after processing the invocation.
+	 */
+	private List<ExceptionSensorData> exceptionSensorDataList;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -347,7 +352,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		@SuppressWarnings("unchecked")
 		public Object[] getElements(Object inputElement) {
 			List<InvocationSequenceData> invocationSequenceDataList = (List<InvocationSequenceData>) inputElement;
-			List<ExceptionSensorData> exceptionSensorDataList = updateErrorMessagesAndExtractOverview(extractExceptionSensorData(invocationSequenceDataList, new ArrayList<ExceptionSensorData>()));
+			exceptionSensorDataList = updateErrorMessagesAndExtractOverview(extractExceptionSensorData(invocationSequenceDataList, new ArrayList<ExceptionSensorData>()));
 			return exceptionSensorDataList.toArray();
 		}
 
@@ -590,7 +595,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		}
 		throw new RuntimeException("Could not create the human readable string!");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -606,6 +611,14 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 			return values;
 		}
 		throw new RuntimeException("Could not create the column values!");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Object[] getObjectsToSearch(Object tableInput) {
+		return exceptionSensorDataList.toArray();
 	}
 
 	/**

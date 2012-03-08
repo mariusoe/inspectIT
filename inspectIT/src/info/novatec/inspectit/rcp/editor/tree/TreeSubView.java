@@ -5,6 +5,10 @@ import info.novatec.inspectit.rcp.editor.AbstractSubView;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.FormRootEditor;
+import info.novatec.inspectit.rcp.editor.search.ISearchExecutor;
+import info.novatec.inspectit.rcp.editor.search.criteria.SearchCriteria;
+import info.novatec.inspectit.rcp.editor.search.criteria.SearchResult;
+import info.novatec.inspectit.rcp.editor.search.helper.DeferredTreeViewerSearchHelper;
 import info.novatec.inspectit.rcp.editor.tree.input.TreeInputController;
 import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
 import info.novatec.inspectit.rcp.menu.ShowHideMenuManager;
@@ -41,11 +45,11 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * Sub-view which is used to create a tree.
- *
+ * 
  * @author Patrice Bouillet
- *
+ * 
  */
-public class TreeSubView extends AbstractSubView {
+public class TreeSubView extends AbstractSubView implements ISearchExecutor {
 
 	/**
 	 * The referenced input controller.
@@ -58,8 +62,13 @@ public class TreeSubView extends AbstractSubView {
 	private TreeViewer treeViewer;
 
 	/**
+	 * {@link DeferredTreeViewerSearchHelper}.
+	 */
+	private DeferredTreeViewerSearchHelper searchHelper;
+
+	/**
 	 * Default constructor which needs a tree input controller to create all the content etc.
-	 *
+	 * 
 	 * @param treeInputController
 	 *            The tree input controller.
 	 */
@@ -189,14 +198,18 @@ public class TreeSubView extends AbstractSubView {
 			column.addControlListener(columnResizeListener);
 		}
 
-		// update the order of columns if the order was defined for the class, and no new columns were added
+		// update the order of columns if the order was defined for the class, and no new columns
+		// were added
 		int[] columnOrder = ShowHideColumnsHandler.getColumnOrder(treeInputController.getClass());
 		if (null != columnOrder && columnOrder.length == tree.getColumns().length) {
 			tree.setColumnOrder(columnOrder);
 		} else if (null != columnOrder) {
-			//if the order exists, but length is not same, then update with the default order
+			// if the order exists, but length is not same, then update with the default order
 			ShowHideColumnsHandler.setColumnOrder(treeInputController.getClass(), tree.getColumnOrder());
 		}
+
+		// create search helper
+		searchHelper = new DeferredTreeViewerSearchHelper((DeferredTreeViewer) treeViewer, treeInputController, getRootEditor().getInputDefinition().getRepositoryDefinition());
 	}
 
 	/**
@@ -262,7 +275,7 @@ public class TreeSubView extends AbstractSubView {
 
 	/**
 	 * Returns the tree viewer.
-	 *
+	 * 
 	 * @return The tree viewer.
 	 */
 	public TreeViewer getTreeViewer() {
@@ -271,7 +284,7 @@ public class TreeSubView extends AbstractSubView {
 
 	/**
 	 * Returns the tree input controller.
-	 *
+	 * 
 	 * @return The tree input controller.
 	 */
 	public TreeInputController getTreeInputController() {
@@ -279,10 +292,10 @@ public class TreeSubView extends AbstractSubView {
 	}
 
 	/**
-	 * Return the names of all columns in the tree. Not visible columns names will also be
-	 * included. The order of the names will be same to the initial tree column order, thus not
-	 * reflecting the current state of the table if the columns were moved.
-	 *
+	 * Return the names of all columns in the tree. Not visible columns names will also be included.
+	 * The order of the names will be same to the initial tree column order, thus not reflecting the
+	 * current state of the table if the columns were moved.
+	 * 
 	 * @return List of column names.
 	 */
 	public List<String> getColumnNames() {
@@ -294,7 +307,7 @@ public class TreeSubView extends AbstractSubView {
 	}
 
 	/**
-	 *
+	 * 
 	 * @return The list of integers representing the column order in the tree. Note that only
 	 *         columns that are currently visible will be included in the list.
 	 * @see Table#getColumnOrder()
@@ -308,6 +321,38 @@ public class TreeSubView extends AbstractSubView {
 			}
 		}
 		return orderWithoutHidden;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SearchResult executeSearch(SearchCriteria searchCriteria) {
+		return searchHelper.executeSearch(searchCriteria);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SearchResult next() {
+		return searchHelper.next();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SearchResult previous() {
+		return searchHelper.previous();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void clearSearch() {
+		searchHelper.clearSearch();
 	}
 
 	/**

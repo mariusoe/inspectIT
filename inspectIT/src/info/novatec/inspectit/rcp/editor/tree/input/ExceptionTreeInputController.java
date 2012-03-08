@@ -177,6 +177,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 	/**
 	 * {@inheritDoc}.
 	 * <p>
+	 * 
 	 * @see AbstractTreeInputController#showDetails(Shell, Object)
 	 */
 	public void showDetails(Shell parent, Object element) {
@@ -462,7 +463,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 		}
 		throw new RuntimeException("Could not create the human readable string!");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -484,10 +485,28 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
+	public Object[] getObjectsToSearch(Object treeInput) {
+		List<ExceptionSensorData> allObjects = new ArrayList<ExceptionSensorData>();
+		List<ExceptionSensorData> exceptionSensorDataList = (List<ExceptionSensorData>) treeInput;
+		for (ExceptionSensorData exData : exceptionSensorDataList) {
+			ExceptionSensorData objectToAdd = exData;
+			while (null != objectToAdd) {
+				allObjects.add(objectToAdd);
+				objectToAdd = objectToAdd.getChild();
+			}
+		}
+		return allObjects.toArray();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void dispose() {
 		resourceManager.dispose();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -495,4 +514,5 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 	public SubViewClassification getSubViewClassification() {
 		return SubViewClassification.SLAVE;
 	}
+
 }

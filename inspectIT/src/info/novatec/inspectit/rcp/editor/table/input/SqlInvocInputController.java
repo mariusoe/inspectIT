@@ -118,6 +118,11 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	private CachedDataService cachedDataService;
 
 	/**
+	 * List that is displayed after processing the invocation.
+	 */
+	private List<SqlStatementData> sqlStatementDataList;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -323,7 +328,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private static final class SqlInvocContentProvider implements IStructuredContentProvider {
+	private final class SqlInvocContentProvider implements IStructuredContentProvider {
 
 		/**
 		 * {@inheritDoc}
@@ -331,7 +336,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		@SuppressWarnings("unchecked")
 		public Object[] getElements(Object inputElement) {
 			List<InvocationSequenceData> invocationSequenceDataList = (List<InvocationSequenceData>) inputElement;
-			List<SqlStatementData> sqlStatementDataList = extractSqlData(invocationSequenceDataList, new ArrayList<SqlStatementData>());
+			sqlStatementDataList = extractSqlData(invocationSequenceDataList, new ArrayList<SqlStatementData>());
 			return sqlStatementDataList.toArray();
 		}
 
@@ -463,7 +468,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		}
 		throw new RuntimeException("Could not create the human readable string!");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -478,6 +483,14 @@ public class SqlInvocInputController extends AbstractTableInputController {
 			return values;
 		}
 		throw new RuntimeException("Could not create the column values!");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Object[] getObjectsToSearch(Object tableInput) {
+		return sqlStatementDataList.toArray();
 	}
 
 	/**

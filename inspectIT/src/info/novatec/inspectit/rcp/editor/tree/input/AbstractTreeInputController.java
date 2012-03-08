@@ -6,6 +6,7 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.Pre
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -162,6 +163,20 @@ public abstract class AbstractTreeInputController implements TreeInputController
 	 */
 	public int getExpandLevel() {
 		return 2;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Object[] getObjectsToSearch(Object treeInput) {
+		if (treeInput instanceof Object[]) {
+			return (Object[]) treeInput;
+		}
+		if (treeInput instanceof Collection) {
+			return ((Collection<?>) treeInput).toArray();
+		}
+		return new Object[0];
 	}
 
 	/**

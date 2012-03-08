@@ -5,6 +5,7 @@ import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -123,6 +124,20 @@ public abstract class AbstractTableInputController implements TableInputControll
 	@Override
 	public boolean canShowDetails() {
 		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Object[] getObjectsToSearch(Object tableInput) {
+		if (tableInput instanceof Object[]) {
+			return (Object[]) tableInput;
+		}
+		if (tableInput instanceof Collection) {
+			return ((Collection<?>) tableInput).toArray();
+		}
+		return new Object[0];
 	}
 
 	/**

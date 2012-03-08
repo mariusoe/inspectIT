@@ -9,6 +9,10 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.editor.root.FormRootEditor;
 import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController.SubViewClassification;
+import info.novatec.inspectit.rcp.editor.search.ISearchExecutor;
+import info.novatec.inspectit.rcp.editor.search.criteria.SearchCriteria;
+import info.novatec.inspectit.rcp.editor.search.criteria.SearchResult;
+import info.novatec.inspectit.rcp.editor.search.helper.TableViewerSearchHelper;
 import info.novatec.inspectit.rcp.editor.table.input.TableInputController;
 import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
 import info.novatec.inspectit.rcp.menu.ShowHideMenuManager;
@@ -48,11 +52,11 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * Sub-view which is used to create a table.
- *
+ * 
  * @author Patrice Bouillet
- *
+ * 
  */
-public class TableSubView extends AbstractSubView {
+public class TableSubView extends AbstractSubView implements ISearchExecutor {
 
 	/**
 	 * The referenced input controller.
@@ -70,8 +74,13 @@ public class TableSubView extends AbstractSubView {
 	private volatile boolean jobInSchedule = false;
 
 	/**
+	 * {@link TableViewerSearchHelper}.
+	 */
+	private TableViewerSearchHelper tableViewerSearchHelper;
+
+	/**
 	 * Default constructor which needs a tree input controller to create all the content etc.
-	 *
+	 * 
 	 * @param tableInputController
 	 *            The table input controller.
 	 */
@@ -203,6 +212,8 @@ public class TableSubView extends AbstractSubView {
 			// if the order exists, but length is not same, then update with the default order
 			ShowHideColumnsHandler.setColumnOrder(tableInputController.getClass(), table.getColumnOrder());
 		}
+
+		tableViewerSearchHelper = new TableViewerSearchHelper(tableViewer, tableInputController, getRootEditor().getInputDefinition().getRepositoryDefinition());
 	}
 
 	/**
@@ -300,7 +311,7 @@ public class TableSubView extends AbstractSubView {
 
 	/**
 	 * Returns the table input controller.
-	 *
+	 * 
 	 * @return The table input controller.
 	 */
 	public TableInputController getTableInputController() {
@@ -311,7 +322,7 @@ public class TableSubView extends AbstractSubView {
 	 * Return the names of all columns in the table. Not visible columns names will also be
 	 * included. The order of the names will be same to the initial table column order, thus not
 	 * reflecting the current state of the table if the columns were moved.
-	 *
+	 * 
 	 * @return List of column names.
 	 */
 	public List<String> getColumnNames() {
@@ -323,7 +334,7 @@ public class TableSubView extends AbstractSubView {
 	}
 
 	/**
-	 *
+	 * 
 	 * @return The list of integers representing the column order in the table. Note that only
 	 *         columns that are currently visible will be included in the list.
 	 * @see Table#getColumnOrder()
@@ -340,17 +351,9 @@ public class TableSubView extends AbstractSubView {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void dispose() {
-		tableInputController.dispose();
-	}
-
-	/**
 	 * Updates the message on the editor's form header, based on the number of items displayed
 	 * Currently. Message will be displayed only for master views.
-	 *
+	 * 
 	 * @param limit
 	 *            Number of items displayed. -1 for all.
 	 */
@@ -368,6 +371,46 @@ public class TableSubView extends AbstractSubView {
 				form.setMessage(message.toString());
 			}
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SearchResult executeSearch(SearchCriteria searchCriteria) {
+		return tableViewerSearchHelper.executeSearch(searchCriteria);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SearchResult next() {
+		return tableViewerSearchHelper.next();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SearchResult previous() {
+		return tableViewerSearchHelper.previous();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void clearSearch() {
+		tableViewerSearchHelper.clearSearch();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void dispose() {
+		tableInputController.dispose();
 	}
 
 }

@@ -632,6 +632,10 @@
             class="info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler"
             commandId="info.novatec.inspectit.rcp.commands.showHideColumn">
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.FindHandler"
+            commandId="org.eclipse.ui.edit.findReplace">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
