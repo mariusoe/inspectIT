@@ -319,9 +319,25 @@ public class ServerView extends ViewPart implements CmrRepositoryChangeListener 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void updateRepository(RepositoryDefinition repositoryDefinition) {
+	public void updateRepository(final RepositoryDefinition repositoryDefinition) {
 		if (repositoryDefinition instanceof StorageRepositoryDefinition) {
-			updateStorageRepository();
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					updateStorageRepository();
+				}
+			});
+		} else if (repositoryDefinition instanceof CmrRepositoryDefinition) {
+			final CmrRepositoryShelfItem shelfItem = repositoryShelfMap.get(repositoryDefinition);
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					shelfItem.updateStatusImage();
+					if (((CmrRepositoryDefinition) repositoryDefinition).getOnlineStatus() == OnlineStatus.ONLINE) {
+						shelfItem.updateCmrRepresentation();
+					}
+				}
+			});
 		}
 	}
 

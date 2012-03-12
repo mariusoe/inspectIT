@@ -1,7 +1,9 @@
 package info.novatec.inspectit.rcp.repository;
 
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.util.ListenerList;
+import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -120,10 +122,25 @@ public class RepositoryManager {
 				if (existingUpdateRepositoryJob.cancel()) {
 					existingUpdateRepositoryJob.schedule(UPDATE_JOB_REPETITION);
 				}
-				
+
 			}
-			// then execute a short term job for updating
-			UpdateRepositoryJob updateRepositoryJob = new UpdateRepositoryJob((CmrRepositoryDefinition) repositoryDefinition, false);
+			// then execute a short term job for updating and signal to also refresh the repository
+			final CmrRepositoryDefinition cmrRepositoryDefinition = (CmrRepositoryDefinition) repositoryDefinition;
+			UpdateRepositoryJob updateRepositoryJob = new UpdateRepositoryJob(cmrRepositoryDefinition, false) {
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					OnlineStatus oldStatus = cmrRepositoryDefinition.getOnlineStatus();
+					IStatus status = super.run(monitor);
+					OnlineStatus newStatus = cmrRepositoryDefinition.getOnlineStatus();
+					// only if status did not change, signal to refresh the view
+					if (ObjectUtils.equals(newStatus, oldStatus)) {
+						for (RepositoryChangeListener repositoryChangeListener : repositoryChangeListeners) {
+							repositoryChangeListener.updateRepository(cmrRepositoryDefinition);
+						}
+					}
+					return status;
+				}
+			};
 			updateRepositoryJob.schedule();
 		} else if (repositoryDefinition instanceof StorageRepositoryDefinition) {
 			updateStorageRepository();
@@ -153,7 +170,7 @@ public class RepositoryManager {
 			if (updateRepositoryJob.cancel()) {
 				updateRepositoryJob.schedule();
 			}
-		} 
+		}
 	}
 
 	/**
