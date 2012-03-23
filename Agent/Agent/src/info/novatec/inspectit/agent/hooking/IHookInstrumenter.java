@@ -2,8 +2,8 @@ package info.novatec.inspectit.agent.hooking;
 
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.hooking.impl.HookException;
-import info.novatec.inspectit.javassist.CtConstructor;
-import info.novatec.inspectit.javassist.CtMethod;
+import javassist.CtConstructor;
+import javassist.CtMethod;
 
 /**
  * The hook instrumenter interface defines methods to add method and constructor hooks.

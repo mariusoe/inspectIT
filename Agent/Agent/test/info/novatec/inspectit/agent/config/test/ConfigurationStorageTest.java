@@ -24,7 +24,6 @@ import info.novatec.inspectit.agent.config.impl.PropertyAccessor.PropertyPathSta
 import info.novatec.inspectit.agent.config.impl.StrategyConfig;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
-import info.novatec.inspectit.javassist.Modifier;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
+import javassist.Modifier;
 
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;

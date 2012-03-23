@@ -3,8 +3,6 @@ package info.novatec.inspectit.agent.config.impl;
 import info.novatec.inspectit.agent.hooking.IHook;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
-import info.novatec.inspectit.javassist.CtBehavior;
-import info.novatec.inspectit.javassist.Modifier;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,6 +12,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+
+import javassist.CtBehavior;
+import javassist.Modifier;
 
 /**
  * After a sensor is registered at the CMR, this class is used to store all the information as the

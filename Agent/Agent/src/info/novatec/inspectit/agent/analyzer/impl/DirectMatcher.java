@@ -2,18 +2,19 @@ package info.novatec.inspectit.agent.analyzer.impl;
 
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
-import info.novatec.inspectit.javassist.CtBehavior;
-import info.novatec.inspectit.javassist.CtClass;
-import info.novatec.inspectit.javassist.CtConstructor;
-import info.novatec.inspectit.javassist.CtMethod;
-import info.novatec.inspectit.javassist.Modifier;
-import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import javassist.CtBehavior;
+import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtMethod;
+import javassist.Modifier;
+import javassist.NotFoundException;
 
 /**
  * This implementation compares directly the class name, method name and parameter types. 'Direct'

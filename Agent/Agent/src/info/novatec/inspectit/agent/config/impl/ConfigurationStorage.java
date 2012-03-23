@@ -6,7 +6,6 @@ import info.novatec.inspectit.agent.analyzer.impl.ModifierMatcher;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.PriorityEnum;
 import info.novatec.inspectit.agent.config.StorageException;
-import info.novatec.inspectit.javassist.Modifier;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +14,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javassist.Modifier;
 
 /**
  * The default configuration storage implementation which stores everything in the memory.

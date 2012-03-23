@@ -10,16 +10,17 @@ import info.novatec.inspectit.agent.analyzer.IMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.ModifierMatcher;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
 import info.novatec.inspectit.agent.test.MockInit;
-import info.novatec.inspectit.javassist.ClassPool;
-import info.novatec.inspectit.javassist.CtClass;
-import info.novatec.inspectit.javassist.CtConstructor;
-import info.novatec.inspectit.javassist.CtMethod;
-import info.novatec.inspectit.javassist.Modifier;
-import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtMethod;
+import javassist.Modifier;
+import javassist.NotFoundException;
 
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
@@ -33,7 +34,7 @@ public class ModifierMatcherTest extends MockInit {
 	private UnregisteredSensorConfig unregisteredSensorConfig;
 
 	private IMatcher matcher;
-	
+
 	private IMatcher delegateMatcher;
 
 	public ModifierMatcherTest() {
@@ -145,7 +146,7 @@ public class ModifierMatcherTest extends MockInit {
 	@Test
 	public void testDefault() throws NotFoundException {
 		unregisteredSensorConfig.setModifiers(ModifierMatcher.DEFAULT);
-		
+
 		ClassLoader classLoader = this.getClass().getClassLoader();
 		ClassPool classPool = ClassPool.getDefault();
 		CtClass ctClass = classPool.get(this.getClass().getName());
@@ -191,15 +192,15 @@ public class ModifierMatcherTest extends MockInit {
 	@Test
 	public void testConstructor() throws NotFoundException {
 		unregisteredSensorConfig.setModifiers(Modifier.PRIVATE);
-		
+
 		ClassLoader classLoader = this.getClass().getClassLoader();
 		ClassPool classPool = ClassPool.getDefault();
 		CtClass ctClass = classPool.get(this.getClass().getName());
 		CtConstructor[] ctConstructors = ctClass.getDeclaredConstructors();
-		
+
 		// stub the delegateMatcher method
 		when(delegateMatcher.getMatchingConstructors(classLoader, "info.novatec.test.Test")).thenReturn(Arrays.asList(ctConstructors));
-	
+
 		// execute the test call
 		List<CtConstructor> ctConstructorList = matcher.getMatchingConstructors(classLoader, "info.novatec.test.Test");
 		assertNotNull(ctConstructorList);
@@ -207,6 +208,6 @@ public class ModifierMatcherTest extends MockInit {
 		for (CtConstructor constructor : ctConstructorList) {
 			assertTrue(Modifier.isPrivate(constructor.getModifiers()));
 		}
-		
+
 	}
 }

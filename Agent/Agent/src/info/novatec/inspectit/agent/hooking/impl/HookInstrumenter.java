@@ -6,18 +6,19 @@ import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.hooking.IHookDispatcher;
 import info.novatec.inspectit.agent.hooking.IHookInstrumenter;
-import info.novatec.inspectit.javassist.CannotCompileException;
-import info.novatec.inspectit.javassist.ClassPool;
-import info.novatec.inspectit.javassist.CtClass;
-import info.novatec.inspectit.javassist.CtConstructor;
-import info.novatec.inspectit.javassist.CtMethod;
-import info.novatec.inspectit.javassist.Modifier;
-import info.novatec.inspectit.javassist.NotFoundException;
-import info.novatec.inspectit.javassist.expr.ExprEditor;
-import info.novatec.inspectit.javassist.expr.Handler;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javassist.CannotCompileException;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtMethod;
+import javassist.Modifier;
+import javassist.NotFoundException;
+import javassist.expr.ExprEditor;
+import javassist.expr.Handler;
 
 /**
  * The byte code instrumenter class. Used to instrument the additional instructions into the target
@@ -38,7 +39,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 * The hook dispatcher. This string shouldn't be touched. For changing the dispatcher, alter the
 	 * hook dispatcher instance in the Agent class.
 	 */
-	private static String hookDispatcherTarget = "info.novatec.inspectit.agent.PicoAgent#getInstance().getHookDispatcher()";
+	private static String hookDispatcherTarget = "info.novatec.inspectit.agent.Agent#agent.getHookDispatcher()";
 
 	/**
 	 * The hook dispatching service.
@@ -107,7 +108,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 			boolean exceptionSensorEnhanced = configurationStorage.isEnhancedExceptionSensorActivated();
 			// instrument as finally if exception sensor is deactivated or activated in simple mode
 			boolean asFinally = !(exceptionSensorActivated && exceptionSensorEnhanced);
-			
+
 			if (Modifier.isStatic(method.getModifiers())) {
 				// static method
 				method.insertBefore(hookDispatcherTarget + ".dispatchMethodBeforeBody(" + methodId + "l, null, $args);");
@@ -167,7 +168,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 			boolean exceptionSensorEnhanced = configurationStorage.isEnhancedExceptionSensorActivated();
 			// instrument as finally if exception sensor is deactivated or activated in simple mode
 			boolean asFinally = !(exceptionSensorActivated && exceptionSensorEnhanced);
-			
+
 			constructor.insertBeforeBody(hookDispatcherTarget + ".dispatchConstructorBeforeBody(" + constructorId + "l, $0, $args);");
 			constructor.insertAfter(hookDispatcherTarget + ".dispatchConstructorAfterBody(" + constructorId + "l, $0, $args);", asFinally);
 

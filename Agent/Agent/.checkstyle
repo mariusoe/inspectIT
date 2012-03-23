@@ -9,7 +9,6 @@
   </fileset>
   <filter name="FilesFromPackage" enabled="true">
     <filter-data value="src/com"/>
-    <filter-data value="src/info/novatec/inspectit/javassist"/>
     <filter-data value="test"/>
   </filter>
 </fileset-config>

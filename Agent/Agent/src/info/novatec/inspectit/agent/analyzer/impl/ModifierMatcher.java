@@ -3,14 +3,15 @@ package info.novatec.inspectit.agent.analyzer.impl;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatcher;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
-import info.novatec.inspectit.javassist.CtBehavior;
-import info.novatec.inspectit.javassist.CtConstructor;
-import info.novatec.inspectit.javassist.CtMethod;
-import info.novatec.inspectit.javassist.Modifier;
-import info.novatec.inspectit.javassist.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javassist.CtBehavior;
+import javassist.CtConstructor;
+import javassist.CtMethod;
+import javassist.Modifier;
+import javassist.NotFoundException;
 
 /**
  * The modifier matcher is used to check if the modifier of class methods correspond to the modifier

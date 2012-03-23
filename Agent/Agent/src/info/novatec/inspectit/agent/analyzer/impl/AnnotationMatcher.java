@@ -4,21 +4,22 @@ import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatcher;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
-import info.novatec.inspectit.javassist.CtBehavior;
-import info.novatec.inspectit.javassist.CtClass;
-import info.novatec.inspectit.javassist.CtConstructor;
-import info.novatec.inspectit.javassist.CtMethod;
-import info.novatec.inspectit.javassist.NotFoundException;
-import info.novatec.inspectit.javassist.bytecode.AnnotationsAttribute;
-import info.novatec.inspectit.javassist.bytecode.AttributeInfo;
-import info.novatec.inspectit.javassist.bytecode.ClassFile;
-import info.novatec.inspectit.javassist.bytecode.FieldInfo;
-import info.novatec.inspectit.javassist.bytecode.MethodInfo;
-import info.novatec.inspectit.javassist.bytecode.annotation.Annotation;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javassist.CtBehavior;
+import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtMethod;
+import javassist.NotFoundException;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.AttributeInfo;
+import javassist.bytecode.ClassFile;
+import javassist.bytecode.FieldInfo;
+import javassist.bytecode.MethodInfo;
+import javassist.bytecode.annotation.Annotation;
 
 /**
  * This matcher filers that classes and methods based on the annotation class name defined in the

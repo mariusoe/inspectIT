@@ -11,10 +11,11 @@ import info.novatec.inspectit.agent.analyzer.impl.ModifierMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.SimpleMatchPattern;
 import info.novatec.inspectit.agent.analyzer.impl.SuperclassMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.ThrowableMatcher;
-import info.novatec.inspectit.javassist.Modifier;
 
 import java.util.List;
 import java.util.regex.Matcher;
+
+import javassist.Modifier;
 
 /**
  * Container for the values of a sensor configuration. It stores all the values defined in a config

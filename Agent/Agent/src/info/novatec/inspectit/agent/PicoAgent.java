@@ -59,7 +59,7 @@ import org.picocontainer.defaults.ComponentParameter;
  * @author Patrice Bouillet
  * 
  */
-public class PicoAgent {
+public class PicoAgent implements IAgent {
 
 	/**
 	 * The logger of this class.
@@ -69,7 +69,7 @@ public class PicoAgent {
 	/**
 	 * The singleton instance of this class.
 	 */
-	private static PicoAgent instance = null;
+	private static IAgent instance = null;
 
 	/**
 	 * These patterns are checked in the {@link #inspectByteCode(byte[], String, ClassLoader)}
@@ -98,9 +98,11 @@ public class PicoAgent {
 	 */
 	private boolean initializationError = false;
 
-	static {
-		instance = new PicoAgent();
-		instance.init();
+	/**
+	 * Constructor initializing this agent.
+	 */
+	public PicoAgent() {
+		this.init();
 	}
 
 	/**
@@ -108,7 +110,7 @@ public class PicoAgent {
 	 * 
 	 * @return The singleton instance
 	 */
-	public static PicoAgent getInstance() {
+	public static IAgent getInstance() {
 		return instance;
 	}
 
@@ -117,7 +119,6 @@ public class PicoAgent {
 	 * component.
 	 */
 	private void init() {
-
 		try {
 			// Use the caching mechanism. This is where a component has a single
 			// instance in the container rather that a new one created each time
@@ -279,18 +280,7 @@ public class PicoAgent {
 	}
 
 	/**
-	 * This method will inspect the given byte code and class name to check if it needs to be
-	 * instrumented by the Agent. The class loader is needed as different versions of the same class
-	 * can be loaded.
-	 * 
-	 * @param byteCode
-	 *            The byte code.
-	 * @param className
-	 *            The name of the class
-	 * @param classLoader
-	 *            The class loader of the passed class.
-	 * @return Returns the instrumented byte code if something has been changed, otherwise
-	 *         <code>null</code>.
+	 * {@inheritDoc}
 	 */
 	public byte[] inspectByteCode(byte[] byteCode, String className, ClassLoader classLoader) {
 		// if an error in the init method was caught, we'll do nothing here.
@@ -327,10 +317,7 @@ public class PicoAgent {
 	}
 
 	/**
-	 * Returns the hook dispatcher. This is needed for the instrumented methods in the target
-	 * application! Otherwise the entry point for them would be missing.
-	 * 
-	 * @return The hook dispatcher
+	 * {@inheritDoc}
 	 */
 	public IHookDispatcher getHookDispatcher() {
 		return hookDispatcher;
