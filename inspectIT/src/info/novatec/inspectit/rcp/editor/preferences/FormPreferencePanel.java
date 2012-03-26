@@ -6,14 +6,18 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.Pre
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.TimeResolution;
 import info.novatec.inspectit.rcp.editor.preferences.control.IPreferenceControl;
+import info.novatec.inspectit.rcp.handlers.MaximizeActiveViewHandler;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
+import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionItem;
@@ -21,14 +25,23 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.bindings.Binding;
+import org.eclipse.jface.bindings.TriggerSequence;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.internal.menus.CommandMessages;
+import org.eclipse.ui.keys.IBindingService;
+import org.eclipse.ui.menus.CommandContributionItem;
+import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 /**
  * This is the class where the preference panel is created.
@@ -38,6 +51,11 @@ import org.eclipse.ui.forms.widgets.Section;
  * @author Stefan Siegl
  */
 public class FormPreferencePanel implements IPreferencePanel {
+
+	/**
+	 * ID of the preference panel.
+	 */
+	private String id;
 
 	/**
 	 * The used toolkit.
@@ -85,6 +103,15 @@ public class FormPreferencePanel implements IPreferencePanel {
 		Assert.isNotNull(toolkit);
 
 		this.toolkit = toolkit;
+		this.id = UUID.randomUUID().toString();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getId() {
+		return id;
 	}
 
 	/**
@@ -232,6 +259,16 @@ public class FormPreferencePanel implements IPreferencePanel {
 			toolBarManager.add(new SwitchHttpCategorizationRequestMethod("Include Request Method in Categorization"));
 			toolBarManager.add(new Separator());
 		}
+
+		// add the maximize to all forms, let eclipse hide it as declared in plugin.xml
+		IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		Map<Object, Object> params = new HashMap<Object, Object>();
+		params.put(MaximizeActiveViewHandler.PREFERENCE_PANEL_ID_PARAMETER, id);
+		CommandContributionItemParameter contributionParameters = new CommandContributionItemParameter(workbenchWindow, null, MaximizeActiveViewHandler.COMMAND_ID, params, InspectIT.getDefault()
+				.getImageDescriptor(InspectITConstants.IMG_WINDOW), null, null, null, null, getTooltipTextForMaximizeContributionItem(), SWT.CHECK, null, true);
+		CommandContributionItem maximizeCommandContribution = new CommandContributionItem(contributionParameters);
+		toolBarManager.add(maximizeCommandContribution);
+
 		if (preferenceSet.contains(PreferenceId.SAMPLINGRATE) || preferenceSet.contains(PreferenceId.TIMELINE)) {
 			toolBarManager.add(switchPreferences);
 		}
@@ -343,6 +380,42 @@ public class FormPreferencePanel implements IPreferencePanel {
 		}
 
 		toolBarManager.update(true);
+	}
+
+	/**
+	 * Due to the Eclipse bug this method will return the correct tool-tip text with correct binding
+	 * sequence for the maximize active sub-view command.
+	 * <p>
+	 * <i>This method should be removed when Eclipse fixes the bug.</i>
+	 * 
+	 * @return Returns tool-tip text with key binding sequence.
+	 */
+	@SuppressWarnings("restriction")
+	private String getTooltipTextForMaximizeContributionItem() {
+		String tooltipText = "Maximize Active Sub-View";
+
+		IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
+		TriggerSequence activeBinding = null;
+		Binding[] allBindings = bindingService.getBindings();
+		for (Binding b : allBindings) {
+			ParameterizedCommand pCommand = b.getParameterizedCommand();
+			if (null != pCommand) {
+				String commandId = pCommand.getId();
+				if (ObjectUtils.equals(commandId, MaximizeActiveViewHandler.COMMAND_ID)) {
+					activeBinding = b.getTriggerSequence();
+					break;
+				}
+			}
+		}
+
+		if (activeBinding != null && !activeBinding.isEmpty()) {
+			String acceleratorText = activeBinding.format();
+			if (acceleratorText != null && acceleratorText.length() != 0) {
+				tooltipText = NLS.bind(CommandMessages.Tooltip_Accelerator, tooltipText, acceleratorText);
+			}
+		}
+
+		return tooltipText;
 	}
 
 	/**

@@ -175,6 +175,7 @@ public class InspectIT extends AbstractUIPlugin {
 		addImageToRegistry(reg, InspectITConstants.IMG_HTTP_AGGREGATION_REQUESTMESSAGE);
 		addImageToRegistry(reg, InspectITConstants.IMG_CHECKMARK);
 		addImageToRegistry(reg, InspectITConstants.IMG_CLOSE);
+		addImageToRegistry(reg, InspectITConstants.IMG_WINDOW);
 		addImageToRegistry(reg, InspectITConstants.IMG_FONT);
 	}
 

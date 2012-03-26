@@ -143,4 +143,21 @@ public class TabbedCompositeSubView extends AbstractCompositeSubView {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void maximizeSubView(ISubView subView) {
+		// tabbed view already have maximized mode
+		// thus no maximization possible
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void restoreMaximization() {
+		// no minimization possible
+	}
+
 }

@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.editor.composite;
 
 import info.novatec.inspectit.rcp.editor.ISubView;
+import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -130,6 +131,50 @@ public class SashCompositeSubView extends AbstractCompositeSubView {
 	 */
 	public Control getControl() {
 		return sashForm;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void maximizeSubView(ISubView subView) {
+		ISubView maximizeSubView = subView;
+		if (maximizeSubView == null) {
+			maximizeSubView = getSubViews().get(0);
+		}
+
+		int[] weights = new int[getSubViews().size()];
+		int i = 0;
+		for (ISubView view : getSubViews()) {
+			if (ObjectUtils.equals(view, maximizeSubView)) {
+				view.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+				weights[i] = 1;
+			} else {
+				GridData gd = new GridData();
+				gd.exclude = true;
+				view.getControl().setLayoutData(gd);
+				weights[i] = 0;
+			}
+			i++;
+		}
+		sashForm.setWeights(weights);
+		sashForm.layout();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void restoreMaximization() {
+		int[] weights = new int[getSubViews().size()];
+		int i = 0;
+		for (ISubView view : getSubViews()) {
+			view.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+			weights[i] = weightMapping.get(view);
+			i++;
+		}
+		sashForm.setWeights(weights);
+		sashForm.layout();
 	}
 
 }

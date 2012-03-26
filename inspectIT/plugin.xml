@@ -225,6 +225,15 @@
                optional="false">
          </commandParameter>
       </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.maximizeActiveView"
+            name="Maximize Active Sub-View">
+         <commandParameter
+               id="info.novatec.inspectit.rcp.commands.maximizeActiveView.preferencePanelId"
+               name="Parameter"
+               optional="true">
+         </commandParameter>
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -672,6 +681,28 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.MaximizeActiveViewHandler"
+            commandId="info.novatec.inspectit.rcp.commands.maximizeActiveView">
+         <activeWhen>
+            <and>
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                  </instanceof>
+                  <or>
+                     <test
+                           property="info.novatec.inspectit.canMaximize">
+                     </test>
+                     <test
+                           property="info.novatec.inspectit.canMinimize">
+                     </test>
+                  </or>
+               </with>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -709,6 +740,13 @@
             namespace="info.novatec.inspectit"
             properties="canAddToSteppingObjects"
             type="org.eclipse.jface.viewers.StructuredSelection">
+      </propertyTester>
+      <propertyTester
+            class="info.novatec.inspectit.rcp.editor.testers.MaximizeMinimizeTester"
+            id="info.novatec.inspectit.MaximizeMinimizeTester"
+            namespace="info.novatec.inspectit"
+            properties="canMaximize, canMinimize"
+            type="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
       </propertyTester>
    </extension>
    <extension
@@ -1133,6 +1171,14 @@
             Import inspectIT Data (*.itd) into your current Storage Area.
          </description>
       </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="info.novatec.inspectit.rcp.commands.maximizeActiveView"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+M">
+      </key>
    </extension>
 
 </plugin>

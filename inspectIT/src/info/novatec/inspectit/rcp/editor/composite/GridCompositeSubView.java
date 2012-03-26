@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.editor.composite;
 
 import info.novatec.inspectit.rcp.editor.ISubView;
+import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,8 +10,10 @@ import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -119,6 +122,39 @@ public class GridCompositeSubView extends AbstractCompositeSubView {
 	 */
 	public Control getControl() {
 		return composite;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void maximizeSubView(ISubView subView) {
+		ISubView maximizeSubView = subView;
+		if (maximizeSubView == null) {
+			maximizeSubView = getSubViews().get(0);
+		}
+
+		for (ISubView view : getSubViews()) {
+			if (ObjectUtils.equals(view, maximizeSubView)) {
+				view.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			} else {
+				GridData gd = new GridData();
+				gd.exclude = true;
+				view.getControl().setLayoutData(gd);
+			}
+		}
+		composite.layout();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void restoreMaximization() {
+		for (ISubView view : getSubViews()) {
+			view.getControl().setLayoutData(layoutDataMap.get(view));
+		}
+		composite.layout();
 	}
 
 }

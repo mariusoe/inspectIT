@@ -5,6 +5,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.editor.ISubView;
 import info.novatec.inspectit.rcp.editor.SubViewFactory;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.composite.AbstractCompositeSubView;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferencePanel;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
@@ -102,6 +103,11 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 	 * The selection object. Needed for comparison with the new one.
 	 */
 	private ISelection selection;
+
+	/**
+	 * Denotes if the active {@link ISubView} is currently maximized.
+	 */
+	private boolean isMaximizedMode = false;
 
 	/**
 	 * {@inheritDoc}
@@ -425,6 +431,121 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 	}
 
 	/**
+	 * Returns if the currently active sub-view can be maximized. Note that only if a
+	 * {@link AbstractCompositeSubView} is a main sub-view of the editor this action is possible. In
+	 * addition to that, number of sub-view has to be larger of 1 and currently no view has to be
+	 * maximized.
+	 * <p>
+	 * If {@link #activeSubView} is null, this method will still return true if all the conditions
+	 * above are fulfilled. Note that in this case, maximize action will maximize the first view.
+	 * 
+	 * @return True if the maximize active sub-view action can be executed.
+	 */
+	public boolean canMaximizeActiveSubView() {
+		if (isMaximizedMode) {
+			return false;
+		} else {
+			if (subView instanceof AbstractCompositeSubView) {
+				AbstractCompositeSubView compositeSubView = (AbstractCompositeSubView) subView;
+				List<ISubView> allViews = compositeSubView.getSubViews();
+				if (null != allViews && allViews.size() > 1) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+
+	/**
+	 * Returns if the active sub view is currently maximized and thus can be minimized.
+	 * 
+	 * @return Returns if the active sub view is currently maximized and thus can be minimized.
+	 */
+	public boolean canMinimizeActiveSubView() {
+		return isMaximizedMode;
+	}
+
+	/**
+	 * Maximizes the active sub-view if that is possible.
+	 */
+	public void maximizeActiveSubView() {
+		if (canMaximizeActiveSubView()) {
+			maximizeSubView((AbstractCompositeSubView) subView, activeSubView);
+			isMaximizedMode = true;
+			ISelectionProvider selectionProvider = getSite().getSelectionProvider();
+			selectionProvider.setSelection(StructuredSelection.EMPTY);
+		}
+	}
+
+	/**
+	 * Recursively maximizes all needed sub-views until the active one is maximized.
+	 * 
+	 * @param compositeSubView
+	 *            {@link AbstractCompositeSubView} to start from.
+	 * @param view
+	 *            View to maximize.
+	 * @return True if the composite sub view did the maximization.
+	 */
+	private boolean maximizeSubView(AbstractCompositeSubView compositeSubView, ISubView view) {
+		if (null == view) {
+			compositeSubView.maximizeSubView(null);
+			return true;
+		}
+
+		if (compositeSubView.getSubViews().contains(view)) {
+			compositeSubView.maximizeSubView(view);
+			return true;
+		} else {
+			for (ISubView viewInComposite : compositeSubView.getSubViews()) {
+				if (viewInComposite instanceof AbstractCompositeSubView) {
+					boolean maximized = maximizeSubView((AbstractCompositeSubView) viewInComposite, view);
+					if (maximized) {
+						compositeSubView.maximizeSubView(viewInComposite);
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Minimizes the active sub-view if that is possible.
+	 */
+	public void minimizeActiveSubView() {
+		if (canMinimizeActiveSubView()) {
+			restoreMaximization((AbstractCompositeSubView) subView);
+			isMaximizedMode = false;
+			ISelectionProvider selectionProvider = getSite().getSelectionProvider();
+			selectionProvider.setSelection(StructuredSelection.EMPTY);
+		}
+	}
+
+	/**
+	 * Recursively restores the maximized mode.
+	 * 
+	 * @param compositeSubView
+	 *            {@link AbstractCompositeSubView} to start from.
+	 */
+	private void restoreMaximization(AbstractCompositeSubView compositeSubView) {
+		compositeSubView.restoreMaximization();
+		for (ISubView viewInComposite : compositeSubView.getSubViews()) {
+			if (viewInComposite instanceof AbstractCompositeSubView) {
+				restoreMaximization((AbstractCompositeSubView) viewInComposite);
+			}
+		}
+	}
+
+	/**
+	 * Returns if the editor had the active sub-view maximized.
+	 * 
+	 * @return Returns if the editor had the active sub-view maximized.
+	 */
+	public boolean isActiveViewMaximized() {
+		return isMaximizedMode;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -439,5 +560,4 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 			preferencePanel.dispose();
 		}
 	}
-
 }

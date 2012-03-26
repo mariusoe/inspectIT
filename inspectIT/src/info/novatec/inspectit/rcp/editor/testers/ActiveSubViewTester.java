@@ -27,12 +27,16 @@ public class ActiveSubViewTester extends PropertyTester {
 					return rootEditor.getActiveSubView() instanceof TreeSubView;
 				} else if ("tableSubView".equals(expectedValue)) {
 					return rootEditor.getActiveSubView() instanceof TableSubView;
+				} else if ("notNull".equals(expectedValue)) {
+					return rootEditor.getActiveSubView() != null;
 				}
 			} else if ("hasSubView".equals(property)) {
 				if ("steppingTreeSubView".equals(expectedValue)) {
 					return isSubViewExisting(rootEditor.getSubView(), SteppingTreeSubView.class);
 				} else if ("graphSubView".equals(expectedValue)) {
 					return isSubViewExisting(rootEditor.getSubView(), GraphSubView.class);
+				} else if ("compositeSubView".equals(expectedValue)) {
+					return isSubViewExisting(rootEditor.getSubView(), AbstractCompositeSubView.class);
 				}
 			}
 		}

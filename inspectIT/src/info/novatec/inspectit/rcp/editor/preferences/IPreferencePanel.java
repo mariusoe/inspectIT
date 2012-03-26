@@ -14,6 +14,15 @@ import org.eclipse.swt.widgets.Composite;
 public interface IPreferencePanel {
 
 	/**
+	 * Returns the ID of this preference panel. Each preference panel has a unique ID that can be
+	 * used for a later reference.
+	 * 
+	 * @return Returns the ID of this preference panel. Each preference panel has a unique ID that
+	 *         can be used for a later reference.
+	 */
+	String getId();
+
+	/**
 	 * Creates the part control of this view.
 	 * 
 	 * @param parent

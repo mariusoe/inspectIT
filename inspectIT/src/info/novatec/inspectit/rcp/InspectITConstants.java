@@ -66,6 +66,7 @@ public interface InspectITConstants {
 	String IMG_TOOL = "tool.png"; //$NON-NLS-1$
 	String IMG_CHECKMARK = "checkmark.png"; //$NON-NLS-1$
 	String IMG_CLOSE = "close.png";
+	String IMG_WINDOW = "window.png"; //$NON-NLS-1$
 	String IMG_FONT = "font.png";
 
 	String IMG_HTTP = "http_clean.png"; //$NON-NLS-1$
