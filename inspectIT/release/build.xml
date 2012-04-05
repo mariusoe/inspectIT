@@ -52,15 +52,13 @@
 	<!-- *************************************************************** -->
 
 	<target name="clean">
-		<delete file="../lib/inspectit-commons.jar" />
-		<delete dir="${basedir}/build" />
-		<delete dir="${basedir}/dist" />
-		<delete dir="${lib.root}/prod" />
-		<delete dir="${lib.root}/test" />
+		<delete dir="${basedir}/build" failonerror="false" />
+		<delete dir="${basedir}/dist" failonerror="false" />
+		<delete dir="${lib.root}/prod" failonerror="false" />
+		<delete dir="${lib.root}/test" failonerror="false" />
 
 		<!-- clean the PDE build environment -->
-		<delete dir="${buildDirectory}" />
-		<delete dir="${basedir}/runtime" />
+		<delete dir="${buildDirectory}" failonerror="false" />
 	</target>
 
 	<target name="dist-commons">
@@ -404,7 +402,7 @@ GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), rm
 		<foreach list="${jvm.list}" param="file" target="checkFile" />
 
 		<!-- delete tmp folder -->
-		<delete dir="${jvm.root}/tmp" />
+		<delete dir="${jvm.root}/tmp" failonerror="false" />
 	</target>
 
 	<target name="checkFile" depends="check.download,check.md5" if="file" />
@@ -491,7 +489,7 @@ GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), rm
 							</fileset>
 						</wptg-ftp>
 						<move file="${jvm.root}/tmp/${zip.file}" tofile="${jvm.root}/tmp/${file}.newer-version.zip" overwrite="true" failonerror="true" />
-						<delete dir="${jvm.root}/${zip.file}" />
+						<delete dir="${jvm.root}/${zip.file}" failonerror="false" />
 						<move file="${jvm.root}/tmp/${file}.newer-version.zip" tofile="${jvm.root}/${zip.file}" failonerror="true" />
 					</else>
 				</if>
@@ -503,7 +501,7 @@ GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), rm
 			</catch>
 		</trycatch>
 		<!-- now just delete the MD5 file -->
-		<delete dir="${jvm.root}/tmp/${md5.file}" />
+		<delete dir="${jvm.root}/tmp/${md5.file}" failonerror="false" />
 	</target>
 
 	<target name="-notify-about-jre-update">
@@ -544,6 +542,6 @@ GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), rm
 	<target name="clean-ivy" depends="init-ivy" description="--> clean the ivy installation and the ivy cache">
 		<!--  The ivy cache is cleaned and the install directory is deleted -->
 		<ivy:cleancache />
-		<delete dir="${ivy.jar.dir}" />
+		<delete dir="${ivy.jar.dir}" failonerror="false" />
 	</target>
 </project>

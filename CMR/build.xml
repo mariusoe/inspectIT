@@ -19,10 +19,10 @@
 	</path>
 
 	<target name="clean" description="--> Cleans the project">
-		<delete dir="${build.root}" />
-		<delete dir="${dist.root}" />
-		<delete dir="${lib.root}/prod" />
-		<delete dir="${lib.root}/test" />
+		<delete dir="${build.root}" failonerror="false" />
+		<delete dir="${release.root}" failonerror="false" />
+		<delete dir="${lib.root}/prod" failonerror="false" />
+		<delete dir="${lib.root}/test" failonerror="false" />
 	</target>
 
 	<target name="init" description="--> Creates necessary folder structure">
@@ -309,7 +309,7 @@
 		<foreach list="${jvm.list}" param="file" target="checkFile" />
 
 		<!-- delete tmp folder -->
-		<delete dir="${jvm.root}/tmp" />
+		<delete dir="${jvm.root}/tmp" failonerror="false" />
 	</target>
 
 	<target name="checkFile" depends="check.download,check.md5" if="file" />
@@ -396,7 +396,7 @@
 							</fileset>
 						</wptg-ftp>
 						<move file="${jvm.root}/tmp/${zip.file}" tofile="${jvm.root}/tmp/${file}.newer-version.zip" overwrite="true" failonerror="true" />
-						<delete dir="${jvm.root}/${zip.file}" />
+						<delete dir="${jvm.root}/${zip.file}" failonerror="false" />
 						<move file="${jvm.root}/tmp/${file}.newer-version.zip" tofile="${jvm.root}/${zip.file}" failonerror="true" />
 					</else>
 				</if>
@@ -408,7 +408,7 @@
 			</catch>
 		</trycatch>
 		<!-- now just delete the MD5 file -->
-		<delete dir="${jvm.root}/tmp/${md5.file}" />
+		<delete dir="${jvm.root}/tmp/${md5.file}" failonerror="false" />
 	</target>
 
 	<target name="-notify-about-jre-update">
@@ -435,7 +435,7 @@
 			<zipfileset src="${jvm.root}/jre6-linux-x86.zip" prefix="CMR/jre" filemode="755" />
 			<zipfileset dir="${commons.basedir}/resources" prefix="CMR" includes="inspectIT-licence.pdf" />
 		</tar>
-		<delete file="${build.scripts}/startup.sh" />
+		<delete file="${build.scripts}/startup.sh" failonerror="false" />
 	</target>
 
 	<target name="-linux-x64">
@@ -446,7 +446,7 @@
 			<zipfileset src="${jvm.root}/jre6-linux-x64.zip" prefix="CMR/jre" filemode="755" />
 			<zipfileset dir="${commons.basedir}/resources" prefix="CMR" includes="inspectIT-licence.pdf" />
 		</tar>
-		<delete file="${build.scripts}/startup.sh" />
+		<delete file="${build.scripts}/startup.sh" failonerror="false" />
 	</target>
 
 	<target name="-windows-x86">
@@ -457,7 +457,7 @@
 			<zipfileset src="${jvm.root}/jre6-windows-x86.zip" prefix="CMR/jre" />
 			<zipfileset dir="${commons.basedir}/resources" prefix="CMR" includes="inspectIT-licence.pdf" />
 		</zip>
-		<delete file="${build.scripts}/startup.bat" />
+		<delete file="${build.scripts}/startup.bat" failonerror="false" />
 	</target>
 
 	<target name="-windows-x64">
@@ -468,7 +468,7 @@
 			<zipfileset src="${jvm.root}/jre6-windows-x64.zip" prefix="CMR/jre" />
 			<zipfileset dir="${commons.basedir}/resources" prefix="CMR" includes="inspectIT-licence.pdf" />
 		</zip>
-		<delete file="${build.scripts}/startup.bat" />
+		<delete file="${build.scripts}/startup.bat" failonerror="false" />
 	</target>
 
 	<target name="-create-thirdparty-notification">
@@ -507,6 +507,6 @@ Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA), h2 (1.2.138)" />
 	<target name="clean-ivy" depends="init-ivy" description="--> clean the ivy installation and the ivy cache">
 		<!--  The ivy cache is cleaned and the install directory is deleted -->
 		<ivy:cleancache />
-		<delete dir="${ivy.jar.dir}" />
+		<delete dir="${ivy.jar.dir}" failonerror="false" />
 	</target>
 </project>
