@@ -2,7 +2,6 @@ package info.novatec.inspectit.agent.config.test;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.ParserException;
 import info.novatec.inspectit.agent.config.PriorityEnum;
@@ -78,7 +77,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		verify(configurationStorage, times(1)).setRepository(localhost, 1099);
 		verify(configurationStorage, times(1)).setAgentName(agentName);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -93,7 +91,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		fileConfigurationReader.load();
 
 		verify(configurationStorage, times(1)).addMethodSensorType(name, clazz, priority, Collections.EMPTY_MAP);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -112,7 +109,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		fileConfigurationReader.load();
 
 		verify(configurationStorage, times(1)).addMethodSensorType(name, clazz, priority, settings);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -125,7 +121,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		fileConfigurationReader.load();
 
 		verify(configurationStorage, times(1)).addPlatformSensorType(clazz, Collections.EMPTY_MAP);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -140,7 +135,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		verify(configurationStorage, times(1)).addExceptionSensorType(clazz, Collections.EMPTY_MAP);
 		verify(configurationStorage, times(1)).setEnhancedExceptionSensorActivated(false);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -160,7 +154,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		verify(configurationStorage, times(1)).addExceptionSensorType(clazz, settings);
 		verify(configurationStorage, times(1)).setEnhancedExceptionSensorActivated(true);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -174,7 +167,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		fileConfigurationReader.load();
 
 		verify(configurationStorage, times(1)).addExceptionSensorTypeParameter(clazz, targetClass, false, Collections.EMPTY_MAP);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -193,7 +185,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		fileConfigurationReader.load();
 
 		verify(configurationStorage, times(1)).addExceptionSensorTypeParameter(clazz, "java.lang.Throwable", false, settings);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -207,7 +198,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		fileConfigurationReader.load();
 
 		verify(configurationStorage, times(1)).addExceptionSensorTypeParameter(clazz, targetClass, true, Collections.EMPTY_MAP);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -222,7 +212,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		verify(configurationStorage, times(1)).setEnhancedExceptionSensorActivated(false);
 		verify(configurationStorage, times(1)).addExceptionSensorType(Mockito.anyString(), Mockito.anyMap());
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -237,7 +226,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		verify(configurationStorage, times(1)).setEnhancedExceptionSensorActivated(true);
 		verify(configurationStorage, times(1)).addExceptionSensorType(Mockito.anyString(), Mockito.anyMap());
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -250,7 +238,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		fileConfigurationReader.load();
 
 		verify(configurationStorage, times(1)).setBufferStrategy(clazz, Collections.EMPTY_MAP);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -267,7 +254,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		settings.put("time", "5000");
 
 		verify(configurationStorage, times(1)).addSendingStrategy(clazz, settings);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -282,7 +268,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		fileConfigurationReader.load();
 
 		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, Collections.EMPTY_MAP);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -297,7 +282,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		fileConfigurationReader.load();
 
 		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, Collections.EMPTY_MAP);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -312,7 +296,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		fileConfigurationReader.load();
 
 		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, true, Collections.EMPTY_MAP);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -331,7 +314,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		parameterList.add(parameter);
 
 		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, parameterList, false, Collections.EMPTY_MAP);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -354,7 +336,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		parameterList.add(parameterThree);
 
 		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, parameterList, false, Collections.EMPTY_MAP);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -375,7 +356,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		settings.put("property", propertyList);
 
 		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -396,7 +376,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		settings.put("field", propertyList);
 
 		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -415,7 +394,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		settings.put("minDuration", minDuration);
 
 		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test
@@ -434,7 +412,6 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		settings.put("annotation", annotationClassName);
 
 		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
-		verifyNoMoreInteractions(configurationStorage);
 	}
 
 	@Test(expectedExceptions = { ParserException.class })
@@ -460,7 +437,18 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		settings.put("modifiers", modifiers);
 
 		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
-		verifyNoMoreInteractions(configurationStorage);
+	}
+
+	@Test
+	public void loadAndVerifyExcludeClasses() throws ParserException {
+		String patternString = "info.novatec.*";
+
+		writer.println("exclude-class" + " " + patternString);
+		writer.close();
+
+		fileConfigurationReader.load();
+
+		verify(configurationStorage, times(1)).addIgnoreClassesPattern(patternString);
 	}
 
 	@AfterClass(alwaysRun = true)

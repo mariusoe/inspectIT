@@ -2,7 +2,9 @@ package info.novatec.inspectit.agent.config.impl;
 
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
+import info.novatec.inspectit.agent.analyzer.IMatchPattern;
 import info.novatec.inspectit.agent.analyzer.impl.ModifierMatcher;
+import info.novatec.inspectit.agent.analyzer.impl.SimpleMatchPattern;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.PriorityEnum;
 import info.novatec.inspectit.agent.config.StorageException;
@@ -100,6 +102,12 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 * Indicates whether try/catch instrumentation should be used to handle all exception events.
 	 */
 	private boolean enhancedExceptionSensorActivated = false;
+
+	/**
+	 * List of the ignore classes patterns. Classes matching these patterns should be ignored by the
+	 * configuration.
+	 */
+	private List<IMatchPattern> ignoreClassesPatterns = new ArrayList<IMatchPattern>();
 
 	/**
 	 * Default constructor which takes 2 parameter.
@@ -586,5 +594,19 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 */
 	public boolean isEnhancedExceptionSensorActivated() {
 		return enhancedExceptionSensorActivated;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<IMatchPattern> getIgnoreClassesPatterns() {
+		return ignoreClassesPatterns;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addIgnoreClassesPattern(String patternString) {
+		ignoreClassesPatterns.add(new SimpleMatchPattern(patternString));
 	}
 }

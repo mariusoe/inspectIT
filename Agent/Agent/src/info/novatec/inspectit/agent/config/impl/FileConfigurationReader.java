@@ -1,5 +1,6 @@
 package info.novatec.inspectit.agent.config.impl;
 
+import info.novatec.inspectit.agent.analyzer.IMatchPattern;
 import info.novatec.inspectit.agent.config.IConfigurationReader;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.ParserException;
@@ -38,6 +39,19 @@ public class FileConfigurationReader implements IConfigurationReader {
 	private static final Logger LOGGER = Logger.getLogger(FileConfigurationReader.class.getName());
 
 	/**
+	 * Default ignore classes patterns. These will be used if no patterns is supplied by the user.
+	 */
+	private static final String[] DEFAULT_IGNORE_PATTERNS = new String[] {
+			"info.novatec.inspectit.*",
+			"$Proxy*",
+			"sun.*",
+			"java.lang.ThreadLocal",
+			"java.lang.ref.Reference",
+			"*_WLStub",
+			"*[]"
+	};
+
+	/**
 	 * The configuration storage implementation. Used to store the information to.
 	 */
 	private final IConfigurationStorage configurationStorage;
@@ -63,6 +77,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	private static final String CONFIG_EXCEPTION_SENSOR = "exception-sensor";
 	private static final String CONFIG_EXCEPTION_SENSOR_TYPE = "exception-sensor-type";
 	private static final String CONFIG_INCLUDE_FILE = "$include";
+	private static final String CONFIG_EXCLUDE_CLASS = "exclude-class";
 
 	/**
 	 * Regular expression pattern to find the signatures of the method definitions in the
@@ -112,6 +127,16 @@ public class FileConfigurationReader implements IConfigurationReader {
 			LOGGER.finer("Agent Configuration file found at: " + configFile.getAbsolutePath());
 			InputStreamReader reader = new InputStreamReader(is);
 			this.parse(reader);
+
+			// check if the exlude class patterns were supplied
+			// if not add the defualt ones to the configuration
+			List<IMatchPattern> ignorePatterns = configurationStorage.getIgnoreClassesPatterns();
+			if (null == ignorePatterns || ignorePatterns.isEmpty()) {
+				for (String ignorePatternString : DEFAULT_IGNORE_PATTERNS) {
+					configurationStorage.addIgnoreClassesPattern(ignorePatternString);
+				}
+			}
+
 		} catch (FileNotFoundException e) {
 			LOGGER.info("Agent Configuration file not found at " + pathToConfig + ", aborting!");
 			throw new ParserException("Agent Configuration file not found at " + pathToConfig);
@@ -198,6 +223,11 @@ public class FileConfigurationReader implements IConfigurationReader {
 				if (discriminator.equalsIgnoreCase(CONFIG_INCLUDE_FILE)) {
 					processIncludeFileLine(tokenizer);
 					continue;
+				}
+
+				// check for exclude classes
+				if (discriminator.equalsIgnoreCase(CONFIG_EXCLUDE_CLASS)) {
+					processExcludeClassLine(tokenizer);
 				}
 			}
 		} catch (Throwable throwable) {
@@ -504,6 +534,19 @@ public class FileConfigurationReader implements IConfigurationReader {
 		} catch (FileNotFoundException e) {
 			LOGGER.info("Additional agent configuration file not found at " + file.getAbsolutePath() + ", aborting!");
 			throw new ParserException("Additional agent Configuration file not found at " + file.getAbsolutePath());
+		}
+	}
+
+	/**
+	 * Process a line for the exclude classes configuration.
+	 * 
+	 * @param tokenizer
+	 *            The tokenizer which contains the path to an additional configuration file.
+	 */
+	private void processExcludeClassLine(StringTokenizer tokenizer) {
+		while (tokenizer.hasMoreTokens()) {
+			String patternString = tokenizer.nextToken();
+			configurationStorage.addIgnoreClassesPattern(patternString);
 		}
 	}
 

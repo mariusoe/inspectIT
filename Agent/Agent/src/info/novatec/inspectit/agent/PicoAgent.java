@@ -3,6 +3,7 @@ package info.novatec.inspectit.agent;
 import info.novatec.inspectit.agent.analyzer.IByteCodeAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
+import info.novatec.inspectit.agent.analyzer.IMatchPattern;
 import info.novatec.inspectit.agent.analyzer.impl.ByteCodeAnalyzer;
 import info.novatec.inspectit.agent.analyzer.impl.ClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.impl.InheritanceAnalyzer;
@@ -37,6 +38,7 @@ import info.novatec.inspectit.versioning.FileBasedVersioningServiceImpl;
 import info.novatec.inspectit.versioning.IVersioningService;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -67,23 +69,6 @@ public class PicoAgent implements IAgent {
 	private static final Logger LOGGER = Logger.getLogger(PicoAgent.class.getName());
 
 	/**
-	 * The singleton instance of this class.
-	 */
-	private static IAgent instance = null;
-
-	/**
-	 * These patterns are checked in the {@link #inspectByteCode(byte[], String, ClassLoader)}
-	 * method to ignore them.
-	 */
-	private static final String[] IGNORE_START_PATTERNS = new String[] { "info.novatec.inspectit.", "$Proxy", "sun.", "java.lang.ThreadLocal", "java.lang.ref.Reference" };
-
-	/**
-	 * These patterns are checked in the {@link #inspectByteCode(byte[], String, ClassLoader)}
-	 * method to ignore them.
-	 */
-	private static final String[] IGNORE_END_PATTERNS = new String[] { "_WLStub", "[]" };
-
-	/**
 	 * The pico container.
 	 */
 	private MutablePicoContainer pico;
@@ -103,15 +88,6 @@ public class PicoAgent implements IAgent {
 	 */
 	public PicoAgent() {
 		this.init();
-	}
-
-	/**
-	 * The singleton access to this class. New instances of this class aren't allowed.
-	 * 
-	 * @return The singleton instance
-	 */
-	public static IAgent getInstance() {
-		return instance;
 	}
 
 	/**
@@ -289,18 +265,11 @@ public class PicoAgent implements IAgent {
 			return byteCode;
 		}
 
-		// ignore all classes which fit to these patterns
-		for (int i = 0; i < IGNORE_START_PATTERNS.length; i++) {
-			String ignorePattern = IGNORE_START_PATTERNS[i];
-			if (className.startsWith(ignorePattern)) {
-				return byteCode;
-			}
-		}
-
-		// ignore all classes which fit to these patterns
-		for (int i = 0; i < IGNORE_END_PATTERNS.length; i++) {
-			String ignorePattern = IGNORE_END_PATTERNS[i];
-			if (className.endsWith(ignorePattern)) {
+		// ignore all classes which fit to the patterns in the configuration
+		IConfigurationStorage configurationStorage = (IConfigurationStorage) pico.getComponentInstance(IConfigurationStorage.class);
+		List<IMatchPattern> ignoreClassesPatterns = configurationStorage.getIgnoreClassesPatterns();
+		for (IMatchPattern matchPattern : ignoreClassesPatterns) {
+			if (matchPattern.match(className)) {
 				return byteCode;
 			}
 		}

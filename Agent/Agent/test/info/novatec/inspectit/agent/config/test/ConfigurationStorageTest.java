@@ -8,6 +8,7 @@ import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
+import info.novatec.inspectit.agent.analyzer.IMatchPattern;
 import info.novatec.inspectit.agent.analyzer.impl.DirectMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.IndirectMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.InterfaceMatcher;
@@ -142,6 +143,8 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		settings = new HashMap<String, Object>();
 		settings.put("modifiers", "pub,prot");
 		configurationStorage.addSensor("timer", "*", "*", null, true, settings);
+
+		configurationStorage.addIgnoreClassesPattern("info.novatec.*");
 	}
 
 	@Test()
@@ -658,6 +661,14 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		assertTrue(Modifier.isPublic(configWithModifiers.getModifiers()));
 		assertTrue(Modifier.isProtected(configWithModifiers.getModifiers()));
 
+		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
+	}
+
+	@Test
+	public void ignoreClassesCheck() {
+		List<IMatchPattern> ignorePatterns = configurationStorage.getIgnoreClassesPatterns();
+		assertNotNull(ignorePatterns);
+		assertTrue(!ignorePatterns.isEmpty());
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 }
