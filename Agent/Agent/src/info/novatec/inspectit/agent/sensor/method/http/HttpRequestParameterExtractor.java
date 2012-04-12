@@ -42,7 +42,7 @@ class HttpRequestParameterExtractor {
 	 * Keeps track of already looked up <code>Method</code> objects for faster access. Get and Put
 	 * operations are synchronized by the concurrent hash map.
 	 */
-	private ConcurrentHashMap<HttpMethods, Method> methodCache = new ConcurrentHashMap<HttpMethods, Method>(9);
+	private Map<String, Method> methodCache = new ConcurrentHashMap<String, Method>();
 
 	/**
 	 * Structure to store all necessary methods that we can invoke to get http information. These
@@ -351,21 +351,36 @@ class HttpRequestParameterExtractor {
 	 * @return the <code>Method</code> object or <code>null</code> if the method cannot be found.
 	 */
 	private Method retrieveMethod(HttpMethods httpMethod, Class<?> clazzUsedToLookup) {
-		Method m = methodCache.get(httpMethod);
+		Method m = methodCache.get(getCacheLookupName(httpMethod, clazzUsedToLookup));
 
 		if (null == m) {
 			// We do not yet have the method in the Cache
 			try {
 				m = clazzUsedToLookup.getMethod(httpMethod.methodName, httpMethod.parameters);
-				methodCache.put(httpMethod, m);
+				m.setAccessible(true);
+				methodCache.put(getCacheLookupName(httpMethod, clazzUsedToLookup), m);
 			} catch (Exception e) {
 				LOGGER.log(Level.SEVERE, "The provided class " + clazzUsedToLookup.getCanonicalName() + " did not provide the desired method.", e);
 
 				// Do not try to look up every time.
-				methodCache.put(httpMethod, null);
+				methodCache.put(getCacheLookupName(httpMethod, clazzUsedToLookup), null);
 			}
 		}
 
 		return m;
 	}
+	
+	/**
+	 * Generates and return a lookup name for the cache.
+	 * 
+	 * @param httpMethod 
+	 *            the Method to lookup
+	 * @param clazz 
+	 *            the concrete class to lookup the method upon.
+	 * @return the generated lookup name.
+	 */
+	private String getCacheLookupName(HttpMethods httpMethod, Class<?> clazz) {
+		return clazz.getCanonicalName() + '#' + httpMethod.methodName;
+	}
+	
 }
