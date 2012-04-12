@@ -16,18 +16,14 @@ import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -100,10 +96,9 @@ public class JavaAgent implements ClassFileTransformer {
 			Class<?> agentClazz = classLoader.loadClass(INSPECTIT_AGENT);
 			Object realAgent = agentClazz.newInstance();
 
-			// create the proxy object in here with the delegation to the PicoAgent in the other
-			// classloader
-			IAgent proxyAgent = (IAgent) Proxy.newProxyInstance(classLoader, new Class[] { IAgent.class }, new PassThroughProxyHandler(realAgent));
-			Agent.agent = proxyAgent;
+			// we can reference the Agent now here because it should have been added to the
+			// bootclasspath and thus available from anywhere in the application
+			Agent.agent = (IAgent) realAgent;
 
 			// we need to preload some classes due to the minimal possibility of classcircularity
 			// errors etc.
@@ -308,49 +303,6 @@ public class JavaAgent implements ClassFileTransformer {
 	}
 
 	/**
-	 * This proxy is used to delegate to the real agent via a proxy object to call the agent in a
-	 * different class loader.
-	 * 
-	 * @author Patrice Bouillets
-	 * 
-	 */
-	public static class PassThroughProxyHandler implements InvocationHandler {
-
-		/**
-		 * The delegation object.
-		 */
-		private final Object delegate;
-
-		/**
-		 * Cache for reflection methods.
-		 */
-		private Map<String, Method> methods;
-
-		/**
-		 * Default constructor initialized with the delegation object / real agent.
-		 * 
-		 * @param delegate
-		 *            the real agent.
-		 */
-		public PassThroughProxyHandler(Object delegate) {
-			this.delegate = delegate;
-
-			Method[] clazzMethods = delegate.getClass().getMethods();
-			methods = new HashMap<String, Method>(clazzMethods.length);
-			for (Method method : clazzMethods) {
-				// cache the method object for faster execution - for now the method name suffices
-				methods.put(method.getName(), method);
-			}
-		}
-
-		/** {@inheritDoc} */
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			return methods.get(method.getName()).invoke(delegate, args);
-		}
-
-	}
-
-	/**
 	 * Self first class loader handling the boundaries of our needed dependency classes and
 	 * inspectit classes so we don't mess up with the target.
 	 * 
@@ -399,7 +351,6 @@ public class JavaAgent implements ClassFileTransformer {
 			// ignore the following classes because they are used in the JavaAgent class
 			ignoreClasses.add(JavaAgent.class.getCanonicalName());
 			ignoreClasses.add(InspectItClassLoader.class.getCanonicalName());
-			ignoreClasses.add(PassThroughProxyHandler.class.getCanonicalName());
 		}
 
 		/**
