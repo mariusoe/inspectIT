@@ -19,7 +19,9 @@ import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.AllPermission;
 import java.security.CodeSource;
+import java.security.PermissionCollection;
 import java.security.ProtectionDomain;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -463,6 +465,9 @@ public class JavaAgent implements ClassFileTransformer {
 		public synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 			Class<?> result = findLoadedClass(name);
 			if (null != result) {
+				if (resolve) {
+					resolveClass(result);
+				}
 				return result;
 			}
 
@@ -475,11 +480,26 @@ public class JavaAgent implements ClassFileTransformer {
 
 			// Override parent-first behavior into self-first only for specified classes
 			if (selfFirst) {
-				return findClass(name);
+				Class<?> c = findClass(name);
+				if (resolve) {
+					resolveClass(c);
+				}
+				return c;
 			} else {
 				return super.loadClass(name, resolve);
 			}
 		}
 
+		/** {@inheritDoc} */
+		@Override
+		protected PermissionCollection getPermissions(CodeSource codesource) {
+			// apply the all permission policy to all of our classes and packages.
+			AllPermission allPerm = new AllPermission();
+			PermissionCollection pc = allPerm.newPermissionCollection();
+			pc.add(allPerm);
+			return pc;
+		}
+
 	}
+
 }
