@@ -216,12 +216,7 @@ class HttpRequestParameterExtractor {
 			while (params.hasMoreElements()) {
 				String attrName = params.nextElement();
 				Object value = attributeValue.invoke(httpServletRequest, new Object[] { attrName });
-				if (null != value) {
-					attributes.put(attrName, strConstraint.crop(value.toString()));
-				} else {
-					attributes.put(attrName, "<null>");
-				}
-
+				attributes.put(attrName, strConstraint.crop(getAttributeValue(value)));
 			}
 			return attributes;
 		} catch (Exception e) {
@@ -325,11 +320,7 @@ class HttpRequestParameterExtractor {
 				while (sessionAttr.hasMoreElements()) {
 					String sessionAtt = sessionAttr.nextElement();
 					Object sessionValue = (Object) getAttributeValueSession.invoke(httpSession, sessionAtt);
-					if (null != sessionValue) {
-						sessionAttributes.put(sessionAtt, strConstraint.crop(sessionValue.toString()));
-					} else {
-						sessionAttributes.put(sessionAtt, "<notset>");
-					}
+					sessionAttributes.put(sessionAtt, strConstraint.crop(getAttributeValue(sessionValue)));
 				}
 				return sessionAttributes;
 			}
@@ -369,18 +360,51 @@ class HttpRequestParameterExtractor {
 
 		return m;
 	}
-	
+
 	/**
 	 * Generates and return a lookup name for the cache.
 	 * 
-	 * @param httpMethod 
+	 * @param httpMethod
 	 *            the Method to lookup
-	 * @param clazz 
+	 * @param clazz
 	 *            the concrete class to lookup the method upon.
 	 * @return the generated lookup name.
 	 */
 	private String getCacheLookupName(HttpMethods httpMethod, Class<?> clazz) {
 		return clazz.getCanonicalName() + '#' + httpMethod.methodName;
 	}
-	
+
+	/**
+	 * Utility method that checks if the attribute provided is an Array, and if it so, formats the
+	 * return String in the human-readable form. If the attribute is not an Array, the
+	 * {@link Object#toString()} will be returned. If attribute is <code>null</code>, then
+	 * '<notset>' will be returned.
+	 * 
+	 * @param attribute
+	 *            Attribute to get {@link String} value for.
+	 * @return Human-readable value of attribute.
+	 */
+	private String getAttributeValue(Object attribute) {
+		if (null == attribute) {
+			return "<notset>";
+		}
+		if (attribute.getClass().isArray()) {
+			StringBuilder stringBuilder = new StringBuilder("[");
+			Object[] array = (Object[]) attribute;
+			boolean isFirst = true;
+			for (Object object : array) {
+				if (isFirst) {
+					stringBuilder.append(object.toString());
+					isFirst = false;
+				} else {
+					stringBuilder.append(", ");
+					stringBuilder.append(object.toString());
+				}
+			}
+			stringBuilder.append("]");
+			return stringBuilder.toString();
+		} else {
+			return attribute.toString();
+		}
+	}
 }

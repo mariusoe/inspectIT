@@ -175,6 +175,37 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 	}
 
 	@Test
+	public void readArrayAttributes() {
+		final String att1 = "a1";
+		final String att2 = "a2";
+		final String[] att1Value = { "attValue1", "attValue2", "attValue3" };
+		final String[] att2Value = { "a1", "a2", "a3" };
+		final Vector<String> attributesList = new Vector<String>() {
+			{
+				add(att1);
+				add(att2);
+			}
+		};
+		final Enumeration<String> attributes = attributesList.elements();
+
+		when(httpServletRequest.getAttributeNames()).thenReturn(attributes);
+		when(httpServletRequest.getAttribute(att1)).thenReturn(att1Value);
+		when(httpServletRequest.getAttribute(att2)).thenReturn(att2Value);
+
+		Map<String, String> result = extractor.getAttributes(httpServletRequest.getClass(), httpServletRequest);
+
+		final String extractedAttribute1Value = "[attValue1, attValue2, attValue3]".substring(0, 20) + "...";
+		final String extractedAttribute2Value = "[a1, a2, a3]";
+		Assert.assertEquals(result, new HashMap<String, String>() {
+			{
+				put(att1, extractedAttribute1Value);
+				put(att2, extractedAttribute2Value);
+			}
+		});
+
+	}
+
+	@Test
 	public void readAttributesNull() {
 		Map<String, String> result = extractor.getAttributes(httpServletRequest.getClass(), httpServletRequest);
 
@@ -249,6 +280,38 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 			{
 				put(sa1, sa1Value);
 				put(sa2, sa2Value);
+			}
+		});
+	}
+
+	@Test
+	public void sessionArrayAttributesWithSession() {
+		final String sa1 = "sa1";
+		final String sa2 = "sa2";
+		final String[] sa1Value = { "saValue1", "saValue2", "saValue3" };
+		final String[] sa2Value = { "s1", "s2", "s3" };
+		final Vector<String> sessionAttributesList = new Vector<String>() {
+			{
+				add(sa1);
+				add(sa2);
+			}
+		};
+		final Enumeration<String> sessionAttributes = sessionAttributesList.elements();
+
+		HttpSession session = Mockito.mock(HttpSession.class);
+		when(session.getAttributeNames()).thenReturn(sessionAttributes);
+		when(session.getAttribute(sa1)).thenReturn(sa1Value);
+		when(session.getAttribute(sa2)).thenReturn(sa2Value);
+		when(httpServletRequest.getSession(false)).thenReturn(session);
+
+		Map<String, String> result = extractor.getSessionAttributes(httpServletRequest.getClass(), httpServletRequest);
+
+		final String extractedSa1Value = "[saValue1, saValue2, saValue3]".substring(0, 20) + "...";
+		final String extractedSa2Value = "[s1, s2, s3]";
+		Assert.assertEquals(result, new HashMap<String, String>() {
+			{
+				put(sa1, extractedSa1Value);
+				put(sa2, extractedSa2Value);
 			}
 		});
 	}
