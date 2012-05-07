@@ -15,6 +15,7 @@ import info.novatec.inspectit.spring.logger.Logger;
 
 import java.rmi.RemoteException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -115,9 +116,9 @@ public class RegistrationService implements IRegistrationService {
 			platformIdentDao.saveOrUpdate(platformIdent);
 
 			if (log.isInfoEnabled()) {
-				log.info("Successfully registered Agent '" + agentName + "' with id: " + platformIdent.getId() + " and version " + version);
+				log.info("Successfully registered Agent '" + agentName + "' with id " + platformIdent.getId() + ", version " + version + " and following network interfaces:");
+				printOutDefinedIPs(definedIPs);
 			}
-
 			return platformIdent.getId();
 		} catch (LicenseContentException e) {
 			log.error("Could not register the Agent, due to a license problem: " + e.getMessage());
@@ -223,6 +224,33 @@ public class RegistrationService implements IRegistrationService {
 		platformIdentDao.saveOrUpdate(platformIdent);
 
 		return platformSensorTypeIdent.getId();
+	}
+
+	/**
+	 * Prints out the given list of defined IP addresses. The example is:
+	 * <p>
+	 * |- IPv4: 192.168.1.6<br>
+	 * |- IPv4: 127.0.0.1<br>
+	 * |- IPv6: fe80:0:0:0:221:5cff:fe1d:ffdf%3<br>
+	 * |- IPv6: 0:0:0:0:0:0:0:1%1
+	 * 
+	 * @param definedIPs
+	 *            List of IPv4 and IPv6 IPs.
+	 */
+	private void printOutDefinedIPs(List<String> definedIPs) {
+		List<String> ipList = new ArrayList<String>();
+		for (String ip : definedIPs) {
+			if (ip.indexOf(':') != -1) {
+				ipList.add("|- IPv6: " + ip);
+			} else {
+				ipList.add("|- IPv4: " + ip);
+			}
+		}
+		Collections.sort(ipList);
+		for (String ip : ipList) {
+			log.info(ip);
+		}
+
 	}
 
 	/**
