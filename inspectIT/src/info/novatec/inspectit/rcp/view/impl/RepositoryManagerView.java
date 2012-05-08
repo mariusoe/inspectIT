@@ -336,6 +336,9 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		treeViewer.getTree().setFocus();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void repositoryOnlineStatusUpdated(final CmrRepositoryDefinition repositoryDefinition, OnlineStatus oldStatus, OnlineStatus newStatus) {
 		if (newStatus != OnlineStatus.CHECKING) {
@@ -350,12 +353,13 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 							boolean update = false;
 							for (DeferredAgentsComposite composite : inputList) {
 								if (ObjectUtils.equals(composite.getRepositoryDefinition(), repositoryDefinition)) {
-									treeViewer.refresh(composite);
+									treeViewer.refresh(composite, true);
 									treeViewer.expandAll();
 									if (ObjectUtils.equals(composite, lastSelectedRepository)) {
 										if (null != lastSelectedRepository && inputList.contains(lastSelectedRepository)) {
+											treeViewer.setSelection(StructuredSelection.EMPTY);
 											StructuredSelection ss = new StructuredSelection(lastSelectedRepository);
-											treeViewer.setSelection(ss);
+											treeViewer.setSelection(ss, true);
 											update = true;
 										}
 									}
@@ -478,6 +482,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 							public void run() {
 								treeViewer.refresh(finalToUpdate, true);
 								if (ObjectUtils.equals(finalToUpdate, lastSelectedRepository)) {
+									treeViewer.setSelection(StructuredSelection.EMPTY);
 									StructuredSelection ss = new StructuredSelection(finalToUpdate);
 									treeViewer.setSelection(ss, true);
 									cmrPropertyForm.refresh();
