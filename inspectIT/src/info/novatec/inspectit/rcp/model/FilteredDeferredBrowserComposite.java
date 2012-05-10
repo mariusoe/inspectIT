@@ -4,6 +4,7 @@ import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 
+import com.google.common.base.Objects;
 
 /**
  * Filtered package composite delegates the children creation to the
@@ -18,14 +19,15 @@ public class FilteredDeferredBrowserComposite extends DeferredBrowserComposite {
 	 * Sensor to show.
 	 */
 	private SensorTypeEnum sensorTypeEnumToShow;
-	
+
 	/**
-	 * @param sensorTypeEnum Set the sensor type to show.
+	 * @param sensorTypeEnum
+	 *            Set the sensor type to show.
 	 */
 	public FilteredDeferredBrowserComposite(SensorTypeEnum sensorTypeEnum) {
 		this.sensorTypeEnumToShow = sensorTypeEnum;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -33,7 +35,7 @@ public class FilteredDeferredBrowserComposite extends DeferredBrowserComposite {
 	protected DeferredPackageComposite getNewChild() {
 		return new FilteredDefferedPackageComposite(sensorTypeEnumToShow);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -47,4 +49,34 @@ public class FilteredDeferredBrowserComposite extends DeferredBrowserComposite {
 		}
 		return false;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(super.hashCode(), sensorTypeEnumToShow);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+		if (object == null) {
+			return false;
+		}
+		if (getClass() != object.getClass()) {
+			return false;
+		}
+		if (!super.equals(object)) {
+			return false;
+		}
+		FilteredDeferredBrowserComposite that = (FilteredDeferredBrowserComposite) object;
+		return Objects.equal(this.sensorTypeEnumToShow, that.sensorTypeEnumToShow);
+	}
+
 }

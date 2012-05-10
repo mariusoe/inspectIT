@@ -14,6 +14,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.IElementCollector;
 
+import com.google.common.base.Objects;
+
 /**
  * This class only initializes the sub-tree if it is requested. Furthermore, the creation of the
  * objects is done piece after piece, so that an immediate visualization can be seen (important for
@@ -132,6 +134,36 @@ public class DeferredBrowserComposite extends DeferredComposite {
 	@Override
 	public Image getImage() {
 		return InspectIT.getDefault().getImage(InspectITConstants.IMG_INSTRUMENTATION_BROWSER);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(super.hashCode(), platformIdent, repositoryDefinition);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+		if (object == null) {
+			return false;
+		}
+		if (getClass() != object.getClass()) {
+			return false;
+		}
+		if (!super.equals(object)) {
+			return false;
+		}
+		DeferredBrowserComposite that = (DeferredBrowserComposite) object;
+		return Objects.equal(this.platformIdent, that.platformIdent)
+				&& Objects.equal(this.repositoryDefinition, that.repositoryDefinition);
 	}
 
 }

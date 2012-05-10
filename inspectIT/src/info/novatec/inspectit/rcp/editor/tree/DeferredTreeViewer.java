@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.widgets.Composite;
@@ -240,7 +242,8 @@ public class DeferredTreeViewer extends TreeViewer {
 					internalExpandToLevel(w, level);
 				}
 			} else {
-				// if the list if empty, this means that no object in the tree has to load the children, and they are all expanded, thus we can just select the wanted object
+				// if the list if empty, this means that no object in the tree has to load the
+				// children, and they are all expanded, thus we can just select the wanted object
 				Widget w = internalGetWidgetToSelect(elementOrTreePath);
 				if (null != w) {
 					// if widget is here available
@@ -251,6 +254,36 @@ public class DeferredTreeViewer extends TreeViewer {
 					objectToSelect.set(null);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Expands all ancestors of the given element or tree path so that the given element becomes
+	 * visible in this viewer's tree control and additionally expands the element if it has
+	 * children.
+	 * 
+	 * @param elementOrTreePath
+	 *            the element
+	 * @param level
+	 *            non-negative level, or <code>ALL_LEVELS</code> to expand all levels of the tree
+	 */
+	public void expandObject(Object elementOrTreePath, int level) {
+		if (checkBusy()) {
+			return;
+		}
+		Object parent = getParentElement(elementOrTreePath);
+		// check if the element is already visible, or if it is root
+		if (!((parent != null && getExpandedState(parent)) || isRootElement(elementOrTreePath))) {
+			// get all the objects that need to be expanded so that object is visible
+			List<Object> objectsToExpand = createObjectList(parent, new ArrayList<Object>());
+			if (!objectsToExpand.isEmpty()) {
+				objectsToBeExpanded.addAll(objectsToExpand);
+			}
+		}
+		objectsToBeExpanded.add(elementOrTreePath);
+		Widget w = internalExpand(elementOrTreePath, true);
+		if (w != null) {
+			internalExpandToLevel(w, level);
 		}
 	}
 
@@ -330,12 +363,9 @@ public class DeferredTreeViewer extends TreeViewer {
 	 *            Element to check.
 	 * @return True if the element is one of the root objects.
 	 */
-	@SuppressWarnings("unchecked")
 	private boolean isRootElement(Object element) {
 		Object input = getRoot();
-		if (input != null && input instanceof List) {
-			return ((List<Object>) input).contains(element);
-		}
-		return false;
+		Object[] rootElemens = ((ITreeContentProvider) getContentProvider()).getElements(input);
+		return ArrayUtils.contains(rootElemens, element);
 	}
 }

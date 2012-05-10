@@ -3,6 +3,7 @@ package info.novatec.inspectit.rcp.view.impl;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.editor.tree.DeferredTreeViewer;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.model.TreeModelManager;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryChangeListener;
@@ -20,7 +21,13 @@ import info.novatec.inspectit.rcp.view.tree.TreeLabelProvider;
 import info.novatec.inspectit.rcp.view.tree.TreeViewerComparator;
 import info.novatec.inspectit.storage.LocalStorageData;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
@@ -29,6 +36,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.ToolTip;
@@ -110,7 +118,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	/**
 	 * Tree in the form for the agents representation.
 	 */
-	private TreeViewer treeViewer;
+	private DeferredTreeViewer treeViewer;
 
 	/**
 	 * Composite used for message displaying.
@@ -138,6 +146,11 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	private IToolBarManager toolBarManager;
 
 	/**
+	 * Map of the cached expanded objects in the agent tree per agent.
+	 */
+	private Map<PlatformIdent, List<Object>> expandedElementsPerAgent = new ConcurrentHashMap<PlatformIdent, List<Object>>();
+
+	/**
 	 * Default constructor.
 	 */
 	public DataExplorerView() {
@@ -158,7 +171,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 		toolkit.decorateFormHeading(mainForm);
 
 		Tree tree = toolkit.createTree(mainForm.getBody(), SWT.V_SCROLL | SWT.H_SCROLL);
-		treeViewer = new TreeViewer(tree);
+		treeViewer = new DeferredTreeViewer(tree);
 		treeViewer.setContentProvider(new TreeContentProvider());
 		treeViewer.setLabelProvider(new TreeLabelProvider());
 		treeViewer.setComparator(new TreeViewerComparator());
@@ -200,12 +213,43 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 *            Hint for agent selection.
 	 */
 	private void selectAgentForDisplay(PlatformIdent agent) {
+		if (null != displayedAgent) {
+			cacheExpandedObjects(displayedAgent);
+		}
 		if (null != agent && null != availableAgents && availableAgents.contains(agent)) {
 			displayedAgent = agent;
 		} else if (null != availableAgents && !availableAgents.isEmpty()) {
 			displayedAgent = availableAgents.iterator().next();
 		} else {
 			displayedAgent = null;
+		}
+	}
+
+	/**
+	 * Caches the current expanded objects in the tree viewer with the given platform ident. Note
+	 * that this method will filter out the elements given by
+	 * {@link TreeViewer#getExpandedElements()}, so that only the last expanded element in the tree
+	 * is saved.
+	 * 
+	 * @param platformIdent
+	 *            {@link PlatformIdent} to cache elements for.
+	 */
+	private void cacheExpandedObjects(final PlatformIdent platformIdent) {
+		Object[] allExpanded = treeViewer.getExpandedElements();
+		if (allExpanded.length > 0) {
+			Set<Object> parents = new HashSet<Object>();
+			for (Object expanded : allExpanded) {
+				Object parent = ((ITreeContentProvider) treeViewer.getContentProvider()).getParent(expanded);
+				while (parent != null) {
+					parents.add(parent);
+					parent = ((ITreeContentProvider) treeViewer.getContentProvider()).getParent(parent);
+				}
+			}
+			List<Object> expandedList = new ArrayList<Object>(Arrays.asList(allExpanded));
+			expandedList.removeAll(parents);
+			expandedElementsPerAgent.put(platformIdent, expandedList);
+		} else {
+			expandedElementsPerAgent.put(platformIdent, Collections.emptyList());
 		}
 	}
 
@@ -266,7 +310,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 				if (selected < availableAgents.size()) {
 					PlatformIdent platformIdent = availableAgents.get(selected);
 					if (!ObjectUtils.equals(displayedAgent, platformIdent)) {
-						displayedAgent = platformIdent;
+						selectAgentForDisplay(platformIdent);
 						performUpdate();
 					}
 				}
@@ -339,7 +383,6 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 				treeViewer.setInput(treeModelManager);
 				treeViewer.getTree().setVisible(true);
 				treeViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-				treeViewer.expandToLevel(1);
 			} else {
 				displayMessage("Repository is currently unavailable.", Display.getDefault().getSystemImage(SWT.ICON_ERROR));
 			}
@@ -389,6 +432,14 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 				updateFormBody();
 				updateAgentsCombo();
 				updateViewToolbar();
+				if (null != displayedAgent) {
+					List<Object> expandedObjects = expandedElementsPerAgent.get(displayedAgent);
+					if (null != expandedObjects) {
+						for (Object object : expandedObjects) {
+							treeViewer.expandObject(object, 1);
+						}
+					}
+				}
 				mainForm.setBusy(false);
 			}
 		});
@@ -408,6 +459,9 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	@Override
 	public void refresh() {
 		if (displayedRepositoryDefinition instanceof CmrRepositoryDefinition) {
+			if (null != displayedAgent) {
+				cacheExpandedObjects(displayedAgent);
+			}
 			final UpdateRepositoryJob job = InspectIT.getDefault().getCmrRepositoryManager().forceCmrRepositoryOnlineStatusUpdate((CmrRepositoryDefinition) displayedRepositoryDefinition);
 			job.addJobChangeListener(new JobChangeAdapter() {
 				@Override
@@ -430,7 +484,6 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 					} else {
 						displayedAgent = null;
 					}
-					selectAgentForDisplay(displayedAgent);
 					performUpdate();
 					job.removeJobChangeListener(this);
 				}
@@ -605,7 +658,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 		 * Updates the enabled state of action based on the currently selected
 		 * {@link CmrRepositoryDefinition}.
 		 */
-		public void updateEnabledState() {
+		public final void updateEnabledState() {
 			if (null != treeViewer && treeViewer.getInput() != null) {
 				setEnabled(true);
 			} else {
@@ -618,7 +671,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 		 */
 		@Override
 		public void run() {
-			treeViewer.expandToLevel(1);
+			treeViewer.setExpandedElements(new Object[0]);
 			treeViewer.refresh();
 		}
 

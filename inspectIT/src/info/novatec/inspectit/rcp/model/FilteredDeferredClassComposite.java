@@ -12,6 +12,8 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ui.progress.IElementCollector;
 
+import com.google.common.base.Objects;
+
 /**
  * This composite shows only one sensor for each method of the class that has a
  * {@link SensorTypeEnum} type.
@@ -95,6 +97,35 @@ public class FilteredDeferredClassComposite extends DeferredClassComposite {
 		} finally {
 			monitor.done();
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(super.hashCode(), sensorTypeEnumToShow);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+		if (object == null) {
+			return false;
+		}
+		if (getClass() != object.getClass()) {
+			return false;
+		}
+		if (!super.equals(object)) {
+			return false;
+		}
+		FilteredDeferredClassComposite that = (FilteredDeferredClassComposite) object;
+		return Objects.equal(this.sensorTypeEnumToShow, that.sensorTypeEnumToShow);
 	}
 
 }

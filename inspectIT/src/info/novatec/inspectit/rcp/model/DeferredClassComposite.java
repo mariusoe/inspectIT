@@ -12,6 +12,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.IElementCollector;
 
+import com.google.common.base.Objects;
+
 /**
  * This class only initializes the sub-tree if it is requested. Furthermore, the creation of the
  * objects is done piece after piece, so that an immediate visualization can be seen (important for
@@ -112,6 +114,36 @@ public class DeferredClassComposite extends DeferredComposite {
 	 */
 	protected List<MethodIdent> getMethods() {
 		return methods;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(super.hashCode(), methods, repositoryDefinition);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+		if (object == null) {
+			return false;
+		}
+		if (getClass() != object.getClass()) {
+			return false;
+		}
+		if (!super.equals(object)) {
+			return false;
+		}
+		DeferredClassComposite that = (DeferredClassComposite) object;
+		return Objects.equal(this.methods, that.methods)
+				&& Objects.equal(this.repositoryDefinition, that.repositoryDefinition);
 	}
 
 }
