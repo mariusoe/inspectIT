@@ -342,11 +342,11 @@ public class HttpHookTest extends AbstractLogSupport {
 		httpHook.beforeBody(methodId11, sensorTypeId, servlet, parametersNoHttp, registeredSensorConfig);
 		httpHook.beforeBody(methodId12, sensorTypeId, servlet, parametersHttp, registeredSensorConfig);
 
-		httpHook.firstAfterBody(methodId12, sensorTypeId, servlet, parametersNoHttp, result, registeredSensorConfig);
-		httpHook.secondAfterBody(coreService, methodId12, sensorTypeId, servlet, parametersNoHttp, result, registeredSensorConfig);
+		httpHook.firstAfterBody(methodId12, sensorTypeId, servlet, parametersHttp, result, registeredSensorConfig);
+		httpHook.secondAfterBody(coreService, methodId12, sensorTypeId, servlet, parametersHttp, result, registeredSensorConfig);
 
-		httpHook.firstAfterBody(methodId11, sensorTypeId, servlet, parametersHttp, result, registeredSensorConfig);
-		httpHook.secondAfterBody(coreService, methodId11, sensorTypeId, servlet, parametersHttp, result, registeredSensorConfig);
+		httpHook.firstAfterBody(methodId11, sensorTypeId, servlet, parametersNoHttp, result, registeredSensorConfig);
+		httpHook.secondAfterBody(coreService, methodId11, sensorTypeId, servlet, parametersNoHttp, result, registeredSensorConfig);
 
 		Mockito.verify(coreService).addMethodSensorData(Mockito.eq(registeredSensorTypeId), Mockito.eq(registeredMethodId12), (String) Mockito.eq(null),
 				Mockito.argThat(new HttpTimerDataVerifier((HttpTimerData) data1)));
@@ -354,11 +354,11 @@ public class HttpHookTest extends AbstractLogSupport {
 		httpHook.beforeBody(methodId21, sensorTypeId, servlet, parametersHttp, registeredSensorConfig);
 		httpHook.beforeBody(methodId22, sensorTypeId, servlet, parametersNoHttp, registeredSensorConfig);
 
-		httpHook.firstAfterBody(methodId22, sensorTypeId, servlet, parametersHttp, result, registeredSensorConfig);
-		httpHook.secondAfterBody(coreService, methodId22, sensorTypeId, servlet, parametersHttp, result, registeredSensorConfig);
+		httpHook.firstAfterBody(methodId22, sensorTypeId, servlet, parametersNoHttp, result, registeredSensorConfig);
+		httpHook.secondAfterBody(coreService, methodId22, sensorTypeId, servlet, parametersNoHttp, result, registeredSensorConfig);
 
-		httpHook.firstAfterBody(methodId21, sensorTypeId, servlet, parametersNoHttp, result, registeredSensorConfig);
-		httpHook.secondAfterBody(coreService, methodId21, sensorTypeId, servlet, parametersNoHttp, result, registeredSensorConfig);
+		httpHook.firstAfterBody(methodId21, sensorTypeId, servlet, parametersHttp, result, registeredSensorConfig);
+		httpHook.secondAfterBody(coreService, methodId21, sensorTypeId, servlet, parametersHttp, result, registeredSensorConfig);
 
 		Mockito.verify(coreService).addMethodSensorData(Mockito.eq(registeredSensorTypeId), Mockito.eq(registeredMethodId21), (String) Mockito.eq(null),
 				Mockito.argThat(new HttpTimerDataVerifier((HttpTimerData) data2)));

@@ -14,6 +14,7 @@ import info.novatec.inspectit.util.Timer;
 import java.lang.management.ThreadMXBean;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -51,11 +52,6 @@ public class HttpHook implements IMethodHook {
 	 * The ID manager.
 	 */
 	private final IIdManager idManager;
-
-	/**
-	 * The URI.
-	 */
-	private ThreadLocal<HttpTimerData> httpTimerData = new ThreadLocal<HttpTimerData>();
 
 	/**
 	 * The thread MX bean.
@@ -102,14 +98,14 @@ public class HttpHook implements IMethodHook {
 	 * HttpServletMetrics and do. We are talking about the class of the ServletRequest here. This
 	 * list is extended if a new Class that provides this interface is found.
 	 */
-	private static final CopyOnWriteArrayList<Class<?>> WHITE_LIST = new CopyOnWriteArrayList<Class<?>>();
+	private static final List<Class<?>> WHITE_LIST = new CopyOnWriteArrayList<Class<?>>();
 
 	/**
 	 * Blacklist that contains all classes that we already checked if they provide
 	 * HttpServletMetrics and do not. We are talking about the class of the ServletRequest here.
 	 * This list is extended if a new Class that does not provides this interface is found.
 	 */
-	private static final CopyOnWriteArrayList<Class<?>> BLACK_LIST = new CopyOnWriteArrayList<Class<?>>();
+	private static final List<Class<?>> BLACK_LIST = new CopyOnWriteArrayList<Class<?>>();
 
 	/**
 	 * Helps us to ensure that we only store on http metric per request.
@@ -163,45 +159,40 @@ public class HttpHook implements IMethodHook {
 	 * {@inheritDoc}
 	 */
 	public void beforeBody(long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc) {
+
+		// We mark the invocation of the first servlet and the calls from within it. This way we
+		// gather information just once (from the first one) and avoid overhead and inconclusive
+		// information.
+
+		// Only during the first invocation, we make preparations.
 		if (!refMarker.isMarkerSet()) {
 
 			// We expect the first parameter to be of the type javax.servlet.ServletRequest
-			// If this is not the case then the configuration was wrong. For performance sake
-			// we will not check each any everytime if the parameter is available but will on
-			// purpose break here with an IndexOutOfBoundException.
+			// If this is not the case then the configuration was wrong.
+			if (parameters.length != 0) {
+				Object httpServletRequest = parameters[0];
+				Class<?> servletRequestClass = httpServletRequest.getClass();
 
-			Object httpServletRequest = parameters[0];
-			Class<?> servletRequestClass = httpServletRequest.getClass();
+				// Check if metrics interface provided
+				if (providesHttpMetrics(servletRequestClass)) {
 
-			if (providesHttpMetrics(servletRequestClass)) {
+					// We must take the time as soon as we know that we are dealing with an http
+					// timer. We cannot do that after we read the information from the request
+					// object because these methods could be instrumented and thus the whole http
+					// timer would be off - resulting in very strange results.
+					timeStack.push(new Double(timer.getCurrentTime()));
+					if (threadCPUTimeEnabled) {
+						threadCpuTimeStack.push(new Long(threadMXBean.getCurrentThreadCpuTime()));
+					}
 
-				// We must take the time as soon as we know that we are dealing with an http
-				// timer. We cannot do that after we read the information from the request object
-				// because these methods could be instrumented and thus the whole http timer
-				// would be off - resulting in very strange results.
-				timeStack.push(new Double(timer.getCurrentTime()));
-				if (threadCPUTimeEnabled) {
-					threadCpuTimeStack.push(new Long(threadMXBean.getCurrentThreadCpuTime()));
-				}
+					// Mark first invocation
+					refMarker.markCall();
 
-				refMarker.markCall();
-
-				// Keep the TimerData already thread locally so that we can already add the data
-				// prior to the call.
-				HttpTimerData data = new HttpTimerData();
-				httpTimerData.set(data);
-
-				// Include additional http information
-				data.setUri(extractor.getRequestUri(servletRequestClass, httpServletRequest));
-				data.setRequestMethod(extractor.getRequestMethod(servletRequestClass, httpServletRequest));
-				data.setParameters(extractor.getParameterMap(servletRequestClass, httpServletRequest));
-				data.setAttributes(extractor.getAttributes(servletRequestClass, httpServletRequest));
-				data.setHeaders(extractor.getHeaders(servletRequestClass, httpServletRequest));
-				if (captureSessionData) {
-					data.setSessionAttributes(extractor.getSessionAttributes(servletRequestClass, httpServletRequest));
 				}
 			}
 		} else {
+
+			// Mark sub invocation, first already marked.
 			refMarker.markCall();
 		}
 	}
@@ -210,10 +201,15 @@ public class HttpHook implements IMethodHook {
 	 * {@inheritDoc}
 	 */
 	public void firstAfterBody(long methodId, long sensorTypeId, Object object, Object[] parameters, Object result, RegisteredSensorConfig rsc) {
-		if (!refMarker.isMarkerSet())
-			return;
 
+		// no invocation marked -> skip
+		if (!refMarker.isMarkerSet()) {
+			return;
+		}
+
+		// remove mark from sub call
 		refMarker.markEndCall();
+
 		if (refMarker.matchesFirst()) {
 			// Get the timer and store it.
 			timeStack.push(new Double(timer.getCurrentTime()));
@@ -227,47 +223,73 @@ public class HttpHook implements IMethodHook {
 	 * {@inheritDoc}
 	 */
 	public void secondAfterBody(ICoreService coreService, long methodId, long sensorTypeId, Object object, Object[] parameters, Object result, RegisteredSensorConfig rsc) {
+
+		// check if in the right(first) invocation
 		if (refMarker.isMarkerSet() && refMarker.matchesFirst()) {
-			double endTime = ((Double) timeStack.pop()).doubleValue();
-			double startTime = ((Double) timeStack.pop()).doubleValue();
-			double duration = endTime - startTime;
 
-			// default setting to a negative number
-			double cpuDuration = -1.0d;
-			if (threadCPUTimeEnabled) {
-				long cpuEndTime = ((Long) threadCpuTimeStack.pop()).longValue();
-				long cpuStartTime = ((Long) threadCpuTimeStack.pop()).longValue();
-				cpuDuration = (cpuEndTime - cpuStartTime) / 1000000.0d;
-			}
+			// double check if nothing changed
+			if (parameters.length != 0) {
 
-			try {
-				long platformId = idManager.getPlatformId();
-				long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
-				long registeredMethodId = idManager.getRegisteredMethodId(methodId);
-				Timestamp timestamp = new Timestamp(GregorianCalendar.getInstance().getTimeInMillis());
+				Object httpServletRequest = parameters[0];
+				Class<?> servletRequestClass = httpServletRequest.getClass();
 
-				HttpTimerData data = (HttpTimerData) httpTimerData.get();
-				data.setPlatformIdent(platformId);
-				data.setMethodIdent(registeredMethodId);
-				data.setSensorTypeIdent(registeredSensorTypeId);
-				data.setTimeStamp(timestamp);
+				// double check interface
+				if (providesHttpMetrics(servletRequestClass)) {
 
-				data.setDuration(duration);
-				data.calculateMin(duration);
-				data.calculateMax(duration);
-				data.setCpuDuration(cpuDuration);
-				data.calculateCpuMax(cpuDuration);
-				data.calculateCpuMin(cpuDuration);
-				data.setCount(1L);
+					try {
+						double endTime = ((Double) timeStack.pop()).doubleValue();
+						double startTime = ((Double) timeStack.pop()).doubleValue();
+						double duration = endTime - startTime;
 
-				coreService.addMethodSensorData(registeredSensorTypeId, registeredMethodId, null, data);
+						// default setting to a negative number
+						double cpuDuration = -1.0d;
+						if (threadCPUTimeEnabled) {
+							long cpuEndTime = ((Long) threadCpuTimeStack.pop()).longValue();
+							long cpuStartTime = ((Long) threadCpuTimeStack.pop()).longValue();
+							cpuDuration = (cpuEndTime - cpuStartTime) / 1000000.0d;
+						}
 
-				httpTimerData.remove();
-				refMarker.remove();
+						long platformId = idManager.getPlatformId();
+						long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
+						long registeredMethodId = idManager.getRegisteredMethodId(methodId);
+						Timestamp timestamp = new Timestamp(GregorianCalendar.getInstance().getTimeInMillis());
 
-			} catch (IdNotAvailableException e) {
-				if (LOGGER.isLoggable(Level.FINER)) {
-					LOGGER.finer("Could not save the timer data because of an unavailable id. " + e.getMessage());
+						// Creating return data object
+						HttpTimerData data = new HttpTimerData();
+
+						data.setPlatformIdent(platformId);
+						data.setMethodIdent(registeredMethodId);
+						data.setSensorTypeIdent(registeredSensorTypeId);
+						data.setTimeStamp(timestamp);
+
+						data.setDuration(duration);
+						data.calculateMin(duration);
+						data.calculateMax(duration);
+						data.setCpuDuration(cpuDuration);
+						data.calculateCpuMax(cpuDuration);
+						data.calculateCpuMin(cpuDuration);
+						data.setCount(1L);
+
+						// Include additional http information
+						data.setUri(extractor.getRequestUri(servletRequestClass, httpServletRequest));
+						data.setRequestMethod(extractor.getRequestMethod(servletRequestClass, httpServletRequest));
+						data.setParameters(extractor.getParameterMap(servletRequestClass, httpServletRequest));
+						data.setAttributes(extractor.getAttributes(servletRequestClass, httpServletRequest));
+						data.setHeaders(extractor.getHeaders(servletRequestClass, httpServletRequest));
+						if (captureSessionData) {
+							data.setSessionAttributes(extractor.getSessionAttributes(servletRequestClass, httpServletRequest));
+						}
+
+						// returning gathered information
+						coreService.addMethodSensorData(registeredSensorTypeId, registeredMethodId, null, data);
+
+						refMarker.remove();
+
+					} catch (IdNotAvailableException e) {
+						if (LOGGER.isLoggable(Level.FINER)) {
+							LOGGER.finer("Could not save the timer data because of an unavailable id. " + e.getMessage());
+						}
+					}
 				}
 			}
 		}
