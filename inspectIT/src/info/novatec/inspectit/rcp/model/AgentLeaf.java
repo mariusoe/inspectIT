@@ -26,7 +26,7 @@ public class AgentLeaf extends Leaf {
 	public AgentLeaf(PlatformIdent platformIdent) {
 		this.platformIdent = platformIdent;
 		this.setName(platformIdent.getAgentName() + " [" + platformIdent.getVersion() + "]");
-		this.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_AGENT));
+		this.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_AGENT));
 		this.setTooltip("Double click to explore Agent in the Data Explorer");
 	}
 

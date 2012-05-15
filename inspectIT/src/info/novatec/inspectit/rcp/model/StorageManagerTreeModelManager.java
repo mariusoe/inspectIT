@@ -60,7 +60,7 @@ public class StorageManagerTreeModelManager {
 		if (null != storageLabelType) {
 			Composite unknown = new Composite();
 			unknown.setName("Unknown");
-			unknown.setImageDescriptor(ImageFormatter.getImageDescriptorForLabel(storageLabelType));
+			unknown.setImage(ImageFormatter.getImageForLabel(storageLabelType));
 			boolean addUnknow = false;
 			Map<Object, Composite> map = new HashMap<Object, Composite>();
 			for (Map.Entry<StorageData, CmrRepositoryDefinition> entry : storageRespositoryMap.entrySet()) {
@@ -71,7 +71,7 @@ public class StorageManagerTreeModelManager {
 						if (c == null) {
 							c = new Composite();
 							c.setName(TextFormatter.getLabelName(label) + ": " + TextFormatter.getLabelValue(label, true));
-							c.setImageDescriptor(ImageFormatter.getImageDescriptorForLabel(storageLabelType));
+							c.setImage(ImageFormatter.getImageForLabel(storageLabelType));
 							map.put(TextFormatter.getLabelValue(label, true), c);
 						}
 						StorageLeaf storageLeaf = new StorageLeaf(entry.getKey(), entry.getValue());
@@ -97,7 +97,7 @@ public class StorageManagerTreeModelManager {
 				if (c == null) {
 					c = new Composite();
 					c.setName(cmrRepositoryDefinition.getName());
-					c.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_SERVER_ONLINE_SMALL));
+					c.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_ONLINE_SMALL));
 					map.put(cmrRepositoryDefinition, c);
 				}
 				StorageLeaf storageLeaf = new StorageLeaf(entry.getKey(), entry.getValue());

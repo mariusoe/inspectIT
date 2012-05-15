@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.IElementCollector;
 
 /**
@@ -71,7 +71,7 @@ public class DeferredBrowserComposite extends DeferredComposite {
 					DeferredPackageComposite composite = packageNames.get(packageName);
 					composite.addClassToDisplay(methodIdent);
 				}
-				
+
 				if (monitor.isCanceled()) {
 					break;
 				}
@@ -92,7 +92,8 @@ public class DeferredBrowserComposite extends DeferredComposite {
 	/**
 	 * Should this method ident pass the selection process.
 	 * 
-	 * @param methodIdent {@link MethodIdent}.
+	 * @param methodIdent
+	 *            {@link MethodIdent}.
 	 * @return Should this method ident pass the selection process.
 	 */
 	protected boolean select(MethodIdent methodIdent) {
@@ -129,8 +130,8 @@ public class DeferredBrowserComposite extends DeferredComposite {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ImageDescriptor getImageDescriptor() {
-		return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_INSTRUMENTATION_BROWSER);
+	public Image getImage() {
+		return InspectIT.getDefault().getImage(InspectITConstants.IMG_INSTRUMENTATION_BROWSER);
 	}
 
 }

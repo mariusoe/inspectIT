@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -29,6 +28,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -79,7 +79,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		/** The width of the column. */
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
-		private ImageDescriptor imageDescriptor;
+		private Image image;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -94,7 +94,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		private Column(String name, int width, String imageName) {
 			this.name = name;
 			this.width = width;
-			this.imageDescriptor = InspectIT.getDefault().getImageDescriptor(imageName);
+			this.image = InspectIT.getDefault().getImage(imageName);
 		}
 
 		/**
@@ -142,8 +142,8 @@ public class SqlInvocInputController extends AbstractTableInputController {
 			viewerColumn.getColumn().setResizable(true);
 			viewerColumn.getColumn().setText(column.name);
 			viewerColumn.getColumn().setWidth(column.width);
-			if (null != column.imageDescriptor) {
-				viewerColumn.getColumn().setImage(column.imageDescriptor.createImage());
+			if (null != column.image) {
+				viewerColumn.getColumn().setImage(column.image);
 			}
 			column.column = viewerColumn;
 		}

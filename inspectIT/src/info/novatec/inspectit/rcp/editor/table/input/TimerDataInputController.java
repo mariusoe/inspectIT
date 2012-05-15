@@ -15,8 +15,8 @@ import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
-import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
+import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -34,6 +33,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * Table input controler for the aggregated Timer data view.
@@ -99,7 +99,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 		/** The width of the column. */
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
-		private ImageDescriptor imageDescriptor;
+		private Image image;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -114,7 +114,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 		private Column(String name, int width, String imageName) {
 			this.name = name;
 			this.width = width;
-			this.imageDescriptor = InspectIT.getDefault().getImageDescriptor(imageName);
+			this.image = InspectIT.getDefault().getImage(imageName);
 		}
 
 		/**
@@ -211,8 +211,8 @@ public class TimerDataInputController extends AbstractTableInputController {
 								+ "avg, sum, min and max calculations are reflecting only the timers inside an invocation sequence.");
 			}
 
-			if (null != column.imageDescriptor) {
-				viewerColumn.getColumn().setImage(column.imageDescriptor.createImage());
+			if (null != column.image) {
+				viewerColumn.getColumn().setImage(column.image);
 			}
 			column.column = viewerColumn;
 		}
@@ -348,7 +348,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 		}
 		throw new RuntimeException("Could not create the human readable string!");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -425,7 +425,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 
 		/**
 		 * Decides if the warn sign should be added for the specific column.
-		 *
+		 * 
 		 * @param data
 		 *            TimerData
 		 * @param column

@@ -2,7 +2,7 @@ package info.novatec.inspectit.rcp.model;
 
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * A component can be used in any tree based views.
@@ -23,9 +23,9 @@ public abstract class Component {
 	private String tooltip = "";
 
 	/**
-	 * The image descriptor of the component, if there is any.
+	 * The image of the component, if there is any.
 	 */
-	private ImageDescriptor imageDescriptor;
+	private Image image;
 
 	/**
 	 * The parent component.
@@ -33,8 +33,7 @@ public abstract class Component {
 	private Component parent;
 
 	/**
-	 * The input definition if there is one. This is used to create the
-	 * appropriate view.
+	 * The input definition if there is one. This is used to create the appropriate view.
 	 */
 	private InputDefinition inputDefinition;
 
@@ -54,12 +53,12 @@ public abstract class Component {
 		return tooltip;
 	}
 
-	public ImageDescriptor getImageDescriptor() {
-		return imageDescriptor;
+	public Image getImage() {
+		return image;
 	}
 
-	public void setImageDescriptor(ImageDescriptor imageDescriptor) {
-		this.imageDescriptor = imageDescriptor;
+	public void setImage(Image image) {
+		this.image = image;
 	}
 
 	public Component getParent() {

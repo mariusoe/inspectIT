@@ -262,18 +262,24 @@ public class InspectIT extends AbstractUIPlugin {
 
 	/**
 	 * Returns an image from the image registry by resolving the passed image key.
+	 * <p>
+	 * <b>Images retrieved by this method should not be disposed, because they are shared resources
+	 * in the plugin and will be disposed with the disposal of the display.</b>
 	 * 
 	 * @param imageKey
 	 *            The key of the image to look for in the registry.
 	 * @return The generated image.
 	 */
 	public Image getImage(String imageKey) {
-		return getImageDescriptor(imageKey).createImage();
+		return getImageRegistry().get(imageKey);
 	}
 
 	/**
 	 * Returns the image descriptor for the given key. The key can be one of the IMG_ definitions in
 	 * {@link InspectITConstants}.
+	 * <p>
+	 * <b>Every new image created with the given {@link ImageDescriptor} should be disposed by the
+	 * caller.</b>
 	 * 
 	 * @param imageKey
 	 *            The image key.

@@ -5,7 +5,6 @@ import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.Component;
 import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 
@@ -37,10 +36,7 @@ public class StorageManagerTreeLabelProvider extends StyledCellIndexLabelProvide
 	protected Image getColumnImage(Object element, int index) {
 		if (index == 0) {
 			if (element instanceof Component) {
-				ImageDescriptor imgDescriptor = ((Component) element).getImageDescriptor();
-				if (null != imgDescriptor) {
-					return imgDescriptor.createImage();
-				}
+				return ((Component) element).getImage();
 			}
 		}
 		return super.getColumnImage(element, index);

@@ -15,13 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * Inputcontroller for the tagged http view.
@@ -84,7 +84,7 @@ public class TaggedHttpTimerDataInputController extends AbstractHttpInputControl
 		/** The width of the column. */
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
-		private ImageDescriptor imageDescriptor;
+		private Image image;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -99,7 +99,7 @@ public class TaggedHttpTimerDataInputController extends AbstractHttpInputControl
 		private Column(String name, int width, String imageName) {
 			this.name = name;
 			this.width = width;
-			this.imageDescriptor = InspectIT.getDefault().getImageDescriptor(imageName);
+			this.image = InspectIT.getDefault().getImage(imageName);
 		}
 
 		/**
@@ -148,8 +148,8 @@ public class TaggedHttpTimerDataInputController extends AbstractHttpInputControl
 			viewerColumn.getColumn().setResizable(true);
 			viewerColumn.getColumn().setText(column.name);
 			viewerColumn.getColumn().setWidth(column.width);
-			if (null != column.imageDescriptor) {
-				viewerColumn.getColumn().setImage(column.imageDescriptor.createImage());
+			if (null != column.image) {
+				viewerColumn.getColumn().setImage(column.image);
 			}
 			column.column = viewerColumn;
 		}
@@ -179,7 +179,7 @@ public class TaggedHttpTimerDataInputController extends AbstractHttpInputControl
 
 			/**
 			 * Decides if the warn sign should be added for the specific column.
-			 *
+			 * 
 			 * @param data
 			 *            TimerData
 			 * @param column
@@ -278,7 +278,7 @@ public class TaggedHttpTimerDataInputController extends AbstractHttpInputControl
 		}
 		throw new RuntimeException("Could not create the human readable string!");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

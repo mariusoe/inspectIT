@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.IElementCollector;
 
 /**
@@ -119,8 +119,8 @@ public class DeferredPackageComposite extends DeferredComposite {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ImageDescriptor getImageDescriptor() {
-		return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_PACKAGE);
+	public Image getImage() {
+		return InspectIT.getDefault().getImage(InspectITConstants.IMG_PACKAGE);
 	}
 
 }

@@ -21,7 +21,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.PopupDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -225,9 +224,9 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 					labelsTableViewer.setInput(storageData.getLabelList());
 					labelsTableViewer.refresh();
 					addNewLabel.setEnabled(true);
-					ImageDescriptor imgDesc = ImageFormatter.getImageDescriptorForStorageLeaf(storageData);
-					if (null != imgDesc) {
-						form.setImage(imgDesc.createImage());
+					Image img = ImageFormatter.getImageForStorageLeaf(storageData);
+					if (null != img) {
+						form.setImage(img);
 					}
 					mainComposite.setVisible(true);
 				} else {
@@ -315,10 +314,7 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 			@Override
 			protected Image getColumnImage(Object element, int index) {
 				if (index == 0 && element instanceof AbstractStorageLabel) {
-					ImageDescriptor id = ImageFormatter.getImageDescriptorForLabel(((AbstractStorageLabel<?>) element).getStorageLabelType());
-					if (null != id) {
-						return id.createImage();
-					}
+					return ImageFormatter.getImageForLabel(((AbstractStorageLabel<?>) element).getStorageLabelType());
 				}
 				return null;
 			}

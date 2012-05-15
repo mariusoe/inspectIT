@@ -40,7 +40,7 @@ public class StorageLeaf extends Leaf implements IStorageDataProvider {
 		this.storageData = storageData;
 		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
 		this.setName(storageData.getName());
-		this.setImageDescriptor(ImageFormatter.getImageDescriptorForStorageLeaf(storageData));
+		this.setImage(ImageFormatter.getImageForStorageLeaf(storageData));
 		this.setTooltip(storageData.getName());
 	}
 

@@ -53,7 +53,7 @@ public class NavigateToStartMethodInvocationHandler extends AbstractHandler {
 			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
 			editorPropertiesData.setPartName("Invocation Sequence");
 			editorPropertiesData.setPartTooltip("Invocation Sequence");
-			editorPropertiesData.setImageDescriptor(SensorTypeEnum.INVOCATION_SEQUENCE.getImageDescriptor());
+			editorPropertiesData.setImage(SensorTypeEnum.INVOCATION_SEQUENCE.getImage());
 			editorPropertiesData.setHeaderText("Invocation Sequence");
 			editorPropertiesData.setHeaderDescription(TextFormatter.getMethodWithParameters(methodIdent));
 			inputDefinition.setEditorPropertiesData(editorPropertiesData);

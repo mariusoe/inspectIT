@@ -101,10 +101,10 @@ public final class SubViewFactory {
 			ISubView invocExceptions = new TableSubView(new ExceptionSensorInvocInputController());
 			// ISubView traceInspector = new TraceInspectorSubView();
 
-			invocTabbedSubView.addSubView(invocDetails, "Call Hierarchy", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CALL_HIERARCHY));
-			invocTabbedSubView.addSubView(invocSql, "SQL", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_DATABASE));
-			invocTabbedSubView.addSubView(invocMethods, "Methods", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_METHOD_PUBLIC));
-			invocTabbedSubView.addSubView(invocExceptions, "Exceptions", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_EXCEPTION_SENSOR));
+			invocTabbedSubView.addSubView(invocDetails, "Call Hierarchy", InspectIT.getDefault().getImage(InspectITConstants.IMG_CALL_HIERARCHY));
+			invocTabbedSubView.addSubView(invocSql, "SQL", InspectIT.getDefault().getImage(InspectITConstants.IMG_DATABASE));
+			invocTabbedSubView.addSubView(invocMethods, "Methods", InspectIT.getDefault().getImage(InspectITConstants.IMG_METHOD_PUBLIC));
+			invocTabbedSubView.addSubView(invocExceptions, "Exceptions", InspectIT.getDefault().getImage(InspectITConstants.IMG_EXCEPTION_SENSOR));
 			// invocTabbedSubView.addSubView(traceInspector, "Trace Inspector",
 			// InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CALL_HIERARCHY));
 
@@ -123,8 +123,8 @@ public final class SubViewFactory {
 			ISubView exceptionTree = new TreeSubView(new ExceptionTreeInputController());
 			ISubView stackTraceInput = new TextSubView(new UngroupedExceptionOverviewStackTraceInputController());
 
-			exceptionTreeTabbedSubView.addSubView(exceptionTree, "Exception Tree", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_EXCEPTION_TREE));
-			exceptionTreeTabbedSubView.addSubView(stackTraceInput, "Stack Trace", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_STACKTRACE));
+			exceptionTreeTabbedSubView.addSubView(exceptionTree, "Exception Tree", InspectIT.getDefault().getImage(InspectITConstants.IMG_EXCEPTION_TREE));
+			exceptionTreeTabbedSubView.addSubView(stackTraceInput, "Stack Trace", InspectIT.getDefault().getImage(InspectITConstants.IMG_STACKTRACE));
 
 			ungroupedExceptionSensorSubView.addSubView(ungroupedExceptionOverview, 1);
 			ungroupedExceptionSensorSubView.addSubView(exceptionTreeTabbedSubView, 2);
@@ -154,10 +154,10 @@ public final class SubViewFactory {
 			ISubView invocExceptions1 = new TableSubView(new ExceptionSensorInvocInputController());
 			// ISubView traceInspector = new TraceInspectorSubView();
 
-			invocTabbedSubView1.addSubView(invocDetails1, "Call Hierarchy", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CALL_HIERARCHY));
-			invocTabbedSubView1.addSubView(invocSql1, "SQL", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_DATABASE));
-			invocTabbedSubView1.addSubView(invocMethods1, "Methods", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_METHOD_PUBLIC));
-			invocTabbedSubView1.addSubView(invocExceptions1, "Exceptions", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_EXCEPTION_SENSOR));
+			invocTabbedSubView1.addSubView(invocDetails1, "Call Hierarchy", InspectIT.getDefault().getImage(InspectITConstants.IMG_CALL_HIERARCHY));
+			invocTabbedSubView1.addSubView(invocSql1, "SQL", InspectIT.getDefault().getImage(InspectITConstants.IMG_DATABASE));
+			invocTabbedSubView1.addSubView(invocMethods1, "Methods", InspectIT.getDefault().getImage(InspectITConstants.IMG_METHOD_PUBLIC));
+			invocTabbedSubView1.addSubView(invocExceptions1, "Exceptions", InspectIT.getDefault().getImage(InspectITConstants.IMG_EXCEPTION_SENSOR));
 			// invocTabbedSubView.addSubView(traceInspector, "Trace Inspector",
 			// InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CALL_HIERARCHY));
 

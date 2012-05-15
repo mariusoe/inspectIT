@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -27,6 +26,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * This input controller displays details of all methods involved in an invocation sequence.
@@ -85,7 +85,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		/** The width of the column. */
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
-		private ImageDescriptor imageDescriptor;
+		private Image image;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -100,7 +100,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		private Column(String name, int width, String imageName) {
 			this.name = name;
 			this.width = width;
-			this.imageDescriptor = InspectIT.getDefault().getImageDescriptor(imageName);
+			this.image = InspectIT.getDefault().getImage(imageName);
 		}
 
 		/**
@@ -153,8 +153,8 @@ public class MethodInvocInputController extends AbstractTableInputController {
 			viewerColumn.getColumn().setResizable(true);
 			viewerColumn.getColumn().setText(column.name);
 			viewerColumn.getColumn().setWidth(column.width);
-			if (null != column.imageDescriptor) {
-				viewerColumn.getColumn().setImage(column.imageDescriptor.createImage());
+			if (null != column.image) {
+				viewerColumn.getColumn().setImage(column.image);
 			}
 			column.column = viewerColumn;
 		}

@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -210,10 +209,7 @@ public class ManageLabelWizardPage extends WizardPage {
 			@Override
 			protected Image getColumnImage(Object element, int index) {
 				if (index == 0 && element instanceof AbstractStorageLabelType) {
-					ImageDescriptor id = ImageFormatter.getImageDescriptorForLabel((AbstractStorageLabelType<?>) element);
-					if (null != id) {
-						return id.createImage();
-					}
+					return ImageFormatter.getImageForLabel((AbstractStorageLabelType<?>) element);
 				}
 				return null;
 			}
@@ -322,10 +318,7 @@ public class ManageLabelWizardPage extends WizardPage {
 			@Override
 			protected Image getColumnImage(Object element, int index) {
 				if (index == 0 && element instanceof AbstractStorageLabel) {
-					ImageDescriptor id = ImageFormatter.getImageDescriptorForLabel(((AbstractStorageLabel<?>) element).getStorageLabelType());
-					if (null != id) {
-						return id.createImage();
-					}
+					return ImageFormatter.getImageForLabel(((AbstractStorageLabel<?>) element).getStorageLabelType());
 				}
 				return null;
 			}

@@ -18,6 +18,7 @@ import info.novatec.inspectit.storage.label.type.impl.StatusLabelType;
 import info.novatec.inspectit.storage.label.type.impl.UseCaseLabelType;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.swt.graphics.Image;
 
@@ -33,6 +34,31 @@ public final class ImageFormatter {
 	 * Private constructor.
 	 */
 	private ImageFormatter() {
+	}
+
+	/**
+	 * Returns the {@link Image} for the composite that represents a label.
+	 * 
+	 * @param labelType
+	 *            Label type.
+	 * @return {@link Image} for {@link Composite}.
+	 */
+	public static Image getImageForLabel(AbstractStorageLabelType<?> labelType) {
+		if (AssigneeLabelType.class.equals(labelType.getClass())) {
+			return InspectIT.getDefault().getImage(InspectITConstants.IMG_ASSIGNEE_LABEL_ICON);
+		} else if (CreationDateLabelType.class.equals(labelType.getClass())) {
+			return InspectIT.getDefault().getImage(InspectITConstants.IMG_DATE_LABEL_ICON);
+		} else if (ExploredByLabelType.class.equals(labelType.getClass())) {
+			return InspectIT.getDefault().getImage(InspectITConstants.IMG_MOUNTEDBY_LABEL_ICON);
+		} else if (RatingLabelType.class.equals(labelType.getClass())) {
+			return InspectIT.getDefault().getImage(InspectITConstants.IMG_RATING_LABEL_ICON);
+		} else if (StatusLabelType.class.equals(labelType.getClass())) {
+			return InspectIT.getDefault().getImage(InspectITConstants.IMG_STATUS_LABEL_ICON);
+		} else if (UseCaseLabelType.class.equals(labelType.getClass())) {
+			return InspectIT.getDefault().getImage(InspectITConstants.IMG_USECASE_LABEL_ICON);
+		} else {
+			return InspectIT.getDefault().getImage(InspectITConstants.IMG_USER_LABEL_ICON);
+		}
 	}
 
 	/**
@@ -64,18 +90,18 @@ public final class ImageFormatter {
 	 * 
 	 * @param storageData
 	 *            {@link StorageData} to get picture for.
-	 * @return Returns the {@link ImageDescriptor} for the storage, based on the
+	 * @return Returns the {@link Image} for the storage, based on the
 	 *         {@link StorageData.StorageState}.
 	 */
-	public static ImageDescriptor getImageDescriptorForStorageLeaf(StorageData storageData) {
+	public static Image getImageForStorageLeaf(StorageData storageData) {
 		if (storageData.getState() == StorageState.CREATED_NOT_OPENED) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_STOARGE_NEW);
+			return InspectIT.getDefault().getImage(InspectITConstants.IMG_STOARGE_NEW);
 		} else if (storageData.getState() == StorageState.OPENED) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_STOARGE_OPENED);
+			return InspectIT.getDefault().getImage(InspectITConstants.IMG_STOARGE_OPENED);
 		} else if (storageData.getState() == StorageState.RECORDING) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_STOARGE_RECORDING);
+			return InspectIT.getDefault().getImage(InspectITConstants.IMG_STOARGE_RECORDING);
 		} else if (storageData.getState() == StorageState.CLOSED) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_STOARGE_CLOSED);
+			return InspectIT.getDefault().getImage(InspectITConstants.IMG_STOARGE_CLOSED);
 		}
 		return null;
 	}
@@ -159,15 +185,19 @@ public final class ImageFormatter {
 	 *            Original icon.
 	 * @param repositoryDefinition
 	 *            Repository definition.
+	 * @param resourceManager
+	 *            Resource manager that image will be created with. It is responsibility of a caller
+	 *            to provide {@link ResourceManager} for correct image disposing.
 	 * @return Overlayed icon.
 	 */
-	public static Image getOverlayedEditorImageDescriptor(ImageDescriptor original, RepositoryDefinition repositoryDefinition) {
+	public static Image getOverlayedEditorImage(Image original, RepositoryDefinition repositoryDefinition, ResourceManager resourceManager) {
 		if (repositoryDefinition instanceof CmrRepositoryDefinition) {
-			return original.createImage();
+			return original;
 		} else if (repositoryDefinition instanceof StorageRepositoryDefinition) {
 			ImageDescriptor overlayDescriptor = InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_STORAGE_OVERLAY);
-			DecorationOverlayIcon icon = new DecorationOverlayIcon(original.createImage(), new ImageDescriptor[] { null, null, null, overlayDescriptor, null });
-			return icon.createImage();
+			DecorationOverlayIcon icon = new DecorationOverlayIcon(original, new ImageDescriptor[] { null, null, null, overlayDescriptor, null });
+			Image img = resourceManager.createImage(icon);
+			return img;
 		}
 		return null;
 	}

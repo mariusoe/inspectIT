@@ -83,7 +83,7 @@ public class NavigateToExceptionTypeHandler extends AbstractHandler implements I
 				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
 				editorPropertiesData.setPartName("Exception Sensor");
 				editorPropertiesData.setPartTooltip("Exception Sensor");
-				editorPropertiesData.setImageDescriptor(SensorTypeEnum.EXCEPTION_SENSOR.getImageDescriptor());
+				editorPropertiesData.setImage(SensorTypeEnum.EXCEPTION_SENSOR.getImage());
 				editorPropertiesData.setHeaderText("Throwable type");
 				editorPropertiesData.setHeaderDescription(exceptionSensorData.getThrowableType());
 				inputDefinition.setEditorPropertiesData(editorPropertiesData);
@@ -101,7 +101,7 @@ public class NavigateToExceptionTypeHandler extends AbstractHandler implements I
 				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
 				editorPropertiesData.setPartName("Exceptions (Grouped)");
 				editorPropertiesData.setPartTooltip("Exceptions (Grouped)");
-				editorPropertiesData.setImageDescriptor(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED.getImageDescriptor());
+				editorPropertiesData.setImage(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED.getImage());
 				editorPropertiesData.setHeaderText("Throwable type");
 				editorPropertiesData.setHeaderDescription(exceptionSensorData.getThrowableType());
 				inputDefinition.setEditorPropertiesData(editorPropertiesData);

@@ -6,6 +6,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.swt.graphics.Image;
@@ -17,7 +18,7 @@ import org.eclipse.swt.graphics.Image;
  * @author Patrice Bouillet
  * 
  */
-public class ExceptionImageFactory {
+public final class ExceptionImageFactory {
 
 	/**
 	 * The image descriptor for the error overlay.
@@ -35,10 +36,14 @@ public class ExceptionImageFactory {
 	private static final ImageDescriptor OVERLAY_UP = InspectIT.getDefault().getImageDescriptor(InspectITConstants.OVERLAY_UP);
 
 	/**
+	 * Private constructor.
+	 */
+	private ExceptionImageFactory() {
+	}
+
+	/**
 	 * Returns the image descriptor for the given modifiers.
 	 * 
-	 * @param modifiers
-	 *            The modifiers.
 	 * @param data
 	 *            The {@link ExceptionSensorData} data object where to check for the exception event
 	 *            type.
@@ -70,12 +75,15 @@ public class ExceptionImageFactory {
 	 *            the image that will be decorated with the overlay.
 	 * @param data
 	 *            the exception data from which the event will be extracted.
+	 * @param resourceManager
+	 *            Resource manager that image will be created with. It is responsibility of a caller
+	 *            to provide {@link ResourceManager} for correct image disposing.
 	 * @return the resulting image
 	 */
-	public static Image decorateImageWithException(Image image, ExceptionSensorData data) {
+	public static Image decorateImageWithException(Image image, ExceptionSensorData data, ResourceManager resourceManager) {
 		ImageDescriptor exceptionDesc = getImageDescriptor(data);
 		DecorationOverlayIcon icon = new DecorationOverlayIcon(image, exceptionDesc, IDecoration.BOTTOM_RIGHT);
-		Image createdImage = icon.createImage();
+		Image createdImage = resourceManager.createImage(icon);
 		return createdImage;
 	}
 

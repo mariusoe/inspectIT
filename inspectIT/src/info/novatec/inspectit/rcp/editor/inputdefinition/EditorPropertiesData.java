@@ -1,6 +1,6 @@
 package info.novatec.inspectit.rcp.editor.inputdefinition;
 
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 
 import com.google.common.base.Objects;
 
@@ -25,7 +25,7 @@ public class EditorPropertiesData {
 	/**
 	 * The imageDescriptor descriptor of the view.
 	 */
-	private ImageDescriptor imageDescriptor;
+	private Image image;
 
 	/**
 	 * String used by the {@link Form} currently to display the text on it.
@@ -76,22 +76,22 @@ public class EditorPropertiesData {
 	}
 
 	/**
-	 * Gets {@link #imageDescriptor}.
+	 * Gets {@link #image}.
 	 * 
-	 * @return {@link #imageDescriptor}
+	 * @return {@link #image}
 	 */
-	public ImageDescriptor getImageDescriptor() {
-		return imageDescriptor;
+	public Image getImage() {
+		return image;
 	}
 
 	/**
-	 * Sets {@link #imageDescriptor}.
+	 * Sets {@link #image}.
 	 * 
-	 * @param imageDescriptor
-	 *            New value for {@link #imageDescriptor}
+	 * @param image
+	 *            New value for {@link #image}
 	 */
-	public void setImageDescriptor(ImageDescriptor imageDescriptor) {
-		this.imageDescriptor = imageDescriptor;
+	public void setImage(Image image) {
+		this.image = image;
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class EditorPropertiesData {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(partName, partTooltip, imageDescriptor, headerText, headerDescription);
+		return Objects.hashCode(partName, partTooltip, image, headerText, headerDescription);
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class EditorPropertiesData {
 		EditorPropertiesData that = (EditorPropertiesData) object;
 		return Objects.equal(this.partName, that.partName)
 				&& Objects.equal(this.partTooltip, that.partTooltip)
-				&& Objects.equal(this.imageDescriptor, that.imageDescriptor)
+				&& Objects.equal(this.image, that.image)
 				&& Objects.equal(this.headerText, that.headerText)
 				&& Objects.equal(this.headerDescription, that.headerDescription);
 	}
@@ -170,7 +170,7 @@ public class EditorPropertiesData {
 		return Objects.toStringHelper(this)
 				.add("partName", partName)
 				.add("partTooltip", partTooltip)
-				.add("imageDescriptor", imageDescriptor)
+				.add("imageDescriptor", image)
 				.add("headerText", headerText)
 				.add("headerDescription", headerDescription)
 				.toString();

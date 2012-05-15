@@ -19,7 +19,7 @@ public class TreeLabelProvider extends ColumnLabelProvider {
 	public Image getImage(Object element) {
 		if (element instanceof Component) {
 			Component component = (Component) element;
-			return component.getImageDescriptor().createImage();
+			return component.getImage();
 		}
 
 		return super.getImage(element);

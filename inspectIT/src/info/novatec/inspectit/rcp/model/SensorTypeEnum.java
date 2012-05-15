@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * This enumeration holds all available sensor types with their full qualified name and their image.
@@ -83,7 +83,7 @@ public enum SensorTypeEnum {
 	/**
 	 * The image descriptor.
 	 */
-	private ImageDescriptor imageDescriptor;
+	private Image image;
 
 	/**
 	 * Defines if this sensor type can be opened somehow. By default <b>true</b>.
@@ -100,7 +100,7 @@ public enum SensorTypeEnum {
 	 */
 	private SensorTypeEnum(String fqn, String imageName) {
 		this.fqn = fqn;
-		this.imageDescriptor = InspectIT.getDefault().getImageDescriptor(imageName);
+		this.image = InspectIT.getDefault().getImage(imageName);
 	}
 
 	/**
@@ -115,7 +115,7 @@ public enum SensorTypeEnum {
 	 */
 	private SensorTypeEnum(String fqn, String imageName, boolean openable) {
 		this.fqn = fqn;
-		this.imageDescriptor = InspectIT.getDefault().getImageDescriptor(imageName);
+		this.image = InspectIT.getDefault().getImage(imageName);
 		this.openable = openable;
 	}
 
@@ -159,8 +159,8 @@ public enum SensorTypeEnum {
 	 * 
 	 * @return The sensor type image descriptor.
 	 */
-	public ImageDescriptor getImageDescriptor() {
-		return imageDescriptor;
+	public Image getImage() {
+		return image;
 	}
 
 	/**

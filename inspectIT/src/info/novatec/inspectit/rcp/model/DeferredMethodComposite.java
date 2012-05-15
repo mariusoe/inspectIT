@@ -11,7 +11,7 @@ import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.IElementCollector;
 
 /**
@@ -49,7 +49,7 @@ public class DeferredMethodComposite extends DeferredComposite {
 				String fqn = methodSensorTypeIdent.getFullyQualifiedClassName();
 				SensorTypeEnum sensorTypeEnum = SensorTypeEnum.get(fqn);
 				targetSensorType.setName(sensorTypeEnum.getDisplayName());
-				targetSensorType.setImageDescriptor(sensorTypeEnum.getImageDescriptor());
+				targetSensorType.setImage(sensorTypeEnum.getImage());
 
 				if (sensorTypeEnum.isOpenable()) {
 					InputDefinition inputDefinition = new InputDefinition();
@@ -59,7 +59,7 @@ public class DeferredMethodComposite extends DeferredComposite {
 					EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
 					editorPropertiesData.setPartName(sensorTypeEnum.getDisplayName());
 					editorPropertiesData.setPartTooltip(sensorTypeEnum.getDisplayName());
-					editorPropertiesData.setImageDescriptor(sensorTypeEnum.getImageDescriptor());
+					editorPropertiesData.setImage(sensorTypeEnum.getImage());
 					editorPropertiesData.setHeaderText(method.getPlatformIdent().getAgentName());
 					MethodIdent methodIdent = repositoryDefinition.getCachedDataService().getMethodIdentForId(method.getId());
 					editorPropertiesData.setHeaderDescription(TextFormatter.getMethodString(methodIdent));
@@ -115,8 +115,8 @@ public class DeferredMethodComposite extends DeferredComposite {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ImageDescriptor getImageDescriptor() {
-		return ModifiersImageFactory.getImageDescriptor(method.getModifiers());
+	public Image getImage() {
+		return ModifiersImageFactory.getImage(method.getModifiers());
 	}
 
 }

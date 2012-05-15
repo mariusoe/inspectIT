@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.IElementCollector;
 
 /**
@@ -139,8 +139,8 @@ public class DeferredVSACategoryComposite extends DeferredComposite {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ImageDescriptor getImageDescriptor() {
-		return InspectIT.getDefault().getImageDescriptor(InspectITConstants.VSA_LOGO);
+	public Image getImage() {
+		return InspectIT.getDefault().getImage(InspectITConstants.VSA_LOGO);
 	}
 
 }

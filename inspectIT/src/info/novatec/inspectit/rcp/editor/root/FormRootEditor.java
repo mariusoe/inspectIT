@@ -60,7 +60,7 @@ public class FormRootEditor extends AbstractRootEditor {
 
 		// create the form
 		form = toolkit.createForm(parent);
-		form.setImage(getInputDefinition().getEditorPropertiesData().getImageDescriptor().createImage());
+		form.setImage(getInputDefinition().getEditorPropertiesData().getImage());
 		form.setText(getInputDefinition().getEditorPropertiesData().getHeaderText());
 		form.setMessage(getInputDefinition().getEditorPropertiesData().getHeaderDescription());
 		form.getBody().setLayout(new GridLayout());
@@ -85,8 +85,6 @@ public class FormRootEditor extends AbstractRootEditor {
 	@Override
 	public void dispose() {
 		super.dispose();
-		// manually dispose the image of the form
-		form.getImage().dispose();
 		// dispose of the toolkit
 		toolkit.dispose();
 	}

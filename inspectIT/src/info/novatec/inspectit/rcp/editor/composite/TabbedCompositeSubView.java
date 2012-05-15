@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -17,6 +16,7 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -43,7 +43,7 @@ public class TabbedCompositeSubView extends AbstractCompositeSubView {
 	/**
 	 * The images of the tabs.
 	 */
-	private Map<ISubView, ImageDescriptor> tabImageDescriptors = new HashMap<ISubView, ImageDescriptor>();
+	private Map<ISubView, Image> tabImageMap = new HashMap<ISubView, Image>();
 
 	/**
 	 * {@inheritDoc}
@@ -57,7 +57,7 @@ public class TabbedCompositeSubView extends AbstractCompositeSubView {
 			CTabItem item = new CTabItem(tabFolder, SWT.NONE, getPageCount());
 			item.setControl(subView.getControl());
 			item.setText(tabNames.get(subView));
-			item.setImage(tabImageDescriptors.get(subView).createImage());
+			item.setImage(tabImageMap.get(subView));
 
 			subView.getControl().addFocusListener(new FocusAdapter() {
 				/**
@@ -106,14 +106,14 @@ public class TabbedCompositeSubView extends AbstractCompositeSubView {
 	 *            The sub-view to add.
 	 * @param tabName
 	 *            The name of the sub-view.
-	 * @param tabImageDescriptor
-	 *            The image descriptor of this sub-view.
+	 * @param tabImage
+	 *            The image of this sub-view.
 	 */
-	public void addSubView(ISubView subView, String tabName, ImageDescriptor tabImageDescriptor) {
+	public void addSubView(ISubView subView, String tabName, Image tabImage) {
 		super.addSubView(subView);
 
 		tabNames.put(subView, tabName);
-		tabImageDescriptors.put(subView, tabImageDescriptor);
+		tabImageMap.put(subView, tabImage);
 	}
 
 	/**

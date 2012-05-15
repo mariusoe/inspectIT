@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.dialogs.PopupDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -25,6 +24,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -78,7 +78,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 		/** The width of the column. */
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
-		private ImageDescriptor imageDescriptor;
+		private Image image;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -93,7 +93,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 		private Column(String name, int width, String imageName) {
 			this.name = name;
 			this.width = width;
-			this.imageDescriptor = InspectIT.getDefault().getImageDescriptor(imageName);
+			this.image = InspectIT.getDefault().getImage(imageName);
 		}
 
 		/**
@@ -131,8 +131,8 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 			viewerColumn.getColumn().setResizable(true);
 			viewerColumn.getColumn().setText(column.name);
 			viewerColumn.getColumn().setWidth(column.width);
-			if (null != column.imageDescriptor) {
-				viewerColumn.getColumn().setImage(column.imageDescriptor.createImage());
+			if (null != column.image) {
+				viewerColumn.getColumn().setImage(column.image);
 			}
 		}
 	}

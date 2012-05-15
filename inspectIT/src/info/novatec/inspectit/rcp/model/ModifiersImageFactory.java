@@ -7,7 +7,7 @@ import static info.novatec.inspectit.rcp.model.Modifier.isPublic;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * Creates the appropriate method visibility image for the int value.
@@ -18,24 +18,24 @@ import org.eclipse.jface.resource.ImageDescriptor;
 public final class ModifiersImageFactory {
 
 	/**
-	 * The image descriptor for the private visibility method.
+	 * The image key for the private visibility method.
 	 */
-	private static final ImageDescriptor METHOD_PRIV_IMAGE = InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_METHOD_PRIVATE);
+	private static final String METHOD_PRIV_IMAGE = InspectITConstants.IMG_METHOD_PRIVATE;
 
 	/**
-	 * The image descriptor for the default visibility method.
+	 * The image key for the default visibility method.
 	 */
-	private static final ImageDescriptor METHOD_DEFAULT_IMAGE = InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_METHOD_DEFAULT);
+	private static final String METHOD_DEFAULT_IMAGE = InspectITConstants.IMG_METHOD_DEFAULT;
 
 	/**
-	 * The image descriptor for the protected visibility method.
+	 * The image key for the protected visibility method.
 	 */
-	private static final ImageDescriptor METHOD_PROT_IMAGE = InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_METHOD_PROTECTED);
+	private static final String METHOD_PROT_IMAGE = InspectITConstants.IMG_METHOD_PROTECTED;
 
 	/**
-	 * The image descriptor for the public visibility method.
+	 * The image key for the public visibility method.
 	 */
-	private static final ImageDescriptor METHOD_PUB_IMAGE = InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_METHOD_PUBLIC);
+	private static final String METHOD_PUB_IMAGE = InspectITConstants.IMG_METHOD_PUBLIC;
 
 	/**
 	 * Hide constructor to disallow instantiation.
@@ -44,24 +44,25 @@ public final class ModifiersImageFactory {
 	}
 
 	/**
-	 * Returns the image descriptor for the given modifiers.
+	 * Returns the image for the given modifiers. This image should not be disposed.
 	 * 
 	 * @param modifiers
 	 *            The modifiers.
-	 * @return The image descriptor.
+	 * @return The image.
 	 */
-	public static ImageDescriptor getImageDescriptor(int modifiers) {
+	public static Image getImage(int modifiers) {
+		InspectIT inspectIT = InspectIT.getDefault();
 		if (isPrivate(modifiers)) {
-			return METHOD_PRIV_IMAGE;
+			return inspectIT.getImage(METHOD_PRIV_IMAGE);
 		} else if (isPackage(modifiers)) {
-			return METHOD_DEFAULT_IMAGE;
+			return inspectIT.getImage(METHOD_DEFAULT_IMAGE);
 		} else if (isProtected(modifiers)) {
-			return METHOD_PROT_IMAGE;
+			return inspectIT.getImage(METHOD_PROT_IMAGE);
 		} else if (isPublic(modifiers)) {
-			return METHOD_PUB_IMAGE;
+			return inspectIT.getImage(METHOD_PUB_IMAGE);
 		}
 
-		return ImageDescriptor.getMissingImageDescriptor();
+		return null;
 	}
 
 }

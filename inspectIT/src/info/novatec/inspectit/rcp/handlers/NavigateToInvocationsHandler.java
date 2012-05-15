@@ -85,7 +85,7 @@ public class NavigateToInvocationsHandler extends AbstractHandler {
 			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
 			editorPropertiesData.setPartName("Invocation Sequences");
 			editorPropertiesData.setPartTooltip("Invocation Sequences (that contain " + textualDesc + ")");
-			editorPropertiesData.setImageDescriptor(SensorTypeEnum.INVOCATION_SEQUENCE.getImageDescriptor());
+			editorPropertiesData.setImage(SensorTypeEnum.INVOCATION_SEQUENCE.getImage());
 			editorPropertiesData.setHeaderText("Invocation Sequences");
 			if (invocationsCount > 1) {
 				editorPropertiesData.setHeaderDescription("Show All  (that contain " + textualDesc + ")");

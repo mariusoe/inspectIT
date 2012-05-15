@@ -58,7 +58,7 @@ public class FilteredDeferredClassComposite extends DeferredClassComposite {
 							} else {
 								targetSensorType.setName(String.format(METHOD_FORMAT, method.getMethodName(), ""));
 							}
-							targetSensorType.setImageDescriptor(ModifiersImageFactory.getImageDescriptor(method.getModifiers()));
+							targetSensorType.setImage(ModifiersImageFactory.getImage(method.getModifiers()));
 
 							InputDefinition inputDefinition = new InputDefinition();
 							inputDefinition.setRepositoryDefinition(getRepositoryDefinition());
@@ -66,7 +66,7 @@ public class FilteredDeferredClassComposite extends DeferredClassComposite {
 							EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
 							editorPropertiesData.setPartName(sensorTypeEnum.getDisplayName());
 							editorPropertiesData.setPartTooltip(sensorTypeEnum.getDisplayName());
-							editorPropertiesData.setImageDescriptor(sensorTypeEnum.getImageDescriptor());
+							editorPropertiesData.setImage(sensorTypeEnum.getImage());
 							editorPropertiesData.setHeaderText(method.getPlatformIdent().getAgentName());
 							MethodIdent methodIdent = getRepositoryDefinition().getCachedDataService().getMethodIdentForId(method.getId());
 							editorPropertiesData.setHeaderDescription(TextFormatter.getMethodString(methodIdent));

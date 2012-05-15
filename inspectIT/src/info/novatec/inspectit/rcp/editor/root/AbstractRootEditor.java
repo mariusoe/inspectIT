@@ -4,8 +4,8 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.editor.ISubView;
 import info.novatec.inspectit.rcp.editor.SubViewFactory;
-import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.composite.AbstractCompositeSubView;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferencePanel;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
@@ -20,6 +20,9 @@ import java.util.TimerTask;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -112,6 +115,11 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 	private boolean isMaximizedMode = false;
 
 	/**
+	 * Resource manager.
+	 */
+	private ResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources());
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public void doRefresh() {
@@ -176,7 +184,7 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 		// set site and input
 		setSite(editorSite);
 		setInput(editorInput);
-		setTitleImage(ImageFormatter.getOverlayedEditorImageDescriptor(getInputDefinition().getEditorPropertiesData().getImageDescriptor(), getInputDefinition().getRepositoryDefinition()));
+		setTitleImage(ImageFormatter.getOverlayedEditorImage(getInputDefinition().getEditorPropertiesData().getImage(), getInputDefinition().getRepositoryDefinition(), resourceManager));
 
 		this.subView = SubViewFactory.createSubView(getInputDefinition().getId());
 		this.subView.setRootEditor(this);
@@ -558,11 +566,18 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 		// stop the timer if it is active
 		stopUpdateTimer();
 
+		// dispose the local resource manager
+		resourceManager.dispose();
+
 		super.dispose();
 
 		// dispose the preference panel
 		if (null != preferencePanel) {
 			preferencePanel.dispose();
+		}
+
+		if (null != subView) {
+			subView.dispose();
 		}
 	}
 }

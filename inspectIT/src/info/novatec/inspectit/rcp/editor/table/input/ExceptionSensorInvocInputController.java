@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -97,7 +96,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		/** The width of the column. */
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
-		private ImageDescriptor imageDescriptor;
+		private Image image;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -112,7 +111,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		private Column(String name, int width, String imageName) {
 			this.name = name;
 			this.width = width;
-			this.imageDescriptor = InspectIT.getDefault().getImageDescriptor(imageName);
+			this.image = InspectIT.getDefault().getImage(imageName);
 		}
 
 		/**
@@ -160,8 +159,8 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 			viewerColumn.getColumn().setResizable(true);
 			viewerColumn.getColumn().setText(column.name);
 			viewerColumn.getColumn().setWidth(column.width);
-			if (null != column.imageDescriptor) {
-				viewerColumn.getColumn().setImage(column.imageDescriptor.createImage());
+			if (null != column.image) {
+				viewerColumn.getColumn().setImage(column.image);
 			}
 			column.column = viewerColumn;
 		}
@@ -493,10 +492,8 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 
 			switch (enumId) {
 			case CONSTRUCTOR:
-				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers());
-				Image image = resourceManager.createImage(imageDescriptor);
-				image = ExceptionImageFactory.decorateImageWithException(image, data);
-
+				Image image = ModifiersImageFactory.getImage(methodIdent.getModifiers());
+				image = ExceptionImageFactory.decorateImageWithException(image, data, resourceManager);
 				return image;
 			case ERROR_MESSAGE:
 				return null;

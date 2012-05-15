@@ -13,7 +13,7 @@ import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.IElementCollector;
 
 /**
@@ -105,8 +105,8 @@ public class DeferredCombinedMetricsComposite extends DeferredComposite {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ImageDescriptor getImageDescriptor() {
-		return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_INSTRUMENTATION_BROWSER);
+	public Image getImage() {
+		return InspectIT.getDefault().getImage(InspectITConstants.IMG_INSTRUMENTATION_BROWSER);
 	}
 
 }

@@ -121,14 +121,6 @@ public class SteppingTreeSubView extends TreeSubView {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void dispose() {
-		subComposite.dispose();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
 		super.preferenceEventFired(preferenceEvent);
 		switch (preferenceEvent.getPreferenceId()) {
@@ -303,7 +295,7 @@ public class SteppingTreeSubView extends TreeSubView {
 		 * Visible occurrence of the selected object that could be reached.
 		 */
 		private int visibleOccurrences;
-		
+
 		/**
 		 * Filtered occurrence of the selected object that could not be reached.
 		 */
@@ -564,7 +556,7 @@ public class SteppingTreeSubView extends TreeSubView {
 						if (visibleOccurrences > 1) {
 							msg += "s";
 						}
-						
+
 					} else if (occurrence != 0) {
 						msg = occurrence + "/" + visibleOccurrences;
 					} else {

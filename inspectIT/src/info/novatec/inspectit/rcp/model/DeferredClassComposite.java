@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.IElementCollector;
 
 /**
- * This class only initializes the sub-tree if it is requested. Furthermore, the
- * creation of the objects is done piece after piece, so that an immediate
- * visualization can be seen (important for sub-trees which are very large).
+ * This class only initializes the sub-tree if it is requested. Furthermore, the creation of the
+ * objects is done piece after piece, so that an immediate visualization can be seen (important for
+ * sub-trees which are very large).
  * 
  * @author Patrice Bouillet
  * 
@@ -103,8 +103,8 @@ public class DeferredClassComposite extends DeferredComposite {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ImageDescriptor getImageDescriptor() {
-		return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CLASS);
+	public Image getImage() {
+		return InspectIT.getDefault().getImage(InspectITConstants.IMG_CLASS);
 	}
 
 	/**
@@ -113,5 +113,5 @@ public class DeferredClassComposite extends DeferredComposite {
 	protected List<MethodIdent> getMethods() {
 		return methods;
 	}
-	
+
 }

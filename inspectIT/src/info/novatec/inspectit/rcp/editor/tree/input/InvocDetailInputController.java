@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jface.dialogs.PopupDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
@@ -128,7 +127,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		/** The width of the column. */
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
-		private ImageDescriptor imageDescriptor;
+		private Image image;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -143,7 +142,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		private Column(String name, int width, String imageName) {
 			this.name = name;
 			this.width = width;
-			this.imageDescriptor = InspectIT.getDefault().getImageDescriptor(imageName);
+			this.image = InspectIT.getDefault().getImage(imageName);
 		}
 
 		/**
@@ -189,8 +188,8 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			viewerColumn.getColumn().setResizable(true);
 			viewerColumn.getColumn().setText(column.name);
 			viewerColumn.getColumn().setWidth(column.width);
-			if (null != column.imageDescriptor) {
-				viewerColumn.getColumn().setImage(column.imageDescriptor.createImage());
+			if (null != column.image) {
+				viewerColumn.getColumn().setImage(column.image);
 			}
 		}
 	}
@@ -526,12 +525,11 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			switch (enumId) {
 			case METHOD:
 				ExceptionSensorData exceptionSensorData = null;
-				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers());
-				Image image = resourceManager.createImage(imageDescriptor);
+				Image image = ModifiersImageFactory.getImage(methodIdent.getModifiers());
 
 				if (InvocationSequenceDataHelper.hasExceptionData(data)) {
 					exceptionSensorData = data.getExceptionSensorDataObjects().get(data.getExceptionSensorDataObjects().size() - 1);
-					image = ExceptionImageFactory.decorateImageWithException(image, exceptionSensorData);
+					image = ExceptionImageFactory.decorateImageWithException(image, exceptionSensorData, resourceManager);
 				}
 
 				return image;
@@ -651,9 +649,9 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 					styledString.append("'");
 					styledString.append(parameterContentData.getName());
 					styledString.append("': ");
-					// substring(1) is added because the agent adds ‘ at the
+					// substring(1) is added because the agent adds ï¿½ at the
 					// beginning of each string, there was an issue with hibernate handling
-					// some text strings not correctly, that’s why this is prepended
+					// some text strings not correctly, thatï¿½s why this is prepended
 					styledString.append(parameterContentData.getContent().substring(1));
 					styledString.append(", ");
 				}

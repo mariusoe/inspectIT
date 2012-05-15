@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.PopupDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
@@ -84,7 +83,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 		/** The width of the column. */
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
-		private ImageDescriptor imageDescriptor;
+		private Image image;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -99,7 +98,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 		private Column(String name, int width, String imageName) {
 			this.name = name;
 			this.width = width;
-			this.imageDescriptor = InspectIT.getDefault().getImageDescriptor(imageName);
+			this.image = InspectIT.getDefault().getImage(imageName);
 		}
 
 		/**
@@ -147,8 +146,8 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 			viewerColumn.getColumn().setResizable(true);
 			viewerColumn.getColumn().setText(column.name);
 			viewerColumn.getColumn().setWidth(column.width);
-			if (null != column.imageDescriptor) {
-				viewerColumn.getColumn().setImage(column.imageDescriptor.createImage());
+			if (null != column.image) {
+				viewerColumn.getColumn().setImage(column.image);
 			}
 		}
 	}
@@ -320,10 +319,8 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 
 			switch (enumId) {
 			case METHOD_CONSTRUCTOR:
-				ImageDescriptor imageDescriptor = ModifiersImageFactory.getImageDescriptor(methodIdent.getModifiers());
-				Image image = resourceManager.createImage(imageDescriptor);
-				image = ExceptionImageFactory.decorateImageWithException(image, data);
-
+				Image image = ModifiersImageFactory.getImage(methodIdent.getModifiers());
+				image = ExceptionImageFactory.decorateImageWithException(image, data, resourceManager);
 				return image;
 			case EVENT_TYPE:
 				return null;

@@ -65,7 +65,7 @@ public class NavigateToPlotting extends AbstractHandler {
 		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
 		editorPropertiesData.setPartName(SensorTypeEnum.TIMER.getDisplayName());
 		editorPropertiesData.setPartTooltip(SensorTypeEnum.TIMER.getDisplayName());
-		editorPropertiesData.setImageDescriptor(SensorTypeEnum.TIMER.getImageDescriptor());
+		editorPropertiesData.setImage(SensorTypeEnum.TIMER.getImage());
 		editorPropertiesData.setHeaderText(methodIdent.getPlatformIdent().getAgentName());
 		editorPropertiesData.setHeaderDescription(TextFormatter.getMethodString(methodIdent));
 		inputDefinition.setEditorPropertiesData(editorPropertiesData);

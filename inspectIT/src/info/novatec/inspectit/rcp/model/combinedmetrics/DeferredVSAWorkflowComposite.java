@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.IElementCollector;
 
 /**
@@ -83,7 +83,7 @@ public class DeferredVSAWorkflowComposite extends DeferredComposite {
 			for (String activity : activityList) {
 				Component targetActivity = new Leaf();
 				targetActivity.setName(activity.substring(1, activity.length()));
-				targetActivity.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_ACTIVITY));
+				targetActivity.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_ACTIVITY));
 
 				InputDefinition inputDefinition = new InputDefinition();
 				inputDefinition.setRepositoryDefinition(repositoryDefinition);
@@ -92,7 +92,7 @@ public class DeferredVSAWorkflowComposite extends DeferredComposite {
 				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
 				editorPropertiesData.setPartName("VSA Marvin (" + workflowName + " :: " + activity + ")");
 				editorPropertiesData.setPartTooltip("VSA Marvin (" + workflowName + " :: " + activity + ")");
-				editorPropertiesData.setImageDescriptor(SensorTypeEnum.MARVIN_WORKFLOW.getImageDescriptor());
+				editorPropertiesData.setImage(SensorTypeEnum.MARVIN_WORKFLOW.getImage());
 				editorPropertiesData.setHeaderText("VSA Marvin (" + workflowName + " :: " + activity + ")");
 				editorPropertiesData.setHeaderDescription(activity);
 				inputDefinition.setEditorPropertiesData(editorPropertiesData);
@@ -171,8 +171,8 @@ public class DeferredVSAWorkflowComposite extends DeferredComposite {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ImageDescriptor getImageDescriptor() {
-		return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_ACTIVITY);
+	public Image getImage() {
+		return InspectIT.getDefault().getImage(InspectITConstants.IMG_ACTIVITY);
 	}
 
 }
