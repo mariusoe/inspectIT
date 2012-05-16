@@ -261,7 +261,8 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 		/**
 		 * Aggregation.
 		 */
-		int aggregationPeriod = aggregationPeriodSpiner.getSelection();
+		// aggregation period must be in the milliseconds, thus we multiply with 1000
+		int aggregationPeriod = aggregationPeriodSpiner.getSelection() * 1000;
 		if (saveClassesList.contains(TimerData.class)) {
 			saveClassesList.remove(TimerData.class);
 			DataAggregatorProcessor<TimerData> dataAggregatorProcessor = new DataAggregatorProcessor<TimerData>(TimerData.class, aggregationPeriod, new TimerDataAggregator(true));
@@ -279,10 +280,13 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 		 * Invocation extractor & cloner.
 		 */
 		if (saveClassesList.contains(InvocationSequenceData.class)) {
-			List<AbstractDataProcessor> chainedProcessorsForExtractor = new ArrayList<AbstractDataProcessor>();
-			chainedProcessorsForExtractor.addAll(normalProcessors);
-			InvocationExtractorDataProcessor invocationExtractorDataProcessor = new InvocationExtractorDataProcessor(chainedProcessorsForExtractor);
-			normalProcessors.add(invocationExtractorDataProcessor);
+			// we only include the extractor of invocations if the style is specified
+			if (isStyleApplied(EXTRACT_INVOCATIONS)) {
+				List<AbstractDataProcessor> chainedProcessorsForExtractor = new ArrayList<AbstractDataProcessor>();
+				chainedProcessorsForExtractor.addAll(normalProcessors);
+				InvocationExtractorDataProcessor invocationExtractorDataProcessor = new InvocationExtractorDataProcessor(chainedProcessorsForExtractor);
+				normalProcessors.add(invocationExtractorDataProcessor);
+			}
 			normalProcessors.add(new InvocationClonerDataProcessor());
 		}
 
