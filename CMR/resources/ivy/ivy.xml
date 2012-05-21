@@ -55,17 +55,9 @@
 		<dependency org="truelicense" name="truexml" rev="1.29" transitive="false" conf="prod->default"/>
 
 		<!-- Test -->
+		<!-- Test NG should be on the build path via the Eclipse plug-in -->
 		<dependency org="org.springframework" name="spring-test" rev="3.1.0.RELEASE" transitive="false" conf="test->default"/>
-		<dependency org="org.testng" name="testng" rev="5.14.6" transitive="false" conf="test->default" />
 		<dependency org="org.mockito" name="mockito-all" rev="1.9.0" conf="test->default" />
-		<dependency org="net.sourceforge.cobertura" name="cobertura" rev="1.9.4.1" conf="test->default" />
-		<dependency org="oro" name="oro" rev="2.0.8" conf="test->default" />
-		<dependency org="com.beust" name="jcommander" rev="1.5" transitive="false" conf="test->default" />
-		<dependency org="org.beanshell" name="bsh" rev="2.0b4" transitive="false" conf="test->default" />
-		<dependency org="nl.jqno.equalsverifier" name="equalsverifier" rev="1.0.2" transitive="false" conf="test->default"/>
-		<dependency org="org.objenesis" name="objenesis" rev="1.2" transitive="false" conf="test->default"/>
-		<dependency org="asm" name="asm" rev="3.0" conf="test->default"/>
-		<dependency org="asm" name="asm-tree" rev="3.0" conf="test->default"/>
-
+		<dependency org="nl.jqno.equalsverifier" name="equalsverifier" rev="1.0.2" conf="test->default"/>
 	</dependencies>
 </ivy-module>

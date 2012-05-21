@@ -30,11 +30,6 @@
 		<ivy:cachepath pathid="lib.prod" conf="prod" />
 		<ivy:cachepath pathid="lib.test" conf="test" />
 
-		<taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="lib.test" />
-		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="lib.test" />
-		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="lib.test" />
-		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="lib.test" />
-
 		<ivy:cachepath pathid="path.antcontrib" organisation="ant-contrib" module="ant-contrib" revision="1.0b3" conf="default" inline="true" />
 		<taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="path.antcontrib" />
 	</target>
@@ -50,6 +45,18 @@
 		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="path.pmd" />
 		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.findbugs" />
 		<taskdef resource="checkstyletask.properties" classpathref="path.checkstyle" />
+	</target>
+
+	<target name="init-functional-tests">
+		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+		<!-- needed for TestNG & Cobertura -->
+		<ivy:cachepath pathid="path.testng" organisation="org.testng" module="testng" revision="6.3.1" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.cobertura" organisation="net.sourceforge.cobertura" module="cobertura" revision="1.9.4.1" conf="default" inline="true" />
+
+		<taskdef name="testng" classpathref="path.testng" classname="org.testng.TestNGAntTask" />
+		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="path.cobertura" />
+		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.cobertura" />
+		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.cobertura" />
 	</target>
 
 	<target name="init-ftp-task">
@@ -104,7 +111,7 @@
 	<!-- *************************************************************** -->
 
 	<!--  It depends on the release target, because we need the compiled classes -->
-	<target name="functional-tests" depends="build">
+	<target name="functional-tests" depends="build, init-functional-tests">
 		<mkdir dir="${build.qa.test.testdata}" />
 		<mkdir dir="${build.qa.test.coveragedata}" />
 		<mkdir dir="${build.test.classes}" />
@@ -115,8 +122,8 @@
 			<fileset dir="${commons.build.release}/lib" includes="*.jar" />
 			<fileset dir="${commonscs.build.release}" includes="*.jar" />
 			<fileset dir="${commonscs.build.release}/lib" includes="*.jar" />
-			<path refid="lib.prod" />
 			<path refid="lib.test" />
+			<path refid="path.testng" />
 		</path>
 
 		<javac source="1.7" target="1.7" debug="true" debuglevel="lines,vars,source" nowarn="off" includeAntRuntime="no" destdir="${build.test.classes}" srcdir="${test.root}">
@@ -149,6 +156,8 @@
 			<classpath location="${build.instrumented.classes}" />
 			<classpath refid="complete.classpath" />
 			<classpath refid="path.test.class" />
+			<classpath refid="path.testng" />
+			<classpath refid="path.cobertura" />
 			<!-- this entry is necessary in order to get the spring configurations needed for the test -->
 			<classpath location="${src.root}" />
 			<classpath location="${test.root}" />

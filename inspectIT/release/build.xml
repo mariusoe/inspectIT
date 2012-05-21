@@ -102,12 +102,6 @@
 				<include name="**" />
 			</fileset>
 		</copy>
-
-		<!-- Task Definitions -->
-		<taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="lib.test" />
-		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="lib.test" />
-		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="lib.test" />
-		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="lib.test" />
 	</target>
 
 	<target name="init-static-analysis">
@@ -121,6 +115,18 @@
 		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="path.pmd" />
 		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.findbugs" />
 		<taskdef resource="checkstyletask.properties" classpathref="path.checkstyle" />
+	</target>
+
+	<target name="init-functional-tests">
+		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+		<!-- needed for TestNG & Cobertura -->
+		<ivy:cachepath pathid="path.testng" organisation="org.testng" module="testng" revision="6.3.1" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.cobertura" organisation="net.sourceforge.cobertura" module="cobertura" revision="1.9.4.1" conf="default" inline="true" />
+
+		<taskdef name="testng" classpathref="path.testng" classname="org.testng.TestNGAntTask" />
+		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="path.cobertura" />
+		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.cobertura" />
+		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.cobertura" />
 	</target>
 
 	<target name="init-ftp-task">
@@ -183,13 +189,13 @@
 	<!-- *************************************************************** -->
 
 	<!--  It depends on the release target, because we need the compiled class files from the PDE Build-->
-	<target name="functional-tests" depends="release">
+	<target name="functional-tests" depends="release, init-functional-tests">
 		<mkdir dir="${build.qa.test.testdata}" />
 		<mkdir dir="${build.test.classes}" />
 
 		<javac source="1.7" target="1.7" debug="true" nowarn="off" includeAntRuntime="no" destdir="${build.test.classes}" srcdir="${test.root}">
-			<classpath refid="lib.prod" />
 			<classpath refid="lib.test" />
+			<classpath refid="path.testng" />
 			<classpath refid="path.rcp" />
 			<classpath refid="path.commons.classes" />
 			<classpath refid="path.commonscs.classes" />
@@ -215,17 +221,17 @@
 			<!--instrumentationClasspath>
 				<path location="${build.instrumented.classes}" />
 			</instrumentationClasspath-->
-			<classpath refid="lib.prod" />
 			<classpath refid="lib.test" />
 			<classpath location="${build.instrumented.classes}" />
 		</cobertura-instrument>
 
 		<testng outputdir="${build.qa.test.testdata}" haltonfailure="${testng.haltonfailure}">
-			<classpath refid="lib.prod" />
 			<classpath refid="lib.test" />
 			<classpath refid="path.commons.classes" />
 			<classpath refid="path.commonscs.classes" />
 			<classpath refid="path.test.class" />
+			<classpath refid="path.testng" />
+			<classpath refid="path.cobertura" />
 			<classpath location="${build.instrumented.classes}" />
 			<classpath location="${test.root}" />
 			<classpath refid="path.rcp" />

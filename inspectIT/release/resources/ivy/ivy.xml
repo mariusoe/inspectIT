@@ -50,16 +50,8 @@
 		<dependency org="com.google.guava" name="guava" rev="11.0.1"  conf="prod->default"/>
 
 		<!-- Test -->
-		<dependency org="org.testng" name="testng" rev="5.14.6" transitive="false" conf="test->default" />
+		<!-- Test NG should be on the build path via the Eclipse plug-in -->
 		<dependency org="org.mockito" name="mockito-all" rev="1.9.0" conf="test->default" />
-		<dependency org="net.sourceforge.cobertura" name="cobertura" rev="1.9.4.1" conf="test->default" />
-		<dependency org="log4j" name="log4j" rev="1.2.9" conf="test->default" />
-		<dependency org="oro" name="oro" rev="2.0.8" conf="test->default" />
-		<dependency org="asm" name="asm" rev="3.0" conf="test->default" />
-		<dependency org="asm" name="asm-tree" rev="3.0" conf="test->default" />
-		<dependency org="com.beust" name="jcommander" rev="1.5" transitive="false" conf="test->default" />
-		<dependency org="org.beanshell" name="bsh" rev="2.0b4" transitive="false" conf="test->default" />
-
 		<dependency org="com.ibm.icu" name="icu4j" rev="4.0.1" conf="test->default"/>
 	</dependencies>
 </ivy-module>

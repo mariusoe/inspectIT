@@ -53,11 +53,6 @@
 		<ivy:cachepath pathid="lib.prod" conf="prod" />
 		<ivy:cachefileset setid="lib.prod.fileset" conf="prod"/>
 		<ivy:cachepath pathid="lib.test" conf="test" />
-
-		<taskdef name="testng" classpathref="lib.test" classname="org.testng.TestNGAntTask" />
-		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="lib.test" />
-		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="lib.test" />
-		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="lib.test" />
 	</target>
 
 	<target name="init-static-analysis">
@@ -71,6 +66,18 @@
 		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="path.pmd" />
 		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="path.findbugs" />
 		<taskdef resource="checkstyletask.properties" classpathref="path.checkstyle" />
+	</target>
+
+	<target name="init-functional-tests">
+		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+		<!-- needed for TestNG & Cobertura -->
+		<ivy:cachepath pathid="path.testng" organisation="org.testng" module="testng" revision="6.3.1" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.cobertura" organisation="net.sourceforge.cobertura" module="cobertura" revision="1.9.4.1" conf="default" inline="true" />
+
+		<taskdef name="testng" classpathref="path.testng" classname="org.testng.TestNGAntTask" />
+		<taskdef name="cobertura-instrument" classname="net.sourceforge.cobertura.ant.InstrumentTask" classpathref="path.cobertura" />
+		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.cobertura" />
+		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.cobertura" />
 	</target>
 
 
@@ -107,14 +114,14 @@
 	<!-- component.                                                      -->
 	<!-- *************************************************************** -->
 
-	<target name="functional-tests" depends="build-agent">
+	<target name="functional-tests" depends="build-agent, init-functional-tests">
 		<mkdir dir="${build.agent.test.classes}" />
 		<mkdir dir="${build.qa.test.testdata}" />
 		<mkdir dir="${build.qa.test.coveragedata}" />
 
 		<javac source="1.5" target="1.5" debug="true" nowarn="off" destdir="${build.agent.test.classes}" srcdir="${src.test.root}" includeAntRuntime="no">
-			<classpath refid="lib.prod" />
 			<classpath refid="lib.test" />
+			<classpath refid="path.testng" />
 			<classpath refid="path.agent.classes" />
 			<classpath refid="path.common.classes" />
 		</javac>
@@ -136,7 +143,6 @@
 			<instrumentationClasspath>
 				<path location="${build.agent.instrumented.classes}" />
 			</instrumentationClasspath>
-			<classpath refid="lib.prod" />
 			<classpath refid="lib.test" />
 			<classpath refid="path.common.classes" />
 			<classpath location="${build.agent.instrumented.classes}" />
@@ -144,8 +150,9 @@
 
 		<testng failureproperty="error.test.agent" outputdir="${build.qa.test.testdata}" haltonfailure="${testng.haltonfailure}">
 			<classpath refid="path.agent.test.classes" />
-			<classpath refid="lib.prod" />
 			<classpath refid="lib.test" />
+			<classpath refid="path.testng" />
+			<classpath refid="path.cobertura" />
 			<classpath refid="path.common.classes" />
 			<classpath location="${build.agent.instrumented.classes}" />
 
