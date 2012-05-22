@@ -3,6 +3,7 @@ package info.novatec.inspectit.rcp.view.impl;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.action.MenuAction;
+import info.novatec.inspectit.rcp.filter.FilterComposite;
 import info.novatec.inspectit.rcp.form.StorageDataPropertyForm;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
@@ -11,6 +12,7 @@ import info.novatec.inspectit.rcp.handlers.ShowRepositoryHandler;
 import info.novatec.inspectit.rcp.model.Component;
 import info.novatec.inspectit.rcp.model.StorageLeaf;
 import info.novatec.inspectit.rcp.model.StorageManagerTreeModelManager;
+import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryChangeListener;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
@@ -31,9 +33,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.expressions.IEvaluationContext;
@@ -174,6 +178,16 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	private Composite mainComposite;
 
 	/**
+	 * Upper composite where filter box and storage tree is located.
+	 */
+	private Composite upperComposite;
+
+	/**
+	 * Filter storages composite that will be displayed at top of view.
+	 */
+	private FilterStorageComposite filterStorageComposite;
+
+	/**
 	 * Default constructor.
 	 */
 	public StorageManagerView() {
@@ -193,7 +207,18 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 		mainLayout.marginHeight = 0;
 		mainComposite.setLayout(mainLayout);
 
-		mainForm = toolkit.createForm(mainComposite);
+		upperComposite = toolkit.createComposite(mainComposite);
+		GridLayout upperLayout = new GridLayout(1, true);
+		upperLayout.marginWidth = 0;
+		upperLayout.marginHeight = 0;
+		upperComposite.setLayout(upperLayout);
+		upperComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		// filter composite
+		filterStorageComposite = new FilterStorageComposite(upperComposite, SWT.NONE);
+		filterStorageComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+		mainForm = toolkit.createForm(upperComposite);
 		mainForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		mainForm.getBody().setLayout(new GridLayout(1, true));
 
@@ -212,6 +237,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 			}
 		});
 		treeViewer.addFilter(treeFilter);
+		treeViewer.addFilter(filterStorageComposite.getFilter());
 		treeViewer.getTree().setVisible(false);
 		ColumnViewerToolTipSupport.enableFor(treeViewer, ToolTip.NO_RECREATE);
 
@@ -376,8 +402,10 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 				StructuredSelection ss = new StructuredSelection(lastSelectedLeaf);
 				treeViewer.setSelection(ss, true);
 			}
+			filterStorageComposite.setEnabled(true);
 		} else {
 			displayMessage("No storage information available on currently available CMR repositories.", Display.getDefault().getSystemImage(SWT.ICON_INFORMATION));
+			filterStorageComposite.setEnabled(false);
 		}
 		mainForm.getBody().layout();
 	}
@@ -829,6 +857,116 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 				setToolTipText("Show Properties");
 			}
 		};
+	}
+
+	/**
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private final class FilterStorageComposite extends FilterComposite {
+
+		/**
+		 * String to be filtered.
+		 */
+		private String filterString = "";
+
+		/**
+		 * Filter.
+		 */
+		private ViewerFilter filter = new ViewerFilter() {
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public boolean select(Viewer viewer, Object parentElement, Object element) {
+				if (Objects.equals("", filterString)) {
+					return true;
+				} else {
+					if (element instanceof IStorageDataProvider) {
+						return select(((IStorageDataProvider) element).getStorageData());
+					}
+					return true;
+				}
+			}
+
+			/**
+			 * Does a filter select on {@link StorageData}.
+			 * 
+			 * @param storageData
+			 *            {@link StorageData}
+			 * @return True if data in {@link StorageData} fits the filter string.
+			 */
+			private boolean select(StorageData storageData) {
+				if (StringUtils.containsIgnoreCase(storageData.getName(), filterString)) {
+					return true;
+				}
+				if (StringUtils.containsIgnoreCase(storageData.getDescription(), filterString)) {
+					return true;
+				}
+				if (StringUtils.containsIgnoreCase(storageData.getState().toString(), filterString)) {
+					return true;
+				}
+				for (AbstractStorageLabel<?> label : storageData.getLabelList()) {
+					if (StringUtils.containsIgnoreCase(TextFormatter.getLabelValue(label, false), filterString)) {
+						return true;
+					}
+				}
+				return false;
+			}
+		};
+
+		/**
+		 * Default constructor.
+		 * 
+		 * @param parent
+		 *            A widget which will be the parent of the new instance (cannot be null).
+		 * @param style
+		 *            The style of widget to construct.
+		 * @see Composite#Composite(Composite, int)
+		 */
+		public FilterStorageComposite(Composite parent, int style) {
+			super(parent, style, "Filter storages");
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void executeCancel() {
+			this.filterString = "";
+			treeViewer.refresh();
+			treeViewer.expandToLevel(TreeViewer.ALL_LEVELS);
+			if (null != lastSelectedLeaf && storageRespositoryMap.keySet().contains(lastSelectedLeaf.getStorageData())) {
+				StructuredSelection ss = new StructuredSelection(lastSelectedLeaf);
+				treeViewer.setSelection(ss, true);
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void executeFilter(String filterString) {
+			this.filterString = filterString;
+			treeViewer.refresh();
+			treeViewer.expandToLevel(TreeViewer.ALL_LEVELS);
+			if (null != lastSelectedLeaf && storageRespositoryMap.keySet().contains(lastSelectedLeaf.getStorageData())) {
+				StructuredSelection ss = new StructuredSelection(lastSelectedLeaf);
+				treeViewer.setSelection(ss, true);
+			}
+		}
+
+		/**
+		 * Gets {@link #filter}.
+		 * 
+		 * @return {@link #filter}
+		 */
+		public ViewerFilter getFilter() {
+			return filter;
+		}
+
 	}
 
 	/**
