@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  * Provides <code>HttpTimerData</code> information from the CMR internal in memory buffer.
- *
+ * 
  * @author Stefan Siegl
  */
 @Repository
@@ -49,7 +49,7 @@ public class BufferHttpTimerDataDaoImpl extends AbstractBufferDataDao<HttpTimerD
 	 */
 	@Override
 	public List<HttpTimerData> getTaggedAggregatedHttpTimerData(HttpTimerData httpData, boolean includeRequestMethod) {
-		IIndexQuery query = httpDataQueryFactory.getFindAllHttpTimersQuery(httpData, null, null);
+		IIndexQuery query = httpDataQueryFactory.getFindAllTaggedHttpTimersQuery(httpData, null, null);
 		return super.executeQuery(query, new HttpTimerDataAggregator(true, false, includeRequestMethod));
 	}
 
@@ -58,7 +58,7 @@ public class BufferHttpTimerDataDaoImpl extends AbstractBufferDataDao<HttpTimerD
 	 */
 	@Override
 	public List<HttpTimerData> getTaggedAggregatedHttpTimerData(HttpTimerData httpData, boolean includeRequestMethod, Date fromDate, Date toDate) {
-		IIndexQuery query = httpDataQueryFactory.getFindAllHttpTimersQuery(httpData, fromDate, toDate);
+		IIndexQuery query = httpDataQueryFactory.getFindAllTaggedHttpTimersQuery(httpData, fromDate, toDate);
 		return super.executeQuery(query, new HttpTimerDataAggregator(true, false, includeRequestMethod));
 	}
 
