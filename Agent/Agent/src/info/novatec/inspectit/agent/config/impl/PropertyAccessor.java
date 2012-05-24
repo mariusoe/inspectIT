@@ -218,6 +218,7 @@ public class PropertyAccessor implements IPropertyAccessor {
 		List<ParameterContentData> parameterContentData = new ArrayList<ParameterContentData>();
 		for (Iterator<PropertyPathStart> iterator = propertyAccessorList.iterator(); iterator.hasNext();) {
 			PropertyPathStart start = iterator.next();
+
 			try {
 				String content = this.getPropertyContent(start, clazz, parameters);
 				ParameterContentData paramContentData = new ParameterContentData();
@@ -230,8 +231,13 @@ public class PropertyAccessor implements IPropertyAccessor {
 				if (LOGGER.isLoggable(Level.SEVERE)) {
 					LOGGER.severe("Cannot access the property: " + start + " for class " + clazz.getClass() + ". Will be removed from the list to prevent further errors! (" + e.getMessage() + ")");
 				}
-				iterator.remove();
+
+				propertyAccessorList.remove(start);
+				// iterator.remove(); // Unsupported exception. Iterator can't make changes, since
+				// iterating over a snapshot.
+
 			}
+
 		}
 
 		return parameterContentData;

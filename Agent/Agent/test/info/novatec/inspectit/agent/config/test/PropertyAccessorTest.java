@@ -1,5 +1,7 @@
 package info.novatec.inspectit.agent.config.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import info.novatec.inspectit.agent.config.IPropertyAccessor;
@@ -11,7 +13,9 @@ import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.data.ParameterContentData;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 import org.testng.annotations.BeforeClass;
@@ -155,7 +159,8 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		Person juergen = new Person("Hans");
 		peter.setChild(juergen);
 
-		List<PropertyPathStart> propertyAccessorList = new ArrayList<PropertyPathStart>();
+		// CopyOnWriteArrayList for thread safety
+		List<PropertyPathStart> propertyAccessorList = new CopyOnWriteArrayList<PropertyPathStart>();
 
 		// valid
 		PropertyPathStart start = new PropertyPathStart();
@@ -268,6 +273,68 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 
 		String result = propertyAccessor.getPropertyContent(start, peter, null);
 		assertEquals(new Integer(result).intValue(), 3);
+	}
+
+	@Test
+	public void concurentAccessOnPropertyAccessorList() {
+
+		// create initial object relation
+		Person peter = new Person("Peter");
+		Person juergen = new Person("Jurgen");
+		peter.setChild(juergen);
+
+		// CopyOnWriteArrayList for thread safety. It's the same as the propertyAccessorList in
+		// AbstractSensorConfig, as its operated on. In normal ArrayList, Fail-fast iterators throw
+		// ConcurrentModificationException on a best-effort basis.
+		// So it's not guaranteed, that there will be an exception on concurrent access, but the
+		// results will be inconsistent.
+		List<PropertyPathStart> propertyAccessorList = new CopyOnWriteArrayList<PropertyPathStart>();
+
+		// valid
+		PropertyPathStart start = new PropertyPathStart();
+		start.setName("name");
+		start.setSignaturePosition(0);
+		PropertyPath pathOne = new PropertyPath("child");
+		start.setPathToContinue(pathOne);
+		propertyAccessorList.add(start);
+
+		// not valid
+		start = new PropertyPathStart();
+		start.setName("this");
+		start.setClassOfExecutedMethod(true);
+		pathOne = new PropertyPath("notValid");
+		start.setPathToContinue(pathOne);
+		propertyAccessorList.add(start);
+
+		// not valid as the second parameter will be null
+		start = new PropertyPathStart();
+		start.setName("name");
+		start.setSignaturePosition(1);
+		pathOne = new PropertyPath("child");
+		start.setPathToContinue(pathOne);
+		propertyAccessorList.add(start);
+
+		assertEquals(propertyAccessorList.size(), 3);
+
+		// Creating concurrent access
+		Iterator<PropertyPathStart> i = propertyAccessorList.iterator();
+		// Access via iterator
+		PropertyPathStart p = i.next();
+		// Direct access
+		List<ParameterContentData> parameterContentList = propertyAccessor.getParameterContentData(propertyAccessorList, peter, new Object[] { peter });
+
+		// Double check results, in case of missing exception
+		// size should be reduced to one
+		assertThat(propertyAccessorList.size(), equalTo(1));
+		// so is the size of the parameter content
+		assertNotNull(parameterContentList);
+		assertThat(parameterContentList.size(), equalTo(1));
+		// changed due to xstream, the ' at the beginning will be always removed
+		// if displayed to the end-user.
+		assertThat(parameterContentList.get(0).getContent(), equalTo("'Jurgen'"));
+		assertThat(parameterContentList.get(0).getSignaturePosition(), equalTo(0));
+		assertThat(parameterContentList.get(0).getName(), equalTo("name"));
+
 	}
 
 	private static class Person {

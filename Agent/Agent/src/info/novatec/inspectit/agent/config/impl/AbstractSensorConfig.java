@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * The abstract sensor configuration which is used by the registered and unregistered sensor
@@ -51,7 +52,7 @@ public abstract class AbstractSensorConfig {
 	 * If <code>propertyAccess</code> is set to true, then this list contains at least one element.
 	 * The contents is of type {@link PropertyPathStart}.
 	 */
-	private List<PropertyPathStart> propertyAccessorList = new ArrayList<PropertyPathStart>(0);
+	private List<PropertyPathStart> propertyAccessorList = new CopyOnWriteArrayList<PropertyPathStart>();
 
 	/**
 	 * If this config defines a constructor.
