@@ -1,8 +1,8 @@
 package info.novatec.inspectit.indexing.storage.impl;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * Storage descriptor. POJO that keeps information about where element is stored on disk.
@@ -155,6 +155,22 @@ public class StorageDescriptor implements IStorageDescriptor {
 	/**
 	 * {@inheritDoc}
 	 */
+	public int compareTo(IStorageDescriptor other) {
+		if (this.getChannelId() - other.getChannelId() != 0) {
+			return this.getChannelId() - other.getChannelId();
+		}
+		if (this.getPosition() - other.getPosition() != 0) {
+			return (int) (this.getPosition() - other.getPosition());
+		}
+		if (this.getSize() - other.getSize() != 0) {
+			return (int) (this.getSize() - other.getSize());
+		}
+		return 0;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		ToStringBuilder toStringBuilder = new ToStringBuilder(this);
@@ -163,4 +179,5 @@ public class StorageDescriptor implements IStorageDescriptor {
 		toStringBuilder.append("size", simpleStorageDescriptor.getSize());
 		return toStringBuilder.toString();
 	}
+
 }

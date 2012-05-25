@@ -9,7 +9,7 @@ package info.novatec.inspectit.indexing.storage;
  * @author Ivan Senic
  * 
  */
-public interface IStorageDescriptor {
+public interface IStorageDescriptor extends Comparable<IStorageDescriptor> {
 
 	/**
 	 * @return the channelId

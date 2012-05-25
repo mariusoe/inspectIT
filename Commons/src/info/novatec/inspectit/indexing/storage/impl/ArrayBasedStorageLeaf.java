@@ -6,6 +6,7 @@ import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.impl.IndexingException;
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
+import info.novatec.inspectit.util.ArrayUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -125,7 +126,7 @@ public class ArrayBasedStorageLeaf<E extends DefaultData> implements IStorageTre
 	private boolean insertIntoArrays(long id, SimpleStorageDescriptor simpleDescriptor) {
 		writeLock.lock();
 		try {
-			int index = Arrays.binarySearch(idArray, id);
+			int index = ArrayUtil.binarySearch(idArray, 0, size, id);
 			if (index >= 0) {
 				// same element is already in leaf, we return
 				return false;
@@ -180,7 +181,7 @@ public class ArrayBasedStorageLeaf<E extends DefaultData> implements IStorageTre
 	public IStorageDescriptor get(E element) {
 		readLock.lock();
 		try {
-			int index = Arrays.binarySearch(idArray, element.getId());
+			int index = ArrayUtil.binarySearch(idArray, 0, size, element.getId());
 			if (index >= 0) {
 				SimpleStorageDescriptor simpleDescriptor = descriptorArray[index];
 				if (null != simpleDescriptor) {
@@ -209,7 +210,7 @@ public class ArrayBasedStorageLeaf<E extends DefaultData> implements IStorageTre
 				// min
 				// id
 				if (query.getMinId() != 0) {
-					index = Arrays.binarySearch(idArray, query.getMinId());
+					index = ArrayUtil.binarySearch(idArray, 0, size, query.getMinId());
 					if (index < 0) {
 						index = -index - 1;
 					}
@@ -247,7 +248,7 @@ public class ArrayBasedStorageLeaf<E extends DefaultData> implements IStorageTre
 			// if min id is given, we will start from the first id that is bigger or equal than min
 			// id
 			if (query.getMinId() != 0) {
-				index = Arrays.binarySearch(idArray, query.getMinId());
+				index = ArrayUtil.binarySearch(idArray, 0, size, query.getMinId());
 				if (index < 0) {
 					index = -index - 1;
 				}
@@ -280,7 +281,7 @@ public class ArrayBasedStorageLeaf<E extends DefaultData> implements IStorageTre
 		int index;
 		readLock.lock();
 		try {
-			index = Arrays.binarySearch(idArray, element.getId());
+			index = ArrayUtil.binarySearch(idArray, 0, size, element.getId());
 		} finally {
 			readLock.unlock();
 		}

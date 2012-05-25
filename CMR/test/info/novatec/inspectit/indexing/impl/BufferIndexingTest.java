@@ -31,11 +31,11 @@ import org.testng.annotations.Test;
 
 /**
  * Test class for testing functionality of {@link IBufferTreeComponent}.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
-public class IndexingTest {
+public class BufferIndexingTest {
 
 	/**
 	 * Index query to use.
@@ -68,7 +68,7 @@ public class IndexingTest {
 
 	/**
 	 * Test tree with empty query. All elements should be returned.
-	 *
+	 * 
 	 * @throws IndexingException
 	 *             If {@link IndexingException} occurs.
 	 */
@@ -92,7 +92,7 @@ public class IndexingTest {
 
 	/**
 	 * Test put and retrieval of one element.
-	 *
+	 * 
 	 * @throws IndexingException
 	 *             If {@link IndexingException} occurs.
 	 */
@@ -109,7 +109,7 @@ public class IndexingTest {
 
 	/**
 	 * Test tree with query that holds only platform ident.
-	 *
+	 * 
 	 * @throws IndexingException
 	 *             If {@link IndexingException} occurs.
 	 */
@@ -140,7 +140,7 @@ public class IndexingTest {
 
 	/**
 	 * Test tree with query that holds only method ident.
-	 *
+	 * 
 	 * @throws IndexingException
 	 *             If {@link IndexingException} occurs.
 	 */
@@ -171,7 +171,7 @@ public class IndexingTest {
 
 	/**
 	 * Test tree with query that holds only object type.
-	 *
+	 * 
 	 * @throws IndexingException
 	 *             If {@link IndexingException} occurs.
 	 */
@@ -202,7 +202,7 @@ public class IndexingTest {
 
 	/**
 	 * Test tree with query that holds only time interval.
-	 *
+	 * 
 	 * @throws IndexingException
 	 *             If {@link IndexingException} occurs.
 	 */
@@ -229,7 +229,7 @@ public class IndexingTest {
 		indexQuery.setToDate(plusHour);
 
 		List<DefaultData> results = rootBranch.query(indexQuery);
-		Assert.assertEquals(1, results.size());
+		Assert.assertEquals(results.size(), 1);
 		for (DefaultData result : results) {
 			Assert.assertEquals(minusHour.compareTo(result.getTimeStamp()) <= 0, true);
 			Assert.assertEquals(plusHour.compareTo(result.getTimeStamp()) >= 0, true);
@@ -238,7 +238,7 @@ public class IndexingTest {
 
 	/**
 	 * Test tree with query that holds platform ident and sensor ident in different levels.
-	 *
+	 * 
 	 * @throws IndexingException
 	 *             If {@link IndexingException} occurs.
 	 */
@@ -285,7 +285,7 @@ public class IndexingTest {
 
 	/**
 	 * Test a removal of one element from the indexing tree.
-	 *
+	 * 
 	 * @throws IndexingException
 	 *             If {@link IndexingException} occurs.
 	 */
@@ -303,7 +303,7 @@ public class IndexingTest {
 
 	/**
 	 * Clear all test.
-	 *
+	 * 
 	 * @throws IndexingException
 	 *             If {@link IndexingException} occurs.
 	 */

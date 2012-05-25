@@ -190,8 +190,8 @@ public class StorageIndexingTreeHandler {
 	 *            Write size.
 	 */
 	public void writeSuccessful(WriteTask writeTask, long position, long size) {
-		// remove the data from the map
-		TreeDescriptorPair treeDescriptorPair = writeTasksInProcess.remove(writeTask);
+		// get the data from the map
+		TreeDescriptorPair treeDescriptorPair = writeTasksInProcess.get(writeTask);
 		if (null != treeDescriptorPair) {
 			IStorageDescriptor storageDescriptor = treeDescriptorPair.getStorageDescriptor();
 			// update the descriptor with the information provided
@@ -200,6 +200,8 @@ public class StorageIndexingTreeHandler {
 				storageDescriptor.setSize(size);
 			}
 		}
+		// remove the entry in map after the data has been updated in indexing tree
+		writeTasksInProcess.remove(writeTask);
 	}
 
 	/**
@@ -213,8 +215,8 @@ public class StorageIndexingTreeHandler {
 	 *            Write task that failed.
 	 */
 	public void writeFailed(WriteTask writeTask) {
-		// remove the data from the map
-		TreeDescriptorPair treeDescriptorPair = writeTasksInProcess.remove(writeTask);
+		// get the data from the map
+		TreeDescriptorPair treeDescriptorPair = writeTasksInProcess.get(writeTask);
 		if (null != treeDescriptorPair) {
 			IStorageTreeComponent<DefaultData> indexingTree = treeDescriptorPair.getIndexingTree();
 			// if write fails, remove the descriptor for the data from indexing tree
@@ -222,6 +224,8 @@ public class StorageIndexingTreeHandler {
 				indexingTree.getAndRemove(writeTask.getData());
 			}
 		}
+		// remove the entry in map after the indexing tree was informed
+		writeTasksInProcess.remove(writeTask);
 	}
 
 	/**
