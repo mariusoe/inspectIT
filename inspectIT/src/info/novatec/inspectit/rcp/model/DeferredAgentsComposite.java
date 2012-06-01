@@ -11,6 +11,8 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ui.progress.IElementCollector;
 
+import com.google.common.base.Objects;
+
 /**
  * This composite holds Agents of one CMR as the deferred children.
  * 
@@ -92,6 +94,35 @@ public class DeferredAgentsComposite extends DeferredComposite implements ICmrRe
 	@Override
 	public String getName() {
 		return cmrRepositoryDefinition.getName();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(super.hashCode(), cmrRepositoryDefinition);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+		if (object == null) {
+			return false;
+		}
+		if (getClass() != object.getClass()) {
+			return false;
+		}
+		if (!super.equals(object)) {
+			return false;
+		}
+		DeferredAgentsComposite that = (DeferredAgentsComposite) object;
+		return Objects.equal(this.cmrRepositoryDefinition, that.cmrRepositoryDefinition);
 	}
 
 }
