@@ -107,7 +107,7 @@ public class StatementHook implements IMethodHook {
 
 			if (null == sqlData) {
 				try {
-					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+					Timestamp timestamp = new Timestamp(System.currentTimeMillis() - Math.round(duration));
 					long platformId = idManager.getPlatformId();
 					long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
 					long registeredMethodId = idManager.getRegisteredMethodId(methodId);

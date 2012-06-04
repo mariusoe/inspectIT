@@ -13,7 +13,6 @@ import info.novatec.inspectit.util.Timer;
 
 import java.lang.management.ThreadMXBean;
 import java.sql.Timestamp;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -252,7 +251,7 @@ public class HttpHook implements IMethodHook {
 						long platformId = idManager.getPlatformId();
 						long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
 						long registeredMethodId = idManager.getRegisteredMethodId(methodId);
-						Timestamp timestamp = new Timestamp(GregorianCalendar.getInstance().getTimeInMillis());
+						Timestamp timestamp = new Timestamp(System.currentTimeMillis() - Math.round(duration));
 
 						// Creating return data object
 						HttpTimerData data = new HttpTimerData();

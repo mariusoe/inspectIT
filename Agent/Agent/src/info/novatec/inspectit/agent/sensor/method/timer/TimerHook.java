@@ -191,7 +191,7 @@ public class TimerHook implements IMethodHook, IConstructorHook {
 				long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
 				long registeredMethodId = idManager.getRegisteredMethodId(methodId);
 
-				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+				Timestamp timestamp = new Timestamp(System.currentTimeMillis() - Math.round(duration));
 
 				storage = timerStorageFactory.newStorage(timestamp, platformId, registeredSensorTypeId, registeredMethodId, parameterContentData);
 				storage.addData(duration, cpuDuration);

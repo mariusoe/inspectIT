@@ -123,7 +123,7 @@ public class AverageTimerHook implements IMethodHook, IConstructorHook {
 				long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
 				long registeredMethodId = idManager.getRegisteredMethodId(methodId);
 
-				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+				Timestamp timestamp = new Timestamp(System.currentTimeMillis() - Math.round(duration));
 
 				timerData = new TimerData(timestamp, platformId, registeredSensorTypeId, registeredMethodId, parameterContentData);
 				timerData.increaseCount();

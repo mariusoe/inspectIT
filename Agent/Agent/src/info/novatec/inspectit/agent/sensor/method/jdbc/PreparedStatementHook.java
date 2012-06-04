@@ -13,7 +13,6 @@ import info.novatec.inspectit.util.Timer;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -126,7 +125,7 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 				SqlStatementData sqlData = (SqlStatementData) coreService.getMethodSensorData(sensorTypeId, methodId, sql);
 				if (null == sqlData) {
 					try {
-						Timestamp timestamp = new Timestamp(GregorianCalendar.getInstance().getTimeInMillis());
+						Timestamp timestamp = new Timestamp(System.currentTimeMillis() - Math.round(duration));
 						long platformId = idManager.getPlatformId();
 						long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
 						long registeredMethodId = idManager.getRegisteredMethodId(methodId);

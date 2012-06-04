@@ -147,7 +147,7 @@ public class MarvinWorkflowHook implements IMethodHook {
 
 				List<ParameterContentData> parameterContentData = propertyAccessor.getParameterContentData(rsc.getPropertyAccessorList(), object, parameters);
 
-				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+				Timestamp timestamp = new Timestamp(System.currentTimeMillis() - Math.round(duration));
 				TimerData timerData = new TimerData(timestamp, platformId, registeredSensorTypeId, registeredMethodId, parameterContentData);
 				timerData.addDuration(duration);
 
