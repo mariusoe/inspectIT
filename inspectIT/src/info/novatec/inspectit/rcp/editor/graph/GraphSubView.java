@@ -19,8 +19,7 @@ import java.util.Set;
 
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -123,7 +122,7 @@ public class GraphSubView extends AbstractSubView {
 
 		// create the composite
 		composite = toolkit.createComposite(parent);
-		composite.setLayout(new GridLayout(1, false));
+		composite.setLayout(new FillLayout());
 
 		// create the chart
 		chart = createChart();
@@ -131,9 +130,8 @@ public class GraphSubView extends AbstractSubView {
 		Color color = new Color(toolkit.getColors().getBackground().getRed(), toolkit.getColors().getBackground().getGreen(), toolkit.getColors().getBackground().getBlue());
 		chart.setBackgroundPaint(color);
 
-		frame = new ChartComposite(composite, SWT.NONE, chart, true);
-		// frame.setRangeZoomable(false);
-		frame.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		frame = new ChartComposite(composite, SWT.NONE, chart, ChartComposite.DEFAULT_WIDTH, ChartComposite.DEFAULT_HEIGHT, 0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, true, true, true, false, true,
+				true);
 	}
 
 	/**
