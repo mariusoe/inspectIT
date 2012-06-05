@@ -4,6 +4,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.editor.preferences.FormPreferencePanel;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferencePanel;
+import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
@@ -62,7 +63,7 @@ public class FormRootEditor extends AbstractRootEditor {
 		form = toolkit.createForm(parent);
 		form.setImage(getInputDefinition().getEditorPropertiesData().getImage());
 		form.setText(getInputDefinition().getEditorPropertiesData().getHeaderText());
-		form.setMessage(getInputDefinition().getEditorPropertiesData().getHeaderDescription());
+		form.setMessage(TextFormatter.clearLineBreaks(getInputDefinition().getEditorPropertiesData().getHeaderDescription()));
 		form.getBody().setLayout(new GridLayout());
 
 		// add repository source button

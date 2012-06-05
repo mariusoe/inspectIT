@@ -591,8 +591,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 				return emptyStyledString;
 			}
 		case STATEMENT:
-			String sql = data.getSql().replaceAll("[\r\n]+", " ");
-			return new StyledString(sql);
+			return new StyledString(TextFormatter.clearLineBreaks(data.getSql()));
 		case COUNT:
 			return new StyledString(Long.toString(data.getCount()));
 		case AVERAGE:

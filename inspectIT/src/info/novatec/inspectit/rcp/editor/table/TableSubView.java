@@ -14,6 +14,7 @@ import info.novatec.inspectit.rcp.editor.search.criteria.SearchCriteria;
 import info.novatec.inspectit.rcp.editor.search.criteria.SearchResult;
 import info.novatec.inspectit.rcp.editor.search.helper.TableViewerSearchHelper;
 import info.novatec.inspectit.rcp.editor.table.input.TableInputController;
+import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
 import info.novatec.inspectit.rcp.menu.ShowHideMenuManager;
 
@@ -379,7 +380,7 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 			AbstractRootEditor editor = this.getRootEditor();
 			if (editor instanceof FormRootEditor) {
 				Form form = ((FormRootEditor) editor).getForm();
-				StringBuilder message = new StringBuilder(editor.getInputDefinition().getEditorPropertiesData().getHeaderDescription() + " - ");
+				StringBuilder message = new StringBuilder(TextFormatter.clearLineBreaks(editor.getInputDefinition().getEditorPropertiesData().getHeaderDescription()) + " - ");
 				if (limit == -1) {
 					message.append("all displayed");
 				} else {

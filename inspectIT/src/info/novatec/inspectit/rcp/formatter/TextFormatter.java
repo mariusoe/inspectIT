@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.StyledString;
@@ -366,6 +367,57 @@ public final class TextFormatter {
 		default:
 			return "";
 		}
+	}
+
+	/**
+	 * The original text will be cleaned from the line breaks.
+	 * <p>
+	 * If string passed is <code>null</code>, null will be returned.
+	 * 
+	 * @param originalText
+	 *            Original text to modify.
+	 * @return Returns text without any line breaks.
+	 */
+	public static String clearLineBreaks(String originalText) {
+		if (null == originalText) {
+			return originalText;
+		}
+		boolean lastCharWhitespace = false;
+		StringBuilder stringBuilder = new StringBuilder(originalText.length());
+
+		for (int i = 0; i < originalText.length(); i++) {
+			char c = originalText.charAt(i);
+			if (c == '\r' || c == '\n') {
+				if (!lastCharWhitespace) {
+					stringBuilder.append(' ');
+					lastCharWhitespace = true;
+				}
+			} else if (Character.isWhitespace(c)) {
+				if (!lastCharWhitespace) {
+					stringBuilder.append(' ');
+					lastCharWhitespace = true;
+				}
+			} else {
+				stringBuilder.append(c);
+				lastCharWhitespace = false;
+			}
+		}
+		return stringBuilder.toString();
+	}
+
+	/**
+	 * Crops the string to the maxLength. The string will have '...' appended at the end. This
+	 * method delegates to the {@link StringUtils#abbreviate(String, int)} method.
+	 * 
+	 * @param string
+	 *            String to crop.
+	 * @param maxLength
+	 *            Wanted maximum length.
+	 * @see StringUtils#abbreviate(String, int)
+	 * @return Cropped {@link String}.
+	 */
+	public String crop(String string, int maxLength) {
+		return StringUtils.abbreviate(string, maxLength);
 	}
 
 }

@@ -625,8 +625,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		case SQL:
 			styledString = new StyledString();
 			if (InvocationSequenceDataHelper.hasSQLData(data)) {
-				String sql = data.getSqlStatementData().getSql().replaceAll("[\r\n]+", " ");
-				styledString.append(sql);
+				styledString.append(TextFormatter.clearLineBreaks(data.getSqlStatementData().getSql()));
 			}
 			return styledString;
 		case PARAMETER:
