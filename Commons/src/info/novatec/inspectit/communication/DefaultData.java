@@ -159,18 +159,36 @@ public abstract class DefaultData implements Serializable {
 
 	/**
 	 * Returns the approximate size of the object in the memory in bytes.
-	 * <p>
-	 * This method needs to be overridden by all subclasses.
 	 * 
 	 * @param objectSizes
 	 *            Appropriate instance of {@link IObjectSizes} depending on the VM architecture.
 	 * @return Approximate object size in bytes.
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
-		long size = objectSizes.getSizeOfObject();
+		return this.getObjectSize(objectSizes, true);
+	}
+
+	/**
+	 * Returns the approximate size of the object in the memory in bytes.
+	 * <p>
+	 * This method needs to be overridden by all subclasses.
+	 * 
+	 * @param objectSizes
+	 *            Appropriate instance of {@link IObjectSizes} depending on the VM architecture.
+	 * @param doAlign
+	 *            Should the align of the bytes occur. Note that super classes objects should never
+	 *            align the result because the align occurs only one time per whole object.
+	 * @return Approximate object size in bytes.
+	 */
+	protected long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
+		long size = objectSizes.getSizeOfObjectHeader();
 		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 3, 0);
 		size += objectSizes.getSizeOf(timeStamp);
-		return objectSizes.alignTo8Bytes(size);
+		if (doAlign) {
+			return objectSizes.alignTo8Bytes(size);
+		} else {
+			return size;
+		}
 	}
 
 	/**
@@ -201,7 +219,7 @@ public abstract class DefaultData implements Serializable {
 		if (!query.areAllRestrictionsFulfilled(this)) {
 			return false;
 		}
-		
+
 		return true;
 	}
 }

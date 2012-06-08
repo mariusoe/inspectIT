@@ -307,7 +307,7 @@ public class TimerData extends InvocationAwareData {
 	/**
 	 * <b> Notice: ensure to check using the <code> isExclusiveMetricDataAvailable() </code> if cpu
 	 * metric data is in fact available, otherwise you might get strange results </b>
-	 *
+	 * 
 	 * @return exlusivemax
 	 */
 	public double getExclusiveMax() {
@@ -400,10 +400,14 @@ public class TimerData extends InvocationAwareData {
 	/**
 	 * {@inheritDoc}
 	 */
-	public long getObjectSize(IObjectSizes objectSizes) {
-		long size = super.getObjectSize(objectSizes);
+	public long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
+		long size = super.getObjectSize(objectSizes, false);
 		size += objectSizes.getPrimitiveTypesSize(0, 0, 0, 0, 2, 10);
-		return objectSizes.alignTo8Bytes(size);
+		if (doAlign) {
+			return objectSizes.alignTo8Bytes(size);
+		} else {
+			return size;
+		}
 	}
 
 	/**

@@ -1,21 +1,29 @@
 package info.novatec.inspectit.cmr.cache.impl;
 
+import info.novatec.inspectit.cmr.cache.AbstractObjectSizesIbm;
+
 /**
- * This class is needed because IBM JVM has a larger footprint for a {@link Object} objects. It is
- * 16 bytes, and not 8 like in Sun JVM.
+ * The object size class for 32bit IBM JVM. Works only with Java 7.
  * 
  * @author Ivan Senic
  * 
  */
-public class ObjectSizes32BitsIbm extends ObjectSizes32Bits {
+public class ObjectSizes32BitsIbm extends AbstractObjectSizesIbm {
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
-	 * Size of the object footprint on the IBM JVM is 16 bytes.
 	 */
-	public long getSizeOfObject() {
-		return 16;
+	@Override
+	public long getReferenceSize() {
+		return 4;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getSizeOfObjectHeader() {
+		return 8;
+	}
+
 }

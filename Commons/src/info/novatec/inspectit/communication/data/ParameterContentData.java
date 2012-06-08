@@ -172,7 +172,7 @@ public class ParameterContentData implements Serializable {
 	 * @return Approximate object size in bytes.
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
-		long size = objectSizes.getSizeOfObject();
+		long size = objectSizes.getSizeOfObjectHeader();
 		size += objectSizes.getPrimitiveTypesSize(2, 1, 1, 0, 2, 0);
 		size += objectSizes.getSizeOf(content);
 		size += objectSizes.getSizeOf(name);

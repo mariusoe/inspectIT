@@ -6,9 +6,8 @@ import info.novatec.inspectit.communication.SystemSensorData;
 import java.sql.Timestamp;
 
 /**
- * This class provide dynamic informations about the memory of the underlying
- * operating system and also heap and non-heap memory information of the virtual
- * machine.
+ * This class provide dynamic informations about the memory of the underlying operating system and
+ * also heap and non-heap memory information of the virtual machine.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -56,32 +55,29 @@ public class MemoryInformationData extends SystemSensorData {
 	private long totalFreeSwapSpace = 0;
 
 	/**
-	 * The minimum amount of virtual memory that is guaranteed to be available
-	 * to the running process.
+	 * The minimum amount of virtual memory that is guaranteed to be available to the running
+	 * process.
 	 */
 	private long minComittedVirtualMemSize = Long.MAX_VALUE;
 
 	/**
-	 * The maximum amount of virtual memory that is guaranteed to be available
-	 * to the running process.
+	 * The maximum amount of virtual memory that is guaranteed to be available to the running
+	 * process.
 	 */
 	private long maxComittedVirtualMemSize = 0;
 
 	/**
-	 * The total amount of virtual memory that is guaranteed to be available to
-	 * the running process.
+	 * The total amount of virtual memory that is guaranteed to be available to the running process.
 	 */
 	private long totalComittedVirtualMemSize = 0;
 
 	/**
-	 * The minimum of memory usage of the heap that is used for object
-	 * allocation.
+	 * The minimum of memory usage of the heap that is used for object allocation.
 	 */
 	private long minUsedHeapMemorySize = Long.MAX_VALUE;
 
 	/**
-	 * The maximum of memory usage of the heap that is used for object
-	 * allocation.
+	 * The maximum of memory usage of the heap that is used for object allocation.
 	 */
 	private long maxUsedHeapMemorySize = 0;
 
@@ -91,56 +87,53 @@ public class MemoryInformationData extends SystemSensorData {
 	private long totalUsedHeapMemorySize = 0;
 
 	/**
-	 * The minimum amount of memory that is guaranteed to be available for use
-	 * by the virtual machine for heap memory usage.
+	 * The minimum amount of memory that is guaranteed to be available for use by the virtual
+	 * machine for heap memory usage.
 	 */
 	private long minComittedHeapMemorySize = Long.MAX_VALUE;
 
 	/**
-	 * The maximum amount of memory that is guaranteed to be available for use
-	 * by the virtual machine for heap memory usage.
+	 * The maximum amount of memory that is guaranteed to be available for use by the virtual
+	 * machine for heap memory usage.
 	 */
 	private long maxComittedHeapMemorySize = 0;
 
 	/**
-	 * The total amount of memory that is guaranteed to be available for use by
-	 * the virtual machine for heap memory usage.
+	 * The total amount of memory that is guaranteed to be available for use by the virtual machine
+	 * for heap memory usage.
 	 */
 	private long totalComittedHeapMemorySize = 0;
 
 	/**
-	 * The minimum amount of memory for non-heap memory usage of the virtual
-	 * machine.
+	 * The minimum amount of memory for non-heap memory usage of the virtual machine.
 	 */
 	private long minUsedNonHeapMemorySize = Long.MAX_VALUE;
 
 	/**
-	 * The maximum amount of memory for non-heap memory usage of the virtual
-	 * machine.
+	 * The maximum amount of memory for non-heap memory usage of the virtual machine.
 	 */
 	private long maxUsedNonHeapMemorySize = 0;
 
 	/**
-	 * The total amount of memory for non-heap memory usage of the virtual
-	 * machine.
+	 * The total amount of memory for non-heap memory usage of the virtual machine.
 	 */
 	private long totalUsedNonHeapMemorySize = 0;
 
 	/**
-	 * The minimum amount of memory that is guaranteed to be available for use
-	 * by the virtual machine for non-heap memory usage.
+	 * The minimum amount of memory that is guaranteed to be available for use by the virtual
+	 * machine for non-heap memory usage.
 	 */
 	private long minComittedNonHeapMemorySize = Long.MAX_VALUE;
 
 	/**
-	 * The maximum amount of memory that is guaranteed to be available for use
-	 * by the virtual machine for non-heap memory usage.
+	 * The maximum amount of memory that is guaranteed to be available for use by the virtual
+	 * machine for non-heap memory usage.
 	 */
 	private long maxComittedNonHeapMemorySize = 0;
 
 	/**
-	 * The total amount of memory that is guaranteed to be available for use by
-	 * the virtual machine for non-heap memory usage.
+	 * The total amount of memory that is guaranteed to be available for use by the virtual machine
+	 * for non-heap memory usage.
 	 */
 	private long totalComittedNonHeapMemorySize = 0;
 
@@ -485,14 +478,18 @@ public class MemoryInformationData extends SystemSensorData {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
-	public long getObjectSize(IObjectSizes objectSizes) {
-		long size =  super.getObjectSize(objectSizes);
+	public long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
+		long size = super.getObjectSize(objectSizes, false);
 		size += objectSizes.getPrimitiveTypesSize(0, 0, 1, 0, 21, 0);
-		return objectSizes.alignTo8Bytes(size);
+		if (doAlign) {
+			return objectSizes.alignTo8Bytes(size);
+		} else {
+			return size;
+		}
 	}
 
 }

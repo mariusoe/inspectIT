@@ -152,11 +152,10 @@ public class HttpTimerData extends TimerData {
 	/**
 	 * {@inheritDoc}
 	 */
-	public long getObjectSize(IObjectSizes objectSizes) {
-		long size = super.getObjectSize(objectSizes);
+	public long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
+		long size = super.getObjectSize(objectSizes, false);
 		size += objectSizes.getPrimitiveTypesSize(6, 0, 0, 0, 0, 0);
-		size += objectSizes.getSizeOf(uri);
-		size += objectSizes.getSizeOf(requestMethod);
+		size += objectSizes.getSizeOf(uri, requestMethod);
 
 		if (null != parameters) {
 			size += objectSizes.getSizeOfHashMap(parameters.size());
@@ -194,7 +193,11 @@ public class HttpTimerData extends TimerData {
 			}
 		}
 
-		return objectSizes.alignTo8Bytes(size);
+		if (doAlign) {
+			return objectSizes.alignTo8Bytes(size);
+		} else {
+			return size;
+		}
 	}
 
 	public String toString() {

@@ -85,4 +85,10 @@
 			<class name="info.novatec.inspectit.communication.EqualsVerifierTest" />
 		</classes>
 	</test>
+	<test name="Memory Calculation Test">
+		<classes>
+			<class
+				name="info.novatec.inspectit.cmr.cache.impl.MemoryCalculationTest" />
+		</classes>
+	</test>
 </suite>

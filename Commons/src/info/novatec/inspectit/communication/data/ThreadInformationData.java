@@ -6,8 +6,7 @@ import info.novatec.inspectit.communication.SystemSensorData;
 import java.sql.Timestamp;
 
 /**
- * This class provide dynamic informations about the threads running/started in
- * the virtual machine.
+ * This class provide dynamic informations about the threads running/started in the virtual machine.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -55,38 +54,34 @@ public class ThreadInformationData extends SystemSensorData {
 	private int totalPeakThreadCount = 0;
 
 	/**
-	 * The minimum number of live threads including both daemon and non-daemon
-	 * threads.
+	 * The minimum number of live threads including both daemon and non-daemon threads.
 	 */
 	private int minThreadCount = Integer.MAX_VALUE;
 
 	/**
-	 * The maximum number of live threads including both daemon and non-daemon
-	 * threads.
+	 * The maximum number of live threads including both daemon and non-daemon threads.
 	 */
 	private int maxThreadCount = 0;
 
 	/**
-	 * The total number of live threads including both daemon and non-daemon
-	 * threads.
+	 * The total number of live threads including both daemon and non-daemon threads.
 	 */
 	private int totalThreadCount = 0;
 
 	/**
-	 * The minimum number of total threads created and also started since the
-	 * virtual machine started.
+	 * The minimum number of total threads created and also started since the virtual machine
+	 * started.
 	 */
 	private long minTotalStartedThreadCount = Long.MAX_VALUE;
 
 	/**
-	 * The maximum number of total threads created and also started since the
-	 * virtual machine started.
+	 * The maximum number of total threads created and also started since the virtual machine
+	 * started.
 	 */
 	private long maxTotalStartedThreadCount = 0;
 
 	/**
-	 * The total number of total threads created and also started since the
-	 * virtual machine started.
+	 * The total number of total threads created and also started since the virtual machine started.
 	 */
 	private long totalTotalStartedThreadCount = 0;
 
@@ -311,14 +306,18 @@ public class ThreadInformationData extends SystemSensorData {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
-	public long getObjectSize(IObjectSizes objectSizes) {
-		long size =  super.getObjectSize(objectSizes);
+	public long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
+		long size = super.getObjectSize(objectSizes, false);
 		size += objectSizes.getPrimitiveTypesSize(0, 0, 10, 0, 3, 0);
-		return objectSizes.alignTo8Bytes(size);
+		if (doAlign) {
+			return objectSizes.alignTo8Bytes(size);
+		} else {
+			return size;
+		}
 	}
 
 }

@@ -133,7 +133,7 @@ public class Leaf<E extends DefaultData> implements IBufferTreeComponent<E> {
 	 */
 	public long getComponentSize(IObjectSizes objectSizes) {
 		int mapSize = map.size();
-		long size = objectSizes.getSizeOfObject();
+		long size = objectSizes.getSizeOfObjectHeader();
 		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 0, 0);
 		size += objectSizes.getSizeOfConcurrentHashMap(mapSize, CONCURRENCY_LEVEL);
 		// for Long and CustomWeekReference in a Map.Entry

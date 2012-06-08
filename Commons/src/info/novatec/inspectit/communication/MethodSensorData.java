@@ -139,16 +139,20 @@ public abstract class MethodSensorData extends DefaultData {
 	/**
 	 * {@inheritDoc}
 	 */
-	public long getObjectSize(IObjectSizes objectSizes) {
-		long size = super.getObjectSize(objectSizes);
+	public long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
+		long size = super.getObjectSize(objectSizes, false);
 		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 1, 0);
 		if (null != parameterContentData && parameterContentData instanceof HashSet) {
-			size += objectSizes.getSizeOfHashSet(parameterContentData.size());
+			size += objectSizes.getSizeOfHashSet(parameterContentData.size(), 0);
 			for (ParameterContentData paramContentData : parameterContentData) {
 				size += paramContentData.getObjectSize(objectSizes);
 			}
 		}
-		return objectSizes.alignTo8Bytes(size);
+		if (doAlign) {
+			return objectSizes.alignTo8Bytes(size);
+		} else {
+			return size;
+		}
 	}
 
 	/**

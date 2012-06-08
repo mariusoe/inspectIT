@@ -141,7 +141,7 @@ public class CombinedStorageBranch<E extends DefaultData> implements IStorageTre
 	 * {@inheritDoc}
 	 */
 	public long getComponentSize(IObjectSizes objectSizes) {
-		long size = objectSizes.getSizeOfObject() + objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 0, 0);
+		long size = objectSizes.getSizeOfObjectHeader() + objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 0, 0);
 		size += objectSizes.getSizeOf(branches);
 		for (IStorageTreeComponent<E> branch : branches) {
 			size += branch.getComponentSize(objectSizes);

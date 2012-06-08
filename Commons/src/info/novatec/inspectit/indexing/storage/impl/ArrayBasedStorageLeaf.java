@@ -309,12 +309,12 @@ public class ArrayBasedStorageLeaf<E extends DefaultData> implements IStorageTre
 	 * {@inheritDoc}
 	 */
 	public long getComponentSize(IObjectSizes objectSizes) {
-		long sizeInBytes = objectSizes.getSizeOfObject();
+		long sizeInBytes = objectSizes.getSizeOfObjectHeader();
 		sizeInBytes += objectSizes.getPrimitiveTypesSize(2, 0, 4, 0, 0, 0);
 		sizeInBytes += objectSizes.getSizeOfArray(idArray.length);
 		sizeInBytes += size * objectSizes.getPrimitiveTypesSize(0, 0, 1, 0, 0, 0);
 		sizeInBytes += objectSizes.getSizeOfArray(descriptorArray.length);
-		sizeInBytes += size * (objectSizes.alignTo8Bytes(objectSizes.getSizeOfObject() + objectSizes.getPrimitiveTypesSize(0, 0, 2, 0, 0, 0)));
+		sizeInBytes += size * (objectSizes.alignTo8Bytes(objectSizes.getSizeOfObjectHeader() + objectSizes.getPrimitiveTypesSize(0, 0, 2, 0, 0, 0)));
 		// ignore locks
 		return objectSizes.alignTo8Bytes(sizeInBytes);
 	}

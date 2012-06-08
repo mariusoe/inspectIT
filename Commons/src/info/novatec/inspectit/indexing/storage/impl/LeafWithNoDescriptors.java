@@ -131,11 +131,11 @@ public class LeafWithNoDescriptors<E extends DefaultData> implements IStorageTre
 	 * {@inheritDoc}
 	 */
 	public long getComponentSize(IObjectSizes objectSizes) {
-		long size = objectSizes.getSizeOfObject();
+		long size = objectSizes.getSizeOfObjectHeader();
 		size += objectSizes.getPrimitiveTypesSize(4, 0, 1, 0, 0, 0);
 		size += objectSizes.getSizeOfLongObject();
 		size += objectSizes.getSizeOfLongObject();
-		size += objectSizes.getSizeOfObject();
+		size += objectSizes.getSizeOfObjectObject();
 		if (null != rangeSplitters) {
 			size += objectSizes.getSizeOf(rangeSplitters);
 		}

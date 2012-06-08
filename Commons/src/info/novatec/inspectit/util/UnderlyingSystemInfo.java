@@ -15,6 +15,11 @@ import java.util.List;
 public final class UnderlyingSystemInfo {
 
 	/**
+	 * Amount of heap in bytes till the compressed oops are activated by default with 64bit Sun JVM.
+	 */
+	private static final long MAX_COMPRESSED_OOPS_JAVA7_MEMORY = 34359738368L;
+
+	/**
 	 * Enumeration for Java version.
 	 * 
 	 * @author Ivan Senic
@@ -75,6 +80,11 @@ public final class UnderlyingSystemInfo {
 		 * Denotes JVM from Sun.
 		 */
 		SUN,
+
+		/**
+		 * Denotes JVM from Oracle-Corporation.
+		 */
+		ORACLE,
 
 		/**
 		 * Denotes JVM from IBM.
@@ -143,6 +153,8 @@ public final class UnderlyingSystemInfo {
 	private static JvmProvider getJvmProvider() {
 		if (getJavaVendorMatches("Sun")) {
 			return JvmProvider.SUN;
+		} else if (getJavaVendorMatches("Oracle Corporation")) {
+			return JvmProvider.ORACLE;
 		} else if (getJavaVendorMatches("IBM")) {
 			return JvmProvider.IBM;
 		} else {
@@ -150,6 +162,11 @@ public final class UnderlyingSystemInfo {
 		}
 	}
 
+	/**
+	 * Returns the Java version.
+	 * 
+	 * @return Returns the Java version.
+	 */
 	private static JavaVersion getJavaVersion() {
 		if (getJavaVersionMatches("1.1")) {
 			return JavaVersion.JAVA_1_1;
@@ -192,12 +209,16 @@ public final class UnderlyingSystemInfo {
 	 *         the JVM is not from Sun or IBM.
 	 */
 	private static boolean is64Bit() {
-		if (JVM_PROVIDER == JvmProvider.IBM) {
-			return System.getProperty("com.ibm.vm.bitmode").indexOf("64") != -1;
-		} else if (JVM_PROVIDER == JvmProvider.SUN) {
+		switch (JVM_PROVIDER) {
+		case SUN:
 			return System.getProperty("sun.arch.data.model").indexOf("64") != -1;
+		case ORACLE:
+			return System.getProperty("sun.arch.data.model").indexOf("64") != -1;
+		case IBM:
+			return System.getProperty("com.ibm.vm.bitmode").indexOf("64") != -1;
+		default:
+			return false;
 		}
-		return false;
 	}
 
 	/**
@@ -205,6 +226,11 @@ public final class UnderlyingSystemInfo {
 	 * JVM is 64bit, ignoring the fact that the 32bit JVM can also have
 	 * <code>+UseCompressedOops</code> argument. This method has been tested with Sun & IBM virtual
 	 * machine, and behavior with different providers is unknown.
+	 * <p>
+	 * IMPORTANT (SUN & ORACLE): Compressed oops is supported and enabled by default in Java SE 6u23
+	 * and later. In Java SE 7, use of compressed oops is the default for 64-bit JVM processes when
+	 * -Xmx isn't specified and for values of -Xmx less than 32 gigabytes. For JDK 6 before the 6u23
+	 * release, use the -XX:+UseCompressedOops flag with the java command to enable the feature.
 	 * 
 	 * @return True only if JVM is 64bit and compressed oops are used.
 	 */
@@ -216,8 +242,31 @@ public final class UnderlyingSystemInfo {
 				for (String argument : arguments) {
 					if (argument.indexOf("+UseCompressedOops") != -1 || argument.indexOf("compressedrefs") != -1) {
 						return true;
+					} else if (argument.indexOf("-UseCompressedOops") != -1) {
+						return false;
 					}
 				}
+			}
+
+			switch (getJvmProvider()) {
+			case SUN:
+			case ORACLE:
+				if (getJavaVersion() == JavaVersion.JAVA_1_7) {
+					long max = Runtime.getRuntime().maxMemory();
+					return max == Long.MAX_VALUE || max < MAX_COMPRESSED_OOPS_JAVA7_MEMORY;
+				} else if (getJavaVersion() == JavaVersion.JAVA_1_6) {
+					try {
+						int subversionIndexStart = JAVA_VERSION_TRIMMED.indexOf('_');
+						boolean isAbove6u23 = Integer.parseInt(JAVA_VERSION_TRIMMED.substring(subversionIndexStart + 1)) >= 23;
+						return isAbove6u23;
+					} catch (NumberFormatException e) {
+						break;
+					}
+				}
+				break;
+
+			default:
+				break;
 			}
 		}
 		return false;
@@ -292,9 +341,6 @@ public final class UnderlyingSystemInfo {
 		try {
 			return System.getProperty(property);
 		} catch (SecurityException ex) {
-			// we are not allowed to look at this property
-			System.err.println("Caught a SecurityException reading the system property '" + property
-					+ "'; the SystemUtils property value will default to null.");
 			return null;
 		}
 	}

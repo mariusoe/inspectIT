@@ -2,7 +2,10 @@ package info.novatec.inspectit.cmr.cache;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This is an abstract class that holds general calculations and object sizes that are equal in both
@@ -16,7 +19,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	/**
 	 * General sizes of primitive types.
 	 */
-	private static final long BOOLEAN_SIZE = 1, CHAR_SIZE = 2, INT_SIZE = 4, FLOAT_SIZE = 4, LONG_SIZE = 8, DOUBLE_SIZE = 8, OBJECT_SIZE = 8;
+	private static final long BOOLEAN_SIZE = 1, CHAR_SIZE = 2, SHORT_SIZE = 2, INT_SIZE = 4, FLOAT_SIZE = 4, LONG_SIZE = 8, DOUBLE_SIZE = 8;
 
 	/**
 	 * Default capacity of array list.
@@ -43,21 +46,32 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	/**
 	 * {@inheritDoc}
 	 */
-	public long getSizeOfObject() {
-		return OBJECT_SIZE;
+	public long getSizeOf(String str) {
+		if (null == str) {
+			return 0;
+		}
+		long size = this.getSizeOfObjectHeader();
+		size += this.getPrimitiveTypesSize(1, 0, 3, 0, 0, 0);
+		size += this.getSizeOfPrimitiveArray(str.length(), CHAR_SIZE);
+		return alignTo8Bytes(size);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public long getSizeOf(String str) {
-		if (null == str) {
-			return 0;
+	@Override
+	public long getSizeOf(String... strings) {
+		Set<Integer> identityHashCodeSet = new HashSet<Integer>();
+		long size = 0L;
+		for (String str : strings) {
+			if (null == str) {
+				continue;
+			}
+			if (identityHashCodeSet.add(System.identityHashCode(str))) {
+				size += getSizeOf(str);
+			}
 		}
-		long size = this.getSizeOfObject();
-		size += this.getPrimitiveTypesSize(1, 0, 3, 0, 0, 0);
-		size += this.getSizeOfPrimitiveArray(str.length(), CHAR_SIZE);
-		return alignTo8Bytes(size);
+		return size;
 	}
 
 	/**
@@ -71,27 +85,30 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 		// inside Timestamp. However, I can not check if this is null or not.
 		// In our objects I never found it to be instantiated, so I don't inculde it.
 
-		long size = this.getSizeOfObject();
+		long size = this.getSizeOfObjectHeader();
 		// java.sql.Timestamp
 		size += this.getPrimitiveTypesSize(0, 0, 1, 0, 0, 0);
 		// java.util.Date
-		size += this.getPrimitiveTypesSize(1, 0, 1, 0, 0, 0);
+		size += this.getPrimitiveTypesSize(1, 0, 0, 0, 1, 0);
 		return alignTo8Bytes(size);
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
-	 * The formula used is: 20 bytes + one reference for ArrayList object 12 bytes for array
-	 * reference size * array length.
 	 */
-	@SuppressWarnings("rawtypes")
-	public long getSizeOf(List arrayList) {
+	public long getSizeOf(List<?> arrayList) {
+		return this.getSizeOf(arrayList, ARRAY_LIST_INITIAL_CAPACITY);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public long getSizeOf(List<?> arrayList, int initialCapacity) {
 		if (null == arrayList) {
 			return 0;
 		}
-		int capacity = getArrayCapacity(arrayList.size());
-		long size = this.getSizeOfObject() + this.getPrimitiveTypesSize(1, 0, 2, 0, 0, 0) + this.getSizeOfArray(capacity);
+		int capacity = getArrayCapacity(arrayList.size(), initialCapacity);
+		long size = this.getSizeOfObjectHeader() + this.getPrimitiveTypesSize(1, 0, 2, 0, 0, 0) + this.getSizeOfArray(capacity);
 		return alignTo8Bytes(size);
 	}
 
@@ -102,12 +119,13 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * 
 	 * @param size
 	 *            Array List size.
+	 * @param initialCapacity
+	 *            Initial capacity of Array list.
 	 * @return Capacity of the array that holds elements.
 	 */
-	private int getArrayCapacity(int size) {
-		int initialCapacity = ARRAY_LIST_INITIAL_CAPACITY;
+	private int getArrayCapacity(int size, int initialCapacity) {
 		while (initialCapacity < size) {
-			initialCapacity = (initialCapacity * 3) / 2 + 1;
+			initialCapacity = initialCapacity + (initialCapacity >> 1);
 		}
 		return initialCapacity;
 	}
@@ -116,14 +134,21 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * {@inheritDoc}
 	 */
 	public long getSizeOfHashSet(int hashSetSize) {
-		long size = this.getSizeOfObject();
+		return this.getSizeOfHashSet(hashSetSize, MAP_INITIAL_CAPACITY);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public long getSizeOfHashSet(int hashSetSize, int initialCapacity) {
+		long size = this.getSizeOfObjectHeader();
 		size += this.getPrimitiveTypesSize(1, 0, 0, 0, 0, 0);
-		size += this.getSizeOfHashMap(hashSetSize);
+		size += this.getSizeOfHashMap(hashSetSize, initialCapacity);
 
 		// One object is used as the value in the map for all entries. This object is shared between
 		// all HashSet instances, but we have to calculate it for each instance.
 		if (hashSetSize > 0) {
-			size += this.getSizeOfObject();
+			size += this.getSizeOfObjectObject();
 		}
 		return alignTo8Bytes(size);
 	}
@@ -132,9 +157,16 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * {@inheritDoc}
 	 */
 	public long getSizeOfHashMap(int hashMapSize) {
-		long size = this.getSizeOfObject();
+		return this.getSizeOfHashMap(hashMapSize, MAP_INITIAL_CAPACITY);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public long getSizeOfHashMap(int hashMapSize, int initialCapacity) {
+		long size = this.getSizeOfObjectHeader();
 		size += this.getPrimitiveTypesSize(4, 0, 3, 1, 0, 0);
-		int mapCapacity = this.getHashMapCapacityFromSize(hashMapSize);
+		int mapCapacity = this.getHashMapCapacityFromSize(hashMapSize, initialCapacity);
 
 		// size of the map array for the entries
 		size += this.getSizeOfArray(mapCapacity);
@@ -155,7 +187,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * {@inheritDoc}
 	 */
 	public long getSizeOfConcurrentHashMap(int mapSize, int concurrencyLevel) {
-		long size = this.getSizeOfObject();
+		long size = this.getSizeOfObjectHeader();
 		size += this.getPrimitiveTypesSize(6, 0, 2, 0, 0, 0);
 
 		// array of segments based on capacity
@@ -190,8 +222,43 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public long getSizeOfObjectObject() {
+		return alignTo8Bytes(this.getSizeOfObjectHeader());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public long getSizeOfLongObject() {
-		long size = this.getSizeOfObject() + getPrimitiveTypesSize(0, 0, 0, 0, 1, 0);
+		long size = this.getSizeOfObjectHeader() + LONG_SIZE;
+		return alignTo8Bytes(size);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getSizeOfIntegerObject() {
+		long size = this.getSizeOfObjectHeader() + INT_SIZE;
+		return alignTo8Bytes(size);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getSizeOfShortObject() {
+		long size = this.getSizeOfObjectHeader() + SHORT_SIZE;
+		return alignTo8Bytes(size);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getSizeOfCharacterObject() {
+		long size = this.getSizeOfObjectHeader() + CHAR_SIZE;
 		return alignTo8Bytes(size);
 	}
 
@@ -225,7 +292,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * @return Size in bytes.
 	 */
 	public long getSizeOfArray(int arraySize) {
-		long size = this.getSizeOfObject();
+		long size = this.getSizeOfObjectHeader();
 		size += this.getPrimitiveTypesSize(arraySize, 0, 1, 0, 0, 0);
 		return alignTo8Bytes(size);
 	}
@@ -239,8 +306,8 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 *            Size in bytes of the primitive type in array
 	 * @return Size in bytes.
 	 */
-	private long getSizeOfPrimitiveArray(int arraySize, long primitiveSize) {
-		long size = this.getSizeOfObject();
+	protected long getSizeOfPrimitiveArray(int arraySize, long primitiveSize) {
+		long size = this.getSizeOfObjectHeader();
 		size += this.getPrimitiveTypesSize(0, 0, 1, 0, 0, 0);
 		size += arraySize * primitiveSize;
 		return alignTo8Bytes(size);
@@ -255,11 +322,11 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * @return Size in bytes.
 	 */
 	private long getSizeOfConcurrentSeqment(int seqmentCapacity) {
-		long size = this.getSizeOfObject();
+		long size = this.getSizeOfObjectHeader();
 		size += this.getPrimitiveTypesSize(2, 0, 3, 1, 0, 0);
 
-		// plus the reentrant lock
-		size += alignTo8Bytes(this.getPrimitiveTypesSize(2, 0, 3, 1, 0, 0));
+		// plus the sync in the reentrant lock
+		size += alignTo8Bytes(this.getSizeOfObjectHeader() + this.getPrimitiveTypesSize(3, 0, 1, 0, 0, 0));
 
 		// plus just the empty array because we don't know how many objects segment has, this is
 		// calculated additionally in concurrent map
@@ -277,7 +344,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 *         thus this size has to be added to the HashSet.
 	 */
 	private long getSizeOfHashMapEntry() {
-		long size = this.getSizeOfObject();
+		long size = this.getSizeOfObjectHeader();
 		size += this.getPrimitiveTypesSize(3, 0, 1, 0, 0, 0);
 		return alignTo8Bytes(size);
 	}
@@ -288,11 +355,16 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * 
 	 * @param hashMapSize
 	 *            Size of hash map.
+	 * @param initialCapacity
+	 *            Inital map capacity.
 	 * @return Returns the capacity of the HashMap from it size. The calculations take the default
 	 *         capacity of 16 and default load factor of 0.75.
 	 */
-	private int getHashMapCapacityFromSize(int hashMapSize) {
-		int capacity = 16;
+	protected int getHashMapCapacityFromSize(int hashMapSize, int initialCapacity) {
+		int capacity = 1;
+		if (initialCapacity > 0) {
+			capacity = initialCapacity;
+		}
 		float loadFactor = 0.75f;
 		int threshold = (int) (capacity * loadFactor);
 		while (threshold < hashMapSize) {
@@ -315,7 +387,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 		int capacity = initialCapacity;
 		float loadFactor = 0.75f;
 		int threshold = (int) (capacity * loadFactor);
-		while (threshold + 1 < seqmentSize) {
+		while (threshold + 1 <= seqmentSize) {
 			capacity *= 2;
 			threshold = (int) (capacity * loadFactor);
 		}

@@ -70,7 +70,7 @@
 	<!-- *************************************************************** -->
 
 	<!--  It depends on the release target, because we need the compiled classes -->
-	<target name="functional-tests" depends="build, init-functional-tests">
+	<target name="functional-tests" depends="build, init-functional-tests, init-classmexer">
 		<mkdir dir="${build.qa.test.testdata}" />
 		<mkdir dir="${build.qa.test.coveragedata}" />
 		<mkdir dir="${build.test.classes}" />
@@ -122,6 +122,7 @@
 			<classpath location="${test.root}" />
 
 			<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${build.qa.test.coveragedata}/cobertura.ser" />
+			<jvmarg value="-javaagent:${string.path.classmexer}" />
 			<xmlfileset file="${resources.testng}/testng.xml" />
 		</testng>
 
@@ -301,4 +302,15 @@ MIT License : slf4j-api (1.5.6), slf4j-log4j12 (1.5.6) ${line.separator}
 Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA), h2 (1.2.148)" />
 	</target>
 
+	<!-- *************************************************************** -->
+	<!--            C L A S S M E X E R     T A R G E T S                -->
+	<!-- *************************************************************** -->
+	<target name="init-classmexer" depends="init-ivy">
+		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+		<ivy:cachepath pathid="path.classmexer" organisation="classmexer" module="classmexer" revision="0.0.3" conf="default" inline="true" />
+		<pathconvert property="string.path.classmexer" pathsep="">
+				<path refid="path.classmexer" />
+		</pathconvert>
+		<echo>Using Classmexer on path: ${string.path.classmexer}</echo>
+	</target>
 </project>

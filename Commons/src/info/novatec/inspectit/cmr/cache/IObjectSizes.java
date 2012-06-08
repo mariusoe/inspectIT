@@ -22,12 +22,12 @@ public interface IObjectSizes {
 	long getReferenceSize();
 
 	/**
-	 * Returns a size of a {@link Object} class. This value has to be added to all classes that are
-	 * subclasses of {@link Object}.
+	 * Returns a size of a header of every object. This value has to be added to all classes that
+	 * are subclasses of {@link Object}.
 	 * 
-	 * @return Size of java {@link Object} object in bytes.
+	 * @return Size of java object header in bytes.
 	 */
-	long getSizeOfObject();
+	long getSizeOfObjectHeader();
 
 	/**
 	 * Calculates the approximate size of the {@link String} object based on the number of string's
@@ -38,6 +38,18 @@ public interface IObjectSizes {
 	 * @return Size of {@link String} object in bytes, or 0 if passed string is null.
 	 */
 	long getSizeOf(String str);
+
+	/**
+	 * Calculates the approximate size of all {@link String} objects. Note that this method has
+	 * protection about twice adding the size of the same string referenced with different
+	 * references. Thus all the objects having more than one string should use this method for
+	 * calculation.
+	 * 
+	 * @param strings
+	 *            Strings which sizes have to be calculated.
+	 * @return Size of many {@link String} object sin bytes.
+	 */
+	long getSizeOf(String... strings);
 
 	/**
 	 * Calculates the approximate size of the {@link Timestamp} object.
@@ -51,7 +63,7 @@ public interface IObjectSizes {
 	/**
 	 * Calculates the approximate size of the {@link ArrayList} object. The calculation does not
 	 * include the size of elements that are in the list. The calculation may not be correct for
-	 * other list types.
+	 * other list types. This method will use default array list capacity for calculation.
 	 * 
 	 * @param arrayList
 	 *            ArrayList which size has to be calculated.
@@ -60,9 +72,23 @@ public interface IObjectSizes {
 	long getSizeOf(List<?> arrayList);
 
 	/**
+	 * Calculates the approximate size of the {@link ArrayList} object. The calculation does not
+	 * include the size of elements that are in the list. The calculation may not be correct for
+	 * other list types.
+	 * 
+	 * @param arrayList
+	 *            ArrayList which size has to be calculated.
+	 * @param initialCapacity
+	 *            Capacity {@link ArrayList} was created with. If initial capacity is not know, use
+	 *            the {@link #getSizeOf(List)}.
+	 * @return Size of {@link ArrayList} object in bytes, or 0 if passed object is null.
+	 */
+	long getSizeOf(List<?> arrayList, int initialCapacity);
+
+	/**
 	 * Calculates the approximate size of the {@link HashSet} object. The calculation does not
 	 * include the size of elements that are in the set. The calculation may not be correct for
-	 * other set types.
+	 * other set types. This method will use default hash map capacity for calculation.
 	 * 
 	 * @param hashSetSize
 	 *            HashSet size that has to be calculated.
@@ -71,33 +97,91 @@ public interface IObjectSizes {
 	long getSizeOfHashSet(int hashSetSize);
 
 	/**
+	 * Calculates the approximate size of the {@link HashSet} object. The calculation does not
+	 * include the size of elements that are in the set. The calculation may not be correct for
+	 * other set types.
+	 * 
+	 * @param hashSetSize
+	 *            HashSet size that has to be calculated.
+	 * @param initialCapacity
+	 *            Initial capacity {@link HashSet} has been created with. If initial capacity is not
+	 *            know, use the {@link #getSizeOfHashSet(int)}.
+	 * @return Size of {@link HashSet} object in bytes.
+	 */
+	long getSizeOfHashSet(int hashSetSize, int initialCapacity);
+
+	/**
+	 * Calculates the approximate size of the {@link HashMap} object. The calculation does not
+	 * include the size of elements that are in the map. The calculation may not be correct for
+	 * other map types. This method will use default hash map capacity for calculation.
+	 * 
+	 * @param hashMapSize
+	 *            Size of hash map.
+	 * @return Size of {@link HashMap} object in bytes.
+	 */
+	long getSizeOfHashMap(int hashMapSize);
+
+	/**
 	 * Calculates the approximate size of the {@link HashMap} object. The calculation does not
 	 * include the size of elements that are in the map. The calculation may not be correct for
 	 * other map types.
 	 * 
-	 * @param hashMap
-	 *            HashMap size that has to be calculated.
+	 * @param hashMapSize
+	 *            Size of hash map.
+	 * @param initialCapacity
+	 *            Initial capacity {@link HashMap} has been created with. If initial capacity is not
+	 *            know, use the {@link #getSizeOfHashMap(int)}.
 	 * @return Size of {@link HashMap} object in bytes.
 	 */
-	long getSizeOfHashMap(int hashMapSize);
+	long getSizeOfHashMap(int hashMapSize, int initialCapacity);
 
 	/**
 	 * Calculates the approximate size of the ConcurrentHashMap object. The calculation does not
 	 * include the size of elements that are in the map. The calculation may not be correct for
 	 * other map types.
 	 * 
-	 * @param hashMap
-	 *            Concurrent HashMap size that has to be calculated.
+	 * @param mapSize
+	 *            Map size.
+	 * @param concurrencyLevel
+	 *            Concurrency level in the map.
 	 * @return Size of ConcurrentHashMap object in bytes.
 	 */
 	long getSizeOfConcurrentHashMap(int mapSize, int concurrencyLevel);
 
 	/**
-	 * Calculates size of the {@link Long} objects
+	 * Calculates size of the {@link Object} objects.
 	 * 
-	 * @return Size of the {@link Long} objects in byte.
+	 * @return Size of the {@link Object} objects in bytes.
+	 */
+	long getSizeOfObjectObject();
+
+	/**
+	 * Calculates size of the {@link Long} objects.
+	 * 
+	 * @return Size of the {@link Long} objects in bytes.
 	 */
 	long getSizeOfLongObject();
+
+	/**
+	 * Calculates size of the {@link Integer} objects.
+	 * 
+	 * @return Size of the {@link Integer} objects in bytes.
+	 */
+	long getSizeOfIntegerObject();
+
+	/**
+	 * Calculates size of the {@link Short} objects.
+	 * 
+	 * @return Size of the {@link Short} objects in bytes.
+	 */
+	long getSizeOfShortObject();
+
+	/**
+	 * Calculates size of the {@link Character} objects.
+	 * 
+	 * @return Size of the {@link Character} objects in bytes.
+	 */
+	long getSizeOfCharacterObject();
 
 	/**
 	 * Returns the object size based on the number of given primitive fields in the object's class.
@@ -153,6 +237,6 @@ public interface IObjectSizes {
 	 *            Size of array (length).
 	 * @return Size in bytes.
 	 */
-	public long getSizeOfArray(int arraySize);
-	
+	long getSizeOfArray(int arraySize);
+
 }

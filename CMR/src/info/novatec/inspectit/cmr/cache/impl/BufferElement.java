@@ -84,7 +84,7 @@ public class BufferElement<E extends DefaultData> implements IBufferElement<E> {
 	 * {@inheritDoc}
 	 */
 	public void calculateAndSetBufferElementSize(IObjectSizes objectSizes) {
-		long size = objectSizes.getSizeOfObject() + objectSizes.getPrimitiveTypesSize(2, 0, 0, 0, 1, 0);
+		long size = objectSizes.getSizeOfObjectHeader() + objectSizes.getPrimitiveTypesSize(2, 0, 0, 0, 1, 0);
 		if (null != object) {
 			size += object.getObjectSize(objectSizes);
 		}

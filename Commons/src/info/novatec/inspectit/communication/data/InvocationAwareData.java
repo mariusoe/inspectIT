@@ -181,16 +181,20 @@ public abstract class InvocationAwareData extends MethodSensorData {
 	/**
 	 * {@inheritDoc}
 	 */
-	public long getObjectSize(IObjectSizes objectSizes) {
-		long size = super.getObjectSize(objectSizes);
+	public long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
+		long size = super.getObjectSize(objectSizes, false);
 		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 0, 0);
 		if (null != invocationsParentsIdMap) {
 			size += objectSizes.getSizeOfHashMap(invocationsParentsIdMap.size());
 			size += invocationsParentsIdMap.size() * objectSizes.getSizeOfLongObject();
-			long sizeOfMutableInt = objectSizes.alignTo8Bytes(objectSizes.getSizeOfObject() + objectSizes.getPrimitiveTypesSize(0, 0, 1, 0, 0, 0));
+			long sizeOfMutableInt = objectSizes.alignTo8Bytes(objectSizes.getSizeOfObjectHeader() + objectSizes.getPrimitiveTypesSize(0, 0, 1, 0, 0, 0));
 			size += invocationsParentsIdMap.size() * sizeOfMutableInt;
 		}
-		return objectSizes.alignTo8Bytes(size);
+		if (doAlign) {
+			return objectSizes.alignTo8Bytes(size);
+		} else {
+			return size;
+		}
 	}
 
 	/**

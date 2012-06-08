@@ -257,8 +257,8 @@ public class InvocationSequenceData extends MethodSensorData {
 	/**
 	 * {@inheritDoc}
 	 */
-	public long getObjectSize(IObjectSizes objectSizes) {
-		long size = super.getObjectSize(objectSizes);
+	public long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
+		long size = super.getObjectSize(objectSizes, false);
 		size += objectSizes.getPrimitiveTypesSize(5, 0, 0, 0, 2, 3);
 		if (null != timerData) {
 			size += timerData.getObjectSize(objectSizes);
@@ -267,7 +267,7 @@ public class InvocationSequenceData extends MethodSensorData {
 			size += sqlStatementData.getObjectSize(objectSizes);
 		}
 		if (null != nestedSequences && nestedSequences instanceof ArrayList) {
-			size += objectSizes.getSizeOf(nestedSequences);
+			size += objectSizes.getSizeOf(nestedSequences, 0);
 			for (InvocationSequenceData invocationSequenceData : nestedSequences) {
 				size += invocationSequenceData.getObjectSize(objectSizes);
 			}
@@ -278,7 +278,11 @@ public class InvocationSequenceData extends MethodSensorData {
 				size += exceptionSensorData.getObjectSize(objectSizes);
 			}
 		}
-		return objectSizes.alignTo8Bytes(size);
+		if (doAlign) {
+			return objectSizes.alignTo8Bytes(size);
+		} else {
+			return size;
+		}
 	}
 
 	/**

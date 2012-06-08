@@ -57,7 +57,9 @@
 		<!-- Test -->
 		<!-- Test NG should be on the build path via the Eclipse plug-in -->
 		<dependency org="org.springframework" name="spring-test" rev="3.1.0.RELEASE" transitive="false" conf="test->default"/>
+		<dependency org="classmexer" name="classmexer" rev="0.0.3" transitive="false" conf="test->default" />
 		<dependency org="org.mockito" name="mockito-all" rev="1.9.0" conf="test->default" />
 		<dependency org="nl.jqno.equalsverifier" name="equalsverifier" rev="1.0.2" conf="test->default"/>
+		<dependency org="org.hamcrest" name="hamcrest-all" rev="1.1" conf="test->default" />
 	</dependencies>
 </ivy-module>

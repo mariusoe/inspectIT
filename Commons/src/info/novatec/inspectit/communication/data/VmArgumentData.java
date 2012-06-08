@@ -127,7 +127,7 @@ public class VmArgumentData implements Serializable {
 	 * {@inheritDoc}
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
-		long size =  objectSizes.getSizeOfObject();
+		long size =  objectSizes.getSizeOfObjectHeader();
 		size += objectSizes.getPrimitiveTypesSize(2, 0, 0, 0, 2, 0);
 		size += objectSizes.getSizeOf(vmName);
 		size += objectSizes.getSizeOf(vmValue);

@@ -128,8 +128,8 @@ public class ExceptionSensorData extends InvocationAwareData {
 	/**
 	 * {@inheritDoc}
 	 */
-	public long getObjectSize(IObjectSizes objectSizes) {
-		long size = super.getObjectSize(objectSizes);
+	public long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
+		long size = super.getObjectSize(objectSizes, false);
 		size += objectSizes.getPrimitiveTypesSize(6, 0, 0, 0, 1, 0);
 		size += objectSizes.getSizeOf(errorMessage);
 		size += objectSizes.getSizeOf(cause);
@@ -141,7 +141,11 @@ public class ExceptionSensorData extends InvocationAwareData {
 		if (null != child) {
 			size += child.getObjectSize(objectSizes);
 		}
-		return objectSizes.alignTo8Bytes(size);
+		if (doAlign) {
+			return objectSizes.alignTo8Bytes(size);
+		} else {
+			return size;
+		}
 	}
 
 	/**
@@ -223,6 +227,5 @@ public class ExceptionSensorData extends InvocationAwareData {
 	public String toString() {
 		return throwableType + "@" + throwableIdentityHashCode;
 	}
-
 
 }

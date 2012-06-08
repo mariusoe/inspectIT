@@ -34,6 +34,12 @@ public class ObjectSizesFactory implements FactoryBean<IObjectSizes> {
 			} else {
 				return new ObjectSizes64Bits();
 			}
+		} else if (is64Bit && compresedOops) {
+			if (isIbm) {
+				return new ObjectSizes64BitsCompressedOopsIbm();
+			} else {
+				return new ObjectSizes64BitsCompressedOops();
+			}
 		} else {
 			if (isIbm) {
 				return new ObjectSizes32BitsIbm();

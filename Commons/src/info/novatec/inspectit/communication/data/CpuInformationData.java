@@ -6,8 +6,8 @@ import info.novatec.inspectit.communication.SystemSensorData;
 import java.sql.Timestamp;
 
 /**
- * This class provide dynamic informations about the underlying operating system
- * such as cpu usage and cpu time.
+ * This class provide dynamic informations about the underlying operating system such as cpu usage
+ * and cpu time.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -157,13 +157,17 @@ public class CpuInformationData extends SystemSensorData {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
-	public long getObjectSize(IObjectSizes objectSizes) {
-		long size =  super.getObjectSize(objectSizes);
+	public long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
+		long size = super.getObjectSize(objectSizes, false);
 		size += objectSizes.getPrimitiveTypesSize(0, 0, 1, 3, 1, 0);
-		return objectSizes.alignTo8Bytes(size);
+		if (doAlign) {
+			return objectSizes.alignTo8Bytes(size);
+		} else {
+			return size;
+		}
 	}
 }

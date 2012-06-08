@@ -107,8 +107,8 @@ public class SqlStatementData extends TimerData {
 	/**
 	 * {@inheritDoc}
 	 */
-	public long getObjectSize(IObjectSizes objectSizes) {
-		long size = super.getObjectSize(objectSizes);
+	public long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
+		long size = super.getObjectSize(objectSizes, false);
 		size += objectSizes.getPrimitiveTypesSize(2, 1, 0, 0, 0, 0);
 		size += objectSizes.getSizeOf(sql);
 		if (parameterValues != null) {
@@ -117,7 +117,12 @@ public class SqlStatementData extends TimerData {
 				size += objectSizes.getSizeOf(str);
 			}
 		}
-		return objectSizes.alignTo8Bytes(size);
+
+		if (doAlign) {
+			return objectSizes.alignTo8Bytes(size);
+		} else {
+			return size;
+		}
 	}
 
 }

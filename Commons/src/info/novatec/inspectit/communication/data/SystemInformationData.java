@@ -447,8 +447,8 @@ public class SystemInformationData extends SystemSensorData {
 	/**
 	 * {@inheritDoc}
 	 */
-	public long getObjectSize(IObjectSizes objectSizes) {
-		long size = super.getObjectSize(objectSizes);
+	public long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
+		long size = super.getObjectSize(objectSizes, false);
 		size += objectSizes.getPrimitiveTypesSize(12, 0, 1, 0, 6, 0);
 		size += objectSizes.getSizeOf(architecture);
 		size += objectSizes.getSizeOf(bootClassPath);
@@ -467,7 +467,11 @@ public class SystemInformationData extends SystemSensorData {
 				size += vmArgumentData.getObjectSize(objectSizes);
 			}
 		}
-		return objectSizes.alignTo8Bytes(size);
+		if (doAlign) {
+			return objectSizes.alignTo8Bytes(size);
+		} else {
+			return size;
+		}
 	}
 
 }

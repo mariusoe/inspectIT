@@ -35,7 +35,7 @@ public enum ExceptionEvent {
 	 * @return Approximate object size in bytes.
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
-		long size = objectSizes.getSizeOfObject();
+		long size = objectSizes.getSizeOfObjectHeader();
 		size += objectSizes.getPrimitiveTypesSize(1, 0, 1, 0, 0, 0);
 		size += objectSizes.getSizeOf(name());
 		return objectSizes.alignTo8Bytes(size);
