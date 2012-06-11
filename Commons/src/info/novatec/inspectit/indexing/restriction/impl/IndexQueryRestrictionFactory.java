@@ -154,6 +154,23 @@ public final class IndexQueryRestrictionFactory {
 	}
 
 	/**
+	 * Returns are all in collection restriction. This restriction checks if the value supplied via
+	 * {@link IIndexQueryRestriction#isFulfilled(Object)} is a collection, and all it members are
+	 * also contained in the collection provided with object construction. Note that this
+	 * restriction has to be bounded to a {@link Collection} field.
+	 * 
+	 * @param fieldName
+	 *            Name of the field that is restriction bounded to.
+	 * @param collection
+	 *            Collection to check in.
+	 * @return index query restriction
+	 * @see Collection#containsAll(Object);
+	 */
+	public static IIndexQueryRestriction areAllInCollection(String fieldName, Collection<?> collection) {
+		return new AreAllInCollection(fieldName, collection);
+	}
+
+	/**
 	 * This restriction checks if the restriction value and object supplied via
 	 * {@link #isFulfilled(Object)} are equal, by terms of {@link Object#equals(Object)} method.
 	 * Note that special care is needed if this restriction is used with primitive types, because
@@ -509,6 +526,47 @@ public final class IndexQueryRestrictionFactory {
 		 */
 		public boolean isFulfilled(Object fieldValue) {
 			return collection.contains(fieldValue);
+		}
+
+	}
+
+	/**
+	 * This restriction checks if the value supplied via
+	 * {@link IIndexQueryRestriction#isFulfilled(Object)} is a collection, and all it members are
+	 * also contained in the collection provided with object construction. Note that this
+	 * restriction has to be bounded to a {@link Collection} field.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private static class AreAllInCollection extends AbstractIndexQueryRestriction {
+
+		/**
+		 * Collection to look in.
+		 */
+		private Collection<?> collection;
+
+		/**
+		 * Default constructor.
+		 * 
+		 * @param fieldName
+		 *            Name of the field that is restriction bounded to.
+		 * @param collection
+		 *            Collection to look in.
+		 */
+		public AreAllInCollection(String fieldName, Collection<?> collection) {
+			super(fieldName);
+			this.collection = collection;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public boolean isFulfilled(Object fieldValue) {
+			if (fieldValue instanceof Collection<?>) {
+				return collection.containsAll((Collection<?>) fieldValue);
+			}
+			return false;
 		}
 
 	}

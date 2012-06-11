@@ -13,9 +13,9 @@ import org.eclipse.swt.graphics.Image;
 
 /**
  * This enumeration holds all available sensor types with their full qualified name and their image.
- * 
+ *
  * @author Patrice Bouillet
- * 
+ *
  */
 public enum SensorTypeEnum {
 	/** The timer sensor type. */
@@ -62,7 +62,10 @@ public enum SensorTypeEnum {
 	/** The navigation invocation sequence sensor type. */
 	NAVIGATION_INVOCATION("info.novatec.inspectit.agent.sensor.method.invocationsequence.NavigationInvocationSequenceSensor", InspectITConstants.IMG_INVOCATION),
 	/** The aggregated timer data sensor type. */
-	AGGREGATED_TIMER_DATA("info.novatec.inspectit.agent.sensor.method.invocationsequence.AggregatedTimerSensor", InspectITConstants.IMG_TIMER);
+	AGGREGATED_TIMER_DATA("info.novatec.inspectit.agent.sensor.method.AggregatedTimerSensor", InspectITConstants.IMG_TIMER),
+	/** The multi invocation timer data sensor type. */
+	MULTI_INVOC_DATA("info.novatec.inspectit.agent.sensor.method.MultiInvocSensor", InspectITConstants.IMG_INVOCATION);
+
 	/**
 	 * The LOOKUP map which is used to get an element of the enumeration when passing the full
 	 * qualified name.
@@ -92,7 +95,7 @@ public enum SensorTypeEnum {
 
 	/**
 	 * Constructs an element of the enumeration with the given full qualified name string.
-	 * 
+	 *
 	 * @param fqn
 	 *            The full qualified name.
 	 * @param imageName
@@ -105,7 +108,7 @@ public enum SensorTypeEnum {
 
 	/**
 	 * Same as standard constructor but the openable can be specified in addition.
-	 * 
+	 *
 	 * @param fqn
 	 *            The full qualified name.
 	 * @param imageName
@@ -121,7 +124,7 @@ public enum SensorTypeEnum {
 
 	/**
 	 * The full qualified name of the sensor type.
-	 * 
+	 *
 	 * @return The full qualified name.
 	 */
 	public String getFqn() {
@@ -130,7 +133,7 @@ public enum SensorTypeEnum {
 
 	/**
 	 * Returns an element of the enumeration for the given full qualified name.
-	 * 
+	 *
 	 * @param fqn
 	 *            The full qualified class name of the sensor type.
 	 * @return An element of the enumeration.
@@ -141,7 +144,7 @@ public enum SensorTypeEnum {
 
 	/**
 	 * Returns all elements of the enumeration for the given list of sensor type ident objects.
-	 * 
+	 *
 	 * @param sensorTypes
 	 *            The passed sensor type ident objects.
 	 * @return A set of SensorTypeEnum objects.
@@ -156,7 +159,7 @@ public enum SensorTypeEnum {
 
 	/**
 	 * Returns an image descriptor for this sensor type.
-	 * 
+	 *
 	 * @return The sensor type image descriptor.
 	 */
 	public Image getImage() {
@@ -165,7 +168,7 @@ public enum SensorTypeEnum {
 
 	/**
 	 * Returns a displayable name of the sensor type.
-	 * 
+	 *
 	 * @return The displayable name.
 	 */
 	public String getDisplayName() {
@@ -189,7 +192,7 @@ public enum SensorTypeEnum {
 
 	/**
 	 * Returns if this sensor type can be opened somehow.
-	 * 
+	 *
 	 * @return if its openable.
 	 */
 	public boolean isOpenable() {

@@ -50,6 +50,17 @@ public final class InputDefinitionExtrasMarkerFactory {
 	};
 
 	/**
+	 * Marker for {@link CombinedInvocationsInputDefinitionExtra}.
+	 */
+	public static final InputDefinitionExtraMarker<CombinedInvocationsInputDefinitionExtra> COMBINED_INVOCATIONS_EXTRAS_MARKER = new InputDefinitionExtraMarker<CombinedInvocationsInputDefinitionExtra>() {
+		@Override
+		public Class<CombinedInvocationsInputDefinitionExtra> getInputDefinitionExtraClass() {
+			return CombinedInvocationsInputDefinitionExtra.class;
+		}
+
+	};
+
+	/**
 	 * Abstract class for input definition extras marker.
 	 * 
 	 * @author Ivan Senic

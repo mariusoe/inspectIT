@@ -189,4 +189,25 @@ public interface TableInputController extends SubViewClassificationController {
 	 */
 	void dispose();
 
+	/**
+	 * Signals that the object has been check so that input controller can perform necessary
+	 * actions.
+	 * 
+	 * @param object
+	 *            Object that has be checked.
+	 * @param checked
+	 *            True if object is checked, false if it is not.
+	 */
+	void objectChecked(Object object, boolean checked);
+
+	/**
+	 * @return If the table should apply the SWT.CHECK style.
+	 */
+	boolean isCheckStyle();
+
+	/**
+	 * @return The initial state of check box for all elements.
+	 */
+	boolean areItemsInitiallyChecked();
+
 }

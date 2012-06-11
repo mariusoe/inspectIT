@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -103,7 +104,15 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 	 * {@inheritDoc}
 	 */
 	public void createPartControl(Composite parent, FormToolkit toolkit) {
-		final Table table = toolkit.createTable(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL);
+		// the style can not be SWT.VIRTUAL when the SWT.CHECK style is used
+		// the check of the elements won't work because of the virtual loading
+		int style = SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL;
+		if (tableInputController.isCheckStyle()) {
+			style |= SWT.CHECK;
+		} else {
+			style |= SWT.VIRTUAL;
+		}
+		final Table table = toolkit.createTable(parent, style);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
@@ -223,6 +232,20 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 		}
 
 		tableViewerSearchHelper = new TableViewerSearchHelper(tableViewer, tableInputController, getRootEditor().getInputDefinition().getRepositoryDefinition());
+		// add listener for the check box style if active
+		if (tableInputController.isCheckStyle()) {
+			table.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					if (e.detail == SWT.CHECK) {
+						if (e.item instanceof TableItem) {
+							TableItem item = (TableItem) e.item;
+							tableInputController.objectChecked(item.getData(), item.getChecked());
+						}
+					}
+				}
+			});
+		}
 	}
 
 	/**
@@ -244,7 +267,15 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 									tableViewer.setInput(input);
 									if (tableViewer.getTable().isVisible()) {
 										tableViewer.refresh();
+
+										// if we use check style, set elements to the inital state
+										if (tableInputController.isCheckStyle()) {
+											for (TableItem tableItem : tableViewer.getTable().getItems()) {
+												tableItem.setChecked(tableInputController.areItemsInitiallyChecked());
+											}
+										}
 									}
+
 								}
 							}
 						});

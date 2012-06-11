@@ -408,10 +408,6 @@ public class SqlInvocInputController extends AbstractTableInputController {
 			return true;
 		}
 
-		if (data.size() != 1) {
-			return false;
-		}
-
 		if (!(data.get(0) instanceof InvocationSequenceData)) {
 			return false;
 		}

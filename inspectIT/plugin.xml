@@ -205,6 +205,10 @@
          </commandParameter>
       </command>
       <command
+            id="info.novatec.inspectit.rcp.commands.invocationsAggregatedTimerData"
+            name="Invocations Aggregated Timer Data">
+      </command>
+      <command
             id="info.novatec.inspectit.rcp.commands.showHideColumn"
             name="Show/Hide Column">
          <commandParameter
@@ -998,6 +1002,22 @@
             </and>
          </activeWhen>
       </handler>
+       <handler
+            class="info.novatec.inspectit.rcp.handlers.InvocationsCombineDataHandler"
+            commandId="info.novatec.inspectit.rcp.commands.invocationsAggregatedTimerData">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
       <handler
             class="info.novatec.inspectit.rcp.handlers.EditStorageDataHandler"
             commandId="org.eclipse.ui.edit.rename">
@@ -1296,6 +1316,42 @@
                      <count
                            value="1">
                      </count>
+                     <iterate>
+                        <instanceof
+                              value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                        </instanceof>
+                     </iterate>
+                     <with
+                           variable="activeEditor">
+                        <instanceof
+                              value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                        </instanceof>
+                        <test
+                              property="info.novatec.inspectit.activeSubView"
+                              value="tableSubView">
+                        </test>
+                     </with>
+                  </and>
+               </visibleWhen>
+            </command>
+         </menu>
+         <menu
+               label="Analyze">
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.invocationsAggregatedTimerData"
+                  icon="icons/invocation.png"
+                  label="Combine Data"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <and>
+                     <count
+                           value="+">
+                     </count>
+                     <not>
+                        <count
+                              value="1">
+                        </count></not>
                      <iterate>
                         <instanceof
                               value="info.novatec.inspectit.communication.data.InvocationSequenceData">

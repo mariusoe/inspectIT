@@ -621,4 +621,19 @@ public class TimerDataInputController extends AbstractTableInputController {
 			return new StyledString("error");
 		}
 	}
+	
+	/**
+	 * @return the timerDataList
+	 */
+	public List<TimerData> getTimerDataList() {
+		return timerDataList;
+	}
+
+	/**
+	 * @return the timerDataAccessService
+	 */
+	public ITimerDataAccessService getTimerDataAccessService() {
+		return timerDataAccessService;
+	}
+	
 }

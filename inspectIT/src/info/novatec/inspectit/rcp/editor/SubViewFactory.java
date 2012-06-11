@@ -14,6 +14,7 @@ import info.novatec.inspectit.rcp.editor.table.input.GroupedExceptionOverviewInp
 import info.novatec.inspectit.rcp.editor.table.input.HttpTimerDataInputController;
 import info.novatec.inspectit.rcp.editor.table.input.InvocOverviewInputController;
 import info.novatec.inspectit.rcp.editor.table.input.MethodInvocInputController;
+import info.novatec.inspectit.rcp.editor.table.input.MultiInvocDataInputController;
 import info.novatec.inspectit.rcp.editor.table.input.NavigationInvocOverviewInputController;
 import info.novatec.inspectit.rcp.editor.table.input.SqlInputController;
 import info.novatec.inspectit.rcp.editor.table.input.SqlInvocInputController;
@@ -169,6 +170,22 @@ public final class SubViewFactory {
 			SashCompositeSubView timerSashSubView = new SashCompositeSubView();
 			timerSashSubView.addSubView(new TableSubView(new TimerDataInputController()));
 			return timerSashSubView;
+		case MULTI_INVOC_DATA:
+			SashCompositeSubView multiInvocSubView = new SashCompositeSubView();
+			ISubView multiInvocOverview = new TableSubView(new MultiInvocDataInputController());
+			TabbedCompositeSubView multiInvocTabbedSubView = new TabbedCompositeSubView();
+			ISubView multiInvocSql = new TableSubView(new SqlInvocInputController());
+			ISubView multiInvocMethods = new TableSubView(new MethodInvocInputController());
+			ISubView multiInvocExceptions = new TableSubView(new ExceptionSensorInvocInputController());
+
+			multiInvocTabbedSubView.addSubView(multiInvocSql, "SQL", InspectIT.getDefault().getImage(InspectITConstants.IMG_DATABASE));
+			multiInvocTabbedSubView.addSubView(multiInvocMethods, "Methods", InspectIT.getDefault().getImage(InspectITConstants.IMG_METHOD_PUBLIC));
+			multiInvocTabbedSubView.addSubView(multiInvocExceptions, "Exceptions", InspectIT.getDefault().getImage(InspectITConstants.IMG_EXCEPTION_SENSOR));
+
+			multiInvocSubView.addSubView(multiInvocOverview, 1);
+			multiInvocSubView.addSubView(multiInvocTabbedSubView, 2);
+
+			return multiInvocSubView;
 		case HTTP_TIMER_SENSOR:
 			SashCompositeSubView httpSashSubView = new SashCompositeSubView();
 			httpSashSubView.addSubView(new TableSubView(new HttpTimerDataInputController()));

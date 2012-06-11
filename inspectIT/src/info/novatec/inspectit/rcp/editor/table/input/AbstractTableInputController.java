@@ -166,5 +166,35 @@ public abstract class AbstractTableInputController implements TableInputControll
 	public boolean canAlterColumnWidth(TableColumn tableColumn) {
 		return true;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * By default does nothing, sub-classes may override.
+	 */
+	@Override
+	public void objectChecked(Object object, boolean checked) {
+	}
+
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * By default false.
+	 */
+	@Override
+	public boolean isCheckStyle() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * By default false.
+	 */
+	@Override
+	public boolean areItemsInitiallyChecked() {
+		return false;
+	}
 
 }

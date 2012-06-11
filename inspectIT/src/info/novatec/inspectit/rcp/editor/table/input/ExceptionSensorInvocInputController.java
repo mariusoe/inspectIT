@@ -418,10 +418,6 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 			return true;
 		}
 
-		if (data.size() != 1) {
-			return false;
-		}
-
 		if (!(data.get(0) instanceof InvocationSequenceData)) {
 			return false;
 		}
