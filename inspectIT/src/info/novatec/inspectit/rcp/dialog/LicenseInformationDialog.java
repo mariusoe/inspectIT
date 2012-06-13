@@ -63,6 +63,11 @@ public class LicenseInformationDialog extends TitleAreaDialog {
 	private Composite dialogSubComposite;
 
 	/**
+	 * Last loaded/impored {@link LicenseInfoData}.
+	 */
+	private LicenseInfoData licenseInfoData;
+
+	/**
 	 * Constructor.
 	 * 
 	 * @param parentShell
@@ -199,10 +204,19 @@ public class LicenseInformationDialog extends TitleAreaDialog {
 	}
 
 	/**
+	 * 
+	 * @return Last loaded {@link LicenseInfoData}. This method returns valid results only if the
+	 *         dialog returned with the {@link SWT#OK} value.
+	 */
+	public LicenseInfoData getLicenseInfoData() {
+		return licenseInfoData;
+	}
+
+	/**
 	 * Refreshes the data on the dialog, with new data from the CMR.
 	 */
 	private void refreshData() {
-		LicenseInfoData licenseInfoData = repositoryDefinition.getLicenseService().getLicenseInfoData();
+		licenseInfoData = repositoryDefinition.getLicenseService().getLicenseInfoData();
 		dialogSubComposite.dispose();
 		dialogSubComposite = new Composite(dialogAreaComposite, SWT.NONE);
 		createInformation(dialogSubComposite, licenseInfoData);
@@ -211,4 +225,5 @@ public class LicenseInformationDialog extends TitleAreaDialog {
 		getShell().layout();
 		getShell().pack();
 	}
+
 }

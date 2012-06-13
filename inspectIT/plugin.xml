@@ -151,6 +151,15 @@
             id="info.novatec.inspectit.rcp.wizard.copyDataToStorageWizard"
             name="Copy Data to Storage Wizard">
       </wizard>
+      <wizard
+            class="info.novatec.inspectit.rcp.wizard.AddCmrRepositoryWizard"
+            icon="icons/add.png"
+            id="info.novatec.inspectit.rcp.wizard.addCmrRepositoryDialog"
+            name="Add Central Management Repository (CMR)">
+         <description>
+            Add Central Management Repository (CMR)
+         </description>
+      </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -270,10 +279,6 @@
       <command
             id="info.novatec.inspectit.rcp.commands.clearRepositoryBuffer"
             name="Clear Repository Buffer">
-      </command>
-      <command
-            id="info.novatec.inspectit.rcp.commands.addCmrRepository"
-            name="Add CMR Repository">
       </command>
       <command
             id="info.novatec.inspectit.rcp.commands.removeCmrRepository"
@@ -817,10 +822,6 @@
                </with>
             </or>
          </activeWhen>
-      </handler>
-      <handler
-            class="info.novatec.inspectit.rcp.handlers.AddCmrRepositoryHandler"
-            commandId="info.novatec.inspectit.rcp.commands.addCmrRepository">
       </handler>
       <handler
             class="info.novatec.inspectit.rcp.handlers.RemoveCmrRepositoryHandler"
@@ -1653,10 +1654,14 @@
             allPopups="false"
             locationURI="toolbar:info.novatec.inspectit.rcp.view.repositoryManager">
          <command
-               commandId="info.novatec.inspectit.rcp.commands.addCmrRepository"
+               commandId="org.eclipse.ui.newWizard"
                icon="icons/add.png"
                style="push"
                tooltip="Add Central Management Repository (CMR)">
+            <parameter
+                  name="newWizardId"
+                  value="info.novatec.inspectit.rcp.wizard.addCmrRepositoryDialog">
+            </parameter>
          </command>
          <command
                commandId="info.novatec.inspectit.rcp.commands.removeCmrRepository"
