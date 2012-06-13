@@ -4,12 +4,15 @@ import info.novatec.inspectit.cmr.dao.DefaultDataDao;
 import info.novatec.inspectit.cmr.dao.PlatformIdentDao;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
+import info.novatec.inspectit.cmr.util.AgentStatusDataProvider;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 import info.novatec.inspectit.spring.logger.Logger;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -41,6 +44,12 @@ public class GlobalDataAccessService implements IGlobalDataAccessService {
 	private DefaultDataDao defaultDataDao;
 
 	/**
+	 * {@link AgentStatusDataProvider}.
+	 */
+	@Autowired
+	private AgentStatusDataProvider agentStatusProvider;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@MethodLog
@@ -48,6 +57,14 @@ public class GlobalDataAccessService implements IGlobalDataAccessService {
 		// only load the ones which are currently connected
 		List<PlatformIdent> result = platformIdentDao.findAllInitialized();
 		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@MethodLog
+	public Map<Long, AgentStatusData> getAgentStatusDataMap() {
+		return agentStatusProvider.getAgentStatusDataMap();
 	}
 
 	/**

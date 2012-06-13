@@ -3,8 +3,10 @@ package info.novatec.inspectit.rcp.view.impl;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
+import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.form.CmrRepositoryPropertyForm;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
+import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.handlers.ShowRepositoryHandler;
 import info.novatec.inspectit.rcp.model.AgentLeaf;
 import info.novatec.inspectit.rcp.model.Component;
@@ -19,7 +21,6 @@ import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.rcp.view.IRefreshableView;
 import info.novatec.inspectit.rcp.view.tree.TreeContentProvider;
-import info.novatec.inspectit.rcp.view.tree.TreeLabelProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,12 +47,14 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -187,16 +190,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 				return new Object[0];
 			}
 		});
-		treeViewer.setLabelProvider(new TreeLabelProvider() {
-			@Override
-			public Image getImage(Object element) {
-				if (element instanceof DeferredAgentsComposite) {
-					CmrRepositoryDefinition cmrRepositoryDefinition = (CmrRepositoryDefinition) ((DeferredAgentsComposite) element).getRepositoryDefinition();
-					return ImageFormatter.getCmrRepositoryImage(cmrRepositoryDefinition, true);
-				}
-				return super.getImage(element);
-			}
-		});
+		treeViewer.setLabelProvider(new RepositoryTreeLabelProvider());
 		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
@@ -642,6 +636,72 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 					throw new RuntimeException(e);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Label provider for the tree.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private static class RepositoryTreeLabelProvider extends StyledCellIndexLabelProvider {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected Image getColumnImage(Object element, int index) {
+			if (element instanceof DeferredAgentsComposite) {
+				CmrRepositoryDefinition cmrRepositoryDefinition = (CmrRepositoryDefinition) ((DeferredAgentsComposite) element).getRepositoryDefinition();
+				return ImageFormatter.getCmrRepositoryImage(cmrRepositoryDefinition, true);
+			} else if (element instanceof AgentLeaf) {
+				return ImageFormatter.getAgentLeafImage((AgentLeaf) element);
+			}
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected StyledString getStyledText(Object element, int index) {
+			if (element instanceof DeferredAgentsComposite) {
+				CmrRepositoryDefinition cmrRepositoryDefinition = (CmrRepositoryDefinition) ((DeferredAgentsComposite) element).getRepositoryDefinition();
+				return new StyledString(cmrRepositoryDefinition.getName());
+			} else if (element instanceof AgentLeaf) {
+				return TextFormatter.getStyledAgentLeafString((AgentLeaf) element);
+			}
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getToolTipText(Object element) {
+			if (element instanceof AgentLeaf) {
+				return "Double click to explore Agent in the Data Explorer";
+			}
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Point getToolTipShift(Object object) {
+			int x = 5;
+			int y = 5;
+			return new Point(x, y);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int getToolTipDisplayDelayTime(Object object) {
+			return 500;
 		}
 	}
 

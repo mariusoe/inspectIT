@@ -10,6 +10,7 @@ import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
+import info.novatec.inspectit.cmr.util.AgentStatusDataProvider;
 import info.novatec.inspectit.cmr.util.LicenseUtil;
 import info.novatec.inspectit.spring.logger.Logger;
 
@@ -77,6 +78,12 @@ public class RegistrationService implements IRegistrationService {
 	LicenseUtil licenseUtil;
 
 	/**
+	 * {@link AgentStatusDataProvider}.
+	 */
+	@Autowired
+	AgentStatusDataProvider agentStatusDataProvider;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Transactional
@@ -114,6 +121,8 @@ public class RegistrationService implements IRegistrationService {
 			platformIdent.setVersion(version);
 
 			platformIdentDao.saveOrUpdate(platformIdent);
+
+			agentStatusDataProvider.registerConnected(platformIdent.getId());
 
 			if (log.isInfoEnabled()) {
 				log.info("Successfully registered Agent '" + agentName + "' with id " + platformIdent.getId() + ", version " + version + " and following network interfaces:");

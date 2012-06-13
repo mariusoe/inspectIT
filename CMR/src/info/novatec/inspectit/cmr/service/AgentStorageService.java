@@ -1,6 +1,7 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.DefaultDataDao;
+import info.novatec.inspectit.cmr.util.AgentStatusDataProvider;
 import info.novatec.inspectit.cmr.util.Converter;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.spring.logger.Logger;
@@ -54,6 +55,12 @@ public class AgentStorageService implements IAgentStorageService {
 	private DefaultDataDao defaultDataDao;
 
 	/**
+	 * {@link AgentStatusDataProvider}.
+	 */
+	@Autowired
+	AgentStatusDataProvider platformIdentDateSaver;
+
+	/**
 	 * Queue to store and remove list of data that has to be processed.
 	 */
 	private ArrayBlockingQueue<SoftReference<List<? extends DefaultData>>> dataObjectsBlockingQueue = new ArrayBlockingQueue<SoftReference<List<? extends DefaultData>>>(QUEUE_CAPACITY);
@@ -78,7 +85,8 @@ public class AgentStorageService implements IAgentStorageService {
 	/**
 	 * Constructor that can be used in testing for suppling the queue.
 	 * 
-	 * @param dataObjectsBlockingQueue Queue.
+	 * @param dataObjectsBlockingQueue
+	 *            Queue.
 	 */
 	AgentStorageService(ArrayBlockingQueue<SoftReference<List<? extends DefaultData>>> dataObjectsBlockingQueue) {
 		this.dataObjectsBlockingQueue = dataObjectsBlockingQueue;
@@ -89,6 +97,9 @@ public class AgentStorageService implements IAgentStorageService {
 	 */
 	public void addDataObjects(final List<? extends DefaultData> dataObjects) throws RemoteException {
 		SoftReference<List<? extends DefaultData>> softReference = new SoftReference<List<? extends DefaultData>>(dataObjects);
+		if (!dataObjects.isEmpty()) {
+			platformIdentDateSaver.registerDataSent(dataObjects.get(0).getPlatformIdent());
+		}
 		try {
 			boolean added = dataObjectsBlockingQueue.offer(softReference, DATA_THROW_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
 			if (!added) {

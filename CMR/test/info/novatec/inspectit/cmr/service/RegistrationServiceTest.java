@@ -19,6 +19,7 @@ import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
 import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
+import info.novatec.inspectit.cmr.util.AgentStatusDataProvider;
 import info.novatec.inspectit.cmr.util.LicenseUtil;
 
 import java.rmi.RemoteException;
@@ -83,6 +84,9 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 	@Mock
 	private PlatformSensorTypeIdentDaoImpl platformSensorTypeIdentDao;
 
+	@Mock
+	private AgentStatusDataProvider agentStatusDataProvider;
+
 	/**
 	 * Initializes mocks. Has to run before each test so that mocks are clear.
 	 */
@@ -96,6 +100,7 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		registrationService.methodIdentDao = methodIdentDao;
 		registrationService.methodSensorTypeIdentDao = methodSensorTypeIdentDao;
 		registrationService.platformSensorTypeIdentDao = platformSensorTypeIdentDao;
+		registrationService.agentStatusDataProvider = agentStatusDataProvider;
 		registrationService.log = LogFactory.getLog(RegistrationService.class);
 	}
 
@@ -156,6 +161,8 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		Assert.assertEquals(agentName, argument.getValue().getAgentName());
 		Assert.assertEquals(version, argument.getValue().getVersion());
 		Assert.assertNotNull(argument.getValue().getTimeStamp());
+
+		verify(agentStatusDataProvider, times(1)).registerConnected(platformId);
 	}
 
 	/**
@@ -198,6 +205,8 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		Assert.assertEquals(argument.getValue().getVersion(), version);
 		Assert.assertNotNull(argument.getValue().getTimeStamp());
 		Assert.assertNotSame(argument.getValue().getTimeStamp(), timestamp);
+
+		verify(agentStatusDataProvider, times(1)).registerConnected(platformId);
 	}
 
 	/**

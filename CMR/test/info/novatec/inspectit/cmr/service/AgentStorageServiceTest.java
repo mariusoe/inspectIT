@@ -1,6 +1,7 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
+import info.novatec.inspectit.cmr.util.AgentStatusDataProvider;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.TimerData;
 
@@ -11,7 +12,11 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.commons.logging.LogFactory;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
@@ -28,6 +33,20 @@ public class AgentStorageServiceTest extends AbstractTestNGLogSupport {
 	private AgentStorageService agentStorageService;
 
 	/**
+	 * {@link AgentStatusDataProvider}.
+	 */
+	@Mock
+	private AgentStatusDataProvider agentStatusDataProvider;
+
+	/**
+	 * Initializes the mocks.
+	 */
+	@BeforeMethod
+	public void init() {
+		MockitoAnnotations.initMocks(this);
+	}
+
+	/**
 	 * Proves that the data will be dropped after the timeout if there is no place in the queue and
 	 * amount of dropped data be remembered.
 	 * 
@@ -37,19 +56,23 @@ public class AgentStorageServiceTest extends AbstractTestNGLogSupport {
 	@Test
 	public void dropDataAfterTimeout() throws RemoteException {
 		agentStorageService = new AgentStorageService(new ArrayBlockingQueue<SoftReference<List<? extends DefaultData>>>(1));
+		agentStorageService.platformIdentDateSaver = agentStatusDataProvider;
 		agentStorageService.log = LogFactory.getLog(AgentStorageService.class);
 
 		List<DefaultData> dataList = new ArrayList<DefaultData>();
-		dataList.add(new TimerData());
+		TimerData timerData = new TimerData();
+		timerData.setPlatformIdent(1L);
+		dataList.add(timerData);
 
 		agentStorageService.addDataObjects(dataList);
 		agentStorageService.addDataObjects(dataList);
 
 		Assert.assertEquals(dataList.size(), agentStorageService.getDroppedDataCount());
+		Mockito.verify(agentStatusDataProvider, Mockito.times(2)).registerDataSent(1L);
 	}
 
 	/**
-	 * provies that data will be processed if there is place in the queue.
+	 * Provides that data will be processed if there is place in the queue.
 	 * 
 	 * @throws RemoteException
 	 *             If {@link RemoteException} occurs.
@@ -57,13 +80,17 @@ public class AgentStorageServiceTest extends AbstractTestNGLogSupport {
 	@Test
 	public void acceptData() throws RemoteException {
 		agentStorageService = new AgentStorageService(new ArrayBlockingQueue<SoftReference<List<? extends DefaultData>>>(1));
+		agentStorageService.platformIdentDateSaver = agentStatusDataProvider;
 		agentStorageService.log = LogFactory.getLog(AgentStorageService.class);
 
 		List<DefaultData> dataList = new ArrayList<DefaultData>();
-		dataList.add(new TimerData());
+		TimerData timerData = new TimerData();
+		timerData.setPlatformIdent(1L);
+		dataList.add(timerData);
 
 		agentStorageService.addDataObjects(dataList);
 
 		Assert.assertEquals(0, agentStorageService.getDroppedDataCount());
+		Mockito.verify(agentStatusDataProvider, Mockito.times(1)).registerDataSent(1L);
 	}
 }

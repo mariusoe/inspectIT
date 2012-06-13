@@ -1,12 +1,14 @@
 package info.novatec.inspectit.rcp.model;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
+import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 import info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ui.progress.IElementCollector;
@@ -45,9 +47,11 @@ public class DeferredAgentsComposite extends DeferredComposite implements ICmrRe
 		try {
 			if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
 				List<? extends PlatformIdent> agents = cmrRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents();
+				Map<Long, AgentStatusData> agentStatusDataMap = cmrRepositoryDefinition.getGlobalDataAccessService().getAgentStatusDataMap();
 				if (null != agents) {
 					for (PlatformIdent platformIdent : agents) {
-						Component agentLeaf = new AgentLeaf(platformIdent);
+						AgentStatusData agentStatusData = agentStatusDataMap.get(platformIdent.getId());
+						Component agentLeaf = new AgentLeaf(platformIdent, agentStatusData);
 						collector.add(agentLeaf, monitor);
 						((Composite) object).addChild(agentLeaf);
 

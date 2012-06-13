@@ -5,6 +5,7 @@ import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
+import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
 import info.novatec.inspectit.indexing.storage.impl.StorageIndexQuery;
 import info.novatec.inspectit.rcp.storage.util.StorageIndexQueryProvider;
@@ -15,6 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * {@link IGlobalDataAccessService} for storage purposes. This class indirectly uses the
@@ -45,6 +47,16 @@ public class StorageGlobalDataAccessService extends AbstractStorageService<Defau
 	 */
 	public List<PlatformIdent> getConnectedAgents() {
 		return agents;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Returns the empty map because for the storage we don't have the information saved.
+	 */
+	@Override
+	public Map<Long, AgentStatusData> getAgentStatusDataMap() {
+		return Collections.emptyMap();
 	}
 
 	/**

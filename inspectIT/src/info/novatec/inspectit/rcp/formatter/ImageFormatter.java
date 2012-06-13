@@ -1,7 +1,9 @@
 package info.novatec.inspectit.rcp.formatter;
 
+import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
+import info.novatec.inspectit.rcp.model.AgentLeaf;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
@@ -200,5 +202,26 @@ public final class ImageFormatter {
 			return img;
 		}
 		return null;
+	}
+
+	/**
+	 * Returns the image for the agent leaf based on the last data sent date.
+	 * 
+	 * @param agentLeaf
+	 *            {@link AgentLeaf}.
+	 * @return {@link Image}
+	 */
+	public static Image getAgentLeafImage(AgentLeaf agentLeaf) {
+		AgentStatusData agentStatusData = agentLeaf.getAgentStatusData();
+		if (null != agentStatusData && null != agentStatusData.getMinutesSinceLastData()) {
+			long minutes = agentStatusData.getMinutesSinceLastData().longValue();
+			if (minutes > 0) {
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_AGENT_YELLOW);
+			} else {
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_AGENT_GREEN);
+			}
+		} else {
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_AGENT_GRAY);
+		}
 	}
 }

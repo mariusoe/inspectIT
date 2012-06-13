@@ -2,9 +2,11 @@ package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Interface used to define all methods which clients (be it graphical/textual) can access the
@@ -23,6 +25,13 @@ public interface IGlobalDataAccessService {
 	 * @return All connected Agents.
 	 */
 	List<? extends PlatformIdent> getConnectedAgents();
+
+	/**
+	 * Returns the map of platform ident IDs and {@link AgentStatusData}.
+	 * 
+	 * @return Returns the map of platform ident IDs and {@link AgentStatusData}.
+	 */
+	Map<Long, AgentStatusData> getAgentStatusDataMap();
 
 	/**
 	 * Returns the last saved data objects (with the given time interval). Returns a list of

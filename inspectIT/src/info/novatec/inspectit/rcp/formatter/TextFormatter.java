@@ -6,6 +6,8 @@ import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationAwareData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
+import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
+import info.novatec.inspectit.rcp.model.AgentLeaf;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.storage.StorageData;
@@ -227,6 +229,34 @@ public final class TextFormatter {
 	}
 
 	/**
+	 * Returns {@link StyledString} for the {@link AgentLeaf}.
+	 * 
+	 * @param agentLeaf
+	 *            {@link AgentLeaf}.
+	 * @return Returns {@link StyledString} for the {@link AgentLeaf}.
+	 */
+	public static StyledString getStyledAgentLeafString(AgentLeaf agentLeaf) {
+		StyledString styledString = new StyledString();
+		styledString.append(agentLeaf.getPlatformIdent().getAgentName());
+		styledString.append(" ");
+		styledString.append("[" + agentLeaf.getPlatformIdent().getVersion() + "]", StyledString.QUALIFIER_STYLER);
+		styledString.append(" - ");
+		AgentStatusData agentStatusData = agentLeaf.getAgentStatusData();
+		if (null != agentStatusData && null != agentStatusData.getMinutesSinceLastData()) {
+			long minutes = agentStatusData.getMinutesSinceLastData().longValue();
+			if (minutes > 0) {
+				styledString.append("Last data sent " + minutes + " min ago", StyledString.DECORATIONS_STYLER);
+			} else {
+				styledString.append("Sending data", StyledString.DECORATIONS_STYLER);
+			}
+		} else {
+			styledString.append("No data sent", StyledString.DECORATIONS_STYLER);
+		}
+		return styledString;
+
+	}
+
+	/**
 	 * @param storageState
 	 *            Storage state.
 	 * @return Returns the textual representation of the storage state.
@@ -320,7 +350,7 @@ public final class TextFormatter {
 	 * @param label
 	 *            Label to get name for.
 	 * @param grouped
-	 *            TODO
+	 *            Is is a representation for the grouped labels.
 	 * @return Returns the name of the label, based on it's class.
 	 */
 	public static String getLabelValue(AbstractStorageLabel<?> label, boolean grouped) {

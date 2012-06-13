@@ -1,8 +1,9 @@
 package info.novatec.inspectit.rcp.model;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
-import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITImages;
+import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
+
+import com.google.common.base.Objects;
 
 /**
  * Agent leaf for the tree in the Repository Manager.
@@ -18,23 +19,49 @@ public class AgentLeaf extends Leaf {
 	private PlatformIdent platformIdent;
 
 	/**
+	 * {@link AgentStatusData}.
+	 */
+	private AgentStatusData agentStatusData;
+
+	/**
 	 * Default constructor.
 	 * 
 	 * @param platformIdent
 	 *            Agent to display in leaf.
+	 * @param lastSendDate
+	 *            Last data send date.
 	 */
-	public AgentLeaf(PlatformIdent platformIdent) {
+	public AgentLeaf(PlatformIdent platformIdent, AgentStatusData agentStatusData) {
 		this.platformIdent = platformIdent;
-		this.setName(platformIdent.getAgentName() + " [" + platformIdent.getVersion() + "]");
-		this.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_AGENT));
-		this.setTooltip("Double click to explore Agent in the Data Explorer");
+		this.agentStatusData = agentStatusData;
 	}
 
 	/**
-	 * @return the platformIdent
+	 * Gets {@link #platformIdent}.
+	 * 
+	 * @return {@link #platformIdent}
 	 */
 	public PlatformIdent getPlatformIdent() {
 		return platformIdent;
+	}
+
+	/**
+	 * Sets {@link #platformIdent}.
+	 * 
+	 * @param platformIdent
+	 *            New value for {@link #platformIdent}
+	 */
+	public void setPlatformIdent(PlatformIdent platformIdent) {
+		this.platformIdent = platformIdent;
+	}
+
+	/**
+	 * Gets {@link #agentStatusData}.
+	 * 
+	 * @return {@link #agentStatusData}
+	 */
+	public AgentStatusData getAgentStatusData() {
+		return agentStatusData;
 	}
 
 	/**
@@ -42,35 +69,29 @@ public class AgentLeaf extends Leaf {
 	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((platformIdent == null) ? 0 : platformIdent.hashCode());
-		return result;
+		return Objects.hashCode(super.hashCode(), platformIdent, agentStatusData);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
-		if (obj == null) {
+		if (object == null) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
+		if (getClass() != object.getClass()) {
 			return false;
 		}
-		AgentLeaf other = (AgentLeaf) obj;
-		if (platformIdent == null) {
-			if (other.platformIdent != null) {
-				return false;
-			}
-		} else if (!platformIdent.equals(other.platformIdent)) {
+		if (!super.equals(object)) {
 			return false;
 		}
-		return true;
+		AgentLeaf that = (AgentLeaf) object;
+		return Objects.equal(this.platformIdent, that.platformIdent)
+				&& Objects.equal(this.agentStatusData, that.agentStatusData);
 	}
 
 }
