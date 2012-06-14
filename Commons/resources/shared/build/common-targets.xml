@@ -215,34 +215,79 @@
 		</condition>
 	</target>
 
-	<target name="-retrieve-jre-installations" depends="init-antcontrib,init-ftp-task,check-retrieve-jre-installations" unless="skip.jre.download" if="can-retrieve-jre-installations">
-		<foreach list="${jvm.list}" param="file" target="checkFile" />
+	<target name="-retrieve-jre-installations" depends="check-retrieve-jre-installations,init-antcontrib" unless="skip.jre.download" if="can-retrieve-jre-installations">
+		<var name="download.dir" value="${jvm.root}" />
+		<var name="download.notify.target" value="-notify-about-jre-update" />
+		<var name="download.ftp.remotedir" value="${jvm.remotedir}" />
 
-		<!-- delete tmp folder -->
-		<delete dir="${jvm.root}/tmp" failonerror="false" />
+		<echo message="Retrieving JVMs ${jvm.list} to dir ${download.dir} from remote dir ${download.ftp.remotedir}" />
+
+		<foreach list="${jvm.list}" param="jvmFile" target="-get-jvm-instalation" inheritall="true" />
 	</target>
 
-	<target name="checkFile" depends="check.download,check.md5" if="file" />
+	<target name="-get-jvm-instalation" if="jvmFile">
+		<var name="file" value="${jvmFile}" />
+		<antcall target="checkFile" inheritall="true" />
+	</target>
+
+	<target name="-notify-about-jre-update">
+		<echo message="-------------------------------------------------------------" />
+		<echo message="INFO: A newer JRE Version was found than currently available." />
+		<echo message="--------------------------------------------------------------" />
+		<echo message="The old version is going to be deleted and updated with the " />
+		<echo message="newer version found on the FTP server." />
+		<echo message="In case you don't want to update the JRE, you can skip " />
+		<echo message="the whole update process by starting the Build again with the " />
+		<echo message="option: -Dskip.jre.download=true" />
+		<echo message="-------------------------------------------------------------" />
+		<input>Press Return key to continue and to overwrite the JRE: ${file}</input>
+	</target>
+
+	<!-- *************************************************************** -->
+	<!--   		 D O W N L O A D   &   M D 5    T A R G E T S      	     -->
+	<!-- *************************************************************** -->
+
+
+	<target name="initCheckFile">
+		<condition property="can-checkFile">
+			<and>
+				<isset property="file" />
+				<isset property="download.dir" />
+				<isset property="download.ftp.remotedir" />
+				<isset property="download.notify.target" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="checkFile" depends="init-antcontrib,init-ftp-task,initCheckFile,check.download,check.md5" if="can-checkFile" >
+		<!-- DESCRIPTION -->
+		<!-- Downloads the zip file with the name specified in the 'file' property if MD5 on the server is not the same to the local file. -->
+		<!-- Note that is download is performed property 'download.executed.file' will be set to true, where file is the name of the file. -->
+
+		<!-- delete tmp folder -->
+		<delete dir="${download.dir}/tmp" failonerror="false" />
+	</target>
 
 	<target name="check.download" unless="download-ok" depends="check.init">
-		<echo message="Downloading ${md5.file}" />
-		<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
-			<fileset dir="${jvm.root}/tmp">
+		<echo message="Downloading ${md5.file} from ${ftp.server} and remote dir ${download.ftp.remotedir}" />
+		<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${download.ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
+			<fileset dir="${download.dir}/tmp">
 				<include name="${md5.file}" />
 			</fileset>
 		</wptg-ftp>
 
 		<!-- download the JRE only if it is not already locally available -->
-		<available file="${jvm.root}/${zip.file}" property="download-jre" value="true" />
+		<available file="${download.dir}/${zip.file}" property="download-file" value="true" />
 		<if>
-			<isfalse value="${download-jre}" />
+			<isfalse value="${download-file}" />
 			<then>
 				<echo message="Downloading ${zip.file}" />
-				<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
-					<fileset dir="${jvm.root}/tmp">
+				<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${download.ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
+					<fileset dir="${download.dir}/tmp">
 						<include name="${zip.file}" />
 					</fileset>
 				</wptg-ftp>
+				<property name="download.executed.${file}" value="true"/>
 			</then>
 			<else>
 				<echo message="${zip.file} already locally available, so skipping download." />
@@ -258,8 +303,8 @@
 		</condition>
 		<condition property="download-ok">
 			<and>
-				<available file="${jvm.root}/${zip.file}" />
-				<available file="${jvm.root}/${md5.file}" />
+				<available file="${download.dir}/${zip.file}" />
+				<available file="${download.dir}/${md5.file}" />
 			</and>
 		</condition>
 	</target>
@@ -268,7 +313,7 @@
 		<trycatch>
 			<try>
 				<!-- the valid md5 value specified in the md5 file -->
-				<loadfile srcFile="${jvm.root}/tmp/${md5.file}" property="md5.valid">
+				<loadfile srcFile="${download.dir}/tmp/${md5.file}" property="md5.valid">
 					<!-- need to filter whitespace in the md5sum -->
 					<filterchain>
 						<striplinebreaks />
@@ -283,7 +328,7 @@
 				</loadfile>
 
 				<!-- the actual md5 value -->
-				<checksum file="${jvm.root}/${zip.file}" property="md5.actual" />
+				<checksum file="${download.dir}/${zip.file}" property="md5.actual" />
 				<!-- compare them -->
 				<condition property="md5.isValid">
 					<equals arg1="${md5.valid}" arg2="${md5.actual}" />
@@ -298,40 +343,29 @@
 						<echo message="-> expected: ${md5.valid}" />
 						<echo message="-> actual  : ${md5.actual}" />
 						<!-- rename the file to indicate that it is a newer version -->
-						<antcall target="-notify-about-jre-update" />
+
+						<antcall target="${download.notify.target}" />
 						<echo message="Downloading ${zip.file}" />
-						<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
-							<fileset dir="${jvm.root}/tmp">
+						<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${download.ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
+							<fileset dir="${download.dir}/tmp">
 								<include name="${zip.file}" />
 							</fileset>
 						</wptg-ftp>
-						<move file="${jvm.root}/tmp/${zip.file}" tofile="${jvm.root}/tmp/${file}.newer-version.zip" overwrite="true" failonerror="true" />
-						<delete dir="${jvm.root}/${zip.file}" failonerror="false" />
-						<move file="${jvm.root}/tmp/${file}.newer-version.zip" tofile="${jvm.root}/${zip.file}" failonerror="true" />
+						<move file="${download.dir}/tmp/${zip.file}" tofile="${download.dir}/tmp/${file}.newer-version.zip" overwrite="true" failonerror="true" />
+						<delete dir="${download.dir}/${zip.file}" failonerror="false" />
+						<move file="${download.dir}/tmp/${file}.newer-version.zip" tofile="${download.dir}/${zip.file}" failonerror="true" />
+						<property name="download.executed.${file}" value="true"/>
 					</else>
 				</if>
 			</try>
 			<catch>
 				<!-- the file was not there in the first place, so just put it into the correct folder -->
 				<echo message="${zip.file} was not available, so moving it to the correct location." />
-				<move file="${jvm.root}/tmp/${zip.file}" tofile="${jvm.root}/${zip.file}" overwrite="true" failonerror="true" />
+				<move file="${download.dir}/tmp/${zip.file}" tofile="${download.dir}/${zip.file}" overwrite="true" failonerror="true" />
 			</catch>
 		</trycatch>
 		<!-- now just delete the MD5 file -->
-		<delete dir="${jvm.root}/tmp/${md5.file}" failonerror="false" />
-	</target>
-
-	<target name="-notify-about-jre-update">
-		<echo message="-------------------------------------------------------------" />
-		<echo message="INFO: A newer JRE Version was found than currently available." />
-		<echo message="--------------------------------------------------------------" />
-		<echo message="The old version is going to be deleted and updated with the " />
-		<echo message="newer version found on the FTP server." />
-		<echo message="In case you don't want to update the JRE, you can skip " />
-		<echo message="the whole update process by starting the Build again with the " />
-		<echo message="option: -Dskip.jre.download=true" />
-		<echo message="-------------------------------------------------------------" />
-		<input>Press Return key to continue and to overwrite the JRE: ${file}</input>
+		<delete dir="${download.dir}/tmp/${md5.file}" failonerror="false" />
 	</target>
 
 </project>

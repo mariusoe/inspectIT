@@ -73,17 +73,17 @@
 
 	<target name="dist-commons">
 		<ant antfile="${build.commons.file}" target="release-as-plugin" inheritAll="false" useNativeBasedir="true">
-			<property name="pluginReleaseDir" value="${buildDirectory}/plugins"/>
+			<property name="pluginReleaseDir" value="${buildDirectory}/plugins" />
 		</ant>
 	</target>
 
 	<target name="dist-commonscs">
 		<ant antfile="${build.commonscs.file}" target="release-as-plugin" inheritAll="false" useNativeBasedir="true">
-			<property name="pluginReleaseDir" value="${buildDirectory}/plugins"/>
+			<property name="pluginReleaseDir" value="${buildDirectory}/plugins" />
 		</ant>
 	</target>
 
-	<target name="init" depends="dist-commons, dist-commonscs">
+	<target name="init" depends="retrieve-eclipse, dist-commons, dist-commonscs">
 		<mkdir dir="${buildDirectory}" />
 		<mkdir dir="${buildDirectory}/plugins/info.novatec.inspectit.commons" />
 		<mkdir dir="${buildDirectory}/plugins/info.novatec.inspectit.commons/META-INF" />
@@ -112,22 +112,45 @@
 	<!-- These targets actually download the needed Eclipse versions from-->
 	<!-- the FTP and unpack them in order to be used by the PDE Build.   -->
 	<!-- *************************************************************** -->
-	<target name="checkForEclipse" depends="init, init-ftp-task" description="Checks whether Eclipse is already present.">
-		<condition property="isEclipsePresent">
-			<available file="${release.basedir}/runtime/${eclipse.zip}" property="isEclipsePresent" />
+	<target name="retrieve-eclipse" description="Checks if Eclipse download is necessary, downloads it and unpacks." depends="init-antcontrib">
+		<var name="download.dir" value="${release.basedir}/runtime" />
+		<var name="download.ftp.remotedir" value="${ftp.eclipsedir}" />
+		<var name="download.notify.target" value="-notify-about-eclipse-update" />
+
+		<var name="file" value="${eclipse.file}" />
+
+		<antcall target="retrieve-eclipse-internal" inheritall="true" />
+	</target>
+
+	<target name="retrieve-eclipse-internal" depends="checkFile,unpack-eclipse" />
+	<target name="check-unpack-eclipse">
+		<condition property="should-unpack-eclipse">
+			<or>
+				<isset property="download.executed.${eclipse.file}" />
+				<and>
+					<available file="${release.basedir}/runtime/${eclipse.file}.zip" />
+					<not>
+						<available file="${base}" type="dir" />
+					</not>
+				</and>
+			</or>
 		</condition>
 	</target>
 
-	<target name="retrieve-eclipse" depends="checkForEclipse" unless="isEclipsePresent" description="Downloads Eclipse from the FTP and unpacks it.">
-		<echo message="Downloading Eclipse from ${ftp.server}" />
-		<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${ftp.eclipsedir}" newer="true" retriesAllowed="5" passive="true">
-			<fileset dir="${release.basedir}/runtime">
-				<include name="${eclipse.zip}" />
-			</fileset>
-		</wptg-ftp>
-		<unzip src="${release.basedir}/runtime/${eclipse.zip}" dest="${release.basedir}/runtime" />
+	<target name="unpack-eclipse" depends="check-unpack-eclipse" if="should-unpack-eclipse">
+		<delete dir="${base}" failonerror="false" />
+		<unzip src="${release.basedir}/runtime/${eclipse.file}.zip" dest="${release.basedir}/runtime" />
 	</target>
 
+	<target name="-notify-about-eclipse-update">
+		<echo message="-------------------------------------------------------------" />
+		<echo message="INFO: A newer Eclipse was found than currently available." />
+		<echo message="--------------------------------------------------------------" />
+		<echo message="The old version is going to be deleted and updated with the " />
+		<echo message="newer version found on the FTP server." />
+		<echo message="-------------------------------------------------------------" />
+		<input>Press Return key to continue and to overwrite the Eclipse: ${file}</input>
+	</target>
 
 	<!-- *************************************************************** -->
 	<!--                Q U A L I T Y     T A R G E T S                  -->
@@ -210,26 +233,26 @@
 	<target name="static-analysis" depends="release">
 		<!-- Call PDM -->
 		<fileset dir="${src.root}" includes="**/*.java" id="pmd.fileset" />
-		<antcall target="pmd" inheritrefs="true"/>
+		<antcall target="pmd" inheritrefs="true" />
 
 		<!-- Call Checkstyle -->
 		<fileset dir="${src.root}" includes="**/*.java" id="checkstyle.fileset" />
-		<antcall target="checkstyle" inheritrefs="true"/>
+		<antcall target="checkstyle" inheritrefs="true" />
 
 		<!-- Call FindBugs -->
 		<property name="findbugs.sourcepath" value="${src.root}" />
 		<property name="findbugs.classlocation" value="${buildDirectory}/plugins/info.novatec.inspectit.rcp/@dot" />
-		<path id="findbugs.path" >
+		<path id="findbugs.path">
 			<pathelement path="${build.commons.classes}" />
 			<pathelement path="${build.commonscs.classes}" />
-			<path refid="lib.prod"/>
-			<path refid="lib.test"/>
+			<path refid="lib.prod" />
+			<path refid="lib.test" />
 		</path>
-		<antcall target="findbugs" inheritrefs="true"/>
+		<antcall target="findbugs" inheritrefs="true" />
 
 		<!-- Call CPD -->
-		<fileset dir="${src.root}" includes="**/*.java" id="cpd.fileset"/>
-		<antcall target="cpd" inheritrefs="true"/>
+		<fileset dir="${src.root}" includes="**/*.java" id="cpd.fileset" />
+		<antcall target="cpd" inheritrefs="true" />
 	</target>
 
 
@@ -239,7 +262,7 @@
 	<!-- This target actually executes the PDE Build process by  		 -->
 	<!-- launching the Eclipse antRunner application.     				 -->
 	<!-- *************************************************************** -->
-	<target name="release" depends="retrieve-eclipse">
+	<target name="release" depends="init">
 		<mkdir dir="${basedir}/dist" />
 		<echo message="Executing ${eclipseLocation}/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
