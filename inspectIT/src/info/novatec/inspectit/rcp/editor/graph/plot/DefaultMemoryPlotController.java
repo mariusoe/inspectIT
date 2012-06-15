@@ -28,7 +28,6 @@ import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DeviationRenderer;
 import org.jfree.data.RangeType;
-import org.jfree.data.xy.YIntervalSeries;
 import org.jfree.data.xy.YIntervalSeriesCollection;
 import org.jfree.ui.RectangleInsets;
 
@@ -82,12 +81,12 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 	private Map<XYPlot, Integer> weights = new HashMap<XYPlot, Integer>();
 
 	/**
-	 * The {@link YIntervalSeries} for heap memory.
+	 * The {@link YIntervalSeriesImproved} for heap memory.
 	 */
 	private YIntervalSeriesImproved heapMemory;
 
 	/**
-	 * the {@link YIntervalSeries} for non-heap memory.
+	 * the {@link YIntervalSeriesImproved} for non-heap memory.
 	 */
 	private YIntervalSeriesImproved nonHeapMemory;
 

@@ -14,7 +14,6 @@ import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -634,17 +633,17 @@ public class VmSummaryInputController extends AbstractTextInputController {
 	 * Updates the labels with the dynamic informations.
 	 * 
 	 * @param classLoadingData
-	 *            The {@link List} containing the {@link ClassLoadingInformationData} objects.
+	 *            The {@link ClassLoadingInformationData} object.
 	 * @param cpuData
-	 *            The {@link List} containing the {@link CpuInformationData} objects.
+	 *            The {@link CpuInformationData} object.
 	 * @param compilationData
-	 *            The {@link List} containing the {@link CompilationInformationData} objects.
+	 *            The {@link CompilationInformationData} object.
 	 * @param memoryData
-	 *            The {@link List} containing the {@link MemoryInformationData} objects.
+	 *            The {@link MemoryInformationData} object.
 	 * @param runtimeData
-	 *            The {@link List} containing the {@link RuntimeInformationData} objects.
+	 *            The {@link RuntimeInformationData} object.
 	 * @param threadData
-	 *            The {@link List} containing the {@link ThreadInformationData} objects.
+	 *            The {@link ThreadInformationData} object.
 	 */
 	private void updateLabels(ClassLoadingInformationData classLoadingData, CpuInformationData cpuData, CompilationInformationData compilationData, MemoryInformationData memoryData,
 			RuntimeInformationData runtimeData, ThreadInformationData threadData) {

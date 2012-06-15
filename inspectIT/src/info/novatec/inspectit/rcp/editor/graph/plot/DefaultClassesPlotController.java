@@ -27,7 +27,6 @@ import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DeviationRenderer;
 import org.jfree.data.RangeType;
-import org.jfree.data.xy.YIntervalSeries;
 import org.jfree.data.xy.YIntervalSeriesCollection;
 import org.jfree.ui.RectangleInsets;
 
@@ -67,12 +66,12 @@ public class DefaultClassesPlotController extends AbstractPlotController {
 	private Map<XYPlot, Integer> weights = new HashMap<XYPlot, Integer>();
 
 	/**
-	 * The {@link YIntervalSeries}.
+	 * The {@link YIntervalSeriesImproved}.
 	 */
 	private YIntervalSeriesImproved loadedClasses;
 
 	/**
-	 * The {@link YIntervalSeries}.
+	 * The {@link YIntervalSeriesImproved}.
 	 */
 	private YIntervalSeriesImproved totalLoadedClasses;
 

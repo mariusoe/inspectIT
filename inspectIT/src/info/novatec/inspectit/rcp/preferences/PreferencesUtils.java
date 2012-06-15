@@ -1,8 +1,6 @@
 package info.novatec.inspectit.rcp.preferences;
 
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.preferences.valueproviders.CollectionPreferenceValueProvider;
-import info.novatec.inspectit.rcp.preferences.valueproviders.MapPreferenceValueProvider;
 import info.novatec.inspectit.rcp.preferences.valueproviders.PreferenceValueProviderFactory;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 
@@ -61,7 +59,7 @@ public final class PreferencesUtils {
 	 * General method for saving an object to the preference store. Note that the preference key has
 	 * to be mapped in the {@link PreferenceValueProviderFactory} to the provider that can handle
 	 * the type of object passed.
-	 *
+	 * 
 	 * @param preferenceKey
 	 *            Preference key.
 	 * @param object
@@ -84,7 +82,7 @@ public final class PreferencesUtils {
 	 * General method for loading an object from the preference store. Note that the preference key
 	 * has to be mapped in the {@link PreferenceValueProviderFactory} to the provider that can
 	 * handle the type of type E passed.
-	 *
+	 * 
 	 * @param <E>
 	 *            Type of object.
 	 * @param preferenceKey
@@ -106,9 +104,10 @@ public final class PreferencesUtils {
 
 	/**
 	 * Loads the primitive collection from a preference store. Note that the preference key provided
-	 * has to be mapped to the {@link CollectionPreferenceValueProvider} in the
-	 * {@link PreferenceValueProviderFactory}.
-	 *
+	 * has to be mapped to the
+	 * {@link info.novatec.inspectit.rcp.preferences.valueproviders.CollectionPreferenceValueProvider}
+	 * in the {@link PreferenceValueProviderFactory}.
+	 * 
 	 * @param <E>
 	 *            Type of objects in the collection.
 	 * @param preferenceKey
@@ -133,9 +132,10 @@ public final class PreferencesUtils {
 
 	/**
 	 * Loads the primitive keys and values map from a preference store. Note that the preference key
-	 * provided has to be mapped to the {@link MapPreferenceValueProvider} in the
-	 * {@link PreferenceValueProviderFactory}.
-	 *
+	 * provided has to be mapped to the
+	 * {@link info.novatec.inspectit.rcp.preferences.valueproviders.MapPreferenceValueProvider} in
+	 * the {@link PreferenceValueProviderFactory}.
+	 * 
 	 * @param <K>
 	 *            Type of key.
 	 * @param <V>

@@ -1,6 +1,5 @@
 package info.novatec.inspectit.rcp.editor.preferences.control;
 
-import info.novatec.inspectit.rcp.editor.preferences.FormPreferencePanel;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 
@@ -21,7 +20,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 /**
  * This class creates a control group with a sampling rate slider in the
- * {@link FormPreferencePanel}.
+ * {@link info.novatec.inspectit.rcp.editor.preferences.FormPreferencePanel}.
  * 
  * @author Eduard Tudenhoefner
  * 

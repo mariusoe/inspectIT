@@ -37,12 +37,6 @@ public class SWTCanvasAdapter implements CanvasAdapter {
 			Rectangle rect = invocationBlock.getArea();
 			MethodIdent methodIdent = invocationBlock.getMethodIdent();
 
-			RGB swtLineRGB = lineColor;
-			RGB swtFillRGB = fillColor;
-			if (invocationBlock.isHighlighted()) {
-				swtFillRGB = this.defaultHiglightedFillColor;
-			}
-
 			Color swtLineColor = new Color(gc.getDevice(), lineColor);
 			Color swtFillColor = new Color(gc.getDevice(), fillColor);
 			if (invocationBlock.isHighlighted()) {
@@ -67,9 +61,8 @@ public class SWTCanvasAdapter implements CanvasAdapter {
 			gc.setForeground(swtLineColor);
 			String methodName = methodIdent.getClassName() + "." + methodIdent.getMethodName();
 			int textWidth = 0;
-			int textHeight = 0;
 			FontData oldFontData = gc.getFont().getFontData()[0];
-			while (((textWidth = gc.getFontMetrics().getAverageCharWidth() * methodName.length()) >= (rect.width + 2)) || ((textHeight = gc.getFontMetrics().getHeight()) > rect.height + 2)) {
+			while (((textWidth = gc.getFontMetrics().getAverageCharWidth() * methodName.length()) >= (rect.width + 2)) || ((gc.getFontMetrics().getHeight()) > rect.height + 2)) {
 				FontData fontData = gc.getFont().getFontData()[0];
 				fontData.setHeight(fontData.getHeight() - 1);
 				gc.setFont(new Font(gc.getDevice(), fontData));

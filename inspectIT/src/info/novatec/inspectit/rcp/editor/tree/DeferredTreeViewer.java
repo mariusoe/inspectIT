@@ -18,12 +18,11 @@ import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
-import org.eclipse.ui.progress.DeferredTreeContentManager;
 import org.eclipse.ui.progress.PendingUpdateAdapter;
 
 /**
- * This tree viewer works in conjunction with the {@link DeferredTreeContentManager} so that the
- * expand function will work.
+ * This tree viewer works in conjunction with the
+ * {@link org.eclipse.ui.progress.DeferredTreeContentManager} so that the expand function will work.
  * 
  * @author Patrice Bouillet
  * 

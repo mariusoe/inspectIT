@@ -1,7 +1,6 @@
 package info.novatec.inspectit.rcp.editor.graph.plot;
 
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
-import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
 import info.novatec.inspectit.communication.data.CpuInformationData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
@@ -31,7 +30,6 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DeviationRenderer;
 import org.jfree.data.Range;
 import org.jfree.data.RangeType;
-import org.jfree.data.xy.YIntervalSeries;
 import org.jfree.data.xy.YIntervalSeriesCollection;
 import org.jfree.ui.RectangleInsets;
 
@@ -70,7 +68,7 @@ public class DefaultCpuPlotController extends AbstractPlotController {
 	private Map<XYPlot, Integer> weights = new HashMap<XYPlot, Integer>();
 
 	/**
-	 * The {@link YIntervalSeries}.
+	 * The {@link YIntervalSeriesImproved}.
 	 */
 	private YIntervalSeriesImproved cpuUsage;
 
@@ -177,8 +175,8 @@ public class DefaultCpuPlotController extends AbstractPlotController {
 	}
 
 	/**
-	 * Removes all data from the upper plot and sets the {@link ClassLoadingInformationData} objects
-	 * on the plot.
+	 * Removes all data from the upper plot and sets the {@link CpuInformationData} objects on the
+	 * plot.
 	 * 
 	 * @param cpuInformationData
 	 *            The data to set on the plot.

@@ -1,7 +1,6 @@
 package info.novatec.inspectit.rcp.repository.service.storage;
 
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
-import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.indexing.query.factory.impl.InvocationSequenceDataQueryFactory;
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
@@ -33,7 +32,7 @@ public class StorageInvocationDataAccessService extends AbstractStorageService<I
 	private InvocationSequenceDataQueryFactory<StorageIndexQuery> invocationDataQueryFactory;
 
 	/**
-	 * Comparator used for comparing the time stamps of {@link ExceptionSensorData}.
+	 * Comparator used for comparing the time stamps of {@link InvocationSequenceData}.
 	 */
 	private static final Comparator<InvocationSequenceData> TIMESTAMP_COMPARATOR = new Comparator<InvocationSequenceData>() {
 		public int compare(InvocationSequenceData o1, InvocationSequenceData o2) {

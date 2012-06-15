@@ -1,6 +1,5 @@
 package info.novatec.inspectit.rcp.editor.tree.input;
 
-import info.novatec.inspectit.rcp.editor.tree.SteppingTreeSubView;
 import info.novatec.inspectit.rcp.util.ElementOccurrenceCount;
 
 import java.util.List;
@@ -8,8 +7,8 @@ import java.util.List;
 import org.eclipse.jface.viewers.ViewerFilter;
 
 /**
- * An extension of {@link TreeInputController} that provides the necesarry functionality for
- * supporting {@link SteppingTreeSubView}.
+ * An extension of {@link TreeInputController} that provides the necessary functionality for
+ * supporting {@link info.novatec.inspectit.rcp.editor.tree.SteppingTreeSubView}.
  * 
  * @author Ivan Senic
  * 

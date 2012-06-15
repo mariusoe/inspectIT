@@ -5,10 +5,8 @@ import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController;
-import info.novatec.inspectit.rcp.editor.table.TableSubView;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -45,8 +43,9 @@ public interface TableInputController extends SubViewClassificationController {
 	void createColumns(TableViewer tableViewer);
 
 	/**
-	 * The {@link TableSubView} might need to alter the column width/visibility if the column has
-	 * the remembered size. With this method the controller gives or denies the {@link TableSubView}
+	 * The {@link info.novatec.inspectit.rcp.editor.table.TableSubView} might need to alter the
+	 * column width/visibility if the column has the remembered size. With this method the
+	 * controller gives or denies the {@link info.novatec.inspectit.rcp.editor.table.TableSubView}
 	 * to alter the column width.
 	 * 
 	 * @param tableColumn
@@ -60,7 +59,8 @@ public interface TableInputController extends SubViewClassificationController {
 	 * Generates and returns the input for the table. Returning <code>null</code> is possible and
 	 * indicates most of the time that there is no default list or object to display in the table.
 	 * For some {@link DefaultData} objects, the method {@link #canOpenInput(List)} should return
-	 * true so that the input object is set by the {@link TableSubView}.
+	 * true so that the input object is set by the
+	 * {@link info.novatec.inspectit.rcp.editor.table.TableSubView}.
 	 * 
 	 * @return The table input or <code>null</code> if nothing to display for default.
 	 */
@@ -128,7 +128,8 @@ public interface TableInputController extends SubViewClassificationController {
 	 * Returns all needed preference IDs.
 	 * 
 	 * @return A {@link Set} containing all {@link PreferenceId}. Returning <code>null</code> is not
-	 *         permitted here. At least a {@link Collections#EMPTY_SET} should be returned.
+	 *         permitted here. At least a {@link java.util.Collections#EMPTY_SET} should be
+	 *         returned.
 	 */
 	Set<PreferenceId> getPreferenceIds();
 

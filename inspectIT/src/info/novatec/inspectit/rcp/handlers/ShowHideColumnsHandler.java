@@ -1,6 +1,5 @@
 package info.novatec.inspectit.rcp.handlers;
 
-import info.novatec.inspectit.rcp.editor.table.input.TableInputController;
 import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 
@@ -20,9 +19,9 @@ import org.eclipse.swt.widgets.TreeColumn;
 /**
  * This class is a handler for show/hide of columns, but also a cache for saving the state of the
  * columns.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class ShowHideColumnsHandler extends AbstractHandler {
 
@@ -82,7 +81,7 @@ public class ShowHideColumnsHandler extends AbstractHandler {
 
 	/**
 	 * Shows or hides the {@link TreeColumn} or {@link TableColumn}.
-	 *
+	 * 
 	 * @param column
 	 *            Column.
 	 * @param columnName
@@ -120,7 +119,7 @@ public class ShowHideColumnsHandler extends AbstractHandler {
 
 	/**
 	 * Sets the with of {@link TreeColumn} or {@link TableColumn}.
-	 *
+	 * 
 	 * @param column
 	 *            Column
 	 * @param width
@@ -136,7 +135,7 @@ public class ShowHideColumnsHandler extends AbstractHandler {
 
 	/**
 	 * Gets the width of {@link TreeColumn} or {@link TableColumn}.
-	 *
+	 * 
 	 * @param column
 	 *            Column.
 	 * @return Width of column, or -1 if provided {@link Item} object is not of type
@@ -153,7 +152,7 @@ public class ShowHideColumnsHandler extends AbstractHandler {
 
 	/**
 	 * Sets the {@link TreeColumn} or {@link TableColumn} resizable.
-	 *
+	 * 
 	 * @param column
 	 *            Column
 	 * @param resizable
@@ -169,9 +168,10 @@ public class ShowHideColumnsHandler extends AbstractHandler {
 
 	/**
 	 * Returns if the cache has any knowledge of the column's width.
-	 *
+	 * 
 	 * @param controllerClass
-	 *            {@link TableInputController} class where this column is defined.
+	 *            {@link info.novatec.inspectit.rcp.editor.table.input.TableInputController} class
+	 *            where this column is defined.
 	 * @param columnName
 	 *            Column name.
 	 * @return Size of columns width or <code>null</code> if it is unknown.
@@ -183,9 +183,10 @@ public class ShowHideColumnsHandler extends AbstractHandler {
 
 	/**
 	 * Returns if the cache has any knowledge if the column is hidden.
-	 *
+	 * 
 	 * @param controllerClass
-	 *            {@link TableInputController} class where this column is defined.
+	 *            {@link info.novatec.inspectit.rcp.editor.table.input.TableInputController} class
+	 *            where this column is defined.
 	 * @param columnName
 	 *            Column name.
 	 * @return True if column should be hidden.
@@ -196,7 +197,7 @@ public class ShowHideColumnsHandler extends AbstractHandler {
 
 	/**
 	 * Saves the column order for the controller class.
-	 *
+	 * 
 	 * @param controllerClass
 	 *            Controller class.
 	 * @param order
@@ -210,11 +211,11 @@ public class ShowHideColumnsHandler extends AbstractHandler {
 
 	/**
 	 * Gets the column order for the controller class.
-	 *
+	 * 
 	 * @param controllerClass
 	 *            Controller class.
 	 * @return Array that describes the order of the columns or null if the order was never saved
-	 *          for the controller class.
+	 *         for the controller class.
 	 */
 	public static int[] getColumnOrder(Class<?> controllerClass) {
 		Integer key = Integer.valueOf(controllerClass.getName().hashCode());
@@ -224,9 +225,10 @@ public class ShowHideColumnsHandler extends AbstractHandler {
 	/**
 	 * Registers new column width to be saved for further use. Only positive column widths will be
 	 * saved.
-	 *
+	 * 
 	 * @param controllerClass
-	 *            {@link TableInputController} class where this column is defined.
+	 *            {@link info.novatec.inspectit.rcp.editor.table.input.TableInputController} class
+	 *            where this column is defined.
 	 * @param columnName
 	 *            Column name.
 	 * @param width
@@ -241,11 +243,13 @@ public class ShowHideColumnsHandler extends AbstractHandler {
 	}
 
 	/**
-	 * Creates hash code for column by its name and the {@link TableInputController} class it is
+	 * Creates hash code for column by its name and the
+	 * {@link info.novatec.inspectit.rcp.editor.table.input.TableInputController} class it is
 	 * located.
-	 *
+	 * 
 	 * @param controllerClass
-	 *            {@link TableInputController} class where this column is defined.
+	 *            {@link info.novatec.inspectit.rcp.editor.table.input.TableInputController} class
+	 *            where this column is defined.
 	 * @param columnName
 	 *            Column name.
 	 * @return Hash code for caching.

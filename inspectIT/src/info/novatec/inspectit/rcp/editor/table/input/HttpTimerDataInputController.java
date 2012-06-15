@@ -121,7 +121,6 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Getting HTTP timer data information", IProgressMonitor.UNKNOWN);
 		List<HttpTimerData> aggregatedTimerData;

@@ -38,7 +38,6 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -228,8 +227,8 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	/**
 	 * Caches the current expanded objects in the tree viewer with the given platform ident. Note
 	 * that this method will filter out the elements given by
-	 * {@link TreeViewer#getExpandedElements()}, so that only the last expanded element in the tree
-	 * is saved.
+	 * {@link org.eclipse.jface.viewers.TreeViewer#getExpandedElements()}, so that only the last
+	 * expanded element in the tree is saved.
 	 * 
 	 * @param platformIdent
 	 *            {@link PlatformIdent} to cache elements for.

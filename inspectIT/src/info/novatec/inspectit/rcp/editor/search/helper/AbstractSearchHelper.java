@@ -4,7 +4,6 @@ import info.novatec.inspectit.rcp.editor.search.ISearchExecutor;
 import info.novatec.inspectit.rcp.editor.search.criteria.SearchCriteria;
 import info.novatec.inspectit.rcp.editor.search.criteria.SearchResult;
 import info.novatec.inspectit.rcp.editor.search.factory.SearchFactory;
-import info.novatec.inspectit.rcp.editor.table.input.TableInputController;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 
@@ -13,7 +12,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.viewers.StructuredViewer;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
 /**
@@ -193,8 +191,8 @@ public abstract class AbstractSearchHelper implements ISearchExecutor {
 	}
 
 	/**
-	 * Checks if the input of the {@link TableViewer} changed since the last search. If so, the
-	 * {@link #input} variable will be updated.
+	 * Checks if the input of the viewer changed since the last search. If so, the {@link #input}
+	 * variable will be updated.
 	 * 
 	 * @return True if the input did not change, false otherwise.
 	 */
@@ -210,7 +208,7 @@ public abstract class AbstractSearchHelper implements ISearchExecutor {
 	}
 
 	/**
-	 * Loads all objects that need to be searched from the {@link TableInputController}.
+	 * Loads all objects that need to be searched.
 	 */
 	private void loadAllObjects() {
 		allObjects = getAllObjects();

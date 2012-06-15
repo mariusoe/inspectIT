@@ -1,6 +1,5 @@
 package info.novatec.inspectit.rcp.editor.search.helper;
 
-import info.novatec.inspectit.rcp.editor.search.factory.SearchFactory;
 import info.novatec.inspectit.rcp.editor.table.input.TableInputController;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
@@ -33,7 +32,8 @@ public class TableViewerSearchHelper extends AbstractSearchHelper {
 	 * @param tableInputController
 	 *            {@link TableInputController}.
 	 * @param repositoryDefinition
-	 *            {@link RepositoryDefinition}. Needed for {@link SearchFactory}.
+	 *            {@link RepositoryDefinition}. Needed for
+	 *            {@link info.novatec.inspectit.rcp.editor.search.factory.SearchFactory}.
 	 */
 	public TableViewerSearchHelper(TableViewer tableViewer, TableInputController tableInputController, RepositoryDefinition repositoryDefinition) {
 		super(repositoryDefinition);

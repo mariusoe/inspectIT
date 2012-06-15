@@ -2,7 +2,6 @@ package info.novatec.inspectit.rcp.editor.search;
 
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
-import info.novatec.inspectit.rcp.editor.ISubView;
 import info.novatec.inspectit.rcp.editor.search.criteria.SearchCriteria;
 import info.novatec.inspectit.rcp.editor.search.criteria.SearchResult;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
@@ -47,7 +46,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 public class SearchControl {
 
 	/**
-	 * {@link ISubView} to notify about search.
+	 * {@link info.novatec.inspectit.rcp.editor.ISubView} to notify about search.
 	 */
 	private ISearchExecutor searchExecutor;
 

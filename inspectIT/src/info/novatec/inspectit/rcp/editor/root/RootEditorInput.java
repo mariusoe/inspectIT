@@ -71,6 +71,7 @@ public class RootEditorInput implements IEditorInput {
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (InputDefinition.class == adapter) {
 			return this.inputDefinition;

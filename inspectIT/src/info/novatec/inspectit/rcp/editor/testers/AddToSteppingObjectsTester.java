@@ -2,7 +2,6 @@ package info.novatec.inspectit.rcp.editor.testers;
 
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
-import info.novatec.inspectit.communication.data.InvocationSequenceData;
 
 import java.util.Iterator;
 
@@ -11,8 +10,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 
 /**
  * Tester checks if there is at least one object in the selection that could be added to the
- * steppable objects list. NOte that empty {@link InvocationSequenceData} and {@link HttpTimerData}
- * can not be added.
+ * steppable objects list. NOte that empty
+ * {@link info.novatec.inspectit.communication.data.InvocationSequenceData} and
+ * {@link HttpTimerData} can not be added.
  * 
  * @author Ivan Senic
  * 

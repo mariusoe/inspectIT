@@ -12,7 +12,6 @@ import info.novatec.inspectit.rcp.util.ElementOccurrenceCount;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -36,8 +35,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 public class SteppingTreeSubView extends TreeSubView {
 
 	/**
-	 * Main composite for this view. It holds the {@link TreeViewer} and additionally
-	 * {@link SteppingControl} if necessary.
+	 * Main composite for this view. It holds the {@link org.eclipse.jface.viewers.TreeViewer} and
+	 * additionally {@link SteppingControl} if necessary.
 	 */
 	private Composite subComposite;
 

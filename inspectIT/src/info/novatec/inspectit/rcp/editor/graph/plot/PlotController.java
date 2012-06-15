@@ -1,13 +1,12 @@
 package info.novatec.inspectit.rcp.editor.graph.plot;
 
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.control.SamplingRateControl.Sensitivity;
 import info.novatec.inspectit.rcp.editor.preferences.control.samplingrate.SamplingRateMode;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -39,12 +38,11 @@ public interface PlotController {
 	void setRootEditor(IRootEditor rootEditor);
 
 	/**
-	 * This method is used to retrieve the plots which are used in the whole
-	 * chart. No data has to be requested from the server here, this is done in
-	 * the {@link #update()} method.
+	 * This method is used to retrieve the plots which are used in the whole chart. No data has to
+	 * be requested from the server here, this is done in the {@link #update()} method.
 	 * 
-	 * @return A list containing {@link XYPlot} classes which are used by
-	 *         JFreeChart to initialize the chart.
+	 * @return A list containing {@link XYPlot} classes which are used by JFreeChart to initialize
+	 *         the chart.
 	 */
 	List<XYPlot> getPlots();
 
@@ -58,18 +56,16 @@ public interface PlotController {
 	int getWeight(XYPlot subPlot);
 
 	/**
-	 * The do refresh method is called at least one time to fill the plots with
-	 * some initial data. It depends on several settings if this method is
-	 * called repeatedly.
+	 * The do refresh method is called at least one time to fill the plots with some initial data.
+	 * It depends on several settings if this method is called repeatedly.
 	 */
 	void doRefresh();
 
 	/**
-	 * This method obtains historical information from the DB for the timeframe
-	 * denoted by its parameters.
+	 * This method obtains historical information from the DB for the timeframe denoted by its
+	 * parameters.
 	 * <p>
-	 * After fetching the historical data the upper and lower plot graphs get
-	 * updated.
+	 * After fetching the historical data the upper and lower plot graphs get updated.
 	 * 
 	 * @param from
 	 *            the timeframe's start date.
@@ -91,15 +87,14 @@ public interface PlotController {
 	/**
 	 * Returns all needed preference IDs.
 	 * 
-	 * @return A {@link Set} containing all {@link PreferenceId}. Returning
-	 *         <code>null</code> is not permitted here. At least a
-	 *         {@link Collections#EMPTY_SET} should be returned.
+	 * @return A {@link Set} containing all {@link PreferenceId}. Returning <code>null</code> is not
+	 *         permitted here. At least a {@link java.util.Collections#EMPTY_SET} should be
+	 *         returned.
 	 */
 	Set<PreferenceId> getPreferenceIds();
 
 	/**
-	 * This method is called whenever something is changed in one of the
-	 * preferences.
+	 * This method is called whenever something is changed in one of the preferences.
 	 * 
 	 * @param preferenceEvent
 	 *            The event object containing the changed objects.

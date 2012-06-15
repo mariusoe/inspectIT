@@ -5,7 +5,6 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.Pre
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -61,7 +60,8 @@ public interface ISubView {
 	 * (it is a sub-view containing other views).
 	 * 
 	 * @return A {@link Set} containing all {@link PreferenceId}. Returning <code>null</code> is not
-	 *         permitted here. At least a {@link Collections#EMPTY_SET} should be returned.
+	 *         permitted here. At least a {@link java.util.Collections#EMPTY_SET} should be
+	 *         returned.
 	 */
 	Set<PreferenceId> getPreferenceIds();
 

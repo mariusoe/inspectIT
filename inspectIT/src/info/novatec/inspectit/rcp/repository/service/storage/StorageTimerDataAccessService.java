@@ -2,7 +2,6 @@ package info.novatec.inspectit.rcp.repository.service.storage;
 
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
 import info.novatec.inspectit.communication.data.TimerData;
-import info.novatec.inspectit.indexing.aggregation.IAggregator;
 import info.novatec.inspectit.indexing.aggregation.impl.TimerDataAggregator;
 import info.novatec.inspectit.indexing.query.factory.impl.TimerDataQueryFactory;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
@@ -20,7 +19,7 @@ import java.util.List;
 public class StorageTimerDataAccessService extends AbstractStorageService<TimerData> implements ITimerDataAccessService {
 
 	/**
-	 * {@link IAggregator} used for {@link TimerData}.
+	 * {@link info.novatec.inspectit.indexing.aggregation.IAggregator} used for {@link TimerData}.
 	 */
 	private static final TimerDataAggregator TIMER_DATA_AGGREGATOR = new TimerDataAggregator(false);
 

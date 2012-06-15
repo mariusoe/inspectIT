@@ -47,6 +47,7 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
  * @author Patrice Bouillet
  * @author Stefan Siegl
  */
+@SuppressWarnings("restriction")
 public class FormPreferencePanel implements IPreferencePanel {
 
 	/**
@@ -391,7 +392,6 @@ public class FormPreferencePanel implements IPreferencePanel {
 	 * 
 	 * @return Returns tool-tip text with key binding sequence.
 	 */
-	@SuppressWarnings("restriction")
 	private String getTooltipTextForMaximizeContributionItem() {
 		String tooltipText = "Maximize Active Sub-View";
 

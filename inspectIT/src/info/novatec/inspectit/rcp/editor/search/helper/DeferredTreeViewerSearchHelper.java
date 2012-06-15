@@ -1,6 +1,5 @@
 package info.novatec.inspectit.rcp.editor.search.helper;
 
-import info.novatec.inspectit.rcp.editor.search.factory.SearchFactory;
 import info.novatec.inspectit.rcp.editor.tree.DeferredTreeViewer;
 import info.novatec.inspectit.rcp.editor.tree.input.TreeInputController;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
@@ -34,7 +33,8 @@ public class DeferredTreeViewerSearchHelper extends AbstractSearchHelper {
 	 * @param treeInputController
 	 *            {@link TreeInputController}.
 	 * @param repositoryDefinition
-	 *            {@link RepositoryDefinition}. Needed for {@link SearchFactory}.
+	 *            {@link RepositoryDefinition}. Needed for
+	 *            {@link info.novatec.inspectit.rcp.editor.search.factory.SearchFactory}.
 	 */
 	public DeferredTreeViewerSearchHelper(DeferredTreeViewer treeViewer, TreeInputController treeInputController, RepositoryDefinition repositoryDefinition) {
 		super(repositoryDefinition);

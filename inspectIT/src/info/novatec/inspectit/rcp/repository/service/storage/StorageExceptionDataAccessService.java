@@ -3,7 +3,6 @@ package info.novatec.inspectit.rcp.repository.service.storage;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
-import info.novatec.inspectit.indexing.aggregation.IAggregator;
 import info.novatec.inspectit.indexing.aggregation.impl.ExceptionDataAggregator;
 import info.novatec.inspectit.indexing.aggregation.impl.ExceptionDataAggregator.ExceptionAggregationType;
 import info.novatec.inspectit.indexing.query.factory.impl.ExceptionSensorDataQueryFactory;
@@ -25,12 +24,14 @@ import java.util.List;
 public class StorageExceptionDataAccessService extends AbstractStorageService<ExceptionSensorData> implements IExceptionDataAccessService {
 
 	/**
-	 * {@link IAggregator} for {@link ExceptionSensorData} for the grouped overview.
+	 * {@link info.novatec.inspectit.indexing.aggregation.IAggregator} for
+	 * {@link ExceptionSensorData} for the grouped overview.
 	 */
 	private static final ExceptionDataAggregator GROUP_EXCEPTION_OVERVIEW_AGGREGATOR = new ExceptionDataAggregator(ExceptionAggregationType.GROUP_EXCEPTION_OVERVIEW);
 
 	/**
-	 * {@link IAggregator} for {@link ExceptionSensorData} for the distinct stack traces.
+	 * {@link info.novatec.inspectit.indexing.aggregation.IAggregator} for
+	 * {@link ExceptionSensorData} for the distinct stack traces.
 	 */
 	private static final ExceptionDataAggregator DISTINCT_STACK_TRACES_AGGREGATOR = new ExceptionDataAggregator(ExceptionAggregationType.DISTINCT_STACK_TRACES);
 

@@ -9,7 +9,6 @@ import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
-import info.novatec.inspectit.rcp.editor.tree.SteppingTreeSubView;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 import info.novatec.inspectit.rcp.util.ElementOccurrenceCount;
@@ -23,7 +22,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 
 /**
  * Extension of the {@link InvocDetailInputController} adapted to serve as an input for a
- * {@link SteppingTreeSubView}.
+ * {@link info.novatec.inspectit.rcp.editor.tree.SteppingTreeSubView}.
  * 
  * @author Ivan Senic
  * 

@@ -38,7 +38,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -316,7 +315,7 @@ public class TreeSubView extends AbstractSubView implements ISearchExecutor {
 	 * 
 	 * @return The list of integers representing the column order in the tree. Note that only
 	 *         columns that are currently visible will be included in the list.
-	 * @see Table#getColumnOrder()
+	 * @see org.eclipse.swt.widgets.Table#getColumnOrder()
 	 */
 	public List<Integer> getColumnOrder() {
 		int[] order = treeViewer.getTree().getColumnOrder();

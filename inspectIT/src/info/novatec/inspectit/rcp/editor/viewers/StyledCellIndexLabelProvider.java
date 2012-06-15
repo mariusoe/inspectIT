@@ -9,13 +9,11 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.progress.PendingUpdateAdapter;
 
 /**
- * This class extends the {@link StyledCellLabelProvider} with support for the
- * index of the cell, used in the {@link Tree} or the {@link Table}.
+ * This class extends the {@link StyledCellLabelProvider} with support for the index of the cell,
+ * used in the {@link org.eclipse.swt.widgets.Tree} or the {@link org.eclipse.swt.widgets.Table}.
  * 
  * @author Patrice Bouillet
  * 
@@ -60,8 +58,8 @@ public class StyledCellIndexLabelProvider extends StyledCellLabelProvider {
 	}
 
 	/**
-	 * Default behavior is to return an empty instance of {@link StyledString}.
-	 * Clients should override this method if needed.
+	 * Default behavior is to return an empty instance of {@link StyledString}. Clients should
+	 * override this method if needed.
 	 * 
 	 * @param element
 	 *            The element for which to provide the styled label text
@@ -74,60 +72,59 @@ public class StyledCellIndexLabelProvider extends StyledCellLabelProvider {
 	}
 
 	/**
-	 * Default behavior is to return <code>null</code>. Clients should override
-	 * this method if needed.
+	 * Default behavior is to return <code>null</code>. Clients should override this method if
+	 * needed.
 	 * 
 	 * @param element
 	 *            the element for which to provide the label image
 	 * @param index
 	 *            the index of the element.
-	 * @return the image used to label the element, or <code>null</code> if
-	 *         there is no image for the given object
+	 * @return the image used to label the element, or <code>null</code> if there is no image for
+	 *         the given object
 	 */
 	protected Image getColumnImage(Object element, int index) {
 		return null;
 	}
 
 	/**
-	 * Default behavior is to return <code>null</code>. Clients should override
-	 * this method if needed.
+	 * Default behavior is to return <code>null</code>. Clients should override this method if
+	 * needed.
 	 * 
 	 * @param element
 	 *            the element
 	 * @param index
 	 *            the index of the element.
-	 * @return the font for the element, or <code>null</code> to use the default
-	 *         font
+	 * @return the font for the element, or <code>null</code> to use the default font
 	 */
 	protected Font getFont(Object element, int index) {
 		return null;
 	}
 
 	/**
-	 * Default behavior is to return <code>null</code>. Clients should override
-	 * this method if needed.
+	 * Default behavior is to return <code>null</code>. Clients should override this method if
+	 * needed.
 	 * 
 	 * @param element
 	 *            the element
 	 * @param index
 	 *            the index of the element.
-	 * @return the foreground color for the element, or <code>null</code> to use
-	 *         the default foreground color
+	 * @return the foreground color for the element, or <code>null</code> to use the default
+	 *         foreground color
 	 */
 	protected Color getForeground(Object element, int index) {
 		return null;
 	}
 
 	/**
-	 * Default behavior is to return <code>null</code>. Clients should override
-	 * this method if needed.
+	 * Default behavior is to return <code>null</code>. Clients should override this method if
+	 * needed.
 	 * 
 	 * @param element
 	 *            the element
 	 * @param index
 	 *            the index of the element.
-	 * @return the background color for the element, or <code>null</code> to use
-	 *         the default background color
+	 * @return the background color for the element, or <code>null</code> to use the default
+	 *         background color
 	 */
 	protected Color getBackground(Object element, int index) {
 		return null;

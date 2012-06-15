@@ -1,10 +1,9 @@
 package info.novatec.inspectit.rcp.editor.text.input;
 
-import java.util.List;
-
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
-import info.novatec.inspectit.rcp.editor.text.TextSubView;
+
+import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -47,7 +46,8 @@ public interface TextInputController {
 	void dispose();
 
 	/**
-	 * This method is called when the input of the {@link TextSubView} has been changed.
+	 * This method is called when the input of the
+	 * {@link info.novatec.inspectit.rcp.editor.text.TextSubView} has been changed.
 	 * 
 	 * @param data
 	 *            New input.

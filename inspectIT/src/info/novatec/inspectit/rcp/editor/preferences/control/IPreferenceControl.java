@@ -3,7 +3,6 @@ package info.novatec.inspectit.rcp.editor.preferences.control;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.swt.widgets.Composite;
@@ -18,11 +17,9 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 public interface IPreferenceControl {
 
 	/**
-	 * Returns the unique {@link PreferenceId} of this preference control
-	 * group.
+	 * Returns the unique {@link PreferenceId} of this preference control group.
 	 * 
-	 * @return The unique {@link PreferenceId} of this preference control
-	 *         group.
+	 * @return The unique {@link PreferenceId} of this preference control group.
 	 */
 	PreferenceId getControlGroupId();
 
@@ -38,12 +35,10 @@ public interface IPreferenceControl {
 	Composite createControls(Composite parent, FormToolkit toolkit);
 
 	/**
-	 * This method gets called when pressing the Update Button in the global
-	 * control of the panel. The method gets the actual data values from all
-	 * controls and puts them in a {@link HashMap}.
+	 * This method gets called when pressing the Update Button in the global control of the panel.
+	 * The method gets the actual data values from all controls and puts them in a {@link Map}.
 	 * 
-	 * @return The {@link HashMap} containing the data values from the control
-	 *         items.
+	 * @return The {@link Map} containing the data values from the control items.
 	 */
 	Map<IPreferenceGroup, Object> eventFired();
 
