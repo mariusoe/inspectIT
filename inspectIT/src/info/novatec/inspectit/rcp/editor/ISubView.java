@@ -105,6 +105,29 @@ public interface ISubView {
 	ISelectionProvider getSelectionProvider();
 
 	/**
+	 * Selects the given {@link ISubView} if it exists. The composite sub views should check if the
+	 * given {@link ISubView} is one of the containing views and select it. Non-composite sub views
+	 * should not do anything.
+	 * 
+	 * @param subView
+	 *            {@link ISubView} to select.
+	 */
+	void select(ISubView subView);
+
+	/**
+	 * Returns the sub view of specific class. The composite sub views should check if the given
+	 * {@link ISubView} is one of the given class and return it. Non-composite sub views should
+	 * check if they are of the given class and return them self if so.
+	 * 
+	 * @param <E>
+	 *            Type of sub view.
+	 * @param clazz
+	 *            Sub view class to search for.
+	 * @return {@link ISubView} of given class or <code>null</code> if view can not be found.
+	 */
+	<E extends ISubView> E getSubView(Class<E> clazz);
+
+	/**
 	 * Disposes this sub-view.
 	 */
 	void dispose();

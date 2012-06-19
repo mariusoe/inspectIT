@@ -337,6 +337,11 @@ public final class OccurrenceFinderFactory {
 		 */
 		@Override
 		public boolean doesTemplateEqualsElement(ExceptionSensorData template, ExceptionSensorData element) {
+			if (0 != template.getId()) {
+				if (template.getId() != element.getId()) {
+					return false;
+				}
+			}
 			if (TEMPLATE_STRING != template.getCause()) {
 				if (!ObjectUtils.equals(template.getCause(), element.getCause())) {
 					return false;
@@ -419,6 +424,11 @@ public final class OccurrenceFinderFactory {
 		 */
 		@Override
 		public boolean doesTemplateEqualsElement(SqlStatementData template, SqlStatementData element) {
+			if (0 != template.getId()) {
+				if (template.getId() != element.getId()) {
+					return false;
+				}
+			}
 			if (TEMPLATE_STRING != template.getSql()) {
 				if (!ObjectUtils.equals(template.getSql(), element.getSql())) {
 					return false;
@@ -484,6 +494,11 @@ public final class OccurrenceFinderFactory {
 		 */
 		@Override
 		public boolean doesTemplateEqualsElement(MethodSensorData template, MethodSensorData element) {
+			if (0 != template.getId()) {
+				if (template.getId() != element.getId()) {
+					return false;
+				}
+			}
 			if (0 != template.getMethodIdent()) {
 				if (template.getMethodIdent() != element.getMethodIdent()) {
 					return false;
@@ -535,6 +550,11 @@ public final class OccurrenceFinderFactory {
 		 */
 		@Override
 		public boolean doesTemplateEqualsElement(InvocationSequenceData template, InvocationSequenceData element) {
+			if (0 != template.getId()) {
+				if (template.getId() != element.getId()) {
+					return false;
+				}
+			}
 			if (0 != template.getMethodIdent()) {
 				if (template.getMethodIdent() != element.getMethodIdent()) {
 					return false;

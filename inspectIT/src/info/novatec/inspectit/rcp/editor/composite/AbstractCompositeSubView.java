@@ -64,6 +64,37 @@ public abstract class AbstractCompositeSubView extends AbstractSubView {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
+	public <E extends ISubView> E getSubView(Class<E> clazz) {
+		E view = super.getSubView(clazz);
+		if (null != view) {
+			return view;
+		} else {
+			for (ISubView subView : getSubViews()) {
+				view = subView.getSubView(clazz);
+				if (null != view) {
+					return view;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Delegates the select to all sub views. Implementing classes can override.
+	 */
+	@Override
+	public void select(ISubView subView) {
+		for (ISubView containedSubView : getSubViews()) {
+			containedSubView.select(subView);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public Set<PreferenceId> getPreferenceIds() {
 		Set<PreferenceId> preferenceIds = EnumSet.noneOf(PreferenceId.class);
 

@@ -6,6 +6,7 @@ import info.novatec.inspectit.rcp.editor.ISubView;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -140,6 +141,26 @@ public class TabbedCompositeSubView extends AbstractCompositeSubView {
 			} else {
 				cTabItem.getControl().setVisible(false);
 			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void select(ISubView subView) {
+		int index = -1;
+		for (int i = 0; i < getSubViews().size(); i++) {
+			if (Objects.equals(subView, getSubViews().get(i))) {
+				index = i;
+				break;
+			}
+		}
+
+		if (index > -1 && index < tabFolder.getItemCount()) {
+			tabFolder.setSelection(index);
+		} else {
+			super.select(subView);
 		}
 	}
 

@@ -580,56 +580,6 @@
          </activeWhen>
       </handler>
       <handler
-            class="info.novatec.inspectit.rcp.handlers.AddToSteppingObjectsHandler"
-            commandId="info.novatec.inspectit.rcp.commands.addToSteppingObjects">
-         <activeWhen>
-            <and>
-               <count
-                     value="+">
-               </count>
-               <with
-                     variable="activeEditor">
-                  <instanceof
-                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
-                  </instanceof>
-                  <test
-                        property="info.novatec.inspectit.hasSubView"
-                        value="steppingTreeSubView">
-                  </test>
-                  <or>
-                     <test
-                           property="info.novatec.inspectit.activeSubView"
-                           value="tableSubView">
-                     </test>
-                     <test
-                           property="info.novatec.inspectit.activeSubView"
-                           value="treeSubView">
-                     </test>
-                  </or>
-               </with>
-               <iterate>
-                  <and>
-                     <instanceof
-                           value="info.novatec.inspectit.communication.MethodSensorData">
-                     </instanceof>
-                     <not>
-                        <instanceof
-                              value="info.novatec.inspectit.communication.data.HttpTimerData">
-                        </instanceof>
-                     </not>
-                  </and>
-               </iterate>
-               <with
-                     variable="selection">
-                  <test
-                        property="info.novatec.inspectit.canAddToSteppingObjects"
-                        value="true">
-                  </test>
-               </with>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
             class="info.novatec.inspectit.rcp.handlers.RefreshEditorHandler"
             commandId="org.eclipse.ui.file.refresh">
          <activeWhen>
@@ -1039,6 +989,112 @@
             class="info.novatec.inspectit.rcp.handlers.CloseAndShowStorageHandler"
             commandId="info.novatec.inspectit.rcp.commands.closeAndShowStorage">
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.LocateHandler$SqlLocateHandler"
+            commandId="info.novatec.inspectit.rcp.commands.addToSteppingObjects">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.communication.data.SqlStatementData">
+                  </instanceof>
+               </iterate>
+               <with
+                     variable="activeEditor">
+                  <test
+                        property="info.novatec.inspectit.hasSubView"
+                        value="steppingTreeSubView">
+                  </test>
+               </with>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.LocateHandler$ExceptionLocateHandler"
+            commandId="info.novatec.inspectit.rcp.commands.addToSteppingObjects">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.communication.data.ExceptionSensorData">
+                  </instanceof>
+               </iterate>
+               <with
+                     variable="activeEditor">
+                  <test
+                        property="info.novatec.inspectit.hasSubView"
+                        value="steppingTreeSubView">
+                  </test>
+               </with>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.LocateHandler$InvocationLocateHandler"
+            commandId="info.novatec.inspectit.rcp.commands.addToSteppingObjects">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                  </instanceof>
+               </iterate>
+               <with
+                     variable="activeEditor">
+                  <test
+                        property="info.novatec.inspectit.hasSubView"
+                        value="steppingTreeSubView">
+                  </test>
+                  <test
+                        property="info.novatec.inspectit.activeSubView"
+                        value="treeSubView">
+                  </test>
+               </with>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.LocateHandler$TimerLocateHandler"
+            commandId="info.novatec.inspectit.rcp.commands.addToSteppingObjects">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <not>
+                     <instanceof
+                           value="info.novatec.inspectit.communication.data.SqlStatementData">
+                     </instanceof>
+                  </not>
+                  <not>
+                     <instanceof
+                           value="info.novatec.inspectit.communication.data.HttpTimerData">
+                     </instanceof>
+                  </not>
+                  <instanceof
+                        value="info.novatec.inspectit.communication.data.TimerData">
+                  </instanceof>
+               </iterate>
+               <with
+                     variable="activeEditor">
+                  <test
+                        property="info.novatec.inspectit.hasSubView"
+                        value="steppingTreeSubView">
+                  </test>
+               </with>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -1240,20 +1296,7 @@
                icon="icons/right_down.png"
                style="push">
             <visibleWhen
-                  checkEnabled="false">
-               <and>
-                  <with
-                        variable="activeEditor">
-                     <test
-                           property="info.novatec.inspectit.hasSubView"
-                           value="steppingTreeSubView">
-                     </test>
-                  </with>
-                  <iterate>
-                     <instanceof
-                           value="info.novatec.inspectit.communication.data.InvocationSequenceData">
-                     </instanceof>
-                  </iterate></and>
+                  checkEnabled="true">
             </visibleWhen>
          </command>
          <separator
@@ -1465,26 +1508,7 @@
                icon="icons/right_down.png"
                style="push">
             <visibleWhen
-                  checkEnabled="false">
-               <and>
-                  <with
-                        variable="activeEditor">
-                     <test
-                           property="info.novatec.inspectit.hasSubView"
-                           value="steppingTreeSubView">
-                     </test>
-                  </with>
-                  <iterate>
-                     <instanceof
-                           value="info.novatec.inspectit.communication.MethodSensorData">
-                     </instanceof>
-                     <not>
-                        <instanceof
-                              value="info.novatec.inspectit.communication.data.InvocationSequenceData">
-                        </instanceof>
-                     </not>
-                  </iterate>
-               </and>
+                  checkEnabled="true">
             </visibleWhen>
          </command>
          <separator

@@ -1,7 +1,6 @@
 package info.novatec.inspectit.rcp.handlers;
 
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationAwareData;
@@ -17,13 +16,11 @@ import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
-import info.novatec.inspectit.rcp.util.OccurrenceFinderFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -42,7 +39,7 @@ import org.eclipse.ui.handlers.IHandlerService;
  * @author Ivan Senic
  * 
  */
-public class NavigateToInvocationsHandler extends AbstractHandler {
+public class NavigateToInvocationsHandler extends AbstractTemplateHandler {
 
 	/**
 	 * {@inheritDoc}
@@ -133,19 +130,11 @@ public class NavigateToInvocationsHandler extends AbstractHandler {
 		List<DefaultData> steppableTemplates = new ArrayList<DefaultData>();
 		for (InvocationAwareData invocationAwareData : invocationAwareDataList) {
 			if (invocationAwareData instanceof SqlStatementData) {
-				SqlStatementData template = OccurrenceFinderFactory.getEmptyTemplate((SqlStatementData) invocationAwareData);
-				template.setSql(((SqlStatementData) invocationAwareData).getSql());
-				template.setMethodIdent(((SqlStatementData) invocationAwareData).getMethodIdent());
-				steppableTemplates.add(template);
+				steppableTemplates.add(super.getTemplate((SqlStatementData) invocationAwareData, true, true, true));
 			} else if (invocationAwareData instanceof TimerData && !invocationAwareData.getClass().equals(HttpTimerData.class)) {
-				TimerData template = OccurrenceFinderFactory.getEmptyTemplate((TimerData) invocationAwareData);
-				template.setMethodIdent(((TimerData) invocationAwareData).getMethodIdent());
-				steppableTemplates.add(template);
+				steppableTemplates.add(super.getTemplate((TimerData) invocationAwareData, true, true));
 			} else if (invocationAwareData instanceof ExceptionSensorData) {
-				ExceptionSensorData template = OccurrenceFinderFactory.getEmptyTemplate((ExceptionSensorData) invocationAwareData);
-				template.setExceptionEvent(ExceptionEvent.CREATED);
-				template.setThrowableType(((ExceptionSensorData) invocationAwareData).getThrowableType());
-				steppableTemplates.add(template);
+				steppableTemplates.add(super.getTemplate((ExceptionSensorData) invocationAwareData, true, true, true, true, true));
 			}
 		}
 		return steppableTemplates;

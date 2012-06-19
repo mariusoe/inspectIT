@@ -162,14 +162,34 @@ public class SteppingInvocDetailInputController extends InvocDetailInputControll
 	public String getElementTextualRepresentation(Object invAwareData) {
 		if (invAwareData instanceof SqlStatementData) {
 			SqlStatementData sqlData = (SqlStatementData) invAwareData;
-			return "SQL: " + sqlData.getSql();
+			if (0 == sqlData.getId()) {
+				return "SQL: " + sqlData.getSql() + " [All]";
+			} else {
+				return "SQL: " + sqlData.getSql() + " [Single]";
+			}
 		} else if (invAwareData instanceof TimerData) {
 			TimerData timerData = (TimerData) invAwareData;
 			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(timerData.getMethodIdent());
-			return TextFormatter.getMethodString(methodIdent);
+			if (0 == timerData.getId()) {
+				return TextFormatter.getMethodString(methodIdent) + " [All]";
+			} else {
+				return TextFormatter.getMethodString(methodIdent) + " [Single]";
+			}
 		} else if (invAwareData instanceof ExceptionSensorData) {
 			ExceptionSensorData exData = (ExceptionSensorData) invAwareData;
-			return "Exception: " + exData.getThrowableType();
+			if (0 == exData.getId()) {
+				return "Exception: " + exData.getThrowableType() + " [All]";
+			} else {
+				return "Exception: " + exData.getThrowableType() + " [Single]";
+			}
+		} else if (invAwareData instanceof InvocationSequenceData) {
+			InvocationSequenceData invocationSequenceData = (InvocationSequenceData) invAwareData;
+			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(invocationSequenceData.getMethodIdent());
+			if (0 == invocationSequenceData.getId()) {
+				return TextFormatter.getMethodString(methodIdent) + " [All]";
+			} else {
+				return TextFormatter.getMethodString(methodIdent) + " [Single]";
+			}
 		}
 		return "";
 	}
