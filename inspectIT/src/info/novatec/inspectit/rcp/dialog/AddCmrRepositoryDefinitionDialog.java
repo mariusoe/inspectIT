@@ -9,8 +9,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -34,7 +35,7 @@ import org.eclipse.ui.internal.forms.widgets.BusyIndicator;
  * 
  */
 @SuppressWarnings("restriction")
-public class AddCmrRepositoryDefinitionDialog extends Dialog {
+public class AddCmrRepositoryDefinitionDialog extends TitleAreaDialog {
 
 	/**
 	 * Name tex box.
@@ -82,7 +83,17 @@ public class AddCmrRepositoryDefinitionDialog extends Dialog {
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText("Add new CMR repository definition");
+		newShell.setText("Add CMR Repository Definition");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void create() {
+		super.create();
+		this.setTitle("Add CMR Repository Definition");
+		this.setMessage("Define information for the repository to add", IMessageProvider.INFORMATION);
 	}
 
 	/**

@@ -34,6 +34,7 @@ public class ManageLabelWizard extends Wizard implements INewWizard {
 	 */
 	public ManageLabelWizard(CmrRepositoryDefinition cmrRepositoryDefinition) {
 		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
+		this.setWindowTitle("Manage Labels");
 	}
 
 	/**

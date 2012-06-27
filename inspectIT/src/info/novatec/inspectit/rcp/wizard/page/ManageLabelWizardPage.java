@@ -28,6 +28,8 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -497,7 +499,7 @@ public class ManageLabelWizardPage extends WizardPage {
 	 * @author Ivan Senic
 	 * 
 	 */
-	private class CreateLabelTypeDialog extends Dialog {
+	private class CreateLabelTypeDialog extends TitleAreaDialog {
 
 		/**
 		 * Available type list.
@@ -539,6 +541,16 @@ public class ManageLabelWizardPage extends WizardPage {
 		protected void configureShell(Shell newShell) {
 			super.configureShell(newShell);
 			newShell.setText("Create Label Type");
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void create() {
+			super.create();
+			this.setTitle("Create Label Type");
+			this.setMessage("Define properties for the new label type", IMessageProvider.INFORMATION);
 		}
 
 		/**
@@ -604,6 +616,7 @@ public class ManageLabelWizardPage extends WizardPage {
 			yesButton.addListener(SWT.Selection, listener);
 			noButton.addListener(SWT.Selection, listener);
 
+			name.forceFocus();
 			return main;
 		}
 
@@ -649,7 +662,7 @@ public class ManageLabelWizardPage extends WizardPage {
 	 * @author Ivan Senic
 	 * 
 	 */
-	private class CreateLabelDialog extends Dialog {
+	private class CreateLabelDialog extends TitleAreaDialog {
 
 		/**
 		 * List of label types that can be created.
@@ -715,6 +728,16 @@ public class ManageLabelWizardPage extends WizardPage {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public void create() {
+			super.create();
+			this.setTitle("Create Label");
+			this.setMessage("Selected wanted label type and define label value", IMessageProvider.INFORMATION);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		protected void createButtonsForButtonBar(Composite parent) {
 			createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, true);
 			okButton = createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
@@ -774,6 +797,7 @@ public class ManageLabelWizardPage extends WizardPage {
 			new Label(main, SWT.NONE).setText("Label value:");
 			updateStorageLabelComposite();
 
+			typeSelection.forceFocus();
 			return main;
 		}
 

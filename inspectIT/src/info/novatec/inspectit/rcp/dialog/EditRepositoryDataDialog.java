@@ -2,8 +2,9 @@ package info.novatec.inspectit.rcp.dialog;
 
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -21,7 +22,7 @@ import org.eclipse.swt.widgets.Text;
  * @author Ivan Senic
  * 
  */
-public class EditRepositoryDataDialog extends Dialog {
+public class EditRepositoryDataDialog extends TitleAreaDialog {
 
 	/**
 	 * Name box.
@@ -72,6 +73,16 @@ public class EditRepositoryDataDialog extends Dialog {
 		super(parentShell);
 		this.oldName = oldName;
 		this.oldDescription = oldDescription;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void create() {
+		super.create();
+		this.setTitle("Edit Data");
+		this.setMessage("Enter new name and/or description", IMessageProvider.INFORMATION);
 	}
 
 	/**

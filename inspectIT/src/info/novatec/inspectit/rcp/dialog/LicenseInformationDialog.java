@@ -12,11 +12,10 @@ import java.text.DateFormat;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.expressions.IEvaluationContext;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.window.IShellProvider;
+import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -36,7 +35,7 @@ import org.eclipse.ui.handlers.IHandlerService;
  * @author Ivan Senic
  * 
  */
-public class LicenseInformationDialog extends Dialog {
+public class LicenseInformationDialog extends TitleAreaDialog {
 
 	/**
 	 * Repository definition.
@@ -77,15 +76,14 @@ public class LicenseInformationDialog extends Dialog {
 	}
 
 	/**
-	 * 
-	 * @param parentShell
-	 *            object that returns the current parent shell
-	 * @param repositoryDefinition
-	 *            repositoryDefinition to display information for
+	 * {@inheritDoc}
 	 */
-	public LicenseInformationDialog(IShellProvider parentShell, CmrRepositoryDefinition repositoryDefinition) {
-		super(parentShell);
-		this.repositoryDefinition = repositoryDefinition;
+	@Override
+	public void create() {
+		super.create();
+		this.setTitle("License Information");
+		this.setMessage("Current license info for the " + repositoryDefinition.getName() + " (" + repositoryDefinition.getIp() + ":" + repositoryDefinition.getPort() + ")",
+				IMessageProvider.INFORMATION);
 	}
 
 	/**
@@ -110,15 +108,6 @@ public class LicenseInformationDialog extends Dialog {
 	 */
 	private void createInformation(Composite composite, LicenseInfoData licenceInfoData) {
 		composite.setLayout(new GridLayout(2, false));
-
-		Label info = new Label(composite, SWT.NONE);
-		info.setText("Your current license information:");
-		GridData gd = new GridData();
-		gd.horizontalSpan = 2;
-		info.setLayoutData(gd);
-
-		new Label(composite, SWT.NONE);
-		new Label(composite, SWT.NONE);
 
 		new Label(composite, SWT.NONE).setText("License valid from:");
 		if (null != licenceInfoData) {
@@ -172,7 +161,7 @@ public class LicenseInformationDialog extends Dialog {
 	 */
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
-		shell.setText("Licence Information - " + repositoryDefinition.getName() + " (" + repositoryDefinition.getIp() + ":" + repositoryDefinition.getPort() + ")");
+		shell.setText("Licence Information");
 	}
 
 	/**
