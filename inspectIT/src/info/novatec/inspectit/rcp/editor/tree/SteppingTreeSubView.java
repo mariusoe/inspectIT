@@ -2,7 +2,7 @@ package info.novatec.inspectit.rcp.editor.tree;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
@@ -342,11 +342,11 @@ public class SteppingTreeSubView extends TreeSubView {
 
 			previous = toolkit.createButton(mainComposite, "Previous", SWT.PUSH | SWT.NO_BACKGROUND);
 			previous.setEnabled(false);
-			previous.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_PREVIOUS));
+			previous.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_PREVIOUS));
 
 			next = toolkit.createButton(mainComposite, "Next", SWT.PUSH | SWT.NO_BACKGROUND);
 			next.setEnabled(false);
-			next.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_NEXT));
+			next.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_NEXT));
 
 			info = toolkit.createLabel(mainComposite, "No invocation loaded");
 
@@ -363,7 +363,7 @@ public class SteppingTreeSubView extends TreeSubView {
 
 			clearAll = toolkit.createButton(mainComposite, "", SWT.PUSH | SWT.NO_BACKGROUND);
 			clearAll.setEnabled(false);
-			clearAll.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_TRASH));
+			clearAll.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_TRASH));
 			clearAll.setToolTipText("Empty steppable objects list");
 
 			objectSelection.addListener(SWT.Modify, new Listener() {

@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.editor.preferences;
 
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.action.MenuAction;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
@@ -249,7 +249,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		switchLiveMode = new SwitchLiveMode("Live");
 		switchPreferences = new SwitchPreferences("Additional options");
 		MenuAction menuAction = new MenuAction();
-		menuAction.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_TOOL));
+		menuAction.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_TOOL));
 		menuAction.setToolTipText("Preferences");
 
 		// add the maximize to all forms, let eclipse hide it as declared in plugin.xml
@@ -257,7 +257,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(MaximizeActiveViewHandler.PREFERENCE_PANEL_ID_PARAMETER, id);
 		CommandContributionItemParameter contributionParameters = new CommandContributionItemParameter(workbenchWindow, null, MaximizeActiveViewHandler.COMMAND_ID, params, InspectIT.getDefault()
-				.getImageDescriptor(InspectITConstants.IMG_WINDOW), null, null, null, null, getTooltipTextForMaximizeContributionItem(), SWT.CHECK, null, false);
+				.getImageDescriptor(InspectITImages.IMG_WINDOW), null, null, null, null, getTooltipTextForMaximizeContributionItem(), SWT.CHECK, null, false);
 		CommandContributionItem maximizeCommandContribution = new CommandContributionItem(contributionParameters);
 		toolBarManager.add(maximizeCommandContribution);
 
@@ -434,7 +434,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		 */
 		private SwitchPreferences(String text) {
 			super(text, AS_CHECK_BOX);
-			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_PREFERENCES));
+			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_PREFERENCES));
 		}
 
 		/**
@@ -461,7 +461,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		 */
 		private UpdateAction(String text) {
 			super(text);
-			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_REFRESH));
+			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_REFRESH));
 		}
 
 		/**
@@ -489,7 +489,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		 */
 		public SwitchLiveMode(String text) {
 			super(text);
-			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_LIVE_MODE));
+			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_LIVE_MODE));
 			setChecked(LiveMode.ACTIVE_DEFAULT);
 		}
 
@@ -799,7 +799,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		 */
 		public SwitchSteppingControl(String text) {
 			super(text, AS_CHECK_BOX);
-			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_RIGHT_DOWN_ARROW));
+			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_RIGHT_DOWN_ARROW));
 		}
 
 		/**
@@ -886,7 +886,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		 */
 		public SwitchHttpCategorizationRequestMethod(String text) {
 			super(text, AS_CHECK_BOX);
-			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_HTTP_AGGREGATION_REQUESTMESSAGE));
+			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_HTTP_AGGREGATION_REQUESTMESSAGE));
 		}
 
 		/**
@@ -921,7 +921,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		 */
 		public SwitchInvocationSubviewMode(String text) {
 			super(text, AS_CHECK_BOX);
-			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_HTTP_AGGREGATION_REQUESTMESSAGE));
+			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_HTTP_AGGREGATION_REQUESTMESSAGE));
 		}
 
 		/**

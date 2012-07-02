@@ -3,6 +3,7 @@ package info.novatec.inspectit.rcp;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryManager;
 import info.novatec.inspectit.rcp.storage.InspectITStorageManager;
 
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -152,112 +153,25 @@ public class InspectIT extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Helper method to add one of the IMG_ keys in {@link InspectITConstants} to the image
-	 * registry.
-	 * 
-	 * @param registry
-	 *            The image registry.
-	 * @param imageKey
-	 *            The image key.
-	 */
-	private void addImageToRegistry(ImageRegistry registry, String imageKey) {
-		URL url = getBundle().getEntry(InspectITConstants.ICON_PATH + imageKey);
-		registry.put(imageKey, ImageDescriptor.createFromURL(url));
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	protected void initializeImageRegistry(ImageRegistry reg) {
-		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_ONLINE);
-		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_OFFLINE);
-		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_ONLINE_SMALL);
-		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_OFFLINE_SMALL);
-		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_REFRESH);
-		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_REFRESH_SMALL);
-		addImageToRegistry(reg, InspectITConstants.IMG_SERVER_ADD);
-		addImageToRegistry(reg, InspectITConstants.IMG_AGENT);
-		addImageToRegistry(reg, InspectITConstants.IMG_INSTRUMENTATION_BROWSER);
-		addImageToRegistry(reg, InspectITConstants.IMG_SYSTEM_OVERVIEW);
-		addImageToRegistry(reg, InspectITConstants.IMG_PACKAGE);
-		addImageToRegistry(reg, InspectITConstants.IMG_CLASS);
-		addImageToRegistry(reg, InspectITConstants.IMG_METHOD_PUBLIC);
-		addImageToRegistry(reg, InspectITConstants.IMG_METHOD_PROTECTED);
-		addImageToRegistry(reg, InspectITConstants.IMG_METHOD_DEFAULT);
-		addImageToRegistry(reg, InspectITConstants.IMG_METHOD_PRIVATE);
-		addImageToRegistry(reg, InspectITConstants.IMG_CPU_OVERVIEW);
-		addImageToRegistry(reg, InspectITConstants.IMG_CLASS_OVERVIEW);
-		addImageToRegistry(reg, InspectITConstants.IMG_MEMORY_OVERVIEW);
-		addImageToRegistry(reg, InspectITConstants.IMG_THREADS_OVERVIEW);
-		addImageToRegistry(reg, InspectITConstants.IMG_VM_SUMMARY);
-		addImageToRegistry(reg, InspectITConstants.IMG_ITEM_NA_RED);
-		addImageToRegistry(reg, InspectITConstants.IMG_ITEM_NA_GREY);
-		addImageToRegistry(reg, InspectITConstants.IMG_REFRESH);
-		addImageToRegistry(reg, InspectITConstants.IMG_PREFERENCES);
-		addImageToRegistry(reg, InspectITConstants.IMG_TIMER);
-		addImageToRegistry(reg, InspectITConstants.IMG_INVOCATION);
-		addImageToRegistry(reg, InspectITConstants.IMG_DATABASE);
-		addImageToRegistry(reg, InspectITConstants.IMG_SEARCH);
-		addImageToRegistry(reg, InspectITConstants.IMG_FILTER);
-		addImageToRegistry(reg, InspectITConstants.IMG_SHOW_ALL);
-		addImageToRegistry(reg, InspectITConstants.IMG_LAST_HOUR);
-		addImageToRegistry(reg, InspectITConstants.IMG_THIS_DAY);
-		addImageToRegistry(reg, InspectITConstants.IMG_LAST_WEEK);
-		addImageToRegistry(reg, InspectITConstants.IMG_CALL_HIERARCHY);
-		addImageToRegistry(reg, InspectITConstants.IMG_LIVE_MODE);
-		addImageToRegistry(reg, InspectITConstants.IMG_INFORMATION);
-		addImageToRegistry(reg, InspectITConstants.IMG_ZOOMIN);
-		addImageToRegistry(reg, InspectITConstants.IMG_ZOOMOUT);
-		addImageToRegistry(reg, InspectITConstants.IMG_ZOOMFIT);
-		addImageToRegistry(reg, InspectITConstants.IMG_DRILLUP);
-		addImageToRegistry(reg, InspectITConstants.IMG_DRILLDOWN);
-		addImageToRegistry(reg, InspectITConstants.IMG_HEAT);
-		addImageToRegistry(reg, InspectITConstants.IMG_ACTIVITY);
-		addImageToRegistry(reg, InspectITConstants.IMG_WORKFLOW);
-		addImageToRegistry(reg, InspectITConstants.IMG_EXCEPTION_TREE);
-		addImageToRegistry(reg, InspectITConstants.IMG_STACKTRACE);
-		addImageToRegistry(reg, InspectITConstants.IMG_EXCEPTION_SENSOR);
-		addImageToRegistry(reg, InspectITConstants.VSA_LOGO);
-		addImageToRegistry(reg, InspectITConstants.IMG_CREATED_EXCEPTION);
-		addImageToRegistry(reg, InspectITConstants.OVERLAY_PRIORITY);
-		addImageToRegistry(reg, InspectITConstants.OVERLAY_UP);
-		addImageToRegistry(reg, InspectITConstants.OVERLAY_ERROR);
-		addImageToRegistry(reg, InspectITConstants.IMG_NEXT);
-		addImageToRegistry(reg, InspectITConstants.IMG_PREVIOUS);
-		addImageToRegistry(reg, InspectITConstants.IMG_RIGHT_DOWN_ARROW);
-		addImageToRegistry(reg, InspectITConstants.IMG_TRASH);
-		addImageToRegistry(reg, InspectITConstants.IMG_TOOL);
-		addImageToRegistry(reg, InspectITConstants.IMG_HTTP);
-		addImageToRegistry(reg, InspectITConstants.IMG_HTTP_AGGREGATE);
-		addImageToRegistry(reg, InspectITConstants.IMG_HTTP_TAGGED);
-		addImageToRegistry(reg, InspectITConstants.IMG_HTTP_AGGREGATION_REQUESTMESSAGE);
-		addImageToRegistry(reg, InspectITConstants.IMG_CHECKMARK);
-		addImageToRegistry(reg, InspectITConstants.IMG_WINDOW);
-		addImageToRegistry(reg, InspectITConstants.IMG_FONT);
-		addImageToRegistry(reg, InspectITConstants.IMG_COLLAPSE);
-		addImageToRegistry(reg, InspectITConstants.IMG_ADD);
-		addImageToRegistry(reg, InspectITConstants.IMG_STOARGE_NEW);
-		addImageToRegistry(reg, InspectITConstants.IMG_STOARGE_OPENED);
-		addImageToRegistry(reg, InspectITConstants.IMG_STOARGE_RECORDING);
-		addImageToRegistry(reg, InspectITConstants.IMG_STOARGE_CLOSED);
-		addImageToRegistry(reg, InspectITConstants.IMG_STOARGE_AVAILABLE);
-		addImageToRegistry(reg, InspectITConstants.IMG_STOARGE_NOT_AVAILABLE);
-		addImageToRegistry(reg, InspectITConstants.IMG_ASSIGNEE_LABEL_ICON);
-		addImageToRegistry(reg, InspectITConstants.IMG_MOUNTEDBY_LABEL_ICON);
-		addImageToRegistry(reg, InspectITConstants.IMG_RATING_LABEL_ICON);
-		addImageToRegistry(reg, InspectITConstants.IMG_STATUS_LABEL_ICON);
-		addImageToRegistry(reg, InspectITConstants.IMG_USECASE_LABEL_ICON);
-		addImageToRegistry(reg, InspectITConstants.IMG_USER_LABEL_ICON);
-		addImageToRegistry(reg, InspectITConstants.IMG_PROPERTIES);
-		addImageToRegistry(reg, InspectITConstants.IMG_CLOSE);
-		addImageToRegistry(reg, InspectITConstants.IMG_CHECKMARK);
-		addImageToRegistry(reg, InspectITConstants.IMG_RECORD);
-		addImageToRegistry(reg, InspectITConstants.IMG_RECORD_GRAY);
-		addImageToRegistry(reg, InspectITConstants.IMG_EVENT_GREEN);
-		addImageToRegistry(reg, InspectITConstants.IMG_EVENT_RED);
-		addImageToRegistry(reg, InspectITConstants.IMG_EVENT_YELLOW);
-		addImageToRegistry(reg, InspectITConstants.IMG_STORAGE_OVERLAY);
+		Field[] allFields = InspectITImages.class.getFields();
+		for (Field field : allFields) {
+			if (field.getName().startsWith("IMG") && String.class.equals(field.getType())) {
+				if (!field.isAccessible()) {
+					field.setAccessible(true);
+				}
+				try {
+					String key = (String) field.get(null);
+					URL url = getBundle().getEntry(key);
+					reg.put(key, ImageDescriptor.createFromURL(url));
+				} catch (Exception e) {
+					continue;
+				}
+			}
+		}
 	}
 
 	/**
@@ -276,7 +190,7 @@ public class InspectIT extends AbstractUIPlugin {
 
 	/**
 	 * Returns the image descriptor for the given key. The key can be one of the IMG_ definitions in
-	 * {@link InspectITConstants}.
+	 * {@link InspectITImages}.
 	 * <p>
 	 * <b>Every new image created with the given {@link ImageDescriptor} should be disposed by the
 	 * caller.</b>

@@ -5,7 +5,7 @@ import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
@@ -72,9 +72,9 @@ public class SqlInputController extends AbstractTableInputController {
 	 */
 	private static enum Column {
 		/** The statement column. */
-		STATEMENT("Statement", 600, InspectITConstants.IMG_DATABASE),
+		STATEMENT("Statement", 600, InspectITImages.IMG_DATABASE),
 		/** Invocation Affiliation. */
-		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITConstants.IMG_INVOCATION),
+		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION),
 		/** The count column. */
 		COUNT("Count", 80, null),
 		/** The average column. */
@@ -86,7 +86,7 @@ public class SqlInputController extends AbstractTableInputController {
 		/** The duration column. */
 		DURATION("Duration (ms)", 80, null),
 		/** The method column. */
-		METHOD("Method", 500, InspectITConstants.IMG_METHOD_PUBLIC);
+		METHOD("Method", 500, InspectITImages.IMG_METHOD_PUBLIC);
 
 		/** The real viewer column. */
 		private TableViewerColumn column;
@@ -105,7 +105,7 @@ public class SqlInputController extends AbstractTableInputController {
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITImages}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;

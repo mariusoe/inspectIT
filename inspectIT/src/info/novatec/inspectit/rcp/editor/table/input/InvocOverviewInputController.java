@@ -7,7 +7,7 @@ import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.InvocationSequenceDataHelper;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceConstants;
@@ -73,11 +73,11 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 */
 	private static enum Column {
 		/** The time column. */
-		TIME("Start Time", 150, InspectITConstants.IMG_TIMER),
+		TIME("Start Time", 150, InspectITImages.IMG_TIMER),
 		/** The method column. */
-		METHOD("Method", 550, InspectITConstants.IMG_METHOD_PUBLIC),
+		METHOD("Method", 550, InspectITImages.IMG_METHOD_PUBLIC),
 		/** The duration column. */
-		DURATION("Duration (ms)", 100, InspectITConstants.IMG_LAST_HOUR),
+		DURATION("Duration (ms)", 100, InspectITImages.IMG_LAST_HOUR),
 		/** The count column. */
 		COUNT("Child Count", 100, null),
 		/** The URI column. */
@@ -102,7 +102,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITImages}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;

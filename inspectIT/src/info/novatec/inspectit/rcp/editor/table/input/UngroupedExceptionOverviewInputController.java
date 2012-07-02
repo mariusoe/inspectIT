@@ -5,7 +5,7 @@ import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
@@ -68,11 +68,11 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	 */
 	private static enum Column {
 		/** The count column. */
-		TIMESTAMP("Timestamp", 150, InspectITConstants.IMG_TIMER),
+		TIMESTAMP("Timestamp", 150, InspectITImages.IMG_TIMER),
 		/** The class column. */
-		CLASS("Class", 250, InspectITConstants.IMG_CLASS),
+		CLASS("Class", 250, InspectITImages.IMG_CLASS),
 		/** The package column. */
-		PACKAGE("Package", 400, InspectITConstants.IMG_PACKAGE);
+		PACKAGE("Package", 400, InspectITImages.IMG_PACKAGE);
 
 		/** The name. */
 		private String name;
@@ -89,7 +89,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITImages}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;

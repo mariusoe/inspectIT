@@ -5,7 +5,7 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
@@ -45,11 +45,11 @@ public class TaggedHttpTimerDataInputController extends AbstractHttpInputControl
 	 */
 	private static enum Column {
 		/** The package column. */
-		TAG_VALUE("Tag Value", 300, InspectITConstants.IMG_HTTP_TAGGED),
+		TAG_VALUE("Tag Value", 300, InspectITImages.IMG_HTTP_TAGGED),
 		/** The request method. */
 		HTTP_METHOD("Method", 80, null),
 		/** Invocation Affiliation. */
-		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITConstants.IMG_INVOCATION),
+		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION),
 		/** The count column. */
 		COUNT("Count", 60, null),
 		/** The average column. */
@@ -94,7 +94,7 @@ public class TaggedHttpTimerDataInputController extends AbstractHttpInputControl
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITImages}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;

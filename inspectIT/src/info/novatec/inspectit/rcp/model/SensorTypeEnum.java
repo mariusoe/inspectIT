@@ -2,7 +2,7 @@ package info.novatec.inspectit.rcp.model;
 
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -19,52 +19,52 @@ import org.eclipse.swt.graphics.Image;
  */
 public enum SensorTypeEnum {
 	/** The timer sensor type. */
-	TIMER("info.novatec.inspectit.agent.sensor.method.timer.TimerSensor", InspectITConstants.IMG_TIMER),
+	TIMER("info.novatec.inspectit.agent.sensor.method.timer.TimerSensor", InspectITImages.IMG_TIMER),
 	/** The average timer sensor type. */
-	AVERAGE_TIMER("info.novatec.inspectit.agent.sensor.method.averagetimer.AverageTimerSensor", InspectITConstants.IMG_TIMER),
+	AVERAGE_TIMER("info.novatec.inspectit.agent.sensor.method.averagetimer.AverageTimerSensor", InspectITImages.IMG_TIMER),
 	/** The invocation sequence sensor type. */
-	INVOCATION_SEQUENCE("info.novatec.inspectit.agent.sensor.method.invocationsequence.InvocationSequenceSensor", InspectITConstants.IMG_INVOCATION),
+	INVOCATION_SEQUENCE("info.novatec.inspectit.agent.sensor.method.invocationsequence.InvocationSequenceSensor", InspectITImages.IMG_INVOCATION),
 	/** The sql sensor type. */
-	SQL("info.novatec.inspectit.agent.sensor.method.jdbc.SQLTimerSensor", InspectITConstants.IMG_DATABASE),
+	SQL("info.novatec.inspectit.agent.sensor.method.jdbc.SQLTimerSensor", InspectITImages.IMG_DATABASE),
 	/** The jdbc connection sensor type. */
-	JDBC_CONNECTION("info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionSensor", InspectITConstants.IMG_DATABASE, false),
+	JDBC_CONNECTION("info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionSensor", InspectITImages.IMG_DATABASE, false),
 	/** The jdbc statement sensor type. */
-	JDBC_STATEMENT("info.novatec.inspectit.agent.sensor.method.jdbc.StatementSensor", InspectITConstants.IMG_DATABASE, false),
+	JDBC_STATEMENT("info.novatec.inspectit.agent.sensor.method.jdbc.StatementSensor", InspectITImages.IMG_DATABASE, false),
 	/** The jdbc prepared statement sensor type. */
-	JDBC_PREPARED_STATEMENT("info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementSensor", InspectITConstants.IMG_DATABASE, false),
+	JDBC_PREPARED_STATEMENT("info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementSensor", InspectITImages.IMG_DATABASE, false),
 	/** The jdbc prepared statement parameter sensor type. */
-	JDBC_PREPARED_STATEMENT_PARAMETER("info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementParameterSensor", InspectITConstants.IMG_DATABASE, false),
+	JDBC_PREPARED_STATEMENT_PARAMETER("info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementParameterSensor", InspectITImages.IMG_DATABASE, false),
 	/** The exception sensor. */
-	EXCEPTION_SENSOR("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor", InspectITConstants.IMG_EXCEPTION_SENSOR),
+	EXCEPTION_SENSOR("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor", InspectITImages.IMG_EXCEPTION_SENSOR),
 	/** The exception sensor overview. */
-	EXCEPTION_SENSOR_GROUPED("info.novatec.inspectit.agent.sensor.exception.ExceptionSensorOverview", InspectITConstants.IMG_FILTER),
+	EXCEPTION_SENSOR_GROUPED("info.novatec.inspectit.agent.sensor.exception.ExceptionSensorOverview", InspectITImages.IMG_FILTER),
 	/** The combined metrics sensor type. */
-	MARVIN_WORKFLOW("info.novatec.inspectit.agent.sensor.method.marvintimer.MarvinWorkflowSensor", InspectITConstants.IMG_INVOCATION),
+	MARVIN_WORKFLOW("info.novatec.inspectit.agent.sensor.method.marvintimer.MarvinWorkflowSensor", InspectITImages.IMG_INVOCATION),
 	/** The Http timer sensor type. */
-	HTTP_TIMER_SENSOR("info.novatec.inspectit.agent.sensor.method.http.HttpSensor", InspectITConstants.IMG_HTTP_AGGREGATE),
+	HTTP_TIMER_SENSOR("info.novatec.inspectit.agent.sensor.method.http.HttpSensor", InspectITImages.IMG_HTTP_AGGREGATE),
 	/** The Http timer sensor type. */
-	TAGGED_HTTP_TIMER_SENSOR("info.novatec.inspectit.agent.sensor.method.http.HttpSensor", InspectITConstants.IMG_HTTP_TAGGED),
+	TAGGED_HTTP_TIMER_SENSOR("info.novatec.inspectit.agent.sensor.method.http.HttpSensor", InspectITImages.IMG_HTTP_TAGGED),
 
 	/** The classloading information sensor type. */
-	CLASSLOADING_INFORMATION("info.novatec.inspectit.agent.sensor.platform.ClassLoadingInformation", InspectITConstants.IMG_CLASS_OVERVIEW),
+	CLASSLOADING_INFORMATION("info.novatec.inspectit.agent.sensor.platform.ClassLoadingInformation", InspectITImages.IMG_CLASS_OVERVIEW),
 	/** The compilation information sensor type. */
 	COMPILATION_INFORMATION("info.novatec.inspectit.agent.sensor.platform.CompilationInformation", null),
 	/** The memory information sensor type. */
-	MEMORY_INFORMATION("info.novatec.inspectit.agent.sensor.platform.MemoryInformation", InspectITConstants.IMG_MEMORY_OVERVIEW),
+	MEMORY_INFORMATION("info.novatec.inspectit.agent.sensor.platform.MemoryInformation", InspectITImages.IMG_MEMORY_OVERVIEW),
 	/** The cpu information sensor type. */
-	CPU_INFORMATION("info.novatec.inspectit.agent.sensor.platform.CpuInformation", InspectITConstants.IMG_CPU_OVERVIEW),
+	CPU_INFORMATION("info.novatec.inspectit.agent.sensor.platform.CpuInformation", InspectITImages.IMG_CPU_OVERVIEW),
 	/** The runtime information sensor type. */
 	RUNTIME_INFORMATION("info.novatec.inspectit.agent.sensor.platform.RuntimeInformation", null),
 	/** The system information sensor type. */
-	SYSTEM_INFORMATION("info.novatec.inspectit.agent.sensor.platform.SystemInformation", InspectITConstants.IMG_SYSTEM_OVERVIEW),
+	SYSTEM_INFORMATION("info.novatec.inspectit.agent.sensor.platform.SystemInformation", InspectITImages.IMG_SYSTEM_OVERVIEW),
 	/** The thread information sensor type. */
-	THREAD_INFORMATION("info.novatec.inspectit.agent.sensor.platform.ThreadInformation", InspectITConstants.IMG_THREADS_OVERVIEW),
+	THREAD_INFORMATION("info.novatec.inspectit.agent.sensor.platform.ThreadInformation", InspectITImages.IMG_THREADS_OVERVIEW),
 	/** The navigation invocation sequence sensor type. */
-	NAVIGATION_INVOCATION("info.novatec.inspectit.agent.sensor.method.invocationsequence.NavigationInvocationSequenceSensor", InspectITConstants.IMG_INVOCATION),
+	NAVIGATION_INVOCATION("info.novatec.inspectit.agent.sensor.method.invocationsequence.NavigationInvocationSequenceSensor", InspectITImages.IMG_INVOCATION),
 	/** The aggregated timer data sensor type. */
-	AGGREGATED_TIMER_DATA("info.novatec.inspectit.agent.sensor.method.AggregatedTimerSensor", InspectITConstants.IMG_TIMER),
+	AGGREGATED_TIMER_DATA("info.novatec.inspectit.agent.sensor.method.AggregatedTimerSensor", InspectITImages.IMG_TIMER),
 	/** The multi invocation timer data sensor type. */
-	MULTI_INVOC_DATA("info.novatec.inspectit.agent.sensor.method.MultiInvocSensor", InspectITConstants.IMG_INVOCATION);
+	MULTI_INVOC_DATA("info.novatec.inspectit.agent.sensor.method.MultiInvocSensor", InspectITImages.IMG_INVOCATION);
 
 	/**
 	 * The LOOKUP map which is used to get an element of the enumeration when passing the full
@@ -99,7 +99,7 @@ public enum SensorTypeEnum {
 	 * @param fqn
 	 *            The full qualified name.
 	 * @param imageName
-	 *            The name of the image. Names are defined in {@link InspectITConstants}.
+	 *            The name of the image. Names are defined in {@link InspectITImages}.
 	 */
 	private SensorTypeEnum(String fqn, String imageName) {
 		this.fqn = fqn;
@@ -112,7 +112,7 @@ public enum SensorTypeEnum {
 	 * @param fqn
 	 *            The full qualified name.
 	 * @param imageName
-	 *            The name of the image. Names are defined in {@link InspectITConstants}.
+	 *            The name of the image. Names are defined in {@link InspectITImages}.
 	 * @param openable
 	 *            Defines if this can be opened somehow in the UI.
 	 */

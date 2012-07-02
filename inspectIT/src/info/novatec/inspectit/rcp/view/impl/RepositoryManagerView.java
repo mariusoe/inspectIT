@@ -2,7 +2,7 @@ package info.novatec.inspectit.rcp.view.impl;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.form.CmrRepositoryPropertyForm;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.handlers.ShowRepositoryHandler;
@@ -556,7 +556,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		 */
 		public ShowPropertiesAction() {
 			super(null, AS_CHECK_BOX);
-			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_PROPERTIES));
+			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_PROPERTIES));
 			setChecked(true);
 			setToolTipText("Hide Properties");
 		}

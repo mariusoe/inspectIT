@@ -3,7 +3,7 @@ package info.novatec.inspectit.rcp.form;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.cmr.BufferStatusData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
@@ -323,14 +323,14 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 					}
 					status.setText(cmrRepositoryDefinition.getOnlineStatus().toString());
 					if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
-						form.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_ONLINE_SMALL));
+						form.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_ONLINE_SMALL));
 						String versionString = cmrRepositoryDefinition.getServerStatusService().getVersion();
 						version.setText(versionString);
 					} else if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.CHECKING) {
-						form.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_REFRESH_SMALL));
+						form.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_REFRESH_SMALL));
 						version.setText("n/a");
 					} else {
-						form.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_OFFLINE_SMALL));
+						form.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_OFFLINE_SMALL));
 						version.setText("n/a");
 					}
 					updateCmrDataJob.schedule();
@@ -401,7 +401,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 			// recording information
 			recordingData = cmrRepositoryDefinition.getStorageService().getRecordingData();
 			if (null != recordingData) {
-				recordingIcon.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_RECORD));
+				recordingIcon.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_RECORD));
 				recordingLabel.setText("Active");
 				// get the storage name
 				StorageData storage = recordingData.getRecordingStorage();
@@ -426,7 +426,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 				dataLoaded = true;
 
 			} else {
-				recordingIcon.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_RECORD_GRAY));
+				recordingIcon.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_RECORD_GRAY));
 			}
 		}
 

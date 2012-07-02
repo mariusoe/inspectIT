@@ -7,7 +7,7 @@ import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.indexing.aggregation.impl.AggregationPerformer;
 import info.novatec.inspectit.indexing.aggregation.impl.SqlStatementDataAggregator;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
@@ -77,9 +77,9 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	 */
 	private static enum Column {
 		/** The timestamp column. */
-		TIMESTAMP("Timestamp", 130, InspectITConstants.IMG_TIMER, false, true),
+		TIMESTAMP("Timestamp", 130, InspectITImages.IMG_TIMER, false, true),
 		/** The statement column. */
-		STATEMENT("Statement", 600, InspectITConstants.IMG_DATABASE, true, true),
+		STATEMENT("Statement", 600, InspectITImages.IMG_DATABASE, true, true),
 		/** The count column. */
 		COUNT("Count", 80, null, true, false),
 		/** The average column. */
@@ -114,7 +114,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITImages}.
 		 * @param showInAggregatedMode
 		 *            If the column should be shown in aggregated mode.
 		 * @param showInRawMode

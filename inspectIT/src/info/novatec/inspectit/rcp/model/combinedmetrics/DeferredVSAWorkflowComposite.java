@@ -6,7 +6,7 @@ import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
@@ -83,7 +83,7 @@ public class DeferredVSAWorkflowComposite extends DeferredComposite {
 			for (String activity : activityList) {
 				Component targetActivity = new Leaf();
 				targetActivity.setName(activity.substring(1, activity.length()));
-				targetActivity.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_ACTIVITY));
+				targetActivity.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_ACTIVITY));
 
 				InputDefinition inputDefinition = new InputDefinition();
 				inputDefinition.setRepositoryDefinition(repositoryDefinition);
@@ -172,7 +172,7 @@ public class DeferredVSAWorkflowComposite extends DeferredComposite {
 	 */
 	@Override
 	public Image getImage() {
-		return InspectIT.getDefault().getImage(InspectITConstants.IMG_ACTIVITY);
+		return InspectIT.getDefault().getImage(InspectITImages.IMG_ACTIVITY);
 	}
 
 }

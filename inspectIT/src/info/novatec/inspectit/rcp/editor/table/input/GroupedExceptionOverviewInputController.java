@@ -5,7 +5,7 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
@@ -68,9 +68,9 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	 */
 	private static enum Column {
 		/** The class column. */
-		FQN("Fully-Qualified Name", 450, InspectITConstants.IMG_CLASS),
+		FQN("Fully-Qualified Name", 450, InspectITImages.IMG_CLASS),
 		/** Invocation Affiliation. */
-		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITConstants.IMG_INVOCATION),
+		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION),
 		/** The CREATED column. */
 		CREATED("Created", 70, null),
 		/** The RETHROWN column. */
@@ -95,7 +95,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITImages}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;

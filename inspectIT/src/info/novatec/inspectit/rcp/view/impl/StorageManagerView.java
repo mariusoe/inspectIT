@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.view.impl;
 
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.action.MenuAction;
 import info.novatec.inspectit.rcp.filter.FilterComposite;
 import info.novatec.inspectit.rcp.form.StorageDataPropertyForm;
@@ -310,7 +310,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 
 		MenuAction filterMenuAction = new MenuAction();
 		filterMenuAction.setText("Group and Filter");
-		filterMenuAction.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_FILTER));
+		filterMenuAction.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_FILTER));
 
 		groupByLabelMenu = new MenuManager("Group Storages By");
 		filterMenuAction.addContributionItem(groupByLabelMenu);
@@ -463,7 +463,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 			}
 		}
 		groupByLabelMenu.removeAll();
-		groupByLabelMenu.add(new LabelOrderAction("CMR Repository", InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_SERVER_ONLINE_SMALL), null, null == orderingLabelType));
+		groupByLabelMenu.add(new LabelOrderAction("CMR Repository", InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_SERVER_ONLINE_SMALL), null, null == orderingLabelType));
 		for (AbstractStorageLabelType<?> labelType : availableLabelTypes) {
 			groupByLabelMenu.add(new LabelOrderAction(TextFormatter.getLabelName(labelType), ImageFormatter.getImageDescriptorForLabel(labelType), labelType, ObjectUtils.equals(labelType,
 					orderingLabelType)));
@@ -840,7 +840,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 		 */
 		public ShowPropertiesAction() {
 			super(null, AS_CHECK_BOX);
-			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_PROPERTIES));
+			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_PROPERTIES));
 			setChecked(true);
 			setToolTipText("Hide Properties");
 		}

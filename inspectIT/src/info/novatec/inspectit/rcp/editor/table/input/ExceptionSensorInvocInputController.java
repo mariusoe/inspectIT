@@ -10,7 +10,7 @@ import info.novatec.inspectit.indexing.aggregation.impl.AggregationPerformer;
 import info.novatec.inspectit.indexing.aggregation.impl.ExceptionDataAggregator;
 import info.novatec.inspectit.indexing.aggregation.impl.ExceptionDataAggregator.ExceptionAggregationType;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
@@ -86,9 +86,9 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	 */
 	private static enum Column {
 		/** The timestamp column. */
-		TIMESTAMP("Timestamp", 150, InspectITConstants.IMG_TIMER, false, true),
+		TIMESTAMP("Timestamp", 150, InspectITImages.IMG_TIMER, false, true),
 		/** The fqn column. */
-		FQN("Fully-Qualified Name", 400, InspectITConstants.IMG_CLASS, true, true),
+		FQN("Fully-Qualified Name", 400, InspectITImages.IMG_CLASS, true, true),
 		/** The count column. */
 		CREATED("Created", 60, null, true, false),
 		/** The RETHROWN column. */
@@ -96,7 +96,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		/** The HANDLED column. */
 		HANDLED("Handled", 60, null, true, false),
 		/** The constructor column. */
-		CONSTRUCTOR("Constructor", 250, InspectITConstants.IMG_METHOD_PUBLIC, false, true),
+		CONSTRUCTOR("Constructor", 250, InspectITImages.IMG_METHOD_PUBLIC, false, true),
 		/** The error message column. */
 		ERROR_MESSAGE("Error Message", 250, null, false, true);
 
@@ -121,7 +121,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITImages}.
 		 * @param showInAggregatedMode
 		 *            If the column should be shown in aggregated mode.
 		 * @param showInRawMode

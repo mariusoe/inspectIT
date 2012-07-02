@@ -2,7 +2,7 @@ package info.novatec.inspectit.rcp.view.impl;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.tree.DeferredTreeViewer;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.model.TreeModelManager;
@@ -298,7 +298,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 		headClient.setLayout(gl);
 
 		Label agentImg = new Label(headClient, SWT.NONE);
-		agentImg.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_AGENT));
+		agentImg.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_AGENT));
 
 		agentsCombo = new Combo(headClient, SWT.READ_ONLY | SWT.BORDER | SWT.DROP_DOWN);
 		agentsCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -648,7 +648,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 		 */
 		public CollapseAction() {
 			super();
-			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_COLLAPSE));
+			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_COLLAPSE));
 			setToolTipText("Collapse All");
 			updateEnabledState();
 		}

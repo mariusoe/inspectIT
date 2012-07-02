@@ -70,7 +70,7 @@ public class AggregatedTimerSummaryInputController extends AbstractTableInputCon
 		 *            The width of the column.
 		 * @param imageName
 		 *            The name of the image. Names are defined in
-		 *            {@link info.novatec.inspectit.rcp.InspectITConstants}.
+		 *            {@link info.novatec.inspectit.rcp.InspectITImages}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;

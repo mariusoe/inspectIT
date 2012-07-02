@@ -5,7 +5,7 @@ import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
@@ -88,7 +88,7 @@ public class TreeModelManager {
 	protected Component getInstrumentedMethodsTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		DeferredBrowserComposite instrumentedMethods = new DeferredBrowserComposite();
 		instrumentedMethods.setName("Instrumentation Browser");
-		instrumentedMethods.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_INSTRUMENTATION_BROWSER));
+		instrumentedMethods.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INSTRUMENTATION_BROWSER));
 		instrumentedMethods.setPlatformIdent(platformIdent);
 		instrumentedMethods.setRepositoryDefinition(definition);
 
@@ -107,11 +107,11 @@ public class TreeModelManager {
 	protected Component getInvocationSequenceTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Composite invocationSequence = new Composite();
 		invocationSequence.setName("Invocation Sequences");
-		invocationSequence.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_INVOCATION));
+		invocationSequence.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INVOCATION));
 
 		Component showAll = new Leaf();
 		showAll.setName("Show All");
-		showAll.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SHOW_ALL));
+		showAll.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SHOW_ALL));
 
 		InputDefinition inputDefinition = new InputDefinition();
 		inputDefinition.setRepositoryDefinition(definition);
@@ -135,7 +135,7 @@ public class TreeModelManager {
 		browser.setPlatformIdent(platformIdent);
 		browser.setRepositoryDefinition(repositoryDefinition);
 		browser.setName("Browser");
-		browser.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_INSTRUMENTATION_BROWSER));
+		browser.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INSTRUMENTATION_BROWSER));
 
 		invocationSequence.addChild(showAll);
 		invocationSequence.addChild(browser);
@@ -156,11 +156,11 @@ public class TreeModelManager {
 	private Component getSqlTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Composite invocationSequence = new Composite();
 		invocationSequence.setName("SQL Statements");
-		invocationSequence.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_DATABASE));
+		invocationSequence.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_DATABASE));
 
 		Component showAll = new Leaf();
 		showAll.setName("Show All");
-		showAll.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SHOW_ALL));
+		showAll.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SHOW_ALL));
 
 		InputDefinition inputDefinition = new InputDefinition();
 		inputDefinition.setRepositoryDefinition(definition);
@@ -197,7 +197,7 @@ public class TreeModelManager {
 	private Component getSystemOverviewTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Composite systemOverview = new Composite();
 		systemOverview.setName("System Overview");
-		systemOverview.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SYSTEM_OVERVIEW));
+		systemOverview.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SYSTEM_OVERVIEW));
 
 		Set<SensorTypeIdent> sensorTypeIdents = platformIdent.getSensorTypeIdents();
 		List<PlatformSensorTypeIdent> platformSensorTypeIdentList = new ArrayList<PlatformSensorTypeIdent>();
@@ -250,7 +250,7 @@ public class TreeModelManager {
 		Component cpuOverview = new Leaf();
 		boolean sensorTypeAvailable = false;
 		cpuOverview.setName("CPU");
-		cpuOverview.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_CPU_OVERVIEW));
+		cpuOverview.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_CPU_OVERVIEW));
 
 		for (PlatformSensorTypeIdent platformSensorTypeIdent : platformSensorTypeIdents) {
 			if (platformSensorTypeIdent.getFullyQualifiedClassName().equalsIgnoreCase(SensorTypeEnum.CPU_INFORMATION.getFqn())) {
@@ -279,7 +279,7 @@ public class TreeModelManager {
 		}
 
 		if (!sensorTypeAvailable) {
-			cpuOverview.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_ITEM_NA_GREY));
+			cpuOverview.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_ITEM_NA_GREY));
 			cpuOverview.setTooltip(SensorTypeAvailabilityEnum.CPU_INF_NA.getMessage());
 		}
 
@@ -302,7 +302,7 @@ public class TreeModelManager {
 		Component classesOverview = new Leaf();
 		boolean sensorTypeAvailable = false;
 		classesOverview.setName("Classes");
-		classesOverview.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_CLASS_OVERVIEW));
+		classesOverview.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_CLASS_OVERVIEW));
 
 		for (PlatformSensorTypeIdent platformSensorTypeIdent : platformSensorTypeIdents) {
 			if (platformSensorTypeIdent.getFullyQualifiedClassName().equalsIgnoreCase(SensorTypeEnum.CLASSLOADING_INFORMATION.getFqn())) {
@@ -331,7 +331,7 @@ public class TreeModelManager {
 		}
 
 		if (!sensorTypeAvailable) {
-			classesOverview.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_ITEM_NA_GREY));
+			classesOverview.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_ITEM_NA_GREY));
 			classesOverview.setTooltip(SensorTypeAvailabilityEnum.CLASS_INF_NA.getMessage());
 		}
 
@@ -354,7 +354,7 @@ public class TreeModelManager {
 		Component memoryOverview = new Leaf();
 		boolean sensorTypeAvailable = false;
 		memoryOverview.setName("Memory");
-		memoryOverview.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_MEMORY_OVERVIEW));
+		memoryOverview.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_MEMORY_OVERVIEW));
 
 		for (PlatformSensorTypeIdent platformSensorTypeIdent : platformSensorTypeIdents) {
 			if (platformSensorTypeIdent.getFullyQualifiedClassName().equalsIgnoreCase(SensorTypeEnum.MEMORY_INFORMATION.getFqn())) {
@@ -391,7 +391,7 @@ public class TreeModelManager {
 		}
 
 		if (!sensorTypeAvailable) {
-			memoryOverview.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_ITEM_NA_GREY));
+			memoryOverview.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_ITEM_NA_GREY));
 			memoryOverview.setTooltip(SensorTypeAvailabilityEnum.MEMORY_INF_NA.getMessage());
 		}
 
@@ -414,7 +414,7 @@ public class TreeModelManager {
 		Component threadsOverview = new Leaf();
 		boolean sensorTypeAvailable = false;
 		threadsOverview.setName("Threads");
-		threadsOverview.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_THREADS_OVERVIEW));
+		threadsOverview.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_THREADS_OVERVIEW));
 
 		for (PlatformSensorTypeIdent platformSensorTypeIdent : platformSensorTypeIdents) {
 			if (platformSensorTypeIdent.getFullyQualifiedClassName().equalsIgnoreCase(SensorTypeEnum.THREAD_INFORMATION.getFqn())) {
@@ -443,7 +443,7 @@ public class TreeModelManager {
 		}
 
 		if (!sensorTypeAvailable) {
-			threadsOverview.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_ITEM_NA_GREY));
+			threadsOverview.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_ITEM_NA_GREY));
 			threadsOverview.setTooltip(SensorTypeAvailabilityEnum.THREAD_INF_NA.getMessage());
 		}
 
@@ -466,7 +466,7 @@ public class TreeModelManager {
 		Component vmSummary = new Leaf();
 		boolean sensorTypeAvailable = false;
 		vmSummary.setName("VM Summary");
-		vmSummary.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_INFORMATION));
+		vmSummary.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INFORMATION));
 
 		if (platformSensorTypeIdents.size() > 0) {
 			sensorTypeAvailable = true;
@@ -478,7 +478,7 @@ public class TreeModelManager {
 			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
 			editorPropertiesData.setPartName("System Information");
 			editorPropertiesData.setPartTooltip("System Information");
-			editorPropertiesData.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_INFORMATION));
+			editorPropertiesData.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INFORMATION));
 			editorPropertiesData.setHeaderText("System Information");
 			editorPropertiesData.setHeaderDescription(platformIdent.getAgentName());
 			inputDefinition.setEditorPropertiesData(editorPropertiesData);
@@ -491,7 +491,7 @@ public class TreeModelManager {
 		}
 
 		if (!sensorTypeAvailable) {
-			vmSummary.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_ITEM_NA_GREY));
+			vmSummary.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_ITEM_NA_GREY));
 			vmSummary.setTooltip(SensorTypeAvailabilityEnum.SENSOR_NA.getMessage());
 		}
 
@@ -521,11 +521,11 @@ public class TreeModelManager {
 		}
 
 		if (sensorTypeAvailable) {
-			exceptionSensor.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_EXCEPTION_SENSOR));
+			exceptionSensor.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_EXCEPTION_SENSOR));
 			exceptionSensor.addChild(getUngroupedExceptionOverview(platformIdent, definition));
 			exceptionSensor.addChild(getGroupedExceptionOverview(platformIdent, definition));
 		} else {
-			exceptionSensor.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_ITEM_NA_GREY));
+			exceptionSensor.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_ITEM_NA_GREY));
 			exceptionSensor.setTooltip(SensorTypeAvailabilityEnum.EXCEPTION_SENSOR_NA.getMessage());
 		}
 
@@ -544,7 +544,7 @@ public class TreeModelManager {
 	private Component getUngroupedExceptionOverview(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Component ungroupedExceptionOverview = new Leaf();
 		ungroupedExceptionOverview.setName("Show All");
-		ungroupedExceptionOverview.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SHOW_ALL));
+		ungroupedExceptionOverview.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SHOW_ALL));
 
 		InputDefinition ungroupedExceptionOverviewInputDefinition = new InputDefinition();
 		ungroupedExceptionOverviewInputDefinition.setRepositoryDefinition(definition);
@@ -579,7 +579,7 @@ public class TreeModelManager {
 	private Component getGroupedExceptionOverview(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Component groupedExceptionOverview = new Leaf();
 		groupedExceptionOverview.setName("Grouped");
-		groupedExceptionOverview.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_FILTER));
+		groupedExceptionOverview.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_FILTER));
 
 		InputDefinition groupedExceptionOverviewInputDefinition = new InputDefinition();
 		groupedExceptionOverviewInputDefinition.setRepositoryDefinition(definition);
@@ -613,11 +613,11 @@ public class TreeModelManager {
 	private Component getTimerTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Composite timerDataComposite = new Composite();
 		timerDataComposite.setName("Timer Data");
-		timerDataComposite.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_TIMER));
+		timerDataComposite.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_TIMER));
 
 		Component showAll = new Leaf();
 		showAll.setName("Show All");
-		showAll.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SHOW_ALL));
+		showAll.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SHOW_ALL));
 
 		InputDefinition inputDefinition = new InputDefinition();
 		inputDefinition.setRepositoryDefinition(definition);
@@ -641,7 +641,7 @@ public class TreeModelManager {
 		browser.setPlatformIdent(platformIdent);
 		browser.setRepositoryDefinition(repositoryDefinition);
 		browser.setName("Browser");
-		browser.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_INSTRUMENTATION_BROWSER));
+		browser.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INSTRUMENTATION_BROWSER));
 
 		timerDataComposite.addChild(showAll);
 		timerDataComposite.addChild(browser);
@@ -661,11 +661,11 @@ public class TreeModelManager {
 	private Component getHttpTimerTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Composite timerDataComposite = new Composite();
 		timerDataComposite.setName("Http Timer Data");
-		timerDataComposite.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_HTTP));
+		timerDataComposite.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_HTTP));
 
 		Component urlAggregationView = new Leaf();
 		urlAggregationView.setName("URI Aggregation");
-		urlAggregationView.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_HTTP_AGGREGATE));
+		urlAggregationView.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_HTTP_AGGREGATE));
 		urlAggregationView.setTooltip("Aggregates all http requests that are currently in the buffer based on its URI");
 
 		InputDefinition inputDefinition = new InputDefinition();
@@ -690,7 +690,7 @@ public class TreeModelManager {
 
 		Component taggedView = new Leaf();
 		taggedView.setName("Use Case Aggregation");
-		taggedView.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_HTTP_TAGGED));
+		taggedView.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_HTTP_TAGGED));
 		taggedView.setTooltip("Aggregates all http request that are currently in the buffer based on a the concrete value of the inspectIT Tag Header (called \""
 				+ HttpTimerData.INSPECTIT_TAGGING_HEADER + "\")");
 

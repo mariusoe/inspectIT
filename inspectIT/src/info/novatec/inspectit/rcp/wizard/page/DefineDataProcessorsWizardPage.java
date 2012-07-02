@@ -14,7 +14,7 @@ import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.aggregation.impl.SqlStatementDataAggregator;
 import info.novatec.inspectit.indexing.aggregation.impl.TimerDataAggregator;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.processor.impl.DataAggregatorProcessor;
@@ -393,25 +393,25 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 		@Override
 		public Image getImage(Object element) {
 			if (ObjectUtils.equals(element, TimerData.class)) {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_TIMER);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_TIMER);
 			} else if (ObjectUtils.equals(element, HttpTimerData.class)) {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_HTTP);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_HTTP);
 			} else if (ObjectUtils.equals(element, SqlStatementData.class)) {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_DATABASE);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_DATABASE);
 			} else if (ObjectUtils.equals(element, InvocationSequenceData.class)) {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_INVOCATION);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_INVOCATION);
 			} else if (ObjectUtils.equals(element, ExceptionSensorData.class)) {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_EXCEPTION_SENSOR);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_EXCEPTION_SENSOR);
 			} else if (ObjectUtils.equals(element, MemoryInformationData.class)) {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_MEMORY_OVERVIEW);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_MEMORY_OVERVIEW);
 			} else if (ObjectUtils.equals(element, CpuInformationData.class)) {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_CPU_OVERVIEW);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_CPU_OVERVIEW);
 			} else if (ObjectUtils.equals(element, ClassLoadingInformationData.class)) {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_CLASS_OVERVIEW);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_CLASS_OVERVIEW);
 			} else if (ObjectUtils.equals(element, ThreadInformationData.class)) {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_THREADS_OVERVIEW);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_THREADS_OVERVIEW);
 			} else if (ObjectUtils.equals(element, SystemInformationData.class)) {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_SYSTEM_OVERVIEW);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_SYSTEM_OVERVIEW);
 			}
 			return super.getImage(element);
 		}

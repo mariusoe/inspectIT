@@ -6,7 +6,7 @@ import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.model.Composite;
 import info.novatec.inspectit.rcp.model.DeferredComposite;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
@@ -140,7 +140,7 @@ public class DeferredVSACategoryComposite extends DeferredComposite {
 	 */
 	@Override
 	public Image getImage() {
-		return InspectIT.getDefault().getImage(InspectITConstants.VSA_LOGO);
+		return InspectIT.getDefault().getImage(InspectITImages.VSA_LOGO);
 	}
 
 }

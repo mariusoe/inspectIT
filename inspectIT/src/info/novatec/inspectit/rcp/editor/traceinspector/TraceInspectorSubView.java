@@ -3,7 +3,7 @@ package info.novatec.inspectit.rcp.editor.traceinspector;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.AbstractSubView;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
@@ -70,7 +70,7 @@ public class TraceInspectorSubView extends AbstractSubView {
 
 		ToolItem increaseResolutionButton = new ToolItem(this.toolBar, SWT.PUSH | SWT.BORDER);
 
-		increaseResolutionButton.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_ZOOMIN));
+		increaseResolutionButton.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_ZOOMIN));
 		increaseResolutionButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -79,7 +79,7 @@ public class TraceInspectorSubView extends AbstractSubView {
 		});
 
 		ToolItem decreaseResolutionButton = new ToolItem(this.toolBar, SWT.PUSH | SWT.BORDER);
-		decreaseResolutionButton.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_ZOOMOUT));
+		decreaseResolutionButton.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_ZOOMOUT));
 		decreaseResolutionButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -88,7 +88,7 @@ public class TraceInspectorSubView extends AbstractSubView {
 		});
 
 		ToolItem zoomToFitButton = new ToolItem(this.toolBar, SWT.PUSH | SWT.BORDER);
-		zoomToFitButton.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_ZOOMFIT));
+		zoomToFitButton.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_ZOOMFIT));
 		zoomToFitButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -98,7 +98,7 @@ public class TraceInspectorSubView extends AbstractSubView {
 		});
 
 		ToolItem drillDownButton = new ToolItem(this.toolBar, SWT.PUSH | SWT.BORDER);
-		drillDownButton.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_DRILLDOWN));
+		drillDownButton.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_DRILLDOWN));
 		drillDownButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -108,7 +108,7 @@ public class TraceInspectorSubView extends AbstractSubView {
 		});
 
 		ToolItem drillUpButton = new ToolItem(this.toolBar, SWT.PUSH | SWT.BORDER);
-		drillUpButton.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_DRILLUP));
+		drillUpButton.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_DRILLUP));
 		drillUpButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -118,7 +118,7 @@ public class TraceInspectorSubView extends AbstractSubView {
 		});
 
 		ToolItem heatButton = new ToolItem(this.toolBar, SWT.PUSH | SWT.BORDER | SWT.FLAT);
-		heatButton.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_HEAT));
+		heatButton.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_HEAT));
 		heatButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {

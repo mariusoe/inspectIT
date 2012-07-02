@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.dialog;
 
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 
@@ -170,10 +170,10 @@ public class AddCmrRepositoryDefinitionDialog extends TitleAreaDialog {
 									}
 									if (testOkFinal) {
 										testLabel.setText("Succeeded");
-										busyIndicator.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_CHECKMARK));
+										busyIndicator.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_CHECKMARK));
 									} else {
 										testLabel.setText("Failed");
-										busyIndicator.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_CLOSE));
+										busyIndicator.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_CLOSE));
 									}
 								}
 							}

@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.editor.search;
 
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.search.criteria.SearchCriteria;
 import info.novatec.inspectit.rcp.editor.search.criteria.SearchResult;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
@@ -174,7 +174,7 @@ public class SearchControl {
 		toolBar.setBackground(formColors.getBackground());
 
 		previous = new ToolItem(toolBar, SWT.PUSH | SWT.NO_BACKGROUND);
-		previous.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_PREVIOUS));
+		previous.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_PREVIOUS));
 		previous.setEnabled(false);
 		previous.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -184,7 +184,7 @@ public class SearchControl {
 		});
 
 		next = new ToolItem(toolBar, SWT.PUSH | SWT.NO_BACKGROUND);
-		next.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_NEXT));
+		next.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_NEXT));
 		next.setEnabled(false);
 		next.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -194,7 +194,7 @@ public class SearchControl {
 		});
 
 		caseSensitiveButton = new ToolItem(toolBar, SWT.CHECK | SWT.NO_BACKGROUND);
-		caseSensitiveButton.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_FONT));
+		caseSensitiveButton.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_FONT));
 		caseSensitiveButton.setToolTipText("Case sensitive");
 		caseSensitiveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -215,7 +215,7 @@ public class SearchControl {
 		helpComposite.setLayoutData(gd);
 
 		closeButton = new ToolItem(toolBar, SWT.PUSH | SWT.NO_BACKGROUND);
-		closeButton.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_CLOSE));
+		closeButton.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_CLOSE));
 		closeButton.setToolTipText("Close");
 		closeButton.addSelectionListener(new SelectionAdapter() {
 			@Override

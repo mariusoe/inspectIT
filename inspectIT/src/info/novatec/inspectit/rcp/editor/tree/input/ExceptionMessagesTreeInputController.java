@@ -5,7 +5,7 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
@@ -65,7 +65,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 	 */
 	private static enum Column {
 		/** The error message column. */
-		ERROR_MESSAGE("Error Message with Stack Trace", 450, InspectITConstants.IMG_CLASS),
+		ERROR_MESSAGE("Error Message with Stack Trace", 450, InspectITImages.IMG_CLASS),
 		/** The CREATED column. */
 		CREATED("Created", 70, null),
 		/** The RETHROWN column. */
@@ -88,7 +88,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITImages}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;

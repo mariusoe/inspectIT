@@ -4,7 +4,7 @@ import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.model.Composite;
 import info.novatec.inspectit.rcp.model.DeferredComposite;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
@@ -106,7 +106,7 @@ public class DeferredCombinedMetricsComposite extends DeferredComposite {
 	 */
 	@Override
 	public Image getImage() {
-		return InspectIT.getDefault().getImage(InspectITConstants.IMG_INSTRUMENTATION_BROWSER);
+		return InspectIT.getDefault().getImage(InspectITImages.IMG_INSTRUMENTATION_BROWSER);
 	}
 
 }

@@ -3,7 +3,7 @@ package info.novatec.inspectit.rcp.model;
 import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ResourceManager;
@@ -23,17 +23,17 @@ public final class ExceptionImageFactory {
 	/**
 	 * The image descriptor for the error overlay.
 	 */
-	private static final ImageDescriptor OVERLAY_ERROR = InspectIT.getDefault().getImageDescriptor(InspectITConstants.OVERLAY_ERROR);
+	private static final ImageDescriptor OVERLAY_ERROR = InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_OVERLAY_ERROR);
 
 	/**
 	 * The image descriptor for the priority overlay.
 	 */
-	private static final ImageDescriptor OVERLAY_PRIORITY = InspectIT.getDefault().getImageDescriptor(InspectITConstants.OVERLAY_PRIORITY);
+	private static final ImageDescriptor OVERLAY_PRIORITY = InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_OVERLAY_PRIORITY);
 
 	/**
 	 * The image descriptor for the up overlay.
 	 */
-	private static final ImageDescriptor OVERLAY_UP = InspectIT.getDefault().getImageDescriptor(InspectITConstants.OVERLAY_UP);
+	private static final ImageDescriptor OVERLAY_UP = InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_OVERLAY_UP);
 
 	/**
 	 * Private constructor.

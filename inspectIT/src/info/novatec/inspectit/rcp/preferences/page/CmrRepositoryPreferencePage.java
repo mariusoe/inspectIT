@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.preferences.page;
 
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.dialog.AddCmrRepositoryDefinitionDialog;
 import info.novatec.inspectit.rcp.dialog.LicenseInformationDialog;
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
@@ -406,11 +406,11 @@ public class CmrRepositoryPreferencePage extends PreferencePage implements IWork
 			public Image getImage(Object element) {
 				if (element instanceof CmrRepositoryDefinition) {
 					if (((CmrRepositoryDefinition) element).getOnlineStatus() == OnlineStatus.ONLINE) {
-						return InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_ONLINE_SMALL);
+						return InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_ONLINE_SMALL);
 					} else if (((CmrRepositoryDefinition) element).getOnlineStatus() == OnlineStatus.OFFLINE) {
-						return InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_OFFLINE_SMALL);
+						return InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_OFFLINE_SMALL);
 					} else {
-						return InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_REFRESH_SMALL);
+						return InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_REFRESH_SMALL);
 					}
 				}
 				return null;

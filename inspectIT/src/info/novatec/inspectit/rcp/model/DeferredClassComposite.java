@@ -2,7 +2,7 @@ package info.novatec.inspectit.rcp.model;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
 import java.util.ArrayList;
@@ -106,7 +106,7 @@ public class DeferredClassComposite extends DeferredComposite {
 	 */
 	@Override
 	public Image getImage() {
-		return InspectIT.getDefault().getImage(InspectITConstants.IMG_CLASS);
+		return InspectIT.getDefault().getImage(InspectITImages.IMG_CLASS);
 	}
 
 	/**

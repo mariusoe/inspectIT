@@ -5,7 +5,7 @@ import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
@@ -58,13 +58,13 @@ public class TimerDataInputController extends AbstractTableInputController {
 	 */
 	private static enum Column {
 		/** The package column. */
-		PACKAGE("Package", 200, InspectITConstants.IMG_PACKAGE),
+		PACKAGE("Package", 200, InspectITImages.IMG_PACKAGE),
 		/** The class column. */
-		CLASS("Class", 200, InspectITConstants.IMG_CLASS),
+		CLASS("Class", 200, InspectITImages.IMG_CLASS),
 		/** The method column. */
-		METHOD("Method", 300, InspectITConstants.IMG_METHOD_PUBLIC),
+		METHOD("Method", 300, InspectITImages.IMG_METHOD_PUBLIC),
 		/** Invocation Affiliation. */
-		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITConstants.IMG_INVOCATION),
+		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION),
 		/** The count column. */
 		COUNT("Count", 60, null),
 		/** The average column. */
@@ -109,7 +109,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITImages}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;

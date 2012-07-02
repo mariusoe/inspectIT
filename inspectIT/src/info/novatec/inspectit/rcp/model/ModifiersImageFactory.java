@@ -5,7 +5,7 @@ import static info.novatec.inspectit.rcp.model.Modifier.isPrivate;
 import static info.novatec.inspectit.rcp.model.Modifier.isProtected;
 import static info.novatec.inspectit.rcp.model.Modifier.isPublic;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 
 import org.eclipse.swt.graphics.Image;
 
@@ -20,22 +20,22 @@ public final class ModifiersImageFactory {
 	/**
 	 * The image key for the private visibility method.
 	 */
-	private static final String METHOD_PRIV_IMAGE = InspectITConstants.IMG_METHOD_PRIVATE;
+	private static final String METHOD_PRIV_IMAGE = InspectITImages.IMG_METHOD_PRIVATE;
 
 	/**
 	 * The image key for the default visibility method.
 	 */
-	private static final String METHOD_DEFAULT_IMAGE = InspectITConstants.IMG_METHOD_DEFAULT;
+	private static final String METHOD_DEFAULT_IMAGE = InspectITImages.IMG_METHOD_DEFAULT;
 
 	/**
 	 * The image key for the protected visibility method.
 	 */
-	private static final String METHOD_PROT_IMAGE = InspectITConstants.IMG_METHOD_PROTECTED;
+	private static final String METHOD_PROT_IMAGE = InspectITImages.IMG_METHOD_PROTECTED;
 
 	/**
 	 * The image key for the public visibility method.
 	 */
-	private static final String METHOD_PUB_IMAGE = InspectITConstants.IMG_METHOD_PUBLIC;
+	private static final String METHOD_PUB_IMAGE = InspectITImages.IMG_METHOD_PUBLIC;
 
 	/**
 	 * Hide constructor to disallow instantiation.

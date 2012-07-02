@@ -7,7 +7,7 @@ import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.aggregation.impl.AggregationPerformer;
 import info.novatec.inspectit.indexing.aggregation.impl.TimerDataAggregator;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
@@ -57,13 +57,13 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	 */
 	private static enum Column {
 		/** The timestamp column. */
-		TIMESTAMP("Timestamp", 130, InspectITConstants.IMG_TIMER, false, true),
+		TIMESTAMP("Timestamp", 130, InspectITImages.IMG_TIMER, false, true),
 		/** The package column. */
-		PACKAGE("Package", 200, InspectITConstants.IMG_PACKAGE, true, true),
+		PACKAGE("Package", 200, InspectITImages.IMG_PACKAGE, true, true),
 		/** The class column. */
-		CLASS("Class", 200, InspectITConstants.IMG_CLASS, true, true),
+		CLASS("Class", 200, InspectITImages.IMG_CLASS, true, true),
 		/** The method column. */
-		METHOD("Method", 300, InspectITConstants.IMG_METHOD_PUBLIC, true, true),
+		METHOD("Method", 300, InspectITImages.IMG_METHOD_PUBLIC, true, true),
 		/** The count column. */
 		COUNT("Count", 60, null, true, false),
 		/** The average column. */
@@ -112,7 +112,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITImages}.
 		 * @param showInAggregatedMode
 		 *            If the column should be shown in aggregated mode.
 		 * @param showInRawMode

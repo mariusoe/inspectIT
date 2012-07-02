@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.menu;
 
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
 
 import java.util.ArrayList;
@@ -144,7 +144,7 @@ public class ShowHideMenuManager extends MenuManager implements IMenuListener {
 			if (width > 0) {
 				visible = false;
 				tooltip = "Hide column";
-				icon = InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CHECKMARK);
+				icon = InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_CHECKMARK);
 			} else {
 				visible = true;
 				tooltip = "Show column";

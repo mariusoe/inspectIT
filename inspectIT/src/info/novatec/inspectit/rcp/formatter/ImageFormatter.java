@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.formatter;
 
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
@@ -45,19 +45,19 @@ public final class ImageFormatter {
 	 */
 	public static Image getImageForLabel(AbstractStorageLabelType<?> labelType) {
 		if (AssigneeLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_ASSIGNEE_LABEL_ICON);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_ASSIGNEE_LABEL_ICON);
 		} else if (CreationDateLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_DATE_LABEL_ICON);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_DATE_LABEL_ICON);
 		} else if (ExploredByLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_MOUNTEDBY_LABEL_ICON);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_MOUNTEDBY_LABEL_ICON);
 		} else if (RatingLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_RATING_LABEL_ICON);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_RATING_LABEL_ICON);
 		} else if (StatusLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_STATUS_LABEL_ICON);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_STATUS_LABEL_ICON);
 		} else if (UseCaseLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_USECASE_LABEL_ICON);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_USECASE_LABEL_ICON);
 		} else {
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_USER_LABEL_ICON);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_USER_LABEL_ICON);
 		}
 	}
 
@@ -70,19 +70,19 @@ public final class ImageFormatter {
 	 */
 	public static ImageDescriptor getImageDescriptorForLabel(AbstractStorageLabelType<?> labelType) {
 		if (AssigneeLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_ASSIGNEE_LABEL_ICON);
+			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_ASSIGNEE_LABEL_ICON);
 		} else if (CreationDateLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_DATE_LABEL_ICON);
+			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_DATE_LABEL_ICON);
 		} else if (ExploredByLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_MOUNTEDBY_LABEL_ICON);
+			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_MOUNTEDBY_LABEL_ICON);
 		} else if (RatingLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_RATING_LABEL_ICON);
+			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_RATING_LABEL_ICON);
 		} else if (StatusLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_STATUS_LABEL_ICON);
+			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_STATUS_LABEL_ICON);
 		} else if (UseCaseLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_USECASE_LABEL_ICON);
+			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_USECASE_LABEL_ICON);
 		} else {
-			return InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_USER_LABEL_ICON);
+			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_USER_LABEL_ICON);
 		}
 	}
 
@@ -95,13 +95,13 @@ public final class ImageFormatter {
 	 */
 	public static Image getImageForStorageLeaf(StorageData storageData) {
 		if (storageData.getState() == StorageState.CREATED_NOT_OPENED) {
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_STOARGE_NEW);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_STOARGE_NEW);
 		} else if (storageData.getState() == StorageState.OPENED) {
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_STOARGE_OPENED);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_STOARGE_OPENED);
 		} else if (storageData.getState() == StorageState.RECORDING) {
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_STOARGE_RECORDING);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_STOARGE_RECORDING);
 		} else if (storageData.getState() == StorageState.CLOSED) {
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_STOARGE_CLOSED);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_STOARGE_CLOSED);
 		}
 		return null;
 	}
@@ -118,21 +118,21 @@ public final class ImageFormatter {
 	public static Image getCmrRepositoryImage(CmrRepositoryDefinition selectedCmrRepositoryDefinition, boolean small) {
 		if (selectedCmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
 			if (small) {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_ONLINE_SMALL);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_ONLINE_SMALL);
 			} else {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_ONLINE);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_ONLINE);
 			}
 		} else if (selectedCmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.OFFLINE) {
 			if (small) {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_OFFLINE_SMALL);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_OFFLINE_SMALL);
 			} else {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_OFFLINE);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_OFFLINE);
 			}
 		} else {
 			if (small) {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_REFRESH_SMALL);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_REFRESH_SMALL);
 			} else {
-				return InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_REFRESH);
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_REFRESH);
 			}
 		}
 	}
@@ -146,9 +146,9 @@ public final class ImageFormatter {
 	 */
 	public static Image getStorageRepositoryImage(StorageRepositoryDefinition storageRepositoryDefinition) {
 		if (storageRepositoryDefinition.getLocalStorageData().isFullyDownloaded() || storageRepositoryDefinition.getCmrRepositoryDefinition().getOnlineStatus() != OnlineStatus.OFFLINE) {
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_STOARGE_AVAILABLE);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_STOARGE_AVAILABLE);
 		} else {
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_STOARGE_NOT_AVAILABLE);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_STOARGE_NOT_AVAILABLE);
 		}
 	}
 
@@ -167,11 +167,11 @@ public final class ImageFormatter {
 		}
 		switch (status) {
 		case GOOD:
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_EVENT_GREEN);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_EVENT_GREEN);
 		case MEDIUM:
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_EVENT_YELLOW);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_EVENT_YELLOW);
 		case BAD:
-			return InspectIT.getDefault().getImage(InspectITConstants.IMG_EVENT_RED);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_EVENT_RED);
 		default:
 			return null;
 		}
@@ -194,7 +194,7 @@ public final class ImageFormatter {
 		if (repositoryDefinition instanceof CmrRepositoryDefinition) {
 			return original;
 		} else if (repositoryDefinition instanceof StorageRepositoryDefinition) {
-			ImageDescriptor overlayDescriptor = InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_STORAGE_OVERLAY);
+			ImageDescriptor overlayDescriptor = InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_STORAGE_OVERLAY);
 			DecorationOverlayIcon icon = new DecorationOverlayIcon(original, new ImageDescriptor[] { null, null, null, overlayDescriptor, null });
 			Image img = resourceManager.createImage(icon);
 			return img;

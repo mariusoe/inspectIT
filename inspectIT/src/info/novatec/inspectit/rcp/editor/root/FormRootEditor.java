@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.editor.root;
 
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.preferences.FormPreferencePanel;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferencePanel;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
@@ -179,9 +179,9 @@ public class FormRootEditor extends AbstractRootEditor {
 		};
 		action.setText("Source Repository Details");
 		if (repositoryDefinition instanceof CmrRepositoryDefinition) {
-			action.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_SERVER_ONLINE_SMALL));
+			action.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_SERVER_ONLINE_SMALL));
 		} else if (repositoryDefinition instanceof StorageRepositoryDefinition) {
-			action.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_STOARGE_NEW));
+			action.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_STOARGE_NEW));
 		}
 		return action;
 	}

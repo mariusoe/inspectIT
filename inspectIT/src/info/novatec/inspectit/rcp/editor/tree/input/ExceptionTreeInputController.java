@@ -4,7 +4,7 @@ import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
@@ -72,7 +72,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 		/** The event type column. */
 		EVENT_TYPE("Event Type", 280, null),
 		/** The method column. */
-		METHOD_CONSTRUCTOR("Method / Constructor", 500, InspectITConstants.IMG_METHOD_PUBLIC),
+		METHOD_CONSTRUCTOR("Method / Constructor", 500, InspectITImages.IMG_METHOD_PUBLIC),
 		/** The error message column. */
 		ERROR_MESSAGE("Error Message", 250, null),
 		/** The cause column. */
@@ -93,7 +93,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITImages}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;

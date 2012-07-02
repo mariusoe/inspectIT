@@ -11,7 +11,7 @@ import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
@@ -108,17 +108,17 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	 */
 	private static enum Column {
 		/** The method column. */
-		METHOD("Method", 700, InspectITConstants.IMG_CALL_HIERARCHY),
+		METHOD("Method", 700, InspectITImages.IMG_CALL_HIERARCHY),
 		/** The duration column. */
-		DURATION("Duration (ms)", 100, InspectITConstants.IMG_LAST_HOUR),
+		DURATION("Duration (ms)", 100, InspectITImages.IMG_LAST_HOUR),
 		/** The exclusive duration column. */
 		EXCLUSIVE("Exc. duration (ms)", 100, null),
 		/** The cpu duration column. */
 		CPUDURATION("Cpu Duration (ms)", 100, null),
 		/** The time-stamp column. **/
-		START_DELTA("Start Delta (ms)", 100, InspectITConstants.IMG_TIMER),
+		START_DELTA("Start Delta (ms)", 100, InspectITImages.IMG_TIMER),
 		/** The count column. */
-		SQL("SQL", 300, InspectITConstants.IMG_DATABASE),
+		SQL("SQL", 300, InspectITImages.IMG_DATABASE),
 		/** The parameter/field contents. */
 		PARAMETER("Parameter Content", 200, null);
 
@@ -137,7 +137,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITImages}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;

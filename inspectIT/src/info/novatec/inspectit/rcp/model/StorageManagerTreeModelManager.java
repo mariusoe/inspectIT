@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.model;
 
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
@@ -97,7 +97,7 @@ public class StorageManagerTreeModelManager {
 				if (c == null) {
 					c = new Composite();
 					c.setName(cmrRepositoryDefinition.getName());
-					c.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_SERVER_ONLINE_SMALL));
+					c.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_ONLINE_SMALL));
 					map.put(cmrRepositoryDefinition, c);
 				}
 				StorageLeaf storageLeaf = new StorageLeaf(entry.getKey(), entry.getValue());

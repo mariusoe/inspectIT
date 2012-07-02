@@ -2,7 +2,7 @@ package info.novatec.inspectit.rcp.model;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
+import info.novatec.inspectit.rcp.InspectITImages;
 
 /**
  * Agent leaf for the tree in the Repository Manager.
@@ -26,7 +26,7 @@ public class AgentLeaf extends Leaf {
 	public AgentLeaf(PlatformIdent platformIdent) {
 		this.platformIdent = platformIdent;
 		this.setName(platformIdent.getAgentName() + " [" + platformIdent.getVersion() + "]");
-		this.setImage(InspectIT.getDefault().getImage(InspectITConstants.IMG_AGENT));
+		this.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_AGENT));
 		this.setTooltip("Double click to explore Agent in the Data Explorer");
 	}
 
