@@ -28,8 +28,8 @@ public class AgentLeaf extends Leaf {
 	 * 
 	 * @param platformIdent
 	 *            Agent to display in leaf.
-	 * @param lastSendDate
-	 *            Last data send date.
+	 * @param agentStatusData
+	 *            {@link AgentStatusData}
 	 */
 	public AgentLeaf(PlatformIdent platformIdent, AgentStatusData agentStatusData) {
 		this.platformIdent = platformIdent;
@@ -69,7 +69,7 @@ public class AgentLeaf extends Leaf {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(super.hashCode(), platformIdent, agentStatusData);
+		return Objects.hashCode(super.hashCode(), platformIdent);
 	}
 
 	/**
@@ -90,8 +90,6 @@ public class AgentLeaf extends Leaf {
 			return false;
 		}
 		AgentLeaf that = (AgentLeaf) object;
-		return Objects.equal(this.platformIdent, that.platformIdent)
-				&& Objects.equal(this.agentStatusData, that.agentStatusData);
+		return Objects.equal(this.platformIdent, that.platformIdent);
 	}
-
 }
