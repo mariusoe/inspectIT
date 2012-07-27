@@ -203,6 +203,26 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		theirSize = MemoryUtil.deepMemoryUsageOf(arrayList, VisibilityFilter.ALL);
 		assertThat("Random list size", ourSize, is(equalTo(theirSize)));
 	}
+	
+	/**
+	 * Tests size of empty and populated {@link ArrayList} object with initial size of 0.
+	 */
+	@Test(invocationCount = 50)
+	public void arrayListInitializeZero() {
+		ArrayList<Object> arrayList = new ArrayList<Object>(0);
+		long ourSize = objectSizes.getSizeOf(arrayList, 0);
+		long theirSize = MemoryUtil.deepMemoryUsageOf(arrayList, VisibilityFilter.ALL);
+		assertThat("Empty list", ourSize, is(equalTo(theirSize)));
+
+		int size = (int) (Math.random() * 100);
+		for (int i = 0; i < size; i++) {
+			arrayList.add(new Object());
+		}
+
+		ourSize = objectSizes.getSizeOf(arrayList, 0) + size * objectSizes.getSizeOfObjectObject();
+		theirSize = MemoryUtil.deepMemoryUsageOf(arrayList, VisibilityFilter.ALL);
+		assertThat("Random list size", ourSize, is(equalTo(theirSize)));
+	}
 
 	/**
 	 * Tests size of empty and populated {@link HashMap} object.

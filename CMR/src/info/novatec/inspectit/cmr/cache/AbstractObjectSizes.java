@@ -125,7 +125,11 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 */
 	private int getArrayCapacity(int size, int initialCapacity) {
 		while (initialCapacity < size) {
-			initialCapacity = initialCapacity + (initialCapacity >> 1);
+			if (initialCapacity == 0 || initialCapacity == 1) {
+				initialCapacity = initialCapacity + 1;
+			} else {
+				initialCapacity = initialCapacity + (initialCapacity >> 1);
+			}
 		}
 		return initialCapacity;
 	}
