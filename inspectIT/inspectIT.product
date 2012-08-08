@@ -39,48 +39,50 @@
    <license>
         <url>http://www.inspectit.eu</url>
         <text>
-   inspectIT END-USER LICENSE CLICKWRAP AGREEMENT
-This End-User License Agreement (hereinafter referred to as &quot;EULA&quot;) is a legal agreement between the individual or entity (hereinafter referred to as &quot;licensee&quot;) and NovaTec GmbH, Germany, (hereinafter referred to as „NovaTec“) related to the software program(s) licensee has requested to download and license. 
-This license agreement applies to the copy of the accompanying software program(s), (hereinafter SOFTWARE), identified in the title of this license agreement and all material (hereinafter MATERIAL) included with it. By installing, copying, or otherwise using this SOFTWARE, licensee agrees to be bound by the terms of this EULA. If licensee does not agree to the terms of this EULA, licensee may not install or use this SOFTWARE. This SOFTWARE is a proprietary product of NovaTec and is protected under copyright laws and international treaties. This SOFTWARE is licensed, not sold.
+   1. SCOPE OF APPLICATION
+These General Terms and Conditions of Use apply to any licensing of the product. The application of any contradicting purchasing terms and conditions by the Licensee is excluded, even if the Licensor does not expressly exclude their application in individual cases.
+By applying for a license key, or downloading the product, or installing the product, the Licensee agrees to be fully bound by these General Terms and Conditions of Use.
 
-1.	GRANT OF LICENSE
-Subject to the terms and conditions of this agreement, NovaTec grants the licensee a non-exclusive, non-transferable, non assignable and time-limited right to use the SOFTWARE or components thereof.
+2. GRANT OF LICENSE
+The license is granted by reception of a license key the licensee has requested by registering on the Licensor´s website. The licensor reserves the right to reject any application for a license key without citing any reasons. The license is granted only to named users who have registered on the Licensor´s website. Each user may request only one license key. It is prohibited to use the license key of any other user.
+If the license is granted commercially or on behalf of a commercial third party, the registration must include the name of the respective company. In this case, the named company is deemed to be the licensee, not the user.
+The License includes and is limited to the following rights to use the product:
+Use for performance analysis purposes and all other test purposes in commercial and non commercial software development projects.
+The right to use the product is time-limited and expires within three months after reception of the license key.
+The product may be licensed repeatedly under the then current General Terms and Conditions of Use.
+The license is not limited to any region or territory. It is non-assignable in full or in part. The Licensor reserves the right to charge an appropriate license fee for all later versions of the product.
+Any use on productive systems or for productive purposes requires the Licensor´s prior consent. If the Licensor consents, the licensee will allow the licensor an on-site reference visit in order to observe the productive use of the product and potentially gain knowledge for its development. Furthermore, to licensee
+will allow the licensor to publish a success story which will be coordinated by both parties.
+The Licensor´s consent is conditional on the conclusion of an individual agreement between the parties.
+The Licensor retains all rights to the product (including but not limited to ownership and copyright) unless said rights are expressly granted to the Licensee by these terms and conditions.
 
-2.	TERMS AND CONDITIONS
-a)	Licensee may request a named user license by registering on NovaTec´s website. The right to use the SOFTWARE is explicitly bound to the user who has registered on NovaTec´s website and applied for that license. All other users of the SOFTWARE need to acquire their own licenses and have their own personal license key files. 
-b)	The SOFTWARE may be installed on several computers provided they are all under the sole control of the licensee.  
-c)	NovaTec reserves the right to reject any application for a licenses without citing any reasons.
-d)	The right to use the SOFTWARE is time-limited and expires within three months after the beginning of licensee´s use of the SOFTWARE. The SOFTWARE is „in use“ by the licensee when it is loaded into RAM (i.e., temporary memory).  
-e)	If licensee wishes to extend the right to use the SOFTWARE, licensee may request a new license key under the same terms and conditions on NovaTec´s website. However, NovaTec reserves the right to discontinue or alter the service of the inspectIT license at any time and without any advance notice.
-f)	The license is free of charge and may be used for commercial and non-commercial software development projects including using it on development and test systems. Any use on productive systems or for productive purposes is explicitly prohibited. 
-g)	NovaTec does not offer any support services for the Software and has no obligation to offer any updates of the SOFTWARE. However, the licensee may download new versions of the SOFTWARE and new license files from NovaTec´s website if NovaTec has opted to release such new versions and license files. 
+3. ADDITIONAL SOFTWARE AND SERVICES
+These General Terms and Conditions of Use also apply to updates, expansions, add-on components or components of online services for the product which the Licensor may provide or make available. The Licensor has no such obligation. The Licensor has no obligation to provide any maintenance or support services.
+The Licensor reserves the right to discontinue to product at any time without notice.
 
-3.	PROHIBITION OF USE OF THE SOFTWARE
-a)	Licensee must not use this SOFTWARE with a license key created for another user or without a valid license key.
-b)	Licensee must not rent or lease or in any other way give this SOFTWARE or any components of it to third parties, neither in full nor in part. 
-c)	Licensee may not use the license for commercial purposes other than commercial software development projects under provision 2. f) including, but not limited to, consulting services.
-d)	Licensee must not reverse-engineer, decompile, or disassemble this SOFTWARE.
-e)	Licensee must not modify the SOFTWARE in any manner to the purpose of altering or expanding the scope of the license granted under these terms and conditions. 
-f)	Licensee must not remove or obliterate any copyright, trademark or proprietary rights notices of NovaTec from the SOFTWARE.
+4. LIMITATIONS WITH REGARD TO REVERSE ENGINEERING, DECOMPILING AND DISASSEMBLY
+The Licensee is not entitled to reverse engineer, decompile or disassemble the product unless (and to the extent) expressly permitted by applicable law irrespective of this limitation.
 
-4.	COPYRIGHT
-All rights, title and copy right in and to the SOFTWARE (including but not limited to any images, photographs, animations, video, audio, music, text and &quot;applets&quot; incorporated into 
-the SOFTWARE), and any copies of the SOFTWARE, are owned by NovaTec and are protected by copyright laws and international treaty provisions.
+5. WARRANTY, LIABILITY, AND THIRD-PARTY RIGHTS
+With respect to the product being free of charge, the Licensor makes no warranties regarding the product whatsoever and shall under no circumstances be liable for any damages whatsoever including third party claims that may arise from the use of the product.
 
-5.	EXPIRY AND TERMINATION
-This agreement will expire within 3 months after the beginning of licensee&apos;s use of the SOFTWARE. Without prejudice to any other rights, NovaTec may terminate this agreement if licensee fails to comply with the terms and conditions of this EULA. Once this agreement has expired or been terminated, licensee shall stop to use the SOFTWARE and shall destroy all copies of the SOFTWARE and all of its component parts, unless he requests a new license key according to provision 2. e). 
+6. OVERALL REGULATION OF THE CONTRACTUAL ARRANGEMENT
+These General Terms and Conditions of Use (including all separate addenda or supplementary agreements) govern the entire contractual arrangement between the Licensor and the Licensee in connection with the product and any support services. They take precedence over any previous or concurrent, verbal or written
+notices, proposals or commitments with regard to the product or any other subject of the license. If individual provisions are contradicted by provisions of one of the Licensor’s policies or one of his programs for support services, these General Terms and Conditions of Use shall take precedence.
 
-6.	WARRANTY
-NovaTec makes no warranties regarding the SOFTWARE. NovaTec disclaims all warranties either expressed or implied, including but not limited to, implied warranties of merchantability and fitness for a particular purpose, with respect to the SOFTWARE and any other accompanying material. There is no warranty by NovaTec or any other party or person neither that the functions contained in the software will not be altered by the downloading process through the Internet nor that the functions contained in the software will meet licensee&apos;s requirements or that the operation of the software will be uninterrupted or error-free. Licensee assumes all responsibility for the selection of the software to achieve the intended results. Licensee acknowledges that no promise, representation, warranty or undertaking has been made or given by NovaTec to any person or company on its behalf in relation to the profitability of, or any other consequences or benefits to be obtained from the delivery or use of the SOFTWARE and any accompanying materials including but not limited to SOFTWARE, manuals or written materials.
+7. TERMINATION
+Without prejudice to other rights, the Licensor is entitled to terminate this agreement without notice if the Licensee does not observe the provisions of this agreement. In this case, the Licensee is obliged to destroy all copies of the product and all of its components.
+The Licensee shall ensure that the software governed by the agreement is used in accordance with the provisions of the agreement. If there is a justified suspicion that the software is being used in breach of the provisions of the agreement, the Licensor shall be entitled to verify the proper use of the software using
+appropriate measures, including on-site inspection if necessary.
 
-7.	LIABILITY FOR CONSEQUENTIAL DAMAGES
-Licensee fully understands and agrees that NovaTec shall not in any circumstances be liable for any damages whatsoever (including, without limitation, damages for loss of business, business interruption, loss of business information, confidential information or other direct, indirect or consequential loss) arising out of the use or inability to use or supply or non-supply of the SOFTWARE and any other accompanying written materials.
-8.	INDEMNIFICATION
-Licensee agrees to indemnify, defend, and hold NovaTec harmless from any claims, damages, losses, or expenses NovaTec may be exposed to as a result of licensee&apos;s use,  maintenance or operation of the SOFTWARE.
+8. REQUIREMENT OF THE WRITTEN FORM
+All amendments, addenda and supplements to these General Terms and Conditions of Use must be in writing. Any agreement revoking or limiting this requirement of the written form must also be in writing.
 
-9.	GENERAL
-This agreement supersedes all prior agreements between the parties and represents the complete and exclusive description of the license granted by NovaTec to the licensee. 
-This agreement is governed by German Law only. Each of the parties hereto irrevocably agrees to submit to the jurisdiction of the courts of Germany and further agrees to commence any litigation which may arise hereunder in the courts located in the judicial jurisdiction of Stuttgart, Germany.
+9. APPLICABLE LAW AND COURT OF COMPETENT JURISDICTION
+The validity of these General Terms and Conditions of Use and any legal consequences resulting from them are to be assessed in accordance with the law of the Federal Republic of Germany subject to the exclusion of standards governing conflicting laws and the United Nations Convention on Contracts for the International
+Sale of Goods. The court of competent jurisdiction is Stuttgart.
+
+NTSales_Allgemeine_Nutzungsbedingungen_inspectIT_en.doc_V2.0 / 24.07.2012
          </text>
    </license>
 
