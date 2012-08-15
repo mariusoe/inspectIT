@@ -1,5 +1,10 @@
 package info.novatec.inspectit.agent.analyzer.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
@@ -14,12 +19,17 @@ import info.novatec.inspectit.agent.analyzer.test.classes.MyTestException;
 import info.novatec.inspectit.agent.analyzer.test.classes.TestClass;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
+import info.novatec.inspectit.agent.config.impl.PropertyAccessor;
+import info.novatec.inspectit.agent.config.impl.PropertyAccessor.PropertyPathStart;
+import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
 import info.novatec.inspectit.agent.hooking.IHookInstrumenter;
+import info.novatec.inspectit.agent.hooking.impl.HookException;
 import info.novatec.inspectit.agent.sensor.exception.ExceptionSensor;
 import info.novatec.inspectit.agent.sensor.exception.IExceptionSensor;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.communication.data.ParameterContentType;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,7 +44,9 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -122,6 +134,160 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 		// nothing was really instrumented, thus the byte code has to be the
 		// same
 		assertEquals(instrumentedByteCode, byteCode);
+	}
+
+	@Test
+	public void removeReturnValueCapturingForVoidReturnMethods() throws NotFoundException, IOException, CannotCompileException, HookException {
+		String className = TestClass.class.getName();
+		String methodName = "voidNullParameter";
+		ClassLoader classLoader = TestClass.class.getClassLoader();
+		byte[] byteCode = getByteCode(className);
+
+		ClassPool classPool = ClassPool.getDefault();
+		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(classPool);
+
+		List<UnregisteredSensorConfig> unregisteredSensorConfigs = new ArrayList<UnregisteredSensorConfig>();
+		UnregisteredSensorConfig unregisteredSensorConfig = mock(UnregisteredSensorConfig.class);
+		when(unregisteredSensorConfig.getTargetClassName()).thenReturn(className);
+		when(unregisteredSensorConfig.getTargetMethodName()).thenReturn(methodName);
+		MethodSensorTypeConfig methodSensorTypeConfig = mock(MethodSensorTypeConfig.class);
+		when(methodSensorTypeConfig.getClassName()).thenReturn("");
+
+		IMethodSensor methodSensor = mock(IMethodSensor.class);
+		when(methodSensorTypeConfig.getSensorType()).thenReturn(methodSensor);
+		when(unregisteredSensorConfig.getSensorTypeConfig()).thenReturn(methodSensorTypeConfig);
+
+		IMatcher matcher = mock(IMatcher.class);
+		List<CtMethod> ctMethods = new ArrayList<CtMethod>();
+		ctMethods.add(ClassPool.getDefault().getMethod(className, methodName));
+		when(matcher.compareClassName(classLoader, className)).thenReturn(true);
+		when(matcher.getMatchingMethods(classLoader, className)).thenReturn(ctMethods);
+		when(unregisteredSensorConfig.getMatcher()).thenReturn(matcher);
+
+		List<PropertyPathStart> propertyAccessors = new ArrayList<PropertyAccessor.PropertyPathStart>();
+		PropertyPathStart path = new PropertyPathStart();
+		path.setContentType(ParameterContentType.RETURN);
+		path.setName("returnValue");
+		propertyAccessors.add(path);
+		when(unregisteredSensorConfig.getPropertyAccessorList()).thenReturn(propertyAccessors);
+		when(unregisteredSensorConfig.isPropertyAccess()).thenReturn(true);
+
+		unregisteredSensorConfigs.add(unregisteredSensorConfig);
+		when(configurationStorage.getUnregisteredSensorConfigs()).thenReturn(unregisteredSensorConfigs);
+
+		byte[] instrumentedByteCode = byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
+
+		ArgumentCaptor<RegisteredSensorConfig> capturedRegisteredSensorConfig = ArgumentCaptor.forClass(RegisteredSensorConfig.class);
+		Mockito.verify(hookInstrumenter).addMethodHook(Mockito.any(CtMethod.class), capturedRegisteredSensorConfig.capture());
+		assertThat(capturedRegisteredSensorConfig.getValue().getPropertyAccessorList(), is(empty()));
+		assertThat(capturedRegisteredSensorConfig.getValue().isPropertyAccess(), is(false));
+	}
+
+	@Test
+	public void removeReturnValueCapturingForVoidReturnMethodsButKeepOthers() throws NotFoundException, IOException, CannotCompileException, HookException {
+		String className = TestClass.class.getName();
+		String methodName = "voidNullParameter";
+		ClassLoader classLoader = TestClass.class.getClassLoader();
+		byte[] byteCode = getByteCode(className);
+
+		ClassPool classPool = ClassPool.getDefault();
+		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(classPool);
+
+		List<UnregisteredSensorConfig> unregisteredSensorConfigs = new ArrayList<UnregisteredSensorConfig>();
+		UnregisteredSensorConfig unregisteredSensorConfig = mock(UnregisteredSensorConfig.class);
+		when(unregisteredSensorConfig.getTargetClassName()).thenReturn(className);
+		when(unregisteredSensorConfig.getTargetMethodName()).thenReturn(methodName);
+		MethodSensorTypeConfig methodSensorTypeConfig = mock(MethodSensorTypeConfig.class);
+		when(methodSensorTypeConfig.getClassName()).thenReturn("");
+
+		IMethodSensor methodSensor = mock(IMethodSensor.class);
+		when(methodSensorTypeConfig.getSensorType()).thenReturn(methodSensor);
+		when(unregisteredSensorConfig.getSensorTypeConfig()).thenReturn(methodSensorTypeConfig);
+
+		IMatcher matcher = mock(IMatcher.class);
+		List<CtMethod> ctMethods = new ArrayList<CtMethod>();
+		ctMethods.add(ClassPool.getDefault().getMethod(className, methodName));
+		when(matcher.compareClassName(classLoader, className)).thenReturn(true);
+		when(matcher.getMatchingMethods(classLoader, className)).thenReturn(ctMethods);
+		when(unregisteredSensorConfig.getMatcher()).thenReturn(matcher);
+
+		List<PropertyPathStart> propertyAccessors = new ArrayList<PropertyAccessor.PropertyPathStart>();
+
+		PropertyPathStart path = new PropertyPathStart();
+		path.setContentType(ParameterContentType.RETURN);
+		path.setName("returnValue");
+		propertyAccessors.add(path);
+
+		path = new PropertyPathStart();
+		path.setContentType(ParameterContentType.PARAM);
+		path.setName("returnValue");
+		propertyAccessors.add(path);
+		when(unregisteredSensorConfig.getPropertyAccessorList()).thenReturn(propertyAccessors);
+		when(unregisteredSensorConfig.isPropertyAccess()).thenReturn(true);
+
+		unregisteredSensorConfigs.add(unregisteredSensorConfig);
+		when(configurationStorage.getUnregisteredSensorConfigs()).thenReturn(unregisteredSensorConfigs);
+
+		byte[] instrumentedByteCode = byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
+
+		ArgumentCaptor<RegisteredSensorConfig> capturedRegisteredSensorConfig = ArgumentCaptor.forClass(RegisteredSensorConfig.class);
+		Mockito.verify(hookInstrumenter).addMethodHook(Mockito.any(CtMethod.class), capturedRegisteredSensorConfig.capture());
+		assertThat(capturedRegisteredSensorConfig.getValue().getPropertyAccessorList(), hasSize(1));
+		assertThat(capturedRegisteredSensorConfig.getValue().isPropertyAccess(), is(true));
+		assertThat(capturedRegisteredSensorConfig.getValue().getPropertyAccessorList(), contains(path));
+	}
+
+	@Test
+	public void noRemovalOfReturnValueCapturingForNonVoidReturnMethods() throws NotFoundException, IOException, CannotCompileException, HookException {
+		String className = TestClass.class.getName();
+		String methodName = "stringNullParameter";
+		ClassLoader classLoader = TestClass.class.getClassLoader();
+		byte[] byteCode = getByteCode(className);
+
+		ClassPool classPool = ClassPool.getDefault();
+		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(classPool);
+
+		List<UnregisteredSensorConfig> unregisteredSensorConfigs = new ArrayList<UnregisteredSensorConfig>();
+		UnregisteredSensorConfig unregisteredSensorConfig = mock(UnregisteredSensorConfig.class);
+		when(unregisteredSensorConfig.getTargetClassName()).thenReturn(className);
+		when(unregisteredSensorConfig.getTargetMethodName()).thenReturn(methodName);
+		MethodSensorTypeConfig methodSensorTypeConfig = mock(MethodSensorTypeConfig.class);
+		when(methodSensorTypeConfig.getClassName()).thenReturn("");
+
+		IMethodSensor methodSensor = mock(IMethodSensor.class);
+		when(methodSensorTypeConfig.getSensorType()).thenReturn(methodSensor);
+		when(unregisteredSensorConfig.getSensorTypeConfig()).thenReturn(methodSensorTypeConfig);
+
+		IMatcher matcher = mock(IMatcher.class);
+		List<CtMethod> ctMethods = new ArrayList<CtMethod>();
+		ctMethods.add(ClassPool.getDefault().getMethod(className, methodName));
+		when(matcher.compareClassName(classLoader, className)).thenReturn(true);
+		when(matcher.getMatchingMethods(classLoader, className)).thenReturn(ctMethods);
+		when(unregisteredSensorConfig.getMatcher()).thenReturn(matcher);
+
+		List<PropertyPathStart> propertyAccessors = new ArrayList<PropertyAccessor.PropertyPathStart>();
+
+		PropertyPathStart path = new PropertyPathStart();
+		path.setContentType(ParameterContentType.RETURN);
+		path.setName("returnValue");
+		propertyAccessors.add(path);
+
+		path = new PropertyPathStart();
+		path.setContentType(ParameterContentType.PARAM);
+		path.setName("returnValue");
+		propertyAccessors.add(path);
+		when(unregisteredSensorConfig.getPropertyAccessorList()).thenReturn(propertyAccessors);
+		when(unregisteredSensorConfig.isPropertyAccess()).thenReturn(true);
+
+		unregisteredSensorConfigs.add(unregisteredSensorConfig);
+		when(configurationStorage.getUnregisteredSensorConfigs()).thenReturn(unregisteredSensorConfigs);
+
+		byte[] instrumentedByteCode = byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
+
+		ArgumentCaptor<RegisteredSensorConfig> capturedRegisteredSensorConfig = ArgumentCaptor.forClass(RegisteredSensorConfig.class);
+		Mockito.verify(hookInstrumenter).addMethodHook(Mockito.any(CtMethod.class), capturedRegisteredSensorConfig.capture());
+		assertThat(capturedRegisteredSensorConfig.getValue().getPropertyAccessorList(), hasSize(2));
+		assertThat(capturedRegisteredSensorConfig.getValue().isPropertyAccess(), is(true));
 	}
 
 	@Test

@@ -16,6 +16,7 @@ import info.novatec.inspectit.communication.data.InvocationAwareData.MutableInt;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.MemoryInformationData;
 import info.novatec.inspectit.communication.data.ParameterContentData;
+import info.novatec.inspectit.communication.data.ParameterContentType;
 import info.novatec.inspectit.communication.data.RuntimeInformationData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.SystemInformationData;
@@ -171,6 +172,7 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(StorageData.class, new CustomCompatibleFieldSerializer(kryo, StorageData.class, schemaManager), false);
 		kryo.register(LocalStorageData.class, new CustomCompatibleFieldSerializer(kryo, LocalStorageData.class, schemaManager), false);
 		kryo.register(StorageState.class, new EnumSerializer(StorageState.class), false);
+		kryo.register(ParameterContentType.class, new EnumSerializer(ParameterContentType.class), false);
 		/** Storage labels */
 		kryo.register(BooleanStorageLabel.class, new FieldSerializer(kryo, BooleanStorageLabel.class), false);
 		kryo.register(DateStorageLabel.class, new FieldSerializer(kryo, DateStorageLabel.class), false);

@@ -8,7 +8,7 @@
 		<property name="methodSensorId" column="method_sensor_id" />
 		<property name="name" column="name" />
 		<property name="content" column="content" length="10000" />
-		<property name="methodParameter" column="isMethodParameter" />
+		<property name="contentType" column="contentType" />
 		<property name="signaturePosition" column="signaturePosition" />
 	</class>
 </hibernate-mapping>

@@ -445,7 +445,7 @@ public class AverageTimerHookTest extends AbstractLogSupport {
 		averageTimerHook.secondAfterBody(coreService, methodId, sensorTypeId, object, parameters, result, registeredSensorConfig);
 
 		verify(registeredSensorConfig, times(1)).isPropertyAccess();
-		verify(propertyAccessor, times(1)).getParameterContentData(registeredSensorConfig.getPropertyAccessorList(), object, parameters);
+		verify(propertyAccessor, times(1)).getParameterContentData(registeredSensorConfig.getPropertyAccessorList(), object, parameters, result);
 	}
 
 }

@@ -41,15 +41,8 @@ public class FileConfigurationReader implements IConfigurationReader {
 	/**
 	 * Default ignore classes patterns. These will be used if no patterns is supplied by the user.
 	 */
-	private static final String[] DEFAULT_IGNORE_PATTERNS = new String[] {
-			"info.novatec.inspectit.*",
-			"$Proxy*",
-			"sun.*",
-			"java.lang.ThreadLocal",
-			"java.lang.ref.Reference",
-			"*_WLStub",
-			"*[]"
-	};
+	private static final String[] DEFAULT_IGNORE_PATTERNS = new String[] { "java.security.SecureClassLoader", "info.novatec.inspectit.*", "$Proxy*", "sun.*", "java.lang.ThreadLocal",
+			"java.lang.ref.Reference", "*_WLStub", "*[]" };
 
 	/**
 	 * The configuration storage implementation. Used to store the information to.
@@ -416,6 +409,14 @@ public class FileConfigurationReader implements IConfigurationReader {
 					if (null == propertyAccessorList) {
 						propertyAccessorList = new ArrayList<String>();
 						settings.put("field", propertyAccessorList);
+					}
+					propertyAccessorList.add(rightSide);
+				} else if ("return".equals(leftSide) || "r".equals(leftSide)) {
+					@SuppressWarnings("unchecked")
+					List<String> propertyAccessorList = (List<String>) settings.get("return");
+					if (null == propertyAccessorList) {
+						propertyAccessorList = new ArrayList<String>();
+						settings.put("return", propertyAccessorList);
 					}
 					propertyAccessorList.add(rightSide);
 				} else {

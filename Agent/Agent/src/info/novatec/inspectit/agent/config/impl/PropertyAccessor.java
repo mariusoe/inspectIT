@@ -3,6 +3,7 @@ package info.novatec.inspectit.agent.config.impl;
 import info.novatec.inspectit.agent.config.IPropertyAccessor;
 import info.novatec.inspectit.agent.config.PropertyAccessException;
 import info.novatec.inspectit.communication.data.ParameterContentData;
+import info.novatec.inspectit.communication.data.ParameterContentType;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -30,6 +31,12 @@ public class PropertyAccessor implements IPropertyAccessor {
 	private static final Logger LOGGER = Logger.getLogger(PropertyAccessor.class.getName());
 
 	/**
+	 * Static null value for return value capturing in case the returned value was <code>null</code>
+	 * .
+	 */
+	private static final String NULL_VALUE = "null";
+
+	/**
 	 * An array containing the names of all methods that might be called by the PropertyAccessor.
 	 * Names should not include the brackets.
 	 */
@@ -38,18 +45,22 @@ public class PropertyAccessor implements IPropertyAccessor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getPropertyContent(PropertyPathStart propertyPathStart, Object clazz, Object[] parameters) throws PropertyAccessException {
+	public String getPropertyContent(PropertyPathStart propertyPathStart, Object clazz, Object[] parameters, Object returnValue) throws PropertyAccessException {
 		if (null == propertyPathStart) {
 			throw new PropertyAccessException("Property path start cannot be null!");
 		}
 
-		if (propertyPathStart.isClassOfExecutedMethod()) {
+		if (null == propertyPathStart.contentType) {
+			throw new PropertyAccessException("Content type is not defined.");
+		}
+
+		switch (propertyPathStart.contentType) {
+		case FIELD:
 			if (null == clazz) {
 				throw new PropertyAccessException("Class reference cannot be null!");
 			}
-
 			return getPropertyContent(propertyPathStart.getPathToContinue(), clazz);
-		} else {
+		case PARAM:
 			if (null == parameters) {
 				throw new PropertyAccessException("Parameter array reference cannot be null!");
 			}
@@ -59,6 +70,17 @@ public class PropertyAccessor implements IPropertyAccessor {
 			}
 
 			return getPropertyContent(propertyPathStart.getPathToContinue(), parameters[propertyPathStart.getSignaturePosition()]);
+		case RETURN:
+			// we will not throw an exception here as the return value of a method can sometimes be
+			// null. If we throw an exception, this will lead to the removal of the path and thus no
+			// return value of this property accessor will be captured afterwards.
+			if (null == returnValue) {
+				return NULL_VALUE;
+			} else {
+				return getPropertyContent(propertyPathStart.getPathToContinue(), returnValue);
+			}
+		default:
+			throw new PropertyAccessException("Missing handler for type " + propertyPathStart.contentType);
 		}
 	}
 
@@ -214,22 +236,22 @@ public class PropertyAccessor implements IPropertyAccessor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<ParameterContentData> getParameterContentData(List<PropertyPathStart> propertyAccessorList, Object clazz, Object[] parameters) {
+	public List<ParameterContentData> getParameterContentData(List<PropertyPathStart> propertyAccessorList, Object clazz, Object[] parameters, Object returnValue) {
 		List<ParameterContentData> parameterContentData = new ArrayList<ParameterContentData>();
 		for (Iterator<PropertyPathStart> iterator = propertyAccessorList.iterator(); iterator.hasNext();) {
 			PropertyPathStart start = iterator.next();
 
 			try {
-				String content = this.getPropertyContent(start, clazz, parameters);
+				String content = this.getPropertyContent(start, clazz, parameters, returnValue);
 				ParameterContentData paramContentData = new ParameterContentData();
 				paramContentData.setContent("'" + content + "'");
-				paramContentData.setMethodParameter(!start.isClassOfExecutedMethod());
+				paramContentData.setContentType(start.getContentType());
 				paramContentData.setName(start.getName());
 				paramContentData.setSignaturePosition(start.getSignaturePosition());
 				parameterContentData.add(paramContentData);
 			} catch (PropertyAccessException e) {
 				if (LOGGER.isLoggable(Level.SEVERE)) {
-					LOGGER.severe("Cannot access the property: " + start + " for class " + clazz.getClass() + ". Will be removed from the list to prevent further errors! (" + e.getMessage() + ")");
+					LOGGER.severe("Cannot access the property: " + start + " for class " + clazz + ". Will be removed from the list to prevent further errors! (" + e.getMessage() + ")");
 				}
 
 				propertyAccessorList.remove(start);
@@ -311,28 +333,51 @@ public class PropertyAccessor implements IPropertyAccessor {
 	public static class PropertyPathStart extends PropertyPath {
 
 		/**
-		 * Defines if we are starting in the class where the method etc. is executed currently.
+		 * Defines what type of property we are capturing.
 		 */
-		private boolean classOfExecutedMethod = false;
+		private ParameterContentType contentType;
 
 		/**
 		 * The position of the parameter in the signature if the <code>classOfExecutedMethod</code>
-		 * value is set to <code>false</code> .
+		 * value is set to <code>false</code>. Only set if <code>contentType</code> is set to
+		 * <code>Parameter</code>
 		 */
 		private int signaturePosition = -1;
 
-		public void setClassOfExecutedMethod(boolean classOfExecutedMethod) {
-			this.classOfExecutedMethod = classOfExecutedMethod;
+		/**
+		 * Gets {@link #contentType}.
+		 * 
+		 * @return {@link #contentType}
+		 */
+		public ParameterContentType getContentType() {
+			return contentType;
 		}
 
-		public boolean isClassOfExecutedMethod() {
-			return classOfExecutedMethod;
+		/**
+		 * Sets {@link #contentType}.
+		 * 
+		 * @param contentType
+		 *            New value for {@link #platformIdent}
+		 */
+		public void setContentType(ParameterContentType contentType) {
+			this.contentType = contentType;
 		}
 
+		/**
+		 * sets the position of the parameter in the signature to read.
+		 * 
+		 * @param signaturePosition
+		 *            the position of the parameter in the signature to read.
+		 */
 		public void setSignaturePosition(int signaturePosition) {
 			this.signaturePosition = signaturePosition;
 		}
 
+		/**
+		 * returns the position of the parameter in the signature to read.
+		 * 
+		 * @return position of the parameter in the signature to read.
+		 */
 		public int getSignaturePosition() {
 			return signaturePosition;
 		}

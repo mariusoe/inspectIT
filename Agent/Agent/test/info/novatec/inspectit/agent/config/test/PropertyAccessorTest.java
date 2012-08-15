@@ -2,6 +2,7 @@ package info.novatec.inspectit.agent.config.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import info.novatec.inspectit.agent.config.IPropertyAccessor;
@@ -11,6 +12,7 @@ import info.novatec.inspectit.agent.config.impl.PropertyAccessor.PropertyPath;
 import info.novatec.inspectit.agent.config.impl.PropertyAccessor.PropertyPathStart;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.data.ParameterContentData;
+import info.novatec.inspectit.communication.data.ParameterContentType;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,12 +20,16 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
+import org.mockito.Mockito;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class PropertyAccessorTest extends AbstractLogSupport {
 
 	private IPropertyAccessor propertyAccessor;
+
+	private Object resultValueMock;
 
 	@Override
 	protected Level getLogLevel() {
@@ -35,48 +41,70 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		propertyAccessor = new PropertyAccessor();
 	}
 
-	@Test
-	public void analyzePersonObject() throws PropertyAccessException {
-		Person person = new Person();
-		person.setName("Dirk");
-
-		PropertyPathStart start = new PropertyPathStart();
-		start.setName("this");
-		start.setClassOfExecutedMethod(true);
-
-		String result = propertyAccessor.getPropertyContent(start, person, null);
-		assertEquals(result, "Dirk");
+	@BeforeMethod
+	public void initialize() {
+		resultValueMock = Mockito.mock(Object.class);
 	}
 
 	@Test
-	public void analyzePersonName() throws PropertyAccessException {
+	public void readFieldPersonObject() throws PropertyAccessException {
 		Person person = new Person();
 		person.setName("Dirk");
 
 		PropertyPathStart start = new PropertyPathStart();
 		start.setName("this");
-		start.setClassOfExecutedMethod(true);
+		start.setContentType(ParameterContentType.FIELD);
+
+		String result = propertyAccessor.getPropertyContent(start, person, null, resultValueMock);
+		assertEquals(result, "Dirk");
+		Mockito.verifyZeroInteractions(resultValueMock);
+	}
+
+	@Test
+	public void readFieldPersonName() throws PropertyAccessException {
+		Person person = new Person();
+		person.setName("Dirk");
+
+		PropertyPathStart start = new PropertyPathStart();
+		start.setName("this");
+		start.setContentType(ParameterContentType.FIELD);
 
 		PropertyPath path = new PropertyPath();
 		path.setName("name");
 		start.setPathToContinue(path);
 
-		String result = propertyAccessor.getPropertyContent(start, person, null);
+		String result = propertyAccessor.getPropertyContent(start, person, null, resultValueMock);
 		assertEquals(result, "Dirk");
+		Mockito.verifyZeroInteractions(resultValueMock);
 	}
 
 	@Test(expectedExceptions = { PropertyAccessException.class })
 	public void nullStartPath() throws PropertyAccessException {
-		propertyAccessor.getPropertyContent(null, null, null);
+		propertyAccessor.getPropertyContent(null, null, null, null);
 	}
 
 	@Test(expectedExceptions = { PropertyAccessException.class })
-	public void nullNeededClassObject() throws PropertyAccessException {
+	public void nullNeededClassObjectForFieldAccess() throws PropertyAccessException {
 		PropertyPathStart start = new PropertyPathStart();
 		start.setName("this");
-		start.setClassOfExecutedMethod(true);
+		start.setContentType(ParameterContentType.FIELD);
 
-		propertyAccessor.getPropertyContent(start, null, null);
+		propertyAccessor.getPropertyContent(start, null, null, resultValueMock);
+		Mockito.verifyZeroInteractions(resultValueMock);
+	}
+
+	/*
+	 * We no longer throw exceptions in the case that the return value is null as this would
+	 * completely remove the property accessor and this is not the desired behaviour.
+	 */
+	@Test
+	public void nullNeededResultObjectForResultAccess() throws PropertyAccessException {
+		PropertyPathStart start = new PropertyPathStart();
+		start.setName("this");
+		start.setContentType(ParameterContentType.RETURN);
+
+		String result = propertyAccessor.getPropertyContent(start, null, null, null);
+		assertThat(result, is(equalTo("null")));
 	}
 
 	@Test(expectedExceptions = { PropertyAccessException.class })
@@ -84,8 +112,10 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		PropertyPathStart start = new PropertyPathStart();
 		start.setName("name");
 		start.setSignaturePosition(0);
+		start.setContentType(ParameterContentType.PARAM);
 
-		propertyAccessor.getPropertyContent(start, null, null);
+		propertyAccessor.getPropertyContent(start, null, null, resultValueMock);
+		Mockito.verifyZeroInteractions(resultValueMock);
 	}
 
 	@Test(expectedExceptions = { PropertyAccessException.class })
@@ -93,8 +123,19 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		PropertyPathStart start = new PropertyPathStart();
 		start.setName("name");
 		start.setSignaturePosition(0);
+		start.setContentType(ParameterContentType.PARAM);
 
-		propertyAccessor.getPropertyContent(start, null, new Object[0]);
+		propertyAccessor.getPropertyContent(start, null, new Object[0], resultValueMock);
+		Mockito.verifyZeroInteractions(resultValueMock);
+	}
+
+	@Test(expectedExceptions = { PropertyAccessException.class })
+	public void missingContentType() throws PropertyAccessException {
+		PropertyPathStart start = new PropertyPathStart();
+		start.setName("name");
+		start.setSignaturePosition(0);
+
+		propertyAccessor.getPropertyContent(start, null, null, null);
 	}
 
 	@Test(expectedExceptions = { PropertyAccessException.class })
@@ -104,21 +145,22 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 
 		PropertyPathStart start = new PropertyPathStart();
 		start.setName("this");
-		start.setClassOfExecutedMethod(true);
+		start.setContentType(ParameterContentType.FIELD);
 
 		PropertyPath path = new PropertyPath();
 		path.setName("surname");
 		start.setPathToContinue(path);
 
 		// name != surname -> exception
-		propertyAccessor.getPropertyContent(start, person, null);
+		propertyAccessor.getPropertyContent(start, person, null, resultValueMock);
+		Mockito.verifyZeroInteractions(resultValueMock);
 	}
 
 	@Test
 	public void analyzePersonParameter() throws PropertyAccessException {
 		// create initial object relation
 		Person peter = new Person("Peter");
-		Person juergen = new Person("Jürgen");
+		Person juergen = new Person("Juergen");
 		peter.setChild(juergen);
 		Person hans = new Person("Hans");
 		juergen.setChild(hans);
@@ -131,6 +173,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		PropertyPathStart start = new PropertyPathStart();
 		start.setName("name");
 		start.setSignaturePosition(1);
+		start.setContentType(ParameterContentType.PARAM);
 
 		PropertyPath pathOne = new PropertyPath("child");
 		start.setPathToContinue(pathOne);
@@ -147,8 +190,9 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		// set the parameter array
 		Object[] parameters = { null, peter };
 
-		String result = propertyAccessor.getPropertyContent(start, new Object(), parameters);
+		String result = propertyAccessor.getPropertyContent(start, new Object(), parameters, resultValueMock);
 		assertEquals(result, "Michael");
+		Mockito.verifyZeroInteractions(resultValueMock);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -166,6 +210,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		PropertyPathStart start = new PropertyPathStart();
 		start.setName("name");
 		start.setSignaturePosition(0);
+		start.setContentType(ParameterContentType.PARAM);
 		PropertyPath pathOne = new PropertyPath("child");
 		start.setPathToContinue(pathOne);
 		propertyAccessorList.add(start);
@@ -173,7 +218,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		// not valid
 		start = new PropertyPathStart();
 		start.setName("this");
-		start.setClassOfExecutedMethod(true);
+		start.setContentType(ParameterContentType.FIELD);
 		pathOne = new PropertyPath("notValid");
 		start.setPathToContinue(pathOne);
 		propertyAccessorList.add(start);
@@ -182,13 +227,14 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		start = new PropertyPathStart();
 		start.setName("name");
 		start.setSignaturePosition(1);
+		start.setContentType(ParameterContentType.PARAM);
 		pathOne = new PropertyPath("child");
 		start.setPathToContinue(pathOne);
 		propertyAccessorList.add(start);
 
 		assertEquals(propertyAccessorList.size(), 3);
 
-		List<ParameterContentData> parameterContentList = propertyAccessor.getParameterContentData(propertyAccessorList, peter, new Object[] { peter });
+		List<ParameterContentData> parameterContentList = propertyAccessor.getParameterContentData(propertyAccessorList, peter, new Object[] { peter }, resultValueMock);
 
 		// size should be reduced to one
 		assertEquals(propertyAccessorList.size(), 1);
@@ -211,7 +257,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 
 		PropertyPathStart start = new PropertyPathStart();
 		start.setName("this");
-		start.setClassOfExecutedMethod(true);
+		start.setContentType(ParameterContentType.FIELD);
 
 		PropertyPath path = new PropertyPath();
 		path.setName("foreNames");
@@ -221,8 +267,9 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		path2.setName("length()");
 		path.setPathToContinue(path2);
 
-		String result = propertyAccessor.getPropertyContent(start, peter, null);
+		String result = propertyAccessor.getPropertyContent(start, peter, null, resultValueMock);
 		assertEquals(new Integer(result).intValue(), 2);
+		Mockito.verifyZeroInteractions(resultValueMock);
 	}
 
 	@Test(expectedExceptions = { PropertyAccessException.class })
@@ -234,7 +281,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 
 		PropertyPathStart start = new PropertyPathStart();
 		start.setName("this");
-		start.setClassOfExecutedMethod(true);
+		start.setContentType(ParameterContentType.FIELD);
 
 		PropertyPath path = new PropertyPath();
 		path.setName("name");
@@ -245,7 +292,8 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		path.setPathToContinue(path2);
 
 		// must result in an Exception as name is not an array
-		propertyAccessor.getPropertyContent(start, peter, null);
+		propertyAccessor.getPropertyContent(start, peter, null, resultValueMock);
+		Mockito.verifyZeroInteractions(resultValueMock);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -261,7 +309,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 
 		PropertyPathStart start = new PropertyPathStart();
 		start.setName("this");
-		start.setClassOfExecutedMethod(true);
+		start.setContentType(ParameterContentType.FIELD);
 
 		PropertyPath path = new PropertyPath();
 		path.setName("foreNamesAsList");
@@ -271,8 +319,76 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		path2.setName("size()");
 		path.setPathToContinue(path2);
 
-		String result = propertyAccessor.getPropertyContent(start, peter, null);
+		String result = propertyAccessor.getPropertyContent(start, peter, null, resultValueMock);
 		assertEquals(new Integer(result).intValue(), 3);
+		Mockito.verifyZeroInteractions(resultValueMock);
+	}
+
+	@Test
+	public void analyzeReturnValueString() throws PropertyAccessException {
+		List<PropertyPathStart> propertyAccessorList = new ArrayList<PropertyPathStart>();
+
+		// valid
+		PropertyPathStart start = new PropertyPathStart();
+		start.setName("returnName");
+		start.setContentType(ParameterContentType.RETURN);
+
+		String result = propertyAccessor.getPropertyContent(start, null, null, "Peter");
+		assertEquals(result, "Peter");
+	}
+
+	@Test
+	public void analyzeReturnValueVoidMethod() throws PropertyAccessException {
+		// create initial object relation
+		Person peter = new Person("Peter");
+
+		List<PropertyPathStart> propertyAccessorList = new ArrayList<PropertyPathStart>();
+
+		// valid
+		PropertyPathStart start = new PropertyPathStart();
+		start.setName("setName");
+		start.setContentType(ParameterContentType.RETURN);
+
+		String result = propertyAccessor.getPropertyContent(start, null, null, peter);
+		assertEquals(result, "Peter");
+	}
+
+	@Test
+	public void analyzeReturnValueObject() throws PropertyAccessException {
+		// create initial object relation
+		Person peter = new Person("Peter");
+		Person juergen = new Person("Hans");
+		peter.setChild(juergen);
+
+		List<PropertyPathStart> propertyAccessorList = new ArrayList<PropertyPathStart>();
+
+		// valid
+		PropertyPathStart start = new PropertyPathStart();
+		start.setName("return");
+		start.setContentType(ParameterContentType.RETURN);
+		PropertyPath pathOne = new PropertyPath("child");
+		start.setPathToContinue(pathOne);
+		propertyAccessorList.add(start);
+
+		String result = propertyAccessor.getPropertyContent(start, null, null, peter);
+		assertEquals(result, "Hans");
+	}
+
+	@Test(expectedExceptions = { PropertyAccessException.class })
+	public void invokeForbiddenMethod() throws PropertyAccessException {
+		// create initial object relation
+		Person peter = new Person("Peter");
+
+		PropertyPathStart start = new PropertyPathStart();
+		start.setName("this");
+		start.setContentType(ParameterContentType.FIELD);
+
+		PropertyPath path = new PropertyPath();
+		path.setName("getName()");
+		start.setPathToContinue(path);
+
+		String result = propertyAccessor.getPropertyContent(start, peter, null, resultValueMock);
+		Mockito.verifyZeroInteractions(resultValueMock);
 	}
 
 	@Test
@@ -294,6 +410,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		PropertyPathStart start = new PropertyPathStart();
 		start.setName("name");
 		start.setSignaturePosition(0);
+		start.setContentType(ParameterContentType.PARAM);
 		PropertyPath pathOne = new PropertyPath("child");
 		start.setPathToContinue(pathOne);
 		propertyAccessorList.add(start);
@@ -301,7 +418,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		// not valid
 		start = new PropertyPathStart();
 		start.setName("this");
-		start.setClassOfExecutedMethod(true);
+		start.setContentType(ParameterContentType.FIELD);
 		pathOne = new PropertyPath("notValid");
 		start.setPathToContinue(pathOne);
 		propertyAccessorList.add(start);
@@ -310,6 +427,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		start = new PropertyPathStart();
 		start.setName("name");
 		start.setSignaturePosition(1);
+		start.setContentType(ParameterContentType.PARAM);
 		pathOne = new PropertyPath("child");
 		start.setPathToContinue(pathOne);
 		propertyAccessorList.add(start);
@@ -321,7 +439,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		// Access via iterator
 		PropertyPathStart p = i.next();
 		// Direct access
-		List<ParameterContentData> parameterContentList = propertyAccessor.getParameterContentData(propertyAccessorList, peter, new Object[] { peter });
+		List<ParameterContentData> parameterContentList = propertyAccessor.getParameterContentData(propertyAccessorList, peter, new Object[] { peter }, null);
 
 		// Double check results, in case of missing exception
 		// size should be reduced to one

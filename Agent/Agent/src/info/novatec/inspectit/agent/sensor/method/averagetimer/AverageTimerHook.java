@@ -106,7 +106,7 @@ public class AverageTimerHook implements IMethodHook, IConstructorHook {
 		String prefix = null;
 		// check if some properties need to be accessed and saved
 		if (rsc.isPropertyAccess()) {
-			parameterContentData = propertyAccessor.getParameterContentData(rsc.getPropertyAccessorList(), object, parameters);
+			parameterContentData = propertyAccessor.getParameterContentData(rsc.getPropertyAccessorList(), object, parameters, result);
 			prefix = parameterContentData.toString();
 
 			// crop the content strings of all ParameterContentData but leave the prefix as it is

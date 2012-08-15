@@ -6,10 +6,12 @@ import info.novatec.inspectit.agent.analyzer.IMatcher;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.StorageException;
 import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
+import info.novatec.inspectit.agent.config.impl.PropertyAccessor.PropertyPathStart;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
 import info.novatec.inspectit.agent.hooking.IHookInstrumenter;
 import info.novatec.inspectit.agent.hooking.impl.HookException;
+import info.novatec.inspectit.communication.data.ParameterContentType;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -235,20 +237,30 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 			rsc.setParameterTypes(parameterTypes);
 			rsc.setModifiers(ctBehavior.getModifiers());
 			rsc.setCtBehavior(ctBehavior);
+			rsc.setConstructor(ctBehavior instanceof CtConstructor);
+
+			// return type only for methods available, otherwise the return type is set to empty
+			// string.
+			if (!rsc.isConstructor()) {
+				CtMethod ctMethod = (CtMethod) ctBehavior;
+				rsc.setReturnType(ctMethod.getReturnType().getName());
+			}
 
 			for (UnregisteredSensorConfig usc : configs) {
 				rsc.addSensorTypeConfig(usc.getSensorTypeConfig());
 				rsc.getSettings().putAll(usc.getSettings());
 
 				if (usc.isPropertyAccess()) {
-					rsc.setPropertyAccess(true);
-					rsc.getPropertyAccessorList().addAll(usc.getPropertyAccessorList());
-				}
-
-				if (usc.isConstructor()) {
-					rsc.setConstructor(true);
+					for (PropertyPathStart propertyPathStart : usc.getPropertyAccessorList()) {
+						// Filter not meaningful property accessors.
+						if (isMeaningfulCapturing(propertyPathStart.getContentType(), rsc)) {
+							rsc.getPropertyAccessorList().add(propertyPathStart);
+						}
+					}
 				}
 			}
+
+			rsc.setPropertyAccess(!rsc.getPropertyAccessorList().isEmpty());
 
 			// only when there is an enhanced Exception Sensor defined
 			if (configurationStorage.isExceptionSensorActivated() && configurationStorage.isEnhancedExceptionSensorActivated()) {
@@ -262,11 +274,7 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 			}
 
 			if (!rsc.isConstructor()) {
-				// return type only for methods available
-				CtMethod ctMethod = (CtMethod) ctBehavior;
-				rsc.setReturnType(ctMethod.getReturnType().getName());
-
-				hookInstrumenter.addMethodHook(ctMethod, rsc);
+				hookInstrumenter.addMethodHook((CtMethod) ctBehavior, rsc);
 			} else {
 				hookInstrumenter.addConstructorHook((CtConstructor) ctBehavior, rsc);
 			}
@@ -275,4 +283,35 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 		return ctBehavior.getDeclaringClass().toBytecode();
 	}
 
+	/**
+	 * Checks whether the property accessor is meaningful. Please note that during the creation of
+	 * the property accessor certain checks are already in place. For example it is checked that no
+	 * return value capturing is set on a constructor. Please ensure that checks that could be done
+	 * at creation time are already performed at this time ({@link
+	 * info.novatec.inspectit.agent.config.impl.ConfigurationStorage.addSensor()}).
+	 * 
+	 * Certain checks cannot be done on creation time. One example is the return value capturing on
+	 * method defining a void return type. At creation time the information that the method the
+	 * sensor is attached to has in fact no return value is not known.
+	 * 
+	 * @param type
+	 *            the type of capturing
+	 * @param rsc
+	 *            the sensor configuration
+	 * @return if this property accessor is meaningful.
+	 */
+	private boolean isMeaningfulCapturing(ParameterContentType type, RegisteredSensorConfig rsc) {
+		// Returnvalue capturing on constructors is not meaningful (property accessors should
+		// never be placed on constructors anyway, so this is just an additional layer of safety).
+		if (ParameterContentType.RETURN.equals(type) && rsc.isConstructor()) {
+			return false;
+		}
+
+		// Returnvalue capturing for void returning methods is just not meaningful.
+		if (ParameterContentType.RETURN.equals(type) && !rsc.isConstructor() && "void".equals(rsc.getReturnType())) {
+			return false;
+		}
+
+		return true;
+	}
 }

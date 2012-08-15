@@ -427,10 +427,18 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 					Set<ParameterContentData> parameterContents = InvocationSequenceDataHelper.getCapturedParameters(data);
 
 					for (ParameterContentData parameterContentData : parameterContents) {
-						if (parameterContentData.isMethodParameter()) {
+						switch (parameterContentData.getContentType()) {
+						case FIELD:
+							content += "Field '" + parameterContentData.getName() + "': " + parameterContentData.getContent() + "\n";
+							break;
+						case PARAM:
 							content += "Method Parameter #" + parameterContentData.getSignaturePosition() + " '" + parameterContentData.getName() + "': " + parameterContentData.getContent() + "\n";
-						} else {
-							content += "Parameter '" + parameterContentData.getName() + "': " + parameterContentData.getContent() + "\n";
+							break;
+						case RETURN:
+							content += "Return '" + parameterContentData.getName() + "': " + parameterContentData.getContent() + "\n";
+							break;
+						default:
+							break;
 						}
 					}
 				}

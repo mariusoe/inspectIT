@@ -195,7 +195,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 		if (null != invocationSequenceData) {
 			// check if some properties need to be accessed and saved
 			if (rsc.isPropertyAccess()) {
-				List<ParameterContentData> parameterContentData = propertyAccessor.getParameterContentData(rsc.getPropertyAccessorList(), object, parameters);
+				List<ParameterContentData> parameterContentData = propertyAccessor.getParameterContentData(rsc.getPropertyAccessorList(), object, parameters, result);
 
 				// crop the content strings of all ParameterContentData
 				for (ParameterContentData contentData : parameterContentData) {

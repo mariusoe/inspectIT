@@ -8,6 +8,7 @@ import info.novatec.inspectit.agent.analyzer.impl.SimpleMatchPattern;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.PriorityEnum;
 import info.novatec.inspectit.agent.config.StorageException;
+import info.novatec.inspectit.communication.data.ParameterContentType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -320,6 +321,15 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		}
 
 		UnregisteredSensorConfig sensorConfig = new UnregisteredSensorConfig(classPoolAnalyzer, inheritanceAnalyzer);
+		sensorConfig.setTargetClassName(targetClassName);
+		sensorConfig.setTargetMethodName(targetMethodName);
+		if ("<init>".equals(targetMethodName)) {
+			sensorConfig.setConstructor(true);
+		}
+		sensorConfig.setIgnoreSignature(ignoreSignature);
+		sensorConfig.setParameterTypes(parameterList);
+		sensorConfig.setSettings(settings);
+		sensorConfig.setSensorTypeConfig(getMethodSensorTypeConfigForName(sensorTypeName));
 
 		// check for a virtual definition
 		if (ignoreSignature) {
@@ -363,8 +373,6 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		}
 
 		if (settings.containsKey("field")) {
-			sensorConfig.setPropertyAccess(true);
-
 			@SuppressWarnings("unchecked")
 			List<String> fieldAccessorList = (List<String>) settings.get("field");
 
@@ -373,7 +381,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 				String name = fieldDefinitionParts[0];
 				PropertyAccessor.PropertyPathStart start = new PropertyAccessor.PropertyPathStart();
 				start.setName(name);
-				start.setClassOfExecutedMethod(true);
+				start.setContentType(ParameterContentType.FIELD);
 
 				String[] steps = fieldDefinitionParts[1].split("\\.");
 				PropertyAccessor.PropertyPath parentPath = start;
@@ -389,8 +397,6 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		}
 
 		if (settings.containsKey("property")) {
-			sensorConfig.setPropertyAccess(true);
-
 			@SuppressWarnings("unchecked")
 			List<String> propertyAccessorList = (List<String>) settings.get("property");
 
@@ -400,6 +406,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 				String name = fieldDefinitionParts[1];
 				PropertyAccessor.PropertyPathStart start = new PropertyAccessor.PropertyPathStart();
 				start.setName(name);
+				start.setContentType(ParameterContentType.PARAM);
 				start.setSignaturePosition(position);
 
 				if (3 == fieldDefinitionParts.length) {
@@ -417,16 +424,34 @@ public class ConfigurationStorage implements IConfigurationStorage {
 			}
 		}
 
-		// Now set all the given parameters
-		sensorConfig.setTargetClassName(targetClassName);
-		sensorConfig.setTargetMethodName(targetMethodName);
-		if ("<init>".equals(targetMethodName)) {
-			sensorConfig.setConstructor(true);
+		if (settings.containsKey("return") && !sensorConfig.isConstructor()) {
+			@SuppressWarnings("unchecked")
+			List<String> returnAccessorList = (List<String>) settings.get("return");
+
+			for (String returnDefinition : returnAccessorList) {
+				String[] returnDefinitionParts = returnDefinition.split(";");
+				String name = returnDefinitionParts[0];
+				PropertyAccessor.PropertyPathStart start = new PropertyAccessor.PropertyPathStart();
+				start.setName(name);
+				start.setContentType(ParameterContentType.RETURN);
+
+				if (returnDefinitionParts.length > 1) {
+					String[] steps = returnDefinitionParts[1].split("\\.");
+					PropertyAccessor.PropertyPath parentPath = start;
+					for (String step : steps) {
+						PropertyAccessor.PropertyPath path = new PropertyAccessor.PropertyPath();
+						path.setName(step);
+						parentPath.setPathToContinue(path);
+						parentPath = path;
+					}
+				}
+
+				sensorConfig.getPropertyAccessorList().add(start);
+			}
 		}
-		sensorConfig.setIgnoreSignature(ignoreSignature);
-		sensorConfig.setParameterTypes(parameterList);
-		sensorConfig.setSettings(settings);
-		sensorConfig.setSensorTypeConfig(getMethodSensorTypeConfigForName(sensorTypeName));
+
+		sensorConfig.setPropertyAccess(!sensorConfig.getPropertyAccessorList().isEmpty());
+
 		sensorConfig.completeConfiguration();
 
 		unregisteredSensorConfigs.add(sensorConfig);
