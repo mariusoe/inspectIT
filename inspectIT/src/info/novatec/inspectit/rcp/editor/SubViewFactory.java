@@ -25,6 +25,7 @@ import info.novatec.inspectit.rcp.editor.text.TextSubView;
 import info.novatec.inspectit.rcp.editor.text.input.ClassesInputController;
 import info.novatec.inspectit.rcp.editor.text.input.CpuInputController;
 import info.novatec.inspectit.rcp.editor.text.input.MemoryInputController;
+import info.novatec.inspectit.rcp.editor.text.input.SqlInvocSummaryTextInputController;
 import info.novatec.inspectit.rcp.editor.text.input.ThreadsInputController;
 import info.novatec.inspectit.rcp.editor.text.input.UngroupedExceptionOverviewStackTraceInputController;
 import info.novatec.inspectit.rcp.editor.text.input.VmSummaryInputController;
@@ -93,22 +94,23 @@ public final class SubViewFactory {
 			threadSubView.addSubView(new TextSubView(new ThreadsInputController()), new GridData(SWT.FILL, SWT.FILL, true, false));
 			return threadSubView;
 		case INVOCATION_SEQUENCE:
-			SashCompositeSubView invocSubView = new SashCompositeSubView();
-			ISubView invocOverview = new TableSubView(new InvocOverviewInputController());
+			GridCompositeSubView sqlCombinedView = new GridCompositeSubView();
+			ISubView invocSql = new TableSubView(new SqlInvocInputController());
+			ISubView invocSqlSummary = new TextSubView(new SqlInvocSummaryTextInputController());
+			sqlCombinedView.addSubView(invocSql, new GridData(SWT.FILL, SWT.FILL, true, true));
+			sqlCombinedView.addSubView(invocSqlSummary, new GridData(SWT.FILL, SWT.FILL, true, false));
+
 			TabbedCompositeSubView invocTabbedSubView = new TabbedCompositeSubView();
 			ISubView invocDetails = new SteppingTreeSubView(new SteppingInvocDetailInputController(false));
-			ISubView invocSql = new TableSubView(new SqlInvocInputController());
 			ISubView invocMethods = new TableSubView(new MethodInvocInputController());
 			ISubView invocExceptions = new TableSubView(new ExceptionSensorInvocInputController());
-			// ISubView traceInspector = new TraceInspectorSubView();
-
 			invocTabbedSubView.addSubView(invocDetails, "Call Hierarchy", InspectIT.getDefault().getImage(InspectITImages.IMG_CALL_HIERARCHY));
-			invocTabbedSubView.addSubView(invocSql, "SQL", InspectIT.getDefault().getImage(InspectITImages.IMG_DATABASE));
+			invocTabbedSubView.addSubView(sqlCombinedView, "SQL", InspectIT.getDefault().getImage(InspectITImages.IMG_DATABASE));
 			invocTabbedSubView.addSubView(invocMethods, "Methods", InspectIT.getDefault().getImage(InspectITImages.IMG_METHOD_PUBLIC));
 			invocTabbedSubView.addSubView(invocExceptions, "Exceptions", InspectIT.getDefault().getImage(InspectITImages.IMG_EXCEPTION_SENSOR));
-			// invocTabbedSubView.addSubView(traceInspector, "Trace Inspector",
-			// InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CALL_HIERARCHY));
 
+			SashCompositeSubView invocSubView = new SashCompositeSubView();
+			ISubView invocOverview = new TableSubView(new InvocOverviewInputController());
 			invocSubView.addSubView(invocOverview, 1);
 			invocSubView.addSubView(invocTabbedSubView, 2);
 
@@ -146,22 +148,23 @@ public final class SubViewFactory {
 			combinedMetricsSubView.addSubView(combinedMetricsSummarySubView, new GridData(SWT.FILL, SWT.FILL, true, false));
 			return combinedMetricsSubView;
 		case NAVIGATION_INVOCATION:
-			SashCompositeSubView invocSubView1 = new SashCompositeSubView();
-			ISubView invocOverview1 = new TableSubView(new NavigationInvocOverviewInputController());
+			GridCompositeSubView sqlCombinedView1 = new GridCompositeSubView();
+			ISubView invocSql1 = new TableSubView(new SqlInvocInputController());
+			ISubView invocSqlSummary1 = new TextSubView(new SqlInvocSummaryTextInputController());
+			sqlCombinedView1.addSubView(invocSql1, new GridData(SWT.FILL, SWT.FILL, true, true));
+			sqlCombinedView1.addSubView(invocSqlSummary1, new GridData(SWT.FILL, SWT.FILL, true, false));
+
 			TabbedCompositeSubView invocTabbedSubView1 = new TabbedCompositeSubView();
 			ISubView invocDetails1 = new SteppingTreeSubView(new SteppingInvocDetailInputController(true));
-			ISubView invocSql1 = new TableSubView(new SqlInvocInputController());
 			ISubView invocMethods1 = new TableSubView(new MethodInvocInputController());
 			ISubView invocExceptions1 = new TableSubView(new ExceptionSensorInvocInputController());
-			// ISubView traceInspector = new TraceInspectorSubView();
-
 			invocTabbedSubView1.addSubView(invocDetails1, "Call Hierarchy", InspectIT.getDefault().getImage(InspectITImages.IMG_CALL_HIERARCHY));
-			invocTabbedSubView1.addSubView(invocSql1, "SQL", InspectIT.getDefault().getImage(InspectITImages.IMG_DATABASE));
+			invocTabbedSubView1.addSubView(sqlCombinedView1, "SQL", InspectIT.getDefault().getImage(InspectITImages.IMG_DATABASE));
 			invocTabbedSubView1.addSubView(invocMethods1, "Methods", InspectIT.getDefault().getImage(InspectITImages.IMG_METHOD_PUBLIC));
 			invocTabbedSubView1.addSubView(invocExceptions1, "Exceptions", InspectIT.getDefault().getImage(InspectITImages.IMG_EXCEPTION_SENSOR));
-			// invocTabbedSubView.addSubView(traceInspector, "Trace Inspector",
-			// InspectIT.getDefault().getImageDescriptor(InspectITConstants.IMG_CALL_HIERARCHY));
 
+			SashCompositeSubView invocSubView1 = new SashCompositeSubView();
+			ISubView invocOverview1 = new TableSubView(new NavigationInvocOverviewInputController());
 			invocSubView1.addSubView(invocOverview1, 1);
 			invocSubView1.addSubView(invocTabbedSubView1, 2);
 

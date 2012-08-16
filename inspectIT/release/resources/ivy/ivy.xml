@@ -21,6 +21,7 @@
 
 	<dependencies>
 		<dependency org="commons-logging" name="commons-logging" rev="1.1.1" conf="prod->default" />
+		<dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="prod->default" />
 
 		<dependency org="org.springframework" name="spring-core" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
 		<dependency org="org.springframework" name="spring-context" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>

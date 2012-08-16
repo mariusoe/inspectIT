@@ -324,7 +324,7 @@
 
 	<target name="-create-thirdparty-notification">
 		<echo file="${release.basedir}/thirdparty.txt" message="The inspectIT UI uses the following third party libraries: ${line.separator}
-Apache Software License, 2.0 :  jettison (1.2), httpclient(4.1.1), httpcore (4.1.1), guava (11.0.1), commons-logging (1.1.1), commons-lang (2.5), spring-core (3.1.0.RELEASE), spring-context (3.1.0.RELEASE), spring-beans (3.1.0.RELEASE), spring-web (3.1.0.RELEASE), spring-asm (3.1.0.RELEASE), spring-expression (3.1.0.RELEASE), spring-aop (3.1.0.RELEASE), cglib-nodep (2.2.2), beanlib (5.0.2beta), beanlib-hibernate (5.0.2beta), gilead-core (1.3.2), glead-hibernate (1.3.2)  ${line.separator}
+Apache Software License, 2.0 :  jettison (1.2), httpclient(4.1.1), httpcore (4.1.1), guava (11.0.1), commons-logging (1.1.1), commons-lang (2.5), commons-collections (3.2.1), spring-core (3.1.0.RELEASE), spring-context (3.1.0.RELEASE), spring-beans (3.1.0.RELEASE), spring-web (3.1.0.RELEASE), spring-asm (3.1.0.RELEASE), spring-expression (3.1.0.RELEASE), spring-aop (3.1.0.RELEASE), cglib-nodep (2.2.2), beanlib (5.0.2beta), beanlib-hibernate (5.0.2beta), gilead-core (1.3.2), glead-hibernate (1.3.2)  ${line.separator}
 BSD License :  xstream (1.3.1), kryo (1.04), reflectasm (1.01), minlog (1.2), asm (3.3.1) ${line.separator}
 Eclipse Public License (EPL), 1.0 : nebula-cwt (0.9.0), nebula-cdatetime (0.14.0) ${line.separator}
 GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), jcommon (1.0.16), jfreechart (1.0.13), jfreechart-swt (1.0.13), jfreechart-experimental (1.0.13), swtgraphics2d (1.0.13)" />
