@@ -1,5 +1,10 @@
 package info.novatec.inspectit.cmr.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -18,6 +23,7 @@ import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
+import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.cmr.util.AgentStatusDataProvider;
 import info.novatec.inspectit.cmr.util.LicenseUtil;
@@ -111,10 +117,12 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 	 *             If {@link LicenseContentException} occurs.
 	 * @throws RemoteException
 	 *             If remote exception occurs.
+	 * @throws ServiceException
+	 *             If {@link ServiceException} occurs.
 	 */
 	@Test(expectedExceptions = { LicenseException.class })
 	@SuppressWarnings("unchecked")
-	public void noRegistrationAllowedByLicenseUtil() throws LicenseContentException, RemoteException {
+	public void noRegistrationAllowedByLicenseUtil() throws LicenseContentException, RemoteException, ServiceException {
 		doThrow(LicenseContentException.class).when(licenseUtil).validateLicense(anyList(), anyString());
 		try {
 			registrationService.registerPlatformIdent(new ArrayList<String>(), "agentName", "version");
@@ -125,20 +133,49 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 	}
 
 	/**
-	 * Test that registration will be done properlly if the {@link LicenseUtil} validates license.
+	 * Tests that an exception will be thrown if the database returns two or more platform idents
+	 * after findByExample search.
 	 * 
 	 * @throws LicenseContentException
 	 *             If {@link LicenseContentException} occurs.
 	 * @throws RemoteException
 	 *             If remote exception occurs.
+	 * @throws ServiceException
+	 */
+	@Test(expectedExceptions = { ServiceException.class })
+	public void noRegistrationTwoAgents() throws LicenseContentException, RemoteException, ServiceException {
+		List<String> definedIps = new ArrayList<String>();
+		definedIps.add("ip");
+		String agentName = "agentName";
+		String version = "version";
+
+		doNothing().when(licenseUtil).validateLicense(definedIps, agentName);
+
+		List<PlatformIdent> dbResponseList = new ArrayList<PlatformIdent>();
+		dbResponseList.add(new PlatformIdent());
+		dbResponseList.add(new PlatformIdent());
+		when(platformIdentDao.findByExample((PlatformIdent) anyObject())).thenReturn(dbResponseList);
+
+		registrationService.registerPlatformIdent(definedIps, agentName, version);
+	}
+
+	/**
+	 * Test that registration will be done properly if the {@link LicenseUtil} validates license.
+	 * 
+	 * @throws LicenseContentException
+	 *             If {@link LicenseContentException} occurs.
+	 * @throws RemoteException
+	 *             If remote exception occurs.
+	 * @throws ServiceException
+	 *             If {@link ServiceException} occurs.
 	 */
 	@Test
-	public void registerNewPlatformIdent() throws LicenseContentException, RemoteException {
+	public void registerNewPlatformIdent() throws LicenseContentException, RemoteException, ServiceException {
 		final long platformId = 10;
-		final List<String> definedIps = new ArrayList<String>();
+		List<String> definedIps = new ArrayList<String>();
 		definedIps.add("ip");
-		final String agentName = "agentName";
-		final String version = "version";
+		String agentName = "agentName";
+		String version = "version";
 
 		doNothing().when(licenseUtil).validateLicense(definedIps, agentName);
 		when(platformIdentDao.findByExample((PlatformIdent) anyObject())).thenReturn(Collections.<PlatformIdent> emptyList());
@@ -172,15 +209,17 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 	 *             If {@link LicenseContentException} occurs.
 	 * @throws RemoteException
 	 *             If remote exception occurs.
+	 * @throws ServiceException
+	 *             If {@link ServiceException} occurs.
 	 */
 	@Test
-	public void registerExistingPlatformIdent() throws LicenseContentException, RemoteException {
-		final long platformId = 10;
-		final List<String> definedIps = new ArrayList<String>();
+	public void registerExistingPlatformIdent() throws LicenseContentException, RemoteException, ServiceException {
+		long platformId = 10;
+		List<String> definedIps = new ArrayList<String>();
 		definedIps.add("ip");
-		final String agentName = "agentName";
-		final String version = "version";
-		final Timestamp timestamp = new Timestamp(1);
+		String agentName = "agentName";
+		String version = "version";
+		Timestamp timestamp = new Timestamp(1);
 
 		PlatformIdent platformIdent = new PlatformIdent();
 		platformIdent.setId(Long.valueOf(platformId));
@@ -205,6 +244,98 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		Assert.assertEquals(argument.getValue().getVersion(), version);
 		Assert.assertNotNull(argument.getValue().getTimeStamp());
 		Assert.assertNotSame(argument.getValue().getTimeStamp(), timestamp);
+
+		verify(agentStatusDataProvider, times(1)).registerConnected(platformId);
+	}
+
+	/**
+	 * Test that registration will be done properlly if the {@link LicenseUtil} validates license
+	 * and IP based registration is off.
+	 * 
+	 * @throws LicenseContentException
+	 *             If {@link LicenseContentException} occurs.
+	 * @throws RemoteException
+	 * @throws ServiceException
+	 *             If {@link ServiceException} occurs.
+	 */
+	@Test
+	public void registerNewPlatformIdentNoIpBased() throws LicenseContentException, LicenseException, RemoteException, ServiceException {
+		final long platformId = 10;
+		List<String> definedIps = new ArrayList<String>();
+		definedIps.add("ip");
+		String agentName = "agentName";
+		String version = "version";
+
+		registrationService.ipBasedAgentRegistration = false;
+		doNothing().when(licenseUtil).validateLicense(definedIps, agentName);
+		when(platformIdentDao.findByExample((PlatformIdent) anyObject())).thenReturn(Collections.<PlatformIdent> emptyList());
+		Mockito.doAnswer(new Answer<Object>() {
+			@Override
+			public Object answer(InvocationOnMock invocation) throws Throwable {
+				PlatformIdent platformIdent = (PlatformIdent) invocation.getArguments()[0];
+				platformIdent.setId(Long.valueOf(platformId));
+				return null;
+			}
+		}).when(platformIdentDao).saveOrUpdate((PlatformIdent) anyObject());
+
+		long registeredId = registrationService.registerPlatformIdent(definedIps, agentName, version);
+		assertThat(registeredId, equalTo(platformId));
+
+		ArgumentCaptor<PlatformIdent> argument = ArgumentCaptor.forClass(PlatformIdent.class);
+		verify(platformIdentDao, times(1)).saveOrUpdate(argument.capture());
+
+		assertThat(argument.getValue().getDefinedIPs(), equalTo(definedIps));
+		assertThat(argument.getValue().getAgentName(), equalTo(agentName));
+		assertThat(argument.getValue().getVersion(), equalTo(version));
+		assertThat(argument.getValue().getTimeStamp(), is(notNullValue()));
+
+		verify(agentStatusDataProvider, times(1)).registerConnected(platformId);
+	}
+
+	/**
+	 * Tests that the version and timestamp will be updated if the agent is already registered and
+	 * IP registration is off.
+	 * 
+	 * @throws LicenseContentException
+	 *             If {@link LicenseContentException} occurs.
+	 * @throws RemoteException
+	 *             If remote exception occurs.
+	 * @throws ServiceException
+	 *             If {@link ServiceException} occurs.
+	 */
+	@Test
+	public void registerExistingPlatformIdentNoIpBased() throws LicenseContentException, RemoteException, ServiceException {
+		long platformId = 10;
+		List<String> definedIps = new ArrayList<String>();
+		definedIps.add("ip");
+		String agentName = "agentName";
+		String version = "version";
+		Timestamp timestamp = new Timestamp(1);
+
+		PlatformIdent platformIdent = new PlatformIdent();
+		platformIdent.setId(Long.valueOf(platformId));
+		platformIdent.setAgentName(agentName);
+		platformIdent.setDefinedIPs(Collections.<String> emptyList());
+		platformIdent.setVersion("versionOld");
+		platformIdent.setTimeStamp(timestamp);
+		List<PlatformIdent> findByExampleList = new ArrayList<PlatformIdent>();
+		findByExampleList.add(platformIdent);
+
+		registrationService.ipBasedAgentRegistration = false;
+		doNothing().when(licenseUtil).validateLicense(definedIps, agentName);
+		when(platformIdentDao.findByExample((PlatformIdent) anyObject())).thenReturn(findByExampleList);
+
+		long registeredId = registrationService.registerPlatformIdent(definedIps, agentName, version);
+		assertThat(registeredId, equalTo(platformId));
+
+		ArgumentCaptor<PlatformIdent> argument = ArgumentCaptor.forClass(PlatformIdent.class);
+		verify(platformIdentDao, times(1)).saveOrUpdate(argument.capture());
+
+		assertThat(argument.getValue().getDefinedIPs(), equalTo(definedIps));
+		assertThat(argument.getValue().getAgentName(), equalTo(agentName));
+		assertThat(argument.getValue().getVersion(), equalTo(version));
+		assertThat(argument.getValue().getTimeStamp(), is(notNullValue()));
+		assertThat(argument.getValue().getTimeStamp(), not(equalTo(timestamp)));
 
 		verify(agentStatusDataProvider, times(1)).registerConnected(platformId);
 	}
@@ -272,7 +403,7 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		parameterTypes.add("parameter");
 		String returnType = "returnType";
 		int modifiers = 2;
-		final Timestamp timestamp = new Timestamp(1);
+		Timestamp timestamp = new Timestamp(1);
 
 		MethodIdent methodIdent = new MethodIdent();
 		methodIdent.setId(Long.valueOf(methodId));

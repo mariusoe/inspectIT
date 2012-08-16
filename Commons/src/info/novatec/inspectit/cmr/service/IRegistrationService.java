@@ -1,5 +1,7 @@
 package info.novatec.inspectit.cmr.service;
 
+import info.novatec.inspectit.cmr.service.exception.ServiceException;
+
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -40,8 +42,10 @@ public interface IRegistrationService extends Remote {
 	 *             if the registration was not successful because the registration failed.
 	 * @throws RemoteException
 	 *             If a remote exception occurs somewhere.
+	 * @throws ServiceException
+	 *             If database contains more than one corresponding platform ident already.
 	 */
-	long registerPlatformIdent(List<String> definedIPs, String agentName, String version) throws LicenseException, RemoteException;
+	long registerPlatformIdent(List<String> definedIPs, String agentName, String version) throws LicenseException, RemoteException, ServiceException;
 
 	/**
 	 * Every instrumented method has to be registered from every Agent. This method returns a unique

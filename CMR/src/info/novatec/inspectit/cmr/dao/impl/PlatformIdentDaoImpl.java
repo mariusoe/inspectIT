@@ -78,7 +78,6 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	public List<PlatformIdent> findAll() {
 		return getHibernateTemplate().loadAll(PlatformIdent.class);
 	}
@@ -180,7 +179,7 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 		if (null == wantedAgentsIds) {
 			return Collections.emptyList();
 		}
-		
+
 		List<PlatformIdent> initializedPlatformIdents = new ArrayList<PlatformIdent>();
 		List<Long> cleanIdents = new ArrayList<Long>();
 		for (PlatformIdent platformIdent : platformIdentCache.getCleanPlatformIdents()) {

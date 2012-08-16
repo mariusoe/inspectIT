@@ -9,6 +9,7 @@ import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
+import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
 import info.novatec.inspectit.cmr.util.AgentStatusDataProvider;
 import info.novatec.inspectit.cmr.util.LicenseUtil;
@@ -26,6 +27,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +47,12 @@ public class RegistrationService implements IRegistrationService {
 	/** The logger of this class. */
 	@Logger
 	Log log;
+
+	/**
+	 * Should IP addresses be used for agent distinction.
+	 */
+	@Value(value = "${cmr.ipBasedAgentRegistration}")
+	boolean ipBasedAgentRegistration = true;
 
 	/**
 	 * The platform ident DAO.
@@ -88,7 +96,7 @@ public class RegistrationService implements IRegistrationService {
 	 */
 	@Transactional
 	@MethodLog
-	public synchronized long registerPlatformIdent(List<String> definedIPs, String agentName, String version) throws LicenseException, RemoteException {
+	public synchronized long registerPlatformIdent(List<String> definedIPs, String agentName, String version) throws LicenseException, RemoteException, ServiceException {
 		try {
 			if (log.isInfoEnabled()) {
 				log.info("Trying to register Agent '" + agentName + "'");
@@ -96,7 +104,9 @@ public class RegistrationService implements IRegistrationService {
 
 			licenseUtil.validateLicense(definedIPs, agentName);
 			PlatformIdent platformIdent = new PlatformIdent();
-			platformIdent.setDefinedIPs(definedIPs);
+			if (ipBasedAgentRegistration) {
+				platformIdent.setDefinedIPs(definedIPs);
+			}
 			platformIdent.setAgentName(agentName);
 
 			// need to reset the version number, otherwise it will be used for the query
@@ -112,10 +122,12 @@ public class RegistrationService implements IRegistrationService {
 			} else if (platformIdentResults.size() > 1) {
 				// this cannot occur anymore, if it occurs, then there is something totally wrong!
 				log.fatal("More than one platform ident has been retrieved! Please send your Database to the NovaTec inspectIT support!");
+				throw new ServiceException("Platform ident can not be registered because the inspectIT Database has more than one corresponding platform ident already.");
 			}
 
-			// always update the time stamp, no matter if this is an old or new record.
+			// always update the time stamp and ips, no matter if this is an old or new record.
 			platformIdent.setTimeStamp(new Timestamp(GregorianCalendar.getInstance().getTimeInMillis()));
+			platformIdent.setDefinedIPs(definedIPs);
 
 			// also always update the version information of the agent
 			platformIdent.setVersion(version);

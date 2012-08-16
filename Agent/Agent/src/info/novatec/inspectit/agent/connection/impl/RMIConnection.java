@@ -10,6 +10,7 @@ import info.novatec.inspectit.agent.connection.ServerUnavailableException;
 import info.novatec.inspectit.cmr.service.IAgentStorageService;
 import info.novatec.inspectit.cmr.service.IRegistrationService;
 import info.novatec.inspectit.cmr.service.LicenseException;
+import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.communication.DefaultData;
 
 import java.net.ConnectException;
@@ -142,6 +143,9 @@ public class RMIConnection implements IConnection {
 			LOGGER.severe("Could not obtain network interfaces from this machine!");
 			LOGGER.throwing(RMIConnection.class.getName(), "Constructor", socketException);
 			throw new RegistrationException("Could not register the platform", socketException);
+		} catch (ServiceException serviceException) {
+			LOGGER.throwing(ServiceException.class.getName(), "registerPlatform(String)", serviceException);
+			throw new RegistrationException("Could not register the platform", serviceException);
 		}
 	}
 
