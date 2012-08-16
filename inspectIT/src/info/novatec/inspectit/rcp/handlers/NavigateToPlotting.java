@@ -9,6 +9,7 @@ import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
+import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
@@ -63,11 +64,10 @@ public class NavigateToPlotting extends AbstractHandler {
 		inputDefinition.setId(SensorTypeEnum.TIMER);
 
 		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-		editorPropertiesData.setPartName(SensorTypeEnum.TIMER.getDisplayName());
-		editorPropertiesData.setPartTooltip(SensorTypeEnum.TIMER.getDisplayName());
-		editorPropertiesData.setImage(SensorTypeEnum.TIMER.getImage());
-		editorPropertiesData.setHeaderText(methodIdent.getPlatformIdent().getAgentName());
-		editorPropertiesData.setHeaderDescription(TextFormatter.getMethodString(methodIdent));
+		editorPropertiesData.setSensorImage(SensorTypeEnum.TIMER.getImage());
+		editorPropertiesData.setSensorName(SensorTypeEnum.TIMER.getDisplayName());
+		editorPropertiesData.setViewImage(ModifiersImageFactory.getImage(methodIdent.getModifiers()));
+		editorPropertiesData.setViewName(TextFormatter.getMethodString(methodIdent));
 		inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();

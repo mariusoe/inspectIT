@@ -8,6 +8,7 @@ import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
+import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
@@ -51,11 +52,10 @@ public class NavigateToStartMethodInvocationHandler extends AbstractHandler {
 			inputDefinition.setId(SensorTypeEnum.INVOCATION_SEQUENCE);
 
 			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-			editorPropertiesData.setPartName("Invocation Sequence");
-			editorPropertiesData.setPartTooltip("Invocation Sequence");
-			editorPropertiesData.setImage(SensorTypeEnum.INVOCATION_SEQUENCE.getImage());
-			editorPropertiesData.setHeaderText("Invocation Sequence");
-			editorPropertiesData.setHeaderDescription(TextFormatter.getMethodWithParameters(methodIdent));
+			editorPropertiesData.setSensorImage(SensorTypeEnum.INVOCATION_SEQUENCE.getImage());
+			editorPropertiesData.setSensorName("Invocation Sequences");
+			editorPropertiesData.setViewImage(ModifiersImageFactory.getImage(methodIdent.getModifiers()));
+			editorPropertiesData.setViewName(TextFormatter.getMethodString(methodIdent));
 			inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 			IdDefinition idDefinition = new IdDefinition();
@@ -82,5 +82,4 @@ public class NavigateToStartMethodInvocationHandler extends AbstractHandler {
 		}
 		return null;
 	}
-
 }

@@ -5,6 +5,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.tree.DeferredTreeViewer;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
+import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.TreeModelManager;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryChangeListener;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
@@ -329,7 +330,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 			int i = 0;
 			int selectedIndex = -1;
 			for (PlatformIdent platformIdent : availableAgents) {
-				agentsCombo.add(getAgentDescription(platformIdent));
+				agentsCombo.add(TextFormatter.getAgentDescription(platformIdent));
 				if (ObjectUtils.equals(platformIdent, displayedAgent)) {
 					selectedIndex = i;
 				}
@@ -622,17 +623,6 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 */
 	private String getCmrRepositoryDescription(CmrRepositoryDefinition cmrRepositoryDefinition) {
 		return "Central Management Repository @ http://" + cmrRepositoryDefinition.getIp() + ":" + cmrRepositoryDefinition.getPort();
-	}
-
-	/**
-	 * Description of the agent.
-	 * 
-	 * @param agent
-	 *            {@link PlatformIdent}
-	 * @return Description of the agent.
-	 */
-	public String getAgentDescription(PlatformIdent agent) {
-		return agent.getAgentName() + " [" + agent.getVersion() + "]";
 	}
 
 	/**

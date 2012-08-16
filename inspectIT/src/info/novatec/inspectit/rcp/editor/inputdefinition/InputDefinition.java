@@ -193,7 +193,7 @@ public class InputDefinition {
 	private SensorTypeEnum id;
 
 	/**
-	 * Editor data that define the title of the editor, description, icon and simillar properties.
+	 * Editor data that define the title of the editor, description, icon and similar properties.
 	 */
 	private EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
 

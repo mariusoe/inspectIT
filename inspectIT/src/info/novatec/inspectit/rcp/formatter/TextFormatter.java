@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.formatter;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationAwareData;
@@ -400,6 +401,17 @@ public final class TextFormatter {
 	}
 
 	/**
+	 * Description of the agent.
+	 * 
+	 * @param agent
+	 *            {@link PlatformIdent}
+	 * @return Description of the agent.
+	 */
+	public static String getAgentDescription(PlatformIdent agent) {
+		return agent.getAgentName() + " [" + agent.getVersion() + "]";
+	}
+
+	/**
 	 * The original text will be cleaned from the line breaks.
 	 * <p>
 	 * If string passed is <code>null</code>, null will be returned.
@@ -446,7 +458,7 @@ public final class TextFormatter {
 	 * @see StringUtils#abbreviate(String, int)
 	 * @return Cropped {@link String}.
 	 */
-	public String crop(String string, int maxLength) {
+	public static String crop(String string, int maxLength) {
 		return StringUtils.abbreviate(string, maxLength);
 	}
 

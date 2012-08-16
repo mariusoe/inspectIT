@@ -90,11 +90,9 @@ public class DeferredVSAWorkflowComposite extends DeferredComposite {
 				inputDefinition.setId(SensorTypeEnum.MARVIN_WORKFLOW);
 
 				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-				editorPropertiesData.setPartName("VSA Marvin (" + workflowName + " :: " + activity + ")");
-				editorPropertiesData.setPartTooltip("VSA Marvin (" + workflowName + " :: " + activity + ")");
-				editorPropertiesData.setImage(SensorTypeEnum.MARVIN_WORKFLOW.getImage());
-				editorPropertiesData.setHeaderText("VSA Marvin (" + workflowName + " :: " + activity + ")");
-				editorPropertiesData.setHeaderDescription(activity);
+				editorPropertiesData.setSensorImage(SensorTypeEnum.MARVIN_WORKFLOW.getImage());
+				editorPropertiesData.setSensorName("VSA Marvin");
+				editorPropertiesData.setViewName(workflowName + " :: " + activity);
 				inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 				CombinedMetricsInputDefinitionExtra combinedMetricsExtra = new CombinedMetricsInputDefinitionExtra();

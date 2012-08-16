@@ -1191,16 +1191,23 @@
                style="push">
          </command>
          <menu
+               icon="icons/down.png"
                label="Navigate To">
             <command
                   commandId="info.novatec.inspectit.rcp.commands.navigateToInvocations"
                   icon="icons/invocation.png"
                   style="push">
+               <visibleWhen
+                     checkEnabled="true">
+               </visibleWhen>
             </command>
             <command
                   commandId="info.novatec.inspectit.rcp.commands.navigateToPlotting"
                   icon="icons/timer.png"
                   style="push">
+               <visibleWhen
+                     checkEnabled="true">
+               </visibleWhen>
             </command>
             <command
                   commandId="info.novatec.inspectit.rcp.commands.navigateToExceptionType"
@@ -1274,7 +1281,7 @@
                         </instanceof>
                         <test
                               property="info.novatec.inspectit.activeSubView"
-                              value="tableSubView">
+                              value="treeSubView">
                         </test>
                      </with>
                      <with
@@ -1327,91 +1334,30 @@
                style="push">
          </command>
          <menu
+               icon="icons/down.png"
                label="Navigate To">
             <command
                   commandId="info.novatec.inspectit.rcp.commands.navigateToInvocations"
                   icon="icons/invocation.png"
                   style="push">
                <visibleWhen
-                     checkEnabled="false">
-                  <and>
-                     <iterate>
-                        <not>
-                           <instanceof
-                                 value="info.novatec.inspectit.communication.data.InvocationSequenceData">
-                           </instanceof>
-                        </not>
-                     </iterate>
-                  </and>
+                     checkEnabled="true">
                </visibleWhen>
             </command>
             <command
                   commandId="info.novatec.inspectit.rcp.commands.navigateToPlotting"
                   icon="icons/timer.png"
                   style="push">
+               <visibleWhen
+                     checkEnabled="true">
+               </visibleWhen>
             </command>
             <command
                   commandId="info.novatec.inspectit.rcp.commands.navigateToStartMethodInvocations"
                   icon="icons/invocation.png"
                   style="push">
                <visibleWhen
-                     checkEnabled="false">
-                  <and>
-                     <count
-                           value="1">
-                     </count>
-                     <iterate>
-                        <instanceof
-                              value="info.novatec.inspectit.communication.data.InvocationSequenceData">
-                        </instanceof>
-                     </iterate>
-                     <with
-                           variable="activeEditor">
-                        <instanceof
-                              value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
-                        </instanceof>
-                        <test
-                              property="info.novatec.inspectit.activeSubView"
-                              value="tableSubView">
-                        </test>
-                     </with>
-                  </and>
-               </visibleWhen>
-            </command>
-         </menu>
-         <menu
-               label="Analyze">
-            <command
-                  commandId="info.novatec.inspectit.rcp.commands.invocationsAggregatedTimerData"
-                  icon="icons/invocation.png"
-                  label="Combine Data"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <and>
-                     <count
-                           value="+">
-                     </count>
-                     <not>
-                        <count
-                              value="1">
-                        </count></not>
-                     <iterate>
-                        <instanceof
-                              value="info.novatec.inspectit.communication.data.InvocationSequenceData">
-                        </instanceof>
-                     </iterate>
-                     <with
-                           variable="activeEditor">
-                        <instanceof
-                              value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
-                        </instanceof>
-                        <test
-                              property="info.novatec.inspectit.activeSubView"
-                              value="tableSubView">
-                        </test>
-                     </with>
-                  </and>
+                     checkEnabled="true">
                </visibleWhen>
             </command>
             <command
@@ -1501,6 +1447,43 @@
                      name="info.novatec.inspectit.rcp.commands.navigateToExceptionType.ViewType"
                      value="grouped">
                </parameter>
+            </command>
+         </menu>
+         <menu
+               icon="icons/chart_bar.png"
+               label="Analyze">
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.invocationsAggregatedTimerData"
+                  icon="icons/invocation.png"
+                  label="Combine Data"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <and>
+                     <count
+                           value="+">
+                     </count>
+                     <not>
+                        <count
+                              value="1">
+                        </count></not>
+                     <iterate>
+                        <instanceof
+                              value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                        </instanceof>
+                     </iterate>
+                     <with
+                           variable="activeEditor">
+                        <instanceof
+                              value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                        </instanceof>
+                        <test
+                              property="info.novatec.inspectit.activeSubView"
+                              value="tableSubView">
+                        </test>
+                     </with>
+                  </and>
+               </visibleWhen>
             </command>
          </menu>
          <command

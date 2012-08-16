@@ -103,4 +103,5 @@ public interface InspectITImages {
 	String IMG_AGENT_YELLOW = InspectITConstants.ICON_PATH + "agent_yellow.png";
 	String IMG_AGENT_GREEN = InspectITConstants.ICON_PATH + "agent_green.png";
 	String IMG_AGENT_GRAY = InspectITConstants.ICON_PATH + "agent_gray.png";
+	String IMG_NAVIGATE = InspectITConstants.ICON_PATH + "down.png";
 }

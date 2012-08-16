@@ -7,6 +7,7 @@ import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
+import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData.PartType;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.formatter.SensorTypeAvailabilityEnum;
@@ -118,11 +119,10 @@ public class TreeModelManager {
 		inputDefinition.setId(SensorTypeEnum.INVOCATION_SEQUENCE);
 
 		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-		editorPropertiesData.setPartName("Invocation Sequences (Show All)");
-		editorPropertiesData.setPartTooltip("Invocation Sequences (Show All)");
-		editorPropertiesData.setImage(SensorTypeEnum.INVOCATION_SEQUENCE.getImage());
-		editorPropertiesData.setHeaderText("Invocation Sequences");
-		editorPropertiesData.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+		editorPropertiesData.setSensorImage(SensorTypeEnum.INVOCATION_SEQUENCE.getImage());
+		editorPropertiesData.setSensorName("Invocation Sequences");
+		editorPropertiesData.setViewImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SHOW_ALL));
+		editorPropertiesData.setViewName("Show All");
 		inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();
@@ -167,11 +167,10 @@ public class TreeModelManager {
 		inputDefinition.setId(SensorTypeEnum.SQL);
 
 		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-		editorPropertiesData.setPartName("SQL Statements (Show All)");
-		editorPropertiesData.setPartTooltip("SQL Statements (Show All)");
-		editorPropertiesData.setImage(SensorTypeEnum.SQL.getImage());
-		editorPropertiesData.setHeaderText("SQL Statements");
-		editorPropertiesData.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+		editorPropertiesData.setSensorName("SQL Statements");
+		editorPropertiesData.setSensorImage(SensorTypeEnum.SQL.getImage());
+		editorPropertiesData.setViewName("Show All");
+		editorPropertiesData.setViewImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SHOW_ALL));
 		inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();
@@ -261,11 +260,11 @@ public class TreeModelManager {
 				inputDefinition.setId(SensorTypeEnum.CPU_INFORMATION);
 
 				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-				editorPropertiesData.setPartName("CPU");
-				editorPropertiesData.setPartTooltip("CPU");
-				editorPropertiesData.setImage(SensorTypeEnum.CPU_INFORMATION.getImage());
-				editorPropertiesData.setHeaderText("CPU Information");
-				editorPropertiesData.setHeaderDescription(platformIdent.getAgentName());
+				editorPropertiesData.setSensorImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SYSTEM_OVERVIEW));
+				editorPropertiesData.setSensorName("System Overview");
+				editorPropertiesData.setViewImage(SensorTypeEnum.CPU_INFORMATION.getImage());
+				editorPropertiesData.setViewName("CPU Information");
+				editorPropertiesData.setPartImageFlag(PartType.VIEW);
 				inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 				IdDefinition idDefinition = new IdDefinition();
@@ -313,11 +312,11 @@ public class TreeModelManager {
 				inputDefinition.setId(SensorTypeEnum.CLASSLOADING_INFORMATION);
 
 				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-				editorPropertiesData.setPartName("Class Loading");
-				editorPropertiesData.setPartTooltip("Class Loading");
-				editorPropertiesData.setImage(SensorTypeEnum.CLASSLOADING_INFORMATION.getImage());
-				editorPropertiesData.setHeaderText("Class Loading Information");
-				editorPropertiesData.setHeaderDescription(platformIdent.getAgentName());
+				editorPropertiesData.setSensorImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SYSTEM_OVERVIEW));
+				editorPropertiesData.setSensorName("System Overview");
+				editorPropertiesData.setViewImage(SensorTypeEnum.CLASSLOADING_INFORMATION.getImage());
+				editorPropertiesData.setViewName("Class Loading Information");
+				editorPropertiesData.setPartImageFlag(PartType.VIEW);
 				inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 				IdDefinition idDefinition = new IdDefinition();
@@ -373,11 +372,11 @@ public class TreeModelManager {
 				inputDefinition.setId(SensorTypeEnum.MEMORY_INFORMATION);
 
 				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-				editorPropertiesData.setPartName("Memory");
-				editorPropertiesData.setPartTooltip("Memory");
-				editorPropertiesData.setImage(SensorTypeEnum.MEMORY_INFORMATION.getImage());
-				editorPropertiesData.setHeaderText("Memory Information");
-				editorPropertiesData.setHeaderDescription(platformIdent.getAgentName());
+				editorPropertiesData.setSensorImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SYSTEM_OVERVIEW));
+				editorPropertiesData.setSensorName("System Overview");
+				editorPropertiesData.setViewImage(SensorTypeEnum.MEMORY_INFORMATION.getImage());
+				editorPropertiesData.setViewName("Memory Information");
+				editorPropertiesData.setPartImageFlag(PartType.VIEW);
 				inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 				IdDefinition idDefinition = new IdDefinition();
@@ -425,11 +424,11 @@ public class TreeModelManager {
 				inputDefinition.setId(SensorTypeEnum.THREAD_INFORMATION);
 
 				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-				editorPropertiesData.setPartName("Threads");
-				editorPropertiesData.setPartTooltip("Threads");
-				editorPropertiesData.setImage(SensorTypeEnum.THREAD_INFORMATION.getImage());
-				editorPropertiesData.setHeaderText("Thread Information");
-				editorPropertiesData.setHeaderDescription(platformIdent.getAgentName());
+				editorPropertiesData.setSensorImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SYSTEM_OVERVIEW));
+				editorPropertiesData.setSensorName("System Overview");
+				editorPropertiesData.setViewImage(SensorTypeEnum.THREAD_INFORMATION.getImage());
+				editorPropertiesData.setViewName("Thread Information");
+				editorPropertiesData.setPartImageFlag(PartType.VIEW);
 				inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 				IdDefinition idDefinition = new IdDefinition();
@@ -476,11 +475,11 @@ public class TreeModelManager {
 			inputDefinition.setId(SensorTypeEnum.SYSTEM_INFORMATION);
 
 			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-			editorPropertiesData.setPartName("System Information");
-			editorPropertiesData.setPartTooltip("System Information");
-			editorPropertiesData.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INFORMATION));
-			editorPropertiesData.setHeaderText("System Information");
-			editorPropertiesData.setHeaderDescription(platformIdent.getAgentName());
+			editorPropertiesData.setSensorImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SYSTEM_OVERVIEW));
+			editorPropertiesData.setSensorName("System Overview");
+			editorPropertiesData.setViewImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INFORMATION));
+			editorPropertiesData.setViewName("System Information");
+			editorPropertiesData.setPartImageFlag(PartType.VIEW);
 			inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 			IdDefinition idDefinition = new IdDefinition();
@@ -551,11 +550,10 @@ public class TreeModelManager {
 		ungroupedExceptionOverviewInputDefinition.setId(SensorTypeEnum.EXCEPTION_SENSOR);
 
 		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-		editorPropertiesData.setPartName("Exceptions (Show All)");
-		editorPropertiesData.setPartTooltip("Exceptions (Show All)");
-		editorPropertiesData.setImage(SensorTypeEnum.EXCEPTION_SENSOR.getImage());
-		editorPropertiesData.setHeaderText("Exceptions");
-		editorPropertiesData.setHeaderDescription("Exceptions (" + platformIdent.getAgentName() + ")");
+		editorPropertiesData.setSensorImage(SensorTypeEnum.EXCEPTION_SENSOR.getImage());
+		editorPropertiesData.setSensorName("Exceptions");
+		editorPropertiesData.setViewImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SHOW_ALL));
+		editorPropertiesData.setViewName("Show All");
 		ungroupedExceptionOverviewInputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();
@@ -586,11 +584,10 @@ public class TreeModelManager {
 		groupedExceptionOverviewInputDefinition.setId(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED);
 
 		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-		editorPropertiesData.setPartName("Exceptions (Grouped)");
-		editorPropertiesData.setPartTooltip("Exceptions (Grouped)");
-		editorPropertiesData.setImage(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED.getImage());
-		editorPropertiesData.setHeaderText("Exceptions");
-		editorPropertiesData.setHeaderDescription("Exceptions (" + platformIdent.getAgentName() + ")");
+		editorPropertiesData.setSensorImage(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED.getImage());
+		editorPropertiesData.setSensorName("Exceptions");
+		editorPropertiesData.setViewImage(InspectIT.getDefault().getImage(InspectITImages.IMG_FILTER));
+		editorPropertiesData.setViewName("Grouped");
 		groupedExceptionOverviewInputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();
@@ -624,11 +621,10 @@ public class TreeModelManager {
 		inputDefinition.setId(SensorTypeEnum.AGGREGATED_TIMER_DATA);
 
 		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-		editorPropertiesData.setPartName("Aggregated Timer Data (Show All)");
-		editorPropertiesData.setPartTooltip("Aggregated Timer Data (Show All)");
-		editorPropertiesData.setImage(SensorTypeEnum.AGGREGATED_TIMER_DATA.getImage());
-		editorPropertiesData.setHeaderText("Aggregated Timer Data");
-		editorPropertiesData.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+		editorPropertiesData.setSensorImage(SensorTypeEnum.AGGREGATED_TIMER_DATA.getImage());
+		editorPropertiesData.setSensorName("Timer Data");
+		editorPropertiesData.setViewImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SHOW_ALL));
+		editorPropertiesData.setViewName("Show All");
 		inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();
@@ -673,11 +669,10 @@ public class TreeModelManager {
 		inputDefinition.setId(SensorTypeEnum.HTTP_TIMER_SENSOR);
 
 		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-		editorPropertiesData.setPartName("Http (" + platformIdent.getAgentName() + ")");
-		editorPropertiesData.setPartTooltip("Aggregates all http requests that are currently in the buffer based on its URI");
-		editorPropertiesData.setImage(SensorTypeEnum.HTTP_TIMER_SENSOR.getImage());
-		editorPropertiesData.setHeaderText("URI based aggregation");
-		editorPropertiesData.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+		editorPropertiesData.setSensorImage(SensorTypeEnum.HTTP_TIMER_SENSOR.getImage());
+		editorPropertiesData.setSensorName("Http Timer Data");
+		editorPropertiesData.setViewImage(InspectIT.getDefault().getImage(InspectITImages.IMG_HTTP_AGGREGATE));
+		editorPropertiesData.setViewName("URI Aggregation");
 		inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();
@@ -699,12 +694,10 @@ public class TreeModelManager {
 		inputDefinition.setId(SensorTypeEnum.TAGGED_HTTP_TIMER_SENSOR);
 
 		editorPropertiesData = new EditorPropertiesData();
-		editorPropertiesData.setPartName("Use Case Http (" + platformIdent.getAgentName() + ")");
-		editorPropertiesData.setPartTooltip("Aggregates all http request that are currently in the buffer based on a the concrete value of the inspectIT Tag Header (called \""
-				+ HttpTimerData.INSPECTIT_TAGGING_HEADER + "\")");
-		editorPropertiesData.setImage(SensorTypeEnum.TAGGED_HTTP_TIMER_SENSOR.getImage());
-		editorPropertiesData.setHeaderText("Use Case based aggregation");
-		editorPropertiesData.setHeaderDescription("Show All (" + platformIdent.getAgentName() + ")");
+		editorPropertiesData.setSensorImage(SensorTypeEnum.TAGGED_HTTP_TIMER_SENSOR.getImage());
+		editorPropertiesData.setSensorName("Http Timer Data");
+		editorPropertiesData.setViewImage(InspectIT.getDefault().getImage(InspectITImages.IMG_HTTP_TAGGED));
+		editorPropertiesData.setViewName("Use Case Aggregation");
 		inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		idDefinition = new IdDefinition();
@@ -717,5 +710,4 @@ public class TreeModelManager {
 
 		return timerDataComposite;
 	}
-
 }

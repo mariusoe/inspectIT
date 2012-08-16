@@ -65,13 +65,12 @@ public class FilteredDeferredClassComposite extends DeferredClassComposite {
 							InputDefinition inputDefinition = new InputDefinition();
 							inputDefinition.setRepositoryDefinition(getRepositoryDefinition());
 							inputDefinition.setId(sensorTypeEnum);
+
 							EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-							editorPropertiesData.setPartName(sensorTypeEnum.getDisplayName());
-							editorPropertiesData.setPartTooltip(sensorTypeEnum.getDisplayName());
-							editorPropertiesData.setImage(sensorTypeEnum.getImage());
-							editorPropertiesData.setHeaderText(method.getPlatformIdent().getAgentName());
-							MethodIdent methodIdent = getRepositoryDefinition().getCachedDataService().getMethodIdentForId(method.getId());
-							editorPropertiesData.setHeaderDescription(TextFormatter.getMethodString(methodIdent));
+							editorPropertiesData.setSensorImage(sensorTypeEnum.getImage());
+							editorPropertiesData.setSensorName(sensorTypeEnum.getDisplayName());
+							editorPropertiesData.setViewName(TextFormatter.getMethodString(method));
+							editorPropertiesData.setViewImage(ModifiersImageFactory.getImage(method.getModifiers()));
 							inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 							IdDefinition idDefinition = new IdDefinition();

@@ -184,7 +184,7 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 		// set site and input
 		setSite(editorSite);
 		setInput(editorInput);
-		setTitleImage(ImageFormatter.getOverlayedEditorImage(getInputDefinition().getEditorPropertiesData().getImage(), getInputDefinition().getRepositoryDefinition(), resourceManager));
+		setTitleImage(ImageFormatter.getOverlayedEditorImage(getInputDefinition().getEditorPropertiesData().getPartImage(), getInputDefinition().getRepositoryDefinition(), resourceManager));
 
 		this.subView = SubViewFactory.createSubView(getInputDefinition().getId());
 		this.subView.setRootEditor(this);

@@ -1,9 +1,9 @@
 package info.novatec.inspectit.rcp.handlers;
 
-import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
+import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData.PartType;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.CombinedInvocationsInputDefinitionExtra;
@@ -57,18 +57,16 @@ public class InvocationsCombineDataHandler extends AbstractHandler implements IH
 		}
 
 		if (!invocationsList.isEmpty()) {
-			PlatformIdent agent = repositoryDefinition.getCachedDataService().getPlatformIdentForId(platformIdent);
 			String desc = "Aggregated data found in " + invocationsList.size() + " selected invocations";
 
 			inputDefinition = new InputDefinition();
 			inputDefinition.setRepositoryDefinition(repositoryDefinition);
 			inputDefinition.setId(SensorTypeEnum.MULTI_INVOC_DATA);
 			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-			editorPropertiesData.setPartName("Combine Data");
-			editorPropertiesData.setPartTooltip(desc);
-			editorPropertiesData.setImage(SensorTypeEnum.MULTI_INVOC_DATA.getImage());
-			editorPropertiesData.setHeaderText(agent.getAgentName());
-			editorPropertiesData.setHeaderDescription(desc);
+			editorPropertiesData.setSensorImage(SensorTypeEnum.INVOCATION_SEQUENCE.getImage());
+			editorPropertiesData.setSensorName("Invocation Sequences");
+			editorPropertiesData.setViewName(desc);
+			editorPropertiesData.setPartNameFlag(PartType.SENSOR);
 			inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 			IdDefinition idDefinition = new IdDefinition();

@@ -70,6 +70,7 @@ public class ExceptionDataAggregator implements IAggregator<ExceptionSensorData>
 	 */
 	public ExceptionSensorData getClone(ExceptionSensorData exceptionData) {
 		AggregatedExceptionSensorData clone = new AggregatedExceptionSensorData();
+		clone.setPlatformIdent(exceptionData.getPlatformIdent());
 		clone.setCause(exceptionData.getCause());
 		clone.setErrorMessage(exceptionData.getErrorMessage());
 		clone.setExceptionEvent(exceptionData.getExceptionEvent());

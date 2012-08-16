@@ -8,6 +8,7 @@ import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
+import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData.PartType;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
@@ -80,15 +81,10 @@ public class NavigateToInvocationsHandler extends AbstractTemplateHandler {
 			inputDefinition.setId(SensorTypeEnum.NAVIGATION_INVOCATION);
 
 			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-			editorPropertiesData.setPartName("Invocation Sequences");
-			editorPropertiesData.setPartTooltip("Invocation Sequences (that contain " + textualDesc + ")");
-			editorPropertiesData.setImage(SensorTypeEnum.INVOCATION_SEQUENCE.getImage());
-			editorPropertiesData.setHeaderText("Invocation Sequences");
-			if (invocationsCount > 1) {
-				editorPropertiesData.setHeaderDescription("Show All  (that contain " + textualDesc + ")");
-			} else if (invocationsCount == 1) {
-				editorPropertiesData.setHeaderDescription("Show One  (that contains " + textualDesc + ")");
-			}
+			editorPropertiesData.setSensorImage(SensorTypeEnum.INVOCATION_SEQUENCE.getImage());
+			editorPropertiesData.setSensorName("Invocation Sequences");
+			editorPropertiesData.setViewName("that contain " + textualDesc);
+			editorPropertiesData.setPartNameFlag(PartType.SENSOR);
 			inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 			IdDefinition idDefinition = new IdDefinition();

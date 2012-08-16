@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.editor.inputdefinition;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.graphics.Image;
 
 import com.google.common.base.Objects;
@@ -13,47 +14,108 @@ import com.google.common.base.Objects;
 public class EditorPropertiesData {
 
 	/**
-	 * The name of the view part.
-	 */
-	private String partName = "Editor title";
-
-	/**
-	 * The tooltip is shown when hovering over the view part tab.
-	 */
-	private String partTooltip = "Editor tooltip";
-
-	/**
-	 * The imageDescriptor descriptor of the view.
-	 */
-	private Image image;
-
-	/**
-	 * String used by the {@link Form} currently to display the text on it.
-	 */
-	private String headerText = "Form title";
-
-	/**
-	 * String used by the {@link Form} currently to display the message on it.
-	 */
-	private String headerDescription = "Form description";
-
-	/**
-	 * Gets {@link #partName}.
+	 * Enumeration that can be used to specify what should be used for editors part image and name.
 	 * 
-	 * @return {@link #partName}
+	 * @author Ivan Senic
+	 * 
 	 */
-	public String getPartName() {
-		return partName;
+	public enum PartType {
+
+		/**
+		 * Value for group properties, can be used when specifying the part title and image.
+		 */
+		SENSOR,
+
+		/**
+		 * Value for view properties, can be used when specifying the part title and image.
+		 */
+		VIEW,
+
 	}
 
 	/**
-	 * Sets {@link #partName}.
-	 * 
-	 * @param partName
-	 *            New value for {@link #partName}
+	 * Flag for specifying what should be used as a part name. Defaults to
+	 * {@link EditorPropertiesData#VIEW}.
 	 */
-	public void setPartName(String partName) {
-		this.partName = partName;
+	private PartType partNameFlag = PartType.VIEW;
+
+	/**
+	 * Flag for specifying what should be used as a part image. Defaults to
+	 * {@link EditorPropertiesData#SENSOR}.
+	 */
+	private PartType partImageFlag = PartType.SENSOR;
+
+	/**
+	 * Group/sensor image.
+	 */
+	private Image sensorImage;
+
+	/**
+	 * Group/sensor name.
+	 */
+	private String sensorName = "";
+
+	/**
+	 * The image of the view.
+	 */
+	private Image viewImage;
+
+	/**
+	 * View name.
+	 */
+	private String viewName = "";
+
+	/**
+	 * @return Returns the part name. This {@link String} should be used for the editor tab.
+	 */
+	public String getPartName() {
+		switch (partNameFlag) {
+		case SENSOR:
+			return sensorName;
+		default:
+			return viewName;
+		}
+	}
+
+	/**
+	 * Sets what will be used as part name.
+	 * <p>
+	 * Values acceptable are:<br>
+	 * {@link #SENSOR} - Uses sensor name as the part name<br>
+	 * {@link #VIEW} - Uses view name as the part name<br>
+	 * {@link #INFO} - Uses info as the part name
+	 * 
+	 * @param partType
+	 *            Flag to set for part name.
+	 */
+	public void setPartNameFlag(PartType partType) {
+		partNameFlag = partType;
+	}
+
+	/**
+	 * @return Returns the part image. This {@link Image} should be used for the editor tab.
+	 */
+	public Image getPartImage() {
+		switch (partImageFlag) {
+		case VIEW:
+			return viewImage;
+		default:
+			return sensorImage;
+		}
+	}
+
+	/**
+	 * Sets what will be used as part image.
+	 * <p>
+	 * Values acceptable are:<br>
+	 * {@link #SENSOR} - Uses sensor image as the part image<br>
+	 * {@link #VIEW} - Uses view image as the part image<br>
+	 * 
+	 * @param partType
+	 *            Flag to set for part image.
+	 */
+	public void setPartImageFlag(PartType partType) {
+		partImageFlag = partType;
 	}
 
 	/**
@@ -62,74 +124,90 @@ public class EditorPropertiesData {
 	 * @return {@link #partTooltip}
 	 */
 	public String getPartTooltip() {
-		return partTooltip;
+		StringBuilder stringBuilder = new StringBuilder(sensorName);
+		if (StringUtils.isNotEmpty(viewName)) {
+			if (stringBuilder.length() > 0) {
+				stringBuilder.append(" > ");
+			}
+			stringBuilder.append(viewName);
+		}
+		return stringBuilder.toString();
 	}
 
 	/**
-	 * Sets {@link #partTooltip}.
+	 * Gets {@link #sensorImage}.
 	 * 
-	 * @param partTooltip
-	 *            New value for {@link #partTooltip}
+	 * @return {@link #sensorImage}
 	 */
-	public void setPartTooltip(String partTooltip) {
-		this.partTooltip = partTooltip;
+	public Image getSensorImage() {
+		return sensorImage;
 	}
 
 	/**
-	 * Gets {@link #image}.
-	 * 
-	 * @return {@link #image}
-	 */
-	public Image getImage() {
-		return image;
-	}
-
-	/**
-	 * Sets {@link #image}.
+	 * Sets {@link #sensorImage}.
 	 * 
 	 * @param image
-	 *            New value for {@link #image}
+	 *            New value for {@link #sensorImage}
 	 */
-	public void setImage(Image image) {
-		this.image = image;
+	public void setSensorImage(Image image) {
+		this.sensorImage = image;
 	}
 
 	/**
-	 * Gets {@link #headerText}.
+	 * Gets {@link #sensorName}.
 	 * 
-	 * @return {@link #headerText}
+	 * @return {@link #sensorName}
 	 */
-	public String getHeaderText() {
-		return headerText;
+	public String getSensorName() {
+		return sensorName;
 	}
 
 	/**
-	 * Sets {@link #headerText}.
+	 * Sets {@link #sensorName}.
 	 * 
-	 * @param headerText
-	 *            New value for {@link #headerText}
+	 * @param sensorName
+	 *            New value for {@link #sensorName}
 	 */
-	public void setHeaderText(String headerText) {
-		this.headerText = headerText;
+	public void setSensorName(String sensorName) {
+		this.sensorName = sensorName;
 	}
 
 	/**
-	 * Gets {@link #headerDescription}.
+	 * Gets {@link #viewImage}.
 	 * 
-	 * @return {@link #headerDescription}
+	 * @return {@link #viewImage}
 	 */
-	public String getHeaderDescription() {
-		return headerDescription;
+	public Image getViewImage() {
+		return viewImage;
 	}
 
 	/**
-	 * Sets {@link #headerDescription}.
+	 * Sets {@link #viewImage}.
 	 * 
-	 * @param headerDescription
-	 *            New value for {@link #headerDescription}
+	 * @param descriptionImage
+	 *            New value for {@link #viewImage}
 	 */
-	public void setHeaderDescription(String headerDescription) {
-		this.headerDescription = headerDescription;
+	public void setViewImage(Image descriptionImage) {
+		this.viewImage = descriptionImage;
+	}
+
+	/**
+	 * Gets {@link #viewName}.
+	 * 
+	 * @return {@link #viewName}
+	 */
+	public String getViewName() {
+		return viewName;
+	}
+
+	/**
+	 * Sets {@link #viewName}.
+	 * 
+	 * @param viewName
+	 *            New value for {@link #viewName}
+	 */
+	public void setViewName(String viewName) {
+		this.viewName = viewName;
 	}
 
 	/**
@@ -137,7 +215,7 @@ public class EditorPropertiesData {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(partName, partTooltip, image, headerText, headerDescription);
+		return Objects.hashCode(partImageFlag, partNameFlag, sensorImage, sensorName, viewImage, viewName);
 	}
 
 	/**
@@ -155,11 +233,12 @@ public class EditorPropertiesData {
 			return false;
 		}
 		EditorPropertiesData that = (EditorPropertiesData) object;
-		return Objects.equal(this.partName, that.partName)
-				&& Objects.equal(this.partTooltip, that.partTooltip)
-				&& Objects.equal(this.image, that.image)
-				&& Objects.equal(this.headerText, that.headerText)
-				&& Objects.equal(this.headerDescription, that.headerDescription);
+		return Objects.equal(this.partImageFlag, that.partImageFlag)
+				&& Objects.equal(this.partNameFlag, that.partNameFlag)
+				&& Objects.equal(this.sensorImage, that.sensorImage)
+				&& Objects.equal(this.sensorName, that.sensorName)
+				&& Objects.equal(this.viewImage, that.viewImage)
+				&& Objects.equal(this.viewName, that.viewName);
 	}
 
 	/**
@@ -168,11 +247,10 @@ public class EditorPropertiesData {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-				.add("partName", partName)
-				.add("partTooltip", partTooltip)
-				.add("imageDescriptor", image)
-				.add("headerText", headerText)
-				.add("headerDescription", headerDescription)
+				.add("group/sensor image", sensorImage)
+				.add("group/sensor", sensorName)
+				.add("viewName", viewImage)
+				.add("viewName", viewName)
 				.toString();
 	}
 

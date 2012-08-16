@@ -37,13 +37,13 @@ public enum SensorTypeEnum {
 	/** The exception sensor. */
 	EXCEPTION_SENSOR("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor", InspectITImages.IMG_EXCEPTION_SENSOR),
 	/** The exception sensor overview. */
-	EXCEPTION_SENSOR_GROUPED("info.novatec.inspectit.agent.sensor.exception.ExceptionSensorOverview", InspectITImages.IMG_FILTER),
+	EXCEPTION_SENSOR_GROUPED("info.novatec.inspectit.agent.sensor.exception.ExceptionSensorOverview", InspectITImages.IMG_EXCEPTION_SENSOR),
 	/** The combined metrics sensor type. */
 	MARVIN_WORKFLOW("info.novatec.inspectit.agent.sensor.method.marvintimer.MarvinWorkflowSensor", InspectITImages.IMG_INVOCATION),
 	/** The Http timer sensor type. */
-	HTTP_TIMER_SENSOR("info.novatec.inspectit.agent.sensor.method.http.HttpSensor", InspectITImages.IMG_HTTP_AGGREGATE),
+	HTTP_TIMER_SENSOR("info.novatec.inspectit.agent.sensor.method.http.HttpSensor", InspectITImages.IMG_HTTP),
 	/** The Http timer sensor type. */
-	TAGGED_HTTP_TIMER_SENSOR("info.novatec.inspectit.agent.sensor.method.http.HttpSensor", InspectITImages.IMG_HTTP_TAGGED),
+	TAGGED_HTTP_TIMER_SENSOR("info.novatec.inspectit.agent.sensor.method.http.HttpSensor", InspectITImages.IMG_HTTP),
 
 	/** The classloading information sensor type. */
 	CLASSLOADING_INFORMATION("info.novatec.inspectit.agent.sensor.platform.ClassLoadingInformation", InspectITImages.IMG_CLASS_OVERVIEW),
