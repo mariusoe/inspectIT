@@ -296,6 +296,10 @@
             id="info.novatec.inspectit.rcp.commands.closeAndShowStorage"
             name="Close And Show Storage">
       </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.copySqlQuery"
+            name="Copy SQL Query">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -990,6 +994,22 @@
             commandId="info.novatec.inspectit.rcp.commands.closeAndShowStorage">
       </handler>
       <handler
+            class="info.novatec.inspectit.rcp.handlers.CopySqlQueryHandler"
+            commandId="info.novatec.inspectit.rcp.commands.copySqlQuery">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.communication.data.SqlStatementData">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
             class="info.novatec.inspectit.rcp.handlers.LocateHandler$SqlLocateHandler"
             commandId="info.novatec.inspectit.rcp.commands.addToSteppingObjects">
          <activeWhen>
@@ -1314,6 +1334,13 @@
                commandId="org.eclipse.ui.edit.copy"
                style="push">
          </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.copySqlQuery"
+               style="push">
+            <visibleWhen
+                  checkEnabled="true">
+            </visibleWhen>
+         </command>
          <separator
                name="inspectit.editor.formrooteditor.treesubview.separator2"
                visible="true">
@@ -1501,6 +1528,13 @@
          <command
                commandId="org.eclipse.ui.edit.copy"
                style="push">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.copySqlQuery"
+               style="push">
+            <visibleWhen
+                  checkEnabled="true">
+            </visibleWhen>
          </command>
          <separator
                name="inspectit.editor.formrooteditor.tablesubview.separator2"

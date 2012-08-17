@@ -126,6 +126,7 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 				if (null == sqlData) {
 					try {
 						Timestamp timestamp = new Timestamp(System.currentTimeMillis() - Math.round(duration));
+						List<String> params = statementStorage.getParameters(object);
 						long platformId = idManager.getPlatformId();
 						long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
 						long registeredMethodId = idManager.getRegisteredMethodId(methodId);
@@ -137,6 +138,7 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 						sqlData.calculateMin(duration);
 						sqlData.calculateMax(duration);
 						sqlData.setCount(1L);
+						sqlData.setParameterValues(params);
 						coreService.addMethodSensorData(sensorTypeId, methodId, sql, sqlData);
 					} catch (IdNotAvailableException e) {
 						if (LOGGER.isLoggable(Level.FINER)) {

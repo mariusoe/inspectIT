@@ -12,6 +12,7 @@ import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 
 /**
@@ -191,6 +192,12 @@ public final class SearchFactory {
 		public boolean isSearchCompatible(SqlStatementData element, SearchCriteria searchCriteria, RepositoryDefinition repositoryDefinition) {
 			if (stringMatches(element.getSql(), searchCriteria)) {
 				return true;
+			} else if (CollectionUtils.isNotEmpty(element.getParameterValues())) {
+				for (String param : element.getParameterValues()) {
+					if (stringMatches(param, searchCriteria)) {
+						return true;
+					}
+				}
 			}
 			MethodIdent methodIdent = repositoryDefinition.getCachedDataService().getMethodIdentForId(element.getMethodIdent());
 			return super.isSearchCompatible(methodIdent, searchCriteria);

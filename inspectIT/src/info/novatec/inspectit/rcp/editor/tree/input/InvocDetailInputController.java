@@ -417,7 +417,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 					SqlStatementData sql = data.getSqlStatementData();
 					Formatter sqlFormatter = FormatStyle.BASIC.getFormatter();
 					content += "\n";
-					content += "SQL: " + sqlFormatter.format(sql.getSql()) + "\n";
+					content += "SQL: " + sqlFormatter.format(sql.getSqlWithParameterValues()) + "\n";
 				}
 
 				// Integrate parameter information from both invocation sequence and timer data
@@ -633,7 +633,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		case SQL:
 			styledString = new StyledString();
 			if (InvocationSequenceDataHelper.hasSQLData(data)) {
-				styledString.append(TextFormatter.clearLineBreaks(data.getSqlStatementData().getSql()));
+				String sql = TextFormatter.clearLineBreaks(data.getSqlStatementData().getSqlWithParameterValues());
 			}
 			return styledString;
 		case PARAMETER:

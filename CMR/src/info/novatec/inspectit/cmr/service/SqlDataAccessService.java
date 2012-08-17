@@ -50,6 +50,24 @@ public class SqlDataAccessService implements ISqlDataAccessService {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@MethodLog
+	public List<SqlStatementData> getParameterAggregatedSqlStatements(SqlStatementData sqlStatementData) {
+		List<SqlStatementData> result = sqlDataDao.getParameterAggregatedSqlStatements(sqlStatementData);
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@MethodLog
+	public List<SqlStatementData> getParameterAggregatedSqlStatements(SqlStatementData sqlStatementData, Date fromDate, Date toDate) {
+		List<SqlStatementData> result = sqlDataDao.getParameterAggregatedSqlStatements(sqlStatementData, fromDate, toDate);
+		return result;
+	}
+
+	/**
 	 * Is executed after dependency injection is done to perform any initialization.
 	 * 
 	 * @throws Exception

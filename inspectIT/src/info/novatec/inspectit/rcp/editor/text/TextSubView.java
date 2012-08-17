@@ -2,12 +2,14 @@ package info.novatec.inspectit.rcp.editor.text;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.AbstractSubView;
+import info.novatec.inspectit.rcp.editor.ISubView;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.text.input.TextInputController;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -113,6 +115,17 @@ public class TextSubView extends AbstractSubView {
 	 */
 	public Set<PreferenceId> getPreferenceIds() {
 		return Collections.emptySet();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ISubView getSubViewWithInputController(Class<?> inputControllerClass) {
+		if (Objects.equals(inputControllerClass, textInputController.getClass())) {
+			return this;
+		}
+		return null;
 	}
 
 	/**

@@ -6,32 +6,40 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
+import info.novatec.inspectit.rcp.editor.ISubView;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.TimeResolution;
+import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
+import info.novatec.inspectit.rcp.editor.text.input.SqlStatementTextInputController;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PopupDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -45,6 +53,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.hibernate.jdbc.util.FormatStyle;
 import org.hibernate.jdbc.util.Formatter;
@@ -86,7 +97,9 @@ public class SqlInputController extends AbstractTableInputController {
 		/** The duration column. */
 		DURATION("Duration (ms)", 80, null),
 		/** The method column. */
-		METHOD("Method", 500, InspectITImages.IMG_METHOD_PUBLIC);
+		METHOD("Method", 500, InspectITImages.IMG_METHOD_PUBLIC),
+		/** The prepared column. */
+		PREPARED("Prepared?", 80, null);
 
 		/** The real viewer column. */
 		private TableViewerColumn column;
@@ -283,10 +296,7 @@ public class SqlInputController extends AbstractTableInputController {
 	 */
 	@Override
 	public boolean canOpenInput(List<? extends DefaultData> data) {
-		if (data.isEmpty()) {
-			return true;
-		}
-		return false;
+		return true;
 	}
 
 	/**
@@ -295,18 +305,33 @@ public class SqlInputController extends AbstractTableInputController {
 	@Override
 	public void doRefresh(IProgressMonitor monitor) {
 		monitor.beginTask("Getting SQL information", IProgressMonitor.UNKNOWN);
-		List<SqlStatementData> invocData;
+		List<SqlStatementData> sqlStatementList;
 		if (autoUpdate) {
-			invocData = dataAccessService.getAggregatedSqlStatements(template);
+			sqlStatementList = dataAccessService.getAggregatedSqlStatements(template);
 		} else {
-			invocData = dataAccessService.getAggregatedSqlStatements(template, fromDate, toDate);
+			sqlStatementList = dataAccessService.getAggregatedSqlStatements(template, fromDate, toDate);
 		}
 
 		sqlData.clear();
-		if (invocData.size() > 0) {
-			sqlData.addAll(invocData);
+		if (CollectionUtils.isNotEmpty(sqlStatementList)) {
+			sqlData.addAll(sqlStatementList);
 		}
 
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				IWorkbenchPage page = window.getActivePage();
+				IRootEditor rootEditor = (IRootEditor) page.getActiveEditor();
+				ISubView paramSubView = rootEditor.getSubView().getSubViewWithInputController(SqlParameterAggregationInputControler.class);
+				if (null != paramSubView) {
+					paramSubView.setDataInput(Collections.<DefaultData> emptyList());
+				}
+				ISubView sqlStringSubView = rootEditor.getSubView().getSubViewWithInputController(SqlStatementTextInputController.class);
+				if (null != sqlStringSubView) {
+					sqlStringSubView.setDataInput(Collections.<DefaultData> emptyList());
+				}
+			}
+		});
 		monitor.done();
 	}
 
@@ -403,6 +428,8 @@ public class SqlInputController extends AbstractTableInputController {
 				return text1.compareTo(text2);
 			case DURATION:
 				return Double.compare(sql1.getDuration(), sql2.getDuration());
+			case PREPARED:
+				return Boolean.compare(sql1.isPreparedStatement(), sql2.isPreparedStatement());
 			default:
 				return 0;
 			}
@@ -415,11 +442,45 @@ public class SqlInputController extends AbstractTableInputController {
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
-		// double click on an sql item will open a details window
-		TableViewer tableViewer = (TableViewer) event.getSource();
-		IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-		Shell parent = tableViewer.getTable().getShell();
-		showDetails(parent, selection.getFirstElement());
+		final StructuredSelection selection = (StructuredSelection) event.getSelection();
+		if (!selection.isEmpty()) {
+			try {
+				PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
+					public void run(final IProgressMonitor monitor) {
+						monitor.beginTask("Retrieving Parameter Aggregated SQLs", IProgressMonitor.UNKNOWN);
+						SqlStatementData data = (SqlStatementData) selection.getFirstElement();
+						List<SqlStatementData> dataList = Collections.emptyList();
+						if (data.isPreparedStatement()) {
+							dataList = dataAccessService.getParameterAggregatedSqlStatements(data, fromDate, toDate);
+
+							// if we have only one statement and it has no parameters, we won't load
+							// the bottom part with empty parameters
+							if (dataList.size() == 1 && CollectionUtils.isEmpty(dataList.get(0).getParameterValues())) {
+								dataList = Collections.emptyList();
+							}
+						}
+
+						final List<SqlStatementData> finalDataList = dataList;
+						Display.getDefault().asyncExec(new Runnable() {
+							public void run() {
+								IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+								IWorkbenchPage page = window.getActivePage();
+								IRootEditor rootEditor = (IRootEditor) page.getActiveEditor();
+								ISubView paramSubView = rootEditor.getSubView().getSubViewWithInputController(SqlParameterAggregationInputControler.class);
+								if (null != paramSubView) {
+									paramSubView.setDataInput(finalDataList);
+								}
+							}
+						});
+						monitor.done();
+					}
+				});
+			} catch (InvocationTargetException e) {
+				MessageDialog.openError(Display.getDefault().getActiveShell().getShell(), "Error", e.getCause().toString());
+			} catch (InterruptedException e) {
+				MessageDialog.openInformation(Display.getDefault().getActiveShell().getShell(), "Cancelled", e.getCause().toString());
+			}
+		}
 	}
 
 	/**
@@ -504,9 +565,6 @@ public class SqlInputController extends AbstractTableInputController {
 				content += "Max (ms): " + data.getMax() + "\n";
 				content += "Total duration (ms): " + data.getDuration() + "\n";
 
-				content += "\n";
-				content += "Is Prepared Statement: " + data.isPreparedStatement() + "\n";
-
 				Formatter sqlFormatter = FormatStyle.BASIC.getFormatter();
 				content += "\n";
 				content += "SQL: " + sqlFormatter.format(data.getSql()) + "\n";
@@ -559,6 +617,12 @@ public class SqlInputController extends AbstractTableInputController {
 			return TextFormatter.getStyledMethodString(methodIdent);
 		case DURATION:
 			return new StyledString(NumberFormatter.formatDouble(data.getDuration(), timeDecimalPlaces));
+		case PREPARED:
+			if (data.isPreparedStatement()) {
+				return new StyledString("true");
+			} else {
+				return new StyledString("false");
+			}
 		default:
 			return new StyledString("error");
 		}

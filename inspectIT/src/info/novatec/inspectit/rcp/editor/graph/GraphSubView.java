@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.editor.graph;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.AbstractSubView;
+import info.novatec.inspectit.rcp.editor.ISubView;
 import info.novatec.inspectit.rcp.editor.graph.plot.DateAxisZoomNotify;
 import info.novatec.inspectit.rcp.editor.graph.plot.PlotController;
 import info.novatec.inspectit.rcp.editor.graph.plot.ZoomListener;
@@ -15,6 +16,7 @@ import java.awt.Color;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -276,6 +278,17 @@ public class GraphSubView extends AbstractSubView {
 				plotController.update(minDate, maxDate);
 			}
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ISubView getSubViewWithInputController(Class<?> inputControllerClass) {
+		if (Objects.equals(inputControllerClass, plotController.getClass())) {
+			return this;
+		}
+		return null;
 	}
 
 	/**

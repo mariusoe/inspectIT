@@ -5,6 +5,7 @@ import info.novatec.inspectit.indexing.indexer.impl.InvocationChildrenIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.MethodIdentIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.ObjectTypeIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.PlatformIdentIndexer;
+import info.novatec.inspectit.indexing.indexer.impl.SqlStringIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.TimestampIndexer;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
 
@@ -13,9 +14,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * Factory for producing {@link IStorageTreeComponent}.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 @Component("storageRootBranchFactory")
 public class StorageRootBranchFactory implements FactoryBean<IStorageTreeComponent<DefaultData>> {
@@ -24,7 +25,8 @@ public class StorageRootBranchFactory implements FactoryBean<IStorageTreeCompone
 	 * {@inheritDoc}
 	 */
 	public IStorageTreeComponent<DefaultData> getObject() throws Exception {
-		StorageBranchIndexer<DefaultData> methodIdentIndexer = new StorageBranchIndexer<DefaultData>(new MethodIdentIndexer<DefaultData>());
+		StorageBranchIndexer<DefaultData> sqlStringIndexer = new StorageBranchIndexer<DefaultData>(new SqlStringIndexer<DefaultData>());
+		StorageBranchIndexer<DefaultData> methodIdentIndexer = new StorageBranchIndexer<DefaultData>(new MethodIdentIndexer<DefaultData>(), sqlStringIndexer);
 		StorageBranchIndexer<DefaultData> timestampIndexer = new StorageBranchIndexer<DefaultData>(new TimestampIndexer<DefaultData>(), methodIdentIndexer);
 		StorageBranchIndexer<DefaultData> objectTypeIndexer = new StorageBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>(), timestampIndexer);
 		StorageBranchIndexer<DefaultData> invocationChildrenIndexer = new StorageBranchIndexer<DefaultData>(new InvocationChildrenIndexer<DefaultData>(), objectTypeIndexer);

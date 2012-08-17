@@ -351,12 +351,18 @@ public class SqlInvocInputController extends AbstractTableInputController {
 				content += "Max (ms): " + data.getMax() + "\n";
 				content += "Total duration (ms): " + data.getDuration() + "\n";
 
-				content += "\n";
-				content += "Is Prepared Statement: " + (rawMode ? data.isPreparedStatement() : "") + "\n";
+				if (rawMode) {
+					content += "\n";
+					content += "Is Prepared Statement: " + data.isPreparedStatement() + "\n";
+				}
 
 				Formatter sqlFormatter = FormatStyle.BASIC.getFormatter();
 				content += "\n";
-				content += "SQL: " + sqlFormatter.format(data.getSql()) + "\n";
+				if (rawMode) {
+					content += "SQL: " + sqlFormatter.format(data.getSqlWithParameterValues()) + "\n";
+				} else {
+					content += "SQL: " + sqlFormatter.format(data.getSql()) + "\n";
+				}
 
 				text.setText(content);
 			}
@@ -545,7 +551,11 @@ public class SqlInvocInputController extends AbstractTableInputController {
 					return 0;
 				}
 			case STATEMENT:
-				return sql1.getSql().compareTo(sql2.getSql());
+				if (rawMode) {
+					return sql1.getSqlWithParameterValues().compareTo(sql2.getSqlWithParameterValues());
+				} else {
+					return sql1.getSql().compareTo(sql2.getSql());
+				}
 			case COUNT:
 				return Long.valueOf(sql1.getCount()).compareTo(Long.valueOf(sql2.getCount()));
 			case AVERAGE:
@@ -587,7 +597,13 @@ public class SqlInvocInputController extends AbstractTableInputController {
 				return emptyStyledString;
 			}
 		case STATEMENT:
-			return new StyledString(TextFormatter.clearLineBreaks(data.getSql()));
+			if (rawMode) {
+				String sql = TextFormatter.clearLineBreaks(data.getSqlWithParameterValues());
+				return new StyledString(sql);
+			} else {
+				String sql = TextFormatter.clearLineBreaks(data.getSql());
+				return new StyledString(sql);
+			}
 		case COUNT:
 			return new StyledString(Long.toString(data.getCount()));
 		case AVERAGE:

@@ -23,6 +23,7 @@ import info.novatec.inspectit.indexing.indexer.impl.MethodIdentIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.ObjectTypeIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.PlatformIdentIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.SensorTypeIdentIndexer;
+import info.novatec.inspectit.indexing.indexer.impl.SqlStringIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.TimestampIndexer;
 import info.novatec.inspectit.indexing.storage.impl.ArrayBasedStorageLeaf;
 import info.novatec.inspectit.indexing.storage.impl.SimpleStorageDescriptor;
@@ -77,7 +78,8 @@ public class SerializerTest {
 			{ PlatformIdentIndexer.class }, { ObjectTypeIndexer.class }, { MethodIdentIndexer.class }, { SensorTypeIdentIndexer.class }, { TimestampIndexer.class },
 			{ InvocationChildrenIndexer.class }, { StorageBranch.class }, { StorageBranchIndexer.class }, { BooleanStorageLabel.class }, { DateStorageLabel.class }, { NumberStorageLabel.class },
 			{ StringStorageLabel.class }, { AssigneeLabelType.class }, { CreationDateLabelType.class }, { CustomBooleanLabelType.class }, { CustomDateLabelType.class },
-			{ CustomNumberLabelType.class }, { CustomStringLabelType.class }, { ExploredByLabelType.class }, { RatingLabelType.class }, { StatusLabelType.class }, { UseCaseLabelType.class } };
+			{ CustomNumberLabelType.class }, { CustomStringLabelType.class }, { ExploredByLabelType.class }, { RatingLabelType.class }, { StatusLabelType.class }, { UseCaseLabelType.class },
+			{ SqlStringIndexer.class } };
 
 	/**
 	 * Serializer.

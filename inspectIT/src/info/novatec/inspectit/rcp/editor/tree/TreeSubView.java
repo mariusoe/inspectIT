@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.editor.tree;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.AbstractSubView;
+import info.novatec.inspectit.rcp.editor.ISubView;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.FormRootEditor;
@@ -15,6 +16,7 @@ import info.novatec.inspectit.rcp.menu.ShowHideMenuManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -326,6 +328,17 @@ public class TreeSubView extends AbstractSubView implements ISearchExecutor {
 			}
 		}
 		return orderWithoutHidden;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ISubView getSubViewWithInputController(Class<?> inputControllerClass) {
+		if (Objects.equals(inputControllerClass, treeInputController.getClass())) {
+			return this;
+		}
+		return null;
 	}
 
 	/**

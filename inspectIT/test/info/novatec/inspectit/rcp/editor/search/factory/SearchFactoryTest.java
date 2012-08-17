@@ -123,6 +123,17 @@ public class SearchFactoryTest {
 		searchCriteria.setCaseSensitive(true);
 		assertThat(SearchFactory.isSearchCompatible(sqlData, searchCriteria, repositoryDefinition), is(equalTo(false)));
 		assertThat(SearchFactory.isSearchCompatible(sqlData, wrong, repositoryDefinition), is(equalTo(false)));
+
+		List<String> parameters = new ArrayList<String>();
+		parameters.add("blah");
+		sqlData.setSql("Select somthing from table where condition=?");
+		sqlData.setParameterValues(parameters);
+		searchCriteria.setCaseSensitive(false);
+		assertThat(SearchFactory.isSearchCompatible(sqlData, searchCriteria, repositoryDefinition), is(equalTo(true)));
+		searchCriteria.setCaseSensitive(true);
+		assertThat(SearchFactory.isSearchCompatible(sqlData, searchCriteria, repositoryDefinition), is(equalTo(false)));
+		assertThat(SearchFactory.isSearchCompatible(sqlData, wrong, repositoryDefinition), is(equalTo(false)));
+
 	}
 
 	/**

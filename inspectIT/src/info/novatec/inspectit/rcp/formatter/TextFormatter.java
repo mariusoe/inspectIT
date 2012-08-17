@@ -25,10 +25,12 @@ import info.novatec.inspectit.storage.label.type.impl.RatingLabelType;
 import info.novatec.inspectit.storage.label.type.impl.StatusLabelType;
 import info.novatec.inspectit.storage.label.type.impl.UseCaseLabelType;
 
+import java.sql.SQLClientInfoException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -46,6 +48,7 @@ import org.eclipse.swt.graphics.TextStyle;
  * 
  * @author Patrice Bouillet
  * @author Stefan Siegl
+ * @author Ivan Senic
  */
 public final class TextFormatter {
 
@@ -409,6 +412,37 @@ public final class TextFormatter {
 	 */
 	public static String getAgentDescription(PlatformIdent agent) {
 		return agent.getAgentName() + " [" + agent.getVersion() + "]";
+	}
+
+	/**
+	 * Returns formated {@link String} for the {@link SQLClientInfoException} parameter values list.
+	 * <p>
+	 * Elements that are <code>null</code> in the list will be printed as '?'.
+	 * 
+	 * @param parameterValues
+	 *            List of parameter values.
+	 * @return Formated string in form [param1, param2,.., paramN].
+	 */
+	public static String getSqlParametersText(List<String> parameterValues) {
+		if (null == parameterValues || parameterValues.isEmpty()) {
+			return "[]";
+		} else {
+			Iterator<String> it = parameterValues.iterator();
+			StringBuilder sb = new StringBuilder();
+			sb.append('[');
+			while (it.hasNext()) {
+				String param = it.next();
+				if (null != param) {
+					sb.append(param);
+				} else {
+					sb.append('?');
+				}
+				if (it.hasNext()) {
+					sb.append(", ");
+				}
+			}
+			return sb.append(']').toString();
+		}
 	}
 
 	/**

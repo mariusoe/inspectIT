@@ -28,6 +28,7 @@ import info.novatec.inspectit.indexing.indexer.impl.MethodIdentIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.ObjectTypeIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.PlatformIdentIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.SensorTypeIdentIndexer;
+import info.novatec.inspectit.indexing.indexer.impl.SqlStringIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.TimestampIndexer;
 import info.novatec.inspectit.indexing.storage.impl.ArrayBasedStorageLeaf;
 import info.novatec.inspectit.indexing.storage.impl.LeafWithNoDescriptors;
@@ -196,6 +197,7 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(SensorTypeIdentIndexer.class, new FieldSerializer(kryo, SensorTypeIdentIndexer.class), false);
 		kryo.register(TimestampIndexer.class, new CustomCompatibleFieldSerializer(kryo, TimestampIndexer.class, schemaManager), false);
 		kryo.register(InvocationChildrenIndexer.class, new FieldSerializer(kryo, InvocationChildrenIndexer.class), false);
+		kryo.register(SqlStringIndexer.class, new FieldSerializer(kryo, SqlStringIndexer.class), false);
 	}
 
 	/**

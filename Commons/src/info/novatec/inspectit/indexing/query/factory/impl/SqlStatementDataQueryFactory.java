@@ -1,9 +1,9 @@
 package info.novatec.inspectit.indexing.query.factory.impl;
 
 import info.novatec.inspectit.communication.data.SqlStatementData;
-import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.query.factory.AbstractQueryFactory;
+import info.novatec.inspectit.indexing.restriction.impl.IndexQueryRestrictionFactory;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -13,17 +13,18 @@ import org.springframework.stereotype.Component;
 
 /**
  * Factory for all queries for the {@link SqlStatementData}.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  * @param <E>
  */
 @Component
 public class SqlStatementDataQueryFactory<E extends IIndexQuery> extends AbstractQueryFactory<E> {
 
 	/**
-	 * Returns the query for aggregating the {@link TimerData}.
-	 *
+	 * Returns the query for aggregating the {@link SqlStatementData}. If the template holds the SQL
+	 * query string, only objects with this query string will be returned.
+	 * 
 	 * @param sqlStatementData
 	 *            The template containing the platform id.
 	 * @param fromDate
@@ -38,6 +39,9 @@ public class SqlStatementDataQueryFactory<E extends IIndexQuery> extends Abstrac
 		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
 		searchedClasses.add(SqlStatementData.class);
 		query.setObjectClasses(searchedClasses);
+		if (null != sqlStatementData.getSql()) {
+			query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("sql", sqlStatementData.getSql()));
+		}
 		if (null != fromDate) {
 			query.setFromDate(new Timestamp(fromDate.getTime()));
 		}
@@ -46,4 +50,5 @@ public class SqlStatementDataQueryFactory<E extends IIndexQuery> extends Abstrac
 		}
 		return query;
 	}
+
 }

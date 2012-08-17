@@ -128,6 +128,17 @@ public interface ISubView {
 	<E extends ISubView> E getSubView(Class<E> clazz);
 
 	/**
+	 * Returns the sub view that has given input controller class if exists. The composite sub views
+	 * should check if the given {@link ISubView} is one of the given contained and return it.
+	 * Non-composite sub views should check if they have the controller and return them self if so.
+	 * 
+	 * @param inputControllerClass
+	 *            Class of the input controller that sub view to search for has.
+	 * @return {@link ISubView} of or <code>null</code> if view can not be found.
+	 */
+	ISubView getSubViewWithInputController(Class<?> inputControllerClass);
+
+	/**
 	 * Disposes this sub-view.
 	 */
 	void dispose();

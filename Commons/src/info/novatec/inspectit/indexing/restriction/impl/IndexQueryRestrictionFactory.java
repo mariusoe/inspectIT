@@ -525,7 +525,7 @@ public final class IndexQueryRestrictionFactory {
 		 * {@inheritDoc}
 		 */
 		public boolean isFulfilled(Object fieldValue) {
-			return collection.contains(fieldValue);
+			return collection != null && collection.contains(fieldValue);
 		}
 
 	}

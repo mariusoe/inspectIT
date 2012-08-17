@@ -62,6 +62,14 @@ public abstract class AbstractSubView implements ISubView {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
+	public ISubView getSubViewWithInputController(Class<?> inputControllerClass) {
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public void dispose() {
 	}
 

@@ -82,6 +82,20 @@ public abstract class AbstractCompositeSubView extends AbstractSubView {
 
 	/**
 	 * {@inheritDoc}
+	 */
+	@Override
+	public ISubView getSubViewWithInputController(Class<?> inputControllerClass) {
+		for (ISubView subView : getSubViews()) {
+			ISubView view = subView.getSubViewWithInputController(inputControllerClass);
+			if (null != view) {
+				return view;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
 	 * <p>
 	 * Delegates the select to all sub views. Implementing classes can override.
 	 */

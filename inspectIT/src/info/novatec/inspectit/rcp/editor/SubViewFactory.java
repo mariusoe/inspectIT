@@ -18,6 +18,7 @@ import info.novatec.inspectit.rcp.editor.table.input.MultiInvocDataInputControll
 import info.novatec.inspectit.rcp.editor.table.input.NavigationInvocOverviewInputController;
 import info.novatec.inspectit.rcp.editor.table.input.SqlInputController;
 import info.novatec.inspectit.rcp.editor.table.input.SqlInvocInputController;
+import info.novatec.inspectit.rcp.editor.table.input.SqlParameterAggregationInputControler;
 import info.novatec.inspectit.rcp.editor.table.input.TaggedHttpTimerDataInputController;
 import info.novatec.inspectit.rcp.editor.table.input.TimerDataInputController;
 import info.novatec.inspectit.rcp.editor.table.input.UngroupedExceptionOverviewInputController;
@@ -26,6 +27,7 @@ import info.novatec.inspectit.rcp.editor.text.input.ClassesInputController;
 import info.novatec.inspectit.rcp.editor.text.input.CpuInputController;
 import info.novatec.inspectit.rcp.editor.text.input.MemoryInputController;
 import info.novatec.inspectit.rcp.editor.text.input.SqlInvocSummaryTextInputController;
+import info.novatec.inspectit.rcp.editor.text.input.SqlStatementTextInputController;
 import info.novatec.inspectit.rcp.editor.text.input.ThreadsInputController;
 import info.novatec.inspectit.rcp.editor.text.input.UngroupedExceptionOverviewStackTraceInputController;
 import info.novatec.inspectit.rcp.editor.text.input.VmSummaryInputController;
@@ -117,7 +119,9 @@ public final class SubViewFactory {
 			return invocSubView;
 		case SQL:
 			SashCompositeSubView sqlSashSubView = new SashCompositeSubView();
-			sqlSashSubView.addSubView(new TableSubView(new SqlInputController()));
+			sqlSashSubView.addSubView(new TableSubView(new SqlInputController()), 10);
+			sqlSashSubView.addSubView(new TableSubView(new SqlParameterAggregationInputControler()), 5);
+			sqlSashSubView.addSubView(new TextSubView(new SqlStatementTextInputController()), 1);
 			return sqlSashSubView;
 		case EXCEPTION_SENSOR:
 			SashCompositeSubView ungroupedExceptionSensorSubView = new SashCompositeSubView();

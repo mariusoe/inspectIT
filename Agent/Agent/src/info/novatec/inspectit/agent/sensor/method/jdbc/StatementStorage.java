@@ -5,6 +5,8 @@ import info.novatec.inspectit.util.ThreadLocalStack;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
@@ -81,37 +83,32 @@ public class StatementStorage {
 	 * @return The sql string.
 	 */
 	protected String getPreparedStatement(Object object) {
-		if (preparedStatementMap.containsKey(object)) {
-			String sql = preparedStatementMap.get(object);
+		if (LOGGER.isLoggable(Level.FINER)) {
+			LOGGER.finer("Return preparded sql statement: " + preparedStatementMap.get(object));
+		}
 
-			if (parameterMap.containsKey(object)) {
-				String[] parameters = parameterMap.get(object);
-				char[] sqlChars = sql.toCharArray();
-				int index = 0;
-				// TODO compute size of string buffer
-				StringBuffer stringBuffer = new StringBuffer(sql.length());
-				for (int i = 0; i < sqlChars.length; i++) {
-					char c = sqlChars[i];
-					if ('?' == c) {
-						String parameter = parameters[index];
-						if ((null == parameter) || "".equals(parameter.trim())) {
-							stringBuffer.append(c);
-						} else {
-							stringBuffer.append(parameter);
-						}
-						index = index + 1;
-					} else {
-						stringBuffer.append(c);
-					}
-				}
-				sql = stringBuffer.toString();
-			}
+		return preparedStatementMap.get(object);
+	}
 
+	/**
+	 * Returns a stored parameters for the object.
+	 * 
+	 * @param object
+	 *            The object which will be used to look up in the map.
+	 * @return The list of parameters.
+	 */
+	protected List<String> getParameters(Object object) {
+		String[] params = parameterMap.get(object);
+		if (null != params) {
 			if (LOGGER.isLoggable(Level.FINER)) {
-				LOGGER.finer("Return preparded sql statement: " + sql);
+				LOGGER.finer("Return preparded sql statement parameters: " + params);
 			}
 
-			return sql;
+			List<String> paramList = new ArrayList<String>(params.length);
+			for (String param : params) {
+				paramList.add(param);
+			}
+			return paramList;
 		} else {
 			return null;
 		}

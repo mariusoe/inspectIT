@@ -1,15 +1,16 @@
 package info.novatec.inspectit.indexing.aggregation.impl;
 
-import java.io.Serializable;
-
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.indexing.aggregation.IAggregator;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+
 /**
  * {@link IAggregator} for {@link SqlStatementData}.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class SqlStatementDataAggregator implements IAggregator<SqlStatementData>, Serializable {
 
@@ -24,13 +25,31 @@ public class SqlStatementDataAggregator implements IAggregator<SqlStatementData>
 	private boolean cloning;
 
 	/**
-	 * Default constructor.
-	 *
+	 * Should the parameters be included in aggregation.
+	 */
+	private boolean includeParameters;
+
+	/**
+	 * Default constructor. Same as calling {@link #SqlStatementDataAggregator(boolean, false)}.
+	 * 
 	 * @param cloning
 	 *            Should cloning be used or not.
 	 */
 	public SqlStatementDataAggregator(boolean cloning) {
+		this(cloning, false);
+	}
+
+	/**
+	 * Secondary constructor. Allows to define if parameters should be included in the aggregation.
+	 * 
+	 * @param cloning
+	 *            Should cloning be used or not.
+	 * @param includeParameters
+	 *            Should the parameters be included in aggregation.
+	 */
+	public SqlStatementDataAggregator(boolean cloning, boolean includeParameters) {
 		this.cloning = cloning;
+		this.includeParameters = includeParameters;
 	}
 
 	/**
@@ -47,7 +66,11 @@ public class SqlStatementDataAggregator implements IAggregator<SqlStatementData>
 		SqlStatementData clone = new SqlStatementData();
 		clone.setPlatformIdent(sqlStatementData.getPlatformIdent());
 		clone.setMethodIdent(sqlStatementData.getMethodIdent());
+		clone.setPreparedStatement(sqlStatementData.isPreparedStatement());
 		clone.setSql(sqlStatementData.getSql());
+		if (includeParameters && null != sqlStatementData.getParameterValues()) {
+			clone.setParameterValues(new ArrayList<String>(sqlStatementData.getParameterValues()));
+		}
 		return clone;
 	}
 
@@ -65,7 +88,11 @@ public class SqlStatementDataAggregator implements IAggregator<SqlStatementData>
 		final int prime = 31;
 		int result = 0;
 		result = prime * result + (int) (sqlStatementData.getMethodIdent() ^ (sqlStatementData.getMethodIdent() >>> 32));
+		result = prime * result + (sqlStatementData.isPreparedStatement() ? 1231 : 1237);
 		result = prime * result + ((sqlStatementData.getSql() == null) ? 0 : sqlStatementData.getSql().hashCode());
+		if (includeParameters) {
+			result = prime * result + ((sqlStatementData.getParameterValues() == null) ? 0 : sqlStatementData.getParameterValues().hashCode());
+		}
 		return result;
 	}
 

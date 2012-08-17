@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.editor.table;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.AbstractSubView;
+import info.novatec.inspectit.rcp.editor.ISubView;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
@@ -18,6 +19,7 @@ import info.novatec.inspectit.rcp.menu.ShowHideMenuManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -291,7 +293,7 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 	public void setDataInput(List<? extends DefaultData> data) {
 		if (tableInputController.canOpenInput(data)) {
 			tableViewer.setInput(data);
-			tableViewer.refresh();
+			tableViewer.refresh(true);
 		}
 	}
 
@@ -388,6 +390,17 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 			}
 		}
 		return orderWithoutHidden;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ISubView getSubViewWithInputController(Class<?> inputControllerClass) {
+		if (Objects.equals(inputControllerClass, tableInputController.getClass())) {
+			return this;
+		}
+		return null;
 	}
 
 	/**

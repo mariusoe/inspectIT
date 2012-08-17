@@ -31,6 +31,11 @@ public class StorageIndexQuery extends IndexQuery {
 	private List<Long> excludeIds;
 
 	/**
+	 * Wanted sql string.
+	 */
+	private String sql;
+
+	/**
 	 * @return the onlyInvocationsWithoutChildren
 	 */
 	public boolean isOnlyInvocationsWithoutChildren() {
@@ -76,6 +81,25 @@ public class StorageIndexQuery extends IndexQuery {
 	}
 
 	/**
+	 * Gets {@link #sql}.
+	 * 
+	 * @return {@link #sql}
+	 */
+	public String getSql() {
+		return sql;
+	}
+
+	/**
+	 * Sets {@link #sql}.
+	 * 
+	 * @param sql
+	 *            New value for {@link #sql}
+	 */
+	public void setSql(String sql) {
+		this.sql = sql;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -92,6 +116,7 @@ public class StorageIndexQuery extends IndexQuery {
 		toStringBuilder.append("onlyInvocationsWithoutChildren", onlyInvocationsWithoutChildren);
 		toStringBuilder.append("includeIds", includeIds);
 		toStringBuilder.append("excludeIds", excludeIds);
+		toStringBuilder.append("sql", sql);
 		return toStringBuilder.toString();
 	}
 }

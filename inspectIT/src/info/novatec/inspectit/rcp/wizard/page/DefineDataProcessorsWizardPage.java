@@ -272,7 +272,7 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 		if (saveClassesList.contains(SqlStatementData.class)) {
 			saveClassesList.remove(SqlStatementData.class);
 			DataAggregatorProcessor<SqlStatementData> dataAggregatorProcessor = new DataAggregatorProcessor<SqlStatementData>(SqlStatementData.class, aggregationPeriod,
-					new SqlStatementDataAggregator(true));
+					new SqlStatementDataAggregator(true, true));
 			normalProcessors.add(dataAggregatorProcessor);
 		}
 

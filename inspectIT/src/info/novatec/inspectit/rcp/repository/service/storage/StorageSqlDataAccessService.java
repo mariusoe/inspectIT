@@ -25,6 +25,12 @@ public class StorageSqlDataAccessService extends AbstractStorageService<SqlState
 	private static final SqlStatementDataAggregator SQL_STATEMENT_DATA_AGGREGATOR = new SqlStatementDataAggregator(false);
 
 	/**
+	 * {@link IAggregator} used for {@link SqlStatementData} when parameters are included in
+	 * aggregation.
+	 */
+	private static final SqlStatementDataAggregator SQL_STATEMENT_DATA_PARAMETER_AGGREGATOR = new SqlStatementDataAggregator(true, true);
+
+	/**
 	 * Indexing tree.
 	 */
 	private IStorageTreeComponent<SqlStatementData> indexingTree;
@@ -47,6 +53,22 @@ public class StorageSqlDataAccessService extends AbstractStorageService<SqlState
 	public List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData sqlStatementData, Date fromDate, Date toDate) {
 		StorageIndexQuery query = sqlDataQueryFactory.getAggregatedSqlStatementsQuery(sqlStatementData, fromDate, toDate);
 		return super.executeQuery(query, SQL_STATEMENT_DATA_AGGREGATOR);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<SqlStatementData> getParameterAggregatedSqlStatements(SqlStatementData sqlStatementData) {
+		return this.getParameterAggregatedSqlStatements(sqlStatementData, null, null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<SqlStatementData> getParameterAggregatedSqlStatements(SqlStatementData sqlStatementData, Date fromDate, Date toDate) {
+		StorageIndexQuery query = sqlDataQueryFactory.getAggregatedSqlStatementsQuery(sqlStatementData, fromDate, toDate);
+		query.setSql(sqlStatementData.getSql());
+		return super.executeQuery(query, SQL_STATEMENT_DATA_PARAMETER_AGGREGATOR);
 	}
 
 	/**
