@@ -23,16 +23,6 @@ public class StorageData extends AbstractStorageData {
 	private static final long serialVersionUID = -7907538407211424496L;
 
 	/**
-	 * Size on disk in bytes.
-	 */
-	private long diskSize;
-
-	/**
-	 * Description.
-	 */
-	private String description;
-
-	/**
 	 * List of labels.
 	 */
 	private List<AbstractStorageLabel<?>> labelList = new ArrayList<AbstractStorageLabel<?>>();
@@ -51,36 +41,6 @@ public class StorageData extends AbstractStorageData {
 		dateLabel.setStorageLabelType(new CreationDateLabelType());
 		dateLabel.setDateValue(new Date());
 		labelList.add(dateLabel);
-	}
-
-	/**
-	 * @return the diskSize
-	 */
-	public long getDiskSize() {
-		return diskSize;
-	}
-
-	/**
-	 * @param diskSize
-	 *            the diskSize to set
-	 */
-	public void setDiskSize(long diskSize) {
-		this.diskSize = diskSize;
-	}
-
-	/**
-	 * @return the description
-	 */
-	public String getDescription() {
-		return description;
-	}
-
-	/**
-	 * @param description
-	 *            the description to set
-	 */
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	/**

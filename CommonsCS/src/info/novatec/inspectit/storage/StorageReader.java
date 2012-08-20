@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -58,7 +59,7 @@ public class StorageReader {
 	 */
 	@Autowired
 	@Resource(name = "storageExecutorService")
-	private ExecutorService executorService;
+	private ScheduledExecutorService executorService;
 
 	/**
 	 * {@link ByteBufferProvider}.
@@ -76,7 +77,7 @@ public class StorageReader {
 	 * @return Combined array of bytes. The order of bytes in the array does not have to be same as
 	 *         the order of descriptors.
 	 */
-	public byte[] read(StorageData storageData, Collection<IStorageDescriptor> descriptors) {
+	public byte[] read(IStorageData storageData, Collection<IStorageDescriptor> descriptors) {
 		final AtomicInteger count = new AtomicInteger(0);
 		final AtomicLong totalReadSize = new AtomicLong(0);
 		final LinkedBlockingQueue<ByteBuffer> localBufferQueue = new LinkedBlockingQueue<ByteBuffer>();
@@ -159,6 +160,46 @@ public class StorageReader {
 		} else {
 			return result;
 		}
+	}
+
+	/**
+	 * Sets {@link #storageManager}.
+	 * 
+	 * @param storageManager
+	 *            New value for {@link #storageManager}
+	 */
+	public void setStorageManager(StorageManager storageManager) {
+		this.storageManager = storageManager;
+	}
+
+	/**
+	 * Sets {@link #readingChannelManager}.
+	 * 
+	 * @param readingChannelManager
+	 *            New value for {@link #readingChannelManager}
+	 */
+	public void setReadingChannelManager(ReadingChannelManager readingChannelManager) {
+		this.readingChannelManager = readingChannelManager;
+	}
+
+	/**
+	 * Sets {@link #executorService}.
+	 * 
+	 * @param executorService
+	 *            New value for {@link #executorService}
+	 */
+	public void setExecutorService(ScheduledExecutorService executorService) {
+		this.executorService = executorService;
+	}
+
+	/**
+	 * Sets {@link #byteBufferProvider}.
+	 * 
+	 * @param byteBufferProvider
+	 *            New value for {@link #byteBufferProvider}
+	 */
+	public void setByteBufferProvider(ByteBufferProvider byteBufferProvider) {
+		this.byteBufferProvider = byteBufferProvider;
 	}
 
 	/**

@@ -1,17 +1,20 @@
-package info.novatec.inspectit.rcp.model;
+package info.novatec.inspectit.rcp.model.storage;
 
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
+import info.novatec.inspectit.rcp.model.Leaf;
 import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.storage.StorageData;
 
 import org.eclipse.core.runtime.Assert;
 
+import com.google.common.base.Objects;
+
 /**
  * Leaf used for displaying the storages in the storage tree.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class StorageLeaf extends Leaf implements IStorageDataProvider {
 
@@ -27,7 +30,7 @@ public class StorageLeaf extends Leaf implements IStorageDataProvider {
 
 	/**
 	 * Default constructor.
-	 *
+	 * 
 	 * @param storageData
 	 *            {@link StorageData}
 	 * @param cmrRepositoryDefinition
@@ -63,43 +66,29 @@ public class StorageLeaf extends Leaf implements IStorageDataProvider {
 	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((cmrRepositoryDefinition == null) ? 0 : cmrRepositoryDefinition.hashCode());
-		result = prime * result + ((storageData == null) ? 0 : storageData.hashCode());
-		return result;
+		return Objects.hashCode(storageData, cmrRepositoryDefinition);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
-		if (obj == null) {
+		if (object == null) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
+		if (getClass() != object.getClass()) {
 			return false;
 		}
-		StorageLeaf other = (StorageLeaf) obj;
-		if (cmrRepositoryDefinition == null) {
-			if (other.cmrRepositoryDefinition != null) {
-				return false;
-			}
-		} else if (!cmrRepositoryDefinition.equals(other.cmrRepositoryDefinition)) {
+		if (!super.equals(object)) {
 			return false;
 		}
-		if (storageData == null) {
-			if (other.storageData != null) {
-				return false;
-			}
-		} else if (!storageData.equals(other.storageData)) {
-			return false;
-		}
-		return true;
+		StorageLeaf that = (StorageLeaf) object;
+		return Objects.equal(this.storageData, that.storageData)
+				&& Objects.equal(this.cmrRepositoryDefinition, that.cmrRepositoryDefinition);
 	}
 
 }

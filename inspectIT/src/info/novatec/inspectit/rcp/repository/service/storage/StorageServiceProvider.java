@@ -9,16 +9,16 @@ import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
-import info.novatec.inspectit.storage.IStorageIdProvider;
+import info.novatec.inspectit.storage.LocalStorageData;
 
 import java.util.List;
 
 /**
  * Provider of all storage related services. This classes correctly initialize the service with help
  * of Spring.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public abstract class StorageServiceProvider {
 
@@ -29,20 +29,20 @@ public abstract class StorageServiceProvider {
 
 	/**
 	 * Properly initialized {@link StorageTimerDataAccessService}.
-	 *
+	 * 
 	 * @param cmrRepositoryDefinition
 	 *            CMR where storage is located.
-	 * @param storageIdProvider
-	 *            {@link StorageIdProvider}.
+	 * @param localStorageData
+	 *            {@link LocalStorageData}.
 	 * @param storageTreeComponent
 	 *            Indexing tree.
 	 * @return Properly initialized {@link StorageTimerDataAccessService}.
 	 */
-	public StorageTimerDataAccessService createStorageTimerDataAccessService(CmrRepositoryDefinition cmrRepositoryDefinition, IStorageIdProvider storageIdProvider,
+	public StorageTimerDataAccessService createStorageTimerDataAccessService(CmrRepositoryDefinition cmrRepositoryDefinition, LocalStorageData localStorageData,
 			IStorageTreeComponent<TimerData> storageTreeComponent) {
 		StorageTimerDataAccessService storageTimerDataService = createStorageTimerDataAccessService();
 		storageTimerDataService.setCmrRepositoryDefinition(cmrRepositoryDefinition);
-		storageTimerDataService.setStorageIdProvider(storageIdProvider);
+		storageTimerDataService.setLocalStorageData(localStorageData);
 		storageTimerDataService.setIndexingTree(storageTreeComponent);
 		return storageTimerDataService;
 	}
@@ -54,20 +54,20 @@ public abstract class StorageServiceProvider {
 
 	/**
 	 * Properly initialized {@link StorageHttpTimerDataAccessService}.
-	 *
+	 * 
 	 * @param cmrRepositoryDefinition
 	 *            CMR where storage is located.
-	 * @param storageIdProvider
-	 *            {@link StorageData}.
+	 * @param localStorageData
+	 *            {@link LocalStorageData}.
 	 * @param storageTreeComponent
 	 *            Indexing tree.
 	 * @return Properly initialized {@link StorageHttpTimerDataAccessService}.
 	 */
-	public StorageHttpTimerDataAccessService createStorageHttpTimerDataAccessService(CmrRepositoryDefinition cmrRepositoryDefinition, IStorageIdProvider storageIdProvider,
+	public StorageHttpTimerDataAccessService createStorageHttpTimerDataAccessService(CmrRepositoryDefinition cmrRepositoryDefinition, LocalStorageData localStorageData,
 			IStorageTreeComponent<HttpTimerData> storageTreeComponent) {
 		StorageHttpTimerDataAccessService storageHttpTimerDataService = createStorageHttpTimerDataAccessService();
 		storageHttpTimerDataService.setCmrRepositoryDefinition(cmrRepositoryDefinition);
-		storageHttpTimerDataService.setStorageIdProvider(storageIdProvider);
+		storageHttpTimerDataService.setLocalStorageData(localStorageData);
 		storageHttpTimerDataService.setIndexingTree(storageTreeComponent);
 		return storageHttpTimerDataService;
 	}
@@ -79,20 +79,20 @@ public abstract class StorageServiceProvider {
 
 	/**
 	 * Properly initialized {@link StorageSqlDataAccessService}.
-	 *
+	 * 
 	 * @param cmrRepositoryDefinition
 	 *            CMR where storage is located.
-	 * @param storageIdProvider
-	 *            {@link StorageData}.
+	 * @param localStorageData
+	 *            {@link LocalStorageData}.
 	 * @param storageTreeComponent
 	 *            Indexing tree.
 	 * @return Properly initialized {@link StorageSqlDataAccessService}.
 	 */
-	public StorageSqlDataAccessService createStorageSqlDataAccessService(CmrRepositoryDefinition cmrRepositoryDefinition, IStorageIdProvider storageIdProvider,
+	public StorageSqlDataAccessService createStorageSqlDataAccessService(CmrRepositoryDefinition cmrRepositoryDefinition, LocalStorageData localStorageData,
 			IStorageTreeComponent<SqlStatementData> storageTreeComponent) {
 		StorageSqlDataAccessService storageSqlDataAccessService = createStorageSqlDataAccessService();
 		storageSqlDataAccessService.setCmrRepositoryDefinition(cmrRepositoryDefinition);
-		storageSqlDataAccessService.setStorageIdProvider(storageIdProvider);
+		storageSqlDataAccessService.setLocalStorageData(localStorageData);
 		storageSqlDataAccessService.setIndexingTree(storageTreeComponent);
 		return storageSqlDataAccessService;
 	}
@@ -104,20 +104,20 @@ public abstract class StorageServiceProvider {
 
 	/**
 	 * Properly initialized {@link StorageExceptionDataAccessService}.
-	 *
+	 * 
 	 * @param cmrRepositoryDefinition
 	 *            CMR where storage is located.
-	 * @param storageIdProvider
-	 *            {@link StorageData}.
+	 * @param localStorageData
+	 *            {@link LocalStorageData}.
 	 * @param storageTreeComponent
 	 *            Indexing tree.
 	 * @return Properly initialized {@link StorageExceptionDataAccessService}.
 	 */
-	public StorageExceptionDataAccessService createStorageExceptionDataAccessService(CmrRepositoryDefinition cmrRepositoryDefinition, IStorageIdProvider storageIdProvider,
+	public StorageExceptionDataAccessService createStorageExceptionDataAccessService(CmrRepositoryDefinition cmrRepositoryDefinition, LocalStorageData localStorageData,
 			IStorageTreeComponent<ExceptionSensorData> storageTreeComponent) {
 		StorageExceptionDataAccessService storageExceptionDataAccessService = createStorageExceptionDataAccessService();
 		storageExceptionDataAccessService.setCmrRepositoryDefinition(cmrRepositoryDefinition);
-		storageExceptionDataAccessService.setStorageIdProvider(storageIdProvider);
+		storageExceptionDataAccessService.setLocalStorageData(localStorageData);
 		storageExceptionDataAccessService.setIndexingTree(storageTreeComponent);
 		return storageExceptionDataAccessService;
 	}
@@ -129,20 +129,20 @@ public abstract class StorageServiceProvider {
 
 	/**
 	 * Properly initialized {@link StorageInvocationDataAccessService}.
-	 *
+	 * 
 	 * @param cmrRepositoryDefinition
 	 *            CMR where storage is located.
-	 * @param storageIdProvider
-	 *            {@link StorageData}.
+	 * @param localStorageData
+	 *            {@link LocalStorageData}.
 	 * @param storageTreeComponent
 	 *            Indexing tree.
 	 * @return Properly initialized {@link StorageInvocationDataAccessService}.
 	 */
-	public StorageInvocationDataAccessService createStorageInvocationDataAccessService(CmrRepositoryDefinition cmrRepositoryDefinition, IStorageIdProvider storageIdProvider,
+	public StorageInvocationDataAccessService createStorageInvocationDataAccessService(CmrRepositoryDefinition cmrRepositoryDefinition, LocalStorageData localStorageData,
 			IStorageTreeComponent<InvocationSequenceData> storageTreeComponent) {
 		StorageInvocationDataAccessService storageExceptionDataAccessService = createStorageInvocationDataAccessService();
 		storageExceptionDataAccessService.setCmrRepositoryDefinition(cmrRepositoryDefinition);
-		storageExceptionDataAccessService.setStorageIdProvider(storageIdProvider);
+		storageExceptionDataAccessService.setLocalStorageData(localStorageData);
 		storageExceptionDataAccessService.setIndexingTree(storageTreeComponent);
 		return storageExceptionDataAccessService;
 	}
@@ -154,25 +154,24 @@ public abstract class StorageServiceProvider {
 
 	/**
 	 * Properly initialized {@link StorageGlobalDataAccessService}.
-	 *
+	 * 
 	 * @param cmrRepositoryDefinition
 	 *            CMR where storage is located.
-	 * @param storageIdProvider
-	 *            {@link StorageData}.
+	 * @param localStorageData
+	 *            {@link LocalStorageData}.
 	 * @param storageTreeComponent
 	 *            Indexing tree.
 	 * @param platformIdents
 	 *            Agents related to storage.
 	 * @return Properly initialized {@link StorageGlobalDataAccessService}.
 	 */
-	public StorageGlobalDataAccessService createStorageGlobalDataAccessService(CmrRepositoryDefinition cmrRepositoryDefinition, IStorageIdProvider storageIdProvider,
+	public StorageGlobalDataAccessService createStorageGlobalDataAccessService(CmrRepositoryDefinition cmrRepositoryDefinition, LocalStorageData localStorageData,
 			IStorageTreeComponent<DefaultData> storageTreeComponent, List<PlatformIdent> platformIdents) {
 		StorageGlobalDataAccessService storageGlobalCachedDataAccessService = createStorageGlobalDataAccessService();
 		storageGlobalCachedDataAccessService.setCmrRepositoryDefinition(cmrRepositoryDefinition);
-		storageGlobalCachedDataAccessService.setStorageIdProvider(storageIdProvider);
+		storageGlobalCachedDataAccessService.setLocalStorageData(localStorageData);
 		storageGlobalCachedDataAccessService.setIndexingTree(storageTreeComponent);
 		storageGlobalCachedDataAccessService.setAgents(platformIdents);
 		return storageGlobalCachedDataAccessService;
 	}
-
 }

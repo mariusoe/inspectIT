@@ -10,19 +10,25 @@ import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.handlers.CloseAndShowStorageHandler;
 import info.novatec.inspectit.rcp.handlers.ShowRepositoryHandler;
 import info.novatec.inspectit.rcp.model.Component;
-import info.novatec.inspectit.rcp.model.StorageLeaf;
-import info.novatec.inspectit.rcp.model.StorageManagerTreeModelManager;
+import info.novatec.inspectit.rcp.model.storage.LocalStorageLeaf;
+import info.novatec.inspectit.rcp.model.storage.LocalStorageTreeModelManager;
+import info.novatec.inspectit.rcp.model.storage.StorageLeaf;
+import info.novatec.inspectit.rcp.model.storage.StorageTreeModelManager;
+import info.novatec.inspectit.rcp.provider.ILocalStorageDataProvider;
 import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryChangeListener;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryManager;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
+import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
 import info.novatec.inspectit.rcp.storage.InspectITStorageManager;
+import info.novatec.inspectit.rcp.storage.listener.StorageChangeListener;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.rcp.view.IRefreshableView;
 import info.novatec.inspectit.rcp.view.tree.StorageManagerTreeContentProvider;
 import info.novatec.inspectit.rcp.view.tree.StorageManagerTreeLabelProvider;
+import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageData.StorageState;
@@ -31,8 +37,10 @@ import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,13 +74,17 @@ import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.ISources;
@@ -89,7 +101,8 @@ import org.eclipse.ui.progress.UIJob;
  * @author Ivan Senic
  * 
  */
-public class StorageManagerView extends ViewPart implements CmrRepositoryChangeListener, IRefreshableView {
+public class StorageManagerView extends ViewPart implements CmrRepositoryChangeListener, StorageChangeListener, IRefreshableView {
+
 	/**
 	 * View id.
 	 */
@@ -106,14 +119,24 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	private CmrRepositoryManager cmrRepositoryManager;
 
 	/**
+	 * {@link InspectITStorageManager}.
+	 */
+	private InspectITStorageManager storageManager;
+
+	/**
 	 * Map of storages and their repositories.
 	 */
-	private Map<StorageData, CmrRepositoryDefinition> storageRespositoryMap = new ConcurrentHashMap<StorageData, CmrRepositoryDefinition>();
+	private Map<StorageData, CmrRepositoryDefinition> storageRepositoryMap = new ConcurrentHashMap<StorageData, CmrRepositoryDefinition>();
 
 	/**
 	 * Cashed statuses of CMR repository definitions.
 	 */
 	private ConcurrentHashMap<CmrRepositoryDefinition, OnlineStatus> cachedOnlineStatus = new ConcurrentHashMap<CmrRepositoryDefinition, OnlineStatus>();
+
+	/**
+	 * Set of downloaded storages.
+	 */
+	private Set<LocalStorageData> downloadedStorages = Collections.newSetFromMap(new ConcurrentHashMap<LocalStorageData, Boolean>());
 
 	/**
 	 * Toolkit for decorations.
@@ -158,6 +181,11 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	private MenuManager groupByLabelMenu;
 
 	/**
+	 * Menu manager for filtering the storages based on the state.
+	 */
+	private MenuManager filterByStateMenu;
+
+	/**
 	 * Storage property form.
 	 */
 	private StorageDataPropertyForm storagePropertyForm;
@@ -166,6 +194,11 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	 * Last selected leaf.
 	 */
 	private StorageLeaf lastSelectedLeaf = null;
+
+	/**
+	 * Last selected local storage leaf.
+	 */
+	private LocalStorageLeaf lastSelectedLocalStorageLeaf = null;
 
 	/**
 	 * Boolean for layout of view.
@@ -188,14 +221,30 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	private FilterStorageComposite filterStorageComposite;
 
 	/**
+	 * Selection button for showing the remove storages.
+	 */
+	private Button remoteStorageSelection;
+
+	/**
+	 * Selection button for showing the local storages.
+	 */
+	private Button localStorageSelection;
+
+	/**
 	 * Default constructor.
 	 */
 	public StorageManagerView() {
 		cmrRepositoryManager = InspectIT.getDefault().getCmrRepositoryManager();
 		cmrRepositoryManager.addCmrRepositoryChangeListener(this);
+		storageManager = InspectIT.getDefault().getInspectITStorageManager();
+		storageManager.addStorageChangeListener(this);
 		updateStorageList();
+		updateDownloadedStorages();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		toolkit = new FormToolkit(parent.getDisplay());
@@ -207,22 +256,26 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 		mainLayout.marginHeight = 0;
 		mainComposite.setLayout(mainLayout);
 
-		upperComposite = toolkit.createComposite(mainComposite);
-		GridLayout upperLayout = new GridLayout(1, true);
-		upperLayout.marginWidth = 0;
-		upperLayout.marginHeight = 0;
-		upperComposite.setLayout(upperLayout);
-		upperComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		mainForm = toolkit.createForm(mainComposite);
+		mainForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		GridLayout lauout = new GridLayout(1, true);
+		lauout.marginWidth = 0;
+		lauout.marginHeight = 0;
+		mainForm.getBody().setLayout(lauout);
+		toolkit.decorateFormHeading(mainForm);
+		createHeadClient();
 
 		// filter composite
-		filterStorageComposite = new FilterStorageComposite(upperComposite, SWT.NONE);
+		filterStorageComposite = new FilterStorageComposite(mainForm.getBody(), SWT.NONE);
 		filterStorageComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-		mainForm = toolkit.createForm(upperComposite);
-		mainForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		mainForm.getBody().setLayout(new GridLayout(1, true));
+		upperComposite = toolkit.createComposite(mainForm.getBody());
+		lauout = new GridLayout(1, true);
+		lauout.marginHeight = 0;
+		upperComposite.setLayout(lauout);
+		upperComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		Tree tree = toolkit.createTree(mainForm.getBody(), SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI);
+		Tree tree = toolkit.createTree(upperComposite, SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI);
 		treeViewer = new TreeViewer(tree);
 		treeViewer.setContentProvider(new StorageManagerTreeContentProvider());
 		treeViewer.setLabelProvider(new StorageManagerTreeLabelProvider());
@@ -251,6 +304,8 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 				StructuredSelection structuredSelection = (StructuredSelection) event.getSelection();
 				if (structuredSelection.getFirstElement() instanceof StorageLeaf) {
 					lastSelectedLeaf = (StorageLeaf) structuredSelection.getFirstElement();
+				} else if (structuredSelection.getFirstElement() instanceof LocalStorageLeaf) {
+					lastSelectedLocalStorageLeaf = (LocalStorageLeaf) structuredSelection.getFirstElement();
 				}
 			}
 		});
@@ -277,19 +332,19 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 				int width = mainComposite.getBounds().width;
 				int height = mainComposite.getBounds().height;
 
-				GridLayout gd = null;
+				GridLayout gl = null;
 				if (width > height && verticaLayout) {
 					verticaLayout = false;
-					gd = new GridLayout(2, true);
+					gl = new GridLayout(2, true);
 				} else if (width < height && !verticaLayout) {
 					verticaLayout = true;
-					gd = new GridLayout(1, true);
+					gl = new GridLayout(1, true);
 				}
 
-				if (null != gd) {
-					gd.marginHeight = 0;
-					gd.marginWidth = 0;
-					mainComposite.setLayout(gd);
+				if (null != gl) {
+					gl.marginHeight = 0;
+					gl.marginWidth = 0;
+					mainComposite.setLayout(gl);
 					mainComposite.layout();
 				}
 			}
@@ -299,6 +354,36 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 		updateViewToolbar();
 
 		getSite().setSelectionProvider(treeViewer);
+	}
+
+	/**
+	 * Creates the head client for form.
+	 */
+	private void createHeadClient() {
+		Composite headClient = new Composite(mainForm.getHead(), SWT.NONE);
+		GridLayout gl = new GridLayout(3, false);
+		gl.marginHeight = 0;
+		gl.marginWidth = 0;
+		headClient.setLayout(gl);
+
+		new Label(headClient, SWT.NONE).setText("Show available: ");
+
+		remoteStorageSelection = new Button(headClient, SWT.RADIO);
+		remoteStorageSelection.setText("Online");
+		remoteStorageSelection.setSelection(true);
+
+		localStorageSelection = new Button(headClient, SWT.RADIO);
+		localStorageSelection.setText("Local");
+
+		remoteStorageSelection.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				updateViewToolbar();
+				updateFormBody();
+			}
+		});
+
+		mainForm.setHeadClient(headClient);
 	}
 
 	/**
@@ -318,7 +403,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 		filterByRepositoryMenu = new MenuManager("Filter By Repository");
 		filterMenuAction.addContributionItem(filterByRepositoryMenu);
 
-		MenuManager filterByStateMenu = new MenuManager("Filter By Storage State");
+		filterByStateMenu = new MenuManager("Filter By Storage State");
 		filterByStateMenu.add(new FilterStatesAction("Writable", StorageState.OPENED));
 		filterByStateMenu.add(new FilterStatesAction("Recording", StorageState.RECORDING));
 		filterByStateMenu.add(new FilterStatesAction("Readable", StorageState.CLOSED));
@@ -333,7 +418,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	 * Updates the storage list for all {@link CmrRepositoryDefinition}.
 	 */
 	private void updateStorageList() {
-		storageRespositoryMap.clear();
+		storageRepositoryMap.clear();
 		for (CmrRepositoryDefinition cmrRepositoryDefinition : cmrRepositoryManager.getCmrRepositoryDefinitions()) {
 			boolean canUpdate = false;
 			if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
@@ -348,7 +433,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 				try {
 					List<StorageData> storages = cmrRepositoryDefinition.getStorageService().getExistingStorages();
 					for (StorageData storage : storages) {
-						storageRespositoryMap.put(storage, cmrRepositoryDefinition);
+						storageRepositoryMap.put(storage, cmrRepositoryDefinition);
 					}
 				} catch (Exception e) {
 					continue;
@@ -366,7 +451,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	 *            If set to true, no storages will be loaded from the CMR.
 	 */
 	private void updateStorageList(CmrRepositoryDefinition cmrRepositoryDefinition, boolean removeOnly) {
-		while (storageRespositoryMap.values().remove(cmrRepositoryDefinition)) {
+		while (storageRepositoryMap.values().remove(cmrRepositoryDefinition)) {
 			continue;
 		}
 		if (!removeOnly) {
@@ -382,10 +467,18 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 			if (canUpdate) {
 				List<StorageData> storages = cmrRepositoryDefinition.getStorageService().getExistingStorages();
 				for (StorageData storage : storages) {
-					storageRespositoryMap.put(storage, cmrRepositoryDefinition);
+					storageRepositoryMap.put(storage, cmrRepositoryDefinition);
 				}
 			}
 		}
+	}
+
+	/**
+	 * Updates the list of downloaded storages.
+	 */
+	private void updateDownloadedStorages() {
+		downloadedStorages.clear();
+		downloadedStorages.addAll(InspectIT.getDefault().getInspectITStorageManager().getDownloadedStorages());
 	}
 
 	/**
@@ -393,21 +486,38 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	 */
 	private void updateFormBody() {
 		clearFormBody();
-		if (!storageRespositoryMap.isEmpty()) {
-			treeViewer.getTree().setVisible(true);
-			treeViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-			treeViewer.setInput(new StorageManagerTreeModelManager(storageRespositoryMap, orderingLabelType));
-			treeViewer.expandToLevel(TreeViewer.ALL_LEVELS);
-			if (null != lastSelectedLeaf && storageRespositoryMap.keySet().contains(lastSelectedLeaf.getStorageData())) {
-				StructuredSelection ss = new StructuredSelection(lastSelectedLeaf);
-				treeViewer.setSelection(ss, true);
+		if (remoteStorageSelection.getSelection()) {
+			if (!storageRepositoryMap.isEmpty()) {
+				treeViewer.getTree().setVisible(true);
+				treeViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+				treeViewer.setInput(new StorageTreeModelManager(storageRepositoryMap, orderingLabelType));
+				treeViewer.expandToLevel(TreeViewer.ALL_LEVELS);
+				if (null != lastSelectedLeaf && storageRepositoryMap.keySet().contains(lastSelectedLeaf.getStorageData())) {
+					StructuredSelection ss = new StructuredSelection(lastSelectedLeaf);
+					treeViewer.setSelection(ss, true);
+				}
+				filterStorageComposite.setEnabled(true);
+			} else {
+				displayMessage("No storage information available on currently available CMR repositories.", Display.getDefault().getSystemImage(SWT.ICON_INFORMATION));
+				filterStorageComposite.setEnabled(false);
 			}
-			filterStorageComposite.setEnabled(true);
 		} else {
-			displayMessage("No storage information available on currently available CMR repositories.", Display.getDefault().getSystemImage(SWT.ICON_INFORMATION));
-			filterStorageComposite.setEnabled(false);
+			if (!downloadedStorages.isEmpty()) {
+				treeViewer.getTree().setVisible(true);
+				treeViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+				treeViewer.setInput(new LocalStorageTreeModelManager(downloadedStorages, orderingLabelType));
+				treeViewer.expandToLevel(TreeViewer.ALL_LEVELS);
+				if (null != lastSelectedLocalStorageLeaf && downloadedStorages.contains(lastSelectedLocalStorageLeaf.getLocalStorageData())) {
+					StructuredSelection ss = new StructuredSelection(lastSelectedLocalStorageLeaf);
+					treeViewer.setSelection(ss, true);
+				}
+				filterStorageComposite.setEnabled(true);
+			} else {
+				displayMessage("No downloaded storage is available on the local machine.", Display.getDefault().getSystemImage(SWT.ICON_INFORMATION));
+				filterStorageComposite.setEnabled(false);
+			}
 		}
-		mainForm.getBody().layout();
+		upperComposite.layout();
 	}
 
 	/**
@@ -432,7 +542,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	 */
 	private void displayMessage(String text, Image image) {
 		if (null == cmrMessageComposite || cmrMessageComposite.isDisposed()) {
-			cmrMessageComposite = toolkit.createComposite(mainForm.getBody());
+			cmrMessageComposite = toolkit.createComposite(upperComposite);
 		} else {
 			for (Control c : cmrMessageComposite.getChildren()) {
 				if (!c.isDisposed()) {
@@ -450,24 +560,46 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	 * Updates the view tool-bar.
 	 */
 	private void updateViewToolbar() {
+		boolean remoteStoragesShown = remoteStorageSelection.getSelection();
+
+		// filter by repository visible only when remote storage sare displayed
 		filterByRepositoryMenu.removeAll();
 		for (CmrRepositoryDefinition cmrRepositoryDefinition : cmrRepositoryManager.getCmrRepositoryDefinitions()) {
 			filterByRepositoryMenu.add(new FilterRepositoriesAction(cmrRepositoryDefinition));
 		}
 		filterByRepositoryMenu.getParent().update(false);
+		filterByRepositoryMenu.setVisible(remoteStoragesShown);
 
+		// filter by state is not visible with downloaded storages displayed
+		filterByStateMenu.setVisible(remoteStoragesShown);
+
+		// group by label
 		Set<AbstractStorageLabelType<?>> availableLabelTypes = new HashSet<AbstractStorageLabelType<?>>();
-		for (StorageData storageData : storageRespositoryMap.keySet()) {
-			for (AbstractStorageLabel<?> label : storageData.getLabelList()) {
-				availableLabelTypes.add(label.getStorageLabelType());
+		if (remoteStoragesShown) {
+			for (StorageData storageData : storageRepositoryMap.keySet()) {
+				for (AbstractStorageLabel<?> label : storageData.getLabelList()) {
+					availableLabelTypes.add(label.getStorageLabelType());
+				}
+			}
+		} else {
+			for (LocalStorageData localStorageData : downloadedStorages) {
+				for (AbstractStorageLabel<?> label : localStorageData.getLabelList()) {
+					availableLabelTypes.add(label.getStorageLabelType());
+				}
 			}
 		}
+
 		groupByLabelMenu.removeAll();
-		groupByLabelMenu.add(new LabelOrderAction("CMR Repository", InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_SERVER_ONLINE_SMALL), null, null == orderingLabelType));
+		if (remoteStoragesShown) {
+			groupByLabelMenu.add(new LabelOrderAction("CMR Repository", InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_SERVER_ONLINE_SMALL), null, null == orderingLabelType));
+		} else {
+			groupByLabelMenu.add(new LabelOrderAction("None", InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_STORAGE_DOWNLOADED), null, null == orderingLabelType));
+		}
 		for (AbstractStorageLabelType<?> labelType : availableLabelTypes) {
 			groupByLabelMenu.add(new LabelOrderAction(TextFormatter.getLabelName(labelType), ImageFormatter.getImageDescriptorForLabel(labelType), labelType, ObjectUtils.equals(labelType,
 					orderingLabelType)));
 		}
+
 	}
 
 	/**
@@ -484,6 +616,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 				if (updateStorageList) {
 					updateStorageList();
 				}
+				updateDownloadedStorages();
 				updateFormBody();
 				updateViewToolbar();
 				mainForm.setBusy(false);
@@ -579,7 +712,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	 */
 	@Override
 	public boolean canRefresh() {
-		return !storageRespositoryMap.isEmpty() || !cmrRepositoryManager.getCmrRepositoryDefinitions().isEmpty();
+		return !storageRepositoryMap.isEmpty() || !cmrRepositoryManager.getCmrRepositoryDefinitions().isEmpty();
 	}
 
 	/**
@@ -601,16 +734,22 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	 */
 	public void setShowProperties(boolean show) {
 		if (show) {
-			StorageLeaf storageLeaf = null;
 			StructuredSelection selection = (StructuredSelection) treeViewer.getSelection();
 			if (!selection.isEmpty()) {
 				if (selection.getFirstElement() instanceof StorageLeaf) {
-					storageLeaf = ((StorageLeaf) selection.getFirstElement());
+					StorageLeaf storageLeaf = ((StorageLeaf) selection.getFirstElement());
+					storagePropertyForm = new StorageDataPropertyForm(mainComposite, toolkit, storageLeaf);
+					storagePropertyForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+				} else if (selection.getFirstElement() instanceof LocalStorageLeaf) {
+					IStorageData storageData = ((LocalStorageLeaf) selection.getFirstElement()).getLocalStorageData();
+					storagePropertyForm = new StorageDataPropertyForm(mainComposite, toolkit, null, storageData);
+					storagePropertyForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+				} else {
+					storagePropertyForm = new StorageDataPropertyForm(mainComposite, toolkit);
+					storagePropertyForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 				}
 			}
 
-			storagePropertyForm = new StorageDataPropertyForm(mainComposite, toolkit, storageLeaf);
-			storagePropertyForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 			treeViewer.addSelectionChangedListener(storagePropertyForm);
 			mainComposite.layout();
 			setTitleToolTip("Hide Properties");
@@ -636,8 +775,64 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	 * {@inheritDoc}
 	 */
 	@Override
+	public void storageDataUpdated(IStorageData storageData) {
+		CmrRepositoryDefinition repositoryToUpdate = storageRepositoryMap.get(storageData);
+		if (null != repositoryToUpdate) {
+			refresh(repositoryToUpdate);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void storageRemotelyDeleted(IStorageData storageData) {
+		for (Iterator<Entry<StorageData, CmrRepositoryDefinition>> it = storageRepositoryMap.entrySet().iterator(); it.hasNext();) {
+			if (Objects.equals(it.next().getKey().getId(), storageData.getId())) {
+				it.remove();
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						if (remoteStorageSelection.getSelection()) {
+							refreshWithoutCmrCall();
+						}
+					}
+				});
+
+				break;
+			}
+
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void storageLocallyDeleted(IStorageData storageData) {
+		for (Iterator<LocalStorageData> it = downloadedStorages.iterator(); it.hasNext();) {
+			if (Objects.equals(it.next().getId(), storageData.getId())) {
+				it.remove();
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						if (localStorageSelection.getSelection()) {
+							refreshWithoutCmrCall();
+						}
+					}
+				});
+				break;
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void dispose() {
 		cmrRepositoryManager.removeCmrRepositoryChangeListener(this);
+		storageManager.removeStorageChangeListener(this);
 		super.dispose();
 	}
 
@@ -772,7 +967,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 			}
 			treeViewer.refresh();
 			treeViewer.expandToLevel(TreeViewer.ALL_LEVELS);
-			if (null != lastSelectedLeaf && storageRespositoryMap.keySet().contains(lastSelectedLeaf.getStorageData())) {
+			if (null != lastSelectedLeaf && storageRepositoryMap.keySet().contains(lastSelectedLeaf.getStorageData())) {
 				StructuredSelection ss = new StructuredSelection(lastSelectedLeaf);
 				treeViewer.setSelection(ss, true);
 			}
@@ -819,7 +1014,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 			}
 			treeViewer.refresh();
 			treeViewer.expandToLevel(TreeViewer.ALL_LEVELS);
-			if (null != lastSelectedLeaf && storageRespositoryMap.keySet().contains(lastSelectedLeaf.getStorageData())) {
+			if (null != lastSelectedLeaf && storageRepositoryMap.keySet().contains(lastSelectedLeaf.getStorageData())) {
 				StructuredSelection ss = new StructuredSelection(lastSelectedLeaf);
 				treeViewer.setSelection(ss, true);
 			}
@@ -886,6 +1081,8 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 				} else {
 					if (element instanceof IStorageDataProvider) {
 						return select(((IStorageDataProvider) element).getStorageData());
+					} else if (element instanceof ILocalStorageDataProvider) {
+						return select(((ILocalStorageDataProvider) element).getLocalStorageData());
 					}
 					return true;
 				}
@@ -895,17 +1092,14 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 			 * Does a filter select on {@link StorageData}.
 			 * 
 			 * @param storageData
-			 *            {@link StorageData}
-			 * @return True if data in {@link StorageData} fits the filter string.
+			 *            {@link IStorageData}
+			 * @return True if data in {@link IStorageData} fits the filter string.
 			 */
-			private boolean select(StorageData storageData) {
+			private boolean select(IStorageData storageData) {
 				if (StringUtils.containsIgnoreCase(storageData.getName(), filterString)) {
 					return true;
 				}
 				if (StringUtils.containsIgnoreCase(storageData.getDescription(), filterString)) {
-					return true;
-				}
-				if (StringUtils.containsIgnoreCase(storageData.getState().toString(), filterString)) {
 					return true;
 				}
 				for (AbstractStorageLabel<?> label : storageData.getLabelList()) {
@@ -913,8 +1107,16 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 						return true;
 					}
 				}
+
+				if (storageData instanceof StorageData) {
+					if (StringUtils.containsIgnoreCase(((StorageData) storageData).getState().toString(), filterString)) {
+						return true;
+					}
+				}
+
 				return false;
 			}
+
 		};
 
 		/**
@@ -938,9 +1140,16 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 			this.filterString = "";
 			treeViewer.refresh();
 			treeViewer.expandToLevel(TreeViewer.ALL_LEVELS);
-			if (null != lastSelectedLeaf && storageRespositoryMap.keySet().contains(lastSelectedLeaf.getStorageData())) {
-				StructuredSelection ss = new StructuredSelection(lastSelectedLeaf);
-				treeViewer.setSelection(ss, true);
+			if (remoteStorageSelection.getSelection()) {
+				if (null != lastSelectedLeaf && storageRepositoryMap.keySet().contains(lastSelectedLeaf.getStorageData())) {
+					StructuredSelection ss = new StructuredSelection(lastSelectedLeaf);
+					treeViewer.setSelection(ss, true);
+				}
+			} else {
+				if (null != lastSelectedLocalStorageLeaf && downloadedStorages.contains(lastSelectedLocalStorageLeaf.getLocalStorageData())) {
+					StructuredSelection ss = new StructuredSelection(lastSelectedLocalStorageLeaf);
+					treeViewer.setSelection(ss, true);
+				}
 			}
 		}
 
@@ -952,9 +1161,16 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 			this.filterString = filterString;
 			treeViewer.refresh();
 			treeViewer.expandToLevel(TreeViewer.ALL_LEVELS);
-			if (null != lastSelectedLeaf && storageRespositoryMap.keySet().contains(lastSelectedLeaf.getStorageData())) {
-				StructuredSelection ss = new StructuredSelection(lastSelectedLeaf);
-				treeViewer.setSelection(ss, true);
+			if (remoteStorageSelection.getSelection()) {
+				if (null != lastSelectedLeaf && storageRepositoryMap.keySet().contains(lastSelectedLeaf.getStorageData())) {
+					StructuredSelection ss = new StructuredSelection(lastSelectedLeaf);
+					treeViewer.setSelection(ss, true);
+				}
+			} else {
+				if (null != lastSelectedLocalStorageLeaf && downloadedStorages.contains(lastSelectedLocalStorageLeaf.getLocalStorageData())) {
+					StructuredSelection ss = new StructuredSelection(lastSelectedLocalStorageLeaf);
+					treeViewer.setSelection(ss, true);
+				}
 			}
 		}
 
@@ -1014,7 +1230,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 					}
 				} else if (storageLeaf.getStorageData().getState() == StorageState.CLOSED) {
 					try {
-						storageManager.mountStorage(storageLeaf.getStorageData(), storageLeaf.getCmrRepositoryDefinition(), false);
+						storageManager.mountStorage(storageLeaf.getStorageData(), storageLeaf.getCmrRepositoryDefinition());
 						LocalStorageData localStorageData = storageManager.getLocalDataForStorage(storageLeaf.getStorageData());
 						repositoryDefinition = storageManager.getStorageRepositoryDefinition(localStorageData);
 					} catch (Exception e1) {
@@ -1044,18 +1260,17 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 				}
 
 				if (null != repositoryDefinition) {
-					IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
-					ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
-
-					Command command = commandService.getCommand(ShowRepositoryHandler.COMMAND);
-					ExecutionEvent executionEvent = handlerService.createExecutionEvent(command, new Event());
-					IEvaluationContext context = (IEvaluationContext) executionEvent.getApplicationContext();
-					context.addVariable(ShowRepositoryHandler.REPOSITORY_DEFINITION, repositoryDefinition);
-
+					executeShowRepositoryCommand(repositoryDefinition);
+				}
+			} else if (!selection.isEmpty() && selection.getFirstElement() instanceof ILocalStorageDataProvider) {
+				LocalStorageData localStorageData = ((ILocalStorageDataProvider) selection.getFirstElement()).getLocalStorageData();
+				if (localStorageData.isFullyDownloaded()) {
+					StorageRepositoryDefinition storageRepositoryDefinition;
 					try {
-						command.executeWithChecks(executionEvent);
+						storageRepositoryDefinition = InspectIT.getDefault().getInspectITStorageManager().getStorageRepositoryDefinition(localStorageData);
+						executeShowRepositoryCommand(storageRepositoryDefinition);
 					} catch (Exception e) {
-						throw new RuntimeException(e);
+						InspectIT.getDefault().createErrorDialog("Exception occured trying to open storage repository definition.", e, -1);
 					}
 				}
 			} else {
@@ -1069,6 +1284,28 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 						treeViewer.expandToLevel(path, 1);
 					}
 				}
+			}
+		}
+
+		/**
+		 * Executes show repository command.
+		 * 
+		 * @param repositoryDefinition
+		 *            Repository to open.
+		 */
+		private void executeShowRepositoryCommand(RepositoryDefinition repositoryDefinition) {
+			try {
+				IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
+				ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
+
+				Command command = commandService.getCommand(ShowRepositoryHandler.COMMAND);
+				ExecutionEvent executionEvent = handlerService.createExecutionEvent(command, new Event());
+				IEvaluationContext context = (IEvaluationContext) executionEvent.getApplicationContext();
+				context.addVariable(ShowRepositoryHandler.REPOSITORY_DEFINITION, repositoryDefinition);
+
+				command.executeWithChecks(executionEvent);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
 		}
 	}

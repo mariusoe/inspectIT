@@ -3,7 +3,7 @@ package info.novatec.inspectit.cmr.storage;
 import info.novatec.inspectit.cmr.dao.StorageDataDao;
 import info.novatec.inspectit.cmr.dao.impl.DefaultDataDaoImpl;
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.storage.IStorageIdProvider;
+import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageData.StorageState;
 import info.novatec.inspectit.storage.StorageException;
@@ -412,6 +412,23 @@ public class CmrStorageManager extends StorageManager {
 	}
 
 	/**
+	 * Returns the storage data based on the ID. This method can be helpful when the updated version
+	 * of {@link StorageData} needs to be retrieved.
+	 * 
+	 * @param id
+	 *            ID of storage.
+	 * @return {@link StorageData}
+	 */
+	public StorageData getStorageData(String id) {
+		for (StorageData storageData : existingStoragesSet) {
+			if (storageData.getId().equals(id)) {
+				return storageData;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Returns list of existing storages.
 	 * 
 	 * @return Returns list of existing storages.
@@ -506,13 +523,13 @@ public class CmrStorageManager extends StorageManager {
 	/**
 	 * Returns storage {@link Path}.
 	 * 
-	 * @param storageIdProvider
+	 * @param storageData
 	 *            Storage.
 	 * @return Returns storage {@link Path}.
 	 * @see Paths#get(String, String...)
 	 */
-	public Path getStoragePath(IStorageIdProvider storageIdProvider) {
-		return Paths.get(getStorageDefaultFolder(), storageIdProvider.getStorageFolder());
+	public Path getStoragePath(IStorageData storageData) {
+		return Paths.get(getStorageDefaultFolder(), storageData.getStorageFolder());
 	}
 
 	/**
@@ -531,6 +548,24 @@ public class CmrStorageManager extends StorageManager {
 	 */
 	public List<String> getIndexFilesLocations(StorageData storageData) throws IOException {
 		return getFilesHttpLocation(storageData, StorageFileExtensions.INDEX_FILE_EXT);
+	}
+
+	/**
+	 * Returns the list of the string that represent the path to the data files for one storage. The
+	 * paths are in form "/directory/file.extension". These paths can be used in combination to
+	 * CMR's IP and port to get the files via HTTP.
+	 * <p>
+	 * For example, if the CMR has the IP localhost and port 8080, the address for the file would
+	 * be: http://localhost:8080/directory/file.extension
+	 * 
+	 * @param storageData
+	 *            Storage to get index files for.
+	 * @return Returns the list of the string that represent the path to the data files.
+	 * @throws IOException
+	 *             If {@link IOException} occurs.
+	 */
+	public List<String> getDataFilesLocations(StorageData storageData) throws IOException {
+		return getFilesHttpLocation(storageData, StorageFileExtensions.DATA_FILE_EXTENSION);
 	}
 
 	/**
@@ -622,7 +657,7 @@ public class CmrStorageManager extends StorageManager {
 	 * @throws SerializationException
 	 *             If {@link SerializationException} happens.
 	 */
-	public boolean removeLabelFromStorage(StorageData storageData, AbstractStorageLabel storageLabel) throws IOException, SerializationException {
+	public boolean removeLabelFromStorage(StorageData storageData, AbstractStorageLabel<?> storageLabel) throws IOException, SerializationException {
 		StorageData local = getLocalStorageDataObject(storageData);
 		if (null != local) {
 			boolean removed = local.removeLabel(storageLabel);

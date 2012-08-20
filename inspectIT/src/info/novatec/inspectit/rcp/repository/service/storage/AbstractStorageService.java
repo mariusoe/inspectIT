@@ -6,9 +6,11 @@ import info.novatec.inspectit.indexing.aggregation.impl.AggregationPerformer;
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
 import info.novatec.inspectit.indexing.storage.impl.StorageIndexQuery;
+import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
-import info.novatec.inspectit.rcp.storage.util.HttpDataRetriever;
-import info.novatec.inspectit.storage.IStorageIdProvider;
+import info.novatec.inspectit.rcp.storage.util.DataRetriever;
+import info.novatec.inspectit.storage.LocalStorageData;
+import info.novatec.inspectit.storage.serializer.SerializationException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,59 +38,14 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 	private CmrRepositoryDefinition cmrRepositoryDefinition;
 
 	/**
-	 * {@link IStorageIdProvider}.
+	 * {@link LocalStorageData}.
 	 */
-	private IStorageIdProvider storageIdProvider;
+	private LocalStorageData localStorageData;
 
 	/**
-	 * {@link HttpDataRetriever}.
+	 * {@link DataRetriever}.
 	 */
-	private HttpDataRetriever httpDataRetriever;
-
-	/**
-	 * @return the cmrRepositoryDefinition
-	 */
-	public CmrRepositoryDefinition getCmrRepositoryDefinition() {
-		return cmrRepositoryDefinition;
-	}
-
-	/**
-	 * @param cmrRepositoryDefinition
-	 *            the cmrRepositoryDefinition to set
-	 */
-	public void setCmrRepositoryDefinition(CmrRepositoryDefinition cmrRepositoryDefinition) {
-		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
-	}
-
-	/**
-	 * @return the storageData
-	 */
-	public IStorageIdProvider getStorageIdProvider() {
-		return storageIdProvider;
-	}
-
-	/**
-	 * @param storageIdProvider
-	 *            the storageIdProvider to set
-	 */
-	public void setStorageIdProvider(IStorageIdProvider storageIdProvider) {
-		this.storageIdProvider = storageIdProvider;
-	}
-
-	/**
-	 * @return the httpDataRetriever
-	 */
-	public HttpDataRetriever getHttpDataRetriever() {
-		return httpDataRetriever;
-	}
-
-	/**
-	 * @param httpDataRetriever
-	 *            the httpDataRetriever to set
-	 */
-	public void setHttpDataRetriever(HttpDataRetriever httpDataRetriever) {
-		this.httpDataRetriever = httpDataRetriever;
-	}
+	private DataRetriever dataRetriever;
 
 	/**
 	 * Returns the indexing tree that can be used for querying.
@@ -237,7 +194,22 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 			// if the size is already to big, or we reached end do query
 			if (size > MAX_QUERY_SIZE || count == descriptors.size()) {
 				// load data and filter with restrictions
-				List<E> allData = httpDataRetriever.getDataViaHttp(cmrRepositoryDefinition, storageIdProvider, limitedDescriptors);
+				List<E> allData;
+				if (localStorageData.isFullyDownloaded()) {
+					try {
+						allData = dataRetriever.getDataLocally(localStorageData, descriptors);
+					} catch (SerializationException e) {
+						InspectIT.getDefault().createErrorDialog("Exception occured trying to load the data.", e, -1);
+						return Collections.emptyList();
+					}
+				} else {
+					try {
+						allData = dataRetriever.getDataViaHttp(cmrRepositoryDefinition, localStorageData, limitedDescriptors);
+					} catch (Exception e) {
+						InspectIT.getDefault().createErrorDialog("Exception occured trying to load the data.", e, -1);
+						return Collections.emptyList();
+					}
+				}
 				List<E> passedData = getRestrictionsPassedList(allData, storageIndexQuery);
 
 				// if we need to aggregate then do so, otherwise just add to result list
@@ -290,4 +262,47 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 		}
 		return passedList;
 	}
+
+	/**
+	 * @return the cmrRepositoryDefinition
+	 */
+	public CmrRepositoryDefinition getCmrRepositoryDefinition() {
+		return cmrRepositoryDefinition;
+	}
+
+	/**
+	 * @param cmrRepositoryDefinition
+	 *            the cmrRepositoryDefinition to set
+	 */
+	public void setCmrRepositoryDefinition(CmrRepositoryDefinition cmrRepositoryDefinition) {
+		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
+	}
+
+	/**
+	 * Gets {@link #localStorageData}.
+	 * 
+	 * @return {@link #localStorageData}
+	 */
+	public LocalStorageData getLocalStorageData() {
+		return localStorageData;
+	}
+
+	/**
+	 * Sets {@link #localStorageData}.
+	 * 
+	 * @param localStorageData
+	 *            New value for {@link #localStorageData}
+	 */
+	public void setLocalStorageData(LocalStorageData localStorageData) {
+		this.localStorageData = localStorageData;
+	}
+
+	/**
+	 * @param dataRetriever
+	 *            the httpDataRetriever to set
+	 */
+	public void setDataRetriever(DataRetriever dataRetriever) {
+		this.dataRetriever = dataRetriever;
+	}
+
 }

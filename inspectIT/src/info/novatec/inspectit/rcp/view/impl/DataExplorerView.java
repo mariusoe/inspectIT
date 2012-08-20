@@ -13,6 +13,7 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatu
 import info.novatec.inspectit.rcp.repository.CmrRepositoryManager.UpdateRepositoryJob;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
+import info.novatec.inspectit.rcp.storage.listener.StorageChangeListener;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.rcp.util.SelectionProviderAdapter;
 import info.novatec.inspectit.rcp.view.IRefreshableView;
@@ -20,6 +21,7 @@ import info.novatec.inspectit.rcp.view.listener.TreeViewDoubleClickListener;
 import info.novatec.inspectit.rcp.view.tree.TreeContentProvider;
 import info.novatec.inspectit.rcp.view.tree.TreeLabelProvider;
 import info.novatec.inspectit.rcp.view.tree.TreeViewerComparator;
+import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
 
 import java.util.ArrayList;
@@ -63,7 +65,7 @@ import org.eclipse.ui.part.ViewPart;
  * @author Ivan Senic
  * 
  */
-public class DataExplorerView extends ViewPart implements CmrRepositoryChangeListener, IRefreshableView {
+public class DataExplorerView extends ViewPart implements CmrRepositoryChangeListener, StorageChangeListener, IRefreshableView {
 
 	/**
 	 * ID of the refresh contribution item needed for setting the visibility.
@@ -155,6 +157,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 */
 	public DataExplorerView() {
 		InspectIT.getDefault().getCmrRepositoryManager().addCmrRepositoryChangeListener(this);
+		InspectIT.getDefault().getInspectITStorageManager().addStorageChangeListener(this);
 	}
 
 	/**
@@ -568,9 +571,67 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	/**
 	 * {@inheritDoc}
 	 */
+	public void storageDataUpdated(IStorageData storageData) {
+		if (displayedRepositoryDefinition instanceof StorageRepositoryDefinition) {
+			final StorageRepositoryDefinition storageRepositoryDefinition = (StorageRepositoryDefinition) displayedRepositoryDefinition;
+			if (ObjectUtils.equals(storageData.getId(), storageRepositoryDefinition.getLocalStorageData().getId())) {
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						updateFormTitle();
+					}
+				});
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void storageRemotelyDeleted(IStorageData storageData) {
+		if (displayedRepositoryDefinition instanceof StorageRepositoryDefinition) {
+			final StorageRepositoryDefinition storageRepositoryDefinition = (StorageRepositoryDefinition) displayedRepositoryDefinition;
+			if (!storageRepositoryDefinition.getLocalStorageData().isFullyDownloaded() && ObjectUtils.equals(storageData.getId(), storageRepositoryDefinition.getLocalStorageData().getId())) {
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						clearFormBody();
+						agentsCombo.removeAll();
+						agentsCombo.setEnabled(false);
+						displayMessage("Selected storage was remotely deleted and is not available anymore.", Display.getDefault().getSystemImage(SWT.ICON_WARNING));
+					}
+				});
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void storageLocallyDeleted(IStorageData storageData) {
+		if (displayedRepositoryDefinition instanceof StorageRepositoryDefinition) {
+			final StorageRepositoryDefinition storageRepositoryDefinition = (StorageRepositoryDefinition) displayedRepositoryDefinition;
+			if (ObjectUtils.equals(storageData.getId(), storageRepositoryDefinition.getLocalStorageData().getId())) {
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						clearFormBody();
+						agentsCombo.removeAll();
+						agentsCombo.setEnabled(false);
+						displayMessage("Selected storage was locally deleted and is not available anymore.", Display.getDefault().getSystemImage(SWT.ICON_WARNING));
+					}
+				});
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void dispose() {
 		InspectIT.getDefault().getCmrRepositoryManager().removeCmrRepositoryChangeListener(this);
+		InspectIT.getDefault().getInspectITStorageManager().removeStorageChangeListener(this);
 		super.dispose();
 	}
 

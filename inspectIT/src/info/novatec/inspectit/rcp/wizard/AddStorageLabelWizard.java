@@ -78,7 +78,12 @@ public class AddStorageLabelWizard extends Wizard implements INewWizard {
 		if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
 			List<AbstractStorageLabel<?>> labelsToAdd = addStorageLabelWizardPage.getLabelsToAdd();
 			try {
-				cmrRepositoryDefinition.getStorageService().addLabelsToStorage(storageData, labelsToAdd, true);
+				StorageData updatedStorageData = cmrRepositoryDefinition.getStorageService().addLabelsToStorage(storageData, labelsToAdd, true);
+				try {
+					InspectIT.getDefault().getInspectITStorageManager().storageRemotelyUpdated(updatedStorageData);
+				} catch (Exception e) {
+					InspectIT.getDefault().createErrorDialog("Error occured trying to save local storage data to disk.", e, -1);
+				}
 			} catch (StorageException e) {
 				InspectIT.getDefault().createErrorDialog("Adding label to storage failed.", e, -1);
 				return false;

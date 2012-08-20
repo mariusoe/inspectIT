@@ -10,3 +10,4 @@ temp-testng-customsuite.xml
 /release/runtime
 /release/resources/ivy/install
 /release/thirdparty.txt
+/storage

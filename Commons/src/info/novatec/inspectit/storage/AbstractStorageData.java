@@ -4,11 +4,11 @@ import java.io.Serializable;
 
 /**
  * Abstract storage data.
- * 
+ *
  * @author Ivan Senic
- * 
+ *
  */
-public abstract class AbstractStorageData implements IStorageIdProvider, Serializable {
+public abstract class AbstractStorageData implements IStorageData, Serializable {
 
 	/**
 	 * Generated UID.
@@ -26,40 +26,94 @@ public abstract class AbstractStorageData implements IStorageIdProvider, Seriali
 	private String name;
 
 	/**
-	 * @return the id
+	 * Size on disk in bytes.
+	 */
+	private long diskSize;
+
+	/**
+	 * Description.
+	 */
+	private String description;
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getStorageFolder() {
+		return id;
+	}
+
+	/**
+	 * @return the diskSize
+	 */
+	public long getDiskSize() {
+		return diskSize;
+	}
+
+	/**
+	 * Gets {@link #id}.
+	 *
+	 * @return {@link #id}
 	 */
 	public String getId() {
 		return id;
 	}
 
 	/**
+	 * Sets {@link #id}.
+	 *
 	 * @param id
-	 *            the id to set
+	 *            New value for {@link #id}
 	 */
 	public void setId(String id) {
 		this.id = id;
 	}
 
 	/**
-	 * @return the name
+	 * Gets {@link #name}.
+	 *
+	 * @return {@link #name}
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
+	 * Sets {@link #name}.
+	 *
 	 * @param name
-	 *            the name to set
+	 *            New value for {@link #name}
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	/**
-	 * {@inheritDoc}
+	 * Gets {@link #description}.
+	 *
+	 * @return {@link #description}
 	 */
-	public String getStorageFolder() {
-		return id;
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * Sets {@link #description}.
+	 *
+	 * @param description
+	 *            New value for {@link #description}
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	/**
+	 * Sets {@link #diskSize}.
+	 *
+	 * @param diskSize
+	 *            New value for {@link #diskSize}
+	 */
+	public void setDiskSize(long diskSize) {
+		this.diskSize = diskSize;
 	}
 
 	/**
@@ -97,7 +151,7 @@ public abstract class AbstractStorageData implements IStorageIdProvider, Seriali
 		}
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

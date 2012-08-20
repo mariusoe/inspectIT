@@ -234,7 +234,7 @@
 		<property name="pathSpec" value="/remoting/HttpTimerDataAccessService" />
 	</bean>
 	<!-- END -->
-	
+
 	<!-- Storage  Service -->
 	<bean name="storageServiceRequestHandlerServlet"
 		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
@@ -252,11 +252,11 @@
 		<property name="pathSpec" value="/remoting/StorageService" />
 	</bean>
 	<!-- END -->
-	
+
 	<!-- DEFAULT SERVER FOR STATIC CONTENT -->
 	<bean id="defaultServlet" class="org.mortbay.jetty.servlet.DefaultServlet" />
 
-	
+
 	<bean id="defaultServletHolder"
 		class="org.mortbay.jetty.servlet.ServletHolder">
 		<property name="name" value="defaultServletExporter" />
@@ -266,7 +266,7 @@
 				<entry key="dirAllowed" value="false"/>
 				<entry key="resourceBase" value="./${storage.storageDefaultFolder}" />
 			</map>
-		</property>	
+		</property>
 	</bean>
 
 	<bean id="defaultServletMapping"
@@ -274,7 +274,29 @@
 		<property name="servletName" value="defaultServletExporter" />
 		<property name="pathSpec" value="/"/>
 	</bean>
-	
+
+	<!-- END -->
+
+	<!-- GZIP FILTER -->
+	<bean id="gzipFilter" class="org.mortbay.servlet.GzipFilter" />
+
+	<bean id="gzipFilterHolder"
+		class="org.mortbay.jetty.servlet.FilterHolder">
+		<property name="name" value="gzipFilterExporter" />
+		<property name="filter" ref="gzipFilter" />
+		<property name="initParameters">
+			<map>
+				<entry key="mimeTypes" value="application/octet-stream" />
+				<entry key="minGzipSize" value="${storage.minGzipSize}" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="gzipFilterMapping"
+		class="org.mortbay.jetty.servlet.FilterMapping">
+		<property name="filterName" value="gzipFilterExporter" />
+		<property name="pathSpec" value="*"/>
+	</bean>
 	<!-- END -->
 
 	<bean id="servletHandler" class="org.mortbay.jetty.servlet.ServletHandler">
@@ -310,6 +332,16 @@
 				<ref bean="httpTimerDataAccessServiceServiceMapping" />
 				<ref bean="storageServiceServiceMapping" />
 				<ref bean="defaultServletMapping" />
+			</list>
+		</property>
+		<property name="filters">
+			<list>
+				<ref bean="gzipFilterHolder" />
+			</list>
+		</property>
+		<property name="filterMappings">
+			<list>
+				<ref bean="gzipFilterMapping" />
 			</list>
 		</property>
 	</bean>

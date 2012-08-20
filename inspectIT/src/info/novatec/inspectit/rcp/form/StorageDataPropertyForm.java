@@ -1,12 +1,14 @@
 package info.novatec.inspectit.rcp.form;
 
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.handlers.AddStorageLabelHandler;
 import info.novatec.inspectit.rcp.handlers.RemoveStorageLabelHandler;
+import info.novatec.inspectit.rcp.provider.ILocalStorageDataProvider;
 import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
@@ -14,6 +16,7 @@ import info.novatec.inspectit.rcp.storage.label.edit.LabelValueEditingSupport;
 import info.novatec.inspectit.rcp.storage.label.edit.LabelValueEditingSupport.LabelEditListener;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
+import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
@@ -71,6 +74,11 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 	 * Number of max characters displayed for storage description.
 	 */
 	private static final int MAX_DESCRIPTION_LENGTH = 150;
+
+	/**
+	 * Storage data holding the main information about the storage.
+	 */
+	private IStorageData storageData;
 
 	/**
 	 * Leaf that is displayed currently.
@@ -158,6 +166,29 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 		this.toolkit = toolkit;
 		this.form = toolkit.createForm(parent);
 		this.storageDataProvider = storageDataProvider;
+		if (null != storageDataProvider) {
+			this.storageData = storageDataProvider.getStorageData();
+		}
+		initWidget();
+	}
+
+	/**
+	 * Third constructor. Lets set everything.
+	 * 
+	 * @param parent
+	 *            Parent where form will be created.
+	 * @param toolkit
+	 *            {@link FormToolkit}.
+	 * @param storageDataProvider
+	 *            {@link IStorageDataProvider} to display. Can be <code>null</code>.
+	 * @param storageData
+	 *            {@link IStorageData} to display. Can be <code>null</code>.
+	 */
+	public StorageDataPropertyForm(Composite parent, FormToolkit toolkit, IStorageDataProvider storageDataProvider, IStorageData storageData) {
+		this.toolkit = toolkit;
+		this.form = toolkit.createForm(parent);
+		this.storageDataProvider = storageDataProvider;
+		this.storageData = storageData;
 		initWidget();
 	}
 
@@ -186,17 +217,16 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 				if (firstElement instanceof IStorageDataProvider) {
 					if (!ObjectUtils.equals(storageDataProvider, firstElement)) {
 						storageDataProvider = (IStorageDataProvider) firstElement;
-
-						final StorageData storageData = storageDataProvider.getStorageData();
+						storageData = storageDataProvider.getStorageData();
 						final CmrRepositoryDefinition cmrRepositoryDefinition = storageDataProvider.getCmrRepositoryDefinition();
-						LabelValueEditingSupport editingSupport = new LabelValueEditingSupport(labelsTableViewer, storageData, cmrRepositoryDefinition);
+						LabelValueEditingSupport editingSupport = new LabelValueEditingSupport(labelsTableViewer, storageDataProvider.getStorageData(), cmrRepositoryDefinition);
 						editingSupport.addLabelEditListener(new LabelEditListener() {
 
 							@Override
 							public void preLabelValueChange(AbstractStorageLabel<?> label) {
 								if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
 									try {
-										cmrRepositoryDefinition.getStorageService().removeLabelFromStorage(storageData, label);
+										cmrRepositoryDefinition.getStorageService().removeLabelFromStorage(storageDataProvider.getStorageData(), label);
 									} catch (StorageException e) {
 										InspectIT.getDefault().createErrorDialog("Label value can not be updated.", e, -1);
 									}
@@ -208,7 +238,7 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 								if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
 									try {
 										label.setId(0);
-										cmrRepositoryDefinition.getStorageService().addLabelToStorage(storageData, label, true);
+										cmrRepositoryDefinition.getStorageService().addLabelToStorage(storageDataProvider.getStorageData(), label, true);
 										refreshStorageManagerView(cmrRepositoryDefinition);
 									} catch (StorageException e) {
 										InspectIT.getDefault().createErrorDialog("Label value can not be updated.", e, -1);
@@ -221,11 +251,21 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 						refreshData();
 					}
 					return;
+				} else if (firstElement instanceof ILocalStorageDataProvider) {
+					IStorageData localStorageData = ((ILocalStorageDataProvider) firstElement).getLocalStorageData();
+					if (!ObjectUtils.equals(storageData, localStorageData)) {
+						storageDataProvider = null;
+						storageData = localStorageData;
+						valueViewerColumn.setEditingSupport(null);
+						refreshData();
+					}
+					return;
 				}
 			}
 		}
-		if (null != storageDataProvider) {
+		if (null != storageDataProvider || null != storageData) {
 			storageDataProvider = null;
+			storageData = null;
 			valueViewerColumn.setEditingSupport(null);
 			refreshData();
 		}
@@ -237,16 +277,14 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 	private void refreshData() {
 		// refresh data asynchronously
 		Display.getDefault().asyncExec(new Runnable() {
-
 			@Override
 			public void run() {
 				form.setBusy(true);
-				if (null != storageDataProvider) {
-					StorageData storageData = storageDataProvider.getStorageData();
-					CmrRepositoryDefinition cmrRepositoryDefinition = storageDataProvider.getCmrRepositoryDefinition();
+				if (isDataExistsForDisplay()) {
+					// data exists, we display info we have
 					form.setText(storageData.getName());
-					form.setMessage(null);
-					repository.setText(cmrRepositoryDefinition.getName() + " (" + cmrRepositoryDefinition.getIp() + ":" + cmrRepositoryDefinition.getPort() + ")");
+					form.setMessage("");
+					mainComposite.setVisible(true);
 					String desc = storageData.getDescription();
 					if (null != desc) {
 						if (desc.length() > MAX_DESCRIPTION_LENGTH) {
@@ -258,23 +296,32 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 						description.setText("", false, false);
 					}
 					sizeOnDisk.setText(NumberFormatter.formatBytesToMBytes(storageData.getDiskSize()));
-					state.setText(TextFormatter.getStorageStateTextualRepresentation(storageData.getState()));
 					labelsTableViewer.setInput(storageData.getLabelList());
 					labelsTableViewer.refresh();
-					addNewLabel.setEnabled(true);
-					Image img = ImageFormatter.getImageForStorageLeaf(storageData);
-					if (null != img) {
+					addNewLabel.setEnabled(isRemoteStorageDisplayed());
+
+					// depending of type enable/disable widgets
+					if (isRemoteStorageDisplayed()) {
+						// for remote storage
+						CmrRepositoryDefinition cmrRepositoryDefinition = storageDataProvider.getCmrRepositoryDefinition();
+						repository.setText(cmrRepositoryDefinition.getName() + " (" + cmrRepositoryDefinition.getIp() + ":" + cmrRepositoryDefinition.getPort() + ")");
+						state.setText(TextFormatter.getStorageStateTextualRepresentation(storageDataProvider.getStorageData().getState()));
+						Image img = ImageFormatter.getImageForStorageLeaf((StorageData) storageData);
 						form.setImage(img);
+					} else {
+						// for downloaded storage
+						repository.setText("Available locally");
+						state.setText("Downloaded");
+						form.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_STORAGE_DOWNLOADED));
 					}
-					mainComposite.setVisible(true);
 				} else {
+					// nothing is selected we display the proper info
 					form.setText(null);
 					form.setMessage("Please select a storage to see its properties.", IMessageProvider.INFORMATION);
 					mainComposite.setVisible(false);
 				}
-				mainComposite.layout();
-				form.layout();
 
+				form.layout();
 				form.setBusy(false);
 			}
 		});
@@ -369,7 +416,7 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 		labelsTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				if (labelsTableViewer.getSelection().isEmpty()) {
+				if (labelsTableViewer.getSelection().isEmpty() || !isRemoteStorageDisplayed()) {
 					removeLabels.setEnabled(false);
 				} else {
 					removeLabels.setEnabled(true);
@@ -446,7 +493,7 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 				gd.horizontalIndent = 3;
 				gd.verticalIndent = 3;
 				text.setLayoutData(gd);
-				text.setText(storageDataProvider.getStorageData().getDescription());
+				text.setText(storageData.getDescription());
 				return composite;
 			}
 
@@ -476,6 +523,20 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 		if (viewPart instanceof StorageManagerView) {
 			((StorageManagerView) viewPart).refresh(cmrRepositoryDefinition);
 		}
+	}
+
+	/**
+	 * @return Returns if any data exists for displaying.
+	 */
+	private boolean isDataExistsForDisplay() {
+		return null != storageData;
+	}
+
+	/**
+	 * @return Returns if the remote storage is displayed.
+	 */
+	private boolean isRemoteStorageDisplayed() {
+		return null != storageDataProvider;
 	}
 
 	/**

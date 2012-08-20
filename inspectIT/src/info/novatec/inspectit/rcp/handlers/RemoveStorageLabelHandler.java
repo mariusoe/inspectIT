@@ -5,6 +5,7 @@ import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
+import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 
@@ -63,14 +64,15 @@ public class RemoveStorageLabelHandler extends AbstractHandler implements IHandl
 			CmrRepositoryDefinition cmrRepositoryDefinition = storageProvider.getCmrRepositoryDefinition();
 			if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
 				try {
-					boolean allRemoved = cmrRepositoryDefinition.getStorageService().removeLabelsFromStorage(storageProvider.getStorageData(), inputList);
-					if (!allRemoved) {
-						InspectIT.getDefault().createErrorDialog("Not all labels could be removed from the storage.", null, -1);
-					} else {
-						IViewPart viewPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(StorageManagerView.VIEW_ID);
-						if (viewPart instanceof StorageManagerView) {
-							((StorageManagerView) viewPart).refresh(cmrRepositoryDefinition);
-						}
+					StorageData updatedStorageData = cmrRepositoryDefinition.getStorageService().removeLabelsFromStorage(storageProvider.getStorageData(), inputList);
+					try {
+						InspectIT.getDefault().getInspectITStorageManager().storageRemotelyUpdated(updatedStorageData);
+					} catch (Exception e) {
+						InspectIT.getDefault().createErrorDialog("Error occured trying to save local storage data to disk.", e, -1);
+					}
+					IViewPart viewPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(StorageManagerView.VIEW_ID);
+					if (viewPart instanceof StorageManagerView) {
+						((StorageManagerView) viewPart).refresh(cmrRepositoryDefinition);
 					}
 				} catch (StorageException e) {
 					return null;

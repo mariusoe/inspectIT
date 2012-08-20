@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.tester;
 
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.model.storage.StorageLeaf;
 import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.storage.InspectITStorageManager;
 import info.novatec.inspectit.storage.StorageData;
@@ -10,9 +11,9 @@ import org.eclipse.core.expressions.PropertyTester;
 
 /**
  * Testing the state of storage. Works if reciever is {@link StorageData} or {@link StorageLeaf}.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class StorageStateTester extends PropertyTester {
 
@@ -37,7 +38,7 @@ public class StorageStateTester extends PropertyTester {
 				return true;
 			} else if ("RECORDING".equalsIgnoreCase((String) expectedValue) && storageData.getState() == StorageState.RECORDING) {
 				return true;
-			}  else if ("CLOSED".equalsIgnoreCase((String) expectedValue) && storageData.getState() == StorageState.CLOSED) {
+			} else if ("CLOSED".equalsIgnoreCase((String) expectedValue) && storageData.getState() == StorageState.CLOSED) {
 				return true;
 			}
 			return false;
@@ -52,7 +53,15 @@ public class StorageStateTester extends PropertyTester {
 			}
 		}
 
+		if ("isStorageDownloaded".equals(property)) {
+			InspectITStorageManager storageManager = InspectIT.getDefault().getInspectITStorageManager();
+			if (Boolean.TRUE.equals(expectedValue)) {
+				return storageManager.isFullyDownloaded(storageData);
+			} else if (Boolean.FALSE.equals(expectedValue)) {
+				return !storageManager.isFullyDownloaded(storageData);
+			}
+		}
+
 		return false;
 	}
-
 }

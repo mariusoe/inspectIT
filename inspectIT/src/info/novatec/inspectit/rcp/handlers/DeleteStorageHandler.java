@@ -1,10 +1,13 @@
 package info.novatec.inspectit.rcp.handlers;
 
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
-import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
+import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
+import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
+import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.label.type.impl.ExploredByLabelType;
@@ -28,7 +31,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -80,6 +85,24 @@ public class DeleteStorageHandler extends AbstractHandler implements IHandler {
 					}
 				}
 
+				final IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				final List<IEditorPart> openedEditors = new ArrayList<IEditorPart>();
+				IEditorReference[] editorReferences = activePage.getEditorReferences();
+				for (IEditorReference editorReference : editorReferences) {
+					IEditorPart editor = editorReference.getEditor(false);
+					if (editor instanceof AbstractRootEditor) {
+						RepositoryDefinition repositoryDefinition = ((AbstractRootEditor) editor).getInputDefinition().getRepositoryDefinition();
+						if (isStorageForRepository(repositoryDefinition, storagesToDelete)) {
+							openedEditors.add(editor);
+						}
+					}
+				}
+				if (!openedEditors.isEmpty() && !plural) {
+					confirmText.append("\n\nNote that all opened editors displaying the data from selected storage will be closed");
+				} else if (!openedEditors.isEmpty() && plural) {
+					confirmText.append("\n\nNote that all opened editors displaying the data from selected storages will be closed");
+				}
+
 				MessageBox confirmDelete = new MessageBox(HandlerUtil.getActiveShell(event), SWT.OK | SWT.CANCEL | SWT.ICON_QUESTION);
 				confirmDelete.setText("Confirm Delete");
 				confirmDelete.setMessage(confirmText.toString());
@@ -91,43 +114,51 @@ public class DeleteStorageHandler extends AbstractHandler implements IHandler {
 
 						@Override
 						protected IStatus run(IProgressMonitor monitor) {
-							boolean failedToDelete = false;
 							final Set<CmrRepositoryDefinition> involvedCmrSet = new HashSet<CmrRepositoryDefinition>();
-							for (IStorageDataProvider storageDataProvider : storagesToDelete) {
+							for (final IStorageDataProvider storageDataProvider : storagesToDelete) {
 								if (storageDataProvider.getCmrRepositoryDefinition().getOnlineStatus() != OnlineStatus.OFFLINE) {
 									involvedCmrSet.add(storageDataProvider.getCmrRepositoryDefinition());
 									try {
 										storageDataProvider.getCmrRepositoryDefinition().getStorageService().deleteStorage(storageDataProvider.getStorageData());
-									} catch (StorageException e) {
-										failedToDelete = true;
+										InspectIT.getDefault().getInspectITStorageManager().storageRemotelyDeleted(storageDataProvider.getStorageData());
+									} catch (final StorageException e) {
+										Display.getDefault().asyncExec(new Runnable() {
+											@Override
+											public void run() {
+												String name = storageDataProvider.getStorageData().getName();
+												InspectIT.getDefault().createErrorDialog("Storage '" + name + "' could not be successfully deleted from CMR.", e, -1);
+											}
+										});
+									} catch (final Exception e) {
+										Display.getDefault().asyncExec(new Runnable() {
+											@Override
+											public void run() {
+												String name = storageDataProvider.getStorageData().getName();
+												InspectIT.getDefault().createErrorDialog("Local data for storage '" + name + "' was not cleared successfully.", e, -1);
+											}
+										});
 									}
 								} else {
-									failedToDelete = true;
+									Display.getDefault().asyncExec(new Runnable() {
+										@Override
+										public void run() {
+											String name = storageDataProvider.getStorageData().getName();
+											InspectIT.getDefault().createInfoDialog("Storage '" + name + "' can not be deleted, because CMR where it is located is offline.", -1);
+										}
+									});
 								}
 							}
-							if (failedToDelete) {
-								Display.getDefault().asyncExec(new Runnable() {
-									@Override
-									public void run() {
-										if (!plural) {
-											InspectIT.getDefault().createInfoDialog("Selected storage could not could not be deleted.", -1);
-										} else {
-											InspectIT.getDefault().createInfoDialog("Some of the selected storages could not could not be deleted.", -1);
-										}
-									}
-								});
 
-							} else if (confirmedFinal) {
+							if (confirmedFinal) {
 								Display.getDefault().asyncExec(new Runnable() {
 									@Override
 									public void run() {
-										IViewPart viewPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(StorageManagerView.VIEW_ID);
-										if (viewPart instanceof StorageManagerView) {
-											for (CmrRepositoryDefinition cmrRepositoryDefinition : involvedCmrSet) {
-												((StorageManagerView) viewPart).refresh(cmrRepositoryDefinition);
-											}
+										// close editors
+										for (IEditorPart editor : openedEditors) {
+											activePage.closeEditor(editor, false);
 										}
 									}
+
 								});
 							}
 							return Status.OK_STATUS;
@@ -139,6 +170,29 @@ public class DeleteStorageHandler extends AbstractHandler implements IHandler {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Returns if the given repository is StorageRepositoryDefinition and is bounded to one of
+	 * deleted storages.
+	 * 
+	 * @param repositoryDefinition
+	 *            Repository.
+	 * @param storagesToDelete
+	 *            Storages that were deleted.
+	 * @return True if repository fits to the deleted storages.
+	 */
+	private boolean isStorageForRepository(RepositoryDefinition repositoryDefinition, List<IStorageDataProvider> storagesToDelete) {
+		if (repositoryDefinition instanceof StorageRepositoryDefinition) {
+			StorageRepositoryDefinition storageRepositoryDefinition = (StorageRepositoryDefinition) repositoryDefinition;
+			for (IStorageDataProvider storageDataProvider : storagesToDelete) {
+				if (!storageRepositoryDefinition.getLocalStorageData().isFullyDownloaded()
+						&& ObjectUtils.equals(storageRepositoryDefinition.getLocalStorageData().getId(), storageDataProvider.getStorageData().getId())) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }

@@ -3,7 +3,6 @@ package info.novatec.inspectit.rcp.repository.service.storage;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.indexing.query.factory.impl.InvocationSequenceDataQueryFactory;
-import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
 import info.novatec.inspectit.indexing.storage.impl.StorageIndexQuery;
 
@@ -95,8 +94,7 @@ public class StorageInvocationDataAccessService extends AbstractStorageService<I
 		ArrayList<Long> includeIds = new ArrayList<Long>();
 		includeIds.add(template.getId());
 		query.setIncludeIds(includeIds);
-		List<IStorageDescriptor> descriptors = indexingTree.query(query);
-		List<InvocationSequenceData> results = getHttpDataRetriever().getDataViaHttp(getCmrRepositoryDefinition(), getStorageIdProvider(), descriptors);
+		List<InvocationSequenceData> results = super.executeQuery(query);
 		if (results.size() == 1) {
 			return results.get(0);
 		}

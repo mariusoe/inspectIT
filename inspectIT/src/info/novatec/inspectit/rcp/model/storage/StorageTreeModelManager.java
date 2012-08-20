@@ -1,9 +1,10 @@
-package info.novatec.inspectit.rcp.model;
+package info.novatec.inspectit.rcp.model.storage;
 
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
+import info.novatec.inspectit.rcp.model.Composite;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
@@ -20,12 +21,12 @@ import java.util.Map;
  * @author Ivan Senic
  * 
  */
-public class StorageManagerTreeModelManager {
+public class StorageTreeModelManager {
 
 	/**
 	 * Storage and repository map.
 	 */
-	private Map<StorageData, CmrRepositoryDefinition> storageRespositoryMap;
+	private Map<StorageData, CmrRepositoryDefinition> storageRepositoryMap;
 
 	/**
 	 * Label type for grouping.
@@ -33,15 +34,15 @@ public class StorageManagerTreeModelManager {
 	private AbstractStorageLabelType<?> storageLabelType;
 
 	/**
-	 * @param storageRespositoryMap
+	 * @param storageRepositoryMap
 	 *            map of {@link StorageData} objects and repositories where they are located.
 	 * @param storageLabelType
 	 *            {@link AbstractStorageLabelType} to define the label ordering. It can be null,
 	 *            then Storages will be ordered by repository.
 	 */
-	public StorageManagerTreeModelManager(Map<StorageData, CmrRepositoryDefinition> storageRespositoryMap, AbstractStorageLabelType<?> storageLabelType) {
+	public StorageTreeModelManager(Map<StorageData, CmrRepositoryDefinition> storageRepositoryMap, AbstractStorageLabelType<?> storageLabelType) {
 		super();
-		this.storageRespositoryMap = storageRespositoryMap;
+		this.storageRepositoryMap = storageRepositoryMap;
 		this.storageLabelType = storageLabelType;
 	}
 
@@ -53,7 +54,7 @@ public class StorageManagerTreeModelManager {
 	 *         {@link CmrRepositoryDefinition} they are located to.
 	 */
 	public Object[] getRootObjects() {
-		if (null == storageRespositoryMap || storageRespositoryMap.isEmpty()) {
+		if (null == storageRepositoryMap || storageRepositoryMap.isEmpty()) {
 			return new Object[0];
 		}
 
@@ -61,9 +62,9 @@ public class StorageManagerTreeModelManager {
 			Composite unknown = new Composite();
 			unknown.setName("Unknown");
 			unknown.setImage(ImageFormatter.getImageForLabel(storageLabelType));
-			boolean addUnknow = false;
+			boolean addUnknown = false;
 			Map<Object, Composite> map = new HashMap<Object, Composite>();
-			for (Map.Entry<StorageData, CmrRepositoryDefinition> entry : storageRespositoryMap.entrySet()) {
+			for (Map.Entry<StorageData, CmrRepositoryDefinition> entry : storageRepositoryMap.entrySet()) {
 				List<? extends AbstractStorageLabel<?>> labelList = entry.getKey().getLabels(storageLabelType);
 				if (labelList != null && !labelList.isEmpty()) {
 					for (AbstractStorageLabel<?> label : labelList) {
@@ -80,18 +81,18 @@ public class StorageManagerTreeModelManager {
 					}
 				} else {
 					unknown.addChild(new StorageLeaf(entry.getKey(), entry.getValue()));
-					addUnknow = true;
+					addUnknown = true;
 				}
 			}
 			ArrayList<Composite> returnList = new ArrayList<Composite>();
 			returnList.addAll(map.values());
-			if (addUnknow) {
+			if (addUnknown) {
 				returnList.add(unknown);
 			}
 			return returnList.toArray(new Composite[returnList.size()]);
 		} else {
 			Map<CmrRepositoryDefinition, Composite> map = new HashMap<CmrRepositoryDefinition, Composite>();
-			for (Map.Entry<StorageData, CmrRepositoryDefinition> entry : storageRespositoryMap.entrySet()) {
+			for (Map.Entry<StorageData, CmrRepositoryDefinition> entry : storageRepositoryMap.entrySet()) {
 				CmrRepositoryDefinition cmrRepositoryDefinition = entry.getValue();
 				Composite c = map.get(cmrRepositoryDefinition);
 				if (c == null) {

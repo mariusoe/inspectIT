@@ -152,6 +152,12 @@
             name="Copy Data to Storage Wizard">
       </wizard>
       <wizard
+            class="info.novatec.inspectit.rcp.wizard.DownloadStorageWizard"
+            icon="icons/mount_storage.png"
+            id="info.novatec.inspectit.rcp.wizard.downloadStorageWizard"
+            name="Download Storage Wizard">
+      </wizard>
+      <wizard
             class="info.novatec.inspectit.rcp.wizard.AddCmrRepositoryWizard"
             icon="icons/add.png"
             id="info.novatec.inspectit.rcp.wizard.addCmrRepositoryWizard"
@@ -316,6 +322,10 @@
                name="Search string"
                optional="false">
          </commandParameter>
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.downloadStorage"
+            name="Download Storage">
       </command>
    </extension>
    <extension
@@ -1112,6 +1122,30 @@
          </activeWhen>
       </handler>
       <handler
+            class="info.novatec.inspectit.rcp.handlers.DownloadStorageHandler"
+            commandId="info.novatec.inspectit.rcp.commands.downloadStorage">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.IStorageDataProvider">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.storageState"
+                        value="CLOSED">
+                  </test>
+                  <test
+                        property="info.novatec.inspectit.isStorageDownloaded"
+                        value="false">
+                  </test>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
             class="info.novatec.inspectit.rcp.handlers.LocateHandler$TimerLocateHandler"
             commandId="info.novatec.inspectit.rcp.commands.addToSteppingObjects">
          <activeWhen>
@@ -1155,6 +1189,19 @@
       <handler
             class="info.novatec.inspectit.rcp.handlers.OpenUrlHandler$SearchDocumentationHandler"
             commandId="info.novatec.inspectit.rcp.commands.searchDocumentation">
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.DeleteLocalStorageHandler"
+            commandId="info.novatec.inspectit.rcp.commands.deleteStorage">
+         <activeWhen>
+            <and>
+            	<iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.ILocalStorageDataProvider">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
       </handler>
    </extension>
    <extension
@@ -1204,7 +1251,7 @@
       <propertyTester
             class="info.novatec.inspectit.rcp.tester.StorageStateTester"
             id="info.inspectit.rcp.StorageStateTester"
-            namespace="info.novatec.inspectit"          properties="storageState, isStorageMounted"
+            namespace="info.novatec.inspectit"          properties="storageState, isStorageMounted, isStorageDownloaded"
             type="info.novatec.inspectit.rcp.provider.IStorageDataProvider">
       </propertyTester>
       <propertyTester
@@ -1730,6 +1777,12 @@
                visible="true">
          </separator>
          <command
+               commandId="info.novatec.inspectit.rcp.commands.downloadStorage"
+               icon="icons/mount_storage.png"
+               style="push"
+               tooltip="Fully Download Storage - Makes storage accessible offline">
+         </command>
+         <command
                commandId="org.eclipse.ui.file.refresh"
                icon="icons/refresh.png"
                style="push"
@@ -1825,6 +1878,12 @@
                style="push">
          </command>
          <command
+               commandId="info.novatec.inspectit.rcp.commands.addStorageLabel"
+               icon="icons/label_add.png"
+               label="Add Label"
+               style="push">
+         </command>
+         <command
                commandId="info.novatec.inspectit.rcp.commands.closeStorage"
                icon="icons/finalize_storage.png"
                label="Finalize Storage"
@@ -1841,10 +1900,10 @@
                visible="true">
          </separator>
          <command
-               commandId="info.novatec.inspectit.rcp.commands.addStorageLabel"
-               icon="icons/label_add.png"
-               label="Add Labels"
-               style="push">
+               commandId="info.novatec.inspectit.rcp.commands.downloadStorage"
+               icon="icons/mount_storage.png"
+               style="push"
+               tooltip="Fully Download Storage - Makes storage accessible offline">
          </command>
       </menuContribution>
       <menuContribution

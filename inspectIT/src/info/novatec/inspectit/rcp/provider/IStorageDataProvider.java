@@ -10,6 +10,7 @@ import info.novatec.inspectit.storage.StorageData;
  * 
  */
 public interface IStorageDataProvider {
+
 	/**
 	 * Gives the {@link CmrRepositoryDefinition} where Storage is located.
 	 * 

@@ -205,6 +205,22 @@ public interface IStorageService {
 	List<String> getIndexFilesLocations(StorageData storageData) throws StorageException;
 
 	/**
+	 * Returns the list of the string that represent the path to the data files for one storage. The
+	 * paths are in form "/directory/file.extension". These paths can be used in combination to
+	 * CMR's ip and port to get the files via HTTP.
+	 * <p>
+	 * For example, if the CMR has the ip localhost and port 8080, the address for the file would
+	 * be: http://localhost:8080/directory/file.extension
+	 * 
+	 * @param storageData
+	 *            Storage to get index files for.
+	 * @return Returns the list of the string that represent the path to the data files.
+	 * @throws StorageException
+	 *             When provided storage does not exist.
+	 */
+	List<String> getDataFilesLocations(StorageData storageData) throws StorageException;
+
+	/**
 	 * Returns the list of the string that represent the path to the agent files for one storage.
 	 * The paths are in form "/directory/file.extension". These paths can be used in combination to
 	 * CMR's ip and port to get the files via HTTP.
@@ -230,10 +246,11 @@ public interface IStorageService {
 	 *            Label.
 	 * @param doOverwrite
 	 *            Should be overwritten if it is one per {@link StorageData}.
+	 * @return Updated storage data.
 	 * @throws StorageException
 	 *             If gathering the file names fails.
 	 */
-	void addLabelToStorage(StorageData storageData, AbstractStorageLabel<?> storageLabel, boolean doOverwrite) throws StorageException;
+	StorageData addLabelToStorage(StorageData storageData, AbstractStorageLabel<?> storageLabel, boolean doOverwrite) throws StorageException;
 
 	/**
 	 * Adds collection of labels to the {@link StorageData}. Note that if overwrite is true, the
@@ -245,10 +262,11 @@ public interface IStorageService {
 	 *            Labels.
 	 * @param doOverwrite
 	 *            Should be overwritten if it is one per {@link StorageData}.
+	 * @return Updated storage data.
 	 * @throws StorageException
 	 *             If gathering the file names fails.
 	 */
-	void addLabelsToStorage(StorageData storageData, Collection<AbstractStorageLabel<?>> storageLabels, boolean doOverwrite) throws StorageException;
+	StorageData addLabelsToStorage(StorageData storageData, Collection<AbstractStorageLabel<?>> storageLabels, boolean doOverwrite) throws StorageException;
 
 	/**
 	 * Removes the label from the {@link StorageData}.
@@ -257,11 +275,11 @@ public interface IStorageService {
 	 *            {@link StorageData}
 	 * @param storageLabel
 	 *            Label.
-	 * @return Returns true if label was removed, false otherwise.
+	 * @return Updated storage data.
 	 * @throws StorageException
 	 *             If {@link StorageData} information can not be updated on the disk.
 	 */
-	boolean removeLabelFromStorage(StorageData storageData, AbstractStorageLabel<?> storageLabel) throws StorageException;
+	StorageData removeLabelFromStorage(StorageData storageData, AbstractStorageLabel<?> storageLabel) throws StorageException;
 
 	/**
 	 * Removes the label list from the {@link StorageData}.
@@ -270,11 +288,11 @@ public interface IStorageService {
 	 *            {@link StorageData}
 	 * @param storageLabelList
 	 *            List of labels to remove.
-	 * @return Returns true if all labels were removed, false otherwise.
+	 * @return Updated storage data.
 	 * @throws StorageException
 	 *             If {@link StorageData} information can not be updated on the disk.
 	 */
-	boolean removeLabelsFromStorage(StorageData storageData, List<AbstractStorageLabel<?>> storageLabelList) throws StorageException;
+	StorageData removeLabelsFromStorage(StorageData storageData, List<AbstractStorageLabel<?>> storageLabelList) throws StorageException;
 
 	/**
 	 * Returns all labels that are at the moment existing in all storages. Note that if the same

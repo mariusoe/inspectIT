@@ -10,9 +10,10 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryChangeListener;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
-import info.novatec.inspectit.rcp.storage.util.HttpDataRetriever;
+import info.novatec.inspectit.rcp.storage.listener.StorageChangeListener;
+import info.novatec.inspectit.rcp.storage.util.DataRetriever;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
-import info.novatec.inspectit.storage.IStorageIdProvider;
+import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
@@ -22,6 +23,7 @@ import info.novatec.inspectit.storage.label.StringStorageLabel;
 import info.novatec.inspectit.storage.label.type.impl.ExploredByLabelType;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.FileVisitResult;
@@ -39,6 +41,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.mutable.MutableObject;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * {@link StorageManager} for GUI.
@@ -47,6 +51,11 @@ import org.apache.commons.lang.mutable.MutableObject;
  * 
  */
 public abstract class InspectITStorageManager extends StorageManager implements CmrRepositoryChangeListener {
+
+	/**
+	 * List of downloaded storages.
+	 */
+	private List<LocalStorageData> downloadedStorages = Collections.synchronizedList(new ArrayList<LocalStorageData>());
 
 	/**
 	 * Map of mounted and online not available storages.
@@ -64,9 +73,19 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	private ConcurrentHashMap<CmrRepositoryDefinition, OnlineStatus> cachedRepositoriesStatus = new ConcurrentHashMap<CmrRepositoryDefinition, OnlineStatus>();
 
 	/**
-	 * {@link HttpDataRetriever}.
+	 * List of {@link StorageChangeListener}s.
 	 */
-	private HttpDataRetriever httpDataRetriever;
+	private List<StorageChangeListener> storageChangeListeners = new ArrayList<StorageChangeListener>();
+
+	/**
+	 * {@link DataRetriever}.
+	 */
+	private DataRetriever dataRetriever;
+
+	/**
+	 * Bundle file need for the proper path resolving when in development mode.
+	 */
+	private File bundleFile;
 
 	/**
 	 * Returns Spring instantiated {@link StorageRepositoryDefinition}.
@@ -76,7 +95,23 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	protected abstract StorageRepositoryDefinition createStorageRepositoryDefinition();
 
 	/**
-	 * Mounts a new storage locally.
+	 * Mounts a new storage locally. Same as calling
+	 * {@link #mountStorage(StorageData, CmrRepositoryDefinition, false, false)}.
+	 * 
+	 * @param storageData
+	 *            Storage to mount.
+	 * @param cmrRepositoryDefinition
+	 *            {@link CmrRepositoryDefinition}.
+	 * @throws Exception
+	 *             If mount fails.
+	 */
+	public void mountStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition) throws Exception {
+		this.mountStorage(storageData, cmrRepositoryDefinition, false, false);
+	}
+
+	/**
+	 * Mounts a new storage locally. Provides option to specify if the complete download should be
+	 * performed.
 	 * 
 	 * @param storageData
 	 *            Storage to mount.
@@ -84,10 +119,13 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 *            {@link CmrRepositoryDefinition}.
 	 * @param fullyDownload
 	 *            Should storage be immediately fully down-loaded. Intended for future use.
+	 * @param compressBefore
+	 *            If the fullyDownalod is <code>true</code>, this parameter can define if data files
+	 *            should be compressed on the fly before sent.
 	 * @throws Exception
 	 *             If mount fails.
 	 */
-	public void mountStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, boolean fullyDownload) throws Exception {
+	private void mountStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, boolean fullyDownload, boolean compressBefore) throws Exception {
 		LocalStorageData localStorageData = new LocalStorageData(storageData);
 
 		Path directory = getStoragePath(localStorageData);
@@ -95,23 +133,34 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 			try {
 				Files.createDirectories(directory);
 			} catch (IOException e) {
+				e.printStackTrace();
 				throw new StorageException("Could not create local storage directory.", e);
 			}
 		}
 
-		if (!httpDataRetriever.downloadAndSavePlatformIdents(cmrRepositoryDefinition, storageData, directory)) {
-			deleteLocalStorageData(localStorageData);
-			throw new StorageException("Could not download and save agent information for local storage.");
+		try {
+			dataRetriever.downloadAndSavePlatformIdents(cmrRepositoryDefinition, storageData, directory);
+		} catch (Exception e) {
+			deleteLocalStorageData(localStorageData, false);
+			throw e;
 		}
 
-		if (!httpDataRetriever.downloadAndSaveIndexingTrees(cmrRepositoryDefinition, storageData, directory)) {
-			deleteLocalStorageData(localStorageData);
-			throw new StorageException("Could not download and save idnexing trees for local storage.");
+		try {
+			dataRetriever.downloadAndSaveIndexingTrees(cmrRepositoryDefinition, storageData, directory);
+		} catch (Exception e) {
+			deleteLocalStorageData(localStorageData, false);
+			throw e;
 		}
 
 		if (fullyDownload) {
-			localStorageData.setFullyDownloaded(true);
-			// TODO full download!!!
+			try {
+				dataRetriever.downloadAndSaveDataFiles(cmrRepositoryDefinition, storageData, directory, compressBefore);
+				downloadedStorages.add(localStorageData);
+				localStorageData.setFullyDownloaded(true);
+			} catch (Exception e) {
+				deleteLocalStorageData(localStorageData, false);
+				throw e;
+			}
 		}
 
 		try {
@@ -120,17 +169,81 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 			throw new StorageException("Could save local storage information to disk.", e);
 		}
 
+		final String systemUserName = getSystemUsername();
 		try {
-			String systemUserName = getSystemUsername();
 			if (null != systemUserName) {
 				StringStorageLabel mountedByLabel = new StringStorageLabel(systemUserName, new ExploredByLabelType());
 				cmrRepositoryDefinition.getStorageService().addLabelToStorage(storageData, mountedByLabel, true);
 			}
-		} catch (Exception e) {
-			// ignore
+		} catch (final Exception e) {
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					InspectIT.getDefault().createInfoDialog("'Mounted by' label with value '" + systemUserName + "'was not added to the storage. Exception message is:\n\n" + e.getMessage(), -1);
+				}
+			});
 		}
 
 		mountedAvailableStorages.put(localStorageData, cmrRepositoryDefinition);
+	}
+
+	/**
+	 * Returns if the storage data is already downloaded.
+	 * 
+	 * @param storageData
+	 *            {@link StorageData}.
+	 * @return Returns if the storage data is already downloaded.
+	 */
+	public boolean isFullyDownloaded(StorageData storageData) {
+		for (LocalStorageData lsd : downloadedStorages) {
+			if (ObjectUtils.equals(lsd.getId(), storageData.getId())) {
+				return lsd.isFullyDownloaded();
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Fully downloads selected storage.
+	 * 
+	 * @param storageData
+	 *            StorageData.
+	 * @param cmrRepositoryDefinition
+	 *            {@link CmrRepositoryDefinition}.
+	 * @param compressBefore
+	 *            Should data files be compressed on the fly before sent.
+	 * @throws Exception
+	 *             If any exception occurs.
+	 */
+	public void fullyDownloadStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, boolean compressBefore) throws Exception {
+		LocalStorageData localStorageData = null;
+		for (LocalStorageData lsd : mountedAvailableStorages.keySet()) {
+			if (ObjectUtils.equals(lsd.getId(), storageData.getId())) {
+				localStorageData = lsd;
+				break;
+			}
+		}
+
+		if (null == localStorageData) {
+			mountStorage(storageData, cmrRepositoryDefinition, true, compressBefore);
+			return;
+		}
+
+		if (localStorageData.isFullyDownloaded()) {
+			throw new StorageException("Storage is already fully downloaded.");
+		}
+
+		Path directory = getStoragePath(localStorageData);
+		dataRetriever.downloadAndSaveDataFiles(cmrRepositoryDefinition, storageData, directory, compressBefore);
+		downloadedStorages.add(localStorageData);
+		localStorageData.setFullyDownloaded(true);
+		try {
+			writeLocalStorageDataToDisk(localStorageData);
+		} catch (Exception e) {
+			throw new StorageException("Could not save local storage information to disk.", e);
+		}
+
 	}
 
 	/**
@@ -141,10 +254,33 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 * @throws IOException
 	 *             If deleting of the local data fails.
 	 */
-	private void deleteLocalStorageData(LocalStorageData localStorageData) throws IOException {
+	public void deleteLocalStorageData(LocalStorageData localStorageData) throws IOException {
+		this.deleteLocalStorageData(localStorageData, true);
+	}
+
+	/**
+	 * Deletes all local data saved for given {@link LocalStorageData}, unmount storage.
+	 * 
+	 * @param localStorageData
+	 *            {@link LocalStorageData}.
+	 * @param informListeners
+	 *            Should the listeners be informed.
+	 * @throws IOException
+	 *             If deleting of the local data fails.
+	 */
+	private void deleteLocalStorageData(LocalStorageData localStorageData, boolean informListeners) throws IOException {
 		this.deleteCompleteStorageDataFromDisk(localStorageData);
 		mountedAvailableStorages.remove(localStorageData);
 		mountedNotAvailableStorages.remove(localStorageData);
+		downloadedStorages.remove(localStorageData);
+
+		if (informListeners) {
+			synchronized (storageChangeListeners) {
+				for (StorageChangeListener storageChangeListener : storageChangeListeners) {
+					storageChangeListener.storageLocallyDeleted(localStorageData);
+				}
+			}
+		}
 	}
 
 	/**
@@ -156,7 +292,7 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 * @throws Exception
 	 *             If deleting of the local data fails.
 	 */
-	public void storageRemotlyDeleted(StorageData storageData) throws Exception {
+	public void storageRemotelyDeleted(StorageData storageData) throws Exception {
 		LocalStorageData localStorageData = null;
 		for (Map.Entry<LocalStorageData, CmrRepositoryDefinition> entry : mountedAvailableStorages.entrySet()) {
 			if (ObjectUtils.equals(entry.getKey().getId(), storageData.getId())) {
@@ -165,7 +301,7 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 			}
 		}
 		if (null != localStorageData && !localStorageData.isFullyDownloaded()) {
-			deleteLocalStorageData(localStorageData);
+			deleteLocalStorageData(localStorageData, false);
 		} else {
 			for (LocalStorageData notAvailable : mountedNotAvailableStorages) {
 				if (ObjectUtils.equals(notAvailable.getId(), storageData.getId())) {
@@ -174,7 +310,37 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 				}
 			}
 			if (null != localStorageData && !localStorageData.isFullyDownloaded()) {
-				deleteLocalStorageData(localStorageData);
+				deleteLocalStorageData(localStorageData, false);
+			}
+		}
+
+		synchronized (storageChangeListeners) {
+			for (StorageChangeListener storageChangeListener : storageChangeListeners) {
+				storageChangeListener.storageRemotelyDeleted(storageData);
+			}
+		}
+	}
+
+	/**
+	 * Informs the Storage Manager that the {@link StorageData} has been remotely updated, so that
+	 * existing local clone of the data can be updated.
+	 * 
+	 * @param storageData
+	 *            {@link StorageData} that was updated.
+	 * @throws IOException
+	 *             If {@link IOException} occurs during saving data to disk.
+	 * @throws SerializationException
+	 *             If serialization fails during saving data to disk.
+	 */
+	public void storageRemotelyUpdated(StorageData storageData) throws IOException, SerializationException {
+		LocalStorageData localStorageData = getLocalDataForStorage(storageData);
+		if (null != localStorageData) {
+			updateLocalStorageData(localStorageData, storageData);
+		}
+
+		synchronized (storageChangeListeners) {
+			for (StorageChangeListener storageChangeListener : storageChangeListeners) {
+				storageChangeListener.storageDataUpdated(storageData);
 			}
 		}
 	}
@@ -199,21 +365,37 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	}
 
 	/**
+	 * Returns collection of fully downloaded storages.
+	 * 
+	 * @return List of {@link LocalStorageData}.
+	 */
+	public Collection<LocalStorageData> getDownloadedStorages() {
+		return Collections.unmodifiableList(downloadedStorages);
+	}
+
+	/**
 	 * Returns storage {@link Path}.
 	 * 
-	 * @param storageIdProvider
+	 * @param storageData
 	 *            Storage.
 	 * @return Returns storage {@link Path}.
 	 * @see Paths#get(String, String...)
 	 */
-	public Path getStoragePath(IStorageIdProvider storageIdProvider) {
-		return Paths.get(getStorageDefaultFolder(), storageIdProvider.getStorageFolder());
+	public Path getStoragePath(IStorageData storageData) {
+		return getDefaultStorageDirPath().resolve(storageData.getStorageFolder());
 	}
 
 	/**
 	 * Loads initial local mounted storage information.
 	 */
 	public void startUp() {
+		// this will return directory if we are in development, and jar if in release
+		try {
+			bundleFile = FileLocator.getBundleFile(InspectIT.getDefault().getBundle());
+		} catch (IOException e) {
+			bundleFile = null;
+		}
+
 		List<LocalStorageData> mountedStorages;
 		try {
 			mountedStorages = getMountedStoragesFromDisk();
@@ -224,19 +406,29 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 
 		for (LocalStorageData localStorageData : mountedStorages) {
 			if (localStorageData.isFullyDownloaded()) {
-				mountedAvailableStorages.put(localStorageData, null);
-			} else {
-				boolean availableOnline = false;
-				for (Map.Entry<StorageData, CmrRepositoryDefinition> entry : onlineStorages.entrySet()) {
-					if (ObjectUtils.equals(entry.getKey().getId(), localStorageData.getId())) {
-						availableOnline = true;
-						mountedAvailableStorages.put(localStorageData, entry.getValue());
-						break;
+				downloadedStorages.add(localStorageData);
+			}
+			boolean availableOnline = false;
+			for (Map.Entry<StorageData, CmrRepositoryDefinition> entry : onlineStorages.entrySet()) {
+				if (ObjectUtils.equals(entry.getKey().getId(), localStorageData.getId())) {
+					availableOnline = true;
+					try {
+						updateLocalStorageData(localStorageData, entry.getKey());
+					} catch (final Exception e) {
+						final String name = localStorageData.getName();
+						Display.getDefault().syncExec(new Runnable() {
+							@Override
+							public void run() {
+								InspectIT.getDefault().createErrorDialog("Local data for the storage '" + name + "' could not be updated with the online data.", e, -1);
+							}
+						});
 					}
+					mountedAvailableStorages.put(localStorageData, entry.getValue());
+					break;
 				}
-				if (!availableOnline) {
-					mountedNotAvailableStorages.add(localStorageData);
-				}
+			}
+			if (!availableOnline) {
+				mountedNotAvailableStorages.add(localStorageData);
 			}
 		}
 
@@ -263,12 +455,15 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 */
 	public StorageRepositoryDefinition getStorageRepositoryDefinition(LocalStorageData localStorageData) throws Exception {
 		// check if it is available
-		if (!mountedAvailableStorages.keySet().contains(localStorageData)) {
+		if (!mountedAvailableStorages.keySet().contains(localStorageData) && !downloadedStorages.contains(localStorageData)) {
 			throw new StorageException("The storage is not fully downloaded, and it's repository could not be found. The Storage repository definition could not be created.");
 		}
 
-		// find CMR repository def
-		CmrRepositoryDefinition cmrRepositoryDefinition = mountedAvailableStorages.get(localStorageData);
+		// find CMR repository def, allow null for downloaded storages
+		CmrRepositoryDefinition cmrRepositoryDefinition = null;
+		if (!downloadedStorages.contains(localStorageData)) {
+			cmrRepositoryDefinition = mountedAvailableStorages.get(localStorageData);
+		}
 
 		// get agents
 		List<PlatformIdent> platformIdents = getPlatformIdentsLocally(localStorageData);
@@ -304,13 +499,18 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	}
 
 	/**
-	 * Returns the local data for storage if the storage is mounted.
+	 * Returns the local data for storage if the storage is mounted or downloaded.
 	 * 
 	 * @param storageData
 	 *            Storage data to check.
 	 * @return {@link LocalStorageData}.
 	 */
 	public LocalStorageData getLocalDataForStorage(StorageData storageData) {
+		for (LocalStorageData downloadedStorage : downloadedStorages) {
+			if (ObjectUtils.equals(downloadedStorage.getId(), storageData.getId())) {
+				return downloadedStorage;
+			}
+		}
 		for (LocalStorageData mountedStorage : mountedNotAvailableStorages) {
 			if (ObjectUtils.equals(storageData.getId(), mountedStorage.getId())) {
 				return mountedStorage;
@@ -322,6 +522,32 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Registers a {@link StorageChangeListener} if the same listener does not already exist.
+	 * 
+	 * @param storageChangeListener
+	 *            {@link StorageChangeListener} to add.
+	 */
+	public void addStorageChangeListener(StorageChangeListener storageChangeListener) {
+		synchronized (storageChangeListeners) {
+			if (!storageChangeListeners.contains(storageChangeListener)) {
+				storageChangeListeners.add(storageChangeListener);
+			}
+		}
+	}
+
+	/**
+	 * Removes a {@link StorageChangeListener}.
+	 * 
+	 * @param storageChangeListener
+	 *            {@link StorageChangeListener} to remove.
+	 */
+	public void removeStorageChangeListener(StorageChangeListener storageChangeListener) {
+		synchronized (storageChangeListeners) {
+			storageChangeListeners.remove(storageChangeListener);
+		}
 	}
 
 	/**
@@ -356,6 +582,24 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	}
 
 	/**
+	 * Updates the information of the local storage data saved on the client machine with the data
+	 * provided in the storage data available online.
+	 * 
+	 * @param localStorageData
+	 *            Local storage data to update.
+	 * @param storageData
+	 *            Storage data that holds new information.
+	 * @throws SerializationException
+	 *             If serialization of data fails.
+	 * @throws IOException
+	 *             If {@link IOException} occurs during data saving to disk.
+	 */
+	private void updateLocalStorageData(LocalStorageData localStorageData, StorageData storageData) throws IOException, SerializationException {
+		localStorageData.copyStorageDataInformation(storageData);
+		writeLocalStorageDataToDisk(localStorageData);
+	}
+
+	/**
 	 * Adds mounted storages that are bounded to the given {@link CmrRepositoryDefinition} to
 	 * "available" map.
 	 * 
@@ -370,6 +614,17 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 				for (StorageData storageData : closedStorages) {
 					if (ObjectUtils.equals(localStorageData.getId(), storageData.getId())) {
 						newAvailableStoarges.add(localStorageData);
+						try {
+							updateLocalStorageData(localStorageData, storageData);
+						} catch (final Exception e) {
+							final String name = localStorageData.getName();
+							Display.getDefault().syncExec(new Runnable() {
+								@Override
+								public void run() {
+									InspectIT.getDefault().createErrorDialog("Local data for the storage '" + name + "' could not be updated with the online data.", e, -1);
+								}
+							});
+						}
 						mountedAvailableStorages.put(localStorageData, cmrRepositoryDefinition);
 						break;
 					}
@@ -407,8 +662,8 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	/**
 	 * Loads {@link PlatformIdent}s from a disk for a storage.
 	 * 
-	 * @param storageIdProvider
-	 *            {@link IStorageIdProvider}
+	 * @param storageData
+	 *            {@link IStorageData}
 	 * @return List of {@link PlatformIdent}s involved in the storage data or null if no file
 	 *         exists.
 	 * @throws IOException
@@ -416,8 +671,8 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 * @throws SerializationException
 	 *             If data can not be deserialized.
 	 */
-	private List<PlatformIdent> getPlatformIdentsLocally(final IStorageIdProvider storageIdProvider) throws IOException, SerializationException {
-		Path storagePath = getStoragePath(storageIdProvider);
+	private List<PlatformIdent> getPlatformIdentsLocally(final IStorageData storageData) throws IOException, SerializationException {
+		Path storagePath = getStoragePath(storageData);
 		List<PlatformIdent> returnList = this.getObjectsByFileTreeWalk(storagePath, StorageFileExtensions.AGENT_FILE_EXT);
 		if (!returnList.isEmpty()) {
 			return returnList;
@@ -429,16 +684,16 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	/**
 	 * Loads indexing tree from a disk for a storage.
 	 * 
-	 * @param storageIdProvider
-	 *            {@link IStorageIdProvider}
+	 * @param storageData
+	 *            {@link IStorageData}
 	 * @return Indexing tree or null if it can not be found.
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
 	 * @throws SerializationException
 	 *             If data can not be deserialized.
 	 */
-	private IStorageTreeComponent<DefaultData> getIndexingTree(final IStorageIdProvider storageIdProvider) throws IOException, SerializationException {
-		Path storagePath = getStoragePath(storageIdProvider);
+	private IStorageTreeComponent<DefaultData> getIndexingTree(final IStorageData storageData) throws IOException, SerializationException {
+		Path storagePath = getStoragePath(storageData);
 		List<IStorageTreeComponent<DefaultData>> indexingTrees = this.getObjectsByFileTreeWalk(storagePath, StorageFileExtensions.INDEX_FILE_EXT);
 		if (!indexingTrees.isEmpty()) {
 			if (indexingTrees.size() == 1) {
@@ -463,8 +718,7 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 *             If data can not be deserialized.
 	 */
 	private List<LocalStorageData> getMountedStoragesFromDisk() throws IOException, SerializationException {
-		Path defaultDirectory = Paths.get(getStorageDefaultFolder());
-		return this.getObjectsByFileTreeWalk(defaultDirectory, StorageFileExtensions.LOCAL_STORAGE_FILE_EXT);
+		return this.getObjectsByFileTreeWalk(getDefaultStorageDirPath(), StorageFileExtensions.LOCAL_STORAGE_FILE_EXT);
 	}
 
 	/**
@@ -545,6 +799,22 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	}
 
 	/**
+	 * Returns the default storage directory as a path.
+	 * 
+	 * @return Returns the default storage directory as a path.
+	 */
+	private Path getDefaultStorageDirPath() {
+		if (bundleFile != null && bundleFile.isDirectory()) {
+			// if bundle file is directory that we can use it for the storage folder
+			// as we are in development
+			return Paths.get(bundleFile.getAbsolutePath(), getStorageDefaultFolder());
+		} else {
+			// if not then we fail to the default eclipse folder
+			return Paths.get(getStorageDefaultFolder());
+		}
+	}
+
+	/**
 	 * 
 	 * @return Returns the system username.
 	 */
@@ -553,11 +823,11 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	}
 
 	/**
-	 * @param httpDataRetriever
+	 * @param dataRetriever
 	 *            the httpDataRetriever to set
 	 */
-	public void setHttpDataRetriever(HttpDataRetriever httpDataRetriever) {
-		this.httpDataRetriever = httpDataRetriever;
+	public void setDataRetriever(DataRetriever dataRetriever) {
+		this.dataRetriever = dataRetriever;
 	}
 
 }

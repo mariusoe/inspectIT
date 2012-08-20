@@ -6,9 +6,11 @@
 
 	<bean id="readingChannelManager"
 		class="info.novatec.inspectit.storage.nio.read.ReadingChannelManager">
+		<property name="executorService" ref="IOExecutorService" />
 	</bean>
 
 	<bean id="storageReader" class="info.novatec.inspectit.storage.StorageReader">
+		<property name="executorService" ref="storageExecutorService" />
 	</bean>
 
 </beans>

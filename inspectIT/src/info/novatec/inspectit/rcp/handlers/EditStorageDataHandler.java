@@ -5,7 +5,6 @@ import info.novatec.inspectit.rcp.dialog.EditRepositoryDataDialog;
 import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
-import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
 
@@ -14,8 +13,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
@@ -38,7 +35,7 @@ public class EditStorageDataHandler extends AbstractHandler implements IHandler 
 		} else {
 			return null;
 		}
-		
+
 		StorageData storageData = storageDataProvider.getStorageData();
 		EditRepositoryDataDialog editStorageDataDialog = new EditRepositoryDataDialog(HandlerUtil.getActiveShell(event), storageData.getName(), storageData.getDescription());
 		editStorageDataDialog.open();
@@ -49,9 +46,10 @@ public class EditStorageDataHandler extends AbstractHandler implements IHandler 
 					storageData.setName(editStorageDataDialog.getName());
 					storageData.setDescription(editStorageDataDialog.getDescription());
 					cmrRepositoryDefinition.getStorageService().updateStorageData(storageData);
-					IViewPart viewPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(StorageManagerView.VIEW_ID);
-					if (viewPart instanceof StorageManagerView) {
-						((StorageManagerView) viewPart).refresh(cmrRepositoryDefinition);
+					try {
+						InspectIT.getDefault().getInspectITStorageManager().storageRemotelyUpdated(storageData);
+					} catch (Exception e) {
+						InspectIT.getDefault().createErrorDialog("Storage data update failed.", e, -1);
 					}
 				} catch (StorageException e) {
 					InspectIT.getDefault().createErrorDialog("Storage data update failed.", e, -1);

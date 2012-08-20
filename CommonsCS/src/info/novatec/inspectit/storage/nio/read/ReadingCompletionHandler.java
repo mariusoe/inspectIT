@@ -4,15 +4,16 @@ import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.nio.WriteReadAttachment;
 import info.novatec.inspectit.storage.nio.WriteReadCompletionRunnable;
 
+import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 
 import org.apache.commons.logging.Log;
 
 /**
  * Completion handler for asynchronous reading.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class ReadingCompletionHandler implements CompletionHandler<Integer, WriteReadAttachment> {
 
@@ -40,7 +41,17 @@ public class ReadingCompletionHandler implements CompletionHandler<Integer, Writ
 
 			attachment.getFileChannel().read(attachment.getByteBuffer(), position, attachment, this);
 		} else {
-			attachment.getByteBuffer().flip();
+			ByteBuffer byteBuffer = attachment.getByteBuffer();
+			// there is a chance that we can read more bytes that wanted, that's just the
+			// possibility coming from Java NIO2
+			// in that case, we need to assure that the byte buffer contains only the amount of
+			// bytes we wanted to read
+			// that will assure that the de-serialization goes without problems
+			// keep in mind that in situation described bytesToReadMore is negative
+			if (bytesToReadMore < 0) {
+				byteBuffer.position(byteBuffer.position() + (int) bytesToReadMore);
+			}
+			byteBuffer.flip();
 			WriteReadCompletionRunnable completionRunnable = attachment.getCompletionRunnable();
 			if (null != completionRunnable) {
 				completionRunnable.setCompleted(true);

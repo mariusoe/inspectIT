@@ -289,6 +289,22 @@ public class StorageService implements IStorageService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
+	public List<String> getDataFilesLocations(StorageData storageData) throws StorageException {
+		if (!storageManager.isStorageExisting(storageData)) {
+			throw new StorageException("The storage " + storageData + " does not exsist on the CMR.");
+		}
+		try {
+			return storageManager.getDataFilesLocations(storageData);
+		} catch (IOException e) {
+			log.warn("Exception in storage service.", e);
+			throw new StorageException("Exception occurred trying to load storages data files locations.", e);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@MethodLog
 	public List<String> getAgentFilesLocations(StorageData storageData) throws StorageException {
 		if (!storageManager.isStorageExisting(storageData)) {
 			throw new StorageException("The storage " + storageData + " does not exsist on the CMR.");
@@ -305,10 +321,11 @@ public class StorageService implements IStorageService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public void addLabelToStorage(StorageData storageData, AbstractStorageLabel<?> storageLabel, boolean doOverwrite) throws StorageException {
+	public StorageData addLabelToStorage(StorageData storageData, AbstractStorageLabel<?> storageLabel, boolean doOverwrite) throws StorageException {
 		try {
 			storageManager.addLabelToStorage(storageData, storageLabel, doOverwrite);
 			storageLabelDataDao.saveLabel(storageLabel);
+			return storageManager.getStorageData(storageData.getId());
 		} catch (Exception e) {
 			log.warn("Exception in storage service.", e);
 			throw new StorageException("Exception occurred trying to save storage data changes to disk.", e);
@@ -319,25 +336,13 @@ public class StorageService implements IStorageService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public void addLabelsToStorage(StorageData storageData, Collection<AbstractStorageLabel<?>> storageLabels, boolean doOverwrite) throws StorageException {
-		for (AbstractStorageLabel<?> storageLabel : storageLabels) {
-			try {
+	public StorageData addLabelsToStorage(StorageData storageData, Collection<AbstractStorageLabel<?>> storageLabels, boolean doOverwrite) throws StorageException {
+		try {
+			for (AbstractStorageLabel<?> storageLabel : storageLabels) {
 				storageManager.addLabelToStorage(storageData, storageLabel, doOverwrite);
 				storageLabelDataDao.saveLabel(storageLabel);
-			} catch (Exception e) {
-				log.warn("Exception in storage service.", e);
-				throw new StorageException("Exception occurred trying to save storage data changes to disk.", e);
 			}
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@MethodLog
-	public boolean removeLabelFromStorage(StorageData storageData, AbstractStorageLabel<?> storageLabel) throws StorageException {
-		try {
-			return storageManager.removeLabelFromStorage(storageData, storageLabel);
+			return storageManager.getStorageData(storageData.getId());
 		} catch (Exception e) {
 			log.warn("Exception in storage service.", e);
 			throw new StorageException("Exception occurred trying to save storage data changes to disk.", e);
@@ -348,13 +353,26 @@ public class StorageService implements IStorageService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public boolean removeLabelsFromStorage(StorageData storageData, List<AbstractStorageLabel<?>> storageLabelList) throws StorageException {
-		boolean allRemoved = true;
+	public StorageData removeLabelFromStorage(StorageData storageData, AbstractStorageLabel<?> storageLabel) throws StorageException {
+		try {
+			storageManager.removeLabelFromStorage(storageData, storageLabel);
+			return storageManager.getStorageData(storageData.getId());
+		} catch (Exception e) {
+			log.warn("Exception in storage service.", e);
+			throw new StorageException("Exception occurred trying to save storage data changes to disk.", e);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@MethodLog
+	public StorageData removeLabelsFromStorage(StorageData storageData, List<AbstractStorageLabel<?>> storageLabelList) throws StorageException {
 		try {
 			for (AbstractStorageLabel<?> label : storageLabelList) {
-				allRemoved &= storageManager.removeLabelFromStorage(storageData, label);
+				storageManager.removeLabelFromStorage(storageData, label);
 			}
-			return allRemoved;
+			return storageManager.getStorageData(storageData.getId());
 		} catch (Exception e) {
 			log.warn("Exception in storage service.", e);
 			throw new StorageException("Exception occurred trying to save storage data changes to disk.", e);

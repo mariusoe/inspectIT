@@ -187,6 +187,16 @@ public abstract class AbstractChannelManager {
 	}
 
 	/**
+	 * Sets {@link #executorService}.
+	 * 
+	 * @param executorService
+	 *            New value for {@link #executorService}
+	 */
+	public void setExecutorService(ExecutorService executorService) {
+		this.executorService = executorService;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

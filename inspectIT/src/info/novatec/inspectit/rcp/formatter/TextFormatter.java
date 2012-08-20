@@ -8,9 +8,11 @@ import info.novatec.inspectit.communication.data.InvocationAwareData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
+import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.model.AgentLeaf;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
+import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageData.StorageState;
 import info.novatec.inspectit.storage.WritingStatus;
@@ -228,7 +230,27 @@ public final class TextFormatter {
 		styledString.append("[" + cmrRepositoryDefinition.getName() + "]", StyledString.QUALIFIER_STYLER);
 		styledString.append(" - ");
 		styledString.append(getStorageStateTextualRepresentation(storageData.getState()), StyledString.DECORATIONS_STYLER);
+		if (InspectIT.getDefault().getInspectITStorageManager().isFullyDownloaded(storageData)) {
+			styledString.append(", Downloaded", StyledString.DECORATIONS_STYLER);
+		}
 		styledString.append(", " + NumberFormatter.formatBytesToMBytes(storageData.getDiskSize()), StyledString.DECORATIONS_STYLER);
+		return styledString;
+	}
+
+	/**
+	 * Returns the styled string for the {@link LocalStorageData}.
+	 * 
+	 * @param localStorageData
+	 *            Local storage data.
+	 * @return Styled string for nicer representation.
+	 */
+	public static StyledString getStyledStorageDataString(LocalStorageData localStorageData) {
+		StyledString styledString = new StyledString();
+		styledString.append(localStorageData.getName());
+		styledString.append(" ");
+		styledString.append("[Local Disk]", StyledString.QUALIFIER_STYLER);
+		styledString.append(" - ");
+		styledString.append(NumberFormatter.formatBytesToMBytes(localStorageData.getDiskSize()), StyledString.DECORATIONS_STYLER);
 		return styledString;
 	}
 

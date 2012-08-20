@@ -2,18 +2,20 @@ package info.novatec.inspectit.rcp.view.tree;
 
 import info.novatec.inspectit.rcp.model.Component;
 import info.novatec.inspectit.rcp.model.Composite;
-import info.novatec.inspectit.rcp.model.StorageManagerTreeModelManager;
+import info.novatec.inspectit.rcp.model.storage.LocalStorageTreeModelManager;
+import info.novatec.inspectit.rcp.model.storage.StorageTreeModelManager;
 
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 /**
  * Content provider for the storage tree.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
-public class StorageManagerTreeContentProvider implements ITreeContentProvider {
+public class StorageManagerTreeContentProvider extends ArrayContentProvider implements ITreeContentProvider {
 
 	/**
 	 * {@inheritDoc}
@@ -31,10 +33,13 @@ public class StorageManagerTreeContentProvider implements ITreeContentProvider {
 	 * {@inheritDoc}
 	 */
 	public Object[] getElements(Object inputElement) {
-		if (inputElement instanceof StorageManagerTreeModelManager) {
-			return ((StorageManagerTreeModelManager) inputElement).getRootObjects();
+		if (inputElement instanceof StorageTreeModelManager) {
+			return ((StorageTreeModelManager) inputElement).getRootObjects();
+		} else if (inputElement instanceof LocalStorageTreeModelManager) {
+			return ((LocalStorageTreeModelManager) inputElement).getRootObjects();
+		} else {
+			return super.getElements(inputElement);
 		}
-		return new Object[0];
 	}
 
 	/**

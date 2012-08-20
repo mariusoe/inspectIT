@@ -59,7 +59,7 @@ public class CloseAndShowStorageHandler extends CloseStorageHandler implements I
 				public void done(IJobChangeEvent jobEvent) {
 					InspectITStorageManager storageManager = InspectIT.getDefault().getInspectITStorageManager();
 					try {
-						storageManager.mountStorage(storageData, cmrRepositoryDefinition, false);
+						storageManager.mountStorage(storageData, cmrRepositoryDefinition);
 					} catch (final Exception exception) {
 						Display.getDefault().asyncExec(new Runnable() {
 							@Override

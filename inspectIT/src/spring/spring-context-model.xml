@@ -434,8 +434,8 @@
 	<bean id="exceptionSensorDataQueryFactory"
 		class="info.novatec.inspectit.indexing.query.factory.impl.ExceptionSensorDataQueryFactory" />
 
-	<bean id="httpDataRetriever"
-		class="info.novatec.inspectit.rcp.storage.util.HttpDataRetriever" />
+	<bean id="dataRetriever"
+		class="info.novatec.inspectit.rcp.storage.util.DataRetriever" />
 
 	<bean id="storageRepositoryDefinition"
 		class="info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition"
@@ -491,4 +491,28 @@
 		<lookup-method name="createStorageGlobalDataAccessService"
 			bean="storageGlobalDataAccessService" />
 	</bean>
+
+	<bean id="IOExecutorService"
+		class="info.novatec.inspectit.rcp.storage.util.ExecutorServiceFactory">
+		<property name="executorThreads" value="2" />
+		<property name="beanSingleton" value="true" />
+	</bean>
+
+	<bean id="storageExecutorService"
+		class="info.novatec.inspectit.rcp.storage.util.ExecutorServiceFactory" >
+		<property name="executorThreads" value="3" />
+		<property name="scheduledExecutor" value="true" />
+	</bean>
+
+	<bean id="readingChannelManager" class="info.novatec.inspectit.storage.nio.read.ReadingChannelManager" depends-on="IOExecutorService">
+		<property name="executorService">
+			<ref bean="IOExecutorService"/>
+		</property>
+	</bean>
+	<bean id="storageReader" class="info.novatec.inspectit.storage.StorageReader" >
+		<property name="executorService">
+			<ref bean="storageExecutorService"/>
+		</property>
+	</bean>
+
 </beans>
