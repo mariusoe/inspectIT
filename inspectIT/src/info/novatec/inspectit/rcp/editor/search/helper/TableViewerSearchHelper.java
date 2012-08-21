@@ -6,6 +6,7 @@ import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * Search helper for {@link TableViewer}.
@@ -39,6 +40,9 @@ public class TableViewerSearchHelper extends AbstractSearchHelper {
 		super(repositoryDefinition);
 		this.tableViewer = tableViewer;
 		this.tableInputController = tableInputController;
+		for (TableColumn tableColumn : tableViewer.getTable().getColumns()) {
+			tableColumn.addSelectionListener(getColumnSortingListener());
+		}
 	}
 
 	/**

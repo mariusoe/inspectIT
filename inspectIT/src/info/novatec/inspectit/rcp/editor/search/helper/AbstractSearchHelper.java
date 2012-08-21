@@ -9,10 +9,12 @@ import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.swt.events.SelectionAdapter;
 
 /**
  * Abstract search helper. Joins the search logics and delegates specific actions to the
@@ -60,6 +62,21 @@ public abstract class AbstractSearchHelper implements ISearchExecutor {
 	private int oldInputHash;
 
 	/**
+	 * The selection adapter that will clear the search on the new sorting of columns.
+	 */
+	private SelectionAdapter columnSortingListener = new SelectionAdapter() {
+		public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
+			clearSearch();
+		};
+	};
+
+	/**
+	 * If <code>true</code> singles that the {@link #clearSearch()} was executed and search should
+	 * start over.
+	 */
+	private boolean cleared;
+
+	/**
 	 * @param repositoryDefinition
 	 *            {@link RepositoryDefinition}. Needed for {@link SearchFactory}.
 	 */
@@ -98,7 +115,7 @@ public abstract class AbstractSearchHelper implements ISearchExecutor {
 	 */
 	@Override
 	public SearchResult executeSearch(SearchCriteria searchCriteria) {
-		if (ObjectUtils.equals(lastSearchCriteria, searchCriteria)) {
+		if (!cleared && ObjectUtils.equals(lastSearchCriteria, searchCriteria)) {
 			// we search with same criteria as last time
 			// just execute next
 			return this.next();
@@ -117,6 +134,7 @@ public abstract class AbstractSearchHelper implements ISearchExecutor {
 		}
 
 		lastSearchCriteria = searchCriteria;
+		cleared = false;
 		return getSearchResult();
 	}
 
@@ -125,9 +143,15 @@ public abstract class AbstractSearchHelper implements ISearchExecutor {
 	 */
 	@Override
 	public SearchResult next() {
+		if (cleared) {
+			return executeSearch(lastSearchCriteria);
+		}
+
 		if (!checkInput()) {
 			loadAllObjects();
 			updateFoundObjects(lastSearchCriteria);
+		} else {
+			sortAsInViewer(foundObjects);
 		}
 		if (totalOccurrences > 1) {
 			currentOccurrence++;
@@ -150,9 +174,15 @@ public abstract class AbstractSearchHelper implements ISearchExecutor {
 	 */
 	@Override
 	public SearchResult previous() {
+		if (cleared) {
+			return executeSearch(lastSearchCriteria);
+		}
+
 		if (!checkInput()) {
 			loadAllObjects();
 			updateFoundObjects(lastSearchCriteria);
+		} else {
+			sortAsInViewer(foundObjects);
 		}
 		if (totalOccurrences > 1) {
 			currentOccurrence--;
@@ -175,6 +205,7 @@ public abstract class AbstractSearchHelper implements ISearchExecutor {
 	 */
 	@Override
 	public void clearSearch() {
+		cleared = true;
 	}
 
 	/**
@@ -228,7 +259,25 @@ public abstract class AbstractSearchHelper implements ISearchExecutor {
 				foundObjects.add(object);
 			}
 		}
+		sortAsInViewer(foundObjects);
 		totalOccurrences = foundObjects.size();
+	}
+
+	/**
+	 * Sorts the list of objects as they appear in the table.
+	 * 
+	 * @param objects
+	 *            List of objects.
+	 */
+	private void sortAsInViewer(List<Object> objects) {
+		if (null != getViewer().getComparator()) {
+			Collections.sort(objects, new Comparator<Object>() {
+				@Override
+				public int compare(Object o1, Object o2) {
+					return getViewer().getComparator().compare(getViewer(), o1, o2);
+				}
+			});
+		}
 	}
 
 	/**
@@ -263,6 +312,15 @@ public abstract class AbstractSearchHelper implements ISearchExecutor {
 			Object selected = foundObjects.get(occurrence - 1);
 			this.selectElement(selected);
 		}
+	}
+
+	/**
+	 * Gets {@link #columnSortingListener}.
+	 * 
+	 * @return {@link #columnSortingListener}
+	 */
+	protected SelectionAdapter getColumnSortingListener() {
+		return columnSortingListener;
 	}
 
 }

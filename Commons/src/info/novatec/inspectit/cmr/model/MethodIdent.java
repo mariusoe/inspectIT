@@ -72,96 +72,216 @@ public class MethodIdent implements Serializable {
 	 */
 	private int modifiers;
 
+	/**
+	 * Default constructor.
+	 */
 	public MethodIdent() {
 	}
 
+	/**
+	 * Gets {@link #id}.
+	 * 
+	 * @return {@link #id}
+	 */
 	public Long getId() {
 		return id;
 	}
 
+	/**
+	 * Sets {@link #id}.
+	 * 
+	 * @param id
+	 *            New value for {@link #id}
+	 */
 	public void setId(Long id) {
 		this.id = id;
 	}
 
+	/**
+	 * Gets {@link #timeStamp}.
+	 * 
+	 * @return {@link #timeStamp}
+	 */
 	public Timestamp getTimeStamp() {
 		return timeStamp;
 	}
 
+	/**
+	 * Sets {@link #timeStamp}.
+	 * 
+	 * @param timeStamp
+	 *            New value for {@link #timeStamp}
+	 */
 	public void setTimeStamp(Timestamp timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
+	/**
+	 * Gets {@link #methodSensorTypeIdents}.
+	 * 
+	 * @return {@link #methodSensorTypeIdents}
+	 */
 	public Set<MethodSensorTypeIdent> getMethodSensorTypeIdents() {
 		return methodSensorTypeIdents;
 	}
 
+	/**
+	 * Sets {@link #methodSensorTypeIdents}.
+	 * 
+	 * @param methodSensorTypeIdents
+	 *            New value for {@link #methodSensorTypeIdents}
+	 */
 	public void setMethodSensorTypeIdents(Set<MethodSensorTypeIdent> methodSensorTypeIdents) {
 		this.methodSensorTypeIdents = methodSensorTypeIdents;
 	}
 
+	/**
+	 * Gets {@link #platformIdent}.
+	 * 
+	 * @return {@link #platformIdent}
+	 */
 	public PlatformIdent getPlatformIdent() {
 		return platformIdent;
 	}
 
+	/**
+	 * Sets {@link #platformIdent}.
+	 * 
+	 * @param platformIdent
+	 *            New value for {@link #platformIdent}
+	 */
 	public void setPlatformIdent(PlatformIdent platformIdent) {
 		this.platformIdent = platformIdent;
 	}
 
+	/**
+	 * Gets {@link #parameters}.
+	 * 
+	 * @return {@link #parameters}
+	 */
 	public List<String> getParameters() {
 		return parameters;
 	}
 
+	/**
+	 * Sets {@link #parameters}.
+	 * 
+	 * @param parameters
+	 *            New value for {@link #parameters}
+	 */
 	public void setParameters(List<String> parameters) {
 		this.parameters = parameters;
 	}
 
+	/**
+	 * Gets {@link #packageName}.
+	 * 
+	 * @return {@link #packageName}
+	 */
 	public String getPackageName() {
 		return packageName;
 	}
 
+	/**
+	 * Sets {@link #packageName}.
+	 * 
+	 * @param packageName
+	 *            New value for {@link #packageName}
+	 */
 	public void setPackageName(String packageName) {
 		this.packageName = packageName;
 	}
 
+	/**
+	 * Gets {@link #className}.
+	 * 
+	 * @return {@link #className}
+	 */
 	public String getClassName() {
 		return className;
 	}
 
+	/**
+	 * Sets {@link #className}.
+	 * 
+	 * @param className
+	 *            New value for {@link #className}
+	 */
 	public void setClassName(String className) {
 		this.className = className;
 	}
 
+	/**
+	 * Gets {@link #methodName}.
+	 * 
+	 * @return {@link #methodName}
+	 */
 	public String getMethodName() {
 		return methodName;
 	}
 
+	/**
+	 * Sets {@link #methodName}.
+	 * 
+	 * @param methodName
+	 *            New value for {@link #methodName}
+	 */
 	public void setMethodName(String methodName) {
 		this.methodName = methodName;
 	}
 
+	/**
+	 * Gets {@link #returnType}.
+	 * 
+	 * @return {@link #returnType}
+	 */
 	public String getReturnType() {
 		return returnType;
 	}
 
-	public void setReturnType(String returnValue) {
-		this.returnType = returnValue;
+	/**
+	 * Sets {@link #returnType}.
+	 * 
+	 * @param returnType
+	 *            New value for {@link #returnType}
+	 */
+	public void setReturnType(String returnType) {
+		this.returnType = returnType;
 	}
 
-	public void setModifiers(int modifiers) {
-		this.modifiers = modifiers;
-	}
-
+	/**
+	 * Gets {@link #modifiers}.
+	 * 
+	 * @return {@link #modifiers}
+	 */
 	public int getModifiers() {
 		return modifiers;
 	}
 
-	public String toString() {
-		return packageName + "." + className + "#" + methodName + parameters + " : " + returnType;
+	/**
+	 * Sets {@link #modifiers}.
+	 * 
+	 * @param modifiers
+	 *            New value for {@link #modifiers}
+	 */
+	public void setModifiers(int modifiers) {
+		this.modifiers = modifiers;
+	}
+
+	/**
+	 * Returns the Fully qualified name (FQN) of the class {@link MethodIdent} is holding
+	 * information for.
+	 * 
+	 * @return Fully qualified name (FQN) string.
+	 */
+	public String getFQN() {
+		return packageName + '.' + className;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -179,6 +299,7 @@ public class MethodIdent implements Serializable {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -243,6 +364,14 @@ public class MethodIdent implements Serializable {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return packageName + "." + className + "#" + methodName + parameters + " : " + returnType;
 	}
 
 }

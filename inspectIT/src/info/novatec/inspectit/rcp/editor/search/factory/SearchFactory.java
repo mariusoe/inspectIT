@@ -10,6 +10,10 @@ import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.editor.search.criteria.SearchCriteria;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
+import java.util.Map;
+
+import org.apache.commons.collections.MapUtils;
+
 /**
  * Class for supporting the search functionality.
  * 
@@ -139,11 +143,9 @@ public final class SearchFactory {
 		protected boolean isSearchCompatible(MethodIdent methodIdent, SearchCriteria searchCriteria) {
 			if (null == methodIdent) {
 				return false;
-			} else if (stringMatches(methodIdent.getClassName(), searchCriteria)) {
+			} else if (stringMatches(methodIdent.getFQN(), searchCriteria)) {
 				return true;
 			} else if (stringMatches(methodIdent.getMethodName(), searchCriteria)) {
-				return true;
-			} else if (stringMatches(methodIdent.getPackageName(), searchCriteria)) {
 				return true;
 			} else if (methodIdent.getParameters() != null && !methodIdent.getParameters().isEmpty()) {
 				for (String parameter : methodIdent.getParameters()) {
@@ -211,6 +213,42 @@ public final class SearchFactory {
 				return true;
 			} else if (stringMatches(element.getUri(), searchCriteria)) {
 				return true;
+			} else {
+				if (MapUtils.isNotEmpty(element.getAttributes())) {
+
+					for (Map.Entry<String, String> entry : element.getAttributes().entrySet()) {
+						if (stringMatches(entry.getKey(), searchCriteria) || stringMatches(entry.getValue(), searchCriteria)) {
+							return true;
+						}
+					}
+				}
+				if (MapUtils.isNotEmpty(element.getHeaders())) {
+					for (Map.Entry<String, String> entry : element.getHeaders().entrySet()) {
+						if (stringMatches(entry.getKey(), searchCriteria) || stringMatches(entry.getValue(), searchCriteria)) {
+							return true;
+						}
+					}
+				}
+				if (MapUtils.isNotEmpty(element.getParameters())) {
+					for (Map.Entry<String, String[]> entry : element.getParameters().entrySet()) {
+						if (stringMatches(entry.getKey(), searchCriteria)) {
+							return true;
+						} else {
+							for (String string : entry.getValue()) {
+								if (stringMatches(string, searchCriteria)) {
+									return true;
+								}
+							}
+						}
+					}
+				}
+				if (MapUtils.isNotEmpty(element.getSessionAttributes())) {
+					for (Map.Entry<String, String> entry : element.getSessionAttributes().entrySet()) {
+						if (stringMatches(entry.getKey(), searchCriteria) || stringMatches(entry.getValue().toString(), searchCriteria)) {
+							return true;
+						}
+					}
+				}
 			}
 			MethodIdent methodIdent = repositoryDefinition.getCachedDataService().getMethodIdentForId(element.getMethodIdent());
 			return super.isSearchCompatible(methodIdent, searchCriteria);

@@ -5,6 +5,7 @@ import info.novatec.inspectit.rcp.editor.tree.input.TreeInputController;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
 import org.eclipse.jface.viewers.StructuredViewer;
+import org.eclipse.swt.widgets.TreeColumn;
 
 /**
  * Search helper for {@link DeferredTreeViewer}.
@@ -40,6 +41,9 @@ public class DeferredTreeViewerSearchHelper extends AbstractSearchHelper {
 		super(repositoryDefinition);
 		this.treeViewer = treeViewer;
 		this.treeInputController = treeInputController;
+		for (TreeColumn treeColumn : treeViewer.getTree().getColumns()) {
+			treeColumn.addSelectionListener(getColumnSortingListener());
+		}
 	}
 
 	/**
