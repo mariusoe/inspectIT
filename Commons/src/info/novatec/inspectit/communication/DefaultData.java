@@ -20,7 +20,7 @@ import java.sql.Timestamp;
  * @author Patrice Bouillet
  * 
  */
-public abstract class DefaultData implements Serializable {
+public abstract class DefaultData implements Serializable, Sizeable {
 
 	/**
 	 * The serial version UID.

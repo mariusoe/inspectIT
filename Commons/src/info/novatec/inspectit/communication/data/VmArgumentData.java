@@ -1,17 +1,17 @@
 package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
+import info.novatec.inspectit.communication.Sizeable;
 
 import java.io.Serializable;
 
 /**
- * This class provide informations about system properties of the virtual
- * machine.
+ * This class provide informations about system properties of the virtual machine.
  * 
  * @author Eduard Tudenhoefner
  * 
  */
-public class VmArgumentData implements Serializable {
+public class VmArgumentData implements Serializable, Sizeable {
 
 	/**
 	 * The serial version uid for this class.
@@ -122,12 +122,12 @@ public class VmArgumentData implements Serializable {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public long getObjectSize(IObjectSizes objectSizes) {
-		long size =  objectSizes.getSizeOfObjectHeader();
+		long size = objectSizes.getSizeOfObjectHeader();
 		size += objectSizes.getPrimitiveTypesSize(2, 0, 0, 0, 2, 0);
 		size += objectSizes.getSizeOf(vmName);
 		size += objectSizes.getSizeOf(vmValue);

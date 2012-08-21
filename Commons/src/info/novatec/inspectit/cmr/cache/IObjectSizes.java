@@ -1,5 +1,7 @@
 package info.novatec.inspectit.cmr.cache;
 
+import info.novatec.inspectit.communication.Sizeable;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +30,16 @@ public interface IObjectSizes {
 	 * @return Size of java object header in bytes.
 	 */
 	long getSizeOfObjectHeader();
+
+	/**
+	 * Returns the size of the sizable object.
+	 * 
+	 * @param sizeable
+	 *            {@link Sizeable}.
+	 * @return Size in bytes. If passed object is <code>null</code>, <code>0</code> will be returned
+	 *         as result.
+	 */
+	long getSizeOf(Sizeable sizeable);
 
 	/**
 	 * Calculates the approximate size of the {@link String} object based on the number of string's

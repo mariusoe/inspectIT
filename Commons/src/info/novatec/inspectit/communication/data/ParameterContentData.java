@@ -1,6 +1,7 @@
 package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
+import info.novatec.inspectit.communication.Sizeable;
 
 import java.io.Serializable;
 
@@ -10,7 +11,7 @@ import java.io.Serializable;
  * @author Patrice Bouillet
  * 
  */
-public class ParameterContentData implements Serializable {
+public class ParameterContentData implements Serializable, Sizeable {
 
 	/**
 	 * The serial version UID.
@@ -170,12 +171,26 @@ public class ParameterContentData implements Serializable {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the approximate size of the object in the memory in bytes.
+	 * <p>
+	 * This method needs to be overwritten by all subclasses.
+	 * 
+	 * @param objectSizes
+	 *            Appropriate instance of {@link IObjectSizes} depending on the VM architecture.
+	 * @return Approximate object size in bytes.
 	 */
-	public String toString() {
-		return content;
+	public long getObjectSize(IObjectSizes objectSizes) {
+		long size = objectSizes.getSizeOfObjectHeader();
+		size += objectSizes.getPrimitiveTypesSize(3, 1, 1, 0, 2, 0);
+		size += objectSizes.getSizeOf(content);
+		size += objectSizes.getSizeOf(name);
+		size += objectSizes.getSizeOf(contentType);
+		return objectSizes.alignTo8Bytes(size);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -229,22 +244,10 @@ public class ParameterContentData implements Serializable {
 	}
 
 	/**
-	 * Returns the approximate size of the object in the memory in bytes.
-	 * <p>
-	 * This method needs to be overwritten by all subclasses.
-	 * 
-	 * @param objectSizes
-	 *            Appropriate instance of {@link IObjectSizes} depending on the VM architecture.
-	 * @return Approximate object size in bytes.
+	 * {@inheritDoc}
 	 */
-	public long getObjectSize(IObjectSizes objectSizes) {
-		long size = objectSizes.getSizeOfObjectHeader();
-		size += objectSizes.getPrimitiveTypesSize(3, 1, 1, 0, 2, 0);
-		size += objectSizes.getSizeOf(content);
-		size += objectSizes.getSizeOf(name);
-		if (null != contentType) {
-			size += contentType.getObjectSize(objectSizes);
-		}
-		return objectSizes.alignTo8Bytes(size);
+	public String toString() {
+		return content;
 	}
+
 }

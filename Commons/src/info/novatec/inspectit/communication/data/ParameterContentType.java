@@ -1,6 +1,7 @@
 package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
+import info.novatec.inspectit.communication.Sizeable;
 
 import java.io.Serializable;
 
@@ -12,11 +13,14 @@ import java.io.Serializable;
  * 
  * @author Stefan Siegl
  */
-public enum ParameterContentType implements Serializable {
+public enum ParameterContentType implements Serializable, Sizeable {
+
 	/** Property accessor refers to a field. */
 	FIELD,
+
 	/** Property accessor refers to a parameter. */
 	PARAM,
+
 	/** Property accessor refers to a return value. */
 	RETURN;
 

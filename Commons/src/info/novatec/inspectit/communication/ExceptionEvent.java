@@ -8,7 +8,7 @@ import info.novatec.inspectit.cmr.cache.IObjectSizes;
  * @author Eduard Tudenhoefner
  * 
  */
-public enum ExceptionEvent {
+public enum ExceptionEvent implements Sizeable {
 
 	CREATED, RETHROWN, PASSED, HANDLED, UNREGISTERED_PASSED;
 

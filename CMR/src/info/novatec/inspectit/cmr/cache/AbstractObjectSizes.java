@@ -1,5 +1,7 @@
 package info.novatec.inspectit.cmr.cache;
 
+import info.novatec.inspectit.communication.Sizeable;
+
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,6 +44,17 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * @return Size of reference.
 	 */
 	public abstract long getReferenceSize();
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getSizeOf(Sizeable sizeable) {
+		if (null == sizeable) {
+			return 0;
+		}
+		return sizeable.getObjectSize(this);
+	}
 
 	/**
 	 * {@inheritDoc}

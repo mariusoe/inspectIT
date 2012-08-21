@@ -135,12 +135,8 @@ public class ExceptionSensorData extends InvocationAwareData {
 		size += objectSizes.getSizeOf(cause);
 		size += objectSizes.getSizeOf(stackTrace);
 		size += objectSizes.getSizeOf(throwableType);
-		if (null != exceptionEvent) {
-			size += exceptionEvent.getObjectSize(objectSizes);
-		}
-		if (null != child) {
-			size += child.getObjectSize(objectSizes);
-		}
+		size += objectSizes.getSizeOf(exceptionEvent);
+		size += objectSizes.getSizeOf(child);
 		if (doAlign) {
 			return objectSizes.alignTo8Bytes(size);
 		} else {

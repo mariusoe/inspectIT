@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.is;
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.Sizeable;
 import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
 import info.novatec.inspectit.communication.data.CompilationInformationData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
@@ -203,7 +204,7 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		theirSize = MemoryUtil.deepMemoryUsageOf(arrayList, VisibilityFilter.ALL);
 		assertThat("Random list size", ourSize, is(equalTo(theirSize)));
 	}
-	
+
 	/**
 	 * Tests size of empty and populated {@link ArrayList} object with initial size of 0.
 	 */
@@ -296,7 +297,7 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 	@Test
 	public void arbitraryClass() {
 		TestClass testObject = new TestClass();
-		long ourSize = testObject.getSize(objectSizes);
+		long ourSize = objectSizes.getSizeOf(testObject);
 		long theirSize = MemoryUtil.deepMemoryUsageOf(testObject, VisibilityFilter.ALL);
 		assertThat("Test class", ourSize, is(equalTo(theirSize)));
 	}
@@ -319,7 +320,7 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 	@Test(dataProvider = "classProvider")
 	public void inspectitClasses(Class<? extends DefaultData> defaultDataClass) throws InstantiationException, IllegalAccessException {
 		DefaultData object = defaultDataClass.newInstance();
-		long ourSize = object.getObjectSize(objectSizes);
+		long ourSize = objectSizes.getSizeOf(object);
 		long theirSize = MemoryUtil.deepMemoryUsageOf(object, VisibilityFilter.ALL);
 		assertThat("Size of " + defaultDataClass.getName(), (double) ourSize, is(closeTo((double) theirSize, 8d)));
 	}
@@ -335,7 +336,7 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 	}
 
 	@SuppressWarnings("unused")
-	private static class TestClass {
+	private static class TestClass implements Sizeable {
 
 		private boolean booleanField;
 
@@ -345,7 +346,7 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 
 		private String str = RandomStringUtils.random((int) (Math.random() * 100));
 
-		private long getSize(IObjectSizes objectSizes) {
+		public long getObjectSize(IObjectSizes objectSizes) {
 			long size = objectSizes.getSizeOfObjectHeader();
 			size += objectSizes.getPrimitiveTypesSize(1, 1, 1, 0, 1, 0);
 			size += objectSizes.getSizeOf(str);

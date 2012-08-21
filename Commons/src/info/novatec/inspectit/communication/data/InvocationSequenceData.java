@@ -260,22 +260,18 @@ public class InvocationSequenceData extends MethodSensorData {
 	public long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
 		long size = super.getObjectSize(objectSizes, false);
 		size += objectSizes.getPrimitiveTypesSize(5, 0, 0, 0, 2, 3);
-		if (null != timerData) {
-			size += timerData.getObjectSize(objectSizes);
-		}
-		if (null != sqlStatementData) {
-			size += sqlStatementData.getObjectSize(objectSizes);
-		}
+		size += objectSizes.getSizeOf(timerData);
+		size += objectSizes.getSizeOf(sqlStatementData);
 		if (null != nestedSequences && nestedSequences instanceof ArrayList) {
 			size += objectSizes.getSizeOf(nestedSequences, 0);
 			for (InvocationSequenceData invocationSequenceData : nestedSequences) {
-				size += invocationSequenceData.getObjectSize(objectSizes);
+				size += objectSizes.getSizeOf(invocationSequenceData);
 			}
 		}
 		if (null != exceptionSensorDataObjects) {
 			size += objectSizes.getSizeOf(exceptionSensorDataObjects);
 			for (ExceptionSensorData exceptionSensorData : exceptionSensorDataObjects) {
-				size += exceptionSensorData.getObjectSize(objectSizes);
+				size += objectSizes.getSizeOf(exceptionSensorData);
 			}
 		}
 		if (doAlign) {

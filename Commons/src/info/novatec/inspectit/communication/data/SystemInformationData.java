@@ -464,7 +464,7 @@ public class SystemInformationData extends SystemSensorData {
 		if (null != vmSet) {
 			size += objectSizes.getSizeOfHashSet(vmSet.size());
 			for (VmArgumentData vmArgumentData : vmSet) {
-				size += vmArgumentData.getObjectSize(objectSizes);
+				size += objectSizes.getSizeOf(vmArgumentData);
 			}
 		}
 		if (doAlign) {

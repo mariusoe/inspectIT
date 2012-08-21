@@ -145,7 +145,7 @@ public abstract class MethodSensorData extends DefaultData {
 		if (null != parameterContentData && parameterContentData instanceof HashSet) {
 			size += objectSizes.getSizeOfHashSet(parameterContentData.size(), 0);
 			for (ParameterContentData paramContentData : parameterContentData) {
-				size += paramContentData.getObjectSize(objectSizes);
+				size += objectSizes.getSizeOf(paramContentData);
 			}
 		}
 		if (doAlign) {
