@@ -244,7 +244,7 @@ public class PropertyAccessor implements IPropertyAccessor {
 			try {
 				String content = this.getPropertyContent(start, clazz, parameters, returnValue);
 				ParameterContentData paramContentData = new ParameterContentData();
-				paramContentData.setContent("'" + content + "'");
+				paramContentData.setContent(content);
 				paramContentData.setContentType(start.getContentType());
 				paramContentData.setName(start.getName());
 				paramContentData.setSignaturePosition(start.getSignaturePosition());

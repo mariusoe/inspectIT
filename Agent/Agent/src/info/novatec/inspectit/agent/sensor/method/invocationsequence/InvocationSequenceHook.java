@@ -199,7 +199,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 
 				// crop the content strings of all ParameterContentData
 				for (ParameterContentData contentData : parameterContentData) {
-					contentData.setContent(strConstraint.cropKeepFinalCharacter(contentData.getContent(), '\''));
+					contentData.setContent(strConstraint.crop(contentData.getContent()));
 				}
 			}
 

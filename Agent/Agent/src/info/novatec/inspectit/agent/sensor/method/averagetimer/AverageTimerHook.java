@@ -111,7 +111,7 @@ public class AverageTimerHook implements IMethodHook, IConstructorHook {
 
 			// crop the content strings of all ParameterContentData but leave the prefix as it is
 			for (ParameterContentData contentData : parameterContentData) {
-				contentData.setContent(strConstraint.cropKeepFinalCharacter(contentData.getContent(), '\''));
+				contentData.setContent(strConstraint.crop(contentData.getContent()));
 			}
 		}
 

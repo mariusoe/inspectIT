@@ -656,10 +656,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 					styledString.append("'");
 					styledString.append(parameterContentData.getName());
 					styledString.append("': ");
-					// substring(1) is added because the agent adds � at the
-					// beginning of each string, there was an issue with hibernate handling
-					// some text strings not correctly, that�s why this is prepended
-					styledString.append(parameterContentData.getContent().substring(1));
+					styledString.append(parameterContentData.getContent());
 					styledString.append(", ");
 				}
 			}
