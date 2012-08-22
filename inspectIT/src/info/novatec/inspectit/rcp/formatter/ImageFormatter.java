@@ -11,6 +11,7 @@ import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageData.StorageState;
 import info.novatec.inspectit.storage.WritingStatus;
+import info.novatec.inspectit.storage.label.type.AbstractCustomStorageLabelType;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 import info.novatec.inspectit.storage.label.type.impl.AssigneeLabelType;
 import info.novatec.inspectit.storage.label.type.impl.CreationDateLabelType;
@@ -18,6 +19,8 @@ import info.novatec.inspectit.storage.label.type.impl.ExploredByLabelType;
 import info.novatec.inspectit.storage.label.type.impl.RatingLabelType;
 import info.novatec.inspectit.storage.label.type.impl.StatusLabelType;
 import info.novatec.inspectit.storage.label.type.impl.UseCaseLabelType;
+
+import java.util.Date;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ResourceManager;
@@ -83,9 +86,19 @@ public final class ImageFormatter {
 			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_STATUS_LABEL_ICON);
 		} else if (UseCaseLabelType.class.equals(labelType.getClass())) {
 			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_USECASE_LABEL_ICON);
-		} else {
-			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_USER_LABEL_ICON);
+		} else if (AbstractCustomStorageLabelType.class.isAssignableFrom(labelType.getClass())) {
+			AbstractCustomStorageLabelType<?> customLabelType = (AbstractCustomStorageLabelType<?>) labelType;
+			if (Boolean.class.equals(customLabelType.getValueClass())) {
+				return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_CHECKMARK);
+			} else if (Date.class.equals(customLabelType.getValueClass())) {
+				return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_CALENDAR);
+			} else if (Number.class.equals(customLabelType.getValueClass())) {
+				return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_CALCULATOR);
+			} else if (String.class.equals(customLabelType.getValueClass())) {
+				return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_USER_LABEL_ICON);
+			}
 		}
+		return null;
 	}
 
 	/**
@@ -97,13 +110,13 @@ public final class ImageFormatter {
 	 */
 	public static Image getImageForStorageLeaf(StorageData storageData) {
 		if (storageData.getState() == StorageState.CREATED_NOT_OPENED) {
-			return InspectIT.getDefault().getImage(InspectITImages.IMG_STOARGE_NEW);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_STORAGE_NEW);
 		} else if (storageData.getState() == StorageState.OPENED) {
-			return InspectIT.getDefault().getImage(InspectITImages.IMG_STOARGE_OPENED);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_STORAGE_OPENED);
 		} else if (storageData.getState() == StorageState.RECORDING) {
-			return InspectIT.getDefault().getImage(InspectITImages.IMG_STOARGE_RECORDING);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_STORAGE_RECORDING);
 		} else if (storageData.getState() == StorageState.CLOSED) {
-			return InspectIT.getDefault().getImage(InspectITImages.IMG_STOARGE_CLOSED);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_STORAGE_CLOSED);
 		}
 		return null;
 	}
@@ -148,9 +161,9 @@ public final class ImageFormatter {
 	 */
 	public static Image getStorageRepositoryImage(StorageRepositoryDefinition storageRepositoryDefinition) {
 		if (storageRepositoryDefinition.getLocalStorageData().isFullyDownloaded() || storageRepositoryDefinition.getCmrRepositoryDefinition().getOnlineStatus() != OnlineStatus.OFFLINE) {
-			return InspectIT.getDefault().getImage(InspectITImages.IMG_STOARGE_AVAILABLE);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_STORAGE_AVAILABLE);
 		} else {
-			return InspectIT.getDefault().getImage(InspectITImages.IMG_STOARGE_NOT_AVAILABLE);
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_STORAGE_NOT_AVAILABLE);
 		}
 	}
 

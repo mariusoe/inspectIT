@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.form;
 
+import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
@@ -8,9 +9,13 @@ import info.novatec.inspectit.rcp.handlers.AddStorageLabelHandler;
 import info.novatec.inspectit.rcp.handlers.RemoveStorageLabelHandler;
 import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
-import info.novatec.inspectit.rcp.storage.label.edit.LabelTableEditingSupport;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
+import info.novatec.inspectit.rcp.storage.label.edit.LabelValueEditingSupport;
+import info.novatec.inspectit.rcp.storage.label.edit.LabelValueEditingSupport.LabelEditListener;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
+import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
 import info.novatec.inspectit.storage.StorageData;
+import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 
 import java.util.ArrayList;
@@ -43,6 +48,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
@@ -180,7 +186,38 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 				if (firstElement instanceof IStorageDataProvider) {
 					if (!ObjectUtils.equals(storageDataProvider, firstElement)) {
 						storageDataProvider = (IStorageDataProvider) firstElement;
-						valueViewerColumn.setEditingSupport(new LabelTableEditingSupport(labelsTableViewer, storageDataProvider.getStorageData(), storageDataProvider.getCmrRepositoryDefinition()));
+
+						final StorageData storageData = storageDataProvider.getStorageData();
+						final CmrRepositoryDefinition cmrRepositoryDefinition = storageDataProvider.getCmrRepositoryDefinition();
+						LabelValueEditingSupport editingSupport = new LabelValueEditingSupport(labelsTableViewer, storageData, cmrRepositoryDefinition);
+						editingSupport.addLabelEditListener(new LabelEditListener() {
+
+							@Override
+							public void preLabelValueChange(AbstractStorageLabel<?> label) {
+								if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
+									try {
+										cmrRepositoryDefinition.getStorageService().removeLabelFromStorage(storageData, label);
+									} catch (StorageException e) {
+										InspectIT.getDefault().createErrorDialog("Label value can not be updated.", e, -1);
+									}
+								}
+							}
+
+							@Override
+							public void postLabelValueChange(AbstractStorageLabel<?> label) {
+								if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
+									try {
+										label.setId(0);
+										cmrRepositoryDefinition.getStorageService().addLabelToStorage(storageData, label, true);
+										refreshStorageManagerView(cmrRepositoryDefinition);
+									} catch (StorageException e) {
+										InspectIT.getDefault().createErrorDialog("Label value can not be updated.", e, -1);
+									}
+								}
+							}
+
+						});
+						valueViewerColumn.setEditingSupport(editingSupport);
 						refreshData();
 					}
 					return;
@@ -189,6 +226,7 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 		}
 		if (null != storageDataProvider) {
 			storageDataProvider = null;
+			valueViewerColumn.setEditingSupport(null);
 			refreshData();
 		}
 	}
@@ -340,7 +378,7 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 
 		});
 
-		addNewLabel = toolkit.createHyperlink(mainComposite, "Add New Label", SWT.RIGHT);
+		addNewLabel = toolkit.createHyperlink(mainComposite, "Add new labels", SWT.RIGHT);
 		addNewLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, true, false, 2, 1));
 		addNewLabel.setEnabled(false);
 		addNewLabel.addHyperlinkListener(new HyperlinkAdapter() {
@@ -428,6 +466,16 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 			}
 		};
 		popupDialog.open();
+	}
+
+	/**
+	 * Refreshes the {@link StorageManagerView}.
+	 */
+	private void refreshStorageManagerView(CmrRepositoryDefinition cmrRepositoryDefinition) {
+		IViewPart viewPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(StorageManagerView.VIEW_ID);
+		if (viewPart instanceof StorageManagerView) {
+			((StorageManagerView) viewPart).refresh(cmrRepositoryDefinition);
+		}
 	}
 
 	/**

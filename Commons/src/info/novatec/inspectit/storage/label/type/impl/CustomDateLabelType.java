@@ -5,7 +5,7 @@ import info.novatec.inspectit.storage.label.type.AbstractCustomStorageLabelType;
 import java.util.Date;
 
 /**
- * Custom label type that holds {@link Date} values,
+ * Custom label type that holds {@link Date} values.
  * 
  * @author Ivan Senic
  * 

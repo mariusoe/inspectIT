@@ -1843,7 +1843,7 @@
          <command
                commandId="info.novatec.inspectit.rcp.commands.addStorageLabel"
                icon="icons/label_add.png"
-               label="Add Label"
+               label="Add Labels"
                style="push">
          </command>
       </menuContribution>

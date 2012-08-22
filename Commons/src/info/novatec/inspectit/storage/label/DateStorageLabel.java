@@ -137,11 +137,14 @@ public class DateStorageLabel extends AbstractStorageLabel<Date> {
 			return false;
 		}
 		DateStorageLabel other = (DateStorageLabel) obj;
+		// ISE: Tweaked here a bit of generated equals
 		if (dateValue == null) {
 			if (other.dateValue != null) {
 				return false;
 			}
-		} else if (!dateValue.equals(other.dateValue)) {
+		} else if (other.dateValue == null) {
+			return false;
+		} else if (dateValue.getTime() != other.dateValue.getTime()) {
 			return false;
 		}
 		if (storageLabelType == null) {

@@ -5,6 +5,7 @@ import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
+import info.novatec.inspectit.rcp.wizard.page.AddStorageLabelWizardPage;
 import info.novatec.inspectit.rcp.wizard.page.DefineDataProcessorsWizardPage;
 import info.novatec.inspectit.rcp.wizard.page.DefineNewStorageWizzardPage;
 import info.novatec.inspectit.rcp.wizard.page.DefineTimelineWizardPage;
@@ -13,9 +14,11 @@ import info.novatec.inspectit.rcp.wizard.page.SelectAgentsWizardPage;
 import info.novatec.inspectit.rcp.wizard.page.SelectExistingStorageWizardPage;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
+import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.recording.RecordingProperties;
 
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -25,9 +28,9 @@ import org.eclipse.ui.IWorkbench;
 
 /**
  * Wizard for starting a recording.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class StartRecordingWizard extends Wizard implements INewWizard {
 
@@ -62,6 +65,11 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 	private DefineTimelineWizardPage timelineWizardPage;
 
 	/**
+	 * Add new label wizard page.
+	 */
+	private AddStorageLabelWizardPage addLabelWizardPage;
+
+	/**
 	 * Initially selected CMR.
 	 */
 	private CmrRepositoryDefinition selectedCmr;
@@ -77,7 +85,7 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 	/**
 	 * This constructor will extract the {@link CmrRepositoryDefinition} out of
 	 * {@link IStorageDataProvider}.
-	 *
+	 * 
 	 * @param storageDataProvider
 	 *            {@link IStorageDataProvider}.
 	 */
@@ -88,7 +96,7 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 
 	/**
 	 * This constructor gets the selected {@link CmrRepositoryDefinition}.
-	 *
+	 * 
 	 * @param selectedCmr
 	 *            Selected {@link CmrRepositoryDefinition}.
 	 */
@@ -122,6 +130,8 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 		addPage(defineDataPage);
 		timelineWizardPage = new DefineTimelineWizardPage("Limit Recording", "Optionally select how long recording should last", DefineTimelineWizardPage.FUTURE);
 		addPage(timelineWizardPage);
+		addLabelWizardPage = new AddStorageLabelWizardPage(selectedCmr);
+		addPage(addLabelWizardPage);
 	}
 
 	/**
@@ -150,7 +160,11 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 			boolean isRecordingActive = cmrRepositoryDefinition.getStorageService().isRecordingOn();
 			if (!isRecordingActive) {
 				try {
-					cmrRepositoryDefinition.getStorageService().startRecording(storageData, recordingProperties);
+					StorageData recordingStorage = cmrRepositoryDefinition.getStorageService().startRecording(storageData, recordingProperties);
+					List<AbstractStorageLabel<?>> labels = addLabelWizardPage.getLabelsToAdd();
+					if (!labels.isEmpty()) {
+						cmrRepositoryDefinition.getStorageService().addLabelsToStorage(recordingStorage, labels, true);
+					}
 				} catch (StorageException e) {
 					InspectIT.getDefault().createErrorDialog("Recording did not start.", e, -1);
 					return false;
@@ -176,9 +190,11 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 			}
 		} else if (ObjectUtils.equals(page, defineNewStorageWizzardPage)) {
 			selectAgentsWizardPage.setCmrRepositoryDefinition(defineNewStorageWizzardPage.getSelectedRepository());
+			addLabelWizardPage.setStorageData(defineNewStorageWizzardPage.getStorageData());
 			return selectAgentsWizardPage;
 		} else if (ObjectUtils.equals(page, selectStorageWizardPage)) {
 			selectAgentsWizardPage.setCmrRepositoryDefinition(selectStorageWizardPage.getSelectedRepository());
+			addLabelWizardPage.setStorageData(selectStorageWizardPage.getSelectedStorageData());
 			return selectAgentsWizardPage;
 		} else {
 			return super.getNextPage(page);

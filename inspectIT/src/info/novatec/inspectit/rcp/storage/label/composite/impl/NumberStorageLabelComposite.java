@@ -77,15 +77,11 @@ public class NumberStorageLabelComposite extends AbstractStorageLabelComposite {
 	private void initComposite() {
 		if (showLabel) {
 			GridLayout gl = new GridLayout(2, false);
-			gl.marginWidth = 0;
-			gl.marginHeight = 0;
 			this.setLayout(gl);
 
 			new Label(this, SWT.NONE).setText("Enter number:");
 		} else {
 			GridLayout gl = new GridLayout(1, false);
-			gl.marginWidth = 0;
-			gl.marginHeight = 0;
 			this.setLayout(gl);
 		}
 		textBox = new Text(this, SWT.BORDER | SWT.RIGHT);

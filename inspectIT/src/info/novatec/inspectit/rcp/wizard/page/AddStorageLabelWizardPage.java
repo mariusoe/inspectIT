@@ -1,27 +1,45 @@
 package info.novatec.inspectit.rcp.wizard.page;
 
+import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.InspectITImages;
+import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
+import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
-import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
-import info.novatec.inspectit.rcp.storage.label.composite.AbstractStorageLabelComposite;
-import info.novatec.inspectit.rcp.storage.label.composite.impl.BooleanStorageLabelComposite;
-import info.novatec.inspectit.rcp.storage.label.composite.impl.DateStorageLabelComposite;
-import info.novatec.inspectit.rcp.storage.label.composite.impl.NumberStorageLabelComposite;
-import info.novatec.inspectit.rcp.storage.label.composite.impl.StringStorageLabelComposite;
+import info.novatec.inspectit.rcp.storage.label.edit.LabelValueEditingSupport;
+import info.novatec.inspectit.rcp.storage.label.edit.LabelValueEditingSupport.LabelEditListener;
+import info.novatec.inspectit.rcp.util.ObjectUtils;
+import info.novatec.inspectit.rcp.wizard.ManageLabelWizard;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
+import info.novatec.inspectit.storage.label.BooleanStorageLabel;
+import info.novatec.inspectit.storage.label.DateStorageLabel;
+import info.novatec.inspectit.storage.label.NumberStorageLabel;
+import info.novatec.inspectit.storage.label.StringStorageLabel;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -30,6 +48,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Table;
 
 /**
  * Page for adding storage labels.
@@ -38,6 +57,18 @@ import org.eclipse.swt.widgets.Listener;
  * 
  */
 public class AddStorageLabelWizardPage extends WizardPage {
+
+	/**
+	 * {@link StyledString} that has empty string.
+	 */
+	protected static final StyledString EMPTY_STYLED_STRING = new StyledString();
+
+	/**
+	 * Defines if the data needed to be entered on this wizard page is optional. If it is optional
+	 * the page {@link #isPageComplete()} method will return true always, so that wizards can finish
+	 * although no label was inserted.
+	 */
+	private boolean optional;
 
 	/**
 	 * Default message.
@@ -60,24 +91,50 @@ public class AddStorageLabelWizardPage extends WizardPage {
 	private List<AbstractStorageLabelType<?>> labelTypeList;
 
 	/**
-	 * Suggestion label list.
+	 * List of labels to add.
 	 */
-	private List<? extends AbstractStorageLabel<?>> suggestionLabelList = new ArrayList<AbstractStorageLabel<?>>();
+	private List<AbstractStorageLabel<?>> labelsToAdd = new ArrayList<AbstractStorageLabel<?>>();
 
 	/**
-	 * Storage label composite.
+	 * Widgets.
 	 */
-	private AbstractStorageLabelComposite storageLabelComposite;
-
 	private Combo labelTypeSelection;
-	private Button choseFromExisting;
-	private Button createNewValue;
-	private org.eclipse.swt.widgets.List existingValuesSelection;
-	private Composite main;
-	private Listener pageCompletionListener;
 
 	/**
-	 * Default constructor.
+	 * Table to display labels.
+	 */
+	private TableViewer labelsTableViewer;
+
+	/**
+	 * Main composite.
+	 */
+	private Composite main;
+
+	/**
+	 * Remove label button.
+	 */
+	private Button removeLabelButton;
+
+	/**
+	 * Page complete listener.
+	 */
+	private Listener pageCompleteListener = new Listener() {
+
+		@Override
+		public void handleEvent(Event event) {
+			setPageComplete(isPageComplete());
+		}
+	};
+
+	/**
+	 * Value column.
+	 */
+	private TableViewerColumn value;
+
+	/**
+	 * Default constructor. Use this constructor when storage data is known. Note that using the
+	 * page this way, {@link #optional} value is set to true, thus wizard page would not allow to
+	 * finish until label is correctly created.
 	 * 
 	 * @param storageData
 	 *            {@link StorageData}
@@ -85,12 +142,30 @@ public class AddStorageLabelWizardPage extends WizardPage {
 	 *            {@link CmrRepositoryDefinition}
 	 */
 	public AddStorageLabelWizardPage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition) {
-		super("Add New Label");
-		this.setTitle("Add New Label");
+		super("Add New Labels");
+		this.setTitle("Add New Labels");
 		defaultMessage += " for the storage '" + storageData.getName() + "'";
 		this.setMessage(defaultMessage);
 		this.storageData = storageData;
 		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
+		this.optional = false;
+		labelTypeList = cmrRepositoryDefinition.getStorageService().getAllLabelTypes();
+	}
+
+	/**
+	 * The constructor for usage when storage to label is not known in advance. Note that using this
+	 * constructor will set {@link #optional} to true.
+	 * 
+	 * @param cmrRepositoryDefinition
+	 *            {@link CmrRepositoryDefinition}
+	 */
+	public AddStorageLabelWizardPage(CmrRepositoryDefinition cmrRepositoryDefinition) {
+		super("Add New Labels");
+		this.setTitle("Add New Labels");
+		defaultMessage = "Optionally add one or more labels to the selected storage";
+		this.setMessage(defaultMessage);
+		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
+		this.optional = true;
 		labelTypeList = cmrRepositoryDefinition.getStorageService().getAllLabelTypes();
 	}
 
@@ -100,137 +175,241 @@ public class AddStorageLabelWizardPage extends WizardPage {
 	@Override
 	public void createControl(Composite parent) {
 		main = new Composite(parent, SWT.NONE);
-		main.setLayout(new GridLayout(2, false));
+		main.setLayout(new GridLayout(4, false));
 
-		new Label(main, SWT.NONE).setText("Label type:");
+		Label l = new Label(main, SWT.NONE);
+		l.setText("Label type:");
+		l.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
 		labelTypeSelection = new Combo(main, SWT.READ_ONLY);
 		for (AbstractStorageLabelType<?> labelType : labelTypeList) {
 			labelTypeSelection.add(TextFormatter.getLabelName(labelType));
 		}
 		labelTypeSelection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		labelTypeSelection.addSelectionListener(new SelectionAdapter() {
+
+		final Button addButton = new Button(main, SWT.PUSH);
+		addButton.setEnabled(false);
+		addButton.setText("Add");
+		addButton.setToolTipText("Add Label");
+		addButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+		addButton.addSelectionListener(new SelectionAdapter() {
+			@SuppressWarnings("unchecked")
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (labelTypeSelection.getSelectionIndex() != -1) {
-					choseFromExisting.setEnabled(true);
-					createNewValue.setEnabled(true);
-					updateWizardPage();
+				int index = labelTypeSelection.getSelectionIndex();
+				if (-1 != index) {
+					AbstractStorageLabelType<?> selectedLabelType = labelTypeList.get(index);
+
+					if (selectedLabelType.isOnePerStorage() && isLabelTypePresent(selectedLabelType)) {
+						setMessage("Selected label type is one-per-storage. New label value will overwrite the old one.", IMessageProvider.WARNING);
+						Iterator<AbstractStorageLabel<?>> it = labelsToAdd.iterator();
+						while (it.hasNext()) {
+							if (Objects.equals(it.next().getStorageLabelType(), selectedLabelType)) {
+								it.remove();
+								break;
+							}
+						}
+					} else {
+						setMessage(defaultMessage);
+					}
+
+					if (selectedLabelType.getValueClass().equals(Boolean.class)) {
+						BooleanStorageLabel booleanStorageLabel = new BooleanStorageLabel();
+						booleanStorageLabel.setStorageLabelType((AbstractStorageLabelType<Boolean>) selectedLabelType);
+						labelsToAdd.add(booleanStorageLabel);
+					} else if (selectedLabelType.getValueClass().equals(Date.class)) {
+						DateStorageLabel dateStorageLabel = new DateStorageLabel();
+						dateStorageLabel.setStorageLabelType((AbstractStorageLabelType<Date>) selectedLabelType);
+						labelsToAdd.add(dateStorageLabel);
+					} else if (selectedLabelType.getValueClass().equals(Number.class)) {
+						NumberStorageLabel numberStorageLabel = new NumberStorageLabel();
+						numberStorageLabel.setStorageLabelType((AbstractStorageLabelType<Number>) selectedLabelType);
+						labelsToAdd.add(numberStorageLabel);
+					} else if (selectedLabelType.getValueClass().equals(String.class)) {
+						StringStorageLabel stringStorageLabel = new StringStorageLabel();
+						stringStorageLabel.setStorageLabelType((AbstractStorageLabelType<String>) selectedLabelType);
+						labelsToAdd.add(stringStorageLabel);
+					}
+					labelsTableViewer.refresh();
+					labelsTableViewer.editElement(labelsToAdd.get(labelsToAdd.size() - 1), 1);
 				}
 			}
 		});
 
-		choseFromExisting = new Button(main, SWT.RADIO);
-		choseFromExisting.setText("Use already existing label value");
-		choseFromExisting.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-		choseFromExisting.setSelection(true);
-		choseFromExisting.setEnabled(false);
-
-		createNewValue = new Button(main, SWT.RADIO);
-		createNewValue.setText("Create a new label value");
-		createNewValue.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-		createNewValue.setEnabled(false);
-
-		Listener radioButtonsListener = new Listener() {
+		labelTypeSelection.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void handleEvent(Event event) {
-				updateWizardPage();
+			public void widgetSelected(SelectionEvent e) {
+				addButton.setEnabled(labelTypeSelection.getSelectionIndex() >= 0);
 			}
-		};
-		choseFromExisting.addListener(SWT.Selection, radioButtonsListener);
-		createNewValue.addListener(SWT.Selection, radioButtonsListener);
+		});
 
-		pageCompletionListener = new Listener() {
+		Button manageLabelsButton = new Button(main, SWT.PUSH);
+		manageLabelsButton.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_LABEL));
+		manageLabelsButton.setToolTipText("Manage Labels on Repository");
+		manageLabelsButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+		manageLabelsButton.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void handleEvent(Event event) {
-				setPageComplete(isPageComplete());
+			public void widgetSelected(SelectionEvent e) {
+				ManageLabelWizard manageLabelWizard = new ManageLabelWizard(cmrRepositoryDefinition);
+				WizardDialog wizardDialog = new WizardDialog(getShell(), manageLabelWizard);
+				wizardDialog.open();
+				if (wizardDialog.getReturnCode() == WizardDialog.OK) {
+					labelTypeList = cmrRepositoryDefinition.getStorageService().getAllLabelTypes();
+					labelTypeSelection.removeAll();
+					for (AbstractStorageLabelType<?> labelType : labelTypeList) {
+						labelTypeSelection.add(TextFormatter.getLabelName(labelType));
+					}
+				}
 			}
-		};
-		labelTypeSelection.addListener(SWT.Selection, pageCompletionListener);
-		choseFromExisting.addListener(SWT.Selection, pageCompletionListener);
-		createNewValue.addListener(SWT.Selection, pageCompletionListener);
+
+		});
+
+		// table
+		createLabelTable(main);
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1);
+		gd.minimumHeight = 100;
+		labelsTableViewer.getTable().setLayoutData(gd);
+
+		addButton.addListener(SWT.Selection, pageCompleteListener);
+		labelsTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				removeLabelButton.setEnabled(!labelsTableViewer.getSelection().isEmpty());
+			}
+		});
+
+		labelsTableViewer.getTable().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.keyCode == SWT.DEL) {
+					deleteSelectedlabels();
+				}
+			}
+		});
+
+		// empty help label
+		gd = new GridData();
+		gd.horizontalSpan = 2;
+		new Label(main, SWT.NONE).setLayoutData(gd);
+
+		removeLabelButton = new Button(main, SWT.PUSH);
+		removeLabelButton.setText("Remove");
+		removeLabelButton.setToolTipText("Remove Selected Labels");
+		removeLabelButton.setEnabled(false);
+		removeLabelButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
+		removeLabelButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				deleteSelectedlabels();
+			}
+
+		});
 
 		setControl(main);
 	}
 
 	/**
-	 * Updates the controls on the page based on current selections.
+	 * Deletes selected labels.
 	 */
-	@SuppressWarnings("unchecked")
-	private void updateWizardPage() {
-		if (null != existingValuesSelection && !existingValuesSelection.isDisposed()) {
-			existingValuesSelection.dispose();
-		}
-		if (null != storageLabelComposite && !storageLabelComposite.isDisposed()) {
-			storageLabelComposite.dispose();
-		}
-
-		int index = labelTypeSelection.getSelectionIndex();
-		AbstractStorageLabelType<?> selectedLabelType = labelTypeList.get(index);
-
-		if (selectedLabelType.isOnePerStorage() && storageData.isLabelPresent(selectedLabelType)) {
-			setMessage("Selected label type is one-per-storage. New label value will overwrite the old one.", IMessageProvider.WARNING);
-		} else {
-			setPageMessage();
-		}
-
-		if (!selectedLabelType.isValueReusable()) {
-			choseFromExisting.setSelection(true);
-			createNewValue.setSelection(false);
-			createNewValue.setEnabled(false);
-		} else {
-			createNewValue.setEnabled(true);
-		}
-
-		if (choseFromExisting.getSelection()) {
-			suggestionLabelList.clear();
-			existingValuesSelection = new org.eclipse.swt.widgets.List(main, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL);
-			existingValuesSelection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-			if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-				suggestionLabelList = cmrRepositoryDefinition.getStorageService().getLabelSuggestions(selectedLabelType);
-				if (!suggestionLabelList.isEmpty()) {
-					Collections.sort(suggestionLabelList);
-					for (AbstractStorageLabel<?> existingLabel : suggestionLabelList) {
-						existingValuesSelection.add(TextFormatter.getLabelValue(existingLabel, false));
-					}
-					existingValuesSelection.addListener(SWT.Selection, pageCompletionListener);
-				} else {
-					existingValuesSelection.add("No values exist on the repository");
-					existingValuesSelection.setEnabled(false);
-				}
-			} else {
-				existingValuesSelection.add("No values can be loaded from the repository");
-				existingValuesSelection.setEnabled(false);
+	private void deleteSelectedlabels() {
+		StructuredSelection structuredSelection = (StructuredSelection) labelsTableViewer.getSelection();
+		if (!structuredSelection.isEmpty()) {
+			for (Iterator<?> it = structuredSelection.iterator(); it.hasNext();) {
+				labelsToAdd.remove(it.next());
 			}
-		} else {
-			if (selectedLabelType.getValueClass().equals(Boolean.class)) {
-				storageLabelComposite = new BooleanStorageLabelComposite(main, SWT.NONE, (AbstractStorageLabelType<Boolean>) selectedLabelType);
-			} else if (selectedLabelType.getValueClass().equals(Date.class)) {
-				storageLabelComposite = new DateStorageLabelComposite(main, SWT.NONE, (AbstractStorageLabelType<Date>) selectedLabelType);
-			} else if (selectedLabelType.getValueClass().equals(Number.class)) {
-				storageLabelComposite = new NumberStorageLabelComposite(main, SWT.NONE, (AbstractStorageLabelType<Number>) selectedLabelType);
-			} else if (selectedLabelType.getValueClass().equals(String.class)) {
-				storageLabelComposite = new StringStorageLabelComposite(main, SWT.NONE, (AbstractStorageLabelType<String>) selectedLabelType);
-			}
-
-			storageLabelComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-			storageLabelComposite.addListener(pageCompletionListener);
+			labelsTableViewer.refresh();
+			setPageComplete(isPageComplete());
 		}
-		main.layout();
 	}
 
 	/**
-	 * Sets the message based on the page selections.
+	 * Creates the table for the labels.
+	 * 
+	 * @param parent
+	 *            Parent composite.
 	 */
-	private void setPageMessage() {
-		if (labelTypeSelection.getSelectionIndex() == -1) {
-			setMessage("Label type must be selected", ERROR);
-		} else if (choseFromExisting.getSelection() && null != existingValuesSelection && !existingValuesSelection.isDisposed() && existingValuesSelection.getSelectionIndex() == -1) {
-			setMessage("No value for the label selected", ERROR);
-		} else if (createNewValue.getSelection() && null != storageLabelComposite && !storageLabelComposite.isDisposed() && !storageLabelComposite.isInputValid()) {
-			setMessage("No value for the label entered", ERROR);
-		} else {
-			setMessage(defaultMessage);
+	private void createLabelTable(Composite parent) {
+		Table table = new Table(parent, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL);
+		table.setHeaderVisible(true);
+
+		labelsTableViewer = new TableViewer(table);
+
+		TableViewerColumn type = new TableViewerColumn(labelsTableViewer, SWT.NONE);
+		type.getColumn().setText("Label");
+		type.getColumn().setMoveable(false);
+		type.getColumn().setResizable(true);
+		type.getColumn().setWidth(200);
+
+		value = new TableViewerColumn(labelsTableViewer, SWT.NONE);
+		value.getColumn().setText("Value");
+		value.getColumn().setMoveable(false);
+		value.getColumn().setResizable(true);
+		value.getColumn().setWidth(100);
+		LabelValueEditingSupport editingSupport = new LabelValueEditingSupport(labelsTableViewer, storageData, cmrRepositoryDefinition);
+		editingSupport.addLabelEditListener(new LabelEditListener() {
+			@Override
+			public void preLabelValueChange(AbstractStorageLabel<?> label) {
+			}
+
+			@Override
+			public void postLabelValueChange(AbstractStorageLabel<?> label) {
+				setPageComplete(isPageComplete());
+			}
+
+		});
+		value.setEditingSupport(editingSupport);
+
+		labelsTableViewer.setContentProvider(new ArrayContentProvider());
+		labelsTableViewer.setLabelProvider(new StyledCellIndexLabelProvider() {
+			@Override
+			protected StyledString getStyledText(Object element, int index) {
+				if (element instanceof AbstractStorageLabel) {
+					AbstractStorageLabel<?> label = (AbstractStorageLabel<?>) element;
+					switch (index) {
+					case 0:
+						return new StyledString(TextFormatter.getLabelName(label));
+					case 1:
+						if (null != label.getValue()) {
+							return new StyledString(TextFormatter.getLabelValue(label, false));
+						}
+					default:
+						break;
+					}
+				}
+				return EMPTY_STYLED_STRING;
+			}
+
+			@Override
+			protected Image getColumnImage(Object element, int index) {
+				if (index == 0 && element instanceof AbstractStorageLabel) {
+					return ImageFormatter.getImageForLabel(((AbstractStorageLabel<?>) element).getStorageLabelType());
+				}
+				return null;
+			}
+		});
+
+		labelsTableViewer.setInput(labelsToAdd);
+
+	}
+
+	/**
+	 * Returns if the label type is present in the storage or in the list of labels to add.
+	 * 
+	 * @param selectedLabelType
+	 *            Selected {@link AbstractStorageLabelType}.
+	 * @return True if label type already exists.
+	 */
+	private boolean isLabelTypePresent(AbstractStorageLabelType<?> selectedLabelType) {
+		if (storageData.isLabelPresent(selectedLabelType)) {
+			return true;
 		}
+		for (AbstractStorageLabel<?> label : labelsToAdd) {
+			if (ObjectUtils.equals(selectedLabelType, label.getStorageLabelType())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -238,31 +417,56 @@ public class AddStorageLabelWizardPage extends WizardPage {
 	 */
 	@Override
 	public boolean isPageComplete() {
-		if (labelTypeSelection.getSelectionIndex() == -1) {
-			return false;
+		if (optional) {
+			return true;
+		} else if (!labelsToAdd.isEmpty()) {
+			for (AbstractStorageLabel<?> label : labelsToAdd) {
+				if (null != label.getValue()) {
+					return true;
+				}
+			}
 		}
-		if (choseFromExisting.getSelection() && null != existingValuesSelection && !existingValuesSelection.isDisposed() && existingValuesSelection.getSelectionIndex() == -1) {
-			return false;
-		}
-		if (createNewValue.getSelection() && null != storageLabelComposite && !storageLabelComposite.isDisposed() && !storageLabelComposite.isInputValid()) {
-			return false;
-		}
-		return true;
+		return false;
 	}
 
 	/**
-	 * @return Returns label to add to storage.
+	 * Gets {@link #labelsToAdd}.
+	 * 
+	 * @return {@link #labelsToAdd}
 	 */
-	public AbstractStorageLabel<?> getLabelToAdd() {
-		if (choseFromExisting.getSelection()) {
-			int index = existingValuesSelection.getSelectionIndex();
-			if (index >= 0) {
-				return suggestionLabelList.get(index);
+	public List<AbstractStorageLabel<?>> getLabelsToAdd() {
+		Iterator<AbstractStorageLabel<?>> it = labelsToAdd.iterator();
+		while (it.hasNext()) {
+			if (null == it.next().getValue()) {
+				it.remove();
 			}
-		} else if (createNewValue.getSelection()) {
-			return storageLabelComposite.getStorageLabel();
 		}
-		return null;
+
+		return labelsToAdd;
+	}
+
+	/**
+	 * Sets {@link #storageData}.
+	 * 
+	 * @param storageData
+	 *            New value for {@link #storageData}
+	 */
+	public void setStorageData(StorageData storageData) {
+		this.storageData = storageData;
+		// update the editing support
+		LabelValueEditingSupport editingSupport = new LabelValueEditingSupport(labelsTableViewer, storageData, cmrRepositoryDefinition);
+		editingSupport.addLabelEditListener(new LabelEditListener() {
+			@Override
+			public void preLabelValueChange(AbstractStorageLabel<?> label) {
+			}
+
+			@Override
+			public void postLabelValueChange(AbstractStorageLabel<?> label) {
+				setPageComplete(isPageComplete());
+			}
+
+		});
+		value.setEditingSupport(editingSupport);
 	}
 
 }

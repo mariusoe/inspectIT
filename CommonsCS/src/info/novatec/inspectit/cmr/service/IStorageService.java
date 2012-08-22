@@ -4,6 +4,7 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
+import info.novatec.inspectit.storage.label.management.AbstractLabelManagementAction;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.recording.RecordingData;
@@ -30,8 +31,9 @@ public interface IStorageService {
 	 * @throws StorageException
 	 *             When {@link StorageData} is insufficient for storage creation. When storage
 	 *             creation fails. When storage opening fails.
+	 * @return The newly created storage with proper ID and status information.
 	 */
-	void createAndOpenStorage(StorageData storageData) throws StorageException;
+	StorageData createAndOpenStorage(StorageData storageData) throws StorageException;
 
 	/**
 	 * Closes an already open storage. Writing after calling this method will not be possible on the
@@ -108,12 +110,13 @@ public interface IStorageService {
 	 * @param recordingProperties
 	 *            Properties to start recording with. Must not be null, otherwise the recording
 	 *            won't start.
+	 * @return The recording storage with proper ID and status information.
 	 * @throws StorageException
 	 *             If recording is already active. If storage has to be created, then when
 	 *             {@link StorageData} is insufficient for storage creation or when storage creation
 	 *             fails. If storage has to be opened, then when storage opening fails.
 	 */
-	void startRecording(StorageData storageData, RecordingProperties recordingProperties) throws StorageException;
+	StorageData startRecording(StorageData storageData, RecordingProperties recordingProperties) throws StorageException;
 
 	/**
 	 * Stops recording. The storage that is currently used for recording will be closed.
@@ -160,11 +163,11 @@ public interface IStorageService {
 	 * @param dataProcessors
 	 *            List of processor to work on data. Can be null, then the data is only copied with
 	 *            no processing.
+	 * @return The recording storage with proper ID and status information.
 	 * @throws StorageException
-	 *             If storage is not opened, or the storage is currently used for recording. If
-	 *             write fails.
+	 *             If the storage is currently used for recording. If write fails.
 	 */
-	void copyBufferToStorage(StorageData storageData, List<Long> platformIdents, Collection<AbstractDataProcessor> dataProcessors) throws StorageException;
+	StorageData copyBufferToStorage(StorageData storageData, List<Long> platformIdents, Collection<AbstractDataProcessor> dataProcessors) throws StorageException;
 
 	/**
 	 * Copies the data provided in the storage. The storage does not have to be opened before action
@@ -179,11 +182,11 @@ public interface IStorageService {
 	 * @param dataProcessors
 	 *            Processors to process the data. Can be null, then the data is only copied with no
 	 *            processing.
+	 * @return The recording storage with proper ID and status information.
 	 * @throws StorageException
-	 *             If storage is not opened, or the storage is currently used for recording. If
-	 *             write fails.
+	 *             If the storage is currently used for recording. If write fails.
 	 */
-	void copyDataToStorage(StorageData storageData, List<DefaultData> copyDataList, Collection<AbstractDataProcessor> dataProcessors) throws StorageException;
+	StorageData copyDataToStorage(StorageData storageData, List<DefaultData> copyDataList, Collection<AbstractDataProcessor> dataProcessors) throws StorageException;
 
 	/**
 	 * Returns the list of the string that represent the path to the index files for one storage.
@@ -233,6 +236,21 @@ public interface IStorageService {
 	void addLabelToStorage(StorageData storageData, AbstractStorageLabel<?> storageLabel, boolean doOverwrite) throws StorageException;
 
 	/**
+	 * Adds collection of labels to the {@link StorageData}. Note that if overwrite is true, the
+	 * label of the same type will be overwritten if the type is only one per storage data.
+	 * 
+	 * @param storageData
+	 *            {@link StorageData} object.
+	 * @param storageLabels
+	 *            Labels.
+	 * @param doOverwrite
+	 *            Should be overwritten if it is one per {@link StorageData}.
+	 * @throws StorageException
+	 *             If gathering the file names fails.
+	 */
+	void addLabelsToStorage(StorageData storageData, Collection<AbstractStorageLabel<?>> storageLabels, boolean doOverwrite) throws StorageException;
+
+	/**
 	 * Removes the label from the {@link StorageData}.
 	 * 
 	 * @param storageData
@@ -259,7 +277,21 @@ public interface IStorageService {
 	boolean removeLabelsFromStorage(StorageData storageData, List<AbstractStorageLabel<?>> storageLabelList) throws StorageException;
 
 	/**
-	 * Returns all labels registered on the CMR.
+	 * Returns all labels that are at the moment existing in all storages. Note that if the same
+	 * label exists in two or more storages, only one label will be included in the returned
+	 * collection.
+	 * <p>
+	 * <i>Note that the return collection is different from the {@link #getAllLabels()} method
+	 * result. Some of the labels existing in the storages might not be available in the CMR, and
+	 * vice versa.</i>
+	 * 
+	 * @return Returns all labels that are at the moment existing in all storages.
+	 */
+	Collection<AbstractStorageLabel<?>> getAllLabelsInStorages();
+
+	/**
+	 * Returns all labels registered on the CMR. The labels returned are only the one that are saved
+	 * on the CMR database for purpose of label suggestions.
 	 * 
 	 * @return Returns all labels registered on the CMR.
 	 */
@@ -319,7 +351,7 @@ public interface IStorageService {
 	void removeLabelsFromCmr(Collection<AbstractStorageLabel<?>> storageLabels, boolean removeFromStoragesAlso) throws StorageException;;
 
 	/**
-	 * Saves the {@link AbstractStorageLabelType} to the database. The abel will be saved only if
+	 * Saves the {@link AbstractStorageLabelType} to the database. The label will be saved only if
 	 * the {@link AbstractStorageLabelType#isMultiType()} is true or no instances of the label type
 	 * are already saved.
 	 * 
@@ -355,6 +387,17 @@ public interface IStorageService {
 	 * @return Returns all label types.
 	 */
 	List<AbstractStorageLabelType<?>> getAllLabelTypes();
+
+	/**
+	 * Executes the collection of {@link AbstractLabelManagementAction} in order they are given.
+	 * 
+	 * @param managementActions
+	 *            Collection of management actions that can remove different label/label type
+	 *            add/removal.
+	 * @throws StorageException
+	 *             If exception occurs.
+	 */
+	void executeLabelManagementActions(Collection<AbstractLabelManagementAction> managementActions) throws StorageException;
 
 	/**
 	 * Updates the data like name and description for a storage.

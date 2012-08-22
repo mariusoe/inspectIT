@@ -76,15 +76,10 @@ public class BooleanStorageLabelComposite extends AbstractStorageLabelComposite 
 	private void initComposite() {
 		if (showLabel) {
 			GridLayout gl = new GridLayout(3, true);
-			gl.marginWidth = 0;
-			gl.marginHeight = 0;
 			this.setLayout(gl);
-
 			new Label(this, SWT.NONE).setText("Select value:");
 		} else {
 			GridLayout gl = new GridLayout(2, true);
-			gl.marginWidth = 0;
-			gl.marginHeight = 0;
 			this.setLayout(gl);
 		}
 

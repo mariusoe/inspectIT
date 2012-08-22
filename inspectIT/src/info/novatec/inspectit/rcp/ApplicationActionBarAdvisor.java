@@ -130,7 +130,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		public AddStorageAction(IShellProvider shellProvider) {
 			this.shellProvider = shellProvider;
 			this.setText("Create Storage");
-			this.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_STOARGE_NEW));
+			this.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_STORAGE_NEW));
 		}
 
 		/**

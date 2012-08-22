@@ -9,6 +9,8 @@ import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -74,9 +76,9 @@ public class AddStorageLabelWizard extends Wizard implements INewWizard {
 	@Override
 	public boolean performFinish() {
 		if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-			AbstractStorageLabel<?> labelToAdd = addStorageLabelWizardPage.getLabelToAdd();
+			List<AbstractStorageLabel<?>> labelsToAdd = addStorageLabelWizardPage.getLabelsToAdd();
 			try {
-				cmrRepositoryDefinition.getStorageService().addLabelToStorage(storageData, labelToAdd, true);
+				cmrRepositoryDefinition.getStorageService().addLabelsToStorage(storageData, labelsToAdd, true);
 			} catch (StorageException e) {
 				InspectIT.getDefault().createErrorDialog("Adding label to storage failed.", e, -1);
 				return false;

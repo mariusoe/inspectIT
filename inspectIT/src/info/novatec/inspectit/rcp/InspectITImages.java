@@ -70,12 +70,12 @@ public interface InspectITImages {
 	String IMG_FONT = InspectITConstants.ICON_PATH + "font.png";
 	String IMG_COLLAPSE = InspectITConstants.ICON_PATH + "collapseall.gif";
 	String IMG_ADD = InspectITConstants.ICON_PATH + "add.png";
-	String IMG_STOARGE_NEW = InspectITConstants.ICON_PATH + "storage_new.gif";
-	String IMG_STOARGE_OPENED = InspectITConstants.ICON_PATH + "storage_opened.png";
-	String IMG_STOARGE_RECORDING = InspectITConstants.ICON_PATH + "storage_recording.gif";
-	String IMG_STOARGE_CLOSED = InspectITConstants.ICON_PATH + "storage_closed.png";
-	String IMG_STOARGE_AVAILABLE = InspectITConstants.ICON_PATH + "storage_available.gif";
-	String IMG_STOARGE_NOT_AVAILABLE = InspectITConstants.ICON_PATH + "storage_notavailable.gif";
+	String IMG_STORAGE_NEW = InspectITConstants.ICON_PATH + "storage_new.gif";
+	String IMG_STORAGE_OPENED = InspectITConstants.ICON_PATH + "storage_opened.png";
+	String IMG_STORAGE_RECORDING = InspectITConstants.ICON_PATH + "storage_recording.gif";
+	String IMG_STORAGE_CLOSED = InspectITConstants.ICON_PATH + "storage_closed.png";
+	String IMG_STORAGE_AVAILABLE = InspectITConstants.ICON_PATH + "storage_available.gif";
+	String IMG_STORAGE_NOT_AVAILABLE = InspectITConstants.ICON_PATH + "storage_notavailable.gif";
 	String IMG_ASSIGNEE_LABEL_ICON = InspectITConstants.ICON_PATH + "assignee_label.png";
 	String IMG_DATE_LABEL_ICON = IMG_LAST_WEEK;
 	String IMG_MOUNTEDBY_LABEL_ICON = InspectITConstants.ICON_PATH + "mounted_by_label.png";
@@ -104,4 +104,8 @@ public interface InspectITImages {
 	String IMG_AGENT_GREEN = InspectITConstants.ICON_PATH + "agent_green.png";
 	String IMG_AGENT_GRAY = InspectITConstants.ICON_PATH + "agent_gray.png";
 	String IMG_NAVIGATE = InspectITConstants.ICON_PATH + "down.png";
+	String IMG_CALENDAR = InspectITConstants.ICON_PATH + "calendar.png";
+	String IMG_CALCULATOR = InspectITConstants.ICON_PATH + "calculator.png";
+	String IMG_LABEL = InspectITConstants.ICON_PATH + "label.png";
+
 }

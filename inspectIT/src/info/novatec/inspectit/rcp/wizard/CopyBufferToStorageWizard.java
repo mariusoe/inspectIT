@@ -5,6 +5,7 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
+import info.novatec.inspectit.rcp.wizard.page.AddStorageLabelWizardPage;
 import info.novatec.inspectit.rcp.wizard.page.DefineDataProcessorsWizardPage;
 import info.novatec.inspectit.rcp.wizard.page.DefineNewStorageWizzardPage;
 import info.novatec.inspectit.rcp.wizard.page.DefineTimelineWizardPage;
@@ -13,6 +14,7 @@ import info.novatec.inspectit.rcp.wizard.page.SelectAgentsWizardPage;
 import info.novatec.inspectit.rcp.wizard.page.SelectExistingStorageWizardPage;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
+import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.processor.impl.TimeFrameDataProcessor;
 
@@ -77,6 +79,11 @@ public class CopyBufferToStorageWizard extends Wizard implements INewWizard {
 	private DefineTimelineWizardPage timelineWizardPage;
 
 	/**
+	 * Add new label wizard page.
+	 */
+	private AddStorageLabelWizardPage addLabelWizardPage;
+
+	/**
 	 * @param cmrRepositoryDefinition
 	 *            {@link CmrRepositoryDefinition} to perform operation on.
 	 */
@@ -111,6 +118,8 @@ public class CopyBufferToStorageWizard extends Wizard implements INewWizard {
 		timelineWizardPage = new DefineTimelineWizardPage("Limit Data", "Optionally select set of data to be copied by defining time frame", DefineTimelineWizardPage.PAST
 				| DefineTimelineWizardPage.BOTH_DATES);
 		addPage(timelineWizardPage);
+		addLabelWizardPage = new AddStorageLabelWizardPage(cmrRepositoryDefinition);
+		addPage(addLabelWizardPage);
 	}
 
 	/**
@@ -144,7 +153,11 @@ public class CopyBufferToStorageWizard extends Wizard implements INewWizard {
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
 						monitor.beginTask("Copying the content of repository buffer to storage.", IProgressMonitor.UNKNOWN);
-						cmrRepositoryDefinition.getStorageService().copyBufferToStorage(storageData, agents, finalProcessors);
+						StorageData copiedStorage = cmrRepositoryDefinition.getStorageService().copyBufferToStorage(storageData, agents, finalProcessors);
+						List<AbstractStorageLabel<?>> labels = addLabelWizardPage.getLabelsToAdd();
+						if (!labels.isEmpty()) {
+							cmrRepositoryDefinition.getStorageService().addLabelsToStorage(copiedStorage, labels, true);
+						}
 						Display.getDefault().asyncExec(new Runnable() {
 							@Override
 							public void run() {
@@ -189,9 +202,11 @@ public class CopyBufferToStorageWizard extends Wizard implements INewWizard {
 			}
 		} else if (ObjectUtils.equals(page, defineNewStorageWizzardPage)) {
 			selectAgentsPage.setCmrRepositoryDefinition(cmrRepositoryDefinition);
+			addLabelWizardPage.setStorageData(defineNewStorageWizzardPage.getStorageData());
 			return selectAgentsPage;
 		} else if (ObjectUtils.equals(page, selectExistingStorageWizardPage)) {
 			selectAgentsPage.setCmrRepositoryDefinition(cmrRepositoryDefinition);
+			addLabelWizardPage.setStorageData(selectExistingStorageWizardPage.getSelectedStorageData());
 			return selectAgentsPage;
 		} else {
 			return super.getNextPage(page);

@@ -3,7 +3,7 @@ package info.novatec.inspectit.storage.label.type.impl;
 import info.novatec.inspectit.storage.label.type.AbstractCustomStorageLabelType;
 
 /**
- * Custom label type that holds {@link Number} values,
+ * Custom label type that holds {@link Number} values.
  * 
  * @author Ivan Senic
  * 

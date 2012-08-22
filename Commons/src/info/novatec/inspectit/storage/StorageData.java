@@ -35,7 +35,7 @@ public class StorageData extends AbstractStorageData {
 	/**
 	 * List of labels.
 	 */
-	private List<AbstractStorageLabel<?>> labelList;
+	private List<AbstractStorageLabel<?>> labelList = new ArrayList<AbstractStorageLabel<?>>();
 
 	/**
 	 * {@link StorageState} that defines what operations can be done on storage.
@@ -47,7 +47,6 @@ public class StorageData extends AbstractStorageData {
 	 */
 	public StorageData() {
 		state = StorageState.CREATED_NOT_OPENED;
-		labelList = new ArrayList<AbstractStorageLabel<?>>();
 		DateStorageLabel dateLabel = new DateStorageLabel();
 		dateLabel.setStorageLabelType(new CreationDateLabelType());
 		dateLabel.setDateValue(new Date());

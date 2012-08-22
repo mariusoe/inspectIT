@@ -1,19 +1,21 @@
 package info.novatec.inspectit.rcp.wizard.page;
 
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
-import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.storage.label.composite.AbstractStorageLabelComposite;
 import info.novatec.inspectit.rcp.storage.label.composite.impl.BooleanStorageLabelComposite;
 import info.novatec.inspectit.rcp.storage.label.composite.impl.DateStorageLabelComposite;
 import info.novatec.inspectit.rcp.storage.label.composite.impl.NumberStorageLabelComposite;
 import info.novatec.inspectit.rcp.storage.label.composite.impl.StringStorageLabelComposite;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
-import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
+import info.novatec.inspectit.storage.label.management.AbstractLabelManagementAction;
+import info.novatec.inspectit.storage.label.management.impl.AddLabelManagementAction;
+import info.novatec.inspectit.storage.label.management.impl.RemoveLabelManagementAction;
 import info.novatec.inspectit.storage.label.type.AbstractCustomStorageLabelType;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 import info.novatec.inspectit.storage.label.type.impl.CustomBooleanLabelType;
@@ -23,12 +25,16 @@ import info.novatec.inspectit.storage.label.type.impl.CustomStringLabelType;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -53,12 +59,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.FormText;
 
 /**
  * Manage label page.
@@ -74,9 +79,9 @@ public class ManageLabelWizardPage extends WizardPage {
 	private static final String DEFAULT_MESSAGE = "Add and remove labels that can be used later for labeling storages";
 
 	/**
-	 * CMR repository definition.
+	 * Empty style string.
 	 */
-	private CmrRepositoryDefinition cmrRepositoryDefinition;
+	private static final StyledString EMPTY_STYLED_STRING = new StyledString();
 
 	/**
 	 * Available remote label list.
@@ -119,32 +124,32 @@ public class ManageLabelWizardPage extends WizardPage {
 	private Button removeLabelType;
 
 	/**
-	 * Should storage be refreshed at the end of wizard.
+	 * List of labels in storages.
 	 */
-	private boolean shouldRefreshStorages = false;
+	private Set<AbstractStorageLabel<?>> labelsInStorages = new HashSet<AbstractStorageLabel<?>>();
+
+	/**
+	 * List of actions that need to be executed at the end of wizard.
+	 */
+	private List<AbstractLabelManagementAction> managementActions = new LinkedList<AbstractLabelManagementAction>();
 
 	/**
 	 * Default constructor.
 	 * 
 	 * @param cmrRepositoryDefinition
-	 *            Cmr to manage labels for.
+	 *            CMR to manage labels for.
 	 */
 	public ManageLabelWizardPage(CmrRepositoryDefinition cmrRepositoryDefinition) {
 		super("Manage Labels");
 		this.setTitle("Manage Labels");
 		this.setMessage(DEFAULT_MESSAGE);
-		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
 		if (null != cmrRepositoryDefinition) {
 			this.setMessage("Label management for repository '" + cmrRepositoryDefinition.getName() + "' (" + cmrRepositoryDefinition.getIp() + ":" + cmrRepositoryDefinition.getPort() + ")");
 		}
+
+		labelsInStorages.addAll(cmrRepositoryDefinition.getStorageService().getAllLabelsInStorages());
 		labelTypeList.addAll(cmrRepositoryDefinition.getStorageService().getAllLabelTypes());
 		labelList.addAll(cmrRepositoryDefinition.getStorageService().getAllLabels());
-		Iterator<AbstractStorageLabel<?>> it = labelList.iterator();
-		while (it.hasNext()) {
-			if (!it.next().getStorageLabelType().isValueReusable()) {
-				it.remove();
-			}
-		}
 	}
 
 	/**
@@ -155,10 +160,25 @@ public class ManageLabelWizardPage extends WizardPage {
 		SashForm sashForm = new SashForm(parent, SWT.VERTICAL);
 
 		// label type - upper composite
-		Composite upperComposite = new Composite(sashForm, SWT.NONE);
+		createLabelTypeTable(sashForm);
+		// labels - lower composite
+		createLabelTable(sashForm);
+
+		sashForm.setWeights(new int[] { 1, 1 });
+		setControl(sashForm);
+	}
+
+	/**
+	 * Creates the table for the label types.
+	 * 
+	 * @param parent
+	 *            Parent composite.
+	 */
+	private void createLabelTypeTable(Composite parent) {
+		Composite upperComposite = new Composite(parent, SWT.NONE);
 		upperComposite.setLayout(new GridLayout(2, false));
 
-		Label labelTypeInfo = new Label(upperComposite, SWT.BOLD);
+		Label labelTypeInfo = new Label(upperComposite, SWT.NONE);
 		labelTypeInfo.setText("Existing label types");
 		labelTypeInfo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 
@@ -167,10 +187,15 @@ public class ManageLabelWizardPage extends WizardPage {
 		labelTypeTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
 
 		TableColumn column = new TableColumn(labelTypeTable, SWT.NONE);
+		column.setMoveable(false);
+		column.setResizable(false);
+		column.setWidth(25);
+
+		column = new TableColumn(labelTypeTable, SWT.NONE);
 		column.setText("Name");
 		column.setMoveable(false);
 		column.setResizable(true);
-		column.setWidth(140);
+		column.setWidth(200);
 
 		column = new TableColumn(labelTypeTable, SWT.NONE);
 		column.setText("Value type");
@@ -182,7 +207,7 @@ public class ManageLabelWizardPage extends WizardPage {
 		column.setText("One per storage");
 		column.setMoveable(false);
 		column.setResizable(true);
-		column.setWidth(100);
+		column.setWidth(80);
 
 		labelTypeTableViewer = new TableViewer(labelTypeTable);
 		labelTypeTableViewer.setContentProvider(new ArrayContentProvider());
@@ -192,32 +217,37 @@ public class ManageLabelWizardPage extends WizardPage {
 				if (element instanceof AbstractStorageLabelType) {
 					AbstractStorageLabelType<?> labelType = (AbstractStorageLabelType<?>) element;
 					switch (index) {
-					case 0:
-						return new StyledString(TextFormatter.getLabelName(labelType));
 					case 1:
-						return new StyledString(TextFormatter.getLabelValueType(labelType));
+						return new StyledString(TextFormatter.getLabelName(labelType));
 					case 2:
+						return new StyledString(TextFormatter.getLabelValueType(labelType));
+					case 3:
 						if (labelType.isOnePerStorage()) {
 							return new StyledString("Yes");
 						} else {
 							return new StyledString("No");
 						}
 					default:
+						break;
 					}
 				}
-				return null;
+				return EMPTY_STYLED_STRING;
 			}
 
 			@Override
 			protected Image getColumnImage(Object element, int index) {
 				if (index == 0 && element instanceof AbstractStorageLabelType) {
+					if (isLabelTypeExistsInStorage((AbstractStorageLabelType<?>) element, labelsInStorages)) {
+						return InspectIT.getDefault().getImage(InspectITImages.IMG_STORAGE_NEW);
+					}
+				} else
+				if (index == 1 && element instanceof AbstractStorageLabelType) {
 					return ImageFormatter.getImageForLabel((AbstractStorageLabelType<?>) element);
 				}
 				return null;
 			}
 		});
 		labelTypeTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				manageLabelTypeSlection();
@@ -226,7 +256,7 @@ public class ManageLabelWizardPage extends WizardPage {
 		labelTypeTableViewer.setInput(labelTypeList);
 
 		createLabelType = new Button(upperComposite, SWT.PUSH);
-		createLabelType.setText("Create");
+		createLabelType.setText("Add");
 		createLabelType.setToolTipText("Create New Label Type");
 		createLabelType.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
 		createLabelType.addSelectionListener(new SelectionAdapter() {
@@ -236,12 +266,10 @@ public class ManageLabelWizardPage extends WizardPage {
 				createDialog.open();
 				if (createDialog.getReturnCode() == Dialog.OK) {
 					AbstractStorageLabelType<?> createdType = createDialog.getCreatedLabelType();
-					if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-						cmrRepositoryDefinition.getStorageService().saveLabelType(createdType);
-						refreshLabelTypes();
-					} else {
-						InspectIT.getDefault().createInfoDialog("Can not create label type, CMR repository is offline.", -1);
-					}
+					AddLabelManagementAction addLabelManagementAction = new AddLabelManagementAction(createdType);
+					managementActions.add(addLabelManagementAction);
+					labelTypeList.add(createdType);
+					labelTypeTableViewer.refresh();
 				}
 			}
 		});
@@ -255,43 +283,52 @@ public class ManageLabelWizardPage extends WizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				AbstractStorageLabelType<?> typeToRemove = (AbstractStorageLabelType<?>) ((StructuredSelection) labelTypeTableViewer.getSelection()).getFirstElement();
-				// check that there are no existing labels
-				boolean canDelete = true;
-				for (AbstractStorageLabel<?> label : labelList) {
-					if (ObjectUtils.equals(label.getStorageLabelType(), typeToRemove)) {
-						canDelete = false;
-						break;
+				boolean removeFromStorage = false;
+				if (isLabelTypeExistsInStorage(typeToRemove, labelsInStorages)) {
+					MessageDialog messageDialog = new MessageDialog(getShell(), "Remove Label Type", null, "Should all labels of selected type be removed also from storages where they are used?",
+							MessageDialog.QUESTION, new String[] { "Yes", "No" }, 1);
+					if (messageDialog.open() == 0) {
+						removeFromStorage = true;
 					}
 				}
-
-				if (canDelete && cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-					try {
-						cmrRepositoryDefinition.getStorageService().removeLabelType(typeToRemove);
-						refreshLabelTypes();
-					} catch (StorageException exception) {
-						InspectIT.getDefault().createErrorDialog("Exception occured on the server while removing the label type.", exception, -1);
+				RemoveLabelManagementAction removeLabelManagementAction = new RemoveLabelManagementAction(typeToRemove, removeFromStorage);
+				managementActions.add(removeLabelManagementAction);
+				labelTypeList.remove(typeToRemove);
+				Iterator<AbstractStorageLabel<?>> it = labelList.iterator();
+				while (it.hasNext()) {
+					if (ObjectUtils.equals(typeToRemove, it.next().getStorageLabelType())) {
+						it.remove();
 					}
-				} else if (canDelete) {
-					InspectIT.getDefault().createInfoDialog("Can not remove label type, CMR repository is offline.", -1);
-				} else {
-					InspectIT.getDefault().createInfoDialog("Can not remove label type, there are still labels of this type existing. Please remove all labels first.", -1);
 				}
+				labelTypeTableViewer.refresh();
 			}
 		});
+	}
 
-		// labels - lower composite
-		Composite lowerComposite = new Composite(sashForm, SWT.NONE);
+	/**
+	 * Creates the table for the labels.
+	 * 
+	 * @param parent
+	 *            Parent composite.
+	 */
+	private void createLabelTable(Composite parent) {
+		Composite lowerComposite = new Composite(parent, SWT.NONE);
 		lowerComposite.setLayout(new GridLayout(2, false));
 
 		Table table = new Table(lowerComposite, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL);
 		table.setHeaderVisible(true);
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
 
+		TableColumn column = new TableColumn(table, SWT.NONE);
+		column.setMoveable(false);
+		column.setResizable(false);
+		column.setWidth(25);
+
 		column = new TableColumn(table, SWT.NONE);
 		column.setText("Label");
 		column.setMoveable(false);
 		column.setResizable(true);
-		column.setWidth(140);
+		column.setWidth(200);
 
 		column = new TableColumn(table, SWT.NONE);
 		column.setText("Value");
@@ -307,19 +344,25 @@ public class ManageLabelWizardPage extends WizardPage {
 				if (element instanceof AbstractStorageLabel) {
 					AbstractStorageLabel<?> label = (AbstractStorageLabel<?>) element;
 					switch (index) {
-					case 0:
-						return new StyledString(TextFormatter.getLabelName(label));
 					case 1:
+						return new StyledString(TextFormatter.getLabelName(label));
+					case 2:
 						return new StyledString(TextFormatter.getLabelValue(label, false));
 					default:
+						break;
 					}
 				}
-				return null;
+				return EMPTY_STYLED_STRING;
 			}
 
 			@Override
 			protected Image getColumnImage(Object element, int index) {
 				if (index == 0 && element instanceof AbstractStorageLabel) {
+					if (isLabelExistsInStorage((AbstractStorageLabel<?>) element, labelsInStorages)) {
+						return InspectIT.getDefault().getImage(InspectITImages.IMG_STORAGE_NEW);
+					}
+				}
+				if (index == 1 && element instanceof AbstractStorageLabel) {
 					return ImageFormatter.getImageForLabel(((AbstractStorageLabel<?>) element).getStorageLabelType());
 				}
 				return null;
@@ -346,7 +389,7 @@ public class ManageLabelWizardPage extends WizardPage {
 		});
 
 		createLabel = new Button(lowerComposite, SWT.PUSH);
-		createLabel.setText("Create");
+		createLabel.setText("Add");
 		createLabel.setToolTipText("Create New Label");
 		createLabel.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
 		createLabel.setEnabled(false);
@@ -358,12 +401,12 @@ public class ManageLabelWizardPage extends WizardPage {
 				createLabelDialog.open();
 				if (createLabelDialog.getReturnCode() == Dialog.OK) {
 					AbstractStorageLabel<?> createdLabel = createLabelDialog.getCreatedLabel();
-					if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-						cmrRepositoryDefinition.getStorageService().saveLabelToCmr(createdLabel);
-						refreshLabels();
-					} else {
-						InspectIT.getDefault().createInfoDialog("Can not create label, CMR repository is offline.", -1);
-					}
+					List<AbstractStorageLabel<?>> createdList = new ArrayList<AbstractStorageLabel<?>>(1);
+					createdList.add(createdLabel);
+					AddLabelManagementAction addLabelManagementAction = new AddLabelManagementAction(createdList);
+					managementActions.add(addLabelManagementAction);
+					labelList.add(createdLabel);
+					manageLabelTypeSlection();
 				}
 			}
 		});
@@ -372,92 +415,78 @@ public class ManageLabelWizardPage extends WizardPage {
 		removeLabels.setText("Remove");
 		removeLabels.setToolTipText("Remove Label(s)");
 		removeLabels.setEnabled(false);
-
-		final Menu removeButtonMenu = new Menu(removeLabels);
-
-		MenuItem removeOnlyFromCmrMenuItem = new MenuItem(removeButtonMenu, SWT.NONE);
-		removeOnlyFromCmrMenuItem.setText("Remove Only From CMR");
-		removeOnlyFromCmrMenuItem.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				removeSelectedLabels(false);
-			}
-		});
-
-		MenuItem removeAllMenuItem = new MenuItem(removeButtonMenu, SWT.NONE);
-		removeAllMenuItem.setText("Remove From CMR And All Storages");
-		removeAllMenuItem.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				removeSelectedLabels(true);
-				shouldRefreshStorages = true;
-			}
-		});
-
 		removeLabels.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
 		removeLabels.addSelectionListener(new SelectionAdapter() {
+			@SuppressWarnings("unchecked")
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				removeButtonMenu.setVisible(true);
+				List<AbstractStorageLabel<?>> labelsToRemove = ((StructuredSelection) labelsTableViewer.getSelection()).toList();
+				boolean inStorage = false;
+				for (AbstractStorageLabel<?> label : labelsToRemove) {
+					if (isLabelExistsInStorage(label, labelsInStorages)) {
+						inStorage = true;
+						break;
+					}
+				}
+
+				boolean removeFromStorage = false;
+				if (inStorage) {
+					MessageDialog messageDialog = new MessageDialog(getShell(), "Remove Label(s)", null, "Should all selected labels be removed also from storages where they are used?",
+							MessageDialog.QUESTION, new String[] { "Yes", "No" }, 1);
+					if (messageDialog.open() == 0) {
+						removeFromStorage = true;
+						labelsInStorages.removeAll(labelsToRemove);
+					}
+				}
+				RemoveLabelManagementAction removeLabelManagementAction = new RemoveLabelManagementAction(labelsToRemove, removeFromStorage);
+				managementActions.add(removeLabelManagementAction);
+				labelList.removeAll(labelsToRemove);
+				manageLabelTypeSlection();
+				labelTypeTableViewer.refresh(true);
 			}
 		});
 
-		sashForm.setWeights(new int[] { 1, 1 });
-		setControl(sashForm);
+		FormText storageInfo = new FormText(lowerComposite, SWT.NONE);
+		storageInfo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
+		storageInfo.setImage("storage", InspectIT.getDefault().getImage(InspectITImages.IMG_STORAGE_NEW));
+		storageInfo.setText("<form><p>The icon <img href=\"storage\"/> denotes that label type or label is currently used in one or more storages.</p></form>", true, false);
 	}
 
 	/**
-	 * Removes selected labels.
+	 * Returns if any storage in collection of storages does contain at least one label that is of
+	 * the given label type.
 	 * 
-	 * @param removeAlsoFromStorages
-	 *            Should labels be also removed from storages.
+	 * @param labelType
+	 *            Label type to search for.
+	 * @param labelsInStorages
+	 *            Storages to check.
+	 * @return True if at least one label of given type exists in one of given storages.
 	 */
-	private void removeSelectedLabels(boolean removeAlsoFromStorages) {
-		StructuredSelection structuredSelection = ((StructuredSelection) labelsTableViewer.getSelection());
-		List<AbstractStorageLabel<?>> labelsToRemove = new ArrayList<AbstractStorageLabel<?>>(structuredSelection.size());
-		for (Iterator<?> iterator = structuredSelection.iterator(); iterator.hasNext();) {
-			AbstractStorageLabel<?> abstractStorageLabel = (AbstractStorageLabel<?>) iterator.next();
-			labelsToRemove.add(abstractStorageLabel);
-		}
-
-		if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-			try {
-				cmrRepositoryDefinition.getStorageService().removeLabelsFromCmr(labelsToRemove, removeAlsoFromStorages);
-				refreshLabels();
-			} catch (StorageException exception) {
-				InspectIT.getDefault().createErrorDialog("Exception throw trying to remove label(s)", exception, -1);
+	private boolean isLabelTypeExistsInStorage(AbstractStorageLabelType<?> labelType, Set<AbstractStorageLabel<?>> labelsInStorages) {
+		for (AbstractStorageLabel<?> label : labelsInStorages) {
+			if (ObjectUtils.equals(label.getStorageLabelType(), labelType)) {
+				return true;
 			}
-
-		} else {
-			InspectIT.getDefault().createInfoDialog("Can not remove label(s), CMR repository is offline.", -1);
 		}
+		return false;
 	}
 
 	/**
-	 * Refreshes the list of label types and updates the tables and selection.
+	 * Returns if any storage in collection of storages does contain given label.
+	 * 
+	 * @param label
+	 *            Label to search for.
+	 * @param labelsInStorages
+	 *            Storages to check.
+	 * @return True if label exists in one of given storages.
 	 */
-	private void refreshLabelTypes() {
-		AbstractStorageLabelType<?> selectedLabelType = null;
-		if (!labelTypeTableViewer.getSelection().isEmpty()) {
-			selectedLabelType = (AbstractStorageLabelType<?>) ((StructuredSelection) labelTypeTableViewer.getSelection()).getFirstElement();
+	private boolean isLabelExistsInStorage(AbstractStorageLabel<?> label, Set<AbstractStorageLabel<?>> labelsInStorages) {
+		for (AbstractStorageLabel<?> labelInStorage : labelsInStorages) {
+			if (ObjectUtils.equals(label, labelInStorage)) {
+				return true;
+			}
 		}
-		labelTypeList.clear();
-		labelTypeList.addAll(cmrRepositoryDefinition.getStorageService().getAllLabelTypes());
-
-		labelTypeTableViewer.refresh();
-
-		if (null != selectedLabelType) {
-			labelTypeTableViewer.setSelection(new StructuredSelection(selectedLabelType), true);
-		}
-	}
-
-	/**
-	 * Refreshes the list of the labels and updates the tables and selection.
-	 */
-	private void refreshLabels() {
-		labelList.clear();
-		labelList.addAll(cmrRepositoryDefinition.getStorageService().getAllLabels());
-		manageLabelTypeSlection();
+		return false;
 	}
 
 	/**
@@ -465,8 +494,6 @@ public class ManageLabelWizardPage extends WizardPage {
 	 */
 	private void manageLabelTypeSlection() {
 		if (!labelTypeTableViewer.getSelection().isEmpty()) {
-			removeLabelType.setEnabled(true);
-			createLabel.setEnabled(true);
 			AbstractStorageLabelType<?> labelType = (AbstractStorageLabelType<?>) ((StructuredSelection) labelTypeTableViewer.getSelection()).getFirstElement();
 			List<AbstractStorageLabel<?>> inputForLabelTable = new ArrayList<AbstractStorageLabel<?>>();
 			for (AbstractStorageLabel<?> label : labelList) {
@@ -474,11 +501,20 @@ public class ManageLabelWizardPage extends WizardPage {
 					inputForLabelTable.add(label);
 				}
 			}
+			if (labelType.isValueReusable()) {
+				createLabel.setEnabled(true);
+				labelsTableViewer.getTable().setEnabled(true);
+			} else {
+				createLabel.setEnabled(false);
+				labelsTableViewer.getTable().setEnabled(false);
+			}
+			removeLabelType.setEnabled(AbstractCustomStorageLabelType.class.isAssignableFrom(labelType.getClass()));
 			labelsTableViewer.setInput(inputForLabelTable);
 			labelsTableViewer.refresh();
 		} else {
-			removeLabelType.setEnabled(true);
+			removeLabelType.setEnabled(false);
 			createLabel.setEnabled(true);
+			labelsTableViewer.getTable().setEnabled(true);
 			labelsTableViewer.setInput(null);
 			labelsTableViewer.refresh();
 		}
@@ -490,7 +526,16 @@ public class ManageLabelWizardPage extends WizardPage {
 	 * @return {@link #shouldRefreshStorages}
 	 */
 	public boolean isShouldRefreshStorages() {
-		return shouldRefreshStorages;
+		return !managementActions.isEmpty();
+	}
+
+	/**
+	 * Gets {@link #managementActions}.
+	 * 
+	 * @return {@link #managementActions}
+	 */
+	public List<AbstractLabelManagementAction> getManagementActions() {
+		return managementActions;
 	}
 
 	/**
@@ -779,6 +824,7 @@ public class ManageLabelWizardPage extends WizardPage {
 			}
 			typeSelection.select(index);
 			typeSelection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+			typeSelection.setEnabled(false);
 
 			final Listener listener = new Listener() {
 				@Override

@@ -3,7 +3,7 @@ package info.novatec.inspectit.storage.label.type.impl;
 import info.novatec.inspectit.storage.label.type.AbstractCustomStorageLabelType;
 
 /**
- * Custom label type that holds {@link Boolean} values,
+ * Custom label type that holds {@link Boolean} values.
  * 
  * @author Ivan Senic
  * 
@@ -21,6 +21,14 @@ public class CustomBooleanLabelType extends AbstractCustomStorageLabelType<Boole
 	@Override
 	public Class<Boolean> getValueClass() {
 		return Boolean.class;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isValueReusable() {
+		return false;
 	}
 
 }
