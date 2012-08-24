@@ -126,7 +126,7 @@ public class BreadcrumbTitleComposite extends Composite implements CmrRepository
 		viewLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		// create tool-bar and its manager
-		ToolBar toolbar = new ToolBar(this, SWT.FLAT | SWT.BORDER);
+		ToolBar toolbar = new ToolBar(this, SWT.FLAT);
 		toolbar.setLayoutData(new GridData(SWT.END, SWT.FILL, false, false));
 		toolBarManager = new ToolBarManager(toolbar);
 	}
