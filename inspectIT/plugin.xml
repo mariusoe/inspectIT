@@ -112,15 +112,15 @@
       </editor>
    </extension>
    <extension
-         point="org.eclipse.ui.actionSets">
-   </extension>
-   <extension
          point="org.eclipse.ui.newWizards">
       <wizard
             class="info.novatec.inspectit.rcp.wizard.CreateStorageWizard"
-            icon="icons/storage_new.gif"
+            icon="icons/add.png"
             id="info.novatec.inspectit.rcp.wizard.createStorageWizard"
-            name="Create Storage Wizard">
+            name="Create Storage">
+         <description>
+            Create Storage
+         </description>
       </wizard>
       <wizard
             class="info.novatec.inspectit.rcp.wizard.AddStorageLabelWizard"
@@ -154,7 +154,7 @@
       <wizard
             class="info.novatec.inspectit.rcp.wizard.AddCmrRepositoryWizard"
             icon="icons/add.png"
-            id="info.novatec.inspectit.rcp.wizard.addCmrRepositoryDialog"
+            id="info.novatec.inspectit.rcp.wizard.addCmrRepositoryWizard"
             name="Add Central Management Repository (CMR)">
          <description>
             Add Central Management Repository (CMR)
@@ -299,6 +299,23 @@
       <command
             id="info.novatec.inspectit.rcp.commands.copySqlQuery"
             name="Copy SQL Query">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.sendFeedback"
+            name="Send Feedback">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.requestSupport"
+            name="Request Support">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.searchDocumentation"
+            name="Search Documentation">
+         <commandParameter
+               id="info.novatec.inspectit.rcp.commands.searchDocumentation.searchString"
+               name="Search string"
+               optional="false">
+         </commandParameter>
       </command>
    </extension>
    <extension
@@ -457,7 +474,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="info.novatec.inspectit.rcp.handlers.OpenDocumentationHandler"
+            class="info.novatec.inspectit.rcp.handlers.OpenUrlHandler$OpenDocumentationHandler"
             commandId="info.novatec.inspectit.rcp.commands.documentation">
 	  </handler>
       <handler
@@ -611,10 +628,6 @@
                </test>
             </with>
          </activeWhen>
-      </handler>
-      <handler
-            class="info.novatec.inspectit.rcp.handlers.CreateStorageHandler"
-            commandId="info.novatec.inspectit.rcp.commands.createStorage">
       </handler>
       <handler
             class="info.novatec.inspectit.rcp.handlers.CloseStorageHandler"
@@ -892,6 +905,22 @@
       <handler
             class="info.novatec.inspectit.rcp.handlers.FindHandler"
             commandId="org.eclipse.ui.edit.findReplace">
+         <activeWhen>
+            <and>
+               <with
+                     variable="activeEditor">
+                  <not>
+                     <equals
+                           value="null">
+                     </equals>
+                  </not>
+                  <test
+                        property="info.novatec.inspectit.hasSubView"
+                        value="searchExecutor">
+                  </test>
+               </with>
+            </and>
+         </activeWhen>
       </handler>
       <handler
             class="info.novatec.inspectit.rcp.handlers.NavigateToExceptionTypeHandler"
@@ -1114,6 +1143,18 @@
                </with>
             </and>
          </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.OpenUrlHandler$GiveFeedbackHandler"
+            commandId="info.novatec.inspectit.rcp.commands.sendFeedback">
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.OpenUrlHandler$RequestSupportHandler"
+            commandId="info.novatec.inspectit.rcp.commands.requestSupport">
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.OpenUrlHandler$SearchDocumentationHandler"
+            commandId="info.novatec.inspectit.rcp.commands.searchDocumentation">
       </handler>
    </extension>
    <extension
@@ -1657,10 +1698,14 @@
             allPopups="false"
             locationURI="toolbar:info.novatec.inspectit.rcp.view.storageManager">
          <command
-               commandId="info.novatec.inspectit.rcp.commands.createStorage"
+               commandId="org.eclipse.ui.newWizard"
                icon="icons/add.png"
                style="push"
                tooltip="Create Storage">
+            <parameter
+                  name="newWizardId"
+                  value="info.novatec.inspectit.rcp.wizard.createStorageWizard">
+            </parameter>
          </command>
          <command
                commandId="org.eclipse.ui.edit.rename"
@@ -1701,7 +1746,7 @@
                tooltip="Add Central Management Repository (CMR)">
             <parameter
                   name="newWizardId"
-                  value="info.novatec.inspectit.rcp.wizard.addCmrRepositoryDialog">
+                  value="info.novatec.inspectit.rcp.wizard.addCmrRepositoryWizard">
             </parameter>
          </command>
          <command
@@ -1867,6 +1912,51 @@
                style="push"
                tooltip="License Information">
          </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.main.toolbar">
+         <toolbar
+               id="info.novatec.inspectit.rcp.selectionToolbar">
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.details"
+                  icon="icons/properties.gif"
+                  style="push"
+                  tooltip="Details">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.file.save"
+                  style="push"
+                  tooltip="Save on Server">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.edit.copy"
+                  style="push"
+                  tooltip="Copy">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.edit.findReplace"
+                  icon="icons/search.png"
+                  style="push"
+                  tooltip="Search">
+            </command>
+         </toolbar>
+         <toolbar
+               id="info.novatec.inspectit.rcp.helpToolbar">
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.sendFeedback"
+                  icon="icons/mail.png"
+                  style="push">
+            </command>
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.requestSupport"
+                  icon="icons/help.png"
+                  style="push">
+            </command>
+            <control
+                  class="info.novatec.inspectit.rcp.menu.SearchDocumentationContributionItem">
+            </control>
+         </toolbar>
       </menuContribution>
    </extension>
    <extension

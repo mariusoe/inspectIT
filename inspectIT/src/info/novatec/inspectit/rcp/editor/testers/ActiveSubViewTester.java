@@ -4,6 +4,7 @@ import info.novatec.inspectit.rcp.editor.ISubView;
 import info.novatec.inspectit.rcp.editor.composite.AbstractCompositeSubView;
 import info.novatec.inspectit.rcp.editor.graph.GraphSubView;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
+import info.novatec.inspectit.rcp.editor.search.ISearchExecutor;
 import info.novatec.inspectit.rcp.editor.table.TableSubView;
 import info.novatec.inspectit.rcp.editor.tree.SteppingTreeSubView;
 import info.novatec.inspectit.rcp.editor.tree.TreeSubView;
@@ -37,6 +38,8 @@ public class ActiveSubViewTester extends PropertyTester {
 					return isSubViewExisting(rootEditor.getSubView(), GraphSubView.class);
 				} else if ("compositeSubView".equals(expectedValue)) {
 					return isSubViewExisting(rootEditor.getSubView(), AbstractCompositeSubView.class);
+				} else if ("searchExecutor".equals(expectedValue)) {
+					return isSubViewExisting(rootEditor.getSubView(), ISearchExecutor.class);
 				}
 			}
 		}
@@ -54,7 +57,7 @@ public class ActiveSubViewTester extends PropertyTester {
 	 *            Class to search for.
 	 * @return Returns true if the wanted class is found.
 	 */
-	private boolean isSubViewExisting(ISubView subView, Class<? extends ISubView> subViewClass) {
+	private boolean isSubViewExisting(ISubView subView, Class<?> subViewClass) {
 		if (subViewClass.isInstance(subView)) {
 			return true;
 		} else if (subView instanceof AbstractCompositeSubView) {

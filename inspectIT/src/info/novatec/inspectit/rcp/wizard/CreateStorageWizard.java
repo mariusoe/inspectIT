@@ -3,6 +3,7 @@ package info.novatec.inspectit.rcp.wizard;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
+import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
 import info.novatec.inspectit.rcp.wizard.page.DefineNewStorageWizzardPage;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
@@ -10,7 +11,9 @@ import info.novatec.inspectit.storage.StorageException;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Wizzard for creating and opening the storage.
@@ -77,6 +80,10 @@ public class CreateStorageWizard extends Wizard implements INewWizard {
 			StorageData storageData = defineNewStoragePage.getStorageData();
 			try {
 				cmrRepositoryDefinition.getStorageService().createAndOpenStorage(storageData);
+				IViewPart viewPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(StorageManagerView.VIEW_ID);
+				if (viewPart instanceof StorageManagerView) {
+					((StorageManagerView) viewPart).refresh();
+				}
 			} catch (StorageException e) {
 				InspectIT.getDefault().createErrorDialog("Storage can not be created.", e, -1);
 				return false;
