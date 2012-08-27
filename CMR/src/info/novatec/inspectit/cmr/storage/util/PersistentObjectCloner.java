@@ -1,4 +1,4 @@
-package info.novatec.inspectit.storage.util;
+package info.novatec.inspectit.cmr.storage.util;
 
 import net.sf.gilead.configuration.ConfigurationHelper;
 import net.sf.gilead.core.PersistentBeanManager;

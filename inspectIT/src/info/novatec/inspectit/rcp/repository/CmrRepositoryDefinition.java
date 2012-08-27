@@ -231,7 +231,7 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 		this.onlineStatus = OnlineStatus.UNKNOWN;
 		this.name = name;
 
-		CmrServiceProvider cmrServiceProvider = (CmrServiceProvider) InspectIT.getDefault().getApplicationContext().getBean("cmrServiceProvider");
+		CmrServiceProvider cmrServiceProvider = InspectIT.getService(CmrServiceProvider.class);
 
 		sqlDataAccessService = cmrServiceProvider.getSqlDataAccessService(this);
 		serverStatusService = cmrServiceProvider.getServerStatusService(this);

@@ -1,6 +1,5 @@
 package info.novatec.inspectit.storage.nio.write;
 
-
 import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.nio.WriteReadAttachment;
 import info.novatec.inspectit.storage.nio.WriteReadCompletionRunnable;
@@ -11,9 +10,9 @@ import org.apache.commons.logging.Log;
 
 /**
  * Completion handler for asynchronous writing.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class WritingCompletionHandler implements CompletionHandler<Integer, WriteReadAttachment> {
 
@@ -43,8 +42,10 @@ public class WritingCompletionHandler implements CompletionHandler<Integer, Writ
 		} else {
 			WriteReadCompletionRunnable completionRunnable = attachment.getCompletionRunnable();
 			if (null != completionRunnable) {
-				completionRunnable.setCompleted(true);
-				completionRunnable.run();
+				completionRunnable.markSuccess();
+				if (completionRunnable.isFinished()) {
+					completionRunnable.run();
+				}
 			}
 		}
 	}
@@ -56,8 +57,10 @@ public class WritingCompletionHandler implements CompletionHandler<Integer, Writ
 		log.error("Write to the disk failed.", exc);
 		WriteReadCompletionRunnable completionRunnable = attachment.getCompletionRunnable();
 		if (null != completionRunnable) {
-			completionRunnable.setCompleted(false);
-			completionRunnable.run();
+			completionRunnable.markFailed();
+			if (completionRunnable.isFinished()) {
+				completionRunnable.run();
+			}
 		}
 	}
 

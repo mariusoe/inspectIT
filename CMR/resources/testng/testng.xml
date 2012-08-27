@@ -50,10 +50,11 @@
 			<class name="info.novatec.inspectit.communication.data.InvocationAwareDataTest" />
 		</classes>
 	</test>
-	<test name="Channel Managers Test">
+	<test name="NIO">
 		<classes>
-			<class
-				name="info.novatec.inspectit.storage.nio.ChannelManagersTest" />
+			<class name="info.novatec.inspectit.storage.nio.ChannelManagersTest" />
+			<class name="info.novatec.inspectit.storage.nio.ByteBufferProviderTest" />
+			<class name="info.novatec.inspectit.storage.nio.stream.ExtendedByteBufferOutputStreamTest" />
 		</classes>
 	</test>
 	<test name="Storage Processors Test">
@@ -62,10 +63,10 @@
 				name="info.novatec.inspectit.storage.processor.StorageDataProcessorsTest" />
 		</classes>
 	</test>
-	<test name="Serializer Test">
+	<test name="Serializer">
 		<classes>
-			<class
-				name="info.novatec.inspectit.storage.serializer.impl.SerializerTest" />
+			<class name="info.novatec.inspectit.storage.serializer.impl.SerializerTest" />
+			<class name="info.novatec.inspectit.storage.serializer.impl.BackwardForwardCompatibilityTest" />
 		</classes>
 	</test>
 	<test name="Schema Test">

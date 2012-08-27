@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.storage.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -60,7 +61,7 @@ public final class HttpEntityContentParser {
 	 * @throws IOException
 	 *             If {@link IOException} is thrown.
 	 */
-	public static ByteBuffer getByteContent(HttpEntity httpEntity) throws IOException {
+	public static InputStream getByteContent(HttpEntity httpEntity) throws IOException {
 		// check if it is multipart response
 		if (isMultipart(httpEntity)) {
 
@@ -118,13 +119,11 @@ public final class HttpEntityContentParser {
 				nextCopyPosition += marker.getEnd() - marker.getStart();
 			}
 
-			// wrap with ByteBuffer
-			ByteBuffer buffer = ByteBuffer.wrap(allBytes);
-			return buffer;
+			// wrap with input stream
+			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(allBytes);
+			return byteArrayInputStream;
 		} else {
-			byte[] content = EntityUtils.toByteArray(httpEntity);
-			ByteBuffer buffer = ByteBuffer.wrap(content);
-			return buffer;
+			return new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
 		}
 
 	}
@@ -275,7 +274,7 @@ public final class HttpEntityContentParser {
 
 		return -1;
 	}
-	
+
 	/**
 	 * Simple class to mark the start and end of array.
 	 * 
@@ -296,8 +295,11 @@ public final class HttpEntityContentParser {
 
 		/**
 		 * Default constructor.
-		 * @param start Start value
-		 * @param end End value
+		 * 
+		 * @param start
+		 *            Start value
+		 * @param end
+		 *            End value
 		 */
 		public StartEndMarker(int start, int end) {
 			super();

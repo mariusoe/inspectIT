@@ -19,15 +19,17 @@ import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
 import info.novatec.inspectit.indexing.storage.impl.StorageIndexQuery;
 import info.novatec.inspectit.storage.label.StringStorageLabel;
 import info.novatec.inspectit.storage.label.type.impl.RatingLabelType;
+import info.novatec.inspectit.storage.nio.stream.StreamProvider;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.processor.impl.DataSaverProcessor;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
@@ -40,6 +42,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import com.esotericsoftware.kryo.io.Input;
 
 /**
  * Tests the complete CMR storage functionality.
@@ -61,7 +65,7 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 	 * {@link StorageReader} for reading the saved data.
 	 */
 	@Autowired
-	private StorageReader storageReader;
+	private StreamProvider streamProvider;
 
 	/**
 	 * {@link ISerializer}.
@@ -129,8 +133,8 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 
 		// get the data from file and check for equal
 		byte[] storageDataBytes = Files.readAllBytes(storageFiles[0].toPath());
-		ByteBuffer buffer = ByteBuffer.wrap(storageDataBytes);
-		StorageData deserializedStorageData = (StorageData) serializer.deserialize(buffer);
+		Input input = new Input(storageDataBytes);
+		StorageData deserializedStorageData = (StorageData) serializer.deserialize(input);
 		assertThat(deserializedStorageData, is(equalTo(storageData)));
 
 		storageManager.openStorage(storageData);
@@ -139,8 +143,8 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 
 		// get the data from file and check for equal
 		storageDataBytes = Files.readAllBytes(storageFiles[0].toPath());
-		buffer = ByteBuffer.wrap(storageDataBytes);
-		deserializedStorageData = (StorageData) serializer.deserialize(buffer);
+		input.setBuffer(storageDataBytes);
+		deserializedStorageData = (StorageData) serializer.deserialize(input);
 		assertThat(deserializedStorageData, is(equalTo(storageData)));
 
 		// storage manager know for the storage
@@ -214,8 +218,9 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		byte[] indexTreeBytes = Files.readAllBytes(Paths.get(indexFilePath));
 		assertThat(indexTreeBytes.length, is(greaterThan(0)));
 
-		ByteBuffer buffer = ByteBuffer.wrap(indexTreeBytes);
-		Object indexingTree = serializer.deserialize(buffer);
+		ByteArrayInputStream bais = new ByteArrayInputStream(indexTreeBytes);
+		Input input = new Input(bais);
+		Object indexingTree = serializer.deserialize(input);
 		assertThat(indexingTree, is(instanceOf(IStorageTreeComponent.class)));
 
 		storageIndexingTree = (IStorageTreeComponent<?>) indexingTree;
@@ -236,9 +241,11 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 	 * 
 	 * @throws SerializationException
 	 *             If serialization fails.
+	 * @throws IOException
+	 *             If {@link IOException} occurs.
 	 */
 	@Test(dependsOnMethods = { "finalizeWriteTest" })
-	public void readTest() throws SerializationException {
+	public void readTest() throws SerializationException, IOException {
 		if (storageIndexingTree == null) {
 			return;
 		}
@@ -255,14 +262,22 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 			assertThat("Size of the descriptor is wrong.", descriptor.getSize(), is(greaterThan(0L)));
 		}
 
-		byte[] result = storageReader.read(storageData, descriptors);
-		ByteBuffer buffer = ByteBuffer.wrap(result);
+		InputStream result = streamProvider.getExtendedByteBufferInputStream(storageData, descriptors);
+		Input input = new Input(result);
 		int count = 0;
-		while (buffer.hasRemaining()) {
-			Object invocation = serializer.deserialize(buffer);
-			assertThat(invocation, is(instanceOf(InvocationSequenceData.class)));
-			assertThat(createdInvocations, hasItem((InvocationSequenceData) invocation));
-			count++;
+		try {
+			while (result.available() > 0) {
+				try {
+					Object invocation = serializer.deserialize(input);
+					assertThat(invocation, is(instanceOf(InvocationSequenceData.class)));
+					assertThat(createdInvocations, hasItem((InvocationSequenceData) invocation));
+					count++;
+				} catch (SerializationException e) {
+					e.printStackTrace();
+				}
+			}
+		} finally {
+			result.close();
 		}
 		assertThat("Amount of de-serialize objects is less than the amount of invocations saved.", count, is(equalTo(createdInvocations.size())));
 	}
@@ -421,4 +436,5 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		invData.setNestedSequences(children);
 		return invData;
 	}
+
 }

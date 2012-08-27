@@ -1,5 +1,9 @@
 package info.novatec.inspectit.storage.serializer.impl;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
@@ -53,11 +57,15 @@ import info.novatec.inspectit.storage.serializer.schema.SchemaManagerTestProvide
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import com.esotericsoftware.kryo.io.ByteBufferInputStream;
+import com.esotericsoftware.kryo.io.ByteBufferOutputStream;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 /**
  * Test the implementation of the {@link ISerializer} for correctness.
@@ -114,20 +122,6 @@ public class SerializerTest {
 	}
 
 	/**
-	 * Tests if the {@link SerializationException} will be thrown if {@link ByteBuffer} is to small.
-	 * 
-	 * @throws SerializationException
-	 *             Serialization Exception
-	 */
-	@Test(expectedExceptions = { SerializationException.class })
-	public void smallBufferSerialization() throws SerializationException {
-		String s = "String greater than one byte";
-		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1);
-		serializer.serialize(s, byteBuffer);
-		Assert.assertTrue(true);
-	}
-
-	/**
 	 * Tests if the data deserialzied from empty buffer is <code>null</code>.
 	 * 
 	 * @throws SerializationException
@@ -137,8 +131,11 @@ public class SerializerTest {
 	public void emptyBufferSerialization() throws SerializationException {
 		// I need to create a new buffer, because clear on the buffer will not actually erase the
 		// data in the buffer, but only move the pointers
-		Object data = serializer.deserialize(ByteBuffer.allocateDirect(1000));
-		Assert.assertEquals(data, null);
+		ByteBuffer newByteBuffer = ByteBuffer.allocateDirect(1024);
+		ByteBufferInputStream byteBufferInputStream = new ByteBufferInputStream(newByteBuffer);
+		Input input = new Input(byteBufferInputStream);
+		Object data = serializer.deserialize(input);
+		assertThat(data, is(nullValue()));
 	}
 
 	/**
@@ -149,12 +146,15 @@ public class SerializerTest {
 	 */
 	@Test
 	public void radomBufferDataSerialization() throws SerializationException {
+
 		for (int i = 0; i < 64; i++) {
 			byteBuffer.putInt(i);
 		}
 		byteBuffer.flip();
-		Object data = serializer.deserialize(byteBuffer);
-		Assert.assertEquals(data, null);
+		ByteBufferInputStream byteBufferInputStream = new ByteBufferInputStream(byteBuffer);
+		Input input = new Input(byteBufferInputStream);
+		Object data = serializer.deserialize(input);
+		assertThat(data, is(nullValue()));
 	}
 
 	/**
@@ -183,10 +183,14 @@ public class SerializerTest {
 	@Test(dataProvider = "classProvider")
 	public void classesPlanSerialization(Class<?> testingClass) throws InstantiationException, IllegalAccessException, SerializationException {
 		Object object = testingClass.newInstance();
-		serializer.serialize(object, byteBuffer);
+		ByteBufferOutputStream byteBufferOutputStream = new ByteBufferOutputStream(byteBuffer);
+		Output output = new Output(byteBufferOutputStream);
+		serializer.serialize(object, output);
 		byteBuffer.flip();
-		Object deserialized = serializer.deserialize(byteBuffer);
-		Assert.assertEquals(object, deserialized);
+		ByteBufferInputStream byteBufferInputStream = new ByteBufferInputStream(byteBuffer);
+		Input input = new Input(byteBufferInputStream);
+		Object deserialized = serializer.deserialize(input);
+		assertThat(deserialized, is(equalTo(object)));
 	}
 
 }

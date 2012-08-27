@@ -10,14 +10,13 @@ import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.StorageManager;
-import info.novatec.inspectit.storage.StorageReader;
+import info.novatec.inspectit.storage.nio.stream.StreamProvider;
 import info.novatec.inspectit.storage.serializer.ISerializer;
-import info.novatec.inspectit.storage.serializer.SerializationException;
+import info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider;
 import info.novatec.inspectit.storage.util.RangeDescriptor;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -27,6 +26,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.Header;
@@ -37,12 +38,15 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.HttpEntityWrapper;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatus.Series;
+
+import com.esotericsoftware.kryo.io.Input;
 
 /**
  * Class responsible for retrieving the data via HTTP, and de-serializing the data into objects.
@@ -53,19 +57,38 @@ import org.springframework.http.HttpStatus.Series;
 public class DataRetriever {
 
 	/**
+	 * Amount of serializers to be available to this class.
+	 */
+	private int serializerCount = 3;
+
+	/**
 	 * {@link StorageManager}.
 	 */
 	private StorageManager storageManager;
 
 	/**
-	 * {@link StorageReader}.
+	 * Serialization manager provider.
 	 */
-	private StorageReader storageReader;
+	private SerializationManagerProvider serializationManagerProvider;
 
 	/**
-	 * De-serializer.
+	 * Queue for {@link ISerializer} that are available.
 	 */
-	private ISerializer serializer;
+	private BlockingQueue<ISerializer> serializerQueue = new LinkedBlockingQueue<ISerializer>();
+
+	/**
+	 * Stream provider needed for local data reading.
+	 */
+	private StreamProvider streamProvider;
+
+	/**
+	 * Initializes the retriever.
+	 */
+	protected void init() throws Exception {
+		for (int i = 0; i < serializerCount; i++) {
+			serializerQueue.add(serializationManagerProvider.createSerializer());
+		}
+	}
 
 	/**
 	 * Retrieves the wanted data described in the {@link StorageDescriptor} from the desired
@@ -120,11 +143,22 @@ public class DataRetriever {
 			rangeHeader.append(rangeDescriptor);
 
 			httpGet.addHeader("Range", rangeHeader.toString());
-			ByteBuffer buffer = handleResponse(httpClient.execute(httpGet));
-			while (buffer.hasRemaining()) {
-				Object object = serializer.deserialize(buffer);
-				E element = (E) object;
-				receivedData.add(element);
+			ISerializer serializer = serializerQueue.take();
+			InputStream inputStream = null;
+			Input input = null;
+			try {
+				inputStream = httpClient.execute(httpGet, new HttpRequestHandler());
+				input = new Input(inputStream);
+				while (inputStream.available() > 0) {
+					Object object = serializer.deserialize(input);
+					E element = (E) object;
+					receivedData.add(element);
+				}
+			} finally {
+				if (null != input) {
+					input.close();
+				}
+				serializerQueue.add(serializer);
 			}
 		}
 		return receivedData;
@@ -148,11 +182,11 @@ public class DataRetriever {
 	 * @return List of objects in the supplied generic type. Note that if the data described in the
 	 *         descriptor is not of a supplied generic type, there will be a casting exception
 	 *         thrown.
-	 * @throws SerializationException
-	 *             If {@link SerializationException} occurs.
+	 * @throws Exception
+	 *             If {@link Exception} occurs.
 	 */
 	@SuppressWarnings("unchecked")
-	public <E extends DefaultData> List<E> getDataLocally(LocalStorageData localStorageData, List<IStorageDescriptor> descriptors) throws SerializationException {
+	public <E extends DefaultData> List<E> getDataLocally(LocalStorageData localStorageData, List<IStorageDescriptor> descriptors) throws Exception {
 		Map<Integer, List<IStorageDescriptor>> separateFilesGroup = createFilesGroup(localStorageData, descriptors);
 		List<IStorageDescriptor> optimizedDescriptors = new ArrayList<IStorageDescriptor>();
 		for (Map.Entry<Integer, List<IStorageDescriptor>> entry : separateFilesGroup.entrySet()) {
@@ -177,13 +211,25 @@ public class DataRetriever {
 		}
 
 		List<E> receivedData = new ArrayList<E>(descriptors.size());
-		byte[] bytes = storageReader.read(localStorageData, optimizedDescriptors);
-		ByteBuffer buffer = ByteBuffer.wrap(bytes);
-		while (buffer.hasRemaining()) {
-			Object object = serializer.deserialize(buffer);
-			E element = (E) object;
-			receivedData.add(element);
+
+		ISerializer serializer = serializerQueue.take();
+		InputStream inputStream = null;
+		Input input = null;
+		try {
+			inputStream = streamProvider.getExtendedByteBufferInputStream(localStorageData, optimizedDescriptors);
+			input = new Input(inputStream);
+			while (inputStream.available() > 0) {
+				Object object = serializer.deserialize(input);
+				E element = (E) object;
+				receivedData.add(element);
+			}
+		} finally {
+			if (null != input) {
+				input.close();
+			}
+			serializerQueue.add(serializer);
 		}
+
 		return receivedData;
 	}
 
@@ -374,53 +420,43 @@ public class DataRetriever {
 	}
 
 	/**
-	 * Handles the {@link HttpResponse}. If the response have the successful status (codes 2xx) then
-	 * the content provided by the response entity is parsed via {@link HttpEntityContentParser}. If
-	 * response was not successful, exception is raised.
+	 * Sets {@link #storageManager}.
 	 * 
-	 * @param response
-	 *            {@link HttpResponse} to handle.
-	 * @return ByteBuffer containing the bytes passed.
-	 * @throws IOException
-	 *             If {@link IOException} occurs.
-	 * @throws StorageException
-	 *             If status of HTTP response is not successful (codes 2xx).
-	 */
-	private ByteBuffer handleResponse(HttpResponse response) throws IOException, StorageException {
-		StatusLine statusLine = response.getStatusLine();
-		if (HttpStatus.valueOf(statusLine.getStatusCode()).series().equals(Series.SUCCESSFUL)) {
-			HttpEntity entity = response.getEntity();
-			ByteBuffer byteBuffer = HttpEntityContentParser.getByteContent(entity);
-			return byteBuffer;
-		} else {
-			throw new StorageException("Could not receive data via HTTP. The response status is: " + statusLine);
-		}
-	}
-
-	/**
 	 * @param storageManager
-	 *            the storageManager to set
+	 *            New value for {@link #storageManager}
 	 */
 	public void setStorageManager(StorageManager storageManager) {
 		this.storageManager = storageManager;
 	}
 
 	/**
-	 * Sets {@link #storageReader}.
+	 * Sets {@link #serializerCount}.
 	 * 
-	 * @param storageReader
-	 *            New value for {@link #storageReader}
+	 * @param serializerCount
+	 *            New value for {@link #serializerCount}
 	 */
-	public void setStorageReader(StorageReader storageReader) {
-		this.storageReader = storageReader;
+	public void setSerializerCount(int serializerCount) {
+		this.serializerCount = serializerCount;
 	}
 
 	/**
-	 * @param serializer
-	 *            the serializer to set
+	 * Sets {@link #serializationManagerProvider}.
+	 * 
+	 * @param serializationManagerProvider
+	 *            New value for {@link #serializationManagerProvider}
 	 */
-	public void setSerializer(ISerializer serializer) {
-		this.serializer = serializer;
+	public void setSerializationManagerProvider(SerializationManagerProvider serializationManagerProvider) {
+		this.serializationManagerProvider = serializationManagerProvider;
+	}
+
+	/**
+	 * Sets {@link #streamProvider}.
+	 * 
+	 * @param streamProvider
+	 *            New value for {@link #streamProvider}
+	 */
+	public void setStreamProvider(StreamProvider streamProvider) {
+		this.streamProvider = streamProvider;
 	}
 
 	/**
@@ -484,6 +520,25 @@ public class DataRetriever {
 					}
 				}
 			}
+		}
+
+	}
+
+	/**
+	 * Simple handler for the HTTP requests.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private static class HttpRequestHandler implements ResponseHandler<InputStream> {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public InputStream handleResponse(HttpResponse response) throws IOException {
+			HttpEntity entity = response.getEntity();
+			return HttpEntityContentParser.getByteContent(entity);
 		}
 
 	}

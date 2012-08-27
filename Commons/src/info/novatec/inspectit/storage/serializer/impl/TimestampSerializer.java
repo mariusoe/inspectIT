@@ -1,42 +1,41 @@
 package info.novatec.inspectit.storage.serializer.impl;
 
-import static com.esotericsoftware.minlog.Log.TRACE;
-import static com.esotericsoftware.minlog.Log.trace;
-
-import java.nio.ByteBuffer;
 import java.sql.Timestamp;
 
+import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
-import com.esotericsoftware.kryo.serialize.LongSerializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 /**
  * Serializes instances of {@link java.sql.Timestamp}.
  * 
  * @author Ivan Senic
  */
-public class TimestampSerializer extends Serializer {
+public class TimestampSerializer extends Serializer<Timestamp> {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public <T> T readObjectData(ByteBuffer buffer, Class<T> paramClass) {
-		Timestamp timestamp = new Timestamp(LongSerializer.get(buffer, true));
-		if (TRACE) {
-			trace("kryo", "Read timestamp: " + timestamp);
-		}
-		return (T) timestamp;
+	public void write(Kryo kryo, Output output, Timestamp object) {
+		output.writeLong(object.getTime(), true);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeObjectData(ByteBuffer buffer, Object object) {
-		LongSerializer.put(buffer, ((Timestamp) object).getTime(), true);
-		if (TRACE) {
-			trace("kryo", "Wrote timestamp: " + object);
-		}
+	@Override
+	public Timestamp read(Kryo kryo, Input input, Class<Timestamp> type) {
+		return new Timestamp(input.readLong(true));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Timestamp copy(Kryo kryo, Timestamp original) {
+		return new Timestamp(original.getTime());
 	}
 
 }

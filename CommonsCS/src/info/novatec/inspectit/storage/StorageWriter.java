@@ -3,25 +3,27 @@ package info.novatec.inspectit.storage;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.indexing.impl.IndexingException;
 import info.novatec.inspectit.spring.logger.Logger;
-import info.novatec.inspectit.storage.nio.ByteBufferPoolOverflowException;
-import info.novatec.inspectit.storage.nio.ByteBufferProvider;
 import info.novatec.inspectit.storage.nio.WriteReadCompletionRunnable;
+import info.novatec.inspectit.storage.nio.stream.ExtendedByteBufferOutputStream;
+import info.novatec.inspectit.storage.nio.stream.StreamProvider;
 import info.novatec.inspectit.storage.nio.write.WritingChannelManager;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
+import info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider;
 
 import java.io.IOException;
 import java.lang.ref.SoftReference;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -31,8 +33,9 @@ import javax.annotation.Resource;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+
+import com.esotericsoftware.kryo.io.Output;
 
 /**
  * {@link StorageWriter} is class that contains shared functionality for writing data on one
@@ -45,15 +48,15 @@ import org.springframework.scheduling.annotation.Scheduled;
 public class StorageWriter {
 
 	/**
-	 * Amount of time to re-check if the writing tasks are done and finalization can start.
-	 */
-	private static final int FINALIZATION_TASKS_SLEEP_TIME = 500;
-
-	/**
 	 * The log of this class.
 	 */
 	@Logger
 	Log log;
+
+	/**
+	 * Amount of time to re-check if the writing tasks are done and finalization can start.
+	 */
+	private static final int FINALIZATION_TASKS_SLEEP_TIME = 500;
 
 	/**
 	 * Total amount of tasks submitted to {@link #writingExecutorService}.
@@ -88,22 +91,21 @@ public class StorageWriter {
 	private Path writingFolderPath;
 
 	/**
-	 * How much serialization attempts there will be, before the objects writing is abandoned.
-	 */
-	@Value(value = "${storage.serializationAttempts}")
-	private int serializationAttempts;
-
-	/**
 	 * {@link WritingChannelManager}.
 	 */
 	@Autowired
 	private WritingChannelManager writingChannelManager;
 
 	/**
-	 * {@link ISerializer} used for object serialization.
+	 * {@link SerializationManagerProvider}.
 	 */
 	@Autowired
-	private ISerializer serializer;
+	private SerializationManagerProvider serializationManagerProvider;
+
+	/**
+	 * Queue for {@link ISerializer} that are available.
+	 */
+	private BlockingQueue<ISerializer> serializerQueue = new LinkedBlockingQueue<ISerializer>();
 
 	/**
 	 * {@link ExecutorService} for writing tasks.
@@ -113,10 +115,10 @@ public class StorageWriter {
 	private ScheduledThreadPoolExecutor writingExecutorService;
 
 	/**
-	 * {@link ByteBufferProvider}.
+	 * {@link StreamProvider}.
 	 */
 	@Autowired
-	private ByteBufferProvider byteBufferProvider;
+	private StreamProvider streamProvider;
 
 	/**
 	 * Opened channels {@link Paths}. These paths need to be closed when writing is finalized.
@@ -326,46 +328,37 @@ public class StorageWriter {
 	 * @return True if the object was written successfully, otherwise false.
 	 */
 	public boolean writeNonDefaultDataObject(Object object, String fileName) {
-		// Start the serialization, if serialization fails, we search for a bigger buffer
-		boolean serializationPassed = false;
-		int serializationAttemptsFailed = 0;
-		ByteBuffer byteBuffer = byteBufferProvider.acquireByteBuffer();
-		int capacity = byteBuffer.capacity();
-		while (!serializationPassed) {
-			if (serializationAttemptsFailed >= serializationAttempts) {
-				log.error("All " + serializationAttempts + " serialization attempts for the object " + object + " failed. Data will be skipped.");
-				return false;
-			}
-
-			if (serializationAttemptsFailed > 0) {
-				try {
-					byteBuffer = byteBufferProvider.acquireByteBuffer(capacity);
-				} catch (ByteBufferPoolOverflowException e) {
-					log.error("Buffer with enough capacity can not be created for the object " + object + ". Data will be skipped.", e);
-					return false;
-				}
-			}
-
-			// make sure buffer is clear
-			if (byteBuffer.position() > 0) {
-				byteBuffer.clear();
-			}
-
-			try {
-				serializer.serialize(object, byteBuffer);
-				serializationPassed = true;
-			} catch (SerializationException e) {
-				serializationAttemptsFailed++;
-				capacity *= 3;
-				byteBufferProvider.releaseByteBuffer(byteBuffer);
-				if (log.isDebugEnabled()) {
-					log.warn("Serialization failed. Attempt number " + serializationAttemptsFailed + " out of " + serializationAttempts + ".", e);
-				}
-			}
+		ISerializer serializer = null;
+		try {
+			serializer = serializerQueue.take();
+		} catch (InterruptedException e1) {
+			Thread.interrupted();
+		}
+		if (null == serializer) {
+			log.error("Serializer instance could not be obtained.");
+			return false;
 		}
 
-		// flip so that writing channel manager knows where to start
-		byteBuffer.flip();
+		// final reference needed because of the runnable
+		final ExtendedByteBufferOutputStream extendedByteBufferOutputStream = streamProvider.getExtendedByteBufferOutputStream();
+		try {
+			Output output = new Output(extendedByteBufferOutputStream);
+			serializer.serialize(object, output);
+			extendedByteBufferOutputStream.flush(false);
+		} catch (SerializationException e) {
+			serializerQueue.add(serializer);
+			log.error("Serialization for the object " + object + " failed. Data will be skipped.", e);
+			return false;
+		}
+		serializerQueue.add(serializer);
+
+		int buffersToWrite = extendedByteBufferOutputStream.getBuffersCount();
+		WriteReadCompletionRunnable completionRunnable = new WriteReadCompletionRunnable(buffersToWrite) {
+			@Override
+			public void run() {
+				extendedByteBufferOutputStream.close();
+			}
+		};
 
 		// prepare path
 		Path channelPath = writingFolderPath.resolve(fileName);
@@ -378,18 +371,9 @@ public class StorageWriter {
 		}
 		openedChannelPaths.add(channelPath);
 
-		// create completion runnable
-		final ByteBuffer finalByteBuffer = byteBuffer;
-		WriteReadCompletionRunnable completionRunnable = new WriteReadCompletionRunnable() {
-			@Override
-			public void run() {
-				byteBufferProvider.releaseByteBuffer(finalByteBuffer);
-			}
-		};
-
 		// execute write
 		try {
-			writingChannelManager.write(byteBuffer, channelPath, completionRunnable);
+			writingChannelManager.write(extendedByteBufferOutputStream, channelPath, completionRunnable);
 			return true;
 		} catch (IOException e) {
 			log.error("Execption occured while attempting to write data to disk", e);
@@ -476,67 +460,43 @@ public class StorageWriter {
 					return;
 				}
 
-				// Start the serialization, if serialization fails, we search for a bigger buffer
-				boolean serializationPassed = false;
-				int serializationAttemptsFailed = 0;
-				ByteBuffer byteBuffer = byteBufferProvider.acquireByteBuffer();
-				int capacity = byteBuffer.capacity();
-				while (!serializationPassed) {
-					if (serializationAttemptsFailed >= serializationAttempts) {
-						// we won't try till end of the world
-						// we need to remove the reserved place for the indexing
-						indexingTreeHandler.writeFailed(this);
-						log.error("All " + serializationAttempts + " serialization attempts for the object " + data + " failed. Data will be skipped.");
-						return;
-					}
-
-					if (serializationAttemptsFailed > 0) {
-						try {
-							byteBuffer = byteBufferProvider.acquireByteBuffer(capacity);
-						} catch (ByteBufferPoolOverflowException e) {
-							indexingTreeHandler.writeFailed(this);
-							log.error("Buffer with enough capacity can not be created for the object " + data + ". Data will be skipped.", e);
-							return;
-						}
-					}
-
-					// make sure buffer is clear
-					if (byteBuffer.position() > 0) {
-						byteBuffer.clear();
-					}
-
-					try {
-						serializer.serialize(data, byteBuffer);
-						serializationPassed = true;
-					} catch (SerializationException e) {
-						serializationAttemptsFailed++;
-						capacity *= 3;
-						byteBufferProvider.releaseByteBuffer(byteBuffer);
-						if (log.isWarnEnabled()) {
-							log.warn("Serialization failed. Attempt number " + serializationAttemptsFailed + " out of " + serializationAttempts + ".", e);
-						}
-					}
-
+				ISerializer serializer = null;
+				try {
+					serializer = serializerQueue.take();
+				} catch (InterruptedException e1) {
+					Thread.interrupted();
 				}
-				// flip so that writing channel manager knows where to start
-				byteBuffer.flip();
+				if (null == serializer) {
+					log.error("Serializer instance could not be obtained.");
+					return;
+				}
 
-				// remember the writing size
-				long writingSize = byteBuffer.limit() - byteBuffer.position();
+				final ExtendedByteBufferOutputStream extendedByteBufferOutputStream = streamProvider.getExtendedByteBufferOutputStream();
+				try {
+					Output output = new Output(extendedByteBufferOutputStream);
+					serializer.serialize(data, output);
+					extendedByteBufferOutputStream.flush(false);
+				} catch (SerializationException e) {
+					serializerQueue.add(serializer);
+					if (log.isWarnEnabled()) {
+						log.warn("Serialization for the object " + data + " failed. Data will be skipped.", e);
+					}
+				}
+				serializerQueue.add(serializer);
 
 				// final reference needed because of the runnable
-				final ByteBuffer byteBufferFinal = byteBuffer;
+				int buffersToWrite = extendedByteBufferOutputStream.getBuffersCount();
 
-				WriteReadCompletionRunnable completionRunnable = new WriteReadCompletionRunnable() {
+				WriteReadCompletionRunnable completionRunnable = new WriteReadCompletionRunnable(buffersToWrite) {
 					@Override
 					public void run() {
-						// clear and return to queue for somebody else
-						byteBufferProvider.releaseByteBuffer(byteBufferFinal);
-
-						// if the write fails, we have to remove the data from index
-						if (!this.isCompleted()) {
+						if (isCompleted()) {
+							indexingTreeHandler.writeSuccessful(WriteTask.this, getAttemptedWriteReadPosition(), getAttemptedWriteReadSize());
+						} else {
 							indexingTreeHandler.writeFailed(WriteTask.this);
+
 						}
+						extendedByteBufferOutputStream.close();
 					}
 				};
 
@@ -544,8 +504,8 @@ public class StorageWriter {
 				Path channelPath = storageManager.getChannelPath(storageData, channelId);
 				openedChannelPaths.add(channelPath);
 				try {
-					long position = writingChannelManager.write(byteBuffer, channelPath, completionRunnable);
-					indexingTreeHandler.writeSuccessful(this, position, writingSize);
+					// position and size will be set in the completion runnable
+					writingChannelManager.write(extendedByteBufferOutputStream, channelPath, completionRunnable);
 				} catch (IOException e) {
 					// remove from indexing tree if exception occurs
 					indexingTreeHandler.writeFailed(this);
@@ -621,6 +581,14 @@ public class StorageWriter {
 	@PostConstruct
 	public void postConstruct() throws Exception {
 		indexingTreeHandler.registerStorageWriter(this);
+
+		// we create the same number of kryo instances as the size of the executor service
+		// this way every write task will not wait for a reference because one will always be
+		// available
+		int threads = writingExecutorService.getCorePoolSize();
+		for (int i = 0; i < threads; i++) {
+			serializerQueue.add(serializationManagerProvider.createSerializer());
+		}
 	}
 
 	/**
@@ -631,7 +599,6 @@ public class StorageWriter {
 		ToStringBuilder toStringBuilder = new ToStringBuilder(this);
 		toStringBuilder.append("storageData", storageData);
 		toStringBuilder.append("writingFolderPath", writingFolderPath);
-		toStringBuilder.append("serializationAttempts", serializationAttempts);
 		toStringBuilder.append("writingOn", writingOn);
 		toStringBuilder.append("executorService", writingExecutorService);
 		toStringBuilder.append("openedChannelPaths", openedChannelPaths);

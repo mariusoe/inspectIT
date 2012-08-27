@@ -21,16 +21,18 @@ import info.novatec.inspectit.storage.StorageFileExtensions;
 import info.novatec.inspectit.storage.StorageManager;
 import info.novatec.inspectit.storage.label.StringStorageLabel;
 import info.novatec.inspectit.storage.label.type.impl.ExploredByLabelType;
+import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.io.InputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,6 +45,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang.mutable.MutableObject;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.swt.widgets.Display;
+
+import com.esotericsoftware.kryo.io.Input;
 
 /**
  * {@link StorageManager} for GUI.
@@ -744,6 +748,7 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 			return Collections.emptyList();
 		}
 
+		final ISerializer serializer = getSerializationManagerProvider().createSerializer();
 		final MutableObject mutableException = new MutableObject();
 		final List<E> returnList = new ArrayList<E>();
 		Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -752,14 +757,20 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 				if (file.toString().endsWith(fileSufix)) {
+					InputStream inputStream = null;
+					Input input = null;
 					try {
-						byte[] bytes = Files.readAllBytes(file);
-						ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
-						Object deserialized = getSerializer().deserialize(byteBuffer);
+						inputStream = Files.newInputStream(file, StandardOpenOption.READ);
+						input = new Input(inputStream);
+						Object deserialized = serializer.deserialize(input);
 						returnList.add((E) deserialized);
 					} catch (SerializationException e) {
 						mutableException.setValue(e);
 						return FileVisitResult.TERMINATE;
+					} finally {
+						if (null != input) {
+							input.close();
+						}
 					}
 
 				}

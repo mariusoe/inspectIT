@@ -21,10 +21,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.framework.BundleContext;
-import org.springframework.beans.factory.access.BeanFactoryLocator;
-import org.springframework.beans.factory.access.BeanFactoryReference;
-import org.springframework.beans.factory.access.SingletonBeanFactoryLocator;
-import org.springframework.context.ApplicationContext;
+import org.osgi.framework.ServiceReference;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -40,11 +37,6 @@ public class InspectIT extends AbstractUIPlugin {
 	 * The shared instance.
 	 */
 	private static InspectIT plugin;
-
-	/**
-	 * The spring application context.
-	 */
-	private ApplicationContext applicationContext;
 
 	/**
 	 * The global repository management tool. It is used to create and save the connection to the
@@ -83,11 +75,6 @@ public class InspectIT extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		plugin = this;
 		super.start(context);
-
-		// initialize spring
-		BeanFactoryLocator beanFactoryLocator = SingletonBeanFactoryLocator.getInstance();
-		BeanFactoryReference beanFactoryReference = beanFactoryLocator.useBeanFactory("ctx");
-		applicationContext = (ApplicationContext) beanFactoryReference.getFactory();
 	}
 
 	/**
@@ -204,12 +191,20 @@ public class InspectIT extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns the application context.
+	 * Returns a service, if one is registered with the bundle context.
 	 * 
-	 * @return The application context.
+	 * @param clazz
+	 *            Class of service.
+	 * @param <E>
+	 *            Type
+	 * @return Service or <code>null</code> is service is not registered at the moment.
 	 */
-	public ApplicationContext getApplicationContext() {
-		return applicationContext;
+	public static <E> E getService(Class<E> clazz) {
+		ServiceReference<E> reference = getDefault().getBundle().getBundleContext().getServiceReference(clazz);
+		if (null != reference) {
+			return getDefault().getBundle().getBundleContext().getService(reference);
+		}
+		throw new RuntimeException("Requested service of the class " + clazz.getName() + " is not registered in the bundle.");
 	}
 
 	/**
@@ -248,7 +243,7 @@ public class InspectIT extends AbstractUIPlugin {
 		if (null == storageManager) {
 			synchronized (this) {
 				if (null == storageManager) {
-					storageManager = (InspectITStorageManager) applicationContext.getBean("storageManager");
+					storageManager = getService(InspectITStorageManager.class);
 					storageManager.startUp();
 				}
 			}

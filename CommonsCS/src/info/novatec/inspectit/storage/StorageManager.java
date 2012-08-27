@@ -5,9 +5,10 @@ import info.novatec.inspectit.indexing.storage.impl.StorageDescriptor;
 import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
+import info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.io.OutputStream;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -23,6 +24,8 @@ import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+
+import com.esotericsoftware.kryo.io.Output;
 
 /**
  * Abstract class that defines basic storage functionality and properties.
@@ -45,10 +48,10 @@ public abstract class StorageManager {
 	protected static final int UPDATE_RATE = 30000;
 
 	/**
-	 * Serializer.
+	 * {@link SerializationManagerProvider}.
 	 */
 	@Autowired
-	private ISerializer serializer;
+	private SerializationManagerProvider serializationManagerProvider;
 
 	/**
 	 * Default storage folder.
@@ -214,14 +217,18 @@ public abstract class StorageManager {
 			Files.delete(storageDataFile);
 		}
 
-		// 100KB should always enough
-		ByteBuffer buffer = ByteBuffer.allocateDirect(100 * 1024);
-		serializer.serialize(storageData, buffer);
-		buffer.flip();
-		byte[] bytes = new byte[buffer.remaining()];
-		buffer.get(bytes);
-
-		Files.write(storageDataFile, bytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+		ISerializer serializer = serializationManagerProvider.createSerializer();
+		OutputStream outputStream = null;
+		Output output = null;
+		try {
+			outputStream = Files.newOutputStream(storageDataFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+			output = new Output(outputStream);
+			serializer.serialize(storageData, output);
+		} finally {
+			if (null != output) {
+				output.close();
+			}
+		}
 	}
 
 	/**
@@ -310,10 +317,22 @@ public abstract class StorageManager {
 	}
 
 	/**
-	 * @return the serializer
+	 * Gets {@link #serializationManagerProvider}.
+	 * 
+	 * @return {@link #serializationManagerProvider}
 	 */
-	protected ISerializer getSerializer() {
-		return serializer;
+	public SerializationManagerProvider getSerializationManagerProvider() {
+		return serializationManagerProvider;
+	}
+
+	/**
+	 * Sets {@link #serializationManagerProvider}.
+	 * 
+	 * @param serializationManagerProvider
+	 *            New value for {@link #serializationManagerProvider}
+	 */
+	public void setSerializationManagerProvider(SerializationManagerProvider serializationManagerProvider) {
+		this.serializationManagerProvider = serializationManagerProvider;
 	}
 
 	/**
@@ -321,16 +340,6 @@ public abstract class StorageManager {
 	 */
 	public String getStorageDefaultFolder() {
 		return storageDefaultFolder;
-	}
-
-	/**
-	 * <i>This setter can be removed when the Spring3.0 on the GUI side is working properly.</i>
-	 * 
-	 * @param serializer
-	 *            the serializer to set
-	 */
-	public void setSerializer(ISerializer serializer) {
-		this.serializer = serializer;
 	}
 
 	/**

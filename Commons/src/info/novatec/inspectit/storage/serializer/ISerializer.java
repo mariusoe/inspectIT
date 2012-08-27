@@ -1,12 +1,11 @@
 package info.novatec.inspectit.storage.serializer;
 
-
-import java.nio.ByteBuffer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 /**
  * Generic interface for serializer to be used in inspectIT. The interface defines only two methods,
- * one for serialization and one from the serialization. The serializer is tightly coupled with the
- * {@link ByteBuffer}.
+ * one for serialization and one from the serialization.
  * 
  * @author Ivan Senic
  * 
@@ -14,31 +13,29 @@ import java.nio.ByteBuffer;
 public interface ISerializer {
 
 	/**
-	 * Serialize the object into bytes and puts the bytes in the supplied {@link ByteBuffer}. Note
-	 * that the buffer has to have space for putting all the bytes that come from the serialization.
-	 * Furthermore, all operations for preparing the buffer have to be performed before calling this
-	 * method.
+	 * Serialize the object into bytes and puts the bytes in the supplied {@link Output}. All
+	 * operations for preparing the output have to be performed before calling this method. The
+	 * {@link Output#flush()} will be called after the serialization.
 	 * 
 	 * @param object
 	 *            Object to serialize.
-	 * @param byteBuffer
-	 *            {@link ByteBuffer} to hold the serialized bytes.
+	 * @param output
+	 *            {@link Output} to hold the serialized bytes.
 	 * @throws SerializationException
 	 *             Serialization exception is thrown when serialization could not be performed.
 	 */
-	void serialize(Object object, ByteBuffer byteBuffer) throws SerializationException;
+	void serialize(Object object, Output output) throws SerializationException;
 
 	/**
-	 * De-serialize the bytes provided by the {@link ByteBuffer}. It is responsibility of the caller
-	 * to set up the buffer correctly, namely take care about the buffers current position. The way
-	 * bytes are read, is defined in the implementing classes.
+	 * De-serialize the bytes provided by the {@link Input}. It is responsibility of the caller to
+	 * set up the input correctly. The way bytes are read, is defined in the implementing classes.
 	 * 
-	 * @param byteBuffer
-	 *            Byte buffer that provides the bytes.
+	 * @param input
+	 *            {@link Input} that provides the bytes.
 	 * @return Returns the de-serialized object.
 	 * @throws SerializationException
 	 *             If de-serialization fails.
 	 */
-	Object deserialize(ByteBuffer byteBuffer) throws SerializationException;
+	Object deserialize(Input input) throws SerializationException;
 
 }

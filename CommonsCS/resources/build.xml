@@ -14,7 +14,6 @@
 
 	<target name="clean">
 		<delete dir="${build.root}" />
-		<delete dir="${lib.root}" />
 	</target>
 
 	<target name="init" description="--> Creates necessary folder structure">
@@ -24,6 +23,7 @@
 		<ivy:settings file="${ivy.settings.file}" />
 		<ivy:resolve file="${ivy.file}" />
 		<ivy:cachepath pathid="lib.prod" conf="prod" />
+		<ivy:cachepath pathid="lib.osgi" conf="osgi" />
 	</target>
 
 	<!-- *************************************************************** -->
@@ -31,6 +31,7 @@
 	<!-- *************************************************************** -->
 
 	<target name="release-commons" description="--> call the release of the commons project">
+		<ant antfile="${build.commons.file}" target="clean" inheritAll="false" useNativeBasedir="true" />
 		<ant antfile="${build.commons.file}" target="release" inheritAll="false" useNativeBasedir="true" />
 	</target>
 
@@ -73,22 +74,25 @@
 		<mkdir dir="${pluginReleaseDir}/${plugin.name}" />
 		<mkdir dir="${pluginReleaseDir}/${plugin.name}/META-INF" />
 
-		<!-- The retrieve is needed when the plug-in release is done -->
-		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
-		<ivy:resolve file="${ivy.file}" />
-		<ivy:retrieve pattern="${basedir}/lib/[conf]/[artifact].[ext]" />
-
 		<copy file="${basedir}/META-INF/MANIFEST.MF" todir="${pluginReleaseDir}/${plugin.name}/META-INF" />
 		<copy todir="${pluginReleaseDir}/${plugin.name}">
 			<fileset dir="${build.commonscs.classes}">
 				<include name="**/*.*" />
 			</fileset>
 		</copy>
-		<copy todir="${pluginReleaseDir}/${plugin.name}/lib/prod">
-			<fileset dir="${lib.root}/prod">
+
+		<!-- We need to separate the real jars from sources and other artifacts -->
+		<!-- that's why we need a TMP folder -->
+		<copy todir="${build.release.root}/lib/tmp" flatten="true">
+			<path refid="lib.osgi" />
+		</copy>
+		<copy todir="${pluginReleaseDir}">
+			<fileset dir="${build.release.root}/lib/tmp">
 				<include name="**/*.jar" />
+				<exclude name="**/*sources*.jar" />
 			</fileset>
 		</copy>
+		<delete dir="${build.release.root}/lib/tmp" failonerror="false" />
 	</target>
 
 	<!-- Calls the release target and then the analysis targets -->
@@ -102,24 +106,24 @@
 	<target name="static-analysis" depends="build">
 		<!-- Call PDM -->
 		<fileset dir="${src.root}" includes="info/novatec/inspectit/**/*.java" id="pmd.fileset" />
-		<antcall target="pmd" inheritrefs="true"/>
+		<antcall target="pmd" inheritrefs="true" />
 
 		<!-- Call Checkstyle -->
-		<fileset dir="${src.root}" includes="**/*.java" id="checkstyle.fileset"/>
-		<antcall target="checkstyle" inheritrefs="true"/>
+		<fileset dir="${src.root}" includes="**/*.java" id="checkstyle.fileset" />
+		<antcall target="checkstyle" inheritrefs="true" />
 
 		<!-- Call FindBugs -->
 		<property name="findbugs.sourcepath" value="${src.root}" />
 		<property name="findbugs.classlocation" value="${build.commonscs.classes}" />
-		<path id="findbugs.path" >
+		<path id="findbugs.path">
 			<pathelement path="${build.commons.classes}" />
-			<path refid="lib.prod"/>
+			<path refid="lib.prod" />
 		</path>
-		<antcall target="findbugs" inheritrefs="true"/>
+		<antcall target="findbugs" inheritrefs="true" />
 
 		<!-- Call CPD -->
-		<fileset dir="${src.root}" includes="**/*.java" id="cpd.fileset"/>
-		<antcall target="cpd" inheritrefs="true"/>
+		<fileset dir="${src.root}" includes="**/*.java" id="cpd.fileset" />
+		<antcall target="cpd" inheritrefs="true" />
 	</target>
 
 </project>

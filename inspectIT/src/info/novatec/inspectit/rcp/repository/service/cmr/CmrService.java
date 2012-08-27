@@ -48,6 +48,12 @@ public class CmrService implements ICmrService {
 	public void initService(CmrRepositoryDefinition cmrRepositoryDefinition) {
 		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
 		HttpInvokerProxyFactoryBean httpInvokerProxyFactoryBean = new HttpInvokerProxyFactoryBean();
+
+		// we need to set the class loader on our own
+		// the problems is that the service interface class can not be found
+		// I am not quite sure why, but this is suggested on several places as a patch
+		httpInvokerProxyFactoryBean.setBeanClassLoader(getClass().getClassLoader());
+
 		httpInvokerProxyFactoryBean.setServiceInterface(serviceInterface);
 		httpInvokerProxyFactoryBean.setServiceUrl(PROTOCOL + cmrRepositoryDefinition.getIp() + ":" + cmrRepositoryDefinition.getPort() + REMOTING + serviceName);
 		httpInvokerProxyFactoryBean.afterPropertiesSet();

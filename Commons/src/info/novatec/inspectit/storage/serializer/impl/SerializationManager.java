@@ -56,7 +56,6 @@ import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.storage.serializer.schema.ClassSchemaManager;
 
-import java.nio.ByteBuffer;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,28 +68,40 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.serialize.ArraySerializer;
-import com.esotericsoftware.kryo.serialize.ClassSerializer;
-import com.esotericsoftware.kryo.serialize.CollectionSerializer;
-import com.esotericsoftware.kryo.serialize.DateSerializer;
-import com.esotericsoftware.kryo.serialize.EnumSerializer;
-import com.esotericsoftware.kryo.serialize.FieldSerializer;
-import com.esotericsoftware.kryo.serialize.MapSerializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.serializers.CollectionSerializer;
+import com.esotericsoftware.kryo.serializers.DefaultArraySerializers.LongArraySerializer;
+import com.esotericsoftware.kryo.serializers.DefaultArraySerializers.ObjectArraySerializer;
+import com.esotericsoftware.kryo.serializers.DefaultSerializers.ClassSerializer;
+import com.esotericsoftware.kryo.serializers.DefaultSerializers.DateSerializer;
+import com.esotericsoftware.kryo.serializers.DefaultSerializers.EnumSerializer;
+import com.esotericsoftware.kryo.serializers.FieldSerializer;
+import com.esotericsoftware.kryo.serializers.MapSerializer;
+import com.esotericsoftware.kryo.util.MapReferenceResolver;
 
 /**
- * Implementation of the {@link ISerializer} that uses Kryo library for serializing the objects.
+ * Implementation of the {@link ISerializer} that uses Kryo library for serializing the objects. <br>
+ * <br>
+ * <b>This class is not thread safe and should be used with special attention. The class can be used
+ * only by one thread while the serialization/de-serialization process lasts.</b>
  * 
  * @author Ivan Senic
  * 
  */
 @Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Lazy
 public class SerializationManager implements ISerializer, InitializingBean {
 
 	/**
-	 * {@link Kryo} instance.
+	 * Main {@link Kryo} instance.
 	 */
 	private Kryo kryo;
 
@@ -105,107 +116,125 @@ public class SerializationManager implements ISerializer, InitializingBean {
 	 */
 	protected void initKryo() {
 		kryo = new Kryo();
-		kryo.setRegistrationOptional(true);
+		kryo.setReferenceResolver(new MapReferenceResolver() {
+			@SuppressWarnings("rawtypes")
+			@Override
+			public boolean useReferences(Class paramClass) {
+				if (DefaultData.class.isAssignableFrom(paramClass)) {
+					return false;
+				} else {
+					return super.useReferences(paramClass);
+				}
+			}
+		});
+		kryo.setRegistrationRequired(false);
+		registerClasses(kryo);
+	}
 
-		/**
-		 * ATTENTION!
-		 * 
-		 * Please do not change the order of the registered classes. If new classes need to be
-		 * registered, please add this registration at the end. Otherwise the old data will not be
-		 * able to be de-serialized. If some class is not need to be register any more, do not
-		 * remove the registration. If the class is not available any more, add arbitrary class to
-		 * its position, so that the order can be maintained. Do not add unnecessary classes to the
-		 * registration list.
-		 * 
-		 * NOTE: By default, all primitives (including wrappers) and java.lang.String are
-		 * registered. Any other class, including JDK classes like ArrayList and even arrays such as
-		 * String[] or int[] must be registered.
-		 * 
-		 * NOTE: If it is known up front what classes need to be serialized, registering the classes
-		 * is ideal. However, in some cases the classes to serialize are not known until it is time
-		 * to perform the serialization. When setRegistrationOptional is true, registered classes
-		 * are still written as an integer. However, unregistered classes are written as a String,
-		 * using the name of the class. This is much less efficient, but can't always be avoided.
-		 */
-
+	/**
+	 * Registers all necessary classes to the {@link Kryo} instance;
+	 * 
+	 * ATTENTION!
+	 * 
+	 * Please do not change the order of the registered classes. If new classes need to be
+	 * registered, please add this registration at the end. Otherwise the old data will not be able
+	 * to be de-serialized. If some class is not need to be register any more, do not remove the
+	 * registration. If the class is not available any more, add arbitrary class to its position, so
+	 * that the order can be maintained. Do not add unnecessary classes to the registration list.
+	 * 
+	 * NOTE: By default, all primitives (including wrappers) and java.lang.String are registered.
+	 * Any other class, including JDK classes like ArrayList and even arrays such as String[] or
+	 * int[] must be registered.
+	 * 
+	 * NOTE: If it is known up front what classes need to be serialized, registering the classes is
+	 * ideal. However, in some cases the classes to serialize are not known until it is time to
+	 * perform the serialization. When setRegistrationOptional is true, registered classes are still
+	 * written as an integer. However, unregistered classes are written as a String, using the name
+	 * of the class. This is much less efficient, but can't always be avoided.
+	 * 
+	 * @param kryo
+	 *            Kryo that needs to be prepared.
+	 */
+	private void registerClasses(Kryo kryo) {
 		/** Java native classes */
-		kryo.register(Class.class, new ClassSerializer(kryo), false);
-		kryo.register(ArrayList.class, new CollectionSerializer(kryo), false);
-		kryo.register(CopyOnWriteArrayList.class, new CollectionSerializer(kryo), false);
-		kryo.register(HashSet.class, new CollectionSerializer(kryo), false);
-		kryo.register(HashMap.class, new MapSerializer(kryo), false);
-		kryo.register(ConcurrentHashMap.class, new MapSerializer(kryo), false);
-		kryo.register(Timestamp.class, new TimestampSerializer(), false);
-		kryo.register(Date.class, new DateSerializer(), false);
-		kryo.register(AtomicLong.class, new FieldSerializer(kryo, AtomicLong.class), false);
+		kryo.register(Class.class, new ClassSerializer());
+		kryo.register(ArrayList.class, new CollectionSerializer());
+		kryo.register(CopyOnWriteArrayList.class, new CollectionSerializer());
+		kryo.register(HashSet.class, new CollectionSerializer());
+		kryo.register(HashMap.class, new MapSerializer());
+		kryo.register(ConcurrentHashMap.class, new MapSerializer());
+		kryo.register(Timestamp.class, new TimestampSerializer());
+		kryo.register(Date.class, new DateSerializer());
+		kryo.register(AtomicLong.class, new FieldSerializer<AtomicLong>(kryo, AtomicLong.class));
 		/** Arrays */
-		kryo.register(long[].class, new ArraySerializer(kryo));
-		kryo.register(SimpleStorageDescriptor[].class, new ArraySerializer(kryo));
+		kryo.register(long[].class, new LongArraySerializer());
+		kryo.register(SimpleStorageDescriptor[].class, new ObjectArraySerializer());
 		/** inspectIT model classes */
-		kryo.register(PlatformIdent.class, new ReferenceCustomCompatibleFieldSerializer(kryo, PlatformIdent.class, schemaManager), false);
-		kryo.register(MethodIdent.class, new ReferenceCustomCompatibleFieldSerializer(kryo, MethodIdent.class, schemaManager), false);
-		kryo.register(SensorTypeIdent.class, new ReferenceCustomCompatibleFieldSerializer(kryo, SensorTypeIdent.class, schemaManager), false);
-		kryo.register(MethodSensorTypeIdent.class, new ReferenceCustomCompatibleFieldSerializer(kryo, MethodSensorTypeIdent.class, schemaManager), false);
-		kryo.register(PlatformSensorTypeIdent.class, new FieldSerializer(kryo, PlatformSensorTypeIdent.class), false);
+		kryo.register(PlatformIdent.class, new CustomCompatibleFieldSerializer<PlatformIdent>(kryo, PlatformIdent.class, schemaManager));
+		kryo.register(MethodIdent.class, new CustomCompatibleFieldSerializer<MethodIdent>(kryo, MethodIdent.class, schemaManager));
+		kryo.register(SensorTypeIdent.class, new CustomCompatibleFieldSerializer<SensorTypeIdent>(kryo, SensorTypeIdent.class, schemaManager));
+		kryo.register(MethodSensorTypeIdent.class, new CustomCompatibleFieldSerializer<MethodSensorTypeIdent>(kryo, MethodSensorTypeIdent.class, schemaManager));
+		kryo.register(PlatformSensorTypeIdent.class, new FieldSerializer<PlatformSensorTypeIdent>(kryo, PlatformSensorTypeIdent.class));
 		/** Common data classes */
-		kryo.register(MutableInt.class, new FieldSerializer(kryo, MutableInt.class), false);
-		kryo.register(InvocationSequenceData.class, new InvocationSequenceCustomCompatibleFieldSerializer(kryo, InvocationSequenceData.class, schemaManager), false);
-		kryo.register(TimerData.class, new CustomCompatibleFieldSerializer(kryo, TimerData.class, schemaManager), false);
-		kryo.register(HttpTimerData.class, new CustomCompatibleFieldSerializer(kryo, HttpTimerData.class, schemaManager), false);
-		kryo.register(SqlStatementData.class, new CustomCompatibleFieldSerializer(kryo, SqlStatementData.class, schemaManager), false);
-		kryo.register(ExceptionSensorData.class, new CustomCompatibleFieldSerializer(kryo, ExceptionSensorData.class, schemaManager), false);
-		kryo.register(ExceptionEvent.class, new EnumSerializer(ExceptionEvent.class), false);
-		kryo.register(ParameterContentData.class, new CustomCompatibleFieldSerializer(kryo, ParameterContentData.class, schemaManager), false);
-		kryo.register(MemoryInformationData.class, new CustomCompatibleFieldSerializer(kryo, MemoryInformationData.class, schemaManager), false);
-		kryo.register(CpuInformationData.class, new CustomCompatibleFieldSerializer(kryo, CpuInformationData.class, schemaManager), false);
-		kryo.register(SystemInformationData.class, new CustomCompatibleFieldSerializer(kryo, SystemInformationData.class, schemaManager), false);
-		kryo.register(VmArgumentData.class, new CustomCompatibleFieldSerializer(kryo, VmArgumentData.class, schemaManager), false);
-		kryo.register(ThreadInformationData.class, new CustomCompatibleFieldSerializer(kryo, ThreadInformationData.class, schemaManager), false);
-		kryo.register(RuntimeInformationData.class, new CustomCompatibleFieldSerializer(kryo, RuntimeInformationData.class, schemaManager), false);
-		kryo.register(CompilationInformationData.class, new CustomCompatibleFieldSerializer(kryo, CompilationInformationData.class, schemaManager), false);
-		kryo.register(ClassLoadingInformationData.class, new CustomCompatibleFieldSerializer(kryo, ClassLoadingInformationData.class, schemaManager), false);
+		kryo.register(MutableInt.class, new FieldSerializer<MutableInt>(kryo, MutableInt.class));
+		kryo.register(InvocationSequenceData.class, new InvocationSequenceCustomCompatibleFieldSerializer(kryo, InvocationSequenceData.class, schemaManager));
+		kryo.register(TimerData.class, new CustomCompatibleFieldSerializer<TimerData>(kryo, TimerData.class, schemaManager));
+		kryo.register(HttpTimerData.class, new CustomCompatibleFieldSerializer<HttpTimerData>(kryo, HttpTimerData.class, schemaManager));
+		kryo.register(SqlStatementData.class, new CustomCompatibleFieldSerializer<SqlStatementData>(kryo, SqlStatementData.class, schemaManager));
+		kryo.register(ExceptionSensorData.class, new CustomCompatibleFieldSerializer<ExceptionSensorData>(kryo, ExceptionSensorData.class, schemaManager));
+		kryo.register(ExceptionEvent.class, new EnumSerializer(ExceptionEvent.class));
+		kryo.register(ParameterContentData.class, new CustomCompatibleFieldSerializer<ParameterContentData>(kryo, ParameterContentData.class, schemaManager));
+		kryo.register(MemoryInformationData.class, new CustomCompatibleFieldSerializer<MemoryInformationData>(kryo, MemoryInformationData.class, schemaManager));
+		kryo.register(CpuInformationData.class, new CustomCompatibleFieldSerializer<CpuInformationData>(kryo, CpuInformationData.class, schemaManager));
+		kryo.register(SystemInformationData.class, new CustomCompatibleFieldSerializer<SystemInformationData>(kryo, SystemInformationData.class, schemaManager));
+		kryo.register(VmArgumentData.class, new CustomCompatibleFieldSerializer<VmArgumentData>(kryo, VmArgumentData.class, schemaManager));
+		kryo.register(ThreadInformationData.class, new CustomCompatibleFieldSerializer<ThreadInformationData>(kryo, ThreadInformationData.class, schemaManager));
+		kryo.register(RuntimeInformationData.class, new CustomCompatibleFieldSerializer<RuntimeInformationData>(kryo, RuntimeInformationData.class, schemaManager));
+		kryo.register(CompilationInformationData.class, new CustomCompatibleFieldSerializer<CompilationInformationData>(kryo, CompilationInformationData.class, schemaManager));
+		kryo.register(ClassLoadingInformationData.class, new CustomCompatibleFieldSerializer<ClassLoadingInformationData>(kryo, ClassLoadingInformationData.class, schemaManager));
+		kryo.register(ParameterContentType.class, new EnumSerializer(ParameterContentType.class));
 		/** Storage classes */
-		kryo.register(StorageBranch.class, new CustomCompatibleFieldSerializer(kryo, StorageBranch.class, schemaManager), false);
-		kryo.register(StorageBranchIndexer.class, new CustomCompatibleFieldSerializer(kryo, StorageBranchIndexer.class, schemaManager), false);
-		kryo.register(SimpleStorageDescriptor.class, new CustomCompatibleFieldSerializer(kryo, SimpleStorageDescriptor.class, schemaManager), false);
-		kryo.register(ArrayBasedStorageLeaf.class, new CustomCompatibleFieldSerializer(kryo, ArrayBasedStorageLeaf.class, schemaManager), false);
-		kryo.register(LeafWithNoDescriptors.class, new CustomCompatibleFieldSerializer(kryo, LeafWithNoDescriptors.class, schemaManager), false);
-		kryo.register(StorageData.class, new CustomCompatibleFieldSerializer(kryo, StorageData.class, schemaManager), false);
-		kryo.register(LocalStorageData.class, new CustomCompatibleFieldSerializer(kryo, LocalStorageData.class, schemaManager), false);
-		kryo.register(StorageState.class, new EnumSerializer(StorageState.class), false);
-		kryo.register(ParameterContentType.class, new EnumSerializer(ParameterContentType.class), false);
+		kryo.register(StorageBranch.class, new CustomCompatibleFieldSerializer<StorageBranch<?>>(kryo, StorageBranch.class, schemaManager));
+		kryo.register(StorageBranchIndexer.class, new CustomCompatibleFieldSerializer<StorageBranchIndexer<?>>(kryo, StorageBranchIndexer.class, schemaManager));
+		kryo.register(SimpleStorageDescriptor.class, new CustomCompatibleFieldSerializer<SimpleStorageDescriptor>(kryo, SimpleStorageDescriptor.class, schemaManager));
+		kryo.register(ArrayBasedStorageLeaf.class, new CustomCompatibleFieldSerializer<ArrayBasedStorageLeaf<?>>(kryo, ArrayBasedStorageLeaf.class, schemaManager));
+		kryo.register(LeafWithNoDescriptors.class, new CustomCompatibleFieldSerializer<LeafWithNoDescriptors<?>>(kryo, LeafWithNoDescriptors.class, schemaManager));
+		kryo.register(StorageData.class, new CustomCompatibleFieldSerializer<StorageData>(kryo, StorageData.class, schemaManager));
+		kryo.register(LocalStorageData.class, new CustomCompatibleFieldSerializer<LocalStorageData>(kryo, LocalStorageData.class, schemaManager));
+		kryo.register(StorageState.class, new EnumSerializer(StorageState.class));
 		/** Storage labels */
-		kryo.register(BooleanStorageLabel.class, new FieldSerializer(kryo, BooleanStorageLabel.class), false);
-		kryo.register(DateStorageLabel.class, new FieldSerializer(kryo, DateStorageLabel.class), false);
-		kryo.register(NumberStorageLabel.class, new FieldSerializer(kryo, NumberStorageLabel.class), false);
-		kryo.register(StringStorageLabel.class, new FieldSerializer(kryo, StringStorageLabel.class), false);
+		kryo.register(BooleanStorageLabel.class, new FieldSerializer<BooleanStorageLabel>(kryo, BooleanStorageLabel.class));
+		kryo.register(DateStorageLabel.class, new FieldSerializer<DateStorageLabel>(kryo, DateStorageLabel.class));
+		kryo.register(NumberStorageLabel.class, new FieldSerializer<NumberStorageLabel>(kryo, NumberStorageLabel.class));
+		kryo.register(StringStorageLabel.class, new FieldSerializer<StringStorageLabel>(kryo, StringStorageLabel.class));
 		/** Storage labels type */
-		kryo.register(AssigneeLabelType.class, new FieldSerializer(kryo, AssigneeLabelType.class), false);
-		kryo.register(CreationDateLabelType.class, new FieldSerializer(kryo, CreationDateLabelType.class), false);
-		kryo.register(CustomBooleanLabelType.class, new FieldSerializer(kryo, CustomBooleanLabelType.class), false);
-		kryo.register(CustomDateLabelType.class, new FieldSerializer(kryo, CustomDateLabelType.class), false);
-		kryo.register(CustomNumberLabelType.class, new FieldSerializer(kryo, CustomNumberLabelType.class), false);
-		kryo.register(CustomStringLabelType.class, new FieldSerializer(kryo, CustomStringLabelType.class), false);
-		kryo.register(ExploredByLabelType.class, new FieldSerializer(kryo, ExploredByLabelType.class), false);
-		kryo.register(RatingLabelType.class, new FieldSerializer(kryo, RatingLabelType.class), false);
-		kryo.register(StatusLabelType.class, new FieldSerializer(kryo, StatusLabelType.class), false);
-		kryo.register(UseCaseLabelType.class, new FieldSerializer(kryo, UseCaseLabelType.class), false);
+		kryo.register(AssigneeLabelType.class, new FieldSerializer<AssigneeLabelType>(kryo, AssigneeLabelType.class));
+		kryo.register(CreationDateLabelType.class, new FieldSerializer<CreationDateLabelType>(kryo, CreationDateLabelType.class));
+		kryo.register(CustomBooleanLabelType.class, new FieldSerializer<CustomBooleanLabelType>(kryo, CustomBooleanLabelType.class));
+		kryo.register(CustomDateLabelType.class, new FieldSerializer<CustomDateLabelType>(kryo, CustomDateLabelType.class));
+		kryo.register(CustomNumberLabelType.class, new FieldSerializer<CustomNumberLabelType>(kryo, CustomNumberLabelType.class));
+		kryo.register(CustomStringLabelType.class, new FieldSerializer<CustomStringLabelType>(kryo, CustomStringLabelType.class));
+		kryo.register(ExploredByLabelType.class, new FieldSerializer<ExploredByLabelType>(kryo, ExploredByLabelType.class));
+		kryo.register(RatingLabelType.class, new FieldSerializer<RatingLabelType>(kryo, RatingLabelType.class));
+		kryo.register(StatusLabelType.class, new FieldSerializer<StatusLabelType>(kryo, StatusLabelType.class));
+		kryo.register(UseCaseLabelType.class, new FieldSerializer<UseCaseLabelType>(kryo, UseCaseLabelType.class));
 		/** Branch indexers */
-		kryo.register(PlatformIdentIndexer.class, new FieldSerializer(kryo, PlatformIdentIndexer.class), false);
-		kryo.register(ObjectTypeIndexer.class, new FieldSerializer(kryo, ObjectTypeIndexer.class), false);
-		kryo.register(MethodIdentIndexer.class, new FieldSerializer(kryo, MethodIdentIndexer.class), false);
-		kryo.register(SensorTypeIdentIndexer.class, new FieldSerializer(kryo, SensorTypeIdentIndexer.class), false);
-		kryo.register(TimestampIndexer.class, new CustomCompatibleFieldSerializer(kryo, TimestampIndexer.class, schemaManager), false);
-		kryo.register(InvocationChildrenIndexer.class, new FieldSerializer(kryo, InvocationChildrenIndexer.class), false);
-		kryo.register(SqlStringIndexer.class, new FieldSerializer(kryo, SqlStringIndexer.class), false);
+		kryo.register(PlatformIdentIndexer.class, new FieldSerializer<PlatformIdentIndexer<?>>(kryo, PlatformIdentIndexer.class));
+		kryo.register(ObjectTypeIndexer.class, new FieldSerializer<ObjectTypeIndexer<?>>(kryo, ObjectTypeIndexer.class));
+		kryo.register(MethodIdentIndexer.class, new FieldSerializer<MethodIdentIndexer<?>>(kryo, MethodIdentIndexer.class));
+		kryo.register(SensorTypeIdentIndexer.class, new FieldSerializer<SensorTypeIdentIndexer<?>>(kryo, SensorTypeIdentIndexer.class));
+		kryo.register(TimestampIndexer.class, new CustomCompatibleFieldSerializer<TimestampIndexer<?>>(kryo, TimestampIndexer.class, schemaManager));
+		kryo.register(InvocationChildrenIndexer.class, new FieldSerializer<InvocationChildrenIndexer<?>>(kryo, InvocationChildrenIndexer.class));
+		kryo.register(SqlStringIndexer.class, new FieldSerializer<SqlStringIndexer<?>>(kryo, SqlStringIndexer.class));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void serialize(Object object, ByteBuffer buffer) throws SerializationException {
+	public void serialize(Object object, Output output) throws SerializationException {
 		try {
-			kryo.writeClassAndObject(buffer, object);
+			kryo.writeClassAndObject(output, object);
+			output.flush();
 		} catch (Exception exception) {
 			throw new SerializationException("Serialization failed.\n" + exception.getMessage(), exception);
 		}
@@ -214,10 +243,10 @@ public class SerializationManager implements ISerializer, InitializingBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object deserialize(ByteBuffer buffer) throws SerializationException {
+	public Object deserialize(Input input) throws SerializationException {
 		Object object = null;
 		try {
-			object = kryo.readClassAndObject(buffer);
+			object = kryo.readClassAndObject(input);
 		} catch (Exception exception) {
 			throw new SerializationException("De-serialization failed.\n" + exception.getMessage(), exception);
 		}

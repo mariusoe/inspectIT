@@ -1,31 +1,30 @@
 package info.novatec.inspectit.storage.serializer.impl;
 
-import java.nio.ByteBuffer;
-
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.storage.serializer.schema.ClassSchemaManager;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
 
 /**
  * {@link CustomCompatibleFieldSerializer} for the {@link InvocationSequenceData} that in the
  * de-serialization process, connects the parents with the nested sequences.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
-public class InvocationSequenceCustomCompatibleFieldSerializer extends CustomCompatibleFieldSerializer {
+public class InvocationSequenceCustomCompatibleFieldSerializer extends CustomCompatibleFieldSerializer<InvocationSequenceData> {
 
 	/**
 	 * Default constructor.
-	 *
+	 * 
 	 * @param kryo
 	 *            Kryo object.
 	 * @param type
 	 *            Type of class.
 	 * @param schemaManager
 	 *            Schema manager holding the schema for the given type.
-	 *
+	 * 
 	 * @see CustomCompatibleFieldSerializer#CustomCompatibleFieldSerializer(Kryo, Class,
 	 *      ClassSchemaManager)
 	 */
@@ -36,17 +35,16 @@ public class InvocationSequenceCustomCompatibleFieldSerializer extends CustomCom
 	/**
 	 * {@inheritDoc}
 	 */
-	public <T> T readObjectData(ByteBuffer buffer, Class<T> type) {
-		T object = super.readObjectData(buffer, type);
-		if (object instanceof InvocationSequenceData) {
-			connectChildren((InvocationSequenceData) object);
-		}
-		return object;
+	@Override
+	public InvocationSequenceData read(Kryo kryo, Input input, Class<InvocationSequenceData> type) {
+		InvocationSequenceData invocation = super.read(kryo, input, type);
+		connectChildren(invocation);
+		return invocation;
 	}
 
 	/**
 	 * Sets the parent to all nested sequences of the invocation to the correct one.
-	 *
+	 * 
 	 * @param parent
 	 *            Parent to start from.
 	 */

@@ -54,8 +54,10 @@ public class ReadingCompletionHandler implements CompletionHandler<Integer, Writ
 			byteBuffer.flip();
 			WriteReadCompletionRunnable completionRunnable = attachment.getCompletionRunnable();
 			if (null != completionRunnable) {
-				completionRunnable.setCompleted(true);
-				completionRunnable.run();
+				completionRunnable.markSuccess();
+				if (completionRunnable.isFinished()) {
+					completionRunnable.run();
+				}
 			}
 		}
 	}
@@ -67,8 +69,10 @@ public class ReadingCompletionHandler implements CompletionHandler<Integer, Writ
 		log.error("Write to the disk failed.", exc);
 		WriteReadCompletionRunnable completionRunnable = attachment.getCompletionRunnable();
 		if (null != completionRunnable) {
-			completionRunnable.setCompleted(false);
-			completionRunnable.run();
+			completionRunnable.markFailed();
+			if (completionRunnable.isFinished()) {
+				completionRunnable.run();
+			}
 		}
 	}
 

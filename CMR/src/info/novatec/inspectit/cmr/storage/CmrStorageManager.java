@@ -15,15 +15,17 @@ import info.novatec.inspectit.storage.WritingStatus;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.recording.RecordingProperties;
+import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.io.InputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,6 +45,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import com.esotericsoftware.kryo.io.Input;
 
 /**
  * Storage manager for the CMR. Manages creation, opening and closing of storages, as well as
@@ -778,15 +782,19 @@ public class CmrStorageManager extends StorageManager {
 			return;
 		}
 
+		final ISerializer serializer = getSerializationManagerProvider().createSerializer();
 		try {
 			Files.walkFileTree(defaultDirectory, new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 					if (file.toString().endsWith(StorageFileExtensions.STORAGE_FILE_EXT)) {
+
+						InputStream inputStream = null;
+						Input input = null;
 						try {
-							byte[] bytes = Files.readAllBytes(file);
-							ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
-							Object deserialized = getSerializer().deserialize(byteBuffer);
+							inputStream = Files.newInputStream(file, StandardOpenOption.READ);
+							input = new Input(inputStream);
+							Object deserialized = serializer.deserialize(input);
 							if (deserialized instanceof StorageData) {
 								StorageData storageData = (StorageData) deserialized;
 								if (storageData.getState() == StorageState.CLOSED) {
@@ -798,6 +806,10 @@ public class CmrStorageManager extends StorageManager {
 							LOGGER.error("Error reading existing storage data file. File path: " + file.toString() + ".", e);
 						} catch (SerializationException e) {
 							LOGGER.error("Error deserializing existing storage binary data in file:" + file.toString() + ".", e);
+						} finally {
+							if (null != input) {
+								input.close();
+							}
 						}
 					}
 					return FileVisitResult.CONTINUE;

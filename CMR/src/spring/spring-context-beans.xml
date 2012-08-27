@@ -10,6 +10,17 @@
 		<lookup-method name="createNewIndexQuery" bean="indexQuery" />
 	</bean>
 
+	<bean id="streamProvider"
+		class="info.novatec.inspectit.storage.nio.stream.StreamProvider">
+		<lookup-method name="createExtendedByteBufferOutputStream" bean="extendedByteBufferOutputStream" />
+		<lookup-method name="createExtendedByteBufferInputStream" bean="extendedByteBufferInputStream" />
+	</bean>
+
+	<bean id="serializationManagerProvider"
+		class="info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider">
+		<lookup-method name="createSerializer" bean="serializationManager" />
+	</bean>
+
 	<bean id="storageWriterProvider"
 		class="info.novatec.inspectit.cmr.storage.CmrStorageWriterProvider">
 		<lookup-method name="getCmrStorageWriter" bean="cmrStorageWriter" />

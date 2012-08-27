@@ -2,10 +2,10 @@ package info.novatec.inspectit.cmr.storage;
 
 import info.novatec.inspectit.cmr.dao.impl.PlatformIdentDaoImpl;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
+import info.novatec.inspectit.cmr.storage.util.PersistentObjectCloner;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.storage.StorageFileExtensions;
 import info.novatec.inspectit.storage.StorageWriter;
-import info.novatec.inspectit.storage.util.PersistentObjectCloner;
 
 import java.io.IOException;
 import java.util.HashSet;

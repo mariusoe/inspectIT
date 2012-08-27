@@ -6,9 +6,9 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
+import info.novatec.inspectit.indexing.query.provider.impl.StorageIndexQueryProvider;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
 import info.novatec.inspectit.indexing.storage.impl.StorageIndexQuery;
-import info.novatec.inspectit.rcp.storage.util.StorageIndexQueryProvider;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;

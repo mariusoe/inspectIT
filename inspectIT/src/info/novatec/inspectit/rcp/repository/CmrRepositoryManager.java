@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -50,14 +51,16 @@ public class CmrRepositoryManager {
 	 */
 	public CmrRepositoryManager() {
 		List<CmrRepositoryDefinition> savedCmrs = PreferencesUtils.getCmrRepositoryDefinitions();
-		cmrRepositoryDefinitions.addAll(savedCmrs);
-		for (CmrRepositoryDefinition cmrRepositoryDefinition : cmrRepositoryDefinitions) {
-			for (CmrRepositoryChangeListener repositoryChangeListener : cmrRepositoryChangeListeners) {
-				cmrRepositoryDefinition.addCmrRepositoryChangeListener(repositoryChangeListener);
+		if (CollectionUtils.isNotEmpty(savedCmrs)) {
+			cmrRepositoryDefinitions.addAll(savedCmrs);
+			for (CmrRepositoryDefinition cmrRepositoryDefinition : cmrRepositoryDefinitions) {
+				for (CmrRepositoryChangeListener repositoryChangeListener : cmrRepositoryChangeListeners) {
+					cmrRepositoryDefinition.addCmrRepositoryChangeListener(repositoryChangeListener);
+				}
+				UpdateRepositoryJob updateRepositoryJob = new UpdateRepositoryJob(cmrRepositoryDefinition, true);
+				updateRepositoryJob.schedule();
+				repositoryUpdateJobMap.put(cmrRepositoryDefinition, updateRepositoryJob);
 			}
-			UpdateRepositoryJob updateRepositoryJob = new UpdateRepositoryJob(cmrRepositoryDefinition, true);
-			updateRepositoryJob.schedule();
-			repositoryUpdateJobMap.put(cmrRepositoryDefinition, updateRepositoryJob);
 		}
 	}
 

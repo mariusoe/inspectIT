@@ -1,5 +1,4 @@
 build/
 bin/
-lib/prod
-lib/test
+lib/
 

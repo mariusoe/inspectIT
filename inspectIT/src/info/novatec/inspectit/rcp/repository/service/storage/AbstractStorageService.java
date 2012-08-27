@@ -10,7 +10,6 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.storage.util.DataRetriever;
 import info.novatec.inspectit.storage.LocalStorageData;
-import info.novatec.inspectit.storage.serializer.SerializationException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -198,7 +197,7 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 				if (localStorageData.isFullyDownloaded()) {
 					try {
 						allData = dataRetriever.getDataLocally(localStorageData, descriptors);
-					} catch (SerializationException e) {
+					} catch (Exception e) {
 						InspectIT.getDefault().createErrorDialog("Exception occured trying to load the data.", e, -1);
 						return Collections.emptyList();
 					}

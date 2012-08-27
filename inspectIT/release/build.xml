@@ -72,12 +72,14 @@
 	</target>
 
 	<target name="dist-commons">
+		<ant antfile="${build.commons.file}" target="clean" inheritAll="false" useNativeBasedir="true" />
 		<ant antfile="${build.commons.file}" target="release-as-plugin" inheritAll="false" useNativeBasedir="true">
 			<property name="pluginReleaseDir" value="${buildDirectory}/plugins" />
 		</ant>
 	</target>
 
 	<target name="dist-commonscs">
+		<ant antfile="${build.commonscs.file}" target="clean" inheritAll="false" useNativeBasedir="true" />
 		<ant antfile="${build.commonscs.file}" target="release-as-plugin" inheritAll="false" useNativeBasedir="true">
 			<property name="pluginReleaseDir" value="${buildDirectory}/plugins" />
 		</ant>
@@ -85,17 +87,14 @@
 
 	<target name="init" depends="retrieve-eclipse, dist-commons, dist-commonscs">
 		<mkdir dir="${buildDirectory}" />
-		<mkdir dir="${buildDirectory}/plugins/info.novatec.inspectit.commons" />
-		<mkdir dir="${buildDirectory}/plugins/info.novatec.inspectit.commons/META-INF" />
+		<mkdir dir="${buildDirectory}/plugins" />
 		<mkdir dir="${buildDirectory}/features" />
 		<antcall target="init-ivy" />
 
 		<!-- ivy properties -->
 		<ivy:settings file="${ivy.settings.file}" />
 		<ivy:resolve file="${ivy.file}" />
-		<!-- because of the RCP build we still need to have the lib folder -->
-		<ivy:retrieve pattern="${basedir}/../lib/[conf]/[artifact].[ext]" />
-		<ivy:cachepath pathid="lib.prod" conf="prod" />
+		<ivy:cachepath pathid="lib.osgi" conf="osgi" />
 		<ivy:cachepath pathid="lib.test" conf="test" />
 
 		<copy todir="${buildDirectory}/plugins/${topLevelElementId}">
@@ -104,6 +103,19 @@
 				<include name="**" />
 			</fileset>
 		</copy>
+
+		<!-- We need to separate the real jars from sources and other artifacts -->
+		<!-- that's why we need a TMP folder -->
+		<copy todir="${buildDirectory}/plugins/tmp" flatten="true">
+			<path refid="lib.osgi" />
+		</copy>
+		<copy todir="${buildDirectory}/plugins">
+			<fileset dir="${buildDirectory}/plugins/tmp">
+				<include name="**/*.jar" />
+				<exclude name="**/*sources*.jar" />
+			</fileset>
+		</copy>
+		<delete dir="${buildDirectory}/plugins/tmp" failonerror="false" />
 	</target>
 
 	<!-- *************************************************************** -->
@@ -245,7 +257,7 @@
 		<path id="findbugs.path">
 			<pathelement path="${build.commons.classes}" />
 			<pathelement path="${build.commonscs.classes}" />
-			<path refid="lib.prod" />
+			<path refid="lib.osgi" />
 			<path refid="lib.test" />
 		</path>
 		<antcall target="findbugs" inheritrefs="true" />
@@ -324,8 +336,8 @@
 
 	<target name="-create-thirdparty-notification">
 		<echo file="${release.basedir}/thirdparty.txt" message="The inspectIT UI uses the following third party libraries: ${line.separator}
-Apache Software License, 2.0 :  jettison (1.2), httpclient(4.1.1), httpcore (4.1.1), guava (11.0.1), commons-logging (1.1.1), commons-lang (2.5), commons-collections (3.2.1), spring-core (3.1.0.RELEASE), spring-context (3.1.0.RELEASE), spring-beans (3.1.0.RELEASE), spring-web (3.1.0.RELEASE), spring-asm (3.1.0.RELEASE), spring-expression (3.1.0.RELEASE), spring-aop (3.1.0.RELEASE), cglib-nodep (2.2.2), beanlib (5.0.2beta), beanlib-hibernate (5.0.2beta), gilead-core (1.3.2), glead-hibernate (1.3.2)  ${line.separator}
-BSD License :  xstream (1.3.1), kryo (1.04), reflectasm (1.01), minlog (1.2), asm (3.3.1) ${line.separator}
+Apache Software License, 2.0 :  httpclient(4.1.1), httpcore (4.1.1), guava (11.0.1), commons-logging (1.1.1), commons-lang (2.5), commons-collections (3.2.1), commons-pool (1.6), spring-core (3.1.0.RELEASE), spring-context (3.1.0.RELEASE), spring-beans (3.1.0.RELEASE), spring-web (3.1.0.RELEASE), spring-asm (3.1.0.RELEASE), spring-expression (3.1.0.RELEASE), spring-aop (3.1.0.RELEASE), cglib-nodep (2.2.2)  ${line.separator}
+BSD License :  kryo (2.20), reflectasm (1.07), minlog (1.2), asm (4.0) ${line.separator}
 Eclipse Public License (EPL), 1.0 : nebula-cwt (0.9.0), nebula-cdatetime (0.14.0) ${line.separator}
 GNU Lesser General Public License (LGPL), 2.1 : hibernate-core (3.5.3-Final), jcommon (1.0.16), jfreechart (1.0.13), jfreechart-swt (1.0.13), jfreechart-experimental (1.0.13), swtgraphics2d (1.0.13)" />
 	</target>
