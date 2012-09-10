@@ -34,7 +34,7 @@ public class DownloadStorageWizardPage extends WizardPage {
 		super("Download Storage");
 		Assert.isNotNull(storageData);
 		this.setTitle("Download Storage");
-		this.setMessage("Options for downloading the storage '" + storageData.getName() + "' (size: " + NumberFormatter.formatBytesToMBytes(storageData.getDiskSize()) + ")");
+		this.setMessage("Options for downloading the storage '" + storageData.getName() + "' (size: " + NumberFormatter.humanReadableByteCount(storageData.getDiskSize()) + ")");
 	}
 
 	/**
@@ -48,11 +48,11 @@ public class DownloadStorageWizardPage extends WizardPage {
 		new Label(main, SWT.NONE).setText("Compress the data before download:");
 
 		compress = new Button(main, SWT.RADIO);
-		compress.setText("Yes - suggested when downloading from Internet or slow network");
+		compress.setText("Yes - suggested if downloading from Internet or slow network");
 		compress.setSelection(true);
 
 		Button dontCompress = new Button(main, SWT.RADIO);
-		dontCompress.setText("No - suggested when downloading from fast local network");
+		dontCompress.setText("No - suggested if downloading from fast local network");
 		dontCompress.setSelection(false);
 
 		setControl(main);

@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class is for formatting some output.
@@ -265,4 +266,68 @@ public final class NumberFormatter {
 		}
 	}
 
+	/**
+	 * Returns the human readable millis count.
+	 * 
+	 * If <b>shortDescription</b> is <code>true</code> then the format will be: x
+	 * days/hours/minutes/seconds depending on the time. Meaning if more than day has passed only 1
+	 * day will be returned. Otherwise if between 23-24 hours passed, 23 hours will be returned.
+	 * 
+	 * If <b>shortDescrption</b> is <code>false</code> then the the returned format is xd, xh, xm,
+	 * xs.. Not that if any unit is 0 it won't be printed.
+	 * 
+	 * @param millis
+	 *            Number of milliseconds.
+	 * @param shortDescription
+	 *            Short or long description.
+	 * @return Formated string.
+	 */
+	public static String humanReadableMillisCount(long millis, boolean shortDescription) {
+		StringBuilder stringBuilder = new StringBuilder();
+		boolean started = false;
+
+		long days = TimeUnit.MILLISECONDS.toDays(millis);
+		if (days > 0) {
+			if (shortDescription) {
+				return days + " day" + ((days > 1) ? "s" : "");
+			}
+			stringBuilder.append(String.format("%dd", days));
+			started = true;
+		}
+
+		long hours = TimeUnit.MILLISECONDS.toHours(millis) - TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays(millis));
+		if (started) {
+			stringBuilder.append(String.format(", %dh", hours));
+		} else if (hours > 0) {
+			if (shortDescription) {
+				return hours + " hour" + ((hours > 1) ? "s" : "");
+			}
+			stringBuilder.append(String.format("%dh", hours));
+			started = true;
+		}
+
+		long min = TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis));
+		if (started) {
+			stringBuilder.append(String.format(", %dm", min));
+		} else if (min > 0) {
+			if (shortDescription) {
+				return min + " minute" + ((min > 1) ? "s" : "");
+			}
+			stringBuilder.append(String.format("%dm", min));
+			started = true;
+		}
+
+		long sec = TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis));
+		if (started) {
+			stringBuilder.append(String.format(", %ds", sec));
+		} else if (sec > 0) {
+			if (shortDescription) {
+				return sec + " second" + ((sec > 1) ? "s" : "");
+			}
+			stringBuilder.append(String.format("%ds", sec));
+			started = true;
+		}
+
+		return stringBuilder.toString();
+	}
 }

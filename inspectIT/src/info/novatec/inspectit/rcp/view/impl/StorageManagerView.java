@@ -266,10 +266,6 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 		toolkit.decorateFormHeading(mainForm);
 		createHeadClient();
 
-		// filter composite
-		filterStorageComposite = new FilterStorageComposite(mainForm.getBody(), SWT.NONE);
-		filterStorageComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
 		upperComposite = toolkit.createComposite(mainForm.getBody());
 		lauout = new GridLayout(1, true);
 		lauout.marginHeight = 0;
@@ -362,7 +358,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 		gl.marginWidth = 0;
 		headClient.setLayout(gl);
 
-		new Label(headClient, SWT.NONE).setText("Show available: ");
+		new Label(headClient, SWT.NONE).setText("Show available:");
 
 		remoteStorageSelection = new Button(headClient, SWT.RADIO);
 		remoteStorageSelection.setText("Online");
@@ -378,6 +374,10 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 				updateFormBody();
 			}
 		});
+
+		// filter composite
+		filterStorageComposite = new FilterStorageComposite(headClient, SWT.NONE);
+		filterStorageComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1));
 
 		mainForm.setHeadClient(headClient);
 	}
@@ -1130,6 +1130,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 		 */
 		public FilterStorageComposite(Composite parent, int style) {
 			super(parent, style, "Filter storages");
+			((GridLayout) getLayout()).marginWidth = 0;
 		}
 
 		/**

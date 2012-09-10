@@ -479,7 +479,7 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 					} else {
 						description.setText("", false, false);
 					}
-					sizeOnDisk.setText(NumberFormatter.formatBytesToMBytes(storageData.getDiskSize()));
+					sizeOnDisk.setText(NumberFormatter.humanReadableByteCount(storageData.getDiskSize()));
 					labelsTableViewer.setInput(storageData.getLabelList());
 					labelsTableViewer.refresh();
 					addNewLabel.setEnabled(isRemoteStorageDisplayed());

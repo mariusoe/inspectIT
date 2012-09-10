@@ -73,16 +73,17 @@ public class AgentStatusData implements Serializable {
 	private long serverTimestamp;
 
 	/**
-	 * Returns the information about how much minutes passed since last data sending for the agent.
+	 * Returns the information about how much milliseconds passed since last data sending for the
+	 * agent.
 	 * <p>
 	 * This information can be obtained only if valid information is stored in
 	 * {@link #lastDataSendTimestamp} and {@link #serverTimestamp}.
 	 * 
-	 * @return {@link #minutesSinceLastData}
+	 * @return Milliseconds or <code>null</code>.
 	 */
-	public Long getMinutesSinceLastData() {
+	public Long getMillisSinceLastData() {
 		if (0 < lastDataSendTimestamp && lastDataSendTimestamp < serverTimestamp) {
-			return (serverTimestamp - lastDataSendTimestamp) / 1000 / 60;
+			return serverTimestamp - lastDataSendTimestamp;
 		} else {
 			return null;
 		}

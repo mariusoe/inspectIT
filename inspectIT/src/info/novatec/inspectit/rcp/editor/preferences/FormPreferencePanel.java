@@ -259,7 +259,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(MaximizeActiveViewHandler.PREFERENCE_PANEL_ID_PARAMETER, id);
 		CommandContributionItemParameter contributionParameters = new CommandContributionItemParameter(workbenchWindow, null, MaximizeActiveViewHandler.COMMAND_ID, params, InspectIT.getDefault()
-				.getImageDescriptor(InspectITImages.IMG_WINDOW), null, null, null, null, getTooltipTextForMaximizeContributionItem(), SWT.CHECK, null, false);
+				.getImageDescriptor(InspectITImages.IMG_WINDOW), null, null, null, null, getTooltipTextForMaximizeContributionItem(), SWT.CHECK, null, true);
 		CommandContributionItem maximizeCommandContribution = new CommandContributionItem(contributionParameters);
 		toolBarManager.add(maximizeCommandContribution);
 

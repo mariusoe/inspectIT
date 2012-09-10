@@ -72,10 +72,10 @@ public interface InspectITImages {
 	String IMG_ADD = InspectITConstants.ICON_PATH + "add.png";
 	String IMG_STORAGE_NEW = InspectITConstants.ICON_PATH + "storage_new.gif";
 	String IMG_STORAGE_OPENED = InspectITConstants.ICON_PATH + "storage_opened.png";
-	String IMG_STORAGE_RECORDING = InspectITConstants.ICON_PATH + "storage_recording.gif";
+	String IMG_STORAGE_RECORDING = InspectITConstants.ICON_PATH + "storage_recording.png";
 	String IMG_STORAGE_CLOSED = InspectITConstants.ICON_PATH + "storage_closed.png";
-	String IMG_STORAGE_AVAILABLE = InspectITConstants.ICON_PATH + "storage_available.gif";
-	String IMG_STORAGE_NOT_AVAILABLE = InspectITConstants.ICON_PATH + "storage_notavailable.gif";
+	String IMG_STORAGE_AVAILABLE = InspectITConstants.ICON_PATH + "storage_available.png";
+	String IMG_STORAGE_NOT_AVAILABLE = InspectITConstants.ICON_PATH + "storage_notavailable.png";
 	String IMG_STORAGE_DOWNLOADED = InspectITConstants.ICON_PATH + "storage_downloaded.png";
 	String IMG_ASSIGNEE_LABEL_ICON = InspectITConstants.ICON_PATH + "assignee_label.png";
 	String IMG_DATE_LABEL_ICON = IMG_LAST_WEEK;

@@ -8,6 +8,7 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
+import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageData.StorageState;
 import info.novatec.inspectit.storage.WritingStatus;
@@ -176,7 +177,10 @@ public final class ImageFormatter {
 	 * @return Image for the title box.
 	 */
 	public static Image getStorageRepositoryImage(StorageRepositoryDefinition storageRepositoryDefinition) {
-		if (storageRepositoryDefinition.getLocalStorageData().isFullyDownloaded() || storageRepositoryDefinition.getCmrRepositoryDefinition().getOnlineStatus() != OnlineStatus.OFFLINE) {
+		LocalStorageData localStorageData = storageRepositoryDefinition.getLocalStorageData();
+		if (localStorageData.isFullyDownloaded()) {
+			return InspectIT.getDefault().getImage(InspectITImages.IMG_STORAGE_DOWNLOADED);
+		} else if (storageRepositoryDefinition.getCmrRepositoryDefinition().getOnlineStatus() != OnlineStatus.OFFLINE) {
 			return InspectIT.getDefault().getImage(InspectITImages.IMG_STORAGE_AVAILABLE);
 		} else {
 			return InspectIT.getDefault().getImage(InspectITImages.IMG_STORAGE_NOT_AVAILABLE);
@@ -242,9 +246,10 @@ public final class ImageFormatter {
 	 */
 	public static Image getAgentLeafImage(AgentLeaf agentLeaf) {
 		AgentStatusData agentStatusData = agentLeaf.getAgentStatusData();
-		if (null != agentStatusData && null != agentStatusData.getMinutesSinceLastData()) {
-			long minutes = agentStatusData.getMinutesSinceLastData().longValue();
-			if (minutes > 0) {
+		if (null != agentStatusData && null != agentStatusData.getMillisSinceLastData()) {
+			long millis = agentStatusData.getMillisSinceLastData().longValue();
+			// at last one minute of not sending data to display as the non active
+			if (millis > 60000) {
 				return InspectIT.getDefault().getImage(InspectITImages.IMG_AGENT_YELLOW);
 			} else {
 				return InspectIT.getDefault().getImage(InspectITImages.IMG_AGENT_GREEN);

@@ -120,7 +120,7 @@ public class StorageInfoComposite extends Composite {
 				desc = storageData.getDescription();
 			}
 			description.setText(desc);
-			size.setText(NumberFormatter.formatBytesToMBytes(storageData.getDiskSize()));
+			size.setText(NumberFormatter.humanReadableByteCount(storageData.getDiskSize()));
 			if (showDataDownloaded) {
 				LocalStorageData localStorageData = null;
 				if (storageData instanceof LocalStorageData) {

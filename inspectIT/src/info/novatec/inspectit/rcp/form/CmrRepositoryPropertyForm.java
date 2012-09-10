@@ -513,6 +513,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 		if (!dataLoaded) {
 			recordingStorage.setText("");
 			recTimeBar.setVisible(false);
+			recTime.setVisible(false);
 			recordingStatusIcon.setImage(null);
 			recordingStatusIcon.setToolTipText("");
 			recordingLabel.setText("Not Active");
@@ -580,11 +581,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 						}
 						String string;
 						if (millisMore > 0) {
-							long sec = (millisMore / 1000) % 60;
-							long minutes = millisMore / (1000 * 60) % 60;
-							long hours = millisMore / (1000 * 60 * 60) % 24;
-							long days = millisMore / (1000 * 60 * 60 * 24);
-							string = days + "d, " + hours + "h, " + minutes + "m, " + sec + "s";
+							string = NumberFormatter.humanReadableMillisCount(millisMore, false);
 						} else {
 							string = "";
 						}

@@ -534,7 +534,11 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 */
 	public void repositoryOnlineStatusUpdated(CmrRepositoryDefinition repositoryDefinition, OnlineStatus oldStatus, OnlineStatus newStatus) {
 		if (newStatus != OnlineStatus.CHECKING) {
-			if (ObjectUtils.equals(displayedRepositoryDefinition, repositoryDefinition)) {
+			boolean shouldUpdate = ObjectUtils.equals(displayedRepositoryDefinition, repositoryDefinition);
+			if (displayedRepositoryDefinition instanceof StorageRepositoryDefinition) {
+				shouldUpdate |= ObjectUtils.equals(((StorageRepositoryDefinition) displayedRepositoryDefinition).getCmrRepositoryDefinition(), repositoryDefinition);
+			}
+			if (shouldUpdate) {
 				OnlineStatus cachedStatus = cachedOnlineStatus.get(repositoryDefinition);
 				if (cachedStatus == OnlineStatus.OFFLINE && newStatus == OnlineStatus.ONLINE) {
 					updateAvailableAgents(displayedRepositoryDefinition);

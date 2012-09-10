@@ -233,7 +233,7 @@ public final class TextFormatter {
 		if (InspectIT.getDefault().getInspectITStorageManager().isFullyDownloaded(storageData)) {
 			styledString.append(", Downloaded", StyledString.DECORATIONS_STYLER);
 		}
-		styledString.append(", " + NumberFormatter.formatBytesToMBytes(storageData.getDiskSize()), StyledString.DECORATIONS_STYLER);
+		styledString.append(", " + NumberFormatter.humanReadableByteCount(storageData.getDiskSize()), StyledString.DECORATIONS_STYLER);
 		return styledString;
 	}
 
@@ -250,7 +250,7 @@ public final class TextFormatter {
 		styledString.append(" ");
 		styledString.append("[Local Disk]", StyledString.QUALIFIER_STYLER);
 		styledString.append(" - ");
-		styledString.append(NumberFormatter.formatBytesToMBytes(localStorageData.getDiskSize()), StyledString.DECORATIONS_STYLER);
+		styledString.append(NumberFormatter.humanReadableByteCount(localStorageData.getDiskSize()), StyledString.DECORATIONS_STYLER);
 		return styledString;
 	}
 
@@ -268,10 +268,11 @@ public final class TextFormatter {
 		styledString.append("[" + agentLeaf.getPlatformIdent().getVersion() + "]", StyledString.QUALIFIER_STYLER);
 		styledString.append(" - ");
 		AgentStatusData agentStatusData = agentLeaf.getAgentStatusData();
-		if (null != agentStatusData && null != agentStatusData.getMinutesSinceLastData()) {
-			long minutes = agentStatusData.getMinutesSinceLastData().longValue();
-			if (minutes > 0) {
-				styledString.append("Last data sent " + minutes + " min ago", StyledString.DECORATIONS_STYLER);
+		if (null != agentStatusData && null != agentStatusData.getMillisSinceLastData()) {
+			long millis = agentStatusData.getMillisSinceLastData().longValue();
+			// at last one minute of not sending data to display as the non active
+			if (millis > 60000) {
+				styledString.append("Last data sent " + NumberFormatter.humanReadableMillisCount(millis, true) + " ago", StyledString.DECORATIONS_STYLER);
 			} else {
 				styledString.append("Sending data", StyledString.DECORATIONS_STYLER);
 			}
