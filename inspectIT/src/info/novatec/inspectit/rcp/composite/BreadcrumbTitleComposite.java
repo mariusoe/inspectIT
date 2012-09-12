@@ -105,7 +105,7 @@ public class BreadcrumbTitleComposite extends Composite implements CmrRepository
 
 		Composite breadcrumbComposite = new Composite(this, SWT.NONE);
 		breadcrumbComposite.setLayout(new GridLayout(7, false));
-		breadcrumbComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		breadcrumbComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 		repositoryLabel = new CLabel(breadcrumbComposite, SWT.NONE);
 		repositoryLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
@@ -127,7 +127,7 @@ public class BreadcrumbTitleComposite extends Composite implements CmrRepository
 
 		// create tool-bar and its manager
 		ToolBar toolbar = new ToolBar(this, SWT.FLAT);
-		toolbar.setLayoutData(new GridData(SWT.END, SWT.FILL, false, false));
+		toolbar.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 		toolBarManager = new ToolBarManager(toolbar);
 	}
 
