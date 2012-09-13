@@ -270,12 +270,19 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void doubleClick(DoubleClickEvent event) {
-		// double click on an sql item will open a details window
-		TableViewer tableViewer = (TableViewer) event.getSource();
-		IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-		Shell parent = tableViewer.getTable().getShell();
-		showDetails(parent, selection.getFirstElement());
+	public void doubleClick(final DoubleClickEvent event) {
+		if (canShowDetails()) {
+			// double click on an exception item will open a details window
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					TableViewer tableViewer = (TableViewer) event.getSource();
+					IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+					Shell parent = tableViewer.getTable().getShell();
+					showDetails(parent, selection.getFirstElement());
+				}
+			});
+		}
 	}
 
 	/**
