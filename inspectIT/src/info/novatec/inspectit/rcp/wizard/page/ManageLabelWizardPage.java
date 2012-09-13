@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -47,15 +48,21 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -561,7 +568,18 @@ public class ManageLabelWizardPage extends WizardPage {
 		 */
 		private AbstractStorageLabelType<?> createdLabelType;
 
+		/**
+		 * Keys of the images that can be used in custom labels.
+		 */
+		private final String[] imageKeys;
+
+		/**
+		 * Index of the selected image key.
+		 */
+		private int selectedImageKeyIndex = -1;
+
 		/** Widgets. */
+		private Button[] imageButtons;
 		private Button okButton;
 		private Composite main;
 		private Text name;
@@ -577,6 +595,7 @@ public class ManageLabelWizardPage extends WizardPage {
 		 */
 		public CreateLabelTypeDialog(Shell parentShell) {
 			super(parentShell);
+			this.imageKeys = ImageFormatter.LABEL_ICONS;
 		}
 
 		/**
@@ -649,6 +668,62 @@ public class ManageLabelWizardPage extends WizardPage {
 			noButton = new Button(main, SWT.RADIO);
 			noButton.setText("No");
 
+			Label l = new Label(main, SWT.NONE);
+			l.setText("Icon:");
+			l.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+
+			final ScrolledComposite scrolledComposite = new ScrolledComposite(main, SWT.V_SCROLL | SWT.BORDER);
+			gd = new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1);
+			gd.widthHint = 1;
+			gd.heightHint = 120;
+			scrolledComposite.setLayoutData(gd);
+
+			final Composite iconComposite = new Composite(scrolledComposite, SWT.NONE);
+			iconComposite.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+
+			// create buttons for selecting images
+			SelectionAdapter buttonListener = new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					for (int i = 0; i < imageButtons.length; i++) {
+						if (Objects.equals(imageButtons[i], e.widget)) {
+							if (selectedImageKeyIndex == i) {
+								// de-selection occurred
+								selectedImageKeyIndex = -1;
+							} else {
+								selectedImageKeyIndex = i;
+							}
+						} else {
+							imageButtons[i].setSelection(false);
+						}
+					}
+				}
+			};
+			imageButtons = new Button[imageKeys.length];
+			for (int i = 0; i < imageKeys.length; i++) {
+				Button button = new Button(iconComposite, SWT.TOGGLE);
+				button.setImage(InspectIT.getDefault().getImage(imageKeys[i]));
+				button.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+				button.addSelectionListener(buttonListener);
+				imageButtons[i] = button;
+			}
+
+			RowLayout layout = new RowLayout(SWT.HORIZONTAL);
+			layout.wrap = true;
+			layout.fill = true;
+			layout.justify = true;
+			layout.spacing = 7;
+			iconComposite.setLayout(layout);
+			scrolledComposite.setContent(iconComposite);
+			scrolledComposite.setExpandVertical(true);
+			scrolledComposite.setExpandHorizontal(true);
+			scrolledComposite.addControlListener(new ControlAdapter() {
+				public void controlResized(ControlEvent e) {
+					Rectangle r = scrolledComposite.getClientArea();
+					scrolledComposite.setMinSize(iconComposite.computeSize(r.width, SWT.DEFAULT));
+				}
+			});
+
 			final Listener listener = new Listener() {
 				@Override
 				public void handleEvent(Event event) {
@@ -687,6 +762,9 @@ public class ManageLabelWizardPage extends WizardPage {
 			AbstractCustomStorageLabelType<?> labelType = availableTypes[valueTypeSelection.getSelectionIndex()];
 			labelType.setName(name.getText().trim());
 			labelType.setOnePerStorage(yesButton.getSelection());
+			if (selectedImageKeyIndex >= 0 && selectedImageKeyIndex < imageKeys.length) {
+				labelType.setImageKey(imageKeys[selectedImageKeyIndex]);
+			}
 			return labelType;
 		}
 

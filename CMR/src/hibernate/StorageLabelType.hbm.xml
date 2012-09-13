@@ -22,21 +22,25 @@
 		<subclass name="info.novatec.inspectit.storage.label.type.impl.CustomBooleanLabelType" discriminator-value="CBLT" >
 			<property name="name" unique="true"/>
 			<property name="onePerStorage" />
+			<property name="imageKey" />
 		</subclass>
 
 		<subclass name="info.novatec.inspectit.storage.label.type.impl.CustomDateLabelType" discriminator-value="CDLT" >
 			<property name="name" unique="true" />
 			<property name="onePerStorage" />
+			<property name="imageKey" />
 		</subclass>
 
 		<subclass name="info.novatec.inspectit.storage.label.type.impl.CustomNumberLabelType" discriminator-value="CNLT" >
 			<property name="name" unique="true" />
 			<property name="onePerStorage" />
+			<property name="imageKey" />
 		</subclass>
 
 		<subclass name="info.novatec.inspectit.storage.label.type.impl.CustomStringLabelType" discriminator-value="CSLT" >
 			<property name="name" unique="true" />
 			<property name="onePerStorage" />
+			<property name="imageKey" />
 		</subclass>
 
 	</class>

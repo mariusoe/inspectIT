@@ -2,6 +2,14 @@ package info.novatec.inspectit.storage.label.type;
 
 import java.io.Serializable;
 
+/**
+ * Abstract class for all custom storage label types.
+ * 
+ * @author Ivan Senic
+ * 
+ * @param <V>
+ *            Type of value label is holding.
+ */
 public abstract class AbstractCustomStorageLabelType<V> extends AbstractStorageLabelType<V> implements Serializable {
 
 	/**
@@ -18,6 +26,11 @@ public abstract class AbstractCustomStorageLabelType<V> extends AbstractStorageL
 	 * Name of this custom label type.
 	 */
 	private String name;
+
+	/**
+	 * Key of the image that will be used for the label.
+	 */
+	private String imageKey;
 
 	/**
 	 * {@inheritDoc}
@@ -75,6 +88,25 @@ public abstract class AbstractCustomStorageLabelType<V> extends AbstractStorageL
 	}
 
 	/**
+	 * Gets {@link #imageKey}.
+	 * 
+	 * @return {@link #imageKey}
+	 */
+	public String getImageKey() {
+		return imageKey;
+	}
+
+	/**
+	 * Sets {@link #imageKey}.
+	 * 
+	 * @param imageKey
+	 *            New value for {@link #imageKey}
+	 */
+	public void setImageKey(String imageKey) {
+		this.imageKey = imageKey;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -83,6 +115,7 @@ public abstract class AbstractCustomStorageLabelType<V> extends AbstractStorageL
 		int result = 1;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + (onePerStorage ? 1231 : 1237);
+		result = prime * result + ((imageKey == null) ? 0 : imageKey.hashCode());
 		return result;
 	}
 
@@ -109,6 +142,13 @@ public abstract class AbstractCustomStorageLabelType<V> extends AbstractStorageL
 			return false;
 		}
 		if (onePerStorage != other.onePerStorage) {
+			return false;
+		}
+		if (imageKey == null) {
+			if (other.imageKey != null) {
+				return false;
+			}
+		} else if (!imageKey.equals(other.imageKey)) {
 			return false;
 		}
 		return true;

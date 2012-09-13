@@ -36,6 +36,19 @@ import org.eclipse.swt.graphics.Image;
 public final class ImageFormatter {
 
 	/**
+	 * List of icons that can be used for custom labels.
+	 */
+	public static final String[] LABEL_ICONS = new String[] { InspectITImages.IMG_ADDRESSBOOK, InspectITImages.IMG_APPLICATIONS, InspectITImages.IMG_CANCEL, InspectITImages.IMG_DOLLAR,
+			InspectITImages.IMG_EURO, InspectITImages.IMG_FAVORITES, InspectITImages.IMG_HARDDISK, InspectITImages.IMG_HOME, InspectITImages.IMG_JUNK_FULL, InspectITImages.IMG_MAIL,
+			InspectITImages.IMG_PROTECTION, InspectITImages.IMG_SMILEY, InspectITImages.IMG_TELEPHONE, InspectITImages.IMG_WARNING, InspectITImages.IMG_ACTIVITY, InspectITImages.IMG_CALENDAR,
+			InspectITImages.IMG_ASSIGNEE_LABEL_ICON, InspectITImages.IMG_CALCULATOR, InspectITImages.IMG_CHECKMARK, InspectITImages.IMG_CLASS, InspectITImages.IMG_PACKAGE,
+			InspectITImages.IMG_METHOD_DEFAULT, InspectITImages.IMG_MEMORY_OVERVIEW, InspectITImages.IMG_CPU_OVERVIEW, InspectITImages.IMG_THREADS_OVERVIEW, InspectITImages.IMG_DATABASE,
+			InspectITImages.IMG_DATE_LABEL_ICON, InspectITImages.IMG_USECASE_LABEL_ICON, InspectITImages.IMG_RATING_LABEL_ICON, InspectITImages.IMG_STATUS_LABEL_ICON, InspectITImages.IMG_SEARCH,
+			InspectITImages.IMG_TIMER, InspectITImages.IMG_TOOL, InspectITImages.IMG_TRASH, InspectITImages.IMG_LIGHT_BULB_ON, InspectITImages.IMG_PROPERTIES, InspectITImages.IMG_LAST_HOUR,
+			InspectITImages.IMG_FONT, InspectITImages.IMG_INFORMATION, InspectITImages.IMG_FILTER, InspectITImages.IMG_HTTP_AGGREGATE, InspectITImages.IMG_EVENT_GREEN, InspectITImages.IMG_EVENT_RED,
+			InspectITImages.IMG_EVENT_YELLOW };
+
+	/**
 	 * Private constructor.
 	 */
 	private ImageFormatter() {
@@ -49,21 +62,7 @@ public final class ImageFormatter {
 	 * @return {@link Image} for {@link Composite}.
 	 */
 	public static Image getImageForLabel(AbstractStorageLabelType<?> labelType) {
-		if (AssigneeLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImage(InspectITImages.IMG_ASSIGNEE_LABEL_ICON);
-		} else if (CreationDateLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImage(InspectITImages.IMG_DATE_LABEL_ICON);
-		} else if (ExploredByLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImage(InspectITImages.IMG_MOUNTEDBY_LABEL_ICON);
-		} else if (RatingLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImage(InspectITImages.IMG_RATING_LABEL_ICON);
-		} else if (StatusLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImage(InspectITImages.IMG_STATUS_LABEL_ICON);
-		} else if (UseCaseLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImage(InspectITImages.IMG_USECASE_LABEL_ICON);
-		} else {
-			return InspectIT.getDefault().getImage(InspectITImages.IMG_USER_LABEL_ICON);
-		}
+		return InspectIT.getDefault().getImage(getImageKeyForLabel(labelType));
 	}
 
 	/**
@@ -74,31 +73,48 @@ public final class ImageFormatter {
 	 * @return {@link ImageDescriptor} for {@link Composite}.
 	 */
 	public static ImageDescriptor getImageDescriptorForLabel(AbstractStorageLabelType<?> labelType) {
+		return InspectIT.getDefault().getImageDescriptor(getImageKeyForLabel(labelType));
+	}
+
+	/**
+	 * Returns the image key for the label type.
+	 * 
+	 * @param labelType
+	 *            Label type.
+	 * @return String that represents the image key. Will never be <code>null</code>.
+	 */
+	private static String getImageKeyForLabel(AbstractStorageLabelType<?> labelType) {
 		if (AssigneeLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_ASSIGNEE_LABEL_ICON);
+			return InspectITImages.IMG_ASSIGNEE_LABEL_ICON;
 		} else if (CreationDateLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_DATE_LABEL_ICON);
+			return InspectITImages.IMG_DATE_LABEL_ICON;
 		} else if (ExploredByLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_MOUNTEDBY_LABEL_ICON);
+			return InspectITImages.IMG_MOUNTEDBY_LABEL_ICON;
 		} else if (RatingLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_RATING_LABEL_ICON);
+			return InspectITImages.IMG_RATING_LABEL_ICON;
 		} else if (StatusLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_STATUS_LABEL_ICON);
+			return InspectITImages.IMG_STATUS_LABEL_ICON;
 		} else if (UseCaseLabelType.class.equals(labelType.getClass())) {
-			return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_USECASE_LABEL_ICON);
-		} else if (AbstractCustomStorageLabelType.class.isAssignableFrom(labelType.getClass())) {
+			return InspectITImages.IMG_USECASE_LABEL_ICON;
+		} else if (labelType instanceof AbstractCustomStorageLabelType) {
 			AbstractCustomStorageLabelType<?> customLabelType = (AbstractCustomStorageLabelType<?>) labelType;
+			if (null != customLabelType.getImageKey()) {
+				// assure that the image key is registered in the image registry
+				if (null != InspectIT.getDefault().getImage(customLabelType.getImageKey())) { // NOPMD
+					return customLabelType.getImageKey();
+				}
+			}
 			if (Boolean.class.equals(customLabelType.getValueClass())) {
-				return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_CHECKMARK);
+				return InspectITImages.IMG_CHECKMARK;
 			} else if (Date.class.equals(customLabelType.getValueClass())) {
-				return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_CALENDAR);
+				return InspectITImages.IMG_CALENDAR;
 			} else if (Number.class.equals(customLabelType.getValueClass())) {
-				return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_CALCULATOR);
+				return InspectITImages.IMG_CALCULATOR;
 			} else if (String.class.equals(customLabelType.getValueClass())) {
-				return InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_USER_LABEL_ICON);
+				return InspectITImages.IMG_USER_LABEL_ICON;
 			}
 		}
-		return null;
+		return InspectITImages.IMG_USER_LABEL_ICON;
 	}
 
 	/**

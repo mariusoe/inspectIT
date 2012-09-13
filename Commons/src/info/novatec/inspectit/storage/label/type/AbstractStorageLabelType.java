@@ -4,6 +4,14 @@ import info.novatec.inspectit.storage.StorageData;
 
 import java.io.Serializable;
 
+/**
+ * Abstract class for all storage label types.
+ * 
+ * @author Ivan Senic
+ * 
+ * @param <V>
+ *            Type of value label is holding.
+ */
 public abstract class AbstractStorageLabelType<V> implements Serializable, Comparable<AbstractStorageLabelType<?>> {
 
 	/**

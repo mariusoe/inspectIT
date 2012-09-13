@@ -108,5 +108,19 @@ public interface InspectITImages {
 	String IMG_CALENDAR = InspectITConstants.ICON_PATH + "calendar.png";
 	String IMG_CALCULATOR = InspectITConstants.ICON_PATH + "calculator.png";
 	String IMG_LABEL = InspectITConstants.ICON_PATH + "label.png";
+	String IMG_ADDRESSBOOK = InspectITConstants.ICON_PATH + "addressbook.png";
+	String IMG_APPLICATIONS = InspectITConstants.ICON_PATH + "applications.png";
+	String IMG_CANCEL = InspectITConstants.ICON_PATH + "cancel.png";
+	String IMG_DOLLAR = InspectITConstants.ICON_PATH + "dollar.png";
+	String IMG_EURO = InspectITConstants.ICON_PATH + "euro.png";
+	String IMG_FAVORITES = InspectITConstants.ICON_PATH + "favorites.png";
+	String IMG_HARDDISK = InspectITConstants.ICON_PATH + "harddisk.png";
+	String IMG_HOME = InspectITConstants.ICON_PATH + "home.png";
+	String IMG_JUNK_FULL = InspectITConstants.ICON_PATH + "junk_full.png";
+	String IMG_MAIL = InspectITConstants.ICON_PATH + "mail.png";
+	String IMG_PROTECTION = InspectITConstants.ICON_PATH + "protection.png";
+	String IMG_SMILEY = InspectITConstants.ICON_PATH + "smiley.png";
+	String IMG_TELEPHONE = InspectITConstants.ICON_PATH + "telephone.png";
+	String IMG_WARNING = InspectITConstants.ICON_PATH + "warning.png";
 
 }
