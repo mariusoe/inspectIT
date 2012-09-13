@@ -3,6 +3,7 @@ package info.novatec.inspectit.agent.sensor.method.http;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.util.StringConstraint;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -390,15 +391,16 @@ class HttpRequestParameterExtractor {
 		}
 		if (attribute.getClass().isArray()) {
 			StringBuilder stringBuilder = new StringBuilder("[");
-			Object[] array = (Object[]) attribute;
 			boolean isFirst = true;
-			for (Object object : array) {
+
+			int length = Array.getLength(attribute);
+			for (int i = 0; i < length; i++) {
 				if (isFirst) {
-					stringBuilder.append(object.toString());
+					stringBuilder.append(Array.get(attribute, i));
 					isFirst = false;
 				} else {
 					stringBuilder.append(", ");
-					stringBuilder.append(object.toString());
+					stringBuilder.append(Array.get(attribute, i));
 				}
 			}
 			stringBuilder.append("]");

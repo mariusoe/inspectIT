@@ -206,6 +206,36 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 	}
 
 	@Test
+	public void readArrayAttributesPrimitivesInteger() {
+		final String att1 = "a1";
+		final String att2 = "a2";
+		final int[] att1Value = { 1, 2, 3 };
+		final int[] att2Value = { 2, 3, 4 };
+		final Vector<String> attributesList = new Vector<String>() {
+			{
+				add(att1);
+				add(att2);
+			}
+		};
+		final Enumeration<String> attributes = attributesList.elements();
+
+		when(httpServletRequest.getAttributeNames()).thenReturn(attributes);
+		when(httpServletRequest.getAttribute(att1)).thenReturn(att1Value);
+		when(httpServletRequest.getAttribute(att2)).thenReturn(att2Value);
+
+		Map<String, String> result = extractor.getAttributes(httpServletRequest.getClass(), httpServletRequest);
+
+		final String extractedAttribute1Value = "[1, 2, 3]";
+		final String extractedAttribute2Value = "[2, 3, 4]";
+		Assert.assertEquals(result, new HashMap<String, String>() {
+			{
+				put(att1, extractedAttribute1Value);
+				put(att2, extractedAttribute2Value);
+			}
+		});
+	}
+
+	@Test
 	public void readAttributesNull() {
 		Map<String, String> result = extractor.getAttributes(httpServletRequest.getClass(), httpServletRequest);
 
