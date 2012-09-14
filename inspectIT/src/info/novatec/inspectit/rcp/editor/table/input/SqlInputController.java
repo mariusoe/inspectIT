@@ -8,6 +8,8 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.ISubView;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
+import info.novatec.inspectit.rcp.editor.inputdefinition.extra.SqlStatementInputDefinitionExtra;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
@@ -191,6 +193,11 @@ public class SqlInputController extends AbstractTableInputController {
 		template = new SqlStatementData();
 		template.setPlatformIdent(inputDefinition.getIdDefinition().getPlatformId());
 		template.setId(-1);
+
+		if (inputDefinition.hasInputDefinitionExtra(InputDefinitionExtrasMarkerFactory.SQL_STATEMENT_EXTRAS_MARKER)) {
+			SqlStatementInputDefinitionExtra inputDefinitionExtra = inputDefinition.getInputDefinitionExtra(InputDefinitionExtrasMarkerFactory.SQL_STATEMENT_EXTRAS_MARKER);
+			template.setSql(inputDefinitionExtra.getSql());
+		}
 
 		dataAccessService = inputDefinition.getRepositoryDefinition().getSqlDataAccessService();
 		cachedDataService = inputDefinition.getRepositoryDefinition().getCachedDataService();

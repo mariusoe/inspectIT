@@ -186,6 +186,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 
 		template = new TimerData();
 		template.setPlatformIdent(inputDefinition.getIdDefinition().getPlatformId());
+		template.setMethodIdent(inputDefinition.getIdDefinition().getMethodId());
 
 		timerDataAccessService = inputDefinition.getRepositoryDefinition().getTimerDataAccessService();
 		cachedDataService = inputDefinition.getRepositoryDefinition().getCachedDataService();

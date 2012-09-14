@@ -59,6 +59,17 @@ public final class InputDefinitionExtrasMarkerFactory {
 		}
 
 	};
+	
+	/**
+	 * Marker for {@link SqlStatementInputDefinitionExtra}.
+	 */
+	public static final InputDefinitionExtraMarker<SqlStatementInputDefinitionExtra> SQL_STATEMENT_EXTRAS_MARKER = new InputDefinitionExtraMarker<SqlStatementInputDefinitionExtra>() {
+		@Override
+		public Class<SqlStatementInputDefinitionExtra> getInputDefinitionExtraClass() {
+			return SqlStatementInputDefinitionExtra.class;
+		}
+
+	};	
 
 	/**
 	 * Abstract class for input definition extras marker.

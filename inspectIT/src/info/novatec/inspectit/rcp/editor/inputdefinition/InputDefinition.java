@@ -37,7 +37,7 @@ public class InputDefinition {
 		 * If an ID is not in use ({@link #platformId}, {@link #sensorTypeId}, {@link #methodId}) it
 		 * is set to this value to indicate this.
 		 */
-		public static final long ID_NOT_USED = -1;
+		public static final long ID_NOT_USED = 0;
 
 		/**
 		 * The ID of the platform for the view. Default is {@link ID_NOT_USED}.

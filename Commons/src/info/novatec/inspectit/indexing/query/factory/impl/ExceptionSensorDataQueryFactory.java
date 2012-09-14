@@ -41,12 +41,8 @@ public class ExceptionSensorDataQueryFactory<E extends IIndexQuery> extends Abst
 	public E getUngroupedExceptionOverviewQuery(ExceptionSensorData template, int limit, Date fromDate, Date toDate) {
 		E query = getIndexQueryProvider().getIndexQuery();
 		query.setPlatformIdent(template.getPlatformIdent());
-		if (template.getSensorTypeIdent() != -1) {
-			query.setSensorTypeIdent(template.getSensorTypeIdent());
-		}
-		if (template.getMethodIdent() != -1) {
-			query.setMethodIdent(template.getMethodIdent());
-		}
+		query.setSensorTypeIdent(template.getSensorTypeIdent());
+		query.setMethodIdent(template.getMethodIdent());
 		if (null != template.getThrowableType()) {
 			query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("throwableType", template.getThrowableType()));
 		}

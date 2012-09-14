@@ -1,15 +1,22 @@
 package info.novatec.inspectit.rcp.editor.testers;
 
+import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationAwareData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
+import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
+import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
+import info.novatec.inspectit.rcp.model.SensorTypeEnum;
+import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
 import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Tester for all navigations.
@@ -31,9 +38,9 @@ public class NavigationTester extends PropertyTester {
 				if (selectedObject instanceof InvocationSequenceData) {
 					// only navigate if a real TimerData is provided (not for HttpTimerData or SQL)
 					TimerData timerData = ((InvocationSequenceData) selectedObject).getTimerData();
-					return null != timerData && timerData.getClass().equals(TimerData.class);
-				} else if (selectedObject.getClass().equals(TimerData.class)) {
-					return true;
+					return isTimerSensorBounded(timerData);
+				} else if (selectedObject instanceof TimerData) {
+					return isTimerSensorBounded((TimerData) selectedObject);
 				}
 			}
 		} else if ("canNavigateToInvocations".equals(property)) {
@@ -64,9 +71,57 @@ public class NavigationTester extends PropertyTester {
 			} else if (selectedObject instanceof ExceptionSensorData) {
 				return ((ExceptionSensorData) selectedObject).getThrowableType() != null;
 			}
+		} else if ("canNavigateToAggregatedTimerData".equals(property)) {
+			if (receiver instanceof StructuredSelection) {
+				StructuredSelection selection = (StructuredSelection) receiver;
+				Object selectedObject = selection.getFirstElement();
+				if (selectedObject instanceof InvocationSequenceData) {
+					// only navigate if a real TimerData is provided (not for HttpTimerData or SQL)
+					TimerData timerData = ((InvocationSequenceData) selectedObject).getTimerData();
+					return isTimerSensorBounded(timerData);
+				} else if (selectedObject instanceof TimerData) {
+					return isTimerSensorBounded((TimerData) selectedObject);
+				}
+			}
+		} else if ("canNavigateToAggregatedSqlData".equals(property)) {
+			if (receiver instanceof StructuredSelection) {
+				StructuredSelection selection = (StructuredSelection) receiver;
+				Object selectedObject = selection.getFirstElement();
+				if (selectedObject instanceof InvocationSequenceData) {
+					return null != ((InvocationSequenceData) selectedObject).getSqlStatementData();
+				} else if (selectedObject instanceof SqlStatementData) {
+					return true;
+				}
+			}
 		}
 
 		return false;
 	}
 
+	/**
+	 * Checks if the given timer data has a sensor type that equals {@link SensorTypeEnum#TIMER} or
+	 * {@link SensorTypeEnum#AVERAGE_TIMER}, so that a special navigation types are possible or not.
+	 * 
+	 * @param timerData
+	 *            {@link TimerData} to check.
+	 * @return True if given object is of a TimerData class and mentioned sensor types are
+	 *         registered. False otherwise.
+	 */
+	private boolean isTimerSensorBounded(TimerData timerData) {
+		if (null == timerData || !timerData.getClass().equals(TimerData.class)) {
+			return false;
+		}
+
+		IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+		if (editor instanceof AbstractRootEditor) {
+			RepositoryDefinition repositoryDefinition = ((AbstractRootEditor) editor).getInputDefinition().getRepositoryDefinition();
+			SensorTypeIdent sensorTypeIdent = repositoryDefinition.getCachedDataService().getSensorTypeIdentForId(timerData.getSensorTypeIdent());
+			if (null != sensorTypeIdent) {
+				SensorTypeEnum sensorTypeEnum = SensorTypeEnum.get(sensorTypeIdent.getFullyQualifiedClassName());
+				return sensorTypeEnum == SensorTypeEnum.TIMER || sensorTypeEnum == SensorTypeEnum.AVERAGE_TIMER;
+			}
+		}
+
+		return false;
+	}
 }
