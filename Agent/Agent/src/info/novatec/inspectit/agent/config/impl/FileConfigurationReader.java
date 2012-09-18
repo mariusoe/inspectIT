@@ -85,11 +85,6 @@ public class FileConfigurationReader implements IConfigurationReader {
 	private final Pattern emptyMethodSignature = Pattern.compile(".*\\(\\)");
 
 	/**
-	 * The configuration file.
-	 */
-	private File configFile;
-
-	/**
 	 * Default constructor which accepts one parameter.
 	 * 
 	 * @param configurationStorage
@@ -115,11 +110,11 @@ public class FileConfigurationReader implements IConfigurationReader {
 
 		// Load and parse the file
 		try {
-			configFile = new File(pathToConfig);
+			File configFile = new File(pathToConfig);
 			InputStream is = new FileInputStream(configFile);
 			LOGGER.finer("Agent Configuration file found at: " + configFile.getAbsolutePath());
 			InputStreamReader reader = new InputStreamReader(is);
-			this.parse(reader);
+			this.parse(reader, pathToConfig);
 
 			// check if the exlude class patterns were supplied
 			// if not add the defualt ones to the configuration
@@ -141,10 +136,12 @@ public class FileConfigurationReader implements IConfigurationReader {
 	 * 
 	 * @param reader
 	 *            The reader to open and parse.
+	 * @param pathToConfig 
+	 *            The path to the configuration file.
 	 * @throws ParserException
 	 *             Thrown if there was an exception caught by parsing the config file.
 	 */
-	private void parse(Reader reader) throws ParserException {
+	private void parse(Reader reader, String pathToConfig) throws ParserException {
 		// check for a valid Reader object
 		if (null == reader) {
 			throw new ParserException("Input is null! Aborting parsing.");
@@ -214,7 +211,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 
 				// check for a file include
 				if (discriminator.equalsIgnoreCase(CONFIG_INCLUDE_FILE)) {
-					processIncludeFileLine(tokenizer);
+					processIncludeFileLine(tokenizer, pathToConfig);
 					continue;
 				}
 
@@ -513,14 +510,14 @@ public class FileConfigurationReader implements IConfigurationReader {
 	 * @throws ParserException
 	 *             Thrown if there was an exception caught by parsing the config file.
 	 */
-	private void processIncludeFileLine(StringTokenizer tokenizer) throws ParserException {
+	private void processIncludeFileLine(StringTokenizer tokenizer, String pathToParentFile) throws ParserException {
 		String fileName = tokenizer.nextToken();
 
 		File file = new File(fileName);
 		if (!file.isAbsolute()) {
 			// if the file does not denote an absolute file, we have to prepend
 			// the folder in which the current configuration is loaded.
-			file = new File(configFile.getParent() + File.separator + fileName);
+			file = new File(new File(pathToParentFile).getParent() + File.separator + fileName);
 		}
 		if (file.isDirectory()) {
 			LOGGER.info("Specified additional configuration is a folder: " + file.getAbsolutePath() + ", aborting!");
@@ -531,7 +528,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 			InputStream is = new FileInputStream(file);
 			LOGGER.info("Additional agent configuration file found at: " + file.getAbsolutePath());
 			InputStreamReader reader = new InputStreamReader(is);
-			this.parse(reader);
+			this.parse(reader, file.getAbsolutePath());
 		} catch (FileNotFoundException e) {
 			LOGGER.info("Additional agent configuration file not found at " + file.getAbsolutePath() + ", aborting!");
 			throw new ParserException("Additional agent Configuration file not found at " + file.getAbsolutePath());

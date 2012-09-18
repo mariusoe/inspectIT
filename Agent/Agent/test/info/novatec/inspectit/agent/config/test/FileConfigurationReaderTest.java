@@ -12,6 +12,7 @@ import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -90,7 +91,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		fileConfigurationReader.load();
 
-		verify(configurationStorage, times(1)).addMethodSensorType(name, clazz, priority, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).addMethodSensorType(name, clazz, priority, Collections.<String, Object> emptyMap());
 	}
 
 	@Test
@@ -120,7 +121,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		fileConfigurationReader.load();
 
-		verify(configurationStorage, times(1)).addPlatformSensorType(clazz, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).addPlatformSensorType(clazz, Collections.<String, Object> emptyMap());
 	}
 
 	@Test
@@ -133,7 +134,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		fileConfigurationReader.load();
 
-		verify(configurationStorage, times(1)).addExceptionSensorType(clazz, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).addExceptionSensorType(clazz, Collections.<String, Object> emptyMap());
 		verify(configurationStorage, times(1)).setEnhancedExceptionSensorActivated(false);
 	}
 
@@ -166,7 +167,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		fileConfigurationReader.load();
 
-		verify(configurationStorage, times(1)).addExceptionSensorTypeParameter(clazz, targetClass, false, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).addExceptionSensorTypeParameter(clazz, targetClass, false, Collections.<String, Object> emptyMap());
 	}
 
 	@Test
@@ -197,7 +198,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		fileConfigurationReader.load();
 
-		verify(configurationStorage, times(1)).addExceptionSensorTypeParameter(clazz, targetClass, true, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).addExceptionSensorTypeParameter(clazz, targetClass, true, Collections.<String, Object> emptyMap());
 	}
 
 	@Test
@@ -211,7 +212,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		fileConfigurationReader.load();
 
 		verify(configurationStorage, times(1)).setEnhancedExceptionSensorActivated(false);
-		verify(configurationStorage, times(1)).addExceptionSensorType(Mockito.anyString(), Mockito.anyMap());
+		verify(configurationStorage, times(1)).addExceptionSensorType(Mockito.anyString(), Mockito.anyMapOf(String.class, Object.class));
 	}
 
 	@Test
@@ -225,7 +226,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		fileConfigurationReader.load();
 
 		verify(configurationStorage, times(1)).setEnhancedExceptionSensorActivated(true);
-		verify(configurationStorage, times(1)).addExceptionSensorType(Mockito.anyString(), Mockito.anyMap());
+		verify(configurationStorage, times(1)).addExceptionSensorType(Mockito.anyString(), Mockito.anyMapOf(String.class, Object.class));
 	}
 
 	@Test
@@ -237,7 +238,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		fileConfigurationReader.load();
 
-		verify(configurationStorage, times(1)).setBufferStrategy(clazz, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).setBufferStrategy(clazz, Collections.<String, String> emptyMap());
 	}
 
 	@Test
@@ -267,7 +268,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		fileConfigurationReader.load();
 
-		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.<String> emptyList(), false, Collections.<String, Object> emptyMap());
 	}
 
 	@Test
@@ -281,7 +282,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		fileConfigurationReader.load();
 
-		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.<String> emptyList(), false, Collections.<String, Object> emptyMap());
 	}
 
 	@Test
@@ -295,7 +296,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 
 		fileConfigurationReader.load();
 
-		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, true, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.<String> emptyList(), true, Collections.<String, Object> emptyMap());
 	}
 
 	@Test
@@ -313,7 +314,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		List<String> parameterList = new ArrayList<String>();
 		parameterList.add(parameter);
 
-		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, parameterList, false, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, parameterList, false, Collections.<String, Object> emptyMap());
 	}
 
 	@Test
@@ -335,7 +336,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		parameterList.add(parameterTwo);
 		parameterList.add(parameterThree);
 
-		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, parameterList, false, Collections.EMPTY_MAP);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, parameterList, false, Collections.<String, Object> emptyMap());
 	}
 
 	@Test
@@ -355,7 +356,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		propertyList.add(parameterRecord);
 		settings.put("property", propertyList);
 
-		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.<String> emptyList(), false, settings);
 	}
 
 	@Test
@@ -375,7 +376,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		propertyList.add(fieldRecord);
 		settings.put("field", propertyList);
 
-		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.<String> emptyList(), false, settings);
 	}
 
 	@Test
@@ -393,7 +394,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		Map<String, Object> settings = new HashMap<String, Object>();
 		settings.put("minDuration", minDuration);
 
-		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.<String> emptyList(), false, settings);
 	}
 
 	@Test
@@ -411,7 +412,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		Map<String, Object> settings = new HashMap<String, Object>();
 		settings.put("annotation", annotationClassName);
 
-		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.<String> emptyList(), false, settings);
 	}
 
 	@Test(expectedExceptions = { ParserException.class })
@@ -436,7 +437,7 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		Map<String, Object> settings = new HashMap<String, Object>();
 		settings.put("modifiers", modifiers);
 
-		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.EMPTY_LIST, false, settings);
+		verify(configurationStorage, times(1)).addSensor(sensorTypeName, className, methodName, Collections.<String> emptyList(), false, settings);
 	}
 
 	@Test
@@ -449,6 +450,67 @@ public class FileConfigurationReaderTest extends AbstractLogSupport {
 		fileConfigurationReader.load();
 
 		verify(configurationStorage, times(1)).addIgnoreClassesPattern(patternString);
+	}
+
+	@Test
+	public void loadIncludeWithAbsolutePath() throws ParserException, IOException {
+		String include = "$include";
+		String tmpdir = System.getProperty("java.io.tmpdir");
+
+		String additionalFileName = "add-config-file.cfg";
+		File additionalFile = new File(tmpdir + File.separatorChar + additionalFileName);
+		additionalFile.createNewFile();
+
+		writer.println(include + " " + additionalFile.getAbsolutePath());
+		writer.close();
+
+		fileConfigurationReader.load();
+
+		additionalFile.delete();
+	}
+
+	@Test
+	public void loadIncludeWithRelativePath() throws ParserException, IOException {
+		String include = "$include";
+		String tmpdir = System.getProperty("java.io.tmpdir");
+
+		String additionalFileName = "add-config-file.cfg";
+		File additionalFile = new File(tmpdir + File.separatorChar + additionalFileName);
+		additionalFile.createNewFile();
+
+		writer.println(include + " " + additionalFileName);
+		writer.close();
+
+		fileConfigurationReader.load();
+
+		additionalFile.delete();
+	}
+
+	@Test
+	public void loadIncludesWithRelativePathAndSubDirectories() throws ParserException, IOException {
+		String include = "$include";
+		String tmpdir = System.getProperty("java.io.tmpdir");
+		new File(tmpdir + File.separatorChar + "config" + File.separatorChar + "sub").mkdirs();
+
+		String additionalFileNameOne = "config" + File.separatorChar + "add-config-file.cfg";
+		File additionalFileOne = new File(tmpdir + File.separatorChar + additionalFileNameOne);
+		additionalFileOne.createNewFile();
+		PrintWriter additionalFileOneWriter = new PrintWriter(new BufferedWriter(new FileWriter(additionalFileOne)));
+
+		String additionalFileNameTwo = "sub" + File.separatorChar + "another-config-file.cfg";
+		File additionalFileTwo = new File(tmpdir + File.separatorChar + "config" + File.separatorChar + additionalFileNameTwo);
+		additionalFileTwo.createNewFile();
+
+		writer.println(include + " " + additionalFileNameOne);
+		writer.close();
+
+		additionalFileOneWriter.println(include + " " + additionalFileNameTwo);
+		additionalFileOneWriter.close();
+
+		fileConfigurationReader.load();
+
+		additionalFileOne.delete();
+		additionalFileTwo.delete();
 	}
 
 	@AfterClass(alwaysRun = true)
