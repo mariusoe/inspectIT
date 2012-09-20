@@ -633,7 +633,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 		case SQL:
 			styledString = new StyledString();
 			if (InvocationSequenceDataHelper.hasSQLData(data)) {
-				String sql = TextFormatter.clearLineBreaks(data.getSqlStatementData().getSqlWithParameterValues());
+				styledString.append(TextFormatter.clearLineBreaks(data.getSqlStatementData().getSqlWithParameterValues()));
 			}
 			return styledString;
 		case PARAMETER:
