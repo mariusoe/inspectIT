@@ -1,5 +1,14 @@
 package info.novatec.inspectit.storage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import info.novatec.inspectit.cmr.storage.CmrStorageManager;
 import info.novatec.inspectit.cmr.test.AbstractTransactionalTestNGLogSupport;
 import info.novatec.inspectit.communication.DefaultData;
@@ -28,7 +37,6 @@ import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -106,7 +114,8 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		storageManager.createStorage(storageData);
 
 		File storageDir = getStorageFolder();
-		Assert.assertTrue(storageDir.isDirectory());
+
+		assertThat(storageDir.isDirectory(), is(true));
 		File[] storageFiles = storageDir.listFiles(new FilenameFilter() {
 
 			@Override
@@ -116,30 +125,30 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		});
 
 		// only one storage file created
-		Assert.assertTrue(storageFiles.length == 1);
+		assertThat(storageFiles.length, is(equalTo(1)));
 
 		// get the data from file and check for equal
 		byte[] storageDataBytes = Files.readAllBytes(storageFiles[0].toPath());
 		ByteBuffer buffer = ByteBuffer.wrap(storageDataBytes);
-		Object deserializedStorageData = serializer.deserialize(buffer);
-		Assert.assertEquals(storageData, deserializedStorageData);
+		StorageData deserializedStorageData = (StorageData) serializer.deserialize(buffer);
+		assertThat(deserializedStorageData, is(equalTo(storageData)));
 
 		storageManager.openStorage(storageData);
-		Assert.assertTrue(storageData.isStorageOpened());
-		Assert.assertFalse(storageData.isStorageClosed());
+		assertThat(storageData.isStorageOpened(), is(true));
+		assertThat(storageData.isStorageClosed(), is(false));
 
 		// get the data from file and check for equal
 		storageDataBytes = Files.readAllBytes(storageFiles[0].toPath());
 		buffer = ByteBuffer.wrap(storageDataBytes);
-		deserializedStorageData = serializer.deserialize(buffer);
-		Assert.assertEquals(storageData, deserializedStorageData);
+		deserializedStorageData = (StorageData) serializer.deserialize(buffer);
+		assertThat(deserializedStorageData, is(equalTo(storageData)));
 
 		// storage manager know for the storage
-		Assert.assertTrue(storageManager.getExistingStorages().contains(storageData));
-		Assert.assertTrue(storageManager.getOpenedStorages().contains(storageData));
-		Assert.assertFalse(storageManager.getReadableStorages().contains(storageData));
-		Assert.assertTrue(storageData.isStorageOpened());
-		Assert.assertFalse(storageData.isStorageClosed());
+		assertThat(storageManager.getExistingStorages(), hasItem(storageData));
+		assertThat(storageManager.getOpenedStorages(), hasItem(storageData));
+		assertThat(storageManager.getReadableStorages(), not(hasItem(storageData)));
+		assertThat(storageData.isStorageOpened(), is(true));
+		assertThat(storageData.isStorageClosed(), is(false));
 	}
 
 	/**
@@ -155,8 +164,21 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		List<AbstractDataProcessor> processors = new ArrayList<AbstractDataProcessor>();
 		processors.add(dataSaverProcessor);
 		for (int i = 0; i < repeat; i++) {
-			InvocationSequenceData invoc = getInvocationSequenceDataInstance(random.nextInt(1000));
-			createdInvocations.add(invoc);
+			InvocationSequenceData invoc = getInvocationSequenceDataInstance(1 + random.nextInt(1000));
+			boolean canAdd = true;
+			if (invoc.getId() == 0) {
+				canAdd = false;
+			} else {
+				for (InvocationSequenceData inCollection : createdInvocations) {
+					if (invoc.getId() == inCollection.getId()) {
+						canAdd = false;
+						break;
+					}
+				}
+			}
+			if (canAdd) {
+				createdInvocations.add(invoc);
+			}
 		}
 		storageManager.writeToStorage(storageData, createdInvocations, processors);
 	}
@@ -175,8 +197,8 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 	public void finalizeWriteTest() throws IOException, SerializationException, StorageException {
 		storageManager.closeStorage(storageData);
 
-		Assert.assertFalse(storageData.isStorageOpened());
-		Assert.assertTrue(storageData.isStorageClosed());
+		assertThat(storageData.isStorageOpened(), is(false));
+		assertThat(storageData.isStorageClosed(), is(true));
 
 		File storageFolder = getStorageFolder();
 
@@ -186,20 +208,27 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 				return name.endsWith(StorageFileExtensions.INDEX_FILE_EXT);
 			}
 		});
-		Assert.assertTrue(indexFiles.length == 1);
+		assertThat(indexFiles.length, is(equalTo(1)));
 
 		String indexFilePath = indexFiles[0].getPath();
-
 		byte[] indexTreeBytes = Files.readAllBytes(Paths.get(indexFilePath));
-		Assert.assertTrue(indexTreeBytes.length > 0);
+		assertThat(indexTreeBytes.length, is(greaterThan(0)));
 
 		ByteBuffer buffer = ByteBuffer.wrap(indexTreeBytes);
 		Object indexingTree = serializer.deserialize(buffer);
-		Assert.assertTrue(indexingTree instanceof IStorageTreeComponent);
+		assertThat(indexingTree, is(instanceOf(IStorageTreeComponent.class)));
 
 		storageIndexingTree = (IStorageTreeComponent<?>) indexingTree;
 
-		Assert.assertTrue(storageManager.getReadableStorages().contains(storageData));
+		assertThat(storageManager.getReadableStorages(), hasItem(storageData));
+
+		File[] dataFiles = storageFolder.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.endsWith(StorageFileExtensions.DATA_FILE_EXTENSION);
+			}
+		});
+		assertThat("Amount of data files is less than the amount of invocations saved.", dataFiles.length, is(equalTo(createdInvocations.size())));
 	}
 
 	/**
@@ -220,9 +249,10 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		query.setObjectClasses(searchedClasses);
 
 		List<IStorageDescriptor> descriptors = storageIndexingTree.query(query);
+		assertThat("Amount of descriptors is less than the amount of invocations saved.", descriptors.size(), is(equalTo(createdInvocations.size())));
 		for (IStorageDescriptor descriptor : descriptors) {
-			Assert.assertTrue(descriptor.getPosition() >= 0);
-			Assert.assertTrue(descriptor.getSize() > 0, "Size of the descriptor is wrong. Size:" + descriptor.getSize());
+			assertThat("position of descriptor is negative.", descriptor.getPosition(), is(greaterThanOrEqualTo(0L)));
+			assertThat("Size of the descriptor is wrong.", descriptor.getSize(), is(greaterThan(0L)));
 		}
 
 		byte[] result = storageReader.read(storageData, descriptors);
@@ -230,11 +260,11 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		int count = 0;
 		while (buffer.hasRemaining()) {
 			Object invocation = serializer.deserialize(buffer);
-			Assert.assertTrue(invocation instanceof InvocationSequenceData);
-			Assert.assertTrue(createdInvocations.contains(invocation));
+			assertThat(invocation, is(instanceOf(InvocationSequenceData.class)));
+			assertThat(createdInvocations, hasItem((InvocationSequenceData) invocation));
 			count++;
 		}
-		Assert.assertEquals(createdInvocations.size(), count);
+		assertThat("Amount of de-serialize objects is less than the amount of invocations saved.", count, is(equalTo(createdInvocations.size())));
 	}
 
 	/**
@@ -256,9 +286,9 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		storageManager.addLabelToStorage(storageData, label, true);
 		for (StorageData storageToTest : storageManager.getExistingStorages()) {
 			if (storageToTest.getId().equals(storageData.getId())) {
-				Assert.assertTrue(storageToTest.isLabelPresent(ratingLabelType));
-				Assert.assertTrue(storageToTest.getLabels(ratingLabelType).size() == 1);
-				Assert.assertEquals(label, storageToTest.getLabels(ratingLabelType).get(0));
+				assertThat(storageToTest.isLabelPresent(ratingLabelType), is(true));
+				assertThat(storageToTest.getLabels(ratingLabelType).size(), is(equalTo(1)));
+				assertThat((StringStorageLabel) storageToTest.getLabels(ratingLabelType).get(0), is(equalTo(label)));
 			}
 		}
 
@@ -269,9 +299,9 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		storageManager.addLabelToStorage(storageData, label, true);
 		for (StorageData storageToTest : storageManager.getExistingStorages()) {
 			if (storageToTest.getId().equals(storageData.getId())) {
-				Assert.assertTrue(storageToTest.isLabelPresent(ratingLabelType));
-				Assert.assertTrue(storageToTest.getLabels(ratingLabelType).size() == 1);
-				Assert.assertEquals(label, storageToTest.getLabels(ratingLabelType).get(0));
+				assertThat(storageToTest.isLabelPresent(ratingLabelType), is(true));
+				assertThat(storageToTest.getLabels(ratingLabelType).size(), is(equalTo(1)));
+				assertThat((StringStorageLabel) storageToTest.getLabels(ratingLabelType).get(0), is(equalTo(label)));
 			}
 		}
 
@@ -282,9 +312,9 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		storageManager.addLabelToStorage(storageData, label, false);
 		for (StorageData storageToTest : storageManager.getExistingStorages()) {
 			if (storageToTest.getId().equals(storageData.getId())) {
-				Assert.assertTrue(storageToTest.isLabelPresent(ratingLabelType));
-				Assert.assertTrue(storageToTest.getLabels(ratingLabelType).size() == 1);
-				Assert.assertNotSame(label, storageToTest.getLabels(ratingLabelType).get(0));
+				assertThat(storageToTest.isLabelPresent(ratingLabelType), is(true));
+				assertThat(storageToTest.getLabels(ratingLabelType).size(), is(equalTo(1)));
+				assertThat((StringStorageLabel) storageToTest.getLabels(ratingLabelType).get(0), is(not(equalTo(label))));
 			}
 		}
 
@@ -292,11 +322,11 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		label = new StringStorageLabel();
 		label.setStorageLabelType(ratingLabelType);
 		label.setStringValue("Rating1");
-		Assert.assertTrue(storageManager.removeLabelFromStorage(storageData, label));
+		assertThat(storageManager.removeLabelFromStorage(storageData, label), is(true));
 		for (StorageData storageToTest : storageManager.getExistingStorages()) {
 			if (storageToTest.getId().equals(storageData.getId())) {
-				Assert.assertFalse(storageToTest.isLabelPresent(ratingLabelType));
-				Assert.assertTrue(storageToTest.getLabels(ratingLabelType).size() == 0);
+				assertThat(storageToTest.isLabelPresent(ratingLabelType), is(false));
+				assertThat(storageToTest.getLabels(ratingLabelType), is(empty()));
 			}
 		}
 	}
@@ -310,9 +340,9 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		if (storageFolder.exists()) {
 			File[] files = storageFolder.listFiles();
 			for (File file : files) {
-				Assert.assertTrue(file.delete(), "Can not delete storage test file: " + file);
+				assertThat("Can not delete storage test file.", file.delete(), is(true));
 			}
-			Assert.assertTrue(storageFolder.delete(), "Can not delete storage test folder.");
+			assertThat("Can not delete storage test folder.", storageFolder.delete(), is(true));
 		}
 	}
 
