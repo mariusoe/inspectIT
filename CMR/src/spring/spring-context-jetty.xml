@@ -97,21 +97,21 @@
 	</bean>
 	<!-- END -->
 
-	<!-- Buffer  Service -->
-	<bean name="bufferServiceRequestHandlerServlet"
+	<!-- CmrManagementService  -->
+	<bean name="cmrManagementServiceRequestHandlerServlet"
 		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
 	</bean>
 
-	<bean id="bufferServiceServletHolder"
+	<bean id="cmrManagementServiceServletHolder"
 		class="org.mortbay.jetty.servlet.ServletHolder">
-		<property name="name" value="bufferServiceExporter" />
-		<property name="servlet" ref="bufferServiceRequestHandlerServlet" />
+		<property name="name" value="cmrManagementServiceExporter" />
+		<property name="servlet" ref="cmrManagementServiceRequestHandlerServlet" />
 	</bean>
 
-	<bean id="bufferServiceServiceMapping"
+	<bean id="cmrManagementServiceServiceMapping"
 		class="org.mortbay.jetty.servlet.ServletMapping">
-		<property name="servletName" value="bufferServiceExporter" />
-		<property name="pathSpec" value="/remoting/BufferService" />
+		<property name="servletName" value="cmrManagementServiceExporter" />
+		<property name="pathSpec" value="/remoting/CmrManagementService" />
 	</bean>
 	<!-- END -->
 
@@ -310,7 +310,7 @@
 				<ref bean="serverStatusServletHolder" />
 				<ref bean="licenseServletHolder" />
 				<ref bean="configurationInterfaceDataAccessServletHolder" />
-				<ref bean="bufferServiceServletHolder" />
+				<ref bean="cmrManagementServiceServletHolder" />
 				<ref bean="timerDataAccessServiceServletHolder" />
 				<ref bean="httpTimerDataAccessServiceServletHolder" />
 				<ref bean="storageServiceServletHolder" />
@@ -327,7 +327,7 @@
 				<ref bean="serverStatusServiceMapping" />
 				<ref bean="licenseServiceMapping" />
 				<ref bean="configurationInterfaceDataAccessServiceMapping" />
-				<ref bean="bufferServiceServiceMapping" />
+				<ref bean="cmrManagementServiceServiceMapping" />
 				<ref bean="timerDataAccessServiceServiceMapping" />
 				<ref bean="httpTimerDataAccessServiceServiceMapping" />
 				<ref bean="storageServiceServiceMapping" />

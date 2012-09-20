@@ -42,7 +42,7 @@ public final class NumberFormatter {
 	 * Formats a decimal number with the specified pattern.
 	 */
 	private static DecimalFormat doubleFormat = new DecimalFormat("0.000");
-	
+
 	/**
 	 * Formats a decimal number without the specified pattern.
 	 */
@@ -61,7 +61,7 @@ public final class NumberFormatter {
 	static {
 		doubleUnspecificFormat.setGroupingSize(0);
 	}
-	
+
 	/**
 	 * The default private constructor.
 	 */
@@ -176,7 +176,7 @@ public final class NumberFormatter {
 	public static String formatBytesToKBytes(long bytes) {
 		return decFormat.format((double) bytes / 1024) + " Kb";
 	}
-	
+
 	/**
 	 * Formats bytes to megaBytes.
 	 * 
@@ -231,19 +231,38 @@ public final class NumberFormatter {
 	public static String formatDouble(double number) {
 		return doubleFormat.format(number);
 	}
-	
+
 	/**
 	 * Formats a double value based on the number of decimal places.
 	 * 
 	 * @param number
 	 *            The value to format.
-	 * @param decimalPlaces Number of decimal places.
+	 * @param decimalPlaces
+	 *            Number of decimal places.
 	 * @return The formatted string.
 	 */
 	public static String formatDouble(double number, int decimalPlaces) {
 		doubleUnspecificFormat.setMaximumFractionDigits(decimalPlaces);
 		doubleUnspecificFormat.setMinimumFractionDigits(decimalPlaces);
 		return doubleUnspecificFormat.format(number);
+	}
+
+	/**
+	 * Returns the human readable bytes number.
+	 * 
+	 * @param bytes
+	 *            Bytes to transform.
+	 * @return Human readable string.
+	 */
+	public static String humanReadableByteCount(long bytes) {
+		int unit = 1024;
+		if (bytes < unit) {
+			return bytes + " B";
+		} else {
+			int exp = (int) (Math.log(bytes) / Math.log(unit));
+			String pre = ("KMGTPE").charAt(exp - 1) + "i";
+			return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+		}
 	}
 
 }

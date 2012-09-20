@@ -184,7 +184,7 @@ public class StorageWriter {
 	 *            Object to be written.
 	 */
 	public void write(DefaultData defaultData) {
-		if (writingOn) {
+		if (writingOn && storageManager.canWriteMore()) {
 			WriteTask writeTask = new WriteTask(defaultData);
 			writingExecutorService.submit(writeTask);
 		}
@@ -446,6 +446,13 @@ public class StorageWriter {
 		 */
 		public void run() {
 			try {
+				if (!storageManager.canWriteMore()) {
+					if (log.isWarnEnabled()) {
+						log.warn("Writing of data canceled because of limited hard disk space left for the storage.");
+					}
+					return;
+				}
+
 				// get object from soft reference
 				final DefaultData data = referenceToWriteData.get();
 				if (null == data) {
@@ -505,7 +512,7 @@ public class StorageWriter {
 						serializationAttemptsFailed++;
 						capacity *= 3;
 						byteBufferProvider.releaseByteBuffer(byteBuffer);
-						if (log.isDebugEnabled()) {
+						if (log.isWarnEnabled()) {
 							log.warn("Serialization failed. Attempt number " + serializationAttemptsFailed + " out of " + serializationAttempts + ".", e);
 						}
 					}

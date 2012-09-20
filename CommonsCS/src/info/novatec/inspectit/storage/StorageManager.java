@@ -8,16 +8,21 @@ import info.novatec.inspectit.storage.serializer.SerializationException;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.FileStore;
+import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import org.apache.commons.lang.mutable.MutableLong;
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 
 /**
  * Abstract class that defines basic storage functionality and properties.
@@ -34,6 +39,12 @@ public abstract class StorageManager {
 	Log log;
 
 	/**
+	 * The fixed rate of the refresh rate for gathering the statistics.
+	 */
+	@Value("${storage.updateRefreshRate}")
+	protected static final int UPDATE_RATE = 30000;
+
+	/**
 	 * Serializer.
 	 */
 	@Autowired
@@ -46,7 +57,39 @@ public abstract class StorageManager {
 	private String storageDefaultFolder;
 
 	/**
-	 * Returns the {@link Path} for given {@link IStorageData}.
+	 * Amount of bytes CMR can use on the Hard drive to write storage data.
+	 */
+	@Value("${storage.maxHardDriveOccupancy}")
+	private int maxHardDriveOccupancy;
+
+	/**
+	 * Amount of bytes when warning the user about the critical hard drive space left should start.
+	 * This applies to both hard drive space or max hard drive occupancy.
+	 */
+	@Value("${storage.warnHardDriveByteLeft}")
+	private long warnBytesLeft = 1073741824;
+
+	/**
+	 * Amount of bytes when writing any more data is suspended because of the hard drive space left.
+	 * This applies to both hard drive space or max hard drive occupancy.
+	 */
+	@Value("${storage.stopWriteHardDriveBytesLeft}")
+	private long stopWriteBytesLeft = 104857600;
+
+	/**
+	 * Amount of space left for write in bytes. This value is either {@link #maxHardDriveOccupancy}
+	 * or actual space left on the hard drive if no {@link #maxHardDriveOccupancy} is specified or
+	 * space left is smaller than {@link #maxHardDriveOccupancy}.
+	 */
+	private long bytesHardDriveOccupancyLeft;
+
+	/**
+	 * Amount of total space on the hard drive in bytes.
+	 */
+	private long hardDriveSize;
+
+	/**
+	 * Returns the {@link Path} for given {@link IStorageIdProvider}.
 	 * 
 	 * @param storageData
 	 *            {@link IStorageData} object.
@@ -219,6 +262,54 @@ public abstract class StorageManager {
 	}
 
 	/**
+	 * @return Returns if the write of data can be performed in terms of hard disk space left.
+	 */
+	public boolean canWriteMore() {
+		return bytesHardDriveOccupancyLeft > stopWriteBytesLeft;
+	}
+
+	/**
+	 * @return Returns if the warn about the low space left is active.
+	 */
+	public boolean isSpaceWarnActive() {
+		return bytesHardDriveOccupancyLeft < warnBytesLeft;
+	}
+
+	/**
+	 * Updates the space left on the hard drive.
+	 * 
+	 * @throws IOException
+	 *             IF {@link IOException} occurs.
+	 */
+	@Scheduled(fixedRate = UPDATE_RATE * 2)
+	protected void updatedStorageSpaceLeft() throws IOException {
+		Path defaultDirectory = Paths.get(getStorageDefaultFolder());
+
+		FileStore fileStore = Files.getFileStore(Paths.get(FileSystems.getDefault().getSeparator()));
+		hardDriveSize = fileStore.getTotalSpace();
+		long bytesAvailable = fileStore.getUsableSpace();
+
+		if (Files.exists(defaultDirectory) && maxHardDriveOccupancy > 0 && bytesAvailable > maxHardDriveOccupancy) {
+			final MutableLong totalSizeInBytes = new MutableLong();
+			Files.walkFileTree(defaultDirectory, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					totalSizeInBytes.add(Files.size(file));
+					return FileVisitResult.CONTINUE;
+				}
+			});
+
+			long totalSize = totalSizeInBytes.longValue();
+			bytesHardDriveOccupancyLeft = maxHardDriveOccupancy - totalSize;
+			if (bytesHardDriveOccupancyLeft < 0) {
+				bytesHardDriveOccupancyLeft = 0;
+			}
+		} else {
+			bytesHardDriveOccupancyLeft = bytesAvailable;
+		}
+	}
+
+	/**
 	 * @return the serializer
 	 */
 	protected ISerializer getSerializer() {
@@ -250,6 +341,28 @@ public abstract class StorageManager {
 	 */
 	public void setStorageDefaultFolder(String storageDefaultFolder) {
 		this.storageDefaultFolder = storageDefaultFolder;
+	}
+
+	/**
+	 * Gets {@link #bytesHardDriveOccupancyLeft}.
+	 * 
+	 * @return {@link #bytesHardDriveOccupancyLeft}
+	 */
+	public long getBytesHardDriveOccupancyLeft() {
+		return bytesHardDriveOccupancyLeft;
+	}
+
+	/**
+	 * Gets {@link #maxHardDriveOccupancy}.
+	 * 
+	 * @return {@link #maxHardDriveOccupancy}
+	 */
+	public long getMaxBytesHardDriveOccupancy() {
+		if (maxHardDriveOccupancy > -1) {
+			return maxHardDriveOccupancy;
+		} else {
+			return hardDriveSize;
+		}
 	}
 
 }

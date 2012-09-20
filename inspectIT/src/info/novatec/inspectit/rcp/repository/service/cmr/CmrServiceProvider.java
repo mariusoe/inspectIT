@@ -1,6 +1,6 @@
 package info.novatec.inspectit.rcp.repository.service.cmr;
 
-import info.novatec.inspectit.cmr.service.IBufferService;
+import info.novatec.inspectit.cmr.service.ICmrManagementService;
 import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
@@ -29,10 +29,10 @@ public abstract class CmrServiceProvider {
 	 *            {@link CmrRepositoryDefinition} to bound service to.
 	 * @return Returns {@link BufferService}.
 	 */
-	public IBufferService getBufferService(CmrRepositoryDefinition cmrRepositoryDefinition) {
-		IBufferService bufferService = getBufferService();
-		((ICmrService) bufferService).initService(cmrRepositoryDefinition);
-		return bufferService;
+	public ICmrManagementService getCmrManagementService(CmrRepositoryDefinition cmrRepositoryDefinition) {
+		ICmrManagementService cmrManagementService = getCmrManagementService();
+		((ICmrService) cmrManagementService).initService(cmrRepositoryDefinition);
+		return cmrManagementService;
 	}
 
 	/**
@@ -40,7 +40,7 @@ public abstract class CmrServiceProvider {
 	 * 
 	 * @return Returns Spring created {@link BufferService}.
 	 */
-	protected abstract IBufferService getBufferService();
+	protected abstract ICmrManagementService getCmrManagementService();
 
 	/**
 	 * Returns properly initialized {@link CombinedMetricsDataAccessService}.

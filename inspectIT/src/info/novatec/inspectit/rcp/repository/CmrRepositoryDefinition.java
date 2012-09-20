@@ -1,6 +1,6 @@
 package info.novatec.inspectit.rcp.repository;
 
-import info.novatec.inspectit.cmr.service.IBufferService;
+import info.novatec.inspectit.cmr.service.ICmrManagementService;
 import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
@@ -58,7 +58,7 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	 * 
 	 */
 	public enum OnlineStatus {
-		
+
 		/**
 		 * Unknown state before the first check.
 		 */
@@ -176,7 +176,7 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	/**
 	 * The buffer data access service.
 	 */
-	private IBufferService bufferService;
+	private ICmrManagementService cmrManagementService;
 
 	/**
 	 * The timer data access service.
@@ -241,7 +241,7 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 		combinedMetricsDataAccessService = cmrServiceProvider.getCombinedMetricsDataAccessService(this);
 		configurationInterfaceDataAccessService = cmrServiceProvider.getConfigurationInterfaceDataAccessService(this);
 		httpTimerDataAccessService = cmrServiceProvider.getHttpTimerDataAccessService(this);
-		bufferService = cmrServiceProvider.getBufferService(this);
+		cmrManagementService = cmrServiceProvider.getCmrManagementService(this);
 		timerDataAccessService = cmrServiceProvider.getTimerDataAccessService(this);
 		globalDataAccessService = cmrServiceProvider.getGlobalDataAccessService(this);
 		storageService = cmrServiceProvider.getStorageService(this);
@@ -315,8 +315,8 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	/**
 	 * {@inheritDoc}
 	 */
-	public IBufferService getBufferService() {
-		return bufferService;
+	public ICmrManagementService getCmrManagementService() {
+		return cmrManagementService;
 	}
 
 	/**

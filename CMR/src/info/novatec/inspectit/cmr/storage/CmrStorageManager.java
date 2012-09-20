@@ -41,7 +41,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.mutable.MutableLong;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -54,12 +53,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CmrStorageManager extends StorageManager {
-
-	/**
-	 * The fixed rate of the refresh rate for gathering the statistics.
-	 */
-	@Value("${storage.storageSizeUpdateRefreshRate}")
-	private static final int FIXED_RATE = 30000;
 
 	/**
 	 * {@link DefaultDataDaoImpl}.
@@ -291,8 +284,14 @@ public class CmrStorageManager extends StorageManager {
 	 *            Data to write.
 	 */
 	public void record(DefaultData dataToRecord) {
-		if (isRecordingOn()) {
+		if (isRecordingOn() && canWriteMore()) {
 			storageRecorder.record(dataToRecord);
+		} else if (isRecordingOn() && !canWriteMore()) {
+			try {
+				stopRecording();
+			} catch (Exception e) {
+				LOGGER.warn("Exception occured trying to automatically stop the recording due to the hard disk space limitation warning.", e);
+			}
 		}
 	}
 
@@ -711,11 +710,11 @@ public class CmrStorageManager extends StorageManager {
 	 * This method is called from a Spring configured job.
 	 * 
 	 * @throws IOException
-	 *             If {@link IOException} happend during operation.
+	 *             If {@link IOException} happened during operation.
 	 * @throws SerializationException
 	 *             If serialization failed.
 	 */
-	@Scheduled(fixedRate = FIXED_RATE)
+	@Scheduled(fixedRate = UPDATE_RATE)
 	protected void updateExistingStoragesSize() throws IOException, SerializationException {
 		for (StorageData storageData : existingStoragesSet) {
 			synchronized (storageData) {
@@ -839,6 +838,7 @@ public class CmrStorageManager extends StorageManager {
 	@PostConstruct
 	public void postConstruct() throws Exception {
 		loadAllExistingStorages();
+		updatedStorageSpaceLeft();
 		addShutdownHook();
 	}
 

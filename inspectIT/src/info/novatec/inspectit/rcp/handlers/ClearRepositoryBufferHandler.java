@@ -72,7 +72,7 @@ public class ClearRepositoryBufferHandler extends AbstractHandler implements IHa
 				Job clearBufferJob = new Job("Clear Respoitory Buffer") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
-						cmrRepositoryDefinition.getBufferService().clearBuffer();
+						cmrRepositoryDefinition.getCmrManagementService().clearBuffer();
 						Display.getDefault().asyncExec(new Runnable() {
 							@Override
 							public void run() {

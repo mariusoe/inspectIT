@@ -21,9 +21,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * {@link StorageWriter} implementation for the CMR.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 @Component("cmrStorageWriter")
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -63,7 +63,7 @@ public class CmrStorageWriter extends StorageWriter {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 * @throws IOException
 	 */
 	protected void writeAgentData() throws IOException {

@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.form;
 
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.communication.data.cmr.BufferStatusData;
+import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
@@ -96,6 +96,8 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	private Label version;
 	private Label bufferSize;
 	private Label recTime;
+	private Label spaceLeftLabel;
+	private ProgressBar spaceLeftBar;
 
 	/**
 	 * Default constructor.
@@ -177,6 +179,19 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 		toolkit.createLabel(mainComposite, "Data in buffer since:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
 		bufferDate = toolkit.createLabel(mainComposite, null, SWT.WRAP);
 		bufferDate.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+
+		toolkit.createLabel(mainComposite, "Storage space left:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
+		Composite spaceLeftComposite = toolkit.createComposite(mainComposite);
+		gl = new GridLayout(1, true);
+		gl.marginHeight = 0;
+		gl.marginWidth = 0;
+		spaceLeftComposite.setLayout(gl);
+		spaceLeftComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+
+		spaceLeftBar = new ProgressBar(spaceLeftComposite, SWT.SMOOTH);
+		spaceLeftBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		spaceLeftLabel = toolkit.createLabel(spaceLeftComposite, null, SWT.CENTER);
+		spaceLeftLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		toolkit.createLabel(mainComposite, "Recording:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
 		recordingIcon = toolkit.createLabel(mainComposite, null, SWT.WRAP);
@@ -342,7 +357,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 					updateCmrDataJob.cancel();
 				}
 				updateRecordingData();
-				updateBufferData();
+				updateCmrManagementData();
 
 				mainComposite.layout();
 				form.layout();
@@ -355,29 +370,52 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	/**
 	 * Updates buffer data.
 	 */
-	private void updateBufferData() {
+	private void updateCmrManagementData() {
 		boolean dataLoaded = false;
 		if (null != cmrRepositoryDefinition && cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
 			// buffer information
-			BufferStatusData bufferStatusData = cmrRepositoryDefinition.getBufferService().getBufferStatusData();
-			if (null != bufferStatusData) {
+			CmrStatusData cmrStatusData = cmrRepositoryDefinition.getCmrManagementService().getCmrStatusData();
+			if (null != cmrStatusData) {
 				dataLoaded = true;
 				// Transfer to MB right away
-				double bufferMaxOccupancy = (double) bufferStatusData.getMaxBufferSize() / (1024 * 1024);
-				double bufferCurrentOccupancy = (double) bufferStatusData.getCurrentBufferSize() / (1024 * 1024);
+				double bufferMaxOccupancy = (double) cmrStatusData.getMaxBufferSize() / (1024 * 1024);
+				double bufferCurrentOccupancy = (double) cmrStatusData.getCurrentBufferSize() / (1024 * 1024);
 				bufferBar.setMaximum((int) Math.round(bufferMaxOccupancy));
 				bufferBar.setSelection((int) Math.round(bufferCurrentOccupancy));
 				int occupancy = (int) (100 * Math.round(bufferCurrentOccupancy) / Math.round(bufferMaxOccupancy));
-				String occMb = bufferBar.getSelection() + "MB";
-				String maxMb = bufferBar.getMaximum() + "MB";
+
+				String occMb = NumberFormatter.humanReadableByteCount(cmrStatusData.getCurrentBufferSize());
+				String maxMb = NumberFormatter.humanReadableByteCount(cmrStatusData.getMaxBufferSize());
 				String string = occupancy + "% (" + occMb + " / " + maxMb + ")";
 				bufferSize.setText(string);
 
-				DefaultData oldestData = bufferStatusData.getBufferOldestElement();
+				DefaultData oldestData = cmrStatusData.getBufferOldestElement();
 				if (null != oldestData) {
 					bufferDate.setText(NumberFormatter.formatTime(oldestData.getTimeStamp().getTime()));
 				} else {
 					bufferDate.setText("-");
+				}
+
+				// hard drive space data
+				int spaceOccupancy = (int) (100 * (double) cmrStatusData.getStorageDataSpaceLeft() / cmrStatusData.getStorageMaxDataSpace());
+				StringBuilder spaceLeftStringBuilder = new StringBuilder(String.valueOf(spaceOccupancy));
+				spaceLeftStringBuilder.append("% (");
+				spaceLeftStringBuilder.append(NumberFormatter.humanReadableByteCount(cmrStatusData.getStorageDataSpaceLeft()));
+				spaceLeftStringBuilder.append(" / ");
+				spaceLeftStringBuilder.append(NumberFormatter.humanReadableByteCount(cmrStatusData.getStorageMaxDataSpace()));
+				spaceLeftStringBuilder.append(')');
+				spaceLeftLabel.setText(spaceLeftStringBuilder.toString());
+				spaceLeftBar.setMaximum((int) (cmrStatusData.getStorageMaxDataSpace() / 1024 / 1024));
+				spaceLeftBar.setSelection((int) (cmrStatusData.getStorageDataSpaceLeft() / 1024 / 1024));
+				if (!cmrStatusData.isCanWriteMore()) {
+					spaceLeftBar.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+					spaceLeftBar.setToolTipText("Space left is critically low and no write is possible anymore");
+				} else if (cmrStatusData.isWarnSpaceLeftActive()) {
+					spaceLeftBar.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW));
+					spaceLeftBar.setToolTipText("Space left is reaching critical level");
+				} else {
+					spaceLeftBar.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GREEN));
+					spaceLeftBar.setToolTipText("Enough space left");
 				}
 			}
 		}
@@ -387,6 +425,10 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 			bufferBar.setMaximum(Integer.MAX_VALUE);
 			bufferBar.setSelection(0);
 			bufferSize.setText("");
+			spaceLeftBar.setMaximum(Integer.MAX_VALUE);
+			spaceLeftBar.setSelection(0);
+			spaceLeftBar.setToolTipText("");
+			spaceLeftLabel.setText("");
 		}
 	}
 
@@ -555,7 +597,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			if (null != cmrRepositoryDefinition && !form.isDisposed()) {
-				updateBufferData();
+				updateCmrManagementData();
 				updateRecordingData();
 				this.schedule(UPDATE_CMR_DATA_SLEEP);
 			}
