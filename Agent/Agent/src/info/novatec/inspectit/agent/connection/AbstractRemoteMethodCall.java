@@ -7,10 +7,8 @@ import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 /**
- * See http://www.onjava.com/pub/a/onjava/2001/10/17/rmi.html?page=3 for more
- * details.
+ * See http://www.onjava.com/pub/a/onjava/2001/10/17/rmi.html?page=3 for more details.
  * 
  * @author William Grosso
  * 
@@ -27,8 +25,8 @@ public abstract class AbstractRemoteMethodCall {
 	 * 
 	 * @return The object returned from the server (if there is one).
 	 * @throws ServerUnavailableException
-	 *             Throws a ServerUnavailable exception if the server isn't
-	 *             available anymore due to network problems or something else.
+	 *             Throws a ServerUnavailable exception if the server isn't available anymore due to
+	 *             network problems or something else.
 	 */
 	public final Object makeCall() throws ServerUnavailableException {
 		RetryStrategy strategy = getRetryStrategy();
@@ -51,25 +49,23 @@ public abstract class AbstractRemoteMethodCall {
 	}
 
 	/*
-	 * The next 4 methods define the core behavior. Of these, two must be
-	 * implemented by the subclass (and so are left abstract). The remaining
-	 * three can be altered to provide customized retry handling.
+	 * The next 4 methods define the core behavior. Of these, two must be implemented by the
+	 * subclass (and so are left abstract). The remaining three can be altered to provide customized
+	 * retry handling.
 	 */
 
 	/**
-	 * getRemoteObject is a template method which should, in most cases, return
-	 * the stub.
+	 * getRemoteObject is a template method which should, in most cases, return the stub.
 	 * 
 	 * @return The Remote Stub
 	 * @throws ServerUnavailableException
-	 *             Throws a ServerUnavailable exception if the server isn't
-	 *             available anymore due to network problems or something else.
+	 *             Throws a ServerUnavailable exception if the server isn't available anymore due to
+	 *             network problems or something else.
 	 */
 	protected abstract Remote getRemoteObject() throws ServerUnavailableException;
 
 	/**
-	 * performRemoteCall is a template method which actually makes the remote
-	 * method invocation.
+	 * performRemoteCall is a template method which actually makes the remote method invocation.
 	 * 
 	 * @param remoteObject
 	 *            The actual remote object.
@@ -94,12 +90,12 @@ public abstract class AbstractRemoteMethodCall {
 	 * @param remoteObject
 	 *            The remote object.
 	 * @throws ServerUnavailableException
-	 *             The exception {@link ServerUnavailableException} is always
-	 *             thrown when this method is entered.
+	 *             The exception {@link ServerUnavailableException} is always thrown when this
+	 *             method is entered.
 	 */
 	protected final void handleRetryException(final Remote remoteObject) throws ServerUnavailableException {
-		if (LOGGER.isLoggable(Level.SEVERE)) {
-			LOGGER.severe("Repeated attempts to communicate with " + remoteObject + " failed.");
+		if (LOGGER.isLoggable(Level.FINE)) {
+			LOGGER.fine("Repeated attempts to communicate with " + remoteObject + " failed.");
 		}
 		throw new ServerUnavailableException();
 	}

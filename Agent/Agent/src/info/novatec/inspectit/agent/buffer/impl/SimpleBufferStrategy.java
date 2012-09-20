@@ -43,9 +43,8 @@ public class SimpleBufferStrategy implements IBufferStrategy<MethodSensorData> {
 			if (newMeasurements) {
 				// if the measurements already exist, this buffer strategy will simply drop the old
 				// ones, because we can not let the data pile up if the sending of the data is not
-				// fast
-				// enough
-				LOGGER.info("Possible data loss due to the excessive data creation on the Agent!");
+				// fast enough
+				LOGGER.fine("Possible data loss due to the excessive data creation on the Agent!");
 			}
 			this.measurements = measurements;
 			newMeasurements = true;

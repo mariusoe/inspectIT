@@ -70,10 +70,10 @@ public class RMIConnection implements IConnection {
 	private boolean connected = false;
 
 	/**
-	 * Default no-arg constructor.
+	 * Defines if there was a connection exception before. Used for throttling the info log
+	 * messages.
 	 */
-	public RMIConnection() {
-	}
+	private boolean connectionException = false;
 
 	/**
 	 * {@inheritDoc}
@@ -81,20 +81,35 @@ public class RMIConnection implements IConnection {
 	public void connect(String host, int port) throws ConnectException {
 		if (null == registry) {
 			try {
-				LOGGER.info("RMI: Connecting to " + host + ":" + port);
+				if (!connectionException) {
+					LOGGER.info("RMI: Connecting to " + host + ":" + port);
+				}
 				registry = LocateRegistry.getRegistry(host, port);
 				agentStorageService = (IAgentStorageService) registry.lookup(agentStorageName);
 				registrationService = (IRegistrationService) registry.lookup(registrationName);
 				LOGGER.info("RMI: Connection established!");
 				connected = true;
+				connectionException = false;
 			} catch (RemoteException remoteException) {
+				if (!connectionException) {
+					LOGGER.info("RMI: Connection to the server failed.");
+				}
+				connectionException = true;
 				disconnect();
 				LOGGER.throwing(RMIConnection.class.getName(), "connect()", remoteException);
-				throw new ConnectException(remoteException.getMessage());
+				ConnectException e = new ConnectException(remoteException.getMessage());
+				e.initCause(remoteException);
+				throw e; // NOPMD root cause exception is set
 			} catch (NotBoundException notBoundException) {
+				if (!connectionException) {
+					LOGGER.info("RMI: Needed services are not bound on the server.");
+				}
+				connectionException = true;
 				disconnect();
 				LOGGER.throwing(RMIConnection.class.getName(), "connect()", notBoundException);
-				throw new ConnectException(notBoundException.getMessage());
+				ConnectException e = new ConnectException(notBoundException.getMessage());
+				e.initCause(notBoundException);
+				throw e; // NOPMD root cause exception is set
 			}
 		}
 	}
@@ -103,9 +118,9 @@ public class RMIConnection implements IConnection {
 	 * {@inheritDoc}
 	 */
 	public void disconnect() {
-		registry = null;
-		agentStorageService = null;
-		registrationService = null;
+		registry = null; // NOPMD
+		agentStorageService = null; // NOPMD
+		registrationService = null; // NOPMD
 		connected = false;
 	}
 

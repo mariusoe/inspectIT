@@ -117,6 +117,12 @@ public class CoreService implements ICoreService, Startable {
 	private volatile SendingThread sendingThread;
 
 	/**
+	 * Defines if there was an exception before while trying to send the data. Used to throttle the
+	 * printing of log statements.
+	 */
+	private boolean sendingException = false;
+
+	/**
 	 * The default constructor which needs 4 parameters.
 	 * 
 	 * @param configurationStorage
@@ -500,9 +506,13 @@ public class CoreService implements ICoreService, Startable {
 					while (bufferStrategy.hasNext()) {
 						List<DefaultData> dataToSend = bufferStrategy.next();
 						connection.sendDataObjects(dataToSend);
+						sendingException = false;
 					}
 				} catch (Throwable e) {
-					LOGGER.log(Level.SEVERE, "Connection problem appeared, stopping sending actual data!", e);
+					if (!sendingException) {
+						sendingException = true;
+						LOGGER.log(Level.SEVERE, "Connection problem appeared, stopping sending actual data!", e);
+					}
 				}
 			}
 		}

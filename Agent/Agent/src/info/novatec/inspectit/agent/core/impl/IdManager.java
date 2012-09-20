@@ -455,16 +455,22 @@ public class IdManager implements IIdManager, Startable {
 				// clear the flag
 				serverErrorOccured = false;
 			} catch (ServerUnavailableException serverUnavailableException) {
+				if (!serverErrorOccured) {
+					LOGGER.severe("Server unavailable while trying to register something at the server.");
+				}
 				serverErrorOccured = true;
-				LOGGER.severe("Server unavailable while trying to register something at the server.");
 				LOGGER.throwing(RegistrationThread.class.getName(), "run()", serverUnavailableException);
 			} catch (RegistrationException registrationException) {
+				if (!serverErrorOccured) {
+					LOGGER.severe("Registration exception occured while trying to register something at the server.");
+				}
 				serverErrorOccured = true;
-				LOGGER.severe("Registration exception occured while trying to register something at the server.");
 				LOGGER.throwing(RegistrationThread.class.getName(), "run()", registrationException);
 			} catch (ConnectException connectException) {
+				if (!serverErrorOccured) {
+					LOGGER.severe("Connection to the server failed.");
+				}
 				serverErrorOccured = true;
-				LOGGER.severe("Connection to the server failed.");
 				LOGGER.throwing(RegistrationThread.class.getName(), "run()", connectException);
 			}
 		}
