@@ -109,7 +109,7 @@ public class CopyBufferToStorageWizard extends Wizard implements INewWizard {
 		addPage(newOrExistsingStorageWizardPage);
 		defineNewStorageWizzardPage = new DefineNewStorageWizzardPage(cmrRepositoryDefinition);
 		addPage(defineNewStorageWizzardPage);
-		selectExistingStorageWizardPage = new SelectExistingStorageWizardPage(cmrRepositoryDefinition);
+		selectExistingStorageWizardPage = new SelectExistingStorageWizardPage(cmrRepositoryDefinition, false);
 		addPage(selectExistingStorageWizardPage);
 		selectAgentsPage = new SelectAgentsWizardPage("Select Agent(s) to be copied");
 		addPage(selectAgentsPage);

@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 
 /**
- * Selection of recordig storage.
+ * Selection of existing storage.
  * 
  * @author Ivan Senic
  * 
@@ -30,7 +30,7 @@ public class SelectExistingStorageWizardPage extends WizardPage {
 	/**
 	 * Default page message.
 	 */
-	private static final String DEFAULT_MESSAGE = "Select storage and repository where recording will be performed.";
+	private static final String DEFAULT_MESSAGE = "Select storage and repository where data will be stored";
 
 	/**
 	 * List of available repositories.
@@ -58,6 +58,11 @@ public class SelectExistingStorageWizardPage extends WizardPage {
 	private org.eclipse.swt.widgets.List storageSelection;
 
 	/**
+	 * If the recording check should be performed on the selected CMR.
+	 */
+	private boolean checkRecording;
+
+	/**
 	 * Default constructor.
 	 */
 	public SelectExistingStorageWizardPage() {
@@ -69,15 +74,29 @@ public class SelectExistingStorageWizardPage extends WizardPage {
 	}
 
 	/**
-	 * With this constructor the passed {@link CmrRepositoryDefinition} will be initially seected on
-	 * the page.
+	 * Additional constructor to specify the {@link #checkRecording} value.
+	 * 
+	 * @param checkRecording
+	 *            If the recording check should be performed on the selected CMR.
+	 */
+	public SelectExistingStorageWizardPage(boolean checkRecording) {
+		this();
+		this.checkRecording = checkRecording;
+	}
+
+	/**
+	 * With this constructor the passed {@link CmrRepositoryDefinition} will be initially selected
+	 * on the page.
 	 * 
 	 * @param proposedCmrRepositoryDefinition
 	 *            {@link CmrRepositoryDefinition} that should be initially selected.
+	 * @param checkRecording
+	 *            If the recording check should be performed on the selected CMR.
 	 */
-	public SelectExistingStorageWizardPage(CmrRepositoryDefinition proposedCmrRepositoryDefinition) {
+	public SelectExistingStorageWizardPage(CmrRepositoryDefinition proposedCmrRepositoryDefinition, boolean checkRecording) {
 		this();
 		this.proposedCmrRepositoryDefinition = proposedCmrRepositoryDefinition;
+		this.checkRecording = checkRecording;
 	}
 
 	/**
@@ -108,7 +127,7 @@ public class SelectExistingStorageWizardPage extends WizardPage {
 					setMessage("Repository must be selected.", IMessageProvider.ERROR);
 				} else if (getSelectedRepository().getOnlineStatus() == OnlineStatus.OFFLINE) {
 					setMessage("Selected repository is currenly offline.", IMessageProvider.ERROR);
-				} else if (getSelectedRepository().getStorageService().isRecordingOn()) {
+				} else if (checkRecording && getSelectedRepository().getStorageService().isRecordingOn()) {
 					setMessage("Recording is already active on selected repository.", IMessageProvider.ERROR);
 				} else if (getSelectedStorageData() == null) {
 					setMessage("Storage must be selected.", IMessageProvider.ERROR);
@@ -175,7 +194,7 @@ public class SelectExistingStorageWizardPage extends WizardPage {
 			return false;
 		} else if (getSelectedRepository().getOnlineStatus() == OnlineStatus.OFFLINE) {
 			return false;
-		} else if (getSelectedRepository().getStorageService().isRecordingOn()) {
+		} else if (checkRecording && getSelectedRepository().getStorageService().isRecordingOn()) {
 			return false;
 		}
 		if (getSelectedStorageData() == null) {

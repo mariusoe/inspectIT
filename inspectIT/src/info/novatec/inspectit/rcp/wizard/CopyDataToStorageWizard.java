@@ -98,7 +98,7 @@ public class CopyDataToStorageWizard extends Wizard implements INewWizard {
 		addPage(newOrExistsingStorageWizardPage);
 		defineNewStorageWizzardPage = new DefineNewStorageWizzardPage(cmrRepositoryDefinition);
 		addPage(defineNewStorageWizzardPage);
-		selectExistingStorageWizardPage = new SelectExistingStorageWizardPage(cmrRepositoryDefinition);
+		selectExistingStorageWizardPage = new SelectExistingStorageWizardPage(cmrRepositoryDefinition, false);
 		addPage(selectExistingStorageWizardPage);
 		defineDataProcessorsWizardPage = new DefineDataProcessorsWizardPage(DefineDataProcessorsWizardPage.ONLY_INVOCATIONS | DefineDataProcessorsWizardPage.EXTRACT_INVOCATIONS);
 		addPage(defineDataProcessorsWizardPage);

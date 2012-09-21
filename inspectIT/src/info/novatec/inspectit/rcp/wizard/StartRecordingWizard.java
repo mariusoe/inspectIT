@@ -121,7 +121,7 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 		addPage(newOrExistsingStorageWizardPage);
 		defineNewStorageWizzardPage = new DefineNewStorageWizzardPage(selectedCmr);
 		addPage(defineNewStorageWizzardPage);
-		selectStorageWizardPage = new SelectExistingStorageWizardPage(selectedCmr);
+		selectStorageWizardPage = new SelectExistingStorageWizardPage(selectedCmr, true);
 		addPage(selectStorageWizardPage);
 		selectAgentsWizardPage = new SelectAgentsWizardPage("Select Agent(s) that should participate in recording");
 		addPage(selectAgentsWizardPage);
