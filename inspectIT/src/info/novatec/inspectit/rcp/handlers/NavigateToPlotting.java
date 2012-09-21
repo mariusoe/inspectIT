@@ -5,6 +5,7 @@ import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
+import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData.PartType;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
@@ -68,6 +69,7 @@ public class NavigateToPlotting extends AbstractHandler {
 		editorPropertiesData.setSensorName(SensorTypeEnum.TIMER.getDisplayName());
 		editorPropertiesData.setViewImage(ModifiersImageFactory.getImage(methodIdent.getModifiers()));
 		editorPropertiesData.setViewName(TextFormatter.getMethodString(methodIdent));
+		editorPropertiesData.setPartNameFlag(PartType.SENSOR);
 		inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();

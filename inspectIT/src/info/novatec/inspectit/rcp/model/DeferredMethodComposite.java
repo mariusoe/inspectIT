@@ -3,6 +3,7 @@ package info.novatec.inspectit.rcp.model;
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
+import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData.PartType;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
@@ -64,6 +65,7 @@ public class DeferredMethodComposite extends DeferredComposite {
 					MethodIdent methodIdent = repositoryDefinition.getCachedDataService().getMethodIdentForId(method.getId());
 					editorPropertiesData.setViewName(TextFormatter.getMethodString(methodIdent));
 					editorPropertiesData.setViewImage(ModifiersImageFactory.getImage(methodIdent.getModifiers()));
+					editorPropertiesData.setPartNameFlag(PartType.SENSOR);
 					inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 					IdDefinition idDefinition = new IdDefinition();

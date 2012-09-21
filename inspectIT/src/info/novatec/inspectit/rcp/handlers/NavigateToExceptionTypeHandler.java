@@ -4,6 +4,7 @@ import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
+import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData.PartType;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.ExceptionTypeInputDefinitionExtra;
@@ -82,8 +83,9 @@ public class NavigateToExceptionTypeHandler extends AbstractHandler implements I
 
 				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
 				editorPropertiesData.setSensorImage(SensorTypeEnum.EXCEPTION_SENSOR.getImage());
-				editorPropertiesData.setSensorName("Exceptions");
+				editorPropertiesData.setSensorName(SensorTypeEnum.EXCEPTION_SENSOR.getDisplayName());
 				editorPropertiesData.setViewName(exceptionSensorData.getThrowableType());
+				editorPropertiesData.setPartNameFlag(PartType.SENSOR);
 				inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 				IdDefinition idDefinition = new IdDefinition();
@@ -98,8 +100,9 @@ public class NavigateToExceptionTypeHandler extends AbstractHandler implements I
 
 				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
 				editorPropertiesData.setSensorImage(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED.getImage());
-				editorPropertiesData.setSensorName("Exceptions");
+				editorPropertiesData.setSensorName(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED.getDisplayName());
 				editorPropertiesData.setViewName(exceptionSensorData.getThrowableType());
+				editorPropertiesData.setPartNameFlag(PartType.SENSOR);
 				inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 				IdDefinition idDefinition = new IdDefinition();

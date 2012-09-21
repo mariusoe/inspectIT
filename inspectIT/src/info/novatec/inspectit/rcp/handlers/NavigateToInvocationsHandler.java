@@ -82,7 +82,7 @@ public class NavigateToInvocationsHandler extends AbstractTemplateHandler {
 
 			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
 			editorPropertiesData.setSensorImage(SensorTypeEnum.INVOCATION_SEQUENCE.getImage());
-			editorPropertiesData.setSensorName("Invocation Sequences");
+			editorPropertiesData.setSensorName(SensorTypeEnum.INVOCATION_SEQUENCE.getDisplayName());
 			editorPropertiesData.setViewName("that contain " + textualDesc);
 			editorPropertiesData.setPartNameFlag(PartType.SENSOR);
 			inputDefinition.setEditorPropertiesData(editorPropertiesData);
