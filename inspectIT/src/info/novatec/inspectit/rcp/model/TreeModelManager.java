@@ -92,6 +92,8 @@ public class TreeModelManager {
 		instrumentedMethods.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INSTRUMENTATION_BROWSER));
 		instrumentedMethods.setPlatformIdent(platformIdent);
 		instrumentedMethods.setRepositoryDefinition(definition);
+		instrumentedMethods.setTooltip("In this tree, you can see all methods that were being instrumented since the first launch of the Agent. "
+				+ "It does not necessarily mean that these methods are currently instrumented and gathering data.");
 
 		return instrumentedMethods;
 	}
@@ -109,6 +111,8 @@ public class TreeModelManager {
 		Composite invocationSequence = new Composite();
 		invocationSequence.setName("Invocation Sequences");
 		invocationSequence.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INVOCATION));
+		invocationSequence.setTooltip("Invocation Sequences are recorded call trees of the application. Only the starting points (which are defined "
+				+ "via the invocation sequence sensor in the agent configuration) are shown in the browser tree.");
 
 		Component showAll = new Leaf();
 		showAll.setName("Show All");
@@ -136,6 +140,7 @@ public class TreeModelManager {
 		browser.setRepositoryDefinition(repositoryDefinition);
 		browser.setName("Browser");
 		browser.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INSTRUMENTATION_BROWSER));
+		browser.setTooltip("Only the starting points of invocation sequences (which are defined via the invocation sequence sensor in the agent configuration) are shown in this tree.");
 
 		invocationSequence.addChild(showAll);
 		invocationSequence.addChild(browser);
@@ -157,6 +162,7 @@ public class TreeModelManager {
 		Composite invocationSequence = new Composite();
 		invocationSequence.setName("SQL Statements");
 		invocationSequence.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_DATABASE));
+		invocationSequence.setTooltip("All recorded SQL statements can be analyzed here.");
 
 		Component showAll = new Leaf();
 		showAll.setName("Show All");
@@ -467,7 +473,7 @@ public class TreeModelManager {
 		vmSummary.setName("VM Summary");
 		vmSummary.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INFORMATION));
 
-		if (platformSensorTypeIdents.size() > 0) {
+		if (!platformSensorTypeIdents.isEmpty()) {
 			sensorTypeAvailable = true;
 
 			InputDefinition inputDefinition = new InputDefinition();
@@ -509,6 +515,7 @@ public class TreeModelManager {
 	private Component getExceptionSensorTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
 		Composite exceptionSensor = new Composite();
 		exceptionSensor.setName("Exceptions");
+		exceptionSensor.setTooltip("All recorded exceptions can be analyzed here.");
 		boolean sensorTypeAvailable = false;
 
 		Set<SensorTypeIdent> sensorTypeIdents = platformIdent.getSensorTypeIdents();
@@ -611,6 +618,7 @@ public class TreeModelManager {
 		Composite timerDataComposite = new Composite();
 		timerDataComposite.setName("Timer Data");
 		timerDataComposite.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_TIMER));
+		timerDataComposite.setTooltip("With these views, the timer data objects can be analyzed to identify e.g. long running methods.");
 
 		Component showAll = new Leaf();
 		showAll.setName("Show All");
