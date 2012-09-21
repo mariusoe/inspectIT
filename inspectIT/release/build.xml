@@ -311,15 +311,15 @@
 			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
 			<zipfileset src="${jvm.root}/jre7-linux-x64.zip" prefix="inspectit/jre" filemode="775" />
 		</zip>
-		<!-- The Mac versions are unavailable until Java7 is done for Mac -->
-		<!-- <zip destfile="${release.basedir}/dist/inspectit-macosx.cocoa.x86.zip" update="true">
+		<!-- No JRE packing for the Mac versions -->
+		<zip destfile="${release.basedir}/dist/inspectit-macosx.cocoa.x86.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
 			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
 		</zip>
 		<zip destfile="${release.basedir}/dist/inspectit-macosx.cocoa.x86_64.zip" update="true">
 			<zipfileset prefix="inspectit" dir="${release.basedir}" includes="thirdparty.txt" />
 			<zipfileset dir="../../Commons/resources" prefix="inspectit" includes="inspectIT-licence.pdf" />
-		</zip> -->
+		</zip>
 	</target>
 
 	<target name="-create-thirdparty-notification">
