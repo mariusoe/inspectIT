@@ -72,6 +72,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -208,7 +209,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	/**
 	 * Views main composite.
 	 */
-	private Composite mainComposite;
+	private SashForm mainComposite;
 
 	/**
 	 * Upper composite where filter box and storage tree is located.
@@ -250,7 +251,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 		toolkit = new FormToolkit(parent.getDisplay());
 		createViewToolbar();
 
-		mainComposite = toolkit.createComposite(parent);
+		mainComposite = new SashForm(parent, SWT.VERTICAL);
 		GridLayout mainLayout = new GridLayout(1, true);
 		mainLayout.marginWidth = 0;
 		mainLayout.marginHeight = 0;
@@ -294,7 +295,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 		treeViewer.getTree().setVisible(false);
 		ColumnViewerToolTipSupport.enableFor(treeViewer, ToolTip.NO_RECREATE);
 
-		storagePropertyForm = new StorageDataPropertyForm(mainComposite, toolkit);
+		storagePropertyForm = new StorageDataPropertyForm(mainComposite);
 		storagePropertyForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		treeViewer.addSelectionChangedListener(storagePropertyForm);
 
@@ -332,27 +333,22 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 				int width = mainComposite.getBounds().width;
 				int height = mainComposite.getBounds().height;
 
-				GridLayout gl = null;
 				if (width > height && verticaLayout) {
 					verticaLayout = false;
-					gl = new GridLayout(2, true);
+					mainComposite.setOrientation(SWT.HORIZONTAL);
 				} else if (width < height && !verticaLayout) {
 					verticaLayout = true;
-					gl = new GridLayout(1, true);
+					mainComposite.setOrientation(SWT.VERTICAL);
 				}
 
-				if (null != gl) {
-					gl.marginHeight = 0;
-					gl.marginWidth = 0;
-					mainComposite.setLayout(gl);
-					mainComposite.layout();
-				}
+				mainComposite.layout();
 			}
 		});
 
 		updateFormBody();
 		updateViewToolbar();
 
+		mainComposite.setWeights(new int[] { 2, 3 });
 		getSite().setSelectionProvider(treeViewer);
 	}
 
@@ -738,29 +734,29 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 			if (!selection.isEmpty()) {
 				if (selection.getFirstElement() instanceof StorageLeaf) {
 					StorageLeaf storageLeaf = ((StorageLeaf) selection.getFirstElement());
-					storagePropertyForm = new StorageDataPropertyForm(mainComposite, toolkit, storageLeaf);
+					storagePropertyForm = new StorageDataPropertyForm(mainComposite, storageLeaf);
 					storagePropertyForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 				} else if (selection.getFirstElement() instanceof LocalStorageLeaf) {
 					IStorageData storageData = ((LocalStorageLeaf) selection.getFirstElement()).getLocalStorageData();
-					storagePropertyForm = new StorageDataPropertyForm(mainComposite, toolkit, null, storageData);
+					storagePropertyForm = new StorageDataPropertyForm(mainComposite, null, storageData);
 					storagePropertyForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 				} else {
-					storagePropertyForm = new StorageDataPropertyForm(mainComposite, toolkit);
+					storagePropertyForm = new StorageDataPropertyForm(mainComposite);
 					storagePropertyForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 				}
 			}
 
 			treeViewer.addSelectionChangedListener(storagePropertyForm);
+			mainComposite.setWeights(new int[] { 2, 3 });
 			mainComposite.layout();
-			setTitleToolTip("Hide Properties");
 		} else {
 			if (null != storagePropertyForm && !storagePropertyForm.isDisposed()) {
 				treeViewer.removeSelectionChangedListener(storagePropertyForm);
 				storagePropertyForm.dispose();
 				storagePropertyForm = null;
 			}
+			mainComposite.setWeights(new int[] { 1 });
 			mainComposite.layout();
-			setTitleToolTip("Show Properties");
 		}
 	}
 

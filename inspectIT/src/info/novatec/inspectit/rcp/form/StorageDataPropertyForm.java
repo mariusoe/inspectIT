@@ -40,10 +40,12 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -54,12 +56,15 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.forms.ManagedForm;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.Hyperlink;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.TableWrapData;
+import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.handlers.IHandlerService;
 
 /**
@@ -91,9 +96,14 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 	private FormToolkit toolkit;
 
 	/**
+	 * {@link ManagedForm}.
+	 */
+	private ManagedForm managedForm;
+
+	/**
 	 * Form that will be created.
 	 */
-	private Form form;
+	private ScrolledForm form;
 
 	/**
 	 * Label for repository.
@@ -121,14 +131,14 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 	private TableViewer labelsTableViewer;
 
 	/**
-	 * Add new label Hyperlink.
+	 * Add new label button.
 	 */
-	private Hyperlink addNewLabel;
+	private Button addNewLabel;
 
 	/**
-	 * remove labels Hyperlink.
+	 * remove labels button.
 	 */
-	private Hyperlink removeLabels;
+	private Button removeLabels;
 
 	/**
 	 * Main composite where widgets are.
@@ -145,11 +155,9 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 	 * 
 	 * @param parent
 	 *            Parent where form will be created.
-	 * @param toolkit
-	 *            {@link FormToolkit}.
 	 */
-	public StorageDataPropertyForm(Composite parent, FormToolkit toolkit) {
-		this(parent, toolkit, null);
+	public StorageDataPropertyForm(Composite parent) {
+		this(parent, null);
 	}
 
 	/**
@@ -157,14 +165,13 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 	 * 
 	 * @param parent
 	 *            Parent where form will be created.
-	 * @param toolkit
-	 *            {@link FormToolkit}.
 	 * @param storageDataProvider
 	 *            {@link IStorageDataProvider} to display.
 	 */
-	public StorageDataPropertyForm(Composite parent, FormToolkit toolkit, IStorageDataProvider storageDataProvider) {
-		this.toolkit = toolkit;
-		this.form = toolkit.createForm(parent);
+	public StorageDataPropertyForm(Composite parent, IStorageDataProvider storageDataProvider) {
+		this.managedForm = new ManagedForm(parent);
+		this.toolkit = managedForm.getToolkit();
+		this.form = managedForm.getForm();
 		this.storageDataProvider = storageDataProvider;
 		if (null != storageDataProvider) {
 			this.storageData = storageDataProvider.getStorageData();
@@ -177,19 +184,198 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 	 * 
 	 * @param parent
 	 *            Parent where form will be created.
-	 * @param toolkit
-	 *            {@link FormToolkit}.
 	 * @param storageDataProvider
 	 *            {@link IStorageDataProvider} to display. Can be <code>null</code>.
 	 * @param storageData
 	 *            {@link IStorageData} to display. Can be <code>null</code>.
 	 */
-	public StorageDataPropertyForm(Composite parent, FormToolkit toolkit, IStorageDataProvider storageDataProvider, IStorageData storageData) {
-		this.toolkit = toolkit;
-		this.form = toolkit.createForm(parent);
+	public StorageDataPropertyForm(Composite parent, IStorageDataProvider storageDataProvider, IStorageData storageData) {
+		this.managedForm = new ManagedForm(parent);
+		this.toolkit = managedForm.getToolkit();
+		this.form = managedForm.getForm();
 		this.storageDataProvider = storageDataProvider;
 		this.storageData = storageData;
 		initWidget();
+	}
+
+	/**
+	 * Instantiate the widgets.
+	 */
+	private void initWidget() {
+		Composite body = form.getBody();
+		body.setLayout(new TableWrapLayout());
+		managedForm.getToolkit().decorateFormHeading(form.getForm());
+		mainComposite = toolkit.createComposite(body, SWT.NONE);
+		mainComposite.setLayout(new TableWrapLayout());
+		mainComposite.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+
+		// START - General section
+		Section generalSection = toolkit.createSection(mainComposite, Section.TITLE_BAR);
+		generalSection.setText("General information");
+
+		Composite generalComposite = toolkit.createComposite(generalSection, SWT.NONE);
+		TableWrapLayout tableWrapLayout = new TableWrapLayout();
+		tableWrapLayout.numColumns = 2;
+		generalComposite.setLayout(tableWrapLayout);
+		generalComposite.setLayoutData(new TableWrapData(TableWrapData.FILL));
+
+		toolkit.createLabel(generalComposite, "Repository:");
+		repository = toolkit.createLabel(generalComposite, null, SWT.WRAP);
+
+		toolkit.createLabel(generalComposite, "Description:");
+		description = toolkit.createFormText(generalComposite, true);
+		description.setLayoutData(new TableWrapData(TableWrapData.FILL));
+		description.addHyperlinkListener(new HyperlinkAdapter() {
+			@Override
+			public void linkActivated(HyperlinkEvent e) {
+				showStorageDescriptionBox();
+			}
+		});
+
+		toolkit.createLabel(generalComposite, "Size on disk:");
+		sizeOnDisk = toolkit.createLabel(generalComposite, null, SWT.WRAP);
+
+		toolkit.createLabel(generalComposite, "State:");
+		state = toolkit.createLabel(generalComposite, null, SWT.WRAP);
+
+		generalSection.setClient(generalComposite);
+		generalSection.setLayout(new TableWrapLayout());
+		generalSection.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+		// END - General section
+
+		// START - Label section
+		Section labelSection = toolkit.createSection(mainComposite, Section.TITLE_BAR);
+		labelSection.setText("Labels");
+
+		Composite labelComposite = toolkit.createComposite(labelSection, SWT.NONE);
+		tableWrapLayout = new TableWrapLayout();
+		tableWrapLayout.numColumns = 2;
+		labelComposite.setLayout(tableWrapLayout);
+		labelComposite.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+
+		Table table = toolkit.createTable(labelComposite, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL);
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		TableWrapData tableWrapData = new TableWrapData(TableWrapData.FILL_GRAB);
+		tableWrapData.colspan = 2;
+		tableWrapData.heightHint = 150;
+		table.setLayoutData(tableWrapData);
+
+		labelsTableViewer = new TableViewer(table);
+
+		TableViewerColumn viewerColumn = new TableViewerColumn(labelsTableViewer, SWT.NONE);
+		viewerColumn.getColumn().setText("Type");
+		viewerColumn.getColumn().setMoveable(false);
+		viewerColumn.getColumn().setResizable(true);
+		viewerColumn.getColumn().setWidth(140);
+
+		valueViewerColumn = new TableViewerColumn(labelsTableViewer, SWT.NONE);
+		valueViewerColumn.getColumn().setText("Value");
+		valueViewerColumn.getColumn().setMoveable(false);
+		valueViewerColumn.getColumn().setResizable(true);
+		valueViewerColumn.getColumn().setWidth(140);
+
+		labelsTableViewer.setContentProvider(new ArrayContentProvider());
+		labelsTableViewer.setLabelProvider(new StyledCellIndexLabelProvider() {
+			@Override
+			protected StyledString getStyledText(Object element, int index) {
+				if (element instanceof AbstractStorageLabel) {
+					AbstractStorageLabel<?> label = (AbstractStorageLabel<?>) element;
+					switch (index) {
+					case 0:
+						return new StyledString(TextFormatter.getLabelName(label));
+					case 1:
+						return new StyledString(TextFormatter.getLabelValue(label, false));
+					default:
+					}
+				}
+				return null;
+			}
+
+			@Override
+			protected Image getColumnImage(Object element, int index) {
+				if (index == 0 && element instanceof AbstractStorageLabel) {
+					return ImageFormatter.getImageForLabel(((AbstractStorageLabel<?>) element).getStorageLabelType());
+				}
+				return null;
+			}
+		});
+		labelsTableViewer.setComparator(new ViewerComparator() {
+			@Override
+			public int compare(Viewer viewer, Object e1, Object e2) {
+				if (e1 instanceof AbstractStorageLabel && e2 instanceof AbstractStorageLabel) {
+					return ((AbstractStorageLabel<?>) e1).compareTo((AbstractStorageLabel<?>) e2);
+				}
+				return super.compare(viewer, e1, e2);
+			}
+		});
+		labelsTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				if (labelsTableViewer.getSelection().isEmpty() || !isRemoteStorageDisplayed()) {
+					removeLabels.setEnabled(false);
+				} else {
+					removeLabels.setEnabled(true);
+				}
+			}
+
+		});
+
+		addNewLabel = toolkit.createButton(labelComposite, "Add", SWT.PUSH);
+		addNewLabel.setToolTipText("Add new label(s)");
+		addNewLabel.setEnabled(false);
+		addNewLabel.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
+				ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
+
+				Command command = commandService.getCommand(AddStorageLabelHandler.COMMAND);
+				ExecutionEvent executionEvent = handlerService.createExecutionEvent(command, new Event());
+				try {
+					command.executeWithChecks(executionEvent);
+				} catch (Exception exception) {
+					throw new RuntimeException(exception);
+				}
+			}
+		});
+
+		removeLabels = toolkit.createButton(labelComposite, "Remove", SWT.PUSH);
+		removeLabels.setToolTipText("Remove selected label(s)");
+		removeLabels.setEnabled(false);
+		removeLabels.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (!labelsTableViewer.getSelection().isEmpty()) {
+					List<AbstractStorageLabel<?>> inputList = new ArrayList<AbstractStorageLabel<?>>();
+					for (Object object : ((StructuredSelection) labelsTableViewer.getSelection()).toArray()) {
+						if (object instanceof AbstractStorageLabel) {
+							inputList.add((AbstractStorageLabel<?>) object);
+						}
+					}
+
+					IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
+					ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
+
+					Command command = commandService.getCommand(RemoveStorageLabelHandler.COMMAND);
+					ExecutionEvent executionEvent = handlerService.createExecutionEvent(command, new Event());
+					IEvaluationContext context = (IEvaluationContext) executionEvent.getApplicationContext();
+					context.addVariable(RemoveStorageLabelHandler.INPUT, inputList);
+					try {
+						command.executeWithChecks(executionEvent);
+					} catch (Exception exception) {
+						throw new RuntimeException(exception);
+					}
+				}
+			}
+		});
+
+		labelSection.setClient(labelComposite);
+		labelSection.setLayout(new TableWrapLayout());
+		labelSection.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+		// END - General section
+
+		refreshData();
 	}
 
 	/**
@@ -200,8 +386,6 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 	 */
 	public void setLayoutData(Object layoutData) {
 		form.setLayoutData(layoutData);
-		form.layout();
-		form.getBody().layout();
 	}
 
 	/**
@@ -283,7 +467,7 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 				if (isDataExistsForDisplay()) {
 					// data exists, we display info we have
 					form.setText(storageData.getName());
-					form.setMessage("");
+					form.setMessage(null, IMessageProvider.NONE);
 					mainComposite.setVisible(true);
 					String desc = storageData.getDescription();
 					if (null != desc) {
@@ -321,160 +505,10 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 					mainComposite.setVisible(false);
 				}
 
-				form.layout();
+				form.getBody().layout(true, true);
 				form.setBusy(false);
 			}
 		});
-	}
-
-	/**
-	 * Instantiate the widgets.
-	 */
-	private void initWidget() {
-		toolkit.decorateFormHeading(form);
-		form.getBody().setLayout(new GridLayout(1, false));
-
-		mainComposite = toolkit.createComposite(form.getBody());
-		GridLayout gl = new GridLayout(2, false);
-		gl.verticalSpacing = 6;
-		mainComposite.setLayout(gl);
-		mainComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		toolkit.createLabel(mainComposite, "Repository:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-		repository = toolkit.createLabel(mainComposite, null, SWT.WRAP);
-		repository.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-		toolkit.createLabel(mainComposite, "Description:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-		description = toolkit.createFormText(mainComposite, false);
-		description.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		description.addHyperlinkListener(new HyperlinkAdapter() {
-			@Override
-			public void linkActivated(HyperlinkEvent e) {
-				showStorageDescriptionBox();
-			}
-		});
-		toolkit.createLabel(mainComposite, "Size on disk:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-		sizeOnDisk = toolkit.createLabel(mainComposite, null, SWT.WRAP);
-		sizeOnDisk.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-		toolkit.createLabel(mainComposite, "State:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-		state = toolkit.createLabel(mainComposite, null, SWT.WRAP);
-		state.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-		Table table = toolkit.createTable(mainComposite, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL);
-		table.setHeaderVisible(true);
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-
-		labelsTableViewer = new TableViewer(table);
-
-		TableViewerColumn viewerColumn = new TableViewerColumn(labelsTableViewer, SWT.NONE);
-		viewerColumn.getColumn().setText("Label");
-		viewerColumn.getColumn().setMoveable(false);
-		viewerColumn.getColumn().setResizable(true);
-		viewerColumn.getColumn().setWidth(140);
-
-		valueViewerColumn = new TableViewerColumn(labelsTableViewer, SWT.NONE);
-		valueViewerColumn.getColumn().setText("Value");
-		valueViewerColumn.getColumn().setMoveable(false);
-		valueViewerColumn.getColumn().setResizable(true);
-		valueViewerColumn.getColumn().setWidth(100);
-
-		labelsTableViewer.setContentProvider(new ArrayContentProvider());
-		labelsTableViewer.setLabelProvider(new StyledCellIndexLabelProvider() {
-			@Override
-			protected StyledString getStyledText(Object element, int index) {
-				if (element instanceof AbstractStorageLabel) {
-					AbstractStorageLabel<?> label = (AbstractStorageLabel<?>) element;
-					switch (index) {
-					case 0:
-						return new StyledString(TextFormatter.getLabelName(label));
-					case 1:
-						return new StyledString(TextFormatter.getLabelValue(label, false));
-					default:
-					}
-				}
-				return null;
-			}
-
-			@Override
-			protected Image getColumnImage(Object element, int index) {
-				if (index == 0 && element instanceof AbstractStorageLabel) {
-					return ImageFormatter.getImageForLabel(((AbstractStorageLabel<?>) element).getStorageLabelType());
-				}
-				return null;
-			}
-		});
-		labelsTableViewer.setComparator(new ViewerComparator() {
-			@Override
-			public int compare(Viewer viewer, Object e1, Object e2) {
-				if (e1 instanceof AbstractStorageLabel && e2 instanceof AbstractStorageLabel) {
-					return ((AbstractStorageLabel<?>) e1).compareTo((AbstractStorageLabel<?>) e2);
-				}
-				return super.compare(viewer, e1, e2);
-			}
-		});
-		labelsTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				if (labelsTableViewer.getSelection().isEmpty() || !isRemoteStorageDisplayed()) {
-					removeLabels.setEnabled(false);
-				} else {
-					removeLabels.setEnabled(true);
-				}
-			}
-
-		});
-
-		addNewLabel = toolkit.createHyperlink(mainComposite, "Add new labels", SWT.RIGHT);
-		addNewLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, true, false, 2, 1));
-		addNewLabel.setEnabled(false);
-		addNewLabel.addHyperlinkListener(new HyperlinkAdapter() {
-			@Override
-			public void linkActivated(HyperlinkEvent e) {
-				IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
-				ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
-
-				Command command = commandService.getCommand(AddStorageLabelHandler.COMMAND);
-				ExecutionEvent executionEvent = handlerService.createExecutionEvent(command, new Event());
-				try {
-					command.executeWithChecks(executionEvent);
-				} catch (Exception exception) {
-					throw new RuntimeException(exception);
-				}
-			}
-		});
-
-		removeLabels = toolkit.createHyperlink(mainComposite, "Remove selected", SWT.RIGHT);
-		removeLabels.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, true, false, 2, 1));
-		removeLabels.setEnabled(false);
-		removeLabels.addHyperlinkListener(new HyperlinkAdapter() {
-			@Override
-			public void linkActivated(HyperlinkEvent e) {
-				if (!labelsTableViewer.getSelection().isEmpty()) {
-					List<AbstractStorageLabel<?>> inputList = new ArrayList<AbstractStorageLabel<?>>();
-					for (Object object : ((StructuredSelection) labelsTableViewer.getSelection()).toArray()) {
-						if (object instanceof AbstractStorageLabel) {
-							inputList.add((AbstractStorageLabel<?>) object);
-						}
-					}
-
-					IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
-					ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
-
-					Command command = commandService.getCommand(RemoveStorageLabelHandler.COMMAND);
-					ExecutionEvent executionEvent = handlerService.createExecutionEvent(command, new Event());
-					IEvaluationContext context = (IEvaluationContext) executionEvent.getApplicationContext();
-					context.addVariable(RemoveStorageLabelHandler.INPUT, inputList);
-					try {
-						command.executeWithChecks(executionEvent);
-					} catch (Exception exception) {
-						throw new RuntimeException(exception);
-					}
-				}
-			}
-		});
-
-		refreshData();
 	}
 
 	/**
@@ -516,7 +550,11 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 	}
 
 	/**
-	 * Refreshes the {@link StorageManagerView}.
+	 * Refreshes the {@link StorageManagerView}, but only reloads the storages from given
+	 * repository.
+	 * 
+	 * @param cmrRepositoryDefinition
+	 *            {@link CmrRepositoryDefinition}.
 	 */
 	private void refreshStorageManagerView(CmrRepositoryDefinition cmrRepositoryDefinition) {
 		IViewPart viewPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(StorageManagerView.VIEW_ID);

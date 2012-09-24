@@ -37,11 +37,15 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.ManagedForm;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.TableWrapData;
+import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.progress.UIJob;
 
 /**
@@ -80,8 +84,10 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	/**
 	 * Widgets.
 	 */
+	private Composite mainComposite;
 	private FormToolkit toolkit;
-	private Form form;
+	private ManagedForm managedForm;
+	private ScrolledForm form;
 	private Label address;
 	private FormText description;
 	private Label recordingIcon;
@@ -89,7 +95,6 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	private Label status;
 	private Label bufferDate;
 	private ProgressBar bufferBar;
-	private Composite mainComposite;
 	private ProgressBar recTimeBar;
 	private Label recordingStatusIcon;
 	private Label recordingLabel;
@@ -104,11 +109,9 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	 * 
 	 * @param parent
 	 *            Parent composite.
-	 * @param toolkit
-	 *            {@link FormToolkit}.
 	 */
-	public CmrRepositoryPropertyForm(Composite parent, FormToolkit toolkit) {
-		this(parent, toolkit, null);
+	public CmrRepositoryPropertyForm(Composite parent) {
+		this(parent, null);
 	}
 
 	/**
@@ -116,14 +119,13 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	 * 
 	 * @param parent
 	 *            Parent composite.
-	 * @param toolkit
-	 *            {@link FormToolkit}.
 	 * @param cmrRepositoryDefinition
 	 *            Displayed CMR.
 	 */
-	public CmrRepositoryPropertyForm(Composite parent, FormToolkit toolkit, CmrRepositoryDefinition cmrRepositoryDefinition) {
-		this.toolkit = toolkit;
-		this.form = toolkit.createForm(parent);
+	public CmrRepositoryPropertyForm(Composite parent, CmrRepositoryDefinition cmrRepositoryDefinition) {
+		this.managedForm = new ManagedForm(parent);
+		this.toolkit = managedForm.getToolkit();
+		this.form = managedForm.getForm();
 		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
 		initWidget();
 	}
@@ -132,26 +134,32 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	 * Instantiate the widgets.
 	 */
 	private void initWidget() {
-		toolkit.decorateFormHeading(form);
-		form.getBody().setLayout(new GridLayout(1, false));
+		Composite body = form.getBody();
+		body.setLayout(new TableWrapLayout());
+		managedForm.getToolkit().decorateFormHeading(form.getForm());
+		mainComposite = toolkit.createComposite(body, SWT.NONE);
+		mainComposite.setLayout(new TableWrapLayout());
+		mainComposite.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 
-		mainComposite = toolkit.createComposite(form.getBody());
-		GridLayout gl = new GridLayout(3, false);
-		gl.verticalSpacing = 6;
-		mainComposite.setLayout(gl);
-		mainComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		// START - General section
+		Section generalSection = toolkit.createSection(mainComposite, Section.TITLE_BAR);
+		generalSection.setText("General information");
 
-		toolkit.createLabel(mainComposite, "Address:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-		address = toolkit.createLabel(mainComposite, null, SWT.WRAP);
-		address.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+		Composite generalComposite = toolkit.createComposite(generalSection, SWT.NONE);
+		TableWrapLayout tableWrapLayout = new TableWrapLayout();
+		tableWrapLayout.numColumns = 2;
+		generalComposite.setLayout(tableWrapLayout);
+		generalComposite.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
-		toolkit.createLabel(mainComposite, "Version:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-		version = toolkit.createLabel(mainComposite, null, SWT.WRAP);
-		version.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+		toolkit.createLabel(generalComposite, "Address:");
+		address = toolkit.createLabel(generalComposite, null, SWT.WRAP);
 
-		toolkit.createLabel(mainComposite, "Description:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-		description = toolkit.createFormText(mainComposite, false);
-		description.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+		toolkit.createLabel(generalComposite, "Version:");
+		version = toolkit.createLabel(generalComposite, null, SWT.WRAP);
+
+		toolkit.createLabel(generalComposite, "Description:");
+		description = toolkit.createFormText(generalComposite, true);
+		description.setLayoutData(new TableWrapData(TableWrapData.FILL));
 		description.addHyperlinkListener(new HyperlinkAdapter() {
 			@Override
 			public void linkActivated(HyperlinkEvent e) {
@@ -159,68 +167,98 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 			}
 		});
 
-		toolkit.createLabel(mainComposite, "Status:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-		status = toolkit.createLabel(mainComposite, null, SWT.WRAP);
-		status.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+		toolkit.createLabel(generalComposite, "Status:");
+		status = toolkit.createLabel(generalComposite, null, SWT.WRAP);
 
-		toolkit.createLabel(mainComposite, "Buffer occupancy:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-		final Composite bufferComposite = toolkit.createComposite(mainComposite);
-		gl = new GridLayout(1, true);
+		generalSection.setClient(generalComposite);
+		generalSection.setLayout(new TableWrapLayout());
+		generalSection.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+		// END - General section
+
+		// START - Buffer section
+		Section bufferSection = toolkit.createSection(mainComposite, Section.TITLE_BAR);
+		bufferSection.setText("Buffer status");
+
+		Composite bufferSectionComposite = toolkit.createComposite(bufferSection, SWT.NONE);
+		tableWrapLayout = new TableWrapLayout();
+		tableWrapLayout.numColumns = 2;
+		bufferSectionComposite.setLayout(tableWrapLayout);
+		bufferSectionComposite.setLayoutData(new TableWrapData(TableWrapData.FILL));
+
+		toolkit.createLabel(bufferSectionComposite, "Data in buffer since:");
+		bufferDate = toolkit.createLabel(bufferSectionComposite, null, SWT.WRAP);
+
+		toolkit.createLabel(bufferSectionComposite, "Buffer occupancy:");
+		bufferBar = new ProgressBar(bufferSectionComposite, SWT.SMOOTH);
+		bufferBar.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+
+		// help label
+		toolkit.createLabel(bufferSectionComposite, null);
+
+		bufferSize = toolkit.createLabel(bufferSectionComposite, null, SWT.CENTER);
+		bufferSize.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+
+		bufferSection.setClient(bufferSectionComposite);
+		bufferSection.setLayout(new TableWrapLayout());
+		bufferSection.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+		// END - Buffer section
+
+		// START - Storage section
+		Section storageSection = toolkit.createSection(mainComposite, Section.TITLE_BAR);
+		storageSection.setText("Storage status");
+
+		Composite storageSectionComposite = toolkit.createComposite(storageSection, SWT.NONE);
+		tableWrapLayout = new TableWrapLayout();
+		tableWrapLayout.numColumns = 2;
+		storageSectionComposite.setLayout(tableWrapLayout);
+		storageSectionComposite.setLayoutData(new TableWrapData(TableWrapData.FILL));
+
+		toolkit.createLabel(storageSectionComposite, "Storage space left:");
+
+		spaceLeftBar = new ProgressBar(storageSectionComposite, SWT.SMOOTH);
+		spaceLeftBar.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+
+		// help label
+		toolkit.createLabel(storageSectionComposite, null);
+
+		spaceLeftLabel = toolkit.createLabel(storageSectionComposite, null, SWT.CENTER);
+		spaceLeftLabel.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+
+		toolkit.createLabel(storageSectionComposite, "Recording:");
+		Composite recordingHelpComposite = toolkit.createComposite(storageSectionComposite);
+		GridLayout gl = new GridLayout(2, false);
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
-		bufferComposite.setLayout(gl);
-		bufferComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+		recordingHelpComposite.setLayout(gl);
+		recordingIcon = toolkit.createLabel(recordingHelpComposite, null, SWT.WRAP);
+		recordingLabel = toolkit.createLabel(recordingHelpComposite, null, SWT.WRAP);
 
-		bufferBar = new ProgressBar(bufferComposite, SWT.SMOOTH);
-		bufferBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		bufferSize = toolkit.createLabel(bufferComposite, null, SWT.CENTER);
-		bufferSize.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		toolkit.createLabel(storageSectionComposite, "Recording status:");
+		recordingStatusIcon = toolkit.createLabel(storageSectionComposite, null, SWT.NONE);
 
-		toolkit.createLabel(mainComposite, "Data in buffer since:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-		bufferDate = toolkit.createLabel(mainComposite, null, SWT.WRAP);
-		bufferDate.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+		toolkit.createLabel(storageSectionComposite, "Recording storage:");
+		recordingStorage = toolkit.createLabel(storageSectionComposite, null, SWT.WRAP);
 
-		toolkit.createLabel(mainComposite, "Storage space left:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-		Composite spaceLeftComposite = toolkit.createComposite(mainComposite);
-		gl = new GridLayout(1, true);
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		spaceLeftComposite.setLayout(gl);
-		spaceLeftComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+		toolkit.createLabel(storageSectionComposite, "Recording time left:");
 
-		spaceLeftBar = new ProgressBar(spaceLeftComposite, SWT.SMOOTH);
-		spaceLeftBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		spaceLeftLabel = toolkit.createLabel(spaceLeftComposite, null, SWT.CENTER);
-		spaceLeftLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-		toolkit.createLabel(mainComposite, "Recording:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-		recordingIcon = toolkit.createLabel(mainComposite, null, SWT.WRAP);
-		recordingIcon.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-		recordingLabel = toolkit.createLabel(mainComposite, null, SWT.WRAP);
-		recordingLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-		toolkit.createLabel(mainComposite, "Recording status:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-		recordingStatusIcon = toolkit.createLabel(mainComposite, null, SWT.NONE);
-		recordingStatusIcon.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-
-		toolkit.createLabel(mainComposite, "Recording storage:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-		recordingStorage = toolkit.createLabel(mainComposite, null, SWT.WRAP);
-		recordingStorage.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-
-		toolkit.createLabel(mainComposite, "Recording time left:").setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-		Composite recordingComposite = toolkit.createComposite(mainComposite);
-		gl = new GridLayout(1, true);
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		recordingComposite.setLayout(gl);
-		recordingComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-
-		recTimeBar = new ProgressBar(recordingComposite, SWT.SMOOTH);
+		recTimeBar = new ProgressBar(storageSectionComposite, SWT.SMOOTH);
 		recTimeBar.setVisible(false);
-		recTimeBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		recTime = toolkit.createLabel(recordingComposite, null, SWT.CENTER);
+		recTimeBar.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+
+		// help label
+		toolkit.createLabel(storageSectionComposite, null);
+
+		//
+		recTime = toolkit.createLabel(storageSectionComposite, null, SWT.CENTER);
 		recTime.setVisible(false);
-		recTime.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		recTime.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+
+		storageSection.setClient(storageSectionComposite);
+		tableWrapLayout = new TableWrapLayout();
+		tableWrapLayout.numColumns = 2;
+		storageSection.setLayout(tableWrapLayout);
+		storageSection.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+		// END - Storage section
 
 		refreshData();
 	}
@@ -233,8 +271,6 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	 */
 	public void setLayoutData(Object layoutData) {
 		form.setLayoutData(layoutData);
-		form.layout();
-		form.getBody().layout();
 	}
 
 	/**
@@ -255,7 +291,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 				StructuredSelection structuredSelection = (StructuredSelection) selection;
 				Object firstElement = structuredSelection.getFirstElement();
 				while (firstElement != null) {
-					if (firstElement instanceof ICmrRepositoryProvider) {
+					if (firstElement instanceof ICmrRepositoryProvider) { // NOPMD
 						if (!ObjectUtils.equals(cmrRepositoryDefinition, ((ICmrRepositoryProvider) firstElement).getCmrRepositoryDefinition())) {
 							cmrRepositoryDefinition = ((ICmrRepositoryProvider) firstElement).getCmrRepositoryDefinition();
 							refreshData();
@@ -267,9 +303,10 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 			}
 		}
 		if (null != cmrRepositoryDefinition) {
-			cmrRepositoryDefinition = null;
+			cmrRepositoryDefinition = null; // NOPMD
 			refreshData();
 		}
+
 	}
 
 	/**
@@ -324,7 +361,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 
 				if (null != cmrRepositoryDefinition) {
 					form.setText(cmrRepositoryDefinition.getName());
-					form.setMessage(null);
+					form.setMessage(null, IMessageProvider.NONE);
 					address.setText(cmrRepositoryDefinition.getIp() + ":" + cmrRepositoryDefinition.getPort());
 					String desc = cmrRepositoryDefinition.getDescription();
 					if (null != desc) {
@@ -359,9 +396,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 				updateRecordingData();
 				updateCmrManagementData();
 
-				mainComposite.layout();
-				form.layout();
-
+				form.getBody().layout(true, true);
 				form.setBusy(false);
 			}
 		});

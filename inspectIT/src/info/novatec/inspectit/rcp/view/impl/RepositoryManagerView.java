@@ -51,6 +51,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.Image;
@@ -133,7 +134,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 	/**
 	 * Views main composite.
 	 */
-	private Composite mainComposite;
+	private SashForm mainComposite;
 
 	/**
 	 * Boolean for layout of view.
@@ -164,7 +165,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 
 		toolkit = new FormToolkit(parent.getDisplay());
 
-		mainComposite = toolkit.createComposite(parent);
+		mainComposite = new SashForm(parent, SWT.VERTICAL);
 		GridLayout mainLayout = new GridLayout(1, true);
 		mainLayout.marginWidth = 0;
 		mainLayout.marginHeight = 0;
@@ -204,7 +205,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		ColumnViewerToolTipSupport.enableFor(treeViewer, ToolTip.NO_RECREATE);
 		treeViewer.setInput(inputList);
 
-		cmrPropertyForm = new CmrRepositoryPropertyForm(mainComposite, toolkit);
+		cmrPropertyForm = new CmrRepositoryPropertyForm(mainComposite);
 		cmrPropertyForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		treeViewer.addSelectionChangedListener(cmrPropertyForm);
 
@@ -221,25 +222,20 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 				int width = mainComposite.getBounds().width;
 				int height = mainComposite.getBounds().height;
 
-				GridLayout gd = null;
 				if (width > height && verticaLayout) {
 					verticaLayout = false;
-					gd = (new GridLayout(2, true));
+					mainComposite.setOrientation(SWT.HORIZONTAL);
 				} else if (width < height && !verticaLayout) {
 					verticaLayout = true;
-					gd = new GridLayout(1, true);
+					mainComposite.setOrientation(SWT.VERTICAL);
 				}
 
-				if (null != gd) {
-					gd.marginHeight = 0;
-					gd.marginWidth = 0;
-					mainComposite.setLayout(gd);
-					mainComposite.layout();
-				}
+				mainComposite.layout();
 			}
 		});
 
 		updateFormBody();
+		mainComposite.setWeights(new int[] { 2, 3 });
 
 		getSite().setSelectionProvider(treeViewer);
 	}
@@ -514,9 +510,10 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 				}
 			}
 
-			cmrPropertyForm = new CmrRepositoryPropertyForm(mainComposite, toolkit, cmrRepositoryDefinition);
+			cmrPropertyForm = new CmrRepositoryPropertyForm(mainComposite, cmrRepositoryDefinition);
 			cmrPropertyForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 			treeViewer.addSelectionChangedListener(cmrPropertyForm);
+			mainComposite.setWeights(new int[] { 2, 3 });
 			mainComposite.layout();
 		} else {
 			if (null != cmrPropertyForm && !cmrPropertyForm.isDisposed()) {
@@ -524,6 +521,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 				cmrPropertyForm.dispose();
 				cmrPropertyForm = null;
 			}
+			mainComposite.setWeights(new int[] { 1 });
 			mainComposite.layout();
 		}
 	}
