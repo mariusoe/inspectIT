@@ -77,8 +77,6 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 		/** The cpu duration column. */
 		CPUDURATION("Cpu Duration (ms)", 70, null);
 
-		/** The real viewer column. */
-		private TableViewerColumn column;
 		/** The name. */
 		private String name;
 		/** The width of the column. */
@@ -153,7 +151,7 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 			if (null != column.image) {
 				viewerColumn.getColumn().setImage(column.image);
 			}
-			column.column = viewerColumn;
+			mapTableViewerColumn(column, viewerColumn);
 		}
 	}
 
@@ -210,7 +208,7 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 	public TableViewerComparator<? extends DefaultData> getComparator() {
 		HttpDataTableViewerComparator httpTimerDataViewerComparator = new HttpDataTableViewerComparator();
 		for (Column column : Column.values()) {
-			httpTimerDataViewerComparator.addColumn(column.column.getColumn(), column);
+			httpTimerDataViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), column);
 		}
 
 		return httpTimerDataViewerComparator;

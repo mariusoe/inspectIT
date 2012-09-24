@@ -93,8 +93,6 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		/** The prepared column. */
 		PREPARED("Prepared?", 60, null, false, true);
 
-		/** The real viewer column. */
-		private TableViewerColumn column;
 		/** The name. */
 		private String name;
 		/** The width of the column. */
@@ -191,7 +189,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 			if (null != column.image) {
 				viewerColumn.getColumn().setImage(column.image);
 			}
-			column.column = viewerColumn;
+			mapTableViewerColumn(column, viewerColumn);
 		}
 	}
 
@@ -201,7 +199,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	@Override
 	public boolean canAlterColumnWidth(TableColumn tableColumn) {
 		for (Column column : Column.values()) {
-			if (Objects.equals(column.column.getColumn(), tableColumn)) {
+			if (Objects.equals(getMappedTableViewerColumn(column).getColumn(), tableColumn)) {
 				return (column.showInRawMode && rawMode) || (column.showInAggregatedMode && !rawMode);
 			}
 		}
@@ -246,16 +244,16 @@ public class SqlInvocInputController extends AbstractTableInputController {
 			if (rawMode) {
 				if (column.showInRawMode && !column.showInAggregatedMode && !ShowHideColumnsHandler.isColumnHidden(this.getClass(), column.name)) {
 					Integer width = ShowHideColumnsHandler.getRememberedColumnWidth(this.getClass(), column.name);
-					column.column.getColumn().setWidth((null != width) ? width.intValue() : column.width);
+					getMappedTableViewerColumn(column).getColumn().setWidth((null != width) ? width.intValue() : column.width);
 				} else if (!column.showInRawMode && column.showInAggregatedMode) {
-					column.column.getColumn().setWidth(0);
+					getMappedTableViewerColumn(column).getColumn().setWidth(0);
 				}
 			} else {
 				if (!column.showInRawMode && column.showInAggregatedMode && !ShowHideColumnsHandler.isColumnHidden(this.getClass(), column.name)) {
 					Integer width = ShowHideColumnsHandler.getRememberedColumnWidth(this.getClass(), column.name);
-					column.column.getColumn().setWidth((null != width) ? width.intValue() : column.width);
+					getMappedTableViewerColumn(column).getColumn().setWidth((null != width) ? width.intValue() : column.width);
 				} else if (column.showInRawMode && !column.showInAggregatedMode) {
-					column.column.getColumn().setWidth(0);
+					getMappedTableViewerColumn(column).getColumn().setWidth(0);
 				}
 			}
 		}
@@ -398,7 +396,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	public TableViewerComparator<? extends DefaultData> getComparator() {
 		SqlInputViewerComparator sqlInputViewerComparator = new SqlInputViewerComparator();
 		for (Column column : Column.values()) {
-			sqlInputViewerComparator.addColumn(column.column.getColumn(), column);
+			sqlInputViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), column);
 		}
 
 		return sqlInputViewerComparator;

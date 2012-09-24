@@ -92,8 +92,6 @@ public class TimerDataInputController extends AbstractTableInputController {
 		/** The cpu duration column. */
 		CPUDURATION("Cpu Duration (ms)", 70, null);
 
-		/** The real viewer column. */
-		private TableViewerColumn column;
 		/** The name. */
 		private String name;
 		/** The width of the column. */
@@ -215,7 +213,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 			if (null != column.image) {
 				viewerColumn.getColumn().setImage(column.image);
 			}
-			column.column = viewerColumn;
+			mapTableViewerColumn(column, viewerColumn);
 		}
 	}
 
@@ -326,7 +324,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 	public TableViewerComparator<? extends DefaultData> getComparator() {
 		TimerDataViewerComparator timerDataViewerComparator = new TimerDataViewerComparator();
 		for (Column column : Column.values()) {
-			timerDataViewerComparator.addColumn(column.column.getColumn(), column);
+			timerDataViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), column);
 		}
 
 		return timerDataViewerComparator;
@@ -622,7 +620,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 			return new StyledString("error");
 		}
 	}
-	
+
 	/**
 	 * @return the timerDataList
 	 */
@@ -636,5 +634,5 @@ public class TimerDataInputController extends AbstractTableInputController {
 	public ITimerDataAccessService getTimerDataAccessService() {
 		return timerDataAccessService;
 	}
-	
+
 }

@@ -7,12 +7,15 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 
@@ -24,6 +27,12 @@ import org.eclipse.swt.widgets.TableColumn;
  * 
  */
 public abstract class AbstractTableInputController implements TableInputController {
+
+	/**
+	 * Map of the enumeration keys and {@link TableViewerColumn}s. Subclasses can use utility
+	 * methods to bound columns for later use.
+	 */
+	private Map<Enum<?>, TableViewerColumn> tableViewerColumnMap = new HashMap<Enum<?>, TableViewerColumn>();
 
 	/**
 	 * The input definition.
@@ -166,7 +175,7 @@ public abstract class AbstractTableInputController implements TableInputControll
 	public boolean canAlterColumnWidth(TableColumn tableColumn) {
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * <p>
@@ -175,7 +184,6 @@ public abstract class AbstractTableInputController implements TableInputControll
 	@Override
 	public void objectChecked(Object object, boolean checked) {
 	}
-
 
 	/**
 	 * {@inheritDoc}
@@ -197,4 +205,15 @@ public abstract class AbstractTableInputController implements TableInputControll
 		return false;
 	}
 
+	public void mapTableViewerColumn(Enum<?> key, TableViewerColumn column) {
+		tableViewerColumnMap.put(key, column);
+	}
+
+	private boolean isTableViewerColumnMapped(Enum<?> key) {
+		return null != tableViewerColumnMap.get(key);
+	}
+
+	public TableViewerColumn getMappedTableViewerColumn(Enum<?> key) {
+		return tableViewerColumnMap.get(key);
+	}
 }

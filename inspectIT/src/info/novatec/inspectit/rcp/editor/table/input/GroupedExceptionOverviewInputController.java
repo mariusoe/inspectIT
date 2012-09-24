@@ -78,8 +78,6 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		/** The HANDLED column. */
 		HANDLED("Handled", 70, null);
 
-		/** The real viewer column. */
-		private TableViewerColumn column;
 		/** The name. */
 		private String name;
 		/** The width of the column. */
@@ -182,7 +180,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 			if (null != column.image) {
 				viewerColumn.getColumn().setImage(column.image);
 			}
-			column.column = viewerColumn;
+			mapTableViewerColumn(column, viewerColumn);
 		}
 	}
 
@@ -215,7 +213,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	public TableViewerComparator<? extends DefaultData> getComparator() {
 		GroupedExceptionOverviewViewerComparator exceptionOverviewViewerComparator = new GroupedExceptionOverviewViewerComparator();
 		for (Column column : Column.values()) {
-			exceptionOverviewViewerComparator.addColumn(column.column.getColumn(), column);
+			exceptionOverviewViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), column);
 		}
 
 		return exceptionOverviewViewerComparator;

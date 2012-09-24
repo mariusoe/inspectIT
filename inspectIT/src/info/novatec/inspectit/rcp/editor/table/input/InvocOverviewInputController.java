@@ -85,8 +85,6 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		/** The Use case column. */
 		USE_CASE("Use case", 100, null);
 
-		/** The real viewer column. */
-		private TableViewerColumn column;
 		/** The name. */
 		private String name;
 		/** The width of the column. */
@@ -225,7 +223,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 			if (null != column.image) {
 				viewerColumn.getColumn().setImage(column.image);
 			}
-			column.column = viewerColumn;
+			mapTableViewerColumn(column, viewerColumn);
 		}
 	}
 
@@ -258,7 +256,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	public TableViewerComparator<? extends DefaultData> getComparator() {
 		InvocOverviewViewerComparator invocOverviewViewerComparator = new InvocOverviewViewerComparator();
 		for (Column column : Column.values()) {
-			invocOverviewViewerComparator.addColumn(column.column.getColumn(), column);
+			invocOverviewViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), column);
 		}
 
 		return invocOverviewViewerComparator;
