@@ -58,6 +58,8 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.ViewPart;
 
+import com.google.common.base.Objects;
+
 /**
  * Data explorer view show one Agent from a given {@link RepositoryDefinition}. Other agents can be
  * selected via view menu.
@@ -148,9 +150,11 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	private IToolBarManager toolBarManager;
 
 	/**
-	 * Map of the cached expanded objects in the agent tree per agent.
+	 * Map of the cached expanded objects in the agent tree per agent/repository combination. Key
+	 * for this map is the combined hash code that can be obtained by calling method
+	 * {@link #getHashCodeForAgentRepository(PlatformIdent, RepositoryDefinition)}.
 	 */
-	private Map<PlatformIdent, List<Object>> expandedElementsPerAgent = new ConcurrentHashMap<PlatformIdent, List<Object>>();
+	private Map<Integer, List<Object>> expandedElementsPerAgent = new ConcurrentHashMap<Integer, List<Object>>();
 
 	/**
 	 * Default constructor.
@@ -198,6 +202,10 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 *            Agent to select. Can be null. If the repository does not
 	 */
 	public void showRepository(final RepositoryDefinition repositoryDefinition, final PlatformIdent agent) {
+		if (null != displayedAgent && null != displayedRepositoryDefinition) {
+			cacheExpandedObjects(displayedAgent, displayedRepositoryDefinition);
+		}
+
 		displayedRepositoryDefinition = repositoryDefinition;
 		updateAvailableAgents(repositoryDefinition);
 		selectAgentForDisplay(agent);
@@ -216,9 +224,6 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 *            Hint for agent selection.
 	 */
 	private void selectAgentForDisplay(PlatformIdent agent) {
-		if (null != displayedAgent) {
-			cacheExpandedObjects(displayedAgent);
-		}
 		if (null != agent && null != availableAgents && availableAgents.contains(agent)) {
 			displayedAgent = agent;
 		} else if (null != availableAgents && !availableAgents.isEmpty()) {
@@ -229,15 +234,17 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	}
 
 	/**
-	 * Caches the current expanded objects in the tree viewer with the given platform ident. Note
-	 * that this method will filter out the elements given by
+	 * Caches the current expanded objects in the tree viewer with the given platform
+	 * ident/repository combination. Note that this method will filter out the elements given by
 	 * {@link org.eclipse.jface.viewers.TreeViewer#getExpandedElements()}, so that only the last
 	 * expanded element in the tree is saved.
 	 * 
 	 * @param platformIdent
 	 *            {@link PlatformIdent} to cache elements for.
+	 * @param repositoryDefinition
+	 *            Repository that platform is belonging to.
 	 */
-	private void cacheExpandedObjects(final PlatformIdent platformIdent) {
+	private void cacheExpandedObjects(PlatformIdent platformIdent, RepositoryDefinition repositoryDefinition) {
 		Object[] allExpanded = treeViewer.getExpandedElements();
 		if (allExpanded.length > 0) {
 			Set<Object> parents = new HashSet<Object>();
@@ -250,10 +257,23 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 			}
 			List<Object> expandedList = new ArrayList<Object>(Arrays.asList(allExpanded));
 			expandedList.removeAll(parents);
-			expandedElementsPerAgent.put(platformIdent, expandedList);
+			expandedElementsPerAgent.put(getHashCodeForAgentRepository(platformIdent, repositoryDefinition), expandedList);
 		} else {
-			expandedElementsPerAgent.put(platformIdent, Collections.emptyList());
+			expandedElementsPerAgent.put(getHashCodeForAgentRepository(platformIdent, repositoryDefinition), Collections.emptyList());
 		}
+	}
+
+	/**
+	 * Returns the hash code combination for {@link PlatformIdent} and {@link RepositoryDefinition}.
+	 * 
+	 * @param platformIdent
+	 *            {@link PlatformIdent}
+	 * @param repositoryDefinition
+	 *            {@link RepositoryDefinition}
+	 * @return The hash code as int.
+	 */
+	private int getHashCodeForAgentRepository(PlatformIdent platformIdent, RepositoryDefinition repositoryDefinition) {
+		return Objects.hashCode(platformIdent, repositoryDefinition);
 	}
 
 	/**
@@ -313,6 +333,9 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 				if (selected < availableAgents.size()) {
 					PlatformIdent platformIdent = availableAgents.get(selected);
 					if (!ObjectUtils.equals(displayedAgent, platformIdent)) {
+						if (null != displayedAgent && null != displayedRepositoryDefinition) {
+							cacheExpandedObjects(displayedAgent, displayedRepositoryDefinition);
+						}
 						selectAgentForDisplay(platformIdent);
 						performUpdate();
 					}
@@ -436,7 +459,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 				updateAgentsCombo();
 				updateViewToolbar();
 				if (null != displayedAgent) {
-					List<Object> expandedObjects = expandedElementsPerAgent.get(displayedAgent);
+					List<Object> expandedObjects = expandedElementsPerAgent.get(getHashCodeForAgentRepository(displayedAgent, displayedRepositoryDefinition));
 					if (null != expandedObjects) {
 						for (Object object : expandedObjects) {
 							treeViewer.expandObject(object, 1);
@@ -463,7 +486,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	public void refresh() {
 		if (displayedRepositoryDefinition instanceof CmrRepositoryDefinition) {
 			if (null != displayedAgent) {
-				cacheExpandedObjects(displayedAgent);
+				cacheExpandedObjects(displayedAgent, displayedRepositoryDefinition);
 			}
 			final UpdateRepositoryJob job = InspectIT.getDefault().getCmrRepositoryManager().forceCmrRepositoryOnlineStatusUpdate((CmrRepositoryDefinition) displayedRepositoryDefinition);
 			job.addJobChangeListener(new JobChangeAdapter() {

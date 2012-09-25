@@ -10,7 +10,6 @@ import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.IServerStatusService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
-import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
@@ -18,17 +17,20 @@ import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
+import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 import info.novatec.inspectit.rcp.repository.service.storage.StorageServiceProvider;
 import info.novatec.inspectit.storage.LocalStorageData;
 
 import java.util.List;
 
+import com.google.common.base.Objects;
+
 /**
  * Storage repository definition. This {@link RepositoryDefinition} has a direct usage of a
  * {@link CmrRepositoryDefinition} where storage is located.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class StorageRepositoryDefinition implements RepositoryDefinition {
 
@@ -254,6 +256,33 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	 */
 	public void setAgents(List<PlatformIdent> agents) {
 		this.agents = agents;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(localStorageData);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+		if (object == null) {
+			return false;
+		}
+		if (getClass() != object.getClass()) {
+			return false;
+		}
+		StorageRepositoryDefinition that = (StorageRepositoryDefinition) object;
+		return Objects.equal(this.localStorageData, that.localStorageData);
+
 	}
 
 }
