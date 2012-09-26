@@ -234,8 +234,10 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 			Map<IPreferenceGroup, Object> preferenceMap = preferenceEvent.getPreferenceMap();
 			if (null != preferenceMap && preferenceMap.containsKey(PreferenceId.InvocationSubviewMode.RAW)) {
 				Boolean isRawMode = (Boolean) preferenceMap.get(PreferenceId.InvocationSubviewMode.RAW);
+
+				// first show/hide columns and then change the rawMode value
+				handleRawAggregatedColumnVisibility(isRawMode.booleanValue());
 				rawMode = isRawMode.booleanValue();
-				handleRawAggregatedColumnVisibility(rawMode);
 			}
 		}
 	}

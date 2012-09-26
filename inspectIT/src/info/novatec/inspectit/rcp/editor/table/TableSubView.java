@@ -329,7 +329,12 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 			this.doRefresh();
 		}
 
+		// we are suspending the table redraw while controller handles the event to disable any
+		// updates on the table by controller
+		tableViewer.getTable().setRedraw(false);
 		tableInputController.preferenceEventFired(preferenceEvent);
+		tableViewer.getTable().setRedraw(true);
+
 		switch (preferenceEvent.getPreferenceId()) {
 		case CLEAR_BUFFER:
 			if (tableInputController.getPreferenceIds().contains(PreferenceId.CLEAR_BUFFER)) {
