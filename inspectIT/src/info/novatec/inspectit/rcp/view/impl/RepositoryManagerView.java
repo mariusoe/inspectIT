@@ -323,7 +323,11 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 	 */
 	@Override
 	public void setFocus() {
-		treeViewer.getTree().setFocus();
+		if (treeViewer.getTree().isVisible()) {
+			treeViewer.getTree().setFocus();
+		} else {
+			mainForm.setFocus();
+		}
 	}
 
 	/**

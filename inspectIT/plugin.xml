@@ -335,6 +335,10 @@
             id="info.novatec.inspectit.rcp.commands.navigateToAggregatedTimerData"
             name="Navigate To Aggregated Timer Data">
       </command>
+      <command
+            id="info.novatec.inspectit.rcp.menu.addMenu"
+            name="Add Menu Command">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -1274,6 +1278,10 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.EmptyHandler"
+            commandId="info.novatec.inspectit.rcp.menu.addMenu">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -1979,6 +1987,18 @@
             allPopups="false"
             locationURI="toolbar:org.eclipse.ui.main.toolbar">
          <toolbar
+               id="info.novatec.inspectit.rcp.addImportToolbar">
+            <command
+                  commandId="info.novatec.inspectit.rcp.menu.addMenu"
+                  icon="icons/add.png"
+                  style="pulldown">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.file.import"
+                  style="push">
+            </command>
+         </toolbar>
+         <toolbar
                id="info.novatec.inspectit.rcp.selectionToolbar">
             <command
                   commandId="info.novatec.inspectit.rcp.commands.details"
@@ -2019,6 +2039,26 @@
                   class="info.novatec.inspectit.rcp.menu.SearchDocumentationContributionItem">
             </control>
          </toolbar>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:info.novatec.inspectit.rcp.menu.addMenu">
+         <command
+               commandId="org.eclipse.ui.newWizard"
+               style="push">
+            <parameter
+                  name="newWizardId"
+                  value="info.novatec.inspectit.rcp.wizard.addCmrRepositoryWizard">
+            </parameter>
+         </command>
+         <command
+               commandId="org.eclipse.ui.newWizard"
+               style="push">
+            <parameter
+                  name="newWizardId"
+                  value="info.novatec.inspectit.rcp.wizard.createStorageWizard">
+            </parameter>
+         </command>
       </menuContribution>
    </extension>
    <extension

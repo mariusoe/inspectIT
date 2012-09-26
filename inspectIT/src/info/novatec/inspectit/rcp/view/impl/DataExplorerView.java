@@ -476,7 +476,11 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 */
 	@Override
 	public void setFocus() {
-		treeViewer.getTree().setFocus();
+		if (treeViewer.getTree().isVisible()) {
+			treeViewer.getTree().setFocus();
+		} else {
+			mainForm.setFocus();
+		}
 	}
 
 	/**

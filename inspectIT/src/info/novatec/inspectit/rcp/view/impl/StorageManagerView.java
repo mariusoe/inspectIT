@@ -626,7 +626,11 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	 */
 	@Override
 	public void setFocus() {
-		treeViewer.getTree().setFocus();
+		if (treeViewer.getTree().isVisible()) {
+			treeViewer.getTree().setFocus();
+		} else {
+			mainForm.setFocus();
+		}
 	}
 
 	/**

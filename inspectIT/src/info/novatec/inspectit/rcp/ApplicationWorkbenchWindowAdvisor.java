@@ -1,13 +1,24 @@
 package info.novatec.inspectit.rcp;
 
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.ui.application.ActionBarAdvisor;
-import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
+/**
+ * Here we configure our workbench window.
+ * 
+ * @author Ivan Senic
+ * 
+ */
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
+	/**
+	 * Default constructor.
+	 * 
+	 * @param configurer
+	 *            {@link IWorkbenchWindowConfigurer}
+	 * @see WorkbenchWindowAdvisor#WorkbenchWindowAdvisor(IWorkbenchWindowConfigurer)
+	 */
 	public ApplicationWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
 		super(configurer);
 	}
@@ -22,14 +33,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		configurer.setShowCoolBar(true);
 		configurer.setShowStatusLine(true);
 		configurer.setShowProgressIndicator(true);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ActionBarAdvisor createActionBarAdvisor(IActionBarConfigurer configurer) {
-		return new ApplicationActionBarAdvisor(configurer);
 	}
 
 }
