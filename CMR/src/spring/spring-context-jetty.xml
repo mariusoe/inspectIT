@@ -274,6 +274,46 @@
 		<property name="servletName" value="defaultServletExporter" />
 		<property name="pathSpec" value="/"/>
 	</bean>
+	<!-- END -->
+
+	<!-- UPLOAD SERVLET FOR UPLOADING FILES -->
+	<bean id="uploadServlet" class="info.novatec.inspectit.cmr.jetty.FileUploadServlet" >
+		<property name="directoryToStore" value="${storage.storageDefaultFolder}/uploads" />
+	</bean>
+
+	<bean id="uploadServletHolder"
+		class="org.mortbay.jetty.servlet.ServletHolder">
+		<property name="name" value="uploadServletExporter" />
+		<property name="servlet" ref="uploadServlet" />
+	</bean>
+
+	<bean id="uploadServletMapping"
+		class="org.mortbay.jetty.servlet.ServletMapping">
+		<property name="servletName" value="uploadServletExporter" />
+		<property name="pathSpec" value="/fileupload"/>
+	</bean>
+	<!-- END -->
+
+	<!-- MULTIPART FILTER -->
+	<bean id="multiPartFilter" class="org.mortbay.servlet.MultiPartFilter" />
+
+	<bean id="multiPartFilterHolder"
+		class="org.mortbay.jetty.servlet.FilterHolder">
+		<property name="name" value="multiPartFilterExporter" />
+		<property name="filter" ref="multiPartFilter" />
+		<property name="initParameters">
+			<map>
+				<entry key="deleteFiles" value="true"/>
+				<entry key="fileOutputBuffer" value="1024"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="multiPartFilterMapping"
+		class="org.mortbay.jetty.servlet.FilterMapping">
+		<property name="filterName" value="multiPartFilterExporter" />
+		<property name="pathSpec" value="/fileupload"/>
+	</bean>
 
 	<!-- END -->
 
@@ -315,6 +355,7 @@
 				<ref bean="httpTimerDataAccessServiceServletHolder" />
 				<ref bean="storageServiceServletHolder" />
 				<ref bean="defaultServletHolder" />
+				<ref bean="uploadServletHolder" />
 			</list>
 		</property>
 		<property name="servletMappings">
@@ -332,15 +373,18 @@
 				<ref bean="httpTimerDataAccessServiceServiceMapping" />
 				<ref bean="storageServiceServiceMapping" />
 				<ref bean="defaultServletMapping" />
+				<ref bean="uploadServletMapping" />
 			</list>
 		</property>
 		<property name="filters">
 			<list>
+				<ref bean="multiPartFilterHolder" />
 				<ref bean="gzipFilterHolder" />
 			</list>
 		</property>
 		<property name="filterMappings">
 			<list>
+				<ref bean="multiPartFilterMapping" />
 				<ref bean="gzipFilterMapping" />
 			</list>
 		</property>

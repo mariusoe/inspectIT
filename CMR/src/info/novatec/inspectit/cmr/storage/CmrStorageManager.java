@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -568,7 +569,7 @@ public class CmrStorageManager extends StorageManager {
 	 *             If {@link IOException} occurs.
 	 */
 	public List<String> getDataFilesLocations(StorageData storageData) throws IOException {
-		return getFilesHttpLocation(storageData, StorageFileExtensions.DATA_FILE_EXTENSION);
+		return getFilesHttpLocation(storageData, StorageFileExtensions.DATA_FILE_EXT);
 	}
 
 	/**
@@ -732,6 +733,61 @@ public class CmrStorageManager extends StorageManager {
 	}
 
 	/**
+	 * Checks for the uploaded files in the storage uploads folder and tries to extract data to the
+	 * default storage folder.
+	 * 
+	 * @param packedStorageData
+	 *            Storage data that is packed in the file that needs to be unpacked.
+	 * 
+	 * @throws IOException
+	 *             IF {@link IOException} occurs during the file tree walk.
+	 * @throws StorageException
+	 *             If there is not enough space for the unpacking the stoarge.
+	 */
+	public void unpackUploadedStorage(final IStorageData packedStorageData) throws IOException, StorageException {
+		long storageBytesLeft = getBytesHardDriveOccupancyLeft();
+		if (packedStorageData.getDiskSize() > storageBytesLeft) {
+			throw new StorageException("Uploaded storage " + packedStorageData + " can not be unpacked because there is not enough disk space left for storage data on the CMR.");
+		}
+
+		Path uploadPath = Paths.get(this.getStorageUploadsFolder());
+		if (Files.notExists(uploadPath)) {
+			throw new IOException("Can not perform storage unpacking. The main upload path " + uploadPath.toString() + " does not exist.");
+		} else {
+			Files.walkFileTree(uploadPath, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					try {
+						IStorageData storageData = getStorageDataFromZip(file);
+						if (!Objects.equals(packedStorageData, storageData)) {
+							// go to next file if the file that we found does not hold the correct
+							// storage to unpack
+							return FileVisitResult.CONTINUE;
+						}
+
+						if (null != storageData) {
+							StorageData importedStorageData = new StorageData(storageData);
+							if (!existingStoragesSet.contains(importedStorageData)) {
+								unzipStorageData(file, getStoragePath(importedStorageData));
+								Path localInformation = getStoragePath(importedStorageData).resolve(importedStorageData.getId() + StorageFileExtensions.LOCAL_STORAGE_FILE_EXT);
+								Files.deleteIfExists(localInformation);
+								writeStorageDataToDisk(importedStorageData);
+								existingStoragesSet.add(importedStorageData);
+							} else {
+								LOGGER.info("Uploaded storage file " + file.toString() + " contains the storage that is already available on the CMR. File will be deleted.");
+							}
+						}
+						Files.deleteIfExists(file);
+					} catch (Exception e) {
+						LOGGER.warn("Uploaded storage file " + file.toString() + " is not of correct type and can not be extracted. File will be deleted.", e);
+					}
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		}
+	}
+
+	/**
 	 * Returns the size of the storage on disk.
 	 * 
 	 * @param storageData
@@ -821,6 +877,43 @@ public class CmrStorageManager extends StorageManager {
 	}
 
 	/**
+	 * Clears the upload folder.
+	 */
+	private void clearUploadFolder() {
+		final Path uploadPath = Paths.get(this.getStorageUploadsFolder());
+		if (Files.notExists(uploadPath)) {
+			return;
+		}
+
+		try {
+			Files.walkFileTree(uploadPath, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					Files.delete(file);
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+					if (dir.equals(uploadPath)) {
+						return FileVisitResult.CONTINUE;
+					}
+
+					if (null == exc) {
+						Files.delete(dir);
+						return FileVisitResult.CONTINUE;
+					} else {
+						throw exc;
+					}
+				}
+
+			});
+		} catch (IOException e) {
+			LOGGER.warn("Could not delete the storage upload folder on the start-up.", e);
+		}
+	}
+
+	/**
 	 * Adds a shutdown hook to the current {@link Runtime}, so that all storages can be closed,
 	 * before the CMR is shutdown. All pending writes should be executed on shutdown.
 	 */
@@ -851,6 +944,7 @@ public class CmrStorageManager extends StorageManager {
 	public void postConstruct() throws Exception {
 		loadAllExistingStorages();
 		updatedStorageSpaceLeft();
+		clearUploadFolder();
 		addShutdownHook();
 	}
 

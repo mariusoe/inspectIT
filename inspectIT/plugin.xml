@@ -168,6 +168,30 @@
       </wizard>
    </extension>
    <extension
+         point="org.eclipse.ui.importWizards">
+      <wizard
+            class="info.novatec.inspectit.rcp.wizard.ImportStorageWizard"
+            icon="icons/import.gif"
+            id="info.novatec.inspectit.rcp.wizard.importStorageWizard"
+            name="Import Storage">
+         <description>
+            Import Storage
+         </description>
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.exportWizards">
+      <wizard
+            class="info.novatec.inspectit.rcp.wizard.ExportStorageWizard"
+            icon="icons/export.gif"
+            id="info.novatec.inspectit.rcp.wizard.exportStorageWizard"
+            name="Export Storage">
+         <description>
+            Export Storage
+         </description>
+      </wizard>
+   </extension>
+   <extension
          point="org.eclipse.ui.commands">
       <command
             id="info.novatec.inspectit.rcp.commands.openView"
@@ -338,6 +362,10 @@
       <command
             id="info.novatec.inspectit.rcp.menu.addMenu"
             name="Add Menu Command">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.exportStorage"
+            name="Export Storage">
       </command>
    </extension>
    <extension
@@ -1282,6 +1310,33 @@
             class="info.novatec.inspectit.rcp.handlers.EmptyHandler"
             commandId="info.novatec.inspectit.rcp.menu.addMenu">
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.ExportLocalStorageHandler"
+            commandId="info.novatec.inspectit.rcp.commands.exportStorage">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <or>
+                  <iterate>
+                     <instanceof
+                           value="info.novatec.inspectit.rcp.provider.ILocalStorageDataProvider">
+                     </instanceof>
+                  </iterate>
+                  <iterate>
+                     <instanceof
+                           value="info.novatec.inspectit.rcp.provider.IStorageDataProvider">
+                     </instanceof>
+                     <test
+                           property="info.novatec.inspectit.storageState"
+                           value="CLOSED">
+                     </test>
+                  </iterate>
+               </or>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -1794,6 +1849,24 @@
                tooltip="Fully Download Storage - Makes storage accessible offline">
          </command>
          <command
+               commandId="org.eclipse.ui.file.import"
+               icon="icons/import.gif"
+               style="push">
+            <parameter
+                  name="importWizardId"
+                  value="info.novatec.inspectit.rcp.wizard.importStorageWizard">
+            </parameter>
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.exportStorage"
+               icon="icons/export.gif"
+               style="push">
+         </command>
+         <separator
+               name="info.novatec.inspectit.rcp.storageManagerToolbar.separator2"
+               visible="true">
+         </separator>
+         <command
                commandId="org.eclipse.ui.file.refresh"
                icon="icons/refresh.png"
                style="push"
@@ -1915,6 +1988,20 @@
                icon="icons/mount_storage.png"
                style="push"
                tooltip="Fully Download Storage - Makes storage accessible offline">
+         </command>
+         <command
+               commandId="org.eclipse.ui.file.import"
+               icon="icons/import.gif"
+               style="push">
+            <parameter
+                  name="importWizardId"
+                  value="info.novatec.inspectit.rcp.wizard.importStorageWizard">
+            </parameter>
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.exportStorage"
+               icon="icons/export.gif"
+               style="push">
          </command>
       </menuContribution>
       <menuContribution

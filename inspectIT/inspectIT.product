@@ -97,6 +97,7 @@ NTSales_Allgemeine_Nutzungsbedingungen_inspectIT_en.doc_V2.0 / 24.07.2012
       <plugin id="info.novatec.hibernate-core"/>
       <plugin id="info.novatec.httpclient"/>
       <plugin id="info.novatec.httpcore"/>
+      <plugin id="info.novatec.httpmime"/>
       <plugin id="info.novatec.inspectit.commons"/>
       <plugin id="info.novatec.inspectit.commonscs"/>
       <plugin id="info.novatec.inspectit.rcp"/>

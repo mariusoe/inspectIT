@@ -434,6 +434,9 @@
 	<bean id="dataRetriever"
 		class="info.novatec.inspectit.rcp.storage.util.DataRetriever" init-method="init"/>
 
+	<bean id="dataUploader"
+		class="info.novatec.inspectit.rcp.storage.util.DataUploader" />
+
 	<bean id="storageRepositoryDefinition"
 		class="info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition"
 		scope="prototype" lazy-init="true" />

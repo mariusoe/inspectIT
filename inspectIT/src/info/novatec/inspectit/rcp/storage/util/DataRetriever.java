@@ -242,20 +242,29 @@ public class DataRetriever {
 	 * @param storageData
 	 *            {@link StorageData}.
 	 * @param directory
-	 *            Directory to save objects.
+	 *            Directory to save objects. compressBefore Should data files be compressed on the
+	 *            fly before sent.
+	 * @param compressBefore
+	 *            Should data files be compressed on the fly before sent.
+	 * @param decompressContent
+	 *            If the useGzipCompression is <code>true</code>, this parameter will define if the
+	 *            received content will be de-compressed. If false is passed content will be saved
+	 *            to file in the same format as received, but the path of the file will be altered
+	 *            with additional '.gzip' extension at the end.
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
 	 * @throws StorageException
 	 *             If status of HTTP response is not successful (codes 2xx).
 	 */
-	public void downloadAndSavePlatformIdents(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, Path directory) throws IOException, StorageException {
+	public void downloadAndSavePlatformIdents(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, Path directory, boolean compressBefore, boolean decompressContent)
+			throws IOException, StorageException {
 		if (!Files.isDirectory(directory)) {
 			throw new StorageException("Directory path supplied as the agent data saving destinationis is not valid. Given path is: " + directory.toString());
 		}
 
 		List<String> platformIdentsFiles = cmrRepositoryDefinition.getStorageService().getAgentFilesLocations(storageData);
 		if (null != platformIdentsFiles) {
-			this.downloadAndSaveObjects(cmrRepositoryDefinition, platformIdentsFiles, directory, true, true);
+			this.downloadAndSaveObjects(cmrRepositoryDefinition, platformIdentsFiles, directory, compressBefore, decompressContent);
 		} else {
 			throw new StorageException("No agent data files could be found on the repository '" + cmrRepositoryDefinition.getName() + "' for the storage " + storageData.toString());
 		}
@@ -273,19 +282,25 @@ public class DataRetriever {
 	 *            Directory to save objects.
 	 * @param compressBefore
 	 *            Should data files be compressed on the fly before sent.
+	 * @param decompressContent
+	 *            If the useGzipCompression is <code>true</code>, this parameter will define if the
+	 *            received content will be de-compressed. If false is passed content will be saved
+	 *            to file in the same format as received, but the path of the file will be altered
+	 *            with additional '.gzip' extension at the end.
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
 	 * @throws StorageException
 	 *             If status of HTTP response is not successful (codes 2xx).
 	 */
-	public void downloadAndSaveDataFiles(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, Path directory, boolean compressBefore) throws IOException, StorageException {
+	public void downloadAndSaveDataFiles(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, Path directory, boolean compressBefore, boolean decompressContent)
+			throws IOException, StorageException {
 		if (!Files.isDirectory(directory)) {
 			throw new StorageException("Directory path supplied as the data saving destination is not valid. Given path is: " + directory.toString());
 		}
 
 		List<String> dataFiles = cmrRepositoryDefinition.getStorageService().getDataFilesLocations(storageData);
 		if (null != dataFiles) {
-			this.downloadAndSaveObjects(cmrRepositoryDefinition, dataFiles, directory, true, true);
+			this.downloadAndSaveObjects(cmrRepositoryDefinition, dataFiles, directory, compressBefore, decompressContent);
 		}
 	}
 
@@ -298,20 +313,29 @@ public class DataRetriever {
 	 * @param storageData
 	 *            {@link StorageData}.
 	 * @param directory
-	 *            Directory to save objects.
+	 *            Directory to save objects. compressBefore Should data files be compressed on the
+	 *            fly before sent.
+	 * @param compressBefore
+	 *            Should data files be compressed on the fly before sent.
+	 * @param decompressContent
+	 *            If the useGzipCompression is <code>true</code>, this parameter will define if the
+	 *            received content will be de-compressed. If false is passed content will be saved
+	 *            to file in the same format as received, but the path of the file will be altered
+	 *            with additional '.gzip' extension at the end.
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
 	 * @throws StorageException
 	 *             If status of HTTP response is not successful (codes 2xx).
 	 */
-	public void downloadAndSaveIndexingTrees(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, Path directory) throws IOException, StorageException {
+	public void downloadAndSaveIndexingTrees(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, Path directory, boolean compressBefore, boolean decompressContent)
+			throws IOException, StorageException {
 		if (!Files.isDirectory(directory)) {
 			throw new StorageException("Directory path supplied as the agent data saving destination is not valid. Given path is: " + directory.toString());
 		}
 
 		List<String> indexingTreeFiles = cmrRepositoryDefinition.getStorageService().getIndexFilesLocations(storageData);
 		if (null != indexingTreeFiles) {
-			this.downloadAndSaveObjects(cmrRepositoryDefinition, indexingTreeFiles, directory, true, true);
+			this.downloadAndSaveObjects(cmrRepositoryDefinition, indexingTreeFiles, directory, compressBefore, decompressContent);
 		} else {
 			throw new StorageException("No index data files could be found on the repository '" + cmrRepositoryDefinition.getName() + "' for the storage " + storageData.toString());
 		}
@@ -381,7 +405,8 @@ public class DataRetriever {
 	 * @param decompressContent
 	 *            If the useGzipCompression is <code>true</code>, this parameter will define if the
 	 *            received content will be de-compressed. If false is passed content will be saved
-	 *            to file in the same format as received.
+	 *            to file in the same format as received, but the path of the file will be altered
+	 *            with additional '.gzip' extension at the end.
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
 	 * @throws StorageException
@@ -402,6 +427,7 @@ public class DataRetriever {
 			StatusLine statusLine = response.getStatusLine();
 			if (HttpStatus.valueOf(statusLine.getStatusCode()).series().equals(Series.SUCCESSFUL)) {
 				HttpEntity entity = response.getEntity();
+				boolean addGZipExtension = !decompressContent && isGZipContentEncoding(entity);
 				InputStream is = null;
 				try {
 					is = entity.getContent();
@@ -430,10 +456,25 @@ public class DataRetriever {
 	}
 
 	/**
-	 * Sets {@link #serializerCount}.
 	 * 
-	 * @param serializerCount
-	 *            New value for {@link #serializerCount}
+	 * @param entity
+	 *            {@link HttpEntity}
+	 * @return True if the GZip encoding is active.
+	 */
+	private static boolean isGZipContentEncoding(HttpEntity entity) {
+		Header ceHeader = entity.getContentEncoding();
+		if (ceHeader != null) {
+			HeaderElement[] codecs = ceHeader.getElements();
+			for (int i = 0; i < codecs.length; i++) {
+				if (codecs[i].getName().equalsIgnoreCase("gzip")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
 	 */
 	public void setSerializerCount(int serializerCount) {
 		this.serializerCount = serializerCount;
@@ -509,16 +550,8 @@ public class DataRetriever {
 		 */
 		@Override
 		public void process(HttpResponse response, HttpContext context) throws HttpException, IOException {
-			HttpEntity entity = response.getEntity();
-			Header ceHeader = entity.getContentEncoding();
-			if (ceHeader != null) {
-				HeaderElement[] codecs = ceHeader.getElements();
-				for (int i = 0; i < codecs.length; i++) {
-					if (codecs[i].getName().equalsIgnoreCase("gzip")) {
-						response.setEntity(new GzipDecompressingEntity(response.getEntity()));
-						return;
-					}
-				}
+			if (isGZipContentEncoding(response.getEntity())) {
+				response.setEntity(new GzipDecompressingEntity(response.getEntity()));
 			}
 		}
 

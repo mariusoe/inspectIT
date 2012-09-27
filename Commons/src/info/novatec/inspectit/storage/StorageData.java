@@ -44,6 +44,25 @@ public class StorageData extends AbstractStorageData {
 	}
 
 	/**
+	 * Secondary constructor. Copies data from the given {@link StorageData}.
+	 * 
+	 * @param storageData
+	 *            {@link StorageData} to copy information.
+	 */
+	public StorageData(IStorageData storageData) {
+		setId(storageData.getId());
+		setName(storageData.getName());
+		setDescription(storageData.getDescription());
+		setDiskSize(storageData.getDiskSize());
+		labelList = new ArrayList<AbstractStorageLabel<?>>(storageData.getLabelList());
+		if (storageData instanceof StorageData) {
+			state = ((StorageData) storageData).getState();
+		} else {
+			state = StorageState.CLOSED;
+		}
+	}
+
+	/**
 	 * Returns all labels of this {@link StorageData}.
 	 * 
 	 * @return Returns all labels of this {@link StorageData}.

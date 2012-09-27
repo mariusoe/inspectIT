@@ -1,6 +1,7 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
@@ -437,5 +438,18 @@ public interface IStorageService {
 	 *         <code>0</code> will be returned.
 	 */
 	long getStorageQueuedWriteTaskCount(StorageData storageData);
+
+	/**
+	 * Informs the CMR that the given storage data should be unpacked. The CMR will perform a search
+	 * of a proper file in the upload folder that contains the given storage data info. If file is
+	 * found it will be unpacked and storage will be prepared for usage.
+	 * 
+	 * @param storageData
+	 *            Storage data that is packed in the file that needs to be unpacked.
+	 * 
+	 * @throws StorageException
+	 *             If exception occurs during the check.
+	 */
+	void unpackUploadedStorage(IStorageData storageData) throws StorageException;
 
 }

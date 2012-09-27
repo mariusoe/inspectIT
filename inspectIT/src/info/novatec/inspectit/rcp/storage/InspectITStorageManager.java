@@ -12,6 +12,7 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatu
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
 import info.novatec.inspectit.rcp.storage.listener.StorageChangeListener;
 import info.novatec.inspectit.rcp.storage.util.DataRetriever;
+import info.novatec.inspectit.rcp.storage.util.DataUploader;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
@@ -27,6 +28,7 @@ import info.novatec.inspectit.storage.serializer.SerializationException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileSystem;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -92,6 +94,11 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	private File bundleFile;
 
 	/**
+	 * {@link DataUploader}.
+	 */
+	private DataUploader dataUploader;
+
+	/**
 	 * Returns Spring instantiated {@link StorageRepositoryDefinition}.
 	 * 
 	 * @return Spring instantiated {@link StorageRepositoryDefinition}.
@@ -143,14 +150,14 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 		}
 
 		try {
-			dataRetriever.downloadAndSavePlatformIdents(cmrRepositoryDefinition, storageData, directory);
+			dataRetriever.downloadAndSavePlatformIdents(cmrRepositoryDefinition, storageData, directory, compressBefore, true);
 		} catch (Exception e) {
 			deleteLocalStorageData(localStorageData, false);
 			throw e;
 		}
 
 		try {
-			dataRetriever.downloadAndSaveIndexingTrees(cmrRepositoryDefinition, storageData, directory);
+			dataRetriever.downloadAndSaveIndexingTrees(cmrRepositoryDefinition, storageData, directory, compressBefore, true);
 		} catch (Exception e) {
 			deleteLocalStorageData(localStorageData, false);
 			throw e;
@@ -158,7 +165,7 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 
 		if (fullyDownload) {
 			try {
-				dataRetriever.downloadAndSaveDataFiles(cmrRepositoryDefinition, storageData, directory, compressBefore);
+				dataRetriever.downloadAndSaveDataFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true);
 				downloadedStorages.add(localStorageData);
 				localStorageData.setFullyDownloaded(true);
 			} catch (Exception e) {
@@ -239,7 +246,7 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 		}
 
 		Path directory = getStoragePath(localStorageData);
-		dataRetriever.downloadAndSaveDataFiles(cmrRepositoryDefinition, storageData, directory, compressBefore);
+		dataRetriever.downloadAndSaveDataFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true);
 		downloadedStorages.add(localStorageData);
 		localStorageData.setFullyDownloaded(true);
 		try {
@@ -555,6 +562,161 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	}
 
 	/**
+	 * Uploads a file to the {@link CmrRepositoryDefinition} storage uploads.
+	 * 
+	 * @param fileName
+	 *            Name of file.
+	 * @param cmrRepositoryDefinition
+	 *            {@link CmrRepositoryDefinition}.
+	 * @throws Exception
+	 *             If upload file does not exist or upload fails.
+	 */
+	public void uploadZippedStorage(String fileName, CmrRepositoryDefinition cmrRepositoryDefinition) throws Exception {
+		dataUploader.uploadFileToStorageUploads(new File(fileName), cmrRepositoryDefinition);
+	}
+
+	/**
+	 * Compresses the content of the local storage data folder to the file. File name is provided
+	 * via given path. If the file already exists, it will be deleted first.
+	 * 
+	 * @param localStorageData
+	 *            {@link LocalStorageData} to zip.
+	 * @param zipFileName
+	 *            Zip file name.
+	 * @throws StorageException
+	 *             If the storage is not fully downloaded.
+	 * @throws IOException
+	 *             If {@link IOException} occurs during compressing.
+	 */
+	public void zipStorageData(LocalStorageData localStorageData, String zipFileName) throws StorageException, IOException {
+		if (!localStorageData.isFullyDownloaded()) {
+			throw new StorageException("Local storage data is not fully downloaded.");
+		} else {
+			Path zipPath = Paths.get(zipFileName);
+			if (Files.exists(zipPath)) {
+				Files.delete(zipPath);
+			}
+
+			final FileSystem zipFileSystem = createZipFileSystem(zipPath, true);
+			final Path zipRoot = zipFileSystem.getPath("/");
+			try {
+				super.zipStorageData(localStorageData, zipPath, zipRoot);
+			} catch (IOException e) {
+				zipFileSystem.close();
+				Files.deleteIfExists(zipPath);
+				throw e;
+			}
+
+			zipFileSystem.close();
+		}
+	}
+
+	/**
+	 * Zips the remote storage files to the file. File name is provided via given path. If the file
+	 * already exists, it will be deleted first.
+	 * 
+	 * @param storageData
+	 *            Remote storage to zip.
+	 * @param cmrRepositoryDefinition
+	 *            {@link CmrRepositoryDefinition} where storage is located.
+	 * @param zipFileName
+	 *            Zip file name.
+	 * @throws StorageException
+	 *             If serialization of data fails during zipping.
+	 * @throws IOException
+	 *             If {@link IOException} occurs during compressing.
+	 */
+	public void zipStorageData(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, String zipFileName) throws StorageException, IOException {
+		Path zipPath = Paths.get(zipFileName);
+		if (Files.exists(zipPath)) {
+			Files.delete(zipPath);
+		}
+
+		final FileSystem zipFileSystem = createZipFileSystem(zipPath, true);
+		final Path zipRoot = zipFileSystem.getPath("/");
+
+		try {
+			dataRetriever.downloadAndSavePlatformIdents(cmrRepositoryDefinition, storageData, zipRoot, true, false);
+			dataRetriever.downloadAndSaveIndexingTrees(cmrRepositoryDefinition, storageData, zipRoot, true, false);
+			dataRetriever.downloadAndSaveDataFiles(cmrRepositoryDefinition, storageData, zipRoot, true, false);
+		} catch (IOException e) {
+			zipFileSystem.close();
+			Files.deleteIfExists(zipPath);
+			throw e;
+		} catch (StorageException e) {
+			zipFileSystem.close();
+			Files.deleteIfExists(zipPath);
+			throw e;
+		}
+
+		try {
+			LocalStorageData localStorageData = new LocalStorageData(storageData);
+			localStorageData.setFullyDownloaded(true);
+			super.writeLocalStorageDataToDisk(localStorageData, zipRoot);
+		} catch (IOException e) {
+			zipFileSystem.close();
+			Files.deleteIfExists(zipPath);
+			throw e;
+		} catch (SerializationException e) {
+			zipFileSystem.close();
+			Files.deleteIfExists(zipPath);
+			throw new StorageException("Exception saving storage data information to the zip root.", e);
+		}
+
+		zipFileSystem.close();
+	}
+
+	/**
+	 * Returns the {@link StorageData} object that exists in the compressed storage file.
+	 * 
+	 * @param zipFileName
+	 *            Compressed storage file name.
+	 * @return {@link IStorageData} object or <code>null</code> if the given file is not of correct
+	 *         type or does not exist.
+	 */
+	public IStorageData getStorageDataFromZip(String zipFileName) {
+		return this.getStorageDataFromZip(Paths.get(zipFileName));
+	}
+
+	/**
+	 * Unzips the content of the zip file provided to the default storage folder. The method will
+	 * first unzip the complete content of the zip file to the temporary folder and then rename the
+	 * temporary folder to match the storage ID.
+	 * <p>
+	 * The method will also check if the imported storage is available online, and if it is will
+	 * update the local data saved.
+	 * 
+	 * @param fileName
+	 *            File to unzip.
+	 * @throws StorageException
+	 *             If given file does not exist or content is not proper.
+	 * @throws IOException
+	 *             If {@link IOException} occurs.
+	 * @throws SerializationException
+	 *             If serialization exception occurs if data needs to be updated.
+	 * 
+	 */
+	public void unzipStorageData(String fileName) throws StorageException, IOException, SerializationException {
+		Path zipPath = Paths.get(fileName);
+		IStorageData packedStorageData = getStorageDataFromZip(zipPath);
+		this.unzipStorageData(zipPath, getStoragePath(packedStorageData));
+
+		List<LocalStorageData> localStorageDataList = getMountedStoragesFromDisk();
+		for (LocalStorageData localStorageData : localStorageDataList) {
+			if (localStorageData.isFullyDownloaded() && !downloadedStorages.contains(localStorageData)) {
+				downloadedStorages.add(localStorageData);
+				for (StorageData storageData : getOnlineStorages().keySet()) {
+					if (ObjectUtils.equals(storageData.getId(), localStorageData.getId())) {
+						updateLocalStorageData(localStorageData, storageData);
+						break;
+					}
+				}
+				break;
+			}
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public void repositoryAdded(CmrRepositoryDefinition cmrRepositoryDefinition) {
@@ -839,6 +1001,16 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 */
 	public void setDataRetriever(DataRetriever dataRetriever) {
 		this.dataRetriever = dataRetriever;
+	}
+
+	/**
+	 * Sets {@link #dataUploader}.
+	 * 
+	 * @param dataUploader
+	 *            New value for {@link #dataUploader}
+	 */
+	public void setDataUploader(DataUploader dataUploader) {
+		this.dataUploader = dataUploader;
 	}
 
 }

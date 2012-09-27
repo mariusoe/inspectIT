@@ -1222,6 +1222,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 				InspectITStorageManager storageManager = InspectIT.getDefault().getInspectITStorageManager();
 				RepositoryDefinition repositoryDefinition = null;
 				if (storageManager.isStorageMounted(storageLeaf.getStorageData())) {
+					// if we already have all data needed, get the repository definition and show it
 					LocalStorageData localStorageData = storageManager.getLocalDataForStorage(storageLeaf.getStorageData());
 					try {
 						repositoryDefinition = storageManager.getStorageRepositoryDefinition(localStorageData);
@@ -1229,6 +1230,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 						repositoryDefinition = null;
 					}
 				} else if (storageLeaf.getStorageData().getState() == StorageState.CLOSED) {
+					// if it is closed, mount it first
 					try {
 						storageManager.mountStorage(storageLeaf.getStorageData(), storageLeaf.getCmrRepositoryDefinition());
 						LocalStorageData localStorageData = storageManager.getLocalDataForStorage(storageLeaf.getStorageData());
@@ -1237,7 +1239,8 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 						repositoryDefinition = null;
 						InspectIT.getDefault().createErrorDialog("Can not open storage.", e1, -1);
 					}
-				} else {
+				} else if (storageLeaf.getStorageData().getState() == StorageState.OPENED) {
+					// if it's in writable state offer user to finalize it and explore it
 					String dialogMessage = "Storages that are in writable mode can not be explored. Do you want to finalize selected storage first and then open it?";
 					MessageDialog dialog = new MessageDialog(getSite().getShell(), "Opening Writable Storage", null, dialogMessage, MessageDialog.QUESTION, new String[] { "Yes", "No" }, 0);
 					if (0 == dialog.open()) {
@@ -1256,6 +1259,10 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 							throw new RuntimeException(e);
 						}
 					}
+					return;
+				} else if (storageLeaf.getStorageData().getState() == StorageState.RECORDING) {
+					// if it is used for recording, just show message
+					InspectIT.getDefault().createInfoDialog("Selected storage is currently used for recording, it can not be explored.", -1);
 					return;
 				}
 

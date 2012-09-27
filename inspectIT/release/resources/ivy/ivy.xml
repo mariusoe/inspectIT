@@ -61,6 +61,7 @@
 
 		<dependency org="org.apache.httpcomponents" name="info.novatec.httpclient" rev="4.1.1" transitive="false" conf="osgi->default" />
 		<dependency org="org.apache.httpcomponents" name="info.novatec.httpcore" rev="4.1.1" transitive="false" conf="osgi->default" />
+		<dependency org="org.apache.httpcomponents" name="info.novatec.httpmime" rev="4.1.1" transitive="false" conf="osgi->default" />
 		<dependency org="com.google.guava" name="info.novatec.guava" rev="11.0.1"  conf="osgi->default"/>
 
 		<dependency org="com.esotericsoftware.kryo" name="info.novatec.kryo" rev="2.20" transitive="false" conf="osgi->default"/>
