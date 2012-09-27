@@ -148,6 +148,12 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 	private DeferredAgentsComposite lastSelectedRepository = null;
 
 	/**
+	 * Defines if agents are shown in the tree which have not sent any data since the CMR was
+	 * started.
+	 */
+	private boolean showOldAgents = false;
+
+	/**
 	 * Default constructor.
 	 */
 	public RepositoryManagerView() {
@@ -245,6 +251,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 	 */
 	private void createViewToolbar() {
 		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+		toolBarManager.add(new ShowAgentsAction());
 		toolBarManager.add(new ShowPropertiesAction());
 		toolBarManager.add(new Separator());
 	}
@@ -256,7 +263,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		inputList.clear();
 		List<CmrRepositoryDefinition> repositories = cmrRepositoryManager.getCmrRepositoryDefinitions();
 		for (CmrRepositoryDefinition cmrRepositoryDefinition : repositories) {
-			inputList.add(new DeferredAgentsComposite(cmrRepositoryDefinition));
+			inputList.add(new DeferredAgentsComposite(cmrRepositoryDefinition, showOldAgents));
 			OnlineStatus onlineStatus = cmrRepositoryDefinition.getOnlineStatus();
 			cachedStatusMap.put(cmrRepositoryDefinition, onlineStatus);
 		}
@@ -397,7 +404,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 	 */
 	@Override
 	public void repositoryAdded(CmrRepositoryDefinition cmrRepositoryDefinition) {
-		final DeferredAgentsComposite newComposite = new DeferredAgentsComposite(cmrRepositoryDefinition);
+		final DeferredAgentsComposite newComposite = new DeferredAgentsComposite(cmrRepositoryDefinition, showOldAgents);
 		inputList.add(newComposite);
 		OnlineStatus onlineStatus = cmrRepositoryDefinition.getOnlineStatus();
 		cachedStatusMap.put(cmrRepositoryDefinition, onlineStatus);
@@ -412,8 +419,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 						StructuredSelection ss = new StructuredSelection(lastSelectedRepository);
 						treeViewer.setSelection(ss, true);
 					}
-				}
-				else {
+				} else {
 					updateFormBody();
 				}
 				mainForm.setBusy(false);
@@ -568,6 +574,34 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 				setShowProperties(false);
 				setToolTipText("Show Properties");
 			}
+		};
+	}
+
+	/**
+	 * Action for show hide agents which have not sent any data.
+	 * 
+	 * @author Patrice Bouillet
+	 * 
+	 */
+	private class ShowAgentsAction extends Action {
+
+		/**
+		 * Default constructor.
+		 */
+		public ShowAgentsAction() {
+			super(null, AS_CHECK_BOX);
+			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_AGENT_GRAY));
+			setChecked(false);
+			setToolTipText("Show / Hide Agents which have not sent any data yet.");
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public void run() {
+			showOldAgents = isChecked();
+			createInputList();
+			updateFormBody();
 		};
 	}
 

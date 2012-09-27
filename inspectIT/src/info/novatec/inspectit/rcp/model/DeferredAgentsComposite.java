@@ -29,12 +29,22 @@ public class DeferredAgentsComposite extends DeferredComposite implements ICmrRe
 	private CmrRepositoryDefinition cmrRepositoryDefinition;
 
 	/**
+	 * Defines if so called 'old' agents are being shown. These agents never sent data since the CMR
+	 * started.
+	 */
+	private final boolean showOldAgents;
+
+	/**
 	 * Default constructor.
 	 * 
 	 * @param cmrRepositoryDefinition
 	 *            Repository.
+	 * @param showOldAgents
+	 *            Defines if so called 'old' agents are being shown. These agents never sent data
+	 *            since the CMR started.
 	 */
-	public DeferredAgentsComposite(CmrRepositoryDefinition cmrRepositoryDefinition) {
+	public DeferredAgentsComposite(CmrRepositoryDefinition cmrRepositoryDefinition, boolean showOldAgents) {
+		this.showOldAgents = showOldAgents;
 		setRepositoryDefinition(cmrRepositoryDefinition);
 	}
 
@@ -51,9 +61,12 @@ public class DeferredAgentsComposite extends DeferredComposite implements ICmrRe
 				if (null != agents) {
 					for (PlatformIdent platformIdent : agents) {
 						AgentStatusData agentStatusData = agentStatusDataMap.get(platformIdent.getId());
-						Component agentLeaf = new AgentLeaf(platformIdent, agentStatusData);
-						collector.add(agentLeaf, monitor);
-						((Composite) object).addChild(agentLeaf);
+						// the agentstatusdata is null if the agent wasn't connected before
+						if (showOldAgents || (!showOldAgents && agentStatusData != null)) {
+							Component agentLeaf = new AgentLeaf(platformIdent, agentStatusData);
+							collector.add(agentLeaf, monitor);
+							((Composite) object).addChild(agentLeaf);
+						}
 
 						if (monitor.isCanceled()) {
 							break;
