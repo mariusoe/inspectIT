@@ -69,6 +69,9 @@ public class TextSubView extends AbstractSubView {
 	 * {@inheritDoc}
 	 */
 	public void doRefresh() {
+		if (checkDisposed()) {
+			return;
+		}
 		Assert.isNotNull(textInputController);
 
 		textInputController.doRefresh();
@@ -101,6 +104,10 @@ public class TextSubView extends AbstractSubView {
 	 * {@inheritDoc}
 	 */
 	public void setDataInput(List<? extends DefaultData> data) {
+		if (checkDisposed()) {
+			return;
+		}
+
 		textInputController.setDataInput(data);
 	}
 
@@ -126,6 +133,15 @@ public class TextSubView extends AbstractSubView {
 			return this;
 		}
 		return null;
+	}
+
+	/**
+	 * Returns true if the composite in the sub-view is disposed. False otherwise.
+	 * 
+	 * @return Returns true if the composite in the sub-view is disposed. False otherwise.
+	 */
+	private boolean checkDisposed() {
+		return composite.isDisposed();
 	}
 
 	/**

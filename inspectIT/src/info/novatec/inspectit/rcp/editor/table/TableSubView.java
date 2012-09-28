@@ -255,6 +255,10 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 						tableInputController.doRefresh(monitor);
 						Display.getDefault().asyncExec(new Runnable() {
 							public void run() {
+								if (checkDisposed()) {
+									return;
+								}
+
 								// refresh should only influence the master sub views
 								if (tableInputController.getSubViewClassification() == SubViewClassification.MASTER) {
 									Object input = tableInputController.getTableInput();
@@ -291,6 +295,10 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 	 * {@inheritDoc}
 	 */
 	public void setDataInput(List<? extends DefaultData> data) {
+		if (checkDisposed()) {
+			return;
+		}
+
 		if (tableInputController.canOpenInput(data)) {
 			tableViewer.setInput(data);
 			tableViewer.refresh(true);
@@ -322,6 +330,10 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 	 * {@inheritDoc}
 	 */
 	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
+		if (checkDisposed()) {
+			return;
+		}
+
 		if (PreferenceId.ITEMCOUNT.equals(preferenceEvent.getPreferenceId())) {
 			Map<IPreferenceGroup, Object> preferenceMap = preferenceEvent.getPreferenceMap();
 			int limit = (Integer) preferenceMap.get(PreferenceId.ItemCount.COUNT_SELECTION_ID);
@@ -438,6 +450,15 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 	@Override
 	public void clearSearch() {
 		tableViewerSearchHelper.clearSearch();
+	}
+
+	/**
+	 * Returns true if the table in the sub-view is disposed. False otherwise.
+	 * 
+	 * @return Returns true if the table in the sub-view is disposed. False otherwise.
+	 */
+	private boolean checkDisposed() {
+		return tableViewer.getTable().isDisposed();
 	}
 
 	/**

@@ -223,12 +223,21 @@ public class TreeSubView extends AbstractSubView implements ISearchExecutor {
 	 * {@inheritDoc}
 	 */
 	public void doRefresh() {
+		// I added the disposed check anyway because one day somebody might add something to this
+		// method and forget about check disposed
+		if (checkDisposed()) {
+			return;
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setDataInput(List<? extends DefaultData> data) {
+		if (checkDisposed()) {
+			return;
+		}
+
 		if (treeInputController.canOpenInput(data)) {
 			treeViewer.setInput(data);
 			treeViewer.expandToLevel(treeInputController.getExpandLevel());
@@ -265,6 +274,10 @@ public class TreeSubView extends AbstractSubView implements ISearchExecutor {
 	 * {@inheritDoc}
 	 */
 	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
+		if (checkDisposed()) {
+			return;
+		}
+
 		treeInputController.preferenceEventFired(preferenceEvent);
 		switch (preferenceEvent.getPreferenceId()) {
 		case FILTERSENSORTYPE:
@@ -371,6 +384,15 @@ public class TreeSubView extends AbstractSubView implements ISearchExecutor {
 	@Override
 	public void clearSearch() {
 		searchHelper.clearSearch();
+	}
+
+	/**
+	 * Returns true if the tree in the sub-view is disposed. False otherwise.
+	 * 
+	 * @return Returns true if the tree in the sub-view is disposed. False otherwise.
+	 */
+	private boolean checkDisposed() {
+		return treeViewer.getTree().isDisposed();
 	}
 
 	/**

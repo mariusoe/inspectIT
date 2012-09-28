@@ -327,13 +327,15 @@ public class SqlInputController extends AbstractTableInputController {
 				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 				IWorkbenchPage page = window.getActivePage();
 				IRootEditor rootEditor = (IRootEditor) page.getActiveEditor();
-				ISubView paramSubView = rootEditor.getSubView().getSubViewWithInputController(SqlParameterAggregationInputControler.class);
-				if (null != paramSubView) {
-					paramSubView.setDataInput(Collections.<DefaultData> emptyList());
-				}
-				ISubView sqlStringSubView = rootEditor.getSubView().getSubViewWithInputController(SqlStatementTextInputController.class);
-				if (null != sqlStringSubView) {
-					sqlStringSubView.setDataInput(Collections.<DefaultData> emptyList());
+				if (null != rootEditor) {
+					ISubView paramSubView = rootEditor.getSubView().getSubViewWithInputController(SqlParameterAggregationInputControler.class);
+					if (null != paramSubView) {
+						paramSubView.setDataInput(Collections.<DefaultData> emptyList());
+					}
+					ISubView sqlStringSubView = rootEditor.getSubView().getSubViewWithInputController(SqlStatementTextInputController.class);
+					if (null != sqlStringSubView) {
+						sqlStringSubView.setDataInput(Collections.<DefaultData> emptyList());
+					}
 				}
 			}
 		});

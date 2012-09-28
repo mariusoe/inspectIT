@@ -312,9 +312,11 @@ public class SqlParameterAggregationInputControler extends AbstractTableInputCon
 				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 				IWorkbenchPage page = window.getActivePage();
 				IRootEditor rootEditor = (IRootEditor) page.getActiveEditor();
-				ISubView sqlStringSubView = rootEditor.getSubView().getSubViewWithInputController(SqlStatementTextInputController.class);
-				if (null != sqlStringSubView) {
-					sqlStringSubView.setDataInput(dataList);
+				if (null != rootEditor) {
+					ISubView sqlStringSubView = rootEditor.getSubView().getSubViewWithInputController(SqlStatementTextInputController.class);
+					if (null != sqlStringSubView) {
+						sqlStringSubView.setDataInput(dataList);
+					}
 				}
 			}
 		});
