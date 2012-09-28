@@ -286,20 +286,24 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
 		ISelection selection = event.getSelection();
-		if (!selection.isEmpty()) {
-			if (selection instanceof StructuredSelection) {
-				StructuredSelection structuredSelection = (StructuredSelection) selection;
-				Object firstElement = structuredSelection.getFirstElement();
-				while (firstElement != null) {
-					if (firstElement instanceof ICmrRepositoryProvider) { // NOPMD
-						if (!ObjectUtils.equals(cmrRepositoryDefinition, ((ICmrRepositoryProvider) firstElement).getCmrRepositoryDefinition())) {
-							cmrRepositoryDefinition = ((ICmrRepositoryProvider) firstElement).getCmrRepositoryDefinition();
-							refreshData();
-						}
-						return;
+		if (!selection.isEmpty() && selection instanceof StructuredSelection) {
+			StructuredSelection structuredSelection = (StructuredSelection) selection;
+			Object firstElement = structuredSelection.getFirstElement();
+			if (!(firstElement instanceof Component)) {
+				// it is possible that the PendingAdapterUpdate is in the selection because it
+				// is still loading the agents
+				return;
+			}
+
+			while (firstElement != null) {
+				if (firstElement instanceof ICmrRepositoryProvider) { // NOPMD
+					if (!ObjectUtils.equals(cmrRepositoryDefinition, ((ICmrRepositoryProvider) firstElement).getCmrRepositoryDefinition())) {
+						cmrRepositoryDefinition = ((ICmrRepositoryProvider) firstElement).getCmrRepositoryDefinition();
+						refreshData();
 					}
-					firstElement = ((Component) firstElement).getParent();
+					return;
 				}
+				firstElement = ((Component) firstElement).getParent();
 			}
 		}
 		if (null != cmrRepositoryDefinition) {
