@@ -69,7 +69,7 @@ public class LocalStorageTreeModelManager {
 			Map<Object, Composite> map = new HashMap<Object, Composite>();
 			for (LocalStorageData localStorageData : localStorageDataCollection) {
 				List<? extends AbstractStorageLabel<?>> labelList = localStorageData.getLabels(storageLabelType);
-				if (CollectionUtils.isEmpty(labelList)) {
+				if (CollectionUtils.isNotEmpty(labelList)) {
 					for (AbstractStorageLabel<?> label : labelList) {
 						Composite c = map.get(TextFormatter.getLabelValue(label, true));
 						if (c == null) {

@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
+
 /**
  * Tree model manager for storage manager view.
  * 
@@ -66,7 +68,7 @@ public class StorageTreeModelManager {
 			Map<Object, Composite> map = new HashMap<Object, Composite>();
 			for (Map.Entry<StorageData, CmrRepositoryDefinition> entry : storageRepositoryMap.entrySet()) {
 				List<? extends AbstractStorageLabel<?>> labelList = entry.getKey().getLabels(storageLabelType);
-				if (labelList != null && !labelList.isEmpty()) {
+				if (CollectionUtils.isNotEmpty(labelList)) {
 					for (AbstractStorageLabel<?> label : labelList) {
 						Composite c = map.get(TextFormatter.getLabelValue(label, true));
 						if (c == null) {
