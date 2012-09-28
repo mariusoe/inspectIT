@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.repository.service.cmr;
 
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
+import info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider;
 
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
 
@@ -43,6 +44,11 @@ public class CmrService implements ICmrService {
 	private String serviceName;
 
 	/**
+	 * The serialization manager for kryo.
+	 */
+	private SerializationManagerProvider serializationManagerProvider;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public void initService(CmrRepositoryDefinition cmrRepositoryDefinition) {
@@ -53,6 +59,12 @@ public class CmrService implements ICmrService {
 		// the problems is that the service interface class can not be found
 		// I am not quite sure why, but this is suggested on several places as a patch
 		httpInvokerProxyFactoryBean.setBeanClassLoader(getClass().getClassLoader());
+
+		// using kryo (de-)serialization for the requests and responses
+		KryoSimpleHttpInvokerRequestExecutor kryoSimpleHttpInvokerRequestExecutor = new KryoSimpleHttpInvokerRequestExecutor();
+		kryoSimpleHttpInvokerRequestExecutor.setBeanClassLoader(getClass().getClassLoader());
+		kryoSimpleHttpInvokerRequestExecutor.setSerializationManagerProvider(serializationManagerProvider);
+		httpInvokerProxyFactoryBean.setHttpInvokerRequestExecutor(kryoSimpleHttpInvokerRequestExecutor);
 
 		httpInvokerProxyFactoryBean.setServiceInterface(serviceInterface);
 		httpInvokerProxyFactoryBean.setServiceUrl(PROTOCOL + cmrRepositoryDefinition.getIp() + ":" + cmrRepositoryDefinition.getPort() + REMOTING + serviceName);
@@ -76,26 +88,42 @@ public class CmrService implements ICmrService {
 	}
 
 	/**
+	 * Sets {@link #serviceInterface}.
+	 * 
 	 * @param serviceInterface
-	 *            the serviceInterface to set
+	 *            New value for {@link #serviceInterface}
 	 */
 	public void setServiceInterface(Class<?> serviceInterface) {
 		this.serviceInterface = serviceInterface;
 	}
 
 	/**
-	 * @return Returns the service interface class.
+	 * Gets {@link #serviceInterface}.
+	 * 
+	 * @return {@link #serviceInterface}
 	 */
 	public Class<?> getServiceInterface() {
 		return serviceInterface;
 	}
 
 	/**
+	 * Sets {@link #serviceName}.
+	 * 
 	 * @param serviceName
-	 *            the serviceName to set
+	 *            New value for {@link #serviceName}
 	 */
 	public void setServiceName(String serviceName) {
 		this.serviceName = serviceName;
+	}
+
+	/**
+	 * Sets {@link #serializationManagerProvider}.
+	 * 
+	 * @param serializationManagerProvider
+	 *            New value for {@link #serializationManagerProvider}
+	 */
+	public void setSerializationManagerProvider(SerializationManagerProvider serializationManagerProvider) {
+		this.serializationManagerProvider = serializationManagerProvider;
 	}
 
 }

@@ -1,6 +1,7 @@
 package info.novatec.inspectit.storage;
 
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.cmr.WritingStatus;
 import info.novatec.inspectit.indexing.impl.IndexingException;
 import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.nio.WriteReadCompletionRunnable;
@@ -45,7 +46,7 @@ import com.esotericsoftware.kryo.io.Output;
  * @author Ivan Senic
  * 
  */
-public class StorageWriter {
+public class StorageWriter implements IWriter {
 
 	/**
 	 * The log of this class.
@@ -210,11 +211,9 @@ public class StorageWriter {
 	}
 
 	/**
-	 * Writes one object to the disk. This method is only submitting a new writing task, thus it is
-	 * thread safe and very fast.
-	 * 
-	 * @param defaultData
-	 *            Object to be written.
+	 * {@inheritDoc}
+	 * <p>
+	 * This method is only submitting a new writing task, thus it is thread safe and very fast.
 	 */
 	public void write(DefaultData defaultData) {
 		if (writingOn && storageManager.canWriteMore()) {

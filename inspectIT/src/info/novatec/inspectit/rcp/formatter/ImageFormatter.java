@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.formatter;
 
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
+import info.novatec.inspectit.communication.data.cmr.WritingStatus;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.model.AgentLeaf;
@@ -11,7 +12,6 @@ import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageData.StorageState;
-import info.novatec.inspectit.storage.WritingStatus;
 import info.novatec.inspectit.storage.label.type.AbstractCustomStorageLabelType;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 import info.novatec.inspectit.storage.label.type.impl.AssigneeLabelType;

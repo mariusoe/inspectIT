@@ -1,15 +1,15 @@
 package info.novatec.inspectit.indexing.aggregation.impl;
 
-import java.io.Serializable;
-
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.aggregation.IAggregator;
 
+import java.io.Serializable;
+
 /**
  * {@link IAggregator} for {@link TimerData}.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class TimerDataAggregator implements IAggregator<TimerData>, Serializable {
 
@@ -24,8 +24,14 @@ public class TimerDataAggregator implements IAggregator<TimerData>, Serializable
 	private boolean cloning;
 
 	/**
+	 * No-arg constructor.
+	 */
+	public TimerDataAggregator() {
+	}
+
+	/**
 	 * Default constructor.
-	 *
+	 * 
 	 * @param cloning
 	 *            Should cloning be used or not.
 	 */

@@ -68,6 +68,12 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 	private IAggregator<E> dataAggregator;
 
 	/**
+	 * No-arg constructor.
+	 */
+	public DataAggregatorProcessor() {
+	}
+
+	/**
 	 * Default constructor. Sets max elements to {@value #DEFAULT_MAX_ELEMENTS}.
 	 * 
 	 * @param clazz

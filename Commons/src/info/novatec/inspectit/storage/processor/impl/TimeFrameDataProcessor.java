@@ -4,6 +4,7 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.storage.processor.AbstractChainedDataProcessor;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +34,13 @@ public class TimeFrameDataProcessor extends AbstractChainedDataProcessor {
 	private Date toDate;
 
 	/**
+	 * No-arg constructor.
+	 */
+	public TimeFrameDataProcessor() {
+		super(Collections.<AbstractDataProcessor> emptyList());
+	}
+
+	/**
 	 * Default constructor.
 	 * 
 	 * @param fromDate
@@ -59,7 +67,7 @@ public class TimeFrameDataProcessor extends AbstractChainedDataProcessor {
 	public boolean canBeProcessed(DefaultData defaultData) {
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

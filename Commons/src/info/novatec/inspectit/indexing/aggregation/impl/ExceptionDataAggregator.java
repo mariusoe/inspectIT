@@ -43,6 +43,12 @@ public class ExceptionDataAggregator implements IAggregator<ExceptionSensorData>
 	private ExceptionAggregationType exceptionAggregationType;
 
 	/**
+	 * No-arg constructor.
+	 */
+	public ExceptionDataAggregator() {
+	}
+
+	/**
 	 * Default constructor.
 	 * 
 	 * @param exceptionAggregationType

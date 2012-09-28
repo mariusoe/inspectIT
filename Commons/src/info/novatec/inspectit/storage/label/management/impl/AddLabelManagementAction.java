@@ -6,6 +6,7 @@ import info.novatec.inspectit.storage.label.management.AbstractLabelManagementAc
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Action for the adding of data related to labels and label types.
@@ -19,6 +20,13 @@ public class AddLabelManagementAction extends AbstractLabelManagementAction {
 	 * Generated UID.
 	 */
 	private static final long serialVersionUID = 4099978606572054690L;
+
+	/**
+	 * No-arg constructor. Only for the serialization and should not be used.
+	 */
+	public AddLabelManagementAction() {
+		this(Collections.<AbstractStorageLabel<?>> emptyList());
+	}
 
 	/**
 	 * Constructor when action is for a label type.

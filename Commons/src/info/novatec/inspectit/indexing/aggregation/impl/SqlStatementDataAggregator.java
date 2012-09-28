@@ -30,6 +30,12 @@ public class SqlStatementDataAggregator implements IAggregator<SqlStatementData>
 	private boolean includeParameters;
 
 	/**
+	 * No-arg constructor.
+	 */
+	public SqlStatementDataAggregator() {
+	}
+
+	/**
 	 * Default constructor. Same as calling {@link #SqlStatementDataAggregator(boolean, false)}.
 	 * 
 	 * @param cloning

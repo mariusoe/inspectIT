@@ -19,11 +19,17 @@ public class DataSaverProcessor extends AbstractDataProcessor {
 	 * Generated UID.
 	 */
 	private static final long serialVersionUID = -5795459378970312428L;
-	
+
 	/**
 	 * List of classes that should be saved by this simple saver.
 	 */
 	private List<Class<? extends DefaultData>> classes;
+
+	/**
+	 * No-arg constructor.
+	 */
+	public DataSaverProcessor() {
+	}
 
 	/**
 	 * Default constructor.
@@ -54,5 +60,5 @@ public class DataSaverProcessor extends AbstractDataProcessor {
 		}
 		return false;
 	}
-	
+
 }

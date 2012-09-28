@@ -1,11 +1,12 @@
-package info.novatec.inspectit.storage.recording;
+package info.novatec.inspectit.communication.data.cmr;
 
 import info.novatec.inspectit.storage.StorageData;
-import info.novatec.inspectit.storage.WritingStatus;
 
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -139,6 +140,36 @@ public class RecordingData implements Serializable {
 	 */
 	public void setRecordEndDate(Date recordEndDate) {
 		this.recordEndDate = recordEndDate;
+	}
+
+	@Override
+	public int hashCode() {
+		HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
+		hashCodeBuilder.append(recordEndDate);
+		hashCodeBuilder.append(recordStartDate);
+		hashCodeBuilder.append(recordingStorage);
+		hashCodeBuilder.append(recordingWritingStatus);
+		return hashCodeBuilder.toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		RecordingData other = (RecordingData) obj;
+		EqualsBuilder equalsBuilder = new EqualsBuilder();
+		equalsBuilder.append(recordEndDate, other.recordEndDate);
+		equalsBuilder.append(recordStartDate, other.recordStartDate);
+		equalsBuilder.append(recordingStorage, other.recordingStorage);
+		equalsBuilder.append(recordingWritingStatus, other.recordingWritingStatus);
+		return equalsBuilder.isEquals();
 	}
 
 	/**

@@ -1,7 +1,7 @@
 package info.novatec.inspectit.storage.processor;
 
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.storage.StorageWriter;
+import info.novatec.inspectit.storage.IWriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,19 +96,19 @@ public abstract class AbstractChainedDataProcessor extends AbstractDataProcessor
 	 * Passes the writer to all chained processors.
 	 */
 	@Override
-	public void setStorageWriter(StorageWriter storageWriter) {
+	public void setStorageWriter(IWriter storageWriter) {
 		super.setStorageWriter(storageWriter);
 		for (AbstractDataProcessor processor : dataProcessors) {
 			processor.setStorageWriter(storageWriter);
 		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String toString() {
-		ToStringBuilder toStringBuilder =  new ToStringBuilder(this);
+		ToStringBuilder toStringBuilder = new ToStringBuilder(this);
 		toStringBuilder.append("chainedProcessors", dataProcessors);
 		return toStringBuilder.toString();
 	}

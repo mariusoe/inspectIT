@@ -22,6 +22,9 @@ import info.novatec.inspectit.communication.data.SystemInformationData;
 import info.novatec.inspectit.communication.data.ThreadInformationData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.communication.data.VmArgumentData;
+import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
+import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
+import info.novatec.inspectit.communication.data.cmr.RecordingData;
 import info.novatec.inspectit.indexing.indexer.impl.InvocationChildrenIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.MethodIdentIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.ObjectTypeIndexer;
@@ -88,8 +91,8 @@ public class SerializerTest {
 			{ StringStorageLabel.class }, { AssigneeLabelType.class }, { CreationDateLabelType.class }, { CustomBooleanLabelType.class }, { CustomDateLabelType.class },
 			{ CustomNumberLabelType.class }, { CustomStringLabelType.class }, { ExploredByLabelType.class }, { RatingLabelType.class }, { StatusLabelType.class }, { UseCaseLabelType.class },
 			{ SqlStringIndexer.class }, { BooleanStorageLabel.class }, { DateStorageLabel.class }, { NumberStorageLabel.class }, { StringStorageLabel.class }, { CustomDateLabelType.class },
-			{ CustomBooleanLabelType.class }, { CustomNumberLabelType.class }, { CustomStringLabelType.class }, { AssigneeLabelType.class }, { RatingLabelType.class }, { ExploredByLabelType.class },
-			{ CreationDateLabelType.class }, { StatusLabelType.class }, { UseCaseLabelType.class } };
+			{ CmrStatusData.class }, { AgentStatusData.class }, { RecordingData.class }, { CustomBooleanLabelType.class }, { CustomNumberLabelType.class }, { CustomStringLabelType.class },
+			{ AssigneeLabelType.class }, { RatingLabelType.class }, { ExploredByLabelType.class }, { CreationDateLabelType.class }, { StatusLabelType.class }, { UseCaseLabelType.class } };
 
 	/**
 	 * Serializer.

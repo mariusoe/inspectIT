@@ -4,18 +4,12 @@ Bundle-Name: inspectIT Client-Server Commons
 Bundle-SymbolicName: info.novatec.inspectit.commonscs
 Bundle-Version: 1.4.0
 Bundle-ClassPath: .
-Export-Package: info.novatec.inspectit.cmr.service,
- info.novatec.inspectit.storage,
+Export-Package: info.novatec.inspectit.storage,
  info.novatec.inspectit.storage.nio,
  info.novatec.inspectit.storage.nio.bytebuffer,
  info.novatec.inspectit.storage.nio.read,
  info.novatec.inspectit.storage.nio.stream,
  info.novatec.inspectit.storage.nio.write,
- info.novatec.inspectit.storage.processor,
- info.novatec.inspectit.storage.processor.impl,
- info.novatec.inspectit.storage.label.management,
- info.novatec.inspectit.storage.label.management.impl,
- info.novatec.inspectit.storage.recording,
  info.novatec.inspectit.storage.serializer.provider,
  info.novatec.inspectit.storage.util
 Bundle-Vendor: NovaTec GmbH

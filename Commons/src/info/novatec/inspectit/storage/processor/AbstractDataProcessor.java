@@ -1,11 +1,11 @@
 package info.novatec.inspectit.storage.processor;
 
+import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.storage.IWriter;
+
 import java.io.Serializable;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-
-import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.storage.StorageWriter;
 
 /**
  * Abstract class for all storage data processors.
@@ -21,9 +21,9 @@ public abstract class AbstractDataProcessor implements Serializable {
 	private static final long serialVersionUID = 3557026153566448866L;
 
 	/**
-	 * {@link StorageWriter} to write data to.
+	 * {@link IWriter} to write data to.
 	 */
-	private transient StorageWriter storageWriter;
+	private transient IWriter storageWriter;
 
 	/**
 	 * Processes one {@link DefaultData} object. This method will check is
@@ -75,7 +75,7 @@ public abstract class AbstractDataProcessor implements Serializable {
 	 * 
 	 * @return the storageWriter
 	 */
-	protected StorageWriter getStorageWriter() {
+	protected IWriter getStorageWriter() {
 		return storageWriter;
 	}
 
@@ -84,10 +84,10 @@ public abstract class AbstractDataProcessor implements Serializable {
 	 * @param storageWriter
 	 *            the storage writer
 	 */
-	public void setStorageWriter(StorageWriter storageWriter) {
+	public void setStorageWriter(IWriter storageWriter) {
 		this.storageWriter = storageWriter;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

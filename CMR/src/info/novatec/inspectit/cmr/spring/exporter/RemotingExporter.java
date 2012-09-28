@@ -23,7 +23,6 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.support.ResourcePropertySource;
-import org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter;
 import org.springframework.remoting.rmi.RmiServiceExporter;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -144,7 +143,7 @@ public class RemotingExporter implements BeanFactoryPostProcessor {
 					}
 					break;
 				case HTTP:
-					definition = new RootBeanDefinition(HttpInvokerServiceExporter.class);
+					definition = new RootBeanDefinition(KryoHttpInvokerServiceExporter.class);
 					break;
 				default:
 					throw new BeanCreationException("Could not create service exporter bean because exporter type is not handled: " + type);

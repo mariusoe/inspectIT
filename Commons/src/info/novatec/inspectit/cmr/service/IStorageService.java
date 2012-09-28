@@ -1,6 +1,7 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.cmr.RecordingData;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
@@ -8,7 +9,6 @@ import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.label.management.AbstractLabelManagementAction;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
-import info.novatec.inspectit.storage.recording.RecordingData;
 import info.novatec.inspectit.storage.recording.RecordingProperties;
 
 import java.util.Collection;

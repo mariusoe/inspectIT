@@ -4,6 +4,7 @@ import info.novatec.inspectit.cmr.dao.StorageDataDao;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
 import info.novatec.inspectit.cmr.storage.CmrStorageManager;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.cmr.RecordingData;
 import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.StorageData;
@@ -12,7 +13,6 @@ import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.label.management.AbstractLabelManagementAction;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
-import info.novatec.inspectit.storage.recording.RecordingData;
 import info.novatec.inspectit.storage.recording.RecordingProperties;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 

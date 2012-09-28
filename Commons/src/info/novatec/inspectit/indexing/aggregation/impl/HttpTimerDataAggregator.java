@@ -1,15 +1,15 @@
 package info.novatec.inspectit.indexing.aggregation.impl;
 
-import java.io.Serializable;
-
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.indexing.aggregation.IAggregator;
 
+import java.io.Serializable;
+
 /**
  * Aggregation for {@link HttpTimerData}.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class HttpTimerDataAggregator implements IAggregator<HttpTimerData>, Serializable {
 
@@ -34,8 +34,14 @@ public class HttpTimerDataAggregator implements IAggregator<HttpTimerData>, Seri
 	private boolean includeRequestMethod;
 
 	/**
+	 * No-arg constructor.
+	 */
+	public HttpTimerDataAggregator() {
+	}
+
+	/**
 	 * Default constructor that defines aggregation parameters.
-	 *
+	 * 
 	 * @param cloning
 	 *            Should cloning be active.
 	 * @param uriBased

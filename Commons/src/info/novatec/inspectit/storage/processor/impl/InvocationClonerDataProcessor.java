@@ -2,7 +2,6 @@ package info.novatec.inspectit.storage.processor.impl;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
-import info.novatec.inspectit.storage.StorageWriter;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 
 /**
@@ -35,5 +34,5 @@ public class InvocationClonerDataProcessor extends AbstractDataProcessor {
 	public boolean canBeProcessed(DefaultData defaultData) {
 		return defaultData instanceof InvocationSequenceData;
 	}
-	
+
 }

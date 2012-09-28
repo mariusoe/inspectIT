@@ -7,6 +7,7 @@ import info.novatec.inspectit.storage.label.management.AbstractLabelManagementAc
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,6 +27,13 @@ public class RemoveLabelManagementAction extends AbstractLabelManagementAction {
 	 * Should action also perform remove data from storages.
 	 */
 	private boolean removeFromStorageAlso;
+
+	/**
+	 * No-arg constructor. Only for the serialization and should not be used.
+	 */
+	public RemoveLabelManagementAction() {
+		this(Collections.<AbstractStorageLabel<?>> emptyList(), false);
+	}
 
 	/**
 	 * Constructor when action is for a label type.

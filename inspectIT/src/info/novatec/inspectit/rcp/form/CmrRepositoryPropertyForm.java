@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.form;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
+import info.novatec.inspectit.communication.data.cmr.RecordingData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
@@ -13,7 +14,6 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.storage.StorageData;
-import info.novatec.inspectit.storage.recording.RecordingData;
 
 import java.util.Date;
 

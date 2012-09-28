@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 
 /**
  * Clones the persistant objects by removing the Hibernate persistant collections.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 @Component
-public class PersistentObjectCloner {
+public class PersistentObjectCloner implements IObjectCloner {
 
 	/**
 	 * Persistant bean manager that does the cloning.
@@ -24,7 +24,7 @@ public class PersistentObjectCloner {
 
 	/**
 	 * Default constructor. Needs hibernate {@link SessionFactory} for proper initialization.
-	 *
+	 * 
 	 * @param sessionFactory
 	 *            {@link SessionFactory}.
 	 */
@@ -34,13 +34,7 @@ public class PersistentObjectCloner {
 	}
 
 	/**
-	 * Clones the the given object and removes the persistent Hibernate collections.
-	 *
-	 * @param object
-	 *            Object to clone.
-	 * @param <E>
-	 *            Type of the object.
-	 * @return Clone.
+	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
 	public <E> E clone(E object) {

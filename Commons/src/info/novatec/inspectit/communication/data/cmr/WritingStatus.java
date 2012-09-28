@@ -1,4 +1,4 @@
-package info.novatec.inspectit.storage;
+package info.novatec.inspectit.communication.data.cmr;
 
 /**
  * Status of the writing.

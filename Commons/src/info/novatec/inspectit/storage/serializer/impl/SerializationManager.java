@@ -5,11 +5,14 @@ import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
+import info.novatec.inspectit.cmr.storage.util.IObjectCloner;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.ExceptionEvent;
+import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
 import info.novatec.inspectit.communication.data.CompilationInformationData;
 import info.novatec.inspectit.communication.data.CpuInformationData;
+import info.novatec.inspectit.communication.data.DatabaseAggregatedTimerData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationAwareData.MutableInt;
@@ -23,6 +26,16 @@ import info.novatec.inspectit.communication.data.SystemInformationData;
 import info.novatec.inspectit.communication.data.ThreadInformationData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.communication.data.VmArgumentData;
+import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
+import info.novatec.inspectit.communication.data.cmr.AgentStatusData.AgentConnection;
+import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
+import info.novatec.inspectit.communication.data.cmr.LicenseInfoData;
+import info.novatec.inspectit.communication.data.cmr.RecordingData;
+import info.novatec.inspectit.communication.data.cmr.WritingStatus;
+import info.novatec.inspectit.indexing.aggregation.impl.ExceptionDataAggregator;
+import info.novatec.inspectit.indexing.aggregation.impl.HttpTimerDataAggregator;
+import info.novatec.inspectit.indexing.aggregation.impl.SqlStatementDataAggregator;
+import info.novatec.inspectit.indexing.aggregation.impl.TimerDataAggregator;
 import info.novatec.inspectit.indexing.indexer.impl.InvocationChildrenIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.MethodIdentIndexer;
 import info.novatec.inspectit.indexing.indexer.impl.ObjectTypeIndexer;
@@ -42,6 +55,8 @@ import info.novatec.inspectit.storage.label.BooleanStorageLabel;
 import info.novatec.inspectit.storage.label.DateStorageLabel;
 import info.novatec.inspectit.storage.label.NumberStorageLabel;
 import info.novatec.inspectit.storage.label.StringStorageLabel;
+import info.novatec.inspectit.storage.label.management.impl.AddLabelManagementAction;
+import info.novatec.inspectit.storage.label.management.impl.RemoveLabelManagementAction;
 import info.novatec.inspectit.storage.label.type.impl.AssigneeLabelType;
 import info.novatec.inspectit.storage.label.type.impl.CreationDateLabelType;
 import info.novatec.inspectit.storage.label.type.impl.CustomBooleanLabelType;
@@ -52,6 +67,11 @@ import info.novatec.inspectit.storage.label.type.impl.ExploredByLabelType;
 import info.novatec.inspectit.storage.label.type.impl.RatingLabelType;
 import info.novatec.inspectit.storage.label.type.impl.StatusLabelType;
 import info.novatec.inspectit.storage.label.type.impl.UseCaseLabelType;
+import info.novatec.inspectit.storage.processor.impl.DataAggregatorProcessor;
+import info.novatec.inspectit.storage.processor.impl.DataSaverProcessor;
+import info.novatec.inspectit.storage.processor.impl.InvocationClonerDataProcessor;
+import info.novatec.inspectit.storage.processor.impl.InvocationExtractorDataProcessor;
+import info.novatec.inspectit.storage.processor.impl.TimeFrameDataProcessor;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.storage.serializer.schema.ClassSchemaManager;
@@ -71,6 +91,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
+import org.springframework.remoting.support.RemoteInvocation;
+import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.stereotype.Component;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -110,6 +132,12 @@ public class SerializationManager implements ISerializer, InitializingBean {
 	 */
 	@Autowired
 	ClassSchemaManager schemaManager;
+
+	/**
+	 * Object cloner that will be used in special serializers.
+	 */
+	@Autowired
+	private IObjectCloner objectCloner;
 
 	/**
 	 * Initialize {@link Kryo} properties.
@@ -170,7 +198,7 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(long[].class, new LongArraySerializer());
 		kryo.register(SimpleStorageDescriptor[].class, new ObjectArraySerializer());
 		/** inspectIT model classes */
-		kryo.register(PlatformIdent.class, new CustomCompatibleFieldSerializer<PlatformIdent>(kryo, PlatformIdent.class, schemaManager));
+		kryo.register(PlatformIdent.class, new CloningCustomCompatibleFieldSerializer<PlatformIdent>(kryo, PlatformIdent.class, schemaManager, objectCloner));
 		kryo.register(MethodIdent.class, new CustomCompatibleFieldSerializer<MethodIdent>(kryo, MethodIdent.class, schemaManager));
 		kryo.register(SensorTypeIdent.class, new CustomCompatibleFieldSerializer<SensorTypeIdent>(kryo, SensorTypeIdent.class, schemaManager));
 		kryo.register(MethodSensorTypeIdent.class, new CustomCompatibleFieldSerializer<MethodSensorTypeIdent>(kryo, MethodSensorTypeIdent.class, schemaManager));
@@ -186,7 +214,7 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(ParameterContentData.class, new CustomCompatibleFieldSerializer<ParameterContentData>(kryo, ParameterContentData.class, schemaManager));
 		kryo.register(MemoryInformationData.class, new CustomCompatibleFieldSerializer<MemoryInformationData>(kryo, MemoryInformationData.class, schemaManager));
 		kryo.register(CpuInformationData.class, new CustomCompatibleFieldSerializer<CpuInformationData>(kryo, CpuInformationData.class, schemaManager));
-		kryo.register(SystemInformationData.class, new CustomCompatibleFieldSerializer<SystemInformationData>(kryo, SystemInformationData.class, schemaManager));
+		kryo.register(SystemInformationData.class, new CloningCustomCompatibleFieldSerializer<SystemInformationData>(kryo, SystemInformationData.class, schemaManager, objectCloner));
 		kryo.register(VmArgumentData.class, new CustomCompatibleFieldSerializer<VmArgumentData>(kryo, VmArgumentData.class, schemaManager));
 		kryo.register(ThreadInformationData.class, new CustomCompatibleFieldSerializer<ThreadInformationData>(kryo, ThreadInformationData.class, schemaManager));
 		kryo.register(RuntimeInformationData.class, new CustomCompatibleFieldSerializer<RuntimeInformationData>(kryo, RuntimeInformationData.class, schemaManager));
@@ -226,6 +254,40 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(TimestampIndexer.class, new CustomCompatibleFieldSerializer<TimestampIndexer<?>>(kryo, TimestampIndexer.class, schemaManager));
 		kryo.register(InvocationChildrenIndexer.class, new FieldSerializer<InvocationChildrenIndexer<?>>(kryo, InvocationChildrenIndexer.class));
 		kryo.register(SqlStringIndexer.class, new FieldSerializer<SqlStringIndexer<?>>(kryo, SqlStringIndexer.class));
+
+		// aggregation classes
+		kryo.register(AggregatedExceptionSensorData.class, new CustomCompatibleFieldSerializer<AggregatedExceptionSensorData>(kryo, AggregatedExceptionSensorData.class, schemaManager));
+		kryo.register(DatabaseAggregatedTimerData.class, new CloningCustomCompatibleFieldSerializer<DatabaseAggregatedTimerData>(kryo, DatabaseAggregatedTimerData.class, schemaManager, true,
+				objectCloner));
+
+		// classes needed for the HTTP calls from the UI
+		kryo.register(RemoteInvocation.class, new FieldSerializer<RemoteInvocation>(kryo, RemoteInvocation.class));
+		kryo.register(RemoteInvocationResult.class, new FieldSerializer<RemoteInvocationResult>(kryo, RemoteInvocationResult.class) {
+			@Override
+			protected RemoteInvocationResult create(Kryo arg0, Input input, Class<RemoteInvocationResult> type) {
+				return new RemoteInvocationResult(null);
+			}
+		});
+
+		// data classes between CMR and UI
+		// this classes can be registered with FieldSerializer since they are not saved to disk
+		kryo.register(LicenseInfoData.class, new FieldSerializer<LicenseInfoData>(kryo, LicenseInfoData.class));
+		kryo.register(CmrStatusData.class, new FieldSerializer<CmrStatusData>(kryo, CmrStatusData.class));
+		kryo.register(AgentStatusData.class, new FieldSerializer<AgentStatusData>(kryo, AgentStatusData.class));
+		kryo.register(AgentConnection.class, new EnumSerializer(AgentConnection.class));
+		kryo.register(RecordingData.class, new FieldSerializer<RecordingData>(kryo, RecordingData.class));
+		kryo.register(WritingStatus.class, new EnumSerializer(WritingStatus.class));
+		kryo.register(AddLabelManagementAction.class, new FieldSerializer<AddLabelManagementAction>(kryo, AddLabelManagementAction.class));
+		kryo.register(RemoveLabelManagementAction.class, new FieldSerializer<RemoveLabelManagementAction>(kryo, RemoveLabelManagementAction.class));
+		kryo.register(DataAggregatorProcessor.class, new FieldSerializer<DataAggregatorProcessor<?>>(kryo, DataAggregatorProcessor.class));
+		kryo.register(DataSaverProcessor.class, new FieldSerializer<DataSaverProcessor>(kryo, DataSaverProcessor.class));
+		kryo.register(InvocationClonerDataProcessor.class, new FieldSerializer<InvocationClonerDataProcessor>(kryo, InvocationClonerDataProcessor.class));
+		kryo.register(InvocationExtractorDataProcessor.class, new FieldSerializer<InvocationExtractorDataProcessor>(kryo, InvocationExtractorDataProcessor.class));
+		kryo.register(TimeFrameDataProcessor.class, new FieldSerializer<TimeFrameDataProcessor>(kryo, TimeFrameDataProcessor.class));
+		kryo.register(TimerDataAggregator.class, new FieldSerializer<TimerDataAggregator>(kryo, TimerDataAggregator.class));
+		kryo.register(SqlStatementDataAggregator.class, new FieldSerializer<SqlStatementDataAggregator>(kryo, SqlStatementDataAggregator.class));
+		kryo.register(HttpTimerDataAggregator.class, new FieldSerializer<HttpTimerDataAggregator>(kryo, HttpTimerDataAggregator.class));
+		kryo.register(ExceptionDataAggregator.class, new FieldSerializer<ExceptionDataAggregator>(kryo, ExceptionDataAggregator.class));
 	}
 
 	/**
@@ -261,6 +323,16 @@ public class SerializationManager implements ISerializer, InitializingBean {
 	 */
 	public void setSchemaManager(ClassSchemaManager schemaManager) {
 		this.schemaManager = schemaManager;
+	}
+
+	/**
+	 * Sets {@link #objectCloner}.
+	 * 
+	 * @param objectCloner
+	 *            New value for {@link #objectCloner}
+	 */
+	public void setObjectCloner(IObjectCloner objectCloner) {
+		this.objectCloner = objectCloner;
 	}
 
 	/**

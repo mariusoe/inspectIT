@@ -7,14 +7,15 @@ import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.processor.AbstractExtractorDataProcessor;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * This is a special type of processor. It extract the children information from a
  * {@link InvocationSequenceData} and passes the data to any chained processor that it has.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class InvocationExtractorDataProcessor extends AbstractExtractorDataProcessor {
 
@@ -24,8 +25,15 @@ public class InvocationExtractorDataProcessor extends AbstractExtractorDataProce
 	private static final long serialVersionUID = -3793308278679460679L;
 
 	/**
+	 * No-arg constructor.
+	 */
+	public InvocationExtractorDataProcessor() {
+		this(Collections.<AbstractDataProcessor> emptyList());
+	}
+
+	/**
 	 * Default constructor.
-	 *
+	 * 
 	 * @param chainedDataProcessors
 	 *            List of the processors that will have the children of invocation passed to.
 	 */
@@ -52,11 +60,10 @@ public class InvocationExtractorDataProcessor extends AbstractExtractorDataProce
 
 	/**
 	 * Extract data from the invocation and return it to the storage writer to process it.
-	 *
+	 * 
 	 * @param invocation
 	 *            {@link InvocationSequenceData}
 	 */
-	@SuppressWarnings("unchecked")
 	private void extractDataFromInvocation(InvocationSequenceData invocation) {
 		if (null != invocation.getTimerData()) {
 			passToChainedProcessors(invocation.getTimerData());
