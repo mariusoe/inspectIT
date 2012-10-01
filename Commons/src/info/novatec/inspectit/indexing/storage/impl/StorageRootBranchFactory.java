@@ -25,12 +25,14 @@ public class StorageRootBranchFactory implements FactoryBean<IStorageTreeCompone
 	 * {@inheritDoc}
 	 */
 	public IStorageTreeComponent<DefaultData> getObject() throws Exception {
-		StorageBranchIndexer<DefaultData> sqlStringIndexer = new StorageBranchIndexer<DefaultData>(new SqlStringIndexer<DefaultData>());
-		StorageBranchIndexer<DefaultData> methodIdentIndexer = new StorageBranchIndexer<DefaultData>(new MethodIdentIndexer<DefaultData>(), sqlStringIndexer);
-		StorageBranchIndexer<DefaultData> timestampIndexer = new StorageBranchIndexer<DefaultData>(new TimestampIndexer<DefaultData>(), methodIdentIndexer);
-		StorageBranchIndexer<DefaultData> objectTypeIndexer = new StorageBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>(), timestampIndexer);
-		StorageBranchIndexer<DefaultData> invocationChildrenIndexer = new StorageBranchIndexer<DefaultData>(new InvocationChildrenIndexer<DefaultData>(), objectTypeIndexer);
-		StorageBranchIndexer<DefaultData> platformIndexer = new StorageBranchIndexer<DefaultData>(new PlatformIdentIndexer<DefaultData>(), invocationChildrenIndexer);
+		// the time-stamp indexer has to be the last indexer in the tree, so that the amount of
+		// files in storage won't grow with the time passing by
+		StorageBranchIndexer<DefaultData> timestampIndexer = new StorageBranchIndexer<DefaultData>(new TimestampIndexer<DefaultData>(), true);
+		StorageBranchIndexer<DefaultData> sqlStringIndexer = new StorageBranchIndexer<DefaultData>(new SqlStringIndexer<DefaultData>(10), timestampIndexer, false);
+		StorageBranchIndexer<DefaultData> methodIdentIndexer = new StorageBranchIndexer<DefaultData>(new MethodIdentIndexer<DefaultData>(), sqlStringIndexer, false);
+		StorageBranchIndexer<DefaultData> objectTypeIndexer = new StorageBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>(), methodIdentIndexer, false);
+		StorageBranchIndexer<DefaultData> invocationChildrenIndexer = new StorageBranchIndexer<DefaultData>(new InvocationChildrenIndexer<DefaultData>(), objectTypeIndexer, false);
+		StorageBranchIndexer<DefaultData> platformIndexer = new StorageBranchIndexer<DefaultData>(new PlatformIdentIndexer<DefaultData>(), invocationChildrenIndexer, false);
 		return new StorageBranch<DefaultData>(platformIndexer);
 	}
 

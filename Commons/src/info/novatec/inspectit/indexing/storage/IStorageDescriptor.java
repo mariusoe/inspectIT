@@ -28,20 +28,19 @@ public interface IStorageDescriptor extends Comparable<IStorageDescriptor> {
 	long getPosition();
 
 	/**
-	 * @param position
-	 *            the position to set
-	 */
-	void setPosition(long position);
-
-	/**
 	 * @return the size
 	 */
 	long getSize();
 
 	/**
+	 * Sets the position and size in the file for this descriptor.
+	 * 
+	 * @param position
+	 *            the position to set
+	 * 
 	 * @param size
 	 *            the size to set
 	 */
-	void setSize(long size);
+	void setPositionAndSize(long position, long size);
 
 }

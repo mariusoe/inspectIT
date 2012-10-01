@@ -1,5 +1,6 @@
 package info.novatec.inspectit.indexing.storage.impl;
 
+import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.indexing.AbstractBranch;
 import info.novatec.inspectit.indexing.ITreeComponent;
@@ -31,7 +32,8 @@ public class StorageBranch<E extends DefaultData> extends AbstractBranch<IStorag
 	/**
 	 * Default constructor.
 	 * 
-	 * @param storageBranchIndexer Indexer to be used in the branch.
+	 * @param storageBranchIndexer
+	 *            Indexer to be used in the branch.
 	 */
 	public StorageBranch(IStorageBranchIndexer<E> storageBranchIndexer) {
 		super(storageBranchIndexer);
@@ -43,6 +45,27 @@ public class StorageBranch<E extends DefaultData> extends AbstractBranch<IStorag
 	 */
 	protected ITreeComponent<IStorageDescriptor, E> getNextTreeComponent(E element) {
 		return storageBranchIndexer.getNextTreeComponent(element);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void preWriteFinalization() {
+		for (ITreeComponent<IStorageDescriptor, E> storageTreeComponent : getComponentMap().values()) {
+			if (storageTreeComponent instanceof IStorageTreeComponent) {
+				((IStorageTreeComponent<E>) storageTreeComponent).preWriteFinalization();
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getComponentSize(IObjectSizes objectSizes) {
+		long size = super.getComponentSize(objectSizes);
+		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 0, 0);
+		return objectSizes.alignTo8Bytes(size);
 	}
 
 	/**

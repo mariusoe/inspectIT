@@ -6,12 +6,12 @@ import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.impl.IndexingException;
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
+import info.novatec.inspectit.storage.util.StorageUtil;
 import info.novatec.inspectit.util.ArrayUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -20,7 +20,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * This implementation of leaf for the {@link IStorageTreeComponent} holds
- * {@link SimpleStorageDescriptor}s and IDs of elements in seperate arrays.
+ * {@link SimpleStorageDescriptor}s and IDs of elements in separate arrays.
  * <p>
  * <b>IMPORTANT!</b>
  * <p>
@@ -31,8 +31,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * only when we fail to serialize it (so very rare). On the other hand, putting elements into would
  * usually bring elements with higher ID than the ones indexed before. Thus, there is a chance that
  * the complete array copy operations are not executed so often (actually only when resizing of
- * array is needed), which would have better performance in compare to the hash structre, cause
+ * array is needed), which would have better performance in compare to the hash structure, cause
  * there is no need for any rehashing here.
+ * <P>
+ * <b>Important:</b><br>
+ * Changing this class can cause the break of the backward/forward compatibility of the storage in
+ * the way that we will not be able to read any data from the storage. Thus, please be careful with
+ * performing any changes until there is a proper mechanism to protect against this problem.
  * 
  * @author Ivan Senic
  * 
@@ -82,10 +87,20 @@ public class ArrayBasedStorageLeaf<E extends DefaultData> implements IStorageTre
 	private transient Lock writeLock;
 
 	/**
-	 * Default constructor.
+	 * Default constructor. Generates leaf ID.
 	 */
 	public ArrayBasedStorageLeaf() {
-		id = UUID.randomUUID().hashCode();
+		this(StorageUtil.getRandomInt());
+	}
+
+	/**
+	 * Secondary constructor. Assigns the leaf with the ID.
+	 * 
+	 * @param id
+	 *            ID to be assigned to the leaf.
+	 */
+	public ArrayBasedStorageLeaf(int id) {
+		this.id = id;
 
 		capacity = DEFAULT_CAPACITY;
 		size = 0;
@@ -197,6 +212,9 @@ public class ArrayBasedStorageLeaf<E extends DefaultData> implements IStorageTre
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public List<IStorageDescriptor> query(IIndexQuery query) {
 		if (query instanceof StorageIndexQuery) {
 			return this.queryWithStorageQuery((StorageIndexQuery) query);
@@ -307,6 +325,14 @@ public class ArrayBasedStorageLeaf<E extends DefaultData> implements IStorageTre
 
 	/**
 	 * {@inheritDoc}
+	 * <p>
+	 * Does nothing.
+	 */
+	public void preWriteFinalization() {
+	}
+
+	/**
+	 * {@inheritDoc}
 	 */
 	public long getComponentSize(IObjectSizes objectSizes) {
 		long sizeInBytes = objectSizes.getSizeOfObjectHeader();
@@ -314,7 +340,7 @@ public class ArrayBasedStorageLeaf<E extends DefaultData> implements IStorageTre
 		sizeInBytes += objectSizes.getSizeOfArray(idArray.length);
 		sizeInBytes += size * objectSizes.getPrimitiveTypesSize(0, 0, 1, 0, 0, 0);
 		sizeInBytes += objectSizes.getSizeOfArray(descriptorArray.length);
-		sizeInBytes += size * (objectSizes.alignTo8Bytes(objectSizes.getSizeOfObjectHeader() + objectSizes.getPrimitiveTypesSize(0, 0, 2, 0, 0, 0)));
+		sizeInBytes += size * (objectSizes.alignTo8Bytes(objectSizes.getSizeOfObjectHeader() + objectSizes.getPrimitiveTypesSize(0, 0, 1, 0, 1, 0)));
 		// ignore locks
 		return objectSizes.alignTo8Bytes(sizeInBytes);
 	}

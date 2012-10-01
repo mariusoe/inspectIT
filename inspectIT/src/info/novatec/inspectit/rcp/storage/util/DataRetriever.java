@@ -224,16 +224,12 @@ public class DataRetriever {
 			for (IStorageDescriptor descriptor : entry.getValue()) {
 				if (null == storageDescriptor) {
 					storageDescriptor = new StorageDescriptor(entry.getKey());
-					storageDescriptor.setPosition(descriptor.getPosition());
-					storageDescriptor.setSize(descriptor.getSize());
+					storageDescriptor.setPositionAndSize(descriptor.getPosition(), descriptor.getSize());
 				} else {
-					if (storageDescriptor.getPosition() + storageDescriptor.getSize() == descriptor.getPosition()) {
-						storageDescriptor.setSize(storageDescriptor.getSize() + descriptor.getSize());
-					} else {
+					if (!storageDescriptor.join(descriptor)) {
 						optimizedDescriptors.add(storageDescriptor);
 						storageDescriptor = new StorageDescriptor(entry.getKey());
-						storageDescriptor.setPosition(descriptor.getPosition());
-						storageDescriptor.setSize(descriptor.getSize());
+						storageDescriptor.setPositionAndSize(descriptor.getPosition(), descriptor.getSize());
 					}
 				}
 			}

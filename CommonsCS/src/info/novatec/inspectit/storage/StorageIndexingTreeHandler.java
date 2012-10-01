@@ -196,8 +196,7 @@ public class StorageIndexingTreeHandler {
 			IStorageDescriptor storageDescriptor = treeDescriptorPair.getStorageDescriptor();
 			// update the descriptor with the information provided
 			if (null != storageDescriptor) {
-				storageDescriptor.setPosition(position);
-				storageDescriptor.setSize(size);
+				storageDescriptor.setPositionAndSize(position, size);
 			}
 		}
 		// remove the entry in map after the data has been updated in indexing tree
@@ -261,6 +260,7 @@ public class StorageIndexingTreeHandler {
 					Thread.interrupted();
 				}
 			}
+			currentIndexingTree.preWriteFinalization();
 			boolean written = storageWriter.writeNonDefaultDataObject(currentIndexingTree, getRandomFileName() + StorageFileExtensions.INDEX_FILE_EXT);
 			if (!written) {
 				log.error("Indexing tree saving failed. Indexing tree might be lost.");
@@ -315,6 +315,7 @@ public class StorageIndexingTreeHandler {
 									public void run() {
 										boolean safeToSave = Collections.disjoint(writeTasksToWait, writeTasksInProcess.keySet());
 										if (safeToSave) {
+											currentIndexingTree.preWriteFinalization();
 											boolean written = storageWriter.writeNonDefaultDataObject(currentIndexingTree, getRandomFileName() + StorageFileExtensions.INDEX_FILE_EXT);
 											if (!written) {
 												log.error("Indexing tree saving failed. Indexing tree might be lost.");

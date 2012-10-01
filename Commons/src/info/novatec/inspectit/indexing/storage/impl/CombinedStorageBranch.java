@@ -113,6 +113,15 @@ public class CombinedStorageBranch<E extends DefaultData> implements IStorageTre
 
 	/**
 	 * {@inheritDoc}
+	 */
+	public void preWriteFinalization() {
+		for (IStorageTreeComponent<E> branch : branches) {
+			branch.preWriteFinalization();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
 	 * <p>
 	 * Method returns combined results from all branches that are combined.
 	 */

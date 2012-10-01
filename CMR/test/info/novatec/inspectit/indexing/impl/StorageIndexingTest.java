@@ -4,6 +4,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.MethodSensorData;
+import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.indexer.impl.MethodIdentIndexer;
@@ -57,18 +58,20 @@ public class StorageIndexingTest {
 	 */
 	@Test
 	public void emptyQueryTest() throws IndexingException {
-		IStorageTreeComponent<DefaultData> rootBranch = new StorageBranch<DefaultData>(new StorageBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>()));
+		IStorageTreeComponent<DefaultData> rootBranch = new StorageBranch<DefaultData>(new StorageBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>(), false));
 
 		DefaultData defaultData = mock(DefaultData.class);
 		when(defaultData.getId()).thenReturn(1L);
-		rootBranch.put(defaultData);
+		IStorageDescriptor storageDescriptor1 = rootBranch.put(defaultData);
+		storageDescriptor1.setPositionAndSize(0, 1);
 
 		SqlStatementData defaultData2 = mock(SqlStatementData.class);
 		when(defaultData2.getId()).thenReturn(2L);
-		rootBranch.put(defaultData2);
+		IStorageDescriptor storageDescriptor2 = rootBranch.put(defaultData2);
+		storageDescriptor2.setPositionAndSize(2, 1);
 
 		List<IStorageDescriptor> results = rootBranch.query(storageIndexQuery);
-		Assert.assertEquals(2, results.size());
+		Assert.assertEquals(results.size(), 2);
 	}
 
 	/**
@@ -79,14 +82,30 @@ public class StorageIndexingTest {
 	 *             If {@link IndexingException} occurs.
 	 */
 	@Test
+	public void putAndGetInvocation() throws IndexingException {
+		IStorageTreeComponent<DefaultData> rootBranch = new StorageBranch<DefaultData>(new StorageBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>(), false));
+
+		InvocationSequenceData invocationSequenceData = new InvocationSequenceData();
+		invocationSequenceData.setId(1L);
+		IStorageDescriptor storageDescriptor = rootBranch.put(invocationSequenceData);
+
+		Assert.assertEquals(storageDescriptor.compareTo(rootBranch.get(invocationSequenceData)), 0);
+	}
+
+	/**
+	 * Test that the get on the {@link LeafWithNoDescriptors} will throw an exception if invoked.
+	 * 
+	 * @throws IndexingException
+	 *             If {@link IndexingException} occurs.
+	 */
+	@Test(expectedExceptions = { UnsupportedOperationException.class })
 	public void putAndGetElement() throws IndexingException {
-		IStorageTreeComponent<DefaultData> rootBranch = new StorageBranch<DefaultData>(new StorageBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>()));
+		IStorageTreeComponent<DefaultData> rootBranch = new LeafWithNoDescriptors<DefaultData>();
 
 		DefaultData defaultData = mock(DefaultData.class);
 		when(defaultData.getId()).thenReturn(1L);
-		IStorageDescriptor storageDescriptor = rootBranch.put(defaultData);
-
-		Assert.assertEquals(0, storageDescriptor.compareTo(rootBranch.get(defaultData)));
+		rootBranch.put(defaultData);
+		rootBranch.get(defaultData);
 	}
 
 	/**
@@ -97,19 +116,19 @@ public class StorageIndexingTest {
 	 */
 	@Test
 	public void queryBranchWithPlatformIdent() throws IndexingException {
-		IStorageTreeComponent<DefaultData> rootBranch = new StorageBranch<DefaultData>(new StorageBranchIndexer<DefaultData>(new PlatformIdentIndexer<DefaultData>()));
+		IStorageTreeComponent<DefaultData> rootBranch = new StorageBranch<DefaultData>(new StorageBranchIndexer<DefaultData>(new PlatformIdentIndexer<DefaultData>(), false));
 
 		DefaultData defaultData1 = mock(DefaultData.class);
 		when(defaultData1.getId()).thenReturn(1L);
 		when(defaultData1.getPlatformIdent()).thenReturn(10L);
 		IStorageDescriptor storageDescriptor1 = rootBranch.put(defaultData1);
-		storageDescriptor1.setSize(100L);
+		storageDescriptor1.setPositionAndSize(0L, 100L);
 
 		DefaultData defaultData2 = mock(DefaultData.class);
 		when(defaultData2.getId()).thenReturn(2L);
 		when(defaultData2.getPlatformIdent()).thenReturn(20L);
 		IStorageDescriptor storageDescriptor2 = rootBranch.put(defaultData2);
-		storageDescriptor2.setSize(200L);
+		storageDescriptor2.setPositionAndSize(0L, 200L);
 
 		storageIndexQuery.setPlatformIdent(10L);
 
@@ -128,19 +147,19 @@ public class StorageIndexingTest {
 	 */
 	@Test
 	public void queryBranchWithMethodIdent() throws IndexingException {
-		IStorageTreeComponent<MethodSensorData> rootBranch = new StorageBranch<MethodSensorData>(new StorageBranchIndexer<MethodSensorData>(new MethodIdentIndexer<MethodSensorData>()));
+		IStorageTreeComponent<MethodSensorData> rootBranch = new StorageBranch<MethodSensorData>(new StorageBranchIndexer<MethodSensorData>(new MethodIdentIndexer<MethodSensorData>(), false));
 
 		MethodSensorData defaultData1 = mock(MethodSensorData.class);
 		when(defaultData1.getId()).thenReturn(1L);
 		when(defaultData1.getMethodIdent()).thenReturn(10L);
 		IStorageDescriptor storageDescriptor1 = rootBranch.put(defaultData1);
-		storageDescriptor1.setSize(100L);
+		storageDescriptor1.setPositionAndSize(0L, 100L);
 
 		MethodSensorData defaultData2 = mock(MethodSensorData.class);
 		when(defaultData2.getId()).thenReturn(2L);
 		when(defaultData2.getMethodIdent()).thenReturn(20L);
 		IStorageDescriptor storageDescriptor2 = rootBranch.put(defaultData2);
-		storageDescriptor2.setSize(200L);
+		storageDescriptor2.setPositionAndSize(0L, 200L);
 
 		storageIndexQuery.setMethodIdent(10L);
 
@@ -159,17 +178,17 @@ public class StorageIndexingTest {
 	 */
 	@Test
 	public void queryBranchWithObjectType() throws IndexingException {
-		IStorageTreeComponent<DefaultData> rootBranch = new StorageBranch<DefaultData>(new StorageBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>()));
+		IStorageTreeComponent<DefaultData> rootBranch = new StorageBranch<DefaultData>(new StorageBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>(), false));
 
 		TimerData defaultData1 = mock(TimerData.class);
 		when(defaultData1.getId()).thenReturn(1L);
 		IStorageDescriptor storageDescriptor1 = rootBranch.put(defaultData1);
-		storageDescriptor1.setSize(100L);
+		storageDescriptor1.setPositionAndSize(0L, 100L);
 
 		SqlStatementData defaultData2 = mock(SqlStatementData.class);
 		when(defaultData2.getId()).thenReturn(2L);
 		IStorageDescriptor storageDescriptor2 = rootBranch.put(defaultData2);
-		storageDescriptor2.setSize(200L);
+		storageDescriptor2.setPositionAndSize(0L, 200L);
 
 		List<Class<?>> searchedClasses = new ArrayList<Class<?>>();
 		searchedClasses.add(defaultData1.getClass());
@@ -193,19 +212,19 @@ public class StorageIndexingTest {
 		Timestamp minusHour = new Timestamp(new Date().getTime() + 20 * 60 * 1000);
 		Timestamp plusHour = new Timestamp(new Date().getTime() + 25 * 60 * 1000);
 
-		IStorageTreeComponent<DefaultData> rootBranch = new StorageBranch<DefaultData>(new StorageBranchIndexer<DefaultData>(new TimestampIndexer<DefaultData>()));
+		IStorageTreeComponent<DefaultData> rootBranch = new StorageBranch<DefaultData>(new StorageBranchIndexer<DefaultData>(new TimestampIndexer<DefaultData>(), false));
 
 		DefaultData defaultData1 = mock(DefaultData.class);
 		when(defaultData1.getId()).thenReturn(1L);
 		when(defaultData1.getTimeStamp()).thenReturn(new Timestamp(new Date().getTime()));
 		IStorageDescriptor storageDescriptor1 = rootBranch.put(defaultData1);
-		storageDescriptor1.setSize(100L);
+		storageDescriptor1.setPositionAndSize(0L, 100L);
 
 		DefaultData defaultData2 = mock(DefaultData.class);
 		when(defaultData2.getId()).thenReturn(2L);
 		when(defaultData2.getTimeStamp()).thenReturn(plusHour);
 		IStorageDescriptor storageDescriptor2 = rootBranch.put(defaultData2);
-		storageDescriptor2.setSize(200L);
+		storageDescriptor2.setPositionAndSize(0L, 200L);
 
 		storageIndexQuery.setFromDate(minusHour);
 		storageIndexQuery.setToDate(plusHour);
@@ -225,9 +244,9 @@ public class StorageIndexingTest {
 	 */
 	@Test
 	public void queryDifferentLevels() throws IndexingException {
-		StorageBranchIndexer<DefaultData> sensorTypeIndexer = new StorageBranchIndexer<DefaultData>(new SensorTypeIdentIndexer<DefaultData>());
-		StorageBranchIndexer<DefaultData> objectTypeIndexer = new StorageBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>(), sensorTypeIndexer);
-		StorageBranchIndexer<DefaultData> platformTypeIndexer = new StorageBranchIndexer<DefaultData>(new PlatformIdentIndexer<DefaultData>(), objectTypeIndexer);
+		StorageBranchIndexer<DefaultData> sensorTypeIndexer = new StorageBranchIndexer<DefaultData>(new SensorTypeIdentIndexer<DefaultData>(), false);
+		StorageBranchIndexer<DefaultData> objectTypeIndexer = new StorageBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>(), sensorTypeIndexer, false);
+		StorageBranchIndexer<DefaultData> platformTypeIndexer = new StorageBranchIndexer<DefaultData>(new PlatformIdentIndexer<DefaultData>(), objectTypeIndexer, false);
 		IStorageTreeComponent<DefaultData> rootBranch = new StorageBranch<DefaultData>(platformTypeIndexer);
 
 		TimerData defaultData1 = mock(TimerData.class);
@@ -235,14 +254,14 @@ public class StorageIndexingTest {
 		when(defaultData1.getPlatformIdent()).thenReturn(10L);
 		when(defaultData1.getSensorTypeIdent()).thenReturn(10L);
 		IStorageDescriptor storageDescriptor1 = rootBranch.put(defaultData1);
-		storageDescriptor1.setSize(100L);
+		storageDescriptor1.setPositionAndSize(0L, 100L);
 
 		SqlStatementData defaultData2 = mock(SqlStatementData.class);
 		when(defaultData2.getId()).thenReturn(2L);
 		when(defaultData2.getPlatformIdent()).thenReturn(10L);
 		when(defaultData2.getSensorTypeIdent()).thenReturn(20L);
 		IStorageDescriptor storageDescriptor2 = rootBranch.put(defaultData2);
-		storageDescriptor2.setSize(200L);
+		storageDescriptor2.setPositionAndSize(0L, 200L);
 
 		storageIndexQuery.setPlatformIdent(10L);
 
@@ -314,11 +333,13 @@ public class StorageIndexingTest {
 
 		DefaultData defaultData = mock(DefaultData.class);
 		long i = 1L;
+		long totalSize = 0L;
 		int entries = 100;
 		while (i <= entries) {
 			when(defaultData.getId()).thenReturn(i);
 			IStorageDescriptor storageDescriptor = arrayBasedStorageLeaf.put(defaultData);
-			storageDescriptor.setSize(i);
+			storageDescriptor.setPositionAndSize(totalSize, i);
+			totalSize += i;
 			i++;
 		}
 		long removeId = 50L;
@@ -351,7 +372,7 @@ public class StorageIndexingTest {
 		while (i <= entries) {
 			when(defaultData.getId()).thenReturn(i);
 			IStorageDescriptor storageDescriptor = leafWithNoDescriptors.put(defaultData);
-			storageDescriptor.setSize(i);
+			storageDescriptor.setPositionAndSize(totalSize, i);
 			totalSize += i;
 			i++;
 		}

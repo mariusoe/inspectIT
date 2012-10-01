@@ -227,14 +227,6 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		storageIndexingTree = (IStorageTreeComponent<?>) indexingTree;
 
 		assertThat(storageManager.getReadableStorages(), hasItem(storageData));
-
-		File[] dataFiles = storageFolder.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith(StorageFileExtensions.DATA_FILE_EXT);
-			}
-		});
-		assertThat("Amount of data files is less than the amount of invocations saved.", dataFiles.length, is(equalTo(createdInvocations.size())));
 	}
 
 	/**

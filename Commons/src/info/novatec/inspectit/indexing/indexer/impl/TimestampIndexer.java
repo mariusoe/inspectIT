@@ -11,17 +11,19 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * {@link IBranchIndexer} that indexes on the timestamp of the {@link DefaultData}. The index is
  * calculated in the way that a key in made for each {@link #indexingPeriod/1000} seconds of time.2
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  * @param <E>
  */
 public class TimestampIndexer<E extends DefaultData> implements IBranchIndexer<E> {
 
 	/**
 	 * Indexing period. Value is {@value #INDEXING_PERIOD} milliseconds.
+	 * <p>
+	 * ISE: Increased to 15 minutes, because it s not necessary to have such s strict limit
 	 */
-	private static final long INDEXING_PERIOD = 5 * 60 * 1000;
+	private static final long INDEXING_PERIOD = 15 * 60 * 1000;
 
 	/**
 	 * To make this class serializable and support concurrency we have to serialize the map, and can
@@ -96,7 +98,7 @@ public class TimestampIndexer<E extends DefaultData> implements IBranchIndexer<E
 
 	/**
 	 * Returns proper key for given timestamp.
-	 *
+	 * 
 	 * @param timestamp
 	 *            Timestamp to map.
 	 * @return Mapping key.

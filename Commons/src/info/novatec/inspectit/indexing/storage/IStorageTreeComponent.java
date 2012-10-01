@@ -12,5 +12,8 @@ import info.novatec.inspectit.indexing.ITreeComponent;
  */
 public interface IStorageTreeComponent<E> extends ITreeComponent<IStorageDescriptor, E> {
 
-
+	/**
+	 * Informs the component that the pre write finalization is needed.
+	 */
+	void preWriteFinalization();
 }

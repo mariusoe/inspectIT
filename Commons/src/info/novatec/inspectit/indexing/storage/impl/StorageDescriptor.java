@@ -56,6 +56,59 @@ public class StorageDescriptor implements IStorageDescriptor {
 	}
 
 	/**
+	 * Assigns the channel ID, position in file and size.
+	 * 
+	 * @param channelId
+	 *            Channel id to hold.
+	 * @param position
+	 *            Position in file.
+	 * @param size
+	 *            Size.
+	 */
+	public StorageDescriptor(int channelId, long position, long size) {
+		this.channelId = channelId;
+		this.simpleStorageDescriptor = new SimpleStorageDescriptor(position, (int) size);
+	}
+
+	/**
+	 * Joins the information from the other storage descriptor if possible. This method will return
+	 * true if the join was successfully done, and false if no join was done. The join is possible
+	 * only if the two descriptors are actually describing the data in the same channel that are
+	 * next to each other. There is no difference if the other descriptor is pointing to the data
+	 * after or before this descriptor. After successful join the joined data descriptor will be
+	 * represented by this descriptor.
+	 * 
+	 * @param other
+	 *            Descriptor information to join.
+	 * @return This method will return true if the join was successfully done, and false if no join
+	 *         was done.
+	 */
+	public boolean join(IStorageDescriptor other) {
+		if (this.getChannelId() != other.getChannelId()) {
+			return false;
+		} else {
+			return join(other.getPosition(), other.getSize());
+		}
+	}
+
+	/**
+	 * Joins the position and size information if possible. This method will return true if the join
+	 * was successfully done, and false if no join was done. The join is possible only if the given
+	 * position and size is pointing to the data that is next to the data currently described in
+	 * {@link StorageDescriptor}.
+	 * 
+	 * @param otherPosition
+	 *            Position
+	 * @param otherSize
+	 *            Size
+	 * @return This method will return true if the join was successfully done, and false if no join
+	 *         was done.
+	 */
+	public boolean join(long otherPosition, long otherSize) {
+		return simpleStorageDescriptor.join(otherPosition, otherSize);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public int getChannelId() {
@@ -94,13 +147,6 @@ public class StorageDescriptor implements IStorageDescriptor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setPosition(long position) {
-		simpleStorageDescriptor.setPosition((int) position);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public long getSize() {
 		return simpleStorageDescriptor.getSize();
 	}
@@ -108,7 +154,8 @@ public class StorageDescriptor implements IStorageDescriptor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setSize(long size) {
+	public void setPositionAndSize(long position, long size) {
+		simpleStorageDescriptor.setPosition(position);
 		simpleStorageDescriptor.setSize((int) size);
 	}
 

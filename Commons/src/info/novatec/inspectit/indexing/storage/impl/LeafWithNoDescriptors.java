@@ -6,12 +6,10 @@ import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.impl.IndexingException;
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
+import info.novatec.inspectit.storage.util.StorageUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -24,9 +22,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * this is not being able to find one concrete element in the leaf. When this is necessary, the
  * other leaf type must be used.
  * <P>
- * When querying this leaf, only one {@link IStorageDescriptor} is returned that contains the
- * position 0 and size of all elements together. However, performing read with this descriptor
- * should be safe and the result should be all elements in the leaf.
+ * <b>Important:</b><br>
+ * Changing this class can cause the break of the backward/forward compatibility of the storage in
+ * the way that we will not be able to read any data from the storage. Thus, please be careful with
+ * performing any changes until there is a proper mechanism to protect against this problem.
+ * 
  * 
  * @author Ivan Senic
  * 
@@ -54,27 +54,25 @@ public class LeafWithNoDescriptors<E extends DefaultData> implements IStorageTre
 	private transient BoundedDecriptor boundedDecriptor = new BoundedDecriptor();
 
 	/**
-	 * Size counting.
+	 * This is a not thread-safe list of the descriptors that need to be synchronized on our own.
 	 */
-	private AtomicLong size;
+	private List<SimpleStorageDescriptor> descriptors = new ArrayList<SimpleStorageDescriptor>();
 
 	/**
-	 * Current splitter value.
-	 */
-	private transient AtomicLong currentSplitter;
-
-	/**
-	 * Valid ranges hold by this leaf.
-	 */
-	private List<Long> rangeSplitters;
-
-	/**
-	 * Default constructor.
+	 * Default constructor. Generates leaf ID.
 	 */
 	public LeafWithNoDescriptors() {
-		id = UUID.randomUUID().hashCode();
-		size = new AtomicLong(0);
-		currentSplitter = new AtomicLong(0);
+		this(StorageUtil.getRandomInt());
+	}
+
+	/**
+	 * Secondary constructor. Assigns the leaf with the ID.
+	 * 
+	 * @param id
+	 *            ID to be assigned to the leaf.
+	 */
+	public LeafWithNoDescriptors(int id) {
+		this.id = id;
 	}
 
 	/**
@@ -91,32 +89,18 @@ public class LeafWithNoDescriptors<E extends DefaultData> implements IStorageTre
 	 * because we simply can not find one element, and have to return descriptor for all elements.
 	 */
 	public IStorageDescriptor get(E element) {
-		return this.getDescriptorForAllElements();
+		throw new UnsupportedOperationException("LeafWithNoDescriptors can not answer on the single element query.");
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public List<IStorageDescriptor> query(IIndexQuery query) {
-		List<IStorageDescriptor> returnList = new ArrayList<IStorageDescriptor>();
-
-		long rangeStart = 0;
-		if (null != rangeSplitters) {
-			for (Long rangeEnd : rangeSplitters) {
-				SimpleStorageDescriptor simpleStorageDescriptor = new SimpleStorageDescriptor();
-				simpleStorageDescriptor.setPosition((int) rangeStart);
-				simpleStorageDescriptor.setSize((int) (rangeEnd.longValue() - rangeStart));
-				returnList.add(new StorageDescriptor(id, simpleStorageDescriptor));
-				rangeStart = rangeEnd.longValue();
-			}
+		List<IStorageDescriptor> list = new ArrayList<IStorageDescriptor>();
+		for (SimpleStorageDescriptor simpleStorageDescriptor : descriptors) {
+			list.add(new StorageDescriptor(id, simpleStorageDescriptor));
 		}
-
-		SimpleStorageDescriptor simpleStorageDescriptor = new SimpleStorageDescriptor();
-		simpleStorageDescriptor.setPosition((int) rangeStart);
-		simpleStorageDescriptor.setSize((int) (size.get() - rangeStart));
-		returnList.add(new StorageDescriptor(id, simpleStorageDescriptor));
-
-		return returnList;
+		return list;
 	}
 
 	/**
@@ -130,49 +114,58 @@ public class LeafWithNoDescriptors<E extends DefaultData> implements IStorageTre
 	/**
 	 * {@inheritDoc}
 	 */
+	public synchronized void preWriteFinalization() {
+		optimiseDescriptors(descriptors);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public long getComponentSize(IObjectSizes objectSizes) {
 		long size = objectSizes.getSizeOfObjectHeader();
-		size += objectSizes.getPrimitiveTypesSize(4, 0, 1, 0, 0, 0);
-		size += objectSizes.getSizeOfLongObject();
-		size += objectSizes.getSizeOfLongObject();
-		size += objectSizes.getSizeOfObjectObject();
-		if (null != rangeSplitters) {
-			size += objectSizes.getSizeOf(rangeSplitters);
-		}
+		size += objectSizes.getPrimitiveTypesSize(2, 0, 1, 0, 0, 0);
+		size += objectSizes.getSizeOf(descriptors);
+		// manually calculate the descriptor size
+		long descriptorSize = objectSizes.alignTo8Bytes(objectSizes.getSizeOfObjectObject() + objectSizes.getPrimitiveTypesSize(0, 0, 1, 0, 1, 0));
+		size += descriptors.size() * descriptorSize;
 		return objectSizes.alignTo8Bytes(size);
 	}
 
 	/**
-	 * @return Returns one descriptor that describes all elements.
+	 * Adds the written position and size by updating the existing {@link #descriptors} list.
+	 * 
+	 * @param position
+	 *            Position that was written.
+	 * @param size
+	 *            Size.
 	 */
-	private IStorageDescriptor getDescriptorForAllElements() {
-		SimpleStorageDescriptor simpleStorageDescriptor = new SimpleStorageDescriptor();
-		simpleStorageDescriptor.setPosition(0);
-		simpleStorageDescriptor.setSize(size.intValue());
-		return new StorageDescriptor(id, simpleStorageDescriptor);
+	private synchronized void addPositionAndSize(long position, long size) {
+		for (SimpleStorageDescriptor storageDescriptor : descriptors) {
+			if (storageDescriptor.getSize() + size < MAX_RANGE_SIZE && storageDescriptor.join(position, size)) {
+				return;
+			}
+		}
+		SimpleStorageDescriptor storageDescriptor = new SimpleStorageDescriptor(position, (int) size);
+		descriptors.add(storageDescriptor);
 	}
 
 	/**
-	 * Initial processing of the size add to the leaf.
+	 * Optimizes the list of the descriptors so that necessary joining is done. This method will
+	 * also assure that no descriptor has bigger size than {@value #MAX_RANGE_SIZE} bytes, as
+	 * defined in {@link #MAX_RANGE_SIZE}.
 	 * 
-	 * @param sizeToAdd
-	 *            Size to add to leaf.
+	 * @param descriptorList
+	 *            List of {@link StorageDescriptor}s to optimize.
 	 */
-	private void addSize(long sizeToAdd) {
-		size.addAndGet(sizeToAdd);
-		while (true) {
-			long totalCurrentSize = size.get();
-			long currentSplitValue = currentSplitter.get();
-			if (totalCurrentSize - currentSplitValue > MAX_RANGE_SIZE) {
-				if (currentSplitter.compareAndSet(currentSplitValue, totalCurrentSize)) {
-					if (null == rangeSplitters) {
-						rangeSplitters = new CopyOnWriteArrayList<Long>();
-					}
-					rangeSplitters.add(totalCurrentSize);
-					break;
+	private void optimiseDescriptors(List<SimpleStorageDescriptor> descriptorList) {
+		for (int i = 0; i < descriptorList.size() - 1; i++) {
+			for (int j = i + 1; j < descriptorList.size(); j++) {
+				SimpleStorageDescriptor descriptor = descriptors.get(i);
+				SimpleStorageDescriptor other = descriptors.get(j);
+				if (descriptor.getSize() + other.getSize() < MAX_RANGE_SIZE && descriptor.join(other)) {
+					descriptorList.remove(j);
+					j--;
 				}
-			} else {
-				break;
 			}
 		}
 	}
@@ -210,25 +203,15 @@ public class LeafWithNoDescriptors<E extends DefaultData> implements IStorageTre
 		/**
 		 * {@inheritDoc}
 		 */
-		public void setPosition(long position) {
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
 		public long getSize() {
 			return 0;
 		}
 
 		/**
 		 * {@inheritDoc}
-		 * <p>
-		 * Delegates the call to the internal leaf processing of size add.
-		 * 
-		 * @see LeafWithNoDescriptors#addSize(long);
 		 */
-		public void setSize(long size) {
-			LeafWithNoDescriptors.this.addSize(size);
+		public void setPositionAndSize(long position, long size) {
+			addPositionAndSize(position, size);
 		}
 
 		/**
@@ -255,7 +238,7 @@ public class LeafWithNoDescriptors<E extends DefaultData> implements IStorageTre
 	@Override
 	public String toString() {
 		ToStringBuilder toStringBuilder = new ToStringBuilder(this);
-		toStringBuilder.append("totalSize", size.get());
+		toStringBuilder.append("descriptors", descriptors);
 		return toStringBuilder.toString();
 	}
 }

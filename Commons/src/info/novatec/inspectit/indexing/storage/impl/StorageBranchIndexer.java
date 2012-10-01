@@ -1,13 +1,14 @@
 package info.novatec.inspectit.indexing.storage.impl;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.indexer.IBranchIndexer;
 import info.novatec.inspectit.indexing.storage.IStorageBranchIndexer;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
+import info.novatec.inspectit.storage.util.StorageUtil;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * Implementation of the indexer for the {@link IStorageTreeComponent}. This indexer delegate the
@@ -21,14 +22,25 @@ import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
 public class StorageBranchIndexer<E extends DefaultData> implements IStorageBranchIndexer<E> {
 
 	/**
+	 * Id that will be passed to the child indexers/leafs if {@link #passId} is true.
+	 */
+	private int id;
+
+	/**
 	 * The delegate indexer for keys creation.
 	 */
 	private IBranchIndexer<E> delegateIndexer;
 
 	/**
-	 * The indexer that is next in the heirarchy.
+	 * The indexer that is next in the hierarchy.
 	 */
 	private StorageBranchIndexer<E> childIndexer;
+
+	/**
+	 * If pass ID mode is on. With this mode, all sub-components created with this indexer will have
+	 * same ID, thus write will be done in same file.
+	 */
+	private boolean passId;
 
 	/**
 	 * No-args constructor.
@@ -37,23 +49,51 @@ public class StorageBranchIndexer<E extends DefaultData> implements IStorageBran
 	}
 
 	/**
+	 * This constructor will generate unique ID and will not set child indexer.
 	 * 
 	 * @param delegateIndexer
 	 *            Provides delegate indexer with a constructor.
+	 * @param passId
+	 *            If pass ID mode is on. With this mode, all sub-components created with this
+	 *            indexer will have same ID, thus write will be done in same file.
 	 */
-	public StorageBranchIndexer(IBranchIndexer<E> delegateIndexer) {
-		this(delegateIndexer, null);
+	public StorageBranchIndexer(IBranchIndexer<E> delegateIndexer, boolean passId) {
+		this(delegateIndexer, null, StorageUtil.getRandomInt(), passId);
 	}
 
 	/**
+	 * This constructor allows setting of all properties except ID that will be uniqly generated.
+	 * 
 	 * @param delegateIndexer
 	 *            Provides delegate indexer with a constructor.
 	 * @param childIndexer
 	 *            Provides child indexer.
+	 * @param passId
+	 *            If pass ID mode is on. With this mode, all sub-components created with this
+	 *            indexer will have same ID, thus write will be done in same file.
 	 */
-	public StorageBranchIndexer(IBranchIndexer<E> delegateIndexer, StorageBranchIndexer<E> childIndexer) {
+	public StorageBranchIndexer(IBranchIndexer<E> delegateIndexer, StorageBranchIndexer<E> childIndexer, boolean passId) {
+		this(delegateIndexer, childIndexer, StorageUtil.getRandomInt(), passId);
+	}
+
+	/**
+	 * This constructor allows setting of all properties.
+	 * 
+	 * @param delegateIndexer
+	 *            Provides delegate indexer with a constructor.
+	 * @param childIndexer
+	 *            Provides child indexer.
+	 * @param id
+	 *            Id given to this indexer.
+	 * @param sharedId
+	 *            If shared ID mode is on. With this mode, all components created with this indexer
+	 *            will have same ID, thus write will be done in same file.
+	 */
+	public StorageBranchIndexer(IBranchIndexer<E> delegateIndexer, StorageBranchIndexer<E> childIndexer, int id, boolean sharedId) {
 		this.delegateIndexer = delegateIndexer;
 		this.childIndexer = childIndexer;
+		this.id = id;
+		this.passId = sharedId;
 	}
 
 	/**
@@ -81,12 +121,15 @@ public class StorageBranchIndexer<E extends DefaultData> implements IStorageBran
 	 * {@inheritDoc}
 	 */
 	public IStorageBranchIndexer<E> getNewInstance() {
-		if (!sharedInstance()) {
-			StorageBranchIndexer<E> storageBranchIndexer = new StorageBranchIndexer<E>(delegateIndexer.getNewInstance(), childIndexer);
-			return storageBranchIndexer;
+		IBranchIndexer<E> branchIndexer = null;
+		if (sharedInstance()) {
+			branchIndexer = delegateIndexer;
 		} else {
-			throw new UnsupportedOperationException("Method getNewInstance() called on the Indexer that has a shared instance.");
+			branchIndexer = delegateIndexer.getNewInstance();
 		}
+
+		StorageBranchIndexer<E> storageBranchIndexer = new StorageBranchIndexer<E>(branchIndexer, childIndexer, passId);
+		return storageBranchIndexer;
 	}
 
 	/**
@@ -94,14 +137,77 @@ public class StorageBranchIndexer<E extends DefaultData> implements IStorageBran
 	 */
 	public IStorageTreeComponent<E> getNextTreeComponent(E object) {
 		if (null != childIndexer) {
-			return new StorageBranch<E>(childIndexer);
-		} else {
-			if (object instanceof InvocationSequenceData) {
-				return new ArrayBasedStorageLeaf<E>();
+			// if there is child indexer we need to create a branch
+
+			if (!childIndexer.isPassId() && !passId) {
+				// if child is not shared and we don't need to pass id
+				// just create new branch with child indexer
+				return new StorageBranch<E>(childIndexer);
 			} else {
-				return new LeafWithNoDescriptors<E>();
+				// create new instance of child indexer and pass id if necessary
+				IStorageBranchIndexer<E> indexer = childIndexer.getNewInstance();
+				if (passId) {
+					indexer.setId(id);
+				}
+				return new StorageBranch<E>(indexer);
+			}
+
+		} else {
+			// if not we need to create Leaf, and pass id is necessary
+			if (object instanceof InvocationSequenceData) {
+				// for invocations ArrayBasedStorageLeaf
+				if (passId) {
+					return new ArrayBasedStorageLeaf<E>(id);
+				} else {
+					return new ArrayBasedStorageLeaf<E>();
+				}
+			} else {
+				// for everything else LeafWithNoDescriptors
+				if (passId) {
+					return new LeafWithNoDescriptors<E>(id);
+				} else {
+					return new LeafWithNoDescriptors<E>();
+				}
 			}
 		}
+	}
+
+	/**
+	 * Gets {@link #id}.
+	 * 
+	 * @return {@link #id}
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * Sets {@link #id}.
+	 * 
+	 * @param id
+	 *            New value for {@link #id}
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	/**
+	 * Gets {@link #passId}.
+	 * 
+	 * @return {@link #passId}
+	 */
+	public boolean isPassId() {
+		return passId;
+	}
+
+	/**
+	 * Sets {@link #passId}.
+	 * 
+	 * @param sharedId
+	 *            New value for {@link #passId}
+	 */
+	public void setPassId(boolean sharedId) {
+		this.passId = sharedId;
 	}
 
 	/**
@@ -148,15 +254,17 @@ public class StorageBranchIndexer<E extends DefaultData> implements IStorageBran
 		}
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String toString() {
 		ToStringBuilder toStringBuilder = new ToStringBuilder(this);
+		toStringBuilder.append("id", id);
 		toStringBuilder.append("delegateIndexer", delegateIndexer);
 		toStringBuilder.append("childIndexer", childIndexer);
+		toStringBuilder.append("passId", passId);
 		return toStringBuilder.toString();
 	}
 

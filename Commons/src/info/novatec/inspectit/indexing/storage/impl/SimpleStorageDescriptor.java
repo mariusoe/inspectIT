@@ -3,8 +3,8 @@ package info.novatec.inspectit.indexing.storage.impl;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * Simple storage descriptor stores only position and size as int values, since this is enough
- * information to read a object if file is known. File specification will be done by
+ * Simple storage descriptor stores only position as long and size as int value, since this is
+ * enough information to read a object if file is known. File specification will be done by
  * {@link StorageLeaf}s directly.
  * 
  * @author Ivan Senic
@@ -15,7 +15,7 @@ public class SimpleStorageDescriptor {
 	/**
 	 * Position in file.
 	 */
-	private int position;
+	private long position;
 
 	/**
 	 * Size.
@@ -23,9 +23,68 @@ public class SimpleStorageDescriptor {
 	private int size;
 
 	/**
+	 * No-arg constructor.
+	 */
+	public SimpleStorageDescriptor() {
+	}
+
+	/**
+	 * Constructor to set the fields.
+	 * 
+	 * @param position
+	 *            Position in file.
+	 * @param size
+	 *            Size.
+	 */
+	public SimpleStorageDescriptor(long position, int size) {
+		this.position = position;
+		this.size = size;
+	}
+
+	/**
+	 * Joins the position and size information if possible contained in other descriptor. This
+	 * method will return true if the join was successfully done, and false if no join was done. The
+	 * join is possible only if the given position and size is pointing to the data that is next to
+	 * the data currently described in {@link SimpleStorageDescriptor}.
+	 * 
+	 * @param other
+	 *            Descriptor to join
+	 * @return This method will return true if the join was successfully done, and false if no join
+	 *         was done.
+	 */
+	public boolean join(SimpleStorageDescriptor other) {
+		return join(other.getPosition(), other.getSize());
+	}
+
+	/**
+	 * Joins the position and size information if possible. This method will return true if the join
+	 * was successfully done, and false if no join was done. The join is possible only if the given
+	 * position and size is pointing to the data that is next to the data currently described in
+	 * {@link SimpleStorageDescriptor}.
+	 * 
+	 * @param otherPosition
+	 *            Position
+	 * @param otherSize
+	 *            Size
+	 * @return This method will return true if the join was successfully done, and false if no join
+	 *         was done.
+	 */
+	public boolean join(long otherPosition, long otherSize) {
+		if (this.position + this.size == otherPosition) {
+			this.size += otherSize;
+			return true;
+		} else if (otherPosition + otherSize == this.position) {
+			this.position = otherPosition;
+			this.size += otherSize;
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * @return the position
 	 */
-	public int getPosition() {
+	public long getPosition() {
 		return position;
 	}
 
@@ -33,7 +92,7 @@ public class SimpleStorageDescriptor {
 	 * @param position
 	 *            the position to set
 	 */
-	public void setPosition(int position) {
+	public void setPosition(long position) {
 		this.position = position;
 	}
 
@@ -59,7 +118,7 @@ public class SimpleStorageDescriptor {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + position;
+		result = prime * result + (int) (position ^ (position >>> 32));
 		result = prime * result + size;
 		return result;
 	}
@@ -87,7 +146,7 @@ public class SimpleStorageDescriptor {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
