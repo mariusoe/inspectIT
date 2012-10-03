@@ -404,17 +404,37 @@ public class VmSummaryInputController extends AbstractTextInputController {
 			addItemToSection(toolkit, SECTION_VM, "Specification Name: ", minTitleColumnWidth);
 			addItemToSection(toolkit, SECTION_VM, data.getVmSpecName(), minInformationColumnWidth);
 			addItemToSection(toolkit, SECTION_MEMORY, "Max heap size: ", minTitleColumnWidth);
-			addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(data.getMaxHeapMemorySize()), minInformationColumnWidth);
+			if (data.getMaxHeapMemorySize() > 0) {
+				addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(data.getMaxHeapMemorySize()), minInformationColumnWidth);
+			} else {
+				addItemToSection(toolkit, SECTION_MEMORY, NOT_AVAILABLE, minInformationColumnWidth);
+			}
 			addItemToSection(toolkit, SECTION_MEMORY, "Max non-heap size: ", minTitleColumnWidth);
-			addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(data.getMaxNonHeapMemorySize()), minInformationColumnWidth);
+			if (data.getMaxNonHeapMemorySize() > 0) {
+				addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(data.getMaxNonHeapMemorySize()), minInformationColumnWidth);
+			} else {
+				addItemToSection(toolkit, SECTION_MEMORY, NOT_AVAILABLE, minInformationColumnWidth);
+			}
 			addItemToSection(toolkit, SECTION_MEMORY, "Total physical memory: ", minTitleColumnWidth);
-			addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(data.getTotalPhysMemory()), minInformationColumnWidth);
+			if (data.getTotalPhysMemory() > 0) {
+				addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(data.getTotalPhysMemory()), minInformationColumnWidth);
+			} else {
+				addItemToSection(toolkit, SECTION_MEMORY, NOT_AVAILABLE, minInformationColumnWidth);
+			}
 			addItemToSection(toolkit, SECTION_MEMORY, "Total swap space: ", minTitleColumnWidth);
-			addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(data.getTotalSwapSpace()), minInformationColumnWidth);
+			if (data.getTotalSwapSpace() > 0) {
+				addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(data.getTotalSwapSpace()), minInformationColumnWidth);
+			} else {
+				addItemToSection(toolkit, SECTION_MEMORY, NOT_AVAILABLE, minInformationColumnWidth);
+			}
 			addItemToSection(toolkit, SECTION_OS, "Operating System: ", minTitleColumnWidth);
 			addItemToSection(toolkit, SECTION_OS, data.getOsName() + " " + data.getOsVersion(), minInformationColumnWidth);
 			addItemToSection(toolkit, SECTION_OS, "Available processors: ", minTitleColumnWidth);
-			addItemToSection(toolkit, SECTION_OS, NumberFormatter.formatInteger(data.getAvailableProcessors()), minInformationColumnWidth);
+			if (data.getAvailableProcessors() > 0) {
+				addItemToSection(toolkit, SECTION_OS, NumberFormatter.formatInteger(data.getAvailableProcessors()), minInformationColumnWidth);
+			} else {
+				addItemToSection(toolkit, SECTION_OS, NOT_AVAILABLE, minInformationColumnWidth);
+			}
 			addItemToSection(toolkit, SECTION_OS, "Architecture: ", minTitleColumnWidth);
 			addItemToSection(toolkit, SECTION_OS, data.getArchitecture(), minInformationColumnWidth);
 
@@ -655,7 +675,11 @@ public class VmSummaryInputController extends AbstractTextInputController {
 		}
 
 		if (cpuData != null) {
-			processCpuTime.setText(NumberFormatter.formatNanosToSeconds(cpuData.getProcessCpuTime()));
+			if (cpuData.getProcessCpuTime() > 0) {
+				processCpuTime.setText(NumberFormatter.formatNanosToSeconds(cpuData.getProcessCpuTime()));
+			} else {
+				processCpuTime.setText(NOT_AVAILABLE);
+			}
 		}
 
 		if (compilationData != null) {
@@ -664,12 +688,36 @@ public class VmSummaryInputController extends AbstractTextInputController {
 
 		if (memoryData != null) {
 			int count = memoryData.getCount();
-			freePhysMemory.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalFreePhysMemory() / count));
-			freeSwapSpace.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalFreeSwapSpace() / count));
-			committedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalComittedHeapMemorySize() / count));
-			committedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalComittedNonHeapMemorySize() / count));
-			usedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalUsedHeapMemorySize() / count));
-			usedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalUsedNonHeapMemorySize() / count));
+			if (memoryData.getTotalFreePhysMemory() > 0) {
+				freePhysMemory.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalFreePhysMemory() / count));
+			} else {
+				freePhysMemory.setText(NOT_AVAILABLE);
+			}
+			if (memoryData.getTotalFreeSwapSpace() > 0) {
+				freeSwapSpace.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalFreeSwapSpace() / count));
+			} else {
+				freeSwapSpace.setText(NOT_AVAILABLE);
+			}
+			if (memoryData.getTotalComittedHeapMemorySize() > 0) {
+				committedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalComittedHeapMemorySize() / count));
+			} else {
+				committedHeapMemorySize.setText(NOT_AVAILABLE);
+			}
+			if (memoryData.getTotalComittedNonHeapMemorySize() > 0) {
+				committedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalComittedNonHeapMemorySize() / count));
+			} else {
+				committedNonHeapMemorySize.setText(NOT_AVAILABLE);
+			}
+			if (memoryData.getTotalUsedHeapMemorySize() > 0) {
+				usedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalUsedHeapMemorySize() / count));
+			} else {
+				usedHeapMemorySize.setText(NOT_AVAILABLE);
+			}
+			if (memoryData.getTotalUsedNonHeapMemorySize() > 0) {
+				usedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalUsedNonHeapMemorySize() / count));
+			} else {
+				usedNonHeapMemorySize.setText(NOT_AVAILABLE);
+			}
 		}
 
 		if (runtimeData != null) {

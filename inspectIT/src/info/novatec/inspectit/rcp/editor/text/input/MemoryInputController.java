@@ -18,8 +18,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 /**
- * This class represents the textual view of the {@link MemoryInformation}
- * sensor-type.
+ * This class represents the textual view of the {@link MemoryInformation} sensor-type.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -35,6 +34,11 @@ public class MemoryInputController extends AbstractTextInputController {
 	 * The name of the section.
 	 */
 	private static final String SECTION_MEMORY = "Memory";
+
+	/**
+	 * The string representing that something is not available.
+	 */
+	private static final String NOT_AVAILABLE = "N/A";
 
 	/**
 	 * The template of the {@link MemoryInformationData} object.
@@ -91,7 +95,7 @@ public class MemoryInputController extends AbstractTextInputController {
 	 */
 	public void setInputDefinition(InputDefinition inputDefinition) {
 		super.setInputDefinition(inputDefinition);
-		
+
 		memoryObj = new MemoryInformationData();
 		memoryObj.setPlatformIdent(inputDefinition.getIdDefinition().getPlatformId());
 
@@ -111,49 +115,65 @@ public class MemoryInputController extends AbstractTextInputController {
 		if (systemData != null) {
 			// adds some static informations
 			addItemToSection(toolkit, SECTION_MEMORY, "Max heap size: ");
-			addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(systemData.getMaxHeapMemorySize()));
+			if (systemData.getMaxHeapMemorySize() > 0) {
+				addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(systemData.getMaxHeapMemorySize()));
+			} else {
+				addItemToSection(toolkit, SECTION_MEMORY, NOT_AVAILABLE);
+			}
 			addItemToSection(toolkit, SECTION_MEMORY, "Max non-heap size: ");
-			addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(systemData.getMaxNonHeapMemorySize()));
+			if (systemData.getMaxNonHeapMemorySize() > 0) {
+				addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(systemData.getMaxNonHeapMemorySize()));
+			} else {
+				addItemToSection(toolkit, SECTION_MEMORY, NOT_AVAILABLE);
+			}
 			addItemToSection(toolkit, SECTION_MEMORY, "Total physical memory: ");
-			addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(systemData.getTotalPhysMemory()));
+			if (systemData.getTotalPhysMemory() > 0) {
+				addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(systemData.getTotalPhysMemory()));
+			} else {
+				addItemToSection(toolkit, SECTION_MEMORY, NOT_AVAILABLE);
+			}
 			addItemToSection(toolkit, SECTION_MEMORY, "Total swap space: ");
-			addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(systemData.getTotalSwapSpace()));
+			if (systemData.getTotalSwapSpace() > 0) {
+				addItemToSection(toolkit, SECTION_MEMORY, NumberFormatter.formatBytesToKBytes(systemData.getTotalSwapSpace()));
+			} else {
+				addItemToSection(toolkit, SECTION_MEMORY, NOT_AVAILABLE);
+			}
 		} else {
 			// if no static informations available
 			addItemToSection(toolkit, SECTION_MEMORY, "Max heap size: ");
-			addItemToSection(toolkit, SECTION_MEMORY, "n/a");
+			addItemToSection(toolkit, SECTION_MEMORY, NOT_AVAILABLE);
 			addItemToSection(toolkit, SECTION_MEMORY, "Max non-heap size: ");
-			addItemToSection(toolkit, SECTION_MEMORY, "n/a");
+			addItemToSection(toolkit, SECTION_MEMORY, NOT_AVAILABLE);
 			addItemToSection(toolkit, SECTION_MEMORY, "Total physical memory: ");
-			addItemToSection(toolkit, SECTION_MEMORY, "n/a");
+			addItemToSection(toolkit, SECTION_MEMORY, NOT_AVAILABLE);
 			addItemToSection(toolkit, SECTION_MEMORY, "Total swap space: ");
-			addItemToSection(toolkit, SECTION_MEMORY, "n/a");
+			addItemToSection(toolkit, SECTION_MEMORY, NOT_AVAILABLE);
 		}
 
 		if (sections.containsKey(SECTION_MEMORY)) {
 			// creates some labels
 			addItemToSection(toolkit, SECTION_MEMORY, "Free physical memory: ");
-			freePhysMemory = toolkit.createLabel(sections.get(SECTION_MEMORY), "n/a", SWT.LEFT);
+			freePhysMemory = toolkit.createLabel(sections.get(SECTION_MEMORY), NOT_AVAILABLE, SWT.LEFT);
 			freePhysMemory.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 			addItemToSection(toolkit, SECTION_MEMORY, "Free swap space: ");
-			freeSwapSpace = toolkit.createLabel(sections.get(SECTION_MEMORY), "n/a", SWT.LEFT);
+			freeSwapSpace = toolkit.createLabel(sections.get(SECTION_MEMORY), NOT_AVAILABLE, SWT.LEFT);
 			freeSwapSpace.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 			addItemToSection(toolkit, SECTION_MEMORY, "Committed heap size: ");
-			committedHeapMemorySize = toolkit.createLabel(sections.get(SECTION_MEMORY), "n/a", SWT.LEFT);
+			committedHeapMemorySize = toolkit.createLabel(sections.get(SECTION_MEMORY), NOT_AVAILABLE, SWT.LEFT);
 			committedHeapMemorySize.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 			addItemToSection(toolkit, SECTION_MEMORY, "Committed non-heap size: ");
-			committedNonHeapMemorySize = toolkit.createLabel(sections.get(SECTION_MEMORY), "n/a", SWT.LEFT);
+			committedNonHeapMemorySize = toolkit.createLabel(sections.get(SECTION_MEMORY), NOT_AVAILABLE, SWT.LEFT);
 			committedNonHeapMemorySize.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 			addItemToSection(toolkit, SECTION_MEMORY, "Used heap size: ");
-			usedHeapMemorySize = toolkit.createLabel(sections.get(SECTION_MEMORY), "n/a", SWT.LEFT);
+			usedHeapMemorySize = toolkit.createLabel(sections.get(SECTION_MEMORY), NOT_AVAILABLE, SWT.LEFT);
 			usedHeapMemorySize.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 			addItemToSection(toolkit, SECTION_MEMORY, "Used non-heap size: ");
-			usedNonHeapMemorySize = toolkit.createLabel(sections.get(SECTION_MEMORY), "n/a", SWT.LEFT);
+			usedNonHeapMemorySize = toolkit.createLabel(sections.get(SECTION_MEMORY), NOT_AVAILABLE, SWT.LEFT);
 			usedNonHeapMemorySize.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		}
 	}
@@ -210,12 +230,36 @@ public class MemoryInputController extends AbstractTextInputController {
 		if (null != data) {
 			// updates the labels
 			int count = data.getCount();
-			freePhysMemory.setText(NumberFormatter.formatBytesToKBytes(data.getTotalFreePhysMemory() / count));
-			freeSwapSpace.setText(NumberFormatter.formatBytesToKBytes(data.getTotalFreeSwapSpace() / count));
-			committedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalComittedHeapMemorySize() / count));
-			committedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalComittedNonHeapMemorySize() / count));
-			usedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalUsedHeapMemorySize() / count));
-			usedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalUsedNonHeapMemorySize() / count));
+			if (data.getTotalFreePhysMemory() > 0) {
+				freePhysMemory.setText(NumberFormatter.formatBytesToKBytes(data.getTotalFreePhysMemory() / count));
+			} else {
+				freePhysMemory.setText(NOT_AVAILABLE);
+			}
+			if (data.getTotalFreeSwapSpace() > 0) {
+				freeSwapSpace.setText(NumberFormatter.formatBytesToKBytes(data.getTotalFreeSwapSpace() / count));
+			} else {
+				freeSwapSpace.setText(NOT_AVAILABLE);
+			}
+			if (data.getTotalComittedHeapMemorySize() > 0) {
+				committedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalComittedHeapMemorySize() / count));
+			} else {
+				committedHeapMemorySize.setText(NOT_AVAILABLE);
+			}
+			if (data.getTotalComittedNonHeapMemorySize() > 0) {
+				committedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalComittedNonHeapMemorySize() / count));
+			} else {
+				committedNonHeapMemorySize.setText(NOT_AVAILABLE);
+			}
+			if (data.getTotalUsedHeapMemorySize() > 0) {
+				usedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalUsedHeapMemorySize() / count));
+			} else {
+				usedHeapMemorySize.setText(NOT_AVAILABLE);
+			}
+			if (data.getTotalUsedNonHeapMemorySize() > 0) {
+				usedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalUsedNonHeapMemorySize() / count));
+			} else {
+				usedNonHeapMemorySize.setText(NOT_AVAILABLE);
+			}
 		}
 	}
 

@@ -17,8 +17,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 /**
- * This class represents the textual view of the {@link CpuInformation}
- * sensor-type.
+ * This class represents the textual view of the {@link CpuInformation} sensor-type.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -34,6 +33,11 @@ public class CpuInputController extends AbstractTextInputController {
 	 * The name of the section.
 	 */
 	private static final String SECTION_CPU = "CPU";
+
+	/**
+	 * The string representing that something is not available.
+	 */
+	private static final String NOT_AVAILABLE = "N/A";
 
 	/**
 	 * The template of the {@link CpuInformationData} object.
@@ -65,7 +69,7 @@ public class CpuInputController extends AbstractTextInputController {
 	 */
 	public void setInputDefinition(InputDefinition inputDefinition) {
 		super.setInputDefinition(inputDefinition);
-		
+
 		cpuObj = new CpuInformationData();
 		cpuObj.setPlatformIdent(inputDefinition.getIdDefinition().getPlatformId());
 
@@ -140,8 +144,16 @@ public class CpuInputController extends AbstractTextInputController {
 
 		if (null != data) {
 			int count = data.getCount();
-			cpuUsage.setText(NumberFormatter.formatCpuPercent(data.getTotalCpuUsage() / count));
-			processCpuTime.setText(NumberFormatter.formatNanosToSeconds(data.getProcessCpuTime()));
+			if (data.getTotalCpuUsage() > 0) {
+				cpuUsage.setText(NumberFormatter.formatCpuPercent(data.getTotalCpuUsage() / count));
+			} else {
+				cpuUsage.setText(NOT_AVAILABLE);
+			}
+			if (data.getProcessCpuTime() > 0) {
+				processCpuTime.setText(NumberFormatter.formatNanosToSeconds(data.getProcessCpuTime()));
+			} else {
+				processCpuTime.setText(NOT_AVAILABLE);
+			}
 		}
 	}
 
