@@ -24,6 +24,7 @@ import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.processor.impl.DataSaverProcessor;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
+import info.novatec.inspectit.storage.serializer.util.KryoUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -266,7 +267,7 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		Input input = new Input(result);
 		int count = 0;
 		try {
-			while (result.available() > 0) {
+			while (KryoUtil.hasMoreBytes(input)) {
 				try {
 					Object invocation = serializer.deserialize(input);
 					assertThat(invocation, is(instanceOf(InvocationSequenceData.class)));

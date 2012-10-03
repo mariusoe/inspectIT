@@ -37,6 +37,7 @@ Export-Package: info.novatec.inspectit.cmr.cache,
  info.novatec.inspectit.storage.serializer,
  info.novatec.inspectit.storage.serializer.impl,
  info.novatec.inspectit.storage.serializer.schema,
+ info.novatec.inspectit.storage.serializer.util,
  info.novatec.inspectit.util,
  info.novatec.inspectit.versioning,
  schema

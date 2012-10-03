@@ -13,6 +13,7 @@ import info.novatec.inspectit.storage.StorageManager;
 import info.novatec.inspectit.storage.nio.stream.StreamProvider;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider;
+import info.novatec.inspectit.storage.serializer.util.KryoUtil;
 import info.novatec.inspectit.storage.util.RangeDescriptor;
 
 import java.io.IOException;
@@ -149,7 +150,7 @@ public class DataRetriever {
 			try {
 				inputStream = httpClient.execute(httpGet, new HttpRequestHandler());
 				input = new Input(inputStream);
-				while (inputStream.available() > 0) {
+				while (KryoUtil.hasMoreBytes(input)) {
 					Object object = serializer.deserialize(input);
 					E element = (E) object;
 					receivedData.add(element);
@@ -218,7 +219,7 @@ public class DataRetriever {
 		try {
 			inputStream = streamProvider.getExtendedByteBufferInputStream(localStorageData, optimizedDescriptors);
 			input = new Input(inputStream);
-			while (inputStream.available() > 0) {
+			while (KryoUtil.hasMoreBytes(input)) {
 				Object object = serializer.deserialize(input);
 				E element = (E) object;
 				receivedData.add(element);
