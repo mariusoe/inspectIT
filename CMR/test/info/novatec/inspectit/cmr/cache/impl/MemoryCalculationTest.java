@@ -20,11 +20,15 @@ import info.novatec.inspectit.communication.data.SystemInformationData;
 import info.novatec.inspectit.communication.data.ThreadInformationData;
 import info.novatec.inspectit.communication.data.TimerData;
 
+import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -180,9 +184,12 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		for (int i = 0; i < array.length; i++) {
 			array[i] = new Object();
 		}
-		ourSize = objectSizes.getSizeOfArray(array.length) + array.length * objectSizes.getSizeOfObjectObject();
-		theirSize = MemoryUtil.deepMemoryUsageOf(array, VisibilityFilter.ALL);
-		assertThat("Full array", ourSize, is(equalTo(theirSize)));
+
+		if (checkObjectGraphIdentityHashCodeCollision(array, new HashSet<Integer>(), new ArrayList<Integer>())) {
+			ourSize = objectSizes.getSizeOfArray(array.length) + array.length * objectSizes.getSizeOfObjectObject();
+			theirSize = MemoryUtil.deepMemoryUsageOf(array, VisibilityFilter.ALL);
+			assertThat("Full array", ourSize, is(equalTo(theirSize)));
+		}
 	}
 
 	/**
@@ -200,9 +207,11 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 			arrayList.add(new Object());
 		}
 
-		ourSize = objectSizes.getSizeOf(arrayList) + size * objectSizes.getSizeOfObjectObject();
-		theirSize = MemoryUtil.deepMemoryUsageOf(arrayList, VisibilityFilter.ALL);
-		assertThat("Random list size", ourSize, is(equalTo(theirSize)));
+		if (checkObjectGraphIdentityHashCodeCollision(arrayList, new HashSet<Integer>(), new ArrayList<Integer>())) {
+			ourSize = objectSizes.getSizeOf(arrayList) + size * objectSizes.getSizeOfObjectObject();
+			theirSize = MemoryUtil.deepMemoryUsageOf(arrayList, VisibilityFilter.ALL);
+			assertThat("Random list size", ourSize, is(equalTo(theirSize)));
+		}
 	}
 
 	/**
@@ -220,9 +229,11 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 			arrayList.add(new Object());
 		}
 
-		ourSize = objectSizes.getSizeOf(arrayList, 0) + size * objectSizes.getSizeOfObjectObject();
-		theirSize = MemoryUtil.deepMemoryUsageOf(arrayList, VisibilityFilter.ALL);
-		assertThat("Random list size", ourSize, is(equalTo(theirSize)));
+		if (checkObjectGraphIdentityHashCodeCollision(arrayList, new HashSet<Integer>(), new ArrayList<Integer>())) {
+			ourSize = objectSizes.getSizeOf(arrayList, 0) + size * objectSizes.getSizeOfObjectObject();
+			theirSize = MemoryUtil.deepMemoryUsageOf(arrayList, VisibilityFilter.ALL);
+			assertThat("Random list size", ourSize, is(equalTo(theirSize)));
+		}
 	}
 
 	/**
@@ -240,9 +251,11 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 			hashMap.put(new Object(), new Object());
 		}
 
-		ourSize = objectSizes.getSizeOfHashMap(hashMap.size()) + 2 * size * objectSizes.getSizeOfObjectObject();
-		theirSize = MemoryUtil.deepMemoryUsageOf(hashMap, VisibilityFilter.ALL);
-		assertThat("Random map size", ourSize, is(equalTo(theirSize + HASH_MAP_SAFTY_DELTA)));
+		if (checkObjectGraphIdentityHashCodeCollision(hashMap, new HashSet<Integer>(), new ArrayList<Integer>())) {
+			ourSize = objectSizes.getSizeOfHashMap(hashMap.size()) + 2 * size * objectSizes.getSizeOfObjectObject();
+			theirSize = MemoryUtil.deepMemoryUsageOf(hashMap, VisibilityFilter.ALL);
+			assertThat("Random map size", ourSize, is(equalTo(theirSize + HASH_MAP_SAFTY_DELTA)));
+		}
 	}
 
 	/**
@@ -260,9 +273,12 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 			hashSet.add(new Object());
 		}
 
-		ourSize = objectSizes.getSizeOfHashSet(hashSet.size()) + size * objectSizes.getSizeOfObjectObject();
-		theirSize = MemoryUtil.deepMemoryUsageOf(hashSet, VisibilityFilter.ALL);
-		assertThat("Random set size", ourSize, is(equalTo(theirSize + HASH_MAP_SAFTY_DELTA)));
+		if (checkObjectGraphIdentityHashCodeCollision(hashSet, new HashSet<Integer>(), new ArrayList<Integer>())) {
+			ourSize = objectSizes.getSizeOfHashSet(hashSet.size()) + size * objectSizes.getSizeOfObjectObject();
+			theirSize = MemoryUtil.deepMemoryUsageOf(hashSet, VisibilityFilter.ALL);
+			assertThat("Random set size", ourSize, is(equalTo(theirSize + HASH_MAP_SAFTY_DELTA)));
+
+		}
 	}
 
 	/**
@@ -281,14 +297,16 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		assertThat("Empty map", ourSize, is(equalTo(theirSize)));
 
 		concurrentHashMap = new ConcurrentHashMap<Object, Object>(16, 0.75f, 1);
-		int size = (int) (Math.random() * 100);
+		int size = 86;
 		for (int i = 0; i < size; i++) {
 			concurrentHashMap.put(new Object(), new Object());
 		}
 
-		ourSize = objectSizes.getSizeOfConcurrentHashMap(concurrentHashMap.size(), 1) + size * 2 * objectSizes.getSizeOfObjectObject();
-		theirSize = MemoryUtil.deepMemoryUsageOf(concurrentHashMap, VisibilityFilter.ALL);
-		assertThat("Random map size of " + size, ourSize, is(equalTo(theirSize)));
+		if (checkObjectGraphIdentityHashCodeCollision(concurrentHashMap, new HashSet<Integer>(), new ArrayList<Integer>())) {
+			ourSize = objectSizes.getSizeOfConcurrentHashMap(concurrentHashMap.size(), 1) + size * 2 * objectSizes.getSizeOfObjectObject();
+			theirSize = MemoryUtil.deepMemoryUsageOf(concurrentHashMap, VisibilityFilter.ALL);
+			assertThat("Random map size of " + size, ourSize, is(equalTo(theirSize)));
+		}
 	}
 
 	/**
@@ -322,7 +340,75 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		DefaultData object = defaultDataClass.newInstance();
 		long ourSize = objectSizes.getSizeOf(object);
 		long theirSize = MemoryUtil.deepMemoryUsageOf(object, VisibilityFilter.ALL);
-		assertThat("Size of " + defaultDataClass.getName(), (double) ourSize, is(closeTo((double) theirSize, 8d)));
+		assertThat("Size of " + defaultDataClass.getName(), (double) ourSize, is(closeTo(theirSize, 8d)));
+	}
+
+	/**
+	 * Checks for the possible object graph identity hash code collision. Objects that don't pass
+	 * this check can not be given to the classmexer for size caclultaions, because correct size
+	 * will not be calculated due to the collision that will occur in the classmexer internally.
+	 * <p>
+	 * Most of this method is copied by the classmexer.
+	 * 
+	 * @param obj
+	 *            Object to check. Note that this method is recursive.
+	 * @param counted
+	 *            HashSet that will serve as the collision tester
+	 * @param countedList
+	 *            List that will hold all the original identity values.
+	 * 
+	 * @return True if there is no collisions in the hash set (map) and object can be tested via
+	 *         classmexer. False otherwise.
+	 * @throws SecurityException
+	 */
+	private static boolean checkObjectGraphIdentityHashCodeCollision(Object obj, Set<Integer> counted, List<Integer> countedList) throws SecurityException {
+		Stack<Object> stack = new Stack<Object>();
+		stack.push(obj);
+		while (!(stack.isEmpty())) {
+			Object object = stack.pop();
+			Integer identityHashCode = Integer.valueOf(System.identityHashCode(object));
+			boolean added = counted.add(identityHashCode);
+			if (!added) {
+				if (!countedList.contains(identityHashCode)) {
+					return false;
+				}
+			} else {
+				Class<?> clazz = object.getClass();
+				Class<?> compType = clazz.getComponentType();
+				if ((compType != null) && (!(compType.isPrimitive()))) {
+					Object[] array = (Object[]) object;
+					for (int i = 0; i < array.length; i++) {
+						Object element = array[i];
+						if (element != null) {
+							stack.push(element);
+						}
+					}
+				}
+				while (clazz != null) {
+					for (Field field : clazz.getDeclaredFields()) {
+						int mod = field.getModifiers();
+						if ((mod & 0x8) == 0) {
+							Class<?> fieldClass = field.getType();
+							if (!(fieldClass.isPrimitive())) {
+								if (!(field.isAccessible())) {
+									field.setAccessible(true);
+								}
+								try {
+									Object subObject = field.get(object);
+									if (subObject != null) {
+										stack.push(subObject);
+									}
+								} catch (IllegalAccessException illAcc) {
+									throw new InternalError("Couldn't read " + field);
+								}
+							}
+						}
+					}
+					clazz = clazz.getSuperclass();
+				}
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -346,6 +432,7 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 
 		private String str = RandomStringUtils.random((int) (Math.random() * 100));
 
+		@Override
 		public long getObjectSize(IObjectSizes objectSizes) {
 			long size = objectSizes.getSizeOfObjectHeader();
 			size += objectSizes.getPrimitiveTypesSize(1, 1, 1, 0, 1, 0);
