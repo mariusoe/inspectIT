@@ -14,7 +14,6 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatu
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.recording.RecordingData;
-import info.novatec.inspectit.storage.recording.RecordingProperties;
 
 import java.util.Date;
 
@@ -493,7 +492,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 				}
 
 				// check if the recording time is limited
-				if (null != recordingData.getRecordingProperties().getRecordEndDate()) {
+				if (null != recordingData.getRecordEndDate()) {
 					countdownJobActive = true;
 				} else {
 					recTimeBar.setVisible(false);
@@ -564,9 +563,8 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			if (null != recordingData && !form.isDisposed()) {
-				RecordingProperties recordingProperties = recordingData.getRecordingProperties();
-				Date endDate = recordingProperties.getRecordEndDate();
-				Date startDate = recordingProperties.getRecordStartDate();
+				Date endDate = recordingData.getRecordEndDate();
+				Date startDate = recordingData.getRecordStartDate();
 				if (null != endDate && null != startDate) {
 					Date now = new Date();
 					long millisMore = endDate.getTime() - now.getTime();

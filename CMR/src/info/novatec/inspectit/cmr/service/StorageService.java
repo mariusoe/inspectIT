@@ -216,7 +216,11 @@ public class StorageService implements IStorageService {
 	public RecordingData getRecordingData() {
 		if (isRecordingOn()) {
 			RecordingData recordingData = new RecordingData();
-			recordingData.setRecordingProperties(storageManager.getRecordingProperties());
+			RecordingProperties recordingProperties = storageManager.getRecordingProperties();
+			if (null != recordingProperties) {
+				recordingData.setRecordStartDate(recordingProperties.getRecordStartDate());
+				recordingData.setRecordEndDate(recordingProperties.getRecordEndDate());
+			}
 			recordingData.setRecordingStorage(storageManager.getRecordingStorage());
 			recordingData.setRecordingWritingStatus(storageManager.getRecordingStatus());
 			return recordingData;

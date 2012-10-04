@@ -12,12 +12,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class aggregates data and writes only aggregated objects to the writer.
- *
+ * 
  * @param <E>
  *            Type of data to aggregate.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataProcessor {
 
@@ -69,7 +69,7 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 
 	/**
 	 * Default constructor. Sets max elements to {@value #DEFAULT_MAX_ELEMENTS}.
-	 *
+	 * 
 	 * @param clazz
 	 *            List of classes to be saved to storage by this {@link AbstractDataProcessor}.
 	 * @param aggregationPeriod
@@ -83,7 +83,7 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 
 	/**
 	 * Secondary constructor.
-	 *
+	 * 
 	 * @param clazz
 	 *            List of classes to be saved to storage by this {@link AbstractDataProcessor}.
 	 * @param aggregationPeriod
@@ -174,7 +174,7 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 
 	/**
 	 * Returns the cache hash code.
-	 *
+	 * 
 	 * @param timerData
 	 *            Object to calculate cache hash for.
 	 * @param timestampValue
@@ -191,7 +191,7 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 
 	/**
 	 * Returns the value of the time stamp based on a aggregation period.
-	 *
+	 * 
 	 * @param timerData
 	 *            {@link TimerData} to get aggregation time stamp.
 	 * @return Aggregation time stamp.
@@ -204,7 +204,7 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 
 	/**
 	 * Creates new {@link TimerData} object for aggregation purposes.
-	 *
+	 * 
 	 * @param timerData
 	 *            {@link TimerData} to clone.
 	 * @param alteredTimestamp
