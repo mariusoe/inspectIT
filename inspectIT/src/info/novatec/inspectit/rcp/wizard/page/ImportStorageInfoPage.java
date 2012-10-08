@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.wizard.page;
 
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.composite.StorageInfoComposite;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
@@ -16,7 +17,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
 /**
@@ -54,21 +54,6 @@ public class ImportStorageInfoPage extends WizardPage {
 	private boolean canImport = false;
 
 	/**
-	 * Name of storage to import.
-	 */
-	private Label name;
-
-	/**
-	 * Description of storage to import.
-	 */
-	private Label description;
-
-	/**
-	 * Disk size of storage to import.
-	 */
-	private Label diskSize;
-
-	/**
 	 * Label to display file name.
 	 */
 	private Label file;
@@ -82,6 +67,11 @@ public class ImportStorageInfoPage extends WizardPage {
 	 * Main composite.
 	 */
 	private Composite main;
+
+	/**
+	 * {@link StorageInfoComposite}.
+	 */
+	private StorageInfoComposite storageInfoComposite;
 
 	/**
 	 * Default constructor.
@@ -106,25 +96,8 @@ public class ImportStorageInfoPage extends WizardPage {
 		new Label(main, SWT.NONE).setText("Import to:");
 		importTo = new Label(main, SWT.WRAP);
 
-		Group group = new Group(main, SWT.NONE);
-		group.setText("Storage Info");
-		GridLayout gl = new GridLayout(2, false);
-		gl.marginHeight = 10;
-		gl.marginWidth = 10;
-		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-		group.setLayout(gl);
-
-		new Label(group, SWT.NONE).setText("Name:");
-		name = new Label(group, SWT.WRAP);
-		name.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-		new Label(group, SWT.NONE).setText("Description:");
-		description = new Label(group, SWT.WRAP);
-		description.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-		new Label(group, SWT.NONE).setText("Size on disk:");
-		diskSize = new Label(group, SWT.WRAP);
-		diskSize.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		storageInfoComposite = new StorageInfoComposite(main, SWT.NONE, false);
+		storageInfoComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
 		setControl(main);
 	}
@@ -149,13 +122,7 @@ public class ImportStorageInfoPage extends WizardPage {
 					InspectITStorageManager storageManager = InspectIT.getDefault().getInspectITStorageManager();
 					IStorageData storageData = storageManager.getStorageDataFromZip(fileName);
 					if (null != storageData) {
-						name.setText(storageData.getName());
-						String desc = "";
-						if (null != storageData.getDescription()) {
-							desc = storageData.getDescription();
-						}
-						description.setText(desc);
-						diskSize.setText(NumberFormatter.humanReadableByteCount(storageData.getDiskSize()));
+						storageInfoComposite.displayStorageData(storageData);
 						if (importLocally) {
 							boolean notImportedYet = true;
 							for (LocalStorageData localStorageData : storageManager.getDownloadedStorages()) {
@@ -198,9 +165,7 @@ public class ImportStorageInfoPage extends WizardPage {
 							setMessage("Can not import storage to selected CMR because the CMR is offline", ERROR);
 						}
 					} else {
-						name.setText("n/a");
-						description.setText("n/a");
-						diskSize.setText("n/a");
+						storageInfoComposite.showDataUnavailable();
 						canImport = false;
 						setMessage("Provided file is not valid inspectIT compressed storage file", ERROR);
 					}

@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,10 +20,9 @@ import org.springframework.beans.factory.InitializingBean;
  * filter should prepare the files that are sent in the "multipart/form-data" encoding as a list of
  * files in the request attribute {@value #MULTI_PART_FILTER_FILES}.
  * <p>
- * This servlet can be used for uploading any files. The original name and extension of the file is
- * not saved. The file will have the arbitrary name and the extension of the files can be defined by
- * setting the {@link #extension} property. Directory where the files can be saved on the server is
- * defined by the {@link #directoryToStore} property.
+ * This servlet can be used for uploading any number files in one request. The file has to be
+ * uploaded with the name that represents the relative path to the upload folder where file will be
+ * saved.
  * 
  * @author Ivan Senic
  * 
@@ -45,29 +46,35 @@ public class FileUploadServlet extends HttpServlet implements InitializingBean {
 	private String directoryToStore;
 
 	/**
-	 * Extension to add to the files that have been upload. If it is not set, no extension will be
-	 * added.
-	 */
-	private String extension;
-
-	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		List<?> files = (List<?>) req.getAttribute(MULTI_PART_FILTER_FILES);
+
 		if (null != files) {
 			for (int i = 0; i < files.size(); i++) {
 				File file = (File) files.get(i);
 				StringBuilder nameBuffer = new StringBuilder();
 				nameBuffer.append(directoryToStore);
 				nameBuffer.append(File.separatorChar);
-				nameBuffer.append(file.getName());
-				if (null != extension) {
-					nameBuffer.append(extension);
+
+				Enumeration<String> attributeNames = req.getAttributeNames();
+				while (attributeNames.hasMoreElements()) {
+					String fileName = attributeNames.nextElement();
+					if (Objects.equals(file, req.getAttribute(fileName))) {
+						nameBuffer.append(fileName);
+						break;
+					}
 				}
+
 				File outputFile = new File(nameBuffer.toString());
 				if (outputFile.exists()) {
 					throw new IOException("Upload file already exists. Aborting the upload.");
+				}
+				File outputDir = outputFile.getParentFile();
+				if (null != outputDir && !outputDir.exists()) {
+					outputDir.mkdirs();
 				}
 				file.renameTo(outputFile);
 			}
@@ -89,16 +96,6 @@ public class FileUploadServlet extends HttpServlet implements InitializingBean {
 	 */
 	public void setDirectoryToStore(String directoryToStore) {
 		this.directoryToStore = directoryToStore;
-	}
-
-	/**
-	 * Sets {@link #extension}.
-	 * 
-	 * @param extension
-	 *            New value for {@link #extension}
-	 */
-	public void setExtension(String extension) {
-		this.extension = extension;
 	}
 
 	/**

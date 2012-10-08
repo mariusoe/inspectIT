@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.wizard.page;
 
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.formatter.NumberFormatter;
+import info.novatec.inspectit.rcp.composite.StorageInfoComposite;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
@@ -18,7 +18,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -96,29 +95,9 @@ public class ExportStorageWizardPage extends WizardPage {
 		});
 		select.forceFocus();
 
-		Group group = new Group(main, SWT.NONE);
-		group.setText("Storage Info");
-		GridLayout gl = new GridLayout(2, false);
-		gl.marginHeight = 10;
-		gl.marginWidth = 10;
-		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1));
-		group.setLayout(gl);
+		StorageInfoComposite storageInfoComposite = new StorageInfoComposite(main, SWT.NONE, true, storageData);
+		storageInfoComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1));
 
-		new Label(group, SWT.NONE).setText("Name:");
-		new Label(group, SWT.NONE).setText(storageData.getName());
-
-		new Label(group, SWT.NONE).setText("Description:");
-		String desc = "";
-		if (null != storageData.getDescription()) {
-			desc = storageData.getDescription();
-		}
-		new Label(group, SWT.NONE).setText(desc);
-
-		new Label(group, SWT.NONE).setText("Size on disk:");
-		new Label(group, SWT.NONE).setText(NumberFormatter.formatBytesToMBytes(storageData.getDiskSize()));
-
-		new Label(group, SWT.NONE).setText("Data downloaded:");
-		Label downloaded = new Label(group, SWT.NONE);
 		LocalStorageData localStorageData = null;
 		if (storageData instanceof LocalStorageData) {
 			localStorageData = (LocalStorageData) storageData;
@@ -126,13 +105,6 @@ public class ExportStorageWizardPage extends WizardPage {
 			localStorageData = InspectIT.getDefault().getInspectITStorageManager().getLocalDataForStorage((StorageData) storageData);
 		}
 		boolean notDownloaded = (null == localStorageData || !localStorageData.isFullyDownloaded());
-
-		if (notDownloaded) {
-			downloaded.setText("No");
-		} else {
-			downloaded.setText("Yes");
-		}
-
 		if (notDownloaded) {
 			Composite infoComposite = new Composite(main, SWT.NONE);
 			infoComposite.setLayout(new GridLayout(2, false));

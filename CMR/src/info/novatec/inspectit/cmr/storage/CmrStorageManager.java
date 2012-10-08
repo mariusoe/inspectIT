@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -774,7 +775,7 @@ public class CmrStorageManager extends StorageManager {
 	 * @throws IOException
 	 *             IF {@link IOException} occurs during the file tree walk.
 	 * @throws StorageException
-	 *             If there is not enough space for the unpacking the stoarge.
+	 *             If there is not enough space for the unpacking the storage.
 	 */
 	public void unpackUploadedStorage(final IStorageData packedStorageData) throws IOException, StorageException {
 		long storageBytesLeft = getBytesHardDriveOccupancyLeft();
@@ -790,6 +791,11 @@ public class CmrStorageManager extends StorageManager {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 					try {
+						// skip all other files
+						if (!file.toString().endsWith(StorageFileExtensions.ZIP_STORAGE_EXT)) {
+							return FileVisitResult.CONTINUE;
+						}
+
 						IStorageData storageData = getStorageDataFromZip(file);
 						if (!Objects.equals(packedStorageData, storageData)) {
 							// go to next file if the file that we found does not hold the correct
@@ -799,12 +805,11 @@ public class CmrStorageManager extends StorageManager {
 
 						if (null != storageData) {
 							StorageData importedStorageData = new StorageData(storageData);
-							if (!existingStoragesSet.contains(importedStorageData)) {
+							if (existingStoragesSet.add(importedStorageData)) {
 								unzipStorageData(file, getStoragePath(importedStorageData));
 								Path localInformation = getStoragePath(importedStorageData).resolve(importedStorageData.getId() + StorageFileExtensions.LOCAL_STORAGE_FILE_EXT);
 								Files.deleteIfExists(localInformation);
 								writeStorageDataToDisk(importedStorageData);
-								existingStoragesSet.add(importedStorageData);
 							} else {
 								LOGGER.info("Uploaded storage file " + file.toString() + " contains the storage that is already available on the CMR. File will be deleted.");
 							}
@@ -812,6 +817,69 @@ public class CmrStorageManager extends StorageManager {
 						Files.deleteIfExists(file);
 					} catch (Exception e) {
 						LOGGER.warn("Uploaded storage file " + file.toString() + " is not of correct type and can not be extracted. File will be deleted.", e);
+					}
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		}
+	}
+
+	/**
+	 * Creates a storage form the uploaded local storage directory.
+	 * 
+	 * @param localStorageData
+	 *            Local storage information.
+	 * @throws IOException
+	 *             If {@link IOException} occurs.
+	 * @throws StorageException
+	 *             If there is not enough space for the unpacking the storage.
+	 */
+	public void createStorageFromUploadedDir(final IStorageData localStorageData) throws IOException, StorageException {
+		long storageBytesLeft = getBytesHardDriveOccupancyLeft();
+		if (localStorageData.getDiskSize() > storageBytesLeft) {
+			throw new StorageException("Uploaded storage " + localStorageData + " can not be unpacked because there is not enough disk space left for storage data on the CMR.");
+		}
+
+		Path uploadPath = Paths.get(this.getStorageUploadsFolder());
+		if (Files.notExists(uploadPath)) {
+			throw new IOException("Can not perform storage unpacking. The main upload path " + uploadPath.toString() + " does not exist.");
+		} else {
+			final ISerializer serializer = getSerializationManagerProvider().createSerializer();
+			Files.walkFileTree(uploadPath, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					// skip all other files, search for the local data
+					if (!file.toString().endsWith(localStorageData.getId() + StorageFileExtensions.LOCAL_STORAGE_FILE_EXT)) {
+						return FileVisitResult.CONTINUE;
+					}
+
+					// when found confirm it is the one we wanted to upload
+					InputStream inputStream = null;
+					Input input = null;
+					try {
+						inputStream = Files.newInputStream(file, StandardOpenOption.READ);
+						input = new Input(inputStream);
+						Object deserialized = serializer.deserialize(input);
+						if (Objects.equals(deserialized, localStorageData)) {
+							StorageData uploadedStorageData = new StorageData(localStorageData);
+							if (existingStoragesSet.add(uploadedStorageData)) {
+								// if add is successful we move the complete folder, write the
+								// storage data to disk and terminate to walk
+								Files.move(file.getParent(), getStoragePath(uploadedStorageData), StandardCopyOption.ATOMIC_MOVE);
+								Path localInformation = getStoragePath(uploadedStorageData).resolve(uploadedStorageData.getId() + StorageFileExtensions.LOCAL_STORAGE_FILE_EXT);
+								Files.deleteIfExists(localInformation);
+								writeStorageDataToDisk(uploadedStorageData);
+								return FileVisitResult.TERMINATE;
+							} else {
+								LOGGER.info("Uploaded storage file " + file.toString() + " contains the storage that is already available on the CMR. File will be deleted.");
+							}
+						}
+					} catch (SerializationException e) {
+						LOGGER.warn("Error de-serializing local storage file.", e);
+					} finally {
+						if (null != input) {
+							input.close();
+						}
 					}
 					return FileVisitResult.CONTINUE;
 				}

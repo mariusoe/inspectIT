@@ -166,6 +166,12 @@
             Add Central Management Repository (CMR)
          </description>
       </wizard>
+      <wizard
+            class="info.novatec.inspectit.rcp.wizard.UploadStorageWizard"
+            icon="icons/upload_storage.png"
+            id="info.novatec.inspectit.rcp.wizard.uploadStorageWizard"
+            name="Upload Storage Wizard">
+      </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.importWizards">
@@ -366,6 +372,10 @@
       <command
             id="info.novatec.inspectit.rcp.commands.exportStorage"
             name="Export Storage">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.uploadStorage"
+            name="Upload Storage">
       </command>
    </extension>
    <extension
@@ -1337,6 +1347,22 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.UploadStorageHandler"
+            commandId="info.novatec.inspectit.rcp.commands.uploadStorage">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.ILocalStorageDataProvider">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -1849,6 +1875,12 @@
                tooltip="Fully Download Storage - Makes storage accessible offline">
          </command>
          <command
+               commandId="info.novatec.inspectit.rcp.commands.uploadStorage"
+               icon="icons/upload_storage.png"
+               label="Upload Storage to an available CMR (Central Management Repository)"
+               style="push">
+         </command>
+         <command
                commandId="org.eclipse.ui.file.import"
                icon="icons/import.gif"
                style="push">
@@ -1988,6 +2020,11 @@
                icon="icons/mount_storage.png"
                style="push"
                tooltip="Fully Download Storage - Makes storage accessible offline">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.uploadStorage"
+               icon="icons/upload_storage.png"
+               style="push">
          </command>
          <command
                commandId="org.eclipse.ui.file.import"

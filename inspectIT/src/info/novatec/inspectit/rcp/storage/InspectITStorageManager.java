@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.mutable.MutableObject;
@@ -572,7 +573,39 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 *             If upload file does not exist or upload fails.
 	 */
 	public void uploadZippedStorage(String fileName, CmrRepositoryDefinition cmrRepositoryDefinition) throws Exception {
-		dataUploader.uploadFileToStorageUploads(new File(fileName), cmrRepositoryDefinition);
+		Path file = Paths.get(fileName);
+		Path relativizePath = file.getParent();
+		String tmpDir = "tmp" + UUID.randomUUID().hashCode();
+		dataUploader.uploadFileToStorageUploads(file, relativizePath, tmpDir, cmrRepositoryDefinition);
+	}
+
+	/**
+	 * Uploads a complete storage to the {@link CmrRepositoryDefinition} upload folder. All files
+	 * belonging to the local storage data will be uploaded to the temporary directory.
+	 * 
+	 * @param localStorageData
+	 *            Storage to upload.
+	 * @param cmrRepositoryDefinition
+	 *            Repository definition.
+	 * @throws Exception
+	 *             If storage is not fully downloaded or exception occurs during upload.
+	 */
+	public void uploadCompleteStorage(LocalStorageData localStorageData, final CmrRepositoryDefinition cmrRepositoryDefinition) throws Exception {
+		if (!localStorageData.isFullyDownloaded()) {
+			throw new StorageException("Can not upload storage that is not fully downloaded.");
+		}
+
+		String tmpDir = "tmp" + UUID.randomUUID().hashCode();
+		Path storageDir = getStoragePath(localStorageData);
+		final List<Path> toUpload = new ArrayList<Path>();
+		Files.walkFileTree(storageDir, new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+				toUpload.add(file);
+				return FileVisitResult.CONTINUE;
+			}
+		});
+		dataUploader.uploadFileToStorageUploads(toUpload, storageDir, tmpDir, cmrRepositoryDefinition);
 	}
 
 	/**

@@ -454,4 +454,16 @@ public interface IStorageService {
 	 */
 	void unpackUploadedStorage(IStorageData storageData) throws StorageException;
 
+	/**
+	 * Creates a storage form the uploaded local storage directory. The CMR will perform a search of
+	 * a proper local file in the upload folder.
+	 * 
+	 * @param localStorageData
+	 *            Local storage information.
+	 * @throws StorageException
+	 *             If exception occurs during the check.
+	 * 
+	 */
+	void createStorageFromUploadedDir(final IStorageData localStorageData) throws StorageException;
+
 }

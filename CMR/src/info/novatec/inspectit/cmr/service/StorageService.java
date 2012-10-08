@@ -533,7 +533,19 @@ public class StorageService implements IStorageService {
 		try {
 			storageManager.unpackUploadedStorage(storageData);
 		} catch (IOException e) {
-			throw new StorageException("Exception occurred trying to check for uploaded storages.", e);
+			throw new StorageException("Exception occurred trying to check for imported storage.", e);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@MethodLog
+	public void createStorageFromUploadedDir(final IStorageData localStorageData) throws StorageException {
+		try {
+			storageManager.createStorageFromUploadedDir(localStorageData);
+		} catch (IOException e) {
+			throw new StorageException("Exception occurred trying to create storage from uploaded local storage.", e);
 		}
 	}
 
