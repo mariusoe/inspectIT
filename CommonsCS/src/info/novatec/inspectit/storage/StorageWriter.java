@@ -145,6 +145,9 @@ public class StorageWriter {
 	 * provided. Processor define which data will be stored, when and in which format.
 	 * <p>
 	 * If null is passed as a processors list the data will be directly written.
+	 * <p>
+	 * The write will be done asynchronously, thus the method will return after creating writing
+	 * tasks and not waiting for actual write to take place.
 	 * 
 	 * @param defaultDataList
 	 *            List of objects to process.
@@ -174,6 +177,34 @@ public class StorageWriter {
 			// the write all data with out processing
 			for (DefaultData defaultData : defaultDataList) {
 				this.write(defaultData);
+			}
+		}
+	}
+
+	/**
+	 * Processes the write of collection in the way that this method will return only when all data
+	 * is written on the disk. In any other way this method is same as
+	 * {@link #process(Collection, Collection)}.
+	 * 
+	 * @param defaultDataList
+	 *            List of objects to process.
+	 * @param processors
+	 *            List of processors. Can be null, and in this case direct write will be executed.
+	 */
+	public void processSynchronously(Collection<? extends DefaultData> defaultDataList, Collection<AbstractDataProcessor> processors) {
+		this.process(defaultDataList, processors);
+		long tasksCount = writingExecutorService.getTaskCount();
+		while (true) {
+			long tasksCompleted = writingExecutorService.getCompletedTaskCount();
+			if (tasksCompleted >= tasksCount) {
+				break;
+			} else {
+				// if still are not done sleep
+				try {
+					Thread.sleep(FINALIZATION_TASKS_SLEEP_TIME);
+				} catch (InterruptedException e) {
+					Thread.interrupted();
+				}
 			}
 		}
 	}

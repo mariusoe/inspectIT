@@ -312,16 +312,22 @@ public class CmrStorageManager extends StorageManager {
 	 * @param dataProcessors
 	 *            Processors that will be used for data writing. Can be null. In this case, the
 	 *            direct write is done.
+	 * @param synchronously
+	 *            If write will be done synchronously or not.
 	 * @throws StorageException
 	 *             If storage is used as a recording storage.
 	 */
-	public void writeToStorage(StorageData storageData, Collection<? extends DefaultData> dataToWrite, Collection<AbstractDataProcessor> dataProcessors) throws StorageException {
+	public void writeToStorage(StorageData storageData, Collection<? extends DefaultData> dataToWrite, Collection<AbstractDataProcessor> dataProcessors, boolean synchronously) throws StorageException {
 		StorageData local = getLocalStorageDataObject(storageData);
 		StorageWriter writer = openedStoragesMap.get(local);
 		if (writer != null) {
-			writer.process(dataToWrite, dataProcessors);
+			if (synchronously) {
+				writer.processSynchronously(dataToWrite, dataProcessors);
+			} else {
+				writer.process(dataToWrite, dataProcessors);
+			}
 		} else if (Objects.equals(local, recorderStorageData)) {
-			throw new StorageException("Can not write to storage that is currenlty used as a recording storage.");
+			throw new StorageException("Can not write to storage that is currently used as a recording storage.");
 		} else if (local.getState() == StorageState.CLOSED) {
 			throw new StorageException("Can not write to closed storage");
 		} else {
@@ -357,8 +363,9 @@ public class CmrStorageManager extends StorageManager {
 
 		for (Long platformId : platformIdents) {
 			List<DefaultData> toWriteList = storageDataDao.getAllDefaultDataForAgent(platformId.longValue());
-			this.writeToStorage(local, toWriteList, dataProcessors);
+			this.writeToStorage(local, toWriteList, dataProcessors, true);
 		}
+		updateExistingStorageSize(local);
 	}
 
 	/**
@@ -392,7 +399,8 @@ public class CmrStorageManager extends StorageManager {
 		}
 
 		List<DefaultData> toWriteList = storageDataDao.getDataFromCopyTemplateList(copyDataList);
-		this.writeToStorage(local, toWriteList, dataProcessors);
+		this.writeToStorage(local, toWriteList, dataProcessors, true);
+		updateExistingStorageSize(local);
 	}
 
 	/**
@@ -730,6 +738,22 @@ public class CmrStorageManager extends StorageManager {
 	@Scheduled(fixedRate = UPDATE_RATE)
 	protected void updateExistingStoragesSize() throws IOException, SerializationException {
 		for (StorageData storageData : existingStoragesSet) {
+			updateExistingStorageSize(storageData);
+		}
+	}
+
+	/**
+	 * Updates size of the given storage and saves information to this.
+	 * 
+	 * @param storageData
+	 *            Storage data.
+	 * @throws IOException
+	 *             If {@link IOException} happened during operation.
+	 * @throws SerializationException
+	 *             If serialization failed.
+	 */
+	private void updateExistingStorageSize(StorageData storageData) throws IOException, SerializationException {
+		if (null != storageData) {
 			synchronized (storageData) {
 				long newSize = getDiskSizeForStorage(storageData);
 				if (newSize != storageData.getDiskSize()) {

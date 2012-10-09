@@ -233,11 +233,11 @@ public class StorageService implements IStorageService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public void writeToStorage(StorageData storageData, Collection<DefaultData> defaultDataCollection, Collection<AbstractDataProcessor> dataProcessors) throws StorageException {
+	public void writeToStorage(StorageData storageData, Collection<DefaultData> defaultDataCollection, Collection<AbstractDataProcessor> dataProcessors, boolean synchronously) throws StorageException {
 		if (!storageManager.isStorageOpen(storageData)) {
 			throw new StorageException("Writing to storage tried to be performed on the storage that is not opened. Please open the storage first.");
 		}
-		storageManager.writeToStorage(storageData, defaultDataCollection, dataProcessors);
+		storageManager.writeToStorage(storageData, defaultDataCollection, dataProcessors, synchronously);
 	}
 
 	/**

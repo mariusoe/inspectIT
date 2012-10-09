@@ -146,11 +146,13 @@ public interface IStorageService {
 	 *            Data to write.
 	 * @param dataProcessors
 	 *            List of processor to work on data.
+	 * @param synchronously
+	 *            Should write be synchronous or not.
 	 * @throws StorageException
 	 *             If storage is not opened, or the storage is currently used for recording. If
 	 *             write fails.
 	 */
-	void writeToStorage(StorageData storageData, Collection<DefaultData> defaultDataCollection, Collection<AbstractDataProcessor> dataProcessors) throws StorageException;
+	void writeToStorage(StorageData storageData, Collection<DefaultData> defaultDataCollection, Collection<AbstractDataProcessor> dataProcessors, boolean synchronously) throws StorageException;
 
 	/**
 	 * Copies the complete content of the buffer to the provided storage. The storage does not have

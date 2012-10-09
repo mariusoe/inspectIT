@@ -185,7 +185,7 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 				createdInvocations.add(invoc);
 			}
 		}
-		storageManager.writeToStorage(storageData, createdInvocations, processors);
+		storageManager.writeToStorage(storageData, createdInvocations, processors, false);
 	}
 
 	/**
