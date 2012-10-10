@@ -155,11 +155,11 @@ public class CmrStorageManager extends StorageManager {
 	public void closeStorage(StorageData storageData) throws StorageException, IOException, SerializationException {
 		StorageData local = getLocalStorageDataObject(storageData);
 		synchronized (local) {
+			if (Objects.equals(local, recorderStorageData)) {
+				throw new StorageException("Storage " + local + " can not be finalized because it is currenlty used for recording purposes.");
+			}
 			StorageWriter writer = openedStoragesMap.get(local);
 			if (writer != null) {
-				if (writer == storageRecorder.getStorageWriter()) {
-					throw new StorageException("Storage " + local + " can not be finalized because it is currenlty used for recording purposes.");
-				}
 				writer.closeStorageWriter();
 			}
 			openedStoragesMap.remove(local);
@@ -254,7 +254,7 @@ public class CmrStorageManager extends StorageManager {
 		}
 		synchronized (this) {
 			if (!isRecordingOn()) {
-				StorageWriter storageWriter = openedStoragesMap.get(local);
+				StorageWriter storageWriter = openedStoragesMap.remove(local);
 				storageRecorder.startRecording(storageWriter, recordingProperties);
 				recorderStorageData = local;
 				recorderStorageData.markRecording();
@@ -274,8 +274,10 @@ public class CmrStorageManager extends StorageManager {
 	public void stopRecording() throws IOException, SerializationException {
 		synchronized (this) {
 			if (isRecordingOn()) {
+				StorageWriter storageWriter = storageRecorder.getStorageWriter();
 				storageRecorder.stopRecording();
 				recorderStorageData.markOpened();
+				openedStoragesMap.put(recorderStorageData, storageWriter);
 				writeStorageDataToDisk(recorderStorageData);
 				recorderStorageData = null;
 			}
@@ -318,10 +320,13 @@ public class CmrStorageManager extends StorageManager {
 		StorageWriter writer = openedStoragesMap.get(local);
 		if (writer != null) {
 			writer.process(dataToWrite, dataProcessors);
-		} else if (local.equals(recorderStorageData)) {
+		} else if (Objects.equals(local, recorderStorageData)) {
 			throw new StorageException("Can not write to storage that is currenlty used as a recording storage.");
 		} else if (local.getState() == StorageState.CLOSED) {
 			throw new StorageException("Can not write to closed storage");
+		} else {
+			LOGGER.error("Writer for the not closed storage " + local + " not available.");
+			throw new StorageException("Writer for the not closed storage " + local + " not available.");
 		}
 	}
 
