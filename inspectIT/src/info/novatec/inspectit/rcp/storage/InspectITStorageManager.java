@@ -972,18 +972,16 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	}
 
 	/**
-	 * Returns the default storage directory as a path.
-	 * 
-	 * @return Returns the default storage directory as a path.
+	 * {@inheritDoc}
 	 */
-	private Path getDefaultStorageDirPath() {
+	protected Path getDefaultStorageDirPath() {
 		if (bundleFile != null && bundleFile.isDirectory()) {
 			// if bundle file is directory that we can use it for the storage folder
 			// as we are in development
-			return Paths.get(bundleFile.getAbsolutePath(), getStorageDefaultFolder());
+			return Paths.get(bundleFile.getAbsolutePath(), getStorageDefaultFolder()).toAbsolutePath();
 		} else {
 			// if not then we fail to the default eclipse folder
-			return Paths.get(getStorageDefaultFolder());
+			return Paths.get(getStorageDefaultFolder()).toAbsolutePath();
 		}
 	}
 

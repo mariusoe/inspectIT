@@ -17,7 +17,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
@@ -114,6 +113,13 @@ public abstract class StorageManager {
 	 * @return {@link Path} that can be used in IO operations.
 	 */
 	public abstract Path getStoragePath(IStorageData storageData);
+
+	/**
+	 * Returns the default storage directory as the absolute path.
+	 * 
+	 * @return Returns the default storage directory as the absolute path.
+	 */
+	protected abstract Path getDefaultStorageDirPath();
 
 	/**
 	 * Returns the {@link Path} of the channel for given {@link StorageData} and
@@ -342,9 +348,13 @@ public abstract class StorageManager {
 	 */
 	@Scheduled(fixedRate = UPDATE_RATE * 2)
 	protected void updatedStorageSpaceLeft() throws IOException {
-		Path defaultDirectory = Paths.get(getStorageDefaultFolder());
+		Path defaultDirectory = getDefaultStorageDirPath();
 
-		FileStore fileStore = Files.getFileStore(Paths.get(FileSystems.getDefault().getSeparator()));
+		Path parent = defaultDirectory;
+		while (Files.notExists(parent)) {
+			parent = parent.getParent();
+		}
+		FileStore fileStore = Files.getFileStore(parent);
 		hardDriveSize = fileStore.getTotalSpace();
 		long bytesAvailable = fileStore.getUsableSpace();
 

@@ -525,15 +525,18 @@ public class CmrStorageManager extends StorageManager {
 	}
 
 	/**
-	 * Returns storage {@link Path}.
-	 * 
-	 * @param storageData
-	 *            Storage.
-	 * @return Returns storage {@link Path}.
-	 * @see Paths#get(String, String...)
+	 * {@inheritDoc}
 	 */
 	public Path getStoragePath(IStorageData storageData) {
-		return Paths.get(getStorageDefaultFolder(), storageData.getStorageFolder());
+		return getDefaultStorageDirPath().resolve(storageData.getStorageFolder());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected Path getDefaultStorageDirPath() {
+		return Paths.get(getStorageDefaultFolder()).toAbsolutePath();
 	}
 
 	/**
