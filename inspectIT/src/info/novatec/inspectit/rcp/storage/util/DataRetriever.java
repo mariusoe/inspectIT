@@ -16,6 +16,7 @@ import info.novatec.inspectit.storage.serializer.provider.SerializationManagerPr
 import info.novatec.inspectit.storage.serializer.util.KryoUtil;
 import info.novatec.inspectit.storage.util.RangeDescriptor;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -31,6 +32,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.fileupload.MultipartStream;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
@@ -39,11 +41,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.HttpEntityWrapper;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatus.Series;
 
@@ -84,6 +86,9 @@ public class DataRetriever {
 
 	/**
 	 * Initializes the retriever.
+	 * 
+	 * @throws Exception
+	 *             If exception occurs.
 	 */
 	protected void init() throws Exception {
 		for (int i = 0; i < serializerCount; i++) {
@@ -119,7 +124,7 @@ public class DataRetriever {
 	 */
 	@SuppressWarnings("unchecked")
 	public <E extends DefaultData> List<E> getDataViaHttp(CmrRepositoryDefinition cmrRepositoryDefinition, IStorageData storageData, List<IStorageDescriptor> descriptors) throws Exception {
-		Map<Integer, List<IStorageDescriptor>> separateFilesGroup = createFilesGroup(storageData, descriptors);
+		Map<Integer, List<IStorageDescriptor>> separateFilesGroup = createFilesGroup(descriptors);
 		List<E> receivedData = new ArrayList<E>();
 		String serverUri = getServerUri(cmrRepositoryDefinition);
 
@@ -148,14 +153,38 @@ public class DataRetriever {
 			InputStream inputStream = null;
 			Input input = null;
 			try {
-				inputStream = httpClient.execute(httpGet, new HttpRequestHandler());
-				input = new Input(inputStream);
-				while (KryoUtil.hasMoreBytes(input)) {
-					Object object = serializer.deserialize(input);
-					E element = (E) object;
-					receivedData.add(element);
+				HttpResponse response = httpClient.execute(httpGet);
+				HttpEntity entity = response.getEntity();
+				if (MultipartEntityUtil.isMultipart(entity)) {
+					inputStream = entity.getContent();
+					// all non-deprecated constructors have default modifier
+					MultipartStream multipartStream = new MultipartStream(inputStream, MultipartEntityUtil.getBoundary(entity).getBytes());
+					ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+					boolean nextPart = multipartStream.skipPreamble();
+					while (nextPart) {
+						multipartStream.readHeaders();
+						multipartStream.readBodyData(byteArrayOutputStream);
+						input = new Input(byteArrayOutputStream.toByteArray());
+						while (KryoUtil.hasMoreBytes(input)) {
+							Object object = serializer.deserialize(input);
+							E element = (E) object;
+							receivedData.add(element);
+						}
+						nextPart = multipartStream.readBoundary();
+					}
+				} else {
+					// when kryo changes the visibility of optional() method, we can really stream
+					input = new Input(EntityUtils.toByteArray(entity));
+					while (KryoUtil.hasMoreBytes(input)) {
+						Object object = serializer.deserialize(input);
+						E element = (E) object;
+						receivedData.add(element);
+					}
 				}
 			} finally {
+				if (null != inputStream) {
+					inputStream.close();
+				}
 				if (null != input) {
 					input.close();
 				}
@@ -188,7 +217,7 @@ public class DataRetriever {
 	 */
 	@SuppressWarnings("unchecked")
 	public <E extends DefaultData> List<E> getDataLocally(LocalStorageData localStorageData, List<IStorageDescriptor> descriptors) throws Exception {
-		Map<Integer, List<IStorageDescriptor>> separateFilesGroup = createFilesGroup(localStorageData, descriptors);
+		Map<Integer, List<IStorageDescriptor>> separateFilesGroup = createFilesGroup(descriptors);
 		List<IStorageDescriptor> optimizedDescriptors = new ArrayList<IStorageDescriptor>();
 		for (Map.Entry<Integer, List<IStorageDescriptor>> entry : separateFilesGroup.entrySet()) {
 			StorageDescriptor storageDescriptor = null;
@@ -358,13 +387,12 @@ public class DataRetriever {
 	 * descriptors in the list are associated with the channel, thus all the data described in the
 	 * descriptors can be retrieved with a single HTTP/local request.
 	 * 
-	 * @param storageData
-	 *            {@link StorageData} for correct file names.
 	 * @param descriptors
 	 *            Un-grouped descriptors.
+	 * 
 	 * @return Map of channel IDs with its descriptors.
 	 */
-	private Map<Integer, List<IStorageDescriptor>> createFilesGroup(IStorageData storageData, List<IStorageDescriptor> descriptors) {
+	private Map<Integer, List<IStorageDescriptor>> createFilesGroup(List<IStorageDescriptor> descriptors) {
 		Map<Integer, List<IStorageDescriptor>> filesMap = new HashMap<Integer, List<IStorageDescriptor>>();
 		for (IStorageDescriptor storageDescriptor : descriptors) {
 			Integer channelId = Integer.valueOf(storageDescriptor.getChannelId());
@@ -428,7 +456,6 @@ public class DataRetriever {
 			StatusLine statusLine = response.getStatusLine();
 			if (HttpStatus.valueOf(statusLine.getStatusCode()).series().equals(Series.SUCCESSFUL)) {
 				HttpEntity entity = response.getEntity();
-				boolean addGZipExtension = !decompressContent && isGZipContentEncoding(entity);
 				InputStream is = null;
 				try {
 					is = entity.getContent();
@@ -476,6 +503,10 @@ public class DataRetriever {
 	}
 
 	/**
+	 * Sets {@link #serializerCount}.
+	 * 
+	 * @param serializerCount
+	 *            New value for {@link #serializerCount}
 	 */
 	public void setSerializerCount(int serializerCount) {
 		this.serializerCount = serializerCount;
@@ -558,22 +589,4 @@ public class DataRetriever {
 
 	}
 
-	/**
-	 * Simple handler for the HTTP requests.
-	 * 
-	 * @author Ivan Senic
-	 * 
-	 */
-	private static class HttpRequestHandler implements ResponseHandler<InputStream> {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public InputStream handleResponse(HttpResponse response) throws IOException {
-			HttpEntity entity = response.getEntity();
-			return HttpEntityContentParser.getByteContent(entity);
-		}
-
-	}
 }

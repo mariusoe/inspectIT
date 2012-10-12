@@ -175,6 +175,19 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 	 */
 	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, IAggregator<E> aggregator, Comparator<E> comparator, int limit) {
 		List<IStorageDescriptor> descriptors = getIndexingTree().query(storageIndexQuery);
+		// sort the descriptors to optimize the number of read operations
+		Collections.sort(descriptors, new Comparator<IStorageDescriptor>() {
+			@Override
+			public int compare(IStorageDescriptor o1, IStorageDescriptor o2) {
+				int channelCompare = Integer.compare(o1.getChannelId(), o2.getChannelId());
+				if (channelCompare != 0) {
+					return channelCompare;
+				} else {
+					return Long.compare(o1.getPosition(), o2.getPosition());
+				}
+			}
+		});
+
 		AggregationPerformer<E> aggregationPerformer = null;
 		if (null != aggregator) {
 			aggregationPerformer = new AggregationPerformer<E>(aggregator);

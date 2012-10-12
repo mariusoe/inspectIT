@@ -38,6 +38,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.nebula.widgets.cdatetime;bundle-version="0.14.0",
  com.springsource.org.apache.commons.logging;bundle-version="1.1.1",
  org.apache.commons.collections;bundle-version="3.2.1",
+ org.apache.commons.fileupload;bundle-version="1.2.2",
  org.apache.commons.lang;bundle-version="2.5.0",
  info.novatec.kryo;bundle-version="2.20.0"
 Bundle-ActivationPolicy: lazy
