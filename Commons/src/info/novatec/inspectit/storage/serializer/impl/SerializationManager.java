@@ -203,21 +203,21 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(LocalStorageData.class, new CustomCompatibleFieldSerializer<LocalStorageData>(kryo, LocalStorageData.class, schemaManager));
 		kryo.register(StorageState.class, new EnumSerializer(StorageState.class));
 		/** Storage labels */
-		kryo.register(BooleanStorageLabel.class, new FieldSerializer<BooleanStorageLabel>(kryo, BooleanStorageLabel.class));
-		kryo.register(DateStorageLabel.class, new FieldSerializer<DateStorageLabel>(kryo, DateStorageLabel.class));
-		kryo.register(NumberStorageLabel.class, new FieldSerializer<NumberStorageLabel>(kryo, NumberStorageLabel.class));
-		kryo.register(StringStorageLabel.class, new FieldSerializer<StringStorageLabel>(kryo, StringStorageLabel.class));
+		kryo.register(BooleanStorageLabel.class, new CustomCompatibleFieldSerializer<BooleanStorageLabel>(kryo, BooleanStorageLabel.class, schemaManager));
+		kryo.register(DateStorageLabel.class, new CustomCompatibleFieldSerializer<DateStorageLabel>(kryo, DateStorageLabel.class, schemaManager));
+		kryo.register(NumberStorageLabel.class, new CustomCompatibleFieldSerializer<NumberStorageLabel>(kryo, NumberStorageLabel.class, schemaManager));
+		kryo.register(StringStorageLabel.class, new CustomCompatibleFieldSerializer<StringStorageLabel>(kryo, StringStorageLabel.class, schemaManager));
 		/** Storage labels type */
-		kryo.register(AssigneeLabelType.class, new FieldSerializer<AssigneeLabelType>(kryo, AssigneeLabelType.class));
-		kryo.register(CreationDateLabelType.class, new FieldSerializer<CreationDateLabelType>(kryo, CreationDateLabelType.class));
-		kryo.register(CustomBooleanLabelType.class, new FieldSerializer<CustomBooleanLabelType>(kryo, CustomBooleanLabelType.class));
-		kryo.register(CustomDateLabelType.class, new FieldSerializer<CustomDateLabelType>(kryo, CustomDateLabelType.class));
-		kryo.register(CustomNumberLabelType.class, new FieldSerializer<CustomNumberLabelType>(kryo, CustomNumberLabelType.class));
-		kryo.register(CustomStringLabelType.class, new FieldSerializer<CustomStringLabelType>(kryo, CustomStringLabelType.class));
-		kryo.register(ExploredByLabelType.class, new FieldSerializer<ExploredByLabelType>(kryo, ExploredByLabelType.class));
-		kryo.register(RatingLabelType.class, new FieldSerializer<RatingLabelType>(kryo, RatingLabelType.class));
-		kryo.register(StatusLabelType.class, new FieldSerializer<StatusLabelType>(kryo, StatusLabelType.class));
-		kryo.register(UseCaseLabelType.class, new FieldSerializer<UseCaseLabelType>(kryo, UseCaseLabelType.class));
+		kryo.register(AssigneeLabelType.class, new CustomCompatibleFieldSerializer<AssigneeLabelType>(kryo, AssigneeLabelType.class, schemaManager, true));
+		kryo.register(CreationDateLabelType.class, new CustomCompatibleFieldSerializer<CreationDateLabelType>(kryo, CreationDateLabelType.class, schemaManager, true));
+		kryo.register(CustomBooleanLabelType.class, new CustomCompatibleFieldSerializer<CustomBooleanLabelType>(kryo, CustomBooleanLabelType.class, schemaManager, true));
+		kryo.register(CustomDateLabelType.class, new CustomCompatibleFieldSerializer<CustomDateLabelType>(kryo, CustomDateLabelType.class, schemaManager, true));
+		kryo.register(CustomNumberLabelType.class, new CustomCompatibleFieldSerializer<CustomNumberLabelType>(kryo, CustomNumberLabelType.class, schemaManager, true));
+		kryo.register(CustomStringLabelType.class, new CustomCompatibleFieldSerializer<CustomStringLabelType>(kryo, CustomStringLabelType.class, schemaManager, true));
+		kryo.register(ExploredByLabelType.class, new CustomCompatibleFieldSerializer<ExploredByLabelType>(kryo, ExploredByLabelType.class, schemaManager, true));
+		kryo.register(RatingLabelType.class, new CustomCompatibleFieldSerializer<RatingLabelType>(kryo, RatingLabelType.class, schemaManager, true));
+		kryo.register(StatusLabelType.class, new CustomCompatibleFieldSerializer<StatusLabelType>(kryo, StatusLabelType.class, schemaManager, true));
+		kryo.register(UseCaseLabelType.class, new CustomCompatibleFieldSerializer<UseCaseLabelType>(kryo, UseCaseLabelType.class, schemaManager, true));
 		/** Branch indexers */
 		kryo.register(PlatformIdentIndexer.class, new FieldSerializer<PlatformIdentIndexer<?>>(kryo, PlatformIdentIndexer.class));
 		kryo.register(ObjectTypeIndexer.class, new FieldSerializer<ObjectTypeIndexer<?>>(kryo, ObjectTypeIndexer.class));

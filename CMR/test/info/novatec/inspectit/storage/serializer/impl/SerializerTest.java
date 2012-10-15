@@ -87,7 +87,9 @@ public class SerializerTest {
 			{ InvocationChildrenIndexer.class }, { StorageBranch.class }, { StorageBranchIndexer.class }, { BooleanStorageLabel.class }, { DateStorageLabel.class }, { NumberStorageLabel.class },
 			{ StringStorageLabel.class }, { AssigneeLabelType.class }, { CreationDateLabelType.class }, { CustomBooleanLabelType.class }, { CustomDateLabelType.class },
 			{ CustomNumberLabelType.class }, { CustomStringLabelType.class }, { ExploredByLabelType.class }, { RatingLabelType.class }, { StatusLabelType.class }, { UseCaseLabelType.class },
-			{ SqlStringIndexer.class } };
+			{ SqlStringIndexer.class }, { BooleanStorageLabel.class }, { DateStorageLabel.class }, { NumberStorageLabel.class }, { StringStorageLabel.class }, { CustomDateLabelType.class },
+			{ CustomBooleanLabelType.class }, { CustomNumberLabelType.class }, { CustomStringLabelType.class }, { AssigneeLabelType.class }, { RatingLabelType.class }, { ExploredByLabelType.class },
+			{ CreationDateLabelType.class }, { StatusLabelType.class }, { UseCaseLabelType.class } };
 
 	/**
 	 * Serializer.

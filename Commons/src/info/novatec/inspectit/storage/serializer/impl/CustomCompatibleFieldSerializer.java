@@ -65,8 +65,35 @@ public class CustomCompatibleFieldSerializer<T> extends FieldSerializer<T> {
 	 *            {@link ClassSchemaManager} holding information about values.
 	 */
 	public CustomCompatibleFieldSerializer(Kryo kryo, Class<?> type, ClassSchemaManager schemaManager) {
+		this(kryo, type, schemaManager, false);
+	}
+
+	/**
+	 * Default constructor.
+	 * 
+	 * @param kryo
+	 *            Kryo instance
+	 * @param type
+	 *            Class to be serialized
+	 * @param schemaManager
+	 *            {@link ClassSchemaManager} holding information about values.
+	 * @param useSuperclassSchema
+	 *            If the superclass schema should be used if the one for the class is not available.
+	 */
+	public CustomCompatibleFieldSerializer(Kryo kryo, Class<?> type, ClassSchemaManager schemaManager, boolean useSuperclassSchema) {
 		super(kryo, type);
 		schema = schemaManager.getSchema(type.getName());
+		if (useSuperclassSchema && null == schema) {
+			Class<?> superclass = type.getSuperclass();
+			while (null != superclass) {
+				schema = schemaManager.getSchema(superclass.getName());
+				if (null != schema) {
+					break;
+				}
+				superclass = superclass.getSuperclass();
+			}
+		}
+
 		if (schema == null) {
 			throw new IllegalArgumentException("Schema for the class '" + type.getName() + "' does not exists in provided schema manager.");
 		}

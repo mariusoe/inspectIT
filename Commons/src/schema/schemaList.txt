@@ -25,3 +25,9 @@ schema/SqlStatementData.sch
 schema/AggregatedExceptionSensorData.sch
 schema/ExceptionSensorData.sch
 schema/TimestampIndexer.sch
+schema/BooleanStorageLabel.sch
+schema/DateStorageLabel.sch
+schema/NumberStorageLabel.sch
+schema/StringStorageLabel.sch
+schema/AbstractStorageLabelType.sch
+schema/AbstractCustomStorageLabelType.sch
