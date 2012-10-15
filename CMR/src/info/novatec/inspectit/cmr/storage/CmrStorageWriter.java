@@ -4,6 +4,7 @@ import info.novatec.inspectit.cmr.dao.impl.PlatformIdentDaoImpl;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.storage.util.PersistentObjectCloner;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.StorageFileExtensions;
 import info.novatec.inspectit.storage.StorageWriter;
 
@@ -12,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Lazy;
@@ -31,6 +32,12 @@ import org.springframework.stereotype.Component;
 public class CmrStorageWriter extends StorageWriter {
 
 	/**
+	 * The log of this class.
+	 */
+	@Logger
+	Log log;
+
+	/**
 	 * Set of involved Agents, used after recording to store proper Agent information.
 	 */
 	private Set<Long> involvedAgentsSet = new HashSet<Long>();
@@ -46,11 +53,6 @@ public class CmrStorageWriter extends StorageWriter {
 	 */
 	@Autowired
 	private PersistentObjectCloner persistentObjectCloner;
-
-	/**
-	 * Logger for buffer.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(CmrStorageWriter.class);
 
 	/**
 	 * {@inheritDoc}
@@ -82,7 +84,7 @@ public class CmrStorageWriter extends StorageWriter {
 		try {
 			writeAgentData();
 		} catch (IOException e) {
-			LOGGER.error("Exception trying to write agent data to disk.", e);
+			log.error("Exception trying to write agent data to disk.", e);
 		}
 		super.finalizeWrite();
 	}

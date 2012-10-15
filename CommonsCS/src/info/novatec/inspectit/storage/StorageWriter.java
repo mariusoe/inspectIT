@@ -471,7 +471,7 @@ public class StorageWriter {
 				// get object from soft reference
 				final DefaultData data = referenceToWriteData.get();
 				if (null == data) {
-					log.warn("Failed to write data to storage. The data to be written was already garbage collected due to the high amount of writting tasks.");
+					log.warn("Failed to write data to storage. The data to be written was already garbage collected due to the high amount of writing tasks.");
 					return;
 				}
 
@@ -481,7 +481,9 @@ public class StorageWriter {
 					channelId = indexingTreeHandler.startWrite(this);
 				} catch (IndexingException e) {
 					indexingTreeHandler.writeFailed(this);
-					log.error("Indexing execption occured while attempting to write data to disk.", e);
+					if (log.isDebugEnabled()) {
+						log.debug("Indexing exception occured while attempting to write data to disk.", e);
+					}
 					return;
 				}
 

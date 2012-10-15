@@ -3,6 +3,7 @@ package info.novatec.inspectit.cmr.storage;
 import info.novatec.inspectit.cmr.dao.StorageDataDao;
 import info.novatec.inspectit.cmr.dao.impl.DefaultDataDaoImpl;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageData.StorageState;
@@ -43,7 +44,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.mutable.MutableLong;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -59,6 +60,12 @@ import com.esotericsoftware.kryo.io.Input;
  */
 @Component
 public class CmrStorageManager extends StorageManager {
+
+	/**
+	 * The log of this class.
+	 */
+	@Logger
+	Log log;
 
 	/**
 	 * {@link DefaultDataDaoImpl}.
@@ -92,11 +99,6 @@ public class CmrStorageManager extends StorageManager {
 	 */
 	@Autowired
 	private StorageRecorder storageRecorder;
-
-	/**
-	 * Logger for buffer.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(CmrStorageManager.class);
 
 	/**
 	 * Creates new storage.
@@ -298,7 +300,7 @@ public class CmrStorageManager extends StorageManager {
 			try {
 				stopRecording();
 			} catch (Exception e) {
-				LOGGER.warn("Exception occured trying to automatically stop the recording due to the hard disk space limitation warning.", e);
+				log.warn("Exception occured trying to automatically stop the recording due to the hard disk space limitation warning.", e);
 			}
 		}
 	}
@@ -332,7 +334,7 @@ public class CmrStorageManager extends StorageManager {
 		} else if (local.getState() == StorageState.CLOSED) {
 			throw new StorageException("Can not write to closed storage");
 		} else {
-			LOGGER.error("Writer for the not closed storage " + local + " not available.");
+			log.error("Writer for the not closed storage " + local + " not available.");
 			throw new StorageException("Writer for the not closed storage " + local + " not available.");
 		}
 	}
@@ -416,7 +418,7 @@ public class CmrStorageManager extends StorageManager {
 			try {
 				stopRecording();
 			} catch (Exception e) {
-				LOGGER.warn("Recording storage could not be finalized during the CMR shut-down.", e);
+				log.warn("Recording storage could not be finalized during the CMR shut-down.", e);
 
 			}
 		}
@@ -424,7 +426,7 @@ public class CmrStorageManager extends StorageManager {
 			try {
 				this.closeStorage(openedStorage);
 			} catch (Exception e) {
-				LOGGER.warn("Storage " + openedStorage + " could not be finalized during the CMR shut-down.", e);
+				log.warn("Storage " + openedStorage + " could not be finalized during the CMR shut-down.", e);
 			}
 		}
 	}
@@ -811,12 +813,12 @@ public class CmrStorageManager extends StorageManager {
 								Files.deleteIfExists(localInformation);
 								writeStorageDataToDisk(importedStorageData);
 							} else {
-								LOGGER.info("Uploaded storage file " + file.toString() + " contains the storage that is already available on the CMR. File will be deleted.");
+								log.info("Uploaded storage file " + file.toString() + " contains the storage that is already available on the CMR. File will be deleted.");
 							}
 						}
 						Files.deleteIfExists(file);
 					} catch (Exception e) {
-						LOGGER.warn("Uploaded storage file " + file.toString() + " is not of correct type and can not be extracted. File will be deleted.", e);
+						log.warn("Uploaded storage file " + file.toString() + " is not of correct type and can not be extracted. File will be deleted.", e);
 					}
 					return FileVisitResult.CONTINUE;
 				}
@@ -871,11 +873,11 @@ public class CmrStorageManager extends StorageManager {
 								writeStorageDataToDisk(uploadedStorageData);
 								return FileVisitResult.TERMINATE;
 							} else {
-								LOGGER.info("Uploaded storage file " + file.toString() + " contains the storage that is already available on the CMR. File will be deleted.");
+								log.info("Uploaded storage file " + file.toString() + " contains the storage that is already available on the CMR. File will be deleted.");
 							}
 						}
 					} catch (SerializationException e) {
-						LOGGER.warn("Error de-serializing local storage file.", e);
+						log.warn("Error de-serializing local storage file.", e);
 					} finally {
 						if (null != input) {
 							input.close();
@@ -959,9 +961,9 @@ public class CmrStorageManager extends StorageManager {
 								}
 							}
 						} catch (IOException e) {
-							LOGGER.error("Error reading existing storage data file. File path: " + file.toString() + ".", e);
+							log.error("Error reading existing storage data file. File path: " + file.toString() + ".", e);
 						} catch (SerializationException e) {
-							LOGGER.error("Error deserializing existing storage binary data in file:" + file.toString() + ".", e);
+							log.error("Error deserializing existing storage binary data in file:" + file.toString() + ".", e);
 						} finally {
 							if (null != input) {
 								input.close();
@@ -972,7 +974,7 @@ public class CmrStorageManager extends StorageManager {
 				}
 			});
 		} catch (IOException e) {
-			LOGGER.error("Error exploring default storage directory. Directory path: " + defaultDirectory.toString() + ".", e);
+			log.error("Error exploring default storage directory. Directory path: " + defaultDirectory.toString() + ".", e);
 		}
 	}
 
@@ -1009,7 +1011,7 @@ public class CmrStorageManager extends StorageManager {
 
 			});
 		} catch (IOException e) {
-			LOGGER.warn("Could not delete the storage upload folder on the start-up.", e);
+			log.warn("Could not delete the storage upload folder on the start-up.", e);
 		}
 	}
 
