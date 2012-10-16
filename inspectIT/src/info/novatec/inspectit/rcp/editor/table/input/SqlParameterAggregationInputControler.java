@@ -5,12 +5,11 @@ import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.InspectITImages;
-import info.novatec.inspectit.rcp.editor.ISubView;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
-import info.novatec.inspectit.rcp.editor.text.input.SqlStatementTextInputController;
+import info.novatec.inspectit.rcp.editor.text.input.SqlStatementTextInputController.SqlHolderHelper;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
@@ -25,11 +24,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
@@ -180,7 +179,9 @@ public class SqlParameterAggregationInputControler extends AbstractTableInputCon
 	public boolean canOpenInput(List<? extends DefaultData> data) {
 		if (data != null) {
 			for (DefaultData defaultData : data) {
-				if (!(defaultData instanceof SqlStatementData)) {
+				if (!(defaultData instanceof SqlHolderHelper)) {
+					return false;
+				} else if (!((SqlHolderHelper) defaultData).isMaster()) {
 					return false;
 				}
 			}
@@ -259,7 +260,9 @@ public class SqlParameterAggregationInputControler extends AbstractTableInputCon
 		if (!selection.isEmpty()) {
 			Object selected = selection.getFirstElement();
 			if (selected instanceof SqlStatementData) {
-				passSqlWithParameters((SqlStatementData) selected);
+				List<SqlStatementData> sqlList = new ArrayList<SqlStatementData>();
+				sqlList.add((SqlStatementData) selected);
+				passSqlWithParameters(sqlList);
 			}
 		}
 	}
@@ -302,22 +305,18 @@ public class SqlParameterAggregationInputControler extends AbstractTableInputCon
 	/**
 	 * Passes the {@link SqlStatementData} to the bottom view that displays the SQL string.
 	 * 
-	 * @param sqlStatementData
-	 *            Data to pass.
+	 * @param sqlStatementDataList
+	 *            List to pass.
 	 */
-	private void passSqlWithParameters(SqlStatementData sqlStatementData) {
-		final List<DefaultData> dataList = new ArrayList<DefaultData>();
-		dataList.add(sqlStatementData);
+	private void passSqlWithParameters(final List<SqlStatementData> sqlStatementDataList) {
+		final SqlHolderHelper sqlHolderHelper = new SqlHolderHelper(sqlStatementDataList, false);
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
 				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 				IWorkbenchPage page = window.getActivePage();
 				IRootEditor rootEditor = (IRootEditor) page.getActiveEditor();
 				if (null != rootEditor) {
-					ISubView sqlStringSubView = rootEditor.getSubView().getSubViewWithInputController(SqlStatementTextInputController.class);
-					if (null != sqlStringSubView) {
-						sqlStringSubView.setDataInput(dataList);
-					}
+					rootEditor.setDataInput(Collections.singletonList(sqlHolderHelper));
 				}
 			}
 		});
@@ -393,7 +392,7 @@ public class SqlParameterAggregationInputControler extends AbstractTableInputCon
 	 * @author Ivan Senic
 	 * 
 	 */
-	private final class SqlParameterContentProvider extends ArrayContentProvider {
+	private final class SqlParameterContentProvider implements IStructuredContentProvider {
 
 		/**
 		 * {@inheritDoc}
@@ -404,18 +403,38 @@ public class SqlParameterAggregationInputControler extends AbstractTableInputCon
 			if (null == newInput || Objects.equals(newInput, Collections.emptyList())) {
 				viewer.getControl().setEnabled(false);
 			} else {
-				final List<SqlStatementData> list = (List<SqlStatementData>) newInput;
-				viewer.getControl().setEnabled(true);
-				Display.getDefault().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						SqlParameterAggregationInputControler.this.passSqlWithParameters(list.get(0));
-						StructuredSelection structuredSelection = new StructuredSelection(list.get(0));
-						viewer.setSelection(structuredSelection, true);
-					}
-				});
+				List<SqlHolderHelper> helperList = (List<SqlHolderHelper>) newInput;
+				final List<SqlStatementData> list = helperList.get(0).getSqlStatementDataList();
+				if (null == list || Objects.equals(list, Collections.emptyList())) {
+					viewer.getControl().setEnabled(false);
+				} else {
+					viewer.getControl().setEnabled(true);
+					SqlParameterAggregationInputControler.this.passSqlWithParameters(list);
+					StructuredSelection structuredSelection = new StructuredSelection(list.get(0));
+					viewer.setSelection(structuredSelection, true);
+				}
 			}
+		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void dispose() {
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Object[] getElements(Object inputElement) {
+			if (inputElement instanceof List && !((List<?>) inputElement).isEmpty()) {
+				Object first = ((List<?>) inputElement).get(0);
+				if (first instanceof SqlHolderHelper) {
+					return ((SqlHolderHelper) first).getSqlStatementDataList().toArray();
+				}
+			}
+			return new Object[0];
 		}
 	}
 

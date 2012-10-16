@@ -32,11 +32,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 public class SqlStatementTextInputController extends AbstractTextInputController {
 
 	/**
-	 * SQL to display.
-	 */
-	private SqlStatementData dataToDisplay;
-
-	/**
 	 * Form text to display the data.
 	 */
 	private FormText formText;
@@ -93,25 +88,26 @@ public class SqlStatementTextInputController extends AbstractTextInputController
 	 */
 	@Override
 	public void setDataInput(List<? extends DefaultData> data) {
-		if (null != data) {
-			if (!data.isEmpty()) {
-				DefaultData defaultData = data.get(0);
-				if (defaultData instanceof SqlStatementData) {
-					dataToDisplay = (SqlStatementData) defaultData;
+		if (null != data && !data.isEmpty()) {
+			DefaultData defaultData = data.get(0);
+			if (defaultData instanceof SqlHolderHelper) {
+				SqlHolderHelper sqlHolderHelper = (SqlHolderHelper) defaultData;
+				if (!sqlHolderHelper.isMaster() && !sqlHolderHelper.getSqlStatementDataList().isEmpty()) {
+					updateRepresentation(sqlHolderHelper.getSqlStatementDataList().get(0));
+					return;
 				}
-			} else {
-				dataToDisplay = null;
 			}
-		} else {
-			dataToDisplay = null;
 		}
-		updateRepresentation();
+		updateRepresentation(null);
 	}
 
 	/**
 	 * Updates the representation of the text form.
+	 * 
+	 * @param dataToDisplay
+	 *            Sql to display.
 	 */
-	private void updateRepresentation() {
+	private void updateRepresentation(SqlStatementData dataToDisplay) {
 		if (null != dataToDisplay) {
 			String boldSql = StringUtils.replaceEach(dataToDisplay.getSql(), new String[] { "?" }, new String[] { "<b>?</b>" });
 			if (CollectionUtils.isNotEmpty(dataToDisplay.getParameterValues())) {
@@ -147,5 +143,60 @@ public class SqlStatementTextInputController extends AbstractTextInputController
 	private void fitSizeOfScrolledContent() {
 		Point p = scrollComposite.getSize();
 		main.setSize(main.computeSize(p.x, SWT.DEFAULT));
+	}
+
+	/**
+	 * Helper class for passing the SQL data to the right sub-view.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	public static class SqlHolderHelper extends DefaultData {
+
+		/**
+		 * Generated UID.
+		 */
+		private static final long serialVersionUID = 3529538348986684584L;
+
+		/**
+		 * If data is meant to be displayed in master or slave view of the SQL parameters sub-part.
+		 */
+		private final boolean master;
+
+		/**
+		 * Holding SQL data.
+		 */
+		private final List<SqlStatementData> sqlStatementDataList;
+
+		/**
+		 * @param sqlStatementData
+		 *            Holding SQL data.
+		 * @param master
+		 *            If data is meant to be displayed in master or slave view of the SQL parameters
+		 *            sub-part.
+		 */
+		public SqlHolderHelper(List<SqlStatementData> sqlStatementData, boolean master) {
+			this.sqlStatementDataList = sqlStatementData;
+			this.master = master;
+		}
+
+		/**
+		 * Gets {@link #sqlStatementData}.
+		 * 
+		 * @return {@link #sqlStatementData}
+		 */
+		public List<SqlStatementData> getSqlStatementDataList() {
+			return sqlStatementDataList;
+		}
+
+		/**
+		 * Gets {@link #master}.
+		 * 
+		 * @return {@link #master}
+		 */
+		public boolean isMaster() {
+			return master;
+		}
+
 	}
 }

@@ -6,7 +6,6 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
-import info.novatec.inspectit.rcp.editor.ISubView;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.SqlStatementInputDefinitionExtra;
@@ -15,7 +14,7 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
-import info.novatec.inspectit.rcp.editor.text.input.SqlStatementTextInputController;
+import info.novatec.inspectit.rcp.editor.text.input.SqlStatementTextInputController.SqlHolderHelper;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
@@ -302,6 +301,13 @@ public class SqlInputController extends AbstractTableInputController {
 	 */
 	@Override
 	public boolean canOpenInput(List<? extends DefaultData> data) {
+		if (data != null) {
+			for (DefaultData defaultData : data) {
+				if (!(defaultData instanceof SqlStatementData)) {
+					return false;
+				}
+			}
+		}
 		return true;
 	}
 
@@ -329,14 +335,7 @@ public class SqlInputController extends AbstractTableInputController {
 				IWorkbenchPage page = window.getActivePage();
 				IRootEditor rootEditor = (IRootEditor) page.getActiveEditor();
 				if (null != rootEditor) {
-					ISubView paramSubView = rootEditor.getSubView().getSubViewWithInputController(SqlParameterAggregationInputControler.class);
-					if (null != paramSubView) {
-						paramSubView.setDataInput(Collections.<DefaultData> emptyList());
-					}
-					ISubView sqlStringSubView = rootEditor.getSubView().getSubViewWithInputController(SqlStatementTextInputController.class);
-					if (null != sqlStringSubView) {
-						sqlStringSubView.setDataInput(Collections.<DefaultData> emptyList());
-					}
+					rootEditor.setDataInput(Collections.<DefaultData> emptyList());
 				}
 			}
 		});
@@ -458,28 +457,45 @@ public class SqlInputController extends AbstractTableInputController {
 						monitor.beginTask("Retrieving Parameter Aggregated SQLs", IProgressMonitor.UNKNOWN);
 						SqlStatementData data = (SqlStatementData) selection.getFirstElement();
 						List<SqlStatementData> dataList = Collections.emptyList();
+						boolean hasNoParameters = !data.isPreparedStatement();
 						if (data.isPreparedStatement()) {
 							dataList = dataAccessService.getParameterAggregatedSqlStatements(data, fromDate, toDate);
 
 							// if we have only one statement and it has no parameters, we won't load
 							// the bottom part with empty parameters
 							if (dataList.size() == 1 && CollectionUtils.isEmpty(dataList.get(0).getParameterValues())) {
-								dataList = Collections.emptyList();
+								hasNoParameters = true;
 							}
 						}
 
-						final List<SqlStatementData> finalDataList = dataList;
-						Display.getDefault().asyncExec(new Runnable() {
-							public void run() {
-								IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-								IWorkbenchPage page = window.getActivePage();
-								IRootEditor rootEditor = (IRootEditor) page.getActiveEditor();
-								ISubView paramSubView = rootEditor.getSubView().getSubViewWithInputController(SqlParameterAggregationInputControler.class);
-								if (null != paramSubView) {
-									paramSubView.setDataInput(finalDataList);
+						if (hasNoParameters) {
+							final SqlHolderHelper inputForParametersTable = new SqlHolderHelper(Collections.<SqlStatementData> emptyList(), true);
+							final SqlHolderHelper inputForTextOnly = new SqlHolderHelper(Collections.singletonList(data), false);
+							Display.getDefault().asyncExec(new Runnable() {
+								public void run() {
+									IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+									IWorkbenchPage page = window.getActivePage();
+									IRootEditor rootEditor = (IRootEditor) page.getActiveEditor();
+									if (null != rootEditor) {
+										rootEditor.setDataInput(Collections.singletonList(inputForParametersTable));
+										rootEditor.setDataInput(Collections.singletonList(inputForTextOnly));
+									}
 								}
-							}
-						});
+							});
+
+						} else {
+							final SqlHolderHelper inputForParametersTable = new SqlHolderHelper(dataList, true);
+							Display.getDefault().asyncExec(new Runnable() {
+								public void run() {
+									IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+									IWorkbenchPage page = window.getActivePage();
+									IRootEditor rootEditor = (IRootEditor) page.getActiveEditor();
+									if (null != rootEditor) {
+										rootEditor.setDataInput(Collections.singletonList(inputForParametersTable));
+									}
+								}
+							});
+						}
 						monitor.done();
 					}
 				});
