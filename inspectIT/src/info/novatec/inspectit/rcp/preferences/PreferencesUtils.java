@@ -31,6 +31,174 @@ public final class PreferencesUtils {
 	}
 
 	/**
+	 * Saves a double value to the preference store.
+	 * 
+	 * @param name
+	 *            Name of the preference.
+	 * @param value
+	 *            Value to be saved.
+	 * @param isDefault
+	 *            If this is true, the setting will be saved as a default preference. Not that the
+	 *            default preferences are not saved to disk, and have to be entered manually. If it
+	 *            is false, preference will be saved in the configuration scope.
+	 */
+	public static void saveDoubleValue(String name, double value, boolean isDefault) {
+		if (isDefault) {
+			preferenceStore.setDefault(name, value);
+		} else {
+			preferenceStore.setValue(name, value);
+		}
+		try {
+			preferenceStore.save();
+		} catch (IOException e) {
+			InspectIT.getDefault().createErrorDialog("Error occured trying to save setting with name '" + name + "' to preference store.", e, -1);
+		}
+	}
+
+	/**
+	 * Returns double value from the preferences. Same as calling
+	 * {@link #getDoubleValue(PreferenceKey, false)}.
+	 * 
+	 * @param name
+	 *            Name of the preference.
+	 * @return String value.
+	 */
+	public static double getDoubleValue(String name) {
+		return getDoubleValue(name, false);
+	}
+
+	/**
+	 * Returns double value from the preferences.
+	 * 
+	 * @param name
+	 *            Name of the preference.
+	 * @param isDefault
+	 *            Should default value be retrieved.
+	 * @return Double value.
+	 */
+	public static double getDoubleValue(String name, boolean isDefault) {
+		double value;
+		if (isDefault) {
+			value = preferenceStore.getDefaultDouble(name);
+		} else {
+			value = preferenceStore.getDouble(name);
+		}
+		return value;
+	}
+
+	/**
+	 * Saves a long value to the preference store.
+	 * 
+	 * @param name
+	 *            Name of the preference.
+	 * @param value
+	 *            Value to be saved.
+	 * @param isDefault
+	 *            If this is true, the setting will be saved as a default preference. Not that the
+	 *            default preferences are not saved to disk, and have to be entered manually. If it
+	 *            is false, preference will be saved in the configuration scope.
+	 */
+	public static void saveLongValue(String name, long value, boolean isDefault) {
+		if (isDefault) {
+			preferenceStore.setDefault(name, value);
+		} else {
+			preferenceStore.setValue(name, value);
+		}
+		try {
+			preferenceStore.save();
+		} catch (IOException e) {
+			InspectIT.getDefault().createErrorDialog("Error occured trying to save setting with name '" + name + "' to preference store.", e, -1);
+		}
+	}
+
+	/**
+	 * Returns long value from the preferences. Same as calling
+	 * {@link #getLongValue(PreferenceKey, false)}.
+	 * 
+	 * @param name
+	 *            Name of the preference.
+	 * @return Long value.
+	 */
+	public static long getLongValue(String name) {
+		return getLongValue(name, false);
+	}
+
+	/**
+	 * Returns long value from the preferences.
+	 * 
+	 * @param name
+	 *            Name of the preference.
+	 * @param isDefault
+	 *            Should default value be retrieved.
+	 * @return Long value.
+	 */
+	public static long getLongValue(String name, boolean isDefault) {
+		long value;
+		if (isDefault) {
+			value = preferenceStore.getDefaultLong(name);
+		} else {
+			value = preferenceStore.getLong(name);
+		}
+		return value;
+	}
+
+	/**
+	 * Saves a int value to the preference store.
+	 * 
+	 * @param name
+	 *            Name of the preference.
+	 * @param value
+	 *            Value to be saved.
+	 * @param isDefault
+	 *            If this is true, the setting will be saved as a default preference. Not that the
+	 *            default preferences are not saved to disk, and have to be entered manually. If it
+	 *            is false, preference will be saved in the configuration scope.
+	 */
+	public static void saveIntValue(String name, int value, boolean isDefault) {
+		if (isDefault) {
+			preferenceStore.setDefault(name, value);
+		} else {
+			preferenceStore.setValue(name, value);
+		}
+		try {
+			preferenceStore.save();
+		} catch (IOException e) {
+			InspectIT.getDefault().createErrorDialog("Error occured trying to save setting with name '" + name + "' to preference store.", e, -1);
+		}
+	}
+
+	/**
+	 * Returns int value from the preferences. Same as calling
+	 * {@link #getIntValue(PreferenceKey, false)}.
+	 * 
+	 * @param name
+	 *            Name of the preference.
+	 * @return Int value.
+	 */
+	public static int getIntValue(String name) {
+		return getIntValue(name, false);
+	}
+
+	/**
+	 * Returns int value from the preferences.
+	 * 
+	 * @param name
+	 *            Name of the preference.
+	 * @param isDefault
+	 *            Should default value be retrieved.
+	 * @return Int value.
+	 */
+	public static int getIntValue(String name, boolean isDefault) {
+		int value;
+		if (isDefault) {
+			value = preferenceStore.getDefaultInt(name);
+		} else {
+			value = preferenceStore.getInt(name);
+		}
+		return value;
+	}
+
+	/**
 	 * Saves a string value to the preference store.
 	 * 
 	 * @param name
@@ -53,6 +221,37 @@ public final class PreferencesUtils {
 		} catch (IOException e) {
 			InspectIT.getDefault().createErrorDialog("Error occured trying to save setting with name '" + name + "' to preference store.", e, -1);
 		}
+	}
+
+	/**
+	 * Returns string value from the preferences. Same as calling
+	 * {@link #getStringValue(PreferenceKey, false)}.
+	 * 
+	 * @param name
+	 *            Name of the preference.
+	 * @return String value.
+	 */
+	public static String getStringValue(String name) {
+		return getStringValue(name, false);
+	}
+
+	/**
+	 * Returns string value from the preferences.
+	 * 
+	 * @param name
+	 *            Name of the preference.
+	 * @param isDefault
+	 *            Should default value be retrieved.
+	 * @return String value.
+	 */
+	public static String getStringValue(String name, boolean isDefault) {
+		String value;
+		if (isDefault) {
+			value = preferenceStore.getDefaultString(name);
+		} else {
+			value = preferenceStore.getString(name);
+		}
+		return value;
 	}
 
 	/**

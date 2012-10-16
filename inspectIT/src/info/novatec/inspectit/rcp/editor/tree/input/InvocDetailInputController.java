@@ -21,6 +21,8 @@ import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.ExceptionImageFactory;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
+import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
+import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.util.ArrayList;
@@ -83,20 +85,19 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	private LocalResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources());
 
 	/**
-	 * The default value of the selected sensor types.
+	 * The value of the selected sensor types.
 	 */
-	private Set<SensorTypeEnum> selectedSensorTypes = EnumSet.of(SensorTypeEnum.TIMER, SensorTypeEnum.INVOCATION_SEQUENCE, SensorTypeEnum.EXCEPTION_SENSOR, SensorTypeEnum.JDBC_STATEMENT,
-			SensorTypeEnum.JDBC_PREPARED_STATEMENT);
+	private Set<SensorTypeEnum> selectedSensorTypes = PreferencesUtils.getObject(PreferencesConstants.INVOCATION_FILTER_SENSOR_TYPES);
 
 	/**
-	 * There is no default value for the exclusive time filter, it has to be selected by the user.
+	 * The value for the exclusive time filter.
 	 */
-	private double defaultExclusiveFilterTime = Double.NaN;
+	private double defaultExclusiveFilterTime = PreferencesUtils.getDoubleValue(PreferencesConstants.INVOCATION_FILTER_EXCLUSIVE_TIME);
 
 	/**
-	 * There is no default value for the total time filter, it has to be selected by the user.
+	 * The value for the total time filter.
 	 */
-	private double defaultTotalFilterTime = Double.NaN;
+	private double defaultTotalFilterTime = PreferencesUtils.getDoubleValue(PreferencesConstants.INVOCATION_FILTER_TOTAL_TIME);
 
 	/**
 	 * The private inner enumeration used to define the used IDs which are mapped into the columns.

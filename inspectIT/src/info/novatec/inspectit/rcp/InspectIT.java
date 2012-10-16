@@ -214,7 +214,7 @@ public class InspectIT extends AbstractUIPlugin {
 		if (null == preferenceStore) {
 			synchronized (this) {
 				if (null == preferenceStore) {
-					preferenceStore = new ScopedPreferenceStore(new ConfigurationScope(), ID);
+					preferenceStore = new ScopedPreferenceStore(ConfigurationScope.INSTANCE, ID);
 				}
 			}
 		}

@@ -7,7 +7,7 @@ package info.novatec.inspectit.rcp.preferences;
  * 
  */
 public interface PreferencesConstants {
-	
+
 	/**
 	 * Token used to separate the objects when list of properties of objects that are saved.
 	 */
@@ -37,5 +37,35 @@ public interface PreferencesConstants {
 	 * Preference key for columns order of our tables.
 	 */
 	String TABLE_COLUMN_ORDER_CACHE = "TABLE_COLUMN_ORDER_CACHE";
+
+	/**
+	 * Preference key for refresh rate in the editors.
+	 */
+	String REFRESH_RATE = "REFRESH_RATE";
+
+	/**
+	 * Preference key for decimal places displayed in the editors.
+	 */
+	String DECIMAL_PLACES = "DECIMAL_PLACES";
+
+	/**
+	 * Items to show in editors tables.
+	 */
+	String ITEMS_COUNT_TO_SHOW = "ITEMS_COUNT_TO_SHOW";
+
+	/**
+	 * Invocation filter exclusive time preference.
+	 */
+	String INVOCATION_FILTER_EXCLUSIVE_TIME = "INVOCATION_FILTER_EXCLUSIVE_TIME";
+
+	/**
+	 * Invocation filter total time preference.
+	 */
+	String INVOCATION_FILTER_TOTAL_TIME = "INVOCATION_FILTER_TOTAL_TIME";
+
+	/**
+	 * Invocation filter sensor types preference.
+	 */
+	String INVOCATION_FILTER_SENSOR_TYPES = "INVOCATION_FILTER_SENSOR_TYPES";
 
 }

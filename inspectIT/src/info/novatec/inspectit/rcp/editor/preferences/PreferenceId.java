@@ -136,11 +136,6 @@ public enum PreferenceId {
 		 * The identifier for the definition of decimal places.
 		 */
 		TIME_DECIMAL_PLACES_ID;
-
-		/**
-		 * Defines if the live mode is active by default.
-		 */
-		public static final int DECIMAL_PLACES_DEFAULT = 0;
 	}
 
 	/**

@@ -7,9 +7,10 @@ import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.TimeResolution;
-import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
+import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
+import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
+import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -73,7 +74,7 @@ public abstract class AbstractHttpInputController extends AbstractTableInputCont
 	/**
 	 * Decimal places.
 	 */
-	protected int timeDecimalPlaces = TimeResolution.DECIMAL_PLACES_DEFAULT;
+	protected int timeDecimalPlaces = PreferencesUtils.getIntValue(PreferencesConstants.DECIMAL_PLACES);
 
 	/**
 	 * Flag identifying whether the aggregation should take the request method into account.

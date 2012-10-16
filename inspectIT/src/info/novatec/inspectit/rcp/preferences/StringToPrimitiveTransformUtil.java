@@ -49,7 +49,8 @@ public final class StringToPrimitiveTransformUtil {
 				}
 			}
 		} else {
-			throw new PreferenceException("Error tranforming Colletion<java.lang.String> to Collection<" + elementClass.getName() + ">. Parsing method can not be found in class " + elementClass.getName() + ".");
+			throw new PreferenceException("Error tranforming Colletion<java.lang.String> to Collection<" + elementClass.getName() + ">. Parsing method can not be found in class "
+					+ elementClass.getName() + ".");
 		}
 	}
 
@@ -89,9 +90,11 @@ public final class StringToPrimitiveTransformUtil {
 				}
 			}
 		} else if (null == parseKeyMethod) {
-			throw new PreferenceException("Error tranforming Map<java.lang.String, java.lang.String> to Map<" + keyClass.getName() + ", " + valueClass.getName() + ">." + "Parsing method can not be found in class " + keyClass.getName() + ".");
+			throw new PreferenceException("Error tranforming Map<java.lang.String, java.lang.String> to Map<" + keyClass.getName() + ", " + valueClass.getName() + ">."
+					+ "Parsing method can not be found in class " + keyClass.getName() + ".");
 		} else {
-			throw new PreferenceException("Error tranforming Map<java.lang.String, java.lang.String> to Map<" + keyClass.getName() + ", " + valueClass.getName() + ">." + "Parsing method can not be found in class " + valueClass.getName() + ".");
+			throw new PreferenceException("Error tranforming Map<java.lang.String, java.lang.String> to Map<" + keyClass.getName() + ", " + valueClass.getName() + ">."
+					+ "Parsing method can not be found in class " + valueClass.getName() + ".");
 		}
 	}
 

@@ -9,6 +9,8 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.TimeResolution
 import info.novatec.inspectit.rcp.editor.preferences.control.IPreferenceControl;
 import info.novatec.inspectit.rcp.handlers.MaximizeActiveViewHandler;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
+import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
+import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.util.ArrayList;
@@ -285,10 +287,11 @@ public class FormPreferencePanel implements IPreferencePanel {
 
 			// Refresh rate
 			MenuManager refreshMenuManager = new MenuManager("Refresh rate");
-			refreshMenuManager.add(new SetRefreshRateAction("5 (s)", 5, true));
-			refreshMenuManager.add(new SetRefreshRateAction("10 (s)", 10));
-			refreshMenuManager.add(new SetRefreshRateAction("30 (s)", 30));
-			refreshMenuManager.add(new SetRefreshRateAction("60 (s)", 60));
+			long currentRefreshRate = PreferencesUtils.getLongValue(PreferencesConstants.REFRESH_RATE);
+			refreshMenuManager.add(new SetRefreshRateAction("5 (s)", 5000, currentRefreshRate));
+			refreshMenuManager.add(new SetRefreshRateAction("10 (s)", 10000, currentRefreshRate));
+			refreshMenuManager.add(new SetRefreshRateAction("30 (s)", 30000, currentRefreshRate));
+			refreshMenuManager.add(new SetRefreshRateAction("60 (s)", 60000, currentRefreshRate));
 			menuAction.addContributionItem(refreshMenuManager);
 		}
 		if (preferenceSet.contains(PreferenceId.UPDATE)) {
@@ -296,83 +299,88 @@ public class FormPreferencePanel implements IPreferencePanel {
 		}
 
 		if (preferenceSet.contains(PreferenceId.ITEMCOUNT)) {
+			int currentItemsToShow = PreferencesUtils.getIntValue(PreferencesConstants.ITEMS_COUNT_TO_SHOW);
 			MenuManager countMenuManager = new MenuManager("Item count to show");
-			countMenuManager.add(new SetItemCountAction("10", 10));
-			countMenuManager.add(new SetItemCountAction("20", 20));
-			countMenuManager.add(new SetItemCountAction("50", 50));
-			countMenuManager.add(new SetItemCountAction("100", 100));
-			countMenuManager.add(new SetItemCountAction("200", 200));
-			countMenuManager.add(new SetItemCountAction("500", 500));
-			countMenuManager.add(new SetItemCountAction("All...", -1, true));
+			countMenuManager.add(new SetItemCountAction("10", 10, currentItemsToShow));
+			countMenuManager.add(new SetItemCountAction("20", 20, currentItemsToShow));
+			countMenuManager.add(new SetItemCountAction("50", 50, currentItemsToShow));
+			countMenuManager.add(new SetItemCountAction("100", 100, currentItemsToShow));
+			countMenuManager.add(new SetItemCountAction("200", 200, currentItemsToShow));
+			countMenuManager.add(new SetItemCountAction("500", 500, currentItemsToShow));
+			countMenuManager.add(new SetItemCountAction("All...", -1, currentItemsToShow));
 			menuAction.addContributionItem(countMenuManager);
 		}
 		if (preferenceSet.contains(PreferenceId.FILTERSENSORTYPE)) {
+			Set<SensorTypeEnum> activeSensors = PreferencesUtils.getObject(PreferencesConstants.INVOCATION_FILTER_SENSOR_TYPES);
 			MenuManager sensorTypeMenuManager = new MenuManager("Filter by SensorType");
-			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Timer", SensorTypeEnum.TIMER));
-			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Invocation Seq", SensorTypeEnum.INVOCATION_SEQUENCE));
-			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Exception", SensorTypeEnum.EXCEPTION_SENSOR));
+			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Timer", SensorTypeEnum.TIMER, activeSensors));
+			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Invocation Seq", SensorTypeEnum.INVOCATION_SEQUENCE, activeSensors));
+			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Exception", SensorTypeEnum.EXCEPTION_SENSOR, activeSensors));
 			sensorTypeMenuManager.add(new Separator());
-			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Statement", SensorTypeEnum.JDBC_STATEMENT));
-			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Prep Statement", SensorTypeEnum.JDBC_PREPARED_STATEMENT));
-			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Connection", SensorTypeEnum.JDBC_CONNECTION, false));
-			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Prep Parameter", SensorTypeEnum.JDBC_PREPARED_STATEMENT_PARAMETER, false));
+			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Statement", SensorTypeEnum.JDBC_STATEMENT, activeSensors));
+			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Prep Statement", SensorTypeEnum.JDBC_PREPARED_STATEMENT, activeSensors));
+			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Connection", SensorTypeEnum.JDBC_CONNECTION, activeSensors));
+			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Prep Parameter", SensorTypeEnum.JDBC_PREPARED_STATEMENT_PARAMETER, activeSensors));
 			menuAction.addContributionItem(sensorTypeMenuManager);
 		}
 		if (preferenceSet.contains(PreferenceId.INVOCFILTEREXCLUSIVETIME)) {
+			double currentInvocFilterExclusive = PreferencesUtils.getDoubleValue(PreferencesConstants.INVOCATION_FILTER_EXCLUSIVE_TIME);
 			MenuManager timeMenuManager = new MenuManager("Filter Details by Exclusive Time");
-			timeMenuManager.add(new FilterByExclusiveTimeAction("No filter", Double.NaN, true));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("No filter", Double.NaN, currentInvocFilterExclusive));
 			// timeMenuManager.add(new Separator());
-			timeMenuManager.add(new FilterByExclusiveTimeAction("0.1 ms", 0.1));
-			timeMenuManager.add(new FilterByExclusiveTimeAction("0.2 ms", 0.2));
-			timeMenuManager.add(new FilterByExclusiveTimeAction("0.5 ms", 0.5));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("0.1 ms", 0.1, currentInvocFilterExclusive));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("0.2 ms", 0.2, currentInvocFilterExclusive));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("0.5 ms", 0.5, currentInvocFilterExclusive));
 			// timeMenuManager.add(new Separator());
-			timeMenuManager.add(new FilterByExclusiveTimeAction("1 ms", 1.0));
-			timeMenuManager.add(new FilterByExclusiveTimeAction("2 ms", 2.0));
-			timeMenuManager.add(new FilterByExclusiveTimeAction("5 ms", 5.0));
-			timeMenuManager.add(new FilterByExclusiveTimeAction("10 ms", 10.0));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("1 ms", 1.0, currentInvocFilterExclusive));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("2 ms", 2.0, currentInvocFilterExclusive));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("5 ms", 5.0, currentInvocFilterExclusive));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("10 ms", 10.0, currentInvocFilterExclusive));
 			// timeMenuManager.add(new Separator());
-			timeMenuManager.add(new FilterByExclusiveTimeAction("50 ms", 50.0));
-			timeMenuManager.add(new FilterByExclusiveTimeAction("100 ms", 100.0));
-			timeMenuManager.add(new FilterByExclusiveTimeAction("200 ms", 200.0));
-			timeMenuManager.add(new FilterByExclusiveTimeAction("500 ms", 500.0));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("50 ms", 50.0, currentInvocFilterExclusive));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("100 ms", 100.0, currentInvocFilterExclusive));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("200 ms", 200.0, currentInvocFilterExclusive));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("500 ms", 500.0, currentInvocFilterExclusive));
 			// timeMenuManager.add(new Separator());
-			timeMenuManager.add(new FilterByExclusiveTimeAction("1 s", 1000.0));
-			timeMenuManager.add(new FilterByExclusiveTimeAction("1.5 s", 1500.0));
-			timeMenuManager.add(new FilterByExclusiveTimeAction("2 s", 2000.0));
-			timeMenuManager.add(new FilterByExclusiveTimeAction("5 s", 5000.0));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("1 s", 1000.0, currentInvocFilterExclusive));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("1.5 s", 1500.0, currentInvocFilterExclusive));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("2 s", 2000.0, currentInvocFilterExclusive));
+			timeMenuManager.add(new FilterByExclusiveTimeAction("5 s", 5000.0, currentInvocFilterExclusive));
 			menuAction.addContributionItem(timeMenuManager);
 		}
 		if (preferenceSet.contains(PreferenceId.INVOCFILTERTOTALTIME)) {
+			double currentInvocFilterTotal = PreferencesUtils.getDoubleValue(PreferencesConstants.INVOCATION_FILTER_TOTAL_TIME);
 			MenuManager timeMenuManager = new MenuManager("Filter Details by Total Time");
-			timeMenuManager.add(new FilterByTotalTimeAction("No filter", Double.NaN, true));
+			timeMenuManager.add(new FilterByTotalTimeAction("No filter", Double.NaN, currentInvocFilterTotal));
 			// timeMenuManager.add(new Separator());
-			timeMenuManager.add(new FilterByTotalTimeAction("0.1 ms", 0.1));
-			timeMenuManager.add(new FilterByTotalTimeAction("0.2 ms", 0.2));
-			timeMenuManager.add(new FilterByTotalTimeAction("0.5 ms", 0.5));
+			timeMenuManager.add(new FilterByTotalTimeAction("0.1 ms", 0.1, currentInvocFilterTotal));
+			timeMenuManager.add(new FilterByTotalTimeAction("0.2 ms", 0.2, currentInvocFilterTotal));
+			timeMenuManager.add(new FilterByTotalTimeAction("0.5 ms", 0.5, currentInvocFilterTotal));
 			// timeMenuManager.add(new Separator());
-			timeMenuManager.add(new FilterByTotalTimeAction("1 ms", 1.0));
-			timeMenuManager.add(new FilterByTotalTimeAction("2 ms", 2.0));
-			timeMenuManager.add(new FilterByTotalTimeAction("5 ms", 5.0));
-			timeMenuManager.add(new FilterByTotalTimeAction("10 ms", 10.0));
+			timeMenuManager.add(new FilterByTotalTimeAction("1 ms", 1.0, currentInvocFilterTotal));
+			timeMenuManager.add(new FilterByTotalTimeAction("2 ms", 2.0, currentInvocFilterTotal));
+			timeMenuManager.add(new FilterByTotalTimeAction("5 ms", 5.0, currentInvocFilterTotal));
+			timeMenuManager.add(new FilterByTotalTimeAction("10 ms", 10.0, currentInvocFilterTotal));
 			// timeMenuManager.add(new Separator());
-			timeMenuManager.add(new FilterByTotalTimeAction("50 ms", 50.0));
-			timeMenuManager.add(new FilterByTotalTimeAction("100 ms", 100.0));
-			timeMenuManager.add(new FilterByTotalTimeAction("200 ms", 200.0));
-			timeMenuManager.add(new FilterByTotalTimeAction("500 ms", 500.0));
+			timeMenuManager.add(new FilterByTotalTimeAction("50 ms", 50.0, currentInvocFilterTotal));
+			timeMenuManager.add(new FilterByTotalTimeAction("100 ms", 100.0, currentInvocFilterTotal));
+			timeMenuManager.add(new FilterByTotalTimeAction("200 ms", 200.0, currentInvocFilterTotal));
+			timeMenuManager.add(new FilterByTotalTimeAction("500 ms", 500.0, currentInvocFilterTotal));
 			// timeMenuManager.add(new Separator());
-			timeMenuManager.add(new FilterByTotalTimeAction("1 s", 1000.0));
-			timeMenuManager.add(new FilterByTotalTimeAction("1.5 s", 1500.0));
-			timeMenuManager.add(new FilterByTotalTimeAction("2 s", 2000.0));
-			timeMenuManager.add(new FilterByTotalTimeAction("5 s", 5000.0));
+			timeMenuManager.add(new FilterByTotalTimeAction("1 s", 1000.0, currentInvocFilterTotal));
+			timeMenuManager.add(new FilterByTotalTimeAction("1.5 s", 1500.0, currentInvocFilterTotal));
+			timeMenuManager.add(new FilterByTotalTimeAction("2 s", 2000.0, currentInvocFilterTotal));
+			timeMenuManager.add(new FilterByTotalTimeAction("5 s", 5000.0, currentInvocFilterTotal));
 			menuAction.addContributionItem(timeMenuManager);
 		}
 
 		if (preferenceSet.contains(PreferenceId.TIME_RESOLUTION)) {
 			MenuManager timeMenuManager = new MenuManager("Time Decimal Places");
-			timeMenuManager.add(new SetTimeDecimalPlaces("0", 0, true));
-			timeMenuManager.add(new SetTimeDecimalPlaces("1", 1));
-			timeMenuManager.add(new SetTimeDecimalPlaces("2", 2));
-			timeMenuManager.add(new SetTimeDecimalPlaces("3", 3));
+			int currentDecimalPlaces = PreferencesUtils.getIntValue(PreferencesConstants.DECIMAL_PLACES);
+			timeMenuManager.add(new SetTimeDecimalPlaces("0", 0, currentDecimalPlaces));
+			timeMenuManager.add(new SetTimeDecimalPlaces("1", 1, currentDecimalPlaces));
+			timeMenuManager.add(new SetTimeDecimalPlaces("2", 2, currentDecimalPlaces));
+			timeMenuManager.add(new SetTimeDecimalPlaces("3", 3, currentDecimalPlaces));
 			menuAction.addContributionItem(timeMenuManager);
 		}
 
@@ -512,31 +520,19 @@ public class FormPreferencePanel implements IPreferencePanel {
 		private int limit;
 
 		/**
-		 * Constructor, setting checked to false.
-		 * 
-		 * @param text
-		 *            the text
-		 * @param limit
-		 *            the maximum number of elements shown.
-		 */
-		public SetItemCountAction(String text, int limit) {
-			this(text, limit, false);
-		}
-
-		/**
 		 * Constructor.
 		 * 
 		 * @param text
 		 *            the text
 		 * @param limit
 		 *            the maximum number of elements shown.
-		 * @param isChecked
-		 *            whether this option is set
+		 * @param currentItemsToShow
+		 *            current items to show, button will be selected if it matches the passed limit
 		 */
-		public SetItemCountAction(String text, int limit, boolean isChecked) {
+		public SetItemCountAction(String text, int limit, int currentItemsToShow) {
 			super(text, Action.AS_RADIO_BUTTON);
 			this.limit = limit;
-			setChecked(isChecked);
+			setChecked(currentItemsToShow == limit);
 		}
 
 		/**
@@ -545,6 +541,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		@Override
 		public void run() {
 			if (isChecked()) {
+				PreferencesUtils.saveIntValue(PreferencesConstants.ITEMS_COUNT_TO_SHOW, limit, false);
 				Map<IPreferenceGroup, Object> countPreference = new HashMap<IPreferenceGroup, Object>();
 				countPreference.put(PreferenceId.ItemCount.COUNT_SELECTION_ID, limit);
 				PreferenceEvent event = new PreferenceEvent(PreferenceId.ITEMCOUNT);
@@ -560,20 +557,9 @@ public class FormPreferencePanel implements IPreferencePanel {
 	 * @author Stefan Siegl
 	 */
 	private final class FilterBySensorTypeAction extends Action {
+
 		/** The sensor type. */
 		private SensorTypeEnum sensorType;
-
-		/**
-		 * Constructor, setting checked to false.
-		 * 
-		 * @param text
-		 *            the text
-		 * @param sensorType
-		 *            the sensor type
-		 */
-		public FilterBySensorTypeAction(String text, SensorTypeEnum sensorType) {
-			this(text, sensorType, true);
-		}
 
 		/**
 		 * Constructor.
@@ -582,13 +568,14 @@ public class FormPreferencePanel implements IPreferencePanel {
 		 *            the text
 		 * @param sensorType
 		 *            the sensor type
-		 * @param isChecked
-		 *            if this option is checked
+		 * @param activeSensors
+		 *            currently active sensor types, button will be checked if the given sensor type
+		 *            is contained in the set
 		 */
-		public FilterBySensorTypeAction(String text, SensorTypeEnum sensorType, boolean isChecked) {
+		public FilterBySensorTypeAction(String text, SensorTypeEnum sensorType, Set<SensorTypeEnum> activeSensors) {
 			super(text, Action.AS_CHECK_BOX);
 			this.sensorType = sensorType;
-			setChecked(isChecked);
+			setChecked(activeSensors.contains(sensorType));
 		}
 
 		/**
@@ -596,6 +583,14 @@ public class FormPreferencePanel implements IPreferencePanel {
 		 */
 		@Override
 		public void run() {
+			Set<SensorTypeEnum> activeSensors = PreferencesUtils.getObject(PreferencesConstants.INVOCATION_FILTER_SENSOR_TYPES);
+			if (isChecked() && !activeSensors.contains(sensorType)) {
+				activeSensors.add(sensorType);
+				PreferencesUtils.saveObject(PreferencesConstants.INVOCATION_FILTER_SENSOR_TYPES, activeSensors, false);
+			} else if (!isChecked() && activeSensors.contains(sensorType)) {
+				activeSensors.remove(sensorType);
+				PreferencesUtils.saveObject(PreferencesConstants.INVOCATION_FILTER_SENSOR_TYPES, activeSensors, false);
+			}
 			Map<IPreferenceGroup, Object> sensorTypePreference = new HashMap<IPreferenceGroup, Object>();
 			sensorTypePreference.put(PreferenceId.SensorTypeSelection.SENSOR_TYPE_SELECTION_ID, sensorType);
 			PreferenceEvent event = new PreferenceEvent(PreferenceId.FILTERSENSORTYPE);
@@ -614,31 +609,20 @@ public class FormPreferencePanel implements IPreferencePanel {
 		private double time;
 
 		/**
-		 * Constructor, setting checked to false.
-		 * 
-		 * @param text
-		 *            the text
-		 * @param time
-		 *            the time
-		 */
-		public FilterByExclusiveTimeAction(String text, double time) {
-			this(text, time, false);
-		}
-
-		/**
 		 * Constructor.
 		 * 
 		 * @param text
 		 *            the text
 		 * @param time
 		 *            the time
-		 * @param isChecked
-		 *            if this option is checked
+		 * @param currentInvocFilterExclusive
+		 *            current invocation filter exclusive time value, button will be checked if it
+		 *            matches passed time
 		 */
-		public FilterByExclusiveTimeAction(String text, double time, boolean isChecked) {
+		public FilterByExclusiveTimeAction(String text, double time, double currentInvocFilterExclusive) {
 			super(text, Action.AS_RADIO_BUTTON);
 			this.time = time;
-			setChecked(isChecked);
+			setChecked(currentInvocFilterExclusive == time);
 		}
 
 		/**
@@ -647,6 +631,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		@Override
 		public void run() {
 			if (isChecked()) {
+				PreferencesUtils.saveDoubleValue(PreferencesConstants.INVOCATION_FILTER_EXCLUSIVE_TIME, time, false);
 				Map<IPreferenceGroup, Object> sensorTypePreference = new HashMap<IPreferenceGroup, Object>();
 				sensorTypePreference.put(PreferenceId.InvocExclusiveTimeSelection.TIME_SELECTION_ID, new Double(time));
 				PreferenceEvent event = new PreferenceEvent(PreferenceId.INVOCFILTEREXCLUSIVETIME);
@@ -666,31 +651,20 @@ public class FormPreferencePanel implements IPreferencePanel {
 		private double time;
 
 		/**
-		 * Constructor, setting checked to false.
-		 * 
-		 * @param text
-		 *            the text
-		 * @param time
-		 *            the time
-		 */
-		public FilterByTotalTimeAction(String text, double time) {
-			this(text, time, false);
-		}
-
-		/**
 		 * Constructor.
 		 * 
 		 * @param text
 		 *            the text
 		 * @param time
 		 *            the time
-		 * @param isChecked
-		 *            if this option is checked
+		 * @param currentInvocFilterTotal
+		 *            current invocation filter total time value, button will be checked if it
+		 *            matches passed time
 		 */
-		public FilterByTotalTimeAction(String text, double time, boolean isChecked) {
+		public FilterByTotalTimeAction(String text, double time, double currentInvocFilterTotal) {
 			super(text, Action.AS_RADIO_BUTTON);
 			this.time = time;
-			setChecked(isChecked);
+			setChecked(currentInvocFilterTotal == time);
 		}
 
 		/**
@@ -699,6 +673,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		@Override
 		public void run() {
 			if (isChecked()) {
+				PreferencesUtils.saveDoubleValue(PreferencesConstants.INVOCATION_FILTER_TOTAL_TIME, time, false);
 				Map<IPreferenceGroup, Object> sensorTypePreference = new HashMap<IPreferenceGroup, Object>();
 				sensorTypePreference.put(PreferenceId.InvocTotalTimeSelection.TIME_SELECTION_ID, new Double(time));
 				PreferenceEvent event = new PreferenceEvent(PreferenceId.INVOCFILTERTOTALTIME);
@@ -714,20 +689,11 @@ public class FormPreferencePanel implements IPreferencePanel {
 	 * @author Stefan Siegl
 	 */
 	private final class SetRefreshRateAction extends Action {
-		/** refresh rate in ms. */
-		private int rate;
 
 		/**
-		 * Constructor, setting checked to false.
-		 * 
-		 * @param text
-		 *            the text
-		 * @param rate
-		 *            the refresh rate
+		 * Refresh rate in ms.
 		 */
-		public SetRefreshRateAction(String text, int rate) {
-			this(text, rate, false);
-		}
+		private long rate;
 
 		/**
 		 * Constructor.
@@ -736,13 +702,14 @@ public class FormPreferencePanel implements IPreferencePanel {
 		 *            the text
 		 * @param rate
 		 *            the refresh rate
-		 * @param isChecked
-		 *            whether or not this option is active.
+		 * @param currentRate
+		 *            current refresh rate, button will be checked if rate and current rate are the
+		 *            same
 		 */
-		public SetRefreshRateAction(String text, int rate, boolean isChecked) {
+		public SetRefreshRateAction(String text, long rate, long currentRate) {
 			super(text, Action.AS_RADIO_BUTTON);
 			this.rate = rate;
-			setChecked(isChecked);
+			setChecked(rate == currentRate);
 		}
 
 		/**
@@ -751,6 +718,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		@Override
 		public void run() {
 			if (isChecked()) {
+				PreferencesUtils.saveLongValue(PreferencesConstants.REFRESH_RATE, rate, false);
 				Map<IPreferenceGroup, Object> refreshPreference = new HashMap<IPreferenceGroup, Object>();
 				refreshPreference.put(LiveMode.REFRESH_RATE, rate);
 				PreferenceEvent event = new PreferenceEvent(PreferenceId.LIVEMODE);
@@ -823,7 +791,10 @@ public class FormPreferencePanel implements IPreferencePanel {
 	 * 
 	 */
 	private final class SetTimeDecimalPlaces extends Action {
-		/** The number of decimal places. */
+
+		/**
+		 * The number of decimal places.
+		 * */
 		private int decimalPlaces;
 
 		/**
@@ -833,27 +804,15 @@ public class FormPreferencePanel implements IPreferencePanel {
 		 *            the action's text, or <code>null</code> if there is no text
 		 * @param decimalPlaces
 		 *            the number of decimal places
+		 * @param currentDecimalPlaces
+		 *            current decimal places, button will be checked if decimalPlaces and
+		 *            currentDecimalPlaces are same
 		 * @see Action
 		 */
-		public SetTimeDecimalPlaces(String text, int decimalPlaces) {
-			this(text, decimalPlaces, false);
-		}
-
-		/**
-		 * Default constructor.
-		 * 
-		 * @param text
-		 *            the action's text, or <code>null</code> if there is no text
-		 * @param decimalPlaces
-		 *            the number of decimal places
-		 * @param isChecked
-		 *            whether or not this option is enabled
-		 * @see Action
-		 */
-		public SetTimeDecimalPlaces(String text, int decimalPlaces, boolean isChecked) {
+		public SetTimeDecimalPlaces(String text, int decimalPlaces, int currentDecimalPlaces) {
 			super(text, Action.AS_RADIO_BUTTON);
 			this.decimalPlaces = decimalPlaces;
-			setChecked(isChecked);
+			setChecked(decimalPlaces == currentDecimalPlaces);
 		}
 
 		/**
@@ -862,6 +821,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		@Override
 		public void run() {
 			if (isChecked()) {
+				PreferencesUtils.saveIntValue(PreferencesConstants.DECIMAL_PLACES, decimalPlaces, false);
 				Map<IPreferenceGroup, Object> decimalPlacesPreference = new HashMap<IPreferenceGroup, Object>();
 				decimalPlacesPreference.put(TimeResolution.TIME_DECIMAL_PLACES_ID, decimalPlaces);
 				PreferenceEvent event = new PreferenceEvent(PreferenceId.TIME_RESOLUTION);

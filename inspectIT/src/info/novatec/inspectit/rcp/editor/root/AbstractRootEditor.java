@@ -225,8 +225,8 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 							isLiveMode = true;
 						}
 						if (preferenceEvent.getPreferenceMap().containsKey(LiveMode.REFRESH_RATE)) {
-							int refresh = (Integer) preferenceEvent.getPreferenceMap().get(LiveMode.REFRESH_RATE);
-							getInputDefinition().setUpdateRate(refresh * 1000L);
+							long refresh = (Long) preferenceEvent.getPreferenceMap().get(LiveMode.REFRESH_RATE);
+							getInputDefinition().setUpdateRate(refresh);
 						}
 
 						if (preferenceEvent.getPreferenceMap().containsKey(LiveMode.BUTTON_LIVE_ID)) {

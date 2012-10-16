@@ -3,6 +3,8 @@ package info.novatec.inspectit.rcp.editor.inputdefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.IInputDefinitionExtra;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory.InputDefinitionExtraMarker;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
+import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
+import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
 import java.util.ArrayList;
@@ -160,15 +162,9 @@ public class InputDefinition {
 	public static final String GLOBAL_ID = "inspectit.subview.global";
 
 	/**
-	 * The default update rate of the automatic update mechanism.
+	 * The update rate of the automatic update mechanism.
 	 */
-	public static final long DEFAULT_UPDATE_RATE = 5000L;
-
-	/**
-	 * The update rate of the automatic update mechanism. If not specified, the default one is used
-	 * {@link InputDefinition#DEFAULT_UPDATE_RATE}.
-	 */
-	private long updateRate = DEFAULT_UPDATE_RATE;
+	private long updateRate = PreferencesUtils.getLongValue(PreferencesConstants.REFRESH_RATE);
 
 	/**
 	 * If the view should be updated automatically. Default is <code>false</code> .
