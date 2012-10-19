@@ -1,10 +1,11 @@
 package info.novatec.inspectit.rcp.wizard;
 
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
-import info.novatec.inspectit.rcp.wizard.page.DownloadStorageWizardPage;
+import info.novatec.inspectit.rcp.wizard.page.StorageCompressionWizardPage;
 import info.novatec.inspectit.storage.StorageData;
 
 import org.eclipse.core.runtime.Assert;
@@ -41,7 +42,7 @@ public class DownloadStorageWizard extends Wizard implements INewWizard {
 	/**
 	 * Wizard page.
 	 */
-	private DownloadStorageWizardPage downloadStorageWizardPage;
+	private StorageCompressionWizardPage storageCompressionWizardPage;
 
 	/**
 	 * Default constructor.
@@ -82,8 +83,10 @@ public class DownloadStorageWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public void addPages() {
-		downloadStorageWizardPage = new DownloadStorageWizardPage(storageData);
-		addPage(downloadStorageWizardPage);
+		String title = "Download Storage";
+		String message = "Options for downloading the storage '" + storageData.getName() + "' (size: " + NumberFormatter.formatBytesToMBytes(storageData.getDiskSize()) + ")";
+		storageCompressionWizardPage = new StorageCompressionWizardPage(storageData, title, message);
+		addPage(storageCompressionWizardPage);
 	}
 
 	/**
@@ -91,7 +94,7 @@ public class DownloadStorageWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public boolean performFinish() {
-		final boolean compress = downloadStorageWizardPage.isCompressBefore();
+		final boolean compress = storageCompressionWizardPage.isCompressBefore();
 		switch (cmrRepositoryDefinition.getOnlineStatus()) {
 		case OFFLINE:
 			// inform CMR is offline

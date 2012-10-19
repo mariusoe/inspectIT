@@ -1,11 +1,13 @@
 package info.novatec.inspectit.rcp.wizard;
 
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.storage.InspectITStorageManager;
 import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
 import info.novatec.inspectit.rcp.wizard.page.ExportStorageWizardPage;
+import info.novatec.inspectit.rcp.wizard.page.StorageCompressionWizardPage;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
@@ -44,6 +46,11 @@ public class ExportStorageWizard extends Wizard implements INewWizard {
 	 * {@link ExportStorageWizardPage}.
 	 */
 	private ExportStorageWizardPage exportStorageWizardPage;
+
+	/**
+	 * Wizard page.
+	 */
+	private StorageCompressionWizardPage storageCompressionWizardPage;
 
 	/**
 	 * Default constructor.
@@ -91,6 +98,15 @@ public class ExportStorageWizard extends Wizard implements INewWizard {
 	public void addPages() {
 		exportStorageWizardPage = new ExportStorageWizardPage(storageData);
 		addPage(exportStorageWizardPage);
+		if (storageData instanceof StorageData) {
+			StorageData remoteStorageData = (StorageData) storageData;
+			if (!InspectIT.getDefault().getInspectITStorageManager().isFullyDownloaded(remoteStorageData)) {
+				String title = "Export Storage";
+				String message = "Options for exporting the storage '" + storageData.getName() + "' (size: " + NumberFormatter.formatBytesToMBytes(storageData.getDiskSize()) + ")";
+				storageCompressionWizardPage = new StorageCompressionWizardPage(storageData, title, message);
+				addPage(storageCompressionWizardPage);
+			}
+		}
 	}
 
 	/**
@@ -141,12 +157,13 @@ public class ExportStorageWizard extends Wizard implements INewWizard {
 			exportStorageJob.schedule();
 		} else {
 			if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
+				final boolean compress = storageCompressionWizardPage.isCompressBefore();
 				Job downloadAndExportStorageJob = new Job("Download And Export Storage") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						monitor.beginTask("Exporting data..", IProgressMonitor.UNKNOWN);
 						try {
-							storageManager.zipStorageData((StorageData) storageData, cmrRepositoryDefinition, fileName);
+							storageManager.zipStorageData((StorageData) storageData, cmrRepositoryDefinition, fileName, compress);
 							Display.getDefault().asyncExec(new Runnable() {
 								@Override
 								public void run() {

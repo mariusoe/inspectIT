@@ -1,7 +1,6 @@
 package info.novatec.inspectit.rcp.wizard.page;
 
-import info.novatec.inspectit.rcp.formatter.NumberFormatter;
-import info.novatec.inspectit.storage.StorageData;
+import info.novatec.inspectit.storage.IStorageData;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.wizard.WizardPage;
@@ -12,12 +11,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 /**
- * Page for the selecting if data to be downloaded should be compressed before.
+ * Page for the selecting if storage should be compressed before downloading/exporting etc..
  * 
  * @author Ivan Senic
  * 
  */
-public class DownloadStorageWizardPage extends WizardPage {
+public class StorageCompressionWizardPage extends WizardPage {
 
 	/**
 	 * If compression should be used.
@@ -30,11 +29,11 @@ public class DownloadStorageWizardPage extends WizardPage {
 	 * @param storageData
 	 *            Storage to download.
 	 */
-	public DownloadStorageWizardPage(StorageData storageData) {
-		super("Download Storage");
+	public StorageCompressionWizardPage(IStorageData storageData, String title, String message) {
+		super(title);
 		Assert.isNotNull(storageData);
-		this.setTitle("Download Storage");
-		this.setMessage("Options for downloading the storage '" + storageData.getName() + "' (size: " + NumberFormatter.humanReadableByteCount(storageData.getDiskSize()) + ")");
+		this.setTitle(title);
+		this.setMessage(message);
 	}
 
 	/**

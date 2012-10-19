@@ -654,12 +654,14 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 *            {@link CmrRepositoryDefinition} where storage is located.
 	 * @param zipFileName
 	 *            Zip file name.
+	 * @param compressBefore
+	 *            Defines if the data should be compressed before downloading.
 	 * @throws StorageException
 	 *             If serialization of data fails during zipping.
 	 * @throws IOException
 	 *             If {@link IOException} occurs during compressing.
 	 */
-	public void zipStorageData(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, String zipFileName) throws StorageException, IOException {
+	public void zipStorageData(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, String zipFileName, boolean compressBefore) throws StorageException, IOException {
 		Path zipPath = Paths.get(zipFileName);
 		if (Files.exists(zipPath)) {
 			Files.delete(zipPath);
@@ -669,9 +671,9 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 		final Path zipRoot = zipFileSystem.getPath("/");
 
 		try {
-			dataRetriever.downloadAndSavePlatformIdents(cmrRepositoryDefinition, storageData, zipRoot, true, false);
-			dataRetriever.downloadAndSaveIndexingTrees(cmrRepositoryDefinition, storageData, zipRoot, true, false);
-			dataRetriever.downloadAndSaveDataFiles(cmrRepositoryDefinition, storageData, zipRoot, true, false);
+			dataRetriever.downloadAndSavePlatformIdents(cmrRepositoryDefinition, storageData, zipRoot, compressBefore, false);
+			dataRetriever.downloadAndSaveIndexingTrees(cmrRepositoryDefinition, storageData, zipRoot, compressBefore, false);
+			dataRetriever.downloadAndSaveDataFiles(cmrRepositoryDefinition, storageData, zipRoot, compressBefore, false);
 		} catch (IOException e) {
 			zipFileSystem.close();
 			Files.deleteIfExists(zipPath);
