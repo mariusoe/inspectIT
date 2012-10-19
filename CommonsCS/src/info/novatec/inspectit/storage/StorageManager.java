@@ -10,17 +10,17 @@ import info.novatec.inspectit.storage.serializer.provider.SerializationManagerPr
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.ProviderNotFoundException;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.spi.FileSystemProvider;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -573,12 +573,20 @@ public abstract class StorageManager {
 	 *             If {@link IOException} occurs.
 	 */
 	protected static FileSystem createZipFileSystem(Path path, boolean create) throws IOException {
-		final URI uri = URI.create("jar:file:" + path.toUri().getPath());
-		final Map<String, String> env = new HashMap<String, String>();
+		Map<String, String> env = new HashMap<String, String>();
 		if (create) {
 			env.put("create", "true");
 		}
-		return FileSystems.newFileSystem(uri, env);
+
+		// check installed providers, we cannot use the FileSystems class here as it does not
+		// allow to pass a Path object and in addition the environment properties ...
+		for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
+			try {
+				return provider.newFileSystem(path, env);
+			} catch (UnsupportedOperationException uoe) {
+			}
+		}
+		throw new ProviderNotFoundException("Provider not found");
 	}
 
 	/**
