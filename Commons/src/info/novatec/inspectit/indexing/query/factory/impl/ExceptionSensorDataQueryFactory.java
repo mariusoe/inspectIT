@@ -72,6 +72,7 @@ public class ExceptionSensorDataQueryFactory<E extends IIndexQuery> extends Abst
 		searchedClasses.add(ExceptionSensorData.class);
 		query.setObjectClasses(searchedClasses);
 		query.setPlatformIdent(template.getPlatformIdent());
+		query.setMethodIdent(template.getMethodIdent());
 		query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("throwableIdentityHashCode", template.getThrowableIdentityHashCode()));
 		return query;
 	}
