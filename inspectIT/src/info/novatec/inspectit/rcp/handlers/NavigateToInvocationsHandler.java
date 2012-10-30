@@ -126,11 +126,11 @@ public class NavigateToInvocationsHandler extends AbstractTemplateHandler {
 		List<DefaultData> steppableTemplates = new ArrayList<DefaultData>();
 		for (InvocationAwareData invocationAwareData : invocationAwareDataList) {
 			if (invocationAwareData instanceof SqlStatementData) {
-				steppableTemplates.add(super.getTemplate((SqlStatementData) invocationAwareData, true, true, true));
+				steppableTemplates.add(super.getTemplate((SqlStatementData) invocationAwareData, false, true, true));
 			} else if (invocationAwareData instanceof TimerData && !invocationAwareData.getClass().equals(HttpTimerData.class)) {
-				steppableTemplates.add(super.getTemplate((TimerData) invocationAwareData, true, true));
+				steppableTemplates.add(super.getTemplate((TimerData) invocationAwareData, false, true));
 			} else if (invocationAwareData instanceof ExceptionSensorData) {
-				steppableTemplates.add(super.getTemplate((ExceptionSensorData) invocationAwareData, true, true, true, true, true));
+				steppableTemplates.add(super.getTemplate((ExceptionSensorData) invocationAwareData, false, true, true, true, true));
 			}
 		}
 		return steppableTemplates;

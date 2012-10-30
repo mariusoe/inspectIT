@@ -550,14 +550,6 @@
                   <instanceof
                         value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
                   </instanceof>
-                  <test
-                        property="info.novatec.inspectit.activeSubView"
-                        value="tableSubView">
-                  </test>
-                  <test
-                        property="info.novatec.inspectit.subViewClassification"
-                        value="master">
-                  </test>
                </with>
                <with
                      variable="selection">

@@ -71,12 +71,11 @@ public class ExceptionDataAggregator implements IAggregator<ExceptionSensorData>
 	public ExceptionSensorData getClone(ExceptionSensorData exceptionData) {
 		AggregatedExceptionSensorData clone = new AggregatedExceptionSensorData();
 		clone.setPlatformIdent(exceptionData.getPlatformIdent());
-		clone.setCause(exceptionData.getCause());
 		clone.setErrorMessage(exceptionData.getErrorMessage());
-		clone.setExceptionEvent(exceptionData.getExceptionEvent());
-		clone.setParameterContentData(exceptionData.getParameterContentData());
 		clone.setThrowableType(exceptionData.getThrowableType());
-		clone.setStackTrace(exceptionData.getStackTrace());
+		if (exceptionAggregationType == ExceptionAggregationType.DISTINCT_STACK_TRACES) {
+			clone.setStackTrace(exceptionData.getStackTrace());
+		}
 		return clone;
 	}
 
@@ -87,6 +86,9 @@ public class ExceptionDataAggregator implements IAggregator<ExceptionSensorData>
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Object getAggregationKey(ExceptionSensorData exceptionSensorData) {
 		final int prime = 31;
 		if (exceptionAggregationType == ExceptionAggregationType.GROUP_EXCEPTION_OVERVIEW) {
