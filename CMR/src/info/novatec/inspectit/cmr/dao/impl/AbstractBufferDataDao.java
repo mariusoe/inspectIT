@@ -6,6 +6,7 @@ import info.novatec.inspectit.indexing.aggregation.IAggregator;
 import info.novatec.inspectit.indexing.aggregation.impl.AggregationPerformer;
 import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -160,7 +161,7 @@ public abstract class AbstractBufferDataDao<E extends DefaultData> {
 		}
 
 		if (limit > -1 && data.size() > limit) {
-			data = data.subList(0, limit);
+			data = new ArrayList<E>(data.subList(0, limit));
 		}
 
 		return data;
