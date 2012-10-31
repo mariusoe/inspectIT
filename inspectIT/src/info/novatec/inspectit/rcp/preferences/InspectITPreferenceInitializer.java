@@ -32,7 +32,7 @@ public class InspectITPreferenceInitializer extends AbstractPreferenceInitialize
 		// Editor defaults
 		PreferencesUtils.saveIntValue(PreferencesConstants.DECIMAL_PLACES, 0, true);
 		PreferencesUtils.saveLongValue(PreferencesConstants.REFRESH_RATE, 5000L, true);
-		PreferencesUtils.saveIntValue(PreferencesConstants.ITEMS_COUNT_TO_SHOW, -1, true);
+		PreferencesUtils.saveIntValue(PreferencesConstants.ITEMS_COUNT_TO_SHOW, 100, true);
 		PreferencesUtils.saveDoubleValue(PreferencesConstants.INVOCATION_FILTER_EXCLUSIVE_TIME, Double.NaN, true);
 		PreferencesUtils.saveDoubleValue(PreferencesConstants.INVOCATION_FILTER_TOTAL_TIME, Double.NaN, true);
 		PreferencesUtils.saveObject(PreferencesConstants.INVOCATION_FILTER_SENSOR_TYPES,
