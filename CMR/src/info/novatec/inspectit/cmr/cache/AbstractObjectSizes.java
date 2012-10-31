@@ -64,7 +64,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 			return 0;
 		}
 		long size = this.getSizeOfObjectHeader();
-		size += this.getPrimitiveTypesSize(1, 0, 3, 0, 0, 0);
+		size += this.getPrimitiveTypesSize(1, 0, 2, 0, 0, 0);
 		size += this.getSizeOfPrimitiveArray(str.length(), CHAR_SIZE);
 		return alignTo8Bytes(size);
 	}
@@ -182,7 +182,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 */
 	public long getSizeOfHashMap(int hashMapSize, int initialCapacity) {
 		long size = this.getSizeOfObjectHeader();
-		size += this.getPrimitiveTypesSize(4, 0, 3, 1, 0, 0);
+		size += this.getPrimitiveTypesSize(4, 1, 4, 1, 0, 0);
 		int mapCapacity = this.getHashMapCapacityFromSize(hashMapSize, initialCapacity);
 
 		// size of the map array for the entries
@@ -205,7 +205,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 */
 	public long getSizeOfConcurrentHashMap(int mapSize, int concurrencyLevel) {
 		long size = this.getSizeOfObjectHeader();
-		size += this.getPrimitiveTypesSize(6, 0, 2, 0, 0, 0);
+		size += this.getPrimitiveTypesSize(6, 0, 3, 0, 0, 0);
 
 		// array of segments based on capacity
 		size += this.getSizeOfArray(concurrencyLevel);
@@ -377,7 +377,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * @return Returns the capacity of the HashMap from it size. The calculations take the default
 	 *         capacity of 16 and default load factor of 0.75.
 	 */
-	protected int getHashMapCapacityFromSize(int hashMapSize, int initialCapacity) {
+	public int getHashMapCapacityFromSize(int hashMapSize, int initialCapacity) {
 		int capacity = 1;
 		if (initialCapacity > 0) {
 			capacity = initialCapacity;

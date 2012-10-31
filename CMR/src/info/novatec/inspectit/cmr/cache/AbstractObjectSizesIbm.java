@@ -68,7 +68,7 @@ public abstract class AbstractObjectSizesIbm extends AbstractObjectSizes {
 	 * HashMap from IBM JVM handles in different way the map capacity calculations.
 	 */
 	@Override
-	protected int getHashMapCapacityFromSize(int hashMapSize, int initialCapacity) {
+	public int getHashMapCapacityFromSize(int hashMapSize, int initialCapacity) {
 		return super.getHashMapCapacityFromSize(hashMapSize, calculateHashMapCapacity(initialCapacity));
 	}
 
