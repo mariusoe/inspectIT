@@ -65,6 +65,16 @@ public class AgentLeaf extends Leaf {
 	}
 
 	/**
+	 * Sets {@link #agentStatusData}.
+	 * 
+	 * @param agentStatusData
+	 *            New value for {@link #agentStatusData}
+	 */
+	public void setAgentStatusData(AgentStatusData agentStatusData) {
+		this.agentStatusData = agentStatusData;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

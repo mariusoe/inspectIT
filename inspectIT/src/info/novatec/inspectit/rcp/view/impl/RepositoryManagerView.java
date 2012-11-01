@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.view.impl;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
+import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.expressions.IEvaluationContext;
@@ -36,6 +38,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
@@ -154,6 +157,11 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 	private boolean showOldAgents = false;
 
 	/**
+	 * {@link AgentStatusUpdateJob}.
+	 */
+	private AgentStatusUpdateJob agentStatusUpdateJob;
+
+	/**
 	 * Default constructor.
 	 */
 	public RepositoryManagerView() {
@@ -242,6 +250,8 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 
 		updateFormBody();
 		mainComposite.setWeights(new int[] { 2, 3 });
+
+		agentStatusUpdateJob = new AgentStatusUpdateJob();
 
 		getSite().setSelectionProvider(treeViewer);
 	}
@@ -497,6 +507,42 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 	}
 
 	/**
+	 * Updates the agent status for each CMR and updates the displayed CMR repository.
+	 */
+	private void updateAgentsAndCmrStatus() {
+		if (!cmrPropertyForm.isDisposed()) {
+			cmrPropertyForm.refresh();
+		}
+		if (null != inputList) {
+			final List<Object> toUpdate = new ArrayList<Object>();
+			for (DeferredAgentsComposite agentsComposite : inputList) {
+				CmrRepositoryDefinition cmrRepositoryDefinition = agentsComposite.getCmrRepositoryDefinition();
+				List<?> leafs = agentsComposite.getChildren();
+				if (CollectionUtils.isNotEmpty(leafs) && cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
+					Map<Long, AgentStatusData> statusMap = cmrRepositoryDefinition.getGlobalDataAccessService().getAgentStatusDataMap();
+					for (Object child : leafs) {
+						if (child instanceof AgentLeaf) {
+							AgentLeaf agentLeaf = (AgentLeaf) child;
+							AgentStatusData agentStatusData = statusMap.get(agentLeaf.getPlatformIdent().getId());
+							agentLeaf.setAgentStatusData(agentStatusData);
+							toUpdate.add(agentLeaf);
+						}
+					}
+				}
+			}
+			if (CollectionUtils.isNotEmpty(toUpdate)) {
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						treeViewer.update(toUpdate.toArray(), null);
+					}
+				});
+			}
+
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -542,6 +588,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 	@Override
 	public void dispose() {
 		cmrRepositoryManager.removeCmrRepositoryChangeListener(this);
+		agentStatusUpdateJob.cancel();
 		super.dispose();
 	}
 
@@ -739,6 +786,39 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		public int getToolTipDisplayDelayTime(Object object) {
 			return 500;
 		}
+	}
+
+	/**
+	 * Job for auto-update of view.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private final class AgentStatusUpdateJob extends Job {
+
+		/**
+		 * Update rate in milliseconds. Currently every 60 seconds.
+		 */
+		private static final long UPDATE_RATE = 60 * 1000L;
+
+		/**
+		 * Default constructor.
+		 */
+		public AgentStatusUpdateJob() {
+			super("Agents status auto-update");
+			setUser(false);
+			schedule(UPDATE_RATE);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		protected IStatus run(IProgressMonitor monitor) {
+			RepositoryManagerView.this.updateAgentsAndCmrStatus();
+			schedule(UPDATE_RATE);
+			return Status.OK_STATUS;
+		}
+
 	}
 
 }

@@ -76,11 +76,6 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	private RecordCountdownJob recordCountdownJob = new RecordCountdownJob();
 
 	/**
-	 * Job for updating the CMR data.
-	 */
-	private UpdateCmrDataJob updateCmrDataJob = new UpdateCmrDataJob();
-
-	/**
 	 * Widgets.
 	 */
 	private Composite mainComposite;
@@ -388,13 +383,11 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 						form.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_OFFLINE_SMALL));
 						version.setText("n/a");
 					}
-					updateCmrDataJob.schedule();
 					mainComposite.setVisible(true);
 				} else {
 					form.setText(null);
 					form.setMessage("Please select a CMR to see its properties.", IMessageProvider.INFORMATION);
 					mainComposite.setVisible(false);
-					updateCmrDataJob.cancel();
 				}
 				updateRecordingData();
 				updateCmrManagementData();
@@ -604,38 +597,4 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 		}
 	}
 
-	/**
-	 * Job that updates the CMR data every 30s.
-	 * 
-	 * @author Ivan Senic
-	 * 
-	 */
-	private class UpdateCmrDataJob extends UIJob {
-
-		/**
-		 * Sleep time in milliseconds.
-		 */
-		private static final long UPDATE_CMR_DATA_SLEEP = 30000;
-
-		/**
-		 * Default constructor.
-		 */
-		public UpdateCmrDataJob() {
-			super("Update CMR Data");
-			setUser(false);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public IStatus runInUIThread(IProgressMonitor monitor) {
-			if (null != cmrRepositoryDefinition && !form.isDisposed()) {
-				updateCmrManagementData();
-				updateRecordingData();
-				this.schedule(UPDATE_CMR_DATA_SLEEP);
-			}
-			return Status.OK_STATUS;
-		}
-	}
 }
