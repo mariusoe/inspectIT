@@ -7,6 +7,8 @@ import info.novatec.inspectit.rcp.editor.tree.DeferredTreeViewer;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.TreeModelManager;
+import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
+import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryChangeListener;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
@@ -33,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.action.Action;
@@ -189,6 +192,21 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 		updateFormBody();
 		updateAgentsCombo();
 
+		RepositoryDefinition lastSelectedRepositoryDefinition = PreferencesUtils.getObject(PreferencesConstants.LAST_SELECTED_REPOSITORY);
+		if (null != lastSelectedRepositoryDefinition) {
+			showRepository(lastSelectedRepositoryDefinition, null);
+			if (CollectionUtils.isNotEmpty(availableAgents)) {
+				long lastSelectedAgentId = PreferencesUtils.getLongValue(PreferencesConstants.LAST_SELECTED_AGENT);
+				for (PlatformIdent platformIdent : availableAgents) {
+					if (platformIdent.getId().longValue() == lastSelectedAgentId) {
+						selectAgentForDisplay(platformIdent);
+						performUpdate();
+						break;
+					}
+				}
+			}
+		}
+
 		getSite().setSelectionProvider(selectionProviderAdapter);
 	}
 
@@ -207,6 +225,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 		}
 
 		displayedRepositoryDefinition = repositoryDefinition;
+		PreferencesUtils.saveObject(PreferencesConstants.LAST_SELECTED_REPOSITORY, displayedRepositoryDefinition, false);
 		updateAvailableAgents(repositoryDefinition);
 		selectAgentForDisplay(agent);
 
@@ -226,6 +245,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	private void selectAgentForDisplay(PlatformIdent agent) {
 		if (null != agent && null != availableAgents && availableAgents.contains(agent)) {
 			displayedAgent = agent;
+			PreferencesUtils.saveLongValue(PreferencesConstants.LAST_SELECTED_AGENT, agent.getId().longValue(), false);
 		} else if (null != availableAgents && !availableAgents.isEmpty()) {
 			displayedAgent = availableAgents.iterator().next();
 		} else {

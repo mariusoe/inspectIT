@@ -33,6 +33,7 @@ public final class PreferenceValueProviderFactory {
 		preferenceValueProviders.put(PreferencesConstants.HIDDEN_TABLE_COLUMN_CACHE, new CollectionPreferenceValueProvider());
 		preferenceValueProviders.put(PreferencesConstants.TABLE_COLUMN_ORDER_CACHE, new ColumnOrderPreferenceValueProvider());
 		preferenceValueProviders.put(PreferencesConstants.INVOCATION_FILTER_SENSOR_TYPES, new EnumSetPreferenceValueProvider<SensorTypeEnum>(SensorTypeEnum.class));
+		preferenceValueProviders.put(PreferencesConstants.LAST_SELECTED_REPOSITORY, new LastSelectedRepositoryPreferenceValueProvider());
 	}
 
 	/**

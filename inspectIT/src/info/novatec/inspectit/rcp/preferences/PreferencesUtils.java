@@ -268,6 +268,12 @@ public final class PreferencesUtils {
 	 */
 	public static void saveObject(String preferenceKey, Object object, boolean isDefault) {
 		try {
+			// if null is passed save still
+			if (null == object) {
+				saveStringValue(preferenceKey, "", isDefault);
+				return;
+			}
+
 			String value = PreferenceValueProviderFactory.getValueForObject(preferenceKey, object);
 			if (value != null && !"".equals(value)) {
 				saveStringValue(preferenceKey, value, isDefault);

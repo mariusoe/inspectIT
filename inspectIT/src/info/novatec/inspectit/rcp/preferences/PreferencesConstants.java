@@ -68,4 +68,14 @@ public interface PreferencesConstants {
 	 */
 	String INVOCATION_FILTER_SENSOR_TYPES = "INVOCATION_FILTER_SENSOR_TYPES";
 
+	/**
+	 * Last selected repository in data explorer view.
+	 */
+	String LAST_SELECTED_REPOSITORY = "LAST_SELECTED_REPOSITORY";
+
+	/**
+	 * Last selected agent in data explorer view.
+	 */
+	String LAST_SELECTED_AGENT = "LAST_SELECTED_AGENT";
+
 }
