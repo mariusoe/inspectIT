@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -256,18 +255,20 @@ public class PreviewCmrDataWizardPage extends WizardPage {
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					busyIndicator.setBusy(false);
-					if (testOkFinal) {
-						connectionTest.setText("Succeeded");
-						version.setText(verFinal);
-						updateLicenseInfo(licenseInfoDataFinal);
-					} else {
-						connectionTest.setText("Failed");
-						version.setText("n/a");
-						license.setText("n/a", false, false);
-						license.setToolTipText("");
+					if (!main.isDisposed()) {
+						busyIndicator.setBusy(false);
+						if (testOkFinal) {
+							connectionTest.setText("Succeeded");
+							version.setText(verFinal);
+							updateLicenseInfo(licenseInfoDataFinal);
+						} else {
+							connectionTest.setText("Failed");
+							version.setText("n/a");
+							license.setText("n/a", false, false);
+							license.setToolTipText("");
+						}
+						main.layout();
 					}
-					main.layout();
 				}
 			});
 			return Status.OK_STATUS;
