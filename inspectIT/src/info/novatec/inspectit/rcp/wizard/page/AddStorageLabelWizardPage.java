@@ -329,7 +329,7 @@ public class AddStorageLabelWizardPage extends WizardPage {
 	 *            Parent composite.
 	 */
 	private void createLabelTable(Composite parent) {
-		Table table = new Table(parent, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL);
+		Table table = new Table(parent, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL | SWT.FULL_SELECTION);
 		table.setHeaderVisible(true);
 
 		labelsTableViewer = new TableViewer(table);

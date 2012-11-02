@@ -9,8 +9,8 @@ import org.eclipse.ui.progress.IDeferredWorkbenchAdapter;
 import org.eclipse.ui.progress.IElementCollector;
 
 /**
- * Abstract class of a deferred composite type where the sub tree is only
- * initialized if it is requested.
+ * Abstract class of a deferred composite type where the sub tree is only initialized if it is
+ * requested.
  * 
  * @author Patrice Bouillet
  * 
@@ -21,6 +21,21 @@ public abstract class DeferredComposite extends Composite implements IDeferredWo
 	 * {@inheritDoc}
 	 */
 	public abstract void fetchDeferredChildren(Object object, IElementCollector collector, IProgressMonitor monitor);
+
+	/**
+	 * Sets the repository definition.
+	 * 
+	 * @param repositoryDefinition
+	 *            the repository definition.
+	 */
+	public abstract void setRepositoryDefinition(RepositoryDefinition repositoryDefinition);
+
+	/**
+	 * Returns the repository definition.
+	 * 
+	 * @return the repository definition.
+	 */
+	public abstract RepositoryDefinition getRepositoryDefinition();
 
 	/**
 	 * {@inheritDoc}
@@ -65,18 +80,11 @@ public abstract class DeferredComposite extends Composite implements IDeferredWo
 	}
 
 	/**
-	 * Sets the repository definition.
-	 * 
-	 * @param repositoryDefinition
-	 *            the repository definition.
+	 * {@inheritDoc}
 	 */
-	public abstract void setRepositoryDefinition(RepositoryDefinition repositoryDefinition);
-
-	/**
-	 * Returns the repository definition.
-	 * 
-	 * @return the repository definition.
-	 */
-	public abstract RepositoryDefinition getRepositoryDefinition();
+	@Override
+	public String toString() {
+		return getName();
+	}
 
 }

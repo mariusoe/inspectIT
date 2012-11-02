@@ -6,12 +6,14 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
+import info.novatec.inspectit.rcp.wizard.page.AddStorageLabelWizardPage;
 import info.novatec.inspectit.rcp.wizard.page.DefineDataProcessorsWizardPage;
 import info.novatec.inspectit.rcp.wizard.page.DefineNewStorageWizzardPage;
 import info.novatec.inspectit.rcp.wizard.page.NewOrExistsingStorageWizardPage;
 import info.novatec.inspectit.rcp.wizard.page.SelectExistingStorageWizardPage;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
+import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 
 import java.util.Collection;
@@ -70,6 +72,11 @@ public class CopyDataToStorageWizard extends Wizard implements INewWizard {
 	private DefineDataProcessorsWizardPage defineDataProcessorsWizardPage;
 
 	/**
+	 * Add label wizard page.
+	 */
+	private AddStorageLabelWizardPage addLabelWizardPage;
+
+	/**
 	 * Default constructor.
 	 * 
 	 * @param cmrRepositoryDefinition
@@ -80,6 +87,7 @@ public class CopyDataToStorageWizard extends Wizard implements INewWizard {
 	public CopyDataToStorageWizard(CmrRepositoryDefinition cmrRepositoryDefinition, List<DefaultData> copyDataList) {
 		this.copyDataList = copyDataList;
 		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
+		this.setWindowTitle("Save Data to Storage Wizard");
 	}
 
 	/**
@@ -102,6 +110,8 @@ public class CopyDataToStorageWizard extends Wizard implements INewWizard {
 		addPage(selectExistingStorageWizardPage);
 		defineDataProcessorsWizardPage = new DefineDataProcessorsWizardPage(DefineDataProcessorsWizardPage.ONLY_INVOCATIONS | DefineDataProcessorsWizardPage.EXTRACT_INVOCATIONS);
 		addPage(defineDataProcessorsWizardPage);
+		addLabelWizardPage = new AddStorageLabelWizardPage(cmrRepositoryDefinition);
+		addPage(addLabelWizardPage);
 	}
 
 	/**
@@ -123,7 +133,11 @@ public class CopyDataToStorageWizard extends Wizard implements INewWizard {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
-						cmrRepositoryDefinition.getStorageService().copyDataToStorage(finalStorageData, copyDataList, processors);
+						StorageData updatedStorageData = cmrRepositoryDefinition.getStorageService().copyDataToStorage(finalStorageData, copyDataList, processors);
+						List<AbstractStorageLabel<?>> labels = addLabelWizardPage.getLabelsToAdd();
+						if (!labels.isEmpty()) {
+							cmrRepositoryDefinition.getStorageService().addLabelsToStorage(updatedStorageData, labels, true);
+						}
 						Display.getDefault().asyncExec(new Runnable() {
 							@Override
 							public void run() {
@@ -165,8 +179,10 @@ public class CopyDataToStorageWizard extends Wizard implements INewWizard {
 				return selectExistingStorageWizardPage;
 			}
 		} else if (ObjectUtils.equals(page, defineNewStorageWizzardPage)) {
+			addLabelWizardPage.setStorageData(defineNewStorageWizzardPage.getStorageData());
 			return defineDataProcessorsWizardPage;
 		} else if (ObjectUtils.equals(page, selectExistingStorageWizardPage)) {
+			addLabelWizardPage.setStorageData(selectExistingStorageWizardPage.getSelectedStorageData());
 			return defineDataProcessorsWizardPage;
 		} else {
 			return super.getNextPage(page);

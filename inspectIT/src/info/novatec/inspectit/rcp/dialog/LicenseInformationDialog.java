@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.expressions.IEvaluationContext;
@@ -16,6 +17,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -27,6 +29,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.handlers.IHandlerService;
 
 /**
@@ -60,12 +63,20 @@ public class LicenseInformationDialog extends TitleAreaDialog {
 	/**
 	 * Sub composite where all the widgets are. This composite can be disposed and re created.
 	 */
-	private Composite dialogSubComposite;
+	private Composite mainComposite;
 
 	/**
 	 * Last loaded/impored {@link LicenseInfoData}.
 	 */
 	private LicenseInfoData licenseInfoData;
+
+	private Label validFrom;
+
+	private Label validUntil;
+
+	private Label maxAgents;
+
+	private FormText holder;
 
 	/**
 	 * Constructor.
@@ -96,59 +107,79 @@ public class LicenseInformationDialog extends TitleAreaDialog {
 	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		dialogAreaComposite = (Composite) super.createDialogArea(parent);
-		dialogSubComposite = new Composite(dialogAreaComposite, SWT.NONE);
+		mainComposite = new Composite(parent, SWT.NONE);
+
+		mainComposite.setLayout(new GridLayout(2, false));
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gd.minimumWidth = 400;
+		gd.minimumHeight = 150;
+		mainComposite.setLayoutData(gd);
+
+		Label label = new Label(mainComposite, SWT.NONE);
+		label.setText("License valid from:");
+		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+		validFrom = new Label(mainComposite, SWT.WRAP);
+		validFrom.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+
+		label = new Label(mainComposite, SWT.NONE);
+		label.setText("License valid until:");
+		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+		validUntil = new Label(mainComposite, SWT.WRAP);
+		validUntil.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+
+		label = new Label(mainComposite, SWT.NONE);
+		label.setText("Max agents allowed:");
+		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+		maxAgents = new Label(mainComposite, SWT.WRAP);
+		maxAgents.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+
+		label = new Label(mainComposite, SWT.NONE);
+		label.setText("License holder:");
+		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+		holder = new FormText(mainComposite, SWT.WRAP | SWT.NO_FOCUS);
+		holder.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+
 		LicenseInfoData licenseInfoData = repositoryDefinition.getLicenseService().getLicenseInfoData();
-		createInformation(dialogSubComposite, licenseInfoData);
-		return dialogAreaComposite;
+		displayInformation(licenseInfoData);
+
+		mainComposite.setFocus();
+		return mainComposite;
 	}
 
 	/**
 	 * Creates the widgets.
 	 * 
-	 * @param composite
-	 *            Parent.
 	 * @param licenceInfoData
 	 *            License information.
 	 */
-	private void createInformation(Composite composite, LicenseInfoData licenceInfoData) {
-		composite.setLayout(new GridLayout(2, false));
-
-		new Label(composite, SWT.NONE).setText("License valid from:");
+	private void displayInformation(LicenseInfoData licenceInfoData) {
 		if (null != licenceInfoData) {
-			new Label(composite, SWT.NONE).setText(DateFormat.getDateInstance().format(licenceInfoData.getNotBefore()));
+			validFrom.setText(DateFormat.getDateInstance().format(licenceInfoData.getNotBefore()));
 		} else {
-			new Label(composite, SWT.NONE).setText("-");
+			validFrom.setText("-");
 		}
 
-		new Label(composite, SWT.NONE).setText("License valid until:");
 		if (null != licenceInfoData) {
-			new Label(composite, SWT.NONE).setText(DateFormat.getDateInstance().format(licenceInfoData.getNotAfter()));
+			validUntil.setText(DateFormat.getDateInstance().format(licenceInfoData.getNotAfter()));
 		} else {
-			new Label(composite, SWT.NONE).setText("-");
+			validUntil.setText("-");
 		}
 
-		new Label(composite, SWT.NONE).setText("Max agents allowed:");
 		if (null != licenceInfoData) {
-			new Label(composite, SWT.NONE).setText(licenceInfoData.getMaximumAgents() + " agent(s)");
+			maxAgents.setText(licenceInfoData.getMaximumAgents() + " agent(s)");
 		} else {
-			new Label(composite, SWT.NONE).setText("-");
+			maxAgents.setText("-");
 		}
 
-		new Label(composite, SWT.NONE).setText("License holder:");
 		if (null != licenceInfoData) {
-			String holder = licenceInfoData.getHolder();
-			String[] infos = holder.split(",");
-			for (int i = 0; i < infos.length; i++) {
-				new Label(composite, SWT.NONE).setText(infos[i].trim());
-				if (i + 1 < infos.length) {
-					new Label(composite, SWT.NONE);
-				}
-			}
+			String holderText = licenceInfoData.getHolder();
+			String text = "<form><p>" + StringUtils.replace(holderText, ",", "<br/>") + "</p></form>";
+			holder.setText(text, true, false);
 		} else {
-			new Label(composite, SWT.NONE).setText("-");
+			holder.setText("-", false, false);
 		}
 
+		mainComposite.layout(true, true);
 	}
 
 	/**
@@ -217,13 +248,7 @@ public class LicenseInformationDialog extends TitleAreaDialog {
 	 */
 	private void refreshData() {
 		licenseInfoData = repositoryDefinition.getLicenseService().getLicenseInfoData();
-		dialogSubComposite.dispose();
-		dialogSubComposite = new Composite(dialogAreaComposite, SWT.NONE);
-		createInformation(dialogSubComposite, licenseInfoData);
-		dialogAreaComposite.layout();
-		dialogAreaComposite.pack();
-		getShell().layout();
-		getShell().pack();
+		displayInformation(licenseInfoData);
 	}
 
 }

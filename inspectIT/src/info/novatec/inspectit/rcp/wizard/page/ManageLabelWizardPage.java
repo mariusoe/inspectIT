@@ -189,7 +189,7 @@ public class ManageLabelWizardPage extends WizardPage {
 		labelTypeInfo.setText("Existing label types");
 		labelTypeInfo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 
-		Table labelTypeTable = new Table(upperComposite, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL);
+		Table labelTypeTable = new Table(upperComposite, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL | SWT.FULL_SELECTION);
 		labelTypeTable.setHeaderVisible(true);
 		labelTypeTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
 
@@ -322,7 +322,7 @@ public class ManageLabelWizardPage extends WizardPage {
 		Composite lowerComposite = new Composite(parent, SWT.NONE);
 		lowerComposite.setLayout(new GridLayout(2, false));
 
-		Table table = new Table(lowerComposite, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL);
+		Table table = new Table(lowerComposite, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL | SWT.FULL_SELECTION);
 		table.setHeaderVisible(true);
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
 

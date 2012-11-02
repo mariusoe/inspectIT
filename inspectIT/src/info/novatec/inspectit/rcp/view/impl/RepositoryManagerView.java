@@ -52,6 +52,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -206,6 +208,15 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 			}
 		});
 		treeViewer.setLabelProvider(new RepositoryTreeLabelProvider());
+		treeViewer.setComparator(new ViewerComparator() {
+			@Override
+			public int compare(Viewer viewer, Object e1, Object e2) {
+				if (e1 instanceof Component && e2 instanceof Component) {
+					return ObjectUtils.compare(((Component) e1).getName(), ((Component) e2).getName());
+				}
+				return 0;
+			}
+		});
 		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {

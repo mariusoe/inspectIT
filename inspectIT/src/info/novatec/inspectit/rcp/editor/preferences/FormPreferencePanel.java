@@ -264,14 +264,14 @@ public class FormPreferencePanel implements IPreferencePanel {
 		toolBarManager.add(maximizeCommandContribution);
 
 		if (preferenceSet.contains(PreferenceId.HTTP_AGGREGATION_REQUESTMETHOD)) {
-			toolBarManager.add(new Separator());
 			toolBarManager.add(new SwitchHttpCategorizationRequestMethod("Include Request Method in Categorization"));
-			toolBarManager.add(new Separator());
 		}
 
 		if (preferenceSet.contains(PreferenceId.INVOCATION_SUBVIEW_MODE)) {
 			toolBarManager.add(new SwitchInvocationSubviewMode("Switch the tabbed views mode from/to aggregated/raw"));
 		}
+
+		toolBarManager.add(new Separator());
 
 		if (preferenceSet.contains(PreferenceId.SAMPLINGRATE) || preferenceSet.contains(PreferenceId.TIMELINE)) {
 			toolBarManager.add(switchPreferences);

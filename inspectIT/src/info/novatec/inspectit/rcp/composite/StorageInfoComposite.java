@@ -6,12 +6,20 @@ import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 
+import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.events.HyperlinkEvent;
+import org.eclipse.ui.forms.widgets.FormText;
 
 /**
  * Composite that show the storage info.
@@ -27,10 +35,20 @@ public class StorageInfoComposite extends Composite {
 	private static final String NOT_AVAILABLE = "N/A";
 
 	/**
+	 * Max storage description that will be displayed.
+	 */
+	private static final int MAX_DESCRIPTION_LENGTH = 100;
+
+	/**
+	 * Data to display.
+	 */
+	private IStorageData storageData;
+
+	/**
 	 * Widgets.
 	 */
 	private Label name;
-	private Label description;
+	private FormText description;
 	private Label size;
 	private Label downloaded;
 
@@ -91,18 +109,38 @@ public class StorageInfoComposite extends Composite {
 		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		group.setLayout(gl);
 
-		new Label(group, SWT.NONE).setText("Name:");
-		name = new Label(group, SWT.NONE);
+		Label label = new Label(group, SWT.NONE);
+		label.setText("Name:");
+		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+		name = new Label(group, SWT.WRAP);
+		name.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-		new Label(group, SWT.NONE).setText("Description:");
-		description = new Label(group, SWT.NONE);
+		label = new Label(group, SWT.NONE);
+		label.setText("Description:");
+		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+		description = new FormText(group, SWT.NO_FOCUS | SWT.WRAP);
+		GridData gd = new GridData(SWT.FILL, SWT.TOP, true, false);
+		gd.widthHint = 400;
+		description.setLayoutData(gd);
+		description.addHyperlinkListener(new HyperlinkAdapter() {
+			@Override
+			public void linkActivated(HyperlinkEvent e) {
+				showStorageDescriptionBox();
+			}
+		});
 
-		new Label(group, SWT.NONE).setText("Size on disk:");
-		size = new Label(group, SWT.NONE);
+		label = new Label(group, SWT.NONE);
+		label.setText("Size on disk:");
+		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+		size = new Label(group, SWT.WRAP);
+		size.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
 		if (showDataDownloaded) {
-			new Label(group, SWT.NONE).setText("Data downloaded:");
-			downloaded = new Label(group, SWT.NONE);
+			label = new Label(group, SWT.NONE);
+			label.setText("Data downloaded:");
+			label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+			downloaded = new Label(group, SWT.WRAP);
+			downloaded.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		}
 	}
 
@@ -113,13 +151,18 @@ public class StorageInfoComposite extends Composite {
 	 *            Data to display information for.
 	 */
 	public final void displayStorageData(IStorageData storageData) {
+		this.storageData = storageData;
 		if (null != storageData) {
 			name.setText(storageData.getName());
-			String desc = "";
 			if (null != storageData.getDescription()) {
-				desc = storageData.getDescription();
+				if (storageData.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
+					description.setText("<form><p>" + storageData.getDescription().substring(0, MAX_DESCRIPTION_LENGTH) + ".. <a href=\"More\">[More]</a></p></form>", true, false);
+				} else {
+					description.setText(storageData.getDescription(), false, false);
+				}
+			} else {
+				description.setText("", false, false);
 			}
-			description.setText(desc);
 			size.setText(NumberFormatter.humanReadableByteCount(storageData.getDiskSize()));
 			if (showDataDownloaded) {
 				LocalStorageData localStorageData = null;
@@ -147,11 +190,49 @@ public class StorageInfoComposite extends Composite {
 	 */
 	public final void showDataUnavailable() {
 		name.setText(NOT_AVAILABLE);
-		description.setText(NOT_AVAILABLE);
+		description.setText(NOT_AVAILABLE, false, false);
 		size.setText(NOT_AVAILABLE);
 		if (showDataDownloaded) {
 			downloaded.setText(NOT_AVAILABLE);
 		}
+	}
+
+	/**
+	 * Shows storage description box.
+	 */
+	private void showStorageDescriptionBox() {
+		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
+		PopupDialog popupDialog = new PopupDialog(getShell(), shellStyle, true, false, false, false, false, "Storage description", "Storage description") {
+			private static final int CURSOR_SIZE = 15;
+
+			@Override
+			protected Control createDialogArea(Composite parent) {
+				Composite composite = (Composite) super.createDialogArea(parent);
+				Text text = new Text(parent, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL);
+				GridData gd = new GridData(GridData.BEGINNING | GridData.FILL_BOTH);
+				gd.horizontalIndent = 3;
+				gd.verticalIndent = 3;
+				text.setLayoutData(gd);
+				text.setText(storageData.getDescription());
+				return composite;
+			}
+
+			@Override
+			protected Point getInitialLocation(Point initialSize) {
+				// show popup relative to cursor
+				Display display = getShell().getDisplay();
+				Point location = display.getCursorLocation();
+				location.x += CURSOR_SIZE;
+				location.y += CURSOR_SIZE;
+				return location;
+			}
+
+			@Override
+			protected Point getInitialSize() {
+				return new Point(400, 200);
+			}
+		};
+		popupDialog.open();
 	}
 
 }

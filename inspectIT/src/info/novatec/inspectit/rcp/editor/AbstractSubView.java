@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.editor;
 
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
+import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
 import java.util.Objects;
 
@@ -65,6 +66,14 @@ public abstract class AbstractSubView implements ISubView {
 	@Override
 	public ISubView getSubViewWithInputController(Class<?> inputControllerClass) {
 		return null;
+	}
+
+	/**
+	 * @return Returns the string for the data retrieving job.
+	 */
+	protected String getDataLoadingJobName() {
+		RepositoryDefinition repositoryDefinition = getRootEditor().getInputDefinition().getRepositoryDefinition();
+		return "Retrieving data from " + repositoryDefinition.getName();
 	}
 
 	/**

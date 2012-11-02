@@ -147,7 +147,7 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 		final Composite main = new Composite(parent, SWT.NONE);
 		main.setLayout(new GridLayout(4, false));
 
-		table = new Table(main, SWT.BORDER | SWT.CHECK | SWT.V_SCROLL);
+		table = new Table(main, SWT.BORDER | SWT.CHECK | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		table.setHeaderVisible(false);
 		table.setLinesVisible(false);
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 2));
@@ -183,6 +183,7 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 			public void widgetSelected(SelectionEvent e) {
 				for (TableItem tableItem : table.getItems()) {
 					tableItem.setChecked(true);
+					aggregationPeriodSpiner.setEnabled(true);
 				}
 			}
 		});
@@ -195,6 +196,7 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 			public void widgetSelected(SelectionEvent e) {
 				for (TableItem tableItem : table.getItems()) {
 					tableItem.setChecked(false);
+					aggregationPeriodSpiner.setEnabled(false);
 				}
 			}
 		});

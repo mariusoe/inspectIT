@@ -24,9 +24,9 @@ import org.eclipse.swt.widgets.TableItem;
 
 /**
  * Wizard page for selecting the agents.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class SelectAgentsWizardPage extends WizardPage {
 
@@ -74,7 +74,7 @@ public class SelectAgentsWizardPage extends WizardPage {
 
 	/**
 	 * This constructor sets the wizard page message.
-	 *
+	 * 
 	 * @param message
 	 *            Wizard page message.
 	 */
@@ -119,7 +119,7 @@ public class SelectAgentsWizardPage extends WizardPage {
 
 	/**
 	 * Returns if all agents should be used.
-	 *
+	 * 
 	 * @return Returns if all agents should be used.
 	 */
 	public boolean isAllAgents() {
@@ -151,7 +151,7 @@ public class SelectAgentsWizardPage extends WizardPage {
 
 	/**
 	 * Sets the repository. Needed to be called before the page is displayed to the user.
-	 *
+	 * 
 	 * @param cmrRepositoryDefinition
 	 *            {@link CmrRepositoryDefinition}.
 	 */
@@ -173,7 +173,7 @@ public class SelectAgentsWizardPage extends WizardPage {
 				specificAgents = new Button(main, SWT.RADIO);
 				specificAgents.setText("Select specific Agent(s)");
 
-				agentSelection = new Table(main, SWT.CHECK | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+				agentSelection = new Table(main, SWT.CHECK | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
 				for (PlatformIdent platformIdent : agentList) {
 					new TableItem(agentSelection, SWT.NONE).setText(platformIdent.getAgentName() + " [v. " + platformIdent.getVersion() + "]");
 				}

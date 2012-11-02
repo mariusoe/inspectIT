@@ -29,6 +29,7 @@ import info.novatec.inspectit.storage.LocalStorageData;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -319,6 +320,14 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 			}
 		} else {
 			availableAgents = null;
+		}
+		if (CollectionUtils.isNotEmpty(availableAgents)) {
+			Collections.sort(availableAgents, new Comparator<PlatformIdent>() {
+				@Override
+				public int compare(PlatformIdent o1, PlatformIdent o2) {
+					return ObjectUtils.compare(o1.getAgentName(), o2.getAgentName());
+				}
+			});
 		}
 	}
 

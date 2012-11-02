@@ -248,7 +248,8 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 	public void doRefresh() {
 		if (!jobInSchedule) {
 			jobInSchedule = true;
-			Job job = new Job("Retrieving Data from the CMR") {
+
+			Job job = new Job(getDataLoadingJobName()) {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
