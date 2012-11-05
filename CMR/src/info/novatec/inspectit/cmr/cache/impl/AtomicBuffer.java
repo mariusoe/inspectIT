@@ -17,7 +17,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
 
@@ -29,9 +32,9 @@ import org.springframework.stereotype.Component;
  * Buffer uses atomic variables and references to handle the synchronization. Thus, non of its
  * methods is synchronized, nor synchronized block were used. However, the whole buffer is thread
  * safe.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  * @param <E>
  *            Parameterized type of elements buffer can hold.
  */
@@ -178,6 +181,27 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	private long flagsSetOnBytes;
 
 	/**
+	 * This is the read lock that has to be acquired when the size of the buffer or indexing tree is
+	 * updated.
+	 */
+	private Lock clearReadLock;
+
+	/**
+	 * This is the write lock and has to be acquired when buffer is cleared. This means that during
+	 * the clear of the buffer all operations will be suspended.
+	 */
+	private Lock clearWriteLock;
+
+	/**
+	 * Default constructor.
+	 */
+	public AtomicBuffer() {
+		ReadWriteLock readWriteCleanLock = new ReentrantReadWriteLock();
+		clearReadLock = readWriteCleanLock.readLock();
+		clearWriteLock = readWriteCleanLock.writeLock();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * <p>
 	 * This method also set the ID of the object that buffer element is holding, thus overwriting
@@ -276,43 +300,49 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 				break;
 			}
 
-			// set up the values for evicting the fragment of elements
-			IBufferElement<E> newLastElement = currentLastElement;
-			long evictionFragmentMaxSize = (long) (this.getMaxSize() * bufferProperties.getEvictionFragmentSizePercentage());
-			long fragmentSize = 0;
-			int elementsInFragment = 0;
+			clearReadLock.lock();
+			try {
+				// set up the values for evicting the fragment of elements
+				IBufferElement<E> newLastElement = currentLastElement;
+				long evictionFragmentMaxSize = (long) (this.getMaxSize() * bufferProperties.getEvictionFragmentSizePercentage());
+				long fragmentSize = 0;
+				int elementsInFragment = 0;
 
-			// iterate until size of the eviction fragment is reached
-			while (fragmentSize < evictionFragmentMaxSize) {
-				fragmentSize += newLastElement.getBufferElementSize();
-				newLastElement.setBufferElementState(BufferElementState.EVICTED);
-				elementsInFragment++;
-				newLastElement = newLastElement.getNextElement();
+				// iterate until size of the eviction fragment is reached
+				while (fragmentSize < evictionFragmentMaxSize) {
+					fragmentSize += newLastElement.getBufferElementSize();
+					newLastElement.setBufferElementState(BufferElementState.EVICTED);
+					elementsInFragment++;
+					newLastElement = newLastElement.getNextElement();
 
-				// break if we reach the end of queue
-				if (emptyBufferElement.equals(newLastElement)) {
+					// break if we reach the end of queue
+					if (emptyBufferElement.equals(newLastElement)) {
+						break;
+					}
+				}
+
+				// change the last element to the right one
+				// only thread that execute compare and set successfully can perform changes
+				if (last.compareAndSet(currentLastElement, newLastElement)) {
+					// subtract the fragment size
+					substractFromCurrentSize(fragmentSize);
+
+					// add evicted elements to the total count
+					elementsEvicted.addAndGet(elementsInFragment);
+
+					// if the last is now pointing to the empty buffer element, it means that we
+					// have
+					// evicted all elements, so first should also point to empty buffer element
+					// this can only happen in theory
+					if (emptyBufferElement == last.get()) {
+						first.set(emptyBufferElement);
+					}
+
+					// break from while
 					break;
 				}
-			}
-
-			// change the last element to the right one
-			// only thread that execute compare and set successfully can perform changes
-			if (last.compareAndSet(currentLastElement, newLastElement)) {
-				// subtract the fragment size
-				substractFromCurrentSize(fragmentSize);
-
-				// add evicted elements to the total count
-				elementsEvicted.addAndGet(elementsInFragment);
-
-				// if the last is now pointing to the empty buffer element, it means that we have
-				// evicted all elements, so first should also point to empty buffer element
-				// this can only happen in theory
-				if (emptyBufferElement == last.get()) {
-					first.set(emptyBufferElement);
-				}
-
-				// break from while
-				break;
+			} finally {
+				clearReadLock.unlock();
 			}
 		}
 
@@ -346,14 +376,19 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 				break;
 			}
 
+			clearReadLock.lock();
 			// only thread that execute compare and set successfully can perform changes
 			if (nextForAnalysis.compareAndSet(elementToAnalyze, elementToAnalyze.getNextElement())) {
 
-				// perform analysis
-				elementToAnalyze.calculateAndSetBufferElementSize(objectSizes);
-				elementToAnalyze.setBufferElementState(BufferElementState.ANALYZED);
-				addToCurrentSize(elementToAnalyze.getBufferElementSize(), true);
-				elementsAnalyzed.incrementAndGet();
+				try {
+					// perform analysis
+					elementToAnalyze.calculateAndSetBufferElementSize(objectSizes);
+					elementToAnalyze.setBufferElementState(BufferElementState.ANALYZED);
+					addToCurrentSize(elementToAnalyze.getBufferElementSize(), true);
+					elementsAnalyzed.incrementAndGet();
+				} finally {
+					clearReadLock.unlock();
+				}
 
 				// if now we are pointing to the marker we go to sleep until we are informed that
 				// something was added in the buffer
@@ -379,6 +414,8 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 
 				// break from while
 				break;
+			} else {
+				clearReadLock.unlock();
 			}
 		}
 	}
@@ -425,6 +462,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 				continue;
 			}
 
+			clearReadLock.lock();
 			// only thread that execute compare and set successfully can perform changes
 			if (nextForIndexing.compareAndSet(elementToIndex, elementToIndex.getNextElement())) {
 				try {
@@ -432,7 +470,8 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 					indexingTree.put(elementToIndex.getObject());
 					elementToIndex.setBufferElementState(BufferElementState.INDEXED);
 
-					// increase number of indexed elements, and perform calculation of the indexing
+					// increase number of indexed elements, and perform calculation of the
+					// indexing
 					// tree size if enough elements have been indexed
 					elementsIndexed.incrementAndGet();
 
@@ -443,26 +482,29 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 							time = System.nanoTime();
 						}
 
-						long newSize = indexingTree.getComponentSize(objectSizes);
-						newSize += newSize * objectSizes.getObjectSecurityExpansionRate();
-						long oldSize = 0;
 						while (true) {
-							oldSize = indexingTreeSize.get();
+							// calculation of new size has to be repeated if old size compare
+							// and
+							// set fails
+							long newSize = indexingTree.getComponentSize(objectSizes);
+							newSize += newSize * objectSizes.getObjectSecurityExpansionRate();
+							long oldSize = indexingTreeSize.get();
 							if (indexingTreeSize.compareAndSet(oldSize, newSize)) {
 								addToCurrentSize(newSize - oldSize, false);
+								if (log.isDebugEnabled()) {
+									log.debug("Indexing tree size update duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+									log.debug("Indexing tree delta: " + (newSize - oldSize));
+									log.debug("Indexing tree new size: " + newSize);
+								}
 								break;
 							}
-						}
-
-						if (log.isDebugEnabled()) {
-							log.debug("Indexing tree size update duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
-							log.debug("Indexing tree delta: " + (newSize - oldSize));
-							log.debug("Indexing tree new size: " + newSize);
 						}
 					}
 				} catch (IndexingException e) {
 					// indexing exception should not happen
 					log.error(e.getMessage(), e);
+				} finally {
+					clearReadLock.unlock();
 				}
 
 				// if now we are pointing to the marker we go to sleep until we are informed that
@@ -489,6 +531,8 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 
 				// break from while
 				break;
+			} else {
+				clearReadLock.unlock();
 			}
 		}
 
@@ -539,7 +583,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 
 	/**
 	 * Sets the current size of the buffer.
-	 *
+	 * 
 	 * @param currentSize
 	 *            Size in bytes.
 	 */
@@ -552,7 +596,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	 * Adds size value to the current size.
 	 * <p>
 	 * This method is thread safe.
-	 *
+	 * 
 	 * @param size
 	 *            Size in bytes.
 	 * @param areObjects
@@ -572,7 +616,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	 * Subtracts size value from the current size.
 	 * <p>
 	 * This method is thread safe.
-	 *
+	 * 
 	 * @param size
 	 *            Size in bytes.
 	 */
@@ -620,23 +664,30 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	 * {@inheritDoc}
 	 */
 	public void clearAll() {
-		first.set(emptyBufferElement);
-		last.set(emptyBufferElement);
-		nextForAnalysis.set(emptyBufferElement);
-		nextForIndexing.set(emptyBufferElement);
-		setCurrentSize(0);
-		elementsAdded.set(0);
-		elementsAnalyzed.set(0);
-		elementsIndexed.set(0);
-		elementsEvicted.set(0);
-		indexingTree.clearAll();
-		dataAddedInBytes.set(0);
-		dataRemovedInBytes.set(0);
+		clearWriteLock.lock();
+		try {
+			last.set(emptyBufferElement);
+			nextForAnalysis.set(emptyBufferElement);
+			nextForIndexing.set(emptyBufferElement);
+			setCurrentSize(0);
+			elementsAdded.set(0);
+			elementsAnalyzed.set(0);
+			elementsIndexed.set(0);
+			elementsEvicted.set(0);
+			indexingTree.clearAll();
+			indexingTreeSize.set(0);
+			dataAddedInBytes.set(0);
+			dataRemovedInBytes.set(0);
+			// reference to first has to be reset at the end
+			first.set(emptyBufferElement);
+		} finally {
+			clearWriteLock.unlock();
+		}
 	}
 
 	/**
 	 * Returns the number of inserted elements since the buffer has been created.
-	 *
+	 * 
 	 * @return Number of inserted elements.
 	 */
 	public long getInsertedElemenets() {
@@ -645,7 +696,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 
 	/**
 	 * Returns the number of evicted elements since the buffer has been created.
-	 *
+	 * 
 	 * @return Number of evicted elements.
 	 */
 	public long getEvictedElemenets() {
@@ -654,7 +705,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 
 	/**
 	 * Returns the number of indexed elements since the buffer has been created.
-	 *
+	 * 
 	 * @return Number of indexed elements.
 	 */
 	public long getIndexedElements() {
@@ -665,7 +716,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	 * {@inheritDoc}
 	 */
 	public E getOldestElement() {
-		IBufferElement<E> bufferElement  = last.get();
+		IBufferElement<E> bufferElement = last.get();
 		if (null != bufferElement) {
 			return bufferElement.getObject();
 		}
@@ -676,7 +727,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	 * {@inheritDoc}
 	 */
 	public E getNewestElement() {
-		IBufferElement<E> bufferElement  = first.get();
+		IBufferElement<E> bufferElement = first.get();
 		if (null != bufferElement) {
 			return bufferElement.getObject();
 		}
@@ -685,7 +736,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 
 	/**
 	 * Is executed after dependency injection is done to perform any initialization.
-	 *
+	 * 
 	 * @throws Exception
 	 *             if an error occurs during {@link PostConstruct}
 	 */
@@ -750,9 +801,9 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 
 	/**
 	 * Class that serves as a marker for empty buffer element.
-	 *
+	 * 
 	 * @author Ivan Senic
-	 *
+	 * 
 	 */
 	private class EmptyBufferElement implements IBufferElement<E> {
 
