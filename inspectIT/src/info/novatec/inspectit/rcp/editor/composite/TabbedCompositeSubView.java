@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.editor.composite;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.ISubView;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 
 import java.util.HashMap;
 import java.util.List;
@@ -120,6 +121,15 @@ public class TabbedCompositeSubView extends AbstractCompositeSubView {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
+	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
+		super.preferenceEventFired(preferenceEvent);
+		fixTabControlsVisibility();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public Control getControl() {
 		return tabFolder;
 	}
@@ -130,18 +140,7 @@ public class TabbedCompositeSubView extends AbstractCompositeSubView {
 	@Override
 	public void setDataInput(List<? extends DefaultData> data) {
 		super.setDataInput(data);
-
-		// The following is needed for Bug INSPECTIT-184
-		// The problem is that the visible attribute for windows seems not be
-		// correct under some circumstances.
-		CTabItem[] items = tabFolder.getItems();
-		for (CTabItem cTabItem : items) {
-			if (cTabItem.equals(tabFolder.getSelection())) {
-				cTabItem.getControl().setVisible(true);
-			} else {
-				cTabItem.getControl().setVisible(false);
-			}
-		}
+		fixTabControlsVisibility();
 	}
 
 	/**
@@ -179,6 +178,25 @@ public class TabbedCompositeSubView extends AbstractCompositeSubView {
 	@Override
 	public void restoreMaximization() {
 		// no minimization possible
+	}
+
+	/**
+	 * In the Windows the visibility of the controls is mixed up if the controls that are in the
+	 * tabs are accessed outside. This method fixes the visibility by setting the currently selected
+	 * tab's control visible and all other not visible.
+	 */
+	private void fixTabControlsVisibility() {
+		// The following is needed for Bug INSPECTIT-184
+		// The problem is that the visible attribute for windows seems not be
+		// correct under some circumstances.
+		CTabItem[] items = tabFolder.getItems();
+		for (CTabItem cTabItem : items) {
+			if (cTabItem.equals(tabFolder.getSelection())) {
+				cTabItem.getControl().setVisible(true);
+			} else {
+				cTabItem.getControl().setVisible(false);
+			}
+		}
 	}
 
 }
