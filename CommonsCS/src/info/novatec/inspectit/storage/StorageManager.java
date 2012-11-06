@@ -6,6 +6,7 @@ import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider;
+import info.novatec.inspectit.storage.util.DeleteFileVisitor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -306,23 +307,7 @@ public abstract class StorageManager {
 		}
 
 		if (Files.exists(storageDir)) {
-			Files.walkFileTree(storageDir, new SimpleFileVisitor<Path>() {
-				@Override
-				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-					Files.delete(file);
-					return FileVisitResult.CONTINUE;
-				}
-
-				@Override
-				public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-					if (null == exc) {
-						Files.delete(dir);
-						return FileVisitResult.CONTINUE;
-					} else {
-						throw exc;
-					}
-				}
-			});
+			Files.walkFileTree(storageDir, new DeleteFileVisitor());
 		}
 	}
 

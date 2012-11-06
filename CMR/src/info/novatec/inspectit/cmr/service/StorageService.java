@@ -544,7 +544,7 @@ public class StorageService implements IStorageService {
 	public void createStorageFromUploadedDir(final IStorageData localStorageData) throws StorageException {
 		try {
 			storageManager.createStorageFromUploadedDir(localStorageData);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new StorageException("Exception occurred trying to create storage from uploaded local storage.", e);
 		}
 	}
