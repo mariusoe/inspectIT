@@ -2,7 +2,10 @@ package info.novatec.inspectit.storage.nio;
 
 import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.nio.bytebuffer.ByteBufferPoolFactory;
+import info.novatec.inspectit.util.UnderlyingSystemInfo;
+import info.novatec.inspectit.util.UnderlyingSystemInfo.JvmProvider;
 
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
 import javax.annotation.PostConstruct;
@@ -10,6 +13,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -52,20 +56,28 @@ public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
 	private ByteBufferPoolFactory poolFactory;
 
 	/**
+	 * Amount of bytes this pool should have at minimum.
+	 */
+	@Value(value = "${storage.bufferPoolMinCapacity}")
+	private long poolMinCapacity;
+
+	/**
 	 * Amount of bytes this pool can acquire in total.
-	 * <p>
-	 * <i>Hard coded to 150MB</i>
 	 */
 	@Value(value = "${storage.bufferPoolMaxCapacity}")
 	private long poolMaxCapacity;
 
 	/**
-	 * Amount of bytes this pool should have at minimum.
-	 * <p>
-	 * <i>Hard coded to 30MB</i>
+	 * Min size based on the percentage of the direct memory available to the JVM.
 	 */
-	@Value(value = "${storage.bufferPoolMinCapacity}")
-	private long poolMinCapacity;
+	@Value(value = "${storage.bufferPoolMinDirectMemoryOccupancy}")
+	private float bufferPoolMinDirectMemoryOccupancy;
+
+	/**
+	 * Min size based on the percentage of the direct memory available to the JVM.
+	 */
+	@Value(value = "${storage.bufferPoolMaxDirectMemoryOccupancy}")
+	private float bufferPoolMaxDirectMemoryOccupancy;
 
 	/**
 	 * Default constructor.
@@ -160,6 +172,26 @@ public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
 	}
 
 	/**
+	 * Sets {@link #bufferPoolMinDirectMemoryOccupancy}.
+	 * 
+	 * @param bufferPoolMinDirectMemoryOccupancy
+	 *            New value for {@link #bufferPoolMinDirectMemoryOccupancy}
+	 */
+	public void setBufferPoolMinDirectMemoryOccupancy(float bufferPoolMinDirectMemoryOccupancy) {
+		this.bufferPoolMinDirectMemoryOccupancy = bufferPoolMinDirectMemoryOccupancy;
+	}
+
+	/**
+	 * Sets {@link #bufferPoolMaxDirectMemoryOccupancy}.
+	 * 
+	 * @param bufferPoolMaxDirectMemoryOccupancy
+	 *            New value for {@link #bufferPoolMaxDirectMemoryOccupancy}
+	 */
+	public void setBufferPoolMaxDirectMemoryOccupancy(float bufferPoolMaxDirectMemoryOccupancy) {
+		this.bufferPoolMaxDirectMemoryOccupancy = bufferPoolMaxDirectMemoryOccupancy;
+	}
+
+	/**
 	 * Sets {@link #bufferSize}.
 	 * 
 	 * @param bufferSize
@@ -174,6 +206,36 @@ public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
 	 */
 	@PostConstruct
 	protected void init() {
+		if (bufferPoolMinDirectMemoryOccupancy > bufferPoolMaxDirectMemoryOccupancy) {
+			throw new BeanInitializationException("Settings for the byte buffer pool are not correct. bufferPoolMinDirectMemoryOccupancy (" + bufferPoolMaxDirectMemoryOccupancy
+					+ ") is greater than bufferPoolMaxDirectMemoryOccupancy (" + bufferPoolMinDirectMemoryOccupancy + ")");
+		}
+		if (poolMinCapacity > poolMaxCapacity) {
+			throw new BeanInitializationException("Settings for the byte buffer pool are not correct. poolMinCapacity (" + poolMinCapacity + ") is greater than poolMaxCapacity (" + poolMaxCapacity
+					+ ")");
+		}
+
+		// assume that the maxDirect memory is 64MB
+		long maxDirectMemory = 64 * 1024 * 1024;
+		try {
+			if (UnderlyingSystemInfo.JVM_PROVIDER.equals(JvmProvider.SUN) || UnderlyingSystemInfo.JVM_PROVIDER.equals(JvmProvider.ORACLE)) {
+				Class<?> vmClazz = Class.forName("sun.misc.VM");
+				Method directMemoryMethod = vmClazz.getMethod("maxDirectMemory");
+				directMemoryMethod.setAccessible(true);
+				maxDirectMemory = (Long) directMemoryMethod.invoke(null);
+			}
+		} catch (Exception e) {
+			if (log.isDebugEnabled()) {
+				log.debug("Exception occured trying to use the class sun.misc.VM via reflection", e);
+			}
+		}
+
+		if (poolMinCapacity > (long) (maxDirectMemory * bufferPoolMinDirectMemoryOccupancy)) {
+			poolMinCapacity = (long) (maxDirectMemory * bufferPoolMinDirectMemoryOccupancy);
+		}
+		if (poolMaxCapacity > (long) (maxDirectMemory * bufferPoolMaxDirectMemoryOccupancy)) {
+			poolMaxCapacity = (long) (maxDirectMemory * bufferPoolMaxDirectMemoryOccupancy);
+		}
 		poolFactory.setBufferCpacity(bufferSize);
 		int maxIdle = (int) (poolMinCapacity / bufferSize);
 		int maxActive = (int) (poolMaxCapacity / bufferSize);

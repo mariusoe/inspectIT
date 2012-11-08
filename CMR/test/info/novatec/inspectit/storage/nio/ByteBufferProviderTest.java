@@ -31,6 +31,8 @@ public class ByteBufferProviderTest extends AbstractTestNGLogSupport {
 	@BeforeMethod
 	public void init() {
 		byteBufferProvider = new ByteBufferProvider();
+		byteBufferProvider.setBufferPoolMaxDirectMemoryOccupancy(0.6f);
+		byteBufferProvider.setBufferPoolMinDirectMemoryOccupancy(0.3f);
 	}
 
 	/**
