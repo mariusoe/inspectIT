@@ -1,8 +1,7 @@
-package info.novatec.inspectit.agent.sensor.method.jdbc.test;
+package info.novatec.inspectit.agent.sensor.method.jdbc;
 
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import info.novatec.inspectit.agent.core.IIdManager;
-import info.novatec.inspectit.agent.sensor.method.jdbc.StatementSensor;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.util.Timer;
 

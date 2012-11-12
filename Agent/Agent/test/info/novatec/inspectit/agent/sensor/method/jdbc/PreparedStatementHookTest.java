@@ -1,8 +1,6 @@
-package info.novatec.inspectit.agent.sensor.method.jdbc.test;
+package info.novatec.inspectit.agent.sensor.method.jdbc;
 
 import info.novatec.inspectit.agent.core.impl.IdManager;
-import info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementHook;
-import info.novatec.inspectit.agent.sensor.method.jdbc.StatementStorage;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.util.Timer;
 

@@ -174,19 +174,26 @@
 	<test name="SQL Hook Hook">
 		<classes>
 			<class
-				name="info.novatec.inspectit.agent.sensor.method.jdbc.test.StatementHookTest" />
+				name="info.novatec.inspectit.agent.sensor.method.jdbc.StatementHookTest" />
 		</classes>
 	</test>
+	<test name="SQL Statement Storage">
+		<classes>
+			<class
+				name="info.novatec.inspectit.agent.sensor.method.jdbc.StatementStorageTest" />
+		</classes>
+	</test>
+
 	<test name="SQL Prepared Hook">
 		<classes>
 			<class
-				name="info.novatec.inspectit.agent.sensor.method.jdbc.test.PreparedStatementHookTest" />
+				name="info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementHookTest" />
 		</classes>
 	</test>
 	<test name="SQL Sensor Hook">
 		<classes>
 			<class
-				name="info.novatec.inspectit.agent.sensor.method.jdbc.test.StatementSensorTest" />
+				name="info.novatec.inspectit.agent.sensor.method.jdbc.StatementSensorTest" />
 		</classes>
 	</test>
 	<test name="Timer Hook">

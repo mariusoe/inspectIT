@@ -126,7 +126,15 @@ public class StatementStorage {
 	 */
 	protected void addParameter(Object preparedStatement, int index, Object value) {
 		String[] parameters = parameterMap.get(preparedStatement);
+
 		if (null != parameters) {
+			if (parameters.length <= index) {
+				if (LOGGER.isLoggable(Level.WARNING)) {
+					LOGGER.warning("Trying to set the parameter with value " + value + " at index " + index + ", but the prepared statement did not have this parameter.");
+				}
+				return;
+			}
+
 			if (null != value) {
 				if (value instanceof String || value instanceof Date || value instanceof Time || value instanceof Timestamp) {
 					parameters[index] = "'" + value.toString() + "'";
@@ -134,7 +142,8 @@ public class StatementStorage {
 					parameters[index] = value.toString();
 				}
 			} else {
-				parameters[index] = "[null]";
+				value = "[null]";
+				parameters[index] = (String) value;
 			}
 
 			if (LOGGER.isLoggable(Level.FINE)) {

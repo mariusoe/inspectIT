@@ -1,4 +1,4 @@
-package info.novatec.inspectit.agent.sensor.method.jdbc.test;
+package info.novatec.inspectit.agent.sensor.method.jdbc;
 
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -16,7 +16,6 @@ import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IObjectStorage;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.core.impl.IdManager;
-import info.novatec.inspectit.agent.sensor.method.jdbc.StatementHook;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
