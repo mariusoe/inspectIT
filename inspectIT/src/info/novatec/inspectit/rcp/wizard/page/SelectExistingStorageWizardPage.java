@@ -66,8 +66,8 @@ public class SelectExistingStorageWizardPage extends WizardPage {
 	 * Default constructor.
 	 */
 	public SelectExistingStorageWizardPage() {
-		super("Select Recording Storage");
-		this.setTitle("Select Recording Storage");
+		super("Select Storage");
+		this.setTitle("Select Storage");
 		this.setMessage(DEFAULT_MESSAGE);
 		cmrRepositories = new ArrayList<CmrRepositoryDefinition>();
 		cmrRepositories.addAll(InspectIT.getDefault().getCmrRepositoryManager().getCmrRepositoryDefinitions());
