@@ -8,6 +8,7 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatu
 import info.novatec.inspectit.rcp.view.impl.RepositoryManagerView;
 import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
 import info.novatec.inspectit.storage.StorageException;
+import info.novatec.inspectit.storage.recording.RecordingState;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -48,8 +49,8 @@ public class StopRecordingHanlder extends AbstractHandler implements IHandler {
 		}
 		if (null != cmrRepositoryDefinition) {
 			if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-				boolean isRecordingActive = cmrRepositoryDefinition.getStorageService().isRecordingOn();
-				if (isRecordingActive) {
+				boolean canStop = cmrRepositoryDefinition.getStorageService().getRecordingState() != RecordingState.OFF;
+				if (canStop) {
 					try {
 						final CmrRepositoryDefinition finalCmrRepositoryDefinition = cmrRepositoryDefinition;
 						Job stopRecordingJob = new Job("Stop Recording") {

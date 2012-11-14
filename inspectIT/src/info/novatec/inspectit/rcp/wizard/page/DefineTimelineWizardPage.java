@@ -146,7 +146,7 @@ public class DefineTimelineWizardPage extends WizardPage {
 			defineDate.setText(defineDate.getText() + "s");
 		}
 		defineDate.setSelection(false);
-		
+
 		useTimeframe.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -175,7 +175,7 @@ public class DefineTimelineWizardPage extends WizardPage {
 		updatePage();
 
 		enableControlAndChildren(group, false);
-		
+
 		setControl(main);
 	}
 
@@ -332,19 +332,24 @@ public class DefineTimelineWizardPage extends WizardPage {
 
 			cdtPrimary = new CDateTime(cdtComposite, CDT.BORDER | CDT.DROP_DOWN | CDT.TAB_FIELDS);
 			cdtPrimary.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-			cdtPrimary.setSelection(new Date());
 			cdtPrimary.addListener(SWT.Modify, pageCompleteListener);
 
+			Calendar calendar = Calendar.getInstance();
+			calendar.set(Calendar.SECOND, 0);
+			calendar.set(Calendar.MILLISECOND, 0);
 			if ((timeStyle & FUTURE) != 0 && !((timeStyle & BOTH_DATES) != 0)) {
 				cdtPrimary.setPattern("'Till\t\t' EEEE, MMMM d YYYY '@' h:mm a");
+				calendar.add(Calendar.HOUR, 1);
 			} else {
 				cdtPrimary.setPattern("'From\t' EEEE, MMMM d YYYY '@' h:mm a");
 			}
+			cdtPrimary.setSelection(calendar.getTime());
 
 			if ((timeStyle & BOTH_DATES) != 0) {
 				cdtSecondary = new CDateTime(cdtComposite, CDT.BORDER | CDT.DROP_DOWN | CDT.TAB_FIELDS);
 				cdtSecondary.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-				cdtSecondary.setSelection(new Date());
+				calendar.add(Calendar.HOUR, 1);
+				cdtSecondary.setSelection(calendar.getTime());
 				cdtSecondary.addListener(SWT.Modify, pageCompleteListener);
 				cdtSecondary.setPattern("'Till\t\t' EEEE, MMMM d YYYY '@' h:mm a");
 			}

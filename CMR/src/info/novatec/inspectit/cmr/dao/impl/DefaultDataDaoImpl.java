@@ -17,6 +17,7 @@ import info.novatec.inspectit.communication.data.VmArgumentData;
 import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
 import info.novatec.inspectit.indexing.impl.IndexingException;
 import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.storage.recording.RecordingState;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -124,7 +125,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	public void saveAll(List<? extends DefaultData> defaultDataCollection) {
 		StatelessSession session = getHibernateTemplate().getSessionFactory().openStatelessSession();
 		Transaction tx = session.beginTransaction();
-		boolean isRecording = storageManager.isRecordingOn();
+		boolean isRecording = storageManager.getRecordingState() == RecordingState.ON;
 		for (DefaultData element : defaultDataCollection) {
 			cacheIdGenerator.assignObjectAnId(element);
 			if (element instanceof InvocationSequenceData) {

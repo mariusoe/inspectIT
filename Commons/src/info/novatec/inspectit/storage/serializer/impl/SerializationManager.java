@@ -71,6 +71,8 @@ import info.novatec.inspectit.storage.processor.impl.DataSaverProcessor;
 import info.novatec.inspectit.storage.processor.impl.InvocationClonerDataProcessor;
 import info.novatec.inspectit.storage.processor.impl.InvocationExtractorDataProcessor;
 import info.novatec.inspectit.storage.processor.impl.TimeFrameDataProcessor;
+import info.novatec.inspectit.storage.recording.RecordingProperties;
+import info.novatec.inspectit.storage.recording.RecordingState;
 import info.novatec.inspectit.storage.serializer.HibernateAwareClassResolver;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
@@ -313,6 +315,10 @@ public class SerializationManager implements ISerializer, InitializingBean {
 				return new ArrayList<Object>();
 			}
 		});
+
+		// added with INSPECTIT-723
+		kryo.register(RecordingState.class, new EnumSerializer(RecordingState.class));
+		kryo.register(RecordingProperties.class, new FieldSerializer<RecordingProperties>(kryo, RecordingProperties.class));
 	}
 
 	/**

@@ -6,6 +6,7 @@ import info.novatec.inspectit.cmr.storage.CmrStorageManager;
 import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.nio.write.WritingChannelManager;
+import info.novatec.inspectit.storage.recording.RecordingState;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
@@ -419,7 +420,7 @@ public class HealthStatus {
 			log.info("No active writable storage available.");
 		}
 
-		if (storageManager.isRecordingOn()) {
+		if (storageManager.getRecordingState() == RecordingState.ON) {
 			StorageData recordingStorageData = storageManager.getRecordingStorage();
 			if (null != recordingStorageData) {
 				log.info("Recording is active on the storage " + recordingStorageData + ".");

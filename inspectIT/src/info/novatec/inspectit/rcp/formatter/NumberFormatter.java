@@ -297,7 +297,7 @@ public final class NumberFormatter {
 
 		long hours = TimeUnit.MILLISECONDS.toHours(millis) - TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays(millis));
 		if (started) {
-			stringBuilder.append(String.format(", %dh", hours));
+			stringBuilder.append(String.format(" %dh", hours));
 		} else if (hours > 0) {
 			if (shortDescription) {
 				return hours + " hour" + ((hours > 1) ? "s" : "");
@@ -308,7 +308,7 @@ public final class NumberFormatter {
 
 		long min = TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis));
 		if (started) {
-			stringBuilder.append(String.format(", %dm", min));
+			stringBuilder.append(String.format(" %dm", min));
 		} else if (min > 0) {
 			if (shortDescription) {
 				return min + " minute" + ((min > 1) ? "s" : "");
@@ -319,7 +319,7 @@ public final class NumberFormatter {
 
 		long sec = TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis));
 		if (started) {
-			stringBuilder.append(String.format(", %ds", sec));
+			stringBuilder.append(String.format(" %ds", sec));
 		} else if (sec > 0) {
 			if (shortDescription) {
 				return sec + " second" + ((sec > 1) ? "s" : "");

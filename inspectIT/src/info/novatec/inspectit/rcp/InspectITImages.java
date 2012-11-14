@@ -130,4 +130,5 @@ public interface InspectITImages {
 	String IMG_EXPORT = InspectITConstants.ICON_PATH + "export.gif";
 	String IMG_IMPORT = InspectITConstants.ICON_PATH + "impor.gif";
 	String IMG_UPLOAD = InspectITConstants.ICON_PATH + "upload_storage.png";
+	String IMG_RECORD_SCHEDULED = InspectITConstants.ICON_PATH + "record_scheduled.png";
 }

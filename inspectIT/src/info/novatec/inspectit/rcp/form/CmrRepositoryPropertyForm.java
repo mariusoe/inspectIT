@@ -14,7 +14,9 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.storage.StorageData;
+import info.novatec.inspectit.storage.recording.RecordingState;
 
+import java.text.DateFormat;
 import java.util.Date;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -471,8 +473,14 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 			// recording information
 			recordingData = cmrRepositoryDefinition.getStorageService().getRecordingData();
 			if (null != recordingData) {
-				recordingIcon.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_RECORD));
-				recordingLabel.setText("Active");
+				RecordingState recordingState = cmrRepositoryDefinition.getStorageService().getRecordingState();
+				if (recordingState == RecordingState.ON) {
+					recordingIcon.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_RECORD));
+					recordingLabel.setText("Active");
+				} else if (recordingState == RecordingState.SCHEDULED) {
+					recordingIcon.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_RECORD_SCHEDULED));
+					recordingLabel.setText("Scheduled @ " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(recordingData.getRecordStartDate()));
+				}
 				// get the storage name
 				StorageData storage = recordingData.getRecordingStorage();
 				if (null != storage) {
@@ -556,7 +564,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 			if (null != recordingData && !form.isDisposed()) {
 				Date endDate = recordingData.getRecordEndDate();
 				Date startDate = recordingData.getRecordStartDate();
-				if (null != endDate && null != startDate) {
+				if (null != endDate && null != startDate && startDate.before(new Date())) {
 					Date now = new Date();
 					long millisMore = endDate.getTime() - now.getTime();
 					if (millisMore > 0) {

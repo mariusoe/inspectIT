@@ -11,11 +11,11 @@ import info.novatec.inspectit.storage.StorageData.StorageState;
 import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.StorageFileExtensions;
 import info.novatec.inspectit.storage.StorageManager;
-import info.novatec.inspectit.storage.StorageRecorder;
 import info.novatec.inspectit.storage.StorageWriter;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.recording.RecordingProperties;
+import info.novatec.inspectit.storage.recording.RecordingState;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.storage.util.CopyMoveFileVisitor;
@@ -100,7 +100,7 @@ public class CmrStorageManager extends StorageManager {
 	 * {@link StorageRecorder} to deal with recording.
 	 */
 	@Autowired
-	private StorageRecorder storageRecorder;
+	private CmrStorageRecorder storageRecorder;
 
 	/**
 	 * Creates new storage.
@@ -160,7 +160,7 @@ public class CmrStorageManager extends StorageManager {
 	public void closeStorage(StorageData storageData) throws StorageException, IOException, SerializationException {
 		StorageData local = getLocalStorageDataObject(storageData);
 		synchronized (local) {
-			if (isRecordingOn() && Objects.equals(local, recorderStorageData)) {
+			if ((storageRecorder.isRecordingOn() || storageRecorder.isRecordingScheduled()) && Objects.equals(local, recorderStorageData)) {
 				throw new StorageException("Storage " + local + " can not be finalized because it is currenlty used for recording purposes.");
 			}
 			StorageWriter writer = openedStoragesMap.get(local);
@@ -196,13 +196,6 @@ public class CmrStorageManager extends StorageManager {
 	}
 
 	/**
-	 * @return Returns if the recording is currently active.
-	 */
-	public boolean isRecordingOn() {
-		return storageRecorder.isRecordingOn();
-	}
-
-	/**
 	 * If the recording is active, returns the storage that is used for storing recording data.
 	 * 
 	 * @return Storage that is used for recording, or null if recording is not active.
@@ -219,6 +212,16 @@ public class CmrStorageManager extends StorageManager {
 	 */
 	public RecordingProperties getRecordingProperties() {
 		return storageRecorder.getRecordingProperties();
+	}
+
+	/**
+	 * Returns the recording state.
+	 * 
+	 * @return Returns the recording state.
+	 * @See {@link RecordingState}
+	 */
+	public RecordingState getRecordingState() {
+		return storageRecorder.getRecordingState();
 	}
 
 	/**
@@ -249,7 +252,7 @@ public class CmrStorageManager extends StorageManager {
 	 * @throws SerializationException
 	 *             If serialization fails when creating the storage.
 	 */
-	public void startRecording(StorageData storageData, RecordingProperties recordingProperties) throws IOException, SerializationException {
+	public void startOrScheduleRecording(StorageData storageData, RecordingProperties recordingProperties) throws IOException, SerializationException {
 		if (!isStorageExisting(storageData)) {
 			this.createStorage(storageData);
 		}
@@ -258,9 +261,9 @@ public class CmrStorageManager extends StorageManager {
 			this.openStorage(local);
 		}
 		synchronized (this) {
-			if (!isRecordingOn()) {
+			if (!storageRecorder.isRecordingOn() && !storageRecorder.isRecordingScheduled()) {
 				StorageWriter storageWriter = openedStoragesMap.remove(local);
-				storageRecorder.startRecording(storageWriter, recordingProperties);
+				storageRecorder.startOrScheduleRecording(storageWriter, recordingProperties);
 				recorderStorageData = local;
 				recorderStorageData.markRecording();
 				writeStorageDataToDisk(recorderStorageData);
@@ -278,7 +281,7 @@ public class CmrStorageManager extends StorageManager {
 	 */
 	public void stopRecording() throws IOException, SerializationException {
 		synchronized (this) {
-			if (isRecordingOn()) {
+			if (storageRecorder.isRecordingOn() || storageRecorder.isRecordingScheduled()) {
 				StorageWriter storageWriter = storageRecorder.getStorageWriter();
 				storageRecorder.stopRecording();
 				recorderStorageData.markOpened();
@@ -296,9 +299,9 @@ public class CmrStorageManager extends StorageManager {
 	 *            Data to write.
 	 */
 	public void record(DefaultData dataToRecord) {
-		if (isRecordingOn() && canWriteMore()) {
+		if (storageRecorder.isRecordingOn() && canWriteMore()) {
 			storageRecorder.record(dataToRecord);
-		} else if (isRecordingOn() && !canWriteMore()) {
+		} else if (storageRecorder.isRecordingOn() && !canWriteMore()) {
 			try {
 				stopRecording();
 			} catch (Exception e) {
@@ -416,7 +419,7 @@ public class CmrStorageManager extends StorageManager {
 	 * @throws IOException
 	 */
 	protected void closeAllStorages() {
-		if (isRecordingOn()) {
+		if (storageRecorder.isRecordingOn() || storageRecorder.isRecordingScheduled()) {
 			try {
 				stopRecording();
 			} catch (Exception e) {
@@ -727,7 +730,7 @@ public class CmrStorageManager extends StorageManager {
 		for (Map.Entry<StorageData, StorageWriter> entry : openedStoragesMap.entrySet()) {
 			map.put(entry.getKey(), entry.getValue().getExecutorServiceStatus());
 		}
-		if (isRecordingOn()) {
+		if (storageRecorder.isRecordingOn()) {
 			StorageData storageData = recorderStorageData;
 			StorageWriter storageWriter = storageRecorder.getStorageWriter();
 			if (null != storageData && null != storageWriter) {

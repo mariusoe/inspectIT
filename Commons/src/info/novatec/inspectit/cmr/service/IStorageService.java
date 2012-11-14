@@ -10,6 +10,7 @@ import info.novatec.inspectit.storage.label.management.AbstractLabelManagementAc
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.recording.RecordingProperties;
+import info.novatec.inspectit.storage.recording.RecordingState;
 
 import java.util.Collection;
 import java.util.List;
@@ -91,15 +92,20 @@ public interface IStorageService {
 	List<StorageData> getReadableStorages();
 
 	/**
-	 * Returns if the recording is currently active.
+	 * Returns the recording state.
 	 * 
-	 * @return Returns if the recording is currently active.
+	 * @return Returns the recording state.
+	 * @see RecordingState
 	 */
-	boolean isRecordingOn();
+	RecordingState getRecordingState();
 
 	/**
-	 * Starts recording on the provided storage. All data coming to the CMR from this moment to the
-	 * moment of calling {@link #stopRecording()} will be written to the given storage.
+	 * Starts or schedules recording on the provided storage. If the recording properties define the
+	 * start date that is after current time, recording will be scheduled. Otherwise it is started
+	 * right away.
+	 * <p>
+	 * When recording is started all data coming to the CMR from this moment to the moment of
+	 * calling {@link #stopRecording()} will be written to the given storage.
 	 * <p>
 	 * If provided storage is not opened, it will be. If the provided storage does not exists, it
 	 * will be created and opened.
@@ -113,11 +119,11 @@ public interface IStorageService {
 	 *            won't start.
 	 * @return The recording storage with proper ID and status information.
 	 * @throws StorageException
-	 *             If recording is already active. If storage has to be created, then when
-	 *             {@link StorageData} is insufficient for storage creation or when storage creation
-	 *             fails. If storage has to be opened, then when storage opening fails.
+	 *             If recording is already active or scheduled. If storage has to be created, then
+	 *             when {@link StorageData} is insufficient for storage creation or when storage
+	 *             creation fails. If storage has to be opened, then when storage opening fails.
 	 */
-	StorageData startRecording(StorageData storageData, RecordingProperties recordingProperties) throws StorageException;
+	StorageData startOrScheduleRecording(StorageData storageData, RecordingProperties recordingProperties) throws StorageException;
 
 	/**
 	 * Stops recording. The storage that is currently used for recording will be closed.

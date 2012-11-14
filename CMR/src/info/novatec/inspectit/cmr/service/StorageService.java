@@ -14,6 +14,7 @@ import info.novatec.inspectit.storage.label.management.AbstractLabelManagementAc
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.recording.RecordingProperties;
+import info.novatec.inspectit.storage.recording.RecordingState;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 
 import java.io.IOException;
@@ -171,22 +172,22 @@ public class StorageService implements IStorageService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public boolean isRecordingOn() {
-		return storageManager.isRecordingOn();
+	public RecordingState getRecordingState() {
+		return storageManager.getRecordingState();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public StorageData startRecording(StorageData storageData, RecordingProperties recordingProperties) throws StorageException {
-		if (storageManager.isRecordingOn() && !storageData.equals(storageManager.getRecordingStorage())) {
-			throw new StorageException("Recording is already active with different storage. Only one storage at time can be choosen as recording destination.");
-		} else if (storageManager.isRecordingOn()) {
-			throw new StorageException("Recording is already active with selected storage.");
+	public StorageData startOrScheduleRecording(StorageData storageData, RecordingProperties recordingProperties) throws StorageException {
+		if ((storageManager.getRecordingState() == RecordingState.ON || storageManager.getRecordingState() == RecordingState.SCHEDULED) && !storageData.equals(storageManager.getRecordingStorage())) {
+			throw new StorageException("Recording is already active/scheduled with different storage. Only one storage at time can be choosen as recording destination.");
+		} else if (storageManager.getRecordingState() == RecordingState.ON || storageManager.getRecordingState() == RecordingState.SCHEDULED) {
+			throw new StorageException("Recording is already active/scheduled with selected storage.");
 		} else {
 			try {
-				storageManager.startRecording(storageData, recordingProperties);
+				storageManager.startOrScheduleRecording(storageData, recordingProperties);
 				return storageData;
 			} catch (Exception e) {
 				log.warn("Exception in storage service.", e);
@@ -214,7 +215,7 @@ public class StorageService implements IStorageService {
 	@MethodLog
 	@Override
 	public RecordingData getRecordingData() {
-		if (isRecordingOn()) {
+		if (storageManager.getRecordingState() == RecordingState.ON || storageManager.getRecordingState() == RecordingState.SCHEDULED) {
 			RecordingData recordingData = new RecordingData();
 			RecordingProperties recordingProperties = storageManager.getRecordingProperties();
 			if (null != recordingProperties) {

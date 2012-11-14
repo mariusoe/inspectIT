@@ -6,6 +6,7 @@ import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
+import info.novatec.inspectit.storage.recording.RecordingState;
 
 import org.eclipse.core.expressions.PropertyTester;
 
@@ -49,7 +50,7 @@ public class CmrOnlineStatusTester extends PropertyTester {
 		} else if ("recordingActive".equals(property)) {
 			if (expectedValue instanceof Boolean) {
 				if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-					boolean recordingActive = cmrRepositoryDefinition.getStorageService().isRecordingOn();
+					boolean recordingActive = cmrRepositoryDefinition.getStorageService().getRecordingState() != RecordingState.OFF;
 					return ((Boolean) expectedValue).booleanValue() == recordingActive;
 				} else {
 					return false;

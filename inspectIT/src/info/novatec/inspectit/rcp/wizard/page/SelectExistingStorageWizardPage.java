@@ -4,6 +4,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.storage.StorageData;
+import info.novatec.inspectit.storage.recording.RecordingState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +128,7 @@ public class SelectExistingStorageWizardPage extends WizardPage {
 					setMessage("Repository must be selected.", IMessageProvider.ERROR);
 				} else if (getSelectedRepository().getOnlineStatus() == OnlineStatus.OFFLINE) {
 					setMessage("Selected repository is currenly offline.", IMessageProvider.ERROR);
-				} else if (checkRecording && getSelectedRepository().getStorageService().isRecordingOn()) {
+				} else if (checkRecording && getSelectedRepository().getStorageService().getRecordingState() != RecordingState.OFF) {
 					setMessage("Recording is already active on selected repository.", IMessageProvider.ERROR);
 				} else if (getSelectedStorageData() == null) {
 					setMessage("Storage must be selected.", IMessageProvider.ERROR);
@@ -194,7 +195,7 @@ public class SelectExistingStorageWizardPage extends WizardPage {
 			return false;
 		} else if (getSelectedRepository().getOnlineStatus() == OnlineStatus.OFFLINE) {
 			return false;
-		} else if (checkRecording && getSelectedRepository().getStorageService().isRecordingOn()) {
+		} else if (checkRecording && getSelectedRepository().getStorageService().getRecordingState() != RecordingState.OFF) {
 			return false;
 		}
 		if (getSelectedStorageData() == null) {

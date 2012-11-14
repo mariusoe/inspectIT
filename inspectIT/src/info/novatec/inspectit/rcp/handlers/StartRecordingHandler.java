@@ -1,17 +1,24 @@
 package info.novatec.inspectit.rcp.handlers;
 
 import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
+import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.view.impl.RepositoryManagerView;
 import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
 import info.novatec.inspectit.rcp.wizard.StartRecordingWizard;
+import info.novatec.inspectit.storage.recording.RecordingProperties;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -20,6 +27,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.progress.IProgressConstants;
 
 /**
  * Starts recording.
@@ -65,7 +73,7 @@ public class StartRecordingHandler extends AbstractHandler implements IHandler {
 
 		// if recording has been started refresh the repository and storage manager view
 		if (wizardDialog.getReturnCode() == WizardDialog.OK) {
-			IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			final IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 			IViewPart repositoryManagerView = activePage.findView(RepositoryManagerView.VIEW_ID);
 			if (repositoryManagerView instanceof RepositoryManagerView) {
 				((RepositoryManagerView) repositoryManagerView).refresh();
@@ -77,6 +85,26 @@ public class StartRecordingHandler extends AbstractHandler implements IHandler {
 				} else {
 					((StorageManagerView) storageManagerView).refresh();
 				}
+			}
+
+			// auto-refresh on recording stop if there is recording duration specified
+			RecordingProperties recordingProperties = startRecordingWizard.getRecordingProperties();
+			if (null != recordingProperties && recordingProperties.getRecordDuration() > 0) {
+				Job refreshStorageManagerJob = new Job("Recording Auto-Stop Updates") {
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						IViewPart storageManagerView = activePage.findView(StorageManagerView.VIEW_ID);
+						if (storageManagerView instanceof StorageManagerView) {
+							((StorageManagerView) storageManagerView).refresh();
+						}
+						return Status.OK_STATUS;
+					}
+				};
+				refreshStorageManagerJob.setUser(false);
+				refreshStorageManagerJob.setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImage(InspectITImages.IMG_RECORD_STOP));
+				// add 5 seconds to be sure all is done
+				long delay = 5000 + recordingProperties.getRecordDuration() + recordingProperties.getStartDelay();
+				refreshStorageManagerJob.schedule(delay);
 			}
 		}
 		return null;

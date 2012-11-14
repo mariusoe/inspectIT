@@ -16,6 +16,7 @@ import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.recording.RecordingProperties;
+import info.novatec.inspectit.storage.recording.RecordingState;
 
 import java.util.Date;
 import java.util.List;
@@ -75,6 +76,11 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 	private CmrRepositoryDefinition selectedCmr;
 
 	/**
+	 * Recording properties defined in the wizard.
+	 */
+	private RecordingProperties recordingProperties;
+
+	/**
 	 * Public constructor.
 	 */
 	public StartRecordingWizard() {
@@ -128,7 +134,7 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 		defineDataPage = new DefineDataProcessorsWizardPage(DefineDataProcessorsWizardPage.BUFFER_DATA | DefineDataProcessorsWizardPage.SYSTEM_DATA
 				| DefineDataProcessorsWizardPage.EXTRACT_INVOCATIONS);
 		addPage(defineDataPage);
-		timelineWizardPage = new DefineTimelineWizardPage("Limit Recording", "Optionally select how long recording should last", DefineTimelineWizardPage.FUTURE);
+		timelineWizardPage = new DefineTimelineWizardPage("Limit Recording", "Optionally select how long recording should last", DefineTimelineWizardPage.FUTURE | DefineTimelineWizardPage.BOTH_DATES);
 		addPage(timelineWizardPage);
 		addLabelWizardPage = new AddStorageLabelWizardPage(selectedCmr);
 		addPage(addLabelWizardPage);
@@ -151,16 +157,27 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 		}
 
 		if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-			RecordingProperties recordingProperties = new RecordingProperties();
+			recordingProperties = new RecordingProperties();
 			recordingProperties.setRecordingDataProcessors(defineDataPage.getProcessorList());
 			if (timelineWizardPage.isTimerframeUsed()) {
+				Date recordStartDate = timelineWizardPage.getFromDate();
 				Date recordEndDate = timelineWizardPage.getToDate();
-				recordingProperties.setRecordEndDate(recordEndDate);
+				Date now = new Date();
+				if (null != recordStartDate && recordStartDate.after(now)) {
+					recordingProperties.setStartDelay(recordStartDate.getTime() - now.getTime());
+				}
+				if (null != recordEndDate && recordEndDate.after(now)) {
+					if (null != recordStartDate && recordStartDate.before(recordEndDate)) {
+						recordingProperties.setRecordDuration(recordEndDate.getTime() - recordStartDate.getTime());
+					} else {
+						recordingProperties.setRecordDuration(recordEndDate.getTime() - now.getTime());
+					}
+				}
 			}
-			boolean isRecordingActive = cmrRepositoryDefinition.getStorageService().isRecordingOn();
-			if (!isRecordingActive) {
+			boolean canStart = cmrRepositoryDefinition.getStorageService().getRecordingState() == RecordingState.OFF;
+			if (canStart) {
 				try {
-					StorageData recordingStorage = cmrRepositoryDefinition.getStorageService().startRecording(storageData, recordingProperties);
+					StorageData recordingStorage = cmrRepositoryDefinition.getStorageService().startOrScheduleRecording(storageData, recordingProperties);
 					List<AbstractStorageLabel<?>> labels = addLabelWizardPage.getLabelsToAdd();
 					if (!labels.isEmpty()) {
 						cmrRepositoryDefinition.getStorageService().addLabelsToStorage(recordingStorage, labels, true);
@@ -239,4 +256,14 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 		}
 		return true;
 	}
+
+	/**
+	 * Gets {@link #recordingProperties}.
+	 * 
+	 * @return {@link #recordingProperties}
+	 */
+	public RecordingProperties getRecordingProperties() {
+		return recordingProperties;
+	}
+
 }
