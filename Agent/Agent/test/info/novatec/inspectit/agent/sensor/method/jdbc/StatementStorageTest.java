@@ -87,6 +87,6 @@ public class StatementStorageTest extends AbstractLogSupport {
 		List<String> result = storage.getParameters(marker);
 
 		assertThat(result, is(not(equalTo(null))));
-		assertThat(result, contains(equalTo("[null]")));
+		assertThat(result, contains(equalTo("null")));
 	}
 }

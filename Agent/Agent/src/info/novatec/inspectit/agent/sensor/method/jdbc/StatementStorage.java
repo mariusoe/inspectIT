@@ -142,7 +142,7 @@ public class StatementStorage {
 					parameters[index] = value.toString();
 				}
 			} else {
-				value = "[null]";
+				value = "null";
 				parameters[index] = (String) value;
 			}
 

@@ -183,11 +183,15 @@
 				name="info.novatec.inspectit.agent.sensor.method.jdbc.StatementStorageTest" />
 		</classes>
 	</test>
-
 	<test name="SQL Prepared Hook">
 		<classes>
 			<class
 				name="info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementHookTest" />
+		</classes>
+	</test>
+	<test name="SQL Prepared Parameter Hook">
+		<classes>
+			<class name="info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementParameterHookTest" />
 		</classes>
 	</test>
 	<test name="SQL Sensor Hook">
