@@ -530,7 +530,10 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		public StyledString getStyledText(Object element, int index) {
 			ExceptionSensorData data = (ExceptionSensorData) element;
 			Column enumId = Column.fromOrd(index);
-			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
+			MethodIdent methodIdent = null;
+			if (0 != data.getMethodIdent()) {
+				methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
+			}
 
 			return getStyledTextForColumn(data, methodIdent, enumId);
 		}
