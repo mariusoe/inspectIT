@@ -74,7 +74,7 @@ public class ExceptionDataAggregator implements IAggregator<ExceptionSensorData>
 		clone.setErrorMessage(exceptionData.getErrorMessage());
 		clone.setThrowableType(exceptionData.getThrowableType());
 		if (exceptionAggregationType == ExceptionAggregationType.DISTINCT_STACK_TRACES) {
-			clone.setStackTrace(exceptionData.getStackTrace());
+			clone.setStackTrace(getCorrectStackTrace(exceptionData.getStackTrace()));
 		}
 		return clone;
 	}
@@ -99,10 +99,30 @@ public class ExceptionDataAggregator implements IAggregator<ExceptionSensorData>
 		} else if (exceptionAggregationType == ExceptionAggregationType.DISTINCT_STACK_TRACES) {
 			int result = 0;
 			result = prime * result + ((exceptionSensorData.getErrorMessage() == null) ? 0 : exceptionSensorData.getErrorMessage().hashCode());
-			result = prime * result + ((exceptionSensorData.getStackTrace() == null) ? 0 : exceptionSensorData.getStackTrace().hashCode());
+			result = prime * result + ((exceptionSensorData.getStackTrace() == null) ? 0 : getCorrectStackTrace(exceptionSensorData.getStackTrace()).hashCode());
 			return result;
 		}
 		return 0;
+	}
+
+	/**
+	 * Returns the stack trace starting at the first line where the method trace starts.
+	 * 
+	 * @param stackTrace
+	 *            Original stack trace.
+	 * @return Modified stack trace.
+	 */
+	private String getCorrectStackTrace(String stackTrace) {
+		if (null == stackTrace) {
+			return null;
+		} else {
+			int index = stackTrace.indexOf("\n\tat");
+			if (index >= 0) {
+				return stackTrace.substring(index + 1);
+			} else {
+				return stackTrace;
+			}
+		}
 	}
 
 }

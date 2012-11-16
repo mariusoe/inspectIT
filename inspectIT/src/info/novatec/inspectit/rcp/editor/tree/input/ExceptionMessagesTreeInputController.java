@@ -8,6 +8,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
+import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.util.ArrayList;
@@ -45,6 +46,11 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 	 * The ID of this subview / controller.
 	 */
 	public static final String ID = "inspectit.subview.tree.exceptionmessagestree";
+
+	/**
+	 * Mam leght of the error message in the tree.
+	 */
+	private static final int MAX_ERROR_MSG_SIZE = 150;
 
 	/**
 	 * Message for stack trace not available.
@@ -226,19 +232,24 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 			}
 
 			private void addText(Text text) {
+				StringBuilder stringBuilder = new StringBuilder(data.getThrowableType());
+				if (null != data.getErrorMessage()) {
+					stringBuilder.append(": " + data.getErrorMessage() + "\n");
+				} else if (!isStackTrace) {
+					stringBuilder = new StringBuilder(NO_ERROR_MESSAGE_PROVIDED + "\n");
+				} else {
+					stringBuilder.append("\n");
+				}
+
 				if (isStackTrace) {
 					if (null != data.getStackTrace()) {
-						text.setText(data.getStackTrace() + "\n");
+						stringBuilder.append(data.getStackTrace() + "\n");
 					} else {
-						text.setText(STACK_TRACK_NOT_AVAILABLE + "\n");
-					}
-				} else {
-					if (null != data.getErrorMessage()) {
-						text.setText(data.getErrorMessage() + "\n");
-					} else {
-						text.setText(NO_ERROR_MESSAGE_PROVIDED + "\n");
+						stringBuilder = new StringBuilder(STACK_TRACK_NOT_AVAILABLE + "\n");
 					}
 				}
+
+				text.setText(stringBuilder.toString());
 			}
 		};
 		dialog.open();
@@ -399,7 +410,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 				if (null != errorMessage && !"".equals(errorMessage)) {
 					// if error message is provided then it's a first level element
 					// of the tree
-					styledString = new StyledString(errorMessage);
+					styledString = new StyledString(TextFormatter.crop(TextFormatter.clearLineBreaks(errorMessage), MAX_ERROR_MSG_SIZE));
 				} else {
 					// is used when there is no error message provided in the first
 					// level element
