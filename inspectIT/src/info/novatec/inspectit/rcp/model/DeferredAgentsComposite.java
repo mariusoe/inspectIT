@@ -7,8 +7,8 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ui.progress.IElementCollector;
@@ -56,11 +56,11 @@ public class DeferredAgentsComposite extends DeferredComposite implements ICmrRe
 		monitor.beginTask("Loading agents..", IProgressMonitor.UNKNOWN);
 		try {
 			if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
-				List<? extends PlatformIdent> agents = cmrRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents();
-				Map<Long, AgentStatusData> agentStatusDataMap = cmrRepositoryDefinition.getGlobalDataAccessService().getAgentStatusDataMap();
+				Map<PlatformIdent, AgentStatusData> agents = cmrRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents();
 				if (null != agents) {
-					for (PlatformIdent platformIdent : agents) {
-						AgentStatusData agentStatusData = agentStatusDataMap.get(platformIdent.getId());
+					for (Entry<PlatformIdent, AgentStatusData> entry : agents.entrySet()) {
+						PlatformIdent platformIdent = entry.getKey();
+						AgentStatusData agentStatusData = entry.getValue();
 						// the agentstatusdata is null if the agent wasn't connected before
 						if (showOldAgents || (!showOldAgents && agentStatusData != null)) {
 							Component agentLeaf = new AgentLeaf(platformIdent, agentStatusData);

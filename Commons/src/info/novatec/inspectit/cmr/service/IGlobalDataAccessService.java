@@ -19,12 +19,13 @@ import java.util.Map;
 public interface IGlobalDataAccessService {
 
 	/**
-	 * Returns all the connected Agents of this CMR. The List contains {@link PlatformIdent}
-	 * objects.
+	 * Returns all the connected Agents of this CMR. The Map contains {@link PlatformIdent} objects
+	 * with the current AgentStatusInfo.
 	 * 
-	 * @return All connected Agents.
+	 * @return All connected Agents with it's statues. Note that it is possible that the status of
+	 *         an agent is not available. Thus it is recommended to use the entry set of this map.
 	 */
-	List<? extends PlatformIdent> getConnectedAgents();
+	Map<PlatformIdent, AgentStatusData> getConnectedAgents();
 
 	/**
 	 * Returns the map of platform ident IDs and {@link AgentStatusData}.

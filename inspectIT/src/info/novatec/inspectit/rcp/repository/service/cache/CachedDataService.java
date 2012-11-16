@@ -4,13 +4,15 @@ import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
+import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.runtime.Assert;
+
 /**
  * The default implementation of the cached ident objects. Provides a protected-visible method to
  * analyze and put a list of platform ident objects into the cache.
@@ -60,7 +62,7 @@ public class CachedDataService {
 	 * @param agents
 	 *            The list of platform ident objects to cache.
 	 */
-	public void putIntoCache(List<? extends PlatformIdent> agents) {
+	public void putIntoCache(Collection<? extends PlatformIdent> agents) {
 		platformMap.clear();
 		methodMap.clear();
 		sensorTypeMap.clear();
@@ -134,8 +136,8 @@ public class CachedDataService {
 	 * Internal refresh of the idents. Currently everything is loaded again.
 	 */
 	private void refreshIdents() {
-		List<? extends PlatformIdent> agents = globalDataAccessService.getConnectedAgents();
-		putIntoCache(agents);
+		Map<PlatformIdent, AgentStatusData> agents = globalDataAccessService.getConnectedAgents();
+		putIntoCache(agents.keySet());
 	}
 
 }

@@ -163,7 +163,7 @@ public class SelectAgentsWizardPage extends WizardPage {
 			}
 
 			if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-				agentList = cmrRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents();
+				agentList = new ArrayList<PlatformIdent>(cmrRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents().keySet());
 				main.setLayout(new GridLayout(1, false));
 
 				allAgents = new Button(main, SWT.RADIO);

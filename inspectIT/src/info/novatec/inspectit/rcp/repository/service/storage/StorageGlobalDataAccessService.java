@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,8 +46,12 @@ public class StorageGlobalDataAccessService extends AbstractStorageService<Defau
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<PlatformIdent> getConnectedAgents() {
-		return agents;
+	public Map<PlatformIdent, AgentStatusData> getConnectedAgents() {
+		Map<PlatformIdent, AgentStatusData> result = new HashMap<PlatformIdent, AgentStatusData>();
+		for (PlatformIdent platformIdent : agents) {
+			result.put(platformIdent, null);
+		}
+		return result;
 	}
 
 	/**

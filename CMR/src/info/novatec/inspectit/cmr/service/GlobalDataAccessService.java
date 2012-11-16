@@ -11,6 +11,7 @@ import info.novatec.inspectit.spring.logger.Logger;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,10 +54,15 @@ public class GlobalDataAccessService implements IGlobalDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public List<PlatformIdent> getConnectedAgents() {
-		// only load the ones which are currently connected
-		List<PlatformIdent> result = platformIdentDao.findAllInitialized();
-		return result;
+	public Map<PlatformIdent, AgentStatusData> getConnectedAgents() {
+		List<PlatformIdent> agents = platformIdentDao.findAllInitialized();
+		Map<Long, AgentStatusData> agentStatusMap = agentStatusProvider.getAgentStatusDataMap();
+
+		Map<PlatformIdent, AgentStatusData> resultMap = new HashMap<PlatformIdent, AgentStatusData>();
+		for (PlatformIdent platformIdent : agents) {
+			resultMap.put(platformIdent, agentStatusMap.get(platformIdent.getId()));
+		}
+		return resultMap;
 	}
 
 	/**

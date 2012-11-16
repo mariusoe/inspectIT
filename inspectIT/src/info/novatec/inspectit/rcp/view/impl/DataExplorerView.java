@@ -303,18 +303,19 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 * @param repositoryDefinition
 	 *            {@link RepositoryDefinition}.
 	 */
+	@SuppressWarnings("unchecked")
 	private void updateAvailableAgents(RepositoryDefinition repositoryDefinition) {
 		if (repositoryDefinition instanceof CmrRepositoryDefinition) {
 			CmrRepositoryDefinition cmrRepositoryDefinition = (CmrRepositoryDefinition) repositoryDefinition;
 			if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-				availableAgents = cmrRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents();
+				availableAgents = new ArrayList<PlatformIdent>(cmrRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents().keySet());
 			} else {
 				availableAgents = null;
 			}
 		} else if (repositoryDefinition instanceof StorageRepositoryDefinition) {
 			StorageRepositoryDefinition storageRepositoryDefinition = (StorageRepositoryDefinition) repositoryDefinition;
 			if (storageRepositoryDefinition.getLocalStorageData().isFullyDownloaded() || storageRepositoryDefinition.getCmrRepositoryDefinition().getOnlineStatus() != OnlineStatus.OFFLINE) {
-				availableAgents = storageRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents();
+				availableAgents = new ArrayList<PlatformIdent>(storageRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents().keySet());
 			} else {
 				availableAgents = null;
 			}
