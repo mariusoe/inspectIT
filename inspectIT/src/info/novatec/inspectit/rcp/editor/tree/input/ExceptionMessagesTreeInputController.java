@@ -40,10 +40,21 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  * 
  */
 public class ExceptionMessagesTreeInputController extends AbstractTreeInputController {
+
 	/**
 	 * The ID of this subview / controller.
 	 */
 	public static final String ID = "inspectit.subview.tree.exceptionmessagestree";
+
+	/**
+	 * Message for stack trace not available.
+	 */
+	private static final String STACK_TRACK_NOT_AVAILABLE = "Stack track not available";
+
+	/**
+	 * Message for no error message.
+	 */
+	private static final String NO_ERROR_MESSAGE_PROVIDED = "No Error Message provided";
 
 	/**
 	 * Data access service for getting the stack traces.
@@ -153,15 +164,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 	@Override
 	public void showDetails(Shell parent, Object element) {
 		final ExceptionSensorData data = (ExceptionSensorData) element;
-		String trace = "You selected the error message. Please select a stack trace from the subsequent tree.";
-
-		if (!parentChildrenMap.containsKey(data)) {
-			// show stack trace in the tool tip only when we selected a stack
-			// trace from the tree and not an error message
-			trace = data.getStackTrace();
-		}
-
-		final String stackTrace = trace;
+		final boolean isStackTrace = !parentChildrenMap.containsKey(data);
 
 		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
 		boolean takeFocusOnOpen = true;
@@ -169,8 +172,13 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 		boolean persistLocation = true;
 		boolean showDialogMenu = false;
 		boolean showPersistActions = true;
-		String titleText = "StackTrace";
-		String infoText = "StackTrace";
+		String titleText = null;
+		String infoText = "Exception sensor data";
+		if (isStackTrace) {
+			titleText = "Stack trace";
+		} else {
+			titleText = "Error message";
+		}
 
 		PopupDialog dialog = new PopupDialog(parent, shellStyle, takeFocusOnOpen, persistSize, persistLocation, showDialogMenu, showPersistActions, titleText, infoText) {
 			private static final int CURSOR_SIZE = 15;
@@ -218,8 +226,19 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 			}
 
 			private void addText(Text text) {
-				String content = stackTrace + "\n";
-				text.setText(content);
+				if (isStackTrace) {
+					if (null != data.getStackTrace()) {
+						text.setText(data.getStackTrace() + "\n");
+					} else {
+						text.setText(STACK_TRACK_NOT_AVAILABLE + "\n");
+					}
+				} else {
+					if (null != data.getErrorMessage()) {
+						text.setText(data.getErrorMessage() + "\n");
+					} else {
+						text.setText(NO_ERROR_MESSAGE_PROVIDED + "\n");
+					}
+				}
 			}
 		};
 		dialog.open();
@@ -384,14 +403,14 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 				} else {
 					// is used when there is no error message provided in the first
 					// level element
-					styledString = new StyledString("No Error Message provided");
+					styledString = new StyledString(NO_ERROR_MESSAGE_PROVIDED);
 				}
 			} else {
 				String[] stackTraceLines = data.getStackTrace().split("\n");
 				if (stackTraceLines.length > 1) {
 					styledString = new StyledString(stackTraceLines[1]);
 				} else {
-					styledString = new StyledString("Stack track not available");
+					styledString = new StyledString(STACK_TRACK_NOT_AVAILABLE);
 				}
 			}
 			return styledString;
