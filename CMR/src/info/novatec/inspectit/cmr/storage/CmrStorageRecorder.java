@@ -1,8 +1,11 @@
 package info.novatec.inspectit.cmr.storage;
 
+import info.novatec.inspectit.cmr.dao.StorageDataDao;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.SystemInformationData;
 import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.StorageData;
+import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.StorageWriter;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.recording.RecordingProperties;
@@ -10,6 +13,9 @@ import info.novatec.inspectit.storage.recording.RecordingState;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -17,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -44,6 +51,12 @@ public class CmrStorageRecorder {
 	private CmrStorageManager cmrStorageManager;
 
 	/**
+	 * {@link StorageDataDao}.
+	 */
+	@Autowired
+	private StorageDataDao storageDataDao;
+
+	/**
 	 * {@link ExecutorService} for tasks of the tree handling.
 	 */
 	@Autowired
@@ -59,6 +72,11 @@ public class CmrStorageRecorder {
 	 * Future for the task of recording start.
 	 */
 	private ScheduledFuture<?> startRecordingFuture;
+
+	/**
+	 * Set of involved Agents, used after recording to store proper Agent information.
+	 */
+	private Set<Long> involvedAgentsSet = new HashSet<Long>();
 
 	/**
 	 * Storage writer to use for writing.
@@ -88,13 +106,13 @@ public class CmrStorageRecorder {
 	public void record(DefaultData defaultData) {
 		if (isRecordingOn() && storageWriter.isWritingOn()) {
 			Collection<AbstractDataProcessor> recordingDataProcessors = recordingProperties.getRecordingDataProcessors();
-			if (null != recordingDataProcessors && !recordingDataProcessors.isEmpty()) {
+			if (CollectionUtils.isNotEmpty(recordingDataProcessors)) {
 				for (AbstractDataProcessor dataProcessor : recordingDataProcessors) {
 					dataProcessor.process(defaultData);
 				}
-			} else {
-				storageWriter.write(defaultData);
 			}
+			involvedAgentsSet.add(defaultData.getPlatformIdent());
+
 		}
 	}
 
@@ -106,16 +124,20 @@ public class CmrStorageRecorder {
 	 *            Writer for executing writing tasks.
 	 * @param recProperties
 	 *            {@link RecordingProperties} used during the recording.
+	 * @throws StorageException
+	 *             If parameters are null, storage writer is not prepared for write or data
+	 *             processor are not provided.
 	 */
-	public synchronized void startOrScheduleRecording(final StorageWriter stWriter, final RecordingProperties recProperties) {
+	public synchronized void startOrScheduleRecording(final StorageWriter stWriter, final RecordingProperties recProperties) throws StorageException {
 		if (!isRecordingOn() && !isRecordingScheduled()) {
 			if (null == stWriter) {
-				throw new IllegalArgumentException("Storage writer can not be null. Recording will not be started.");
+				throw new StorageException("Storage writer can not be null. Recording will not be started.");
 			} else if (!stWriter.isWritingOn()) {
-				throw new IllegalArgumentException("Storage writer must be prepared for write. Recording will not be started.");
-			}
-			if (null == recProperties) {
-				throw new IllegalArgumentException("Recording properties can not be null. Recording will not be started.");
+				throw new StorageException("Storage writer must be prepared for write. Recording will not be started.");
+			} else if (null == recProperties) {
+				throw new StorageException("Recording properties can not be null. Recording will not be started.");
+			} else if (CollectionUtils.isEmpty(recProperties.getRecordingDataProcessors())) {
+				throw new StorageException("Recording data processor must be provided for recording.");
 			}
 			storageWriter = stWriter;
 			recordingProperties = recProperties;
@@ -148,17 +170,8 @@ public class CmrStorageRecorder {
 	 * @param recProperties
 	 *            {@link RecordingProperties} used during the recording.
 	 */
-	protected synchronized void startRecording(StorageWriter stWriter, RecordingProperties recProperties) {
+	private synchronized void startRecording(StorageWriter stWriter, RecordingProperties recProperties) {
 		if (!isRecordingOn()) {
-			if (null == stWriter) {
-				throw new IllegalArgumentException("Storage writer can not be null. Recording will not be started.");
-			} else if (!stWriter.isWritingOn()) {
-				throw new IllegalArgumentException("Storage writer must be prepared for write. Recording will not be started.");
-			}
-			if (null == recProperties) {
-				throw new IllegalArgumentException("Recording properties can not be null. Recording will not be started.");
-			}
-
 			storageWriter = stWriter;
 			recordingProperties = recProperties;
 
@@ -221,6 +234,15 @@ public class CmrStorageRecorder {
 					abstractDataProcessor.flush();
 				}
 			}
+
+			// save system info data if necessary
+			if (!involvedAgentsSet.isEmpty()) {
+				List<SystemInformationData> toRecord = storageDataDao.getSystemInformationData(involvedAgentsSet);
+				for (SystemInformationData defaultData : toRecord) {
+					record(defaultData);
+				}
+			}
+			involvedAgentsSet.clear();
 
 			if (log.isDebugEnabled()) {
 				log.info("Recording stopped for storage: " + getStorageData());

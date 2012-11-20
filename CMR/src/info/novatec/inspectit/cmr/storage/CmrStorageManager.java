@@ -251,8 +251,10 @@ public class CmrStorageManager extends StorageManager {
 	 *             If {@link IOException} occurs while creating and opening the storage.
 	 * @throws SerializationException
 	 *             If serialization fails when creating the storage.
+	 * @throws StorageException
+	 *             If recording can not be started for some reason.
 	 */
-	public void startOrScheduleRecording(StorageData storageData, RecordingProperties recordingProperties) throws IOException, SerializationException {
+	public void startOrScheduleRecording(StorageData storageData, RecordingProperties recordingProperties) throws IOException, SerializationException, StorageException {
 		if (!isStorageExisting(storageData)) {
 			this.createStorage(storageData);
 		}

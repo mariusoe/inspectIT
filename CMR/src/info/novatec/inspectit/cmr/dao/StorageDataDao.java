@@ -1,6 +1,7 @@
 package info.novatec.inspectit.cmr.dao;
 
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.SystemInformationData;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 
@@ -116,5 +117,14 @@ public interface StorageDataDao {
 	 * @return Data to be store in storage.
 	 */
 	List<DefaultData> getDataFromCopyTemplateList(List<DefaultData> copyDataList);
+
+	/**
+	 * Returns the last {@link SystemInformationData} for every agent provided in the list.
+	 * 
+	 * @param agentIds
+	 *            Collection of agent IDs.
+	 * @return List of {@link SystemInformationData}.
+	 */
+	List<SystemInformationData> getSystemInformationData(Collection<Long> agentIds);
 
 }

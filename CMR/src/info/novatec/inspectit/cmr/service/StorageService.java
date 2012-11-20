@@ -189,7 +189,10 @@ public class StorageService implements IStorageService {
 			try {
 				storageManager.startOrScheduleRecording(storageData, recordingProperties);
 				return storageData;
-			} catch (Exception e) {
+			} catch (IOException e) {
+				log.warn("Exception in storage service.", e);
+				throw new StorageException("Exception occurred trying to start recording on storage " + storageData + ".", e);
+			} catch (SerializationException e) {
 				log.warn("Exception in storage service.", e);
 				throw new StorageException("Exception occurred trying to start recording on storage " + storageData + ".", e);
 			}

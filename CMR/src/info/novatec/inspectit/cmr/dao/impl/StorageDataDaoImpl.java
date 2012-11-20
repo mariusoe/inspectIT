@@ -2,6 +2,7 @@ package info.novatec.inspectit.cmr.dao.impl;
 
 import info.novatec.inspectit.cmr.dao.StorageDataDao;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.SystemInformationData;
 import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
 import info.novatec.inspectit.indexing.impl.IndexingException;
@@ -27,6 +28,8 @@ import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -201,6 +204,21 @@ public class StorageDataDaoImpl extends HibernateDaoSupport implements StorageDa
 			query.setPlatformIdent(platformIdents.iterator().next().longValue());
 		}
 		return indexingTree.query(query);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	public List<SystemInformationData> getSystemInformationData(Collection<Long> agentIds) {
+		DetachedCriteria subQuery = DetachedCriteria.forClass(SystemInformationData.class);
+		subQuery.add(Restrictions.in("platformIdent", agentIds));
+		subQuery.setProjection(Projections.projectionList().add(Projections.max("id")));
+
+		DetachedCriteria defaultDataCriteria = DetachedCriteria.forClass(SystemInformationData.class);
+		defaultDataCriteria.add(Property.forName("id").in(subQuery));
+		defaultDataCriteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
+		return getHibernateTemplate().findByCriteria(defaultDataCriteria);
 	}
 
 	/**

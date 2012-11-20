@@ -16,8 +16,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * {@link IGlobalDataAccessService} for storage purposes. This class indirectly uses the
@@ -77,10 +80,28 @@ public class StorageGlobalDataAccessService extends AbstractStorageService<Defau
 	 * {@inheritDoc}
 	 */
 	public DefaultData getLastDataObject(DefaultData template) {
-		// Problematic, to get the last object we need to de-serialize all to find which one has
-		// highest timestamp
-		// TODO Solution!?
-		return null;
+		StorageIndexQuery query = storageIndexQueryProvider.createNewStorageIndexQuery();
+		query.setMinId(template.getId());
+		ArrayList<Class<?>> searchClasses = new ArrayList<Class<?>>();
+		searchClasses.add(template.getClass());
+		query.setObjectClasses(searchClasses);
+		query.setPlatformIdent(template.getPlatformIdent());
+		query.setSensorTypeIdent(template.getSensorTypeIdent());
+		List<DefaultData> resultList = super.executeQuery(query);
+
+		if (CollectionUtils.isNotEmpty(resultList)) {
+			Iterator<DefaultData> it = resultList.iterator();
+			DefaultData lastObject = it.next();
+			while (it.hasNext()) {
+				DefaultData next = it.next();
+				if (next.getTimeStamp().after(lastObject.getTimeStamp())) {
+					lastObject = next;
+				}
+			}
+			return lastObject;
+		} else {
+			return null;
+		}
 	}
 
 	/**
