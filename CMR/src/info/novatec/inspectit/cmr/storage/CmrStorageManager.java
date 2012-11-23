@@ -583,56 +583,59 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	}
 
 	/**
-	 * Returns the list of the string that represent the path to the index files for one storage.
-	 * The paths are in form "/directory/file.extension". These paths can be used in combination to
-	 * CMR's IP and port to get the files via HTTP.
+	 * Returns the map of the string/long pairs that represent the path to the index files for one
+	 * storage and their size in bytes. The paths are in form "/directory/file.extension". These
+	 * paths can be used in combination to CMR's ip and port to get the files via HTTP.
 	 * <p>
-	 * For example, if the CMR has the IP localhost and port 8080, the address for the file would
+	 * For example, if the CMR has the ip localhost and port 8080, the address for the file would
 	 * be: http://localhost:8080/directory/file.extension
 	 * 
 	 * @param storageData
 	 *            Storage to get index files for.
-	 * @return Returns the list of the string that represent the path to the index files.
+	 * @return Returns the map of the string/long pairs that represent the path to the index files
+	 *         and their size.
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
 	 */
-	public List<String> getIndexFilesLocations(StorageData storageData) throws IOException {
+	public Map<String, Long> getIndexFilesLocations(StorageData storageData) throws IOException {
 		return getFilesHttpLocation(storageData, StorageFileExtensions.INDEX_FILE_EXT);
 	}
 
 	/**
-	 * Returns the list of the string that represent the path to the data files for one storage. The
-	 * paths are in form "/directory/file.extension". These paths can be used in combination to
-	 * CMR's IP and port to get the files via HTTP.
+	 * Returns the map of the string/long pairs that represent the path to the data files for one
+	 * storage and their size in bytes. The paths are in form "/directory/file.extension". These
+	 * paths can be used in combination to CMR's ip and port to get the files via HTTP.
 	 * <p>
-	 * For example, if the CMR has the IP localhost and port 8080, the address for the file would
+	 * For example, if the CMR has the ip localhost and port 8080, the address for the file would
 	 * be: http://localhost:8080/directory/file.extension
 	 * 
 	 * @param storageData
 	 *            Storage to get index files for.
-	 * @return Returns the list of the string that represent the path to the data files.
+	 * @return Returns the map of the string/long pairs that represent the path to the data files
+	 *         and their size.
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
 	 */
-	public List<String> getDataFilesLocations(StorageData storageData) throws IOException {
+	public Map<String, Long> getDataFilesLocations(StorageData storageData) throws IOException {
 		return getFilesHttpLocation(storageData, StorageFileExtensions.DATA_FILE_EXT);
 	}
 
 	/**
-	 * Returns the list of the string that represent the path to the agent files for one storage.
-	 * The paths are in form "/directory/file.extension". These paths can be used in combination to
-	 * CMR's IP and port to get the files via HTTP.
+	 * Returns the map of the string/long pairs that represent the path to the agent files for one
+	 * storage and their size in bytes. The paths are in form "/directory/file.extension". These
+	 * paths can be used in combination to CMR's ip and port to get the files via HTTP.
 	 * <p>
-	 * For example, if the CMR has the IP localhost and port 8080, the address for the file would
+	 * For example, if the CMR has the ip localhost and port 8080, the address for the file would
 	 * be: http://localhost:8080/directory/file.extension
 	 * 
 	 * @param storageData
 	 *            Storage to get index files for.
-	 * @return Returns the list of the string that represent the path to the agent files.
+	 * @return Returns the map of the string/long pairs that represent the path to the agent files
+	 *         and their size.
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
 	 */
-	public List<String> getAgentFilesLocations(StorageData storageData) throws IOException {
+	public Map<String, Long> getAgentFilesLocations(StorageData storageData) throws IOException {
 		return getFilesHttpLocation(storageData, StorageFileExtensions.AGENT_FILE_EXT);
 	}
 
@@ -643,14 +646,15 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 *            Storage.
 	 * @param extension
 	 *            Files extension.
-	 * @return Returns list of files with given extension for a storage in HTTP form.
+	 * @return Returns the map conating pair with file name with given extension for a storage in
+	 *         HTTP form and size of each file.
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
 	 */
-	private List<String> getFilesHttpLocation(StorageData storageData, final String extension) throws IOException {
+	private Map<String, Long> getFilesHttpLocation(StorageData storageData, final String extension) throws IOException {
 		Path storagePath = getStoragePath(storageData);
 		if (storagePath == null || !Files.isDirectory(storagePath)) {
-			return Collections.emptyList();
+			return Collections.emptyMap();
 		}
 
 		final List<Path> filesPaths = new ArrayList<Path>();
@@ -664,9 +668,9 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 			}
 		});
 
-		List<String> result = new ArrayList<String>();
+		Map<String, Long> result = new HashMap<String, Long>();
 		for (Path path : filesPaths) {
-			result.add("/" + storageData.getStorageFolder() + "/" + path.getFileName());
+			result.put("/" + storageData.getStorageFolder() + "/" + path.getFileName(), Files.size(path));
 		}
 
 		return result;

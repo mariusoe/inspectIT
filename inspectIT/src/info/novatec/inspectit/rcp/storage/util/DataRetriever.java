@@ -4,6 +4,8 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
 import info.novatec.inspectit.indexing.storage.impl.StorageDescriptor;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
+import info.novatec.inspectit.rcp.storage.http.TransferDataMonitor;
+import info.novatec.inspectit.rcp.storage.http.TransferRateInputStream;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
@@ -31,7 +33,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.fileupload.MultipartStream;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
@@ -45,6 +49,7 @@ import org.apache.http.entity.HttpEntityWrapper;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.eclipse.core.runtime.SubMonitor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatus.Series;
 
@@ -57,6 +62,30 @@ import com.esotericsoftware.kryo.io.Input;
  * 
  */
 public class DataRetriever {
+
+	/**
+	 * Enumeration for different storage file types that can be downloaded.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	public enum StorageFileType {
+
+		/**
+		 * Agent files.
+		 */
+		AGENT,
+
+		/**
+		 * Indexing files.
+		 */
+		INDEX,
+
+		/**
+		 * Data files.
+		 */
+		DATA;
+	}
 
 	/**
 	 * Amount of serializers to be available to this class.
@@ -260,8 +289,9 @@ public class DataRetriever {
 	}
 
 	/**
-	 * Down-loads and saves locally all platform idents associated with given {@link StorageData}.
-	 * Files will be saved in passed directory.
+	 * Downloads and saves locally wanted files associated with given {@link StorageData}. Files
+	 * will be saved in passed directory. The caller can specify the type of the files to download
+	 * by passing the proper {@link StorageFileType}s to the method.
 	 * 
 	 * @param cmrRepositoryDefinition
 	 *            {@link CmrRepositoryDefinition}.
@@ -277,93 +307,120 @@ public class DataRetriever {
 	 *            received content will be de-compressed. If false is passed content will be saved
 	 *            to file in the same format as received, but the path of the file will be altered
 	 *            with additional '.gzip' extension at the end.
+	 * @param subMonitor
+	 *            {@link SubMonitor} for process reporting.
+	 * @param fileTypes
+	 *            Files that should be downloaded.
+	 * @throws StorageException
+	 *             If directory to save does not exists. If files wanted can not be found on the
+	 *             server.
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
-	 * @throws StorageException
-	 *             If status of HTTP response is not successful (codes 2xx).
 	 */
-	public void downloadAndSavePlatformIdents(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, Path directory, boolean compressBefore, boolean decompressContent)
-			throws IOException, StorageException {
-		if (!Files.isDirectory(directory)) {
-			throw new StorageException("Directory path supplied as the agent data saving destinationis is not valid. Given path is: " + directory.toString());
-		}
-
-		List<String> platformIdentsFiles = cmrRepositoryDefinition.getStorageService().getAgentFilesLocations(storageData);
-		if (null != platformIdentsFiles) {
-			this.downloadAndSaveObjects(cmrRepositoryDefinition, platformIdentsFiles, directory, compressBefore, decompressContent);
-		} else {
-			throw new StorageException("No agent data files could be found on the repository '" + cmrRepositoryDefinition.getName() + "' for the storage " + storageData.toString());
-		}
-	}
-
-	/**
-	 * Down-loads and saves locally all platform idents associated with given {@link StorageData}.
-	 * Files will be saved in passed directory.
-	 * 
-	 * @param cmrRepositoryDefinition
-	 *            {@link CmrRepositoryDefinition}.
-	 * @param storageData
-	 *            {@link StorageData}.
-	 * @param directory
-	 *            Directory to save objects.
-	 * @param compressBefore
-	 *            Should data files be compressed on the fly before sent.
-	 * @param decompressContent
-	 *            If the useGzipCompression is <code>true</code>, this parameter will define if the
-	 *            received content will be de-compressed. If false is passed content will be saved
-	 *            to file in the same format as received, but the path of the file will be altered
-	 *            with additional '.gzip' extension at the end.
-	 * @throws IOException
-	 *             If {@link IOException} occurs.
-	 * @throws StorageException
-	 *             If status of HTTP response is not successful (codes 2xx).
-	 */
-	public void downloadAndSaveDataFiles(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, Path directory, boolean compressBefore, boolean decompressContent)
-			throws IOException, StorageException {
+	public void downloadAndSaveStorageFiles(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, Path directory, boolean compressBefore,
+			boolean decompressContent, SubMonitor subMonitor, StorageFileType... fileTypes) throws StorageException, IOException {
 		if (!Files.isDirectory(directory)) {
 			throw new StorageException("Directory path supplied as the data saving destination is not valid. Given path is: " + directory.toString());
 		}
 
-		List<String> dataFiles = cmrRepositoryDefinition.getStorageService().getDataFilesLocations(storageData);
-		if (null != dataFiles) {
-			this.downloadAndSaveObjects(cmrRepositoryDefinition, dataFiles, directory, compressBefore, decompressContent);
+		Map<String, Long> allFiles = new HashMap<String, Long>();
+
+		// agent files
+		if (ArrayUtils.contains(fileTypes, StorageFileType.AGENT)) {
+			Map<String, Long> platformIdentsFiles = cmrRepositoryDefinition.getStorageService().getAgentFilesLocations(storageData);
+			if (MapUtils.isEmpty(platformIdentsFiles)) {
+				throw new StorageException("No agent data files could be found on the repository '" + cmrRepositoryDefinition.getName() + "' for the storage " + storageData.toString());
+			}
+			allFiles.putAll(platformIdentsFiles);
+		}
+
+		// indexing files
+		if (ArrayUtils.contains(fileTypes, StorageFileType.INDEX)) {
+			Map<String, Long> indexingTreeFiles = cmrRepositoryDefinition.getStorageService().getIndexFilesLocations(storageData);
+			if (MapUtils.isEmpty(indexingTreeFiles)) {
+				throw new StorageException("No index data files could be found on the repository '" + cmrRepositoryDefinition.getName() + "' for the storage " + storageData.toString());
+			}
+			allFiles.putAll(indexingTreeFiles);
+		}
+
+		if (ArrayUtils.contains(fileTypes, StorageFileType.DATA)) {
+			// data files
+			Map<String, Long> dataFiles = cmrRepositoryDefinition.getStorageService().getDataFilesLocations(storageData);
+			allFiles.putAll(dataFiles);
+		}
+
+		if (MapUtils.isNotEmpty(allFiles)) {
+			this.downloadAndSaveObjects(cmrRepositoryDefinition, allFiles, directory, compressBefore, decompressContent, subMonitor);
 		}
 	}
 
 	/**
-	 * Down-loads and saves locally all indexing files associated with given {@link StorageData}.
-	 * Files will be saved in passed directory.
+	 * Down-loads and saves the file from a {@link CmrRepositoryDefinition}. Files will be saved in
+	 * the directory that is denoted as the given Path object. Original file names will be used.
 	 * 
 	 * @param cmrRepositoryDefinition
-	 *            {@link CmrRepositoryDefinition}.
-	 * @param storageData
-	 *            {@link StorageData}.
-	 * @param directory
-	 *            Directory to save objects. compressBefore Should data files be compressed on the
-	 *            fly before sent.
-	 * @param compressBefore
-	 *            Should data files be compressed on the fly before sent.
+	 *            Repository.
+	 * @param files
+	 *            Map with file names and sizes.
+	 * @param path
+	 *            Directory where files will be saved.
+	 * @param useGzipCompression
+	 *            If the GZip compression should be used when files are downloaded.
 	 * @param decompressContent
 	 *            If the useGzipCompression is <code>true</code>, this parameter will define if the
 	 *            received content will be de-compressed. If false is passed content will be saved
 	 *            to file in the same format as received, but the path of the file will be altered
 	 *            with additional '.gzip' extension at the end.
+	 * @param subMonitor
+	 *            {@link SubMonitor} for process reporting.
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
 	 * @throws StorageException
 	 *             If status of HTTP response is not successful (codes 2xx).
 	 */
-	public void downloadAndSaveIndexingTrees(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, Path directory, boolean compressBefore, boolean decompressContent)
-			throws IOException, StorageException {
-		if (!Files.isDirectory(directory)) {
-			throw new StorageException("Directory path supplied as the agent data saving destination is not valid. Given path is: " + directory.toString());
+	private void downloadAndSaveObjects(CmrRepositoryDefinition cmrRepositoryDefinition, Map<String, Long> files, Path path, boolean useGzipCompression, boolean decompressContent,
+			final SubMonitor subMonitor) throws IOException, StorageException {
+		DefaultHttpClient httpClient = new DefaultHttpClient();
+		final TransferDataMonitor transferDataMonitor = new TransferDataMonitor(subMonitor, files, useGzipCompression);
+		httpClient.addResponseInterceptor(new HttpResponseInterceptor() {
+			@Override
+			public void process(HttpResponse response, HttpContext context) throws HttpException,
+					IOException {
+				response.setEntity(new TransferRateEntity(response.getEntity(), transferDataMonitor));
+			}
+		});
+
+		if (useGzipCompression && decompressContent) {
+			httpClient.addResponseInterceptor(new GzipHttpResponseInterceptor());
 		}
 
-		List<String> indexingTreeFiles = cmrRepositoryDefinition.getStorageService().getIndexFilesLocations(storageData);
-		if (null != indexingTreeFiles) {
-			this.downloadAndSaveObjects(cmrRepositoryDefinition, indexingTreeFiles, directory, compressBefore, decompressContent);
-		} else {
-			throw new StorageException("No index data files could be found on the repository '" + cmrRepositoryDefinition.getName() + "' for the storage " + storageData.toString());
+		for (Map.Entry<String, Long> fileEntry : files.entrySet()) {
+			String fileName = fileEntry.getKey();
+			String fileLocation = getServerUri(cmrRepositoryDefinition) + fileName;
+			HttpGet httpGet = new HttpGet(fileLocation);
+			if (useGzipCompression) {
+				httpGet.addHeader("accept-encoding", "gzip");
+			}
+
+			transferDataMonitor.startDownload(fileName);
+			HttpResponse response = httpClient.execute(httpGet);
+			StatusLine statusLine = response.getStatusLine();
+			if (HttpStatus.valueOf(statusLine.getStatusCode()).series().equals(Series.SUCCESSFUL)) {
+				HttpEntity entity = response.getEntity();
+				InputStream is = null;
+				try {
+					is = entity.getContent();
+					String[] splittedFileName = fileName.split("/");
+					String originalFileName = splittedFileName[splittedFileName.length - 1];
+					Path writePath = path.resolve(originalFileName);
+					Files.copy(is, writePath, StandardCopyOption.REPLACE_EXISTING);
+				} finally {
+					if (null != is) {
+						is.close();
+					}
+				}
+			}
+			transferDataMonitor.endDownload(fileName);
 		}
 	}
 
@@ -413,60 +470,6 @@ public class DataRetriever {
 		}
 
 		return filesMap;
-	}
-
-	/**
-	 * Down-loads and saves the file from a {@link CmrRepositoryDefinition}. Files will be saved in
-	 * the directory that is denoted as the given Path object. Original file names will be used.
-	 * 
-	 * @param cmrRepositoryDefinition
-	 *            Repository.
-	 * @param fileNames
-	 *            Name of the files.
-	 * @param path
-	 *            Directory where files will be saved.
-	 * @param useGzipCompression
-	 *            If the GZip compression should be used when files are downloaded.
-	 * @param decompressContent
-	 *            If the useGzipCompression is <code>true</code>, this parameter will define if the
-	 *            received content will be de-compressed. If false is passed content will be saved
-	 *            to file in the same format as received, but the path of the file will be altered
-	 *            with additional '.gzip' extension at the end.
-	 * @throws IOException
-	 *             If {@link IOException} occurs.
-	 * @throws StorageException
-	 *             If status of HTTP response is not successful (codes 2xx).
-	 */
-	private void downloadAndSaveObjects(CmrRepositoryDefinition cmrRepositoryDefinition, List<String> fileNames, Path path, boolean useGzipCompression, boolean decompressContent) throws IOException,
-			StorageException {
-		DefaultHttpClient httpClient = new DefaultHttpClient();
-		if (useGzipCompression && decompressContent) {
-			httpClient.addResponseInterceptor(new GzipHttpResponseInterceptor());
-		}
-		for (String fileName : fileNames) {
-			HttpGet httpGet = new HttpGet(getServerUri(cmrRepositoryDefinition) + fileName);
-			if (useGzipCompression) {
-				httpGet.addHeader("accept-encoding", "gzip");
-			}
-			HttpResponse response = httpClient.execute(httpGet);
-			StatusLine statusLine = response.getStatusLine();
-			if (HttpStatus.valueOf(statusLine.getStatusCode()).series().equals(Series.SUCCESSFUL)) {
-				HttpEntity entity = response.getEntity();
-				InputStream is = null;
-				try {
-					is = entity.getContent();
-					String[] splittedFileName = fileName.split("/");
-					String originalFileName = splittedFileName[splittedFileName.length - 1];
-					Path writePath = path.resolve(originalFileName);
-					Files.copy(is, writePath, StandardCopyOption.REPLACE_EXISTING);
-				} finally {
-					if (null != is) {
-						is.close();
-					}
-				}
-			}
-
-		}
 	}
 
 	/**
@@ -563,6 +566,42 @@ public class DataRetriever {
 			return -1;
 		}
 
+	}
+
+	/**
+	 * Wrapping entity to support download speed monitoring.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private static class TransferRateEntity extends HttpEntityWrapper {
+
+		/**
+		 * {@link TransferDataMonitor} to pass to the {@link TransferRateInputStream}.
+		 */
+		private TransferDataMonitor transferDataMonitor;
+
+		/**
+		 * Default constructor.
+		 * 
+		 * @param wrapped
+		 *            Entity to be wrapped.
+		 * @param transferDataMonitor
+		 *            {@link TransferDataMonitor} to pass to the {@link TransferRateInputStream}.
+		 */
+		public TransferRateEntity(HttpEntity wrapped, TransferDataMonitor transferDataMonitor) {
+			super(wrapped);
+			this.transferDataMonitor = transferDataMonitor;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public InputStream getContent() throws IOException {
+			InputStream wrappedin = wrappedEntity.getContent();
+			return new TransferRateInputStream(wrappedin, transferDataMonitor);
+		}
 	}
 
 	/**

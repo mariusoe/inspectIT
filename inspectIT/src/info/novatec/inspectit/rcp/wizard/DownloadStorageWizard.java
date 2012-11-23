@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -112,9 +113,9 @@ public class DownloadStorageWizard extends Wizard implements INewWizard {
 			Job downloadStorageJob = new Job("Download Storage") {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
-					monitor.beginTask("Downloading data files..", IProgressMonitor.UNKNOWN);
+					SubMonitor subMonitor = SubMonitor.convert(monitor);
 					try {
-						InspectIT.getDefault().getInspectITStorageManager().fullyDownloadStorage(storageData, cmrRepositoryDefinition, compress);
+						InspectIT.getDefault().getInspectITStorageManager().fullyDownloadStorage(storageData, cmrRepositoryDefinition, compress, subMonitor);
 						Display.getDefault().asyncExec(new Runnable() {
 							@Override
 							public void run() {

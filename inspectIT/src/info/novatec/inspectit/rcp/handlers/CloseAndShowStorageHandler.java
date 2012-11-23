@@ -13,7 +13,12 @@ import info.novatec.inspectit.storage.StorageData;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
@@ -57,55 +62,65 @@ public class CloseAndShowStorageHandler extends CloseStorageHandler implements I
 			finalizeStorageJob.addJobChangeListener(new JobChangeAdapter() {
 				@Override
 				public void done(IJobChangeEvent jobEvent) {
-					InspectITStorageManager storageManager = InspectIT.getDefault().getInspectITStorageManager();
-					try {
-						storageManager.mountStorage(storageData, cmrRepositoryDefinition);
-					} catch (final Exception exception) {
-						Display.getDefault().asyncExec(new Runnable() {
-							@Override
-							public void run() {
-								InspectIT.getDefault().createErrorDialog("There was an exception trying to open the storage.", exception, -1);
-							}
-						});
-					}
-					RepositoryDefinition repositoryDefinition = null;
-					try {
-						repositoryDefinition = storageManager.getStorageRepositoryDefinition(storageManager.getLocalDataForStorage(storageData));
-					} catch (final Exception exception) {
-						Display.getDefault().asyncExec(new Runnable() {
-							@Override
-							public void run() {
-								InspectIT.getDefault().createErrorDialog("There was an exception trying to open the storage.", exception, -1);
-							}
-						});
-					}
-
-					// find views
-					final IWorkbenchPage page = HandlerUtil.getActiveSite(event).getPage();
-					final RepositoryDefinition finalRepositoryDefinition = repositoryDefinition;
-					Display.getDefault().asyncExec(new Runnable() {
+					Job mountStorageJob = new Job("Mounting Storage") {
 						@Override
-						public void run() {
-							IViewPart dataExplorerView = page.findView(DataExplorerView.VIEW_ID);
-							IViewPart storageManagerView = page.findView(StorageManagerView.VIEW_ID);
-							if (dataExplorerView == null) {
-								try {
-									dataExplorerView = page.showView(DataExplorerView.VIEW_ID);
-								} catch (PartInitException e) {
-									return;
+						protected IStatus run(IProgressMonitor monitor) {
+							SubMonitor subMonitor = SubMonitor.convert(monitor);
+							InspectITStorageManager storageManager = InspectIT.getDefault().getInspectITStorageManager();
+							try {
+								storageManager.mountStorage(storageData, cmrRepositoryDefinition, subMonitor);
+							} catch (final Exception exception) {
+								Display.getDefault().asyncExec(new Runnable() {
+									@Override
+									public void run() {
+										InspectIT.getDefault().createErrorDialog("There was an exception trying to open the storage.", exception, -1);
+									}
+								});
+							}
+							RepositoryDefinition repositoryDefinition = null;
+							try {
+								repositoryDefinition = storageManager.getStorageRepositoryDefinition(storageManager.getLocalDataForStorage(storageData));
+							} catch (final Exception exception) {
+								Display.getDefault().asyncExec(new Runnable() {
+									@Override
+									public void run() {
+										InspectIT.getDefault().createErrorDialog("There was an exception trying to open the storage.", exception, -1);
+									}
+								});
+							}
+
+							// find views
+							final IWorkbenchPage page = HandlerUtil.getActiveSite(event).getPage();
+							final RepositoryDefinition finalRepositoryDefinition = repositoryDefinition;
+							Display.getDefault().asyncExec(new Runnable() {
+								@Override
+								public void run() {
+									IViewPart dataExplorerView = page.findView(DataExplorerView.VIEW_ID);
+									IViewPart storageManagerView = page.findView(StorageManagerView.VIEW_ID);
+									if (dataExplorerView == null) {
+										try {
+											dataExplorerView = page.showView(DataExplorerView.VIEW_ID);
+										} catch (PartInitException e) {
+											return;
+										}
+									}
+									if (dataExplorerView instanceof DataExplorerView) {
+										PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().activate(dataExplorerView);
+										((DataExplorerView) dataExplorerView).showRepository(finalRepositoryDefinition, null);
+									}
+
+									if (storageManagerView instanceof StorageManagerView) {
+										((StorageManagerView) storageManagerView).refresh(cmrRepositoryDefinition);
+									}
 								}
-							}
-							if (dataExplorerView instanceof DataExplorerView) {
-								PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().activate(dataExplorerView);
-								((DataExplorerView) dataExplorerView).showRepository(finalRepositoryDefinition, null);
-							}
+							});
+							monitor.done();
+							return Status.OK_STATUS;
 
-							if (storageManagerView instanceof StorageManagerView) {
-								((StorageManagerView) storageManagerView).refresh(cmrRepositoryDefinition);
-							}
 						}
-					});
-
+					};
+					mountStorageJob.setUser(true);
+					mountStorageJob.schedule();
 				}
 			});
 

@@ -16,6 +16,7 @@ import info.novatec.inspectit.storage.StorageData;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -164,9 +165,9 @@ public class ExportStorageWizard extends Wizard implements INewWizard {
 				Job downloadAndExportStorageJob = new Job("Download And Export Storage") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
-						monitor.beginTask("Exporting data..", IProgressMonitor.UNKNOWN);
+						SubMonitor subMonitor = SubMonitor.convert(monitor);
 						try {
-							storageManager.zipStorageData((StorageData) storageData, cmrRepositoryDefinition, fileName, compress);
+							storageManager.zipStorageData((StorageData) storageData, cmrRepositoryDefinition, fileName, compress, subMonitor);
 							Display.getDefault().asyncExec(new Runnable() {
 								@Override
 								public void run() {

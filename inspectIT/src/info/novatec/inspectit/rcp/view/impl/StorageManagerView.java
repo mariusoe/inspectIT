@@ -36,6 +36,7 @@ import info.novatec.inspectit.storage.StorageData.StorageState;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -54,6 +55,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -62,6 +64,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -100,6 +103,7 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.ui.progress.UIJob;
 
 /**
@@ -1290,8 +1294,8 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 		private void process() {
 			StructuredSelection selection = (StructuredSelection) treeViewer.getSelection();
 			if (!selection.isEmpty() && selection.getFirstElement() instanceof StorageLeaf) {
-				StorageLeaf storageLeaf = (StorageLeaf) selection.getFirstElement();
-				InspectITStorageManager storageManager = InspectIT.getDefault().getInspectITStorageManager();
+				final StorageLeaf storageLeaf = (StorageLeaf) selection.getFirstElement();
+				final InspectITStorageManager storageManager = InspectIT.getDefault().getInspectITStorageManager();
 				RepositoryDefinition repositoryDefinition = null;
 				if (storageManager.isStorageMounted(storageLeaf.getStorageData())) {
 					// if we already have all data needed, get the repository definition and show it
@@ -1304,12 +1308,23 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 				} else if (storageLeaf.getStorageData().getState() == StorageState.CLOSED) {
 					// if it is closed, mount it first
 					try {
-						storageManager.mountStorage(storageLeaf.getStorageData(), storageLeaf.getCmrRepositoryDefinition());
+						((IProgressService) PlatformUI.getWorkbench().getService(IProgressService.class)).busyCursorWhile(new IRunnableWithProgress() {
+							@Override
+							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+								try {
+									SubMonitor subMonitor = SubMonitor.convert(monitor);
+									storageManager.mountStorage(storageLeaf.getStorageData(), storageLeaf.getCmrRepositoryDefinition(), subMonitor);
+									monitor.done();
+								} catch (Exception e) {
+									throw new InvocationTargetException(e);
+								}
+							}
+						});
 						LocalStorageData localStorageData = storageManager.getLocalDataForStorage(storageLeaf.getStorageData());
 						repositoryDefinition = storageManager.getStorageRepositoryDefinition(localStorageData);
-					} catch (Exception e1) {
+					} catch (Exception e) {
 						repositoryDefinition = null; // NOPMD
-						InspectIT.getDefault().createErrorDialog("Can not open storage.", e1, -1);
+						InspectIT.getDefault().createErrorDialog("Can not open storage.", e, -1);
 					}
 				} else if (storageLeaf.getStorageData().getState() == StorageState.OPENED) {
 					// if it's in writable state offer user to finalize it and explore it

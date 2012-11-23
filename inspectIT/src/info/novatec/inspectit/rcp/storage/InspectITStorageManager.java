@@ -12,6 +12,7 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatu
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
 import info.novatec.inspectit.rcp.storage.listener.StorageChangeListener;
 import info.novatec.inspectit.rcp.storage.util.DataRetriever;
+import info.novatec.inspectit.rcp.storage.util.DataRetriever.StorageFileType;
 import info.novatec.inspectit.rcp.storage.util.DataUploader;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.storage.IStorageData;
@@ -47,6 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.mutable.MutableObject;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.widgets.Display;
 
 import com.esotericsoftware.kryo.io.Input;
@@ -114,11 +116,13 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 *            Storage to mount.
 	 * @param cmrRepositoryDefinition
 	 *            {@link CmrRepositoryDefinition}.
+	 * @param subMonitor
+	 *            {@link SubMonitor} to report to.
 	 * @throws Exception
 	 *             If mount fails.
 	 */
-	public void mountStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition) throws Exception {
-		this.mountStorage(storageData, cmrRepositoryDefinition, false, false);
+	public void mountStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, SubMonitor subMonitor) throws Exception {
+		this.mountStorage(storageData, cmrRepositoryDefinition, false, false, subMonitor);
 	}
 
 	/**
@@ -134,10 +138,13 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 * @param compressBefore
 	 *            If the fullyDownalod is <code>true</code>, this parameter can define if data files
 	 *            should be compressed on the fly before sent.
+	 * @param subMonitor
+	 *            {@link SubMonitor} to report to.
 	 * @throws Exception
 	 *             If mount fails.
 	 */
-	private void mountStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, boolean fullyDownload, boolean compressBefore) throws Exception {
+	private void mountStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, boolean fullyDownload, boolean compressBefore, SubMonitor subMonitor)
+			throws Exception {
 		LocalStorageData localStorageData = new LocalStorageData(storageData);
 
 		Path directory = getStoragePath(localStorageData);
@@ -149,25 +156,20 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 			}
 		}
 
-		try {
-			dataRetriever.downloadAndSavePlatformIdents(cmrRepositoryDefinition, storageData, directory, compressBefore, true);
-		} catch (Exception e) {
-			deleteLocalStorageData(localStorageData, false);
-			throw e;
-		}
-
-		try {
-			dataRetriever.downloadAndSaveIndexingTrees(cmrRepositoryDefinition, storageData, directory, compressBefore, true);
-		} catch (Exception e) {
-			deleteLocalStorageData(localStorageData, false);
-			throw e;
-		}
-
 		if (fullyDownload) {
 			try {
-				dataRetriever.downloadAndSaveDataFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true);
+				subMonitor.setTaskName("Downloading storage files..");
+				dataRetriever.downloadAndSaveStorageFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true, subMonitor, StorageFileType.values());
 				downloadedStorages.add(localStorageData);
 				localStorageData.setFullyDownloaded(true);
+			} catch (Exception e) {
+				deleteLocalStorageData(localStorageData, false);
+				throw e;
+			}
+		} else {
+			try {
+				subMonitor.setTaskName("Downloading agent and indexing files..");
+				dataRetriever.downloadAndSaveStorageFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true, subMonitor, StorageFileType.AGENT, StorageFileType.INDEX);
 			} catch (Exception e) {
 				deleteLocalStorageData(localStorageData, false);
 				throw e;
@@ -224,10 +226,12 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 *            {@link CmrRepositoryDefinition}.
 	 * @param compressBefore
 	 *            Should data files be compressed on the fly before sent.
+	 * @param subMonitor
+	 *            {@link SubMonitor} to report to.
 	 * @throws Exception
 	 *             If any exception occurs.
 	 */
-	public void fullyDownloadStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, boolean compressBefore) throws Exception {
+	public void fullyDownloadStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, boolean compressBefore, SubMonitor subMonitor) throws Exception {
 		LocalStorageData localStorageData = null;
 		for (LocalStorageData lsd : mountedAvailableStorages.keySet()) {
 			if (ObjectUtils.equals(lsd.getId(), storageData.getId())) {
@@ -237,7 +241,7 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 		}
 
 		if (null == localStorageData) {
-			mountStorage(storageData, cmrRepositoryDefinition, true, compressBefore);
+			mountStorage(storageData, cmrRepositoryDefinition, true, compressBefore, subMonitor);
 			return;
 		}
 
@@ -246,7 +250,8 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 		}
 
 		Path directory = getStoragePath(localStorageData);
-		dataRetriever.downloadAndSaveDataFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true);
+		subMonitor.setTaskName("Downloading storage data files..");
+		dataRetriever.downloadAndSaveStorageFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true, subMonitor, StorageFileType.DATA);
 		downloadedStorages.add(localStorageData);
 		localStorageData.setFullyDownloaded(true);
 		try {
@@ -655,12 +660,15 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 *            Zip file name.
 	 * @param compressBefore
 	 *            Defines if the data should be compressed before downloading.
+	 * @param subMonitor
+	 *            {@link SubMonitor} to report to.
 	 * @throws StorageException
 	 *             If serialization of data fails during zipping.
 	 * @throws IOException
 	 *             If {@link IOException} occurs during compressing.
 	 */
-	public void zipStorageData(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, String zipFileName, boolean compressBefore) throws StorageException, IOException {
+	public void zipStorageData(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, String zipFileName, boolean compressBefore, SubMonitor subMonitor) throws StorageException,
+			IOException {
 		Path zipPath = Paths.get(zipFileName);
 		if (Files.exists(zipPath)) {
 			Files.delete(zipPath);
@@ -670,9 +678,8 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 		final Path zipRoot = zipFileSystem.getPath("/");
 
 		try {
-			dataRetriever.downloadAndSavePlatformIdents(cmrRepositoryDefinition, storageData, zipRoot, compressBefore, false);
-			dataRetriever.downloadAndSaveIndexingTrees(cmrRepositoryDefinition, storageData, zipRoot, compressBefore, false);
-			dataRetriever.downloadAndSaveDataFiles(cmrRepositoryDefinition, storageData, zipRoot, compressBefore, false);
+			subMonitor.setTaskName("Downloading and packing storage files..");
+			dataRetriever.downloadAndSaveStorageFiles(cmrRepositoryDefinition, storageData, zipRoot, compressBefore, false, subMonitor, StorageFileType.values());
 		} catch (IOException e) {
 			zipFileSystem.close();
 			Files.deleteIfExists(zipPath);

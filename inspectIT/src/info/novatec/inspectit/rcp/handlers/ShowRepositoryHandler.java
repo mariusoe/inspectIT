@@ -10,7 +10,9 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
@@ -45,16 +47,21 @@ public class ShowRepositoryHandler extends AbstractHandler implements IHandler {
 
 		if (null != repositoryDefinition) {
 			// find view
-			IViewPart viewPart = HandlerUtil.getActiveWorkbenchWindow(event).getActivePage().findView(DataExplorerView.VIEW_ID);
+			IWorkbenchWindow workbenchWindow = HandlerUtil.getActiveWorkbenchWindow(event);
+			if (null == workbenchWindow) {
+				workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			}
+
+			IViewPart viewPart = workbenchWindow.getActivePage().findView(DataExplorerView.VIEW_ID);
 			if (viewPart == null) {
 				try {
-					viewPart = HandlerUtil.getActiveWorkbenchWindow(event).getActivePage().showView(DataExplorerView.VIEW_ID);
+					viewPart = workbenchWindow.getActivePage().showView(DataExplorerView.VIEW_ID);
 				} catch (PartInitException e) {
 					return null;
 				}
 			}
 			if (viewPart instanceof DataExplorerView) {
-				HandlerUtil.getActiveWorkbenchWindow(event).getActivePage().activate(viewPart);
+				workbenchWindow.getActivePage().activate(viewPart);
 				((DataExplorerView) viewPart).showRepository(repositoryDefinition, platformIdent);
 			}
 		}

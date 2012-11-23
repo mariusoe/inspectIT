@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -279,7 +280,7 @@ public class StorageService implements IStorageService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public List<String> getIndexFilesLocations(StorageData storageData) throws StorageException {
+	public Map<String, Long> getIndexFilesLocations(StorageData storageData) throws StorageException {
 		if (!storageManager.isStorageExisting(storageData)) {
 			throw new StorageException("The storage " + storageData + " does not exsist on the CMR.");
 		}
@@ -295,7 +296,7 @@ public class StorageService implements IStorageService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public List<String> getDataFilesLocations(StorageData storageData) throws StorageException {
+	public Map<String, Long> getDataFilesLocations(StorageData storageData) throws StorageException {
 		if (!storageManager.isStorageExisting(storageData)) {
 			throw new StorageException("The storage " + storageData + " does not exsist on the CMR.");
 		}
@@ -311,7 +312,7 @@ public class StorageService implements IStorageService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public List<String> getAgentFilesLocations(StorageData storageData) throws StorageException {
+	public Map<String, Long> getAgentFilesLocations(StorageData storageData) throws StorageException {
 		if (!storageManager.isStorageExisting(storageData)) {
 			throw new StorageException("The storage " + storageData + " does not exsist on the CMR.");
 		}

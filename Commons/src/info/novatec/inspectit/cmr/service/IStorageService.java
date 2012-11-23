@@ -14,6 +14,7 @@ import info.novatec.inspectit.storage.recording.RecordingState;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Definition of Storage service provided by CMR.
@@ -202,52 +203,55 @@ public interface IStorageService {
 	StorageData copyDataToStorage(StorageData storageData, Collection<Long> elementIds, long platformIdent, Collection<AbstractDataProcessor> dataProcessors) throws StorageException;
 
 	/**
-	 * Returns the list of the string that represent the path to the index files for one storage.
-	 * The paths are in form "/directory/file.extension". These paths can be used in combination to
-	 * CMR's ip and port to get the files via HTTP.
+	 * Returns the map of the string/long pairs that represent the path to the index files for one
+	 * storage and their size in bytes. The paths are in form "/directory/file.extension". These
+	 * paths can be used in combination to CMR's ip and port to get the files via HTTP.
 	 * <p>
 	 * For example, if the CMR has the ip localhost and port 8080, the address for the file would
 	 * be: http://localhost:8080/directory/file.extension
 	 * 
 	 * @param storageData
 	 *            Storage to get index files for.
-	 * @return Returns the list of the string that represent the path to the index files.
+	 * @return Returns the map of the string/long pairs that represent the path to the index files
+	 *         and their size.
 	 * @throws StorageException
 	 *             When provided storage does not exist.
 	 */
-	List<String> getIndexFilesLocations(StorageData storageData) throws StorageException;
+	Map<String, Long> getIndexFilesLocations(StorageData storageData) throws StorageException;
 
 	/**
-	 * Returns the list of the string that represent the path to the data files for one storage. The
-	 * paths are in form "/directory/file.extension". These paths can be used in combination to
-	 * CMR's ip and port to get the files via HTTP.
+	 * Returns the map of the string/long pairs that represent the path to the data files for one
+	 * storage and their size in bytes. The paths are in form "/directory/file.extension". These
+	 * paths can be used in combination to CMR's ip and port to get the files via HTTP.
 	 * <p>
 	 * For example, if the CMR has the ip localhost and port 8080, the address for the file would
 	 * be: http://localhost:8080/directory/file.extension
 	 * 
 	 * @param storageData
 	 *            Storage to get index files for.
-	 * @return Returns the list of the string that represent the path to the data files.
+	 * @return Returns the map of the string/long pairs that represent the path to the data files
+	 *         and their size.
 	 * @throws StorageException
 	 *             When provided storage does not exist.
 	 */
-	List<String> getDataFilesLocations(StorageData storageData) throws StorageException;
+	Map<String, Long> getDataFilesLocations(StorageData storageData) throws StorageException;
 
 	/**
-	 * Returns the list of the string that represent the path to the agent files for one storage.
-	 * The paths are in form "/directory/file.extension". These paths can be used in combination to
-	 * CMR's ip and port to get the files via HTTP.
+	 * Returns the map of the string/long pairs that represent the path to the agent files for one
+	 * storage and their size in bytes. The paths are in form "/directory/file.extension". These
+	 * paths can be used in combination to CMR's ip and port to get the files via HTTP.
 	 * <p>
 	 * For example, if the CMR has the ip localhost and port 8080, the address for the file would
 	 * be: http://localhost:8080/directory/file.extension
 	 * 
 	 * @param storageData
 	 *            Storage to get index files for.
-	 * @return Returns the list of the string that represent the path to the agent files.
+	 * @return Returns the map of the string/long pairs that represent the path to the agent files
+	 *         and their size.
 	 * @throws StorageException
 	 *             If gathering the file names fails.
 	 */
-	List<String> getAgentFilesLocations(StorageData storageData) throws StorageException;
+	Map<String, Long> getAgentFilesLocations(StorageData storageData) throws StorageException;
 
 	/**
 	 * Adds one label to the {@link StorageData}. Note that if overwrite is true, the label of the
