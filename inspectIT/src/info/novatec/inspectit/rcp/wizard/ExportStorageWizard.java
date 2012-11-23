@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.wizard;
 
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
@@ -23,6 +24,7 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.IProgressConstants;
 
 /**
  * Wizard for exporting the storage.
@@ -154,6 +156,7 @@ public class ExportStorageWizard extends Wizard implements INewWizard {
 				}
 			};
 			exportStorageJob.setUser(true);
+			exportStorageJob.setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_EXPORT));
 			exportStorageJob.schedule();
 		} else {
 			if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
@@ -185,6 +188,7 @@ public class ExportStorageWizard extends Wizard implements INewWizard {
 					}
 				};
 				downloadAndExportStorageJob.setUser(true);
+				downloadAndExportStorageJob.setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_EXPORT));
 				downloadAndExportStorageJob.schedule();
 			} else {
 				Display.getDefault().asyncExec(new Runnable() {

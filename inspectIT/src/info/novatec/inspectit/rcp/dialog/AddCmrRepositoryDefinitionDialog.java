@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.internal.forms.widgets.BusyIndicator;
+import org.eclipse.ui.progress.IProgressConstants;
 
 /**
  * Dialog for add repository definition action.
@@ -182,6 +183,7 @@ public class AddCmrRepositoryDefinitionDialog extends TitleAreaDialog {
 					}
 				};
 				checkCmr.setUser(false);
+				checkCmr.setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_SERVER_REFRESH_SMALL));
 				checkCmr.schedule();
 			}
 		});

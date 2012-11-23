@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.wizard;
 
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
@@ -34,6 +35,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.IProgressConstants;
 
 /**
  * Wizard for copying the buffer content of the {@link CmrRepositoryDefinition} to Storage.
@@ -181,6 +183,7 @@ public class CopyBufferToStorageWizard extends Wizard implements INewWizard {
 				}
 			};
 			copyBufferJob.setUser(true);
+			copyBufferJob.setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_COPY_BUFFER));
 			copyBufferJob.schedule();
 		} else {
 			InspectIT.getDefault().createErrorDialog("Copy of the buffer data to storage failed. Selected CMR repository is currently not available.", -1);

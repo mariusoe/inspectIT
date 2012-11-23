@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.wizard;
 
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.storage.InspectITStorageManager;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
@@ -23,6 +24,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.IProgressConstants;
 
 /**
  * Wizard for importing the storages.
@@ -150,6 +152,7 @@ public class ImportStorageWizard extends Wizard implements INewWizard {
 				}
 			};
 			importStorageJob.setUser(true);
+			importStorageJob.setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_IMPORT));
 			importStorageJob.schedule();
 		} else {
 			Job importStorageJob = new Job("Import Storage") {
@@ -198,6 +201,7 @@ public class ImportStorageWizard extends Wizard implements INewWizard {
 				}
 			};
 			importStorageJob.setUser(true);
+			importStorageJob.setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_IMPORT));
 			importStorageJob.schedule();
 		}
 

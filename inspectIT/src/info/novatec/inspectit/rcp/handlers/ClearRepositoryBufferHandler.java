@@ -1,6 +1,8 @@
 package info.novatec.inspectit.rcp.handlers;
 
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
@@ -30,6 +32,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.progress.IProgressConstants;
 
 /**
  * Handler for clearing the repository buffer.
@@ -100,6 +103,7 @@ public class ClearRepositoryBufferHandler extends AbstractHandler implements IHa
 					}
 				};
 				clearBufferJob.setUser(true);
+				clearBufferJob.setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_CLEAR_BUFFER));
 				clearBufferJob.schedule();
 			}
 		}

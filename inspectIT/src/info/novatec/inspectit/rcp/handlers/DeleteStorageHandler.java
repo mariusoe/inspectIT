@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.handlers;
 
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
@@ -36,6 +37,7 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.progress.IProgressConstants;
 
 /**
  * Handler for deleting a Storage. Handler will inform the user about the users who have mounted the
@@ -165,6 +167,7 @@ public class DeleteStorageHandler extends AbstractHandler implements IHandler {
 						}
 					};
 					deleteStorageJob.setUser(true);
+					deleteStorageJob.setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_DELETE));
 					deleteStorageJob.schedule();
 				}
 			}

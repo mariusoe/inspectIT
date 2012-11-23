@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.wizard;
 
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.provider.ILocalStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.storage.InspectITStorageManager;
@@ -19,6 +20,7 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.IProgressConstants;
 
 /**
  * Wizard for uploading a storage.
@@ -103,6 +105,7 @@ public class UploadStorageWizard extends Wizard implements INewWizard {
 			}
 		};
 		uploadStorageJob.setUser(true);
+		uploadStorageJob.setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_UPLOAD));
 		uploadStorageJob.schedule();
 		return true;
 	}

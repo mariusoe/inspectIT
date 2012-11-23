@@ -1,5 +1,7 @@
 package info.novatec.inspectit.rcp.repository;
 
+import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 import info.novatec.inspectit.rcp.util.ListenerList;
 
@@ -15,6 +17,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ui.progress.IProgressConstants;
 
 /**
  * The repository manager only for {@link CmrRepositoryDefinition}s.
@@ -258,6 +261,7 @@ public class CmrRepositoryManager {
 			this.cmrRepositoryDefinition = cmrRepositoryDefinition;
 			this.rescheduleJob = rescheduleJob;
 			this.setUser(false);
+			this.setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_SERVER_REFRESH_SMALL));
 		}
 
 		/**

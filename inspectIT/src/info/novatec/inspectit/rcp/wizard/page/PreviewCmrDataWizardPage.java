@@ -1,6 +1,8 @@
 package info.novatec.inspectit.rcp.wizard.page;
 
 import info.novatec.inspectit.communication.data.cmr.LicenseInfoData;
+import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.dialog.LicenseInformationDialog;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
@@ -23,6 +25,7 @@ import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.internal.forms.widgets.BusyIndicator;
+import org.eclipse.ui.progress.IProgressConstants;
 
 /**
  * The wizard page that displays the CMR info and checks for the connection status.
@@ -221,6 +224,7 @@ public class PreviewCmrDataWizardPage extends WizardPage {
 		public CheckCmrJob(CmrRepositoryDefinition cmrRepositoryDefinition) {
 			super("Checking online status..");
 			setUser(false);
+			setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_SERVER_REFRESH_SMALL));
 			this.cmrRepositoryDefinition = cmrRepositoryDefinition;
 		}
 

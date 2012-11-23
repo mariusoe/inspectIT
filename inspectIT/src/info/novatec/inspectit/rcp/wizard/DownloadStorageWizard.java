@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.wizard;
 
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
@@ -20,6 +21,7 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.IProgressConstants;
 
 /**
  * Wizard for downloading storage.
@@ -137,6 +139,7 @@ public class DownloadStorageWizard extends Wizard implements INewWizard {
 				}
 			};
 			downloadStorageJob.setUser(true);
+			downloadStorageJob.setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_STORAGE_DOWNLOADED));
 			downloadStorageJob.schedule();
 			break;
 		default:

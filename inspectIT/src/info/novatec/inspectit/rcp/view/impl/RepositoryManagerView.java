@@ -75,6 +75,7 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.progress.IProgressConstants;
 import org.eclipse.ui.progress.UIJob;
 
 /**
@@ -818,6 +819,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		public AgentStatusUpdateJob() {
 			super("Agents status auto-update");
 			setUser(false);
+			setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_AGENT));
 			schedule(UPDATE_RATE);
 		}
 

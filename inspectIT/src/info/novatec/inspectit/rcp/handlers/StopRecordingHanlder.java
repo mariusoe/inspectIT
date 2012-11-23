@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.handlers;
 
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
@@ -23,6 +24,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.progress.IProgressConstants;
 
 /**
  * Stops recording.
@@ -42,7 +44,7 @@ public class StopRecordingHanlder extends AbstractHandler implements IHandler {
 		if (selection instanceof StructuredSelection) {
 			if (((StructuredSelection) selection).getFirstElement() instanceof ICmrRepositoryProvider) {
 				cmrRepositoryDefinition = ((ICmrRepositoryProvider) ((StructuredSelection) selection).getFirstElement()).getCmrRepositoryDefinition();
-			} 
+			}
 		}
 		if (null != cmrRepositoryDefinition) {
 			if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
@@ -81,6 +83,7 @@ public class StopRecordingHanlder extends AbstractHandler implements IHandler {
 							}
 						};
 						stopRecordingJob.setUser(true);
+						stopRecordingJob.setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_RECORD_STOP));
 						stopRecordingJob.schedule();
 					} catch (Exception e) {
 						InspectIT.getDefault().createErrorDialog("Execution Error", e, -1);

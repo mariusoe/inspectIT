@@ -87,6 +87,7 @@ public interface InspectITImages {
 	String IMG_PROPERTIES = InspectITConstants.ICON_PATH + "properties.gif";
 	String IMG_CLOSE = InspectITConstants.ICON_PATH + "close.png";
 	String IMG_RECORD = InspectITConstants.ICON_PATH + "record.png";
+	String IMG_RECORD_STOP = InspectITConstants.ICON_PATH + "record_stop.png";
 	String IMG_RECORD_GRAY = InspectITConstants.ICON_PATH + "record_gray.png";
 	String IMG_EVENT_GREEN = InspectITConstants.ICON_PATH + "event_green.png";
 	String IMG_EVENT_RED = InspectITConstants.ICON_PATH + "event_red.png";
@@ -122,5 +123,11 @@ public interface InspectITImages {
 	String IMG_SMILEY = InspectITConstants.ICON_PATH + "smiley.png";
 	String IMG_TELEPHONE = InspectITConstants.ICON_PATH + "telephone.png";
 	String IMG_WARNING = InspectITConstants.ICON_PATH + "warning.png";
-
+	String IMG_CLEAR_BUFFER = InspectITConstants.ICON_PATH + "clean_buffer.png";
+	String IMG_DELETE = InspectITConstants.ICON_PATH + "delete.png";
+	String IMG_FINALIZE_STORAGE = InspectITConstants.ICON_PATH + "finalize_storage.png";
+	String IMG_COPY_BUFFER = InspectITConstants.ICON_PATH + "copy_buffer.png";
+	String IMG_EXPORT = InspectITConstants.ICON_PATH + "export.gif";
+	String IMG_IMPORT = InspectITConstants.ICON_PATH + "impor.gif";
+	String IMG_UPLOAD = InspectITConstants.ICON_PATH + "upload_storage.png";
 }

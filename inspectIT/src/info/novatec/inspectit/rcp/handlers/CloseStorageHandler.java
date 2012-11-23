@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.handlers;
 
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
@@ -24,6 +25,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.progress.IProgressConstants;
 
 /**
  * Tries to close the list of storages given through the storage leaf.
@@ -95,6 +97,7 @@ public class CloseStorageHandler extends AbstractHandler implements IHandler {
 			this.storageData = storageData;
 			this.cmrRepositoryDefinition = cmrRepositoryDefinition;
 			setUser(true);
+			setProperty(IProgressConstants.ICON_PROPERTY, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_FINALIZE_STORAGE));
 		}
 
 		/**
