@@ -101,6 +101,13 @@
             name="Repository Manager"
             restorable="true">
       </view>
+      <view
+            class="org.eclipse.ui.ExtensionFactory:progressView"
+            icon="icons/pview.gif"
+            id="org.eclipse.ui.views.ProgressView"
+            name="Progress View"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
