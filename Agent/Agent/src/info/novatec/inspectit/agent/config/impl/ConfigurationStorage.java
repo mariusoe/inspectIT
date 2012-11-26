@@ -38,6 +38,11 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	private static final Logger LOGGER = Logger.getLogger(ConfigurationStorage.class.getName());
 
 	/**
+	 * The name of the property for the repository IP.
+	 */
+	private static final String REPOSITORY_PROPERTY = "inspectit.repository";
+
+	/**
 	 * The class pool analyzer.
 	 */
 	private final IClassPoolAnalyzer classPoolAnalyzer;
@@ -121,6 +126,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	public ConfigurationStorage(IClassPoolAnalyzer classPoolAnalyzer, IInheritanceAnalyzer inheritanceAnalyzer) {
 		this.classPoolAnalyzer = classPoolAnalyzer;
 		this.inheritanceAnalyzer = inheritanceAnalyzer;
+		loadConfigurationFromJvmParameters();
 	}
 
 	/**
@@ -135,7 +141,10 @@ public class ConfigurationStorage implements IConfigurationStorage {
 			throw new StorageException("Repository port has to be greater than 0!");
 		}
 
-		this.repository = new RepositoryConfig(host, port);
+		// can not reset repository
+		if (null == repository) {
+			this.repository = new RepositoryConfig(host, port);
+		}
 
 		if (LOGGER.isLoggable(Level.INFO)) {
 			LOGGER.info("Repository definition added. Host: " + host + " Port: " + port);
@@ -157,7 +166,10 @@ public class ConfigurationStorage implements IConfigurationStorage {
 			throw new StorageException("Agent name cannot be null or empty!");
 		}
 
-		agentName = name;
+		// don't allow reseting
+		if (null == agentName) {
+			agentName = name;
+		}
 
 		if (LOGGER.isLoggable(Level.INFO)) {
 			LOGGER.info("Agent name set to: " + name);
@@ -633,5 +645,49 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 */
 	public void addIgnoreClassesPattern(String patternString) {
 		ignoreClassesPatterns.add(new SimpleMatchPattern(patternString));
+	}
+
+	/**
+	 * Checks if the JVM parameters have the repository and agent information.
+	 */
+	private void loadConfigurationFromJvmParameters() {
+
+		// check if the information about the repository and agent is provided with the JVM params
+		String repositoryProperty = System.getProperty(REPOSITORY_PROPERTY);
+
+		if (null == repositoryProperty) {
+			return;
+		}
+
+		// expecting data in the form ip:port;name
+		StringTokenizer tokenizer = new StringTokenizer(repositoryProperty, ";");
+		if (tokenizer.countTokens() == 2) {
+			// ip and host
+			String[] repositoryIpHost = tokenizer.nextToken().split(":");
+			if (repositoryIpHost.length == 2) {
+				String repositoryIp = repositoryIpHost[0];
+				String repositoryPort = repositoryIpHost[1];
+				if (null != repositoryIp && !"".equals(repositoryIp) && null != repositoryPort && !"".equals(repositoryPort)) {
+					LOGGER.info("Repository information found in the JVM parameters: IP=" + repositoryIp + " Port=" + repositoryPort);
+					try {
+						int port = Integer.parseInt(repositoryPort);
+						setRepository(repositoryIp, port);
+					} catch (Exception e) {
+						LOGGER.log(Level.WARNING, "Repository could not be defined from the data in the JVM parameters", e);
+					}
+				}
+			}
+
+			// agent
+			String agentName = tokenizer.nextToken();
+			if (null != agentName && !"".equals(agentName)) {
+				try {
+					LOGGER.info("Agent name found in the JVM parameters: AgentName=" + agentName);
+					setAgentName(agentName);
+				} catch (Exception e) {
+					LOGGER.log(Level.WARNING, "Agent name could not be defined from the data in the JVM parameters", e);
+				}
+			}
+		}
 	}
 }

@@ -190,7 +190,21 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 
-	@SuppressWarnings("unchecked")
+	@Test
+	public void resetRepositoryNotAllowed() throws StorageException {
+		configurationStorage.setRepository("localhost1", 1200);
+
+		assertEquals(configurationStorage.getRepositoryConfig().getHost(), "localhost");
+		assertEquals(configurationStorage.getRepositoryConfig().getPort(), 1099);
+	}
+
+	@Test
+	public void resetAgentnameNotAllowed() throws StorageException {
+		configurationStorage.setAgentName("agent1");
+
+		assertEquals(configurationStorage.getAgentName(), "UnitTestAgent");
+	}
+
 	@Test
 	public void methodSensorTypesCheck() {
 		List<MethodSensorTypeConfig> configs = configurationStorage.getMethodSensorTypes();
