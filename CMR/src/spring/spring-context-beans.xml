@@ -48,7 +48,7 @@
 
 	<bean id="scheduledExecutorService"
 		class="info.novatec.inspectit.storage.util.ExecutorServiceFactory">
-		<property name="executorThreads" value="1" />
+		<property name="executorThreads" value="5" />
 		<property name="scheduledExecutor" value="true" />
 		<property name="beanSingleton" value="true" />
 	</bean>

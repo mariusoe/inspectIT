@@ -23,6 +23,5 @@
 
 	<!-- needed for @Scheduled annotation -->
 	<task:annotation-driven executor="executor" scheduler="scheduledExecutorService"/>
-	<task:executor id="executor" pool-size="1" />
-
+	<task:executor id="executor" />
 </beans>
