@@ -249,6 +249,8 @@ public class StorageIndexingTreeHandler {
 			// wait until no more data is there
 			int sleepCount = 0;
 			while (!writeTasksInProcess.isEmpty()) {
+				log.info("Indexing tree handler still waiting for " + writeTasksInProcess.size() + " task(s) to be finished. Going for sleep " + (sleepCount + 1) + " out of "
+						+ FINISH_WAITING_ITERATIONS + ".");
 				if (sleepCount > FINISH_WAITING_ITERATIONS) {
 					log.warn("Indexing tree handler waited " + (sleepCount * WAITING_FOR_TREE_TO_BE_READY) + " milliseconds for all tasks to be finished. There are " + writeTasksInProcess.size()
 							+ " tasks still in-progress. Saving of the indexing tree will continue without waiting for these tasks.");
@@ -256,6 +258,7 @@ public class StorageIndexingTreeHandler {
 				}
 				try {
 					Thread.sleep(WAITING_FOR_TREE_TO_BE_READY);
+					sleepCount++;
 				} catch (InterruptedException e) {
 					Thread.interrupted();
 				}

@@ -499,6 +499,7 @@ public class StorageWriter implements IWriter {
 					Thread.interrupted();
 				}
 				if (null == serializer) {
+					indexingTreeHandler.writeFailed(this);
 					log.error("Serializer instance could not be obtained.");
 					return;
 				}
@@ -509,10 +510,12 @@ public class StorageWriter implements IWriter {
 					serializer.serialize(data, output);
 					extendedByteBufferOutputStream.flush(false);
 				} catch (SerializationException e) {
+					indexingTreeHandler.writeFailed(this);
 					serializerQueue.add(serializer);
 					if (log.isWarnEnabled()) {
 						log.warn("Serialization for the object " + data + " failed. Data will be skipped.", e);
 					}
+					return;
 				}
 				serializerQueue.add(serializer);
 

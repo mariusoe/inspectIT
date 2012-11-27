@@ -160,7 +160,7 @@ public class CmrStorageManager extends StorageManager {
 	public void closeStorage(StorageData storageData) throws StorageException, IOException, SerializationException {
 		StorageData local = getLocalStorageDataObject(storageData);
 		synchronized (local) {
-			if (Objects.equals(local, recorderStorageData)) {
+			if (isRecordingOn() && Objects.equals(local, recorderStorageData)) {
 				throw new StorageException("Storage " + local + " can not be finalized because it is currenlty used for recording purposes.");
 			}
 			StorageWriter writer = openedStoragesMap.get(local);

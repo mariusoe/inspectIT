@@ -272,9 +272,7 @@ public abstract class StorageManager {
 		}
 
 		Path storageDataFile = dir.resolve(storageData.getId() + extenstion);
-		if (Files.exists(storageDataFile)) {
-			Files.delete(storageDataFile);
-		}
+		Files.deleteIfExists(storageDataFile);
 
 		ISerializer serializer = serializationManagerProvider.createSerializer();
 		OutputStream outputStream = null;
