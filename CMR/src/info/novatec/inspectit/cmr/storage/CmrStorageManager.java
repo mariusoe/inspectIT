@@ -727,6 +727,13 @@ public class CmrStorageManager extends StorageManager {
 		for (Map.Entry<StorageData, StorageWriter> entry : openedStoragesMap.entrySet()) {
 			map.put(entry.getKey(), entry.getValue().getExecutorServiceStatus());
 		}
+		if (isRecordingOn()) {
+			StorageData storageData = recorderStorageData;
+			StorageWriter storageWriter = storageRecorder.getStorageWriter();
+			if (null != storageData && null != storageWriter) {
+				map.put(storageData, storageWriter.getExecutorServiceStatus());
+			}
+		}
 		return map;
 	}
 

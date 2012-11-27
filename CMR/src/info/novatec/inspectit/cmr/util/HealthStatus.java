@@ -26,9 +26,9 @@ import org.springframework.stereotype.Component;
 /**
  * This service is used to check the health of the CMR in terms of cpu, memory, some overall
  * statistics etc.
- *
+ * 
  * @author Patrice Bouillet
- *
+ * 
  */
 @Component
 public class HealthStatus {
@@ -152,12 +152,12 @@ public class HealthStatus {
 
 	/**
 	 * Log a graphical version of the load average.
-	 *
+	 * 
 	 * @param loadAvg
 	 *            The current load average over the last 60 seconds.
 	 * @param availCpus
 	 *            The available cpus.
-	 *
+	 * 
 	 * @see OperatingSystemMXBean#getSystemLoadAverage()
 	 */
 	private void logGraphicalLoadAverage(double loadAvg, int availCpus) {
@@ -248,12 +248,12 @@ public class HealthStatus {
 
 	/**
 	 * Log a graphical version of the memory usage object..
-	 *
+	 * 
 	 * @param memoryUsage
 	 *            The memory usage object to log.
 	 * @param title
 	 *            Title of graphical box.
-	 *
+	 * 
 	 * @see MemoryUsage
 	 */
 	private void logGraphicalMemoryUsage(MemoryUsage memoryUsage, String title) {
@@ -314,7 +314,7 @@ public class HealthStatus {
 
 	/**
 	 * Checks if the values in {@link MemoryUsage} are OK for the graphical memory logging.
-	 *
+	 * 
 	 * @param memoryUsage
 	 *            {@link MemoryUsage}
 	 * @return True if values are OK.
@@ -363,7 +363,7 @@ public class HealthStatus {
 
 	/**
 	 * Log a graphical version of buffer occupancy.
-	 *
+	 * 
 	 * @param bufferOccupancy
 	 *            Current buffer occupancy in percentages.
 	 */
@@ -417,6 +417,15 @@ public class HealthStatus {
 			}
 		} else {
 			log.info("No active writable storage available.");
+		}
+
+		if (storageManager.isRecordingOn()) {
+			StorageData recordingStorageData = storageManager.getRecordingStorage();
+			if (null != recordingStorageData) {
+				log.info("Recording is active on the storage " + recordingStorageData + ".");
+			}
+		} else {
+			log.info("Recording is not active.");
 		}
 	}
 
