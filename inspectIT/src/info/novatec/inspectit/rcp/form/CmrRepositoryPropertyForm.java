@@ -372,16 +372,13 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 						description.setText("", false, false);
 					}
 					status.setText(cmrRepositoryDefinition.getOnlineStatus().toString());
+					version.setText(cmrRepositoryDefinition.getVersion());
 					if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
 						form.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_ONLINE_SMALL));
-						String versionString = cmrRepositoryDefinition.getServerStatusService().getVersion();
-						version.setText(versionString);
 					} else if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.CHECKING) {
 						form.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_REFRESH_SMALL));
-						version.setText("n/a");
 					} else {
 						form.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_OFFLINE_SMALL));
-						version.setText("n/a");
 					}
 					mainComposite.setVisible(true);
 				} else {

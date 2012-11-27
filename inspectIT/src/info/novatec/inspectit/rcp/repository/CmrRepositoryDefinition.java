@@ -300,14 +300,6 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public IServerStatusService getServerStatusService() {
-		return serverStatusService;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public ILicenseService getLicenseService() {
 		return licenseService;
 	}
@@ -427,6 +419,24 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	 */
 	public OnlineStatus getOnlineStatus() {
 		return onlineStatus;
+	}
+
+	/**
+	 * If the CMR is online invokes the {@link IServerStatusService} to get the version. Otherwise
+	 * returns 'N/A'.
+	 * 
+	 * @return Version of this CMR.
+	 */
+	public String getVersion() {
+		if (onlineStatus != OnlineStatus.OFFLINE) {
+			try {
+				return serverStatusService.getVersion();
+			} catch (Exception e) {
+				return IServerStatusService.VERSION_NOT_AVAILABLE;
+			}
+		} else {
+			return IServerStatusService.VERSION_NOT_AVAILABLE;
+		}
 	}
 
 	/**

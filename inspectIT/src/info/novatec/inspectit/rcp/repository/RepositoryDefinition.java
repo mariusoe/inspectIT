@@ -6,7 +6,6 @@ import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
-import info.novatec.inspectit.cmr.service.IServerStatusService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
 import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
@@ -46,13 +45,6 @@ public interface RepositoryDefinition {
 	 * @return The license service.
 	 */
 	ILicenseService getLicenseService();
-
-	/**
-	 * Returns the server status service for this repository definition.
-	 * 
-	 * @return The server status service.
-	 */
-	IServerStatusService getServerStatusService();
 
 	/**
 	 * Returns the combined metrics data access service for this repository definition.

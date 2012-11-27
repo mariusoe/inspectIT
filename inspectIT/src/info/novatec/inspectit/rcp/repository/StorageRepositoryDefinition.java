@@ -7,7 +7,6 @@ import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
-import info.novatec.inspectit.cmr.service.IServerStatusService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
 import info.novatec.inspectit.communication.DefaultData;
@@ -120,13 +119,6 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	 */
 	public ILicenseService getLicenseService() {
 		return cmrRepositoryDefinition.getLicenseService();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public IServerStatusService getServerStatusService() {
-		return cmrRepositoryDefinition.getServerStatusService();
 	}
 
 	/**

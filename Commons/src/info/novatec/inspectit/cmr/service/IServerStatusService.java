@@ -9,6 +9,11 @@ package info.novatec.inspectit.cmr.service;
 @ServiceInterface(exporter = ServiceExporterType.HTTP)
 public interface IServerStatusService {
 
+	/**
+	 * String returned for version not available.
+	 */
+	String VERSION_NOT_AVAILABLE = "n/a";
+
 	int SERVER_OFFLINE = 0;
 
 	int SERVER_ONLINE = 1;

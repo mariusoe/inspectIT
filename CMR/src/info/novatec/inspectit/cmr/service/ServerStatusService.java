@@ -68,7 +68,7 @@ public class ServerStatusService implements IServerStatusService {
 			if (log.isDebugEnabled()) {
 				log.debug("Cannot obtain current version", e);
 			}
-			return "n/a";
+			return IServerStatusService.VERSION_NOT_AVAILABLE;
 		}
 	}
 

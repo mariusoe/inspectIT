@@ -249,7 +249,7 @@ public class PreviewCmrDataWizardPage extends WizardPage {
 			if (isCanceled) {
 				return Status.CANCEL_STATUS;
 			} else if (testOk) {
-				ver = cmrRepositoryDefinition.getServerStatusService().getVersion();
+				ver = cmrRepositoryDefinition.getVersion();
 				lid = cmrRepositoryDefinition.getLicenseService().getLicenseInfoData();
 			}
 
