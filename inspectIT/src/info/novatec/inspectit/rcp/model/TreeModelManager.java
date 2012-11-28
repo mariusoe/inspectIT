@@ -516,24 +516,10 @@ public class TreeModelManager {
 		Composite exceptionSensor = new Composite();
 		exceptionSensor.setName("Exceptions");
 		exceptionSensor.setTooltip("All recorded exceptions can be analyzed here.");
-		boolean sensorTypeAvailable = false;
 
-		Set<SensorTypeIdent> sensorTypeIdents = platformIdent.getSensorTypeIdents();
-		for (SensorTypeIdent sensorTypeIdent : sensorTypeIdents) {
-			if (SensorTypeEnum.EXCEPTION_SENSOR.getFqn().equals(sensorTypeIdent.getFullyQualifiedClassName())) {
-				sensorTypeAvailable = true;
-				break;
-			}
-		}
-
-		if (sensorTypeAvailable) {
-			exceptionSensor.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_EXCEPTION_SENSOR));
-			exceptionSensor.addChild(getUngroupedExceptionOverview(platformIdent, definition));
-			exceptionSensor.addChild(getGroupedExceptionOverview(platformIdent, definition));
-		} else {
-			exceptionSensor.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_ITEM_NA_GREY));
-			exceptionSensor.setTooltip(SensorTypeAvailabilityEnum.EXCEPTION_SENSOR_NA.getMessage());
-		}
+		exceptionSensor.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_EXCEPTION_SENSOR));
+		exceptionSensor.addChild(getUngroupedExceptionOverview(platformIdent, definition));
+		exceptionSensor.addChild(getGroupedExceptionOverview(platformIdent, definition));
 
 		return exceptionSensor;
 	}
