@@ -34,7 +34,12 @@ public class ExceptionDataAggregator implements IAggregator<ExceptionSensorData>
 		/**
 		 * Aggregation based on the stack trace and error message.
 		 */
-		DISTINCT_STACK_TRACES;
+		DISTINCT_STACK_TRACES,
+
+		/**
+		 * Aggregation just based on the throwable type.
+		 */
+		THROWABLE_TYPE;
 	}
 
 	/**
@@ -77,8 +82,10 @@ public class ExceptionDataAggregator implements IAggregator<ExceptionSensorData>
 	public ExceptionSensorData getClone(ExceptionSensorData exceptionData) {
 		AggregatedExceptionSensorData clone = new AggregatedExceptionSensorData();
 		clone.setPlatformIdent(exceptionData.getPlatformIdent());
-		clone.setErrorMessage(exceptionData.getErrorMessage());
 		clone.setThrowableType(exceptionData.getThrowableType());
+		if (exceptionAggregationType == ExceptionAggregationType.GROUP_EXCEPTION_OVERVIEW || exceptionAggregationType == ExceptionAggregationType.DISTINCT_STACK_TRACES) {
+			clone.setErrorMessage(exceptionData.getErrorMessage());
+		}
 		if (exceptionAggregationType == ExceptionAggregationType.DISTINCT_STACK_TRACES) {
 			clone.setStackTrace(getCorrectStackTrace(exceptionData.getStackTrace()));
 		}
@@ -97,7 +104,12 @@ public class ExceptionDataAggregator implements IAggregator<ExceptionSensorData>
 	 */
 	public Object getAggregationKey(ExceptionSensorData exceptionSensorData) {
 		final int prime = 31;
-		if (exceptionAggregationType == ExceptionAggregationType.GROUP_EXCEPTION_OVERVIEW) {
+		if (exceptionAggregationType == ExceptionAggregationType.THROWABLE_TYPE) {
+			int result = 0;
+			result = prime * result + ((exceptionSensorData.getThrowableType() == null) ? 0 : exceptionSensorData.getThrowableType().hashCode());
+			return result;
+		}
+		else if (exceptionAggregationType == ExceptionAggregationType.GROUP_EXCEPTION_OVERVIEW) {
 			int result = 0;
 			result = prime * result + ((exceptionSensorData.getThrowableType() == null) ? 0 : exceptionSensorData.getThrowableType().hashCode());
 			result = prime * result + ((exceptionSensorData.getErrorMessage() == null) ? 0 : exceptionSensorData.getErrorMessage().hashCode());

@@ -462,7 +462,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 			exceptionSensorDataList = getRawExceptionSensorDataList(invocationSequenceDataList, new ArrayList<ExceptionSensorData>());
 			if (!rawMode) {
 				AggregationPerformer<ExceptionSensorData> aggregationPerformer = new AggregationPerformer<ExceptionSensorData>(new ExceptionDataAggregator(
-						ExceptionAggregationType.GROUP_EXCEPTION_OVERVIEW));
+						ExceptionAggregationType.THROWABLE_TYPE));
 				aggregationPerformer.processCollection(exceptionSensorDataList);
 				exceptionSensorDataList = aggregationPerformer.getResultList();
 			}
