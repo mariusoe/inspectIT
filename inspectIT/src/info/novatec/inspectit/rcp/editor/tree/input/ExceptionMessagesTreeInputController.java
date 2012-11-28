@@ -418,8 +418,8 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 				}
 			} else {
 				String[] stackTraceLines = data.getStackTrace().split("\n");
-				if (stackTraceLines.length > 1) {
-					styledString = new StyledString(stackTraceLines[1]);
+				if (stackTraceLines.length > 0) {
+					styledString = new StyledString(stackTraceLines[0]);
 				} else {
 					styledString = new StyledString(STACK_TRACK_NOT_AVAILABLE);
 				}

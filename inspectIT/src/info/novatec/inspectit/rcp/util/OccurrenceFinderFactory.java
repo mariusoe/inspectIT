@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.eclipse.jface.viewers.ViewerFilter;
 
@@ -353,7 +354,8 @@ public final class OccurrenceFinderFactory {
 				}
 			}
 			if (TEMPLATE_STRING != template.getStackTrace()) {
-				if (!ObjectUtils.equals(template.getStackTrace(), element.getStackTrace())) {
+				// allow also parts of stack traces
+				if (!StringUtils.contains(element.getStackTrace(), template.getStackTrace())) {
 					return false;
 				}
 			}
