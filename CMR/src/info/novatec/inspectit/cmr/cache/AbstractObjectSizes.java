@@ -225,8 +225,8 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 		// approximate capacity of each segment
 		int segmentCapacity = getSegmentCapacityFromSize(mapSize / concurrencyLevel, MAP_INITIAL_CAPACITY / concurrencyLevel);
 
-		// if map is empty there is only one segment created no matter what
-		int segments = mapSize == 0 ? 1 : concurrencyLevel;
+		// get number of segments
+		int segments = getNumberOfConcurrentSegments(mapSize, concurrencyLevel);
 
 		// size of each segment based on the capacity, times number of segments
 		size += segments * this.getSizeOfConcurrentSeqment(segmentCapacity);
@@ -237,6 +237,20 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 		size += mapSize * this.getSizeOfHashMapEntry();
 
 		return alignTo8Bytes(size);
+	}
+
+	/**
+	 * Returns number of segments in the conncurent hash map.
+	 * 
+	 * @param mapSize
+	 *            Size of map
+	 * @param concurrencyLevel
+	 *            Initial concurrency level.
+	 * @return Number of segments.
+	 */
+	protected int getNumberOfConcurrentSegments(int mapSize, int concurrencyLevel) {
+		// if map is empty there is only one segment created no matter what
+		return mapSize == 0 ? 1 : concurrencyLevel;
 	}
 
 	/**
@@ -369,7 +383,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * 
 	 * @return Size in bytes.
 	 */
-	private long getSizeOfConcurrentSeqment(int seqmentCapacity) {
+	protected long getSizeOfConcurrentSeqment(int seqmentCapacity) {
 		long size = this.getSizeOfObjectHeader();
 		size += this.getPrimitiveTypesSize(2, 0, 3, 1, 0, 0);
 
@@ -437,7 +451,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 *            Initial capacity.
 	 * @return Size in bytes.
 	 */
-	private int getSegmentCapacityFromSize(int seqmentSize, int initialCapacity) {
+	protected int getSegmentCapacityFromSize(int seqmentSize, int initialCapacity) {
 		int capacity = initialCapacity;
 		float loadFactor = 0.75f;
 		int threshold = (int) (capacity * loadFactor);

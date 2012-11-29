@@ -12,6 +12,16 @@ public abstract class AbstractObjectSizesIbm extends AbstractObjectSizes {
 	/**
 	 * {@inheritDoc}
 	 * <p>
+	 * IBM JVM uses 4 bytes per boolean and does not pack bolleans together.
+	 */
+	@Override
+	public long getPrimitiveTypesSize(int referenceCount, int booleanCount, int intCount, int floatCount, int longCount, int doubleCount) {
+		return super.getPrimitiveTypesSize(referenceCount, 0, intCount + booleanCount, floatCount, longCount, doubleCount);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
 	 * IBM JVM does not keep size of array in one int field.
 	 */
 	@Override
@@ -81,21 +91,57 @@ public abstract class AbstractObjectSizesIbm extends AbstractObjectSizes {
 	 * @return Real starting capacity.
 	 */
 	private static int calculateHashMapCapacity(int specifiedCapacity) {
-		if (specifiedCapacity >= 1 << 30) {
-			return 1 << 30;
+		int capacity = 1;
+		while (capacity < specifiedCapacity) {
+			capacity <<= 1;
 		}
-		if (specifiedCapacity == 0) {
-			return 16;
-		}
-		if (specifiedCapacity == 1) {
-			return 2;
-		}
-		specifiedCapacity = specifiedCapacity - 1;
-		specifiedCapacity |= specifiedCapacity >> 1;
-		specifiedCapacity |= specifiedCapacity >> 2;
-		specifiedCapacity |= specifiedCapacity >> 4;
-		specifiedCapacity |= specifiedCapacity >> 8;
-		specifiedCapacity |= specifiedCapacity >> 16;
-		return specifiedCapacity + 1;
+		return capacity;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected int getNumberOfConcurrentSegments(int mapSize, int concurrencyLevel) {
+		int segments = 1;
+		while (segments < concurrencyLevel) {
+			segments <<= 1;
+		}
+		return segments;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * I can not figure out what I am missing, but seams that I am missing one reference size here.
+	 */
+	protected long getSizeOfConcurrentSeqment(int seqmentCapacity) {
+		long size = super.getSizeOfConcurrentSeqment(seqmentCapacity);
+
+		// for unknown reasons i miss one reference
+		size += this.getPrimitiveTypesSize(1, 0, 0, 0, 0, 0);
+
+		return alignTo8Bytes(size);
+	}
+
+	/**
+	 * Returns the concurrent hash map segment capacity from its size and initial capacity.
+	 * 
+	 * @param seqmentSize
+	 *            Number of elements in the segment.
+	 * @param initialCapacity
+	 *            Initial capacity.
+	 * @return Size in bytes.
+	 */
+	protected int getSegmentCapacityFromSize(int seqmentSize, int initialCapacity) {
+		int capacity = initialCapacity;
+		float loadFactor = 0.75f;
+		int threshold = (int) (capacity * loadFactor);
+		while (threshold + 1 < seqmentSize) {
+			capacity <<= 1;
+			threshold = (int) (capacity * loadFactor);
+		}
+		return capacity;
+	}
+
 }

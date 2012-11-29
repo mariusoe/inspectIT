@@ -231,6 +231,11 @@ public final class UnderlyingSystemInfo {
 	 * and later. In Java SE 7, use of compressed oops is the default for 64-bit JVM processes when
 	 * -Xmx isn't specified and for values of -Xmx less than 32 gigabytes. For JDK 6 before the 6u23
 	 * release, use the -XX:+UseCompressedOops flag with the java command to enable the feature.
+	 * <p>
+	 * IMPORTANT (IBM): From Java 6 SR 5, 64-bit JVMs recognize the following Oracle JVM options:
+	 * -XX:+UseCompressedOops This enables compressed references in 64-bit JVMs. It is identical to
+	 * specifying the -Xcompressedrefs option. -XX:-UseCompressedOops This prevents use of
+	 * compressed references in 64-bit JVMs.
 	 * 
 	 * @return True only if JVM is 64bit and compressed oops are used.
 	 */

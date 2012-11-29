@@ -26,6 +26,8 @@ import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.SystemInformationData;
 import info.novatec.inspectit.communication.data.ThreadInformationData;
 import info.novatec.inspectit.communication.data.TimerData;
+import info.novatec.inspectit.util.UnderlyingSystemInfo;
+import info.novatec.inspectit.util.UnderlyingSystemInfo.JvmProvider;
 
 import java.lang.reflect.Field;
 import java.sql.Timestamp;
@@ -39,6 +41,7 @@ import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.log4j.Logger;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -57,6 +60,11 @@ import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
 public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 
 	/**
+	 * The logger of this class.
+	 */
+	private static final Logger LOGGER = Logger.getLogger(MemoryCalculationTest.class);
+
+	/**
 	 * Our classes to be tested.
 	 */
 	public static final Object[][] TESTING_CLASSES = new Object[][] { { TestDefaultData.class }, { TestMethodSensorData.class }, { TestInvocationAwareData.class }, { TimerData.class },
@@ -72,7 +80,12 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 	/**
 	 * Field for knowing how much big is the hash map table.
 	 */
-	private static Field HASH_MAP_TABLE;
+	private static Field oracleHashMapTable;
+
+	/**
+	 * Field for knowing how much big is the hash map table.
+	 */
+	private static Field ibmHashMapTable;
 
 	/**
 	 * {@link IObjectSizes}.
@@ -90,9 +103,16 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 	public void initCorrectObjectSizesInstance() throws Exception {
 		objectSizes = new ObjectSizesFactory().getObject();
 
-		HASH_MAP_TABLE = HashMap.class.getDeclaredField("table");
-		if (null != HASH_MAP_TABLE) {
-			HASH_MAP_TABLE.setAccessible(true);
+		if (UnderlyingSystemInfo.JVM_PROVIDER == JvmProvider.SUN || UnderlyingSystemInfo.JVM_PROVIDER == JvmProvider.ORACLE) {
+			oracleHashMapTable = HashMap.class.getDeclaredField("table"); // NOPMD
+			if (null != oracleHashMapTable) {
+				oracleHashMapTable.setAccessible(true);
+			}
+		} else if (UnderlyingSystemInfo.JVM_PROVIDER == JvmProvider.IBM) {
+			ibmHashMapTable = HashMap.class.getDeclaredField("table"); // NOPMD
+			if (null != ibmHashMapTable) {
+				ibmHashMapTable.setAccessible(true);
+			}
 		}
 
 	}
@@ -135,7 +155,7 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 	 */
 	@Test
 	public void shortObject() {
-		Short s = Short.valueOf((short) 1);
+		Short s = Short.valueOf((short) 1); // NOPMD
 		long ourSize = objectSizes.getSizeOfShortObject();
 		long theirSize = MemoryUtil.deepMemoryUsageOf(s, VisibilityFilter.ALL);
 		assertThat(ourSize, is(equalTo(theirSize)));
@@ -217,9 +237,10 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		}
 
 		if (checkObjectGraphIdentityHashCodeCollision(array, new HashSet<Integer>(), new ArrayList<Integer>())) {
+			LOGGER.info("Object graph identity collision check passed for test: array()");
 			ourSize = objectSizes.getSizeOfArray(array.length) + array.length * objectSizes.getSizeOfObjectObject();
 			theirSize = MemoryUtil.deepMemoryUsageOf(array, VisibilityFilter.ALL);
-			assertThat("Full array", ourSize, is(equalTo(theirSize)));
+			assertThat("Full array of " + array.length + " elements", ourSize, is(equalTo(theirSize)));
 		}
 	}
 
@@ -239,6 +260,7 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		}
 
 		if (checkObjectGraphIdentityHashCodeCollision(arrayList, new HashSet<Integer>(), new ArrayList<Integer>())) {
+			LOGGER.info("Object graph identity collision check passed for test: arrayList()");
 			ourSize = objectSizes.getSizeOf(arrayList) + size * objectSizes.getSizeOfObjectObject();
 			theirSize = MemoryUtil.deepMemoryUsageOf(arrayList, VisibilityFilter.ALL);
 			assertThat("Random list size", ourSize, is(equalTo(theirSize)));
@@ -261,6 +283,7 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		}
 
 		if (checkObjectGraphIdentityHashCodeCollision(arrayList, new HashSet<Integer>(), new ArrayList<Integer>())) {
+			LOGGER.info("Object graph identity collision check passed for test: arrayListInitializeZero()");
 			ourSize = objectSizes.getSizeOf(arrayList, 0) + size * objectSizes.getSizeOfObjectObject();
 			theirSize = MemoryUtil.deepMemoryUsageOf(arrayList, VisibilityFilter.ALL);
 			assertThat("Random list size", ourSize, is(equalTo(theirSize)));
@@ -280,24 +303,30 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		long theirSize = MemoryUtil.deepMemoryUsageOf(hashMap, VisibilityFilter.ALL);
 		assertThat("Empty map", ourSize, is(equalTo(theirSize + HASH_MAP_SAFTY_DELTA)));
 
-		int size = 13; // (int) (Math.random() * 100);
+		int size = (int) (Math.random() * 100);
 		for (int i = 0; i < size; i++) {
 			hashMap.put(new Object(), new Object());
 		}
 
 		if (checkObjectGraphIdentityHashCodeCollision(hashMap, new HashSet<Integer>(), new ArrayList<Integer>())) {
+			LOGGER.info("Object graph identity collision check passed for test: hashMap()");
 			ourSize = objectSizes.getSizeOfHashMap(hashMap.size()) + 2 * size * objectSizes.getSizeOfObjectObject();
 			theirSize = MemoryUtil.deepMemoryUsageOf(hashMap, VisibilityFilter.ALL);
 
 			boolean tableCorrect = false;
-			if (null != HASH_MAP_TABLE) {
-				Object[] table = (Object[]) HASH_MAP_TABLE.get(hashMap);
-				if (null != table) {
-					int tableSize = table.length;
-					int ourTableSize = ((AbstractObjectSizes) objectSizes).getHashMapCapacityFromSize(size, 16);
-					tableCorrect = tableSize == ourTableSize;
-				}
+			Object[] table = null;
+
+			if (null != oracleHashMapTable) {
+				table = (Object[]) oracleHashMapTable.get(hashMap);
+			} else if (null != ibmHashMapTable) {
+				table = (Object[]) ibmHashMapTable.get(hashMap);
 			}
+			if (null != table) {
+				int tableSize = table.length;
+				int ourTableSize = ((AbstractObjectSizes) objectSizes).getHashMapCapacityFromSize(size, 16);
+				tableCorrect = tableSize == ourTableSize;
+			}
+
 			if (tableCorrect) {
 				assertThat("Random map size of " + size, ourSize, is(equalTo(theirSize + HASH_MAP_SAFTY_DELTA)));
 			} else {
@@ -331,8 +360,8 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		// we can only precisely calculate random amount of elements with one segment
 		int concurrencyLevel = 1;
 		ConcurrentHashMap<Object, Object> concurrentHashMap = new ConcurrentHashMap<Object, Object>(16, 0.75f, concurrencyLevel);
-		long ourSize = objectSizes.getSizeOfConcurrentHashMap(concurrentHashMap.size(), concurrencyLevel);
 		long theirSize = MemoryUtil.deepMemoryUsageOf(concurrentHashMap, VisibilityFilter.ALL);
+		long ourSize = objectSizes.getSizeOfConcurrentHashMap(0, concurrencyLevel);
 		assertThat("Empty map", ourSize, is(equalTo(theirSize)));
 
 		concurrentHashMap = new ConcurrentHashMap<Object, Object>(16, 0.75f, 1);
@@ -342,8 +371,9 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		}
 
 		if (checkObjectGraphIdentityHashCodeCollision(concurrentHashMap, new HashSet<Integer>(), new ArrayList<Integer>())) {
-			ourSize = objectSizes.getSizeOfConcurrentHashMap(concurrentHashMap.size(), 1) + size * 2 * objectSizes.getSizeOfObjectObject();
+			LOGGER.info("Object graph identity collision check passed for test: concurrentHashMap()");
 			theirSize = MemoryUtil.deepMemoryUsageOf(concurrentHashMap, VisibilityFilter.ALL);
+			ourSize = objectSizes.getSizeOfConcurrentHashMap(size, 1) + size * 2 * objectSizes.getSizeOfObjectObject();
 			assertThat("Random map size of " + size, ourSize, is(equalTo(theirSize)));
 		}
 	}
@@ -392,11 +422,12 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		long ourSize = objectSizes.getSizeOf(object);
 		long theirSize = MemoryUtil.deepMemoryUsageOf(object, VisibilityFilter.ALL);
 		assertThat("Size of " + defaultDataClass.getName(), ourSize, is(theirSize));
+		LOGGER.info("Tested class " + defaultDataClass.getName() + " -> our size: " + ourSize + ", their size: " + theirSize);
 	}
 
 	/**
 	 * Checks for the possible object graph identity hash code collision. Objects that don't pass
-	 * this check can not be given to the classmexer for size caclultaions, because correct size
+	 * this check can not be given to the classmexer for size calculations, because correct size
 	 * will not be calculated due to the collision that will occur in the classmexer internally.
 	 * <p>
 	 * Most of this method is copied by the classmexer.
@@ -469,7 +500,7 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 	 */
 	@DataProvider(name = "classProvider")
 	public Object[][] classprovider() {
-		return TESTING_CLASSES;
+		return TESTING_CLASSES; // NOPMD
 	}
 
 	@SuppressWarnings("unused")

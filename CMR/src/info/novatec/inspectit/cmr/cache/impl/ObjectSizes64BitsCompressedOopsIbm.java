@@ -23,7 +23,7 @@ public class ObjectSizes64BitsCompressedOopsIbm extends AbstractObjectSizesIbm {
 	 */
 	@Override
 	public long getSizeOfObjectHeader() {
-		return 12;
+		return 8;
 	}
 
 }
