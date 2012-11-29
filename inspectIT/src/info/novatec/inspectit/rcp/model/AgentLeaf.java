@@ -78,6 +78,14 @@ public class AgentLeaf extends Leaf {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public String getName() {
+		return platformIdent.getAgentName();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int hashCode() {
 		return Objects.hashCode(super.hashCode(), platformIdent);
 	}

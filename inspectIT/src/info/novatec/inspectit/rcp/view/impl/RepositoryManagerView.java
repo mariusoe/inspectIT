@@ -214,8 +214,14 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 			public int compare(Viewer viewer, Object e1, Object e2) {
 				if (e1 instanceof Component && e2 instanceof Component) {
 					return ObjectUtils.compare(((Component) e1).getName(), ((Component) e2).getName());
+				} else if (e1 instanceof Component) {
+					return 1;
+				} else if (e2 instanceof Component) {
+					return -1;
+				} else {
+					return 0;
 				}
-				return 0;
+
 			}
 		});
 		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
