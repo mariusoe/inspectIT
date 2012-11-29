@@ -109,7 +109,7 @@ public class SqlStatementTextInputController extends AbstractTextInputController
 	 */
 	private void updateRepresentation(SqlStatementData dataToDisplay) {
 		if (null != dataToDisplay) {
-			String boldSql = StringUtils.replaceEach(dataToDisplay.getSql(), new String[] { "?" }, new String[] { "<b>?</b>" });
+			String boldSql = StringUtils.replaceEach(dataToDisplay.getSql(), new String[] { "?", "<", ">", "&" }, new String[] { "<b>?</b>", "&lt;", "&gt;", "&amp;" });
 			if (CollectionUtils.isNotEmpty(dataToDisplay.getParameterValues())) {
 				int index = 0;
 				StringBuilder stringBuilder = new StringBuilder(boldSql.length());
