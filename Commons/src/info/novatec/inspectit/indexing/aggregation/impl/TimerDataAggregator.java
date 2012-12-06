@@ -1,5 +1,7 @@
 package info.novatec.inspectit.indexing.aggregation.impl;
 
+import info.novatec.inspectit.communication.IAggregatedData;
+import info.novatec.inspectit.communication.data.AggregatedTimerData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.aggregation.IAggregator;
 
@@ -19,49 +21,21 @@ public class TimerDataAggregator implements IAggregator<TimerData>, Serializable
 	private static final long serialVersionUID = 8176969641431206899L;
 
 	/**
-	 * Is cloning active.
+	 * {@inheritDoc}
 	 */
-	private boolean cloning;
-
-	/**
-	 * No-arg constructor.
-	 */
-	public TimerDataAggregator() {
-	}
-
-	/**
-	 * Default constructor.
-	 * 
-	 * @param cloning
-	 *            Should cloning be used or not.
-	 */
-	public TimerDataAggregator(boolean cloning) {
-		this.cloning = cloning;
+	public void aggregate(IAggregatedData<TimerData> aggregatedObject, TimerData objectToAdd) {
+		aggregatedObject.aggregate(objectToAdd);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void aggregate(TimerData aggregatedObject, TimerData objectToAdd) {
-		aggregatedObject.aggregateTimerData(objectToAdd);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public TimerData getClone(TimerData timerData) {
-		TimerData clone = new TimerData();
+	public IAggregatedData<TimerData> getClone(TimerData timerData) {
+		AggregatedTimerData clone = new AggregatedTimerData();
 		clone.setPlatformIdent(timerData.getPlatformIdent());
 		clone.setSensorTypeIdent(timerData.getSensorTypeIdent());
 		clone.setMethodIdent(timerData.getMethodIdent());
 		return clone;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean isCloning() {
-		return cloning;
 	}
 
 	/**

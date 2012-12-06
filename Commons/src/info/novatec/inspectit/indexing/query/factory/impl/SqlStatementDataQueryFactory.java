@@ -1,5 +1,6 @@
 package info.novatec.inspectit.indexing.query.factory.impl;
 
+import info.novatec.inspectit.communication.data.AggregatedSqlStatementData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.query.factory.AbstractQueryFactory;
@@ -38,6 +39,7 @@ public class SqlStatementDataQueryFactory<E extends IIndexQuery> extends Abstrac
 		query.setPlatformIdent(sqlStatementData.getPlatformIdent());
 		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
 		searchedClasses.add(SqlStatementData.class);
+		searchedClasses.add(AggregatedSqlStatementData.class);
 		query.setObjectClasses(searchedClasses);
 		if (null != sqlStatementData.getSql()) {
 			query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("sql", sqlStatementData.getSql()));

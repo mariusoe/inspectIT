@@ -2,6 +2,9 @@ package info.novatec.inspectit.rcp.editor.search.factory;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
+import info.novatec.inspectit.communication.data.AggregatedHttpTimerData;
+import info.novatec.inspectit.communication.data.AggregatedSqlStatementData;
+import info.novatec.inspectit.communication.data.AggregatedTimerData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
@@ -72,11 +75,11 @@ public final class SearchFactory {
 			return false;
 		}
 
-		if (TimerData.class.equals(element.getClass())) {
+		if (TimerData.class.equals(element.getClass()) || AggregatedTimerData.class.equals(element.getClass())) {
 			return timerSearchFinder.isSearchCompatible((TimerData) element, searchCriteria, repositoryDefinition);
-		} else if (SqlStatementData.class.equals(element.getClass())) {
+		} else if (SqlStatementData.class.equals(element.getClass()) || AggregatedSqlStatementData.class.equals(element.getClass())) {
 			return sqlSearchFinder.isSearchCompatible((SqlStatementData) element, searchCriteria, repositoryDefinition);
-		} else if (HttpTimerData.class.equals(element.getClass())) {
+		} else if (HttpTimerData.class.equals(element.getClass()) || AggregatedHttpTimerData.class.equals(element.getClass())) {
 			return httpSearchFinder.isSearchCompatible((HttpTimerData) element, searchCriteria, repositoryDefinition);
 		} else if (ExceptionSensorData.class.equals(element.getClass()) || AggregatedExceptionSensorData.class.equals(element.getClass())) {
 			return exceptionSearchFinder.isSearchCompatible((ExceptionSensorData) element, searchCriteria, repositoryDefinition);

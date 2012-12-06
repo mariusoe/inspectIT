@@ -319,7 +319,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 			List<InvocationSequenceData> invocationSequenceDataList = (List<InvocationSequenceData>) inputElement;
 			timerDataList = getRawInputList(invocationSequenceDataList, new ArrayList<TimerData>());
 			if (!rawMode) {
-				AggregationPerformer<TimerData> aggregationPerformer = new AggregationPerformer<TimerData>(new TimerDataAggregator(true));
+				AggregationPerformer<TimerData> aggregationPerformer = new AggregationPerformer<TimerData>(new TimerDataAggregator());
 				aggregationPerformer.processCollection(timerDataList);
 				timerDataList = aggregationPerformer.getResultList();
 			} else {

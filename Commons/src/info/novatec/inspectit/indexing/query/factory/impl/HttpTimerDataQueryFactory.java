@@ -1,5 +1,6 @@
 package info.novatec.inspectit.indexing.query.factory.impl;
 
+import info.novatec.inspectit.communication.data.AggregatedHttpTimerData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.query.factory.AbstractQueryFactory;
@@ -37,6 +38,7 @@ public class HttpTimerDataQueryFactory<E extends IIndexQuery> extends AbstractQu
 		query.setPlatformIdent(httpData.getPlatformIdent());
 		ArrayList<Class<?>> classesToSearch = new ArrayList<Class<?>>();
 		classesToSearch.add(HttpTimerData.class);
+		classesToSearch.add(AggregatedHttpTimerData.class);
 		query.setObjectClasses(classesToSearch);
 		if (null != fromDate) {
 			query.setFromDate(new Timestamp(fromDate.getTime()));
@@ -64,6 +66,7 @@ public class HttpTimerDataQueryFactory<E extends IIndexQuery> extends AbstractQu
 		query.setPlatformIdent(httpData.getPlatformIdent());
 		ArrayList<Class<?>> classesToSearch = new ArrayList<Class<?>>();
 		classesToSearch.add(HttpTimerData.class);
+		classesToSearch.add(AggregatedHttpTimerData.class);
 		query.setObjectClasses(classesToSearch);
 		query.addIndexingRestriction(IndexQueryRestrictionFactory.isNotNull("inspectItTaggingHeaderValue"));
 		if (null != fromDate) {

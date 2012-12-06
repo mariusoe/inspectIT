@@ -23,6 +23,9 @@ schema/MethodSensorTypeIdent.sch
 schema/CompilationInformationData.sch
 schema/SqlStatementData.sch
 schema/AggregatedExceptionSensorData.sch
+schema/AggregatedHttpTimerData.sch
+schema/AggregatedSqlStatementData.sch
+schema/AggregatedTimerData.sch
 schema/ExceptionSensorData.sch
 schema/TimestampIndexer.sch
 schema/BooleanStorageLabel.sch

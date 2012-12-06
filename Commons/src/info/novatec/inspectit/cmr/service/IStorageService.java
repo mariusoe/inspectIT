@@ -179,15 +179,19 @@ public interface IStorageService {
 	StorageData copyBufferToStorage(StorageData storageData, List<Long> platformIdents, Collection<AbstractDataProcessor> dataProcessors) throws StorageException;
 
 	/**
-	 * Copies the data provided in the storage. The storage does not have to be opened before action
-	 * can be executed (storage will be created/opened first in this case). If the provided storage
-	 * is currently used for recording, the exception will be thrown.
+	 * Copies the data with provided IDs in the storage. The buffer will be queried for the data
+	 * first. The storage does not have to be opened before action can be executed (storage will be
+	 * created/opened first in this case). If the provided storage is currently used for recording,
+	 * the exception will be thrown.
 	 * 
 	 * @param storageData
 	 *            {@link StorageData} to copy to.
-	 * @param copyDataList
-	 *            List of data. Note that this list will be used as a template list. The data will
-	 *            be first loaded from the buffer.
+	 * @param elementIds
+	 *            Collection of IDs. These IDs represent the objects to be saved.
+	 * @param platformIdent
+	 *            PLatform ident that element belong to. If zero is passed it will be ignored and
+	 *            complete buffer will be searched for the IDs. Providing the platform ident will
+	 *            considerably speed-up the query that needs to be performed.
 	 * @param dataProcessors
 	 *            Processors to process the data. Can be null, then the data is only copied with no
 	 *            processing.
@@ -195,7 +199,7 @@ public interface IStorageService {
 	 * @throws StorageException
 	 *             If the storage is currently used for recording. If write fails.
 	 */
-	StorageData copyDataToStorage(StorageData storageData, List<DefaultData> copyDataList, Collection<AbstractDataProcessor> dataProcessors) throws StorageException;
+	StorageData copyDataToStorage(StorageData storageData, Collection<Long> elementIds, long platformIdent, Collection<AbstractDataProcessor> dataProcessors) throws StorageException;
 
 	/**
 	 * Returns the list of the string that represent the path to the index files for one storage.

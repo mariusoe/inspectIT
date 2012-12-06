@@ -1,5 +1,6 @@
 package info.novatec.inspectit.indexing.query.factory.impl;
 
+import info.novatec.inspectit.communication.data.AggregatedTimerData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.query.factory.AbstractQueryFactory;
@@ -40,6 +41,7 @@ public class TimerDataQueryFactory<E extends IIndexQuery> extends AbstractQueryF
 		// subclasses by default
 		// HttpTimerData will not be shown in the timer data view (we also do not show SQL data)
 		searchedClasses.add(TimerData.class);
+		searchedClasses.add(AggregatedTimerData.class);
 		query.setObjectClasses(searchedClasses);
 		if (null != fromDate) {
 			query.setFromDate(new Timestamp(fromDate.getTime()));

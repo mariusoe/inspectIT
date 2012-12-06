@@ -12,6 +12,9 @@ import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
 import info.novatec.inspectit.cmr.util.HibernateUtil;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.AggregatedHttpTimerData;
+import info.novatec.inspectit.communication.data.AggregatedSqlStatementData;
+import info.novatec.inspectit.communication.data.AggregatedTimerData;
 import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
 import info.novatec.inspectit.communication.data.CompilationInformationData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
@@ -102,7 +105,8 @@ public class SerializerTest {
 			{ CustomNumberLabelType.class }, { CustomStringLabelType.class }, { ExploredByLabelType.class }, { RatingLabelType.class }, { StatusLabelType.class }, { UseCaseLabelType.class },
 			{ SqlStringIndexer.class }, { BooleanStorageLabel.class }, { DateStorageLabel.class }, { NumberStorageLabel.class }, { StringStorageLabel.class }, { CustomDateLabelType.class },
 			{ CmrStatusData.class }, { AgentStatusData.class }, { RecordingData.class }, { CustomBooleanLabelType.class }, { CustomNumberLabelType.class }, { CustomStringLabelType.class },
-			{ AssigneeLabelType.class }, { RatingLabelType.class }, { ExploredByLabelType.class }, { CreationDateLabelType.class }, { StatusLabelType.class }, { UseCaseLabelType.class } };
+			{ AssigneeLabelType.class }, { RatingLabelType.class }, { ExploredByLabelType.class }, { CreationDateLabelType.class }, { StatusLabelType.class }, { UseCaseLabelType.class },
+			{ AggregatedHttpTimerData.class }, { AggregatedSqlStatementData.class }, { AggregatedTimerData.class } };
 
 	/**
 	 * Serializer.

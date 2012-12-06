@@ -105,10 +105,22 @@ public abstract class InvocationAwareData extends MethodSensorData {
 	}
 
 	/**
-	 * @return the invocationsParentsIdMap
+	 * Gets {@link #invocationsParentsIdMap}.
+	 * 
+	 * @return {@link #invocationsParentsIdMap}
 	 */
-	protected Map<Long, MutableInt> getInvocationsParentsIdMap() {
+	public Map<Long, MutableInt> getInvocationsParentsIdMap() {
 		return invocationsParentsIdMap;
+	}
+
+	/**
+	 * Sets {@link #invocationsParentsIdMap}.
+	 * 
+	 * @param invocationsParentsIdMap
+	 *            New value for {@link #invocationsParentsIdMap}
+	 */
+	public void setInvocationsParentsIdMap(Map<Long, MutableInt> invocationsParentsIdMap) {
+		this.invocationsParentsIdMap = invocationsParentsIdMap;
 	}
 
 	/**

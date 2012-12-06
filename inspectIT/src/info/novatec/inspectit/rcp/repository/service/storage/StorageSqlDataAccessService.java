@@ -22,13 +22,13 @@ public class StorageSqlDataAccessService extends AbstractStorageService<SqlState
 	 * {@link info.novatec.inspectit.indexing.aggregation.IAggregator} used for
 	 * {@link SqlStatementData}.
 	 */
-	private static final SqlStatementDataAggregator SQL_STATEMENT_DATA_AGGREGATOR = new SqlStatementDataAggregator(false);
+	private static final SqlStatementDataAggregator SQL_STATEMENT_DATA_AGGREGATOR = new SqlStatementDataAggregator();
 
 	/**
 	 * {@link info.novatec.inspectit.indexing.aggregation.IAggregator} used for
 	 * {@link SqlStatementData} when parameters are included in aggregation.
 	 */
-	private static final SqlStatementDataAggregator SQL_STATEMENT_DATA_PARAMETER_AGGREGATOR = new SqlStatementDataAggregator(true, true);
+	private static final SqlStatementDataAggregator SQL_STATEMENT_DATA_PARAMETER_AGGREGATOR = new SqlStatementDataAggregator(true);
 
 	/**
 	 * Indexing tree.

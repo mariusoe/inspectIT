@@ -104,7 +104,7 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		createdInvocations = new ArrayList<InvocationSequenceData>();
 		List<Class<? extends DefaultData>> saverClasses = new ArrayList<Class<? extends DefaultData>>();
 		saverClasses.add(InvocationSequenceData.class);
-		dataSaverProcessor = new DataSaverProcessor(saverClasses);
+		dataSaverProcessor = new DataSaverProcessor(saverClasses, true);
 	}
 
 	/**

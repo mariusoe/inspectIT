@@ -23,7 +23,9 @@ import info.novatec.inspectit.storage.processor.impl.InvocationClonerDataProcess
 import info.novatec.inspectit.storage.processor.impl.InvocationExtractorDataProcessor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
@@ -76,6 +78,26 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 	public static final int ONLY_INVOCATIONS = 8;
 
 	/**
+	 * Marker that marks that only timer are saved.
+	 */
+	public static final int ONLY_TIMERS = 16;
+
+	/**
+	 * Marker that marks that only invocations are saved.
+	 */
+	public static final int ONLY_SQL_STATEMENTS = 32;
+
+	/**
+	 * Marker that marks that only HTTP timers are saved.
+	 */
+	public static final int ONLY_HTTP_TIMERS = 64;
+
+	/**
+	 * Marker that marks that only exceptions are saved.
+	 */
+	public static final int ONLY_EXCEPTIONS = 128;
+
+	/**
 	 * Default message.
 	 */
 	private static final String DEFAULT_MESSAGE = "Define the data that should be stored in the storage and additional options";
@@ -83,7 +105,7 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 	/**
 	 * Input list for table containing all the classes.
 	 */
-	private List<Class<?>> inputList = new ArrayList<Class<?>>();
+	private Set<Class<?>> inputList = new HashSet<Class<?>>();
 
 	/**
 	 * Style for providing different selection possibilities.
@@ -131,6 +153,22 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 			inputList.add(InvocationSequenceData.class);
 			inputList.add(ExceptionSensorData.class);
 		}
+		if (isStyleApplied(ONLY_TIMERS)) {
+			inputList.add(TimerData.class);
+			inputList.add(InvocationSequenceData.class);
+		}
+		if (isStyleApplied(ONLY_SQL_STATEMENTS)) {
+			inputList.add(SqlStatementData.class);
+			inputList.add(InvocationSequenceData.class);
+		}
+		if (isStyleApplied(ONLY_HTTP_TIMERS)) {
+			inputList.add(HttpTimerData.class);
+			inputList.add(InvocationSequenceData.class);
+		}
+		if (isStyleApplied(ONLY_EXCEPTIONS)) {
+			inputList.add(ExceptionSensorData.class);
+			inputList.add(InvocationSequenceData.class);
+		}
 		if (isStyleApplied(SYSTEM_DATA)) {
 			inputList.add(MemoryInformationData.class);
 			inputList.add(CpuInformationData.class);
@@ -162,13 +200,21 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 		tableViewer.setInput(inputList);
 		tableViewer.refresh();
 
-		if (!isStyleApplied(ONLY_INVOCATIONS)) {
+		if (isStyleApplied(BUFFER_DATA) || isStyleApplied(SYSTEM_DATA)) {
 			for (TableItem tableItem : table.getItems()) {
 				tableItem.setChecked(true);
 			}
 		} else {
 			for (TableItem tableItem : table.getItems()) {
-				if (ObjectUtils.equals(tableItem.getData(), InvocationSequenceData.class)) {
+				if (ObjectUtils.equals(tableItem.getData(), InvocationSequenceData.class) && isStyleApplied(ONLY_INVOCATIONS)) {
+					tableItem.setChecked(true);
+				} else if (ObjectUtils.equals(tableItem.getData(), TimerData.class) && isStyleApplied(ONLY_TIMERS)) {
+					tableItem.setChecked(true);
+				} else if (ObjectUtils.equals(tableItem.getData(), SqlStatementData.class) && isStyleApplied(ONLY_SQL_STATEMENTS)) {
+					tableItem.setChecked(true);
+				} else if (ObjectUtils.equals(tableItem.getData(), ExceptionSensorData.class) && isStyleApplied(ONLY_EXCEPTIONS)) {
+					tableItem.setChecked(true);
+				} else if (ObjectUtils.equals(tableItem.getData(), HttpTimerData.class) && isStyleApplied(ONLY_HTTP_TIMERS)) {
 					tableItem.setChecked(true);
 				} else {
 					tableItem.setChecked(false);
@@ -242,6 +288,22 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 			setMessage("Invocation Sequence Data type has to be selected because it is source of data", ERROR);
 			return false;
 		}
+		if (isStyleApplied(ONLY_TIMERS) && !getSelectedClassesFromTable().contains(TimerData.class)) {
+			setMessage("Timer Data type has to be selected because it is source of data", ERROR);
+			return false;
+		}
+		if (isStyleApplied(ONLY_SQL_STATEMENTS) && !getSelectedClassesFromTable().contains(SqlStatementData.class)) {
+			setMessage("SQL Statement Data type has to be selected because it is source of data", ERROR);
+			return false;
+		}
+		if (isStyleApplied(ONLY_EXCEPTIONS) && !getSelectedClassesFromTable().contains(ExceptionSensorData.class)) {
+			setMessage("Exception Sensor Data type has to be selected because it is source of data", ERROR);
+			return false;
+		}
+		if (isStyleApplied(ONLY_HTTP_TIMERS) && !getSelectedClassesFromTable().contains(HttpTimerData.class)) {
+			setMessage("HTTP Timer Data type has to be selected because it is source of data", ERROR);
+			return false;
+		}
 		setMessage(DEFAULT_MESSAGE);
 		return true;
 	}
@@ -256,8 +318,10 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 		 * Normal saving processor.
 		 */
 		List<Class<? extends DefaultData>> saveClassesList = getSelectedClassesFromTable();
+		boolean writeInvocationAffiliation = saveClassesList.contains(InvocationSequenceData.class);
+
 		if (!saveClassesList.isEmpty()) {
-			normalProcessors.add(new DataSaverProcessor(saveClassesList));
+			normalProcessors.add(new DataSaverProcessor(saveClassesList, writeInvocationAffiliation));
 		}
 
 		/**
@@ -267,14 +331,15 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 		int aggregationPeriod = aggregationPeriodSpiner.getSelection() * 1000;
 		if (saveClassesList.contains(TimerData.class)) {
 			saveClassesList.remove(TimerData.class);
-			DataAggregatorProcessor<TimerData> dataAggregatorProcessor = new DataAggregatorProcessor<TimerData>(TimerData.class, aggregationPeriod, new TimerDataAggregator(true));
+			DataAggregatorProcessor<TimerData> dataAggregatorProcessor = new DataAggregatorProcessor<TimerData>(TimerData.class, aggregationPeriod, new TimerDataAggregator(),
+					writeInvocationAffiliation);
 			normalProcessors.add(dataAggregatorProcessor);
 		}
 
 		if (saveClassesList.contains(SqlStatementData.class)) {
 			saveClassesList.remove(SqlStatementData.class);
 			DataAggregatorProcessor<SqlStatementData> dataAggregatorProcessor = new DataAggregatorProcessor<SqlStatementData>(SqlStatementData.class, aggregationPeriod,
-					new SqlStatementDataAggregator(true, true));
+					new SqlStatementDataAggregator(true), writeInvocationAffiliation);
 			normalProcessors.add(dataAggregatorProcessor);
 		}
 

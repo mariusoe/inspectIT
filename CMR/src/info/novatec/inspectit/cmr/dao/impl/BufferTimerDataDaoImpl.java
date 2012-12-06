@@ -25,7 +25,7 @@ public class BufferTimerDataDaoImpl extends AbstractBufferDataDao<TimerData> imp
 	/**
 	 * {@link IAggregator} used for {@link TimerData}.
 	 */
-	private static final TimerDataAggregator TIMER_DATA_AGGREGATOR = new TimerDataAggregator(true);
+	private static final TimerDataAggregator TIMER_DATA_AGGREGATOR = new TimerDataAggregator();
 
 	/**
 	 * Index query factory.

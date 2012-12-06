@@ -8,6 +8,9 @@ import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
+import info.novatec.inspectit.communication.data.AggregatedHttpTimerData;
+import info.novatec.inspectit.communication.data.AggregatedSqlStatementData;
+import info.novatec.inspectit.communication.data.AggregatedTimerData;
 import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
 import info.novatec.inspectit.communication.data.CompilationInformationData;
 import info.novatec.inspectit.communication.data.CpuInformationData;
@@ -83,13 +86,17 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,6 +122,7 @@ import com.esotericsoftware.kryo.serializers.FieldSerializer;
 import com.esotericsoftware.kryo.serializers.MapSerializer;
 import com.esotericsoftware.kryo.util.DefaultClassResolver;
 import com.esotericsoftware.kryo.util.MapReferenceResolver;
+import com.esotericsoftware.kryo.util.ObjectMap;
 
 /**
  * Implementation of the {@link ISerializer} that uses Kryo library for serializing the objects. <br>
@@ -224,10 +232,11 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		/** Common data classes */
 		kryo.register(MutableInt.class, new FieldSerializer<MutableInt>(kryo, MutableInt.class));
 		kryo.register(InvocationSequenceData.class, new InvocationSequenceCustomCompatibleFieldSerializer(kryo, InvocationSequenceData.class, schemaManager));
-		kryo.register(TimerData.class, new CustomCompatibleFieldSerializer<TimerData>(kryo, TimerData.class, schemaManager));
-		kryo.register(HttpTimerData.class, new CustomCompatibleFieldSerializer<HttpTimerData>(kryo, HttpTimerData.class, schemaManager));
-		kryo.register(SqlStatementData.class, new CustomCompatibleFieldSerializer<SqlStatementData>(kryo, SqlStatementData.class, schemaManager));
-		kryo.register(ExceptionSensorData.class, new CustomCompatibleFieldSerializer<ExceptionSensorData>(kryo, ExceptionSensorData.class, schemaManager));
+		// TODO Check if we want for these
+		kryo.register(TimerData.class, new InvocationAwareDataSerializer<TimerData>(kryo, TimerData.class, schemaManager));
+		kryo.register(HttpTimerData.class, new InvocationAwareDataSerializer<HttpTimerData>(kryo, HttpTimerData.class, schemaManager));
+		kryo.register(SqlStatementData.class, new InvocationAwareDataSerializer<SqlStatementData>(kryo, SqlStatementData.class, schemaManager));
+		kryo.register(ExceptionSensorData.class, new InvocationAwareDataSerializer<ExceptionSensorData>(kryo, ExceptionSensorData.class, schemaManager));
 		kryo.register(ExceptionEvent.class, new EnumSerializer(ExceptionEvent.class));
 		kryo.register(ParameterContentData.class, new CustomCompatibleFieldSerializer<ParameterContentData>(kryo, ParameterContentData.class, schemaManager));
 		kryo.register(MemoryInformationData.class, new CustomCompatibleFieldSerializer<MemoryInformationData>(kryo, MemoryInformationData.class, schemaManager));
@@ -274,8 +283,8 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(SqlStringIndexer.class, new FieldSerializer<SqlStringIndexer<?>>(kryo, SqlStringIndexer.class));
 
 		// aggregation classes
-		kryo.register(AggregatedExceptionSensorData.class, new CustomCompatibleFieldSerializer<AggregatedExceptionSensorData>(kryo, AggregatedExceptionSensorData.class, schemaManager));
-		kryo.register(DatabaseAggregatedTimerData.class, new CustomCompatibleFieldSerializer<DatabaseAggregatedTimerData>(kryo, DatabaseAggregatedTimerData.class, schemaManager, true));
+		kryo.register(AggregatedExceptionSensorData.class, new InvocationAwareDataSerializer<AggregatedExceptionSensorData>(kryo, AggregatedExceptionSensorData.class, schemaManager));
+		kryo.register(DatabaseAggregatedTimerData.class, new InvocationAwareDataSerializer<DatabaseAggregatedTimerData>(kryo, DatabaseAggregatedTimerData.class, schemaManager, true));
 
 		// classes needed for the HTTP calls from the UI
 		kryo.register(RemoteInvocation.class, new FieldSerializer<RemoteInvocation>(kryo, RemoteInvocation.class));
@@ -319,12 +328,31 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		// added with INSPECTIT-723
 		kryo.register(RecordingState.class, new EnumSerializer(RecordingState.class));
 		kryo.register(RecordingProperties.class, new FieldSerializer<RecordingProperties>(kryo, RecordingProperties.class));
+
+		// INSPECTIT-846
+		kryo.register(AggregatedHttpTimerData.class, new InvocationAwareDataSerializer<AggregatedHttpTimerData>(kryo, AggregatedHttpTimerData.class, schemaManager));
+		kryo.register(AggregatedSqlStatementData.class, new InvocationAwareDataSerializer<AggregatedSqlStatementData>(kryo, AggregatedSqlStatementData.class, schemaManager));
+		kryo.register(AggregatedTimerData.class, new InvocationAwareDataSerializer<AggregatedTimerData>(kryo, AggregatedTimerData.class, schemaManager));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void serialize(Object object, Output output) throws SerializationException {
+		serialize(object, output, Collections.emptyMap());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	public void serialize(Object object, Output output, Map<?, ?> kryoPreferences) throws SerializationException {
+		if (MapUtils.isNotEmpty(kryoPreferences)) {
+			ObjectMap<Object, Object> graphContext = kryo.getGraphContext();
+			for (Entry<?, ?> entry : kryoPreferences.entrySet()) {
+				graphContext.put(entry.getKey(), entry.getValue());
+			}
+		}
 		try {
 			kryo.writeClassAndObject(output, object);
 			output.flush();

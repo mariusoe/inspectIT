@@ -51,7 +51,7 @@ public class StorageDataProcessorsTest {
 		storageWriter = mock(StorageWriter.class);
 		List<Class<? extends DefaultData>> includedClasses = new ArrayList<Class<? extends DefaultData>>();
 		includedClasses.add(InvocationSequenceData.class);
-		DataSaverProcessor dataSaverProcessor = new DataSaverProcessor(includedClasses);
+		DataSaverProcessor dataSaverProcessor = new DataSaverProcessor(includedClasses, true);
 		dataSaverProcessor.setStorageWriter(storageWriter);
 
 		TimerData timerData = new TimerData();
@@ -70,7 +70,7 @@ public class StorageDataProcessorsTest {
 		storageWriter = mock(StorageWriter.class);
 		List<Class<? extends DefaultData>> includedClasses = new ArrayList<Class<? extends DefaultData>>();
 		includedClasses.add(InvocationSequenceData.class);
-		DataSaverProcessor dataSaverProcessor = new DataSaverProcessor(includedClasses);
+		DataSaverProcessor dataSaverProcessor = new DataSaverProcessor(includedClasses, true);
 		dataSaverProcessor.setStorageWriter(storageWriter);
 
 		InvocationSequenceData invocation = new InvocationSequenceData();
@@ -182,7 +182,7 @@ public class StorageDataProcessorsTest {
 	public void testDataAggregatorProcessor() {
 		int aggregationPeriod = 100;
 		storageWriter = mock(StorageWriter.class);
-		DataAggregatorProcessor<TimerData> dataAggregatorProcessor = new DataAggregatorProcessor<TimerData>(TimerData.class, aggregationPeriod, new TimerDataAggregator(true));
+		DataAggregatorProcessor<TimerData> dataAggregatorProcessor = new DataAggregatorProcessor<TimerData>(TimerData.class, aggregationPeriod, new TimerDataAggregator(), true);
 		dataAggregatorProcessor.setStorageWriter(storageWriter);
 
 		long timestampValue = new Date().getTime();

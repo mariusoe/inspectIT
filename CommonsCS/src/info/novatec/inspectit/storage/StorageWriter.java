@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -216,8 +217,17 @@ public class StorageWriter implements IWriter {
 	 * This method is only submitting a new writing task, thus it is thread safe and very fast.
 	 */
 	public void write(DefaultData defaultData) {
+		write(defaultData, Collections.emptyMap());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This method is only submitting a new writing task, thus it is thread safe and very fast.
+	 */
+	public void write(DefaultData defaultData, Map<?, ?> kryoPreferences) {
 		if (writingOn && storageManager.canWriteMore()) {
-			WriteTask writeTask = new WriteTask(defaultData);
+			WriteTask writeTask = new WriteTask(defaultData, kryoPreferences);
 			writingExecutorService.submit(writeTask);
 		}
 	}
@@ -446,13 +456,21 @@ public class StorageWriter implements IWriter {
 		private SoftReference<DefaultData> referenceToWriteData;
 
 		/**
+		 * Map of preferences to be passed to the serializer.
+		 */
+		private Map<?, ?> kryoPreferences;
+
+		/**
 		 * Default constructor. Object to be written.
 		 * 
 		 * @param data
 		 *            Data to be written.
+		 * @param kryoPreferences
+		 *            Map of preferences to be passed to the serializer.
 		 */
-		public WriteTask(DefaultData data) {
+		public WriteTask(DefaultData data, Map<?, ?> kryoPreferences) {
 			referenceToWriteData = new SoftReference<DefaultData>(data);
+			this.kryoPreferences = kryoPreferences;
 		}
 
 		/**
@@ -507,7 +525,7 @@ public class StorageWriter implements IWriter {
 				final ExtendedByteBufferOutputStream extendedByteBufferOutputStream = streamProvider.getExtendedByteBufferOutputStream();
 				try {
 					Output output = new Output(extendedByteBufferOutputStream);
-					serializer.serialize(data, output);
+					serializer.serialize(data, output, kryoPreferences);
 					extendedByteBufferOutputStream.flush(false);
 				} catch (SerializationException e) {
 					indexingTreeHandler.writeFailed(this);

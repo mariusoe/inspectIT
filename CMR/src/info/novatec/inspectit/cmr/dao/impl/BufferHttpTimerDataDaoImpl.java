@@ -32,7 +32,7 @@ public class BufferHttpTimerDataDaoImpl extends AbstractBufferDataDao<HttpTimerD
 	@Override
 	public List<HttpTimerData> getAggregatedHttpTimerData(HttpTimerData httpData, boolean includeRequestMethod) {
 		IIndexQuery query = httpDataQueryFactory.getFindAllHttpTimersQuery(httpData, null, null);
-		return super.executeQuery(query, new HttpTimerDataAggregator(true, true, includeRequestMethod));
+		return super.executeQuery(query, new HttpTimerDataAggregator(true, includeRequestMethod));
 	}
 
 	/**
@@ -41,7 +41,7 @@ public class BufferHttpTimerDataDaoImpl extends AbstractBufferDataDao<HttpTimerD
 	@Override
 	public List<HttpTimerData> getAggregatedHttpTimerData(HttpTimerData httpData, boolean includeRequestMethod, Date fromDate, Date toDate) {
 		IIndexQuery query = httpDataQueryFactory.getFindAllHttpTimersQuery(httpData, fromDate, toDate);
-		return super.executeQuery(query, new HttpTimerDataAggregator(true, true, includeRequestMethod));
+		return super.executeQuery(query, new HttpTimerDataAggregator(true, includeRequestMethod));
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class BufferHttpTimerDataDaoImpl extends AbstractBufferDataDao<HttpTimerD
 	@Override
 	public List<HttpTimerData> getTaggedAggregatedHttpTimerData(HttpTimerData httpData, boolean includeRequestMethod) {
 		IIndexQuery query = httpDataQueryFactory.getFindAllTaggedHttpTimersQuery(httpData, null, null);
-		return super.executeQuery(query, new HttpTimerDataAggregator(true, false, includeRequestMethod));
+		return super.executeQuery(query, new HttpTimerDataAggregator(false, includeRequestMethod));
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class BufferHttpTimerDataDaoImpl extends AbstractBufferDataDao<HttpTimerD
 	@Override
 	public List<HttpTimerData> getTaggedAggregatedHttpTimerData(HttpTimerData httpData, boolean includeRequestMethod, Date fromDate, Date toDate) {
 		IIndexQuery query = httpDataQueryFactory.getFindAllTaggedHttpTimersQuery(httpData, fromDate, toDate);
-		return super.executeQuery(query, new HttpTimerDataAggregator(true, false, includeRequestMethod));
+		return super.executeQuery(query, new HttpTimerDataAggregator(false, includeRequestMethod));
 	}
 
 }

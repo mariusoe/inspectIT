@@ -33,7 +33,7 @@ public class StorageHttpTimerDataAccessService extends AbstractStorageService<Ht
 	 */
 	public List<HttpTimerData> getAggregatedTimerData(HttpTimerData httpData, boolean includeRequestMethod) {
 		StorageIndexQuery query = httpDataQueryFactory.getFindAllHttpTimersQuery(httpData, null, null);
-		return super.executeQuery(query, new HttpTimerDataAggregator(false, true, includeRequestMethod));
+		return super.executeQuery(query, new HttpTimerDataAggregator(true, includeRequestMethod));
 	}
 
 	/**
@@ -41,7 +41,7 @@ public class StorageHttpTimerDataAccessService extends AbstractStorageService<Ht
 	 */
 	public List<HttpTimerData> getAggregatedTimerData(HttpTimerData httpData, boolean includeRequestMethod, Date fromDate, Date toDate) {
 		StorageIndexQuery query = httpDataQueryFactory.getFindAllHttpTimersQuery(httpData, fromDate, toDate);
-		return super.executeQuery(query, new HttpTimerDataAggregator(false, true, includeRequestMethod));
+		return super.executeQuery(query, new HttpTimerDataAggregator(true, includeRequestMethod));
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class StorageHttpTimerDataAccessService extends AbstractStorageService<Ht
 	 */
 	public List<HttpTimerData> getTaggedAggregatedTimerData(HttpTimerData httpData, boolean includeRequestMethod) {
 		StorageIndexQuery query = httpDataQueryFactory.getFindAllTaggedHttpTimersQuery(httpData, null, null);
-		return super.executeQuery(query, new HttpTimerDataAggregator(false, false, includeRequestMethod));
+		return super.executeQuery(query, new HttpTimerDataAggregator(false, includeRequestMethod));
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class StorageHttpTimerDataAccessService extends AbstractStorageService<Ht
 	 */
 	public List<HttpTimerData> getTaggedAggregatedTimerData(HttpTimerData httpData, boolean includeRequestMethod, Date fromDate, Date toDate) {
 		StorageIndexQuery query = httpDataQueryFactory.getFindAllTaggedHttpTimersQuery(httpData, fromDate, toDate);
-		return super.executeQuery(query, new HttpTimerDataAggregator(false, false, includeRequestMethod));
+		return super.executeQuery(query, new HttpTimerDataAggregator(false, includeRequestMethod));
 	}
 
 	/**

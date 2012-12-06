@@ -44,7 +44,7 @@ public class HttpDataAggregatorTest extends AbstractTestNGLogSupport {
 		final List<HttpTimerData> input = new ArrayList<HttpTimerData>();
 		Collections.addAll(input, data, data2);
 
-		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(true, false, false));
+		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(false, false));
 		aggregationPerformer.processCollection(input);
 		final List<HttpTimerData> output = aggregationPerformer.getResultList();
 		assertThat(output, is(notNullValue()));
@@ -84,7 +84,7 @@ public class HttpDataAggregatorTest extends AbstractTestNGLogSupport {
 		final List<HttpTimerData> input = new ArrayList<HttpTimerData>();
 		Collections.addAll(input, data, data2);
 
-		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(true, false, false));
+		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(false, false));
 		aggregationPerformer.processCollection(input);
 		final List<HttpTimerData> output = aggregationPerformer.getResultList();
 
@@ -122,7 +122,7 @@ public class HttpDataAggregatorTest extends AbstractTestNGLogSupport {
 		final List<HttpTimerData> input = new ArrayList<HttpTimerData>();
 		Collections.addAll(input, data, data2);
 
-		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(true, true, false));
+		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(true, false));
 		aggregationPerformer.processCollection(input);
 		final List<HttpTimerData> output = aggregationPerformer.getResultList();
 
@@ -156,7 +156,7 @@ public class HttpDataAggregatorTest extends AbstractTestNGLogSupport {
 
 		final List<HttpTimerData> input = new ArrayList<HttpTimerData>();
 		Collections.addAll(input, data, data2);
-		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(true, true, true));
+		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(true, true));
 		aggregationPerformer.processCollection(input);
 		final List<HttpTimerData> output = aggregationPerformer.getResultList();
 

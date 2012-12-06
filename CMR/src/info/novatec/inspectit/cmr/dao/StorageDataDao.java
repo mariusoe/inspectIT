@@ -109,14 +109,16 @@ public interface StorageDataDao {
 	List<DefaultData> getAllDefaultDataForAgent(long platformId);
 
 	/**
-	 * Returns the fresh data from the buffer from the given template list. This data is later used
-	 * to be copied to storage.
+	 * Returns the fresh data from the buffer which IDs correspond to the given IDs.
 	 * 
-	 * @param copyDataList
-	 *            Template list.
+	 * @param elementIds
+	 *            Id to search for.
+	 * @param platformIdent
+	 *            PLatform ident that elements belong to. Value 0 will ignore the platform ident and
+	 *            search the complete buffer.
 	 * @return Data to be store in storage.
 	 */
-	List<DefaultData> getDataFromCopyTemplateList(List<DefaultData> copyDataList);
+	List<DefaultData> getDataFromIdList(Collection<Long> elementIds, long platformIdent);
 
 	/**
 	 * Returns the last {@link SystemInformationData} for every agent provided in the list.

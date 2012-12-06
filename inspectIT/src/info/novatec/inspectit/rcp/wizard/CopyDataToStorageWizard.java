@@ -1,6 +1,17 @@
 package info.novatec.inspectit.rcp.wizard;
 
+import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
+import info.novatec.inspectit.communication.data.AggregatedHttpTimerData;
+import info.novatec.inspectit.communication.data.AggregatedSqlStatementData;
+import info.novatec.inspectit.communication.data.AggregatedTimerData;
+import info.novatec.inspectit.communication.data.ExceptionSensorData;
+import info.novatec.inspectit.communication.data.HttpTimerData;
+import info.novatec.inspectit.communication.data.InvocationAwareData;
+import info.novatec.inspectit.communication.data.InvocationSequenceData;
+import info.novatec.inspectit.communication.data.SqlStatementData;
+import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
@@ -17,7 +28,9 @@ import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -102,13 +115,28 @@ public class CopyDataToStorageWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public void addPages() {
+		int style = 0;
+		for (DefaultData copyData : copyDataList) {
+			Class<?> clazz = copyData.getClass();
+			if (HttpTimerData.class.equals(clazz) || AggregatedHttpTimerData.class.equals(clazz)) {
+				style |= DefineDataProcessorsWizardPage.ONLY_HTTP_TIMERS;
+			} else if (SqlStatementData.class.equals(clazz) || AggregatedSqlStatementData.class.equals(clazz)) {
+				style |= DefineDataProcessorsWizardPage.ONLY_SQL_STATEMENTS;
+			} else if (ExceptionSensorData.class.equals(clazz) || AggregatedExceptionSensorData.class.equals(clazz)) {
+				style |= DefineDataProcessorsWizardPage.ONLY_EXCEPTIONS;
+			} else if (TimerData.class.equals(clazz) || AggregatedTimerData.class.equals(clazz)) {
+				style |= DefineDataProcessorsWizardPage.ONLY_TIMERS;
+			} else if (InvocationSequenceData.class.equals(clazz)) {
+				style |= DefineDataProcessorsWizardPage.ONLY_INVOCATIONS | DefineDataProcessorsWizardPage.EXTRACT_INVOCATIONS;
+			}
+		}
 		newOrExistsingStorageWizardPage = new NewOrExistsingStorageWizardPage();
 		addPage(newOrExistsingStorageWizardPage);
 		defineNewStorageWizzardPage = new DefineNewStorageWizzardPage(cmrRepositoryDefinition);
 		addPage(defineNewStorageWizzardPage);
 		selectExistingStorageWizardPage = new SelectExistingStorageWizardPage(cmrRepositoryDefinition, false);
 		addPage(selectExistingStorageWizardPage);
-		defineDataProcessorsWizardPage = new DefineDataProcessorsWizardPage(DefineDataProcessorsWizardPage.ONLY_INVOCATIONS | DefineDataProcessorsWizardPage.EXTRACT_INVOCATIONS);
+		defineDataProcessorsWizardPage = new DefineDataProcessorsWizardPage(style);
 		addPage(defineDataProcessorsWizardPage);
 		addLabelWizardPage = new AddStorageLabelWizardPage(cmrRepositoryDefinition);
 		addPage(addLabelWizardPage);
@@ -126,14 +154,35 @@ public class CopyDataToStorageWizard extends Wizard implements INewWizard {
 			storageData = selectExistingStorageWizardPage.getSelectedStorageData();
 		}
 
-		final Collection<AbstractDataProcessor> processors = defineDataProcessorsWizardPage.getProcessorList();
-		final StorageData finalStorageData = storageData;
 		if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
+			// prepare for save
+			final Collection<AbstractDataProcessor> processors = defineDataProcessorsWizardPage.getProcessorList();
+			final StorageData finalStorageData = storageData;
+			final Set<Long> idSet = new HashSet<Long>();
+			Set<Long> platformIdents = new HashSet<Long>();
+			for (DefaultData template : copyDataList) {
+				if (template instanceof IAggregatedData<?>) {
+					// if we have aggregated data add all objects that were included in the
+					// aggregation
+					idSet.addAll(((IAggregatedData<?>) template).getAggregatedIds());
+				} else if (0 != template.getId()) {
+					idSet.add(template.getId());
+				}
+				if (template instanceof InvocationAwareData) {
+					// if we have invocation aware object, add also all invocations
+					// data processor will filter the correct data to save
+					idSet.addAll(((InvocationAwareData) template).getInvocationParentsIdSet());
+				}
+				platformIdents.add(template.getPlatformIdent());
+			}
+			final long platformIdent = (platformIdents.size() == 1) ? platformIdents.iterator().next() : 0;
+
+			// create and execute job
 			Job copyDataJob = new Job("Copy Data to Buffer") {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
-						StorageData updatedStorageData = cmrRepositoryDefinition.getStorageService().copyDataToStorage(finalStorageData, copyDataList, processors);
+						StorageData updatedStorageData = cmrRepositoryDefinition.getStorageService().copyDataToStorage(finalStorageData, idSet, platformIdent, processors);
 						List<AbstractStorageLabel<?>> labels = addLabelWizardPage.getLabelsToAdd();
 						if (!labels.isEmpty()) {
 							cmrRepositoryDefinition.getStorageService().addLabelsToStorage(updatedStorageData, labels, true);
@@ -223,4 +272,5 @@ public class CopyDataToStorageWizard extends Wizard implements INewWizard {
 		}
 		return true;
 	}
+
 }

@@ -25,6 +25,7 @@
 		<!-- OSGi plugins -->
 		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.logging" rev="1.1.1" conf="osgi->default" />
 		<dependency org="commons-lang" name="commons-lang" rev="2.5" conf="osgi->default"/>
+		<dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="osgi->default" />
 
 		<dependency org="org.springframework" name="org.springframework.core" rev="3.1.0.RELEASE" conf="osgi->default" />
 		<dependency org="org.springframework" name="org.springframework.beans" rev="3.1.0.RELEASE" conf="osgi->default" />
@@ -46,6 +47,7 @@
 		<!-- Original jars for CMR production -->
 		<dependency org="commons-logging" name="commons-logging" rev="1.1.1" conf="prod->default" />
 		<dependency org="commons-lang" name="commons-lang" rev="2.5" conf="prod->default"/>
+		<dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="prod->default" />
 
 		<dependency org="org.springframework" name="spring-core" rev="3.1.0.RELEASE" conf="prod->default"/>
 		<dependency org="org.springframework" name="spring-beans" rev="3.1.0.RELEASE" conf="prod->default"/>

@@ -25,3 +25,4 @@ class: info.novatec.inspectit.communication.data.AggregatedExceptionSensorData
 15: created
 16: passed
 17: handled
+18: aggregatedIds

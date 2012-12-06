@@ -21,7 +21,7 @@ public class StorageTimerDataAccessService extends AbstractStorageService<TimerD
 	/**
 	 * {@link info.novatec.inspectit.indexing.aggregation.IAggregator} used for {@link TimerData}.
 	 */
-	private static final TimerDataAggregator TIMER_DATA_AGGREGATOR = new TimerDataAggregator(false);
+	private static final TimerDataAggregator TIMER_DATA_AGGREGATOR = new TimerDataAggregator();
 
 	/**
 	 * Indexing tree.

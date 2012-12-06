@@ -1,5 +1,8 @@
 package info.novatec.inspectit.indexing.aggregation;
 
+import info.novatec.inspectit.communication.IAggregatedData;
+import info.novatec.inspectit.communication.DefaultData;
+
 /**
  * Interface that defines the operations needed to do a aggregation on the objects. This interface
  * can be used with queries to provide simpler aggregation possibilities.
@@ -9,7 +12,7 @@ package info.novatec.inspectit.indexing.aggregation;
  * @param <E>
  *            Type of data that is aggregated.
  */
-public interface IAggregator<E> {
+public interface IAggregator<E extends DefaultData> {
 
 	/**
 	 * Performs the aggregation. The aggregation should be done in the aggregatedObject, and
@@ -20,7 +23,7 @@ public interface IAggregator<E> {
 	 * @param objectToAdd
 	 *            Object which values are added to the other object.
 	 */
-	void aggregate(E aggregatedObject, E objectToAdd);
+	void aggregate(IAggregatedData<E> aggregatedObject, E objectToAdd);
 
 	/**
 	 * Provides cloned object if the {@link #isCloning()} returns true.
@@ -29,14 +32,7 @@ public interface IAggregator<E> {
 	 *            Object to be cloned.
 	 * @return Provides cloned object if the {@link #isCloning()} returns true.
 	 */
-	E getClone(E object);
-
-	/**
-	 * Define if objects should be cloned before aggregation.
-	 * 
-	 * @return Define if objects should be cloned before aggregation.
-	 */
-	boolean isCloning();
+	IAggregatedData<E> getClone(E object);
 
 	/**
 	 * Returns aggregation key.

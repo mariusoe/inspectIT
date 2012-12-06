@@ -16,11 +16,8 @@ import info.novatec.inspectit.storage.label.type.impl.RatingLabelType;
 import info.novatec.inspectit.storage.label.type.impl.StatusLabelType;
 import info.novatec.inspectit.storage.label.type.impl.UseCaseLabelType;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -186,23 +183,11 @@ public class StorageDataDaoImpl extends HibernateDaoSupport implements StorageDa
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<DefaultData> getDataFromCopyTemplateList(List<DefaultData> copyDataList) {
+	@Override
+	public List<DefaultData> getDataFromIdList(Collection<Long> elementIds, long platformIdent) {
 		IIndexQuery query = indexQueryProvider.createNewIndexQuery();
-
-		Set<Long> platformIdents = new HashSet<Long>();
-		Set<Class<?>> searchedClassesSet = new HashSet<Class<?>>();
-		Set<Long> idSet = new HashSet<Long>();
-		for (DefaultData template : copyDataList) {
-			platformIdents.add(template.getPlatformIdent());
-			searchedClassesSet.add(template.getClass());
-			idSet.add(template.getId());
-		}
-
-		query.addIndexingRestriction(IndexQueryRestrictionFactory.isInCollection("id", idSet));
-		query.setObjectClasses(new ArrayList<Class<?>>(searchedClassesSet));
-		if (platformIdents.size() == 1) {
-			query.setPlatformIdent(platformIdents.iterator().next().longValue());
-		}
+		query.addIndexingRestriction(IndexQueryRestrictionFactory.isInCollection("id", elementIds));
+		query.setPlatformIdent(platformIdent);
 		return indexingTree.query(query);
 	}
 

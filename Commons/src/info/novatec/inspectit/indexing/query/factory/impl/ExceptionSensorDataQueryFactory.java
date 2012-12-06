@@ -1,6 +1,7 @@
 package info.novatec.inspectit.indexing.query.factory.impl;
 
 import info.novatec.inspectit.communication.ExceptionEvent;
+import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.query.factory.AbstractQueryFactory;
@@ -48,6 +49,7 @@ public class ExceptionSensorDataQueryFactory<E extends IIndexQuery> extends Abst
 		}
 		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
 		searchedClasses.add(ExceptionSensorData.class);
+		searchedClasses.add(AggregatedExceptionSensorData.class);
 		query.setObjectClasses(searchedClasses);
 		query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("exceptionEvent", ExceptionEvent.CREATED));
 		if (null != fromDate) {
@@ -70,6 +72,7 @@ public class ExceptionSensorDataQueryFactory<E extends IIndexQuery> extends Abst
 		E query = getIndexQueryProvider().getIndexQuery();
 		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
 		searchedClasses.add(ExceptionSensorData.class);
+		searchedClasses.add(AggregatedExceptionSensorData.class);
 		query.setObjectClasses(searchedClasses);
 		query.setPlatformIdent(template.getPlatformIdent());
 		query.setMethodIdent(template.getMethodIdent());
@@ -94,6 +97,7 @@ public class ExceptionSensorDataQueryFactory<E extends IIndexQuery> extends Abst
 		E query = getIndexQueryProvider().getIndexQuery();
 		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
 		searchedClasses.add(ExceptionSensorData.class);
+		searchedClasses.add(AggregatedExceptionSensorData.class);
 		query.setObjectClasses(searchedClasses);
 		query.setPlatformIdent(template.getPlatformIdent());
 		if (null != template.getThrowableType()) {
@@ -119,6 +123,7 @@ public class ExceptionSensorDataQueryFactory<E extends IIndexQuery> extends Abst
 		E query = getIndexQueryProvider().getIndexQuery();
 		ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
 		searchedClasses.add(ExceptionSensorData.class);
+		searchedClasses.add(AggregatedExceptionSensorData.class);
 		query.setObjectClasses(searchedClasses);
 		query.setPlatformIdent(template.getPlatformIdent());
 		query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("throwableType", template.getThrowableType()));

@@ -10,6 +10,7 @@ import info.novatec.inspectit.storage.StorageWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -53,6 +54,15 @@ public class CmrStorageWriter extends StorageWriter {
 	@Override
 	public void write(DefaultData defaultData) {
 		super.write(defaultData);
+		involvedAgentsSet.add(defaultData.getPlatformIdent());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void write(DefaultData defaultData, Map<?, ?> kryoPreferences) {
+		super.write(defaultData, kryoPreferences);
 		involvedAgentsSet.add(defaultData.getPlatformIdent());
 	}
 

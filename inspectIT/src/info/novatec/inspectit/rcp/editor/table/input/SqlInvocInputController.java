@@ -463,7 +463,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 			List<InvocationSequenceData> invocationSequenceDataList = (List<InvocationSequenceData>) inputElement;
 			sqlStatementDataList = getRawInputList(invocationSequenceDataList, new ArrayList<SqlStatementData>());
 			if (!rawMode) {
-				AggregationPerformer<SqlStatementData> aggregationPerformer = new AggregationPerformer<SqlStatementData>(new SqlStatementDataAggregator(true));
+				AggregationPerformer<SqlStatementData> aggregationPerformer = new AggregationPerformer<SqlStatementData>(new SqlStatementDataAggregator());
 				aggregationPerformer.processCollection(sqlStatementDataList);
 				sqlStatementDataList = aggregationPerformer.getResultList();
 			} else {

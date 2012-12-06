@@ -28,7 +28,7 @@ public class InvocationSequenceCustomCompatibleFieldSerializer extends CustomCom
 	 * @see CustomCompatibleFieldSerializer#CustomCompatibleFieldSerializer(Kryo, Class,
 	 *      ClassSchemaManager)
 	 */
-	public InvocationSequenceCustomCompatibleFieldSerializer(Kryo kryo, Class<?> type, ClassSchemaManager schemaManager) {
+	public InvocationSequenceCustomCompatibleFieldSerializer(Kryo kryo, Class<? extends InvocationSequenceData> type, ClassSchemaManager schemaManager) {
 		super(kryo, type, schemaManager);
 	}
 

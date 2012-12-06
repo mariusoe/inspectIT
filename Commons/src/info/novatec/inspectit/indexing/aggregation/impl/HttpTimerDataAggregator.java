@@ -1,5 +1,7 @@
 package info.novatec.inspectit.indexing.aggregation.impl;
 
+import info.novatec.inspectit.communication.IAggregatedData;
+import info.novatec.inspectit.communication.data.AggregatedHttpTimerData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.indexing.aggregation.IAggregator;
 
@@ -17,11 +19,6 @@ public class HttpTimerDataAggregator implements IAggregator<HttpTimerData>, Seri
 	 * Generated UID.
 	 */
 	private static final long serialVersionUID = 495449254866425040L;
-
-	/**
-	 * Is cloning active.
-	 */
-	private boolean cloning;
 
 	/**
 	 * Is UIR based.
@@ -42,15 +39,12 @@ public class HttpTimerDataAggregator implements IAggregator<HttpTimerData>, Seri
 	/**
 	 * Default constructor that defines aggregation parameters.
 	 * 
-	 * @param cloning
-	 *            Should cloning be active.
 	 * @param uriBased
 	 *            Is aggregation URi based.
 	 * @param includeRequestMethod
 	 *            Should request method be included in aggregation.
 	 */
-	public HttpTimerDataAggregator(boolean cloning, boolean uriBased, boolean includeRequestMethod) {
-		this.cloning = cloning;
+	public HttpTimerDataAggregator(boolean uriBased, boolean includeRequestMethod) {
 		this.uriBased = uriBased;
 		this.includeRequestMethod = includeRequestMethod;
 	}
@@ -58,7 +52,7 @@ public class HttpTimerDataAggregator implements IAggregator<HttpTimerData>, Seri
 	/**
 	 * {@inheritDoc}
 	 */
-	public void aggregate(HttpTimerData aggregatedObject, HttpTimerData objectToAdd) {
+	public void aggregate(IAggregatedData<HttpTimerData> aggregatedObject, HttpTimerData objectToAdd) {
 		if (!uriBased) {
 			if (!objectToAdd.hasInspectItTaggingHeader()) {
 				// use case aggregation for elements that do not have any tagged value does not
@@ -67,12 +61,12 @@ public class HttpTimerDataAggregator implements IAggregator<HttpTimerData>, Seri
 			}
 		}
 
-		aggregatedObject.aggregateTimerData(objectToAdd);
+		aggregatedObject.aggregate(objectToAdd);
 
 		if (!includeRequestMethod) {
 			// If we have different request methods, we set the request method to "multiple"
-			if (!objectToAdd.getRequestMethod().equals(aggregatedObject.getRequestMethod()) && !aggregatedObject.getRequestMethod().equals(HttpTimerData.REQUEST_METHOD_MULTIPLE)) {
-				aggregatedObject.setRequestMethod(HttpTimerData.REQUEST_METHOD_MULTIPLE);
+			if (!objectToAdd.getRequestMethod().equals(aggregatedObject.getData().getRequestMethod()) && !aggregatedObject.getData().getRequestMethod().equals(HttpTimerData.REQUEST_METHOD_MULTIPLE)) {
+				aggregatedObject.getData().setRequestMethod(HttpTimerData.REQUEST_METHOD_MULTIPLE);
 			}
 		}
 	}
@@ -80,8 +74,8 @@ public class HttpTimerDataAggregator implements IAggregator<HttpTimerData>, Seri
 	/**
 	 * {@inheritDoc}
 	 */
-	public HttpTimerData getClone(HttpTimerData httpData) {
-		HttpTimerData clone = new HttpTimerData();
+	public IAggregatedData<HttpTimerData> getClone(HttpTimerData httpData) {
+		AggregatedHttpTimerData clone = new AggregatedHttpTimerData();
 		clone.setPlatformIdent(httpData.getPlatformIdent());
 		clone.setSensorTypeIdent(httpData.getSensorTypeIdent());
 		clone.setMethodIdent(httpData.getMethodIdent());
@@ -95,13 +89,6 @@ public class HttpTimerDataAggregator implements IAggregator<HttpTimerData>, Seri
 		}
 		clone.setRequestMethod(httpData.getRequestMethod());
 		return clone;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean isCloning() {
-		return cloning;
 	}
 
 	/**

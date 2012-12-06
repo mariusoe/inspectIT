@@ -10,6 +10,10 @@ import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.Sizeable;
+import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
+import info.novatec.inspectit.communication.data.AggregatedHttpTimerData;
+import info.novatec.inspectit.communication.data.AggregatedSqlStatementData;
+import info.novatec.inspectit.communication.data.AggregatedTimerData;
 import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
 import info.novatec.inspectit.communication.data.CompilationInformationData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
@@ -56,7 +60,8 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 	 */
 	public static final Object[][] TESTING_CLASSES = new Object[][] { { TimerData.class }, { SqlStatementData.class }, { ExceptionSensorData.class }, { InvocationSequenceData.class },
 			{ ClassLoadingInformationData.class }, { CompilationInformationData.class }, { MemoryInformationData.class }, { RuntimeInformationData.class }, { SystemInformationData.class },
-			{ ThreadInformationData.class }, { HttpTimerData.class } };
+			{ ThreadInformationData.class }, { HttpTimerData.class }, { AggregatedExceptionSensorData.class }, { AggregatedHttpTimerData.class }, { AggregatedSqlStatementData.class },
+			{ AggregatedTimerData.class } };
 
 	/**
 	 * Amount that we add to each hash map because of the entry, key and value set safety.

@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.util;
 
 import info.novatec.inspectit.communication.MethodSensorData;
+import info.novatec.inspectit.communication.data.AggregatedTimerData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
@@ -140,9 +141,9 @@ public final class OccurrenceFinderFactory {
 	 */
 	@SuppressWarnings("rawtypes")
 	private static OccurrenceFinder getOccurrenceFinder(Object element) {
-		if (element.getClass().equals(SqlStatementData.class)) {
+		if (SqlStatementData.class.isAssignableFrom(element.getClass())) {
 			return sqlOccurrenceFinder;
-		} else if (element.getClass().equals(TimerData.class)) {
+		} else if (element.getClass().equals(TimerData.class) || element.getClass().equals(AggregatedTimerData.class)) {
 			return timerOccurrenceFinder;
 		} else if (ExceptionSensorData.class.isAssignableFrom(element.getClass())) {
 			return exceptionOccurrenceFinder;

@@ -1,5 +1,7 @@
 package info.novatec.inspectit.indexing.aggregation.impl;
 
+import info.novatec.inspectit.communication.IAggregatedData;
+import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.indexing.aggregation.IAggregator;
 
 import java.util.ArrayList;
@@ -17,12 +19,12 @@ import java.util.Map;
  * @param <E>
  *            Type to be aggregated.
  */
-public class AggregationPerformer<E> {
+public class AggregationPerformer<E extends DefaultData> {
 
 	/**
 	 * Map for caching.
 	 */
-	private Map<Object, E> aggregationMap;
+	private Map<Object, IAggregatedData<E>> aggregationMap;
 
 	/**
 	 * {@link IAggregator} used.
@@ -40,7 +42,7 @@ public class AggregationPerformer<E> {
 			throw new IllegalArgumentException("Aggregator can not be null.");
 		}
 		this.aggregator = aggregator;
-		this.aggregationMap = new HashMap<Object, E>();
+		this.aggregationMap = new HashMap<Object, IAggregatedData<E>>();
 	}
 
 	/**
@@ -51,17 +53,13 @@ public class AggregationPerformer<E> {
 	 */
 	public void processElement(E element) {
 		Object key = aggregator.getAggregationKey(element);
-		E aggregatedObject = aggregationMap.get(key);
+		IAggregatedData<E> aggregatedObject = aggregationMap.get(key);
 		if (null != aggregatedObject) {
 			aggregator.aggregate(aggregatedObject, element);
 		} else {
-			if (aggregator.isCloning()) {
-				aggregatedObject = aggregator.getClone(element);
-				aggregationMap.put(key, aggregatedObject);
-				aggregator.aggregate(aggregatedObject, element);
-			} else {
-				aggregationMap.put(key, element);
-			}
+			aggregatedObject = aggregator.getClone(element);
+			aggregationMap.put(key, aggregatedObject);
+			aggregator.aggregate(aggregatedObject, element);
 		}
 	}
 
@@ -83,7 +81,11 @@ public class AggregationPerformer<E> {
 	 * @return Returns aggregation results.
 	 */
 	public List<E> getResultList() {
-		return new ArrayList<E>(aggregationMap.values());
+		List<E> returnList = new ArrayList<E>();
+		for (IAggregatedData<E> aggregatedData : aggregationMap.values()) {
+			returnList.add(aggregatedData.getData());
+		}
+		return returnList;
 	}
 
 }

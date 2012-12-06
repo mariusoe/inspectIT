@@ -397,10 +397,10 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 * 
 	 * @param storageData
 	 *            {@link StorageData} to copy to.
-	 * 
-	 * @param copyDataList
-	 *            List of data. Note that this list will be used as a template list. The data will
-	 *            be first loaded from the buffer.
+	 * @param elementIds
+	 *            IDs of the elements to be saved.
+	 * @param platformIdent
+	 *            Platform ident elements belong to.
 	 * @param dataProcessors
 	 *            Processors to process the data. Can be null, then the data is only copied with no
 	 *            processing.
@@ -411,8 +411,8 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 * @throws StorageException
 	 *             If {@link StorageException} occurs.
 	 */
-	public void copyDataToStorage(StorageData storageData, List<DefaultData> copyDataList, Collection<AbstractDataProcessor> dataProcessors) throws IOException, SerializationException,
-			StorageException {
+	public void copyDataToStorage(StorageData storageData, Collection<Long> elementIds, long platformIdent, Collection<AbstractDataProcessor> dataProcessors) throws IOException,
+			SerializationException, StorageException {
 		if (!isStorageExisting(storageData)) {
 			this.createStorage(storageData);
 		}
@@ -421,7 +421,7 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 			this.openStorage(local);
 		}
 
-		List<DefaultData> toWriteList = storageDataDao.getDataFromCopyTemplateList(copyDataList);
+		List<DefaultData> toWriteList = storageDataDao.getDataFromIdList(elementIds, platformIdent);
 		this.writeToStorage(local, toWriteList, dataProcessors, true);
 		updateExistingStorageSize(local);
 	}

@@ -261,13 +261,10 @@ public class StorageService implements IStorageService {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@MethodLog
-	public StorageData copyDataToStorage(StorageData storageData, List<DefaultData> copyDataList, Collection<AbstractDataProcessor> dataProcessors) throws StorageException {
+	@Override
+	public StorageData copyDataToStorage(StorageData storageData, Collection<Long> elementIds, long platformIdent, Collection<AbstractDataProcessor> dataProcessors) throws StorageException {
 		try {
-			storageManager.copyDataToStorage(storageData, copyDataList, dataProcessors);
+			storageManager.copyDataToStorage(storageData, elementIds, platformIdent, dataProcessors);
 			return storageData;
 		} catch (IOException e) {
 			log.warn("Exception in storage service.", e);

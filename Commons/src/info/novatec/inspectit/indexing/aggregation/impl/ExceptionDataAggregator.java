@@ -1,5 +1,6 @@
 package info.novatec.inspectit.indexing.aggregation.impl;
 
+import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.indexing.aggregation.IAggregator;
@@ -66,20 +67,17 @@ public class ExceptionDataAggregator implements IAggregator<ExceptionSensorData>
 	/**
 	 * {@inheritDoc}
 	 */
-	public void aggregate(ExceptionSensorData aggregatedObject, ExceptionSensorData objectToAdd) {
-		if (aggregatedObject instanceof AggregatedExceptionSensorData) {
-			AggregatedExceptionSensorData aggregatedExceptionSensorData = (AggregatedExceptionSensorData) aggregatedObject;
-			aggregatedExceptionSensorData.aggregateExceptionData(objectToAdd);
-			if (null != objectToAdd.getChild()) {
-				aggregate(aggregatedExceptionSensorData, objectToAdd.getChild());
-			}
+	public void aggregate(IAggregatedData<ExceptionSensorData> aggregatedObject, ExceptionSensorData objectToAdd) {
+		aggregatedObject.aggregate(objectToAdd);
+		if (null != objectToAdd.getChild()) {
+			aggregate(aggregatedObject, objectToAdd.getChild());
 		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public ExceptionSensorData getClone(ExceptionSensorData exceptionData) {
+	public IAggregatedData<ExceptionSensorData> getClone(ExceptionSensorData exceptionData) {
 		AggregatedExceptionSensorData clone = new AggregatedExceptionSensorData();
 		clone.setPlatformIdent(exceptionData.getPlatformIdent());
 		clone.setThrowableType(exceptionData.getThrowableType());
@@ -90,13 +88,6 @@ public class ExceptionDataAggregator implements IAggregator<ExceptionSensorData>
 			clone.setStackTrace(getCorrectStackTrace(exceptionData.getStackTrace()));
 		}
 		return clone;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean isCloning() {
-		return true;
 	}
 
 	/**

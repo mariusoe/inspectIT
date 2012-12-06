@@ -1,5 +1,7 @@
 package info.novatec.inspectit.indexing.aggregation.impl;
 
+import info.novatec.inspectit.communication.IAggregatedData;
+import info.novatec.inspectit.communication.data.AggregatedSqlStatementData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.indexing.aggregation.IAggregator;
 
@@ -20,11 +22,6 @@ public class SqlStatementDataAggregator implements IAggregator<SqlStatementData>
 	private static final long serialVersionUID = -2226935151962665996L;
 
 	/**
-	 * Is cloning active.
-	 */
-	private boolean cloning;
-
-	/**
 	 * Should the parameters be included in aggregation.
 	 */
 	private boolean includeParameters;
@@ -36,40 +33,27 @@ public class SqlStatementDataAggregator implements IAggregator<SqlStatementData>
 	}
 
 	/**
-	 * Default constructor. Same as calling {@link #SqlStatementDataAggregator(boolean, false)}.
-	 * 
-	 * @param cloning
-	 *            Should cloning be used or not.
-	 */
-	public SqlStatementDataAggregator(boolean cloning) {
-		this(cloning, false);
-	}
-
-	/**
 	 * Secondary constructor. Allows to define if parameters should be included in the aggregation.
 	 * 
-	 * @param cloning
-	 *            Should cloning be used or not.
 	 * @param includeParameters
 	 *            Should the parameters be included in aggregation.
 	 */
-	public SqlStatementDataAggregator(boolean cloning, boolean includeParameters) {
-		this.cloning = cloning;
+	public SqlStatementDataAggregator(boolean includeParameters) {
 		this.includeParameters = includeParameters;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void aggregate(SqlStatementData aggregatedObject, SqlStatementData objectToAdd) {
-		aggregatedObject.aggregateTimerData(objectToAdd);
+	public void aggregate(IAggregatedData<SqlStatementData> aggregatedObject, SqlStatementData objectToAdd) {
+		aggregatedObject.aggregate(objectToAdd);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public SqlStatementData getClone(SqlStatementData sqlStatementData) {
-		SqlStatementData clone = new SqlStatementData();
+	public IAggregatedData<SqlStatementData> getClone(SqlStatementData sqlStatementData) {
+		AggregatedSqlStatementData clone = new AggregatedSqlStatementData();
 		clone.setPlatformIdent(sqlStatementData.getPlatformIdent());
 		clone.setMethodIdent(sqlStatementData.getMethodIdent());
 		clone.setPreparedStatement(sqlStatementData.isPreparedStatement());
@@ -78,13 +62,6 @@ public class SqlStatementDataAggregator implements IAggregator<SqlStatementData>
 			clone.setParameterValues(new ArrayList<String>(sqlStatementData.getParameterValues()));
 		}
 		return clone;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean isCloning() {
-		return cloning;
 	}
 
 	/**

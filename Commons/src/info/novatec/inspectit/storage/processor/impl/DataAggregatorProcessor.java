@@ -1,11 +1,16 @@
 package info.novatec.inspectit.storage.processor.impl;
 
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.IAggregatedData;
+import info.novatec.inspectit.communication.data.InvocationAwareData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.aggregation.IAggregator;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
+import info.novatec.inspectit.storage.serializer.util.KryoSerializationPreferences;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -49,12 +54,12 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 	/**
 	 * Map for caching.
 	 */
-	private ConcurrentHashMap<Integer, E> map = new ConcurrentHashMap<Integer, E>(64, 0.75f, 4);
+	private ConcurrentHashMap<Integer, IAggregatedData<E>> map = new ConcurrentHashMap<Integer, IAggregatedData<E>>(64, 0.75f, 4);
 
 	/**
 	 * Queue for knowing the order.
 	 */
-	private ConcurrentLinkedQueue<E> queue = new ConcurrentLinkedQueue<E>();
+	private ConcurrentLinkedQueue<IAggregatedData<E>> queue = new ConcurrentLinkedQueue<IAggregatedData<E>>();
 
 	/**
 	 * List of classes that should be aggregated by this processor. Only instances of
@@ -66,6 +71,11 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 	 * Timer data aggregator.
 	 */
 	private IAggregator<E> dataAggregator;
+
+	/**
+	 * If invocation affiliation should be written along side {@link InvocationAwareData}.
+	 */
+	private boolean writeInvocationAffiliation;
 
 	/**
 	 * No-arg constructor.
@@ -82,9 +92,11 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 	 *            Period of time in which data should be aggregated. In milliseconds.
 	 * @param dataAggregator
 	 *            {@link IAggregator} used to aggregate data. Must not be null.
+	 * @param writeInvocationAffiliation
+	 *            If invocation affiliation should be written along side {@link InvocationAwareData}
 	 */
-	public DataAggregatorProcessor(Class<E> clazz, long aggregationPeriod, IAggregator<E> dataAggregator) {
-		this(clazz, aggregationPeriod, DEFAULT_MAX_ELEMENTS, dataAggregator);
+	public DataAggregatorProcessor(Class<E> clazz, long aggregationPeriod, IAggregator<E> dataAggregator, boolean writeInvocationAffiliation) {
+		this(clazz, aggregationPeriod, DEFAULT_MAX_ELEMENTS, dataAggregator, writeInvocationAffiliation);
 	}
 
 	/**
@@ -98,8 +110,10 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 	 *            Max elements in the cache of the processor.
 	 * @param dataAggregator
 	 *            {@link IAggregator} used to aggregate data. Must not be null.
+	 * @param writeInvocationAffiliation
+	 *            If invocation affiliation should be written along side {@link InvocationAwareData}
 	 */
-	public DataAggregatorProcessor(Class<E> clazz, long aggregationPeriod, int maxElements, IAggregator<E> dataAggregator) {
+	public DataAggregatorProcessor(Class<E> clazz, long aggregationPeriod, int maxElements, IAggregator<E> dataAggregator, boolean writeInvocationAffiliation) {
 		if (null == clazz) {
 			throw new IllegalArgumentException("Aggregation class can not be null.");
 		}
@@ -117,6 +131,7 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 		this.maxElements = maxElements;
 		this.dataAggregator = dataAggregator;
 		this.clazz = clazz;
+		this.writeInvocationAffiliation = writeInvocationAffiliation;
 	}
 
 	/**
@@ -128,10 +143,10 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 		long alteredTimestamp = getAlteredTimestamp(timerData);
 		int cacheHash = getCacheHash(timerData, alteredTimestamp);
 
-		E aggData = map.get(cacheHash);
+		IAggregatedData<E> aggData = map.get(cacheHash);
 		if (null == aggData) {
 			aggData = clone(timerData, alteredTimestamp);
-			E insertedData = map.putIfAbsent(cacheHash, aggData);
+			IAggregatedData<E> insertedData = map.putIfAbsent(cacheHash, aggData);
 			// if put happened null will be returned
 			if (null == insertedData) {
 				queue.add(aggData);
@@ -143,7 +158,7 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 				aggData = insertedData;
 			}
 		}
-		aggData.aggregateTimerData(timerData);
+		aggData.aggregate(timerData);
 	}
 
 	/**
@@ -160,11 +175,12 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 	 * Writes the oldest data to the storage.
 	 */
 	private void writeOldest() {
-		E oldest = queue.poll();
-		map.remove(getCacheHash(oldest, oldest.getTimeStamp().getTime()));
-		oldest.finalizeData();
+		IAggregatedData<E> oldest = queue.poll();
+		E data = oldest.getData();
+		map.remove(getCacheHash(data, data.getTimeStamp().getTime()));
+		data.finalizeData();
 		elementCount.decrementAndGet();
-		getStorageWriter().write(oldest);
+		passToStorageWriter(data);
 	}
 
 	/**
@@ -172,14 +188,33 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 	 */
 	@Override
 	public void flush() {
-		E oldest = queue.poll();
+		IAggregatedData<E> oldest = queue.poll();
 		while (null != oldest) {
-			map.remove(getCacheHash(oldest, oldest.getTimeStamp().getTime()));
-			oldest.finalizeData();
+			E data = oldest.getData();
+			map.remove(getCacheHash(data, data.getTimeStamp().getTime()));
+			data.finalizeData();
 			elementCount.decrementAndGet();
-			getStorageWriter().write(oldest);
+			passToStorageWriter(data);
 
 			oldest = queue.poll();
+		}
+	}
+
+	/**
+	 * Passes data to StorageWriter to be written.
+	 * 
+	 * @param data
+	 *            Data to be written.
+	 */
+	private void passToStorageWriter(E data) {
+		// if I am writing the InvocationAwareData and invocations are not saved
+		// make sure we don't save the invocation affiliation
+		if (!writeInvocationAffiliation) {
+			Map<String, Boolean> kryoPreferences = new HashMap<String, Boolean>(1);
+			kryoPreferences.put(KryoSerializationPreferences.WRITE_INVOCATION_AFFILIATION_DATA, Boolean.FALSE);
+			getStorageWriter().write(data, kryoPreferences);
+		} else {
+			getStorageWriter().write(data);
 		}
 	}
 
@@ -222,10 +257,10 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 	 *            New altered time stamp clone to have.
 	 * @return Cloned object ready for aggregation.
 	 */
-	private E clone(E timerData, long alteredTimestamp) {
-		E clone = dataAggregator.getClone(timerData);
-		clone.setId(timerData.getId());
-		clone.setTimeStamp(new Timestamp(alteredTimestamp));
+	private IAggregatedData<E> clone(E timerData, long alteredTimestamp) {
+		IAggregatedData<E> clone = dataAggregator.getClone(timerData);
+		clone.getData().setId(timerData.getId());
+		clone.getData().setTimeStamp(new Timestamp(alteredTimestamp));
 		return clone;
 	}
 
