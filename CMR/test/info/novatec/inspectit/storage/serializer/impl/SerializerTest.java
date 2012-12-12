@@ -2,12 +2,15 @@ package info.novatec.inspectit.storage.serializer.impl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
+import info.novatec.inspectit.cmr.util.HibernateUtil;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
 import info.novatec.inspectit.communication.data.CompilationInformationData;
@@ -59,7 +62,13 @@ import info.novatec.inspectit.storage.serializer.schema.SchemaManagerTestProvide
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.hibernate.collection.PersistentList;
+import org.hibernate.collection.PersistentMap;
+import org.hibernate.collection.PersistentSet;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -114,6 +123,7 @@ public class SerializerTest {
 	public void initSerializer() throws IOException {
 		ClassSchemaManager schemaManager = SchemaManagerTestProvider.getClassSchemaManagerForTests();
 		serializer = new SerializationManager();
+		serializer.hibernateUtil = new HibernateUtil();
 		serializer.schemaManager = schemaManager;
 		serializer.initKryo();
 	}
@@ -196,6 +206,69 @@ public class SerializerTest {
 		Input input = new Input(byteBufferInputStream);
 		Object deserialized = serializer.deserialize(input);
 		assertThat(deserialized, is(equalTo(object)));
+	}
+
+	/**
+	 * Tests that the Hibernate {@link PersistentList} can be serialized, but in way that
+	 * deserialized class will be java list and but not {@link PersistentList}.
+	 * 
+	 * @throws SerializationException
+	 *             SerializationException
+	 */
+	@Test
+	public void hibernatePersistentList() throws SerializationException {
+		PersistentList object = new PersistentList();
+		ByteBufferOutputStream byteBufferOutputStream = new ByteBufferOutputStream(byteBuffer);
+		Output output = new Output(byteBufferOutputStream);
+		serializer.serialize(object, output);
+		byteBuffer.flip();
+		ByteBufferInputStream byteBufferInputStream = new ByteBufferInputStream(byteBuffer);
+		Input input = new Input(byteBufferInputStream);
+		Object deserialized = serializer.deserialize(input);
+		assertThat(deserialized, is(not(instanceOf(PersistentList.class))));
+		assertThat(deserialized, is(instanceOf(List.class)));
+	}
+
+	/**
+	 * Tests that the Hibernate {@link PersistentSet} can be serialized, but in way that
+	 * deserialized class will be java set and but not {@link PersistentSet}.
+	 * 
+	 * @throws SerializationException
+	 *             SerializationException
+	 */
+	@Test
+	public void hibernatePersistentSet() throws SerializationException {
+		PersistentSet object = new PersistentSet();
+		ByteBufferOutputStream byteBufferOutputStream = new ByteBufferOutputStream(byteBuffer);
+		Output output = new Output(byteBufferOutputStream);
+		serializer.serialize(object, output);
+		byteBuffer.flip();
+		ByteBufferInputStream byteBufferInputStream = new ByteBufferInputStream(byteBuffer);
+		Input input = new Input(byteBufferInputStream);
+		Object deserialized = serializer.deserialize(input);
+		assertThat(deserialized, is(not(instanceOf(PersistentSet.class))));
+		assertThat(deserialized, is(instanceOf(Set.class)));
+	}
+
+	/**
+	 * Tests that the Hibernate {@link PersistentMap} can be serialized, but in way that
+	 * deserialized class will be java map and but not {@link PersistentMap}.
+	 * 
+	 * @throws SerializationException
+	 *             SerializationException
+	 */
+	@Test
+	public void hibernatePersistentMap() throws SerializationException {
+		PersistentMap object = new PersistentMap();
+		ByteBufferOutputStream byteBufferOutputStream = new ByteBufferOutputStream(byteBuffer);
+		Output output = new Output(byteBufferOutputStream);
+		serializer.serialize(object, output);
+		byteBuffer.flip();
+		ByteBufferInputStream byteBufferInputStream = new ByteBufferInputStream(byteBuffer);
+		Input input = new Input(byteBufferInputStream);
+		Object deserialized = serializer.deserialize(input);
+		assertThat(deserialized, is(not(instanceOf(PersistentMap.class))));
+		assertThat(deserialized, is(instanceOf(Map.class)));
 	}
 
 }

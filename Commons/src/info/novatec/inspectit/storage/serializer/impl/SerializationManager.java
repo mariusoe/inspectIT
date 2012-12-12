@@ -5,7 +5,6 @@ import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
-import info.novatec.inspectit.cmr.storage.util.IObjectCloner;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
@@ -72,12 +71,16 @@ import info.novatec.inspectit.storage.processor.impl.DataSaverProcessor;
 import info.novatec.inspectit.storage.processor.impl.InvocationClonerDataProcessor;
 import info.novatec.inspectit.storage.processor.impl.InvocationExtractorDataProcessor;
 import info.novatec.inspectit.storage.processor.impl.TimeFrameDataProcessor;
+import info.novatec.inspectit.storage.serializer.HibernateAwareClassResolver;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.storage.serializer.schema.ClassSchemaManager;
+import info.novatec.inspectit.util.IHibernateUtil;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -95,7 +98,9 @@ import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.stereotype.Component;
 
+import com.esotericsoftware.kryo.ClassResolver;
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.ReferenceResolver;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CollectionSerializer;
@@ -106,6 +111,7 @@ import com.esotericsoftware.kryo.serializers.DefaultSerializers.DateSerializer;
 import com.esotericsoftware.kryo.serializers.DefaultSerializers.EnumSerializer;
 import com.esotericsoftware.kryo.serializers.FieldSerializer;
 import com.esotericsoftware.kryo.serializers.MapSerializer;
+import com.esotericsoftware.kryo.util.DefaultClassResolver;
 import com.esotericsoftware.kryo.util.MapReferenceResolver;
 
 /**
@@ -134,17 +140,26 @@ public class SerializationManager implements ISerializer, InitializingBean {
 	ClassSchemaManager schemaManager;
 
 	/**
-	 * Object cloner that will be used in special serializers.
+	 * {@link IHibernateUtil} if needed for Hibernate persistent collections/maps solving.
 	 */
 	@Autowired
-	private IObjectCloner objectCloner;
+	IHibernateUtil hibernateUtil;
 
 	/**
 	 * Initialize {@link Kryo} properties.
 	 */
 	protected void initKryo() {
-		kryo = new Kryo();
-		kryo.setReferenceResolver(new MapReferenceResolver() {
+		// if hibernateUtil is provided, we create special kind of class resolver
+		ClassResolver classResolver;
+		if (null != hibernateUtil) {
+			classResolver = new HibernateAwareClassResolver(hibernateUtil);
+		} else {
+			classResolver = new DefaultClassResolver();
+		}
+
+		// we disable references for DefaultData objects because they are not needed
+		// invocations will be handled manually
+		ReferenceResolver referenceResolver = new MapReferenceResolver() {
 			@SuppressWarnings("rawtypes")
 			@Override
 			public boolean useReferences(Class paramClass) {
@@ -154,7 +169,8 @@ public class SerializationManager implements ISerializer, InitializingBean {
 					return super.useReferences(paramClass);
 				}
 			}
-		});
+		};
+		kryo = new Kryo(classResolver, referenceResolver);
 		kryo.setRegistrationRequired(false);
 		registerClasses(kryo);
 	}
@@ -186,10 +202,10 @@ public class SerializationManager implements ISerializer, InitializingBean {
 	private void registerClasses(Kryo kryo) {
 		/** Java native classes */
 		kryo.register(Class.class, new ClassSerializer());
-		kryo.register(ArrayList.class, new CollectionSerializer());
+		kryo.register(ArrayList.class, new HibernateAwareCollectionSerializer(hibernateUtil));
 		kryo.register(CopyOnWriteArrayList.class, new CollectionSerializer());
-		kryo.register(HashSet.class, new CollectionSerializer());
-		kryo.register(HashMap.class, new MapSerializer());
+		kryo.register(HashSet.class, new HibernateAwareCollectionSerializer(hibernateUtil));
+		kryo.register(HashMap.class, new HibernateAwareMapSerializer(hibernateUtil));
 		kryo.register(ConcurrentHashMap.class, new MapSerializer());
 		kryo.register(Timestamp.class, new TimestampSerializer());
 		kryo.register(Date.class, new DateSerializer());
@@ -198,7 +214,7 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(long[].class, new LongArraySerializer());
 		kryo.register(SimpleStorageDescriptor[].class, new ObjectArraySerializer());
 		/** inspectIT model classes */
-		kryo.register(PlatformIdent.class, new CloningCustomCompatibleFieldSerializer<PlatformIdent>(kryo, PlatformIdent.class, schemaManager, objectCloner));
+		kryo.register(PlatformIdent.class, new CustomCompatibleFieldSerializer<PlatformIdent>(kryo, PlatformIdent.class, schemaManager));
 		kryo.register(MethodIdent.class, new CustomCompatibleFieldSerializer<MethodIdent>(kryo, MethodIdent.class, schemaManager));
 		kryo.register(SensorTypeIdent.class, new CustomCompatibleFieldSerializer<SensorTypeIdent>(kryo, SensorTypeIdent.class, schemaManager));
 		kryo.register(MethodSensorTypeIdent.class, new CustomCompatibleFieldSerializer<MethodSensorTypeIdent>(kryo, MethodSensorTypeIdent.class, schemaManager));
@@ -214,7 +230,7 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(ParameterContentData.class, new CustomCompatibleFieldSerializer<ParameterContentData>(kryo, ParameterContentData.class, schemaManager));
 		kryo.register(MemoryInformationData.class, new CustomCompatibleFieldSerializer<MemoryInformationData>(kryo, MemoryInformationData.class, schemaManager));
 		kryo.register(CpuInformationData.class, new CustomCompatibleFieldSerializer<CpuInformationData>(kryo, CpuInformationData.class, schemaManager));
-		kryo.register(SystemInformationData.class, new CloningCustomCompatibleFieldSerializer<SystemInformationData>(kryo, SystemInformationData.class, schemaManager, objectCloner));
+		kryo.register(SystemInformationData.class, new CustomCompatibleFieldSerializer<SystemInformationData>(kryo, SystemInformationData.class, schemaManager));
 		kryo.register(VmArgumentData.class, new CustomCompatibleFieldSerializer<VmArgumentData>(kryo, VmArgumentData.class, schemaManager));
 		kryo.register(ThreadInformationData.class, new CustomCompatibleFieldSerializer<ThreadInformationData>(kryo, ThreadInformationData.class, schemaManager));
 		kryo.register(RuntimeInformationData.class, new CustomCompatibleFieldSerializer<RuntimeInformationData>(kryo, RuntimeInformationData.class, schemaManager));
@@ -257,8 +273,7 @@ public class SerializationManager implements ISerializer, InitializingBean {
 
 		// aggregation classes
 		kryo.register(AggregatedExceptionSensorData.class, new CustomCompatibleFieldSerializer<AggregatedExceptionSensorData>(kryo, AggregatedExceptionSensorData.class, schemaManager));
-		kryo.register(DatabaseAggregatedTimerData.class, new CloningCustomCompatibleFieldSerializer<DatabaseAggregatedTimerData>(kryo, DatabaseAggregatedTimerData.class, schemaManager, true,
-				objectCloner));
+		kryo.register(DatabaseAggregatedTimerData.class, new CustomCompatibleFieldSerializer<DatabaseAggregatedTimerData>(kryo, DatabaseAggregatedTimerData.class, schemaManager, true));
 
 		// classes needed for the HTTP calls from the UI
 		kryo.register(RemoteInvocation.class, new FieldSerializer<RemoteInvocation>(kryo, RemoteInvocation.class));
@@ -288,6 +303,16 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(SqlStatementDataAggregator.class, new FieldSerializer<SqlStatementDataAggregator>(kryo, SqlStatementDataAggregator.class));
 		kryo.register(HttpTimerDataAggregator.class, new FieldSerializer<HttpTimerDataAggregator>(kryo, HttpTimerDataAggregator.class));
 		kryo.register(ExceptionDataAggregator.class, new FieldSerializer<ExceptionDataAggregator>(kryo, ExceptionDataAggregator.class));
+
+		// INSPECTIT-849 - HIbernate uses Arrays.asList which does not have no-arg constructor
+		// we will create array list instead
+		kryo.register(Arrays.asList().getClass(), new CollectionSerializer() {
+			@Override
+			@SuppressWarnings("rawtypes")
+			protected Collection create(Kryo paramKryo, Input paramInput, Class<Collection> paramClass) {
+				return new ArrayList<Object>();
+			}
+		});
 	}
 
 	/**
@@ -323,16 +348,6 @@ public class SerializationManager implements ISerializer, InitializingBean {
 	 */
 	public void setSchemaManager(ClassSchemaManager schemaManager) {
 		this.schemaManager = schemaManager;
-	}
-
-	/**
-	 * Sets {@link #objectCloner}.
-	 * 
-	 * @param objectCloner
-	 *            New value for {@link #objectCloner}
-	 */
-	public void setObjectCloner(IObjectCloner objectCloner) {
-		this.objectCloner = objectCloner;
 	}
 
 	/**
