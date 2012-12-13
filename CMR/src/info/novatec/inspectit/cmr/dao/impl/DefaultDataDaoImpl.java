@@ -47,7 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
  * <p>
  * Delegates many calls to the {@link HibernateTemplate} returned by the {@link HibernateDaoSupport}
  * class.
- *
+ * 
  * @author Patrice Bouillet
  * @author Eduard Tudenhoefner
  * @author Ivan Senic
@@ -103,7 +103,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	 * here:
 	 * http://blog.springsource.com/2007/06/26/so-should-you-still-use-springs-hibernatetemplate
 	 * -andor-jpatemplate
-	 *
+	 * 
 	 * @param sessionFactory
 	 */
 	@Autowired
@@ -174,14 +174,14 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	/**
 	 * Extract data from the invocation in the way that timer data is saved to the Db, while SQL
 	 * statements and Exceptions are indexed into the root branch.
-	 *
+	 * 
 	 * @param session
 	 *            Session needed for DB persistence.
 	 * @param invData
 	 *            Invocation data to be extracted.
 	 * @param topInvocationParent
 	 *            Top invocation object.
-	 *
+	 * 
 	 */
 	private void extractDataFromInvocation(StatelessSession session, InvocationSequenceData invData, InvocationSequenceData topInvocationParent) {
 		double exclusiveDurationDelta = 0d;
@@ -198,6 +198,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 				durationAddedToTheExclusive = true;
 			}
 			if (null != child.getSqlStatementData()) {
+				topInvocationParent.setNestedSqlStatements(Boolean.TRUE);
 				if (null == child.getTimerData()) {
 					// I don't know if the situation that both timer and sql are set in one
 					// invocation, but just to be sure I only include the time of the sql, if i did
@@ -222,6 +223,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 				}
 			}
 			if (null != child.getExceptionSensorDataObjects()) {
+				topInvocationParent.setNestedExceptions(Boolean.TRUE);
 				for (Object data : child.getExceptionSensorDataObjects()) {
 					ExceptionSensorData exceptionData = (ExceptionSensorData) data;
 					if (exceptionData.getExceptionEvent() == ExceptionEvent.CREATED) {
@@ -290,7 +292,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 
 	/**
 	 * Computes the duration of the nested invocation elements.
-	 *
+	 * 
 	 * @param data
 	 *            The data objects which is inspected for its nested elements.
 	 * @return The duration of all nested sequences (with their nested sequences as well).
@@ -325,7 +327,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	/**
 	 * Deals with the constructor delegation in the invocation sequence data. This method has side
 	 * effects.
-	 *
+	 * 
 	 * @param parent
 	 *            Invocation parent where the exception data is found.
 	 * @param firstExceptionData
@@ -377,7 +379,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 
 	/**
 	 * Connects exception message between linked exception data.
-	 *
+	 * 
 	 * @param exceptionSensorData
 	 *            Parent exception data, thus the one that has exception event CREATED.
 	 */

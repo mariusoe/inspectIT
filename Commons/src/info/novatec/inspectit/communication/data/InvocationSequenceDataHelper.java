@@ -120,6 +120,28 @@ public class InvocationSequenceDataHelper {
 	}
 
 	/**
+	 * Checks whether this data object has nested SQL statements.
+	 * 
+	 * @param data
+	 *            {@link InvocationSequenceData}
+	 * @return True if it has nested SQLs, salse otherwise.
+	 */
+	public static boolean hasNestedSqlStatements(InvocationSequenceData data) {
+		return null != data.isNestedSqlStatements() && data.isNestedSqlStatements().booleanValue();
+	}
+
+	/**
+	 * Checks whether this data object has nested SQL statements.
+	 * 
+	 * @param data
+	 *            {@link InvocationSequenceData}
+	 * @return True if it has nested SQLs, salse otherwise.
+	 */
+	public static boolean hasNestedExceptions(InvocationSequenceData data) {
+		return null != data.isNestedExceptions() && data.isNestedExceptions().booleanValue();
+	}
+
+	/**
 	 * Calculates the duration starting from this invocation sequence data element.
 	 * 
 	 * @param data

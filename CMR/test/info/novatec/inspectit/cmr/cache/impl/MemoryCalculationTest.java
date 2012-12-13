@@ -61,7 +61,7 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 	 * Amount that we add to each hash map because of the entry, key and value set safety.
 	 */
 	private static final long HASH_MAP_SAFTY_DELTA = 16;
-	
+
 	/**
 	 * Field for knowing how much big is the hash map table.
 	 */
@@ -82,12 +82,12 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 	@BeforeClass
 	public void initCorrectObjectSizesInstance() throws Exception {
 		objectSizes = new ObjectSizesFactory().getObject();
-		
+
 		HASH_MAP_TABLE = HashMap.class.getDeclaredField("table");
 		if (null != HASH_MAP_TABLE) {
 			HASH_MAP_TABLE.setAccessible(true);
 		}
-		
+
 	}
 
 	/**
@@ -142,6 +142,17 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		Character s = Character.valueOf('c');
 		long ourSize = objectSizes.getSizeOfCharacterObject();
 		long theirSize = MemoryUtil.deepMemoryUsageOf(s, VisibilityFilter.ALL);
+		assertThat(ourSize, is(equalTo(theirSize)));
+	}
+
+	/**
+	 * Tests size of a {@link Boolean}.
+	 */
+	@Test
+	public void booleanObject() {
+		Boolean b = Boolean.TRUE;
+		long ourSize = objectSizes.getSizeOfBooleanObject();
+		long theirSize = MemoryUtil.deepMemoryUsageOf(b, VisibilityFilter.ALL);
 		assertThat(ourSize, is(equalTo(theirSize)));
 	}
 
@@ -251,8 +262,9 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 
 	/**
 	 * Tests size of empty and populated {@link HashMap} object.
-	 * @throws IllegalAccessException 
-	 * @throws IllegalArgumentException 
+	 * 
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
 	 */
 	@Test(invocationCount = 50)
 	public void hashMap() throws IllegalArgumentException, IllegalAccessException {
@@ -261,7 +273,7 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		long theirSize = MemoryUtil.deepMemoryUsageOf(hashMap, VisibilityFilter.ALL);
 		assertThat("Empty map", ourSize, is(equalTo(theirSize + HASH_MAP_SAFTY_DELTA)));
 
-		int size = 13; //(int) (Math.random() * 100);
+		int size = 13; // (int) (Math.random() * 100);
 		for (int i = 0; i < size; i++) {
 			hashMap.put(new Object(), new Object());
 		}
@@ -269,7 +281,7 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		if (checkObjectGraphIdentityHashCodeCollision(hashMap, new HashSet<Integer>(), new ArrayList<Integer>())) {
 			ourSize = objectSizes.getSizeOfHashMap(hashMap.size()) + 2 * size * objectSizes.getSizeOfObjectObject();
 			theirSize = MemoryUtil.deepMemoryUsageOf(hashMap, VisibilityFilter.ALL);
-			
+
 			boolean tableCorrect = false;
 			if (null != HASH_MAP_TABLE) {
 				Object[] table = (Object[]) HASH_MAP_TABLE.get(hashMap);
@@ -296,7 +308,8 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		long ourSize = objectSizes.getSizeOfHashSet(hashSet.size());
 		long theirSize = MemoryUtil.deepMemoryUsageOf(hashSet, VisibilityFilter.ALL);
 		assertThat("Empty set", ourSize, is(equalTo(theirSize + HASH_MAP_SAFTY_DELTA)));
-		// no hashSet can pass checkObjectGraphIdentityHashCodeCollision check, so we don't checks with elements
+		// no hashSet can pass checkObjectGraphIdentityHashCodeCollision check, so we don't checks
+		// with elements
 		// since it is anyway holding just the HashMap, testing HashMap will be enough
 	}
 

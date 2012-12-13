@@ -196,6 +196,13 @@ public interface IObjectSizes {
 	long getSizeOfCharacterObject();
 
 	/**
+	 * Calculates size of the {@link Boolean} objects.
+	 * 
+	 * @return Size of the {@link Boolean} objects in bytes.
+	 */
+	long getSizeOfBooleanObject();
+
+	/**
 	 * Returns the object size based on the number of given primitive fields in the object's class.
 	 * 
 	 * @param referenceCount

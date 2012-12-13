@@ -22,3 +22,5 @@ class: info.novatec.inspectit.communication.data.InvocationSequenceData
 13: start
 14: end
 15: childCount
+16: nestedSqlStatements
+17: nestedExceptions

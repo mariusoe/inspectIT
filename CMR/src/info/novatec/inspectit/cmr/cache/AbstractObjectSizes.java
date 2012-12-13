@@ -282,6 +282,15 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
+	public long getSizeOfBooleanObject() {
+		long size = this.getSizeOfObjectHeader() + BOOLEAN_SIZE;
+		return alignTo8Bytes(size);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public long getPrimitiveTypesSize(int referenceCount, int booleanCount, int intCount, int floatCount, int longCount, int doubleCount) {
 		return referenceCount * getReferenceSize() + booleanCount * BOOLEAN_SIZE + intCount * INT_SIZE + floatCount * FLOAT_SIZE + longCount * LONG_SIZE + doubleCount * DOUBLE_SIZE;
 	}

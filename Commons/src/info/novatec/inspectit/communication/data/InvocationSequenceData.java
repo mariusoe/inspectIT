@@ -61,12 +61,12 @@ public class InvocationSequenceData extends MethodSensorData {
 	private double duration;
 
 	/**
-	 * The starttime of this invocation sequence
+	 * The start time of this invocation sequence.
 	 */
 	private double start;
 
 	/**
-	 * The endtime of this invocation sequence
+	 * The end time of this invocation sequence.
 	 */
 	private double end;
 
@@ -74,6 +74,16 @@ public class InvocationSequenceData extends MethodSensorData {
 	 * The count of the nested sequences (all levels).
 	 */
 	private long childCount = 0;
+
+	/**
+	 * If the {@link SqlStatementData} is available in this or one of the nested invocations.
+	 */
+	private Boolean nestedSqlStatements;
+
+	/**
+	 * If the {@link ExceptionSensorData} is available in this or one of the nested invocations.
+	 */
+	private Boolean nestedExceptions;
 
 	/**
 	 * Default no-args constructor.
@@ -210,6 +220,44 @@ public class InvocationSequenceData extends MethodSensorData {
 		return childCount;
 	}
 
+	/**
+	 * Gets {@link #nestedSqlStatements}.
+	 * 
+	 * @return {@link #nestedSqlStatements}
+	 */
+	public Boolean isNestedSqlStatements() {
+		return nestedSqlStatements;
+	}
+
+	/**
+	 * Sets {@link #nestedSqlStatements}.
+	 * 
+	 * @param nestedSqlStatements
+	 *            New value for {@link #nestedSqlStatements}
+	 */
+	public void setNestedSqlStatements(Boolean nestedSqlStatements) {
+		this.nestedSqlStatements = nestedSqlStatements;
+	}
+
+	/**
+	 * Gets {@link #nestedExceptions}.
+	 * 
+	 * @return {@link #nestedExceptions}
+	 */
+	public Boolean isNestedExceptions() {
+		return nestedExceptions;
+	}
+
+	/**
+	 * Sets {@link #nestedExceptions}.
+	 * 
+	 * @param nestedExceptions
+	 *            New value for {@link #nestedExceptions}
+	 */
+	public void setNestedExceptions(Boolean nestedExceptions) {
+		this.nestedExceptions = nestedExceptions;
+	}
+
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
@@ -259,7 +307,7 @@ public class InvocationSequenceData extends MethodSensorData {
 	 */
 	public long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
 		long size = super.getObjectSize(objectSizes, false);
-		size += objectSizes.getPrimitiveTypesSize(5, 0, 0, 0, 2, 3);
+		size += objectSizes.getPrimitiveTypesSize(7, 0, 0, 0, 2, 3);
 		size += objectSizes.getSizeOf(timerData);
 		size += objectSizes.getSizeOf(sqlStatementData);
 		if (null != nestedSequences && nestedSequences instanceof ArrayList) {
@@ -273,6 +321,12 @@ public class InvocationSequenceData extends MethodSensorData {
 			for (ExceptionSensorData exceptionSensorData : exceptionSensorDataObjects) {
 				size += objectSizes.getSizeOf(exceptionSensorData);
 			}
+		}
+		if (null != nestedSqlStatements) {
+			size += objectSizes.getSizeOfBooleanObject();
+		}
+		if (null != nestedExceptions) {
+			size += objectSizes.getSizeOfBooleanObject();
 		}
 		if (doAlign) {
 			return objectSizes.alignTo8Bytes(size);
@@ -301,6 +355,8 @@ public class InvocationSequenceData extends MethodSensorData {
 		clone.setTimerData(this.getTimerData());
 		clone.setExceptionSensorDataObjects(this.getExceptionSensorDataObjects());
 		clone.setStart(this.getStart());
+		clone.setNestedSqlStatements(this.isNestedSqlStatements());
+		clone.setNestedExceptions(this.isNestedExceptions());
 		return clone;
 	}
 

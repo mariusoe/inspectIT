@@ -9,6 +9,7 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
+import info.novatec.inspectit.rcp.resource.CombinedIcon;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageData.StorageState;
@@ -235,6 +236,24 @@ public final class ImageFormatter {
 			return img;
 		}
 		return null;
+	}
+
+	/**
+	 * Returns the combined image for given array of descriptors. Orientation can be vertical or
+	 * horizontal.
+	 * @param resourceManager
+	 *            {@link ResourceManager}.
+	 * @param orientation
+	 *            SWT#Vertical or SWT#Horizontal. Descriptors will be pased in given order.
+	 * @param descriptors
+	 *            Array of descriptors.
+	 * 
+	 * @return Combined {@link Image}.
+	 */
+	public static Image getCombinedImage(ResourceManager resourceManager, int orientation, ImageDescriptor... descriptors) {
+		ImageDescriptor combinedImageDescriptor = new CombinedIcon(descriptors, orientation);
+		Image img = resourceManager.createImage(combinedImageDescriptor);
+		return img;
 	}
 
 	/**

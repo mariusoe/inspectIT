@@ -16,6 +16,7 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
+import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
@@ -34,6 +35,8 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
@@ -73,6 +76,8 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 * 
 	 */
 	private static enum Column {
+		/** The time column. */
+		NESTED_DATA("", 40, null),
 		/** The time column. */
 		TIME("Start Time", 150, InspectITImages.IMG_TIMER),
 		/** The method column. */
@@ -168,6 +173,11 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 * Empty styled string.
 	 */
 	private final StyledString emptyStyledString = new StyledString();
+
+	/**
+	 * The resource manager is used for the images etc.
+	 */
+	private LocalResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources());
 
 	/**
 	 * 
@@ -412,6 +422,32 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 			return getStyledTextForColumn(data, methodIdent, enumId);
 		}
 
+		/**
+		 * 
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected Image getColumnImage(Object element, int index) {
+			InvocationSequenceData data = (InvocationSequenceData) element;
+			Column enumId = Column.fromOrd(index);
+
+			switch (enumId) {
+			case NESTED_DATA:
+				if (InvocationSequenceDataHelper.hasNestedSqlStatements(data) && InvocationSequenceDataHelper.hasNestedExceptions(data)) {
+					return ImageFormatter.getCombinedImage(resourceManager, SWT.HORIZONTAL, InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_DATABASE), InspectIT.getDefault()
+							.getImageDescriptor(InspectITImages.IMG_EXCEPTION_SENSOR));
+				} else if (InvocationSequenceDataHelper.hasNestedSqlStatements(data)) {
+					return InspectIT.getDefault().getImage(InspectITImages.IMG_DATABASE);
+				} else if (InvocationSequenceDataHelper.hasNestedExceptions(data)) {
+					return InspectIT.getDefault().getImage(InspectITImages.IMG_EXCEPTION_SENSOR);
+				} else {
+					return super.getColumnImage(element, index);
+				}
+			default:
+				return super.getColumnImage(element, index);
+			}
+
+		}
 	}
 
 	/**
@@ -460,6 +496,22 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		@Override
 		protected int compareElements(Viewer viewer, InvocationSequenceData invoc1, InvocationSequenceData invoc2) {
 			switch ((Column) getEnumSortColumn()) {
+			case NESTED_DATA:
+				int invNested1 = 0;
+				if (InvocationSequenceDataHelper.hasNestedSqlStatements(invoc1)) {
+					invNested1 += 2;
+				}
+				if (InvocationSequenceDataHelper.hasNestedExceptions(invoc1)) {
+					invNested1++;
+				}
+				int invNested2 = 0;
+				if (InvocationSequenceDataHelper.hasNestedSqlStatements(invoc2)) {
+					invNested2 += 2;
+				}
+				if (InvocationSequenceDataHelper.hasNestedExceptions(invoc2)) {
+					invNested2++;
+				}
+				return invNested1 - invNested2;
 			case TIME:
 				return invoc1.getTimeStamp().compareTo(invoc2.getTimeStamp());
 			case METHOD:
@@ -520,6 +572,8 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 */
 	private StyledString getStyledTextForColumn(InvocationSequenceData data, MethodIdent methodIdent, Column enumId) {
 		switch (enumId) {
+		case NESTED_DATA:
+			return emptyStyledString;
 		case TIME:
 			return new StyledString(NumberFormatter.formatTimeWithMillis(data.getTimeStamp()));
 		case METHOD:
@@ -607,4 +661,11 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		return invocationSequenceData.getTimerData() instanceof HttpTimerData;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void dispose() {
+		resourceManager.dispose();
+	}
 }
