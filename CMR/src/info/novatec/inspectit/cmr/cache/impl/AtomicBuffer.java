@@ -755,6 +755,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 		if (log.isInfoEnabled()) {
 			log.info("|-Using buffer with maximum size " + NumberFormat.getInstance().format(maxSize) + " bytes...");
 			log.info("|-Indexing tree maintenance on " + NumberFormat.getInstance().format(flagsSetOnBytes) + " bytes added/removed...");
+			log.info("|-Using object expansion rate of " + NumberFormat.getInstance().format(objectSizes.getObjectSecurityExpansionRate() * 100) + "%");
 		}
 	}
 
