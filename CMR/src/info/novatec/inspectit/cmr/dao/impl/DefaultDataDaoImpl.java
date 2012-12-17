@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.hibernate.FetchMode;
 import org.hibernate.SessionFactory;
@@ -34,6 +35,7 @@ import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -440,8 +442,6 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 		DetachedCriteria defaultDataCriteria = DetachedCriteria.forClass(template.getClass());
 		defaultDataCriteria.add(Restrictions.gt("id", template.getId()));
 		defaultDataCriteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
-		// defaultDataCriteria.add(Restrictions.eq("sensorTypeIdent",
-		// template.getSensorTypeIdent()));
 
 		defaultDataCriteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
 		return getHibernateTemplate().findByCriteria(defaultDataCriteria);
@@ -473,25 +473,22 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	@SuppressWarnings("unchecked")
 	@Transactional
 	public DefaultData findByExampleLastData(DefaultData template) {
-		DetachedCriteria defaultDataCriteria = DetachedCriteria.forClass(template.getClass());
-		defaultDataCriteria.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
-		// defaultDataCriteria.add(Restrictions.eq("sensorTypeIdent",
-		// template.getSensorTypeIdent()));
-		defaultDataCriteria.setProjection(Projections.projectionList().add(Projections.max("id")));
+		DetachedCriteria subQuery = DetachedCriteria.forClass(template.getClass());
+		subQuery.add(Restrictions.eq("platformIdent", template.getPlatformIdent()));
+		subQuery.setProjection(Projections.projectionList().add(Projections.max("id")));
 
+		DetachedCriteria defaultDataCriteria = DetachedCriteria.forClass(template.getClass());
 		if (template instanceof MethodSensorData) {
 			MethodSensorData methodSensorData = (MethodSensorData) template;
-			defaultDataCriteria.add(Restrictions.eq("methodIdent", methodSensorData.getMethodIdent()));
+			subQuery.add(Restrictions.eq("methodIdent", methodSensorData.getMethodIdent()));
 			defaultDataCriteria.setFetchMode("parameterContentData", FetchMode.JOIN);
 		}
+		defaultDataCriteria.add(Property.forName("id").eq(subQuery));
+		defaultDataCriteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
 
-		List<Long> resultList = getHibernateTemplate().findByCriteria(defaultDataCriteria, -1, 1);
-		if ((null != resultList) && !resultList.isEmpty() && (null != resultList.get(0))) {
-			long id = resultList.get(0);
-			DefaultData defaultData = (DefaultData) getHibernateTemplate().get(template.getClass(), id);
-
-			defaultDataCriteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
-			return defaultData;
+		List<DefaultData> resultList = getHibernateTemplate().findByCriteria(defaultDataCriteria);
+		if (CollectionUtils.isNotEmpty(resultList)) {
+			return resultList.get(0);
 		} else {
 			return null;
 		}
