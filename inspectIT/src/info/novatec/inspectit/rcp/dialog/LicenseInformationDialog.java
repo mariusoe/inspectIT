@@ -13,6 +13,12 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -21,6 +27,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -56,11 +63,6 @@ public class LicenseInformationDialog extends TitleAreaDialog {
 	private static final int GET_LICENCE_BUTTON_ID = -2;
 
 	/**
-	 * Composite that is created when dialog is created.
-	 */
-	private Composite dialogAreaComposite;
-
-	/**
 	 * Sub composite where all the widgets are. This composite can be disposed and re created.
 	 */
 	private Composite mainComposite;
@@ -70,12 +72,12 @@ public class LicenseInformationDialog extends TitleAreaDialog {
 	 */
 	private LicenseInfoData licenseInfoData;
 
+	/**
+	 * Widgets.
+	 */
 	private Label validFrom;
-
 	private Label validUntil;
-
 	private Label maxAgents;
-
 	private FormText holder;
 
 	/**
@@ -139,8 +141,7 @@ public class LicenseInformationDialog extends TitleAreaDialog {
 		holder = new FormText(mainComposite, SWT.WRAP | SWT.NO_FOCUS);
 		holder.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-		LicenseInfoData licenseInfoData = repositoryDefinition.getLicenseService().getLicenseInfoData();
-		displayInformation(licenseInfoData);
+		refreshData();
 
 		mainComposite.setFocus();
 		return mainComposite;
@@ -149,37 +150,42 @@ public class LicenseInformationDialog extends TitleAreaDialog {
 	/**
 	 * Creates the widgets.
 	 * 
-	 * @param licenceInfoData
+	 * @param licenseInfoData
 	 *            License information.
 	 */
-	private void displayInformation(LicenseInfoData licenceInfoData) {
-		if (null != licenceInfoData) {
-			validFrom.setText(DateFormat.getDateInstance().format(licenceInfoData.getNotBefore()));
-		} else {
-			validFrom.setText("-");
-		}
+	private void displayInformation(final LicenseInfoData licenseInfoData) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				if (null != licenseInfoData) {
+					validFrom.setText(DateFormat.getDateInstance().format(licenseInfoData.getNotBefore()));
+				} else {
+					validFrom.setText("-");
+				}
 
-		if (null != licenceInfoData) {
-			validUntil.setText(DateFormat.getDateInstance().format(licenceInfoData.getNotAfter()));
-		} else {
-			validUntil.setText("-");
-		}
+				if (null != licenseInfoData) {
+					validUntil.setText(DateFormat.getDateInstance().format(licenseInfoData.getNotAfter()));
+				} else {
+					validUntil.setText("-");
+				}
 
-		if (null != licenceInfoData) {
-			maxAgents.setText(licenceInfoData.getMaximumAgents() + " agent(s)");
-		} else {
-			maxAgents.setText("-");
-		}
+				if (null != licenseInfoData) {
+					maxAgents.setText(licenseInfoData.getMaximumAgents() + " agent(s)");
+				} else {
+					maxAgents.setText("-");
+				}
 
-		if (null != licenceInfoData) {
-			String holderText = licenceInfoData.getHolder();
-			String text = "<form><p>" + StringUtils.replace(holderText, ",", "<br/>") + "</p></form>";
-			holder.setText(text, true, false);
-		} else {
-			holder.setText("-", false, false);
-		}
+				if (null != licenseInfoData) {
+					String holderText = licenseInfoData.getHolder();
+					String text = "<form><p>" + StringUtils.replace(holderText, ",", "<br/>") + "</p></form>";
+					holder.setText(text, true, false);
+				} else {
+					holder.setText("-", false, false);
+				}
 
-		mainComposite.layout(true, true);
+				mainComposite.layout(true, true);
+			}
+		});
 	}
 
 	/**
@@ -247,8 +253,19 @@ public class LicenseInformationDialog extends TitleAreaDialog {
 	 * Refreshes the data on the dialog, with new data from the CMR.
 	 */
 	private void refreshData() {
-		licenseInfoData = repositoryDefinition.getLicenseService().getLicenseInfoData();
-		displayInformation(licenseInfoData);
+		Job updateLicenseJob = new Job("Updating License Information") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				licenseInfoData = repositoryDefinition.getLicenseService().getLicenseInfoData();
+				return Status.OK_STATUS;
+			}
+		};
+		updateLicenseJob.addJobChangeListener(new JobChangeAdapter() {
+			@Override
+			public void done(IJobChangeEvent event) {
+				displayInformation(licenseInfoData);
+			}
+		});
+		updateLicenseJob.schedule();
 	}
-
 }

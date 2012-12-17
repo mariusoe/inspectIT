@@ -8,6 +8,10 @@ import info.novatec.inspectit.rcp.util.ObjectUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -163,56 +167,69 @@ public class SelectAgentsWizardPage extends WizardPage {
 			}
 
 			if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-				agentList = new ArrayList<PlatformIdent>(cmrRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents().keySet());
-				main.setLayout(new GridLayout(1, false));
-
-				allAgents = new Button(main, SWT.RADIO);
-				allAgents.setText("All agent(s)");
-				allAgents.setSelection(true);
-
-				specificAgents = new Button(main, SWT.RADIO);
-				specificAgents.setText("Select specific Agent(s)");
-
-				agentSelection = new Table(main, SWT.CHECK | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
-				for (PlatformIdent platformIdent : agentList) {
-					new TableItem(agentSelection, SWT.NONE).setText(platformIdent.getAgentName() + " [v. " + platformIdent.getVersion() + "]");
-				}
-				agentSelection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-				agentSelection.setEnabled(false);
-
-				Listener pageCompletedListener = new Listener() {
-
+				Job getAgentsJob = new Job("Loading agents information..") {
 					@Override
-					public void handleEvent(Event event) {
-						setPageComplete(isPageComplete());
+					protected IStatus run(IProgressMonitor monitor) {
+						agentList = new ArrayList<PlatformIdent>(cmrRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents().keySet());
+						Display.getDefault().asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								main.setLayout(new GridLayout(1, false));
+
+								allAgents = new Button(main, SWT.RADIO);
+								allAgents.setText("All agent(s)");
+								allAgents.setSelection(true);
+
+								specificAgents = new Button(main, SWT.RADIO);
+								specificAgents.setText("Select specific Agent(s)");
+
+								agentSelection = new Table(main, SWT.CHECK | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
+								for (PlatformIdent platformIdent : agentList) {
+									new TableItem(agentSelection, SWT.NONE).setText(platformIdent.getAgentName() + " [v. " + platformIdent.getVersion() + "]");
+								}
+								agentSelection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+								agentSelection.setEnabled(false);
+
+								Listener pageCompletedListener = new Listener() {
+
+									@Override
+									public void handleEvent(Event event) {
+										setPageComplete(isPageComplete());
+									}
+								};
+								agentSelection.addListener(SWT.Selection, pageCompletedListener);
+								allAgents.addListener(SWT.Selection, pageCompletedListener);
+								specificAgents.addListener(SWT.Selection, pageCompletedListener);
+
+								Listener agentsSelectionListener = new Listener() {
+
+									@Override
+									public void handleEvent(Event event) {
+										if (allAgents.getSelection()) {
+											agentSelection.setEnabled(false);
+										} else {
+											agentSelection.setEnabled(true);
+										}
+									}
+								};
+								allAgents.addListener(SWT.Selection, agentsSelectionListener);
+								specificAgents.addListener(SWT.Selection, agentsSelectionListener);
+
+								main.layout();
+							}
+						});
+						return Status.OK_STATUS;
 					}
 				};
-				agentSelection.addListener(SWT.Selection, pageCompletedListener);
-				allAgents.addListener(SWT.Selection, pageCompletedListener);
-				specificAgents.addListener(SWT.Selection, pageCompletedListener);
-
-				Listener agentsSelectionListener = new Listener() {
-
-					@Override
-					public void handleEvent(Event event) {
-						if (allAgents.getSelection()) {
-							agentSelection.setEnabled(false);
-						} else {
-							agentSelection.setEnabled(true);
-						}
-					}
-				};
-				allAgents.addListener(SWT.Selection, agentsSelectionListener);
-				specificAgents.addListener(SWT.Selection, agentsSelectionListener);
-
+				getAgentsJob.schedule();
 			} else {
 				main.setLayout(new GridLayout(2, false));
 
 				new Label(main, SWT.NONE).setImage(Display.getDefault().getSystemImage(SWT.ERROR));
 				Label text = new Label(main, SWT.WRAP);
 				text.setText("Selected repository is currently offline. Action can not be performed.");
+				main.layout();
 			}
-			main.layout();
 		}
 	}
 

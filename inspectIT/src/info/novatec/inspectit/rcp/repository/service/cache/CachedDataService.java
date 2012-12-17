@@ -93,7 +93,8 @@ public class CachedDataService {
 	 */
 	public PlatformIdent getPlatformIdentForId(long platformId) {
 		Long id = Long.valueOf(platformId);
-		if (!platformMap.containsKey(id)) {
+		// load only if the id is not 0
+		if (0 != id.longValue() && !platformMap.containsKey(id)) {
 			refreshIdents();
 		}
 
@@ -109,7 +110,8 @@ public class CachedDataService {
 	 */
 	public SensorTypeIdent getSensorTypeIdentForId(long sensorTypeId) {
 		Long id = Long.valueOf(sensorTypeId);
-		if (!sensorTypeMap.containsKey(id)) {
+		// load only if the id is not 0
+		if (0 != id.longValue() && !sensorTypeMap.containsKey(id)) {
 			refreshIdents();
 		}
 
@@ -125,7 +127,8 @@ public class CachedDataService {
 	 */
 	public MethodIdent getMethodIdentForId(long methodId) {
 		Long id = Long.valueOf(methodId);
-		if (!methodMap.containsKey(id)) {
+		// load only if the id is not 0
+		if (0 != id.longValue() && !methodMap.containsKey(id)) {
 			refreshIdents();
 		}
 

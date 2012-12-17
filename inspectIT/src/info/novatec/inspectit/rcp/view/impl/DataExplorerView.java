@@ -37,7 +37,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
@@ -221,19 +226,30 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 *            Agent to select. Can be null. If the repository does not
 	 */
 	public void showRepository(final RepositoryDefinition repositoryDefinition, final PlatformIdent agent) {
+		Display.getDefault().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				DataExplorerView.this.displayMessage("Loading agents for repository " + repositoryDefinition.getName(), Display.getDefault().getSystemImage(SWT.ICON_WORKING));
+			}
+		});
+
 		if (null != displayedAgent && null != displayedRepositoryDefinition) {
 			cacheExpandedObjects(displayedAgent, displayedRepositoryDefinition);
 		}
 
 		displayedRepositoryDefinition = repositoryDefinition;
 		PreferencesUtils.saveObject(PreferencesConstants.LAST_SELECTED_REPOSITORY, displayedRepositoryDefinition, false);
-		updateAvailableAgents(repositoryDefinition);
-		selectAgentForDisplay(agent);
+		updateAvailableAgents(repositoryDefinition, new JobChangeAdapter() {
+			@Override
+			public void done(IJobChangeEvent event) {
+				selectAgentForDisplay(agent);
 
-		StructuredSelection ss = new StructuredSelection(repositoryDefinition);
-		selectionProviderAdapter.setSelection(ss);
+				StructuredSelection ss = new StructuredSelection(repositoryDefinition);
+				selectionProviderAdapter.setSelection(ss);
 
-		performUpdate();
+				performUpdate();
+			}
+		});
 	}
 
 	/**
@@ -303,33 +319,42 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 * @param repositoryDefinition
 	 *            {@link RepositoryDefinition}.
 	 */
-	@SuppressWarnings("unchecked")
-	private void updateAvailableAgents(RepositoryDefinition repositoryDefinition) {
-		if (repositoryDefinition instanceof CmrRepositoryDefinition) {
-			CmrRepositoryDefinition cmrRepositoryDefinition = (CmrRepositoryDefinition) repositoryDefinition;
-			if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-				availableAgents = new ArrayList<PlatformIdent>(cmrRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents().keySet());
-			} else {
-				availableAgents = null;
-			}
-		} else if (repositoryDefinition instanceof StorageRepositoryDefinition) {
-			StorageRepositoryDefinition storageRepositoryDefinition = (StorageRepositoryDefinition) repositoryDefinition;
-			if (storageRepositoryDefinition.getLocalStorageData().isFullyDownloaded() || storageRepositoryDefinition.getCmrRepositoryDefinition().getOnlineStatus() != OnlineStatus.OFFLINE) {
-				availableAgents = new ArrayList<PlatformIdent>(storageRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents().keySet());
-			} else {
-				availableAgents = null;
-			}
-		} else {
-			availableAgents = null;
-		}
-		if (CollectionUtils.isNotEmpty(availableAgents)) {
-			Collections.sort(availableAgents, new Comparator<PlatformIdent>() {
-				@Override
-				public int compare(PlatformIdent o1, PlatformIdent o2) {
-					return ObjectUtils.compare(o1.getAgentName(), o2.getAgentName());
+	private void updateAvailableAgents(final RepositoryDefinition repositoryDefinition, IJobChangeListener jobListener) {
+		Job updateAvailableAgentsJob = new Job("Updating Available Agents") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				if (repositoryDefinition instanceof CmrRepositoryDefinition) {
+					CmrRepositoryDefinition cmrRepositoryDefinition = (CmrRepositoryDefinition) repositoryDefinition;
+					if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
+						availableAgents = new ArrayList<PlatformIdent>(cmrRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents().keySet());
+					} else {
+						availableAgents = null;
+					}
+				} else if (repositoryDefinition instanceof StorageRepositoryDefinition) {
+					StorageRepositoryDefinition storageRepositoryDefinition = (StorageRepositoryDefinition) repositoryDefinition;
+					if (storageRepositoryDefinition.getLocalStorageData().isFullyDownloaded() || storageRepositoryDefinition.getCmrRepositoryDefinition().getOnlineStatus() != OnlineStatus.OFFLINE) {
+						availableAgents = new ArrayList<PlatformIdent>(storageRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents().keySet());
+					} else {
+						availableAgents = null;
+					}
+				} else {
+					availableAgents = null;
 				}
-			});
+				if (CollectionUtils.isNotEmpty(availableAgents)) {
+					Collections.sort(availableAgents, new Comparator<PlatformIdent>() {
+						@Override
+						public int compare(PlatformIdent o1, PlatformIdent o2) {
+							return ObjectUtils.compare(o1.getAgentName(), o2.getAgentName());
+						}
+					});
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		if (null != jobListener) {
+			updateAvailableAgentsJob.addJobChangeListener(jobListener);
 		}
+		updateAvailableAgentsJob.schedule();
 	}
 
 	/**
@@ -526,25 +551,29 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 			job.addJobChangeListener(new JobChangeAdapter() {
 				@Override
 				public void done(IJobChangeEvent event) {
-					updateAvailableAgents(displayedRepositoryDefinition);
-					if (null != availableAgents && !availableAgents.isEmpty() && null != displayedAgent) {
-						boolean found = false;
-						for (PlatformIdent platformIdent : availableAgents) {
-							if (platformIdent.getId().longValue() == displayedAgent.getId()) {
-								displayedAgent = platformIdent;
-								found = true;
-								break;
+					updateAvailableAgents(displayedRepositoryDefinition, new JobChangeAdapter() {
+						@Override
+						public void done(IJobChangeEvent event) {
+							if (null != availableAgents && !availableAgents.isEmpty() && null != displayedAgent) {
+								boolean found = false;
+								for (PlatformIdent platformIdent : availableAgents) {
+									if (platformIdent.getId().longValue() == displayedAgent.getId()) {
+										displayedAgent = platformIdent;
+										found = true;
+										break;
+									}
+								}
+								if (!found) {
+									displayedAgent = availableAgents.get(0);
+								}
+							} else if (null != availableAgents && !availableAgents.isEmpty() && null == displayedAgent) {
+								displayedAgent = availableAgents.get(0);
+							} else {
+								displayedAgent = null;
 							}
+							performUpdate();
 						}
-						if (!found) {
-							displayedAgent = availableAgents.get(0);
-						}
-					} else if (null != availableAgents && !availableAgents.isEmpty() && null == displayedAgent) {
-						displayedAgent = availableAgents.get(0);
-					} else {
-						displayedAgent = null;
-					}
-					performUpdate();
+					});
 					job.removeJobChangeListener(this);
 				}
 			});
@@ -571,16 +600,20 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 			if (shouldUpdate) {
 				OnlineStatus cachedStatus = cachedOnlineStatus.get(repositoryDefinition);
 				if (cachedStatus == OnlineStatus.OFFLINE && newStatus == OnlineStatus.ONLINE) {
-					updateAvailableAgents(displayedRepositoryDefinition);
-					Display.getDefault().asyncExec(new Runnable() {
+					updateAvailableAgents(displayedRepositoryDefinition, new JobChangeAdapter() {
 						@Override
-						public void run() {
-							mainForm.setBusy(true);
-							updateFormTitle();
-							updateFormBody();
-							updateAgentsCombo();
-							updateViewToolbar();
-							mainForm.setBusy(false);
+						public void done(IJobChangeEvent event) {
+							Display.getDefault().asyncExec(new Runnable() {
+								@Override
+								public void run() {
+									mainForm.setBusy(true);
+									updateFormTitle();
+									updateFormBody();
+									updateAgentsCombo();
+									updateViewToolbar();
+									mainForm.setBusy(false);
+								}
+							});
 						}
 					});
 				} else if (cachedStatus == OnlineStatus.ONLINE && newStatus == OnlineStatus.OFFLINE) {

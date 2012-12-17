@@ -7,8 +7,13 @@ import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.recording.RecordingState;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -16,6 +21,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -120,7 +126,7 @@ public class SelectExistingStorageWizardPage extends WizardPage {
 		storageSelection.setEnabled(false);
 		storageSelection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		Listener pageCompletedListener = new Listener() {
+		final Listener pageCompletedListener = new Listener() {
 			@Override
 			public void handleEvent(Event event) {
 				setPageComplete(isPageComplete());
@@ -138,14 +144,13 @@ public class SelectExistingStorageWizardPage extends WizardPage {
 			}
 		};
 		cmrRepositoryCombo.addListener(SWT.Selection, new Listener() {
-
 			@Override
 			public void handleEvent(Event event) {
 				updateStorageList();
+				pageCompletedListener.handleEvent(event);
 			}
 		});
 
-		cmrRepositoryCombo.addListener(SWT.Selection, pageCompletedListener);
 		storageSelection.addListener(SWT.Selection, pageCompletedListener);
 
 		int i = 0;
@@ -208,21 +213,37 @@ public class SelectExistingStorageWizardPage extends WizardPage {
 	 * Updates the storage list based on selected repository.
 	 */
 	private void updateStorageList() {
-		CmrRepositoryDefinition cmrRepositoryDefinition = getSelectedRepository();
-		storageSelection.removeAll();
-		if (null != cmrRepositoryDefinition && cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-			storageList = cmrRepositoryDefinition.getStorageService().getOpenedStorages();
-			if (storageList.isEmpty()) {
-				storageSelection.add("No open storage available for writing");
-				storageSelection.setEnabled(false);
-			} else {
-				for (StorageData storageData : storageList) {
-					storageSelection.add(storageData.getName());
+		final CmrRepositoryDefinition cmrRepositoryDefinition = getSelectedRepository();
+		Job updateStoragesJob = new Job("Updating Storages") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				if (null != cmrRepositoryDefinition && cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
+					storageList = cmrRepositoryDefinition.getStorageService().getOpenedStorages();
+				} else {
+					storageList = Collections.emptyList();
 				}
-				storageSelection.setEnabled(true);
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						storageSelection.removeAll();
+						if (null != cmrRepositoryDefinition && cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
+							if (storageList.isEmpty()) {
+								storageSelection.add("No open storage available for writing");
+								storageSelection.setEnabled(false);
+							} else {
+								for (StorageData storageData : storageList) {
+									storageSelection.add(storageData.getName());
+								}
+								storageSelection.setEnabled(true);
+							}
+						} else {
+							storageSelection.setEnabled(false);
+						}
+					}
+				});
+				return Status.OK_STATUS;
 			}
-		} else {
-			storageSelection.setEnabled(false);
-		}
+		};
+		updateStoragesJob.schedule();
 	}
 }

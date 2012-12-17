@@ -525,42 +525,6 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 	}
 
 	/**
-	 * Updates the agent status for each CMR and updates the displayed CMR repository.
-	 */
-	private void updateAgentsAndCmrStatus() {
-		if (!cmrPropertyForm.isDisposed()) {
-			cmrPropertyForm.refresh();
-		}
-		if (null != inputList) {
-			final List<Object> toUpdate = new ArrayList<Object>();
-			for (DeferredAgentsComposite agentsComposite : inputList) {
-				CmrRepositoryDefinition cmrRepositoryDefinition = agentsComposite.getCmrRepositoryDefinition();
-				List<?> leafs = agentsComposite.getChildren();
-				if (CollectionUtils.isNotEmpty(leafs) && cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-					Map<Long, AgentStatusData> statusMap = cmrRepositoryDefinition.getGlobalDataAccessService().getAgentStatusDataMap();
-					for (Object child : leafs) {
-						if (child instanceof AgentLeaf) {
-							AgentLeaf agentLeaf = (AgentLeaf) child;
-							AgentStatusData agentStatusData = statusMap.get(agentLeaf.getPlatformIdent().getId());
-							agentLeaf.setAgentStatusData(agentStatusData);
-							toUpdate.add(agentLeaf);
-						}
-					}
-				}
-			}
-			if (CollectionUtils.isNotEmpty(toUpdate)) {
-				Display.getDefault().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						treeViewer.update(toUpdate.toArray(), null);
-					}
-				});
-			}
-
-		}
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -833,9 +797,45 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		 * {@inheritDoc}
 		 */
 		protected IStatus run(IProgressMonitor monitor) {
-			RepositoryManagerView.this.updateAgentsAndCmrStatus();
+			updateAgentsAndCmrStatus();
 			schedule(UPDATE_RATE);
 			return Status.OK_STATUS;
+		}
+
+		/**
+		 * Updates the agent status for each CMR and updates the displayed CMR repository.
+		 */
+		private void updateAgentsAndCmrStatus() {
+			if (!cmrPropertyForm.isDisposed()) {
+				cmrPropertyForm.refresh();
+			}
+			if (null != inputList) {
+				final List<Object> toUpdate = new ArrayList<Object>();
+				for (DeferredAgentsComposite agentsComposite : inputList) {
+					CmrRepositoryDefinition cmrRepositoryDefinition = agentsComposite.getCmrRepositoryDefinition();
+					List<?> leafs = agentsComposite.getChildren();
+					if (CollectionUtils.isNotEmpty(leafs) && cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
+						Map<Long, AgentStatusData> statusMap = cmrRepositoryDefinition.getGlobalDataAccessService().getAgentStatusDataMap();
+						for (Object child : leafs) {
+							if (child instanceof AgentLeaf) {
+								AgentLeaf agentLeaf = (AgentLeaf) child;
+								AgentStatusData agentStatusData = statusMap.get(agentLeaf.getPlatformIdent().getId());
+								agentLeaf.setAgentStatusData(agentStatusData);
+								toUpdate.add(agentLeaf);
+							}
+						}
+					}
+				}
+				if (CollectionUtils.isNotEmpty(toUpdate)) {
+					Display.getDefault().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							treeViewer.update(toUpdate.toArray(), null);
+						}
+					});
+				}
+
+			}
 		}
 
 	}

@@ -22,6 +22,7 @@ import java.util.Date;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.viewers.ISelection;
@@ -76,6 +77,11 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	 * Job for recording end count-down.
 	 */
 	private RecordCountdownJob recordCountdownJob = new RecordCountdownJob();
+
+	/**
+	 * Job for updating the CMR properties.
+	 */
+	private UpdateCmrPropertiesJob updateCmrPropertiesJob = new UpdateCmrPropertiesJob();
 
 	/**
 	 * Widgets.
@@ -352,59 +358,19 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	 * Refreshes the data on the view.
 	 */
 	private void refreshData() {
-		// refresh data asynchronously
-		Display.getDefault().asyncExec(new Runnable() {
-
-			@Override
-			public void run() {
-				form.setBusy(true);
-
-				if (null != cmrRepositoryDefinition) {
-					form.setText(cmrRepositoryDefinition.getName());
-					form.setMessage(null, IMessageProvider.NONE);
-					address.setText(cmrRepositoryDefinition.getIp() + ":" + cmrRepositoryDefinition.getPort());
-					String desc = cmrRepositoryDefinition.getDescription();
-					if (null != desc) {
-						if (desc.length() > MAX_DESCRIPTION_LENGTH) {
-							description.setText("<form><p>" + desc.substring(0, MAX_DESCRIPTION_LENGTH) + ".. <a href=\"More\">[More]</a></p></form>", true, false);
-						} else {
-							description.setText(desc, false, false);
-						}
-					} else {
-						description.setText("", false, false);
-					}
-					status.setText(cmrRepositoryDefinition.getOnlineStatus().toString());
-					version.setText(cmrRepositoryDefinition.getVersion());
-					if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
-						form.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_ONLINE_SMALL));
-					} else if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.CHECKING) {
-						form.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_REFRESH_SMALL));
-					} else {
-						form.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_OFFLINE_SMALL));
-					}
-					mainComposite.setVisible(true);
-				} else {
-					form.setText(null);
-					form.setMessage("Please select a CMR to see its properties.", IMessageProvider.INFORMATION);
-					mainComposite.setVisible(false);
-				}
-				updateRecordingData();
-				updateCmrManagementData();
-
-				form.getBody().layout(true, true);
-				form.setBusy(false);
-			}
-		});
+		updateCmrPropertiesJob.schedule();
 	}
 
 	/**
 	 * Updates buffer data.
+	 * 
+	 * @param cmrStatusData
+	 *            Status data.
 	 */
-	private void updateCmrManagementData() {
+	private void updateCmrManagementData(CmrStatusData cmrStatusData) {
 		boolean dataLoaded = false;
-		if (null != cmrRepositoryDefinition && cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
+		if (null != cmrStatusData) {
 			// buffer information
-			CmrStatusData cmrStatusData = cmrRepositoryDefinition.getCmrManagementService().getCmrStatusData();
 			if (null != cmrStatusData) {
 				dataLoaded = true;
 				// Transfer to MB right away
@@ -464,15 +430,16 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 
 	/**
 	 * Updates recording data.
+	 * 
+	 * @param recordingData
+	 *            Recording information.
 	 */
-	private void updateRecordingData() {
+	private void updateRecordingData(RecordingData recordingData) {
 		boolean countdownJobActive = false;
 		boolean dataLoaded = false;
 		recordingIcon.setImage(null);
-		if (null != cmrRepositoryDefinition && cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
-			// recording information
-			recordingData = cmrRepositoryDefinition.getStorageService().getRecordingData();
-			if (null != recordingData) {
+		// recording information
+		if (null != recordingData) {
 				RecordingState recordingState = cmrRepositoryDefinition.getStorageService().getRecordingState();
 				if (recordingState == RecordingState.ON) {
 					recordingIcon.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_RECORD));
@@ -481,31 +448,29 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 					recordingIcon.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_RECORD_SCHEDULED));
 					recordingLabel.setText("Scheduled @ " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(recordingData.getRecordStartDate()));
 				}
-				// get the storage name
-				StorageData storage = recordingData.getRecordingStorage();
-				if (null != storage) {
-					recordingStorage.setText(storage.getName());
-				} else {
-					recordingStorage.setText("");
-				}
-
-				// check if the recording time is limited
-				if (null != recordingData.getRecordEndDate()) {
-					countdownJobActive = true;
-				} else {
-					recTimeBar.setVisible(false);
-					recTime.setVisible(false);
-				}
-
-				// recording status stuff
-				recordingStatusIcon.setImage(ImageFormatter.getWritingStatusImage(recordingData.getRecordingWritingStatus()));
-				recordingStatusIcon.setToolTipText(TextFormatter.getWritingStatusText(recordingData.getRecordingWritingStatus()));
-
-				dataLoaded = true;
-
+			// get the storage name
+			StorageData storage = recordingData.getRecordingStorage();
+			if (null != storage) {
+				recordingStorage.setText(storage.getName());
 			} else {
-				recordingIcon.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_RECORD_GRAY));
+				recordingStorage.setText("");
 			}
+
+			// check if the recording time is limited
+			if (null != recordingData.getRecordEndDate()) {
+				countdownJobActive = true;
+			} else {
+				recTimeBar.setVisible(false);
+				recTime.setVisible(false);
+			}
+
+			// recording status stuff
+			recordingStatusIcon.setImage(ImageFormatter.getWritingStatusImage(recordingData.getRecordingWritingStatus()));
+			recordingStatusIcon.setToolTipText(TextFormatter.getWritingStatusText(recordingData.getRecordingWritingStatus()));
+
+			dataLoaded = true;
+		} else {
+			recordingIcon.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_RECORD_GRAY));
 		}
 
 		if (!dataLoaded) {
@@ -538,6 +503,89 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	public void dispose() {
 		form.dispose();
 		recordCountdownJob.cancel();
+	}
+
+	/**
+	 * Job for updating the information about the CMR. Job will perform all UI related work in UI
+	 * thread asynchronously.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private class UpdateCmrPropertiesJob extends Job {
+
+		/**
+		 * Default constructor.
+		 */
+		public UpdateCmrPropertiesJob() {
+			super("Updating CMR Properties..");
+		}
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			if (cmrRepositoryDefinition != null) {
+				final OnlineStatus onlineStatus = cmrRepositoryDefinition.getOnlineStatus();
+				final CmrStatusData cmrStatusData = (onlineStatus == OnlineStatus.ONLINE) ? cmrRepositoryDefinition.getCmrManagementService().getCmrStatusData() : null;
+				recordingData = (onlineStatus == OnlineStatus.ONLINE) ? cmrRepositoryDefinition.getStorageService().getRecordingData() : null;
+				Display.getDefault().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						form.setBusy(true);
+						form.setText(cmrRepositoryDefinition.getName());
+						form.setMessage(null, IMessageProvider.NONE);
+						address.setText(cmrRepositoryDefinition.getIp() + ":" + cmrRepositoryDefinition.getPort());
+						version.setText(cmrRepositoryDefinition.getVersion());
+						String desc = cmrRepositoryDefinition.getDescription();
+						if (null != desc) {
+							if (desc.length() > MAX_DESCRIPTION_LENGTH) {
+								description.setText("<form><p>" + desc.substring(0, MAX_DESCRIPTION_LENGTH) + ".. <a href=\"More\">[More]</a></p></form>", true, false);
+							} else {
+								description.setText(desc, false, false);
+							}
+						} else {
+							description.setText("", false, false);
+						}
+						status.setText(onlineStatus.toString());
+						if (onlineStatus == OnlineStatus.ONLINE) {
+							form.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_ONLINE_SMALL));
+						} else if (onlineStatus == OnlineStatus.CHECKING) {
+							form.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_REFRESH_SMALL));
+						} else {
+							form.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SERVER_OFFLINE_SMALL));
+						}
+
+						updateRecordingData(recordingData);
+						updateCmrManagementData(cmrStatusData);
+
+						mainComposite.setVisible(true);
+						form.getBody().layout(true, true);
+						form.setBusy(false);
+					}
+				});
+			} else {
+
+				Display.getDefault().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						form.setBusy(true);
+
+						form.setText(null);
+						form.setMessage("Please select a CMR to see its properties.", IMessageProvider.INFORMATION);
+						mainComposite.setVisible(false);
+
+						updateRecordingData(null);
+						updateCmrManagementData(null);
+
+						mainComposite.setVisible(true);
+						form.getBody().layout(true, true);
+						form.setBusy(false);
+					}
+				});
+			}
+			return Status.OK_STATUS;
+		}
 	}
 
 	/**

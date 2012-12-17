@@ -52,6 +52,10 @@ import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -239,7 +243,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 		cmrRepositoryManager.addCmrRepositoryChangeListener(this);
 		storageManager = InspectIT.getDefault().getInspectITStorageManager();
 		storageManager.addStorageChangeListener(this);
-		updateStorageList();
+		updateStorageList(null);
 		updateDownloadedStorages();
 	}
 
@@ -413,29 +417,39 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	/**
 	 * Updates the storage list for all {@link CmrRepositoryDefinition}.
 	 */
-	private void updateStorageList() {
-		storageRepositoryMap.clear();
-		for (CmrRepositoryDefinition cmrRepositoryDefinition : cmrRepositoryManager.getCmrRepositoryDefinitions()) {
-			boolean canUpdate = false;
-			if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
-				canUpdate = true;
-			} else {
-				OnlineStatus cachedStatus = cachedOnlineStatus.get(cmrRepositoryDefinition);
-				if (OnlineStatus.ONLINE.equals(cachedStatus)) {
-					canUpdate = true;
-				}
-			}
-			if (canUpdate) {
-				try {
-					List<StorageData> storages = cmrRepositoryDefinition.getStorageService().getExistingStorages();
-					for (StorageData storage : storages) {
-						storageRepositoryMap.put(storage, cmrRepositoryDefinition);
+	private void updateStorageList(IJobChangeListener jobListener) {
+		Job updateStorageListJob = new Job("Update Storages") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				storageRepositoryMap.clear();
+				for (CmrRepositoryDefinition cmrRepositoryDefinition : cmrRepositoryManager.getCmrRepositoryDefinitions()) {
+					boolean canUpdate = false;
+					if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
+						canUpdate = true;
+					} else {
+						OnlineStatus cachedStatus = cachedOnlineStatus.get(cmrRepositoryDefinition);
+						if (OnlineStatus.ONLINE.equals(cachedStatus)) {
+							canUpdate = true;
+						}
 					}
-				} catch (Exception e) {
-					continue;
+					if (canUpdate) {
+						try {
+							List<StorageData> storages = cmrRepositoryDefinition.getStorageService().getExistingStorages();
+							for (StorageData storage : storages) {
+								storageRepositoryMap.put(storage, cmrRepositoryDefinition);
+							}
+						} catch (Exception e) {
+							continue;
+						}
+					}
 				}
+				return Status.OK_STATUS;
 			}
+		};
+		if (null != jobListener) {
+			updateStorageListJob.addJobChangeListener(jobListener);
 		}
+		updateStorageListJob.schedule();
 	}
 
 	/**
@@ -446,27 +460,37 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	 * @param removeOnly
 	 *            If set to true, no storages will be loaded from the CMR.
 	 */
-	private void updateStorageList(CmrRepositoryDefinition cmrRepositoryDefinition, boolean removeOnly) {
-		while (storageRepositoryMap.values().remove(cmrRepositoryDefinition)) {
-			continue;
-		}
-		if (!removeOnly) {
-			boolean canUpdate = false;
-			if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
-				canUpdate = true;
-			} else {
-				OnlineStatus cachedStatus = cachedOnlineStatus.get(cmrRepositoryDefinition);
-				if (OnlineStatus.ONLINE.equals(cachedStatus)) {
-					canUpdate = true;
+	private void updateStorageList(final CmrRepositoryDefinition cmrRepositoryDefinition, final boolean removeOnly, IJobChangeListener jobListener) {
+		Job updateStorageListJob = new Job("Updating Storages") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				while (storageRepositoryMap.values().remove(cmrRepositoryDefinition)) {
+					continue;
 				}
-			}
-			if (canUpdate) {
-				List<StorageData> storages = cmrRepositoryDefinition.getStorageService().getExistingStorages();
-				for (StorageData storage : storages) {
-					storageRepositoryMap.put(storage, cmrRepositoryDefinition);
+				if (!removeOnly) {
+					boolean canUpdate = false;
+					if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
+						canUpdate = true;
+					} else {
+						OnlineStatus cachedStatus = cachedOnlineStatus.get(cmrRepositoryDefinition);
+						if (OnlineStatus.ONLINE.equals(cachedStatus)) {
+							canUpdate = true;
+						}
+					}
+					if (canUpdate) {
+						List<StorageData> storages = cmrRepositoryDefinition.getStorageService().getExistingStorages();
+						for (StorageData storage : storages) {
+							storageRepositoryMap.put(storage, cmrRepositoryDefinition);
+						}
+					}
 				}
+				return Status.OK_STATUS;
 			}
+		};
+		if (null != jobListener) {
+			updateStorageListJob.addJobChangeListener(jobListener);
 		}
+		updateStorageListJob.schedule();
 	}
 
 	/**
@@ -605,20 +629,36 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	 *            If the update should go to the CMRs for an updated storage list.
 	 */
 	private void performUpdate(final boolean updateStorageList) {
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				mainForm.setBusy(true);
-				if (updateStorageList) {
-					updateStorageList();
+		updateDownloadedStorages();
+		if (updateStorageList) {
+			updateStorageList(new JobChangeAdapter() {
+				@Override
+				public void done(IJobChangeEvent event) {
+					Display.getDefault().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							mainForm.setBusy(true);
+							updateFormBody();
+							updateViewToolbar();
+							mainForm.setBusy(false);
+							mainForm.layout();
+						}
+					});
 				}
-				updateDownloadedStorages();
-				updateFormBody();
-				updateViewToolbar();
-				mainForm.setBusy(false);
-				mainForm.layout();
-			}
-		});
+			});
+		} else {
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					mainForm.setBusy(true);
+					updateFormBody();
+					updateViewToolbar();
+					mainForm.setBusy(false);
+					mainForm.layout();
+				}
+			});
+		}
+
 	}
 
 	/**
@@ -641,25 +681,35 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 		if (newStatus == OnlineStatus.ONLINE) {
 			OnlineStatus cachedStatus = cachedOnlineStatus.get(repositoryDefinition);
 			if (null == cachedStatus || OnlineStatus.OFFLINE.equals(cachedStatus) || OnlineStatus.UNKNOWN.equals(cachedStatus)) {
-				updateStorageList(repositoryDefinition, false);
-				Display.getDefault().asyncExec(new Runnable() {
+				updateStorageList(repositoryDefinition, false, new JobChangeAdapter() {
 					@Override
-					public void run() {
-						updateFormBody();
+					public void done(IJobChangeEvent event) {
+						Display.getDefault().asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								updateFormBody();
+							}
+						});
 					}
 				});
+
 			}
 			cachedOnlineStatus.put(repositoryDefinition, newStatus);
 		} else if (newStatus == OnlineStatus.OFFLINE) {
 			OnlineStatus cachedStatus = cachedOnlineStatus.get(repositoryDefinition);
 			if (null == cachedStatus || OnlineStatus.ONLINE.equals(cachedStatus)) {
-				updateStorageList(repositoryDefinition, true);
-				Display.getDefault().asyncExec(new Runnable() {
+				updateStorageList(repositoryDefinition, true, new JobChangeAdapter() {
 					@Override
-					public void run() {
-						updateFormBody();
+					public void done(IJobChangeEvent event) {
+						Display.getDefault().asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								updateFormBody();
+							}
+						});
 					}
 				});
+
 			}
 			cachedOnlineStatus.put(repositoryDefinition, newStatus);
 		}
@@ -671,8 +721,14 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	@Override
 	public void repositoryAdded(CmrRepositoryDefinition cmrRepositoryDefinition) {
 		cachedOnlineStatus.put(cmrRepositoryDefinition, cmrRepositoryDefinition.getOnlineStatus());
-		updateStorageList(cmrRepositoryDefinition, false);
-		performUpdate(false);
+		updateStorageList(cmrRepositoryDefinition, false, new JobChangeAdapter() {
+			@Override
+			public void done(IJobChangeEvent event) {
+				performUpdate(false);
+			}
+
+		});
+
 	}
 
 	/**
@@ -681,8 +737,13 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	@Override
 	public void repositoryRemoved(CmrRepositoryDefinition cmrRepositoryDefinition) {
 		cachedOnlineStatus.remove(cmrRepositoryDefinition);
-		updateStorageList(cmrRepositoryDefinition, true);
-		performUpdate(false);
+		updateStorageList(cmrRepositoryDefinition, true, new JobChangeAdapter() {
+			@Override
+			public void done(IJobChangeEvent event) {
+				performUpdate(false);
+			}
+
+		});
 	}
 
 	/**
@@ -722,8 +783,13 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	 *            Repository to update storages for.
 	 */
 	public void refresh(CmrRepositoryDefinition cmrRepositoryDefinition) {
-		updateStorageList(cmrRepositoryDefinition, false);
-		performUpdate(false);
+		updateStorageList(cmrRepositoryDefinition, false, new JobChangeAdapter() {
+			@Override
+			public void done(IJobChangeEvent event) {
+				performUpdate(false);
+			}
+
+		});
 	}
 
 	/**

@@ -6,6 +6,7 @@ import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.storage.label.edit.LabelValueEditingSupport;
 import info.novatec.inspectit.rcp.storage.label.edit.LabelValueEditingSupport.LabelEditListener;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
@@ -19,11 +20,16 @@ import info.novatec.inspectit.storage.label.StringStorageLabel;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -45,6 +51,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -166,7 +173,7 @@ public class AddStorageLabelWizardPage extends WizardPage {
 		this.setMessage(defaultMessage);
 		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
 		this.optional = true;
-		labelTypeList = cmrRepositoryDefinition.getStorageService().getAllLabelTypes();
+
 	}
 
 	/**
@@ -182,9 +189,6 @@ public class AddStorageLabelWizardPage extends WizardPage {
 		l.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
 		labelTypeSelection = new Combo(main, SWT.READ_ONLY);
-		for (AbstractStorageLabelType<?> labelType : labelTypeList) {
-			labelTypeSelection.add(TextFormatter.getLabelName(labelType));
-		}
 		labelTypeSelection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		final Button addButton = new Button(main, SWT.PUSH);
@@ -254,11 +258,7 @@ public class AddStorageLabelWizardPage extends WizardPage {
 				WizardDialog wizardDialog = new WizardDialog(getShell(), manageLabelWizard);
 				wizardDialog.open();
 				if (wizardDialog.getReturnCode() == WizardDialog.OK) {
-					labelTypeList = cmrRepositoryDefinition.getStorageService().getAllLabelTypes();
-					labelTypeSelection.removeAll();
-					for (AbstractStorageLabelType<?> labelType : labelTypeList) {
-						labelTypeSelection.add(TextFormatter.getLabelName(labelType));
-					}
+					updateLabelTypes();
 				}
 			}
 
@@ -305,7 +305,36 @@ public class AddStorageLabelWizardPage extends WizardPage {
 
 		});
 
+		updateLabelTypes();
 		setControl(main);
+	}
+
+	/**
+	 * Updates the labels types available on the server.
+	 * 
+	 */
+	private void updateLabelTypes() {
+		Job updateLabelsTypes = new Job("Loading Label Types") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
+					labelTypeList = cmrRepositoryDefinition.getStorageService().getAllLabelTypes();
+				} else {
+					labelTypeList = Collections.emptyList();
+				}
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						labelTypeSelection.removeAll();
+						for (AbstractStorageLabelType<?> labelType : labelTypeList) {
+							labelTypeSelection.add(TextFormatter.getLabelName(labelType));
+						}
+					}
+				});
+				return Status.OK_STATUS;
+			}
+		};
+		updateLabelsTypes.schedule();
 	}
 
 	/**

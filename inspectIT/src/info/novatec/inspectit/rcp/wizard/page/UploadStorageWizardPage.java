@@ -8,10 +8,15 @@ import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -19,6 +24,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -62,6 +68,16 @@ public class UploadStorageWizardPage extends WizardPage {
 	private boolean enoughSpace;
 
 	/**
+	 * Storages on selected repository.
+	 */
+	private List<StorageData> storagesOnRepository;
+
+	/**
+	 * Space left on the selected repository.
+	 */
+	private long spaceLeftOnCmr;
+
+	/**
 	 * Default constructor.
 	 * 
 	 * @param localStorageData
@@ -97,7 +113,7 @@ public class UploadStorageWizardPage extends WizardPage {
 		StorageInfoComposite storageInfoComposite = new StorageInfoComposite(main, SWT.NONE, false, localStorageData);
 		storageInfoComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
-		Listener pageCompleteListener = new Listener() {
+		final Listener pageCompleteListener = new Listener() {
 			@Override
 			public void handleEvent(Event event) {
 				boolean isPageComplete = isPageComplete();
@@ -114,10 +130,39 @@ public class UploadStorageWizardPage extends WizardPage {
 				} else {
 					setMessage(DEFAULT_MESSAGE);
 				}
-
 			}
 		};
-		cmrRepositoryCombo.addListener(SWT.Selection, pageCompleteListener);
+
+		Listener cmrComboListener = new Listener() {
+			@Override
+			public void handleEvent(final Event event) {
+				final CmrRepositoryDefinition cmrRepositoryDefinition = getCmrRepositoryDefinition();
+				Job updateCmrData = new Job("Loading CMR Storage Data") {
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						OnlineStatus onlineStatus = cmrRepositoryDefinition.getOnlineStatus();
+						if (onlineStatus != OnlineStatus.OFFLINE) {
+							storagesOnRepository = cmrRepositoryDefinition.getStorageService().getExistingStorages();
+							spaceLeftOnCmr = cmrRepositoryDefinition.getCmrManagementService().getCmrStatusData().getStorageDataSpaceLeft();
+						} else {
+							storagesOnRepository = Collections.emptyList();
+							spaceLeftOnCmr = 0;
+						}
+
+						Display.getDefault().asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								pageCompleteListener.handleEvent(event);
+							}
+						});
+						return Status.OK_STATUS;
+					}
+				};
+				updateCmrData.schedule();
+			}
+		};
+
+		cmrRepositoryCombo.addListener(SWT.Selection, cmrComboListener);
 
 		setControl(main);
 	}
@@ -132,7 +177,6 @@ public class UploadStorageWizardPage extends WizardPage {
 		} else if (getCmrRepositoryDefinition().getOnlineStatus() == OnlineStatus.OFFLINE) {
 			return false;
 		}
-		List<StorageData> storagesOnRepository = getCmrRepositoryDefinition().getStorageService().getExistingStorages();
 		for (StorageData storageData : storagesOnRepository) {
 			if (Objects.equals(storageData.getId(), localStorageData.getId())) {
 				alreadyAvailable = true;
@@ -141,7 +185,6 @@ public class UploadStorageWizardPage extends WizardPage {
 		}
 		alreadyAvailable = false;
 
-		long spaceLeftOnCmr = getCmrRepositoryDefinition().getCmrManagementService().getCmrStatusData().getStorageDataSpaceLeft();
 		enoughSpace = spaceLeftOnCmr > localStorageData.getDiskSize();
 		if (!enoughSpace) {
 			return false;

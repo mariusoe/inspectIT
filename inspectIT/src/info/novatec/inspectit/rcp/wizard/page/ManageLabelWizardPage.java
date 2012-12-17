@@ -32,6 +32,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -141,6 +145,11 @@ public class ManageLabelWizardPage extends WizardPage {
 	private List<AbstractLabelManagementAction> managementActions = new LinkedList<AbstractLabelManagementAction>();
 
 	/**
+	 * {@link CmrRepositoryDefinition}.
+	 */
+	private CmrRepositoryDefinition cmrRepositoryDefinition;
+
+	/**
 	 * Default constructor.
 	 * 
 	 * @param cmrRepositoryDefinition
@@ -153,10 +162,7 @@ public class ManageLabelWizardPage extends WizardPage {
 		if (null != cmrRepositoryDefinition) {
 			this.setMessage("Label management for repository '" + cmrRepositoryDefinition.getName() + "' (" + cmrRepositoryDefinition.getIp() + ":" + cmrRepositoryDefinition.getPort() + ")");
 		}
-
-		labelsInStorages.addAll(cmrRepositoryDefinition.getStorageService().getAllLabelsInStorages());
-		labelTypeList.addAll(cmrRepositoryDefinition.getStorageService().getAllLabelTypes());
-		labelList.addAll(cmrRepositoryDefinition.getStorageService().getAllLabels());
+		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
 	}
 
 	/**
@@ -191,7 +197,9 @@ public class ManageLabelWizardPage extends WizardPage {
 
 		Table labelTypeTable = new Table(upperComposite, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL | SWT.FULL_SELECTION);
 		labelTypeTable.setHeaderVisible(true);
-		labelTypeTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2);
+		gd.heightHint = 150;
+		labelTypeTable.setLayoutData(gd);
 
 		TableColumn column = new TableColumn(labelTypeTable, SWT.NONE);
 		column.setMoveable(false);
@@ -310,6 +318,26 @@ public class ManageLabelWizardPage extends WizardPage {
 				labelTypeTableViewer.refresh();
 			}
 		});
+
+		Job loadDataJob = new Job("Loading Labels Data") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				labelsInStorages.addAll(cmrRepositoryDefinition.getStorageService().getAllLabelsInStorages());
+				labelTypeList.addAll(cmrRepositoryDefinition.getStorageService().getAllLabelTypes());
+				labelList.addAll(cmrRepositoryDefinition.getStorageService().getAllLabels());
+
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						labelsTableViewer.refresh();
+						labelTypeTableViewer.refresh();
+					}
+				});
+
+				return Status.OK_STATUS;
+			}
+		};
+		loadDataJob.schedule();
 	}
 
 	/**
@@ -324,7 +352,9 @@ public class ManageLabelWizardPage extends WizardPage {
 
 		Table table = new Table(lowerComposite, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.VIRTUAL | SWT.FULL_SELECTION);
 		table.setHeaderVisible(true);
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2);
+		gd.heightHint = 150;
+		table.setLayoutData(gd);
 
 		TableColumn column = new TableColumn(table, SWT.NONE);
 		column.setMoveable(false);
