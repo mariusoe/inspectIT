@@ -159,7 +159,7 @@ public class StringStorageLabel extends AbstractStorageLabel<String> {
 				return super.compareTo(other);
 			} else {
 				StringStorageLabel otherLabel = (StringStorageLabel) other;
-				return stringValue.compareTo(otherLabel.stringValue);
+				return stringValue.compareToIgnoreCase(otherLabel.stringValue);
 			}
 		}
 	}

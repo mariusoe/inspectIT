@@ -5,6 +5,7 @@ import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.Composite;
+import info.novatec.inspectit.rcp.model.GroupedLabelsComposite;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
@@ -61,7 +62,7 @@ public class StorageTreeModelManager {
 		}
 
 		if (null != storageLabelType) {
-			Composite unknown = new Composite();
+			Composite unknown = new GroupedLabelsComposite();
 			unknown.setName("Unknown");
 			unknown.setImage(ImageFormatter.getImageForLabel(storageLabelType));
 			boolean addUnknown = false;
@@ -72,7 +73,7 @@ public class StorageTreeModelManager {
 					for (AbstractStorageLabel<?> label : labelList) {
 						Composite c = map.get(TextFormatter.getLabelValue(label, true));
 						if (c == null) {
-							c = new Composite();
+							c = new GroupedLabelsComposite(label);
 							c.setName(TextFormatter.getLabelName(label) + ": " + TextFormatter.getLabelValue(label, true));
 							c.setImage(ImageFormatter.getImageForLabel(storageLabelType));
 							map.put(TextFormatter.getLabelValue(label, true), c);

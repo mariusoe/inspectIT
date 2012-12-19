@@ -10,6 +10,7 @@ import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.handlers.CloseAndShowStorageHandler;
 import info.novatec.inspectit.rcp.handlers.ShowRepositoryHandler;
 import info.novatec.inspectit.rcp.model.Component;
+import info.novatec.inspectit.rcp.model.GroupedLabelsComposite;
 import info.novatec.inspectit.rcp.model.storage.LocalStorageLeaf;
 import info.novatec.inspectit.rcp.model.storage.LocalStorageTreeModelManager;
 import info.novatec.inspectit.rcp.model.storage.StorageLeaf;
@@ -284,8 +285,10 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 		treeViewer.setComparator(new ViewerComparator() {
 			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
-				if (e1 instanceof Component && e2 instanceof Component) {
-					return ((Component) e1).getName().compareTo(((Component) e2).getName());
+				if (e1 instanceof GroupedLabelsComposite && e2 instanceof GroupedLabelsComposite) {
+					return ObjectUtils.compare((GroupedLabelsComposite) e1, (GroupedLabelsComposite) e2);
+				} else if (e1 instanceof Component && e2 instanceof Component) {
+					return ((Component) e1).getName().compareToIgnoreCase(((Component) e2).getName());
 				}
 				return super.compare(viewer, e1, e2);
 			}
