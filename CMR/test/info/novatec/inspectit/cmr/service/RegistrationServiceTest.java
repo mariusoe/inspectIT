@@ -41,7 +41,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -189,15 +188,15 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		}).when(platformIdentDao).saveOrUpdate((PlatformIdent) anyObject());
 
 		long registeredId = registrationService.registerPlatformIdent(definedIps, agentName, version);
-		Assert.assertEquals(registeredId, platformId);
+		assertThat(registeredId, is(equalTo(platformId)));
 
 		ArgumentCaptor<PlatformIdent> argument = ArgumentCaptor.forClass(PlatformIdent.class);
 		verify(platformIdentDao, times(1)).saveOrUpdate(argument.capture());
 
-		Assert.assertEquals(definedIps, argument.getValue().getDefinedIPs());
-		Assert.assertEquals(agentName, argument.getValue().getAgentName());
-		Assert.assertEquals(version, argument.getValue().getVersion());
-		Assert.assertNotNull(argument.getValue().getTimeStamp());
+		assertThat(argument.getValue().getDefinedIPs(), is(equalTo(definedIps)));
+		assertThat(argument.getValue().getAgentName(), is(equalTo(agentName)));
+		assertThat(argument.getValue().getVersion(), is(equalTo(version)));
+		assertThat(argument.getValue().getTimeStamp(), is(notNullValue()));
 
 		verify(agentStatusDataProvider, times(1)).registerConnected(platformId);
 	}
@@ -234,16 +233,16 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		when(platformIdentDao.findByExample((PlatformIdent) anyObject())).thenReturn(findByExampleList);
 
 		long registeredId = registrationService.registerPlatformIdent(definedIps, agentName, version);
-		Assert.assertEquals(registeredId, platformId);
+		assertThat(registeredId, is(equalTo(platformId)));
 
 		ArgumentCaptor<PlatformIdent> argument = ArgumentCaptor.forClass(PlatformIdent.class);
 		verify(platformIdentDao, times(1)).saveOrUpdate(argument.capture());
 
-		Assert.assertEquals(argument.getValue().getDefinedIPs(), definedIps);
-		Assert.assertEquals(argument.getValue().getAgentName(), agentName);
-		Assert.assertEquals(argument.getValue().getVersion(), version);
-		Assert.assertNotNull(argument.getValue().getTimeStamp());
-		Assert.assertNotSame(argument.getValue().getTimeStamp(), timestamp);
+		assertThat(argument.getValue().getDefinedIPs(), is(equalTo(definedIps)));
+		assertThat(argument.getValue().getAgentName(), is(equalTo(agentName)));
+		assertThat(argument.getValue().getVersion(), is(equalTo(version)));
+		assertThat(argument.getValue().getTimeStamp(), is(notNullValue()));
+		assertThat(argument.getValue().getTimeStamp(), is(not(timestamp)));
 
 		verify(agentStatusDataProvider, times(1)).registerConnected(platformId);
 	}
@@ -371,19 +370,19 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		}).when(methodIdentDao).saveOrUpdate((MethodIdent) anyObject());
 
 		long registeredId = registrationService.registerMethodIdent(platformId, packageName, className, methodName, parameterTypes, returnType, modifiers);
-		Assert.assertEquals(registeredId, methodId);
+		assertThat(registeredId, equalTo(methodId));
 
 		ArgumentCaptor<MethodIdent> argument = ArgumentCaptor.forClass(MethodIdent.class);
 		verify(methodIdentDao, times(1)).saveOrUpdate(argument.capture());
 
-		Assert.assertEquals(argument.getValue().getPlatformIdent(), platformIdent);
-		Assert.assertEquals(argument.getValue().getPackageName(), packageName);
-		Assert.assertEquals(argument.getValue().getClassName(), className);
-		Assert.assertEquals(argument.getValue().getMethodName(), methodName);
-		Assert.assertEquals(argument.getValue().getParameters(), parameterTypes);
-		Assert.assertEquals(argument.getValue().getReturnType(), returnType);
-		Assert.assertEquals(argument.getValue().getModifiers(), modifiers);
-		Assert.assertNotNull(argument.getValue().getTimeStamp());
+		assertThat(argument.getValue().getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(argument.getValue().getPackageName(), is(equalTo(packageName)));
+		assertThat(argument.getValue().getClassName(), is(equalTo(className)));
+		assertThat(argument.getValue().getMethodName(), is(equalTo(methodName)));
+		assertThat(argument.getValue().getParameters(), is(equalTo(parameterTypes)));
+		assertThat(argument.getValue().getReturnType(), is(equalTo(returnType)));
+		assertThat(argument.getValue().getModifiers(), is(equalTo(modifiers)));
+		assertThat(argument.getValue(), is(notNullValue()));
 	}
 
 	/**
@@ -423,20 +422,20 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		when(methodIdentDao.findForPlatformIdent(eq(platformIdent), (MethodIdent) anyObject())).thenReturn(findByExampleList);
 
 		long registeredId = registrationService.registerMethodIdent(platformId, packageName, className, methodName, parameterTypes, returnType, modifiers);
-		Assert.assertEquals(registeredId, methodId);
+		assertThat(registeredId, equalTo(methodId));
 
 		ArgumentCaptor<MethodIdent> argument = ArgumentCaptor.forClass(MethodIdent.class);
 		verify(methodIdentDao, times(1)).saveOrUpdate(argument.capture());
 
-		Assert.assertEquals(argument.getValue().getPlatformIdent(), platformIdent);
-		Assert.assertEquals(argument.getValue().getPackageName(), packageName);
-		Assert.assertEquals(argument.getValue().getClassName(), className);
-		Assert.assertEquals(argument.getValue().getMethodName(), methodName);
-		Assert.assertEquals(argument.getValue().getParameters(), parameterTypes);
-		Assert.assertEquals(argument.getValue().getReturnType(), returnType);
-		Assert.assertEquals(argument.getValue().getModifiers(), modifiers);
-		Assert.assertNotNull(argument.getValue().getTimeStamp());
-		Assert.assertNotSame(argument.getValue().getTimeStamp(), timestamp);
+		assertThat(argument.getValue().getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(argument.getValue().getPackageName(), is(equalTo(packageName)));
+		assertThat(argument.getValue().getClassName(), is(equalTo(className)));
+		assertThat(argument.getValue().getMethodName(), is(equalTo(methodName)));
+		assertThat(argument.getValue().getParameters(), is(equalTo(parameterTypes)));
+		assertThat(argument.getValue().getReturnType(), is(equalTo(returnType)));
+		assertThat(argument.getValue().getModifiers(), is(equalTo(modifiers)));
+		assertThat(argument.getValue(), is(notNullValue()));
+		assertThat(argument.getValue().getTimeStamp(), is(not(timestamp)));
 	}
 
 	/**
@@ -464,14 +463,14 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		}).when(methodSensorTypeIdentDao).saveOrUpdate((MethodSensorTypeIdent) anyObject());
 
 		long registeredId = registrationService.registerMethodSensorTypeIdent(platformId, fqcName);
-		Assert.assertEquals(registeredId, methodSensorId);
+		assertThat(registeredId, is(equalTo(methodSensorId)));
 
 		ArgumentCaptor<MethodSensorTypeIdent> methodSensorArgument = ArgumentCaptor.forClass(MethodSensorTypeIdent.class);
 		verify(methodSensorTypeIdentDao, times(1)).saveOrUpdate(methodSensorArgument.capture());
-		Assert.assertEquals(methodSensorArgument.getValue().getFullyQualifiedClassName(), fqcName);
+		assertThat(methodSensorArgument.getValue().getFullyQualifiedClassName(), is(equalTo(fqcName)));
 
 		verify(platformIdentDao, times(1)).saveOrUpdate(platformIdent);
-		Assert.assertEquals(platformIdent.getSensorTypeIdents().toArray()[0], methodSensorArgument.getValue());
+		assertThat(methodSensorArgument.getValue(), is(equalTo(platformIdent.getSensorTypeIdents().toArray()[0])));
 	}
 
 	/**
@@ -499,14 +498,14 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		}).when(platformSensorTypeIdentDao).saveOrUpdate((PlatformSensorTypeIdent) anyObject());
 
 		long registeredId = registrationService.registerPlatformSensorTypeIdent(platformId, fqcName);
-		Assert.assertEquals(registeredId, platformSensorId);
+		assertThat(registeredId, is(equalTo(platformSensorId)));
 
 		ArgumentCaptor<PlatformSensorTypeIdent> platformSensorArgument = ArgumentCaptor.forClass(PlatformSensorTypeIdent.class);
 		verify(platformSensorTypeIdentDao, times(1)).saveOrUpdate(platformSensorArgument.capture());
-		Assert.assertEquals(platformSensorArgument.getValue().getFullyQualifiedClassName(), fqcName);
+		assertThat(platformSensorArgument.getValue().getFullyQualifiedClassName(), is(equalTo(fqcName)));
 
 		verify(platformIdentDao, times(1)).saveOrUpdate(platformIdent);
-		Assert.assertEquals(platformIdent.getSensorTypeIdents().toArray()[0], platformSensorArgument.getValue());
+		assertThat(platformSensorArgument.getValue(), is(equalTo(platformIdent.getSensorTypeIdents().toArray()[0])));
 	}
 
 	/**
@@ -530,7 +529,7 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 
 		verify(methodIdentDao, times(1)).saveOrUpdate(methodIdent);
 		verify(methodSensorTypeIdentDao, times(1)).saveOrUpdate(methodSensorTypeIdent);
-		Assert.assertEquals(methodIdent.getMethodSensorTypeIdents().toArray()[0], methodSensorTypeIdent);
+		assertThat(methodSensorTypeIdent, is(equalTo(methodIdent.getMethodSensorTypeIdents().toArray()[0])));
 	}
 
 }

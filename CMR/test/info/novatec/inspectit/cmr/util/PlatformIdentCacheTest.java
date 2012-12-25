@@ -1,13 +1,16 @@
 package info.novatec.inspectit.cmr.util;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
-import info.novatec.inspectit.cmr.util.PlatformIdentCache;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -39,19 +42,19 @@ public class PlatformIdentCacheTest extends AbstractTestNGLogSupport {
 		int initialSize = platformIdentCache.getSize();
 
 		platformIdentCache.markClean(platformIdent);
-		Assert.assertEquals(initialSize + 1, platformIdentCache.getSize());
-		Assert.assertTrue(platformIdentCache.getCleanPlatformIdents().contains(platformIdent));
-		Assert.assertTrue(platformIdentCache.getDirtyPlatformIdents().isEmpty());
+		assertThat(platformIdentCache.getSize(), is(equalTo(initialSize + 1)));
+		assertThat(platformIdentCache.getCleanPlatformIdents(), contains(platformIdent));
+		assertThat(platformIdentCache.getDirtyPlatformIdents(), is(empty()));
 
 		platformIdentCache.markClean(platformIdent);
-		Assert.assertEquals(initialSize + 1, platformIdentCache.getSize());
+		assertThat(platformIdentCache.getSize(), is(equalTo(initialSize + 1)));
 
 		platformIdentCache.markDirty(platformIdent);
-		Assert.assertEquals(initialSize + 1, platformIdentCache.getSize());
-		Assert.assertTrue(platformIdentCache.getDirtyPlatformIdents().contains(platformIdent));
+		assertThat(platformIdentCache.getSize(), is(equalTo(initialSize + 1)));
+		assertThat(platformIdentCache.getDirtyPlatformIdents(), contains(platformIdent));
 
 		platformIdentCache.remove(platformIdent);
-		Assert.assertEquals(initialSize, platformIdentCache.getSize());
+		assertThat(platformIdentCache.getSize(), is(equalTo(initialSize)));
 	}
 
 }

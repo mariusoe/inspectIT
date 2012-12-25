@@ -1,5 +1,11 @@
 package info.novatec.inspectit.agent.analyzer.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -8,10 +14,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatcher;
@@ -58,7 +60,7 @@ public class SuperclassMatcherTest extends MockInit {
 		parameterList.add("java.lang.String");
 		unregisteredSensorConfig.setParameterTypes(parameterList);
 		unregisteredSensorConfig.setPropertyAccess(false);
-		unregisteredSensorConfig.setSettings(Collections.EMPTY_MAP);
+		unregisteredSensorConfig.setSettings(Collections.<String, Object> emptyMap());
 
 		matcher = new SuperclassMatcher(inheritanceAnalyzer, classPoolAnalyzer, unregisteredSensorConfig);
 	}
@@ -76,7 +78,7 @@ public class SuperclassMatcherTest extends MockInit {
 		String className = "info.novatec.test.Test";
 		when(inheritanceAnalyzer.getSuperclassIterator(classLoader, className)).thenReturn(iterator);
 		boolean compareResult = matcher.compareClassName(this.getClass().getClassLoader(), className);
-		assertTrue(compareResult);
+		assertThat(compareResult, is(true));
 
 		verifyZeroInteractions(classPoolAnalyzer);
 		verify(inheritanceAnalyzer, times(1)).getSuperclassIterator(classLoader, className);
@@ -102,7 +104,7 @@ public class SuperclassMatcherTest extends MockInit {
 		String className = "info.novatec.test.Test";
 		when(inheritanceAnalyzer.getSuperclassIterator(classLoader, className)).thenReturn(iterator);
 		boolean compareResult = matcher.compareClassName(this.getClass().getClassLoader(), className);
-		assertTrue(compareResult);
+		assertThat(compareResult, is(true));
 
 		verifyZeroInteractions(classPoolAnalyzer);
 		verify(inheritanceAnalyzer, times(1)).getSuperclassIterator(classLoader, className);
@@ -118,13 +120,13 @@ public class SuperclassMatcherTest extends MockInit {
 
 		when(inheritanceAnalyzer.getSuperclassIterator(eq(classLoader), anyString())).thenReturn(iterator);
 		boolean compareResult = matcher.compareClassName(classLoader, "info.novatec.test.Fail");
-		assertFalse(compareResult);
+		assertThat(compareResult, is(false));
 		compareResult = matcher.compareClassName(classLoader, "info.novatec.Fail");
-		assertFalse(compareResult);
+		assertThat(compareResult, is(false));
 		compareResult = matcher.compareClassName(classLoader, "info.novatec.*");
-		assertFalse(compareResult);
+		assertThat(compareResult, is(false));
 		compareResult = matcher.compareClassName(classLoader, "");
-		assertFalse(compareResult);
+		assertThat(compareResult, is(false));
 
 		verifyZeroInteractions(classPoolAnalyzer);
 		verify(inheritanceAnalyzer, times(4)).getSuperclassIterator(eq(classLoader), anyString());
@@ -137,7 +139,6 @@ public class SuperclassMatcherTest extends MockInit {
 	public void testMethod(String msg) {
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void getMatchingMethods() throws NotFoundException {
 		ClassLoader classLoader = this.getClass().getClassLoader();
@@ -153,16 +154,15 @@ public class SuperclassMatcherTest extends MockInit {
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, "info.novatec.test.Test");
 		matcher.checkParameters(ctMethodList);
-		assertNotNull(ctMethodList);
-		assertEquals(ctMethodList.size(), 1);
-		assertEquals(ctMethodList.get(0).getParameterTypes().length, 1);
-		assertEquals(ctMethodList.get(0).getParameterTypes()[0].getName(), "java.lang.String");
+		assertThat(ctMethodList, is(notNullValue()));
+		assertThat(ctMethodList, hasSize(1));
+		assertThat(ctMethodList.get(0).getParameterTypes().length, is(equalTo(1)));
+		assertThat(ctMethodList.get(0).getParameterTypes()[0].getName(), is(equalTo("java.lang.String")));
 
 		verify(classPoolAnalyzer, times(1)).getMethodsForClassName(classLoader, "info.novatec.test.Test");
 		verifyNoMoreInteractions(classPoolAnalyzer);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void getMatchingMethodsIgnoreSignature() throws NotFoundException {
 		// ignore the signature, now the result should contain two methods
@@ -180,14 +180,13 @@ public class SuperclassMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, "info.novatec.test.Test");
-		assertNotNull(ctMethodList);
-		assertEquals(ctMethodList.size(), 2);
+		assertThat(ctMethodList, is(notNullValue()));
+		assertThat(ctMethodList, hasSize(2));
 
 		verify(classPoolAnalyzer, times(1)).getMethodsForClassName(classLoader, "info.novatec.test.Test");
 		verifyNoMoreInteractions(classPoolAnalyzer);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void getMatchingMethodsNoMethods() throws NotFoundException {
 		ClassLoader classLoader = this.getClass().getClassLoader();
@@ -198,8 +197,8 @@ public class SuperclassMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, "info.novatec.test.Test");
-		assertNotNull(ctMethodList);
-		assertEquals(ctMethodList.size(), 0);
+		assertThat(ctMethodList, is(notNullValue()));
+		assertThat(ctMethodList, is(empty()));
 
 		verify(classPoolAnalyzer, times(1)).getMethodsForClassName(classLoader, "info.novatec.test.Test");
 		verifyNoMoreInteractions(classPoolAnalyzer);

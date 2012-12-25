@@ -1,8 +1,12 @@
 package info.novatec.inspectit.cmr.dao.ci.impl;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.testng.Assert.fail;
 import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.cmr.dao.ci.MethodSensorDefinitionDataDao;
@@ -114,7 +118,7 @@ public class MethodSensorDefinitionDataDaoTest extends AbstractTransactionalTest
 		methodSensorDefinitionData.setProfileData(profileData);
 
 		methodSensorDefinitionDataDao.addMethodSensorDefinition(methodSensorDefinitionData);
-		assertTrue(methodSensorDefinitionData.getId() > 0);
+		assertThat(methodSensorDefinitionData.getId(), is(greaterThan(0L)));
 	}
 
 	/**
@@ -142,21 +146,21 @@ public class MethodSensorDefinitionDataDaoTest extends AbstractTransactionalTest
 		ProfileData receivedProfileData = profileDataDao.getProfile(profileData.getId());
 		Set<MethodSensorDefinitionData> methodSensorDefinitions = receivedProfileData.getMethodSensorDefinitions();
 
-		assertTrue(!methodSensorDefinitions.isEmpty());
+		assertThat(methodSensorDefinitions, is(not(empty())));
 
 		MethodSensorDefinitionData receivedMethodSensorDefinition = null;
 		for (MethodSensorDefinitionData methodSensorDefinition : methodSensorDefinitions) {
 			receivedMethodSensorDefinition = methodSensorDefinition;
 		}
 
-		assertNotNull(receivedMethodSensorDefinition);
-		assertEquals(receivedMethodSensorDefinition.isActivated(), methodSensorDefinitionData.isActivated());
-		assertEquals(receivedMethodSensorDefinition.getDescription(), methodSensorDefinitionData.getDescription());
-		assertEquals(receivedMethodSensorDefinition.getFullyQualifiedName(), methodSensorDefinitionData.getFullyQualifiedName());
-		assertEquals(receivedMethodSensorDefinition.getName(), methodSensorDefinitionData.getName());
-		assertEquals(receivedMethodSensorDefinition.getId(), methodSensorDefinitionData.getId());
-		assertEquals(receivedMethodSensorDefinition.getProfileData(), methodSensorDefinitionData.getProfileData());
-		assertEquals(receivedMethodSensorDefinition.getSensorOption(), methodSensorDefinitionData.getSensorOption());
+		assertThat(receivedMethodSensorDefinition, is(notNullValue()));
+		assertThat(receivedMethodSensorDefinition.isActivated(), is(equalTo(methodSensorDefinitionData.isActivated())));
+		assertThat(receivedMethodSensorDefinition.getDescription(), is(equalTo(methodSensorDefinitionData.getDescription())));
+		assertThat(receivedMethodSensorDefinition.getFullyQualifiedName(), is(equalTo(methodSensorDefinitionData.getFullyQualifiedName())));
+		assertThat(receivedMethodSensorDefinition.getName(), is(equalTo(methodSensorDefinitionData.getName())));
+		assertThat(receivedMethodSensorDefinition.getId(), is(equalTo(methodSensorDefinitionData.getId())));
+		assertThat(receivedMethodSensorDefinition.getProfileData(), is(equalTo(methodSensorDefinitionData.getProfileData())));
+		assertThat(receivedMethodSensorDefinition.getSensorOption(), is(equalTo(methodSensorDefinitionData.getSensorOption())));
 	}
 
 	/**
@@ -193,28 +197,28 @@ public class MethodSensorDefinitionDataDaoTest extends AbstractTransactionalTest
 		ProfileData receivedProfileData = profileDataDao.getProfile(profileData.getId());
 		Set<MethodSensorDefinitionData> methodSensorDefinitions = receivedProfileData.getMethodSensorDefinitions();
 
-		assertTrue(!methodSensorDefinitions.isEmpty());
+		assertThat(methodSensorDefinitions, is(not(empty())));
 
 		MethodSensorDefinitionData receivedMethodSensorDefinition = null;
 		for (MethodSensorDefinitionData methodSensorDefinition : methodSensorDefinitions) {
 			receivedMethodSensorDefinition = methodSensorDefinition;
 		}
 
-		assertNotNull(receivedMethodSensorDefinition);
+		assertThat(receivedMethodSensorDefinition, is(notNullValue()));
 		// check values against updated version
-		assertEquals(receivedMethodSensorDefinition.isActivated(), methodSensorDefinitionData.isActivated());
-		assertEquals(receivedMethodSensorDefinition.getDescription(), methodSensorDefinitionData.getDescription());
-		assertEquals(receivedMethodSensorDefinition.getFullyQualifiedName(), methodSensorDefinitionData.getFullyQualifiedName());
-		assertEquals(receivedMethodSensorDefinition.getName(), methodSensorDefinitionData.getName());
-		assertEquals(receivedMethodSensorDefinition.getId(), methodSensorDefinitionData.getId());
-		assertEquals(receivedMethodSensorDefinition.getProfileData(), methodSensorDefinitionData.getProfileData());
-		assertEquals(receivedMethodSensorDefinition.getSensorOption(), methodSensorDefinitionData.getSensorOption());
+		assertThat(receivedMethodSensorDefinition.isActivated(), is(equalTo(methodSensorDefinitionData.isActivated())));
+		assertThat(receivedMethodSensorDefinition.getDescription(), is(equalTo(methodSensorDefinitionData.getDescription())));
+		assertThat(receivedMethodSensorDefinition.getFullyQualifiedName(), is(equalTo(methodSensorDefinitionData.getFullyQualifiedName())));
+		assertThat(receivedMethodSensorDefinition.getName(), is(equalTo(methodSensorDefinitionData.getName())));
+		assertThat(receivedMethodSensorDefinition.getId(), is(equalTo(methodSensorDefinitionData.getId())));
+		assertThat(receivedMethodSensorDefinition.getProfileData(), is(equalTo(methodSensorDefinitionData.getProfileData())));
+		assertThat(receivedMethodSensorDefinition.getSensorOption(), is(equalTo(methodSensorDefinitionData.getSensorOption())));
 		// check values against initial version
-		assertTrue(true != receivedMethodSensorDefinition.isActivated());
-		assertTrue(!"description".equals(receivedMethodSensorDefinition.getDescription()));
-		assertTrue(!"fullyQualifiedName".equals(receivedMethodSensorDefinition.getFullyQualifiedName()));
-		assertTrue(!"name".equals(receivedMethodSensorDefinition.getName()));
-		assertTrue(!(MethodSensorDefinitionData.NO_SENSOR_OPTION == receivedMethodSensorDefinition.getSensorOption()));
+		assertThat(receivedMethodSensorDefinition.isActivated(), is(not(true)));
+		assertThat(receivedMethodSensorDefinition.getDescription(), is(not("description")));
+		assertThat(receivedMethodSensorDefinition.getFullyQualifiedName(), is(not("fullyQualifiedName")));
+		assertThat(receivedMethodSensorDefinition.getName(), is(not("name")));
+		assertThat(receivedMethodSensorDefinition.getSensorOption(), is(not(MethodSensorDefinitionData.NO_SENSOR_OPTION)));
 	}
 
 	/**
@@ -273,7 +277,7 @@ public class MethodSensorDefinitionDataDaoTest extends AbstractTransactionalTest
 		// get the sensor types from the environment
 		EnvironmentData receivedEnvironmentData = environmentDataDao.getEnvironments().get(0);
 		Set<SensorTypeData> receivedSensorTypes = receivedEnvironmentData.getSensorTypes();
-		assertTrue(!receivedSensorTypes.isEmpty());
+		assertThat(receivedSensorTypes, is(not(empty())));
 
 		MethodSensorDefinitionData methodSensorDefinitionData = new MethodSensorDefinitionData();
 		methodSensorDefinitionData.setActivated(true);
@@ -301,24 +305,24 @@ public class MethodSensorDefinitionDataDaoTest extends AbstractTransactionalTest
 			receivedMethodSensorDefinition = methodSensorDefinition;
 		}
 
-		assertNotNull(receivedMethodSensorDefinition);
+		assertThat(receivedMethodSensorDefinition, is(notNullValue()));
 		Set<SensorTypeData> assignedSensorTypes = receivedMethodSensorDefinition.getSensorTypes();
-		assertTrue(!assignedSensorTypes.isEmpty());
+		assertThat(assignedSensorTypes, is(not(empty())));
 
 		SensorTypeData receivedSensorTypeData = null;
 		for (SensorTypeData sensorType : assignedSensorTypes) {
 			receivedSensorTypeData = sensorType;
 		}
 
-		assertNotNull(receivedSensorTypeData);
+		assertThat(receivedSensorTypeData, is(notNullValue()));
 		// check values against added sensor type
-		assertEquals(receivedSensorTypeData.getDescription(), sensorTypeData.getDescription());
-		assertEquals(receivedSensorTypeData.getEnvironmentData(), sensorTypeData.getEnvironmentData());
-		assertEquals(receivedSensorTypeData.getFullyQualifiedName(), sensorTypeData.getFullyQualifiedName());
-		assertEquals(receivedSensorTypeData.getId(), sensorTypeData.getId());
-		assertEquals(receivedSensorTypeData.getName(), sensorTypeData.getName());
-		assertEquals(receivedSensorTypeData.getPriority(), sensorTypeData.getPriority());
-		assertEquals(receivedSensorTypeData.getTypeOption(), sensorTypeData.getTypeOption());
+		assertThat(receivedSensorTypeData.getDescription(), is(equalTo(sensorTypeData.getDescription())));
+		assertThat(receivedSensorTypeData.getEnvironmentData(), is(equalTo(sensorTypeData.getEnvironmentData())));
+		assertThat(receivedSensorTypeData.getFullyQualifiedName(), is(equalTo(sensorTypeData.getFullyQualifiedName())));
+		assertThat(receivedSensorTypeData.getId(), is(equalTo(sensorTypeData.getId())));
+		assertThat(receivedSensorTypeData.getName(), is(equalTo(sensorTypeData.getName())));
+		assertThat(receivedSensorTypeData.getPriority(), is(equalTo(sensorTypeData.getPriority())));
+		assertThat(receivedSensorTypeData.getTypeOption(), is(equalTo(sensorTypeData.getTypeOption())));
 	}
 
 	/**

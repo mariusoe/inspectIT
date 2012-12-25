@@ -1,10 +1,13 @@
 package info.novatec.inspectit.rcp.editor.preferences.control.samplingrate.test;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
 import info.novatec.inspectit.rcp.editor.preferences.control.SamplingRateControl;
@@ -92,7 +95,7 @@ public class TimeframeDividerTest {
 
 		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue());
 
-		assertNotNull(resultList);
+		assertThat(resultList, is(notNullValue()));
 	}
 
 	/**
@@ -138,7 +141,7 @@ public class TimeframeDividerTest {
 
 		resultList = mode.adjustSamplingRate(tempList, fromDate, toDate, sensitivity.getValue());
 
-		assertSame(resultList.size(), 2);
+		assertThat(resultList.size(), is(equalTo(2)));
 	}
 
 	/**
@@ -157,7 +160,7 @@ public class TimeframeDividerTest {
 
 		resultList = mode.adjustSamplingRate(null, fromDate, toDate, sensitivity.getValue());
 
-		assertNull(resultList);
+		assertThat(resultList, is(nullValue()));
 	}
 
 	/**
@@ -177,7 +180,7 @@ public class TimeframeDividerTest {
 
 		resultList = mode.adjustSamplingRate(tempList, fromDate, toDate, sensitivity.getValue());
 
-		assertTrue(resultList.size() < sensitivity.getValue());
+		assertThat(resultList.size(), is(lessThan(sensitivity.getValue())));
 	}
 
 	/**
@@ -195,7 +198,7 @@ public class TimeframeDividerTest {
 
 		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, 0);
 
-		assertEquals(dataObjects, resultList);
+		assertThat((Object) dataObjects, is(equalTo((Object) resultList)));
 	}
 
 	/**
@@ -216,7 +219,8 @@ public class TimeframeDividerTest {
 
 		for (DefaultData defaultData : resultList) {
 			long dataTime = defaultData.getTimeStamp().getTime();
-			assertTrue((dataTime >= fromDate.getTime()) && (dataTime <= toDate.getTime()));
+			assertThat(dataTime, is(greaterThanOrEqualTo(fromDate.getTime())));
+			assertThat(dataTime, is(lessThanOrEqualTo(toDate.getTime())));
 		}
 	}
 
@@ -236,7 +240,7 @@ public class TimeframeDividerTest {
 
 		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue());
 
-		assertTrue(resultList.size() <= sensitivity.getValue());
+		assertThat(resultList.size(), is(lessThanOrEqualTo(sensitivity.getValue())));
 	}
 
 	/**
@@ -256,7 +260,7 @@ public class TimeframeDividerTest {
 
 		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue());
 
-		assertSame(resultList.size(), 0);
+		assertThat(resultList.size(), is(equalTo(0)));
 	}
 
 	/**
@@ -275,7 +279,7 @@ public class TimeframeDividerTest {
 
 		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue());
 
-		assertSame(resultList.size(), 1);
+		assertThat(resultList.size(), is(equalTo(1)));
 	}
 
 }

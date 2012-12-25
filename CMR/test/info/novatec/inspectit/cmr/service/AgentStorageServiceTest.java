@@ -1,5 +1,8 @@
 package info.novatec.inspectit.cmr.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.cmr.util.AgentStatusDataProvider;
 import info.novatec.inspectit.communication.DefaultData;
@@ -15,7 +18,6 @@ import org.apache.commons.logging.LogFactory;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -67,7 +69,7 @@ public class AgentStorageServiceTest extends AbstractTestNGLogSupport {
 		agentStorageService.addDataObjects(dataList);
 		agentStorageService.addDataObjects(dataList);
 
-		Assert.assertEquals(dataList.size(), agentStorageService.getDroppedDataCount());
+		assertThat(agentStorageService.getDroppedDataCount(), is(equalTo(dataList.size())));
 		Mockito.verify(agentStatusDataProvider, Mockito.times(2)).registerDataSent(1L);
 	}
 
@@ -90,7 +92,7 @@ public class AgentStorageServiceTest extends AbstractTestNGLogSupport {
 
 		agentStorageService.addDataObjects(dataList);
 
-		Assert.assertEquals(0, agentStorageService.getDroppedDataCount());
+		assertThat(agentStorageService.getDroppedDataCount(), is(equalTo(0)));
 		Mockito.verify(agentStatusDataProvider, Mockito.times(1)).registerDataSent(1L);
 	}
 }

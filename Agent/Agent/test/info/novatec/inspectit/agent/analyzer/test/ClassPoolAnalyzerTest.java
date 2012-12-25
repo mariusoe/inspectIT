@@ -1,9 +1,10 @@
 package info.novatec.inspectit.agent.analyzer.test;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.impl.ClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.test.classes.TestClass;
@@ -39,47 +40,47 @@ public class ClassPoolAnalyzerTest extends AbstractLogSupport {
 	@Test
 	public void getMethodsForClassName() {
 		CtMethod[] ctMethods = classPoolAnalyzer.getMethodsForClassName(TestClass.class.getClassLoader(), TestClass.class.getName());
-		assertNotNull(ctMethods);
-		assertEquals(ctMethods.length, TestClass.class.getDeclaredMethods().length);
+		assertThat(ctMethods, is(notNullValue()));
+		assertThat(ctMethods.length, is(equalTo(TestClass.class.getDeclaredMethods().length)));
 	}
 
 	@Test
 	public void getMethodsForClassNameNullClassLoader() {
 		CtMethod[] ctMethods = classPoolAnalyzer.getMethodsForClassName(null, TestClass.class.getName());
-		assertNotNull(ctMethods);
-		assertEquals(ctMethods.length, TestClass.class.getDeclaredMethods().length);
+		assertThat(ctMethods, is(notNullValue()));
+		assertThat(ctMethods.length, is(equalTo(TestClass.class.getDeclaredMethods().length)));
 	}
 
 	@Test
 	public void getMethodsForClassNameNullClassName() {
 		CtMethod[] ctMethods = classPoolAnalyzer.getMethodsForClassName(TestClass.class.getClassLoader(), null);
-		assertNotNull(ctMethods);
-		assertEquals(ctMethods.length, 0);
+		assertThat(ctMethods, is(notNullValue()));
+		assertThat(ctMethods.length, is(equalTo(0)));
 	}
 
 	@Test
 	public void getMethodsForClassNameEmptyClassName() {
 		CtMethod[] ctMethods = classPoolAnalyzer.getMethodsForClassName(TestClass.class.getClassLoader(), "");
-		assertNotNull(ctMethods);
-		assertEquals(ctMethods.length, 0);
+		assertThat(ctMethods, is(notNullValue()));
+		assertThat(ctMethods.length, is(equalTo(0)));
 	}
 
 	@Test
 	public void equalClassPool() {
 		ClassPool classPool = classPoolAnalyzer.addClassLoader(TestClass.class.getClassLoader());
-		assertNotNull(classPool);
+		assertThat(classPool, is(notNullValue()));
 		ClassPool otherClassPool = classPoolAnalyzer.getClassPool(TestClass.class.getClassLoader());
-		assertNotNull(otherClassPool);
-		assertSame(classPool, otherClassPool);
+		assertThat(otherClassPool, is(notNullValue()));
+		assertThat(classPool, is(equalTo(otherClassPool)));
 	}
 
 	@Test
 	public void extClassLoaderParent() {
 		ClassPool classPool = classPoolAnalyzer.getClassPool(TestClass.class.getClassLoader());
-		assertNotNull(classPool);
+		assertThat(classPool, is(notNullValue()));
 		ClassPool appClassPool = classPoolAnalyzer.getClassPool(TestClass.class.getClassLoader().getParent());
-		assertNotNull(appClassPool);
-		assertTrue(appClassPool.getClassLoader().toString().contains("AppClassLoader"));
+		assertThat(appClassPool, is(notNullValue()));
+		assertThat(appClassPool.getClassLoader().toString(), containsString("AppClassLoader"));
 	}
 
 	private class TestClassLoader extends ClassLoader {
@@ -97,11 +98,11 @@ public class ClassPoolAnalyzerTest extends AbstractLogSupport {
 		classPoolAnalyzer.addClassLoader(subSubTestClassLoader);
 
 		ClassPool classPool = classPoolAnalyzer.getClassPool(subSubTestClassLoader);
-		assertSame(getClassLoader(classPool), subSubTestClassLoader);
+		assertThat(getClassLoader(classPool), is(equalTo((ClassLoader) subSubTestClassLoader)));
 		ClassPool parentClassPool = getParentClassPool(classPool);
-		assertSame(getClassLoader(parentClassPool), subTestClassLoader);
+		assertThat(getClassLoader(parentClassPool), is(equalTo((ClassLoader) subTestClassLoader)));
 		ClassPool parentParentClassPool = getParentClassPool(parentClassPool);
-		assertSame(getClassLoader(parentParentClassPool), testClassLoader);
+		assertThat(getClassLoader(parentParentClassPool), is(equalTo((ClassLoader) testClassLoader)));
 	}
 
 	private ClassPool getParentClassPool(ClassPool classPool) throws Exception {

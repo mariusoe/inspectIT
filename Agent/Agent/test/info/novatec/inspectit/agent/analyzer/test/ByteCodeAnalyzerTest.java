@@ -3,13 +3,13 @@ package info.novatec.inspectit.agent.analyzer.test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatcher;
@@ -96,7 +96,7 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 		byte[] instrumentedByteCode = byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
 
 		// as no instrumentation happened, we get a null object
-		assertNull(instrumentedByteCode);
+		assertThat(instrumentedByteCode, is(nullValue()));
 	}
 
 	@Test
@@ -130,10 +130,10 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 
 		byte[] instrumentedByteCode = byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
 
-		assertNotNull(instrumentedByteCode);
+		assertThat(instrumentedByteCode, is(notNullValue()));
 		// nothing was really instrumented, thus the byte code has to be the
 		// same
-		assertEquals(instrumentedByteCode, byteCode);
+		assertThat(instrumentedByteCode, is(equalTo(byteCode)));
 	}
 
 	@Test
@@ -321,10 +321,10 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 
 		byte[] instrumentedByteCode = byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
 
-		assertNotNull(instrumentedByteCode);
+		assertThat(instrumentedByteCode, is(notNullValue()));
 		// nothing was really instrumented, thus the byte code has to be the
 		// same
-		assertEquals(instrumentedByteCode, byteCode);
+		assertThat(instrumentedByteCode, is(equalTo(byteCode)));
 	}
 
 	@Test
@@ -340,7 +340,7 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 		// actual class was not a subclass of Throwable, so nothing to
 		// instrument
 		byte[] instrumentedByteCode = byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
-		assertNull(instrumentedByteCode);
+		assertThat(instrumentedByteCode, is(nullValue()));
 	}
 
 	@Test
@@ -386,6 +386,6 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 		// exception sensor was activated, so the current Throwable class was
 		// instrumented
 		byte[] instrumentedByteCode = byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
-		assertNotNull(instrumentedByteCode);
+		assertThat(instrumentedByteCode, is(notNullValue()));
 	}
 }

@@ -1,11 +1,13 @@
 package info.novatec.inspectit.agent.sensor.platform.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
@@ -99,42 +101,42 @@ public class MemoryInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		SystemSensorData sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof MemoryInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(MemoryInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		MemoryInformationData memoryData = (MemoryInformationData) sensorData;
-		assertEquals(memoryData.getCount(), 1);
+		assertThat(memoryData.getCount(), is(equalTo(1)));
 
 		// as there was only one data object min/max/total the values must be the
 		// same
-		assertEquals(memoryData.getMinComittedHeapMemorySize(), committedHeapMemorySize);
-		assertEquals(memoryData.getMaxComittedHeapMemorySize(), committedHeapMemorySize);
-		assertEquals(memoryData.getTotalComittedHeapMemorySize(), committedHeapMemorySize);
+		assertThat(memoryData.getMinComittedHeapMemorySize(), is(equalTo(committedHeapMemorySize)));
+		assertThat(memoryData.getMaxComittedHeapMemorySize(), is(equalTo(committedHeapMemorySize)));
+		assertThat(memoryData.getTotalComittedHeapMemorySize(), is(equalTo(committedHeapMemorySize)));
 
-		assertEquals(memoryData.getMinComittedNonHeapMemorySize(), committedNonHeapMemorySize);
-		assertEquals(memoryData.getMaxComittedNonHeapMemorySize(), committedNonHeapMemorySize);
-		assertEquals(memoryData.getTotalComittedNonHeapMemorySize(), committedNonHeapMemorySize);
+		assertThat(memoryData.getMinComittedNonHeapMemorySize(), is(equalTo(committedNonHeapMemorySize)));
+		assertThat(memoryData.getMaxComittedNonHeapMemorySize(), is(equalTo(committedNonHeapMemorySize)));
+		assertThat(memoryData.getTotalComittedNonHeapMemorySize(), is(equalTo(committedNonHeapMemorySize)));
 
-		assertEquals(memoryData.getMinComittedVirtualMemSize(), committedVirtualMemorySize);
-		assertEquals(memoryData.getMaxComittedVirtualMemSize(), committedVirtualMemorySize);
-		assertEquals(memoryData.getTotalComittedVirtualMemSize(), committedVirtualMemorySize);
+		assertThat(memoryData.getMinComittedVirtualMemSize(), is(equalTo(committedVirtualMemorySize)));
+		assertThat(memoryData.getMaxComittedVirtualMemSize(), is(equalTo(committedVirtualMemorySize)));
+		assertThat(memoryData.getTotalComittedVirtualMemSize(), is(equalTo(committedVirtualMemorySize)));
 
-		assertEquals(memoryData.getMinFreePhysMemory(), freePhysicalMemory);
-		assertEquals(memoryData.getMaxFreePhysMemory(), freePhysicalMemory);
-		assertEquals(memoryData.getTotalFreePhysMemory(), freePhysicalMemory);
+		assertThat(memoryData.getMinFreePhysMemory(), is(equalTo(freePhysicalMemory)));
+		assertThat(memoryData.getMaxFreePhysMemory(), is(equalTo(freePhysicalMemory)));
+		assertThat(memoryData.getTotalFreePhysMemory(), is(equalTo(freePhysicalMemory)));
 
-		assertEquals(memoryData.getMinFreeSwapSpace(), freeSwapSpace);
-		assertEquals(memoryData.getMaxFreeSwapSpace(), freeSwapSpace);
-		assertEquals(memoryData.getTotalFreeSwapSpace(), freeSwapSpace);
+		assertThat(memoryData.getMinFreeSwapSpace(), is(equalTo(freeSwapSpace)));
+		assertThat(memoryData.getMaxFreeSwapSpace(), is(equalTo(freeSwapSpace)));
+		assertThat(memoryData.getTotalFreeSwapSpace(), is(equalTo(freeSwapSpace)));
 
-		assertEquals(memoryData.getMinUsedHeapMemorySize(), usedHeapMemorySize);
-		assertEquals(memoryData.getMaxUsedHeapMemorySize(), usedHeapMemorySize);
-		assertEquals(memoryData.getTotalUsedHeapMemorySize(), usedHeapMemorySize);
+		assertThat(memoryData.getMinUsedHeapMemorySize(), is(equalTo(usedHeapMemorySize)));
+		assertThat(memoryData.getMaxUsedHeapMemorySize(), is(equalTo(usedHeapMemorySize)));
+		assertThat(memoryData.getTotalUsedHeapMemorySize(), is(equalTo(usedHeapMemorySize)));
 
-		assertEquals(memoryData.getMinUsedNonHeapMemorySize(), usedNonHeapMemorySize);
-		assertEquals(memoryData.getMaxUsedNonHeapMemorySize(), usedNonHeapMemorySize);
-		assertEquals(memoryData.getTotalUsedNonHeapMemorySize(), usedNonHeapMemorySize);
+		assertThat(memoryData.getMinUsedNonHeapMemorySize(), is(equalTo(usedNonHeapMemorySize)));
+		assertThat(memoryData.getMaxUsedNonHeapMemorySize(), is(equalTo(usedNonHeapMemorySize)));
+		assertThat(memoryData.getTotalUsedNonHeapMemorySize(), is(equalTo(usedNonHeapMemorySize)));
 	}
 
 	@Test
@@ -182,42 +184,42 @@ public class MemoryInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		SystemSensorData sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof MemoryInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(MemoryInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		MemoryInformationData memoryData = (MemoryInformationData) sensorData;
-		assertEquals(memoryData.getCount(), 1);
+		assertThat(memoryData.getCount(), is(equalTo(1)));
 
 		// as there was only one data object min/max/total the values must be the
 		// same
-		assertEquals(memoryData.getMinComittedHeapMemorySize(), committedHeapMemorySize);
-		assertEquals(memoryData.getMaxComittedHeapMemorySize(), committedHeapMemorySize);
-		assertEquals(memoryData.getTotalComittedHeapMemorySize(), committedHeapMemorySize);
+		assertThat(memoryData.getMinComittedHeapMemorySize(), is(equalTo(committedHeapMemorySize)));
+		assertThat(memoryData.getMaxComittedHeapMemorySize(), is(equalTo(committedHeapMemorySize)));
+		assertThat(memoryData.getTotalComittedHeapMemorySize(), is(equalTo(committedHeapMemorySize)));
 
-		assertEquals(memoryData.getMinComittedNonHeapMemorySize(), committedNonHeapMemorySize);
-		assertEquals(memoryData.getMaxComittedNonHeapMemorySize(), committedNonHeapMemorySize);
-		assertEquals(memoryData.getTotalComittedNonHeapMemorySize(), committedNonHeapMemorySize);
+		assertThat(memoryData.getMinComittedNonHeapMemorySize(), is(equalTo(committedNonHeapMemorySize)));
+		assertThat(memoryData.getMaxComittedNonHeapMemorySize(), is(equalTo(committedNonHeapMemorySize)));
+		assertThat(memoryData.getTotalComittedNonHeapMemorySize(), is(equalTo(committedNonHeapMemorySize)));
 
-		assertEquals(memoryData.getMinComittedVirtualMemSize(), committedVirtualMemorySize);
-		assertEquals(memoryData.getMaxComittedVirtualMemSize(), committedVirtualMemorySize);
-		assertEquals(memoryData.getTotalComittedVirtualMemSize(), committedVirtualMemorySize);
+		assertThat(memoryData.getMinComittedVirtualMemSize(), is(equalTo(committedVirtualMemorySize)));
+		assertThat(memoryData.getMaxComittedVirtualMemSize(), is(equalTo(committedVirtualMemorySize)));
+		assertThat(memoryData.getTotalComittedVirtualMemSize(), is(equalTo(committedVirtualMemorySize)));
 
-		assertEquals(memoryData.getMinFreePhysMemory(), freePhysicalMemory);
-		assertEquals(memoryData.getMaxFreePhysMemory(), freePhysicalMemory);
-		assertEquals(memoryData.getTotalFreePhysMemory(), freePhysicalMemory);
+		assertThat(memoryData.getMinFreePhysMemory(), is(equalTo(freePhysicalMemory)));
+		assertThat(memoryData.getMaxFreePhysMemory(), is(equalTo(freePhysicalMemory)));
+		assertThat(memoryData.getTotalFreePhysMemory(), is(equalTo(freePhysicalMemory)));
 
-		assertEquals(memoryData.getMinFreeSwapSpace(), freeSwapSpace);
-		assertEquals(memoryData.getMaxFreeSwapSpace(), freeSwapSpace);
-		assertEquals(memoryData.getTotalFreeSwapSpace(), freeSwapSpace);
+		assertThat(memoryData.getMinFreeSwapSpace(), is(equalTo(freeSwapSpace)));
+		assertThat(memoryData.getMaxFreeSwapSpace(), is(equalTo(freeSwapSpace)));
+		assertThat(memoryData.getTotalFreeSwapSpace(), is(equalTo(freeSwapSpace)));
 
-		assertEquals(memoryData.getMinUsedHeapMemorySize(), usedHeapMemorySize);
-		assertEquals(memoryData.getMaxUsedHeapMemorySize(), usedHeapMemorySize);
-		assertEquals(memoryData.getTotalUsedHeapMemorySize(), usedHeapMemorySize);
+		assertThat(memoryData.getMinUsedHeapMemorySize(), is(equalTo(usedHeapMemorySize)));
+		assertThat(memoryData.getMaxUsedHeapMemorySize(), is(equalTo(usedHeapMemorySize)));
+		assertThat(memoryData.getTotalUsedHeapMemorySize(), is(equalTo(usedHeapMemorySize)));
 
-		assertEquals(memoryData.getMinUsedNonHeapMemorySize(), usedNonHeapMemorySize);
-		assertEquals(memoryData.getMaxUsedNonHeapMemorySize(), usedNonHeapMemorySize);
-		assertEquals(memoryData.getTotalUsedNonHeapMemorySize(), usedNonHeapMemorySize);
+		assertThat(memoryData.getMinUsedNonHeapMemorySize(), is(equalTo(usedNonHeapMemorySize)));
+		assertThat(memoryData.getMaxUsedNonHeapMemorySize(), is(equalTo(usedNonHeapMemorySize)));
+		assertThat(memoryData.getTotalUsedNonHeapMemorySize(), is(equalTo(usedNonHeapMemorySize)));
 
 		// ------------------------
 		// SECOND UPDATE CALL
@@ -239,42 +241,42 @@ public class MemoryInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof MemoryInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(MemoryInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		memoryData = (MemoryInformationData) sensorData;
-		assertEquals(memoryData.getCount(), 2);
+		assertThat(memoryData.getCount(), is(equalTo(2)));
 
 		// as there was only one data object min/max/total values must be the
 		// same
-		assertEquals(memoryData.getMinComittedHeapMemorySize(), committedHeapMemorySize2);
-		assertEquals(memoryData.getMaxComittedHeapMemorySize(), committedHeapMemorySize);
-		assertEquals(memoryData.getTotalComittedHeapMemorySize(), committedHeapMemorySize + committedHeapMemorySize2);
+		assertThat(memoryData.getMinComittedHeapMemorySize(), is(equalTo(committedHeapMemorySize2)));
+		assertThat(memoryData.getMaxComittedHeapMemorySize(), is(equalTo(committedHeapMemorySize)));
+		assertThat(memoryData.getTotalComittedHeapMemorySize(), is(equalTo(committedHeapMemorySize + committedHeapMemorySize2)));
 
-		assertEquals(memoryData.getMinComittedNonHeapMemorySize(), committedNonHeapMemorySize2);
-		assertEquals(memoryData.getMaxComittedNonHeapMemorySize(), committedNonHeapMemorySize);
-		assertEquals(memoryData.getTotalComittedNonHeapMemorySize(), committedNonHeapMemorySize + committedNonHeapMemorySize2);
+		assertThat(memoryData.getMinComittedNonHeapMemorySize(), is(equalTo(committedNonHeapMemorySize2)));
+		assertThat(memoryData.getMaxComittedNonHeapMemorySize(), is(equalTo(committedNonHeapMemorySize)));
+		assertThat(memoryData.getTotalComittedNonHeapMemorySize(), is(equalTo(committedNonHeapMemorySize + committedNonHeapMemorySize2)));
 
-		assertEquals(memoryData.getMinComittedVirtualMemSize(), committedVirtualMemorySize2);
-		assertEquals(memoryData.getMaxComittedVirtualMemSize(), committedVirtualMemorySize);
-		assertEquals(memoryData.getTotalComittedVirtualMemSize(), committedVirtualMemorySize + committedVirtualMemorySize2);
+		assertThat(memoryData.getMinComittedVirtualMemSize(), is(equalTo(committedVirtualMemorySize2)));
+		assertThat(memoryData.getMaxComittedVirtualMemSize(), is(equalTo(committedVirtualMemorySize)));
+		assertThat(memoryData.getTotalComittedVirtualMemSize(), is(equalTo(committedVirtualMemorySize + committedVirtualMemorySize2)));
 
-		assertEquals(memoryData.getMinFreePhysMemory(), freePhysicalMemory2);
-		assertEquals(memoryData.getMaxFreePhysMemory(), freePhysicalMemory);
-		assertEquals(memoryData.getTotalFreePhysMemory(), freePhysicalMemory + freePhysicalMemory2);
+		assertThat(memoryData.getMinFreePhysMemory(), is(equalTo(freePhysicalMemory2)));
+		assertThat(memoryData.getMaxFreePhysMemory(), is(equalTo(freePhysicalMemory)));
+		assertThat(memoryData.getTotalFreePhysMemory(), is(equalTo(freePhysicalMemory + freePhysicalMemory2)));
 
-		assertEquals(memoryData.getMinFreeSwapSpace(), freeSwapSpace2);
-		assertEquals(memoryData.getMaxFreeSwapSpace(), freeSwapSpace);
-		assertEquals(memoryData.getTotalFreeSwapSpace(), freeSwapSpace + freeSwapSpace2);
+		assertThat(memoryData.getMinFreeSwapSpace(), is(equalTo(freeSwapSpace2)));
+		assertThat(memoryData.getMaxFreeSwapSpace(), is(equalTo(freeSwapSpace)));
+		assertThat(memoryData.getTotalFreeSwapSpace(), is(equalTo(freeSwapSpace + freeSwapSpace2)));
 
-		assertEquals(memoryData.getMinUsedHeapMemorySize(), usedHeapMemorySize);
-		assertEquals(memoryData.getMaxUsedHeapMemorySize(), usedHeapMemorySize2);
-		assertEquals(memoryData.getTotalUsedHeapMemorySize(), usedHeapMemorySize + usedHeapMemorySize2);
+		assertThat(memoryData.getMinUsedHeapMemorySize(), is(equalTo(usedHeapMemorySize)));
+		assertThat(memoryData.getMaxUsedHeapMemorySize(), is(equalTo(usedHeapMemorySize2)));
+		assertThat(memoryData.getTotalUsedHeapMemorySize(), is(equalTo(usedHeapMemorySize + usedHeapMemorySize2)));
 
-		assertEquals(memoryData.getMinUsedNonHeapMemorySize(), usedNonHeapMemorySize);
-		assertEquals(memoryData.getMaxUsedNonHeapMemorySize(), usedNonHeapMemorySize2);
-		assertEquals(memoryData.getTotalUsedNonHeapMemorySize(), usedNonHeapMemorySize + usedNonHeapMemorySize2);
+		assertThat(memoryData.getMinUsedNonHeapMemorySize(), is(equalTo(usedNonHeapMemorySize)));
+		assertThat(memoryData.getMaxUsedNonHeapMemorySize(), is(equalTo(usedNonHeapMemorySize2)));
+		assertThat(memoryData.getTotalUsedNonHeapMemorySize(), is(equalTo(usedNonHeapMemorySize + usedNonHeapMemorySize2)));
 	}
 
 	@Test

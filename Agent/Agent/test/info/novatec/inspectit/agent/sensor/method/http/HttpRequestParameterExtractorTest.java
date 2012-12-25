@@ -1,5 +1,11 @@
 package info.novatec.inspectit.agent.sensor.method.http;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.when;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.data.HttpTimerData;
@@ -16,7 +22,6 @@ import javax.servlet.http.HttpSession;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -61,18 +66,18 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 
 		Map<String, String[]> result = extractor.getParameterMap(httpServletRequest.getClass(), httpServletRequest);
 
-		Assert.assertEquals(result.size(), parameterMap.size());
-		Assert.assertTrue(result.containsKey(param1));
-		Assert.assertTrue(result.containsKey(param2));
-		Assert.assertTrue(result.get(param1) != (param1V), "Value should be cropped!");
-		Assert.assertTrue(result.get(param2) == param2V);
+		assertThat(result.size(), is(parameterMap.size()));
+		assertThat(result, hasKey(param1));
+		assertThat(result, hasKey(param2));
+		assertThat("Value should be cropped!", result.get(param1), is(not(param1V)));
+		assertThat(result.get(param2), is(param2V));
 	}
 
 	@Test
 	public void readParametersNull() {
 		Map<String, String[]> result = extractor.getParameterMap(httpServletRequest.getClass(), httpServletRequest);
 
-		Assert.assertEquals(result, null);
+		assertThat(result, is(nullValue()));
 	}
 
 	@Test
@@ -95,16 +100,17 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 
 		Map<String, String> result = extractor.getHeaders(httpServletRequest.getClass(), httpServletRequest);
 
-		Assert.assertEquals(result, new HashMap<String, String>() {
+		Map<String, String> expected = new HashMap<String, String>() {
 			{
 				put(h1, h1Value);
 				put(h2, h2Value);
 			}
-		});
+		};
+		assertThat(result, is(equalTo(expected)));
 
 		// We only create a new instance of the element if we need to change it (e.g. crop)
-		Assert.assertTrue(result.get(h1) == h1Value);
-		Assert.assertTrue(result.get(h2) == h2Value);
+		assertThat("No new instances", result.get(h1) == h1Value);
+		assertThat("No new instances", result.get(h2) == h2Value);
 	}
 
 	@Test
@@ -128,18 +134,18 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 
 		Map<String, String> result = extractor.getHeaders(httpServletRequest.getClass(), httpServletRequest);
 
-		Assert.assertTrue(result.size() == 2);
+		assertThat(result.size(), is(2));
 
 		// We only create a new instance of the element if we need to change it (e.g. crop)
-		Assert.assertTrue(result.get(h1) != h1Value);
-		Assert.assertTrue(result.get(h2) == h2Value);
+		assertThat("No new instances", result.get(h1) != h1Value);
+		assertThat("No new instances", result.get(h2) == h2Value);
 	}
 
 	@Test
 	public void readHeadersNull() {
 		Map<String, String> result = extractor.getHeaders(httpServletRequest.getClass(), httpServletRequest);
 
-		Assert.assertEquals(result, null);
+		assertThat(result, is(nullValue()));
 	}
 
 	@Test
@@ -157,21 +163,23 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 		final Enumeration<String> attributes = attributesList.elements();
 
 		when(httpServletRequest.getAttributeNames()).thenReturn(attributes);
+
 		when(httpServletRequest.getAttribute(att1)).thenReturn(att1Value);
 		when(httpServletRequest.getAttribute(att2)).thenReturn(att2Value);
 
 		Map<String, String> result = extractor.getAttributes(httpServletRequest.getClass(), httpServletRequest);
 
-		Assert.assertEquals(result, new HashMap<String, String>() {
+		Map<String, String> expected = new HashMap<String, String>() {
 			{
 				put(att1, att1Value);
 				put(att2, att2Value);
 			}
-		});
+		};
 
+		assertThat(result, is(equalTo(expected)));
 		// We only create a new instance of the element if we need to change it (e.g. crop)
-		Assert.assertTrue(result.get(att1) == att1Value);
-		Assert.assertTrue(result.get(att2) == att2Value);
+		assertThat("No new instances", result.get(att1) == att1Value);
+		assertThat("No new instances", result.get(att2) == att2Value);
 	}
 
 	@Test
@@ -196,13 +204,14 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 
 		final String extractedAttribute1Value = "[attValue1, attValue2, attValue3]".substring(0, 20) + "...";
 		final String extractedAttribute2Value = "[a1, a2, a3]";
-		Assert.assertEquals(result, new HashMap<String, String>() {
+		Map<String, String> expected = new HashMap<String, String>() {
 			{
 				put(att1, extractedAttribute1Value);
 				put(att2, extractedAttribute2Value);
 			}
-		});
+		};
 
+		assertThat(result, is(equalTo(expected)));
 	}
 
 	@Test
@@ -227,19 +236,20 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 
 		final String extractedAttribute1Value = "[1, 2, 3]";
 		final String extractedAttribute2Value = "[2, 3, 4]";
-		Assert.assertEquals(result, new HashMap<String, String>() {
+		Map<String, String> expected = new HashMap<String, String>() {
 			{
 				put(att1, extractedAttribute1Value);
 				put(att2, extractedAttribute2Value);
 			}
-		});
+		};
+		assertThat(result, is(equalTo(expected)));
 	}
 
 	@Test
 	public void readAttributesNull() {
 		Map<String, String> result = extractor.getAttributes(httpServletRequest.getClass(), httpServletRequest);
 
-		Assert.assertEquals(result, null);
+		assertThat(result, is(nullValue()));
 	}
 
 	@Test
@@ -248,15 +258,15 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 		when(httpServletRequest.getRequestURI()).thenReturn(uri);
 
 		String result = extractor.getRequestUri(httpServletRequest.getClass(), httpServletRequest);
-		Assert.assertEquals(result, uri);
-		Assert.assertTrue(uri == result);
+		assertThat(result, is(equalTo(uri)));
+		assertThat("Same instances", uri == result);
 	}
 
 	@Test
 	public void readRequestUriNull() {
 		String result = extractor.getRequestUri(httpServletRequest.getClass(), httpServletRequest);
 
-		Assert.assertEquals(result, HttpTimerData.UNDEFINED);
+		assertThat(result, is(HttpTimerData.UNDEFINED));
 	}
 
 	@Test
@@ -265,15 +275,15 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 		when(httpServletRequest.getMethod()).thenReturn(method);
 
 		String result = extractor.getRequestMethod(httpServletRequest.getClass(), httpServletRequest);
-		Assert.assertEquals(result, method);
-		Assert.assertTrue(method == result);
+		assertThat(result, is(equalTo(method)));
+		assertThat("Same istances", method == result);
 	}
 
 	@Test
 	public void readRequestMethodNull() {
 		String result = extractor.getRequestMethod(httpServletRequest.getClass(), httpServletRequest);
 
-		Assert.assertEquals(result, HttpTimerData.UNDEFINED);
+		assertThat(result, is(HttpTimerData.UNDEFINED));
 	}
 
 	@Test
@@ -281,7 +291,7 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 		when(httpServletRequest.getSession(false)).thenReturn(null);
 
 		Map<String, String> result = extractor.getSessionAttributes(httpServletRequest.getClass(), httpServletRequest);
-		Assert.assertEquals(result, null);
+		assertThat(result, is(nullValue()));
 	}
 
 	@Test
@@ -306,12 +316,13 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 		when(httpServletRequest.getSession(false)).thenReturn(session);
 
 		Map<String, String> result = extractor.getSessionAttributes(httpServletRequest.getClass(), httpServletRequest);
-		Assert.assertEquals(result, new HashMap<String, String>() {
+		Map<String, String> expected = new HashMap<String, String>() {
 			{
 				put(sa1, sa1Value);
 				put(sa2, sa2Value);
 			}
-		});
+		};
+		assertThat(result, is(equalTo(expected)));
 	}
 
 	@Test
@@ -338,11 +349,12 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 
 		final String extractedSa1Value = "[saValue1, saValue2, saValue3]".substring(0, 20) + "...";
 		final String extractedSa2Value = "[s1, s2, s3]";
-		Assert.assertEquals(result, new HashMap<String, String>() {
+		Map<String, String> expected = new HashMap<String, String>() {
 			{
 				put(sa1, extractedSa1Value);
 				put(sa2, extractedSa2Value);
 			}
-		});
+		};
+		assertThat(result, is(equalTo(expected)));
 	}
 }

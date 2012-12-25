@@ -1,10 +1,12 @@
 package info.novatec.inspectit.agent.util.test;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotSame;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.util.StringConstraint;
 
@@ -47,8 +49,8 @@ public class StringConstraintTest extends AbstractLogSupport {
 		String resultString = constraint.crop(testStr);
 		String ending = "...";
 
-		assertEquals(resultString.length(), stringLength + ending.length());
-		assertEquals(resultString.endsWith(ending), true);
+		assertThat(resultString.length(), is(stringLength + ending.length()));
+		assertThat(resultString, endsWith(ending));
 	}
 
 	@Test
@@ -59,8 +61,8 @@ public class StringConstraintTest extends AbstractLogSupport {
 		String resultString = constraint.cropKeepFinalCharacter(testStr, finalChar);
 		String ending = "..." + finalChar;
 
-		assertEquals(resultString.length(), stringLength + ending.length());
-		assertEquals(resultString.endsWith(ending), true);
+		assertThat(resultString.length(), is(stringLength + ending.length()));
+		assertThat(resultString, endsWith(ending));
 	}
 
 	@Test
@@ -68,8 +70,8 @@ public class StringConstraintTest extends AbstractLogSupport {
 		String testStr = fillString('x', stringLength - 1);
 		String resultString = constraint.crop(testStr);
 
-		assertEquals(resultString == testStr, true);
-		assertEquals(resultString.length(), testStr.length());
+		assertThat("Same istances", resultString == testStr);
+		assertThat(resultString.length(), is(equalTo(testStr.length())));
 	}
 
 	@Test
@@ -77,8 +79,8 @@ public class StringConstraintTest extends AbstractLogSupport {
 		String testStr = fillString('x', stringLength);
 		String resultString = constraint.crop(testStr);
 
-		assertSame(resultString, testStr);
-		assertEquals(resultString.length(), testStr.length());
+		assertThat(resultString, is(equalTo(testStr)));
+		assertThat(resultString.length(), is(equalTo(testStr.length())));
 	}
 
 	@Test
@@ -89,7 +91,7 @@ public class StringConstraintTest extends AbstractLogSupport {
 		String testStr = fillString('x', 100);
 		String resultString = constr.crop(testStr);
 
-		assertEquals(resultString, "");
+		assertThat(resultString, isEmptyString());
 	}
 
 	@Test
@@ -101,7 +103,7 @@ public class StringConstraintTest extends AbstractLogSupport {
 		String testStr = finalChar + fillString('x', 50) + finalChar;
 		String resultString = constr.cropKeepFinalCharacter(testStr, finalChar);
 
-		assertEquals(resultString, "");
+		assertThat(resultString, isEmptyString());
 	}
 
 	@Test
@@ -109,7 +111,7 @@ public class StringConstraintTest extends AbstractLogSupport {
 		String testStr = null;
 		String resultString = constraint.crop(testStr);
 
-		assertEquals(resultString == null, true);
+		assertThat(resultString, is(nullValue()));
 	}
 
 	@Test
@@ -142,16 +144,16 @@ public class StringConstraintTest extends AbstractLogSupport {
 
 		Map<String, String[]> result = constraint.crop(parameterMap);
 
-		assertEquals(result.size(), parameterMap.size());
-		assertTrue(ObjectUtils.equals(result, parameterMap));
-		assertSame(result.get(param1), param1V);
-		assertSame(result.get(param2), param2V);
-		assertSame(result.get(param3), param3V);
-		assertSame(result.get(param1)[0], param1VReal);
-		assertSame(result.get(param2)[0], param2VReal1);
-		assertSame(result.get(param2)[1], param2VReal2);
-		assertSame(result.get(param3)[0], param3VReal1);
-		assertSame(result.get(param3)[1], param3VReal2);
+		assertThat(result.size(), is(equalTo(parameterMap.size())));
+		assertThat("Same compared by ObjectUtils", ObjectUtils.equals(result, parameterMap));
+		assertThat(result.get(param1), is(param1V));
+		assertThat(result.get(param2), is(param2V));
+		assertThat(result.get(param3), is(param3V));
+		assertThat(result.get(param1)[0], is(param1VReal));
+		assertThat(result.get(param2)[0], is(param2VReal1));
+		assertThat(result.get(param2)[1], is(param2VReal2));
+		assertThat(result.get(param3)[0], is(param3VReal1));
+		assertThat(result.get(param3)[1], is(param3VReal2));
 	}
 
 	@Test
@@ -184,16 +186,16 @@ public class StringConstraintTest extends AbstractLogSupport {
 
 		Map<String, String[]> result = constraint.crop(parameterMap);
 
-		assertEquals(result.size(), parameterMap.size());
-		assertFalse(ObjectUtils.equals(result, parameterMap), "need to be cropped");
-		assertSame(result.get(param1), param1V);
-		assertNotSame(result.get(param2), param2V);
-		assertSame(result.get(param3), param3V);
-		assertSame(result.get(param1)[0], param1VReal);
-		assertNotSame(result.get(param2)[0], param2VReal1);
-		assertSame(result.get(param2)[1], param2VReal2);
-		assertSame(result.get(param3)[0], param3VReal1);
-		assertSame(result.get(param3)[1], param3VReal2);
+		assertThat(result.size(), is(equalTo(parameterMap.size())));
+		assertThat("Not same by ObjectUtils, need to be cropped", !ObjectUtils.equals(result, parameterMap));
+		assertThat(result.get(param1), is(param1V));
+		assertThat(result.get(param2), is(not(param2V)));
+		assertThat(result.get(param3), is(param3V));
+		assertThat(result.get(param1)[0], is(param1VReal));
+		assertThat(result.get(param2)[0], is(not(param2VReal1)));
+		assertThat(result.get(param2)[1], is(param2VReal2));
+		assertThat(result.get(param3)[0], is(param3VReal1));
+		assertThat(result.get(param3)[1], is(param3VReal2));
 	}
 
 	private String fillString(char character, int count) {

@@ -1,10 +1,11 @@
 package info.novatec.inspectit.agent.util.test;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import info.novatec.inspectit.util.WeakList;
 
 import org.testng.annotations.BeforeMethod;
@@ -25,8 +26,8 @@ public class WeakListTest {
 		weakList.add(object);
 		Object returnValue = weakList.get(0);
 
-		assertNotNull(returnValue);
-		assertSame(returnValue, object);
+		assertThat(returnValue, is(notNullValue()));
+		assertThat(returnValue, is(object));
 	}
 
 	@Test
@@ -41,7 +42,7 @@ public class WeakListTest {
 
 		weakList.clear();
 
-		assertEquals(weakList.size(), 0);
+		assertThat(weakList, is(empty()));
 	}
 
 	@Test
@@ -62,7 +63,7 @@ public class WeakListTest {
 
 		weakList.clear();
 
-		assertEquals(weakList.size(), 0);
+		assertThat(weakList, is(empty()));
 	}
 
 	@Test
@@ -75,7 +76,7 @@ public class WeakListTest {
 
 		objectOne = null;
 
-		assertTrue(weakList.contains(objectTwo));
+		assertThat(weakList, hasItem(objectTwo));
 	}
 
 	@Test
@@ -90,12 +91,12 @@ public class WeakListTest {
 
 		System.gc();
 
-		assertTrue(weakList.contains(objectTwo));
+		assertThat(weakList, hasItem(objectTwo));
 	}
 
 	@Test(expectedExceptions = { IndexOutOfBoundsException.class })
 	public void outOfBounds() {
-		assertNull(weakList.get(5));
+		assertThat(weakList.get(5), is(nullValue()));
 	}
 
 }

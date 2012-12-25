@@ -1,11 +1,13 @@
 package info.novatec.inspectit.agent.sensor.platform.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
@@ -68,18 +70,18 @@ public class RuntimeInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		SystemSensorData sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof RuntimeInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(RuntimeInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		RuntimeInformationData runtimeData = (RuntimeInformationData) sensorData;
-		assertEquals(runtimeData.getCount(), 1);
+		assertThat(runtimeData.getCount(), is(equalTo(1)));
 
 		// as there was only one data object min/max/total the values must be the
 		// same
-		assertEquals(runtimeData.getMinUptime(), uptime);
-		assertEquals(runtimeData.getMaxUptime(), uptime);
-		assertEquals(runtimeData.getTotalUptime(), uptime);
+		assertThat(runtimeData.getMinUptime(), is(equalTo(uptime)));
+		assertThat(runtimeData.getMaxUptime(), is(equalTo(uptime)));
+		assertThat(runtimeData.getTotalUptime(), is(equalTo(uptime)));
 	}
 
 	@Test
@@ -107,18 +109,18 @@ public class RuntimeInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		SystemSensorData sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof RuntimeInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(RuntimeInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		RuntimeInformationData runtimeData = (RuntimeInformationData) sensorData;
-		assertEquals(runtimeData.getCount(), 1);
+		assertThat(runtimeData.getCount(), is(equalTo(1)));
 
 		// as there was only one data object min/max/total the values must be the
 		// same
-		assertEquals(runtimeData.getMinUptime(), uptime);
-		assertEquals(runtimeData.getMaxUptime(), uptime);
-		assertEquals(runtimeData.getTotalUptime(), uptime);
+		assertThat(runtimeData.getMinUptime(), is(equalTo(uptime)));
+		assertThat(runtimeData.getMaxUptime(), is(equalTo(uptime)));
+		assertThat(runtimeData.getTotalUptime(), is(equalTo(uptime)));
 
 		// ------------------------
 		// SECOND UPDATE CALL
@@ -130,16 +132,16 @@ public class RuntimeInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof RuntimeInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(RuntimeInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		runtimeData = (RuntimeInformationData) sensorData;
-		assertEquals(runtimeData.getCount(), 2);
+		assertThat(runtimeData.getCount(), is(equalTo(2)));
 
-		assertEquals(runtimeData.getMinUptime(), uptime);
-		assertEquals(runtimeData.getMaxUptime(), uptime2);
-		assertEquals(runtimeData.getTotalUptime(), uptime + uptime2);
+		assertThat(runtimeData.getMinUptime(), is(equalTo(uptime)));
+		assertThat(runtimeData.getMaxUptime(), is(equalTo(uptime2)));
+		assertThat(runtimeData.getTotalUptime(), is(equalTo(uptime + uptime2)));
 	}
 
 	@Test

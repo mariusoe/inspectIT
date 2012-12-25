@@ -1,9 +1,12 @@
 package info.novatec.inspectit.agent.analyzer.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatcher;
@@ -54,9 +57,9 @@ public class ModifierMatcherTest extends MockInit {
 		unregisteredSensorConfig.setTargetPackageName("");
 		unregisteredSensorConfig.setTargetClassName("info.novatec.test.Test");
 		unregisteredSensorConfig.setTargetMethodName("t*Method");
-		unregisteredSensorConfig.setParameterTypes(Collections.EMPTY_LIST);
+		unregisteredSensorConfig.setParameterTypes(Collections.<String> emptyList());
 		unregisteredSensorConfig.setPropertyAccess(false);
-		unregisteredSensorConfig.setSettings(Collections.EMPTY_MAP);
+		unregisteredSensorConfig.setSettings(Collections.<String, Object> emptyMap());
 
 		delegateMatcher = mock(IMatcher.class);
 		matcher = new ModifierMatcher(classPoolAnalyzer, unregisteredSensorConfig, delegateMatcher);
@@ -74,7 +77,6 @@ public class ModifierMatcherTest extends MockInit {
 	void testDefaultMethod() {
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testPrivate() throws NotFoundException {
 		unregisteredSensorConfig.setModifiers(Modifier.PRIVATE);
@@ -89,14 +91,13 @@ public class ModifierMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, "info.novatec.test.Test");
-		assertNotNull(ctMethodList);
-		assertTrue(!ctMethodList.isEmpty());
+		assertThat(ctMethodList, is(notNullValue()));
+		assertThat(ctMethodList, is(not(empty())));
 		for (CtMethod method : ctMethodList) {
-			assertTrue(Modifier.isPrivate(method.getModifiers()));
+			assertThat(Modifier.isPrivate(method.getModifiers()), is(true));
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testProtected() throws NotFoundException {
 		unregisteredSensorConfig.setModifiers(Modifier.PROTECTED);
@@ -111,15 +112,14 @@ public class ModifierMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, "info.novatec.test.Test");
-		assertNotNull(ctMethodList);
-		assertTrue(!ctMethodList.isEmpty());
+		assertThat(ctMethodList, is(notNullValue()));
+		assertThat(ctMethodList, is(not(empty())));
 		for (CtMethod method : ctMethodList) {
-			assertTrue(Modifier.isProtected(method.getModifiers()));
+			assertThat(Modifier.isProtected(method.getModifiers()), is(true));
 		}
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testPublic() throws NotFoundException {
 		unregisteredSensorConfig.setModifiers(Modifier.PUBLIC);
@@ -134,15 +134,14 @@ public class ModifierMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, "info.novatec.test.Test");
-		assertNotNull(ctMethodList);
-		assertTrue(!ctMethodList.isEmpty());
+		assertThat(ctMethodList, is(notNullValue()));
+		assertThat(ctMethodList, is(not(empty())));
 		for (CtMethod method : ctMethodList) {
-			assertTrue(Modifier.isPublic(method.getModifiers()));
+			assertThat(Modifier.isPublic(method.getModifiers()), is(true));
 		}
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testDefault() throws NotFoundException {
 		unregisteredSensorConfig.setModifiers(ModifierMatcher.DEFAULT);
@@ -157,15 +156,14 @@ public class ModifierMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, "info.novatec.test.Test");
-		assertNotNull(ctMethodList);
-		assertTrue(!ctMethodList.isEmpty());
+		assertThat(ctMethodList, is(notNullValue()));
+		assertThat(ctMethodList, is(not(empty())));
 		for (CtMethod method : ctMethodList) {
-			assertTrue(Modifier.isPackage(method.getModifiers()));
+			assertThat(Modifier.isPackage(method.getModifiers()), is(true));
 		}
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testCombined() throws NotFoundException {
 		unregisteredSensorConfig.setModifiers(Modifier.PRIVATE | Modifier.PROTECTED);
@@ -180,15 +178,14 @@ public class ModifierMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, "info.novatec.test.Test");
-		assertNotNull(ctMethodList);
-		assertTrue(!ctMethodList.isEmpty());
+		assertThat(ctMethodList, is(notNullValue()));
+		assertThat(ctMethodList, is(not(empty())));
 		for (CtMethod method : ctMethodList) {
-			assertTrue(Modifier.isPrivate(method.getModifiers()) || Modifier.isProtected(method.getModifiers()));
+			assertThat(Modifier.isPrivate(method.getModifiers()) || Modifier.isProtected(method.getModifiers()), is(true));
 		}
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testConstructor() throws NotFoundException {
 		unregisteredSensorConfig.setModifiers(Modifier.PRIVATE);
@@ -203,10 +200,10 @@ public class ModifierMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtConstructor> ctConstructorList = matcher.getMatchingConstructors(classLoader, "info.novatec.test.Test");
-		assertNotNull(ctConstructorList);
-		assertTrue(!ctConstructorList.isEmpty());
+		assertThat(ctConstructorList, is(notNullValue()));
+		assertThat(ctConstructorList, is(not(empty())));
 		for (CtConstructor constructor : ctConstructorList) {
-			assertTrue(Modifier.isPrivate(constructor.getModifiers()));
+			assertThat(Modifier.isPrivate(constructor.getModifiers()), is(true));
 		}
 
 	}

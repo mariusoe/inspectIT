@@ -1,5 +1,10 @@
 package info.novatec.inspectit.agent.core.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -8,8 +13,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
 import info.novatec.inspectit.agent.config.impl.PlatformSensorTypeConfig;
@@ -119,7 +122,7 @@ public class IdManagerTest extends AbstractLogSupport {
 		long platformId = idManager.getPlatformId();
 		idManager.stop();
 
-		assertEquals(platformId, fakePlatformId);
+		assertThat(platformId, is(equalTo(fakePlatformId)));
 	}
 
 	@Test
@@ -134,7 +137,7 @@ public class IdManagerTest extends AbstractLogSupport {
 		long platformId = idManager.getPlatformId();
 		idManager.stop();
 
-		assertEquals(platformId, fakePlatformId);
+		assertThat(platformId, is(equalTo(fakePlatformId)));
 	}
 
 	@Test(expectedExceptions = { IdNotAvailableException.class })
@@ -165,13 +168,13 @@ public class IdManagerTest extends AbstractLogSupport {
 		when(configurationStorage.getMethodSensorTypes()).thenReturn(methodSensorTypes);
 
 		idManager.start();
-		assertEquals(methodSensorType.getId(), 0);
+		assertThat(methodSensorType.getId(), is(0L));
 
 		synchronized (this) {
 			this.wait(2000L);
 		}
 
-		assertTrue(idManager.getRegisteredSensorTypeId(methodSensorType.getId()) != -1);
+		assertThat(idManager.getRegisteredSensorTypeId(methodSensorType.getId()), is(not(-1L)));
 
 		idManager.stop();
 	}
@@ -193,13 +196,13 @@ public class IdManagerTest extends AbstractLogSupport {
 		when(configurationStorage.getPlatformSensorTypes()).thenReturn(platformSensorTypes);
 
 		idManager.start();
-		assertEquals(platformSensorType.getId(), 0);
+		assertThat(platformSensorType.getId(), is(0L));
 
 		synchronized (this) {
 			this.wait(2000L);
 		}
 
-		assertEquals(idManager.getRegisteredSensorTypeId(platformSensorType.getId()), 0);
+		assertThat(idManager.getRegisteredSensorTypeId(platformSensorType.getId()), is(0L));
 
 		idManager.stop();
 	}
@@ -217,7 +220,7 @@ public class IdManagerTest extends AbstractLogSupport {
 		when(configurationStorage.getMethodSensorTypes()).thenReturn(methodSensorTypes);
 
 		idManager.start();
-		assertEquals(methodSensorType.getId(), 0);
+		assertThat(methodSensorType.getId(), is(0L));
 
 		idManager.getRegisteredSensorTypeId(methodSensorType.getId());
 	}
@@ -234,12 +237,12 @@ public class IdManagerTest extends AbstractLogSupport {
 
 		when(connection.registerMethod(anyInt(), eq(registeredSensorConfig))).thenReturn(7L).thenReturn(13L);
 		long id = idManager.registerMethod(registeredSensorConfig);
-		assertTrue(id >= 0);
-		assertEquals(idManager.getRegisteredMethodId(id), 7L);
+		assertThat(id, is(greaterThanOrEqualTo(0L)));
+		assertThat(idManager.getRegisteredMethodId(id), is(7L));
 
 		id = idManager.registerMethod(registeredSensorConfig);
-		assertTrue(id >= 0);
-		assertEquals(idManager.getRegisteredMethodId(id), 13L);
+		assertThat(id, is(greaterThanOrEqualTo(0L)));
+		assertThat(idManager.getRegisteredMethodId(id), is(13L));
 
 		idManager.stop();
 	}

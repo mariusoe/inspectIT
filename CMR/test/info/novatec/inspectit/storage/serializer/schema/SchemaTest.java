@@ -1,5 +1,9 @@
 package info.novatec.inspectit.storage.serializer.schema;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 
 import java.io.IOException;
@@ -11,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -55,7 +58,7 @@ public class SchemaTest {
 	@Test(dataProvider = "schemaProvider")
 	public void checkClassFieldsWithSchema(String className, ClassSchema schema, List<String> excludedFields) throws ClassNotFoundException {
 		// assert that schema gotten by the .getSchema is same
-		Assert.assertEquals(schemaManager.getSchema(className), schema);
+		assertThat(schemaManager.getSchema(className), is(equalTo(schema)));
 
 		Class<?> clazz = Class.forName(className);
 		Set<Integer> markerSet = new HashSet<Integer>();
@@ -66,8 +69,8 @@ public class SchemaTest {
 					Integer marker = schema.getFieldMarker(field.getName());
 					// assert that the field will be in schema and that it has different marker
 					// than other fields
-					Assert.assertNotNull(marker, "Field " + field.getName() + " of class " + className + " is not available in class schema.");
-					Assert.assertTrue(markerSet.add(marker), "Same marker exists for two different fields in class " + className + ". Duplicated number for field " + field.getName());
+					assertThat("Field " + field.getName() + " of class " + className + " is not available in class schema.", marker, is(notNullValue()));
+					assertThat("Same marker exists for two different fields in class " + className + ". Duplicated number for field " + field.getName(), markerSet.add(marker), is(true));
 				}
 			}
 			clazz = clazz.getSuperclass();

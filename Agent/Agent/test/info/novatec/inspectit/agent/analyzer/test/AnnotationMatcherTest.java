@@ -1,9 +1,13 @@
 package info.novatec.inspectit.agent.analyzer.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatcher;
@@ -59,9 +63,9 @@ public class AnnotationMatcherTest extends MockInit {
 		unregisteredSensorConfig.setTargetPackageName("");
 		unregisteredSensorConfig.setTargetClassName(this.getClass().getName());
 		unregisteredSensorConfig.setTargetMethodName("*");
-		unregisteredSensorConfig.setParameterTypes(Collections.EMPTY_LIST);
+		unregisteredSensorConfig.setParameterTypes(Collections.<String> emptyList());
 		unregisteredSensorConfig.setPropertyAccess(false);
-		unregisteredSensorConfig.setSettings(Collections.EMPTY_MAP);
+		unregisteredSensorConfig.setSettings(Collections.<String, Object> emptyMap());
 
 		delegateMatcher = mock(IMatcher.class);
 		matcher = new AnnotationMatcher(inheritanceAnalyzer, classPoolAnalyzer, unregisteredSensorConfig, delegateMatcher);
@@ -87,10 +91,10 @@ public class AnnotationMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, this.getClass().getName());
-		assertNotNull(ctMethodList);
-		assertTrue(!ctMethodList.isEmpty());
+		assertThat(ctMethodList, is(notNullValue()));
+		assertThat(ctMethodList, is(not(empty())));
 		for (CtMethod method : ctMethodList) {
-			assertTrue(method.hasAnnotation(TestAnnotation.class));
+			assertThat(method.hasAnnotation(TestAnnotation.class), is(true));
 		}
 	}
 
@@ -114,10 +118,10 @@ public class AnnotationMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtConstructor> ctConstructorList = matcher.getMatchingConstructors(classLoader, this.getClass().getName());
-		assertNotNull(ctConstructorList);
-		assertTrue(!ctConstructorList.isEmpty());
+		assertThat(ctConstructorList, is(notNullValue()));
+		assertThat(ctConstructorList, is(not(empty())));
 		for (CtConstructor constructor : ctConstructorList) {
-			assertTrue(constructor.hasAnnotation(TestAnnotation.class));
+			assertThat(constructor.hasAnnotation(TestAnnotation.class), is(true));
 		}
 	}
 
@@ -142,9 +146,9 @@ public class AnnotationMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, TestClass.class.getName());
-		assertNotNull(ctMethodList);
-		assertTrue(!ctMethodList.isEmpty());
-		assertTrue(ctMethodList.size() == ctMethods.length);
+		assertThat(ctMethodList, is(notNullValue()));
+		assertThat(ctMethodList, is(not(empty())));
+		assertThat(ctMethodList, hasSize(ctMethods.length));
 
 		// test the constructors of annotated class (all should be loaded)
 		CtConstructor[] ctConstructors = ctClass.getDeclaredConstructors();
@@ -153,9 +157,9 @@ public class AnnotationMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtConstructor> ctConstructorList = matcher.getMatchingConstructors(classLoader, TestClass.class.getName());
-		assertNotNull(ctConstructorList);
-		assertTrue(!ctConstructorList.isEmpty());
-		assertTrue(ctConstructorList.size() == ctConstructors.length);
+		assertThat(ctConstructorList, is(notNullValue()));
+		assertThat(ctConstructorList, is(not(empty())));
+		assertThat(ctConstructorList, hasSize(ctConstructors.length));
 	}
 
 	@Test
@@ -180,9 +184,9 @@ public class AnnotationMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, ExtendedTestClass.class.getName());
-		assertNotNull(ctMethodList);
-		assertTrue(!ctMethodList.isEmpty());
-		assertTrue(ctMethodList.size() == ctMethods.length);
+		assertThat(ctMethodList, is(notNullValue()));
+		assertThat(ctMethodList, is(not(empty())));
+		assertThat(ctMethodList, hasSize(ctMethods.length));
 
 		// test the constructors of annotated class (all should be loaded)
 		CtConstructor[] ctConstructors = ctClass.getDeclaredConstructors();
@@ -197,9 +201,9 @@ public class AnnotationMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtConstructor> ctConstructorList = matcher.getMatchingConstructors(classLoader, ExtendedTestClass.class.getName());
-		assertNotNull(ctConstructorList);
-		assertTrue(!ctConstructorList.isEmpty());
-		assertTrue(ctConstructorList.size() == ctConstructors.length);
+		assertThat(ctConstructorList, is(notNullValue()));
+		assertThat(ctConstructorList, is(not(empty())));
+		assertThat(ctConstructorList, hasSize(ctConstructors.length));
 	}
 
 	@Test
@@ -224,9 +228,9 @@ public class AnnotationMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, InterfaceImplTest.class.getName());
-		assertNotNull(ctMethodList);
-		assertTrue(!ctMethodList.isEmpty());
-		assertTrue(ctMethodList.size() == ctMethods.length);
+		assertThat(ctMethodList, is(notNullValue()));
+		assertThat(ctMethodList, is(not(empty())));
+		assertThat(ctMethodList, hasSize(ctMethods.length));
 
 		// test the constructors of annotated class (all should be loaded)
 		CtConstructor[] ctConstructors = ctClass.getDeclaredConstructors();
@@ -241,9 +245,9 @@ public class AnnotationMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtConstructor> ctConstructorList = matcher.getMatchingConstructors(classLoader, InterfaceImplTest.class.getName());
-		assertNotNull(ctConstructorList);
-		assertTrue(!ctConstructorList.isEmpty());
-		assertTrue(ctConstructorList.size() == ctConstructors.length);
+		assertThat(ctConstructorList, is(notNullValue()));
+		assertThat(ctConstructorList, is(not(empty())));
+		assertThat(ctConstructorList, hasSize(ctConstructors.length));
 	}
 
 	public static @interface TestAnnotation {

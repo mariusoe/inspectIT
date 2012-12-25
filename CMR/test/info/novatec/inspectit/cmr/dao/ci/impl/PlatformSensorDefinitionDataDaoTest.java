@@ -1,8 +1,12 @@
 package info.novatec.inspectit.cmr.dao.ci.impl;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.testng.Assert.fail;
 import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.cmr.dao.ci.PlatformSensorDefinitionDataDao;
@@ -100,7 +104,7 @@ public class PlatformSensorDefinitionDataDaoTest extends AbstractTransactionalTe
 		platformSensorDefinitionData.setProfileData(profileData);
 
 		long id = platformSensorDefinitionDataDao.addPlatformSensorDefinition(platformSensorDefinitionData);
-		assertTrue(id > 0);
+		assertThat(id, is(greaterThan(0L)));
 	}
 
 	/**
@@ -125,18 +129,18 @@ public class PlatformSensorDefinitionDataDaoTest extends AbstractTransactionalTe
 		ProfileData receivedProfileData = profileDataDao.getProfile(profileData.getId());
 		Set<PlatformSensorDefinitionData> platformSensorDefinitions = receivedProfileData.getPlatformSensorDefinitions();
 
-		assertTrue(!platformSensorDefinitions.isEmpty());
+		assertThat(platformSensorDefinitions, is(not(empty())));
 
 		PlatformSensorDefinitionData receivedPlatformSensorDefinition = null;
 		for (PlatformSensorDefinitionData platformSensorDefinition : platformSensorDefinitions) {
 			receivedPlatformSensorDefinition = platformSensorDefinition;
 		}
 
-		assertNotNull(receivedPlatformSensorDefinition);
-		assertEquals(receivedPlatformSensorDefinition.isActivated(), platformSensorDefinitionData.isActivated());
-		assertEquals(receivedPlatformSensorDefinition.getFullyQualifiedName(), platformSensorDefinitionData.getFullyQualifiedName());
-		assertEquals(receivedPlatformSensorDefinition.getId(), platformSensorDefinitionData.getId());
-		assertEquals(receivedPlatformSensorDefinition.getProfileData(), platformSensorDefinitionData.getProfileData());
+		assertThat(receivedPlatformSensorDefinition, is(notNullValue()));
+		assertThat(receivedPlatformSensorDefinition.isActivated(), is(equalTo(platformSensorDefinitionData.isActivated())));
+		assertThat(receivedPlatformSensorDefinition.getFullyQualifiedName(), is(equalTo(platformSensorDefinitionData.getFullyQualifiedName())));
+		assertThat(receivedPlatformSensorDefinition.getId(), is(equalTo(platformSensorDefinitionData.getId())));
+		assertThat(receivedPlatformSensorDefinition.getProfileData(), is(equalTo(platformSensorDefinitionData.getProfileData())));
 	}
 
 	/**
@@ -167,22 +171,23 @@ public class PlatformSensorDefinitionDataDaoTest extends AbstractTransactionalTe
 		ProfileData receivedProfileData = profileDataDao.getProfile(profileData.getId());
 		Set<PlatformSensorDefinitionData> platformSensorDefinitions = receivedProfileData.getPlatformSensorDefinitions();
 
-		assertTrue(!platformSensorDefinitions.isEmpty());
+		assertThat(platformSensorDefinitions, is(not(empty())));
 
 		PlatformSensorDefinitionData receivedPlatformSensorDefinition = null;
 		for (PlatformSensorDefinitionData exceptionSensorDefinition : platformSensorDefinitions) {
 			receivedPlatformSensorDefinition = exceptionSensorDefinition;
 		}
 
-		assertNotNull(receivedPlatformSensorDefinition);
+		assertThat(receivedPlatformSensorDefinition, is(notNullValue()));
 		// check values against updated version
-		assertEquals(receivedPlatformSensorDefinition.isActivated(), platformSensorDefinitionData.isActivated());
-		assertEquals(receivedPlatformSensorDefinition.getFullyQualifiedName(), platformSensorDefinitionData.getFullyQualifiedName());
-		assertEquals(receivedPlatformSensorDefinition.getId(), platformSensorDefinitionData.getId());
-		assertEquals(receivedPlatformSensorDefinition.getProfileData(), platformSensorDefinitionData.getProfileData());
+		assertThat(receivedPlatformSensorDefinition.isActivated(), is(equalTo(platformSensorDefinitionData.isActivated())));
+		assertThat(receivedPlatformSensorDefinition.getFullyQualifiedName(), is(equalTo(platformSensorDefinitionData.getFullyQualifiedName())));
+		assertThat(receivedPlatformSensorDefinition.getId(), is(equalTo(platformSensorDefinitionData.getId())));
+		assertThat(receivedPlatformSensorDefinition.getProfileData(), is(equalTo(platformSensorDefinitionData.getProfileData())));
 		// check values against initial version
-		assertTrue(true != receivedPlatformSensorDefinition.isActivated());
-		assertTrue(!"fullyQualifiedName".equals(receivedPlatformSensorDefinition.getFullyQualifiedName()));
+		assertThat(receivedPlatformSensorDefinition.isActivated(), is(not(true)));
+		assertThat(receivedPlatformSensorDefinition.getFullyQualifiedName(), is(not("fullyQualifiedName")));
+
 	}
 
 	/**

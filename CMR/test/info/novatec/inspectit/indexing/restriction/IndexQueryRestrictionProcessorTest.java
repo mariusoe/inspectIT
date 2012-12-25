@@ -1,23 +1,25 @@
 package info.novatec.inspectit.indexing.restriction;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.restriction.impl.CachingIndexQueryRestrictionProcessor;
 import info.novatec.inspectit.indexing.restriction.impl.IndexQueryRestrictionFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
  * Tests the indexing restriction used with index queries.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport {
 
@@ -55,7 +57,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void equalsTrueRestriction() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.equal("id", 1L));
-		Assert.assertTrue(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(true));
 	}
 
 	/**
@@ -65,7 +67,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void equalsFalseRestriction() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.equal("id", 0L));
-		Assert.assertFalse(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(false));
 	}
 
 	/**
@@ -75,7 +77,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void notEqualsFalseRestriction() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.notEqual("id", 1L));
-		Assert.assertFalse(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(false));
 	}
 
 	/**
@@ -85,7 +87,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void notEqualsTrueRestriction() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.notEqual("id", 0L));
-		Assert.assertTrue(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(true));
 	}
 
 	/**
@@ -95,7 +97,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void isNull() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.isNull("id"));
-		Assert.assertFalse(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(false));
 	}
 
 	/**
@@ -105,7 +107,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void isNotNull() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.isNotNull("id"));
-		Assert.assertTrue(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(true));
 	}
 
 	/**
@@ -115,7 +117,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void greaterThanOne() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.greaterThan("id", 1L));
-		Assert.assertFalse(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(false));
 	}
 
 	/**
@@ -125,7 +127,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void greaterThanZero() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.greaterThan("id", 0L));
-		Assert.assertTrue(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(true));
 	}
 
 	/**
@@ -135,7 +137,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void greaterThanTwo() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.greaterThan("id", 2L));
-		Assert.assertFalse(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(false));
 	}
 
 	/**
@@ -145,7 +147,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void greaterEqualOne() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.greaterEqual("id", 1L));
-		Assert.assertTrue(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(true));
 	}
 
 	/**
@@ -155,7 +157,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void greaterEqualZero() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.greaterEqual("id", 0L));
-		Assert.assertTrue(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(true));
 	}
 
 	/**
@@ -165,7 +167,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void greaterEqualTwo() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.greaterEqual("id", 2L));
-		Assert.assertFalse(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(false));
 	}
 
 	/**
@@ -175,7 +177,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void lessThanOne() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.lessThan("id", 1L));
-		Assert.assertFalse(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(false));
 	}
 
 	/**
@@ -185,7 +187,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void lessThanZero() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.lessThan("id", 0L));
-		Assert.assertFalse(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(false));
 	}
 
 	/**
@@ -195,7 +197,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void lessThanTwo() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.lessThan("id", 2L));
-		Assert.assertTrue(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(true));
 	}
 
 	/**
@@ -205,7 +207,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void lessEqualOne() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.lessEqual("id", 1L));
-		Assert.assertTrue(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(true));
 	}
 
 	/**
@@ -215,7 +217,7 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void lessEqualZero() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.lessEqual("id", 0L));
-		Assert.assertFalse(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(false));
 	}
 
 	/**
@@ -225,7 +227,20 @@ public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport
 	public void lessEqualTwo() {
 		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
 		restrictions.add(IndexQueryRestrictionFactory.lessEqual("id", 2L));
-		Assert.assertTrue(processor.areAllRestrictionsFulfilled(timerData, restrictions));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(true));
 	}
 
+	/**
+	 * Tests is in collection restrictions.
+	 */
+	@Test
+	public void isInCollection() {
+		List<IIndexQueryRestriction> restrictions = new ArrayList<IIndexQueryRestriction>(1);
+		restrictions.add(IndexQueryRestrictionFactory.isInCollection("id", Collections.singletonList(1L)));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(true));
+
+		restrictions = new ArrayList<IIndexQueryRestriction>(1);
+		restrictions.add(IndexQueryRestrictionFactory.isInCollection("id", Collections.singletonList(2L)));
+		assertThat(processor.areAllRestrictionsFulfilled(timerData, restrictions), is(false));
+	}
 }

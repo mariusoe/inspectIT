@@ -1,10 +1,13 @@
 package info.novatec.inspectit.cmr.dao.ci.impl;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.testng.Assert.fail;
 import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.cmr.dao.ci.ProfileDataDao;
@@ -78,7 +81,7 @@ public class ProfileDataDaoTest extends AbstractTransactionalTestNGLogSupport {
 		profileData.setEnvironmentData(environmentData);
 
 		profileDataDao.addProfile(profileData);
-		assertTrue(profileData.getId() > 0);
+		assertThat(profileData.getId(), is(greaterThan(0L)));
 	}
 
 	/**
@@ -96,11 +99,11 @@ public class ProfileDataDaoTest extends AbstractTransactionalTestNGLogSupport {
 
 		ProfileData receivedProfileData = profileDataDao.getProfile(profileData.getId());
 
-		assertNotNull(receivedProfileData);
-		assertEquals(receivedProfileData.getDescription(), profileData.getDescription());
-		assertEquals(receivedProfileData.getId(), profileData.getId());
-		assertEquals(receivedProfileData.getName(), profileData.getName());
-		assertFalse(receivedProfileData.isInitialized());
+		assertThat(receivedProfileData, is(notNullValue()));
+		assertThat(receivedProfileData.getDescription(), is(equalTo(profileData.getDescription())));
+		assertThat(receivedProfileData.getId(), is(equalTo(profileData.getId())));
+		assertThat(receivedProfileData.getName(), is(equalTo(profileData.getName())));
+		assertThat(receivedProfileData.isInitialized(), is(false));
 	}
 
 	/**
@@ -124,16 +127,16 @@ public class ProfileDataDaoTest extends AbstractTransactionalTestNGLogSupport {
 
 		ProfileData receivedProfileData = profileDataDao.getProfile(profileData.getId());
 
-		assertNotNull(receivedProfileData);
+		assertThat(receivedProfileData, is(notNullValue()));
 		// check values against updated version
-		assertEquals(receivedProfileData.getDescription(), profileData.getDescription());
-		assertEquals(receivedProfileData.getEnvironmentData(), profileData.getEnvironmentData());
-		assertEquals(receivedProfileData.getId(), profileData.getId());
-		assertEquals(receivedProfileData.getName(), profileData.getName());
-		assertEquals(receivedProfileData.isInitialized(), profileData.isInitialized());
+		assertThat(receivedProfileData.getDescription(), is(equalTo(profileData.getDescription())));
+		assertThat(receivedProfileData.getEnvironmentData(), is(equalTo(profileData.getEnvironmentData())));
+		assertThat(receivedProfileData.getId(), is(equalTo(profileData.getId())));
+		assertThat(receivedProfileData.getName(), is(equalTo(profileData.getName())));
+		assertThat(receivedProfileData.isInitialized(), is(equalTo(profileData.isInitialized())));
 		// check values against initial version
-		assertTrue(!"description".equals(receivedProfileData.getDescription()));
-		assertTrue(!"name".equals(receivedProfileData.getName()));
+		assertThat(receivedProfileData.getDescription(), is(not("description")));
+		assertThat(receivedProfileData.getName(), is(not("name")));
 	}
 
 	/**
@@ -170,8 +173,7 @@ public class ProfileDataDaoTest extends AbstractTransactionalTestNGLogSupport {
 	@Test(dependsOnMethods = { "deleteProfile" })
 	public void getNonExistingProfile() {
 		ProfileData profile = profileDataDao.getProfile(1000);
-
-		assertNull(profile);
+		assertThat(profile, is(nullValue()));
 	}
 
 	/**
@@ -192,15 +194,15 @@ public class ProfileDataDaoTest extends AbstractTransactionalTestNGLogSupport {
 		profileDataDao.addProfile(profileData);
 
 		// check if profile is stored
-		assertNotNull(profileDataDao.getProfile(profileData.getId()));
+		assertThat(profileDataDao.getProfile(profileData.getId()), is(notNullValue()));
 
 		environmentDataDao.deleteEnvironment(environmentData.getId());
 
 		List<EnvironmentData> environments = environmentDataDao.getEnvironments();
-		assertTrue(environments.isEmpty());
+		assertThat(environments, is(empty()));
 
 		ProfileData profile = profileDataDao.getProfile(profileData.getId());
-		assertNull(profile);
+		assertThat(profile, is(nullValue()));
 	}
 
 	/**

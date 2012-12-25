@@ -1,8 +1,10 @@
 package info.novatec.inspectit.communication.data;
 
-import info.novatec.inspectit.communication.data.InvocationAwareData;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -26,10 +28,9 @@ public class InvocationAwareDataTest {
 
 		i1.aggregateInvocationAwareData(i2);
 
-		Assert.assertEquals(i1.getObjectsInInvocationsCount(), 2);
-		Assert.assertEquals(i1.getInvocationParentsIdSet().size(), 2);
-		Assert.assertTrue(i1.getInvocationParentsIdSet().contains(1L));
-		Assert.assertTrue(i1.getInvocationParentsIdSet().contains(2L));
+		assertThat(i1.getObjectsInInvocationsCount(), is(equalTo(2)));
+		assertThat(i1.getInvocationParentsIdSet().size(), is(equalTo(2)));
+		assertThat(i1.getInvocationParentsIdSet(), contains(1L, 2L));
 	}
 
 	/**
@@ -45,9 +46,9 @@ public class InvocationAwareDataTest {
 
 		i1.aggregateInvocationAwareData(i2);
 
-		Assert.assertEquals(i1.getObjectsInInvocationsCount(), 2);
-		Assert.assertEquals(i1.getInvocationParentsIdSet().size(), 1);
-		Assert.assertTrue(i1.getInvocationParentsIdSet().contains(1L));
+		assertThat(i1.getObjectsInInvocationsCount(), is(equalTo(2)));
+		assertThat(i1.getInvocationParentsIdSet().size(), is(equalTo(1)));
+		assertThat(i1.getInvocationParentsIdSet(), contains(1L));
 	}
 
 	/**
@@ -73,12 +74,9 @@ public class InvocationAwareDataTest {
 
 		i1.aggregateInvocationAwareData(i3);
 
-		Assert.assertEquals(i1.getObjectsInInvocationsCount(), 4);
-		Assert.assertEquals(i1.getInvocationParentsIdSet().size(), 4);
-		Assert.assertTrue(i1.getInvocationParentsIdSet().contains(1L));
-		Assert.assertTrue(i1.getInvocationParentsIdSet().contains(2L));
-		Assert.assertTrue(i1.getInvocationParentsIdSet().contains(3L));
-		Assert.assertTrue(i1.getInvocationParentsIdSet().contains(4L));
+		assertThat(i1.getObjectsInInvocationsCount(), is(equalTo(4)));
+		assertThat(i1.getInvocationParentsIdSet().size(), is(equalTo(4)));
+		assertThat(i1.getInvocationParentsIdSet(), contains(1L, 2L, 3L, 4L));
 	}
 
 	/**
@@ -104,10 +102,9 @@ public class InvocationAwareDataTest {
 
 		i1.aggregateInvocationAwareData(i3);
 
-		Assert.assertEquals(i1.getObjectsInInvocationsCount(), 4);
-		Assert.assertEquals(i1.getInvocationParentsIdSet().size(), 2);
-		Assert.assertTrue(i1.getInvocationParentsIdSet().contains(1L));
-		Assert.assertTrue(i1.getInvocationParentsIdSet().contains(2L));
+		assertThat(i1.getObjectsInInvocationsCount(), is(equalTo(4)));
+		assertThat(i1.getInvocationParentsIdSet().size(), is(equalTo(2)));
+		assertThat(i1.getInvocationParentsIdSet(), contains(1L, 2L));
 	}
 
 	/**

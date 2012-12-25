@@ -1,5 +1,8 @@
 package info.novatec.inspectit.agent.sensor.method.averagetimer.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
@@ -13,7 +16,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
 import info.novatec.inspectit.agent.config.IPropertyAccessor;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
@@ -225,13 +227,13 @@ public class AverageTimerHookTest extends AbstractLogSupport {
 		verify(coreService, times(2)).getMethodSensorData(sensorTypeId, methodId, null);
 		verify(registeredSensorConfig, times(2)).isPropertyAccess();
 
-		assertEquals(timerData.getPlatformIdent(), platformId);
-		assertEquals(timerData.getMethodIdent(), registeredMethodId);
-		assertEquals(timerData.getSensorTypeIdent(), registeredSensorTypeId);
-		assertEquals(timerData.getCount(), 2L);
-		assertEquals(timerData.getDuration(), fourthTimerValue - thirdTimerValue + secondTimerValue - firstTimerValue);
-		assertEquals(timerData.getMax(), fourthTimerValue - thirdTimerValue);
-		assertEquals(timerData.getMin(), secondTimerValue - firstTimerValue);
+		assertThat(timerData.getPlatformIdent(), is(equalTo(platformId)));
+		assertThat(timerData.getMethodIdent(), is(equalTo(registeredMethodId)));
+		assertThat(timerData.getSensorTypeIdent(), is(equalTo(registeredSensorTypeId)));
+		assertThat(timerData.getCount(), is(equalTo(2L)));
+		assertThat(timerData.getDuration(), is(equalTo(fourthTimerValue - thirdTimerValue + secondTimerValue - firstTimerValue)));
+		assertThat(timerData.getMax(), is(equalTo(fourthTimerValue - thirdTimerValue)));
+		assertThat(timerData.getMin(), is(equalTo(secondTimerValue - firstTimerValue)));
 
 		verifyNoMoreInteractions(timer, idManager, coreService, registeredSensorConfig);
 		verifyZeroInteractions(propertyAccessor, object, result);
@@ -295,13 +297,13 @@ public class AverageTimerHookTest extends AbstractLogSupport {
 		verify(coreService, times(2)).getMethodSensorData(sensorTypeId, methodId, null);
 		verify(registeredSensorConfig, times(2)).isPropertyAccess();
 
-		assertEquals(timerData.getPlatformIdent(), platformId);
-		assertEquals(timerData.getMethodIdent(), registeredMethodId);
-		assertEquals(timerData.getSensorTypeIdent(), registeredSensorTypeId);
-		assertEquals(timerData.getCount(), 2L);
-		assertEquals(timerData.getDuration(), fourthTimerValue - thirdTimerValue + secondTimerValue - firstTimerValue);
-		assertEquals(timerData.getMax(), secondTimerValue - firstTimerValue);
-		assertEquals(timerData.getMin(), fourthTimerValue - thirdTimerValue);
+		assertThat(timerData.getPlatformIdent(), is(equalTo(platformId)));
+		assertThat(timerData.getMethodIdent(), is(equalTo(registeredMethodId)));
+		assertThat(timerData.getSensorTypeIdent(), is(equalTo(registeredSensorTypeId)));
+		assertThat(timerData.getCount(), is(equalTo(2L)));
+		assertThat(timerData.getDuration(), is(equalTo(fourthTimerValue - thirdTimerValue + secondTimerValue - firstTimerValue)));
+		assertThat(timerData.getMax(), is(equalTo(secondTimerValue - firstTimerValue)));
+		assertThat(timerData.getMin(), is(equalTo(fourthTimerValue - thirdTimerValue)));
 
 		verifyNoMoreInteractions(timer, idManager, coreService, registeredSensorConfig);
 		verifyZeroInteractions(propertyAccessor, object, result);

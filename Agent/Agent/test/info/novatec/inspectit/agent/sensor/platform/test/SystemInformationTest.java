@@ -1,11 +1,13 @@
 package info.novatec.inspectit.agent.sensor.platform.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
@@ -132,32 +134,32 @@ public class SystemInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		SystemSensorData sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof SystemInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(SystemInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		SystemInformationData systemData = (SystemInformationData) sensorData;
 
 		// as there was only one data object values must be the
 		// same
-		assertEquals(systemData.getArchitecture(), architecture);
-		assertEquals(systemData.getAvailableProcessors(), availableProcessors);
-		assertEquals(systemData.getBootClassPath(), bootClassPath);
-		assertEquals(systemData.getClassPath(), classPath);
-		assertEquals(systemData.getInitHeapMemorySize(), initHeapMemorySize);
-		assertEquals(systemData.getInitNonHeapMemorySize(), initNonHeapMemorySize);
-		assertEquals(systemData.getJitCompilerName(), jitCompilerName);
-		assertEquals(systemData.getLibraryPath(), libraryPath);
-		assertEquals(systemData.getMaxHeapMemorySize(), maxHeapMemorySize);
-		assertEquals(systemData.getMaxNonHeapMemorySize(), maxNonHeapMemorySize);
-		assertEquals(systemData.getOsName(), osName);
-		assertEquals(systemData.getOsVersion(), osVersion);
-		assertEquals(systemData.getTotalPhysMemory(), totalPhysMemory);
-		assertEquals(systemData.getTotalSwapSpace(), totalSwapSpace);
-		assertEquals(systemData.getVmName(), vmName);
-		assertEquals(systemData.getVmSpecName(), vmSpecName);
-		assertEquals(systemData.getVmVendor(), vmVendor);
-		assertEquals(systemData.getVmVersion(), vmVersion);
+		assertThat(systemData.getArchitecture(), is(equalTo(architecture)));
+		assertThat(systemData.getAvailableProcessors(), is(equalTo(availableProcessors)));
+		assertThat(systemData.getBootClassPath(), is(equalTo(bootClassPath)));
+		assertThat(systemData.getClassPath(), is(equalTo(classPath)));
+		assertThat(systemData.getInitHeapMemorySize(), is(equalTo(initHeapMemorySize)));
+		assertThat(systemData.getInitNonHeapMemorySize(), is(equalTo(initNonHeapMemorySize)));
+		assertThat(systemData.getJitCompilerName(), is(equalTo(jitCompilerName)));
+		assertThat(systemData.getLibraryPath(), is(equalTo(libraryPath)));
+		assertThat(systemData.getMaxHeapMemorySize(), is(equalTo(maxHeapMemorySize)));
+		assertThat(systemData.getMaxNonHeapMemorySize(), is(equalTo(maxNonHeapMemorySize)));
+		assertThat(systemData.getOsName(), is(equalTo(osName)));
+		assertThat(systemData.getOsVersion(), is(equalTo(osVersion)));
+		assertThat(systemData.getTotalPhysMemory(), is(equalTo(totalPhysMemory)));
+		assertThat(systemData.getTotalSwapSpace(), is(equalTo(totalSwapSpace)));
+		assertThat(systemData.getVmName(), is(equalTo(vmName)));
+		assertThat(systemData.getVmSpecName(), is(equalTo(vmSpecName)));
+		assertThat(systemData.getVmVendor(), is(equalTo(vmVendor)));
+		assertThat(systemData.getVmVersion(), is(equalTo(vmVersion)));
 	}
 
 	/**
@@ -218,32 +220,32 @@ public class SystemInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		SystemSensorData sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof SystemInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(SystemInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		SystemInformationData systemData = (SystemInformationData) sensorData;
 
 		// as there was only one data object the values must be the
 		// same
-		assertEquals(systemData.getArchitecture(), empty);
-		assertEquals(systemData.getAvailableProcessors(), availableProcessors);
-		assertEquals(systemData.getBootClassPath(), empty);
-		assertEquals(systemData.getClassPath(), empty);
-		assertEquals(systemData.getInitHeapMemorySize(), initHeapMemorySize);
-		assertEquals(systemData.getInitNonHeapMemorySize(), initNonHeapMemorySize);
-		assertEquals(systemData.getJitCompilerName(), jitCompilerName);
-		assertEquals(systemData.getLibraryPath(), empty);
-		assertEquals(systemData.getMaxHeapMemorySize(), maxHeapMemorySize);
-		assertEquals(systemData.getMaxNonHeapMemorySize(), maxNonHeapMemorySize);
-		assertEquals(systemData.getOsName(), empty);
-		assertEquals(systemData.getOsVersion(), empty);
-		assertEquals(systemData.getTotalPhysMemory(), totalPhysMemory);
-		assertEquals(systemData.getTotalSwapSpace(), totalSwapSpace);
-		assertEquals(systemData.getVmName(), vmName);
-		assertEquals(systemData.getVmSpecName(), empty);
-		assertEquals(systemData.getVmVendor(), empty);
-		assertEquals(systemData.getVmVersion(), empty);
+		assertThat(systemData.getArchitecture(), is(equalTo(empty)));
+		assertThat(systemData.getAvailableProcessors(), is(equalTo(availableProcessors)));
+		assertThat(systemData.getBootClassPath(), is(equalTo(empty)));
+		assertThat(systemData.getClassPath(), is(equalTo(empty)));
+		assertThat(systemData.getInitHeapMemorySize(), is(equalTo(initHeapMemorySize)));
+		assertThat(systemData.getInitNonHeapMemorySize(), is(equalTo(initNonHeapMemorySize)));
+		assertThat(systemData.getJitCompilerName(), is(equalTo(jitCompilerName)));
+		assertThat(systemData.getLibraryPath(), is(equalTo(empty)));
+		assertThat(systemData.getMaxHeapMemorySize(), is(equalTo(maxHeapMemorySize)));
+		assertThat(systemData.getMaxNonHeapMemorySize(), is(equalTo(maxNonHeapMemorySize)));
+		assertThat(systemData.getOsName(), is(equalTo(empty)));
+		assertThat(systemData.getOsVersion(), is(equalTo(empty)));
+		assertThat(systemData.getTotalPhysMemory(), is(equalTo(totalPhysMemory)));
+		assertThat(systemData.getTotalSwapSpace(), is(equalTo(totalSwapSpace)));
+		assertThat(systemData.getVmName(), is(equalTo(vmName)));
+		assertThat(systemData.getVmSpecName(), is(equalTo(empty)));
+		assertThat(systemData.getVmVendor(), is(equalTo(empty)));
+		assertThat(systemData.getVmVersion(), is(equalTo(empty)));
 	}
 
 	/**
@@ -310,32 +312,32 @@ public class SystemInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		SystemSensorData sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof SystemInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(SystemInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		SystemInformationData systemData = (SystemInformationData) sensorData;
 
 		// as there was only one data object values must be the
 		// same
-		assertEquals(systemData.getArchitecture(), architecture);
-		assertEquals(systemData.getAvailableProcessors(), availableProcessors);
-		assertEquals(systemData.getBootClassPath(), bootClassPath);
-		assertEquals(systemData.getClassPath(), classPath);
-		assertEquals(systemData.getInitHeapMemorySize(), initHeapMemorySize);
-		assertEquals(systemData.getInitNonHeapMemorySize(), initNonHeapMemorySize);
-		assertEquals(systemData.getJitCompilerName(), jitCompilerName);
-		assertEquals(systemData.getLibraryPath(), libraryPath);
-		assertEquals(systemData.getMaxHeapMemorySize(), maxHeapMemorySize);
-		assertEquals(systemData.getMaxNonHeapMemorySize(), maxNonHeapMemorySize);
-		assertEquals(systemData.getOsName(), osName);
-		assertEquals(systemData.getOsVersion(), osVersion);
-		assertEquals(systemData.getTotalPhysMemory(), totalPhysMemory);
-		assertEquals(systemData.getTotalSwapSpace(), totalSwapSpace);
-		assertEquals(systemData.getVmName(), vmName);
-		assertEquals(systemData.getVmSpecName(), vmSpecName);
-		assertEquals(systemData.getVmVendor(), vmVendor);
-		assertEquals(systemData.getVmVersion(), vmVersion);
+		assertThat(systemData.getArchitecture(), is(equalTo(architecture)));
+		assertThat(systemData.getAvailableProcessors(), is(equalTo(availableProcessors)));
+		assertThat(systemData.getBootClassPath(), is(equalTo(bootClassPath)));
+		assertThat(systemData.getClassPath(), is(equalTo(classPath)));
+		assertThat(systemData.getInitHeapMemorySize(), is(equalTo(initHeapMemorySize)));
+		assertThat(systemData.getInitNonHeapMemorySize(), is(equalTo(initNonHeapMemorySize)));
+		assertThat(systemData.getJitCompilerName(), is(equalTo(jitCompilerName)));
+		assertThat(systemData.getLibraryPath(), is(equalTo(libraryPath)));
+		assertThat(systemData.getMaxHeapMemorySize(), is(equalTo(maxHeapMemorySize)));
+		assertThat(systemData.getMaxNonHeapMemorySize(), is(equalTo(maxNonHeapMemorySize)));
+		assertThat(systemData.getOsName(), is(equalTo(osName)));
+		assertThat(systemData.getOsVersion(), is(equalTo(osVersion)));
+		assertThat(systemData.getTotalPhysMemory(), is(equalTo(totalPhysMemory)));
+		assertThat(systemData.getTotalSwapSpace(), is(equalTo(totalSwapSpace)));
+		assertThat(systemData.getVmName(), is(equalTo(vmName)));
+		assertThat(systemData.getVmSpecName(), is(equalTo(vmSpecName)));
+		assertThat(systemData.getVmVendor(), is(equalTo(vmVendor)));
+		assertThat(systemData.getVmVersion(), is(equalTo(vmVersion)));
 	}
 
 	@Test
@@ -395,32 +397,32 @@ public class SystemInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		SystemSensorData sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof SystemInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(SystemInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		SystemInformationData systemData = (SystemInformationData) sensorData;
 
 		// as there was only one data object the values must be the
 		// same
-		assertEquals(systemData.getArchitecture(), architecture);
-		assertEquals(systemData.getAvailableProcessors(), availableProcessors);
-		assertEquals(systemData.getBootClassPath(), limit);
-		assertEquals(systemData.getClassPath(), limit);
-		assertEquals(systemData.getInitHeapMemorySize(), initHeapMemorySize);
-		assertEquals(systemData.getInitNonHeapMemorySize(), initNonHeapMemorySize);
-		assertEquals(systemData.getJitCompilerName(), jitCompilerName);
-		assertEquals(systemData.getLibraryPath(), limit);
-		assertEquals(systemData.getMaxHeapMemorySize(), maxHeapMemorySize);
-		assertEquals(systemData.getMaxNonHeapMemorySize(), maxNonHeapMemorySize);
-		assertEquals(systemData.getOsName(), osName);
-		assertEquals(systemData.getOsVersion(), osVersion);
-		assertEquals(systemData.getTotalPhysMemory(), totalPhysMemory);
-		assertEquals(systemData.getTotalSwapSpace(), totalSwapSpace);
-		assertEquals(systemData.getVmName(), vmName);
-		assertEquals(systemData.getVmSpecName(), vmSpecName);
-		assertEquals(systemData.getVmVendor(), vmVendor);
-		assertEquals(systemData.getVmVersion(), vmVersion);
+		assertThat(systemData.getArchitecture(), is(equalTo(architecture)));
+		assertThat(systemData.getAvailableProcessors(), is(equalTo(availableProcessors)));
+		assertThat(systemData.getBootClassPath(), is(equalTo(limit)));
+		assertThat(systemData.getClassPath(), is(equalTo(limit)));
+		assertThat(systemData.getInitHeapMemorySize(), is(equalTo(initHeapMemorySize)));
+		assertThat(systemData.getInitNonHeapMemorySize(), is(equalTo(initNonHeapMemorySize)));
+		assertThat(systemData.getJitCompilerName(), is(equalTo(jitCompilerName)));
+		assertThat(systemData.getLibraryPath(), is(equalTo(limit)));
+		assertThat(systemData.getMaxHeapMemorySize(), is(equalTo(maxHeapMemorySize)));
+		assertThat(systemData.getMaxNonHeapMemorySize(), is(equalTo(maxNonHeapMemorySize)));
+		assertThat(systemData.getOsName(), is(equalTo(osName)));
+		assertThat(systemData.getOsVersion(), is(equalTo(osVersion)));
+		assertThat(systemData.getTotalPhysMemory(), is(equalTo(totalPhysMemory)));
+		assertThat(systemData.getTotalSwapSpace(), is(equalTo(totalSwapSpace)));
+		assertThat(systemData.getVmName(), is(equalTo(vmName)));
+		assertThat(systemData.getVmSpecName(), is(equalTo(vmSpecName)));
+		assertThat(systemData.getVmVendor(), is(equalTo(vmVendor)));
+		assertThat(systemData.getVmVersion(), is(equalTo(vmVersion)));
 	}
 
 	/**

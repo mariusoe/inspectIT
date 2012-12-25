@@ -1,8 +1,12 @@
 package info.novatec.inspectit.cmr.dao.ci.impl;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.cmr.dao.ci.SensorTypeDataDao;
 import info.novatec.inspectit.cmr.test.AbstractTransactionalTestNGLogSupport;
@@ -86,7 +90,7 @@ public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGLogSupport
 		sensorTypeData.setEnvironmentData(environmentData);
 
 		sensorTypeDataDao.addSensorType(sensorTypeData);
-		assertTrue(sensorTypeData.getId() > 0);
+		assertThat(sensorTypeData.getId(), is(greaterThan(0L)));
 	}
 
 	/**
@@ -114,21 +118,21 @@ public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGLogSupport
 		List<EnvironmentData> environments = environmentDataDao.getEnvironments();
 		Set<SensorTypeData> sensorTypes = environments.get(0).getSensorTypes();
 
-		assertTrue(!sensorTypes.isEmpty());
+		assertThat(sensorTypes, is(not(empty())));
 
 		SensorTypeData receivedSensorTypeData = null;
 		for (SensorTypeData sensorType : sensorTypes) {
 			receivedSensorTypeData = sensorType;
 		}
 
-		assertNotNull(receivedSensorTypeData);
-		assertEquals(receivedSensorTypeData.getDescription(), sensorTypeData.getDescription());
-		assertEquals(receivedSensorTypeData.getEnvironmentData(), sensorTypeData.getEnvironmentData());
-		assertEquals(receivedSensorTypeData.getFullyQualifiedName(), sensorTypeData.getFullyQualifiedName());
-		assertEquals(receivedSensorTypeData.getId(), sensorTypeData.getId());
-		assertEquals(receivedSensorTypeData.getName(), sensorTypeData.getName());
-		assertEquals(receivedSensorTypeData.getPriority(), SensorTypeData.LOW);
-		assertEquals(receivedSensorTypeData.getTypeOption(), SensorTypeData.NO_TYPE_OPTION);
+		assertThat(receivedSensorTypeData, is(notNullValue()));
+		assertThat(receivedSensorTypeData.getDescription(), is(equalTo(sensorTypeData.getDescription())));
+		assertThat(receivedSensorTypeData.getEnvironmentData(), is(equalTo(sensorTypeData.getEnvironmentData())));
+		assertThat(receivedSensorTypeData.getFullyQualifiedName(), is(equalTo(sensorTypeData.getFullyQualifiedName())));
+		assertThat(receivedSensorTypeData.getId(), is(equalTo(sensorTypeData.getId())));
+		assertThat(receivedSensorTypeData.getName(), is(equalTo(sensorTypeData.getName())));
+		assertThat(receivedSensorTypeData.getPriority(), is(equalTo(SensorTypeData.LOW)));
+		assertThat(receivedSensorTypeData.getTypeOption(), is(equalTo(SensorTypeData.NO_TYPE_OPTION)));
 	}
 
 	/**
@@ -165,28 +169,28 @@ public class SensorTypeDataDaoTest extends AbstractTransactionalTestNGLogSupport
 		List<EnvironmentData> environments = environmentDataDao.getEnvironments();
 		Set<SensorTypeData> sensorTypes = environments.get(0).getSensorTypes();
 
-		assertTrue(!sensorTypes.isEmpty());
+		assertThat(sensorTypes, is(not(empty())));
 
 		SensorTypeData receivedSensorTypeData = null;
 		for (SensorTypeData sensorType : sensorTypes) {
 			receivedSensorTypeData = sensorType;
 		}
 
-		assertNotNull(receivedSensorTypeData);
+		assertThat(receivedSensorTypeData, is(notNullValue()));
 		// check values against updated version
-		assertEquals(receivedSensorTypeData.getDescription(), sensorTypeData.getDescription());
-		assertEquals(receivedSensorTypeData.getEnvironmentData(), sensorTypeData.getEnvironmentData());
-		assertEquals(receivedSensorTypeData.getFullyQualifiedName(), sensorTypeData.getFullyQualifiedName());
-		assertEquals(receivedSensorTypeData.getId(), sensorTypeData.getId());
-		assertEquals(receivedSensorTypeData.getName(), sensorTypeData.getName());
-		assertEquals(receivedSensorTypeData.getPriority(), SensorTypeData.MAX);
-		assertEquals(receivedSensorTypeData.getTypeOption(), SensorTypeData.AGGREGATE);
+		assertThat(receivedSensorTypeData.getDescription(), is(equalTo(sensorTypeData.getDescription())));
+		assertThat(receivedSensorTypeData.getEnvironmentData(), is(equalTo(sensorTypeData.getEnvironmentData())));
+		assertThat(receivedSensorTypeData.getFullyQualifiedName(), is(equalTo(sensorTypeData.getFullyQualifiedName())));
+		assertThat(receivedSensorTypeData.getId(), is(equalTo(sensorTypeData.getId())));
+		assertThat(receivedSensorTypeData.getName(), is(equalTo(sensorTypeData.getName())));
+		assertThat(receivedSensorTypeData.getPriority(), is(equalTo(SensorTypeData.MAX)));
+		assertThat(receivedSensorTypeData.getTypeOption(), is(equalTo(SensorTypeData.AGGREGATE)));
 		// check values against initial version
-		assertTrue(!"description".equals(receivedSensorTypeData.getDescription()));
-		assertTrue(!"fullyQualifiedName".equals(receivedSensorTypeData.getFullyQualifiedName()));
-		assertTrue(!"name".equals(receivedSensorTypeData.getName()));
-		assertTrue(!(SensorTypeData.LOW == receivedSensorTypeData.getPriority()));
-		assertTrue(!(SensorTypeData.NO_TYPE_OPTION == receivedSensorTypeData.getTypeOption()));
+		assertThat(receivedSensorTypeData.getDescription(), is(not("description")));
+		assertThat(receivedSensorTypeData.getFullyQualifiedName(), is(not("fullyQualifiedName")));
+		assertThat(receivedSensorTypeData.getName(), is(not("name")));
+		assertThat(receivedSensorTypeData.getPriority(), is(not(SensorTypeData.LOW)));
+		assertThat(receivedSensorTypeData.getTypeOption(), is(not(SensorTypeData.NO_TYPE_OPTION)));
 	}
 
 	/**

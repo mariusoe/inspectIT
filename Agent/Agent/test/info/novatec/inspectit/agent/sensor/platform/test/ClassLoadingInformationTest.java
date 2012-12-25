@@ -1,11 +1,13 @@
 package info.novatec.inspectit.agent.sensor.platform.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
@@ -73,26 +75,26 @@ public class ClassLoadingInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		SystemSensorData sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof ClassLoadingInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(ClassLoadingInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		ClassLoadingInformationData classLoadingData = (ClassLoadingInformationData) sensorData;
-		assertEquals(classLoadingData.getCount(), 1);
+		assertThat(classLoadingData.getCount(), is(equalTo(1)));
 
 		// as there was only one data object min/max/total the values must be the
 		// same
-		assertEquals(classLoadingData.getMinLoadedClassCount(), loadedClassCount);
-		assertEquals(classLoadingData.getMaxLoadedClassCount(), loadedClassCount);
-		assertEquals(classLoadingData.getTotalLoadedClassCount(), loadedClassCount);
+		assertThat(classLoadingData.getMinLoadedClassCount(), is(equalTo(loadedClassCount)));
+		assertThat(classLoadingData.getMaxLoadedClassCount(), is(equalTo(loadedClassCount)));
+		assertThat(classLoadingData.getTotalLoadedClassCount(), is(equalTo(loadedClassCount)));
 
-		assertEquals(classLoadingData.getMinTotalLoadedClassCount(), totalLoadedClassCount);
-		assertEquals(classLoadingData.getMaxTotalLoadedClassCount(), totalLoadedClassCount);
-		assertEquals(classLoadingData.getTotalTotalLoadedClassCount(), totalLoadedClassCount);
+		assertThat(classLoadingData.getMinTotalLoadedClassCount(), is(equalTo(totalLoadedClassCount)));
+		assertThat(classLoadingData.getMaxTotalLoadedClassCount(), is(equalTo(totalLoadedClassCount)));
+		assertThat(classLoadingData.getTotalTotalLoadedClassCount(), is(equalTo(totalLoadedClassCount)));
 
-		assertEquals(classLoadingData.getMinUnloadedClassCount(), unloadedClassCount);
-		assertEquals(classLoadingData.getMaxUnloadedClassCount(), unloadedClassCount);
-		assertEquals(classLoadingData.getTotalUnloadedClassCount(), unloadedClassCount);
+		assertThat(classLoadingData.getMinUnloadedClassCount(), is(equalTo(unloadedClassCount)));
+		assertThat(classLoadingData.getMaxUnloadedClassCount(), is(equalTo(unloadedClassCount)));
+		assertThat(classLoadingData.getTotalUnloadedClassCount(), is(equalTo(unloadedClassCount)));
 	}
 
 	@Test
@@ -125,26 +127,26 @@ public class ClassLoadingInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		SystemSensorData parameter = sensorDataCaptor.getValue();
-		assertTrue(parameter instanceof ClassLoadingInformationData);
-		assertEquals(parameter.getPlatformIdent(), platformIdent);
-		assertEquals(parameter.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(parameter, is(instanceOf(ClassLoadingInformationData.class)));
+		assertThat(parameter.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(parameter.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		ClassLoadingInformationData classLoadingData = (ClassLoadingInformationData) parameter;
-		assertEquals(classLoadingData.getCount(), 1);
+		assertThat(classLoadingData.getCount(), is(equalTo(1)));
 
 		// as there was only one data object min/max/total the values must be the
 		// same
-		assertEquals(classLoadingData.getMinLoadedClassCount(), loadedClassCount);
-		assertEquals(classLoadingData.getMaxLoadedClassCount(), loadedClassCount);
-		assertEquals(classLoadingData.getTotalLoadedClassCount(), loadedClassCount);
+		assertThat(classLoadingData.getMinLoadedClassCount(), is(equalTo(loadedClassCount)));
+		assertThat(classLoadingData.getMaxLoadedClassCount(), is(equalTo(loadedClassCount)));
+		assertThat(classLoadingData.getTotalLoadedClassCount(), is(equalTo(loadedClassCount)));
 
-		assertEquals(classLoadingData.getMinTotalLoadedClassCount(), totalLoadedClassCount);
-		assertEquals(classLoadingData.getMaxTotalLoadedClassCount(), totalLoadedClassCount);
-		assertEquals(classLoadingData.getTotalTotalLoadedClassCount(), totalLoadedClassCount);
+		assertThat(classLoadingData.getMinTotalLoadedClassCount(), is(equalTo(totalLoadedClassCount)));
+		assertThat(classLoadingData.getMaxTotalLoadedClassCount(), is(equalTo(totalLoadedClassCount)));
+		assertThat(classLoadingData.getTotalTotalLoadedClassCount(), is(equalTo(totalLoadedClassCount)));
 
-		assertEquals(classLoadingData.getMinUnloadedClassCount(), unloadedClassCount);
-		assertEquals(classLoadingData.getMaxUnloadedClassCount(), unloadedClassCount);
-		assertEquals(classLoadingData.getTotalUnloadedClassCount(), unloadedClassCount);
+		assertThat(classLoadingData.getMinUnloadedClassCount(), is(equalTo(unloadedClassCount)));
+		assertThat(classLoadingData.getMaxUnloadedClassCount(), is(equalTo(unloadedClassCount)));
+		assertThat(classLoadingData.getTotalUnloadedClassCount(), is(equalTo(unloadedClassCount)));
 
 		// ------------------------
 		// SECOND UPDATE CALL
@@ -160,24 +162,24 @@ public class ClassLoadingInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		parameter = sensorDataCaptor.getValue();
-		assertTrue(parameter instanceof ClassLoadingInformationData);
-		assertEquals(parameter.getPlatformIdent(), platformIdent);
-		assertEquals(parameter.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(parameter, is(instanceOf(ClassLoadingInformationData.class)));
+		assertThat(parameter.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(parameter.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		classLoadingData = (ClassLoadingInformationData) parameter;
-		assertEquals(classLoadingData.getCount(), 2);
+		assertThat(classLoadingData.getCount(), is(equalTo(2)));
 
-		assertEquals(classLoadingData.getMinLoadedClassCount(), loadedClassCount);
-		assertEquals(classLoadingData.getMaxLoadedClassCount(), loadedClassCount2);
-		assertEquals(classLoadingData.getTotalLoadedClassCount(), loadedClassCount + loadedClassCount2);
+		assertThat(classLoadingData.getMinLoadedClassCount(), is(equalTo(loadedClassCount)));
+		assertThat(classLoadingData.getMaxLoadedClassCount(), is(equalTo(loadedClassCount2)));
+		assertThat(classLoadingData.getTotalLoadedClassCount(), is(equalTo(loadedClassCount + loadedClassCount2)));
 
-		assertEquals(classLoadingData.getMinTotalLoadedClassCount(), totalLoadedClassCount);
-		assertEquals(classLoadingData.getMaxTotalLoadedClassCount(), totalLoadedClassCount2);
-		assertEquals(classLoadingData.getTotalTotalLoadedClassCount(), totalLoadedClassCount + totalLoadedClassCount2);
+		assertThat(classLoadingData.getMinTotalLoadedClassCount(), is(equalTo(totalLoadedClassCount)));
+		assertThat(classLoadingData.getMaxTotalLoadedClassCount(), is(equalTo(totalLoadedClassCount2)));
+		assertThat(classLoadingData.getTotalTotalLoadedClassCount(), is(equalTo(totalLoadedClassCount + totalLoadedClassCount2)));
 
-		assertEquals(classLoadingData.getMinUnloadedClassCount(), unloadedClassCount);
-		assertEquals(classLoadingData.getMaxUnloadedClassCount(), unloadedClassCount);
-		assertEquals(classLoadingData.getTotalUnloadedClassCount(), unloadedClassCount + unloadedClassCount);
+		assertThat(classLoadingData.getMinUnloadedClassCount(), is(equalTo(unloadedClassCount)));
+		assertThat(classLoadingData.getMaxUnloadedClassCount(), is(equalTo(unloadedClassCount)));
+		assertThat(classLoadingData.getTotalUnloadedClassCount(), is(equalTo(unloadedClassCount + unloadedClassCount)));
 	}
 
 	@Test

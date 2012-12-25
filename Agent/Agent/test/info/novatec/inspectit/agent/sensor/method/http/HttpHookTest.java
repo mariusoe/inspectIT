@@ -1,5 +1,8 @@
 package info.novatec.inspectit.agent.sensor.method.http;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
@@ -25,7 +28,6 @@ import javax.servlet.http.HttpSession;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -474,12 +476,12 @@ public class HttpHookTest extends AbstractLogSupport {
 			}
 			HttpTimerData other = (HttpTimerData) object;
 
-			Assert.assertEquals(data.getUri(), other.getUri());
-			Assert.assertEquals(data.getRequestMethod(), other.getRequestMethod());
-			Assert.assertEquals(data.getAttributes(), other.getAttributes());
-			Assert.assertEquals(data.getHeaders(), other.getHeaders());
-			Assert.assertEquals(data.getSessionAttributes(), other.getSessionAttributes());
-			Assert.assertEquals(data.getParameters(), other.getParameters());
+			assertThat(data.getUri(), is(equalTo(other.getUri())));
+			assertThat(data.getRequestMethod(), is(equalTo(other.getRequestMethod())));
+			assertThat(data.getAttributes(), is(equalTo(other.getAttributes())));
+			assertThat(data.getHeaders(), is(equalTo(other.getHeaders())));
+			assertThat(data.getSessionAttributes(), is(equalTo(other.getSessionAttributes())));
+			assertThat(data.getParameters(), is(equalTo(other.getParameters())));
 
 			return true;
 		}

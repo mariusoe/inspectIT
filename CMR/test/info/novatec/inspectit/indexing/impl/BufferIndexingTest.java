@@ -1,5 +1,12 @@
 package info.novatec.inspectit.indexing.impl;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
@@ -24,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -87,7 +93,7 @@ public class BufferIndexingTest {
 		rootBranch.put(defaultData2);
 
 		List<DefaultData> results = rootBranch.query(indexQuery);
-		Assert.assertEquals(2, results.size());
+		assertThat(results.size(), is(equalTo(2)));
 	}
 
 	/**
@@ -104,7 +110,7 @@ public class BufferIndexingTest {
 		when(defaultData.getId()).thenReturn(1L);
 		rootBranch.put(defaultData);
 
-		Assert.assertEquals(defaultData, rootBranch.get(defaultData));
+		assertThat(rootBranch.get(defaultData), is(equalTo(defaultData)));
 	}
 
 	/**
@@ -132,9 +138,9 @@ public class BufferIndexingTest {
 		indexQuery.setPlatformIdent(10L);
 
 		List<DefaultData> results = rootBranch.query(indexQuery);
-		Assert.assertEquals(1, results.size());
+		assertThat(results.size(), is(equalTo(1)));
 		for (DefaultData result : results) {
-			Assert.assertEquals(result.getPlatformIdent(), 10L);
+			assertThat(result.getPlatformIdent(), is(equalTo(10L)));
 		}
 	}
 
@@ -163,9 +169,9 @@ public class BufferIndexingTest {
 		indexQuery.setMethodIdent(10L);
 
 		List<MethodSensorData> results = rootBranch.query(indexQuery);
-		Assert.assertEquals(1, results.size());
+		assertThat(results.size(), is(equalTo(1)));
 		for (MethodSensorData result : results) {
-			Assert.assertEquals(result.getMethodIdent(), 10L);
+			assertThat(result.getMethodIdent(), is(equalTo(10L)));
 		}
 	}
 
@@ -194,9 +200,9 @@ public class BufferIndexingTest {
 		indexQuery.setObjectClasses(searchedClasses);
 
 		List<DefaultData> results = rootBranch.query(indexQuery);
-		Assert.assertEquals(1, results.size());
+		assertThat(results.size(), is(equalTo(1)));
 		for (DefaultData result : results) {
-			Assert.assertEquals(result.getClass(), defaultData1.getClass());
+			assertThat(result, is(instanceOf(defaultData1.getClass())));
 		}
 	}
 
@@ -229,10 +235,10 @@ public class BufferIndexingTest {
 		indexQuery.setToDate(plusHour);
 
 		List<DefaultData> results = rootBranch.query(indexQuery);
-		Assert.assertEquals(results.size(), 1);
+		assertThat(results.size(), is(equalTo(1)));
 		for (DefaultData result : results) {
-			Assert.assertEquals(minusHour.compareTo(result.getTimeStamp()) <= 0, true);
-			Assert.assertEquals(plusHour.compareTo(result.getTimeStamp()) >= 0, true);
+			assertThat(result.getTimeStamp().getTime(), is(greaterThanOrEqualTo(minusHour.getTime())));
+			assertThat(result.getTimeStamp().getTime(), is(lessThanOrEqualTo(plusHour.getTime())));
 		}
 	}
 
@@ -266,19 +272,19 @@ public class BufferIndexingTest {
 		indexQuery.setPlatformIdent(10L);
 
 		List<DefaultData> results = rootBranch.query(indexQuery);
-		Assert.assertEquals(2, results.size());
+		assertThat(results.size(), is(equalTo(2)));
 		for (DefaultData result : results) {
-			Assert.assertEquals(result.getPlatformIdent(), 10L);
+			assertThat(result.getPlatformIdent(), is(equalTo(10L)));
 		}
 
 		indexQuery.setPlatformIdent(10L);
 		indexQuery.setSensorTypeIdent(10L);
 
 		results = rootBranch.query(indexQuery);
-		Assert.assertEquals(1, results.size());
+		assertThat(results.size(), is(equalTo(1)));
 		for (DefaultData result : results) {
-			Assert.assertEquals(result.getPlatformIdent(), 10L);
-			Assert.assertEquals(result.getSensorTypeIdent(), 10L);
+			assertThat(result.getPlatformIdent(), is(equalTo(10L)));
+			assertThat(result.getSensorTypeIdent(), is(equalTo(10L)));
 		}
 
 	}
@@ -298,7 +304,7 @@ public class BufferIndexingTest {
 		rootBranch.put(defaultData);
 		rootBranch.getAndRemove(defaultData);
 
-		Assert.assertEquals(null, rootBranch.get(defaultData));
+		assertThat(rootBranch.get(defaultData), is(nullValue()));
 	}
 
 	/**
@@ -316,7 +322,7 @@ public class BufferIndexingTest {
 		rootBranch.put(defaultData);
 
 		rootBranch.clearAll();
-		Assert.assertEquals(0, rootBranch.getNumberOfElements());
+		assertThat(rootBranch.getNumberOfElements(), is(equalTo(0L)));
 	}
 
 }

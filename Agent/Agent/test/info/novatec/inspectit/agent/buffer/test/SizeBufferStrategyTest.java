@@ -1,11 +1,12 @@
 package info.novatec.inspectit.agent.buffer.test;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import info.novatec.inspectit.agent.buffer.IBufferStrategy;
 import info.novatec.inspectit.agent.buffer.impl.SizeBufferStrategy;
+import info.novatec.inspectit.communication.MethodSensorData;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +20,7 @@ import org.testng.annotations.Test;
 
 public class SizeBufferStrategyTest {
 
-	private IBufferStrategy bufferStrategy;
+	private IBufferStrategy<MethodSensorData> bufferStrategy;
 
 	@BeforeMethod
 	public void initTestClass() {
@@ -28,20 +29,19 @@ public class SizeBufferStrategyTest {
 
 	@Test
 	public void addAndRetrieve() {
-		bufferStrategy.addMeasurements(Collections.EMPTY_LIST);
+		bufferStrategy.addMeasurements(Collections.<MethodSensorData> emptyList());
 
-		assertTrue(bufferStrategy.hasNext());
-		@SuppressWarnings("unchecked")
-		List<Object> list = (List<Object>) bufferStrategy.next();
-		assertNotNull(list);
-		assertSame(list, Collections.EMPTY_LIST);
+		assertThat(bufferStrategy.hasNext(), is(true));
+		List<MethodSensorData> list = bufferStrategy.next();
+		assertThat(list, is(notNullValue()));
+		assertThat(list, is(equalTo(Collections.<MethodSensorData> emptyList())));
 
-		assertFalse(bufferStrategy.hasNext());
+		assertThat(bufferStrategy.hasNext(), is(false));
 	}
 
 	@Test
 	public void emptyBuffer() {
-		assertFalse(bufferStrategy.hasNext());
+		assertThat(bufferStrategy.hasNext(), is(false));
 	}
 
 	@Test(expectedExceptions = { NoSuchElementException.class })
@@ -56,7 +56,7 @@ public class SizeBufferStrategyTest {
 
 	@Test(expectedExceptions = { NoSuchElementException.class })
 	public void exceptionAfterDoubleRetrieve() {
-		bufferStrategy.addMeasurements(Collections.EMPTY_LIST);
+		bufferStrategy.addMeasurements(Collections.<MethodSensorData> emptyList());
 		bufferStrategy.next();
 		bufferStrategy.next();
 	}
@@ -65,7 +65,7 @@ public class SizeBufferStrategyTest {
 	public void callInit() {
 		Map<String, String> settings = new HashMap<String, String>();
 		settings.put("size", "3");
-		bufferStrategy.init(Collections.EMPTY_MAP);
+		bufferStrategy.init(Collections.<String, String> emptyMap());
 	}
 
 	@Test
@@ -74,11 +74,11 @@ public class SizeBufferStrategyTest {
 		settings.put("size", "3");
 		bufferStrategy.init(settings);
 
-		List<Object> listOne = new ArrayList<Object>(0);
-		List<Object> listTwo = new ArrayList<Object>(0);
-		List<Object> listThree = new ArrayList<Object>(0);
-		List<Object> listFour = new ArrayList<Object>(0);
-		List<Object> listFive = new ArrayList<Object>(0);
+		List<MethodSensorData> listOne = new ArrayList<MethodSensorData>(0);
+		List<MethodSensorData> listTwo = new ArrayList<MethodSensorData>(0);
+		List<MethodSensorData> listThree = new ArrayList<MethodSensorData>(0);
+		List<MethodSensorData> listFour = new ArrayList<MethodSensorData>(0);
+		List<MethodSensorData> listFive = new ArrayList<MethodSensorData>(0);
 
 		bufferStrategy.addMeasurements(listOne);
 		bufferStrategy.addMeasurements(listTwo);
@@ -86,11 +86,11 @@ public class SizeBufferStrategyTest {
 		bufferStrategy.addMeasurements(listFour);
 		bufferStrategy.addMeasurements(listFive);
 
-		assertSame(bufferStrategy.next(), listFive);
-		assertSame(bufferStrategy.next(), listFour);
-		assertSame(bufferStrategy.next(), listThree);
+		assertThat(bufferStrategy.next(), is(equalTo(listFive)));
+		assertThat(bufferStrategy.next(), is(equalTo(listFour)));
+		assertThat(bufferStrategy.next(), is(equalTo(listThree)));
 
-		assertFalse(bufferStrategy.hasNext());
+		assertThat(bufferStrategy.hasNext(), is(false));
 	}
 
 }

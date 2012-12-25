@@ -1,11 +1,14 @@
 package info.novatec.inspectit.agent.sensor.platform.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
@@ -78,19 +81,19 @@ public class CpuInformationTest extends AbstractLogSupport {
 
 		// Cast the parameter to the expected concrete class:
 		SystemSensorData parameter = sensorDataCaptor.getValue();
-		assertTrue(parameter instanceof CpuInformationData);
-		assertEquals(parameter.getPlatformIdent(), platformIdent);
-		assertEquals(parameter.getSensorTypeIdent(), sensorType);
+		assertThat(parameter, is(instanceOf(CpuInformationData.class)));
+		assertThat(parameter.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(parameter.getSensorTypeIdent(), is(equalTo(sensorType)));
 
 		CpuInformationData data = (CpuInformationData) parameter;
-		assertEquals(data.getCount(), 1);
+		assertThat(data.getCount(), is(1));
 
 		// CPU usage can only be deduced after two sets of data are captured
-		assertEquals(data.getMaxCpuUsage(), 0f, 0.01f);
-		assertEquals(data.getMinCpuUsage(), 0f, 0.01f);
-		assertEquals(data.getTotalCpuUsage(), 0f, 0.01f);
+		assertThat((double) data.getMaxCpuUsage(), is(closeTo(0d, 0.01d)));
+		assertThat((double) data.getMinCpuUsage(), is(closeTo(0d, 0.01d)));
+		assertThat((double) data.getTotalCpuUsage(), is(closeTo(0d, 0.01d)));
 
-		assertEquals(data.getProcessCpuTime(), processCpuTime);
+		assertThat(data.getProcessCpuTime(), is(equalTo(processCpuTime)));
 	}
 
 	@Test
@@ -135,19 +138,19 @@ public class CpuInformationTest extends AbstractLogSupport {
 
 		// Cast the parameter to the expected concrete class:
 		parameter = sensorDataCaptor.getValue();
-		assertTrue(parameter instanceof CpuInformationData);
-		assertEquals(parameter.getPlatformIdent(), platformIdent);
-		assertEquals(parameter.getSensorTypeIdent(), sensorType);
+		assertThat(parameter, is(instanceOf(CpuInformationData.class)));
+		assertThat(parameter.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(parameter.getSensorTypeIdent(), is(equalTo(sensorType)));
 
 		CpuInformationData data = (CpuInformationData) parameter;
-		assertEquals(data.getCount(), 1);
+		assertThat(data.getCount(), is(1));
 
 		// CPU usage can only be deduced after two sets of data are captured
-		assertEquals(data.getMaxCpuUsage(), 0.0f, 0.01f);
-		assertEquals(data.getMinCpuUsage(), 0.0f, 0.01f);
-		assertEquals(data.getTotalCpuUsage(), 0.0f, 0.01f);
+		assertThat((double) data.getMaxCpuUsage(), is(closeTo(0d, 0.01d)));
+		assertThat((double) data.getMinCpuUsage(), is(closeTo(0d, 0.01d)));
+		assertThat((double) data.getTotalCpuUsage(), is(closeTo(0d, 0.01d)));
 
-		assertEquals(data.getProcessCpuTime(), processCpuTime1);
+		assertThat(data.getProcessCpuTime(), is(equalTo(processCpuTime1)));
 
 		// ------------------------
 		// SECOND UPDATE CALL
@@ -158,21 +161,21 @@ public class CpuInformationTest extends AbstractLogSupport {
 
 		// Cast the parameter to the expected concrete class:
 		parameter = sensorDataCaptor.getValue();
-		assertTrue(parameter instanceof CpuInformationData);
-		assertEquals(parameter.getPlatformIdent(), platformIdent);
-		assertEquals(parameter.getSensorTypeIdent(), sensorType);
+		assertThat(parameter, is(instanceOf(CpuInformationData.class)));
+		assertThat(parameter.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(parameter.getSensorTypeIdent(), is(equalTo(sensorType)));
 
 		data = (CpuInformationData) parameter;
-		assertEquals(data.getCount(), 2);
+		assertThat(data.getCount(), is(2));
 
 		// CPU usage can only be deduced after two sets of data are captured
-		assertEquals(data.getMaxCpuUsage(), cpuUsage2, 0.01f);
+		assertThat((double) data.getMaxCpuUsage(), is(closeTo(cpuUsage2, 0.01d)));
 
 		// the first data set was 0
-		assertEquals(data.getMinCpuUsage(), 0, 0.01f);
-		assertEquals(data.getTotalCpuUsage(), cpuUsage2, 0.01f);
+		assertThat((double) data.getMinCpuUsage(), is(closeTo(0d, 0.01d)));
+		assertThat((double) data.getTotalCpuUsage(), is(closeTo(cpuUsage2, 0.01d)));
 
-		assertEquals(data.getProcessCpuTime(), processCpuTime2);
+		assertThat(data.getProcessCpuTime(), is(equalTo(processCpuTime2)));
 	}
 
 	@Test

@@ -1,7 +1,9 @@
 package info.novatec.inspectit.agent.sensor.platform.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
 import info.novatec.inspectit.agent.sensor.platform.provider.OperatingSystemInfoProvider;
 import info.novatec.inspectit.agent.sensor.platform.provider.sun.SunOperatingSystemInfoProvider;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
@@ -56,14 +58,14 @@ public class CpuUsageCalculatorTest extends AbstractLogSupport {
 		when(osBean.getProcessCpuTime()).thenReturn(processCpuTime1).thenReturn(processCpuTime2);
 
 		float cpuUsage1 = wrapper.retrieveCpuUsage();
-		assertEquals(cpuUsage1, 0.0f, 0.01f);
+		assertThat((double) cpuUsage1, is(closeTo(0.0d, 0.01d)));
 
 		float cpuUsage2 = wrapper.retrieveCpuUsage();
 		// CPU usage can only be deduced after the second call
 		long process = (processCpuTime2 - processCpuTime1);
 		long upAsNano = ((uptime2 - uptime1) * 1000 * 1000);
 		float expectedUsage = (float) process / upAsNano * 100;
-		assertEquals(cpuUsage2, expectedUsage, 0.01f);
+		assertThat((double) cpuUsage2, is(closeTo((double) expectedUsage, 0.01d)));
 	}
 
 	@Override

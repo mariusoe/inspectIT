@@ -1,13 +1,14 @@
 package info.novatec.inspectit.agent.analyzer.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.impl.InheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.test.classes.AbstractSubTest;
@@ -52,22 +53,21 @@ public class InheritanceAnalyzerTest extends MockInit {
 		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(ClassPool.getDefault());
 
 		// main test
-		@SuppressWarnings("unchecked")
 		Iterator<CtClass> iterator = inheritanceAnalyzer.getSuperclassIterator(classLoader, className);
-		assertNotNull(iterator);
-		assertTrue(iterator.hasNext());
+		assertThat(iterator, is(notNullValue()));
+		assertThat(iterator.hasNext(), is(true));
 		CtClass superclass = iterator.next();
-		assertEquals(superclass.getName(), AbstractSubTest.class.getName());
+		assertThat(superclass.getName(), is(equalTo(AbstractSubTest.class.getName())));
 
-		assertTrue(iterator.hasNext());
+		assertThat(iterator.hasNext(), is(true));
 		superclass = iterator.next();
-		assertEquals(superclass.getName(), AbstractTest.class.getName());
+		assertThat(superclass.getName(), is(equalTo(AbstractTest.class.getName())));
 
-		assertTrue(iterator.hasNext());
+		assertThat(iterator.hasNext(), is(true));
 		superclass = iterator.next();
-		assertEquals(superclass.getName(), Object.class.getName());
+		assertThat(superclass.getName(), is(equalTo(Object.class.getName())));
 
-		assertFalse(iterator.hasNext());
+		assertThat(iterator.hasNext(), is(false));
 
 		verify(classPoolAnalyzer, times(1)).getClassPool(classLoader);
 		verifyNoMoreInteractions(classPoolAnalyzer);
@@ -86,26 +86,25 @@ public class InheritanceAnalyzerTest extends MockInit {
 		interfaceList.add(ClassPool.getDefault().get(ITest.class.getName()));
 
 		// main test
-		@SuppressWarnings("unchecked")
 		Iterator<CtClass> iterator = inheritanceAnalyzer.getInterfaceIterator(classLoader, className);
-		assertNotNull(iterator);
+		assertThat(iterator, is(notNullValue()));
 
-		assertTrue(iterator.hasNext());
+		assertThat(iterator.hasNext(), is(true));
 		CtClass interfaceCtClass = iterator.next();
-		assertTrue(interfaceList.contains(interfaceCtClass));
+		assertThat(interfaceList, hasItem(interfaceCtClass));
 		interfaceList.remove(interfaceCtClass);
 
-		assertTrue(iterator.hasNext());
+		assertThat(iterator.hasNext(), is(true));
 		interfaceCtClass = iterator.next();
-		assertTrue(interfaceList.contains(interfaceCtClass));
+		assertThat(interfaceList, hasItem(interfaceCtClass));
 		interfaceList.remove(interfaceCtClass);
 
-		assertTrue(iterator.hasNext());
+		assertThat(iterator.hasNext(), is(true));
 		interfaceCtClass = iterator.next();
-		assertTrue(interfaceList.contains(interfaceCtClass));
+		assertThat(interfaceList, hasItem(interfaceCtClass));
 		interfaceList.remove(interfaceCtClass);
 
-		assertFalse(iterator.hasNext());
+		assertThat(iterator.hasNext(), is(false));
 
 		verify(classPoolAnalyzer, times(1)).getClassPool(classLoader);
 		verifyNoMoreInteractions(classPoolAnalyzer);
@@ -153,10 +152,9 @@ public class InheritanceAnalyzerTest extends MockInit {
 		ClassLoader classLoader = Object.class.getClassLoader();
 		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(ClassPool.getDefault());
 
-		@SuppressWarnings("unchecked")
 		Iterator<CtClass> iterator = inheritanceAnalyzer.getSuperclassIterator(classLoader, Object.class.getName());
-		assertNotNull(iterator);
-		assertFalse(iterator.hasNext());
+		assertThat(iterator, is(notNullValue()));
+		assertThat(iterator.hasNext(), is(false));
 
 		verify(classPoolAnalyzer, times(1)).getClassPool(classLoader);
 		verifyNoMoreInteractions(classPoolAnalyzer);
@@ -168,10 +166,9 @@ public class InheritanceAnalyzerTest extends MockInit {
 		ClassLoader classLoader = Object.class.getClassLoader();
 		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(ClassPool.getDefault());
 
-		@SuppressWarnings("unchecked")
 		Iterator<CtClass> iterator = inheritanceAnalyzer.getInterfaceIterator(classLoader, Object.class.getName());
-		assertNotNull(iterator);
-		assertFalse(iterator.hasNext());
+		assertThat(iterator, is(notNullValue()));
+		assertThat(iterator.hasNext(), is(false));
 
 		verify(classPoolAnalyzer, times(1)).getClassPool(classLoader);
 		verifyNoMoreInteractions(classPoolAnalyzer);
@@ -187,10 +184,10 @@ public class InheritanceAnalyzerTest extends MockInit {
 
 		// main test
 		boolean subclassOfThrowable = inheritanceAnalyzer.subclassOf(className, "java.lang.Throwable", classPool);
-		assertTrue(subclassOfThrowable);
+		assertThat(subclassOfThrowable, is(true));
 
 		boolean subclassOfException = inheritanceAnalyzer.subclassOf(className, "java.lang.Exception", classPool);
-		assertTrue(subclassOfException);
+		assertThat(subclassOfException, is(true));
 	}
 
 	@Test
@@ -202,7 +199,7 @@ public class InheritanceAnalyzerTest extends MockInit {
 		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(classPool);
 
 		boolean subclassOfError = inheritanceAnalyzer.subclassOf(className, "java.lang.Error", classPool);
-		assertTrue(subclassOfError);
+		assertThat(subclassOfError, is(true));
 	}
 
 }

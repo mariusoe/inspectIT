@@ -1,11 +1,12 @@
 package info.novatec.inspectit.agent.buffer.test;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import info.novatec.inspectit.agent.buffer.IBufferStrategy;
 import info.novatec.inspectit.agent.buffer.impl.SimpleBufferStrategy;
+import info.novatec.inspectit.communication.MethodSensorData;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +17,7 @@ import org.testng.annotations.Test;
 
 public class SimpleBufferStrategyTest {
 
-	private IBufferStrategy bufferStrategy;
+	private IBufferStrategy<MethodSensorData> bufferStrategy;
 
 	@BeforeMethod
 	public void initTestClass() {
@@ -25,20 +26,19 @@ public class SimpleBufferStrategyTest {
 
 	@Test
 	public void addAndRetrieve() {
-		bufferStrategy.addMeasurements(Collections.EMPTY_LIST);
+		bufferStrategy.addMeasurements(Collections.<MethodSensorData> emptyList());
 
-		assertTrue(bufferStrategy.hasNext());
-		@SuppressWarnings("unchecked")
-		List<Object> list = (List<Object>) bufferStrategy.next();
-		assertNotNull(list);
-		assertSame(list, Collections.EMPTY_LIST);
+		assertThat(bufferStrategy.hasNext(), is(true));
+		List<MethodSensorData> list = bufferStrategy.next();
+		assertThat(list, is(notNullValue()));
+		assertThat(list, is(equalTo(Collections.<MethodSensorData> emptyList())));
 
-		assertFalse(bufferStrategy.hasNext());
+		assertThat(bufferStrategy.hasNext(), is(false));
 	}
 
 	@Test
 	public void emptyBuffer() {
-		assertFalse(bufferStrategy.hasNext());
+		assertThat(bufferStrategy.hasNext(), is(false));
 	}
 
 	@Test(expectedExceptions = { NoSuchElementException.class })
@@ -53,14 +53,14 @@ public class SimpleBufferStrategyTest {
 
 	@Test(expectedExceptions = { NoSuchElementException.class })
 	public void exceptionAfterDoubleRetrieve() {
-		bufferStrategy.addMeasurements(Collections.EMPTY_LIST);
+		bufferStrategy.addMeasurements(Collections.<MethodSensorData> emptyList());
 		bufferStrategy.next();
 		bufferStrategy.next();
 	}
 
 	@Test
 	public void callInit() {
-		bufferStrategy.init(Collections.EMPTY_MAP);
+		bufferStrategy.init(Collections.<String, String> emptyMap());
 	}
 
 }

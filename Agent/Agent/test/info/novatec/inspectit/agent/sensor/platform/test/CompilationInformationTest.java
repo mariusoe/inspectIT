@@ -1,11 +1,13 @@
 package info.novatec.inspectit.agent.sensor.platform.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
@@ -68,18 +70,18 @@ public class CompilationInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		SystemSensorData sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof CompilationInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(CompilationInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		CompilationInformationData compilationData = (CompilationInformationData) sensorData;
-		assertEquals(compilationData.getCount(), 1);
+		assertThat(compilationData.getCount(), is(equalTo(1)));
 
 		// as there was only one data object min/max/total the values must be the
 		// same
-		assertEquals(compilationData.getMinTotalCompilationTime(), totalCompilationTime);
-		assertEquals(compilationData.getMaxTotalCompilationTime(), totalCompilationTime);
-		assertEquals(compilationData.getTotalTotalCompilationTime(), totalCompilationTime);
+		assertThat(compilationData.getMinTotalCompilationTime(), is(equalTo(totalCompilationTime)));
+		assertThat(compilationData.getMaxTotalCompilationTime(), is(equalTo(totalCompilationTime)));
+		assertThat(compilationData.getTotalTotalCompilationTime(), is(equalTo(totalCompilationTime)));
 	}
 
 	@Test
@@ -107,18 +109,18 @@ public class CompilationInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		SystemSensorData sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof CompilationInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(CompilationInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		CompilationInformationData compilationData = (CompilationInformationData) sensorData;
-		assertEquals(compilationData.getCount(), 1);
+		assertThat(compilationData.getCount(), is(equalTo(1)));
 
 		// as there was only one data object min/max/total the values must be the
 		// same
-		assertEquals(compilationData.getMinTotalCompilationTime(), totalCompilationTime);
-		assertEquals(compilationData.getMaxTotalCompilationTime(), totalCompilationTime);
-		assertEquals(compilationData.getTotalTotalCompilationTime(), totalCompilationTime);
+		assertThat(compilationData.getMinTotalCompilationTime(), is(equalTo(totalCompilationTime)));
+		assertThat(compilationData.getMaxTotalCompilationTime(), is(equalTo(totalCompilationTime)));
+		assertThat(compilationData.getTotalTotalCompilationTime(), is(equalTo(totalCompilationTime)));
 
 		// ------------------------
 		// SECOND UPDATE CALL
@@ -130,16 +132,16 @@ public class CompilationInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof CompilationInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(CompilationInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		compilationData = (CompilationInformationData) sensorData;
-		assertEquals(compilationData.getCount(), 2);
+		assertThat(compilationData.getCount(), is(equalTo(2)));
 
-		assertEquals(compilationData.getMinTotalCompilationTime(), totalCompilationTime);
-		assertEquals(compilationData.getMaxTotalCompilationTime(), totalCompilationTime2);
-		assertEquals(compilationData.getTotalTotalCompilationTime(), totalCompilationTime + totalCompilationTime2);
+		assertThat(compilationData.getMinTotalCompilationTime(), is(equalTo(totalCompilationTime)));
+		assertThat(compilationData.getMaxTotalCompilationTime(), is(equalTo(totalCompilationTime2)));
+		assertThat(compilationData.getTotalTotalCompilationTime(), is(equalTo(totalCompilationTime + totalCompilationTime2)));
 	}
 
 	/**
@@ -171,18 +173,18 @@ public class CompilationInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		SystemSensorData sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof CompilationInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(CompilationInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		CompilationInformationData compilationData = (CompilationInformationData) sensorData;
-		assertEquals(compilationData.getCount(), 1);
+		assertThat(compilationData.getCount(), is(equalTo(1)));
 
 		// as there was only one data object min/max/total the values must be the
 		// same
-		assertEquals(compilationData.getMinTotalCompilationTime(), totalCompilationTime);
-		assertEquals(compilationData.getMaxTotalCompilationTime(), totalCompilationTime);
-		assertEquals(compilationData.getTotalTotalCompilationTime(), totalCompilationTime);
+		assertThat(compilationData.getMinTotalCompilationTime(), is(equalTo(totalCompilationTime)));
+		assertThat(compilationData.getMaxTotalCompilationTime(), is(equalTo(totalCompilationTime)));
+		assertThat(compilationData.getTotalTotalCompilationTime(), is(equalTo(totalCompilationTime)));
 	}
 
 	@Test

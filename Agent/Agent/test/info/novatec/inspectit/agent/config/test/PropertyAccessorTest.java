@@ -2,9 +2,9 @@ package info.novatec.inspectit.agent.config.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
+import static org.hamcrest.Matchers.notNullValue;
 import info.novatec.inspectit.agent.config.IPropertyAccessor;
 import info.novatec.inspectit.agent.config.PropertyAccessException;
 import info.novatec.inspectit.agent.config.impl.PropertyAccessor;
@@ -56,7 +56,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		start.setContentType(ParameterContentType.FIELD);
 
 		String result = propertyAccessor.getPropertyContent(start, person, null, resultValueMock);
-		assertEquals(result, "Dirk");
+		assertThat(result, is("Dirk"));
 		Mockito.verifyZeroInteractions(resultValueMock);
 	}
 
@@ -74,7 +74,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		start.setPathToContinue(path);
 
 		String result = propertyAccessor.getPropertyContent(start, person, null, resultValueMock);
-		assertEquals(result, "Dirk");
+		assertThat(result, is("Dirk"));
 		Mockito.verifyZeroInteractions(resultValueMock);
 	}
 
@@ -191,7 +191,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		Object[] parameters = { null, peter };
 
 		String result = propertyAccessor.getPropertyContent(start, new Object(), parameters, resultValueMock);
-		assertEquals(result, "Michael");
+		assertThat(result, is("Michael"));
 		Mockito.verifyZeroInteractions(resultValueMock);
 	}
 
@@ -232,20 +232,20 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		start.setPathToContinue(pathOne);
 		propertyAccessorList.add(start);
 
-		assertEquals(propertyAccessorList.size(), 3);
+		assertThat(propertyAccessorList, hasSize(3));
 
 		List<ParameterContentData> parameterContentList = propertyAccessor.getParameterContentData(propertyAccessorList, peter, new Object[] { peter }, resultValueMock);
 
 		// size should be reduced to one
-		assertEquals(propertyAccessorList.size(), 1);
+		assertThat(propertyAccessorList, hasSize(1));
 		// so is the size of the parameter content
-		assertNotNull(parameterContentList);
-		assertEquals(parameterContentList.size(), 1);
+		assertThat(parameterContentList, is(notNullValue()));
+		assertThat(parameterContentList, hasSize(1));
 		// changed due to xstream, the ' at the beginning will be always removed
 		// if displayed to the end-user.
-		assertEquals(parameterContentList.get(0).getContent(), "Hans");
-		assertEquals(parameterContentList.get(0).getSignaturePosition(), 0);
-		assertEquals(parameterContentList.get(0).getName(), "name");
+		assertThat(parameterContentList.get(0).getContent(), is("Hans"));
+		assertThat(parameterContentList.get(0).getSignaturePosition(), is(0));
+		assertThat(parameterContentList.get(0).getName(), is("name"));
 	}
 
 	@Test
@@ -268,7 +268,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		path.setPathToContinue(path2);
 
 		String result = propertyAccessor.getPropertyContent(start, peter, null, resultValueMock);
-		assertEquals(new Integer(result).intValue(), 2);
+		assertThat(Integer.parseInt(result), is(2));
 		Mockito.verifyZeroInteractions(resultValueMock);
 	}
 
@@ -301,7 +301,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 	public void invokeListSizeMethod() throws PropertyAccessException {
 		// create initial object relation
 		Person peter = new Person("Peter");
-		List foreNames = new ArrayList<String>();
+		List<String> foreNames = new ArrayList<String>();
 		foreNames.add("blub");
 		foreNames.add("blub2");
 		foreNames.add("blub3");
@@ -320,7 +320,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		path.setPathToContinue(path2);
 
 		String result = propertyAccessor.getPropertyContent(start, peter, null, resultValueMock);
-		assertEquals(new Integer(result).intValue(), 3);
+		assertThat(Integer.parseInt(result), is(3));
 		Mockito.verifyZeroInteractions(resultValueMock);
 	}
 
@@ -334,7 +334,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		start.setContentType(ParameterContentType.RETURN);
 
 		String result = propertyAccessor.getPropertyContent(start, null, null, "Peter");
-		assertEquals(result, "Peter");
+		assertThat(result, is("Peter"));
 	}
 
 	@Test
@@ -350,7 +350,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		start.setContentType(ParameterContentType.RETURN);
 
 		String result = propertyAccessor.getPropertyContent(start, null, null, peter);
-		assertEquals(result, "Peter");
+		assertThat(result, is("Peter"));
 	}
 
 	@Test
@@ -371,7 +371,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		propertyAccessorList.add(start);
 
 		String result = propertyAccessor.getPropertyContent(start, null, null, peter);
-		assertEquals(result, "Hans");
+		assertThat(result, is("Hans"));
 	}
 
 	@Test(expectedExceptions = { PropertyAccessException.class })
@@ -432,7 +432,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		start.setPathToContinue(pathOne);
 		propertyAccessorList.add(start);
 
-		assertEquals(propertyAccessorList.size(), 3);
+		assertThat(propertyAccessorList, hasSize(3));
 
 		// Creating concurrent access
 		Iterator<PropertyPathStart> i = propertyAccessorList.iterator();
@@ -443,15 +443,15 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 
 		// Double check results, in case of missing exception
 		// size should be reduced to one
-		assertThat(propertyAccessorList.size(), equalTo(1));
+		assertThat(propertyAccessorList, hasSize(1));
 		// so is the size of the parameter content
-		assertNotNull(parameterContentList);
-		assertThat(parameterContentList.size(), equalTo(1));
+		assertThat(parameterContentList, is(notNullValue()));
+		assertThat(parameterContentList, hasSize(1));
 		// changed due to xstream, the ' at the beginning will be always removed
 		// if displayed to the end-user.
-		assertThat(parameterContentList.get(0).getContent(), equalTo("Jurgen"));
-		assertThat(parameterContentList.get(0).getSignaturePosition(), equalTo(0));
-		assertThat(parameterContentList.get(0).getName(), equalTo("name"));
+		assertThat(parameterContentList.get(0).getContent(), is("Jurgen"));
+		assertThat(parameterContentList.get(0).getSignaturePosition(), is(0));
+		assertThat(parameterContentList.get(0).getName(), is("name"));
 
 	}
 

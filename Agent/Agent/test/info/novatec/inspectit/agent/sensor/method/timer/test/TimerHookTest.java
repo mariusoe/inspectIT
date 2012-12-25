@@ -1,5 +1,8 @@
 package info.novatec.inspectit.agent.sensor.method.timer.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
@@ -13,7 +16,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
 import info.novatec.inspectit.agent.config.IPropertyAccessor;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
@@ -135,11 +137,11 @@ public class TimerHookTest extends AbstractLogSupport {
 		verify(registeredSensorConfig, times(2)).isPropertyAccess();
 
 		TimerRawVO timerRawVO = (TimerRawVO) plainTimerStorage.finalizeDataObject();
-		assertEquals(timerRawVO.getPlatformIdent(), platformId);
-		assertEquals(timerRawVO.getMethodIdent(), registeredMethodId);
-		assertEquals(timerRawVO.getSensorTypeIdent(), registeredSensorTypeId);
-		assertEquals(((TimerRawContainer) timerRawVO.getData().get(0)).getData()[0], secondTimerValue - firstTimerValue);
-		assertEquals(((TimerRawContainer) timerRawVO.getData().get(0)).getData()[1], fourthTimerValue - thirdTimerValue);
+		assertThat(timerRawVO.getPlatformIdent(), is(equalTo(platformId)));
+		assertThat(timerRawVO.getMethodIdent(), is(equalTo(registeredMethodId)));
+		assertThat(timerRawVO.getSensorTypeIdent(), is(equalTo(registeredSensorTypeId)));
+		assertThat(((TimerRawContainer) timerRawVO.getData().get(0)).getData()[0], is(equalTo(secondTimerValue - firstTimerValue)));
+		assertThat(((TimerRawContainer) timerRawVO.getData().get(0)).getData()[1], is(equalTo(fourthTimerValue - thirdTimerValue)));
 
 		verifyNoMoreInteractions(timer, idManager, coreService, registeredSensorConfig);
 		verifyZeroInteractions(propertyAccessor, object, result);

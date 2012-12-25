@@ -1,7 +1,9 @@
 package info.novatec.inspectit.cmr.dao.ci.impl;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.testng.Assert.fail;
 import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.cmr.dao.ci.ProfileDataDao;
@@ -113,7 +115,7 @@ public class LazyInitializationTest extends AbstractTransactionalTestNGLogSuppor
 	public void getSensorTypes() {
 		try {
 			Set<SensorTypeData> sensorTypes = retrievedEnvironment.getSensorTypes();
-			assertTrue(sensorTypes.isEmpty());
+			assertThat(sensorTypes, is(empty()));
 		} catch (LazyInitializationException e) {
 			fail("Sensor types are not loaded immediately with the environment. Check the hibernate mapping for this relationship. Also check the join mode used for retrieving the data");
 		}
@@ -129,7 +131,7 @@ public class LazyInitializationTest extends AbstractTransactionalTestNGLogSuppor
 	public void getProfiles() {
 		try {
 			Set<ProfileData> profiles = retrievedEnvironment.getProfiles();
-			assertEquals(profiles.size(), 1);
+			assertThat(profiles.size(), is(equalTo(1)));
 		} catch (LazyInitializationException e) {
 			fail("Profiles are not loaded immediately with the environment. Check the hibernate mapping for this relationship. Also check the join mode used for retrieving the data");
 		}
@@ -185,7 +187,7 @@ public class LazyInitializationTest extends AbstractTransactionalTestNGLogSuppor
 	@Test
 	public void getExceptionSensorDefinitionsFromProfile() {
 		Set<ExceptionSensorDefinitionData> exceptionSensorDefinitions = profileWithSensorDefinitions.getExceptionSensorDefinitions();
-		assertTrue(exceptionSensorDefinitions.isEmpty());
+		assertThat(exceptionSensorDefinitions, is(empty()));
 	}
 
 	/**
@@ -196,7 +198,7 @@ public class LazyInitializationTest extends AbstractTransactionalTestNGLogSuppor
 	@Test
 	public void getMethodSensorDefinitionsFromProfile() {
 		Set<MethodSensorDefinitionData> methodSensorDefinitions = profileWithSensorDefinitions.getMethodSensorDefinitions();
-		assertTrue(methodSensorDefinitions.isEmpty());
+		assertThat(methodSensorDefinitions, is(empty()));
 	}
 
 	/**
@@ -207,7 +209,7 @@ public class LazyInitializationTest extends AbstractTransactionalTestNGLogSuppor
 	@Test
 	public void getPlatformSensorDefinitionsFromProfile() {
 		Set<PlatformSensorDefinitionData> platformSensorDefinitions = profileWithSensorDefinitions.getPlatformSensorDefinitions();
-		assertTrue(platformSensorDefinitions.isEmpty());
+		assertThat(platformSensorDefinitions, is(empty()));
 	}
 
 	/**

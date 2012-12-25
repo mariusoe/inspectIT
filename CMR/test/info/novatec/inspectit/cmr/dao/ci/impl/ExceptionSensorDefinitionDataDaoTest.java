@@ -1,8 +1,12 @@
 package info.novatec.inspectit.cmr.dao.ci.impl;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.testng.Assert.fail;
 import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.cmr.dao.ci.ExceptionSensorDefinitionDataDao;
@@ -105,7 +109,7 @@ public class ExceptionSensorDefinitionDataDaoTest extends AbstractTransactionalT
 		exceptionSensorDefinitionData.setProfileData(profileData);
 
 		exceptionSensorDefinitionDataDao.addExceptionSensorDefinition(exceptionSensorDefinitionData);
-		assertTrue(exceptionSensorDefinitionData.getId() > 0);
+		assertThat(exceptionSensorDefinitionData.getId(), is(greaterThan(0L)));
 	}
 
 	/**
@@ -132,20 +136,20 @@ public class ExceptionSensorDefinitionDataDaoTest extends AbstractTransactionalT
 		ProfileData receivedProfileData = profileDataDao.getProfile(profileData.getId());
 		Set<ExceptionSensorDefinitionData> exceptionSensorDefinitions = receivedProfileData.getExceptionSensorDefinitions();
 
-		assertTrue(!exceptionSensorDefinitions.isEmpty());
+		assertThat(exceptionSensorDefinitions, is(not(empty())));
 
 		ExceptionSensorDefinitionData receivedExceptionSensorDefinition = null;
 		for (ExceptionSensorDefinitionData exceptionSensorDefinition : exceptionSensorDefinitions) {
 			receivedExceptionSensorDefinition = exceptionSensorDefinition;
 		}
 
-		assertNotNull(receivedExceptionSensorDefinition);
-		assertEquals(receivedExceptionSensorDefinition.isActivated(), exceptionSensorDefinitionData.isActivated());
-		assertEquals(receivedExceptionSensorDefinition.getDescription(), exceptionSensorDefinitionData.getDescription());
-		assertEquals(receivedExceptionSensorDefinition.getFullyQualifiedName(), exceptionSensorDefinitionData.getFullyQualifiedName());
-		assertEquals(receivedExceptionSensorDefinition.getId(), exceptionSensorDefinitionData.getId());
-		assertEquals(receivedExceptionSensorDefinition.getProfileData(), exceptionSensorDefinitionData.getProfileData());
-		assertEquals(receivedExceptionSensorDefinition.getSensorOption(), exceptionSensorDefinitionData.getSensorOption());
+		assertThat(receivedExceptionSensorDefinition, is(notNullValue()));
+		assertThat(receivedExceptionSensorDefinition.isActivated(), is(equalTo(exceptionSensorDefinitionData.isActivated())));
+		assertThat(receivedExceptionSensorDefinition.getDescription(), is(equalTo(exceptionSensorDefinitionData.getDescription())));
+		assertThat(receivedExceptionSensorDefinition.getFullyQualifiedName(), is(equalTo(exceptionSensorDefinitionData.getFullyQualifiedName())));
+		assertThat(receivedExceptionSensorDefinition.getId(), is(equalTo(exceptionSensorDefinitionData.getId())));
+		assertThat(receivedExceptionSensorDefinition.getProfileData(), is(equalTo(exceptionSensorDefinitionData.getProfileData())));
+		assertThat(receivedExceptionSensorDefinition.getSensorOption(), is(equalTo(exceptionSensorDefinitionData.getSensorOption())));
 	}
 
 	/**
@@ -180,27 +184,27 @@ public class ExceptionSensorDefinitionDataDaoTest extends AbstractTransactionalT
 		ProfileData receivedProfileData = profileDataDao.getProfile(profileData.getId());
 		Set<ExceptionSensorDefinitionData> exceptionSensorDefinitions = receivedProfileData.getExceptionSensorDefinitions();
 
-		assertTrue(!exceptionSensorDefinitions.isEmpty());
+		assertThat(exceptionSensorDefinitions, is(not(empty())));
 
 		ExceptionSensorDefinitionData receivedExceptionSensorDefinition = null;
 		for (ExceptionSensorDefinitionData exceptionSensorDefinition : exceptionSensorDefinitions) {
 			receivedExceptionSensorDefinition = exceptionSensorDefinition;
 		}
 
-		assertNotNull(receivedExceptionSensorDefinition);
+		assertThat(receivedExceptionSensorDefinition, is(notNullValue()));
 		// check values against updated version
-		assertEquals(receivedExceptionSensorDefinition.isActivated(), exceptionSensorDefinitionData.isActivated());
-		assertEquals(receivedExceptionSensorDefinition.getDescription(), exceptionSensorDefinitionData.getDescription());
-		assertEquals(receivedExceptionSensorDefinition.getFullyQualifiedName(), exceptionSensorDefinitionData.getFullyQualifiedName());
-		assertEquals(receivedExceptionSensorDefinition.getId(), exceptionSensorDefinitionData.getId());
-		assertEquals(receivedExceptionSensorDefinition.getProfileData(), exceptionSensorDefinitionData.getProfileData());
-		assertEquals(receivedExceptionSensorDefinition.getSensorOption(), exceptionSensorDefinitionData.getSensorOption());
-		assertEquals(receivedExceptionSensorDefinition.getSensorOption(), ExceptionSensorDefinitionData.INTERFACE);
+		assertThat(receivedExceptionSensorDefinition.isActivated(), is(equalTo(exceptionSensorDefinitionData.isActivated())));
+		assertThat(receivedExceptionSensorDefinition.getDescription(), is(equalTo(exceptionSensorDefinitionData.getDescription())));
+		assertThat(receivedExceptionSensorDefinition.getFullyQualifiedName(), is(equalTo(exceptionSensorDefinitionData.getFullyQualifiedName())));
+		assertThat(receivedExceptionSensorDefinition.getId(), is(equalTo(exceptionSensorDefinitionData.getId())));
+		assertThat(receivedExceptionSensorDefinition.getProfileData(), is(equalTo(exceptionSensorDefinitionData.getProfileData())));
+		assertThat(receivedExceptionSensorDefinition.getSensorOption(), is(equalTo(exceptionSensorDefinitionData.getSensorOption())));
+		assertThat(receivedExceptionSensorDefinition.getSensorOption(), is(equalTo(ExceptionSensorDefinitionData.INTERFACE)));
 		// check values against initial version
-		assertTrue(true != receivedExceptionSensorDefinition.isActivated());
-		assertTrue(!"description".equals(receivedExceptionSensorDefinition.getDescription()));
-		assertTrue(!"fullyQualifiedName".equals(receivedExceptionSensorDefinition.getFullyQualifiedName()));
-		assertTrue(!(ExceptionSensorDefinitionData.NO_SENSOR_OPTION == receivedExceptionSensorDefinition.getSensorOption()));
+		assertThat(receivedExceptionSensorDefinition.isActivated(), is(not(true)));
+		assertThat(receivedExceptionSensorDefinition.getDescription(), is(not("description")));
+		assertThat(receivedExceptionSensorDefinition.getFullyQualifiedName(), is(not("fullyQualifiedName")));
+		assertThat(receivedExceptionSensorDefinition.getSensorOption(), is(not(ExceptionSensorDefinitionData.NO_SENSOR_OPTION)));
 	}
 
 	/**

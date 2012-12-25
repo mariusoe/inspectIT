@@ -1,15 +1,17 @@
 package info.novatec.inspectit.agent.analyzer.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatcher;
@@ -47,9 +49,9 @@ public class DirectMatcherTest extends MockInit {
 		unregisteredSensorConfig.setTargetPackageName("");
 		unregisteredSensorConfig.setTargetClassName("info.novatec.test.Test");
 		unregisteredSensorConfig.setTargetMethodName("testMethod");
-		unregisteredSensorConfig.setParameterTypes(Collections.EMPTY_LIST);
+		unregisteredSensorConfig.setParameterTypes(Collections.<String> emptyList());
 		unregisteredSensorConfig.setPropertyAccess(false);
-		unregisteredSensorConfig.setSettings(Collections.EMPTY_MAP);
+		unregisteredSensorConfig.setSettings(Collections.<String, Object> emptyMap());
 
 		matcher = new DirectMatcher(classPoolAnalyzer, unregisteredSensorConfig);
 	}
@@ -57,7 +59,7 @@ public class DirectMatcherTest extends MockInit {
 	@Test
 	public void compareClassName() throws NotFoundException {
 		boolean compareResult = matcher.compareClassName(this.getClass().getClassLoader(), "info.novatec.test.Test");
-		assertTrue(compareResult);
+		assertThat(compareResult, is(true));
 
 		verifyZeroInteractions(classPoolAnalyzer);
 	}
@@ -65,7 +67,7 @@ public class DirectMatcherTest extends MockInit {
 	@Test
 	public void failCompareClassName() throws NotFoundException {
 		boolean compareResult = matcher.compareClassName(this.getClass().getClassLoader(), "info.novatec.test.Fail");
-		assertFalse(compareResult);
+		assertThat(compareResult, is(false));
 
 		verifyZeroInteractions(classPoolAnalyzer);
 	}
@@ -73,7 +75,7 @@ public class DirectMatcherTest extends MockInit {
 	@Test
 	public void emptyClassName() throws NotFoundException {
 		boolean compareResult = matcher.compareClassName(this.getClass().getClassLoader(), "");
-		assertFalse(compareResult);
+		assertThat(compareResult, is(false));
 
 		verifyZeroInteractions(classPoolAnalyzer);
 	}
@@ -81,7 +83,7 @@ public class DirectMatcherTest extends MockInit {
 	@Test
 	public void regexClassName() throws NotFoundException {
 		boolean compareResult = matcher.compareClassName(this.getClass().getClassLoader(), "*");
-		assertFalse(compareResult);
+		assertThat(compareResult, is(false));
 
 		verifyZeroInteractions(classPoolAnalyzer);
 	}
@@ -92,7 +94,6 @@ public class DirectMatcherTest extends MockInit {
 	public void testMethod(String msg) {
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void getMatchingMethods() throws NotFoundException {
 		ClassLoader classLoader = this.getClass().getClassLoader();
@@ -108,15 +109,14 @@ public class DirectMatcherTest extends MockInit {
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, "info.novatec.test.Test");
 		matcher.checkParameters(ctMethodList);
-		assertNotNull(ctMethodList);
-		assertEquals(ctMethodList.size(), 1);
-		assertEquals(ctMethodList.get(0).getParameterTypes().length, 0);
+		assertThat(ctMethodList, is(notNullValue()));
+		assertThat(ctMethodList, hasSize(1));
+		assertThat(ctMethodList.get(0).getParameterTypes().length, is(equalTo(0)));
 
 		verify(classPoolAnalyzer, times(1)).getMethodsForClassName(classLoader, "info.novatec.test.Test");
 		verifyNoMoreInteractions(classPoolAnalyzer);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void getMatchingMethodsIgnoreSignature() throws NotFoundException {
 		// ignore the signature, now the result should contain two methods
@@ -134,14 +134,13 @@ public class DirectMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, "info.novatec.test.Test");
-		assertNotNull(ctMethodList);
-		assertEquals(ctMethodList.size(), 2);
+		assertThat(ctMethodList, is(notNullValue()));
+		assertThat(ctMethodList, hasSize(2));
 
 		verify(classPoolAnalyzer, times(1)).getMethodsForClassName(classLoader, "info.novatec.test.Test");
 		verifyNoMoreInteractions(classPoolAnalyzer);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void getMatchingMethodsNoMethods() throws NotFoundException {
 		ClassLoader classLoader = this.getClass().getClassLoader();
@@ -152,8 +151,8 @@ public class DirectMatcherTest extends MockInit {
 
 		// execute the test call
 		List<CtMethod> ctMethodList = matcher.getMatchingMethods(classLoader, "info.novatec.test.Test");
-		assertNotNull(ctMethodList);
-		assertEquals(ctMethodList.size(), 0);
+		assertThat(ctMethodList, is(notNullValue()));
+		assertThat(ctMethodList, is(empty()));
 
 		verify(classPoolAnalyzer, times(1)).getMethodsForClassName(classLoader, "info.novatec.test.Test");
 		verifyNoMoreInteractions(classPoolAnalyzer);

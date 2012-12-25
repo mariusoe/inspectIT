@@ -1,5 +1,7 @@
 package info.novatec.inspectit.storage.processor;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -24,14 +26,13 @@ import java.util.List;
 import java.util.Random;
 
 import org.mockito.Mockito;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
  * Tests all {@link AbstractDataProcessor}s for the correct functionality.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class StorageDataProcessorsTest {
 
@@ -53,7 +54,7 @@ public class StorageDataProcessorsTest {
 		dataSaverProcessor.setStorageWriter(storageWriter);
 
 		TimerData timerData = new TimerData();
-		Assert.assertFalse(dataSaverProcessor.canBeProcessed(timerData));
+		assertThat(dataSaverProcessor.canBeProcessed(timerData), is(false));
 
 		dataSaverProcessor.process(timerData);
 		verifyZeroInteractions(storageWriter);
@@ -72,7 +73,7 @@ public class StorageDataProcessorsTest {
 		dataSaverProcessor.setStorageWriter(storageWriter);
 
 		InvocationSequenceData invocation = new InvocationSequenceData();
-		Assert.assertTrue(dataSaverProcessor.canBeProcessed(invocation));
+		assertThat(dataSaverProcessor.canBeProcessed(invocation), is(true));
 
 		dataSaverProcessor.process(invocation);
 		verify(storageWriter, times(1)).write(invocation);
@@ -89,10 +90,10 @@ public class StorageDataProcessorsTest {
 		invocationDataProcessor.setStorageWriter(storageWriter);
 
 		InvocationSequenceData invocation = new InvocationSequenceData();
-		Assert.assertTrue(invocationDataProcessor.canBeProcessed(invocation));
+		assertThat(invocationDataProcessor.canBeProcessed(invocation), is(true));
 
 		TimerData timerData = new TimerData();
-		Assert.assertFalse(invocationDataProcessor.canBeProcessed(timerData));
+		assertThat(invocationDataProcessor.canBeProcessed(timerData), is(false));
 
 		invocationDataProcessor.process(invocation);
 		verify(storageWriter, times(1)).write(any(InvocationSequenceData.class));
@@ -126,7 +127,7 @@ public class StorageDataProcessorsTest {
 		children.add(child2);
 		invocationSequenceData.setNestedSequences(children);
 
-		Assert.assertTrue(invocationExtractorDataProcessor.canBeProcessed(invocationSequenceData));
+		assertThat(invocationExtractorDataProcessor.canBeProcessed(invocationSequenceData), is(true));
 		invocationExtractorDataProcessor.process(invocationSequenceData);
 		verify(chainedProcessor, times(1)).process(timerData);
 		verify(chainedProcessor, times(1)).process(timerData);
@@ -150,7 +151,7 @@ public class StorageDataProcessorsTest {
 		chainedProcessors.add(dataProcessor);
 
 		TimeFrameDataProcessor timeFrameDataProcessor = new TimeFrameDataProcessor(new Date(past), new Date(future), chainedProcessors);
-		Assert.assertTrue(timeFrameDataProcessor.canBeProcessed(defaultData));
+		assertThat(timeFrameDataProcessor.canBeProcessed(defaultData), is(true));
 
 		Mockito.when(defaultData.getTimeStamp()).thenReturn(new Timestamp(time));
 		timeFrameDataProcessor.process(defaultData);
@@ -190,7 +191,7 @@ public class StorageDataProcessorsTest {
 		long methodIdent = random.nextLong();
 		TimerData timerData = new TimerData(new Timestamp(timestampValue), platformIdent, sensorTypeIdent, methodIdent);
 
-		Assert.assertTrue(dataAggregatorProcessor.canBeProcessed(timerData));
+		assertThat(dataAggregatorProcessor.canBeProcessed(timerData), is(true));
 
 		final int elements = 1000;
 		for (int i = 0; i < elements / 2; i++) {

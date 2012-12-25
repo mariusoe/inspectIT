@@ -1,5 +1,8 @@
 package info.novatec.inspectit.cmr.dao.impl;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyObject;
@@ -23,7 +26,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.mockito.ArgumentMatcher;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -123,21 +125,21 @@ public class TimerDataAggregatorTest extends AbstractTestNGLogSupport {
 				}
 				TimerData timerData = (TimerData) argument;
 
-				Assert.assertEquals(0, timerData.getCount() % count);
+				assertThat(timerData.getCount() % count, is(equalTo(0L)));
 
-				Assert.assertEquals(min, timerData.getMin());
-				Assert.assertEquals(max, timerData.getMax());
-				Assert.assertEquals(average, timerData.getAverage());
-				Assert.assertEquals(average, timerData.getDuration() / timerData.getCount());
+				assertThat(timerData.getMin(), is(equalTo(min)));
+				assertThat(timerData.getMax(), is(equalTo(max)));
+				assertThat(timerData.getAverage(), is(equalTo(average)));
+				assertThat(timerData.getDuration() / timerData.getCount(), is(equalTo(average)));
 
-				Assert.assertEquals(min, timerData.getCpuMin());
-				Assert.assertEquals(max, timerData.getCpuMax());
-				Assert.assertEquals(average, timerData.getCpuAverage());
-				Assert.assertEquals(average, timerData.getCpuDuration() / timerData.getCount());
+				assertThat(timerData.getCpuMin(), is(equalTo(min)));
+				assertThat(timerData.getCpuMax(), is(equalTo(max)));
+				assertThat(timerData.getCpuAverage(), is(equalTo(average)));
+				assertThat(timerData.getCpuDuration() / timerData.getCount(), is(equalTo(average)));
 
-				Assert.assertEquals(min, timerData.getExclusiveMin());
-				Assert.assertEquals(max, timerData.getExclusiveMax());
-				Assert.assertEquals(average, timerData.getExclusiveAverage());
+				assertThat(timerData.getExclusiveMin(), is(equalTo(min)));
+				assertThat(timerData.getExclusiveMax(), is(equalTo(max)));
+				assertThat(timerData.getExclusiveAverage(), is(equalTo(average)));
 
 				return true;
 			}

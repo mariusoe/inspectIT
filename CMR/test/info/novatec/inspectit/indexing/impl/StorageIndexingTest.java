@@ -1,5 +1,13 @@
 package info.novatec.inspectit.indexing.impl;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.comparesEqualTo;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import info.novatec.inspectit.communication.DefaultData;
@@ -25,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -71,7 +78,7 @@ public class StorageIndexingTest {
 		storageDescriptor2.setPositionAndSize(2, 1);
 
 		List<IStorageDescriptor> results = rootBranch.query(storageIndexQuery);
-		Assert.assertEquals(results.size(), 2);
+		assertThat(results.size(), is(equalTo(2)));
 	}
 
 	/**
@@ -89,7 +96,7 @@ public class StorageIndexingTest {
 		invocationSequenceData.setId(1L);
 		IStorageDescriptor storageDescriptor = rootBranch.put(invocationSequenceData);
 
-		Assert.assertEquals(storageDescriptor.compareTo(rootBranch.get(invocationSequenceData)), 0);
+		assertThat(storageDescriptor, comparesEqualTo(rootBranch.get(invocationSequenceData)));
 	}
 
 	/**
@@ -133,9 +140,9 @@ public class StorageIndexingTest {
 		storageIndexQuery.setPlatformIdent(10L);
 
 		List<IStorageDescriptor> results = rootBranch.query(storageIndexQuery);
-		Assert.assertEquals(1, results.size());
+		assertThat(results.size(), is(equalTo(1)));
 		for (IStorageDescriptor result : results) {
-			Assert.assertEquals(result.getSize(), 100L);
+			assertThat(result.getSize(), is(equalTo(100L)));
 		}
 	}
 
@@ -164,9 +171,9 @@ public class StorageIndexingTest {
 		storageIndexQuery.setMethodIdent(10L);
 
 		List<IStorageDescriptor> results = rootBranch.query(storageIndexQuery);
-		Assert.assertEquals(1, results.size());
+		assertThat(results.size(), is(equalTo(1)));
 		for (IStorageDescriptor result : results) {
-			Assert.assertEquals(result.getSize(), 100L);
+			assertThat(result.getSize(), is(equalTo(100L)));
 		}
 	}
 
@@ -195,9 +202,9 @@ public class StorageIndexingTest {
 		storageIndexQuery.setObjectClasses(searchedClasses);
 
 		List<IStorageDescriptor> results = rootBranch.query(storageIndexQuery);
-		Assert.assertEquals(1, results.size());
+		assertThat(results.size(), is(equalTo(1)));
 		for (IStorageDescriptor result : results) {
-			Assert.assertEquals(result.getSize(), 100L);
+			assertThat(result.getSize(), is(equalTo(100L)));
 		}
 	}
 
@@ -230,9 +237,9 @@ public class StorageIndexingTest {
 		storageIndexQuery.setToDate(plusHour);
 
 		List<IStorageDescriptor> results = rootBranch.query(storageIndexQuery);
-		Assert.assertEquals(1, results.size());
+		assertThat(results.size(), is(equalTo(1)));
 		for (IStorageDescriptor result : results) {
-			Assert.assertEquals(result.getSize(), 200L);
+			assertThat(result.getSize(), is(equalTo(200L)));
 		}
 	}
 
@@ -266,20 +273,20 @@ public class StorageIndexingTest {
 		storageIndexQuery.setPlatformIdent(10L);
 
 		List<IStorageDescriptor> results = rootBranch.query(storageIndexQuery);
-		Assert.assertEquals(2, results.size());
+		assertThat(results.size(), is(equalTo(2)));
 		long totalSize = 0;
 		for (IStorageDescriptor result : results) {
 			totalSize += result.getSize();
 		}
-		Assert.assertEquals(totalSize, 300L);
+		assertThat(totalSize, is(equalTo(300L)));
 
 		storageIndexQuery.setPlatformIdent(10L);
 		storageIndexQuery.setSensorTypeIdent(10L);
 
 		results = rootBranch.query(storageIndexQuery);
-		Assert.assertEquals(1, results.size());
+		assertThat(results.size(), is(equalTo(1)));
 		for (IStorageDescriptor result : results) {
-			Assert.assertEquals(result.getSize(), 100L);
+			assertThat(result.getSize(), is(equalTo(100L)));
 		}
 
 	}
@@ -315,9 +322,9 @@ public class StorageIndexingTest {
 		when(defaultData.getId()).thenReturn(1L);
 		arrayBasedStorageLeaf.put(defaultData);
 
-		Assert.assertNotNull(arrayBasedStorageLeaf.getAndRemove(defaultData));
-		Assert.assertNull(arrayBasedStorageLeaf.get(defaultData));
-		Assert.assertTrue(arrayBasedStorageLeaf.query(storageIndexQuery).isEmpty());
+		assertThat(arrayBasedStorageLeaf.getAndRemove(defaultData), is(notNullValue()));
+		assertThat(arrayBasedStorageLeaf.get(defaultData), is(nullValue()));
+		assertThat(arrayBasedStorageLeaf.query(storageIndexQuery), is(empty()));
 	}
 
 	/**
@@ -345,12 +352,12 @@ public class StorageIndexingTest {
 		long removeId = 50L;
 		when(defaultData.getId()).thenReturn(removeId);
 
-		Assert.assertNotNull(arrayBasedStorageLeaf.getAndRemove(defaultData));
-		Assert.assertNull(arrayBasedStorageLeaf.get(defaultData));
+		assertThat(arrayBasedStorageLeaf.getAndRemove(defaultData), is(notNullValue()));
+		assertThat(arrayBasedStorageLeaf.get(defaultData), is(nullValue()));
 		List<IStorageDescriptor> results = arrayBasedStorageLeaf.query(storageIndexQuery);
-		Assert.assertEquals(results.size(), entries - 1);
+		assertThat(results.size(), is(equalTo(entries - 1)));
 		for (IStorageDescriptor storageDescriptor : results) {
-			Assert.assertTrue(storageDescriptor.getSize() != removeId);
+			assertThat(storageDescriptor.getSize(), is(not(equalTo(removeId))));
 		}
 	}
 
@@ -382,7 +389,7 @@ public class StorageIndexingTest {
 		for (IStorageDescriptor storageDescriptor : results) {
 			totalReturnedSize += storageDescriptor.getSize();
 		}
-		Assert.assertEquals(totalReturnedSize, totalSize);
+		assertThat(totalReturnedSize, is(equalTo(totalSize)));
 	}
 
 }

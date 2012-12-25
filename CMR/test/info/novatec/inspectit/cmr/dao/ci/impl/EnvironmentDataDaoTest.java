@@ -1,7 +1,10 @@
 package info.novatec.inspectit.cmr.dao.ci.impl;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.fail;
 import info.novatec.inspectit.cmr.dao.ci.EnvironmentDataDao;
 import info.novatec.inspectit.cmr.test.AbstractTransactionalTestNGLogSupport;
@@ -43,7 +46,7 @@ public class EnvironmentDataDaoTest extends AbstractTransactionalTestNGLogSuppor
 		environmentData.setSendStrategy("sendstrategy");
 
 		environmentDataDao.addEnvironment(environmentData);
-		assertTrue(environmentData.getId() > 0);
+		assertThat(environmentData.getId(), is(greaterThan(0L)));
 	}
 
 	/**
@@ -64,15 +67,15 @@ public class EnvironmentDataDaoTest extends AbstractTransactionalTestNGLogSuppor
 		List<EnvironmentData> environments = environmentDataDao.getEnvironments();
 
 		// check list size; must be of size 1
-		assertEquals(environments.size(), 1);
+		assertThat(environments.size(), is(equalTo(1)));
 
 		// check environmentDataOne
 		EnvironmentData receivedEnvironmentData = environments.get(0);
-		assertEquals(receivedEnvironmentData.getBufferStrategy(), environmentData.getBufferStrategy());
-		assertEquals(receivedEnvironmentData.getDescription(), environmentData.getDescription());
-		assertEquals(receivedEnvironmentData.getId(), environmentData.getId());
-		assertEquals(receivedEnvironmentData.getName(), environmentData.getName());
-		assertEquals(receivedEnvironmentData.getSendStrategy(), environmentData.getSendStrategy());
+		assertThat(receivedEnvironmentData.getBufferStrategy(), is(equalTo(environmentData.getBufferStrategy())));
+		assertThat(receivedEnvironmentData.getDescription(), is(equalTo(environmentData.getDescription())));
+		assertThat(receivedEnvironmentData.getId(), is(equalTo(environmentData.getId())));
+		assertThat(receivedEnvironmentData.getName(), is(equalTo(environmentData.getName())));
+		assertThat(receivedEnvironmentData.getSendStrategy(), is(equalTo(environmentData.getSendStrategy())));
 	}
 
 	/**
@@ -99,20 +102,20 @@ public class EnvironmentDataDaoTest extends AbstractTransactionalTestNGLogSuppor
 		environmentDataDao.updateEnvironmentSettings(environmentData);
 
 		List<EnvironmentData> environments = environmentDataDao.getEnvironments();
-		assertEquals(environments.size(), 1);
+		assertThat(environments.size(), is(equalTo(1)));
 
 		EnvironmentData receivedEnvironmentData = environments.get(0);
 		// check values against updated version
-		assertEquals(receivedEnvironmentData.getBufferStrategy(), environmentData.getBufferStrategy());
-		assertEquals(receivedEnvironmentData.getDescription(), environmentData.getDescription());
-		assertEquals(receivedEnvironmentData.getId(), environmentData.getId());
-		assertEquals(receivedEnvironmentData.getName(), environmentData.getName());
-		assertEquals(receivedEnvironmentData.getSendStrategy(), environmentData.getSendStrategy());
+		assertThat(receivedEnvironmentData.getBufferStrategy(), is(equalTo(environmentData.getBufferStrategy())));
+		assertThat(receivedEnvironmentData.getDescription(), is(equalTo(environmentData.getDescription())));
+		assertThat(receivedEnvironmentData.getId(), is(equalTo(environmentData.getId())));
+		assertThat(receivedEnvironmentData.getName(), is(equalTo(environmentData.getName())));
+		assertThat(receivedEnvironmentData.getSendStrategy(), is(equalTo(environmentData.getSendStrategy())));
 		// check values against initial version
-		assertTrue(!"bufferstrategy".equals(receivedEnvironmentData.getBufferStrategy()));
-		assertTrue(!"description".equals(receivedEnvironmentData.getDescription()));
-		assertTrue(!"environment".equals(receivedEnvironmentData.getName()));
-		assertTrue(!"sendstrategy".equals(receivedEnvironmentData.getSendStrategy()));
+		assertThat(receivedEnvironmentData.getBufferStrategy(), is(not(equalTo("bufferstrategy"))));
+		assertThat(receivedEnvironmentData.getBufferStrategy(), is(not(equalTo("description"))));
+		assertThat(receivedEnvironmentData.getName(), is(not(equalTo("environment"))));
+		assertThat(receivedEnvironmentData.getSendStrategy(), is(not(equalTo("sendstrategy"))));
 	}
 
 	/**

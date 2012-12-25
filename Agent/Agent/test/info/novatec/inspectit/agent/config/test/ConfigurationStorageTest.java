@@ -1,11 +1,18 @@
 package info.novatec.inspectit.agent.config.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatchPattern;
@@ -149,7 +156,7 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 	@Test()
 	public void agentNameCheck() {
-		assertEquals(configurationStorage.getAgentName(), "UnitTestAgent");
+		assertThat(configurationStorage.getAgentName(), is(equalTo("UnitTestAgent")));
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
@@ -170,8 +177,8 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 	@Test
 	public void repositoryCheck() {
-		assertEquals(configurationStorage.getRepositoryConfig().getHost(), "localhost");
-		assertEquals(configurationStorage.getRepositoryConfig().getPort(), 1099);
+		assertThat(configurationStorage.getRepositoryConfig().getHost(), is(equalTo("localhost")));
+		assertThat(configurationStorage.getRepositoryConfig().getPort(), is(equalTo(1099)));
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
@@ -194,43 +201,43 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	public void resetRepositoryNotAllowed() throws StorageException {
 		configurationStorage.setRepository("localhost1", 1200);
 
-		assertEquals(configurationStorage.getRepositoryConfig().getHost(), "localhost");
-		assertEquals(configurationStorage.getRepositoryConfig().getPort(), 1099);
+		assertThat(configurationStorage.getRepositoryConfig().getHost(), is(equalTo("localhost")));
+		assertThat(configurationStorage.getRepositoryConfig().getPort(), is(equalTo(1099)));
 	}
 
 	@Test
 	public void resetAgentnameNotAllowed() throws StorageException {
 		configurationStorage.setAgentName("agent1");
 
-		assertEquals(configurationStorage.getAgentName(), "UnitTestAgent");
+		assertThat(configurationStorage.getAgentName(), is(equalTo("UnitTestAgent")));
 	}
 
 	@Test
 	public void methodSensorTypesCheck() {
 		List<MethodSensorTypeConfig> configs = configurationStorage.getMethodSensorTypes();
-		assertNotNull(configs);
-		assertEquals(configs.size(), 3);
+		assertThat(configs, is(notNullValue()));
+		assertThat(configs, hasSize(3));
 
 		// first
 		MethodSensorTypeConfig config = configs.get(0);
-		assertEquals(config.getClassName(), "info.novatec.inspectit.agent.sensor.method.timer.TimerSensor");
-		assertEquals(config.getName(), "timer");
-		assertNotNull(config.getParameters());
+		assertThat(config.getClassName(), is(equalTo("info.novatec.inspectit.agent.sensor.method.timer.TimerSensor")));
+		assertThat(config.getName(), is(equalTo("timer")));
+		assertThat(config.getParameters(), is(notNullValue()));
 		Map<String, Object> settings = config.getParameters();
-		assertEquals(settings.size(), 1);
-		assertTrue(settings.containsKey("mode"));
-		assertEquals(settings.get("mode"), "optimized");
-		assertEquals(config.getPriority(), PriorityEnum.MAX);
-		assertNull(config.getSensorType());
+		assertThat(settings.size(), is(1));
+		assertThat(settings, hasKey("mode"));
+		assertThat(settings, hasEntry("mode", (Object) "optimized"));
+		assertThat(config.getPriority(), is(equalTo(PriorityEnum.MAX)));
+		assertThat(config.getSensorType(), is(nullValue()));
 
 		// second
 		config = configs.get(1);
-		assertEquals(config.getClassName(), "info.novatec.inspectit.agent.sensor.method.invocationsequence.InvocationSequenceSensor");
-		assertEquals(config.getName(), "isequence");
-		assertNotNull(config.getParameters());
-		assertEquals(config.getParameters().size(), 0);
-		assertEquals(config.getPriority(), PriorityEnum.INVOC);
-		assertNull(config.getSensorType());
+		assertThat(config.getClassName(), is(equalTo("info.novatec.inspectit.agent.sensor.method.invocationsequence.InvocationSequenceSensor")));
+		assertThat(config.getName(), is(equalTo("isequence")));
+		assertThat(config.getParameters(), is(notNullValue()));
+		assertThat(config.getParameters().size(), is(0));
+		assertThat(config.getPriority(), is(equalTo(PriorityEnum.INVOC)));
+		assertThat(config.getSensorType(), is(nullValue()));
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
@@ -274,29 +281,29 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	@Test
 	public void platformSensorTypeCheck() {
 		List<PlatformSensorTypeConfig> configs = configurationStorage.getPlatformSensorTypes();
-		assertNotNull(configs);
-		assertEquals(configs.size(), 3);
+		assertThat(configs, is(notNullValue()));
+		assertThat(configs, hasSize(3));
 
 		// first
 		PlatformSensorTypeConfig config = configs.get(0);
-		assertEquals(config.getClassName(), "info.novatec.inspectit.agent.sensor.platform.ClassLoadingInformation");
-		assertNotNull(config.getParameters());
-		assertEquals(config.getParameters().size(), 0);
-		assertNull(config.getSensorType());
+		assertThat(config.getClassName(), is(equalTo("info.novatec.inspectit.agent.sensor.platform.ClassLoadingInformation")));
+		assertThat(config.getParameters(), is(notNullValue()));
+		assertThat(config.getParameters().size(), is(0));
+		assertThat(config.getSensorType(), is(nullValue()));
 
 		// second
 		config = configs.get(1);
-		assertEquals(config.getClassName(), "info.novatec.inspectit.agent.sensor.platform.CompilationInformation");
-		assertNotNull(config.getParameters());
-		assertEquals(config.getParameters().size(), 0);
-		assertNull(config.getSensorType());
+		assertThat(config.getClassName(), is(equalTo("info.novatec.inspectit.agent.sensor.platform.CompilationInformation")));
+		assertThat(config.getParameters(), is(notNullValue()));
+		assertThat(config.getParameters().size(), is(0));
+		assertThat(config.getSensorType(), is(nullValue()));
 
 		// third
 		config = configs.get(2);
-		assertEquals(config.getClassName(), "info.novatec.inspectit.agent.sensor.platform.RuntimeInformation");
-		assertNotNull(config.getParameters());
-		assertEquals(config.getParameters().size(), 0);
-		assertNull(config.getSensorType());
+		assertThat(config.getClassName(), is(equalTo("info.novatec.inspectit.agent.sensor.platform.RuntimeInformation")));
+		assertThat(config.getParameters(), is(notNullValue()));
+		assertThat(config.getParameters().size(), is(0));
+		assertThat(config.getSensorType(), is(nullValue()));
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
@@ -319,14 +326,14 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	@Test
 	public void exceptionSensorCheck() {
 		List<MethodSensorTypeConfig> configs = configurationStorage.getExceptionSensorTypes();
-		assertNotNull(configs);
-		assertEquals(configs.size(), 1);
+		assertThat(configs, is(notNullValue()));
+		assertThat(configs, hasSize(1));
 
 		MethodSensorTypeConfig config = configs.get(0);
-		assertEquals(config.getClassName(), "info.novatec.inspectit.agent.sensor.exception.ExceptionSensor");
-		assertNotNull(config.getParameters());
-		assertEquals(config.getParameters().size(), 0);
-		assertNull(config.getSensorType());
+		assertThat(config.getClassName(), is(equalTo("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor")));
+		assertThat(config.getParameters(), is(notNullValue()));
+		assertThat(config.getParameters().size(), is(0));
+		assertThat(config.getSensorType(), is(nullValue()));
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
@@ -343,72 +350,72 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	@Test
 	public void exceptionSensorParameterCheck() {
 		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
-		assertNotNull(configs);
-		assertEquals(configs.size(), 13);
+		assertThat(configs, is(notNullValue()));
+		assertThat(configs, hasSize(13));
 
 		// first
 		UnregisteredSensorConfig config = configs.get(0);
-		assertEquals(config.getTargetClassName(), "java.lang.Throwable");
-		assertEquals(config.getTargetMethodName(), "");
-		assertNull(config.getTargetPackageName());
-		assertEquals(config.isConstructor(), true);
-		assertEquals(config.isIgnoreSignature(), true);
-		assertEquals(config.isInterface(), false);
-		assertEquals(config.isVirtual(), false);
-		assertEquals(config.isSuperclass(), true);
-		assertSame(config.getMatcher().getClass(), ThrowableMatcher.class);
-		assertNotNull(config.getParameterTypes());
-		assertEquals(config.getParameterTypes().size(), 0);
-		assertNotNull(config.getSettings());
-		assertEquals(config.getSettings().size(), 1);
+		assertThat(config.getTargetClassName(), is(equalTo("java.lang.Throwable")));
+		assertThat(config.getTargetMethodName(), is(equalTo("")));
+		assertThat(config.getTargetPackageName(), is(nullValue()));
+		assertThat(config.isConstructor(), is(true));
+		assertThat(config.isIgnoreSignature(), is(true));
+		assertThat(config.isInterface(), is(false));
+		assertThat(config.isVirtual(), is(false));
+		assertThat(config.isSuperclass(), is(true));
+		assertThat(config.getMatcher(), is(instanceOf(ThrowableMatcher.class)));
+		assertThat(config.getParameterTypes(), is(notNullValue()));
+		assertThat(config.getParameterTypes(), is(empty()));
+		assertThat(config.getSettings(), is(notNullValue()));
+		assertThat(config.getSettings().size(), is(1));
 
 		// second
 		config = configs.get(1);
-		assertEquals(config.getTargetClassName(), "info.novatec.inspectit.agent.analyzer.test.classes.IException");
-		assertEquals(config.getTargetMethodName(), "");
-		assertNull(config.getTargetPackageName());
-		assertEquals(config.isConstructor(), true);
-		assertEquals(config.isIgnoreSignature(), true);
-		assertEquals(config.isInterface(), true);
-		assertEquals(config.isVirtual(), false);
-		assertEquals(config.isSuperclass(), false);
-		assertSame(config.getMatcher().getClass(), ThrowableMatcher.class);
-		assertNotNull(config.getParameterTypes());
-		assertEquals(config.getParameterTypes().size(), 0);
-		assertNotNull(config.getSettings());
-		assertEquals(config.getSettings().size(), 1);
+		assertThat(config.getTargetClassName(), is(equalTo("info.novatec.inspectit.agent.analyzer.test.classes.IException")));
+		assertThat(config.getTargetMethodName(), is(equalTo("")));
+		assertThat(config.getTargetPackageName(), is(nullValue()));
+		assertThat(config.isConstructor(), is(true));
+		assertThat(config.isIgnoreSignature(), is(true));
+		assertThat(config.isInterface(), is(true));
+		assertThat(config.isVirtual(), is(false));
+		assertThat(config.isSuperclass(), is(false));
+		assertThat(config.getMatcher(), is(instanceOf(ThrowableMatcher.class)));
+		assertThat(config.getParameterTypes(), is(notNullValue()));
+		assertThat(config.getParameterTypes(), is(empty()));
+		assertThat(config.getSettings(), is(notNullValue()));
+		assertThat(config.getSettings().size(), is(1));
 
 		// third
 		config = configs.get(2);
-		assertEquals(config.getTargetClassName(), "info.novatec.inspectit.agent.analyzer.test.classes.My*Exception");
-		assertEquals(config.getTargetMethodName(), "");
-		assertNull(config.getTargetPackageName());
-		assertEquals(config.isConstructor(), true);
-		assertEquals(config.isIgnoreSignature(), true);
-		assertEquals(config.isInterface(), false);
-		assertEquals(config.isVirtual(), true);
-		assertEquals(config.isSuperclass(), false);
-		assertSame(config.getMatcher().getClass(), ThrowableMatcher.class);
-		assertNotNull(config.getParameterTypes());
-		assertEquals(config.getParameterTypes().size(), 0);
-		assertNotNull(config.getSettings());
-		assertEquals(config.getSettings().size(), 0);
+		assertThat(config.getTargetClassName(), is(equalTo("info.novatec.inspectit.agent.analyzer.test.classes.My*Exception")));
+		assertThat(config.getTargetMethodName(), is(equalTo("")));
+		assertThat(config.getTargetPackageName(), is(nullValue()));
+		assertThat(config.isConstructor(), is(true));
+		assertThat(config.isIgnoreSignature(), is(true));
+		assertThat(config.isInterface(), is(false));
+		assertThat(config.isVirtual(), is(true));
+		assertThat(config.isSuperclass(), is(false));
+		assertThat(config.getMatcher(), is(instanceOf(ThrowableMatcher.class)));
+		assertThat(config.getParameterTypes(), is(notNullValue()));
+		assertThat(config.getParameterTypes(), is(empty()));
+		assertThat(config.getSettings(), is(notNullValue()));
+		assertThat(config.getSettings().size(), is(0));
 
 		// fourth
 		config = configs.get(3);
-		assertEquals(config.getTargetClassName(), "info.novatec.inspectit.agent.analyzer.test.classes.MyException");
-		assertEquals(config.getTargetMethodName(), "");
-		assertNull(config.getTargetPackageName());
-		assertEquals(config.isConstructor(), true);
-		assertEquals(config.isIgnoreSignature(), true);
-		assertEquals(config.isInterface(), false);
-		assertEquals(config.isVirtual(), false);
-		assertEquals(config.isSuperclass(), false);
-		assertSame(config.getMatcher().getClass(), ThrowableMatcher.class);
-		assertNotNull(config.getParameterTypes());
-		assertEquals(config.getParameterTypes().size(), 0);
-		assertNotNull(config.getSettings());
-		assertEquals(config.getSettings().size(), 0);
+		assertThat(config.getTargetClassName(), is(equalTo("info.novatec.inspectit.agent.analyzer.test.classes.MyException")));
+		assertThat(config.getTargetMethodName(), is(equalTo("")));
+		assertThat(config.getTargetPackageName(), is(nullValue()));
+		assertThat(config.isConstructor(), is(true));
+		assertThat(config.isIgnoreSignature(), is(true));
+		assertThat(config.isInterface(), is(false));
+		assertThat(config.isVirtual(), is(false));
+		assertThat(config.isSuperclass(), is(false));
+		assertThat(config.getMatcher(), is(instanceOf(ThrowableMatcher.class)));
+		assertThat(config.getParameterTypes(), is(notNullValue()));
+		assertThat(config.getParameterTypes(), is(empty()));
+		assertThat(config.getSettings(), is(notNullValue()));
+		assertThat(config.getSettings().size(), is(0));
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 
@@ -426,26 +433,26 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	@Test
 	public void sendingStrategiesCheck() {
 		List<StrategyConfig> strategies = configurationStorage.getSendingStrategyConfigs();
-		assertNotNull(strategies);
-		assertEquals(strategies.size(), 2);
+		assertThat(strategies, is(notNullValue()));
+		assertThat(strategies, hasSize(2));
 
 		// first
 		StrategyConfig config = strategies.get(0);
-		assertEquals(config.getClazzName(), "info.novatec.inspectit.agent.sending.impl.TimeStrategy");
-		assertNotNull(config.getSettings());
+		assertThat(config.getClazzName(), is(equalTo("info.novatec.inspectit.agent.sending.impl.TimeStrategy")));
+		assertThat(config.getSettings(), is(notNullValue()));
 		Map<String, String> settings = config.getSettings();
-		assertEquals(settings.size(), 1);
-		assertTrue(settings.containsKey("time"));
-		assertEquals(settings.get("time"), "5000");
+		assertThat(settings.size(), is(1));
+		assertThat(settings, hasKey("time"));
+		assertThat(settings, hasEntry("time", "5000"));
 
 		// second
 		config = strategies.get(1);
-		assertEquals(config.getClazzName(), "info.novatec.inspectit.agent.sending.impl.ListSizeStrategy");
-		assertNotNull(config.getSettings());
+		assertThat(config.getClazzName(), is(equalTo("info.novatec.inspectit.agent.sending.impl.ListSizeStrategy")));
+		assertThat(config.getSettings(), is(notNullValue()));
 		settings = config.getSettings();
-		assertEquals(settings.size(), 1);
-		assertTrue(settings.containsKey("size"));
-		assertEquals(settings.get("size"), "10");
+		assertThat(settings.size(), is(1));
+		assertThat(settings, hasKey("size"));
+		assertThat(settings, hasEntry("size", "10"));
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
@@ -467,11 +474,11 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	@Test
 	public void bufferStrategyCheck() {
 		StrategyConfig config = configurationStorage.getBufferStrategyConfig();
-		assertNotNull(config);
+		assertThat(config, is(notNullValue()));
 
-		assertEquals(config.getClazzName(), "info.novatec.inspectit.agent.buffer.impl.SimpleBufferStrategy");
-		assertNotNull(config.getSettings());
-		assertEquals(config.getSettings().size(), 0);
+		assertThat(config.getClazzName(), is(equalTo("info.novatec.inspectit.agent.buffer.impl.SimpleBufferStrategy")));
+		assertThat(config.getSettings(), is(notNullValue()));
+		assertThat(config.getSettings().size(), is(0));
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
@@ -494,108 +501,108 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	@Test
 	public void sensorCheck() {
 		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
-		assertNotNull(configs);
-		assertEquals(configs.size(), 13);
+		assertThat(configs, is(notNullValue()));
+		assertThat(configs, hasSize(13));
 
 		// the first 4 configs are the ones from the exception sensor
 		// first
 		UnregisteredSensorConfig config = configs.get(4);
-		assertEquals(config.getSensorTypeConfig().getName(), "timer");
-		assertNull(config.getTargetPackageName());
-		assertEquals(config.getTargetClassName(), "*");
-		assertEquals(config.getTargetMethodName(), "*");
-		assertNotNull(config.getParameterTypes());
-		assertEquals(config.getParameterTypes().size(), 0);
-		assertNotNull(config.getSettings());
-		assertEquals(config.getSettings().size(), 0);
-		assertNotNull(config.getPropertyAccessorList());
-		assertEquals(config.getPropertyAccessorList().size(), 0);
-		assertSame(config.getMatcher().getClass(), IndirectMatcher.class);
+		assertThat(config.getSensorTypeConfig().getName(), is(equalTo("timer")));
+		assertThat(config.getTargetPackageName(), is(nullValue()));
+		assertThat(config.getTargetClassName(), is(equalTo("*")));
+		assertThat(config.getTargetMethodName(), is(equalTo("*")));
+		assertThat(config.getParameterTypes(), is(notNullValue()));
+		assertThat(config.getParameterTypes(), is(empty()));
+		assertThat(config.getSettings(), is(notNullValue()));
+		assertThat(config.getSettings().size(), is(0));
+		assertThat(config.getPropertyAccessorList(), is(notNullValue()));
+		assertThat(config.getPropertyAccessorList(), is(empty()));
+		assertThat(config.getMatcher(), is(instanceOf(IndirectMatcher.class)));
 
 		// second
 		config = configs.get(5);
-		assertEquals(config.getSensorTypeConfig().getName(), "isequence");
-		assertNull(config.getTargetPackageName());
-		assertEquals(config.getTargetClassName(), "info.novatec.inspectitsamples.calculator.Calculator");
-		assertEquals(config.getTargetMethodName(), "actionPerformed");
-		assertNotNull(config.getParameterTypes());
-		assertEquals(config.getParameterTypes().size(), 0);
-		assertNotNull(config.getSettings());
-		assertEquals(config.getSettings().size(), 0);
-		assertNotNull(config.getPropertyAccessorList());
-		assertEquals(config.getPropertyAccessorList().size(), 0);
-		assertSame(config.getMatcher().getClass(), IndirectMatcher.class);
+		assertThat(config.getSensorTypeConfig().getName(), is(equalTo("isequence")));
+		assertThat(config.getTargetPackageName(), is(nullValue()));
+		assertThat(config.getTargetClassName(), is(equalTo("info.novatec.inspectitsamples.calculator.Calculator")));
+		assertThat(config.getTargetMethodName(), is(equalTo("actionPerformed")));
+		assertThat(config.getParameterTypes(), is(notNullValue()));
+		assertThat(config.getParameterTypes(), is(empty()));
+		assertThat(config.getSettings(), is(notNullValue()));
+		assertThat(config.getSettings().size(), is(0));
+		assertThat(config.getPropertyAccessorList(), is(notNullValue()));
+		assertThat(config.getPropertyAccessorList(), is(empty()));
+		assertThat(config.getMatcher(), is(instanceOf(IndirectMatcher.class)));
 
 		// third
 		config = configs.get(6);
-		assertEquals(config.getSensorTypeConfig().getName(), "timer");
-		assertNull(config.getTargetPackageName());
-		assertEquals(config.getTargetClassName(), "info.novatec.inspectitsamples.calculator.Calculator");
-		assertEquals(config.getTargetMethodName(), "actionPerformed");
-		assertNotNull(config.getParameterTypes());
-		assertEquals(config.getParameterTypes().size(), 1);
-		assertTrue(config.getParameterTypes().contains("java.lang.String"));
-		assertNotNull(config.getSettings());
-		assertEquals(config.getSettings().size(), 0);
-		assertNotNull(config.getPropertyAccessorList());
-		assertEquals(config.getPropertyAccessorList().size(), 0);
-		assertSame(config.getMatcher().getClass(), DirectMatcher.class);
+		assertThat(config.getSensorTypeConfig().getName(), is(equalTo("timer")));
+		assertThat(config.getTargetPackageName(), is(nullValue()));
+		assertThat(config.getTargetClassName(), is(equalTo("info.novatec.inspectitsamples.calculator.Calculator")));
+		assertThat(config.getTargetMethodName(), is(equalTo("actionPerformed")));
+		assertThat(config.getParameterTypes(), is(notNullValue()));
+		assertThat(config.getParameterTypes(), hasSize(1));
+		assertThat(config.getParameterTypes(), hasItem("java.lang.String"));
+		assertThat(config.getSettings(), is(notNullValue()));
+		assertThat(config.getSettings().size(), is(0));
+		assertThat(config.getPropertyAccessorList(), is(notNullValue()));
+		assertThat(config.getPropertyAccessorList(), is(empty()));
+		assertThat(config.getMatcher(), is(instanceOf(DirectMatcher.class)));
 
 		// fourth
 		config = configs.get(7);
-		assertEquals(config.getSensorTypeConfig().getName(), "timer");
-		assertNull(config.getTargetPackageName());
-		assertEquals(config.getTargetClassName(), "info.novatec.IService");
-		assertEquals(config.getTargetMethodName(), "*Service");
-		assertNotNull(config.getParameterTypes());
-		assertEquals(config.getParameterTypes().size(), 0);
-		assertNotNull(config.getSettings());
-		assertEquals(config.getSettings().size(), 1);
-		assertTrue(config.getSettings().containsKey("interface"));
-		assertEquals(config.getSettings().get("interface"), "true");
-		assertNotNull(config.getPropertyAccessorList());
-		assertEquals(config.getPropertyAccessorList().size(), 0);
-		assertSame(config.getMatcher().getClass(), InterfaceMatcher.class);
+		assertThat(config.getSensorTypeConfig().getName(), is(equalTo("timer")));
+		assertThat(config.getTargetPackageName(), is(nullValue()));
+		assertThat(config.getTargetClassName(), is(equalTo("info.novatec.IService")));
+		assertThat(config.getTargetMethodName(), is(equalTo("*Service")));
+		assertThat(config.getParameterTypes(), is(notNullValue()));
+		assertThat(config.getParameterTypes(), is(empty()));
+		assertThat(config.getSettings(), is(notNullValue()));
+		assertThat(config.getSettings().size(), is(1));
+		assertThat(config.getSettings(), hasKey("interface"));
+		assertThat(config.getSettings(), hasEntry("interface", (Object) "true"));
+		assertThat(config.getPropertyAccessorList(), is(notNullValue()));
+		assertThat(config.getPropertyAccessorList(), is(empty()));
+		assertThat(config.getMatcher(), is(instanceOf(InterfaceMatcher.class)));
 
 		// fifth
 		config = configs.get(8);
-		assertEquals(config.getSensorTypeConfig().getName(), "isequence");
-		assertNull(config.getTargetPackageName());
-		assertEquals(config.getTargetClassName(), "info.novatec.inspectitsamples.calculator.Calculator");
-		assertEquals(config.getTargetMethodName(), "actionPerformed");
-		assertNotNull(config.getParameterTypes());
-		assertEquals(config.getParameterTypes().size(), 0);
-		assertNotNull(config.getSettings());
-		assertEquals(config.getSettings().size(), 1);
-		assertTrue(config.getSettings().containsKey("superclass"));
-		assertEquals(config.getSettings().get("superclass"), "true");
-		assertNotNull(config.getPropertyAccessorList());
-		assertEquals(config.getPropertyAccessorList().size(), 0);
-		assertSame(config.getMatcher().getClass(), SuperclassMatcher.class);
+		assertThat(config.getSensorTypeConfig().getName(), is(equalTo("isequence")));
+		assertThat(config.getTargetPackageName(), is(nullValue()));
+		assertThat(config.getTargetClassName(), is(equalTo("info.novatec.inspectitsamples.calculator.Calculator")));
+		assertThat(config.getTargetMethodName(), is(equalTo("actionPerformed")));
+		assertThat(config.getParameterTypes(), is(notNullValue()));
+		assertThat(config.getParameterTypes(), is(empty()));
+		assertThat(config.getSettings(), is(notNullValue()));
+		assertThat(config.getSettings().size(), is(1));
+		assertThat(config.getSettings(), hasKey("superclass"));
+		assertThat(config.getSettings(), hasEntry("superclass", (Object) "true"));
+		assertThat(config.getPropertyAccessorList(), is(notNullValue()));
+		assertThat(config.getPropertyAccessorList(), is(empty()));
+		assertThat(config.getMatcher(), is(instanceOf(SuperclassMatcher.class)));
 
 		// sixth
 		config = configs.get(9);
-		assertEquals(config.getPropertyAccessorList().size(), 1);
-		assertSame(config.getPropertyAccessorList().get(0).getClass(), PropertyPathStart.class);
+		assertThat(config.getPropertyAccessorList(), hasSize(1));
+		assertThat(config.getPropertyAccessorList().get(0), is(instanceOf(PropertyPathStart.class)));
 		PropertyPathStart start = (PropertyPathStart) config.getPropertyAccessorList().get(0);
-		assertEquals(start.getName(), "LastOutput");
-		assertEquals(start.getSignaturePosition(), -1);
-		assertSame(start.getPathToContinue().getClass(), PropertyPath.class);
-		assertEquals(start.getPathToContinue().getName(), "jlbOutput");
-		assertSame(start.getPathToContinue().getPathToContinue().getClass(), PropertyPath.class);
-		assertEquals(start.getPathToContinue().getPathToContinue().getName(), "text");
-		assertNull(start.getPathToContinue().getPathToContinue().getPathToContinue());
+		assertThat(start.getName(), is(equalTo("LastOutput")));
+		assertThat(start.getSignaturePosition(), is(-1));
+		assertThat(start.getPathToContinue(), is(instanceOf(PropertyPath.class)));
+		assertThat(start.getPathToContinue().getName(), is(equalTo("jlbOutput")));
+		assertThat(start.getPathToContinue().getPathToContinue(), is(instanceOf(PropertyPath.class)));
+		assertThat(start.getPathToContinue().getPathToContinue().getName(), is(equalTo("text")));
+		assertThat(start.getPathToContinue().getPathToContinue().getPathToContinue(), is(nullValue()));
 
 		// seventh
 		config = configs.get(10);
-		assertEquals(config.getPropertyAccessorList().size(), 1);
-		assertSame(config.getPropertyAccessorList().get(0).getClass(), PropertyPathStart.class);
+		assertThat(config.getPropertyAccessorList(), hasSize(1));
+		assertThat(config.getPropertyAccessorList().get(0), is(instanceOf(PropertyPathStart.class)));
 		start = (PropertyPathStart) config.getPropertyAccessorList().get(0);
-		assertEquals(start.getName(), "Source");
-		assertEquals(start.getSignaturePosition(), 0);
-		assertSame(start.getPathToContinue().getClass(), PropertyPath.class);
-		assertEquals(start.getPathToContinue().getName(), "msg");
-		assertNull(start.getPathToContinue().getPathToContinue());
+		assertThat(start.getName(), is(equalTo("Source")));
+		assertThat(start.getSignaturePosition(), is(0));
+		assertThat(start.getPathToContinue(), is(instanceOf(PropertyPath.class)));
+		assertThat(start.getPathToContinue().getName(), is(equalTo("msg")));
+		assertThat(start.getPathToContinue().getPathToContinue(), is(nullValue()));
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
@@ -653,11 +660,11 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	@Test
 	public void annotationCheck() {
 		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
-		assertNotNull(configs);
+		assertThat(configs, is(notNullValue()));
 
 		UnregisteredSensorConfig annotationConfig = configs.get(11);
-		assertNotNull(annotationConfig.getAnnotationClassName());
-		assertEquals(annotationConfig.getAnnotationClassName(), "javax.ejb.StatelessBean");
+		assertThat(annotationConfig.getAnnotationClassName(), is(notNullValue()));
+		assertThat(annotationConfig.getAnnotationClassName(), is(equalTo("javax.ejb.StatelessBean")));
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
@@ -666,14 +673,14 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	@Test
 	public void modifiersCheck() {
 		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
-		assertNotNull(configs);
+		assertThat(configs, is(notNullValue()));
 
 		// 11 is index of config with modifiers
 		UnregisteredSensorConfig configWithModifiers = configs.get(12);
-		assertTrue(configWithModifiers.getSettings().containsKey("modifiers"));
-		assertTrue(configWithModifiers.getModifiers() != 0);
-		assertTrue(Modifier.isPublic(configWithModifiers.getModifiers()));
-		assertTrue(Modifier.isProtected(configWithModifiers.getModifiers()));
+		assertThat(configWithModifiers.getSettings(), hasKey("modifiers"));
+		assertThat(configWithModifiers.getModifiers(), is(not(0)));
+		assertThat(Modifier.isPublic(configWithModifiers.getModifiers()), is(true));
+		assertThat(Modifier.isProtected(configWithModifiers.getModifiers()), is(true));
 
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
@@ -681,8 +688,8 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 	@Test
 	public void ignoreClassesCheck() {
 		List<IMatchPattern> ignorePatterns = configurationStorage.getIgnoreClassesPatterns();
-		assertNotNull(ignorePatterns);
-		assertTrue(!ignorePatterns.isEmpty());
+		assertThat(ignorePatterns, is(notNullValue()));
+		assertThat(ignorePatterns, is(not(empty())));
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 }

@@ -1,5 +1,6 @@
 package info.novatec.inspectit.cmr.cache.impl;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -23,7 +24,6 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -62,7 +62,7 @@ public class ObjectSizesPrimitiveTypesSizeTest {
 	 */
 	@Test(dataProvider = "classProvider")
 	public void testClassForProperUseOfObjectSizes(Class<? extends DefaultData> defaultDataClass) throws InstantiationException, IllegalAccessException {
-		Assert.assertFalse(Modifier.isAbstract(defaultDataClass.getModifiers()));
+		assertThat("Class is not abstract.", !Modifier.isAbstract(defaultDataClass.getModifiers()));
 		objectSizes = mock(IObjectSizes.class);
 		Map<PrimitiveCount, Integer> primitiveCountMap = new HashMap<PrimitiveCount, Integer>();
 

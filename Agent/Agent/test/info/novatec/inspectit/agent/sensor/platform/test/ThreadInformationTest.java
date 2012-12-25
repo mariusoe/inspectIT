@@ -1,11 +1,13 @@
 package info.novatec.inspectit.agent.sensor.platform.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
@@ -74,30 +76,30 @@ public class ThreadInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		SystemSensorData sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof ThreadInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(ThreadInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		ThreadInformationData threadData = (ThreadInformationData) sensorData;
-		assertEquals(threadData.getCount(), 1);
+		assertThat(threadData.getCount(), is(equalTo(1)));
 
 		// as there was only one data object min/max/total the values must be the
 		// same
-		assertEquals(threadData.getMinDaemonThreadCount(), daemonThreadCount);
-		assertEquals(threadData.getMaxDaemonThreadCount(), daemonThreadCount);
-		assertEquals(threadData.getTotalDaemonThreadCount(), daemonThreadCount);
+		assertThat(threadData.getMinDaemonThreadCount(), is(equalTo(daemonThreadCount)));
+		assertThat(threadData.getMaxDaemonThreadCount(), is(equalTo(daemonThreadCount)));
+		assertThat(threadData.getTotalDaemonThreadCount(), is(equalTo(daemonThreadCount)));
 
-		assertEquals(threadData.getMinPeakThreadCount(), peakThreadCount);
-		assertEquals(threadData.getMaxPeakThreadCount(), peakThreadCount);
-		assertEquals(threadData.getTotalPeakThreadCount(), peakThreadCount);
+		assertThat(threadData.getMinPeakThreadCount(), is(equalTo(peakThreadCount)));
+		assertThat(threadData.getMaxPeakThreadCount(), is(equalTo(peakThreadCount)));
+		assertThat(threadData.getTotalPeakThreadCount(), is(equalTo(peakThreadCount)));
 
-		assertEquals(threadData.getMinThreadCount(), threadCount);
-		assertEquals(threadData.getMaxThreadCount(), threadCount);
-		assertEquals(threadData.getTotalThreadCount(), threadCount);
+		assertThat(threadData.getMinThreadCount(), is(equalTo(threadCount)));
+		assertThat(threadData.getMaxThreadCount(), is(equalTo(threadCount)));
+		assertThat(threadData.getTotalThreadCount(), is(equalTo(threadCount)));
 
-		assertEquals(threadData.getMinTotalStartedThreadCount(), totalStartedThreadCount);
-		assertEquals(threadData.getMaxTotalStartedThreadCount(), totalStartedThreadCount);
-		assertEquals(threadData.getTotalTotalStartedThreadCount(), totalStartedThreadCount);
+		assertThat(threadData.getMinTotalStartedThreadCount(), is(equalTo(totalStartedThreadCount)));
+		assertThat(threadData.getMaxTotalStartedThreadCount(), is(equalTo(totalStartedThreadCount)));
+		assertThat(threadData.getTotalTotalStartedThreadCount(), is(equalTo(totalStartedThreadCount)));
 	}
 
 	@Test
@@ -134,30 +136,30 @@ public class ThreadInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		SystemSensorData sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof ThreadInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(ThreadInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		ThreadInformationData threadData = (ThreadInformationData) sensorData;
-		assertEquals(threadData.getCount(), 1);
+		assertThat(threadData.getCount(), is(equalTo(1)));
 
 		// as there was only one data object min/max/total values must be the
 		// same
-		assertEquals(threadData.getMinDaemonThreadCount(), daemonThreadCount);
-		assertEquals(threadData.getMaxDaemonThreadCount(), daemonThreadCount);
-		assertEquals(threadData.getTotalDaemonThreadCount(), daemonThreadCount);
+		assertThat(threadData.getMinDaemonThreadCount(), is(equalTo(daemonThreadCount)));
+		assertThat(threadData.getMaxDaemonThreadCount(), is(equalTo(daemonThreadCount)));
+		assertThat(threadData.getTotalDaemonThreadCount(), is(equalTo(daemonThreadCount)));
 
-		assertEquals(threadData.getMinPeakThreadCount(), peakThreadCount);
-		assertEquals(threadData.getMaxPeakThreadCount(), peakThreadCount);
-		assertEquals(threadData.getTotalPeakThreadCount(), peakThreadCount);
+		assertThat(threadData.getMinPeakThreadCount(), is(equalTo(peakThreadCount)));
+		assertThat(threadData.getMaxPeakThreadCount(), is(equalTo(peakThreadCount)));
+		assertThat(threadData.getTotalPeakThreadCount(), is(equalTo(peakThreadCount)));
 
-		assertEquals(threadData.getMinThreadCount(), threadCount);
-		assertEquals(threadData.getMaxThreadCount(), threadCount);
-		assertEquals(threadData.getTotalThreadCount(), threadCount);
+		assertThat(threadData.getMinThreadCount(), is(equalTo(threadCount)));
+		assertThat(threadData.getMaxThreadCount(), is(equalTo(threadCount)));
+		assertThat(threadData.getTotalThreadCount(), is(equalTo(threadCount)));
 
-		assertEquals(threadData.getMinTotalStartedThreadCount(), totalStartedThreadCount);
-		assertEquals(threadData.getMaxTotalStartedThreadCount(), totalStartedThreadCount);
-		assertEquals(threadData.getTotalTotalStartedThreadCount(), totalStartedThreadCount);
+		assertThat(threadData.getMinTotalStartedThreadCount(), is(equalTo(totalStartedThreadCount)));
+		assertThat(threadData.getMaxTotalStartedThreadCount(), is(equalTo(totalStartedThreadCount)));
+		assertThat(threadData.getTotalTotalStartedThreadCount(), is(equalTo(totalStartedThreadCount)));
 
 		// ------------------------
 		// SECOND UPDATE CALL
@@ -173,28 +175,28 @@ public class ThreadInformationTest extends AbstractLogSupport {
 		verify(coreService, times(1)).addPlatformSensorData(eq(sensorTypeIdent), sensorDataCaptor.capture());
 
 		sensorData = sensorDataCaptor.getValue();
-		assertTrue(sensorData instanceof ThreadInformationData);
-		assertEquals(sensorData.getPlatformIdent(), platformIdent);
-		assertEquals(sensorData.getSensorTypeIdent(), sensorTypeIdent);
+		assertThat(sensorData, is(instanceOf(ThreadInformationData.class)));
+		assertThat(sensorData.getPlatformIdent(), is(equalTo(platformIdent)));
+		assertThat(sensorData.getSensorTypeIdent(), is(equalTo(sensorTypeIdent)));
 
 		threadData = (ThreadInformationData) sensorData;
-		assertEquals(threadData.getCount(), 2);
+		assertThat(threadData.getCount(), is(equalTo(2)));
 
-		assertEquals(threadData.getMinDaemonThreadCount(), daemonThreadCount);
-		assertEquals(threadData.getMaxDaemonThreadCount(), daemonThreadCount2);
-		assertEquals(threadData.getTotalDaemonThreadCount(), daemonThreadCount + daemonThreadCount2);
+		assertThat(threadData.getMinDaemonThreadCount(), is(equalTo(daemonThreadCount)));
+		assertThat(threadData.getMaxDaemonThreadCount(), is(equalTo(daemonThreadCount2)));
+		assertThat(threadData.getTotalDaemonThreadCount(), is(equalTo(daemonThreadCount + daemonThreadCount2)));
 
-		assertEquals(threadData.getMinPeakThreadCount(), peakThreadCount);
-		assertEquals(threadData.getMaxPeakThreadCount(), peakThreadCount2);
-		assertEquals(threadData.getTotalPeakThreadCount(), peakThreadCount + peakThreadCount2);
+		assertThat(threadData.getMinPeakThreadCount(), is(equalTo(peakThreadCount)));
+		assertThat(threadData.getMaxPeakThreadCount(), is(equalTo(peakThreadCount2)));
+		assertThat(threadData.getTotalPeakThreadCount(), is(equalTo(peakThreadCount + peakThreadCount2)));
 
-		assertEquals(threadData.getMinThreadCount(), threadCount);
-		assertEquals(threadData.getMaxThreadCount(), threadCount2);
-		assertEquals(threadData.getTotalThreadCount(), threadCount + threadCount2);
+		assertThat(threadData.getMinThreadCount(), is(equalTo(threadCount)));
+		assertThat(threadData.getMaxThreadCount(), is(equalTo(threadCount2)));
+		assertThat(threadData.getTotalThreadCount(), is(equalTo(threadCount + threadCount2)));
 
-		assertEquals(threadData.getMinTotalStartedThreadCount(), totalStartedThreadCount);
-		assertEquals(threadData.getMaxTotalStartedThreadCount(), totalStartedThreadCount2);
-		assertEquals(threadData.getTotalTotalStartedThreadCount(), totalStartedThreadCount + totalStartedThreadCount2);
+		assertThat(threadData.getMinTotalStartedThreadCount(), is(equalTo(totalStartedThreadCount)));
+		assertThat(threadData.getMaxTotalStartedThreadCount(), is(equalTo(totalStartedThreadCount2)));
+		assertThat(threadData.getTotalTotalStartedThreadCount(), is(equalTo(totalStartedThreadCount + totalStartedThreadCount2)));
 	}
 
 	@Test

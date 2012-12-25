@@ -1,5 +1,8 @@
 package info.novatec.inspectit.agent.sensor.exception.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.argThat;
@@ -12,7 +15,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
 import info.novatec.inspectit.agent.analyzer.test.classes.MyTestException;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
@@ -250,7 +252,7 @@ public class ExceptionSensorHookTest extends AbstractLogSupport {
 		verify(idManager, times(1)).getPlatformId();
 		verify(coreService, times(1)).addExceptionSensorData(eq(registeredSensorTypeId), eq(exceptionSensorData.getThrowableIdentityHashCode()),
 				argThat(new ExceptionSensorDataVerifier(exceptionSensorData)));
-		assertEquals(exceptionSensorData.getCause(), cause.getClass().getName());
+		assertThat(exceptionSensorData.getCause(), is(equalTo(cause.getClass().getName())));
 
 		// resetting the cause to null as we need the cause only in the first
 		// data object
