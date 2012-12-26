@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A composite extends the component functionality by allowing to add childrens to this node.
+ * A composite extends the component functionality by allowing to add children to this node.
  * 
  * @author Patrice Bouillet
  * 

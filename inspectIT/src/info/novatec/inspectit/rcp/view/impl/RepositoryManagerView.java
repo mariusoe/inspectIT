@@ -4,6 +4,7 @@ import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
+import info.novatec.inspectit.rcp.editor.tree.DeferredTreeViewer;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.form.CmrRepositoryPropertyForm;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
@@ -24,10 +25,13 @@ import info.novatec.inspectit.rcp.view.IRefreshableView;
 import info.novatec.inspectit.rcp.view.tree.TreeContentProvider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -48,10 +52,10 @@ import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.ToolTip;
@@ -125,7 +129,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 	/**
 	 * Tree Viewer.
 	 */
-	private TreeViewer treeViewer;
+	private DeferredTreeViewer treeViewer;
 
 	/**
 	 * Composite for displaying the messages.
@@ -165,6 +169,11 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 	private AgentStatusUpdateJob agentStatusUpdateJob;
 
 	/**
+	 * List of the objects that is expanded in the tree.
+	 */
+	private List<Object> expandedList;
+
+	/**
 	 * Default constructor.
 	 */
 	public RepositoryManagerView() {
@@ -194,8 +203,10 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		toolkit.decorateFormHeading(mainForm);
 
 		Tree tree = toolkit.createTree(mainForm.getBody(), SWT.V_SCROLL | SWT.H_SCROLL);
-		treeViewer = new TreeViewer(tree);
-		treeViewer.setContentProvider(new TreeContentProvider() {
+		treeViewer = new DeferredTreeViewer(tree);
+
+		// create tree content provider
+		TreeContentProvider treeContentProvider = new TreeContentProvider() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public Object[] getElements(Object inputElement) {
@@ -207,13 +218,22 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 				}
 				return new Object[0];
 			}
-		});
+		};
+		// add the listener that will expand all levels of the agent tree that were expanded before
+		// the update
+		treeContentProvider.addUpdateCompleteListener(new ExpandFoldersUpdateCompleteListener());
+		treeViewer.setContentProvider(treeContentProvider);
+
 		treeViewer.setLabelProvider(new RepositoryTreeLabelProvider());
 		treeViewer.setComparator(new ViewerComparator() {
 			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
-				if (e1 instanceof Component && e2 instanceof Component) {
-					return ObjectUtils.compare(((Component) e1).getName(), ((Component) e2).getName());
+				if (e1 instanceof info.novatec.inspectit.rcp.model.Composite && !(e2 instanceof info.novatec.inspectit.rcp.model.Composite)) {
+					return -1;
+				} else if (!(e1 instanceof info.novatec.inspectit.rcp.model.Composite) && e2 instanceof info.novatec.inspectit.rcp.model.Composite) {
+					return 1;
+				} else if (e1 instanceof Component && e2 instanceof Component) {
+					return ((Component) e1).getName().compareToIgnoreCase(((Component) e2).getName());
 				} else if (e1 instanceof Component) {
 					return 1;
 				} else if (e2 instanceof Component) {
@@ -489,7 +509,21 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 	 * <p>
 	 * Refreshes all repositories.
 	 */
-	public void refresh() {
+	public synchronized void refresh() {
+		// preserve what elements need to be expanded after refresh
+		Object[] expandedElements = treeViewer.getExpandedElements();
+		Set<Object> parents = new HashSet<Object>();
+		for (Object expanded : expandedElements) {
+			Object parent = ((ITreeContentProvider) treeViewer.getContentProvider()).getParent(expanded);
+			while (parent != null) {
+				parents.add(parent);
+				parent = ((ITreeContentProvider) treeViewer.getContentProvider()).getParent(parent);
+			}
+		}
+		expandedList = Collections.synchronizedList(new ArrayList<Object>(Arrays.asList(expandedElements)));
+		expandedList.removeAll(parents);
+
+		// execute refresh
 		Collection<UpdateRepositoryJob> jobs = cmrRepositoryManager.forceAllCmrRepositoriesOnlineStatusUpdate();
 		for (final UpdateRepositoryJob updateRepositoryJob : jobs) {
 			updateRepositoryJob.addJobChangeListener(new JobChangeAdapter() {
@@ -702,6 +736,8 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
+			} else {
+				treeViewer.expandToLevel(firstElement, 1);
 			}
 		}
 	}
@@ -724,6 +760,8 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 				return ImageFormatter.getCmrRepositoryImage(cmrRepositoryDefinition, true);
 			} else if (element instanceof AgentLeaf) {
 				return ImageFormatter.getAgentLeafImage((AgentLeaf) element);
+			} else if (element instanceof Component) {
+				return ((Component) element).getImage();
 			}
 			return null;
 		}
@@ -738,6 +776,8 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 				return new StyledString(cmrRepositoryDefinition.getName());
 			} else if (element instanceof AgentLeaf) {
 				return TextFormatter.getStyledAgentLeafString((AgentLeaf) element);
+			} else if (element instanceof Component) {
+				return new StyledString(((Component) element).getName());
 			}
 			return null;
 		}
@@ -840,6 +880,29 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 			}
 		}
 
+	}
+
+	/**
+	 * Listener that is added to the {@link TreeContentProvider} and is invoked when job of updating
+	 * the tree elements is done. At this point this listener will re-expand all the before expanded
+	 * elements.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private class ExpandFoldersUpdateCompleteListener extends JobChangeAdapter {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void done(IJobChangeEvent event) {
+			if (CollectionUtils.isNotEmpty(expandedList)) {
+				for (Object o : expandedList) {
+					treeViewer.expandObject(o, 1);
+				}
+			}
+		}
 	}
 
 }

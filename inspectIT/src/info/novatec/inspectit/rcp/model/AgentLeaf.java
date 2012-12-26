@@ -28,6 +28,11 @@ public class AgentLeaf extends Leaf {
 	 * {@link CmrRepositoryDefinition}.
 	 */
 	private final CmrRepositoryDefinition cmrRepositoryDefinition;
+	
+	/**
+	 * Is this leaf part of the folder.
+	 */
+	private final boolean inFolder;
 
 	/**
 	 * Default constructor.
@@ -38,11 +43,14 @@ public class AgentLeaf extends Leaf {
 	 *            {@link AgentStatusData}
 	 * @param cmrRepositoryDefinition
 	 *            {@link CmrRepositoryDefinition}
+	 * @param inFolder
+	 *            Is this leaf part of the folder.
 	 */
-	public AgentLeaf(PlatformIdent platformIdent, AgentStatusData agentStatusData, CmrRepositoryDefinition cmrRepositoryDefinition) {
+	public AgentLeaf(PlatformIdent platformIdent, AgentStatusData agentStatusData, CmrRepositoryDefinition cmrRepositoryDefinition, boolean inFolder) {
 		this.platformIdent = platformIdent;
 		this.agentStatusData = agentStatusData;
 		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
+		this.inFolder = inFolder;
 	}
 
 	/**
@@ -89,6 +97,15 @@ public class AgentLeaf extends Leaf {
 	@Override
 	public String getName() {
 		return platformIdent.getAgentName();
+	}
+
+	/**
+	 * Gets {@link #inFolder}.
+	 * 
+	 * @return {@link #inFolder}
+	 */
+	public boolean isInFolder() {
+		return inFolder;
 	}
 
 	/**

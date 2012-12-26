@@ -79,6 +79,7 @@ public class DeferredBrowserComposite extends DeferredComposite {
 				}
 			}
 		} finally {
+			collector.done();
 			monitor.done();
 		}
 	}

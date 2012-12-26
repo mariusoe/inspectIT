@@ -7,6 +7,8 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -58,23 +60,26 @@ public class DeferredAgentsComposite extends DeferredComposite implements ICmrRe
 			if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
 				Map<PlatformIdent, AgentStatusData> agents = cmrRepositoryDefinition.getGlobalDataAccessService().getAgentsOverview();
 				if (null != agents) {
+					Map<PlatformIdent, AgentStatusData> filteredMap = new HashMap<PlatformIdent, AgentStatusData>(agents.size());
 					for (Entry<PlatformIdent, AgentStatusData> entry : agents.entrySet()) {
 						PlatformIdent platformIdent = entry.getKey();
 						AgentStatusData agentStatusData = entry.getValue();
 						// the agentstatusdata is null if the agent wasn't connected before
 						if (showOldAgents || (!showOldAgents && agentStatusData != null)) {
-							Component agentLeaf = new AgentLeaf(platformIdent, agentStatusData, cmrRepositoryDefinition);
-							collector.add(agentLeaf, monitor);
-							((Composite) object).addChild(agentLeaf);
+							filteredMap.put(platformIdent, agentStatusData);
 						}
 
-						if (monitor.isCanceled()) {
-							break;
-						}
+					}
+
+					List<Component> components = AgentFolderFactory.getAgentFolderTree(filteredMap, cmrRepositoryDefinition);
+					for (Component component : components) {
+						collector.add(component, monitor);
+						((Composite) object).addChild(component);
 					}
 				}
 			}
 		} finally {
+			collector.done();
 			monitor.done();
 		}
 	}

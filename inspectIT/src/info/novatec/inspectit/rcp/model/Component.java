@@ -139,7 +139,7 @@ public abstract class Component {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(name, tooltip, inputDefinition);
+		return Objects.hashCode(name, tooltip, inputDefinition, parent);
 	}
 
 	/**
@@ -157,7 +157,7 @@ public abstract class Component {
 			return false;
 		}
 		Component that = (Component) object;
-		return Objects.equal(this.name, that.name) && Objects.equal(this.tooltip, that.tooltip) && Objects.equal(this.inputDefinition, that.inputDefinition);
+		return Objects.equal(this.name, that.name) && Objects.equal(this.tooltip, that.tooltip) && Objects.equal(this.inputDefinition, that.inputDefinition) && Objects.equal(this.parent, that.parent);
 	}
 
 }

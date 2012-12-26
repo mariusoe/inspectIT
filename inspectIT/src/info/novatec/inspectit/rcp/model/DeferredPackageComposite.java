@@ -68,6 +68,7 @@ public class DeferredPackageComposite extends DeferredComposite {
 			}
 
 		} finally {
+			collector.done();
 			monitor.done();
 		}
 	}

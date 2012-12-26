@@ -10,6 +10,7 @@ import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 import info.novatec.inspectit.communication.data.cmr.WritingStatus;
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.model.AgentFolderFactory;
 import info.novatec.inspectit.rcp.model.AgentLeaf;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
@@ -262,7 +263,11 @@ public final class TextFormatter {
 	 */
 	public static StyledString getStyledAgentLeafString(AgentLeaf agentLeaf) {
 		StyledString styledString = new StyledString();
-		styledString.append(agentLeaf.getPlatformIdent().getAgentName());
+		if (agentLeaf.isInFolder()) {
+			styledString.append(AgentFolderFactory.getAgentDisplayNameInFolder(agentLeaf.getPlatformIdent().getAgentName()));
+		} else {
+			styledString.append(agentLeaf.getPlatformIdent().getAgentName());
+		}
 		styledString.append(" ");
 		styledString.append("[" + agentLeaf.getPlatformIdent().getVersion() + "]", StyledString.QUALIFIER_STYLER);
 		styledString.append(" - ");

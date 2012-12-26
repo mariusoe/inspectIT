@@ -71,6 +71,7 @@ public class DeferredClassComposite extends DeferredComposite {
 				}
 			}
 		} finally {
+			collector.done();
 			monitor.done();
 		}
 	}
