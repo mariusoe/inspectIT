@@ -173,7 +173,7 @@
 
 		<echo message="Analyse Code with tool: FindBugs" level="info" />
 		<mkdir dir="${build.qa.analysis.findbugs}" />
-		<findbugs output="xml" classpath="${findbugs.classpath}" includefilter="${findbugs.config.include}" excludefilter="${findbugs.config.exclude}" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="findbugs.jar">
+		<findbugs output="xml:withMessages" classpath="${findbugs.classpath}" includefilter="${findbugs.config.include}" excludefilter="${findbugs.config.exclude}" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="findbugs.jar">
 			<sourcePath path="${findbugs.sourcepath}" />
 			<class location="${findbugs.classlocation}" />
 			<auxClasspath>
