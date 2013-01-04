@@ -63,6 +63,13 @@ public class TimeStrategy extends AbstractSendingStrategy {
 	private class Trigger extends Thread {
 
 		/**
+		 * Creates a new <code>Trigger</code> as daemon thread.
+		 */
+		public Trigger() {
+			setDaemon(true);
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		public void run() {

@@ -415,6 +415,13 @@ public class IdManager implements IIdManager, Startable {
 		private static final long REGISTRATION_WAIT_TIME = 10000L;
 
 		/**
+		 * Creates a new instance of the <code>RegistrationThread</code> as a daemon thread.
+		 */
+		public RegistrationThread() {
+			setDaemon(true);
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		public void run() {

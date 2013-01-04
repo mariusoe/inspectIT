@@ -173,6 +173,8 @@ public class CoreService implements ICoreService, Startable {
 
 		platformSensorRefresher = new PlatformSensorRefresher();
 		platformSensorRefresher.start();
+
+		Runtime.getRuntime().addShutdownHook(new ShutdownHookSender());
 	}
 
 	/**
@@ -363,6 +365,13 @@ public class CoreService implements ICoreService, Startable {
 	private class PlatformSensorRefresher extends Thread {
 
 		/**
+		 * Creates a new instance of the <code>PlatformSensorRefresher</code> as a daemon thread.
+		 */
+		public PlatformSensorRefresher() {
+			setDaemon(true);
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		public void run() {
@@ -407,6 +416,78 @@ public class CoreService implements ICoreService, Startable {
 	}
 
 	/**
+	 * Prepares collected data for sending.
+	 * 
+	 * Get all the value objects from the object storages and generate a list containing all the
+	 * value objects.
+	 * 
+	 * <b> WARNING: This code is supposed to be run single-threaded! We ensure single-threaded
+	 * invocation by only calling this method within the single <code>PreparingThread</code>. During
+	 * the JVM shutdown (in the shutdownhook), it is also ensured that this code is run
+	 * singlethreaded. </b>
+	 * 
+	 * @return <code>true</code> if new data were prepared, else <code>false</code>
+	 */
+	@SuppressWarnings("unchecked")
+	private boolean prepareData() {
+		// check if measurements are added in the last interval, if not
+		// nothing needs to be sent.
+		if (sensorDataObjects.isEmpty() && objectStorages.isEmpty()) {
+			return false;
+		}
+
+		// switch the references so that new data is stored
+		// while sending
+		temp = sensorDataObjects;
+		sensorDataObjects = measurementsProcessing;
+		measurementsProcessing = (Map<String, DefaultData>) temp;
+
+		temp = objectStorages;
+		objectStorages = objectStoragesProcessing;
+		objectStoragesProcessing = (Map<String, IObjectStorage>) temp;
+
+		// copy the measurements values to a new list
+		List<DefaultData> tempList = new ArrayList<DefaultData>(measurementsProcessing.values());
+		measurementsProcessing.clear();
+
+		// iterate the object storages and get the value
+		// objects which will be stored in the same list.
+		for (Iterator<IObjectStorage> i = objectStoragesProcessing.values().iterator(); i.hasNext();) {
+			IObjectStorage objectStorage = i.next();
+			tempList.add(objectStorage.finalizeDataObject());
+		}
+		objectStoragesProcessing.clear();
+
+		// Now give the strategy the list
+		bufferStrategy.addMeasurements(tempList);
+
+		return true;
+	}
+
+	/**
+	 * sends the data.
+	 * 
+	 * <b> WARNING: This code is supposed to be run single-threaded! We ensure single-threaded
+	 * invocation by only calling this method within the single <code>SendingThread</code>. During
+	 * the JVM shutdown (in the shutdownhook), it is also ensured that this code is run
+	 * singlethreaded. </b>
+	 */
+	private void send() {
+		try {
+			while (bufferStrategy.hasNext()) {
+				List<DefaultData> dataToSend = bufferStrategy.next();
+				connection.sendDataObjects(dataToSend);
+				sendingException = false;
+			}
+		} catch (Throwable e) { // NOPMD NOCHK
+			if (!sendingException) {
+				sendingException = true;
+				LOGGER.log(Level.SEVERE, "Connection problem appeared, stopping sending actual data!", e);
+			}
+		}
+	}
+
+	/**
 	 * This implementation of a {@link Thread} is used to prepare the data and value objects that
 	 * have to be sent to the CMR. Prepared data is put into {@link IBufferStrategy}.
 	 * <p>
@@ -415,55 +496,36 @@ public class CoreService implements ICoreService, Startable {
 	 * 
 	 * @author Patrice Bouillet
 	 * @author Ivan Senic
-	 * 
+	 * @author Stefan Siegl
 	 */
 	private class PreparingThread extends Thread {
+
+		/**
+		 * Creates a new <code>PreparingThread</code> as daemon.
+		 */
+		public PreparingThread() {
+			setDaemon(true);
+		}
+
 		/**
 		 * {@inheritDoc}
 		 */
-		@SuppressWarnings("unchecked")
 		public void run() {
-			for (;;) {
+			while (!isInterrupted()) {
 				// wait for activation
 				synchronized (this) {
 					try {
 						wait();
 					} catch (InterruptedException e) {
-						LOGGER.severe("Preparing thread interrupted!");
+						LOGGER.severe("Preparing thread interrupted and shuting down!");
+						break; // we were interrupted during waiting and close ourself down.
 					}
 				}
 
-				// We got a request from one of the send strategies. Now create
-				// all the value objects from the object storages and generate a
-				// list containing all the value objects.
+				// We got a request from one of the send strategies.
 
-				// check if measurements are added in the last interval
-				if (!sensorDataObjects.isEmpty() || !objectStorages.isEmpty()) {
-					// switch the references so that new data is stored
-					// while sending
-					temp = sensorDataObjects;
-					sensorDataObjects = measurementsProcessing;
-					measurementsProcessing = (Map<String, DefaultData>) temp;
-
-					temp = objectStorages;
-					objectStorages = objectStoragesProcessing;
-					objectStoragesProcessing = (Map<String, IObjectStorage>) temp;
-
-					// copy the measurements values to a new list
-					List<DefaultData> tempList = new ArrayList<DefaultData>(measurementsProcessing.values());
-					measurementsProcessing.clear();
-
-					// iterate the object storages and get the value
-					// objects which will be stored in the same list.
-					for (Iterator<IObjectStorage> i = objectStoragesProcessing.values().iterator(); i.hasNext();) {
-						IObjectStorage objectStorage = i.next();
-						tempList.add(objectStorage.finalizeDataObject());
-					}
-					objectStoragesProcessing.clear();
-
-					// Now give the strategy the list
-					bufferStrategy.addMeasurements(tempList);
-
+				boolean newDataAvailable = prepareData();
+				if (newDataAvailable) {
 					// Notify sending thread
 					synchronized (sendingThread) {
 						sendingThread.notifyAll();
@@ -481,40 +543,77 @@ public class CoreService implements ICoreService, Startable {
 	 * problems can appear.
 	 * 
 	 * @author Ivan Senic
-	 * 
+	 * @author Stefan Siegl
 	 */
 	private class SendingThread extends Thread {
+
+		/**
+		 * Creates a new <code>SendingThread</code> as daemon.
+		 */
+		public SendingThread() {
+			setDaemon(true);
+		}
+
 		/**
 		 * {@inheritDoc}
 		 */
 		public void run() {
-			for (;;) {
+			while (!isInterrupted()) {
 				// wait for activation if there is nothing to send
 				if (!bufferStrategy.hasNext()) {
 					synchronized (this) {
-						if (!bufferStrategy.hasNext()) { // NOCHK: Will be fixed with another ticket
-							try {
-								wait();
-							} catch (InterruptedException e) {
-								LOGGER.severe("Sending thread interrupted!");
-							}
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							LOGGER.severe("Sending thread interrupted and shuting down!");
+							break; // we were interrupted during waiting and close ourself down.
 						}
 					}
 				}
 
-				try {
-					while (bufferStrategy.hasNext()) {
-						List<DefaultData> dataToSend = bufferStrategy.next();
-						connection.sendDataObjects(dataToSend);
-						sendingException = false;
-					}
-				} catch (Throwable e) { // NOPMD
-					if (!sendingException) {
-						sendingException = true;
-						LOGGER.log(Level.SEVERE, "Connection problem appeared, stopping sending actual data!", e);
-					}
-				}
+				// send the data
+				send();
+
 			}
+		}
+	}
+
+	/**
+	 * Used for the JVM Shutdown. Ensure that all threads are closed correctly and tries to send
+	 * data one last time to prevent data loss.
+	 * 
+	 * @author Stefan Siegl
+	 */
+	private class ShutdownHookSender extends Thread {
+		@Override
+		public void run() {
+			LOGGER.info("Shutdown initialized, sending remaining data");
+			// Stop the CoreService services
+			CoreService.this.stop();
+
+			// wait for the shutdown of the preparing thread and sending thread to ensure thread
+			// safety on the entities used for preparing and sending. If we get interrupted while
+			// waiting, then we stop the ShutdownHook completely.
+			try {
+				preparingThread.join();
+			} catch (InterruptedException e) {
+				LOGGER.severe("ShutdownHook was interrupted while waiting for the preparing thread to shut down. Stopping the shutdown hook");
+				return;
+			}
+
+			try {
+				sendingThread.join();
+			} catch (InterruptedException e) {
+				LOGGER.severe("ShutdownHook was interrupted while waiting for the sending thread to shut down. Stopping the shutdown hook");
+				return;
+			}
+
+			// Try to prepare data for the last time.
+			CoreService.this.prepareData();
+
+			// Try to send data for the last time. We do not set a timeout here, the user can simply
+			// kill the process for good if it takes too long.
+			CoreService.this.send();
 		}
 	}
 

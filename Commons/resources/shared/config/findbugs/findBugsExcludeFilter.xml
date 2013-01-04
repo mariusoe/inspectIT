@@ -43,6 +43,11 @@
 		<Bug pattern="UW_UNCOND_WAIT" />
 	</Match>
 	<Match> <!-- This ignore should be removed after Agent sending/buffering restructuring -->
+		<Class name="info.novatec.inspectit.agent.core.impl.CoreService$SendingThread" />
+		<Method name="run" />
+		<Bug pattern="UW_UNCOND_WAIT" />
+	</Match>
+	<Match> <!-- This ignore should be removed after Agent sending/buffering restructuring -->
 		<Class name="info.novatec.inspectit.agent.javaagent.JavaAgent" />
 		<Method name="premain" />
 		<Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED" />
