@@ -310,7 +310,7 @@ public class InvocationSequenceData extends MethodSensorData {
 		size += objectSizes.getPrimitiveTypesSize(7, 0, 0, 0, 2, 3);
 		size += objectSizes.getSizeOf(timerData);
 		size += objectSizes.getSizeOf(sqlStatementData);
-		if (null != nestedSequences && nestedSequences instanceof ArrayList) {
+		if (nestedSequences instanceof ArrayList) {
 			size += objectSizes.getSizeOf(nestedSequences, 0);
 			for (InvocationSequenceData invocationSequenceData : nestedSequences) {
 				size += objectSizes.getSizeOf(invocationSequenceData);

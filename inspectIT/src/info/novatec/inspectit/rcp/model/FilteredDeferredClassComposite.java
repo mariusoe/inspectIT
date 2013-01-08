@@ -49,7 +49,7 @@ public class FilteredDeferredClassComposite extends DeferredClassComposite {
 				for (MethodSensorTypeIdent methodSensorTypeIdent : method.getMethodSensorTypeIdents()) {
 					String fqn = methodSensorTypeIdent.getFullyQualifiedClassName();
 					SensorTypeEnum sensorTypeEnum = SensorTypeEnum.get(fqn);
-					if (sensorTypeEnum == sensorTypeEnumToShow) {
+					if (sensorTypeEnum == sensorTypeEnumToShow) { // NOPMD
 						if (sensorTypeEnum.isOpenable()) {
 							Component targetSensorType = new Leaf();
 							if (null != method.getParameters()) {

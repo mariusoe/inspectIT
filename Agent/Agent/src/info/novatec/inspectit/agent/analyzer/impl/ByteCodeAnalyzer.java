@@ -119,19 +119,19 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 
 			return instrumentedByteCode;
 		} catch (NotFoundException notFoundException) {
-			notFoundException.printStackTrace();
+			notFoundException.printStackTrace(); // NOPMD
 			return null;
 		} catch (IOException iOException) {
-			iOException.printStackTrace();
+			iOException.printStackTrace(); // NOPMD
 			return null;
 		} catch (CannotCompileException cannotCompileException) {
-			cannotCompileException.printStackTrace();
+			cannotCompileException.printStackTrace(); // NOPMD
 			return null;
 		} catch (HookException hookException) {
-			hookException.printStackTrace();
+			hookException.printStackTrace(); // NOPMD
 			return null;
 		} catch (StorageException storageException) {
-			storageException.printStackTrace();
+			storageException.printStackTrace(); // NOPMD
 			return null;
 		} finally {
 			// Remove the byte array class path from the class pool. The class
@@ -227,7 +227,7 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 			List<String> parameterTypes = new ArrayList<String>();
 			CtClass[] parameterClasses = ctBehavior.getParameterTypes();
 			for (int pos = 0; pos < parameterClasses.length; pos++) {
-				parameterTypes.add((parameterClasses[pos]).getName());
+				parameterTypes.add(parameterClasses[pos].getName());
 			}
 
 			RegisteredSensorConfig rsc = new RegisteredSensorConfig();

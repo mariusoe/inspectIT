@@ -150,7 +150,7 @@ public abstract class AbstractChannelManager {
 	 * @throws IOException
 	 *             When {@link IOException} occurs.
 	 */
-	public void finalizeAll() throws IOException {
+	public void finalizeAllChannels() throws IOException {
 		for (CustomAsyncChannel channel : writingChannelsMap.values()) {
 			if (channel.isOpened()) {
 				closeAsyncChannel(channel);
@@ -168,7 +168,7 @@ public abstract class AbstractChannelManager {
 	 * @throws IOException
 	 *             When {@link IOException} occurs.
 	 */
-	public void finalize(Path channelPath) throws IOException {
+	public void finalizeChannel(Path channelPath) throws IOException {
 		CustomAsyncChannel channel = writingChannelsMap.remove(channelPath);
 		if (channel != null && channel.isOpened()) {
 			closeAsyncChannel(channel);

@@ -61,7 +61,7 @@ import com.esotericsoftware.kryo.io.Input;
  * 
  */
 @Component
-public class CmrStorageManager extends StorageManager {
+public class CmrStorageManager extends StorageManager { // NOPMD - Class can not be shorter
 
 	/**
 	 * The log of this class.
@@ -289,7 +289,7 @@ public class CmrStorageManager extends StorageManager {
 				recorderStorageData.markOpened();
 				openedStoragesMap.put(recorderStorageData, storageWriter);
 				writeStorageDataToDisk(recorderStorageData);
-				recorderStorageData = null;
+				recorderStorageData = null; // NOPMD
 			}
 		}
 	}

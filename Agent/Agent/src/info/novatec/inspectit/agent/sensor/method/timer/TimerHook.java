@@ -127,7 +127,8 @@ public class TimerHook implements IMethodHook, IConstructorHook {
 		} catch (RuntimeException e) {
 			// catching the runtime exceptions which could be thrown by the
 			// above statements.
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Exception in the TimerHook.", e);
+			e.printStackTrace(); // NOPMD
 		}
 
 		timerStorageFactory.setParameters(param);

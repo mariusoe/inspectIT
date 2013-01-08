@@ -104,7 +104,7 @@ public class CustomCompatibleFieldSerializer<T> extends FieldSerializer<T> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void initializeCachedFields() {
+	protected final void initializeCachedFields() {
 		if (null != schema) {
 			CachedField<?>[] fields = getFields();
 

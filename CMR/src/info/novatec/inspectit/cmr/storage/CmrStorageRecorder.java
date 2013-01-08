@@ -223,7 +223,7 @@ public class CmrStorageRecorder {
 				if (!stopRecordingFuture.isDone() && !stopRecordingFuture.isCancelled()) {
 					stopRecordingFuture.cancel(false);
 				}
-				stopRecordingFuture = null;
+				stopRecordingFuture = null; // NOPMD
 			}
 
 			Collection<AbstractDataProcessor> recordingDataProcessors = recordingProperties.getRecordingDataProcessors();
@@ -250,12 +250,12 @@ public class CmrStorageRecorder {
 				if (!startRecordingFuture.isDone() && !startRecordingFuture.isCancelled()) {
 					startRecordingFuture.cancel(false);
 				}
-				startRecordingFuture = null;
+				startRecordingFuture = null; // NOPMD
 			}
 		}
 
-		storageWriter = null;
-		recordingProperties = null;
+		storageWriter = null; // NOPMD
+		recordingProperties = null; // NOPMD
 		recordingState = RecordingState.OFF;
 	}
 

@@ -57,7 +57,7 @@ public abstract class AbstractSensorConfig {
 	/**
 	 * If this config defines a constructor.
 	 */
-	private boolean isConstructor = false;
+	private boolean constructor = false;
 
 	/**
 	 * Returns a map of the defined settings.
@@ -212,7 +212,7 @@ public abstract class AbstractSensorConfig {
 	 *            the isConstructor to set
 	 */
 	public void setConstructor(boolean isConstructor) {
-		this.isConstructor = isConstructor;
+		this.constructor = isConstructor;
 	}
 
 	/**
@@ -221,7 +221,7 @@ public abstract class AbstractSensorConfig {
 	 * @return the isConstructor
 	 */
 	public boolean isConstructor() {
-		return isConstructor;
+		return constructor;
 	}
 
 	/**

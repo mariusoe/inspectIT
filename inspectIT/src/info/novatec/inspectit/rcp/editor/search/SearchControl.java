@@ -312,7 +312,7 @@ public class SearchControl {
 	/**
 	 * Closes the control.
 	 */
-	public void closeControl() {
+	public final void closeControl() {
 		if (!shell.isDisposed()) {
 			shell.close();
 		}
@@ -329,7 +329,7 @@ public class SearchControl {
 			processSearchResult(lastSearchResult);
 		} else {
 			searchExecutor.clearSearch();
-			lastSearchResult = null;
+			lastSearchResult = null; // NOPMD
 			searchTextBox.redraw();
 		}
 	}

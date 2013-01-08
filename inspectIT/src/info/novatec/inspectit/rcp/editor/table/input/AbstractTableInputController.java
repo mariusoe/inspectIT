@@ -209,10 +209,6 @@ public abstract class AbstractTableInputController implements TableInputControll
 		tableViewerColumnMap.put(key, column);
 	}
 
-	private boolean isTableViewerColumnMapped(Enum<?> key) {
-		return null != tableViewerColumnMap.get(key);
-	}
-
 	public TableViewerColumn getMappedTableViewerColumn(Enum<?> key) {
 		return tableViewerColumnMap.get(key);
 	}

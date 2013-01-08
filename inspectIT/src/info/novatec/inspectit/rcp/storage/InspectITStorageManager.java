@@ -145,7 +145,6 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 			try {
 				Files.createDirectories(directory);
 			} catch (IOException e) {
-				e.printStackTrace();
 				throw new StorageException("Could not create local storage directory.", e);
 			}
 		}
@@ -405,7 +404,7 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 		try {
 			bundleFile = FileLocator.getBundleFile(InspectIT.getDefault().getBundle());
 		} catch (IOException e) {
-			bundleFile = null;
+			bundleFile = null; // NOPMD
 		}
 
 		List<LocalStorageData> mountedStorages;

@@ -30,7 +30,7 @@ public class SizeBufferStrategy implements IBufferStrategy<MethodSensorData> {
 	/**
 	 * The linked list containing the FILO stack.
 	 */
-	private LinkedList<List<MethodSensorData>> stack;
+	private LinkedList<List<MethodSensorData>> stack; // NOPMD
 
 	/**
 	 * The stack size.

@@ -33,12 +33,6 @@ public class OpenViewHandler extends AbstractHandler {
 	public static final String INPUT = COMMAND + ".input";
 
 	/**
-	 * The constructor.
-	 */
-	public OpenViewHandler() {
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -56,7 +50,7 @@ public class OpenViewHandler extends AbstractHandler {
 			try {
 				page.openEditor(input, FormRootEditor.ID);
 			} catch (PartInitException e) {
-				e.printStackTrace();
+				throw new ExecutionException("Exception occurred trying to open the editor.", e);
 			}
 		}
 

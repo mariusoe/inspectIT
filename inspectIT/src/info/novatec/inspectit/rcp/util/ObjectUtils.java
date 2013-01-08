@@ -38,8 +38,8 @@ public final class ObjectUtils {
 	 *            the second object, may be <code>null</code>
 	 * @return <code>true</code> if the values of both objects are the same
 	 */
-	public static boolean equals(Object object1, Object object2) {
-		if (object1 == object2) {
+	public static boolean equals(Object object1, Object object2) { // NOPMD
+		if (object1 == object2) { // NOPMD
 			return true;
 		}
 		if ((null == object1) || (null == object2)) {
@@ -50,13 +50,13 @@ public final class ObjectUtils {
 
 	/**
 	 * Null safe compare. Returns following results:
-	 *
+	 * 
 	 * ObjectUtils.equals(Comparable, Object) = Comparable.compareTo(object)
-	 * ObjectUtils.equals(null, Object) = -1
-	 * ObjectUtils.equals(Comparable, null) = 1
+	 * ObjectUtils.equals(null, Object) = -1 ObjectUtils.equals(Comparable, null) = 1
 	 * ObjectUtils.equals(null, null) = 0
-	 *
-	 * @param <T> Type of comparing objects.
+	 * 
+	 * @param <T>
+	 *            Type of comparing objects.
 	 * @param object1
 	 *            Object1
 	 * @param object2

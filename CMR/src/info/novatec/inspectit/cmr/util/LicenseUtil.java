@@ -30,10 +30,10 @@ import de.schlichtherle.util.ObfuscatedString;
 /**
  * This license util holds the informations about the license file, license manager, license
  * content, license extras and the registered agents.
- *
+ * 
  * @author Dirk Maucher
  * @author Patrice Bouillet
- *
+ * 
  */
 @Component
 public class LicenseUtil {
@@ -150,7 +150,7 @@ public class LicenseUtil {
 
 	/**
 	 * Responsible for installing the license file and verify if it is valid or not.
-	 *
+	 * 
 	 * @throws Exception
 	 *             Exceptions like FileNotFoundException or LicenseContentNotValidException
 	 */
@@ -180,12 +180,12 @@ public class LicenseUtil {
 
 	/**
 	 * This method is called every time a agents connects to the CMR.
-	 *
+	 * 
 	 * @param definedIPs
 	 *            a List of IPs from the connecting agent
 	 * @param agentName
 	 *            the name of the connecting agent
-	 *
+	 * 
 	 * @throws LicenseContentException
 	 *             Every problem regarding reading or processing the license file is reported to the
 	 *             caller.
@@ -198,7 +198,7 @@ public class LicenseUtil {
 			// this method.
 			licenseManager.verify();
 		} catch (Exception e) {
-			throw new LicenseContentException(e.getMessage());
+			throw new LicenseContentException(e.getMessage()); // NOPMD
 		}
 
 		// registers the currently connected agent to our local set
@@ -231,7 +231,7 @@ public class LicenseUtil {
 	}
 
 	/**
-	 *
+	 * 
 	 * @return Returns the license information for the CMR.
 	 */
 	public LicenseInfoData getLicenceInfoData() {

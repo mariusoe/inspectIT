@@ -59,8 +59,8 @@ public class ListStringType implements UserType {
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean equals(Object x, Object y) {
-		if (x == y) {
+	public boolean equals(Object x, Object y) { // NOPMD
+		if (x == y) { // NOPMD
 			return true;
 		}
 
@@ -132,12 +132,12 @@ public class ListStringType implements UserType {
 	private String concat(List<? extends Object> list) {
 		StringBuffer buffer = new StringBuffer();
 
-		if (list.size() > 0) {
+		if (!list.isEmpty()) {
 			buffer.append(list.get(0).toString());
 
 			for (int i = 1; i < list.size(); i++) {
 				Object object = list.get(i);
-				buffer.append(" ");
+				buffer.append(' ');
 				buffer.append(object);
 			}
 		}

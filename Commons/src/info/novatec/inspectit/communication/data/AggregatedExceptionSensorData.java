@@ -2,7 +2,6 @@ package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.communication.ExceptionEvent;
 
-
 /**
  * Aggregated exception sensor data. This objects are used for the purpose of grouping the
  * {@link ExceptionSensorData} objects that have same properties.
@@ -93,6 +92,7 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
@@ -105,20 +105,27 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		AggregatedExceptionSensorData other = (AggregatedExceptionSensorData) obj;
-		if (created != other.created)
+		if (created != other.created) {
 			return false;
-		if (handled != other.handled)
+		}
+		if (handled != other.handled) {
 			return false;
-		if (passed != other.passed)
+		}
+		if (passed != other.passed) {
 			return false;
+		}
 		return true;
 	}
 

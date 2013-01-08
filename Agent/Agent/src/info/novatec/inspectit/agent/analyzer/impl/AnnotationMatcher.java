@@ -177,7 +177,7 @@ public class AnnotationMatcher extends AbstractMatcher {
 					return true;
 				}
 			}
-		} catch (NotFoundException e) {
+		} catch (NotFoundException e) { // NOPMD
 			// ignore
 		}
 
@@ -191,7 +191,7 @@ public class AnnotationMatcher extends AbstractMatcher {
 					return true;
 				}
 			}
-		} catch (NotFoundException e) {
+		} catch (NotFoundException e) { // NOPMD
 			// ignore
 		}
 

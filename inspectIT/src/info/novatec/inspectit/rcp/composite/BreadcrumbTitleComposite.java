@@ -364,8 +364,9 @@ public class BreadcrumbTitleComposite extends Composite implements CmrRepository
 		}
 
 		private int mirror(int x) {
-			if (fLTR)
+			if (fLTR) {
 				return x;
+			}
 
 			return ARROW_SIZE - x - 1;
 		}

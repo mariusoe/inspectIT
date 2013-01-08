@@ -5,8 +5,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 
 /**
- * The callback is used by the {@link IPreferencePanel} implementations to fire
- * the events.
+ * The callback is used by the {@link IPreferencePanel} implementations to fire the events.
  * 
  * @author Patrice Bouillet
  * 
@@ -19,7 +18,7 @@ public interface PreferenceEventCallback {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	public class PreferenceEvent {
+	class PreferenceEvent {
 
 		/**
 		 * The ID of this event.
@@ -32,9 +31,8 @@ public interface PreferenceEventCallback {
 		private Map<IPreferenceGroup, Object> preferenceMap;
 
 		/**
-		 * Constructor which needs an {@link PreferenceId}. Throws
-		 * {@link NullPointerException} if the <code>preferenceId</code> is
-		 * <code>null</code>.
+		 * Constructor which needs an {@link PreferenceId}. Throws {@link NullPointerException} if
+		 * the <code>preferenceId</code> is <code>null</code>.
 		 * 
 		 * @param preferenceId
 		 *            The preference ID.

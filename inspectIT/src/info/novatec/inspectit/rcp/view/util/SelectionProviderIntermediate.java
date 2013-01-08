@@ -8,11 +8,10 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 
 /**
- * IPostSelectionProvider implementation that delegates to another
- * ISelectionProvider or IPostSelectionProvider. The selection provider used for
- * delegation can be exchanged dynamically. Registered listeners are adjusted
- * accordingly. This utility class may be used in workbench parts with multiple
- * viewers.
+ * IPostSelectionProvider implementation that delegates to another ISelectionProvider or
+ * IPostSelectionProvider. The selection provider used for delegation can be exchanged dynamically.
+ * Registered listeners are adjusted accordingly. This utility class may be used in workbench parts
+ * with multiple viewers.
  * 
  * @author Marc R. Hoffmann
  */
@@ -41,14 +40,14 @@ public class SelectionProviderIntermediate implements IPostSelectionProvider {
 	};
 
 	/**
-	 * Sets a new selection provider to delegate to. Selection listeners
-	 * registered with the previous delegate are removed before.
+	 * Sets a new selection provider to delegate to. Selection listeners registered with the
+	 * previous delegate are removed before.
 	 * 
 	 * @param newDelegate
 	 *            new selection provider
 	 */
 	public void setSelectionProviderDelegate(ISelectionProvider newDelegate) {
-		if (delegate == newDelegate) {
+		if (delegate == newDelegate) { // NOPMD
 			return;
 		}
 		if (delegate != null) {

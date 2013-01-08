@@ -16,9 +16,6 @@ public class SWTCanvasAdapter implements CanvasAdapter {
 	private GC gc = null;
 	private Table detailTable = null;
 
-	public SWTCanvasAdapter() {
-	}
-
 	public void drawSequence(InvocationBlock invocationBlock) {
 		this.drawSequence(invocationBlock, this.defaultFillColor, this.defaultHiglightedFillColor, this.defaultLineColor, false);
 	}
@@ -62,7 +59,7 @@ public class SWTCanvasAdapter implements CanvasAdapter {
 			String methodName = methodIdent.getClassName() + "." + methodIdent.getMethodName();
 			int textWidth = 0;
 			FontData oldFontData = gc.getFont().getFontData()[0];
-			while (((textWidth = gc.getFontMetrics().getAverageCharWidth() * methodName.length()) >= (rect.width + 2)) || ((gc.getFontMetrics().getHeight()) > rect.height + 2)) {
+			while (((textWidth = gc.getFontMetrics().getAverageCharWidth() * methodName.length()) >= (rect.width + 2)) || ((gc.getFontMetrics().getHeight()) > rect.height + 2)) { // NOPMD
 				FontData fontData = gc.getFont().getFontData()[0];
 				fontData.setHeight(fontData.getHeight() - 1);
 				gc.setFont(new Font(gc.getDevice(), fontData));

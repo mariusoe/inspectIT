@@ -51,12 +51,6 @@ public class ParameterContentData implements Serializable, Sizeable {
 	private int signaturePosition = -1;
 
 	/**
-	 * Default no-args constructor.
-	 */
-	public ParameterContentData() {
-	}
-
-	/**
 	 * Gets {@link #id}.
 	 * 
 	 * @return {@link #id}

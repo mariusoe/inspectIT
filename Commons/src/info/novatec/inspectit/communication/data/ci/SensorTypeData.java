@@ -111,12 +111,6 @@ public class SensorTypeData implements Serializable {
 	 */
 	private Set<MethodSensorDefinitionData> methodSensorDefinitions = new HashSet<MethodSensorDefinitionData>(0);
 
-	/**
-	 * Default no-args constructor.
-	 */
-	public SensorTypeData() {
-	}
-
 	public long getId() {
 		return id;
 	}
@@ -181,6 +175,10 @@ public class SensorTypeData implements Serializable {
 		this.methodSensorDefinitions = methodSensorDefinitions;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -193,38 +191,55 @@ public class SensorTypeData implements Serializable {
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		SensorTypeData other = (SensorTypeData) obj;
 		if (description == null) {
-			if (other.description != null)
+			if (other.description != null) {
 				return false;
-		} else if (!description.equals(other.description))
+			}
+		} else if (!description.equals(other.description)) {
 			return false;
+		}
 		if (environmentData == null) {
-			if (other.environmentData != null)
+			if (other.environmentData != null) {
 				return false;
-		} else if (!environmentData.equals(other.environmentData))
+			}
+		} else if (!environmentData.equals(other.environmentData)) {
 			return false;
+		}
 		if (fullyQualifiedName == null) {
-			if (other.fullyQualifiedName != null)
+			if (other.fullyQualifiedName != null) {
 				return false;
-		} else if (!fullyQualifiedName.equals(other.fullyQualifiedName))
+			}
+		} else if (!fullyQualifiedName.equals(other.fullyQualifiedName)) {
 			return false;
+		}
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
-		if (priority != other.priority)
+		}
+		if (priority != other.priority) {
 			return false;
-		if (typeOption != other.typeOption)
+		}
+		if (typeOption != other.typeOption) {
 			return false;
+		}
 		return true;
 	}
 

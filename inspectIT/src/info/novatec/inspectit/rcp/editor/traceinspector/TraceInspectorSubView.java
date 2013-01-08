@@ -229,7 +229,6 @@ public class TraceInspectorSubView extends AbstractSubView {
 		canvasControl.setData(invocationSequence);
 		canvasControl.redraw();
 		canvasControl.update();
-		return;
 	}
 
 }

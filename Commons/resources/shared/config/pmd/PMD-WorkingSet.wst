@@ -1,46 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workingSets>
-<workingSet editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1315824301666_3" label="PMD WorkingSet" name="PMD WorkingSet">
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.sensor.method.marvintimer" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=CMR/src&lt;info.novatec.inspectit.cmr.dao.ci.impl" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.sending" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.sensor.method.timer" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=CMR/src&lt;info.novatec.inspectit.cmr.util" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.hooking.impl" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=CMR/src&lt;info.novatec.inspectit.cmr.service" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.buffer.impl" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.sensor.exception" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.connection" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=CMR/src&lt;info.novatec.inspectit.cmr" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.config.impl" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.core.impl" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.hooking" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=CMR/src&lt;info.novatec.inspectit.cmr.dao.ci" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.config" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=inspectIT/src" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Commons/src" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=CMR/src&lt;info.novatec.inspectit.cmr.cache.indexing.impl" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.buffer" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=CMR/src&lt;info.novatec.inspectit.cmr.cache" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.sensor.method.jdbc" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.sensor.platform" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.connection.impl" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.sensor.method" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.core" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.analyzer.impl" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.sensor" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.sensor.method.invocationsequence" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.sensor.method.averagetimer" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=CMR/src&lt;info.novatec.inspectit.cmr.jetty" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=CMR/src&lt;info.novatec.inspectit.cmr.dao.impl" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent5.0/src" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=CMR/src&lt;info.novatec.inspectit.cmr.cache.indexing.restriction" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.sending.impl" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=Agent/src&lt;info.novatec.inspectit.agent.analyzer" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=CMR/src&lt;info.novatec.inspectit.cmr.cache.indexing" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=CMR/src&lt;info.novatec.inspectit.cmr.cache.indexing.restriction.impl" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=CMR/src&lt;info.novatec.inspectit.cmr.dao" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=CMR/src&lt;info.novatec.inspectit.cmr.cache.impl" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<workingSet editPageId="org.eclipse.ui.resourceWorkingSetPage" id="1357738528646_3" label="Sources" name="Sources">
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/Agent/src" type="2"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/CMR/src" type="2"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/Commons/src" type="2"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/CommonsCS/src" type="2"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/inspectIT/src" type="2"/>
 </workingSet>
 </workingSets>

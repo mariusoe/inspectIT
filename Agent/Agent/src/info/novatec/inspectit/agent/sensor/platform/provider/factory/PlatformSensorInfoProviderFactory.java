@@ -40,16 +40,12 @@ public final class PlatformSensorInfoProviderFactory {
 				createSunPlatformSensorInfoProvider();
 			}
 		} else if (UnderlyingSystemInfo.JVM_PROVIDER == JvmProvider.IBM && (UnderlyingSystemInfo.JAVA_VERSION == JavaVersion.JAVA_1_6 || UnderlyingSystemInfo.JAVA_VERSION == JavaVersion.JAVA_1_7)) {
-			boolean loaded = true;
 			if (null == platformSensorInfoProvider) {
 				try {
 					createIbmJava6PlatformSensorInfoProvider();
 				} catch (Exception e) {
-					loaded = false;
 					LOGGER.log(Level.WARNING, "Creation of the Platform Sensor Info Provider for IBM virtual machine failed.", e);
 				}
-			}
-			if (loaded) {
 			}
 		}
 

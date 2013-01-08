@@ -106,7 +106,7 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 			try {
 				superClass = superClass.getSuperclass();
 			} catch (NotFoundException e) {
-				throw new NoSuchElementException(e.getMessage());
+				throw new NoSuchElementException(e.getMessage()); // NOPMD
 			}
 
 			if (null == superClass) {
@@ -168,7 +168,7 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 			for (int i = 0; i < num; ++i) {
 				try {
 					ctClasses[i] = ctClass.getClassPool().get(ifs[i]);
-				} catch (NotFoundException e) {
+				} catch (NotFoundException e) { // NOPMD
 					// LOGGER.severe("Interface not found: " + ifs[i] + " (of class: " +
 					// ctClass.getName() + ")");
 				}

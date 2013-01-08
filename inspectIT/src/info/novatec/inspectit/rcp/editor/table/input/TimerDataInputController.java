@@ -25,6 +25,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -296,7 +297,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 		}
 
 		timerDataList.clear();
-		if (aggregatedTimerData.size() > 0) {
+		if (CollectionUtils.isNotEmpty(aggregatedTimerData)) {
 			timerDataList.addAll(aggregatedTimerData);
 		}
 

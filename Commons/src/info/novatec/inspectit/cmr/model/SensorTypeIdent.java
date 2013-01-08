@@ -33,9 +33,6 @@ public abstract class SensorTypeIdent implements Serializable {
 	 */
 	private String fullyQualifiedClassName;
 
-	public SensorTypeIdent() {
-	}
-
 	public Set<PlatformIdent> getPlatformIdents() {
 		return platformIdents;
 	}

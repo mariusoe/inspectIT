@@ -9,7 +9,13 @@ package info.novatec.inspectit.util;
  * @author Ivan Senic
  * 
  */
-public class ArrayUtil {
+public final class ArrayUtil {
+
+	/**
+	 * Private constructor.
+	 */
+	private ArrayUtil() {
+	}
 
 	/**
 	 * Searches a range of the specified array of longs for the specified value using the binary
@@ -71,12 +77,13 @@ public class ArrayUtil {
 			int mid = (low + high) >>> 1;
 			long midVal = a[mid];
 
-			if (midVal < key)
+			if (midVal < key) {
 				low = mid + 1;
-			else if (midVal > key)
+			} else if (midVal > key) {
 				high = mid - 1;
-			else
+			} else {
 				return mid; // key found
+			}
 		}
 		return -(low + 1); // key not found.
 	}

@@ -122,9 +122,9 @@ public class HookDispatcher implements IHookDispatcher {
 						IMethodHook methodHook = (IMethodHook) entry.getValue();
 						methodHook.beforeBody(id, entry.getKey().longValue(), object, parameters, rsc);
 					}
-				} catch (Throwable throwable) {
+				} catch (Throwable throwable) { // NOPMD
 					LOGGER.severe("An error happened in the Hook Dispatcher! (before body)");
-					throwable.printStackTrace();
+					throwable.printStackTrace(); // NOPMD
 				}
 			} finally {
 				executionMarker.deactive();
@@ -146,9 +146,9 @@ public class HookDispatcher implements IHookDispatcher {
 						IMethodHook methodHook = (IMethodHook) entry.getValue();
 						methodHook.firstAfterBody(id, entry.getKey().longValue(), object, parameters, returnValue, rsc);
 					}
-				} catch (Throwable throwable) {
+				} catch (Throwable throwable) { // NOPMD
 					LOGGER.severe("An error happened in the Hook Dispatcher! (after body)");
-					throwable.printStackTrace();
+					throwable.printStackTrace(); // NOPMD
 				}
 			} finally {
 				executionMarker.deactive();
@@ -176,7 +176,7 @@ public class HookDispatcher implements IHookDispatcher {
 						for (Map.Entry<Long, IHook> entry : rsc.getMethodHooks().entrySet()) {
 							IMethodHook methodHook = (IMethodHook) entry.getValue();
 							// the invocation sequence sensor needs the original core service!
-							if (invocCoreService == methodHook) {
+							if (invocCoreService == methodHook) { // NOPMD
 								methodHook.secondAfterBody(coreService, id, entry.getKey().longValue(), object, parameters, returnValue, rsc);
 							} else {
 								methodHook.secondAfterBody(invocCoreService, id, entry.getKey().longValue(), object, parameters, returnValue, rsc);
@@ -204,9 +204,9 @@ public class HookDispatcher implements IHookDispatcher {
 						// already stored in the data object
 						invocationHook.secondAfterBody(coreService, id, -1, object, parameters, returnValue, rsc);
 					}
-				} catch (Throwable throwable) {
+				} catch (Throwable throwable) { // NOPMD
 					LOGGER.severe("An error happened in the Hook Dispatcher! (second after body)");
-					throwable.printStackTrace();
+					throwable.printStackTrace(); // NOPMD
 				}
 			} finally {
 				executionMarker.deactive();
@@ -380,9 +380,9 @@ public class HookDispatcher implements IHookDispatcher {
 						IConstructorHook constructorHook = (IConstructorHook) entry.getValue();
 						constructorHook.beforeConstructor(id, entry.getKey().longValue(), object, parameters, rsc);
 					}
-				} catch (Throwable throwable) {
+				} catch (Throwable throwable) { // NOPMD
 					LOGGER.severe("An error happened in the Hook Dispatcher! (before constructor)");
-					throwable.printStackTrace();
+					throwable.printStackTrace(); // NOPMD
 				}
 			} finally {
 				executionMarker.deactive();
@@ -411,7 +411,7 @@ public class HookDispatcher implements IHookDispatcher {
 							IConstructorHook constructorHook = (IConstructorHook) entry.getValue();
 							// the invocation sequence sensor and the exception sensor need the
 							// original core service!
-							if (invocCoreService == constructorHook) {
+							if (invocCoreService == constructorHook) { // NOPMD
 								constructorHook.afterConstructor(coreService, id, entry.getKey().longValue(), object, parameters, rsc);
 							} else {
 								constructorHook.afterConstructor(invocCoreService, id, entry.getKey().longValue(), object, parameters, rsc);
@@ -439,9 +439,9 @@ public class HookDispatcher implements IHookDispatcher {
 						// a -1. It is already stored in the data object
 						invocationHook.afterConstructor(coreService, id, -1, object, parameters, rsc);
 					}
-				} catch (Throwable throwable) {
+				} catch (Throwable throwable) { // NOPMD
 					LOGGER.severe("An error happened in the Hook Dispatcher! (after constructor)");
-					throwable.printStackTrace();
+					throwable.printStackTrace(); // NOPMD
 				}
 			} finally {
 				executionMarker.deactive();

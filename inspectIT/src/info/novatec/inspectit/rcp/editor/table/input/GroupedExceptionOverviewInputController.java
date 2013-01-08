@@ -450,11 +450,11 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 			}
 			return TextFormatter.getInvocationAffilliationPercentageString(percentage, invocations);
 		case CREATED:
-			return new StyledString("" + data.getCreated());
+			return new StyledString(String.valueOf(data.getCreated()));
 		case RETHROWN:
-			return new StyledString("" + data.getPassed());
+			return new StyledString(String.valueOf(data.getPassed()));
 		case HANDLED:
-			return new StyledString("" + data.getHandled());
+			return new StyledString(String.valueOf(data.getHandled()));
 		default:
 			return new StyledString("error");
 		}

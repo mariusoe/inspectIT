@@ -53,9 +53,18 @@ public final class TimerStorageFactory {
 	 */
 	public static TimerStorageFactory getFactory() {
 		if (null == singleton) {
-			singleton = new TimerStorageFactory();
+			createTimerStorageFactory();
 		}
 		return singleton;
+	}
+
+	/**
+	 * Creates singleton in synchronized method.
+	 */
+	private static synchronized void createTimerStorageFactory() {
+		if (null == singleton) {
+			singleton = new TimerStorageFactory();
+		}
 	}
 
 	/**

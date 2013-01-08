@@ -92,7 +92,7 @@ public class InspectIT extends AbstractUIPlugin {
 			cmrRepositoryManager.cancelAllUpdateRepositoriesJobs();
 		}
 		super.stop(context);
-		plugin = null;
+		plugin = null; // NOPMD
 	}
 
 	/**

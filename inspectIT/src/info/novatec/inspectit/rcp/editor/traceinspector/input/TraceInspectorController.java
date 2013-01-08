@@ -16,7 +16,7 @@ public class TraceInspectorController {
 	private int blockHeight = 20;
 	private boolean resolutionWasSet = false;
 	private InputDefinition inputDefinition = null;
-	private TreeMap<Integer, TreeMap<Integer, InvocationBlock>> clickMap = null;
+	private TreeMap<Integer, TreeMap<Integer, InvocationBlock>> clickMap = null; // NOPMD
 	private InvocationBlock highlightedInvocationBlock = null;
 	private InvocationSequenceData invocationSequence = null;
 	private AbstractSubView transactionInspectorSubView = null;
@@ -41,11 +41,11 @@ public class TraceInspectorController {
 		return xResolution;
 	}
 
-	public TreeMap<Integer, TreeMap<Integer, InvocationBlock>> getClickMap() {
+	public TreeMap<Integer, TreeMap<Integer, InvocationBlock>> getClickMap() { // NOPMD
 		return clickMap;
 	}
 
-	public void setClickMap(TreeMap<Integer, TreeMap<Integer, InvocationBlock>> clickMap) {
+	public void setClickMap(TreeMap<Integer, TreeMap<Integer, InvocationBlock>> clickMap) { // NOPMD
 		this.clickMap = clickMap;
 	}
 
@@ -58,7 +58,7 @@ public class TraceInspectorController {
 	}
 
 	private void paint(CanvasAdapter canvas, InvocationSequenceTraceInspectorDecorator i, double xResolution, double yResolution) {
-		if (resolutionWasSet == false) {
+		if (!resolutionWasSet) {
 			xResolution = canvas.getArea().width / i.getDuration();
 			this.xResolution = xResolution;
 		}
@@ -143,7 +143,7 @@ public class TraceInspectorController {
 				// It's not necessary to check the y axis, because
 				// there are no gaps possible on the y axis.
 				if (x < invocationBlock.getArea().x) {
-					invocationBlock = null;
+					invocationBlock = null; // NOPMD
 				}
 			}
 		}
@@ -152,7 +152,7 @@ public class TraceInspectorController {
 
 	public void highlightInvocationBlock(int x, int y) {
 		InvocationBlock invocationBlock = this.findInvocationBlock(x, y);
-		if (highlightedInvocationBlock != invocationBlock) {
+		if (highlightedInvocationBlock != invocationBlock) { // NOPMD
 			if (highlightedInvocationBlock != null) {
 				highlightedInvocationBlock.setHighlighted(false);
 			}
@@ -193,7 +193,7 @@ public class TraceInspectorController {
 	public void setInvocationSequence(InvocationSequenceData invocationSequence) {
 		this.invocationSequence = this.decorateInvocationSequence(invocationSequence);
 		this.resolutionWasSet = false;
-		this.clickMap = null;
+		this.clickMap = null; // NOPMD
 	}
 
 	public InvocationSequenceData getInvocationSequence() {
@@ -204,7 +204,7 @@ public class TraceInspectorController {
 		this.xResolution = this.xResolution - this.xResolution * (percent / 100);
 		this.yResolution = this.yResolution - this.yResolution * (percent / 100);
 		this.resolutionWasSet = true;
-		this.clickMap = null;
+		this.clickMap = null; // NOPMD
 		transactionInspectorSubView.doRefresh();
 	}
 
@@ -212,7 +212,7 @@ public class TraceInspectorController {
 		this.xResolution = this.xResolution + this.xResolution * (percent / 100);
 		this.yResolution = this.yResolution + this.yResolution * (percent / 100);
 		this.resolutionWasSet = true;
-		this.clickMap = null;
+		this.clickMap = null; // NOPMD
 		transactionInspectorSubView.doRefresh();
 	}
 
@@ -220,7 +220,7 @@ public class TraceInspectorController {
 		this.xResolution = 1.0;
 		this.yResolution = 1.0;
 		this.resolutionWasSet = 5 < 4;
-		this.clickMap = null;
+		this.clickMap = null; // NOPMD
 		transactionInspectorSubView.doRefresh();
 	}
 
@@ -228,7 +228,7 @@ public class TraceInspectorController {
 		InvocationBlock invocationBlock = this.findInvocationBlock(x, y);
 		if (invocationBlock != null) {
 			this.invocationSequence = invocationBlock.getInvocationSequence();
-			this.clickMap = null;
+			this.clickMap = null; // NOPMD
 			transactionInspectorSubView.doRefresh();
 		}
 	}
@@ -236,7 +236,7 @@ public class TraceInspectorController {
 	public void drillDown() {
 		if (highlightedInvocationBlock != null) {
 			this.invocationSequence = highlightedInvocationBlock.getInvocationSequence();
-			this.clickMap = null;
+			this.clickMap = null; // NOPMD
 			transactionInspectorSubView.doRefresh();
 		}
 	}
@@ -244,14 +244,14 @@ public class TraceInspectorController {
 	public void drillUp() {
 		if (invocationSequence.getParentSequence() != null) {
 			this.invocationSequence = invocationSequence.getParentSequence();
-			this.clickMap = null;
+			this.clickMap = null; // NOPMD
 			transactionInspectorSubView.doRefresh();
 		}
 	}
 
 	public void toggleHeat() {
-		this.isHeated = !isHeated;
-		this.clickMap = null;
+		this.isHeated ^= true;
+		this.clickMap = null; // NOPMD
 		transactionInspectorSubView.doRefresh();
 	}
 }

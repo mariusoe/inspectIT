@@ -54,11 +54,11 @@ public class FileBasedVersioningServiceImpl implements IVersioningService {
 			try {
 				if (null != reader) {
 					reader.close();
-					reader = null;
+					reader = null; // NOPMD
 					s.close();
-					s = null;
+					s = null; // NOPMD
 				}
-			} catch (IOException e) {
+			} catch (IOException e) { // NOPMD
 				// ignore
 			}
 		}

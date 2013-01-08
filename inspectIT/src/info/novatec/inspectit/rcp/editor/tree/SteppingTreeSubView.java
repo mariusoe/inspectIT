@@ -268,7 +268,7 @@ public class SteppingTreeSubView extends TreeSubView {
 		/**
 		 * Clear all button.
 		 */
-		private Button clearAll;
+		private Button clearAllButton;
 
 		/**
 		 * Information label.
@@ -361,10 +361,10 @@ public class SteppingTreeSubView extends TreeSubView {
 			gd.widthHint = 0;
 			helpComposite.setLayoutData(gd);
 
-			clearAll = toolkit.createButton(mainComposite, "", SWT.PUSH | SWT.NO_BACKGROUND);
-			clearAll.setEnabled(false);
-			clearAll.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_TRASH));
-			clearAll.setToolTipText("Empty steppable objects list");
+			clearAllButton = toolkit.createButton(mainComposite, "", SWT.PUSH | SWT.NO_BACKGROUND);
+			clearAllButton.setEnabled(false);
+			clearAllButton.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_TRASH));
+			clearAllButton.setToolTipText("Empty steppable objects list");
 
 			objectSelection.addListener(SWT.Modify, new Listener() {
 				@Override
@@ -428,7 +428,7 @@ public class SteppingTreeSubView extends TreeSubView {
 				}
 			});
 
-			clearAll.addListener(SWT.Selection, new Listener() {
+			clearAllButton.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event event) {
 					clearAll();
@@ -445,7 +445,7 @@ public class SteppingTreeSubView extends TreeSubView {
 			steppableObjects.clear();
 			objectSelection.removeAll();
 			objectsInCombo.clear();
-			selectedObject = null;
+			selectedObject = null; // NOPMD
 			occurrence = 0;
 			inputChanged();
 		}
@@ -517,7 +517,7 @@ public class SteppingTreeSubView extends TreeSubView {
 					objectsInCombo = steppableObjects;
 					objectSelection.removeAll();
 					if (!objectsInCombo.isEmpty()) {
-						clearAll.setEnabled(true);
+						clearAllButton.setEnabled(true);
 						for (Object object : objectsInCombo) {
 							objectSelection.add(getTextualString(object));
 						}
@@ -530,7 +530,7 @@ public class SteppingTreeSubView extends TreeSubView {
 					} else {
 						next.setEnabled(false);
 						previous.setEnabled(false);
-						clearAll.setEnabled(false);
+						clearAllButton.setEnabled(false);
 						updateInfoBox();
 					}
 				} else {

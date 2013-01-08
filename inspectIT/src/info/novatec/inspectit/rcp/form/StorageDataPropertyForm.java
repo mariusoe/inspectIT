@@ -438,7 +438,7 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 				} else if (firstElement instanceof ILocalStorageDataProvider) {
 					IStorageData localStorageData = ((ILocalStorageDataProvider) firstElement).getLocalStorageData();
 					if (!ObjectUtils.equals(storageData, localStorageData)) {
-						storageDataProvider = null;
+						storageDataProvider = null; // NOPMD
 						storageData = localStorageData;
 						valueViewerColumn.setEditingSupport(null);
 						refreshData();
@@ -448,8 +448,8 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 			}
 		}
 		if (null != storageDataProvider || null != storageData) {
-			storageDataProvider = null;
-			storageData = null;
+			storageDataProvider = null; // NOPMD
+			storageData = null; // NOPMD
 			valueViewerColumn.setEditingSupport(null);
 			refreshData();
 		}

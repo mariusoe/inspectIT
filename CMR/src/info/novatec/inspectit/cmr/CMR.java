@@ -35,7 +35,7 @@ public final class CMR {
 	/**
 	 * The spring bean factory to get the registered beans.
 	 */
-	private static BeanFactory beanFactory;
+	private static BeanFactory beanFactory; // NOPMD
 
 	/**
 	 * This class will start the Repository.

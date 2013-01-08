@@ -100,8 +100,8 @@ public class ChannelManagersTest extends AbstractTestNGLogSupport {
 		bufferQueue.take().get(readBytes);
 		assertThat(readBytes, is(equalTo(bytes)));
 
-		readingChannelManager.finalize(file);
-		writingChannelManager.finalize(file);
+		readingChannelManager.finalizeChannel(file);
+		writingChannelManager.finalizeChannel(file);
 	}
 
 	/**
@@ -142,8 +142,8 @@ public class ChannelManagersTest extends AbstractTestNGLogSupport {
 		bufferQueue.take().get(readBytes);
 		assertThat(readBytes, is(equalTo(bytes)));
 
-		writingChannelManager.finalize(file);
-		readingChannelManager.finalize(file);
+		writingChannelManager.finalizeChannel(file);
+		readingChannelManager.finalizeChannel(file);
 	}
 
 	/**

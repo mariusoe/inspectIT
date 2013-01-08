@@ -8,7 +8,7 @@ public class InvocationBlock {
 	private Rectangle area = null;
 	private InvocationSequenceData invocationSequence = null;
 	private MethodIdent methodIdent = null;
-	private boolean isHighlighted = false;
+	private boolean highlighted = false;
 	private double amount = 0.0;
 
 	public InvocationBlock() {
@@ -45,11 +45,11 @@ public class InvocationBlock {
 	}
 
 	public boolean isHighlighted() {
-		return isHighlighted;
+		return highlighted;
 	}
 
 	public void setHighlighted(boolean isHighlighted) {
-		this.isHighlighted = isHighlighted;
+		this.highlighted = isHighlighted;
 	}
 
 	public double getAmount() {

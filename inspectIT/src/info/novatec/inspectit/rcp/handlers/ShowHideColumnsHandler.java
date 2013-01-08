@@ -265,7 +265,7 @@ public class ShowHideColumnsHandler extends AbstractHandler {
 	/**
 	 * Loads preferences for columns size/visibility.
 	 */
-	private static void startUp() {
+	private static synchronized void startUp() {
 		columnSizeCache = new HashMap<Integer, Integer>();
 		PreferencesUtils.loadPrimitiveMap(PreferencesConstants.TABLE_COLUMN_SIZE_CACHE, columnSizeCache, Integer.class, Integer.class);
 

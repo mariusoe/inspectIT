@@ -107,7 +107,7 @@ import org.eclipse.ui.progress.UIJob;
  * @author Ivan Senic
  * 
  */
-public class StorageManagerView extends ViewPart implements CmrRepositoryChangeListener, StorageChangeListener, IRefreshableView {
+public class StorageManagerView extends ViewPart implements CmrRepositoryChangeListener, StorageChangeListener, IRefreshableView { // NOPMD
 
 	/**
 	 * View id.
@@ -826,7 +826,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 			if (null != storagePropertyForm && !storagePropertyForm.isDisposed()) {
 				treeViewer.removeSelectionChangedListener(storagePropertyForm);
 				storagePropertyForm.dispose();
-				storagePropertyForm = null;
+				storagePropertyForm = null; // NOPMD
 			}
 			mainComposite.setWeights(new int[] { 1 });
 			mainComposite.layout();
@@ -1271,7 +1271,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
-					process(event);
+					process();
 					return Status.OK_STATUS;
 				}
 			};
@@ -1281,11 +1281,8 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 
 		/**
 		 * Processes the double-click.
-		 * 
-		 * @param event
-		 *            Event that denotes the click.
 		 */
-		private void process(DoubleClickEvent event) {
+		private void process() {
 			StructuredSelection selection = (StructuredSelection) treeViewer.getSelection();
 			if (!selection.isEmpty() && selection.getFirstElement() instanceof StorageLeaf) {
 				StorageLeaf storageLeaf = (StorageLeaf) selection.getFirstElement();
@@ -1297,7 +1294,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 					try {
 						repositoryDefinition = storageManager.getStorageRepositoryDefinition(localStorageData);
 					} catch (Exception e) {
-						repositoryDefinition = null;
+						repositoryDefinition = null; // NOPMD
 					}
 				} else if (storageLeaf.getStorageData().getState() == StorageState.CLOSED) {
 					// if it is closed, mount it first
@@ -1306,7 +1303,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 						LocalStorageData localStorageData = storageManager.getLocalDataForStorage(storageLeaf.getStorageData());
 						repositoryDefinition = storageManager.getStorageRepositoryDefinition(localStorageData);
 					} catch (Exception e1) {
-						repositoryDefinition = null;
+						repositoryDefinition = null; // NOPMD
 						InspectIT.getDefault().createErrorDialog("Can not open storage.", e1, -1);
 					}
 				} else if (storageLeaf.getStorageData().getState() == StorageState.OPENED) {

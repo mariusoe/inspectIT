@@ -204,10 +204,10 @@ public class SerializationManager implements ISerializer, InitializingBean {
 	private void registerClasses(Kryo kryo) {
 		/** Java native classes */
 		kryo.register(Class.class, new ClassSerializer());
-		kryo.register(ArrayList.class, new HibernateAwareCollectionSerializer(hibernateUtil));
+		kryo.register(ArrayList.class, new HibernateAwareCollectionSerializer(hibernateUtil)); // NOPMD
 		kryo.register(CopyOnWriteArrayList.class, new CollectionSerializer());
-		kryo.register(HashSet.class, new HibernateAwareCollectionSerializer(hibernateUtil));
-		kryo.register(HashMap.class, new HibernateAwareMapSerializer(hibernateUtil));
+		kryo.register(HashSet.class, new HibernateAwareCollectionSerializer(hibernateUtil)); // NOPMD
+		kryo.register(HashMap.class, new HibernateAwareMapSerializer(hibernateUtil)); // NOPMD
 		kryo.register(ConcurrentHashMap.class, new MapSerializer());
 		kryo.register(Timestamp.class, new TimestampSerializer());
 		kryo.register(Date.class, new DateSerializer());

@@ -114,7 +114,7 @@ public class JavaAgent implements ClassFileTransformer {
 			inst.addTransformer(new JavaAgent());
 		} catch (Exception e) {
 			LOGGER.severe("Something unexpected happened while trying to initialize the Agent, aborting!");
-			e.printStackTrace();
+			e.printStackTrace(); // NOPMD
 		}
 	}
 
@@ -151,9 +151,9 @@ public class JavaAgent implements ClassFileTransformer {
 			}
 			// LOGGER.severe("Parallel loading of classes: Skipping class "+className);
 			return data;
-		} catch (Throwable ex) {
+		} catch (Throwable ex) { // NOPMD
 			LOGGER.severe("Error occured while dealing with class: " + className + " " + ex.getMessage());
-			ex.printStackTrace();
+			ex.printStackTrace(); // NOPMD
 			return null;
 		}
 	}
@@ -177,7 +177,7 @@ public class JavaAgent implements ClassFileTransformer {
 			LOGGER.info("inspectIT Agent: Advanced instrumentation capabilities not detected due to security constraints...");
 		} catch (Exception e) {
 			LOGGER.severe("Something unexpected happened while trying to get advanced instrumentation capabilities!");
-			e.printStackTrace();
+			e.printStackTrace(); // NOPMD
 		}
 
 		if (!instrumentCoreClasses) {
@@ -229,8 +229,8 @@ public class JavaAgent implements ClassFileTransformer {
 			} else {
 				LOGGER.info("Redefinition of Classes is not supported in this JVM!");
 			}
-		} catch (Throwable t) {
-			t.printStackTrace();
+		} catch (Throwable t) { // NOPMD
+			t.printStackTrace(); // NOPMD
 			LOGGER.severe("The process of class redefinitions produced an error: " + t.getMessage());
 			LOGGER.severe("If you are running on an IBM JVM, please ignore this error as the JVM does not support this feature!");
 			LOGGER.throwing(JavaAgent.class.getCanonicalName(), "analyzeAlreadyLoadedClasses", t);
@@ -405,17 +405,18 @@ public class JavaAgent implements ClassFileTransformer {
 			OutputStream output = null;
 			try {
 				String name = jarEntry.getName().replace('/', '_');
-				int i = name.lastIndexOf(".");
+				int i = name.lastIndexOf('.');
 				String extension = i > -1 ? name.substring(i) : "";
 				File file = File.createTempFile(name.substring(0, name.length() - extension.length()) + ".", extension);
 				file.deleteOnExit();
 				input = jarFile.getInputStream(jarEntry);
 				output = new FileOutputStream(file);
 
-				int readCount;
 				byte[] buffer = new byte[4096];
-				while ((readCount = input.read(buffer)) != -1) {
+				int readCount = input.read(buffer);
+				while (readCount != -1) {
 					output.write(buffer, 0, readCount);
+					readCount = input.read(buffer);
 				}
 
 				return file;
@@ -458,7 +459,7 @@ public class JavaAgent implements ClassFileTransformer {
 			if (closeable != null) {
 				try {
 					closeable.close();
-				} catch (IOException e) {
+				} catch (IOException e) { // NOPMD
 					// don't care about this one
 				}
 			}

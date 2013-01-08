@@ -17,7 +17,7 @@ public interface ILicenseService {
 	 * @param licenseContent
 	 *            The license file content.
 	 */
-	public void receiveLicenseContent(byte[] licenseContent) throws Exception;
+	void receiveLicenseContent(byte[] licenseContent) throws Exception;
 
 	/**
 	 * Returns the license information for the CMR.

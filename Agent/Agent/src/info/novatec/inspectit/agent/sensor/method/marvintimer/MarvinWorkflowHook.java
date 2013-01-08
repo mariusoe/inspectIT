@@ -173,7 +173,7 @@ public class MarvinWorkflowHook implements IMethodHook {
 				// want to access this object in the future. Thus we pass the
 				// nanos as the prefix which should be unique and set both IDs
 				// to 0
-				coreService.addMethodSensorData(0L, 0L, new Double(timer.getCurrentTime()).toString(), timerData);
+				coreService.addMethodSensorData(0L, 0L, Double.toString(timer.getCurrentTime()), timerData);
 			}
 		}
 	}

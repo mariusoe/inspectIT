@@ -186,7 +186,7 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 			// calling first a method on the connection (prepareStatement...)
 			LOGGER.info("Could not add prepared statement, no sql available! Method ID(local): " + methodId);
 			LOGGER.info("This is not an inspectIT issue, but you forget to integrate the Connection creating the SQL statement in the configuration, please consult the management of inspectIT and send the following stacktrace!");
-			e.printStackTrace();
+			e.printStackTrace(); // NOPMD
 
 			// we need to ensure thread safety for the list and do not care for lost updates, so
 			// we simply create a new list based on the old list and change references after we

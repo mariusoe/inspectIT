@@ -3,8 +3,8 @@ package info.novatec.inspectit.communication.data.ci;
 import java.io.Serializable;
 
 /**
- * The platform sensor definition data object is used to store the information
- * about an platform sensor definition.
+ * The platform sensor definition data object is used to store the information about an platform
+ * sensor definition.
  * 
  * @author Matthias Huber
  * 
@@ -35,12 +35,6 @@ public class PlatformSensorDefinitionData implements Serializable {
 	 * Indicates whether this definition is used for monitoring or not.
 	 */
 	private boolean activated;
-
-	/**
-	 * Default no-args constructor.
-	 */
-	public PlatformSensorDefinitionData() {
-	}
 
 	public long getId() {
 		return id;
@@ -74,6 +68,10 @@ public class PlatformSensorDefinitionData implements Serializable {
 		this.activated = activated;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -83,27 +81,39 @@ public class PlatformSensorDefinitionData implements Serializable {
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		PlatformSensorDefinitionData other = (PlatformSensorDefinitionData) obj;
-		if (activated != other.activated)
+		if (activated != other.activated) {
 			return false;
+		}
 		if (fullyQualifiedName == null) {
-			if (other.fullyQualifiedName != null)
+			if (other.fullyQualifiedName != null) {
 				return false;
-		} else if (!fullyQualifiedName.equals(other.fullyQualifiedName))
+			}
+		} else if (!fullyQualifiedName.equals(other.fullyQualifiedName)) {
 			return false;
+		}
 		if (profileData == null) {
-			if (other.profileData != null)
+			if (other.profileData != null) {
 				return false;
-		} else if (!profileData.equals(other.profileData))
+			}
+		} else if (!profileData.equals(other.profileData)) {
 			return false;
+		}
 		return true;
 	}
-	
+
 }

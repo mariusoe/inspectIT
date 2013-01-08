@@ -15,7 +15,7 @@ public final class Agent {
 	/**
 	 * The real agent implementation to point to.
 	 */
-	public static IAgent agent;
+	public static IAgent agent; // NOPMD
 
 	/**
 	 * Private constructor to prevent instantiation.

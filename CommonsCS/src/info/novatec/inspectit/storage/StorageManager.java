@@ -133,7 +133,7 @@ public abstract class StorageManager {
 	 * @return {@link Path} that can be used in IO operations.
 	 */
 	public Path getChannelPath(IStorageData storageData, IStorageDescriptor descriptor) {
-		return getStoragePath(storageData).resolve(String.valueOf(descriptor.getChannelId()) + StorageFileExtensions.DATA_FILE_EXT);
+		return getStoragePath(storageData).resolve(descriptor.getChannelId() + StorageFileExtensions.DATA_FILE_EXT);
 	}
 
 	/**
@@ -566,7 +566,8 @@ public abstract class StorageManager {
 		for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
 			try {
 				return provider.newFileSystem(path, env);
-			} catch (UnsupportedOperationException uoe) {
+			} catch (UnsupportedOperationException uoe) { // NOPMD
+				// ignore
 			}
 		}
 		throw new ProviderNotFoundException("Provider not found");

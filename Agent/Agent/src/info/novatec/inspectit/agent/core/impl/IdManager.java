@@ -76,17 +76,17 @@ public class IdManager implements IIdManager, Startable {
 	/**
 	 * The methods to register at the server.
 	 */
-	private LinkedList<RegisteredSensorConfig> methodsToRegister = new LinkedList<RegisteredSensorConfig>();
+	private LinkedList<RegisteredSensorConfig> methodsToRegister = new LinkedList<RegisteredSensorConfig>(); // NOPMD
 
 	/**
 	 * The sensor types to register at the server.
 	 */
-	private LinkedList<AbstractSensorTypeConfig> sensorTypesToRegister = new LinkedList<AbstractSensorTypeConfig>();
+	private LinkedList<AbstractSensorTypeConfig> sensorTypesToRegister = new LinkedList<AbstractSensorTypeConfig>(); // NOPMD
 
 	/**
 	 * The mapping between the sensor types and methods to register at the server.
 	 */
-	private LinkedList<SensorTypeToMethodMapping> sensorTypeToMethodRegister = new LinkedList<SensorTypeToMethodMapping>();
+	private LinkedList<SensorTypeToMethodMapping> sensorTypeToMethodRegister = new LinkedList<SensorTypeToMethodMapping>(); // NOPMD
 
 	/**
 	 * If set to <code>true</code>, the connection to server created an exception.
@@ -137,7 +137,7 @@ public class IdManager implements IIdManager, Startable {
 		// set the registration thread to null to indicate that the while loop
 		// will be finished on the next run.
 		Thread temp = registrationThread;
-		registrationThread = null;
+		registrationThread = null; // NOPMD
 		synchronized (temp) {
 			temp.interrupt();
 		}
@@ -161,7 +161,7 @@ public class IdManager implements IIdManager, Startable {
 				try {
 					registrationThread.connect();
 					registrationThread.registerPlatform();
-				} catch (Throwable throwable) {
+				} catch (Throwable throwable) { // NOPMD
 					serverErrorOccured = true;
 					throw new IdNotAvailableException("Connection is not established yet, cannot retrieve platform ID", throwable);
 				}
@@ -174,7 +174,7 @@ public class IdManager implements IIdManager, Startable {
 				// occurred, the registration is started
 				try {
 					registrationThread.registerPlatform();
-				} catch (Throwable throwable) {
+				} catch (Throwable throwable) { // NOPMD
 					serverErrorOccured = true;
 					LOGGER.warning("Could not register the platform even though the connection seems to be established, will try later!");
 					throw new IdNotAvailableException("Could not register the platform even though the connection seems to be established, will try later!", throwable);
@@ -235,7 +235,7 @@ public class IdManager implements IIdManager, Startable {
 				}
 
 				registrationThread.registerMethod(registeredSensorConfig);
-			} catch (Throwable throwable) {
+			} catch (Throwable throwable) { // NOPMD
 				synchronized (methodsToRegister) {
 					methodsToRegister.addLast(registeredSensorConfig);
 
@@ -272,7 +272,7 @@ public class IdManager implements IIdManager, Startable {
 				}
 
 				registrationThread.registerSensorType(methodSensorTypeConfig);
-			} catch (Throwable throwable) {
+			} catch (Throwable throwable) { // NOPMD
 				synchronized (sensorTypesToRegister) {
 					sensorTypesToRegister.addLast(methodSensorTypeConfig);
 
@@ -305,7 +305,7 @@ public class IdManager implements IIdManager, Startable {
 				}
 
 				registrationThread.addSensorTypeToMethod(Long.valueOf(sensorTypeId), Long.valueOf(methodId));
-			} catch (Throwable throwable) {
+			} catch (Throwable throwable) { // NOPMD
 				synchronized (sensorTypeToMethodRegister) {
 					sensorTypeToMethodRegister.addLast(new SensorTypeToMethodMapping(sensorTypeId, methodId));
 				}
@@ -340,7 +340,7 @@ public class IdManager implements IIdManager, Startable {
 				}
 
 				registrationThread.registerSensorType(platformSensorTypeConfig);
-			} catch (Throwable throwable) {
+			} catch (Throwable throwable) { // NOPMD
 				synchronized (sensorTypesToRegister) {
 					sensorTypesToRegister.addLast(platformSensorTypeConfig);
 
@@ -413,7 +413,7 @@ public class IdManager implements IIdManager, Startable {
 			Thread thisThread = Thread.currentThread();
 			// break out of the while loop if the registrationThread is set
 			// to null in the stop method of the surrounding class.
-			while (registrationThread == thisThread) {
+			while (registrationThread == thisThread) { // NOPMD
 				try {
 					synchronized (this) {
 						if (serverErrorOccured) {

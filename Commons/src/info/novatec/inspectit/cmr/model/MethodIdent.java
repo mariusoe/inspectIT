@@ -73,12 +73,6 @@ public class MethodIdent implements Serializable {
 	private int modifiers;
 
 	/**
-	 * Default constructor.
-	 */
-	public MethodIdent() {
-	}
-
-	/**
 	 * Gets {@link #id}.
 	 * 
 	 * @return {@link #id}

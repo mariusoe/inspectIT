@@ -24,7 +24,7 @@ public class ProfileData implements Serializable {
 	private long id;
 
 	/**
-	 * The profile name
+	 * The profile name.
 	 */
 	private String name;
 
@@ -58,13 +58,7 @@ public class ProfileData implements Serializable {
 	 * loaded or not (all sensor definition loaded). Therefore this value is not stored into the
 	 * database.
 	 */
-	private boolean isInitialized = false;
-
-	/**
-	 * Default no-args constructor.
-	 */
-	public ProfileData() {
-	}
+	private boolean initialized = false;
 
 	public long getId() {
 		return id;
@@ -123,13 +117,17 @@ public class ProfileData implements Serializable {
 	}
 
 	public boolean isInitialized() {
-		return isInitialized;
+		return initialized;
 	}
 
 	public void setInitialized(boolean isInitialized) {
-		this.isInitialized = isInitialized;
+		this.initialized = isInitialized;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -139,29 +137,42 @@ public class ProfileData implements Serializable {
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		ProfileData other = (ProfileData) obj;
 		if (description == null) {
-			if (other.description != null)
+			if (other.description != null) {
 				return false;
-		} else if (!description.equals(other.description))
+			}
+		} else if (!description.equals(other.description)) {
 			return false;
+		}
 		if (environmentData == null) {
-			if (other.environmentData != null)
+			if (other.environmentData != null) {
 				return false;
-		} else if (!environmentData.equals(other.environmentData))
+			}
+		} else if (!environmentData.equals(other.environmentData)) {
 			return false;
+		}
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		return true;
 	}
 

@@ -165,12 +165,12 @@ public class PicoAgent implements IAgent {
 		} catch (ParserException parserException) {
 			LOGGER.severe("The parser produced an exception!");
 			LOGGER.throwing("PicoAgent", "init", parserException);
-			parserException.printStackTrace();
+			parserException.printStackTrace(); // NOPMD
 			initializationError = true;
-		} catch (Throwable throwable) {
+		} catch (Throwable throwable) { // NOPMD
 			LOGGER.severe("Something unexpected was caught!");
 			LOGGER.throwing("PicoAgent", "init", throwable);
-			throwable.printStackTrace();
+			throwable.printStackTrace(); // NOPMD
 			initializationError = true;
 		}
 
@@ -278,9 +278,9 @@ public class PicoAgent implements IAgent {
 		try {
 			byte[] instrumentedByteCode = byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
 			return instrumentedByteCode;
-		} catch (Throwable throwable) {
+		} catch (Throwable throwable) { // NOPMD
 			LOGGER.severe("Something unexpected happened while trying to analyze or instrument the bytecode with the class name: " + className);
-			throwable.printStackTrace();
+			throwable.printStackTrace(); // NOPMD
 			return byteCode;
 		}
 	}

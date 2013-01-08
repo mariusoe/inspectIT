@@ -373,7 +373,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		if (newStatus != OnlineStatus.CHECKING) {
 			OnlineStatus cachedStatus = cachedStatusMap.get(repositoryDefinition);
 			if (null != cachedStatus) {
-				if (cachedStatus != newStatus) {
+				if (cachedStatus != newStatus) { // NOPMD
 					Display.getDefault().asyncExec(new Runnable() {
 
 						@Override
@@ -557,7 +557,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 			if (null != cmrPropertyForm && !cmrPropertyForm.isDisposed()) {
 				treeViewer.removeSelectionChangedListener(cmrPropertyForm);
 				cmrPropertyForm.dispose();
-				cmrPropertyForm = null;
+				cmrPropertyForm = null; // NOPMD
 			}
 			mainComposite.setWeights(new int[] { 1 });
 			mainComposite.layout();

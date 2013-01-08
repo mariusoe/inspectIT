@@ -53,12 +53,6 @@ public class EnvironmentData implements Serializable {
 	 */
 	private Set<SensorTypeData> sensorTypes = new HashSet<SensorTypeData>(0);
 
-	/**
-	 * Default no-args constructor.
-	 */
-	public EnvironmentData() {
-	}
-
 	public long getId() {
 		return id;
 	}
@@ -115,6 +109,10 @@ public class EnvironmentData implements Serializable {
 		this.sensorTypes = sensorTypes;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -125,34 +123,49 @@ public class EnvironmentData implements Serializable {
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		EnvironmentData other = (EnvironmentData) obj;
 		if (bufferStrategy == null) {
-			if (other.bufferStrategy != null)
+			if (other.bufferStrategy != null) {
 				return false;
-		} else if (!bufferStrategy.equals(other.bufferStrategy))
+			}
+		} else if (!bufferStrategy.equals(other.bufferStrategy)) {
 			return false;
+		}
 		if (description == null) {
-			if (other.description != null)
+			if (other.description != null) {
 				return false;
-		} else if (!description.equals(other.description))
+			}
+		} else if (!description.equals(other.description)) {
 			return false;
+		}
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		if (sendStrategy == null) {
-			if (other.sendStrategy != null)
+			if (other.sendStrategy != null) {
 				return false;
-		} else if (!sendStrategy.equals(other.sendStrategy))
+			}
+		} else if (!sendStrategy.equals(other.sendStrategy)) {
 			return false;
+		}
 		return true;
 	}
 

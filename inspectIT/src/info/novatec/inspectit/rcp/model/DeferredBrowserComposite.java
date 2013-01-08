@@ -59,7 +59,7 @@ public class DeferredBrowserComposite extends DeferredComposite {
 					if (!packageNames.containsKey(packageName)) {
 						DeferredPackageComposite composite = getNewChild();
 						composite.setRepositoryDefinition(repositoryDefinition);
-						if (packageName.equals("")) {
+						if ("".equals(packageName)) {
 							composite.setName("(default)");
 						} else {
 							composite.setName(packageName);

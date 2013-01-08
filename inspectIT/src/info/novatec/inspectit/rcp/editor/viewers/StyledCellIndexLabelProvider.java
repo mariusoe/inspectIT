@@ -130,12 +130,4 @@ public class StyledCellIndexLabelProvider extends StyledCellLabelProvider {
 		return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void dispose() {
-		super.dispose();
-	}
-
 }

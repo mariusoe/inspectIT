@@ -126,10 +126,7 @@ public class StringConstraint {
 						// existing array as we would change strings of the application
 						convertedValue = new String[value.length];
 
-						// and add all current data to it
-						for (int j = 0; j < i; j++) {
-							convertedValue[j] = value[j];
-						}
+						System.arraycopy(value, 0, convertedValue, 0, i);
 
 						// and add the one we are currently dealing with
 						convertedValue[i] = croppingResult;

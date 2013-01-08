@@ -42,7 +42,7 @@ public class CollectionPreferenceValueProvider extends PreferenceValueProvider<C
 		} else {
 			StringBuilder stringBuilder = new StringBuilder();
 			for (Object object : collection) {
-				stringBuilder.append(String.valueOf(object) + PreferencesConstants.PREF_OBJECT_SEPARATION_TOKEN);
+				stringBuilder.append(object + PreferencesConstants.PREF_OBJECT_SEPARATION_TOKEN);
 			}
 			return stringBuilder.toString();
 		}

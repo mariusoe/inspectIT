@@ -277,7 +277,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 			return false;
 		}
 
-		if (data.size() == 0) {
+		if (data.isEmpty()) {
 			return true;
 		}
 
@@ -356,13 +356,13 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 		 * {@inheritDoc}
 		 */
 		public Object[] getChildren(Object parent) {
-			if (null != parent && parent instanceof AggregatedExceptionSensorData) {
+			if (parent instanceof AggregatedExceptionSensorData) {
 				if (parentChildrenMap.containsKey(parent)) {
 					return parentChildrenMap.get(parent).toArray();
 				}
 			}
 
-			return null; // NOPMD
+			return new Object[0];
 		}
 
 		/**
@@ -376,7 +376,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 		 * {@inheritDoc}
 		 */
 		public boolean hasChildren(Object parent) {
-			if (null != parent && parent instanceof AggregatedExceptionSensorData) {
+			if (parent instanceof AggregatedExceptionSensorData) {
 				if (parentChildrenMap.containsKey(parent)) {
 					return true;
 				}
@@ -428,21 +428,21 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 		case CREATED:
 			if (data instanceof AggregatedExceptionSensorData) {
 				if (((AggregatedExceptionSensorData) data).getCreated() >= 0) {
-					return new StyledString("" + ((AggregatedExceptionSensorData) data).getCreated());
+					return new StyledString(String.valueOf(((AggregatedExceptionSensorData) data).getCreated()));
 				}
 			}
 			return new StyledString("");
 		case RETHROWN:
 			if (data instanceof AggregatedExceptionSensorData) {
 				if (((AggregatedExceptionSensorData) data).getPassed() >= 0) {
-					return new StyledString("" + ((AggregatedExceptionSensorData) data).getPassed());
+					return new StyledString(String.valueOf(((AggregatedExceptionSensorData) data).getPassed()));
 				}
 			}
 			return new StyledString("");
 		case HANDLED:
 			if (data instanceof AggregatedExceptionSensorData) {
 				if (((AggregatedExceptionSensorData) data).getHandled() >= 0) {
-					return new StyledString("" + ((AggregatedExceptionSensorData) data).getHandled());
+					return new StyledString(String.valueOf(((AggregatedExceptionSensorData) data).getHandled()));
 				}
 			}
 			return new StyledString("");

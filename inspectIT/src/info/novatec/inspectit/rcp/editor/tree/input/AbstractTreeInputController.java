@@ -101,7 +101,7 @@ public abstract class AbstractTreeInputController implements TreeInputController
 	 * Return <code>null</code> by default, sub-classes may override.
 	 */
 	public ViewerFilter[] getFilters() {
-		return null; // NOPMD
+		return new ViewerFilter[0];
 	}
 
 	/**

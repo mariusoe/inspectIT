@@ -65,7 +65,7 @@ public class SqlStringIndexer<E extends DefaultData> implements IBranchIndexer<E
 				return keys;
 			}
 		}
-		return null;
+		return new Object[0];
 	}
 
 	/**

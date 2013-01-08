@@ -692,7 +692,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 				return children;
 			}
 
-			return null; // NOPMD
+			return new Object[0];
 		}
 
 		/**

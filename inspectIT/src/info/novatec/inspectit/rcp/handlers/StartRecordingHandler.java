@@ -63,7 +63,7 @@ public class StartRecordingHandler extends AbstractHandler implements IHandler {
 						return null;
 					}
 				}
-			} catch (Exception e) {
+			} catch (Exception e) { // NOPMD
 				// ignore because if we can not get the info. we will still respond to user action
 			}
 		}

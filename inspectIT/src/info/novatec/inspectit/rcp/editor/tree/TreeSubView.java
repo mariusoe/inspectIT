@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -125,7 +126,7 @@ public class TreeSubView extends AbstractSubView implements ISearchExecutor {
 				});
 			}
 		}
-		if (null != treeInputController.getFilters()) {
+		if (ArrayUtils.isNotEmpty(treeInputController.getFilters())) {
 			treeViewer.setFilters(treeInputController.getFilters());
 		}
 
@@ -284,7 +285,7 @@ public class TreeSubView extends AbstractSubView implements ISearchExecutor {
 		case INVOCFILTEREXCLUSIVETIME:
 		case INVOCFILTERTOTALTIME:
 			// we have to reapply the filter if there is one
-			if (null != treeInputController.getFilters()) {
+			if (ArrayUtils.isNotEmpty(treeInputController.getFilters())) {
 				treeViewer.setFilters(treeInputController.getFilters());
 			}
 			break;

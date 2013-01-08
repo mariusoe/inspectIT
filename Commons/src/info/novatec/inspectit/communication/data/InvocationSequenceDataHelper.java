@@ -9,7 +9,13 @@ import java.util.Set;
  * 
  * @author Stefan Siegl
  */
-public class InvocationSequenceDataHelper {
+public final class InvocationSequenceDataHelper {
+
+	/**
+	 * Private constructor for utility class.
+	 */
+	private InvocationSequenceDataHelper() {
+	}
 
 	/**
 	 * Checks if the invocation sequence data object itself contains parameters.
@@ -116,7 +122,7 @@ public class InvocationSequenceDataHelper {
 	 * @return whether this data object is the root element of the invocation.
 	 */
 	public static boolean isRootElementInSequence(InvocationSequenceData data) {
-		return hasParentElementInSequence(data) == false;
+		return !hasParentElementInSequence(data);
 	}
 
 	/**

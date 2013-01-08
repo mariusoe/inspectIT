@@ -68,7 +68,7 @@ public class ImportLicenseHandler extends AbstractHandler {
 					if (null != licenseFileInputStream) {
 						licenseFileInputStream.close();
 					}
-				} catch (IOException e) {
+				} catch (IOException e) { // NOPMD
 					// we do not care about this exception
 				}
 			}

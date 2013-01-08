@@ -104,7 +104,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 
 		// Fallback to the standard location of the inspectit configuration
 		// file when no system property is specified.
-		if (pathToConfig.equals("")) {
+		if ("".equals(pathToConfig)) {
 			pathToConfig = System.getProperty("user.dir") + File.separator + "inspectit" + File.separator + CONFIGURATION_PROPERTY;
 		}
 
@@ -127,7 +127,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 
 		} catch (FileNotFoundException e) {
 			LOGGER.info("Agent Configuration file not found at " + pathToConfig + ", aborting!");
-			throw new ParserException("Agent Configuration file not found at " + pathToConfig);
+			throw new ParserException("Agent Configuration file not found at " + pathToConfig, e);
 		}
 	}
 
@@ -136,7 +136,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	 * 
 	 * @param reader
 	 *            The reader to open and parse.
-	 * @param pathToConfig 
+	 * @param pathToConfig
 	 *            The path to the configuration file.
 	 * @throws ParserException
 	 *             Thrown if there was an exception caught by parsing the config file.
@@ -151,7 +151,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 
 		String line = null;
 		try {
-			while ((line = br.readLine()) != null) {
+			while ((line = br.readLine()) != null) { // NOPMD
 				// Skip empty and comment lines
 				if (line.trim().equals("") || line.startsWith(CONFIG_COMMENT)) {
 					continue;
@@ -220,7 +220,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 					processExcludeClassLine(tokenizer);
 				}
 			}
-		} catch (Throwable throwable) {
+		} catch (Throwable throwable) { // NOPMD
 			LOGGER.severe("Error reading config on line : " + line);
 			throw new ParserException("Error reading config on line : " + line, throwable);
 		}
@@ -275,7 +275,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 		String targetClassName = tokenizer.nextToken();
 		boolean isVirtual = false;
 
-		if (targetClassName.indexOf("*") > -1) {
+		if (targetClassName.indexOf('*') > -1) {
 			isVirtual = true;
 		}
 
@@ -531,7 +531,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 			this.parse(reader, file.getAbsolutePath());
 		} catch (FileNotFoundException e) {
 			LOGGER.info("Additional agent configuration file not found at " + file.getAbsolutePath() + ", aborting!");
-			throw new ParserException("Additional agent Configuration file not found at " + file.getAbsolutePath());
+			throw new ParserException("Additional agent Configuration file not found at " + file.getAbsolutePath(), e);
 		}
 	}
 

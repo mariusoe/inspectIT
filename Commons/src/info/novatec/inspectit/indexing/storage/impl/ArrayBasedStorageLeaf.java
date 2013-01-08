@@ -315,7 +315,7 @@ public class ArrayBasedStorageLeaf<E extends DefaultData> implements IStorageTre
 				System.arraycopy(descriptorArray, index + 1, descriptorArray, index, size - index - 1);
 				size--;
 				idArray[size] = 0;
-				descriptorArray[size] = null;
+				descriptorArray[size] = null; // NOPMD
 				return new StorageDescriptor(id, simpleDescriptor);
 			} finally {
 				writeLock.unlock();

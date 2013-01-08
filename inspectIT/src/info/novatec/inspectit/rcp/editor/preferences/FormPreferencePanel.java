@@ -249,7 +249,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 	 */
 	private void createButtons(Set<PreferenceId> preferenceSet, IToolBarManager toolBarManager) {
 		switchLiveMode = new SwitchLiveMode("Live");
-		switchPreferences = new SwitchPreferences("Additional options");
+		switchPreferences = new SwitchPreferences("Additional options"); // NOPMD
 		MenuAction menuAction = new MenuAction();
 		menuAction.setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_TOOL));
 		menuAction.setToolTipText("Preferences");
@@ -295,7 +295,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 			menuAction.addContributionItem(refreshMenuManager);
 		}
 		if (preferenceSet.contains(PreferenceId.UPDATE)) {
-			toolBarManager.add(new UpdateAction("Update"));
+			toolBarManager.add(new UpdateAction("Update")); // NOPMD
 		}
 
 		if (preferenceSet.contains(PreferenceId.ITEMCOUNT)) {
@@ -747,7 +747,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 			preferenceControl.dispose();
 		}
 
-		switchLiveMode = null;
+		switchLiveMode = null; // NOPMD
 	}
 
 	/**

@@ -111,8 +111,8 @@ public class ExceptionEventType implements UserType {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(Object x, Object y) throws HibernateException {
-		if (x == y) {
+	public boolean equals(Object x, Object y) throws HibernateException { // NOPMD
+		if (x == y) { // NOPMD
 			return true;
 		} else if (x == null || y == null) {
 			return false;

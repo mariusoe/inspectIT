@@ -9,8 +9,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 
 /**
- * This class is used to provide an easy comparator used for the sorting of tree
- * viewers.
+ * This class is used to provide an easy comparator used for the sorting of tree viewers.
  * 
  * @param <E>
  *            Defines the objects which are compared by this implementation.
@@ -87,7 +86,7 @@ public abstract class TreeViewerComparator<E> extends ViewerComparator {
 	 *            The enumeration id.
 	 */
 	private void toggleSortColumn(Enum<?> id) {
-		if (enumSortColumn == id) {
+		if (enumSortColumn == id) { // NOPMD
 			switch (sortState) {
 			case NONE:
 				sortState = SortState.UP;
@@ -144,12 +143,11 @@ public abstract class TreeViewerComparator<E> extends ViewerComparator {
 	}
 
 	/**
-	 * Implemented by all extension classes. This performs the actual
-	 * comparison. Clients should NOT care about the reversing of the sorting,
-	 * this is done by the abstract class.
+	 * Implemented by all extension classes. This performs the actual comparison. Clients should NOT
+	 * care about the reversing of the sorting, this is done by the abstract class.
 	 * <p>
-	 * This method is called by the {@link #compare(Viewer, Object, Object)}
-	 * method. Thus NEVER call super.compare(...) in it.
+	 * This method is called by the {@link #compare(Viewer, Object, Object)} method. Thus NEVER call
+	 * super.compare(...) in it.
 	 * 
 	 * @param viewer
 	 *            The viewer.
@@ -157,10 +155,9 @@ public abstract class TreeViewerComparator<E> extends ViewerComparator {
 	 *            The first element to compare.
 	 * @param element2
 	 *            The second element to compare.
-	 * @return A negative number if the first element is less than the second
-	 *         element; the value <code>0</code> if the first element is equal
-	 *         to the second element; and a positive number if the first element
-	 *         is greater than the second element
+	 * @return A negative number if the first element is less than the second element; the value
+	 *         <code>0</code> if the first element is equal to the second element; and a positive
+	 *         number if the first element is greater than the second element
 	 */
 	protected abstract int compareElements(Viewer viewer, E element1, E element2);
 

@@ -22,9 +22,6 @@ public class MethodSensorTypeIdent extends SensorTypeIdent {
 	 */
 	private Set<MethodIdent> methodIdents = new HashSet<MethodIdent>(0);
 
-	public MethodSensorTypeIdent() {
-	}
-
 	public Set<MethodIdent> getMethodIdents() {
 		return methodIdents;
 	}

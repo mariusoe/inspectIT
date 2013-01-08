@@ -232,8 +232,9 @@ public class HttpTimerData extends TimerData {
 			if (other.attributes != null) {
 				return false;
 			}
-		} else if (!attributes.equals(other.attributes))
+		} else if (!attributes.equals(other.attributes)) {
 			return false;
+		}
 		if (headers == null) {
 			if (other.headers != null) {
 				return false;

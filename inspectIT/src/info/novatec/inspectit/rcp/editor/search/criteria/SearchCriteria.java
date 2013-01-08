@@ -66,7 +66,7 @@ public class SearchCriteria {
 		if (null != searchString) {
 			searchStringUpperCase = searchString.toUpperCase();
 		} else {
-			searchStringUpperCase = null;
+			searchStringUpperCase = null; // NOPMD
 		}
 	}
 

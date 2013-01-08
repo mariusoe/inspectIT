@@ -83,7 +83,7 @@ public class DeferredAgentsComposite extends DeferredComposite implements ICmrRe
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setRepositoryDefinition(RepositoryDefinition repositoryDefinition) {
+	public final void setRepositoryDefinition(RepositoryDefinition repositoryDefinition) {
 		if (repositoryDefinition instanceof CmrRepositoryDefinition) {
 			this.cmrRepositoryDefinition = (CmrRepositoryDefinition) repositoryDefinition;
 		}

@@ -1,6 +1,5 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
-import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.TimerData;
@@ -14,6 +13,7 @@ import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
@@ -130,7 +130,7 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 		}
 
 		timerDataList.clear();
-		if (aggregatedTimerData.size() > 0) {
+		if (CollectionUtils.isNotEmpty(aggregatedTimerData)) {
 			timerDataList.addAll(aggregatedTimerData);
 		}
 
@@ -167,10 +167,9 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 			@Override
 			public StyledString getStyledText(Object element, int index) {
 				HttpTimerData data = (HttpTimerData) element;
-				MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 				Column enumId = Column.fromOrd(index);
 
-				StyledString styledString = getStyledTextForColumn(data, methodIdent, enumId);
+				StyledString styledString = getStyledTextForColumn(data, enumId);
 				if (addWarnSign(data, enumId)) {
 					styledString.append(TextFormatter.getWarningSign());
 				}
@@ -272,9 +271,8 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 		if (object instanceof HttpTimerData) {
 			HttpTimerData data = (HttpTimerData) object;
 			StringBuilder sb = new StringBuilder();
-			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			for (Column column : Column.values()) {
-				sb.append(getStyledTextForColumn(data, methodIdent, column).toString());
+				sb.append(getStyledTextForColumn(data, column).toString());
 				sb.append("\t");
 			}
 			return sb.toString();
@@ -290,10 +288,9 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 	public List<String> getColumnValues(Object object) {
 		if (object instanceof HttpTimerData) {
 			HttpTimerData data = (HttpTimerData) object;
-			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			List<String> values = new ArrayList<String>();
 			for (Column column : Column.values()) {
-				values.add(getStyledTextForColumn(data, methodIdent, column).toString());
+				values.add(getStyledTextForColumn(data, column).toString());
 			}
 			return values;
 		}
@@ -305,13 +302,11 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 	 * 
 	 * @param data
 	 *            The data object to extract the information from.
-	 * @param methodIdent
-	 *            The method ident object.
 	 * @param enumId
 	 *            The enumeration ID.
 	 * @return The styled string containing the information from the data object.
 	 */
-	private StyledString getStyledTextForColumn(HttpTimerData data, MethodIdent methodIdent, Column enumId) {
+	private StyledString getStyledTextForColumn(HttpTimerData data, Column enumId) {
 		switch (enumId) {
 		case URI:
 			return new StyledString(data.getUri());

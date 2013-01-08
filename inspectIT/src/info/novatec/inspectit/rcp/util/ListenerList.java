@@ -4,18 +4,16 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * This class is a thread safe list that is designed for storing lists of
- * listeners. The implementation is optimized for minimal memory footprint,
- * frequent reads and infrequent writes. Modification of the list is
- * synchronized and relatively expensive, while accessing the listeners is very
- * fast. Readers are given access to the underlying array data structure for
- * reading, with the trust that they will not modify the underlying array.
+ * This class is a thread safe list that is designed for storing lists of listeners. The
+ * implementation is optimized for minimal memory footprint, frequent reads and infrequent writes.
+ * Modification of the list is synchronized and relatively expensive, while accessing the listeners
+ * is very fast. Readers are given access to the underlying array data structure for reading, with
+ * the trust that they will not modify the underlying array.
  * <p>
- * <a name="same">A listener list handles the <i>same</i> listener being added
- * multiple times, and tolerates removal of listeners that are the same as other
- * listeners in the list. For this purpose, listeners can be compared with each
- * other using either equality or identity, as specified in the list
- * constructor.</a>
+ * <a name="same">A listener list handles the <i>same</i> listener being added multiple times, and
+ * tolerates removal of listeners that are the same as other listeners in the list. For this
+ * purpose, listeners can be compared with each other using either equality or identity, as
+ * specified in the list constructor.</a>
  * </p>
  * 
  * @author Patrice Bouillet
@@ -41,28 +39,26 @@ public class ListenerList<E> implements Iterable<E> {
 	 */
 	public enum Mode {
 		/**
-		 * Mode constant (value 0) indicating that listeners should be
-		 * considered the <a href="#same">same</a> if they are equal.
+		 * Mode constant (value 0) indicating that listeners should be considered the <a
+		 * href="#same">same</a> if they are equal.
 		 */
 		EQUALITY,
 
 		/**
-		 * Mode constant (value 1) indicating that listeners should be
-		 * considered the <a href="#same">same</a> if they are identical.
+		 * Mode constant (value 1) indicating that listeners should be considered the <a
+		 * href="#same">same</a> if they are identical.
 		 */
 		IDENTITY;
 	}
 
 	/**
-	 * Indicates the comparison mode used to determine if two listeners are
-	 * equivalent.
+	 * Indicates the comparison mode used to determine if two listeners are equivalent.
 	 */
 	private final boolean identity;
 
 	/**
-	 * The list of listeners. Initially empty but initialized to an array of
-	 * size capacity the first time a listener is added. Maintains invariant:
-	 * listeners != null.
+	 * The list of listeners. Initially empty but initialized to an array of size capacity the first
+	 * time a listener is added. Maintains invariant: listeners != null.
 	 */
 	private volatile E[] listeners = emptyArray;
 
@@ -77,16 +73,15 @@ public class ListenerList<E> implements Iterable<E> {
 	 * Creates a listener list using the provided comparison mode.
 	 * 
 	 * @param mode
-	 *            The mode used to determine if listeners are the <a
-	 *            href="#same">same</a>.
+	 *            The mode used to determine if listeners are the <a href="#same">same</a>.
 	 */
 	public ListenerList(Mode mode) {
 		this.identity = Mode.IDENTITY.equals(mode);
 	}
 
 	/**
-	 * Adds a listener to this list. This method has no effect if the <a
-	 * href="#same">same</a> listener is already registered.
+	 * Adds a listener to this list. This method has no effect if the <a href="#same">same</a>
+	 * listener is already registered.
 	 * 
 	 * @param listener
 	 *            the non-<code>null</code> listener to add
@@ -103,7 +98,7 @@ public class ListenerList<E> implements Iterable<E> {
 		final int oldSize = listeners.length;
 		for (int i = 0; i < oldSize; ++i) {
 			E listener2 = listeners[i];
-			if (identity ? listener == listener2 : listener.equals(listener2)) {
+			if (identity ? listener == listener2 : listener.equals(listener2)) { // NOPMD
 				return;
 			}
 		}
@@ -118,11 +113,10 @@ public class ListenerList<E> implements Iterable<E> {
 	}
 
 	/**
-	 * Returns an array containing all the registered listeners. The resulting
-	 * array is unaffected by subsequent adds or removes. If there are no
-	 * listeners registered, the result is an empty array. Use this method when
-	 * notifying listeners, so that any modifications to the listener list
-	 * during the notification will have no effect on the notification itself.
+	 * Returns an array containing all the registered listeners. The resulting array is unaffected
+	 * by subsequent adds or removes. If there are no listeners registered, the result is an empty
+	 * array. Use this method when notifying listeners, so that any modifications to the listener
+	 * list during the notification will have no effect on the notification itself.
 	 * <p>
 	 * Note: Callers of this method <b>must not</b> modify the returned array.
 	 * 
@@ -135,16 +129,16 @@ public class ListenerList<E> implements Iterable<E> {
 	/**
 	 * Returns whether this listener list is empty.
 	 * 
-	 * @return <code>true</code> if there are no registered listeners, and
-	 *         <code>false</code> otherwise
+	 * @return <code>true</code> if there are no registered listeners, and <code>false</code>
+	 *         otherwise
 	 */
 	public boolean isEmpty() {
 		return listeners.length == 0;
 	}
 
 	/**
-	 * Removes a listener from this list. Has no effect if the <a
-	 * href="#same">same</a> listener was not already registered.
+	 * Removes a listener from this list. Has no effect if the <a href="#same">same</a> listener was
+	 * not already registered.
 	 * 
 	 * @param listener
 	 *            the non-<code>null</code> listener to remove
@@ -160,7 +154,7 @@ public class ListenerList<E> implements Iterable<E> {
 		int oldSize = listeners.length;
 		for (int i = 0; i < oldSize; ++i) {
 			E listener2 = listeners[i];
-			if (identity ? listener == listener2 : listener.equals(listener2)) {
+			if (identity ? listener == listener2 : listener.equals(listener2)) { // NOPMD
 				if (oldSize == 1) {
 					listeners = emptyArray;
 				} else {
@@ -220,9 +214,8 @@ public class ListenerList<E> implements Iterable<E> {
 		private E[] listeners;
 
 		/**
-		 * The reference to the generic listeners array is passed here because
-		 * in the meantime, while iterating over this list, some new objects
-		 * could be added which is NOT reflected.
+		 * The reference to the generic listeners array is passed here because in the meantime,
+		 * while iterating over this list, some new objects could be added which is NOT reflected.
 		 * 
 		 * @param listeners
 		 *            The listeners.
@@ -247,7 +240,7 @@ public class ListenerList<E> implements Iterable<E> {
 				cursor++;
 				return next;
 			} catch (IndexOutOfBoundsException e) {
-				throw new NoSuchElementException();
+				throw new NoSuchElementException(); // NOPMD
 			}
 		}
 

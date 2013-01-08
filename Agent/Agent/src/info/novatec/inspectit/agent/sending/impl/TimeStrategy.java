@@ -47,7 +47,7 @@ public class TimeStrategy extends AbstractSendingStrategy {
 	public void stop() {
 		// Interrupt the thread to stop it
 		Thread temp = trigger;
-		trigger = null;
+		trigger = null; // NOPMD
 		synchronized (temp) {
 			temp.interrupt();
 		}
@@ -67,7 +67,7 @@ public class TimeStrategy extends AbstractSendingStrategy {
 		 */
 		public void run() {
 			Thread thisThread = Thread.currentThread();
-			while (trigger == thisThread) {
+			while (trigger == thisThread) { // NOPMD
 				try {
 					synchronized (this) {
 						wait(time);

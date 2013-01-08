@@ -278,9 +278,8 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 								}
 							}
 						});
-					} catch (Throwable throwable) {
-						throwable.printStackTrace();
-						return Status.CANCEL_STATUS;
+					} catch (Throwable throwable) { // NOPMD
+						throw new RuntimeException("Unknown exception occurred trying to refresh the view.", throwable);
 					} finally {
 						jobInSchedule = false;
 					}

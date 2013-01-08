@@ -51,12 +51,9 @@ public class PlatformIdent implements Serializable {
 	private String agentName = "Agent";
 
 	/**
-	 * the current version of the agent
+	 * the current version of the agent.
 	 */
 	private String version = "n/a";
-
-	public PlatformIdent() {
-	}
 
 	public Set<SensorTypeIdent> getSensorTypeIdents() {
 		return sensorTypeIdents;

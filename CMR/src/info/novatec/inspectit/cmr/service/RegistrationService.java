@@ -143,7 +143,7 @@ public class RegistrationService implements IRegistrationService {
 			return platformIdent.getId();
 		} catch (LicenseContentException e) {
 			log.error("Could not register the Agent, due to a license problem: " + e.getMessage());
-			throw new LicenseException(e.getMessage());
+			throw new LicenseException(e.getMessage()); // NOPMD
 		}
 	}
 

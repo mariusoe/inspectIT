@@ -132,7 +132,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setRepository(String host, int port) throws StorageException {
+	public final void setRepository(String host, int port) throws StorageException {
 		if ((null == host) || "".equals(host)) {
 			throw new StorageException("Repository host name cannot be null or empty!");
 		}
@@ -161,7 +161,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setAgentName(String name) throws StorageException {
+	public final void setAgentName(String name) throws StorageException {
 		if ((null == name) || "".equals(name)) {
 			throw new StorageException("Agent name cannot be null or empty!");
 		}

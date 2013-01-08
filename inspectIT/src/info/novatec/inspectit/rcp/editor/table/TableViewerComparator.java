@@ -86,7 +86,7 @@ public abstract class TableViewerComparator<E> extends ViewerComparator {
 	 *            The enumeration id.
 	 */
 	private void toggleSortColumn(Enum<?> id) {
-		if (enumSortColumn == id) {
+		if (enumSortColumn == id) { // NOPMD
 			switch (sortState) {
 			case NONE:
 				sortState = SortState.UP;

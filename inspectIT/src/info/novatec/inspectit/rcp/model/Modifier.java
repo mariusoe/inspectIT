@@ -1,16 +1,15 @@
 package info.novatec.inspectit.rcp.model;
 
 /**
- * The Modifier class provides static methods and constants to decode class and
- * member access modifiers. The constant values are equivalent to the
- * corresponding values in {@link AccessFlag}.
+ * The Modifier class provides static methods and constants to decode class and member access
+ * modifiers. The constant values are equivalent to the corresponding values in {@link AccessFlag}.
  * <p>
  * All the methods/constants in this class are compatible with ones in
  * <code>java.lang.reflect.Modifier</code>.
  * <p>
  * <b>This source code is originally located in javassist.</b>
  */
-public class Modifier {
+public final class Modifier {
 	public static final int PUBLIC = AccessFlag.PUBLIC;
 	public static final int PRIVATE = AccessFlag.PRIVATE;
 	public static final int PROTECTED = AccessFlag.PROTECTED;
@@ -25,6 +24,12 @@ public class Modifier {
 	public static final int STRICT = AccessFlag.STRICT;
 	public static final int ANNOTATION = AccessFlag.ANNOTATION;
 	public static final int ENUM = AccessFlag.ENUM;
+
+	/**
+	 * Private constructor for utility class.
+	 */
+	private Modifier() {
+	}
 
 	/**
 	 * Returns true if the modifiers include the <tt>public</tt> modifier.
@@ -48,8 +53,8 @@ public class Modifier {
 	}
 
 	/**
-	 * Returns true if the modifiers do not include either <tt>public</tt>,
-	 * <tt>protected</tt>, or <tt>private</tt>.
+	 * Returns true if the modifiers do not include either <tt>public</tt>, <tt>protected</tt>, or
+	 * <tt>private</tt>.
 	 */
 	public static boolean isPackage(int mod) {
 		return (mod & (PUBLIC | PRIVATE | PROTECTED)) == 0;
@@ -133,8 +138,7 @@ public class Modifier {
 	}
 
 	/**
-	 * Return a string describing the access modifier flags in the specified
-	 * modifier.
+	 * Return a string describing the access modifier flags in the specified modifier.
 	 * 
 	 * @param mod
 	 *            modifier flags.

@@ -324,7 +324,7 @@ public class StorageWriter implements IWriter {
 
 				// close all opened channels
 				for (Path channelPath : openedChannelPaths) {
-					writingChannelManager.finalize(channelPath);
+					writingChannelManager.finalizeChannel(channelPath);
 				}
 
 				finalized = true;
@@ -547,7 +547,7 @@ public class StorageWriter implements IWriter {
 					log.error("Execption occured while attempting to write data to disk", e);
 					return;
 				}
-			} catch (Throwable t) {
+			} catch (Throwable t) { // NOPMD
 				// catch any exception
 				indexingTreeHandler.writeFailed(this);
 				log.error("Unknow exception occured during data write", t);

@@ -147,7 +147,7 @@ public class CoreService implements ICoreService, Startable {
 			throw new IllegalArgumentException("Buffer strategy cannot be null!");
 		}
 
-		if ((null == sendingStrategies) || (0 == sendingStrategies.size())) {
+		if (null == sendingStrategies || sendingStrategies.isEmpty()) {
 			throw new IllegalArgumentException("At least one sending strategy has to be defined!");
 		}
 
@@ -192,7 +192,7 @@ public class CoreService implements ICoreService, Startable {
 		}
 
 		Thread temp = platformSensorRefresher;
-		platformSensorRefresher = null;
+		platformSensorRefresher = null; // NOPMD
 		synchronized (temp) {
 			temp.interrupt();
 		}
@@ -344,7 +344,7 @@ public class CoreService implements ICoreService, Startable {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void notifyListListeners() {
-		if (listListeners.size() > 0) {
+		if (!listListeners.isEmpty()) {
 			List temp = new ArrayList(sensorDataObjects.values());
 			temp.addAll(objectStorages.values());
 			for (ListListener<?> listListener : listListeners) {
@@ -367,7 +367,7 @@ public class CoreService implements ICoreService, Startable {
 		 */
 		public void run() {
 			Thread thisThread = Thread.currentThread();
-			while (platformSensorRefresher == thisThread) {
+			while (platformSensorRefresher == thisThread) { // NOPMD
 				try {
 					synchronized (this) {
 						wait(platformSensorRefreshTime);
@@ -466,7 +466,7 @@ public class CoreService implements ICoreService, Startable {
 
 					// Notify sending thread
 					synchronized (sendingThread) {
-						sendingThread.notify();
+						sendingThread.notifyAll();
 					}
 				}
 			}
@@ -508,7 +508,7 @@ public class CoreService implements ICoreService, Startable {
 						connection.sendDataObjects(dataToSend);
 						sendingException = false;
 					}
-				} catch (Throwable e) {
+				} catch (Throwable e) { // NOPMD
 					if (!sendingException) {
 						sendingException = true;
 						LOGGER.log(Level.SEVERE, "Connection problem appeared, stopping sending actual data!", e);

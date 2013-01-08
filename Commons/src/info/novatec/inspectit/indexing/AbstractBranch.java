@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -21,8 +22,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ivan Senic
  * 
- * @param <R> Type of the element returned by the branch when querying. 
- * @param <E> Type of the element that can be indexed by the branch. 
+ * @param <R>
+ *            Type of the element returned by the branch when querying.
+ * @param <E>
+ *            Type of the element that can be indexed by the branch.
  */
 public abstract class AbstractBranch<R, E> {
 
@@ -52,7 +55,8 @@ public abstract class AbstractBranch<R, E> {
 	 * Default constructor. {@link Branch} can only be initialized with proper branch indexer
 	 * supplied. If null is passed, {@link IllegalArgumentException} will be thrown.
 	 * 
-	 * @param branchIndexer Branch indexer used in this branch.
+	 * @param branchIndexer
+	 *            Branch indexer used in this branch.
 	 */
 	public AbstractBranch(IBranchIndexer<E> branchIndexer) {
 		this.branchIndexer = branchIndexer;
@@ -178,7 +182,7 @@ public abstract class AbstractBranch<R, E> {
 	public List<R> query(IIndexQuery query) {
 		// get all keys for query
 		Object[] keys = getBranchIndexer().getKeys(query);
-		if (null == keys) {
+		if (ArrayUtils.isEmpty(keys)) {
 			// if key can not be created search in next level
 			return queryAllTreeComponents(query);
 		} else if (1 == keys.length) {

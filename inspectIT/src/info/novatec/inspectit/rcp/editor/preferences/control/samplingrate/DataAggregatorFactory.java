@@ -16,6 +16,8 @@ import info.novatec.inspectit.rcp.editor.graph.plot.aggregation.TimerDataAggrega
 import java.security.InvalidParameterException;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+
 /**
  * The data aggregator factory.
  * 
@@ -64,7 +66,7 @@ public final class DataAggregatorFactory {
 	 * @return An instance of the {@link IDataAggregator}.
 	 */
 	public static IDataAggregator getDataAggregator(List<? extends DefaultData> defaultDataList) {
-		if ((null == defaultDataList) || (0 == defaultDataList.size())) {
+		if (CollectionUtils.isEmpty(defaultDataList)) {
 			throw new InvalidParameterException("Invalid parameter for the data aggregator factory!");
 		}
 

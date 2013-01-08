@@ -68,7 +68,7 @@ public class DeleteStorageHandler extends AbstractHandler implements IHandler {
 			}
 
 			if (!storagesToDelete.isEmpty()) {
-				StringBuffer confirmText = new StringBuffer();
+				StringBuffer confirmText = new StringBuffer(90);
 				final boolean plural = storagesToDelete.size() > 1;
 				if (!plural) {
 					confirmText.append("Are you sure you want to delete the selected storage? ");
@@ -83,7 +83,8 @@ public class DeleteStorageHandler extends AbstractHandler implements IHandler {
 				}
 				if (!exploredBySet.isEmpty()) {
 					for (AbstractStorageLabel<String> exploredByLabel : exploredBySet) {
-						confirmText.append("\n * " + exploredByLabel.getValue());
+						confirmText.append("\n * ");
+						confirmText.append(exploredByLabel.getValue());
 					}
 				}
 

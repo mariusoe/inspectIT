@@ -75,12 +75,6 @@ public class MethodSensorDefinitionData implements Serializable {
 	 */
 	private Set<SensorTypeData> sensorTypes = new HashSet<SensorTypeData>(0);
 
-	/**
-	 * Default no-args constructor.
-	 */
-	public MethodSensorDefinitionData() {
-	}
-
 	public long getId() {
 		return id;
 	}
@@ -145,6 +139,10 @@ public class MethodSensorDefinitionData implements Serializable {
 		this.sensorTypes = sensorTypes;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -157,38 +155,55 @@ public class MethodSensorDefinitionData implements Serializable {
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		MethodSensorDefinitionData other = (MethodSensorDefinitionData) obj;
-		if (activated != other.activated)
+		if (activated != other.activated) {
 			return false;
+		}
 		if (description == null) {
-			if (other.description != null)
+			if (other.description != null) {
 				return false;
-		} else if (!description.equals(other.description))
+			}
+		} else if (!description.equals(other.description)) {
 			return false;
+		}
 		if (fullyQualifiedName == null) {
-			if (other.fullyQualifiedName != null)
+			if (other.fullyQualifiedName != null) {
 				return false;
-		} else if (!fullyQualifiedName.equals(other.fullyQualifiedName))
+			}
+		} else if (!fullyQualifiedName.equals(other.fullyQualifiedName)) {
 			return false;
+		}
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		if (profileData == null) {
-			if (other.profileData != null)
+			if (other.profileData != null) {
 				return false;
-		} else if (!profileData.equals(other.profileData))
+			}
+		} else if (!profileData.equals(other.profileData)) {
 			return false;
-		if (sensorOption != other.sensorOption)
+		}
+		if (sensorOption != other.sensorOption) {
 			return false;
+		}
 		return true;
 	}
 

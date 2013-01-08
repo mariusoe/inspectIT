@@ -139,7 +139,7 @@ public class IndirectMatcher extends AbstractMatcher {
 	public void checkParameters(List<? extends CtBehavior> methods) throws NotFoundException {
 		if (!unregisteredSensorConfig.isIgnoreSignature()) {
 			List<String> parameterTypes = unregisteredSensorConfig.getParameterTypes();
-			if (0 == parameterTypesPatterns.size()) {
+			if (parameterTypesPatterns.isEmpty()) {
 				directMatcher.checkParameters(methods);
 			} else if (null != parameterTypes) {
 				for (Iterator<? extends CtBehavior> iterator = methods.iterator(); iterator.hasNext();) {

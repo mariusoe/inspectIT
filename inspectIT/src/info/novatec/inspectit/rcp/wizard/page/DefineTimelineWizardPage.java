@@ -242,7 +242,7 @@ public class DefineTimelineWizardPage extends WizardPage {
 	public Date getFromDate() {
 		if ((timeStyle & FUTURE) != 0) {
 			if ((timeStyle & BOTH_DATES) != 0) {
-				return (null != cdtPrimary) ? cdtPrimary.getSelection() : null;
+				return (null != cdtPrimary) ? cdtPrimary.getSelection() : null; // NOPMD
 			} else {
 				return new Date();
 			}
@@ -250,7 +250,7 @@ public class DefineTimelineWizardPage extends WizardPage {
 			if (definePeriod.getSelection()) {
 				return getDateFromPeriodComposite();
 			} else {
-				return (null != cdtPrimary) ? cdtPrimary.getSelection() : null;
+				return (null != cdtPrimary) ? cdtPrimary.getSelection() : null; // NOPMD
 			}
 		}
 	}
@@ -264,13 +264,13 @@ public class DefineTimelineWizardPage extends WizardPage {
 			if (definePeriod.getSelection()) {
 				return getDateFromPeriodComposite();
 			} else if ((timeStyle & BOTH_DATES) != 0) {
-				return (null != cdtSecondary) ? cdtSecondary.getSelection() : null;
+				return (null != cdtSecondary) ? cdtSecondary.getSelection() : null; // NOPMD
 			} else {
-				return (null != cdtPrimary) ? cdtPrimary.getSelection() : null;
+				return (null != cdtPrimary) ? cdtPrimary.getSelection() : null; // NOPMD
 			}
 		} else {
 			if ((timeStyle & BOTH_DATES) != 0) {
-				return (null != cdtSecondary) ? cdtSecondary.getSelection() : null;
+				return (null != cdtSecondary) ? cdtSecondary.getSelection() : null; // NOPMD
 			} else {
 				return new Date();
 			}

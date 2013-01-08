@@ -25,7 +25,7 @@ public class IbmJava6PlatformSensorInfoProvider implements PlatformSensorInfoPro
 	/**
 	 * {@link OperatingSystemInfoProvider}.
 	 */
-	private static OperatingSystemInfoProvider OPERATING_SYSTEM_INFO_PROVIDER;
+	private static OperatingSystemInfoProvider operatingSystemInfoProvider;
 
 	/**
 	 * {@link RuntimeInfoProvider}.
@@ -43,14 +43,14 @@ public class IbmJava6PlatformSensorInfoProvider implements PlatformSensorInfoPro
 	 * @throws Exception
 	 */
 	public IbmJava6PlatformSensorInfoProvider() throws Exception {
-		if (null == OPERATING_SYSTEM_INFO_PROVIDER) {
+		if (null == operatingSystemInfoProvider) {
 			createOperatingSystemInfoProvider();
 		}
 	}
 
 	private static synchronized void createOperatingSystemInfoProvider() throws Exception {
-		if (null == OPERATING_SYSTEM_INFO_PROVIDER) {
-			OPERATING_SYSTEM_INFO_PROVIDER = new IbmJava6OperatingSystemInfoProvider();
+		if (null == operatingSystemInfoProvider) {
+			operatingSystemInfoProvider = new IbmJava6OperatingSystemInfoProvider();
 		}
 	}
 
@@ -65,7 +65,7 @@ public class IbmJava6PlatformSensorInfoProvider implements PlatformSensorInfoPro
 	 * {@inheritDoc}
 	 */
 	public OperatingSystemInfoProvider getOperatingSystemInfoProvider() {
-		return OPERATING_SYSTEM_INFO_PROVIDER;
+		return operatingSystemInfoProvider;
 	}
 
 	/**

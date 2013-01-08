@@ -348,30 +348,33 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 			}
 
 			private void addText(Text text) {
-				StringBuffer content = new StringBuffer("Fully-Qualified Name: " + data.getThrowableType() + "\n");
+				StringBuilder content = new StringBuilder();
+				content.append("Fully-Qualified Name: ");
+				content.append(data.getThrowableType());
+				content.append("\n");
 				if (rawMode) {
-					content.append("Constructor: " + TextFormatter.getMethodWithParameters(methodIdent));
-					content.append("\n");
+					content.append("Constructor: ");
+					content.append(TextFormatter.getMethodWithParameters(methodIdent));
+					content.append('\n');
 				}
 
-				content.append("Error Message: " + data.getErrorMessage());
-				content.append("\n");
+				content.append("Error Message: ");
+				content.append(data.getErrorMessage());
+				content.append('\n');
 
 				if (rawMode) {
-					content.append("\n");
-					content.append("Exception Hierarchy:\n");
+					content.append("\nException Hierarchy:\n");
 					ExceptionSensorData child = data;
 
 					while (null != child) {
-						content.append(child.getExceptionEvent().toString().toLowerCase() + " in "
-								+ TextFormatter.getMethodWithParameters(cachedDataService.getMethodIdentForId(child.getMethodIdent())));
-						content.append("\n");
+						content.append(child.getExceptionEvent().toString().toLowerCase());
+						content.append(" in ");
+						content.append(TextFormatter.getMethodWithParameters(cachedDataService.getMethodIdentForId(child.getMethodIdent())));
+						content.append('\n');
 						child = child.getChild();
 					}
 
-					content.append("\n");
-					content.append("Stack Trace: ");
-					content.append("\n");
+					content.append("\nStack Trace: \n");
 					content.append(data.getStackTrace());
 
 				}

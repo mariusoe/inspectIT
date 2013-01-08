@@ -52,7 +52,7 @@ public class LocalStorageData extends AbstractStorageData {
 	 * @param storageData
 	 *            {@link StorageData} to copy information from.
 	 */
-	public void copyStorageDataInformation(StorageData storageData) {
+	public final void copyStorageDataInformation(StorageData storageData) {
 		this.setId(storageData.getId());
 		this.setName(storageData.getName());
 		this.setDescription(storageData.getDescription());

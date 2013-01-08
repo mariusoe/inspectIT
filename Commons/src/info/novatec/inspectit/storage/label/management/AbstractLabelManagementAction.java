@@ -50,7 +50,7 @@ public abstract class AbstractLabelManagementAction implements Serializable {
 	 *            Collection of labels.
 	 */
 	public AbstractLabelManagementAction(Collection<AbstractStorageLabel<?>> labelList) {
-		this.labelType = null;
+		this.labelType = null; // NOPMD
 		this.labelList = labelList;
 	}
 

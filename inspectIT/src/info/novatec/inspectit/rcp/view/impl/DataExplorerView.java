@@ -266,7 +266,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 		} else if (null != availableAgents && !availableAgents.isEmpty()) {
 			displayedAgent = availableAgents.iterator().next();
 		} else {
-			displayedAgent = null;
+			displayedAgent = null; // NOPMD
 		}
 	}
 
@@ -328,17 +328,17 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 					if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
 						availableAgents = new ArrayList<PlatformIdent>(cmrRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents().keySet());
 					} else {
-						availableAgents = null;
+						availableAgents = null; // NOPMD
 					}
 				} else if (repositoryDefinition instanceof StorageRepositoryDefinition) {
 					StorageRepositoryDefinition storageRepositoryDefinition = (StorageRepositoryDefinition) repositoryDefinition;
 					if (storageRepositoryDefinition.getLocalStorageData().isFullyDownloaded() || storageRepositoryDefinition.getCmrRepositoryDefinition().getOnlineStatus() != OnlineStatus.OFFLINE) {
 						availableAgents = new ArrayList<PlatformIdent>(storageRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents().keySet());
 					} else {
-						availableAgents = null;
+						availableAgents = null; // NOPMD
 					}
 				} else {
-					availableAgents = null;
+					availableAgents = null; // NOPMD
 				}
 				if (CollectionUtils.isNotEmpty(availableAgents)) {
 					Collections.sort(availableAgents, new Comparator<PlatformIdent>() {
@@ -569,7 +569,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 							} else if (null != availableAgents && !availableAgents.isEmpty() && null == displayedAgent) {
 								displayedAgent = availableAgents.get(0);
 							} else {
-								displayedAgent = null;
+								displayedAgent = null; // NOPMD
 							}
 							performUpdate();
 						}

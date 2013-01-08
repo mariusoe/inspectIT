@@ -1,6 +1,7 @@
 package info.novatec.inspectit.storage.nio.stream;
 
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
+import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageManager;
@@ -25,6 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Lazy;
@@ -48,6 +50,12 @@ import com.esotericsoftware.kryo.io.ByteBufferInputStream;
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Lazy
 public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
+
+	/**
+	 * The log of this class.
+	 */
+	@Logger
+	Log log;
 
 	/**
 	 * Minimum amount of buffers that can be used.
@@ -290,7 +298,7 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 
 		// close opened channel paths
 		for (Path path : openedChannelPaths) {
-			readingChannelManager.finalize(path);
+			readingChannelManager.finalizeChannel(path);
 		}
 	}
 
@@ -474,7 +482,7 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 							}
 						}
 					} catch (IOException e) {
-						e.printStackTrace();
+						log.warn("Exception occurred trying to read in the ReadTask.", e);
 					}
 				}
 

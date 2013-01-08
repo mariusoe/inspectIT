@@ -199,12 +199,6 @@ public class TimerRawVO extends MethodSensorData {
 		private int count = 0;
 
 		/**
-		 * Nothing to do here.
-		 */
-		public TimerRawContainer() {
-		}
-
-		/**
 		 * Adds a new time value to the current data container.
 		 * 
 		 * @param time
@@ -215,7 +209,7 @@ public class TimerRawVO extends MethodSensorData {
 			count++;
 
 			if (null != cpuData) {
-				cpuData = null;
+				cpuData = null; // NOPMD
 			}
 		}
 

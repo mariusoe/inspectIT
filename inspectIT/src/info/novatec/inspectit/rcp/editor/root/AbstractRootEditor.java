@@ -153,7 +153,7 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 	protected void stopUpdateTimer() {
 		if (null != updateTimer) {
 			updateTimer.cancel();
-			updateTimer = null;
+			updateTimer = null; // NOPMD
 		}
 	}
 

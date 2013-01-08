@@ -265,7 +265,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 			return false;
 		}
 
-		if (data.size() == 0) {
+		if (data.isEmpty()) {
 			return true;
 		}
 

@@ -522,8 +522,8 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 		protected IStatus run(IProgressMonitor monitor) {
 			if (cmrRepositoryDefinition != null) {
 				final OnlineStatus onlineStatus = cmrRepositoryDefinition.getOnlineStatus();
-				final CmrStatusData cmrStatusData = (onlineStatus == OnlineStatus.ONLINE) ? cmrRepositoryDefinition.getCmrManagementService().getCmrStatusData() : null;
-				recordingData = (onlineStatus == OnlineStatus.ONLINE) ? cmrRepositoryDefinition.getStorageService().getRecordingData() : null;
+				final CmrStatusData cmrStatusData = (onlineStatus == OnlineStatus.ONLINE) ? cmrRepositoryDefinition.getCmrManagementService().getCmrStatusData() : null; // NOPMD
+				recordingData = (onlineStatus == OnlineStatus.ONLINE) ? cmrRepositoryDefinition.getStorageService().getRecordingData() : null; // NOPMD
 				Display.getDefault().asyncExec(new Runnable() {
 
 					@Override

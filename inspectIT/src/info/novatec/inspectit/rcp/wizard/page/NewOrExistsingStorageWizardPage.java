@@ -17,7 +17,7 @@ public class NewOrExistsingStorageWizardPage extends WizardPage {
 	/**
 	 * Use enw storage button.
 	 */
-	private Button useNewStorage;
+	private Button newStorageButton;
 
 	/**
 	 * Default constructor.
@@ -36,9 +36,9 @@ public class NewOrExistsingStorageWizardPage extends WizardPage {
 		Composite main = new Composite(parent, SWT.NONE);
 		main.setLayout(new GridLayout(1, true));
 
-		useNewStorage = new Button(main, SWT.RADIO);
-		useNewStorage.setText("Create new storage");
-		useNewStorage.setSelection(true);
+		newStorageButton = new Button(main, SWT.RADIO);
+		newStorageButton.setText("Create new storage");
+		newStorageButton.setSelection(true);
 
 		new Button(main, SWT.RADIO).setText("Use existing storage");
 
@@ -51,7 +51,7 @@ public class NewOrExistsingStorageWizardPage extends WizardPage {
 	 * @return Should new storage be used.
 	 */
 	public boolean useNewStorage() {
-		return useNewStorage.getSelection();
+		return newStorageButton.getSelection();
 	}
 
 }
