@@ -44,4 +44,13 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 		return PERSPECTIVE_ID;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void eventLoopException(Throwable exception) {
+		super.eventLoopException(exception);
+		InspectIT.getDefault().createErrorDialog("Unchecked exception occurred during program execution.", exception, -1);
+	}
+
 }
