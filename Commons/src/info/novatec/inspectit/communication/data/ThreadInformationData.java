@@ -113,18 +113,39 @@ public class ThreadInformationData extends SystemSensorData {
 		this.count = count;
 	}
 
+	/**
+	 * increases the count by 1.
+	 */
 	public void incrementCount() {
 		this.count++;
 	}
 
+	/**
+	 * increases the peak thread count by the given number.
+	 * 
+	 * @param peakThreadCount
+	 *            the number to increase the peak thread count by.
+	 */
 	public void addPeakThreadCount(int peakThreadCount) {
 		this.totalPeakThreadCount += peakThreadCount;
 	}
 
+	/**
+	 * increases the daemon thread count by the given number.
+	 * 
+	 * @param daemonThreadCount
+	 *            the number to increase the daemon thread count.
+	 */
 	public void addDaemonThreadCount(int daemonThreadCount) {
 		this.totalDaemonThreadCount += daemonThreadCount;
 	}
 
+	/**
+	 * adds the given number to the thread count.
+	 * 
+	 * @param threadCount
+	 *            the number to increase the thread count.
+	 */
 	public void addThreadCount(int threadCount) {
 		this.totalThreadCount += threadCount;
 	}
@@ -201,6 +222,12 @@ public class ThreadInformationData extends SystemSensorData {
 		this.totalThreadCount = totalThreadCount;
 	}
 
+	/**
+	 * increase the total number of started threads by the given value.
+	 * 
+	 * @param totalStartedThreadCount
+	 *            the value to increase the total number of started threads.
+	 */
 	public void addTotalStartedThreadCount(long totalStartedThreadCount) {
 		this.totalTotalStartedThreadCount += totalStartedThreadCount;
 	}

@@ -437,8 +437,8 @@ public class DataRetriever {
 	 * @throws StorageException
 	 *             If status of HTTP response is not successful (codes 2xx).
 	 */
-	private void downloadAndSaveObjects(CmrRepositoryDefinition cmrRepositoryDefinition, List<String> fileNames, Path path, boolean useGzipCompression, boolean decompressContent)
-			throws IOException, StorageException {
+	private void downloadAndSaveObjects(CmrRepositoryDefinition cmrRepositoryDefinition, List<String> fileNames, Path path, boolean useGzipCompression, boolean decompressContent) throws IOException,
+			StorageException {
 		DefaultHttpClient httpClient = new DefaultHttpClient();
 		if (useGzipCompression && decompressContent) {
 			httpClient.addResponseInterceptor(new GzipHttpResponseInterceptor());

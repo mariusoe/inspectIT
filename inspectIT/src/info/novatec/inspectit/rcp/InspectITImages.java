@@ -9,6 +9,8 @@ package info.novatec.inspectit.rcp;
  */
 public interface InspectITImages {
 
+	// NOCHKALL: We will not javadoc comment each image.
+
 	// images
 	String IMG_SERVER_ONLINE = InspectITConstants.ICON_PATH + "server_online.png"; //$NON-NLS-1$
 	String IMG_SERVER_OFFLINE = InspectITConstants.ICON_PATH + "server_offline.png"; //$NON-NLS-1$

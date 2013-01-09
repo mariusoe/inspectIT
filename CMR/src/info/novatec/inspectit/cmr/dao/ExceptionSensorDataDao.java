@@ -89,8 +89,8 @@ public interface ExceptionSensorDataDao {
 	 * 
 	 * @param template
 	 *            The template object to be used for the query.
-	 * @return A list of {@link AggregatedExceptionSensorData} objects with additional information about how
-	 *         often a specific eventType was caused.
+	 * @return A list of {@link AggregatedExceptionSensorData} objects with additional information
+	 *         about how often a specific eventType was caused.
 	 */
 	List<AggregatedExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template);
 
@@ -105,8 +105,8 @@ public interface ExceptionSensorDataDao {
 	 *            The start date.
 	 * @param toDate
 	 *            The end date.
-	 * @return A list of {@link AggregatedExceptionSensorData} objects with additional information about how
-	 *         often a specific eventType was caused.
+	 * @return A list of {@link AggregatedExceptionSensorData} objects with additional information
+	 *         about how often a specific eventType was caused.
 	 */
 	List<AggregatedExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate);
 
@@ -114,7 +114,8 @@ public interface ExceptionSensorDataDao {
 	 * Returns the exception sensor data list for all error and stack message combinations for the
 	 * throwable type defined in the template.
 	 * 
-	 * @param template template with throwable type set
+	 * @param template
+	 *            template with throwable type set
 	 * @return {@link ExceptionSensorData} list.
 	 */
 	List<ExceptionSensorData> getStackTraceMessagesForThrowableType(ExceptionSensorData template);

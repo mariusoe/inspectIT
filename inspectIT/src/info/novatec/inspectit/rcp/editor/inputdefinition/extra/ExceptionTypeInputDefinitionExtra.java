@@ -65,9 +65,7 @@ public class ExceptionTypeInputDefinitionExtra implements IInputDefinitionExtra 
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this)
-				.add("throwableType", throwableType)
-				.toString();
+		return Objects.toStringHelper(this).add("throwableType", throwableType).toString();
 	}
 
 }

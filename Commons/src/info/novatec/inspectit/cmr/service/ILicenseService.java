@@ -16,6 +16,8 @@ public interface ILicenseService {
 	 * 
 	 * @param licenseContent
 	 *            The license file content.
+	 * @throws Exception
+	 *             in case of problems.
 	 */
 	void receiveLicenseContent(byte[] licenseContent) throws Exception;
 

@@ -65,7 +65,7 @@ public class RegisterMethodIdent extends AbstractRemoteMethodCall {
 	protected Object performRemoteCall(Remote remoteObject) throws RemoteException {
 		IRegistrationService reg = (IRegistrationService) remoteObject;
 
-		return Long.valueOf(reg.registerMethodIdent(platformId, rsc.getTargetPackageName(), rsc.getTargetClassName(), rsc.getTargetMethodName(), rsc.getParameterTypes(), rsc.getReturnType(), rsc
-				.getModifiers()));
+		return Long.valueOf(reg.registerMethodIdent(platformId, rsc.getTargetPackageName(), rsc.getTargetClassName(), rsc.getTargetMethodName(), rsc.getParameterTypes(), rsc.getReturnType(),
+				rsc.getModifiers()));
 	}
 }

@@ -112,7 +112,7 @@ public class HttpHook implements IMethodHook {
 	private final StartEndMarker refMarker = new StartEndMarker();
 
 	/**
-	 * Constructor
+	 * This constructor creates a new instance of a <code>HttpHook</code>.
 	 * 
 	 * @param timer
 	 *            The timer
@@ -120,6 +120,8 @@ public class HttpHook implements IMethodHook {
 	 *            The id manager
 	 * @param threadMXBean
 	 *            the threadMx Bean for cpu timing
+	 * @param parameters
+	 *            the map containing the configuration parameters
 	 */
 	public HttpHook(Timer timer, IIdManager idManager, Map<String, Object> parameters, ThreadMXBean threadMXBean) {
 		this.timer = timer;

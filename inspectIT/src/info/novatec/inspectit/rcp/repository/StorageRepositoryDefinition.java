@@ -1,7 +1,6 @@
 package info.novatec.inspectit.rcp.repository;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
-import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
@@ -119,13 +118,6 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	 */
 	public ILicenseService getLicenseService() {
 		return cmrRepositoryDefinition.getLicenseService();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public ICombinedMetricsDataAccessService getCombinedMetricsDataAccessService() {
-		throw new UnsupportedOperationException("CombinedMetricsDataAccessService not available with Storage repository.");
 	}
 
 	/**

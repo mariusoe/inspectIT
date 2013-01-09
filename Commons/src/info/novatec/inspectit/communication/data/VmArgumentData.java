@@ -44,6 +44,14 @@ public class VmArgumentData implements Serializable, Sizeable {
 	public VmArgumentData() {
 	}
 
+	/**
+	 * Creates a new instance with the given parameters.
+	 * 
+	 * @param vmName
+	 *            the name of the VM.
+	 * @param vmValue
+	 *            the value.
+	 */
 	public VmArgumentData(String vmName, String vmValue) {
 		this.vmName = vmName;
 		this.vmValue = vmValue;

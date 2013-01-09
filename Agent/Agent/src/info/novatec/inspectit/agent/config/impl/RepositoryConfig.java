@@ -1,8 +1,8 @@
 package info.novatec.inspectit.agent.config.impl;
 
 /**
- * Class used by the {@link ConfigurationStorage} implementation to store the
- * information of a repository.
+ * Class used by the {@link ConfigurationStorage} implementation to store the information of a
+ * repository.
  * 
  * @author Patrice Bouillet
  * 

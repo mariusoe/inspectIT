@@ -37,10 +37,36 @@ public abstract class InvocationAwareData extends MethodSensorData {
 	public InvocationAwareData() {
 	}
 
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @param timeStamp
+	 *            the timestamp.
+	 * @param platformIdent
+	 *            the platform identifier.
+	 * @param sensorTypeIdent
+	 *            the sensor type identifier.
+	 * @param methodIdent
+	 *            the method identifier.
+	 */
 	public InvocationAwareData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent) {
 		super(timeStamp, platformIdent, sensorTypeIdent, methodIdent);
 	}
 
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @param timeStamp
+	 *            the timestamp.
+	 * @param platformIdent
+	 *            the platform identifier.
+	 * @param sensorTypeIdent
+	 *            the sensor type identifier.
+	 * @param methodIdent
+	 *            the method identifier.
+	 * @param parameterContentData
+	 *            the parameter contents.
+	 */
 	public InvocationAwareData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData) {
 		super(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);
 	}

@@ -24,6 +24,18 @@ public class DatabaseAggregatedTimerData extends TimerData {
 		super();
 	}
 
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @param timestamp
+	 *            the timestamp.
+	 * @param platformIdent
+	 *            the platform identifier.
+	 * @param sensorTypeIdent
+	 *            the sensor type identifier.
+	 * @param methodIdent
+	 *            the method identifier.
+	 */
 	public DatabaseAggregatedTimerData(Timestamp timestamp, long platformIdent, long sensorTypeIdent, long methodIdent) {
 		super(timestamp, platformIdent, sensorTypeIdent, methodIdent);
 	}

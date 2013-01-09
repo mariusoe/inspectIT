@@ -255,8 +255,7 @@ public class ManageLabelWizardPage extends WizardPage {
 					if (isLabelTypeExistsInStorage((AbstractStorageLabelType<?>) element, labelsInStorages)) {
 						return InspectIT.getDefault().getImage(InspectITImages.IMG_STORAGE_NEW);
 					}
-				} else
-				if (index == 1 && element instanceof AbstractStorageLabelType) {
+				} else if (index == 1 && element instanceof AbstractStorageLabelType) {
 					return ImageFormatter.getImageForLabel((AbstractStorageLabelType<?>) element);
 				}
 				return null;
@@ -586,12 +585,8 @@ public class ManageLabelWizardPage extends WizardPage {
 		/**
 		 * Available type list.
 		 */
-		private final AbstractCustomStorageLabelType<?>[] availableTypes = new AbstractCustomStorageLabelType<?>[] {
-				new CustomBooleanLabelType(),
-				new CustomDateLabelType(),
-				new CustomNumberLabelType(),
-				new CustomStringLabelType()
-		};
+		private final AbstractCustomStorageLabelType<?>[] availableTypes = new AbstractCustomStorageLabelType<?>[] { new CustomBooleanLabelType(), new CustomDateLabelType(),
+				new CustomNumberLabelType(), new CustomStringLabelType() };
 
 		/**
 		 * Reference to the created label type.
@@ -608,13 +603,19 @@ public class ManageLabelWizardPage extends WizardPage {
 		 */
 		private int selectedImageKeyIndex = -1;
 
-		/** Widgets. */
+		/** Image buttons. */
 		private Button[] imageButtons;
+		/** Ok Button. */
 		private Button okButton;
+		/** The main window. */
 		private Composite main;
+		/** the name. */
 		private Text name;
+		/** Selection of the value type. */
 		private Combo valueTypeSelection;
+		/** yes button. */
 		private Button yesButton;
+		/** no button. */
 		private Button noButton;
 
 		/**

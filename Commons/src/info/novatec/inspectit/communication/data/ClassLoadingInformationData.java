@@ -97,10 +97,19 @@ public class ClassLoadingInformationData extends SystemSensorData {
 		this.count = count;
 	}
 
+	/**
+	 * increases the count by 1.
+	 */
 	public void incrementCount() {
 		this.count++;
 	}
 
+	/**
+	 * adds the given value to the total number of loaded classes.
+	 * 
+	 * @param loadedClassCount
+	 *            the value to add.
+	 */
 	public void addLoadedClassCount(int loadedClassCount) {
 		this.totalLoadedClassCount += loadedClassCount;
 	}
@@ -129,6 +138,12 @@ public class ClassLoadingInformationData extends SystemSensorData {
 		this.totalLoadedClassCount = totalLoadedClassCount;
 	}
 
+	/**
+	 * adds the given value to the total number of loaded classes.
+	 * 
+	 * @param totalLoadedClassCount
+	 *            the value to add.
+	 */
 	public void addTotalLoadedClassCount(long totalLoadedClassCount) {
 		this.totalTotalLoadedClassCount += totalLoadedClassCount;
 	}
@@ -157,6 +172,12 @@ public class ClassLoadingInformationData extends SystemSensorData {
 		this.totalTotalLoadedClassCount = totalTotalLoadedClassCount;
 	}
 
+	/**
+	 * adds the given value to the number of unloaded classes.
+	 * 
+	 * @param unloadedClassCount
+	 *            the value to add.
+	 */
 	public void addUnloadedClassCount(long unloadedClassCount) {
 		this.totalUnloadedClassCount += unloadedClassCount;
 	}

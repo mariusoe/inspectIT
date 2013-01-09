@@ -76,7 +76,7 @@ public class TimeStrategy extends AbstractSendingStrategy {
 					if (allowSending) {
 						sendNow();
 					}
-				} catch (InterruptedException e) {
+				} catch (InterruptedException e) { // NOCHK
 					// nothing to do
 				}
 			}

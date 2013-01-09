@@ -26,29 +26,22 @@ public @interface MethodLog {
 	 * 
 	 */
 	public enum Level {
-		OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL;
+		OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL; // NOCHK
 	}
 
 	/**
 	 * The defined level on which the time messages shall be printed to.
-	 * 
-	 * @return the current set time log level.
 	 */
 	Level timeLogLevel() default Level.DEBUG;
 
 	/**
 	 * The defined level on which the trace messages shall be printed to.
-	 * 
-	 * @return the current set trace log level.
 	 */
 	Level traceLogLevel() default Level.TRACE;
 
 	/**
 	 * Defines a duration limit on this method. If the methods duration exceed the specified one, a
 	 * message will be printed into the log.
-	 * 
-	 * @return the current set duration limit. '-1' means, that the duration limit check is not
-	 *         active.
 	 */
 	long durationLimit() default -1;
 

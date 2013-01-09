@@ -262,7 +262,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * @param duration
 	 *            The actual duration.
 	 */
-	private void checkForSavingOrNot(ICoreService coreService, long methodId, long sensorTypeId, RegisteredSensorConfig rsc, InvocationSequenceData invocationSequenceData, double startTime,
+	private void checkForSavingOrNot(ICoreService coreService, long methodId, long sensorTypeId, RegisteredSensorConfig rsc, InvocationSequenceData invocationSequenceData, double startTime, // NOCHK
 			double endTime, double duration) {
 		double minduration = minDurationMap.get(invocationStartId.get()).doubleValue();
 		if (duration >= minduration) {
@@ -413,42 +413,72 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	// All unsupported methods are below from here //
 	// //////////////////////////////////////////////
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void addListListener(ListListener<?> listener) {
 		throw new UnsupportedMethodException();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void addSendStrategy(ISendingStrategy strategy) {
 		throw new UnsupportedMethodException();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void connect() throws ConnectException {
 		throw new UnsupportedMethodException();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void removeListListener(ListListener<?> listener) {
 		throw new UnsupportedMethodException();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void sendData() {
 		throw new UnsupportedMethodException();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setBufferStrategy(IBufferStrategy<DefaultData> bufferStrategy) {
 		throw new UnsupportedMethodException();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void startSendingStrategies() {
 		throw new UnsupportedMethodException();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void addPlatformSensorType(PlatformSensorTypeConfig platformSensorTypeConfig) {
 		throw new UnsupportedMethodException();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void start() {
 		throw new UnsupportedMethodException();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void stop() {
 		throw new UnsupportedMethodException();
 	}

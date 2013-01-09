@@ -44,12 +44,13 @@ public class StorageInfoComposite extends Composite {
 	 */
 	private IStorageData storageData;
 
-	/**
-	 * Widgets.
-	 */
+	/** name of the storage. */
 	private Label name;
+	/** description of the storage. */
 	private FormText description;
+	/** Label holding the size of the storage. */
 	private Label size;
+	/** Label describing if the storage was already downloaded. */
 	private Label downloaded;
 
 	/**

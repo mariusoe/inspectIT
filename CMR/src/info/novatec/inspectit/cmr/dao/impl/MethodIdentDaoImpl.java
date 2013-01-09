@@ -12,7 +12,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
@@ -39,6 +38,7 @@ public class MethodIdentDaoImpl extends HibernateDaoSupport implements MethodIde
 	 * -andor-jpatemplate
 	 * 
 	 * @param sessionFactory
+	 *            the hibernate session factory.
 	 */
 	@Autowired
 	public MethodIdentDaoImpl(SessionFactory sessionFactory) {
@@ -118,5 +118,5 @@ public class MethodIdentDaoImpl extends HibernateDaoSupport implements MethodIde
 
 		return getHibernateTemplate().findByCriteria(methodCriteria);
 	}
-	
+
 }

@@ -148,8 +148,7 @@ public class DeferredMethodComposite extends DeferredComposite {
 			return false;
 		}
 		DeferredMethodComposite that = (DeferredMethodComposite) object;
-		return Objects.equal(this.method, that.method)
-				&& Objects.equal(this.repositoryDefinition, that.repositoryDefinition);
+		return Objects.equal(this.method, that.method) && Objects.equal(this.repositoryDefinition, that.repositoryDefinition);
 	}
 
 }

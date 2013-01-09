@@ -205,10 +205,29 @@ public abstract class AbstractTableInputController implements TableInputControll
 		return false;
 	}
 
+	/**
+	 * Maps a column with the enumeration key. The implementing classes should map each column they
+	 * create to the enum that represents that column. Later on the column can be retireved with the
+	 * enum key if needed.
+	 * 
+	 * @param key
+	 *            Enumeration that represents the column.
+	 * @param column
+	 *            Created column to be mapped.
+	 */
 	public void mapTableViewerColumn(Enum<?> key, TableViewerColumn column) {
 		tableViewerColumnMap.put(key, column);
 	}
 
+	/**
+	 * Returns the column that has been mapped with the given enum key. Enum should represent the
+	 * wanted column.
+	 * 
+	 * @param key
+	 *            Enumeration that represents the column.
+	 * @return Returns the column that has been mapped with the given enum key or <code>null</code>
+	 *         if no mapping has been done.
+	 */
 	public TableViewerColumn getMappedTableViewerColumn(Enum<?> key) {
 		return tableViewerColumnMap.get(key);
 	}

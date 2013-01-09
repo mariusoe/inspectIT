@@ -108,6 +108,7 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	 * -andor-jpatemplate
 	 * 
 	 * @param sessionFactory
+	 *            the hibernate session factory.
 	 */
 	@Autowired
 	public DefaultDataDaoImpl(SessionFactory sessionFactory) {

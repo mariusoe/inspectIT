@@ -61,7 +61,7 @@ public final class ImageFormatter {
 	 * 
 	 * @param labelType
 	 *            Label type.
-	 * @return {@link Image} for {@link Composite}.
+	 * @return {@link Image} for Composite.
 	 */
 	public static Image getImageForLabel(AbstractStorageLabelType<?> labelType) {
 		return InspectIT.getDefault().getImage(getImageKeyForLabel(labelType));
@@ -241,6 +241,7 @@ public final class ImageFormatter {
 	/**
 	 * Returns the combined image for given array of descriptors. Orientation can be vertical or
 	 * horizontal.
+	 * 
 	 * @param resourceManager
 	 *            {@link ResourceManager}.
 	 * @param orientation

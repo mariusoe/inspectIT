@@ -13,7 +13,6 @@ import org.springframework.stereotype.Repository;
 /**
  * 
  * @author Matthias Huber
- *
  */
 @Repository
 public class SensorTypeDataDaoImpl extends HibernateDaoSupport implements SensorTypeDataDao {
@@ -27,23 +26,24 @@ public class SensorTypeDataDaoImpl extends HibernateDaoSupport implements Sensor
 	 * -andor-jpatemplate
 	 * 
 	 * @param sessionFactory
+	 *            the Hibernate Session Factory.
 	 */
 	@Autowired
 	public SensorTypeDataDaoImpl(SessionFactory sessionFactory) {
 		setSessionFactory(sessionFactory);
 	}
-	
+
 	/**
-	 * @see SensorTypeDataDao#addSensorType(SensorTypeData)
+	 * {@inheritDoc}
 	 */
 	public long addSensorType(SensorTypeData sensorTypeData) {
 		getHibernateTemplate().save(sensorTypeData);
-		
+
 		return sensorTypeData.getId();
 	}
 
 	/**
-	 * @see SensorTypeDataDao#deleteSensorType(long)
+	 * {@inheritDoc}
 	 */
 	public void deleteSensorType(long sensorTypeId) throws EntityNotFoundException {
 		HibernateTemplate hibernateTemplate = getHibernateTemplate();
@@ -57,7 +57,7 @@ public class SensorTypeDataDaoImpl extends HibernateDaoSupport implements Sensor
 	}
 
 	/**
-	 * @see SensorTypeDataDao#updateSensorTpe(SensorTypeData)
+	 * {@inheritDoc}
 	 */
 	public void updateSensorType(SensorTypeData sensorTypeData) {
 		getHibernateTemplate().update(sensorTypeData);

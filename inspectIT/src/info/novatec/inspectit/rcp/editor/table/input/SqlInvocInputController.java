@@ -280,7 +280,12 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * shows the details.
+	 * 
+	 * @param parent
+	 *            the parent.
+	 * @param element
+	 *            the element.
 	 */
 	@Override
 	public void showDetails(Shell parent, Object element) {

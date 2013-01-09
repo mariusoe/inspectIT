@@ -65,9 +65,7 @@ public class SqlStatementInputDefinitionExtra implements IInputDefinitionExtra {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this)
-				.add("sql", sql)
-				.toString();
+		return Objects.toStringHelper(this).add("sql", sql).toString();
 	}
 
 }

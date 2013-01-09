@@ -17,17 +17,6 @@ public final class InputDefinitionExtrasMarkerFactory {
 	}
 
 	/**
-	 * Marker for {@link CombinedMetricsInputDefinitionExtra}.
-	 */
-	public static final InputDefinitionExtraMarker<CombinedMetricsInputDefinitionExtra> COMBINED_METRICS_EXTRAS_MARKER = new InputDefinitionExtraMarker<CombinedMetricsInputDefinitionExtra>() {
-		@Override
-		public Class<CombinedMetricsInputDefinitionExtra> getInputDefinitionExtraClass() {
-			return CombinedMetricsInputDefinitionExtra.class;
-		}
-
-	};
-
-	/**
 	 * Marker for {@link NavigationSteppingInputDefinitionExtra}.
 	 */
 	public static final InputDefinitionExtraMarker<NavigationSteppingInputDefinitionExtra> NAVIGATION_STEPPING_EXTRAS_MARKER = new InputDefinitionExtraMarker<NavigationSteppingInputDefinitionExtra>() {
@@ -59,7 +48,7 @@ public final class InputDefinitionExtrasMarkerFactory {
 		}
 
 	};
-	
+
 	/**
 	 * Marker for {@link SqlStatementInputDefinitionExtra}.
 	 */
@@ -69,7 +58,7 @@ public final class InputDefinitionExtrasMarkerFactory {
 			return SqlStatementInputDefinitionExtra.class;
 		}
 
-	};	
+	};
 
 	/**
 	 * Abstract class for input definition extras marker.
@@ -118,9 +107,7 @@ public final class InputDefinitionExtrasMarkerFactory {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringHelper(this)
-					.add("inputDefintionExtraClass", getInputDefinitionExtraClass())
-					.toString();
+			return Objects.toStringHelper(this).add("inputDefintionExtraClass", getInputDefinitionExtraClass()).toString();
 		}
 
 	}

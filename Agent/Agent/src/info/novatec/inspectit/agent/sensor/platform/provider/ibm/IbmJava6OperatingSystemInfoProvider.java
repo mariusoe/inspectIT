@@ -206,6 +206,8 @@ public class IbmJava6OperatingSystemInfoProvider extends DefaultOperatingSystemI
 	 *            Method to invoke
 	 * @param args
 	 *            Arguments
+	 * @param <V>
+	 *            The result type.
 	 * @return Returns method invocation result, or null if method invocation fails for any reason.
 	 */
 	@SuppressWarnings("unchecked")

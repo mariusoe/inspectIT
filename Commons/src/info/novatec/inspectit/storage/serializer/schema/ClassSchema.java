@@ -6,8 +6,8 @@ import java.util.Map;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * {@link ClassSchema} is simple class that defines the field of the class that will be serialized. Each
- * field has a field marker integer value that goes to serialization to define the field.
+ * {@link ClassSchema} is simple class that defines the field of the class that will be serialized.
+ * Each field has a field marker integer value that goes to serialization to define the field.
  * 
  * @author Ivan Senic
  * 
@@ -133,13 +133,13 @@ public class ClassSchema {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String toString() {
-		ToStringBuilder toStringBuilder =  new ToStringBuilder(this);
+		ToStringBuilder toStringBuilder = new ToStringBuilder(this);
 		toStringBuilder.append("className", className);
 		toStringBuilder.append("fieldMap", fieldMap);
 		return toStringBuilder.toString();

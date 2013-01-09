@@ -27,14 +27,13 @@ public class IdentityHashToDataObject {
 	}
 
 	/**
-	 * Constructor taking the identity hashcode and the
-	 * {@link ExceptionSensorData} object for initialization.
+	 * Constructor taking the identity hashcode and the {@link ExceptionSensorData} object for
+	 * initialization.
 	 * 
 	 * @param identityHash
 	 *            The identity hashcode of the {@link Throwable} object.
 	 * @param exceptionSensorData
-	 *            The {@link ExceptionSensorData} object containing the
-	 *            information.
+	 *            The {@link ExceptionSensorData} object containing the information.
 	 */
 	public IdentityHashToDataObject(Long identityHash, ExceptionSensorData exceptionSensorData) {
 		this.identityHash = identityHash;
@@ -61,11 +60,9 @@ public class IdentityHashToDataObject {
 	}
 
 	/**
-	 * Returns the {@link ExceptionSensorData} object containing the
-	 * information.
+	 * Returns the {@link ExceptionSensorData} object containing the information.
 	 * 
-	 * @return The {@link ExceptionSensorData} object containing the
-	 *         information.
+	 * @return The {@link ExceptionSensorData} object containing the information.
 	 */
 	public ExceptionSensorData getExceptionSensorData() {
 		return exceptionSensorData;
@@ -75,8 +72,7 @@ public class IdentityHashToDataObject {
 	 * Sets the {@link ExceptionSensorData} object.
 	 * 
 	 * @param exceptionSensorData
-	 *            The {@link ExceptionSensorData} object containing the
-	 *            information.
+	 *            The {@link ExceptionSensorData} object containing the information.
 	 */
 	public void setExceptionSensorData(ExceptionSensorData exceptionSensorData) {
 		this.exceptionSensorData = exceptionSensorData;

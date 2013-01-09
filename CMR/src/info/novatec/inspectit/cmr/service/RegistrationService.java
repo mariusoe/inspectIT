@@ -96,7 +96,7 @@ public class RegistrationService implements IRegistrationService {
 	 */
 	@Transactional
 	@MethodLog
-	public synchronized long registerPlatformIdent(List<String> definedIPs, String agentName, String version) throws LicenseException, RemoteException, ServiceException {
+	public synchronized long registerPlatformIdent(List<String> definedIPs, String agentName, String version) throws RemoteException, ServiceException {
 		try {
 			if (log.isInfoEnabled()) {
 				log.info("Trying to register Agent '" + agentName + "'");
@@ -276,9 +276,6 @@ public class RegistrationService implements IRegistrationService {
 
 	/**
 	 * Is executed after dependency injection is done to perform any initialization.
-	 * 
-	 * @throws Exception
-	 *             if an error occurs during {@link PostConstruct}
 	 */
 	@PostConstruct
 	public void postConstruct() {

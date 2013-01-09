@@ -69,8 +69,7 @@ public class MapPreferenceValueProvider extends PreferenceValueProvider<Map<?, ?
 					map.put(splitted[0], splitted[1]);
 				} else {
 					throw new PreferenceException("Error loading map entry for the map saved in the preference store are not correct.  Entry key and value received values via the string '"
-							+ nextEntry
-							+ "' are " + Arrays.asList(splitted) + ". Definition will be skipped.");
+							+ nextEntry + "' are " + Arrays.asList(splitted) + ". Definition will be skipped.");
 				}
 			}
 			return map;

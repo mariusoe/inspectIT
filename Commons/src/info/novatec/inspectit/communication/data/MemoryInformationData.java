@@ -165,10 +165,19 @@ public class MemoryInformationData extends SystemSensorData {
 		this.count = count;
 	}
 
+	/**
+	 * increases the count.
+	 */
 	public void incrementCount() {
 		this.count++;
 	}
 
+	/**
+	 * adds the given value to the free physical memory.
+	 * 
+	 * @param freePhysMemory
+	 *            the value to add.
+	 */
 	public void addFreePhysMemory(long freePhysMemory) {
 		this.totalFreePhysMemory += freePhysMemory;
 	}
@@ -197,6 +206,12 @@ public class MemoryInformationData extends SystemSensorData {
 		this.totalFreePhysMemory = totalFreePhysMemory;
 	}
 
+	/**
+	 * adds the given value to the free swap space.
+	 * 
+	 * @param freeSwapSpace
+	 *            the value to add.
+	 */
 	public void addFreeSwapSpace(long freeSwapSpace) {
 		this.totalFreeSwapSpace += freeSwapSpace;
 	}
@@ -225,6 +240,12 @@ public class MemoryInformationData extends SystemSensorData {
 		this.totalFreeSwapSpace = totalFreeSwapSpace;
 	}
 
+	/**
+	 * adds the given value to the comittedVirtualMemSize.
+	 * 
+	 * @param comittedVirtualMemSize
+	 *            the value to add.
+	 */
 	public void addComittedVirtualMemSize(long comittedVirtualMemSize) {
 		this.totalComittedVirtualMemSize += comittedVirtualMemSize;
 	}
@@ -253,6 +274,12 @@ public class MemoryInformationData extends SystemSensorData {
 		this.totalComittedVirtualMemSize = totalComittedVirtualMemSize;
 	}
 
+	/**
+	 * adds the given value to the usedHeapMemorySize.
+	 * 
+	 * @param usedHeapMemorySize
+	 *            the value to add.
+	 */
 	public void addUsedHeapMemorySize(long usedHeapMemorySize) {
 		this.totalUsedHeapMemorySize += usedHeapMemorySize;
 	}
@@ -281,6 +308,12 @@ public class MemoryInformationData extends SystemSensorData {
 		this.totalUsedHeapMemorySize = totalUsedHeapMemorySize;
 	}
 
+	/**
+	 * adds the given value to the comittedHeapMemorySize.
+	 * 
+	 * @param comittedHeapMemorySize
+	 *            the value to add.
+	 */
 	public void addComittedHeapMemorySize(long comittedHeapMemorySize) {
 		this.totalComittedHeapMemorySize += comittedHeapMemorySize;
 	}
@@ -309,6 +342,12 @@ public class MemoryInformationData extends SystemSensorData {
 		this.totalComittedHeapMemorySize = totalComittedHeapMemorySize;
 	}
 
+	/**
+	 * adds the given value to the usedNonHeapMemorySize.
+	 * 
+	 * @param usedNonHeapMemorySize
+	 *            the value to add.
+	 */
 	public void addUsedNonHeapMemorySize(long usedNonHeapMemorySize) {
 		this.totalUsedNonHeapMemorySize += usedNonHeapMemorySize;
 	}
@@ -337,6 +376,12 @@ public class MemoryInformationData extends SystemSensorData {
 		this.totalUsedNonHeapMemorySize = totalUsedNonHeapMemorySize;
 	}
 
+	/**
+	 * adds the given value to the comittedNonHeapMemorySize.
+	 * 
+	 * @param comittedNonHeapMemorySize
+	 *            the value to add.
+	 */
 	public void addComittedNonHeapMemorySize(long comittedNonHeapMemorySize) {
 		this.totalComittedNonHeapMemorySize += comittedNonHeapMemorySize;
 	}

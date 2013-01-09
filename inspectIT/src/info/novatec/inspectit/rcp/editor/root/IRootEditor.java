@@ -36,11 +36,10 @@ public interface IRootEditor {
 	void setActiveSubView(ISubView subView);
 
 	/**
-	 * Returns the current active sub view. One editor can only have one sub
-	 * view child, but this child can act as a composite with other sub views
-	 * contained in it. So this method returns the sub view which is currently
-	 * active somewhere in one of the composite sub-view child elements (if
-	 * there are any).
+	 * Returns the current active sub view. One editor can only have one sub view child, but this
+	 * child can act as a composite with other sub views contained in it. So this method returns the
+	 * sub view which is currently active somewhere in one of the composite sub-view child elements
+	 * (if there are any).
 	 * 
 	 * @return The active sub view.
 	 */
@@ -54,9 +53,8 @@ public interface IRootEditor {
 	InputDefinition getInputDefinition();
 
 	/**
-	 * This will set the data input of the view. Every view can initialize
-	 * itself with some data (like live data from the server). This is only
-	 * needed if some specific needs to be displayed.
+	 * This will set the data input of the view. Every view can initialize itself with some data
+	 * (like live data from the server). This is only needed if some specific needs to be displayed.
 	 * 
 	 * @param data
 	 *            The list of {@link DefaultData} objects.

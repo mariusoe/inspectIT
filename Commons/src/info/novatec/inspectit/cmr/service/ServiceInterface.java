@@ -24,11 +24,16 @@ import java.lang.annotation.Target;
 @Documented
 public @interface ServiceInterface {
 
+	// Note on Checkstyle ignores:
+	// Due to bug http://sourceforge.net/p/checkstyle/bugs/641/ it is currently not possible to add
+	// @return tags to methods within an @interface definition, thus we currently ignore these
+	// incorrect findings.
+
 	/**
 	 * The value may indicate a suggestion for a logical component name, to be turned into a Spring
 	 * bean in case of an autodetected component.
 	 * 
-	 * @return the suggested component name, if any
+	 * @return the suggested component name, if any //NOCHK
 	 */
 	String name() default "";
 
@@ -36,21 +41,21 @@ public @interface ServiceInterface {
 	 * Defines the exporter used for exposing this service. Valid values are defined in the
 	 * enumeration {@link ServiceExporterType}.
 	 * 
-	 * @return the defined exporter type.
+	 * @return the defined exporter type. //NOCHK
 	 */
 	ServiceExporterType exporter();
 
 	/**
 	 * The service port if type {@link ServiceExporterType#RMI} is used.
 	 * 
-	 * @return the specified service port.
+	 * @return the specified service port. //NOCHK
 	 */
 	String servicePort() default "";
 
 	/**
 	 * The registry port if type {@link ServiceExporterType#RMI} is used.
 	 * 
-	 * @return the specified registry port.
+	 * @return the specified registry port. //NOCHK
 	 */
 	String registryPort() default "";
 

@@ -233,12 +233,8 @@ public class EditorPropertiesData {
 			return false;
 		}
 		EditorPropertiesData that = (EditorPropertiesData) object;
-		return Objects.equal(this.partImageFlag, that.partImageFlag)
-				&& Objects.equal(this.partNameFlag, that.partNameFlag)
-				&& Objects.equal(this.sensorImage, that.sensorImage)
-				&& Objects.equal(this.sensorName, that.sensorName)
-				&& Objects.equal(this.viewImage, that.viewImage)
-				&& Objects.equal(this.viewName, that.viewName);
+		return Objects.equal(this.partImageFlag, that.partImageFlag) && Objects.equal(this.partNameFlag, that.partNameFlag) && Objects.equal(this.sensorImage, that.sensorImage)
+				&& Objects.equal(this.sensorName, that.sensorName) && Objects.equal(this.viewImage, that.viewImage) && Objects.equal(this.viewName, that.viewName);
 	}
 
 	/**
@@ -246,12 +242,7 @@ public class EditorPropertiesData {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this)
-				.add("group/sensor image", sensorImage)
-				.add("group/sensor", sensorName)
-				.add("viewName", viewImage)
-				.add("viewName", viewName)
-				.toString();
+		return Objects.toStringHelper(this).add("group/sensor image", sensorImage).add("group/sensor", sensorName).add("viewName", viewImage).add("viewName", viewName).toString();
 	}
 
 }

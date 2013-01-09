@@ -72,10 +72,19 @@ public class CpuInformationData extends SystemSensorData {
 		this.count = count;
 	}
 
+	/**
+	 * increases the count by 1.
+	 */
 	public void incrementCount() {
 		this.count++;
 	}
 
+	/**
+	 * sets the process cpu time if it is higher than the current cpu time.
+	 * 
+	 * @param actualProcessCpuTime
+	 *            the data to set.
+	 */
 	public void updateProcessCpuTime(long actualProcessCpuTime) {
 		if (actualProcessCpuTime > processCpuTime) {
 			processCpuTime = actualProcessCpuTime;
@@ -90,6 +99,12 @@ public class CpuInformationData extends SystemSensorData {
 		this.processCpuTime = processCpuTime;
 	}
 
+	/**
+	 * adds the given value to the cpu usage.
+	 * 
+	 * @param cpuUsage
+	 *            the value to add.
+	 */
 	public void addCpuUsage(float cpuUsage) {
 		this.totalCpuUsage += cpuUsage;
 	}
@@ -118,6 +133,9 @@ public class CpuInformationData extends SystemSensorData {
 		this.totalCpuUsage = totalCpuUsage;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
@@ -129,6 +147,9 @@ public class CpuInformationData extends SystemSensorData {
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;

@@ -14,12 +14,13 @@ public interface IServerStatusService {
 	 */
 	String VERSION_NOT_AVAILABLE = "n/a";
 
+	/** Server offline. */
 	int SERVER_OFFLINE = 0;
-
+	/** Server online. */
 	int SERVER_ONLINE = 1;
-
+	/** Server starting. */
 	int SERVER_STARTING = 2;
-
+	/** Server stopping. */
 	int SERVER_STOPPING = 4;
 
 	/**

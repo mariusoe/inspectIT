@@ -28,6 +28,10 @@ public class StorageCompressionWizardPage extends WizardPage {
 	 * 
 	 * @param storageData
 	 *            Storage to download.
+	 * @param title
+	 *            the title.
+	 * @param message
+	 *            the message.
 	 */
 	public StorageCompressionWizardPage(IStorageData storageData, String title, String message) {
 		super(title);

@@ -8,7 +8,6 @@ import info.novatec.inspectit.rcp.editor.composite.TabbedCompositeSubView;
 import info.novatec.inspectit.rcp.editor.graph.GraphSubView;
 import info.novatec.inspectit.rcp.editor.table.TableSubView;
 import info.novatec.inspectit.rcp.editor.table.input.AggregatedTimerSummaryInputController;
-import info.novatec.inspectit.rcp.editor.table.input.CombinedMetricsInputController;
 import info.novatec.inspectit.rcp.editor.table.input.ExceptionSensorInvocInputController;
 import info.novatec.inspectit.rcp.editor.table.input.GroupedExceptionOverviewInputController;
 import info.novatec.inspectit.rcp.editor.table.input.HttpTimerDataInputController;
@@ -144,13 +143,6 @@ public final class SubViewFactory {
 			groupedExceptionSensorSubView.addSubView(groupedExceptionOverview, 1);
 			groupedExceptionSensorSubView.addSubView(exceptionMessagesTree, 2);
 			return groupedExceptionSensorSubView;
-		case MARVIN_WORKFLOW:
-			GridCompositeSubView combinedMetricsSubView = new GridCompositeSubView();
-			ISubView combinedMetricsSummarySubView = new TableSubView(new CombinedMetricsInputController());
-
-			combinedMetricsSubView.addSubView(new GraphSubView(sensorTypeEnum), new GridData(SWT.FILL, SWT.FILL, true, true));
-			combinedMetricsSubView.addSubView(combinedMetricsSummarySubView, new GridData(SWT.FILL, SWT.FILL, true, false));
-			return combinedMetricsSubView;
 		case NAVIGATION_INVOCATION:
 			GridCompositeSubView sqlCombinedView1 = new GridCompositeSubView();
 			ISubView invocSql1 = new TableSubView(new SqlInvocInputController());

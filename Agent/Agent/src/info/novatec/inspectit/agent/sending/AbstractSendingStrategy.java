@@ -3,11 +3,10 @@ package info.novatec.inspectit.agent.sending;
 import info.novatec.inspectit.agent.core.ICoreService;
 
 /**
- * Every send strategy has to extend this abstract class. The first method that
- * is called after creating an instance is {@link #start()}. An event listener
- * or starting a thread has to be implemented there. {@link #stop()} immediately
- * stops the strategy. {@link #reset()} is called after a successful
- * {@link #sendNow()} is executed.
+ * Every send strategy has to extend this abstract class. The first method that is called after
+ * creating an instance is {@link #start()}. An event listener or starting a thread has to be
+ * implemented there. {@link #stop()} immediately stops the strategy. {@link #reset()} is called
+ * after a successful {@link #sendNow()} is executed.
  * 
  * @author Patrice Bouillet
  * 
@@ -15,8 +14,7 @@ import info.novatec.inspectit.agent.core.ICoreService;
 public abstract class AbstractSendingStrategy implements ISendingStrategy {
 
 	/**
-	 * The {@link ICoreService} implementation. Needed to actually trigger the
-	 * sending of the data.
+	 * The {@link ICoreService} implementation. Needed to actually trigger the sending of the data.
 	 */
 	private ICoreService coreService;
 
@@ -36,8 +34,8 @@ public abstract class AbstractSendingStrategy implements ISendingStrategy {
 	}
 
 	/**
-	 * This method has to be implemented by every strategy concerning the
-	 * sending process. It will start the strategy.
+	 * This method has to be implemented by every strategy concerning the sending process. It will
+	 * start the strategy.
 	 */
 	protected abstract void startStrategy();
 

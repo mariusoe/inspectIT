@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
 /**
  * 
  * @author Matthias Huber
- *
+ * 
  */
 @Repository
 public class ProfileDataDaoImpl extends HibernateDaoSupport implements ProfileDataDao {
@@ -31,23 +31,24 @@ public class ProfileDataDaoImpl extends HibernateDaoSupport implements ProfileDa
 	 * -andor-jpatemplate
 	 * 
 	 * @param sessionFactory
+	 *            the hibernate session factory.
 	 */
 	@Autowired
 	public ProfileDataDaoImpl(SessionFactory sessionFactory) {
 		setSessionFactory(sessionFactory);
 	}
-	
+
 	/**
-	 * @see ProfileDataDao#addProfile(ProfileData)
+	 * {@inheritDoc}
 	 */
 	public long addProfile(ProfileData profileData) {
 		getHibernateTemplate().save(profileData);
-		
+
 		return profileData.getId();
 	}
 
 	/**
-	 * @see ProfileDataDao#deleteProfile(long)
+	 * {@inheritDoc}
 	 */
 	public void deleteProfile(long profileId) throws EntityNotFoundException {
 		HibernateTemplate hibernateTemplate = getHibernateTemplate();
@@ -61,7 +62,7 @@ public class ProfileDataDaoImpl extends HibernateDaoSupport implements ProfileDa
 	}
 
 	/**
-	 * @see ProfileDataDao#getProfile(long)
+	 * {@inheritDoc}
 	 */
 	public ProfileData getProfile(long profileId) {
 		DetachedCriteria profileDataCriteria = DetachedCriteria.forClass(ProfileData.class);
@@ -75,7 +76,7 @@ public class ProfileDataDaoImpl extends HibernateDaoSupport implements ProfileDa
 	}
 
 	/**
-	 * @see ProfileDataDao#updateProfile(ProfileData)
+	 * {@inheritDoc}
 	 */
 	public void updateProfile(ProfileData profileData) {
 		getHibernateTemplate().update(profileData);

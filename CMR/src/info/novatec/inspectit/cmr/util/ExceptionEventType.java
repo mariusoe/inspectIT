@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import org.hibernate.HibernateException;
 import org.hibernate.usertype.UserType;
 
 /**
@@ -36,7 +35,7 @@ public class ExceptionEventType implements UserType {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object deepCopy(Object value) throws HibernateException {
+	public Object deepCopy(Object value) {
 		return value;
 	}
 
@@ -52,7 +51,7 @@ public class ExceptionEventType implements UserType {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object nullSafeGet(ResultSet resultSet, String[] names, Object owner) throws HibernateException, SQLException {
+	public Object nullSafeGet(ResultSet resultSet, String[] names, Object owner) throws SQLException {
 		ExceptionEvent result = null;
 		int dbValue = resultSet.getInt(names[0]);
 		if (dbValue != -1) {
@@ -65,7 +64,7 @@ public class ExceptionEventType implements UserType {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void nullSafeSet(PreparedStatement statement, Object value, int index) throws HibernateException, SQLException {
+	public void nullSafeSet(PreparedStatement statement, Object value, int index) throws SQLException {
 		if (null == value) {
 			statement.setInt(index, -1);
 		} else {
@@ -79,7 +78,7 @@ public class ExceptionEventType implements UserType {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object replace(Object arg0, Object arg1, Object arg2) throws HibernateException {
+	public Object replace(Object arg0, Object arg1, Object arg2) {
 		return null;
 	}
 
@@ -95,7 +94,7 @@ public class ExceptionEventType implements UserType {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object assemble(Serializable arg0, Object arg1) throws HibernateException {
+	public Object assemble(Serializable arg0, Object arg1) {
 		return null;
 	}
 
@@ -103,7 +102,7 @@ public class ExceptionEventType implements UserType {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Serializable disassemble(Object arg0) throws HibernateException {
+	public Serializable disassemble(Object arg0) {
 		return null;
 	}
 
@@ -111,7 +110,7 @@ public class ExceptionEventType implements UserType {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(Object x, Object y) throws HibernateException { // NOPMD
+	public boolean equals(Object x, Object y) { // NOPMD
 		if (x == y) { // NOPMD
 			return true;
 		} else if (x == null || y == null) {
@@ -125,7 +124,7 @@ public class ExceptionEventType implements UserType {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int hashCode(Object object) throws HibernateException {
+	public int hashCode(Object object) {
 		return object.hashCode();
 	}
 

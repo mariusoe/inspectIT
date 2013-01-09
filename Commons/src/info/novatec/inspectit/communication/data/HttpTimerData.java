@@ -17,24 +17,24 @@ import java.util.Map;
  */
 public class HttpTimerData extends TimerData {
 
-	/** Generated serial version id */
+	/** Generated serial version id. */
 	private static final long serialVersionUID = -7868876342858232388L;
-	/** String used to represent an unset <code>uri</code> or <code>requestMethod</code> */
+	/** String used to represent an unset <code>uri</code> or <code>requestMethod</code>. */
 	public static final String UNDEFINED = "n.a.";
-	/** String used to represent multiple request methods in an aggregation */
+	/** String used to represent multiple request methods in an aggregation. */
 	public static final String REQUEST_METHOD_MULTIPLE = "MULTIPLE";
 
-	/** The uri */
+	/** The uri. */
 	private String uri = UNDEFINED;
-	/** Map is String-String[] */
+	/** Map is String-String[]. */
 	private Map<String, String[]> parameters = null;
-	/** Map is String-String */
+	/** Map is String-String. */
 	private Map<String, String> attributes = null;
-	/** Map is String-String */
+	/** Map is String-String. */
 	private Map<String, String> headers = null;
-	/** Map is String-String */
+	/** Map is String-String. */
 	private Map<String, String> sessionAttributes = null;
-	/** The request method */
+	/** The request method. */
 	private String requestMethod = UNDEFINED;
 
 	/** The default header for tagged requests. */
@@ -103,6 +103,12 @@ public class HttpTimerData extends TimerData {
 		return uri;
 	}
 
+	/**
+	 * Sets the uri.
+	 * 
+	 * @param uri
+	 *            the uri.
+	 */
 	public void setUri(String uri) {
 		if (null != uri) {
 			this.uri = uri;
@@ -200,11 +206,17 @@ public class HttpTimerData extends TimerData {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String toString() {
 		String sup = super.toString();
 		return sup + "HttpTimerData [uri=" + uri + ", parameters=" + parameters + ", attributes=" + attributes + ", headers=" + headers + "]";
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
@@ -217,6 +229,9 @@ public class HttpTimerData extends TimerData {
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;

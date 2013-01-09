@@ -51,6 +51,7 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 	 * -andor-jpatemplate
 	 * 
 	 * @param sessionFactory
+	 *            the hibernate session factory.
 	 */
 	@Autowired
 	public PlatformIdentDaoImpl(SessionFactory sessionFactory) {

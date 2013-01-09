@@ -87,7 +87,7 @@ public interface IIndexQuery {
 	 * Set the classes for objects to be returned by query. Only objects that are instances of
 	 * supplied classes will be returned by query.
 	 * 
-	 * @param objectClass
+	 * @param objectClasses
 	 *            class or null for not including this property in the query
 	 */
 	void setObjectClasses(List<Class<?>> objectClasses);
@@ -137,7 +137,7 @@ public interface IIndexQuery {
 	 * will return true only when both {@link #getFromDate} and {@link #getToDate} time stamps are
 	 * not null, and when {@link #getToDate} is after {@link #getFromDate}.
 	 * 
-	 * @return
+	 * @return if the searching interval is set for current {@link IIndexQuery} object.
 	 */
 	boolean isIntervalSet();
 
@@ -149,7 +149,8 @@ public interface IIndexQuery {
 	 * 
 	 * @param timestamp
 	 *            time stamp to be checked
-	 * @return
+	 * @return if the given time stamp is belonging to the interval set in the {@link IIndexQuery}
+	 *         object.
 	 */
 	boolean isInInterval(Timestamp timestamp);
 

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 /**
  * 
  * @author Matthias Huber
- *
+ * 
  */
 @Repository
 public class ExceptionSensorDefinitionDataDaoImpl extends HibernateDaoSupport implements ExceptionSensorDefinitionDataDao {
@@ -27,28 +27,28 @@ public class ExceptionSensorDefinitionDataDaoImpl extends HibernateDaoSupport im
 	 * -andor-jpatemplate
 	 * 
 	 * @param sessionFactory
+	 *            the session factory.
 	 */
 	@Autowired
 	public ExceptionSensorDefinitionDataDaoImpl(SessionFactory sessionFactory) {
 		setSessionFactory(sessionFactory);
 	}
-	
+
 	/**
-	 * @see ExceptionSensorDefinitionDataDao#addExceptionSensorDefinition(ExceptionSensorDefinitionData)
+	 * {@inheritDoc}
 	 */
 	public long addExceptionSensorDefinition(ExceptionSensorDefinitionData exceptionSensorDefinitionData) {
 		getHibernateTemplate().save(exceptionSensorDefinitionData);
-		
+
 		return exceptionSensorDefinitionData.getId();
 	}
 
 	/**
-	 * @see ExceptionSensorDefinitionDataDao#deleteExceptionSensorDefinition(long)
+	 * {@inheritDoc}
 	 */
 	public void deleteExceptionSensorDefinition(long exceptionSensorDefinitionId) throws EntityNotFoundException {
 		HibernateTemplate hibernateTemplate = getHibernateTemplate();
-		Object exceptionSensorDefinition = hibernateTemplate.get(ExceptionSensorDefinitionData.class,
-				exceptionSensorDefinitionId);
+		Object exceptionSensorDefinition = hibernateTemplate.get(ExceptionSensorDefinitionData.class, exceptionSensorDefinitionId);
 
 		if (null != exceptionSensorDefinition) {
 			hibernateTemplate.delete(exceptionSensorDefinition);
@@ -58,7 +58,7 @@ public class ExceptionSensorDefinitionDataDaoImpl extends HibernateDaoSupport im
 	}
 
 	/**
-	 * @see ExceptionSensorDefinitionDataDao#updateExceptionSensorDefinition(ExceptionSensorDefinitionData)
+	 * {@inheritDoc}
 	 */
 	public void updateExceptionSensorDefinition(ExceptionSensorDefinitionData exceptionSensorDefinitionData) {
 		getHibernateTemplate().update(exceptionSensorDefinitionData);

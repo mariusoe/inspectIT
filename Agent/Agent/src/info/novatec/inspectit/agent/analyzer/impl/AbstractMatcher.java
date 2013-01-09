@@ -5,8 +5,7 @@ import info.novatec.inspectit.agent.analyzer.IMatcher;
 import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
 
 /**
- * The abstract matcher class used to store the reference to the sensor
- * configuration.
+ * The abstract matcher class used to store the reference to the sensor configuration.
  * 
  * @author Patrice Bouillet
  * 
@@ -14,21 +13,19 @@ import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
 public abstract class AbstractMatcher implements IMatcher {
 
 	/**
-	 * The link to the class pool analyzer which is used by some Matcher
-	 * implementations.
+	 * The link to the class pool analyzer which is used by some Matcher implementations.
 	 */
 	protected final IClassPoolAnalyzer classPoolAnalyzer;
 
 	/**
-	 * The {@link UnregisteredSensorConfig} object to retrieve all the needed
-	 * sensor informations from.
+	 * The {@link UnregisteredSensorConfig} object to retrieve all the needed sensor informations
+	 * from.
 	 */
 	protected final UnregisteredSensorConfig unregisteredSensorConfig;
 
 	/**
-	 * The only constructor which needs a reference to the
-	 * {@link UnregisteredSensorConfig} instance of the corresponding
-	 * configuration.
+	 * The only constructor which needs a reference to the {@link UnregisteredSensorConfig} instance
+	 * of the corresponding configuration.
 	 * 
 	 * @param classPoolAnalyzer
 	 *            The class pool analyzer.

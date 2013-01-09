@@ -24,7 +24,7 @@ public class TreeDetailsHandler extends AbstractHandler {
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
 		AbstractRootEditor rootEditor = (AbstractRootEditor) HandlerUtil.getActiveEditor(event);
 		TreeSubView subView = (TreeSubView) rootEditor.getActiveSubView();
-		
+
 		subView.getTreeInputController().showDetails(subView.getTreeViewer().getTree().getShell(), selection.getFirstElement());
 
 		return null;

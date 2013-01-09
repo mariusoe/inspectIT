@@ -7,9 +7,9 @@ import org.springframework.core.io.ClassPathResource;
 
 /**
  * A test utility class that provides instances of {@link ClassSchemaManager} for testing purposes.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public final class SchemaManagerTestProvider {
 
@@ -21,7 +21,7 @@ public final class SchemaManagerTestProvider {
 
 	/**
 	 * Returns properly instantiated {@link ClassSchemaManager} that can be used in tests.
-	 *
+	 * 
 	 * @return Returns properly instantiated {@link ClassSchemaManager} that can be used in tests.
 	 * @throws IOException
 	 *             If {@link IOException} occcurs.

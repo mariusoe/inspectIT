@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 /**
  * 
  * @author Matthias Huber
- *
+ * 
  */
 @Repository
 public class MethodSensorDefinitionDataDaoImpl extends HibernateDaoSupport implements MethodSensorDefinitionDataDao {
@@ -27,28 +27,28 @@ public class MethodSensorDefinitionDataDaoImpl extends HibernateDaoSupport imple
 	 * -andor-jpatemplate
 	 * 
 	 * @param sessionFactory
+	 *            the session factory.
 	 */
 	@Autowired
 	public MethodSensorDefinitionDataDaoImpl(SessionFactory sessionFactory) {
 		setSessionFactory(sessionFactory);
 	}
-	
+
 	/**
-	 * @see MethodSensorDefinitionDataDao#addMethodSensorDefinition(MethodSensorDefinitionData)
+	 * {@inheritDoc}
 	 */
 	public long addMethodSensorDefinition(MethodSensorDefinitionData methodSensorDefinitionData) {
 		getHibernateTemplate().save(methodSensorDefinitionData);
-		
+
 		return methodSensorDefinitionData.getId();
 	}
 
 	/**
-	 * @see MethodSensorDefinitionDataDao#deleteMethodSensorDefinition(long)
+	 * {@inheritDoc}
 	 */
 	public void deleteMethodSensorDefinition(long methodSensorDefinitionId) throws EntityNotFoundException {
 		HibernateTemplate hibernateTemplate = getHibernateTemplate();
-		Object methodSensorDefinition = hibernateTemplate.get(MethodSensorDefinitionData.class,
-				methodSensorDefinitionId);
+		Object methodSensorDefinition = hibernateTemplate.get(MethodSensorDefinitionData.class, methodSensorDefinitionId);
 
 		if (null != methodSensorDefinition) {
 			hibernateTemplate.delete(methodSensorDefinition);
@@ -58,7 +58,7 @@ public class MethodSensorDefinitionDataDaoImpl extends HibernateDaoSupport imple
 	}
 
 	/**
-	 * @see MethodSensorDefinitionDataDao#updateMethodSensorDefinition(MethodSensorDefinitionData)
+	 * {@inheritDoc}
 	 */
 	public void updateMethodSensorDefinition(MethodSensorDefinitionData methodSensorDefinitionData) {
 		getHibernateTemplate().update(methodSensorDefinitionData);

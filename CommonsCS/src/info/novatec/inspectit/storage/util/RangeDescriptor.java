@@ -59,7 +59,8 @@ public class RangeDescriptor {
 	}
 
 	/**
-	 * @param start the start to set
+	 * @param start
+	 *            the start to set
 	 */
 	public void setStart(long start) {
 		this.start = start;

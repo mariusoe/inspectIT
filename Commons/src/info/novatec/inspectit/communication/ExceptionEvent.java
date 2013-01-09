@@ -10,7 +10,7 @@ import info.novatec.inspectit.cmr.cache.IObjectSizes;
  */
 public enum ExceptionEvent implements Sizeable {
 
-	CREATED, RETHROWN, PASSED, HANDLED, UNREGISTERED_PASSED;
+	CREATED, RETHROWN, PASSED, HANDLED, UNREGISTERED_PASSED; // NOCHK
 
 	/**
 	 * Utility method to convert an ordinal value into the respective enumeration. Used e.g. for

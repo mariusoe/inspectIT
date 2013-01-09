@@ -10,12 +10,11 @@ import info.novatec.inspectit.agent.core.ICoreService;
 public interface IConstructorHook extends IHook {
 
 	/**
-	 * The bytecode is inserted before a constructor in the super class or this
-	 * class is called. Therefore, the inserted bytecode is subject to
-	 * constraints described in Section 4.8.2 of The Java Virtual Machine
-	 * Specification (2nd ed). For example, it cannot access instance fields or
-	 * methods although it may assign a value to an instance field directly
-	 * declared in this class. Accessing static fields and methods is allowed.
+	 * The bytecode is inserted before a constructor in the super class or this class is called.
+	 * Therefore, the inserted bytecode is subject to constraints described in Section 4.8.2 of The
+	 * Java Virtual Machine Specification (2nd ed). For example, it cannot access instance fields or
+	 * methods although it may assign a value to an instance field directly declared in this class.
+	 * Accessing static fields and methods is allowed.
 	 * 
 	 * @param methodId
 	 *            The unique method id.
@@ -26,8 +25,8 @@ public interface IConstructorHook extends IHook {
 	 * @param parameters
 	 *            The array of parameters.
 	 * @param rsc
-	 *            The {@link RegisteredSensorConfig} object which holds all the
-	 *            information of the executed method.
+	 *            The {@link RegisteredSensorConfig} object which holds all the information of the
+	 *            executed method.
 	 */
 	void beforeConstructor(long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc);
 
@@ -45,8 +44,8 @@ public interface IConstructorHook extends IHook {
 	 * @param parameters
 	 *            The array of parameters.
 	 * @param rsc
-	 *            The {@link RegisteredSensorConfig} object which holds all the
-	 *            information of the executed method.
+	 *            The {@link RegisteredSensorConfig} object which holds all the information of the
+	 *            executed method.
 	 */
 	void afterConstructor(ICoreService coreService, long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc);
 

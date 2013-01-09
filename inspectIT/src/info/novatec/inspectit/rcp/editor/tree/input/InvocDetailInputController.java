@@ -272,7 +272,9 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	}
 
 	/**
-	 * shows the details of an invocation sequence.
+	 * {@inheritDoc}.
+	 * 
+	 * @see AbstractTreeInputController#showDetails(Shell, Object)
 	 */
 	public void showDetails(Shell parent, Object element) {
 		final InvocationSequenceData data = (InvocationSequenceData) element;

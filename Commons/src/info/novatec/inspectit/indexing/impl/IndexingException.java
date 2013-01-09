@@ -16,7 +16,8 @@ public class IndexingException extends Exception {
 	/**
 	 * Same as {@link Exception#Exception(String)}.
 	 * 
-	 * @param message 
+	 * @param message
+	 *            the exception message.
 	 */
 	public IndexingException(String message) {
 		super(message);
@@ -25,8 +26,10 @@ public class IndexingException extends Exception {
 	/**
 	 * Same as {@link Exception#Exception(String, Throwable)}.
 	 * 
-	 * @param message 
-	 * @param throwable 
+	 * @param message
+	 *            the exception message.
+	 * @param throwable
+	 *            the nested <code>Throwable</code> instance.
 	 */
 	public IndexingException(String message, Throwable throwable) {
 		super(message, throwable);

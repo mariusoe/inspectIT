@@ -1,6 +1,5 @@
 package info.novatec.inspectit.rcp.repository;
 
-import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
@@ -45,13 +44,6 @@ public interface RepositoryDefinition {
 	 * @return The license service.
 	 */
 	ILicenseService getLicenseService();
-
-	/**
-	 * Returns the combined metrics data access service for this repository definition.
-	 * 
-	 * @return The combined metrics data access service.
-	 */
-	ICombinedMetricsDataAccessService getCombinedMetricsDataAccessService();
 
 	/**
 	 * Returns the invocation data access service for this repository definition.

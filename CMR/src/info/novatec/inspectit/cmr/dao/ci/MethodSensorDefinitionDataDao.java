@@ -16,8 +16,7 @@ public interface MethodSensorDefinitionDataDao {
 	 * 
 	 * @param methodSensorDefinitionData
 	 *            The {@link MethodSensorDefinitionData} object to add.
-	 * @return The assigned id of the stored {@link MethodSensorDefinitionData}
-	 *         object.
+	 * @return The assigned id of the stored {@link MethodSensorDefinitionData} object.
 	 */
 	long addMethodSensorDefinition(MethodSensorDefinitionData methodSensorDefinitionData);
 
@@ -25,11 +24,10 @@ public interface MethodSensorDefinitionDataDao {
 	 * Deletes the {@link MethodSensorDefinitionData} object with the given id.
 	 * 
 	 * @param methodSensorDefinitionId
-	 *            The id of the {@link MethodSensorDefinitionData} object to
-	 *            delete.
+	 *            The id of the {@link MethodSensorDefinitionData} object to delete.
 	 * @throws EntityNotFoundException
-	 *             If no {@link MethodSensorDefinitionData} object matching the
-	 *             given id could be found.
+	 *             If no {@link MethodSensorDefinitionData} object matching the given id could be
+	 *             found.
 	 */
 	void deleteMethodSensorDefinition(long methodSensorDefinitionId) throws EntityNotFoundException;
 

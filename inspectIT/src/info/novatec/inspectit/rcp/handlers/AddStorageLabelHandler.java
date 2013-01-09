@@ -27,14 +27,14 @@ public class AddStorageLabelHandler extends AbstractHandler implements IHandler 
 	 * The corresponding command id.
 	 */
 	public static final String COMMAND = "info.novatec.inspectit.rcp.commands.addStorageLabel";
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IStorageDataProvider storageProvider = null;
-		
+
 		// try to get it from selection
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		if (selection instanceof StructuredSelection) {
@@ -42,7 +42,7 @@ public class AddStorageLabelHandler extends AbstractHandler implements IHandler 
 				storageProvider = (IStorageDataProvider) ((StructuredSelection) selection).getFirstElement();
 			}
 		}
-		
+
 		if (null != storageProvider) {
 			AddStorageLabelWizard addStorageLabelWizard = new AddStorageLabelWizard(storageProvider);
 			WizardDialog wizardDialog = new WizardDialog(HandlerUtil.getActiveShell(event), addStorageLabelWizard);
@@ -54,7 +54,7 @@ public class AddStorageLabelHandler extends AbstractHandler implements IHandler 
 				}
 			}
 		}
-		
+
 		return null;
 	}
 

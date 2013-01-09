@@ -38,9 +38,8 @@ public class TimeStrategyTest extends MockInit {
 	}
 
 	/**
-	 * This test could fail, thus it invocation count is increased to 5, which
-	 * means that this test will be executed 5 times and only 60% of the tests
-	 * need to be completed successfully.
+	 * This test could fail, thus it invocation count is increased to 5, which means that this test
+	 * will be executed 5 times and only 60% of the tests need to be completed successfully.
 	 */
 	@Test(invocationCount = 5, successPercentage = 60)
 	public void sendAfterOneSecond() throws InterruptedException {

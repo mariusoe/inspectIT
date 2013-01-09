@@ -69,9 +69,7 @@ public class CombinedInvocationsInputDefinitionExtra implements IInputDefinition
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this)
-				.add("templates", templates)
-				.toString();
+		return Objects.toStringHelper(this).add("templates", templates).toString();
 	}
 
 }

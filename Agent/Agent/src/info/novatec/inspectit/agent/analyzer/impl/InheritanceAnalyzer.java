@@ -168,7 +168,7 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 			for (int i = 0; i < num; ++i) {
 				try {
 					ctClasses[i] = ctClass.getClassPool().get(ifs[i]);
-				} catch (NotFoundException e) { // NOPMD
+				} catch (NotFoundException e) { // NOPMD NOCHK
 					// LOGGER.severe("Interface not found: " + ifs[i] + " (of class: " +
 					// ctClass.getName() + ")");
 				}

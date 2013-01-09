@@ -83,28 +83,25 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	 */
 	private UpdateCmrPropertiesJob updateCmrPropertiesJob = new UpdateCmrPropertiesJob();
 
-	/**
-	 * Widgets.
-	 */
-	private Composite mainComposite;
-	private FormToolkit toolkit;
-	private ManagedForm managedForm;
-	private ScrolledForm form;
-	private Label address;
-	private FormText description;
-	private Label recordingIcon;
-	private Label recordingStorage;
-	private Label status;
-	private Label bufferDate;
-	private ProgressBar bufferBar;
-	private ProgressBar recTimeBar;
-	private Label recordingStatusIcon;
-	private Label recordingLabel;
-	private Label version;
-	private Label bufferSize;
-	private Label recTime;
-	private Label spaceLeftLabel;
-	private ProgressBar spaceLeftBar;
+	private Composite mainComposite; // NOCHK
+	private FormToolkit toolkit; // NOCHK
+	private ManagedForm managedForm; // NOCHK
+	private ScrolledForm form; // NOCHK
+	private Label address; // NOCHK
+	private FormText description; // NOCHK
+	private Label recordingIcon; // NOCHK
+	private Label recordingStorage; // NOCHK
+	private Label status; // NOCHK
+	private Label bufferDate; // NOCHK
+	private ProgressBar bufferBar; // NOCHK
+	private ProgressBar recTimeBar; // NOCHK
+	private Label recordingStatusIcon; // NOCHK
+	private Label recordingLabel; // NOCHK
+	private Label version; // NOCHK
+	private Label bufferSize; // NOCHK
+	private Label recTime; // NOCHK
+	private Label spaceLeftLabel; // NOCHK
+	private ProgressBar spaceLeftBar; // NOCHK
 
 	/**
 	 * Default constructor.

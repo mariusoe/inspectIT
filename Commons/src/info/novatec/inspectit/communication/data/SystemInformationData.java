@@ -289,6 +289,14 @@ public class SystemInformationData extends SystemSensorData {
 		this.vmSet = vmSet;
 	}
 
+	/**
+	 * adds the given vm argument.
+	 * 
+	 * @param vmArgumentName
+	 *            the name of the vm argument.
+	 * @param vmArgumentValue
+	 *            the value to add.
+	 */
 	public void addVMArguments(String vmArgumentName, String vmArgumentValue) {
 		VmArgumentData vmArg = new VmArgumentData(vmArgumentName, vmArgumentValue);
 		vmSet.add(vmArg);

@@ -7,7 +7,6 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.mortbay.jetty.servlet.Context;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.context.support.GenericWebApplicationContext;
@@ -70,7 +69,7 @@ public class JettyWebApplicationContextInitializer implements ApplicationContext
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.ctx = applicationContext;
 	}
 

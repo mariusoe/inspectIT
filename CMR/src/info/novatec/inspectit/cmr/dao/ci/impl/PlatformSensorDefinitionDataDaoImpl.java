@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 /**
  * 
  * @author Matthias Huber
- *
+ * 
  */
 @Repository
 public class PlatformSensorDefinitionDataDaoImpl extends HibernateDaoSupport implements PlatformSensorDefinitionDataDao {
@@ -27,14 +27,15 @@ public class PlatformSensorDefinitionDataDaoImpl extends HibernateDaoSupport imp
 	 * -andor-jpatemplate
 	 * 
 	 * @param sessionFactory
+	 *            the hibernate session factory.
 	 */
 	@Autowired
 	public PlatformSensorDefinitionDataDaoImpl(SessionFactory sessionFactory) {
 		setSessionFactory(sessionFactory);
 	}
-	
+
 	/**
-	 * @see PlatformSensorDefinitionDataDao#addPlatformSensorDefinition(PlatformSensorDefinitionData)
+	 * {@inheritDoc}
 	 */
 	public long addPlatformSensorDefinition(PlatformSensorDefinitionData platformSensorDefinitionData) {
 		getHibernateTemplate().save(platformSensorDefinitionData);
@@ -43,12 +44,11 @@ public class PlatformSensorDefinitionDataDaoImpl extends HibernateDaoSupport imp
 	}
 
 	/**
-	 * @see PlatformSensorDefinitionDataDao#deletePlatformSensorDefinition(long)
+	 * {@inheritDoc}
 	 */
 	public void deletePlatformSensorDefinition(long platformSensorDefinitionId) throws EntityNotFoundException {
 		HibernateTemplate hibernateTemplate = getHibernateTemplate();
-		Object platformSensorDefinition = hibernateTemplate.get(PlatformSensorDefinitionData.class,
-				platformSensorDefinitionId);
+		Object platformSensorDefinition = hibernateTemplate.get(PlatformSensorDefinitionData.class, platformSensorDefinitionId);
 
 		if (null != platformSensorDefinition) {
 			hibernateTemplate.delete(platformSensorDefinition);
@@ -58,7 +58,7 @@ public class PlatformSensorDefinitionDataDaoImpl extends HibernateDaoSupport imp
 	}
 
 	/**
-	 * @see PlatformSensorDefinitionDataDao#updatePlatformSensorDefinition(PlatformSensorDefinitionData)
+	 * {@inheritDoc}
 	 */
 	public void updatePlatformSensorDefinition(PlatformSensorDefinitionData platformSensorDefinitionData) {
 		getHibernateTemplate().update(platformSensorDefinitionData);

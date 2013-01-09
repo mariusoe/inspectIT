@@ -73,15 +73,25 @@ public class DefineTimelineWizardPage extends WizardPage {
 	 */
 	private int timeStyle;
 
+	/** button for use time frame dividing. */
 	private Button useTimeframe;
+	/** button to the define the period. */
 	private Button definePeriod;
+	/** button to define the date. */
 	private Button defineDate;
+	/** the primary date. */
 	private CDateTime cdtPrimary;
+	/** the secondary date. */
 	private CDateTime cdtSecondary;
+	/** the period. */
 	private Text periodAmount;
+	/** the group. */
 	private Group group;
+	/** the main composite. */
 	private Composite main;
+	/** the composite holding the period. */
 	private Composite periodComposite;
+	/** the composite holding the dates. */
 	private Composite cdtComposite;
 
 	/**

@@ -20,7 +20,7 @@
 
 		<ivy:settings file="${ivy.settings.file}" />
 		<!-- needed for Checkstyle, PMD & Findbugs -->
-		<ivy:cachepath pathid="path.checkstyle" organisation="com.puppycrawl.tools" module="checkstyle" revision="5.5" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.checkstyle" organisation="com.puppycrawl.tools" module="checkstyle" revision="5.6" conf="default" inline="true" />
 		<ivy:cachepath pathid="path.pmd" organisation="pmd" module="pmd" revision="4.3" conf="default" inline="true" />
 		<ivy:cachepath pathid="path.findbugs" organisation="com.google.code.findbugs" module="findbugs-ant" revision="2.0.0" conf="default" inline="true" />
 		<!-- Ingnore path missing warnings -->
@@ -149,6 +149,8 @@
 
 		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.report.file}" />
 		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >" />
+
+		<fail if="checkstyle.failure" message="Build failed due to checkstyle warnings, please fix these warnings. Have a look at build/QA/static_analysis/checkstyle.html"/>
 	</target>
 
 	<!-- F i n d B u g s -->

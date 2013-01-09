@@ -66,10 +66,19 @@ public class CompilationInformationData extends SystemSensorData {
 		this.count = count;
 	}
 
+	/**
+	 * increases the count by 1.
+	 */
 	public void incrementCount() {
 		this.count++;
 	}
 
+	/**
+	 * adds the value to the total compilation time.
+	 * 
+	 * @param totalCompilationTime
+	 *            the value to add.
+	 */
 	public void addTotalCompilationTime(long totalCompilationTime) {
 		this.totalTotalCompilationTime += totalCompilationTime;
 	}

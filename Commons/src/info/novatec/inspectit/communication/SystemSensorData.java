@@ -3,14 +3,14 @@ package info.novatec.inspectit.communication;
 import java.sql.Timestamp;
 
 /**
- * The {@link SystemSensorData} class is extended by all value & data objects
- * which are used to gather system/platform information.
+ * The {@link SystemSensorData} class is extended by all value & data objects which are used to
+ * gather system/platform information.
  * 
  * @author Patrice Bouillet
  * 
  */
 public abstract class SystemSensorData extends DefaultData {
-	
+
 	/**
 	 * The serial version UID.
 	 */

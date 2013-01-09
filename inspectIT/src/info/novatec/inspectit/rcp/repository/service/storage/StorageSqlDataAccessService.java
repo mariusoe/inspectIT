@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.repository.service.storage;
 
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.communication.data.SqlStatementData;
+import info.novatec.inspectit.indexing.aggregation.IAggregator;
 import info.novatec.inspectit.indexing.aggregation.impl.SqlStatementDataAggregator;
 import info.novatec.inspectit.indexing.query.factory.impl.SqlStatementDataQueryFactory;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;

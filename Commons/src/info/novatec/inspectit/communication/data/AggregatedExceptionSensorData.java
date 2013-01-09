@@ -62,6 +62,12 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData {
 		return (double) getObjectsInInvocationsCount() / created;
 	}
 
+	/**
+	 * aggregates the given exception data to this instance.
+	 * 
+	 * @param exceptionData
+	 *            the exception data containing the data.
+	 */
 	public void aggregateExceptionData(ExceptionSensorData exceptionData) {
 		if (exceptionData.getExceptionEvent() == ExceptionEvent.CREATED) {
 			created++;
@@ -81,6 +87,7 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData {
 	 * Aggregates the exception data.
 	 * 
 	 * @param aggregatedExceptionData
+	 *            the data to be added to this instance.
 	 */
 	public void aggregateExceptionData(AggregatedExceptionSensorData aggregatedExceptionData) {
 		super.aggregateInvocationAwareData(aggregatedExceptionData);

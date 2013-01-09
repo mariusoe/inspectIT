@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
-
 /**
  * This DAO is used to handle all {@link MethodSensorTypeIdent} objects.
  * 
@@ -16,8 +15,7 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 public interface MethodSensorTypeIdentDao {
 
 	/**
-	 * Load a specific {@link MethodSensorTypeIdent} from the underlying storage
-	 * by passing the id.
+	 * Load a specific {@link MethodSensorTypeIdent} from the underlying storage by passing the id.
 	 * 
 	 * @param id
 	 *            The id of the object.
@@ -29,17 +27,15 @@ public interface MethodSensorTypeIdentDao {
 	 * Execute a findByExample query against the underlying storage.
 	 * 
 	 * @param methodSensorTypeIdent
-	 *            The {@link MethodSensorTypeIdent} object which serves as the
-	 *            example.
-	 * @return The list of {@link MethodSensorTypeIdent} objects which have the
-	 *         same contents as the passed example object.
+	 *            The {@link MethodSensorTypeIdent} object which serves as the example.
+	 * @return The list of {@link MethodSensorTypeIdent} objects which have the same contents as the
+	 *         passed example object.
 	 * @see HibernateTemplate#findByExample(Object)
 	 */
 	List<MethodSensorTypeIdent> findByExample(MethodSensorTypeIdent methodSensorTypeIdent);
 
 	/**
-	 * Saves or updates this {@link MethodSensorTypeIdent} in the underlying
-	 * storage.
+	 * Saves or updates this {@link MethodSensorTypeIdent} in the underlying storage.
 	 * 
 	 * @param methodSensorTypeIdent
 	 *            The {@link MethodSensorTypeIdent} object to save or update.
@@ -55,18 +51,15 @@ public interface MethodSensorTypeIdentDao {
 	void delete(MethodSensorTypeIdent methodSensorTypeIdent);
 
 	/**
-	 * Deletes all {@link MethodSensorTypeIdent} objects which are stored in the
-	 * passed list.
+	 * Deletes all {@link MethodSensorTypeIdent} objects which are stored in the passed list.
 	 * 
 	 * @param methodSensorTypeIdents
-	 *            The list containing the {@link MethodSensorTypeIdent} objects
-	 *            to delete.
+	 *            The list containing the {@link MethodSensorTypeIdent} objects to delete.
 	 */
 	void deleteAll(List<MethodSensorTypeIdent> methodSensorTypeIdents);
 
 	/**
-	 * Returns all {@link MethodSensorTypeIdent} objects which are saved in the
-	 * underlying storage.
+	 * Returns all {@link MethodSensorTypeIdent} objects which are saved in the underlying storage.
 	 * 
 	 * @return Returns all stored {@link MethodSensorTypeIdent} objects.
 	 */

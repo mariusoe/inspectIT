@@ -5,6 +5,7 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.service.cmr.ICmrService;
 
+import java.lang.reflect.Method;
 import java.net.ConnectException;
 import java.util.Collections;
 import java.util.List;

@@ -54,13 +54,12 @@ public class CopyDataToStorageHandler extends AbstractHandler implements IHandle
 				CmrStatusData cmrStatusData = cmrRepositoryDefinition.getCmrManagementService().getCmrStatusData();
 				if (cmrStatusData.isWarnSpaceLeftActive()) {
 					String leftSpace = NumberFormatter.humanReadableByteCount(cmrStatusData.getStorageDataSpaceLeft());
-					if (!MessageDialog.openQuestion(HandlerUtil.getActiveShell(event), "Confirm",
-							"For selected CMR there is an active warning about insufficient storage space left. Only " + leftSpace
-									+ " are left on the target server, are you sure you want to continue?")) {
+					if (!MessageDialog.openQuestion(HandlerUtil.getActiveShell(event), "Confirm", "For selected CMR there is an active warning about insufficient storage space left. Only "
+							+ leftSpace + " are left on the target server, are you sure you want to continue?")) {
 						return null;
 					}
 				}
-			} catch (Exception e) { // NOPMD
+			} catch (Exception e) { // NOPMD NOCHK
 				// ignore because if we can not get the info. we will still respond to user
 				// action
 			}

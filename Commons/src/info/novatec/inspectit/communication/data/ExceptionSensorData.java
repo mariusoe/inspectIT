@@ -61,6 +61,18 @@ public class ExceptionSensorData extends InvocationAwareData {
 	public ExceptionSensorData() {
 	}
 
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @param timeStamp
+	 *            the timestamp.
+	 * @param platformIdent
+	 *            the platform identifier.
+	 * @param sensorTypeIdent
+	 *            the sensor type identifier.
+	 * @param methodIdent
+	 *            the method identifier.
+	 */
 	public ExceptionSensorData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent) {
 		super(timeStamp, platformIdent, sensorTypeIdent, methodIdent);
 	}

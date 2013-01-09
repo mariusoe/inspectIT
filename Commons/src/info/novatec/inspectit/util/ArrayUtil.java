@@ -38,14 +38,9 @@ public final class ArrayUtil {
 	 *         the first element in the range greater than the key, or <tt>toIndex</tt> if all
 	 *         elements in the range are less than the specified key. Note that this guarantees that
 	 *         the return value will be &gt;= 0 if and only if the key is found.
-	 * @throws IllegalArgumentException
-	 *             if {@code fromIndex > toIndex}
-	 * @throws ArrayIndexOutOfBoundsException
-	 *             if {@code fromIndex < 0 or toIndex > a.length}
 	 * @since 1.6
 	 */
-	public static int binarySearch(long[] a, int fromIndex, int toIndex,
-			long key) {
+	public static int binarySearch(long[] a, int fromIndex, int toIndex, long key) {
 		rangeCheck(a.length, fromIndex, toIndex);
 		return binarySearch0(a, fromIndex, toIndex, key);
 	}
@@ -53,11 +48,17 @@ public final class ArrayUtil {
 	/**
 	 * Checks that {@code fromIndex} and {@code toIndex} are in the range and throws an appropriate
 	 * exception, if they aren't.
+	 * 
+	 * @param length
+	 *            the length of the array.
+	 * @param fromIndex
+	 *            the starting index.
+	 * @param toIndex
+	 *            the end index.
 	 */
 	private static void rangeCheck(int length, int fromIndex, int toIndex) {
 		if (fromIndex > toIndex) {
-			throw new IllegalArgumentException(
-					"fromIndex(" + fromIndex + ") > toIndex(" + toIndex + ")");
+			throw new IllegalArgumentException("fromIndex(" + fromIndex + ") > toIndex(" + toIndex + ")");
 		}
 		if (fromIndex < 0) {
 			throw new ArrayIndexOutOfBoundsException(fromIndex);
@@ -67,9 +68,20 @@ public final class ArrayUtil {
 		}
 	}
 
-	// Like public version, but without range checks.
-	private static int binarySearch0(long[] a, int fromIndex, int toIndex,
-			long key) {
+	/**
+	 * Like public version, but without range checks.
+	 * 
+	 * @param a
+	 *            the array.
+	 * @param fromIndex
+	 *            the from index.
+	 * @param toIndex
+	 *            the end index.
+	 * @param key
+	 *            the key to search for.
+	 * @return the index.
+	 */
+	private static int binarySearch0(long[] a, int fromIndex, int toIndex, long key) {
 		int low = fromIndex;
 		int high = toIndex - 1;
 

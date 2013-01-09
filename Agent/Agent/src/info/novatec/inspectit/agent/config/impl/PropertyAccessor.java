@@ -284,9 +284,18 @@ public class PropertyAccessor implements IPropertyAccessor {
 		 */
 		private PropertyPath pathToContinue;
 
+		/**
+		 * Creates a new instance and leaves the name empty.
+		 */
 		public PropertyPath() {
 		}
 
+		/**
+		 * Creates a new instance and sets the name.
+		 * 
+		 * @param name
+		 *            the name of this path.
+		 */
 		public PropertyPath(String name) {
 			this.name = name;
 		}

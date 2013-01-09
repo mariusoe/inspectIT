@@ -13,6 +13,9 @@ import java.util.List;
  * {@link ArrayList} suppressing all the references in this list which are already removed by the
  * garbage collector.
  * 
+ * @param <T>
+ *            The class contained in the list.
+ * 
  * @author Patrice Bouillet
  * 
  */

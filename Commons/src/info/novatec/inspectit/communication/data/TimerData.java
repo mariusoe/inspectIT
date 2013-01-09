@@ -83,7 +83,7 @@ public class TimerData extends InvocationAwareData {
 	private double exclusiveDuration;
 
 	/**
-	 * Exclusive max duration;
+	 * Exclusive max duration.
 	 */
 	private double exclusiveMax = -1;
 
@@ -98,10 +98,36 @@ public class TimerData extends InvocationAwareData {
 	public TimerData() {
 	}
 
+	/**
+	 * Creates a new instance of the <code>Timerdata</code>.
+	 * 
+	 * @param timeStamp
+	 *            the timestamp.
+	 * @param platformIdent
+	 *            the platform identifier.
+	 * @param sensorTypeIdent
+	 *            the sensor type identifier.
+	 * @param methodIdent
+	 *            the methode identifier.
+	 */
 	public TimerData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent) {
 		super(timeStamp, platformIdent, sensorTypeIdent, methodIdent);
 	}
 
+	/**
+	 * Creates a new instance of the <code>Timerdata</code>.
+	 * 
+	 * @param timeStamp
+	 *            the timestamp.
+	 * @param platformIdent
+	 *            the platform identifier.
+	 * @param sensorTypeIdent
+	 *            the sensor type identifier.
+	 * @param methodIdent
+	 *            the methode identifier.
+	 * @param parameterContentData
+	 *            The information of captured parameters.
+	 */
 	public TimerData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData) {
 		super(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);
 	}
@@ -109,7 +135,7 @@ public class TimerData extends InvocationAwareData {
 	/**
 	 * <b> CAREFUL! min is initialized to -1 due to data transfer sizes! </b>
 	 * 
-	 * @return
+	 * @return the min time.
 	 */
 	public double getMin() {
 		return min;
@@ -151,6 +177,9 @@ public class TimerData extends InvocationAwareData {
 		this.count = count;
 	}
 
+	/**
+	 * increases the count by 1.
+	 */
 	public void increaseCount() {
 		this.count++;
 	}
@@ -163,6 +192,12 @@ public class TimerData extends InvocationAwareData {
 		this.duration = duration;
 	}
 
+	/**
+	 * adds the given time to the duration.
+	 * 
+	 * @param duration
+	 *            the duration to add.
+	 */
 	public void addDuration(double duration) {
 		this.duration += duration;
 	}
@@ -205,7 +240,7 @@ public class TimerData extends InvocationAwareData {
 	/**
 	 * Sets the maximum if the given value is bigger than the current value.
 	 * 
-	 * @param max
+	 * @param time
 	 *            the maximum to be set
 	 */
 	public void calculateCpuMax(double time) {
@@ -214,7 +249,7 @@ public class TimerData extends InvocationAwareData {
 
 	/**
 	 * <b> Notice: ensure to check using the <code> isCpuMetricDataAvailable() </code> if cpu metric
-	 * data is in fact available, otherwise you might get strange results </b>
+	 * data is in fact available, otherwise you might get strange results. </b>
 	 * 
 	 * @return the cpuMin
 	 */
@@ -224,7 +259,7 @@ public class TimerData extends InvocationAwareData {
 
 	/**
 	 * <b> Notice: ensure to check using the <code> isCpuMetricDataAvailable() </code> if cpu metric
-	 * data is in fact available, otherwise you might get strange results </b>
+	 * data is in fact available, otherwise you might get strange results. </b>
 	 * 
 	 * @return the cpuMax
 	 */
@@ -234,7 +269,7 @@ public class TimerData extends InvocationAwareData {
 
 	/**
 	 * <b> Notice: ensure to check using the <code> isCpuMetricDataAvailable() </code> if cpu metric
-	 * data is in fact available, otherwise you might get strange results </b>
+	 * data is in fact available, otherwise you might get strange results. </b>
 	 * 
 	 * @return the cpuDuration
 	 */
@@ -260,7 +295,7 @@ public class TimerData extends InvocationAwareData {
 
 	/**
 	 * <b> Notice: ensure to check using the <code> isCpuMetricDataAvailable() </code> if cpu metric
-	 * data is in fact available, otherwise you might get strange results </b>
+	 * data is in fact available, otherwise you might get strange results. </b>
 	 * 
 	 * @return the cpuAverage
 	 */
@@ -270,7 +305,7 @@ public class TimerData extends InvocationAwareData {
 
 	/**
 	 * <b> Notice: ensure to check using the <code> isExclusiveMetricDataAvailable() </code> if cpu
-	 * metric data is in fact available, otherwise you might get strange results </b>
+	 * metric data is in fact available, otherwise you might get strange results. </b>
 	 * 
 	 * @return exclusive count
 	 */
@@ -282,13 +317,16 @@ public class TimerData extends InvocationAwareData {
 		this.exclusiveCount = exclusiveCount;
 	}
 
+	/**
+	 * increases the exclusive count by 1.
+	 */
 	public void increaseExclusiveCount() {
 		this.exclusiveCount++;
 	}
 
 	/**
 	 * <b> Notice: ensure to check using the <code> isExclusiveMetricDataAvailable() </code> if cpu
-	 * metric data is in fact available, otherwise you might get strange results </b>
+	 * metric data is in fact available, otherwise you might get strange results. </b>
 	 * 
 	 * @return duration
 	 */
@@ -300,13 +338,19 @@ public class TimerData extends InvocationAwareData {
 		this.exclusiveDuration = exclusiveDuration;
 	}
 
+	/**
+	 * adds the given time to the exclusive duration.
+	 * 
+	 * @param exclusiveDuration
+	 *            the duration to add.
+	 */
 	public void addExclusiveDuration(double exclusiveDuration) {
 		this.exclusiveDuration += exclusiveDuration;
 	}
 
 	/**
 	 * <b> Notice: ensure to check using the <code> isExclusiveMetricDataAvailable() </code> if cpu
-	 * metric data is in fact available, otherwise you might get strange results </b>
+	 * metric data is in fact available, otherwise you might get strange results. </b>
 	 * 
 	 * @return exlusivemax
 	 */
@@ -326,9 +370,9 @@ public class TimerData extends InvocationAwareData {
 
 	/**
 	 * <b> Notice: ensure to check using the <code> isExclusiveMetricDataAvailable() </code> if cpu
-	 * metric data is in fact available, otherwise you might get strange results </b>
+	 * metric data is in fact available, otherwise you might get strange results. </b>
 	 * 
-	 * @return
+	 * @return the exclusive minimum time.
 	 */
 	public double getExclusiveMin() {
 		return exclusiveMin;

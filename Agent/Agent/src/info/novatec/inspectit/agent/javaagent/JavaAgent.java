@@ -459,7 +459,8 @@ public class JavaAgent implements ClassFileTransformer {
 			if (closeable != null) {
 				try {
 					closeable.close();
-				} catch (IOException e) { // NOPMD
+
+				} catch (IOException e) { // NOPMD NOCHK
 					// don't care about this one
 				}
 			}

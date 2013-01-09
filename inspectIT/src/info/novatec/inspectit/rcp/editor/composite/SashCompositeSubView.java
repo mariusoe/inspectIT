@@ -57,8 +57,7 @@ public class SashCompositeSubView extends AbstractCompositeSubView {
 	 * Additional constructor which can specify the style of the sash form.
 	 * <p>
 	 * <dl>
-	 * <dt><b>Styles:</b></dt>
-	 * <dd>HORIZONTAL, VERTICAL, SMOOTH</dd>
+	 * <b>Styles:</b> HORIZONTAL, VERTICAL, SMOOTH
 	 * </dl>
 	 * </p>
 	 * 

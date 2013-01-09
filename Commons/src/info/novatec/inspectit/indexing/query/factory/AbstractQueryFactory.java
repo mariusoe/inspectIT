@@ -1,15 +1,15 @@
 package info.novatec.inspectit.indexing.query.factory;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.query.provider.IIndexQueryProvider;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * Abstract query factory, has only the instance to the {@link IIndexQueryProvider}.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  * @param <E>
  */
 public abstract class AbstractQueryFactory<E extends IIndexQuery> {

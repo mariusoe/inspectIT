@@ -14,8 +14,8 @@ import java.util.List;
 public interface ISamplingRateMode {
 
 	/**
-	 * Adjusts the sampling rate with the given sampling rate mode and returns a
-	 * {@link List} with the aggregated {@link DefaultData} objects.
+	 * Adjusts the sampling rate with the given sampling rate mode and returns a {@link List} with
+	 * the aggregated {@link DefaultData} objects.
 	 * 
 	 * @param defaultData
 	 *            The {@link List} with {@link DefaultData} objects.

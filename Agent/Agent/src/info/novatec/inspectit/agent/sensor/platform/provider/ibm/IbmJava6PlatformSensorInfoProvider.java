@@ -41,6 +41,7 @@ public class IbmJava6PlatformSensorInfoProvider implements PlatformSensorInfoPro
 	 * Default constructor.
 	 * 
 	 * @throws Exception
+	 *             If the SystemInformationProvider could not be created.
 	 */
 	public IbmJava6PlatformSensorInfoProvider() throws Exception {
 		if (null == operatingSystemInfoProvider) {
@@ -48,6 +49,12 @@ public class IbmJava6PlatformSensorInfoProvider implements PlatformSensorInfoPro
 		}
 	}
 
+	/**
+	 * Creates the OperatingSystemInfoProvider for IBM Java6.
+	 * 
+	 * @throws Exception
+	 *             on error.
+	 */
 	private static synchronized void createOperatingSystemInfoProvider() throws Exception {
 		if (null == operatingSystemInfoProvider) {
 			operatingSystemInfoProvider = new IbmJava6OperatingSystemInfoProvider();

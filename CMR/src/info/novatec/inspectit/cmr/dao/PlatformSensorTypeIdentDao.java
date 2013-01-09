@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
-
 /**
  * This DAO is used to handle all {@link PlatformSensorTypeIdent} objects.
  * 
@@ -16,8 +15,8 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 public interface PlatformSensorTypeIdentDao {
 
 	/**
-	 * Load a specific {@link PlatformSensorTypeIdent} from the underlying
-	 * storage by passing the id.
+	 * Load a specific {@link PlatformSensorTypeIdent} from the underlying storage by passing the
+	 * id.
 	 * 
 	 * @param id
 	 *            The id of the object.
@@ -29,17 +28,15 @@ public interface PlatformSensorTypeIdentDao {
 	 * Execute a findByExample query against the underlying storage.
 	 * 
 	 * @param platformSensorTypeIdent
-	 *            The {@link PlatformSensorTypeIdent} object which serves as the
-	 *            example.
-	 * @return The list of {@link PlatformSensorTypeIdent} objects which have
-	 *         the same contents as the passed example object.
+	 *            The {@link PlatformSensorTypeIdent} object which serves as the example.
+	 * @return The list of {@link PlatformSensorTypeIdent} objects which have the same contents as
+	 *         the passed example object.
 	 * @see HibernateTemplate#findByExample(Object)
 	 */
 	List<PlatformSensorTypeIdent> findByExample(PlatformSensorTypeIdent platformSensorTypeIdent);
 
 	/**
-	 * Saves or updates this {@link PlatformSensorTypeIdent} in the underlying
-	 * storage.
+	 * Saves or updates this {@link PlatformSensorTypeIdent} in the underlying storage.
 	 * 
 	 * @param platformSensorTypeIdent
 	 *            The {@link PlatformSensorTypeIdent} object to save or update.
@@ -55,18 +52,16 @@ public interface PlatformSensorTypeIdentDao {
 	void delete(PlatformSensorTypeIdent platformSensorTypeIdent);
 
 	/**
-	 * Deletes all {@link PlatformSensorTypeIdent} objects which are stored in
-	 * the passed list.
+	 * Deletes all {@link PlatformSensorTypeIdent} objects which are stored in the passed list.
 	 * 
 	 * @param platformSensorTypeIdents
-	 *            The list containing the {@link PlatformSensorTypeIdent}
-	 *            objects to delete.
+	 *            The list containing the {@link PlatformSensorTypeIdent} objects to delete.
 	 */
 	void deleteAll(List<PlatformSensorTypeIdent> platformSensorTypeIdents);
 
 	/**
-	 * Returns all {@link PlatformSensorTypeIdent} objects which are saved in
-	 * the underlying storage.
+	 * Returns all {@link PlatformSensorTypeIdent} objects which are saved in the underlying
+	 * storage.
 	 * 
 	 * @return Returns all stored {@link PlatformSensorTypeIdent} objects.
 	 */

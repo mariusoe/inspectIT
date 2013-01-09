@@ -157,9 +157,7 @@ public abstract class Component {
 			return false;
 		}
 		Component that = (Component) object;
-		return Objects.equal(this.name, that.name)
-				&& Objects.equal(this.tooltip, that.tooltip)
-				&& Objects.equal(this.inputDefinition, that.inputDefinition);
+		return Objects.equal(this.name, that.name) && Objects.equal(this.tooltip, that.tooltip) && Objects.equal(this.inputDefinition, that.inputDefinition);
 	}
 
 }

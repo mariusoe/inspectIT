@@ -69,6 +69,8 @@ public abstract class MethodSensorData extends DefaultData {
 	 *            The unique identifier of the sensor type.
 	 * @param methodIdent
 	 *            The unique identifier of the method.
+	 * @param parameterContentData
+	 *            the parameter contents.
 	 */
 	public MethodSensorData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData) {
 		this(timeStamp, platformIdent, sensorTypeIdent, methodIdent);
@@ -86,6 +88,12 @@ public abstract class MethodSensorData extends DefaultData {
 		this.methodIdent = methodIdent;
 	}
 
+	/**
+	 * Adds parameter content data.
+	 * 
+	 * @param parameterContent
+	 *            the data to add.
+	 */
 	public void addParameterContentData(ParameterContentData parameterContent) {
 		parameterContentData.add(parameterContent);
 	}

@@ -9,19 +9,18 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  * {@link IndexQuery} represent an object that is used in querying the tree structure of the buffer.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -233,7 +232,8 @@ public class IndexQuery implements IIndexQuery {
 	}
 
 	/**
-	 * @param restrictionProcessor the restrictionProcessor to set
+	 * @param restrictionProcessor
+	 *            the restrictionProcessor to set
 	 */
 	public void setRestrictionProcessor(IIndexQueryRestrictionProcessor restrictionProcessor) {
 		this.restrictionProcessor = restrictionProcessor;

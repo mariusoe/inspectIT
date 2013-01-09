@@ -378,6 +378,14 @@ public class IdManager implements IIdManager, Startable {
 		 */
 		private long methodId;
 
+		/**
+		 * Creates a new instance.
+		 * 
+		 * @param sensorTypeId
+		 *            the sensor type id.
+		 * @param methodId
+		 *            the method id.
+		 */
 		public SensorTypeToMethodMapping(long sensorTypeId, long methodId) {
 			this.sensorTypeId = sensorTypeId;
 			this.methodId = methodId;
@@ -425,7 +433,7 @@ public class IdManager implements IIdManager, Startable {
 							wait();
 						}
 					}
-				} catch (InterruptedException e) {
+				} catch (InterruptedException e) { // NOCHK
 					// nothing to do
 				}
 

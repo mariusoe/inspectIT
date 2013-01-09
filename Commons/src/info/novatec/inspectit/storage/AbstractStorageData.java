@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 /**
  * Abstract storage data.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public abstract class AbstractStorageData implements IStorageData, Serializable {
 
@@ -51,7 +51,7 @@ public abstract class AbstractStorageData implements IStorageData, Serializable 
 
 	/**
 	 * Gets {@link #id}.
-	 *
+	 * 
 	 * @return {@link #id}
 	 */
 	public String getId() {
@@ -60,7 +60,7 @@ public abstract class AbstractStorageData implements IStorageData, Serializable 
 
 	/**
 	 * Sets {@link #id}.
-	 *
+	 * 
 	 * @param id
 	 *            New value for {@link #id}
 	 */
@@ -70,7 +70,7 @@ public abstract class AbstractStorageData implements IStorageData, Serializable 
 
 	/**
 	 * Gets {@link #name}.
-	 *
+	 * 
 	 * @return {@link #name}
 	 */
 	public String getName() {
@@ -79,7 +79,7 @@ public abstract class AbstractStorageData implements IStorageData, Serializable 
 
 	/**
 	 * Sets {@link #name}.
-	 *
+	 * 
 	 * @param name
 	 *            New value for {@link #name}
 	 */
@@ -89,7 +89,7 @@ public abstract class AbstractStorageData implements IStorageData, Serializable 
 
 	/**
 	 * Gets {@link #description}.
-	 *
+	 * 
 	 * @return {@link #description}
 	 */
 	public String getDescription() {
@@ -98,7 +98,7 @@ public abstract class AbstractStorageData implements IStorageData, Serializable 
 
 	/**
 	 * Sets {@link #description}.
-	 *
+	 * 
 	 * @param description
 	 *            New value for {@link #description}
 	 */
@@ -108,7 +108,7 @@ public abstract class AbstractStorageData implements IStorageData, Serializable 
 
 	/**
 	 * Sets {@link #diskSize}.
-	 *
+	 * 
 	 * @param diskSize
 	 *            New value for {@link #diskSize}
 	 */

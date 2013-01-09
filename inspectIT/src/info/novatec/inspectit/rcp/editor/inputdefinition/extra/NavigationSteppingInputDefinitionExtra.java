@@ -86,8 +86,7 @@ public class NavigationSteppingInputDefinitionExtra implements IInputDefinitionE
 			return false;
 		}
 		NavigationSteppingInputDefinitionExtra that = (NavigationSteppingInputDefinitionExtra) object;
-		return Objects.equal(this.invocationAwareDataList, that.invocationAwareDataList)
-				&& Objects.equal(this.steppingTemplateList, that.steppingTemplateList);
+		return Objects.equal(this.invocationAwareDataList, that.invocationAwareDataList) && Objects.equal(this.steppingTemplateList, that.steppingTemplateList);
 	}
 
 	/**
@@ -95,10 +94,7 @@ public class NavigationSteppingInputDefinitionExtra implements IInputDefinitionE
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this)
-				.add("invocationAwareDataList", invocationAwareDataList)
-				.add("steppingTemplateList", steppingTemplateList)
-				.toString();
+		return Objects.toStringHelper(this).add("invocationAwareDataList", invocationAwareDataList).add("steppingTemplateList", steppingTemplateList).toString();
 	}
 
 }

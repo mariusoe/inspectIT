@@ -286,7 +286,12 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * shows the details.
+	 * 
+	 * @param parent
+	 *            the parent.
+	 * @param element
+	 *            the element.
 	 */
 	@Override
 	public void showDetails(Shell parent, Object element) {
@@ -464,8 +469,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 			List<InvocationSequenceData> invocationSequenceDataList = (List<InvocationSequenceData>) inputElement;
 			exceptionSensorDataList = getRawExceptionSensorDataList(invocationSequenceDataList, new ArrayList<ExceptionSensorData>());
 			if (!rawMode) {
-				AggregationPerformer<ExceptionSensorData> aggregationPerformer = new AggregationPerformer<ExceptionSensorData>(new ExceptionDataAggregator(
-						ExceptionAggregationType.THROWABLE_TYPE));
+				AggregationPerformer<ExceptionSensorData> aggregationPerformer = new AggregationPerformer<ExceptionSensorData>(new ExceptionDataAggregator(ExceptionAggregationType.THROWABLE_TYPE));
 				aggregationPerformer.processCollection(exceptionSensorDataList);
 				exceptionSensorDataList = aggregationPerformer.getResultList();
 			}

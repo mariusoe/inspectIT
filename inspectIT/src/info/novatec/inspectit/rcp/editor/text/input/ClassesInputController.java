@@ -17,8 +17,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 /**
- * This class represents the textual view of the {@link ClassLoadingInformation}
- * sensor-type.
+ * This class represents the textual view of the {@link ClassLoadingInformation} sensor-type.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -70,7 +69,7 @@ public class ClassesInputController extends AbstractTextInputController {
 	 */
 	public void setInputDefinition(InputDefinition inputDefinition) {
 		super.setInputDefinition(inputDefinition);
-		
+
 		classLoadingObj = new ClassLoadingInformationData();
 		classLoadingObj.setPlatformIdent(inputDefinition.getIdDefinition().getPlatformId());
 

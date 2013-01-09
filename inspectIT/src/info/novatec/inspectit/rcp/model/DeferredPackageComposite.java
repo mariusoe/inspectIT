@@ -151,8 +151,7 @@ public class DeferredPackageComposite extends DeferredComposite {
 			return false;
 		}
 		DeferredPackageComposite that = (DeferredPackageComposite) object;
-		return Objects.equal(this.classes, that.classes)
-				&& Objects.equal(this.repositoryDefinition, that.repositoryDefinition);
+		return Objects.equal(this.classes, that.classes) && Objects.equal(this.repositoryDefinition, that.repositoryDefinition);
 	}
 
 }

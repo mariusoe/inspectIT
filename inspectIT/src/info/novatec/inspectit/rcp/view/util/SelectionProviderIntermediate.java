@@ -7,6 +7,8 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 
+// NOCHKALL: Not our code.
+
 /**
  * IPostSelectionProvider implementation that delegates to another ISelectionProvider or
  * IPostSelectionProvider. The selection provider used for delegation can be exchanged dynamically.

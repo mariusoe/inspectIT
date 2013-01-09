@@ -1,7 +1,6 @@
 package info.novatec.inspectit.rcp.editor.graph;
 
 import info.novatec.inspectit.rcp.editor.graph.plot.DefaultClassesPlotController;
-import info.novatec.inspectit.rcp.editor.graph.plot.DefaultCombinedMetricsPlotController;
 import info.novatec.inspectit.rcp.editor.graph.plot.DefaultCpuPlotController;
 import info.novatec.inspectit.rcp.editor.graph.plot.DefaultMemoryPlotController;
 import info.novatec.inspectit.rcp.editor.graph.plot.DefaultThreadsPlotController;
@@ -50,8 +49,6 @@ public final class PlotFactory {
 			return null;
 		case THREAD_INFORMATION:
 			return new DefaultThreadsPlotController();
-		case MARVIN_WORKFLOW:
-			return new DefaultCombinedMetricsPlotController();
 		default:
 			return null;
 		}

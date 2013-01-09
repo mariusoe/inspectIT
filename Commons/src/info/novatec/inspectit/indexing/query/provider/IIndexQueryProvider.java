@@ -5,9 +5,9 @@ import info.novatec.inspectit.indexing.impl.IndexQuery;
 
 /**
  * Common interface for all query providers.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  * @param <E>
  *            Type of query it provides.
  */

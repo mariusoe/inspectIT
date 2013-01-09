@@ -1,8 +1,7 @@
 package info.novatec.inspectit.agent.hooking.impl;
 
 /**
- * This exception is thrown when a something bad happened at hooking a
- * class/method.
+ * This exception is thrown when a something bad happened at hooking a class/method.
  * 
  * @author Patrice Bouillet
  */
@@ -14,8 +13,7 @@ public class HookException extends Exception {
 	private static final long serialVersionUID = 1043321043946792608L;
 
 	/**
-	 * Default constructor which takes one argument used for a message of the
-	 * exception.
+	 * Default constructor which takes one argument used for a message of the exception.
 	 * 
 	 * @param msg
 	 *            The message.

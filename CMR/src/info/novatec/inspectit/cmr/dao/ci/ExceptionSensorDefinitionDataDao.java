@@ -16,21 +16,18 @@ public interface ExceptionSensorDefinitionDataDao {
 	 * 
 	 * @param exceptionSensorDefinitionData
 	 *            The {@link ExceptionSensorDefinitionData} object to add.
-	 * @return The assigned id of the stored
-	 *         {@link ExceptionSensorDefinitionData} object.
+	 * @return The assigned id of the stored {@link ExceptionSensorDefinitionData} object.
 	 */
 	long addExceptionSensorDefinition(ExceptionSensorDefinitionData exceptionSensorDefinitionData);
 
 	/**
-	 * Deletes the {@link ExceptionSensorDefinitionData} object with the given
-	 * id.
+	 * Deletes the {@link ExceptionSensorDefinitionData} object with the given id.
 	 * 
 	 * @param exceptionSensorDefinitionId
-	 *            The id of the {@link ExceptionSensorDefinitionData} object to
-	 *            delete.
+	 *            The id of the {@link ExceptionSensorDefinitionData} object to delete.
 	 * @throws EntityNotFoundException
-	 *             If no {@link ExceptionSensorDefinitionData} object matching
-	 *             the given id could be found.
+	 *             If no {@link ExceptionSensorDefinitionData} object matching the given id could be
+	 *             found.
 	 */
 	void deleteExceptionSensorDefinition(long exceptionSensorDefinitionId) throws EntityNotFoundException;
 
@@ -41,5 +38,5 @@ public interface ExceptionSensorDefinitionDataDao {
 	 *            The {@link ExceptionSensorDefinitionData} object to update.
 	 */
 	void updateExceptionSensorDefinition(ExceptionSensorDefinitionData exceptionSensorDefinitionData);
-	
+
 }

@@ -10,6 +10,6 @@ package info.novatec.inspectit.cmr.service;
  */
 public enum ServiceExporterType {
 
-	HTTP, RMI;
+	HTTP, RMI; // NOCHK
 
 }

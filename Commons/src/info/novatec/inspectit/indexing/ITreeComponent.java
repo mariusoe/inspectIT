@@ -1,9 +1,9 @@
 package info.novatec.inspectit.indexing;
 
-import java.util.List;
-
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.indexing.impl.IndexingException;
+
+import java.util.List;
 
 /**
  * Interface that defines the operations that each component in indexed tree has to implement.

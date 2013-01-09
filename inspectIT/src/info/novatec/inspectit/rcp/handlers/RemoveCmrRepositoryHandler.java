@@ -1,4 +1,5 @@
 package info.novatec.inspectit.rcp.handlers;
+
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;

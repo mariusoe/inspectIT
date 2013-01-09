@@ -153,7 +153,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 	/**
 	 * List that is displayed after processing the invocation.
 	 */
-	public List<TimerData> timerDataList;
+	private List<TimerData> timerDataList;
 
 	/**
 	 * Should view display raw mode or not.
@@ -223,7 +223,7 @@ public class MethodInvocInputController extends AbstractTableInputController {
 			Map<IPreferenceGroup, Object> preferenceMap = preferenceEvent.getPreferenceMap();
 			if (null != preferenceMap && preferenceMap.containsKey(PreferenceId.InvocationSubviewMode.RAW)) {
 				Boolean isRawMode = (Boolean) preferenceMap.get(PreferenceId.InvocationSubviewMode.RAW);
-				
+
 				// first show/hide columns and then change the rawMode value
 				handleRawAggregatedColumnVisibility(isRawMode.booleanValue());
 				rawMode = isRawMode.booleanValue();

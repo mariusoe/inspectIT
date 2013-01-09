@@ -24,6 +24,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class CachingIndexQueryRestrictionProcessor implements IIndexQueryRestrictionProcessor {
 
+	/**
+	 * The logger.
+	 */
 	@Logger
 	Log log;
 

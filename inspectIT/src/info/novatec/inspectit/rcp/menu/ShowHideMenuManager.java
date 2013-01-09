@@ -31,9 +31,9 @@ import org.eclipse.ui.handlers.IHandlerService;
 
 /**
  * Menu manager for displaying the show/hide columns group.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class ShowHideMenuManager extends MenuManager implements IMenuListener {
 
@@ -49,7 +49,7 @@ public class ShowHideMenuManager extends MenuManager implements IMenuListener {
 
 	/**
 	 * Default constructor.
-	 *
+	 * 
 	 * @param columnViewer
 	 *            Viewer to display menu for.
 	 * @param inputControllerClass
@@ -81,7 +81,7 @@ public class ShowHideMenuManager extends MenuManager implements IMenuListener {
 
 	/**
 	 * Returns all contribution items.
-	 *
+	 * 
 	 * @return Returns all contribution items.
 	 */
 	private IAction[] getActionItems() {
@@ -102,9 +102,9 @@ public class ShowHideMenuManager extends MenuManager implements IMenuListener {
 
 	/**
 	 * Action for showing ot hiding one column.
-	 *
+	 * 
 	 * @author Ivan Senic
-	 *
+	 * 
 	 */
 	private class ShowHideColumnAction extends Action {
 
@@ -120,7 +120,7 @@ public class ShowHideMenuManager extends MenuManager implements IMenuListener {
 
 		/**
 		 * Default constructor.
-		 *
+		 * 
 		 * @param column
 		 *            Column for the action.
 		 */

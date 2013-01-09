@@ -3,8 +3,8 @@ package info.novatec.inspectit.rcp.editor.graph.plot;
 import java.util.EventListener;
 
 /**
- * The interface that must be supported by classes that wish to receive
- * notification of zooming events into an axis.
+ * The interface that must be supported by classes that wish to receive notification of zooming
+ * events into an axis.
  * 
  * @author Patrice Bouillet
  * 

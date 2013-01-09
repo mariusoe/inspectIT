@@ -17,8 +17,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 /**
- * This class represents the textual view of the {@link ThreadInformation}
- * sensor-type.
+ * This class represents the textual view of the {@link ThreadInformation} sensor-type.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -75,7 +74,7 @@ public class ThreadsInputController extends AbstractTextInputController {
 	 */
 	public void setInputDefinition(InputDefinition inputDefinition) {
 		super.setInputDefinition(inputDefinition);
-		
+
 		threadObj = new ThreadInformationData();
 		threadObj.setPlatformIdent(inputDefinition.getIdDefinition().getPlatformId());
 

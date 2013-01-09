@@ -1,4 +1,5 @@
 package info.novatec.inspectit.rcp.handlers;
+
 import info.novatec.inspectit.communication.data.SqlStatementData;
 
 import org.eclipse.core.commands.AbstractHandler;

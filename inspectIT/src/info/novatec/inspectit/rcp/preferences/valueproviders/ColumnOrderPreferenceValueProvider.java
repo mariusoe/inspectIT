@@ -10,9 +10,9 @@ import java.util.StringTokenizer;
 
 /**
  * Custom {@link PreferenceValueProvider} for the map of column orders in the tables.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 public class ColumnOrderPreferenceValueProvider extends PreferenceValueProvider<Map<Integer, int[]>> {
 

@@ -23,7 +23,7 @@ public class MethodIdentIndexer<E extends DefaultData> implements IBranchIndexer
 		} else {
 			return 0;
 		}
-		
+
 	}
 
 	/**

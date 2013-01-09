@@ -93,6 +93,8 @@ public class WritingChannelManager extends AbstractChannelManager {
 	 * @param completionRunnable
 	 *            Runnable that will be executed after the complete content of each buffer. Note
 	 *            that the same completion runnable can be executed more than one time.
+	 * @param extendedByteBufferOutputStream
+	 *            the stream to write to.
 	 * @return Position where the data will be written in the channel.
 	 * @throws IOException
 	 *             Delegates the {@link IOException} from I/O operations.

@@ -16,18 +16,15 @@ public interface PlatformSensorDefinitionDataDao {
 	 * 
 	 * @param platformSensorDefinitionData
 	 *            The {@link PlatformSensorDefinitionData} object to add.
-	 * @return The assigned id of the stored
-	 *         {@link PlatformSensorDefinitionData} object.
+	 * @return The assigned id of the stored {@link PlatformSensorDefinitionData} object.
 	 */
 	long addPlatformSensorDefinition(PlatformSensorDefinitionData platformSensorDefinitionData);
 
 	/**
-	 * Deletes the {@link PlatformSensorDefinitionData} object with the given
-	 * id.
+	 * Deletes the {@link PlatformSensorDefinitionData} object with the given id.
 	 * 
 	 * @param platformSensorDefinitionId
-	 *            The id of the {@link PlatformSensorDefinitionData} object to
-	 *            delete.
+	 *            The id of the {@link PlatformSensorDefinitionData} object to delete.
 	 * @throws EntityNotFoundException
 	 *             The {@link PlatformSensorDefinitionData} object to update.
 	 */

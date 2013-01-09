@@ -18,7 +18,7 @@ public class StartEndMarker extends ThreadLocal<MutableInteger> {
 	}
 
 	/**
-	 * Increase the counter
+	 * Increase the counter.
 	 */
 	public void markEndCall() {
 		super.get().decrease();
@@ -34,7 +34,7 @@ public class StartEndMarker extends ThreadLocal<MutableInteger> {
 	}
 
 	/**
-	 * Checks if we already marked a call
+	 * Checks if we already marked a call.
 	 * 
 	 * @return Checks if we already marked a call
 	 */
@@ -57,7 +57,9 @@ public class StartEndMarker extends ThreadLocal<MutableInteger> {
 	 * @author Stefan Siegl
 	 */
 	static class MutableInteger {
+		/** The wrapped integer. */
 		private int value;
+
 		/**
 		 * Marks the first call to the counter. This is necessary in the cases where we have a non
 		 * http providing method at first (for this case, lets say no other method has the http
@@ -67,10 +69,16 @@ public class StartEndMarker extends ThreadLocal<MutableInteger> {
 		 */
 		private boolean set = false;
 
+		/** Constructor. */
 		public MutableInteger() {
 			value = 0;
 		}
 
+		/**
+		 * Returns the value.
+		 * 
+		 * @return the value.
+		 */
 		public int getValue() {
 			return value;
 		}
@@ -79,6 +87,9 @@ public class StartEndMarker extends ThreadLocal<MutableInteger> {
 			this.value = value;
 		}
 
+		/**
+		 * Increases the value and sets the marker to be accessed.
+		 */
 		public void increase() {
 			value++;
 			if (!set) {
@@ -86,6 +97,9 @@ public class StartEndMarker extends ThreadLocal<MutableInteger> {
 			}
 		}
 
+		/**
+		 * Decreases the value and sets the marker to be accessed.
+		 */
 		public void decrease() {
 			value--;
 		}

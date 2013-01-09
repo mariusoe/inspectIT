@@ -1,5 +1,7 @@
 package info.novatec.inspectit.indexing.restriction;
 
+import info.novatec.inspectit.indexing.IIndexQuery;
+
 /**
  * Interface that defines the restriction behavior for indexing query when searching for objects in
  * the indexing tree. Restrictions are part of the {@link IIndexQuery} and allow additional

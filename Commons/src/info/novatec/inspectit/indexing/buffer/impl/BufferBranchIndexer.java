@@ -1,19 +1,19 @@
 package info.novatec.inspectit.indexing.buffer.impl;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.buffer.IBufferBranchIndexer;
 import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
 import info.novatec.inspectit.indexing.indexer.IBranchIndexer;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 /**
  * Implementation of branch indexer for the {@link IBufferTreeComponent}. This indexer is
  * delegatinggeneration of the indexing keys to the {@link IBranchIndexer}.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  * @param <E>
  *            Type of the elements indexed.
  */
@@ -31,7 +31,7 @@ public class BufferBranchIndexer<E extends DefaultData> implements IBufferBranch
 
 	/**
 	 * Default constructor.
-	 *
+	 * 
 	 * @param delegateIndexer
 	 *            Delegate indexer that should generate keys.
 	 */
@@ -41,7 +41,7 @@ public class BufferBranchIndexer<E extends DefaultData> implements IBufferBranch
 
 	/**
 	 * Secondary constructor.
-	 *
+	 * 
 	 * @param delegateIndexer
 	 *            Type of the delegate indexer that will actually generate keys for objects.
 	 * @param childBufferIndexer

@@ -20,8 +20,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 public class MultiSubViewSelectionProvider implements IPostSelectionProvider {
 
 	/**
-	 * Registered selection changed listeners (element type:
-	 * <code>ISelectionChangedListener</code>).
+	 * Registered selection changed listeners (element type: <code>ISelectionChangedListener</code>
+	 * ).
 	 */
 	private ListenerList listeners = new ListenerList();
 
@@ -104,9 +104,8 @@ public class MultiSubViewSelectionProvider implements IPostSelectionProvider {
 	}
 
 	/**
-	 * Notifies all registered selection changed listeners that the editor's
-	 * selection has changed. Only listeners registered at the time this method
-	 * is called are notified.
+	 * Notifies all registered selection changed listeners that the editor's selection has changed.
+	 * Only listeners registered at the time this method is called are notified.
 	 * 
 	 * @param event
 	 *            the selection changed event
@@ -117,8 +116,7 @@ public class MultiSubViewSelectionProvider implements IPostSelectionProvider {
 	}
 
 	/**
-	 * Notifies all post selection changed listeners that the editor's selection
-	 * has changed.
+	 * Notifies all post selection changed listeners that the editor's selection has changed.
 	 * 
 	 * @param event
 	 *            the event to propagate.

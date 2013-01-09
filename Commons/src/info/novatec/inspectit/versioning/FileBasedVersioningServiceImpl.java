@@ -16,6 +16,9 @@ import java.io.InputStreamReader;
  */
 public class FileBasedVersioningServiceImpl implements IVersioningService {
 
+	/**
+	 * The name of the file containing the version information.
+	 */
 	public static final String VERSION_LOG_NAME = "version.log";
 
 	/**
@@ -58,7 +61,7 @@ public class FileBasedVersioningServiceImpl implements IVersioningService {
 					s.close();
 					s = null; // NOPMD
 				}
-			} catch (IOException e) { // NOPMD
+			} catch (IOException e) { // NOPMD NOCHK
 				// ignore
 			}
 		}

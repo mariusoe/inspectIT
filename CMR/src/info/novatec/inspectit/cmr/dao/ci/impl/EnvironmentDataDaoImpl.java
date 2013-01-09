@@ -31,14 +31,15 @@ public class EnvironmentDataDaoImpl extends HibernateDaoSupport implements Envir
 	 * -andor-jpatemplate
 	 * 
 	 * @param sessionFactory
+	 *            the hibernate session factory.
 	 */
 	@Autowired
 	public EnvironmentDataDaoImpl(SessionFactory sessionFactory) {
 		setSessionFactory(sessionFactory);
 	}
-	
+
 	/**
-	 * @see EnvironmentDataDao#addEnvironment(EnvironmentData)
+	 * {@inheritDoc}
 	 */
 	public long addEnvironment(EnvironmentData environmentData) {
 		getHibernateTemplate().save(environmentData);
@@ -47,7 +48,7 @@ public class EnvironmentDataDaoImpl extends HibernateDaoSupport implements Envir
 	}
 
 	/**
-	 * @see EnvironmentDataDao#deleteEnvironment(long)
+	 * {@inheritDoc}
 	 */
 	public void deleteEnvironment(long environmentId) throws EntityNotFoundException {
 		HibernateTemplate hibernateTemplate = getHibernateTemplate();
@@ -61,7 +62,7 @@ public class EnvironmentDataDaoImpl extends HibernateDaoSupport implements Envir
 	}
 
 	/**
-	 * @see EnvironmentDataDao#getEnvironments()
+	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
 	public List<EnvironmentData> getEnvironments() {
@@ -74,7 +75,7 @@ public class EnvironmentDataDaoImpl extends HibernateDaoSupport implements Envir
 	}
 
 	/**
-	 * @see EnvironmentDataDao#updateEnvironmentSettings(EnvironmentData)
+	 * {@inheritDoc}
 	 */
 	public void updateEnvironmentSettings(EnvironmentData environmentData) {
 		getHibernateTemplate().update(environmentData);

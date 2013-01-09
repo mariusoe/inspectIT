@@ -72,12 +72,13 @@ public class LicenseInformationDialog extends TitleAreaDialog {
 	 */
 	private LicenseInfoData licenseInfoData;
 
-	/**
-	 * Widgets.
-	 */
+	/** Label valid from. */
 	private Label validFrom;
+	/** Label valid until. */
 	private Label validUntil;
+	/** Label max agents. */
 	private Label maxAgents;
+	/** Contains the holder information of the license. */
 	private FormText holder;
 
 	/**

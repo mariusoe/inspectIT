@@ -213,7 +213,7 @@ public class InspectIT extends AbstractUIPlugin {
 	public ScopedPreferenceStore getPreferenceStore() {
 		if (null == preferenceStore) {
 			synchronized (this) {
-				if (null == preferenceStore) {
+				if (null == preferenceStore) { // NOCHK: DCL works with volatile.
 					preferenceStore = new ScopedPreferenceStore(ConfigurationScope.INSTANCE, ID);
 				}
 			}
@@ -227,7 +227,7 @@ public class InspectIT extends AbstractUIPlugin {
 	public CmrRepositoryManager getCmrRepositoryManager() {
 		if (null == cmrRepositoryManager) {
 			synchronized (this) {
-				if (null == cmrRepositoryManager) {
+				if (null == cmrRepositoryManager) { // NOCHK: DCL works with volatile.
 					cmrRepositoryManager = new CmrRepositoryManager();
 				}
 			}
@@ -242,7 +242,7 @@ public class InspectIT extends AbstractUIPlugin {
 	public InspectITStorageManager getInspectITStorageManager() {
 		if (null == storageManager) {
 			synchronized (this) {
-				if (null == storageManager) {
+				if (null == storageManager) { // NOCHK: DCL works with volatile.
 					storageManager = getService(InspectITStorageManager.class);
 					storageManager.startUp();
 				}

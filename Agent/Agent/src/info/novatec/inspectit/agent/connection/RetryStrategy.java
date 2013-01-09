@@ -1,8 +1,7 @@
 package info.novatec.inspectit.agent.connection;
 
 /**
- * See http://www.onjava.com/pub/a/onjava/2001/10/17/rmi.html?page=3 for more
- * details.
+ * See http://www.onjava.com/pub/a/onjava/2001/10/17/rmi.html?page=3 for more details.
  * 
  * @author William Grosso
  * 
@@ -46,9 +45,8 @@ public abstract class RetryStrategy {
 	}
 
 	/**
-	 * Called when a remote exception occured at the server. Two options are
-	 * available here, the first is to raise an exception, and the second is to
-	 * wait till we are going for a retry.
+	 * Called when a remote exception occured at the server. Two options are available here, the
+	 * first is to raise an exception, and the second is to wait till we are going for a retry.
 	 * 
 	 * @throws RetryException
 	 *             Thrown if we won't try to send data anymore.
@@ -64,23 +62,23 @@ public abstract class RetryStrategy {
 	}
 
 	/**
-	 * Has to be overwritten by subclasses to specify the time till we'll try
-	 * the next connecting/sending.
+	 * Has to be overwritten by subclasses to specify the time till we'll try the next
+	 * connecting/sending.
 	 * 
 	 * @return Returns a value in milliseconds of how long we'll wait.
 	 */
 	protected abstract long getTimeToWait();
 
 	/**
-	 * Will suspend the actual thread and waits for the time we get through
-	 * {@link #getTimeToWait()}.
+	 * Will suspend the actual thread and waits for the time we get through {@link #getTimeToWait()}
+	 * .
 	 */
 	private void waitUntilNextTry() {
 		long timeToWait = getTimeToWait();
 
 		try {
 			Thread.sleep(timeToWait);
-		} catch (InterruptedException ignored) {
+		} catch (InterruptedException ignored) { // NOCHK
 			// nothing to do here
 		}
 	}

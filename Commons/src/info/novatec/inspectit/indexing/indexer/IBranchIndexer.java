@@ -1,6 +1,7 @@
 package info.novatec.inspectit.indexing.indexer;
 
 import info.novatec.inspectit.indexing.IIndexQuery;
+import info.novatec.inspectit.indexing.buffer.impl.Branch;
 
 /**
  * {@link IBranchIndexer} supplies the {@link Branch} with information about mapping keys.
@@ -15,7 +16,8 @@ public interface IBranchIndexer<E> {
 	/**
 	 * Returns the key for one element.
 	 * 
-	 * @param element 
+	 * @param element
+	 *            the element.
 	 * @return Key or null if passed element is null, or indexing value is not set.
 	 */
 	Object getKey(E element);
@@ -23,7 +25,8 @@ public interface IBranchIndexer<E> {
 	/**
 	 * Return arrays of mapping keys that correspond to the passed query.
 	 * 
-	 * @param query 
+	 * @param query
+	 *            the query.
 	 * @return Keys or null if no keys are associated with query.
 	 */
 	Object[] getKeys(IIndexQuery query);

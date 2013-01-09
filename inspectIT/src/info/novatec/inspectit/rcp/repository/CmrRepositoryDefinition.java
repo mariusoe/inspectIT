@@ -1,7 +1,6 @@
 package info.novatec.inspectit.rcp.repository;
 
 import info.novatec.inspectit.cmr.service.ICmrManagementService;
-import info.novatec.inspectit.cmr.service.ICombinedMetricsDataAccessService;
 import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
@@ -154,11 +153,6 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	private final IExceptionDataAccessService exceptionDataAccessService;
 
 	/**
-	 * The combined metrics data access service.
-	 */
-	private final ICombinedMetricsDataAccessService combinedMetricsDataAccessService;
-
-	/**
 	 * The configuration interface data access service.
 	 */
 	private final IConfigurationInterfaceDataAccessService configurationInterfaceDataAccessService;
@@ -238,7 +232,6 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 		invocationDataAccessService = cmrServiceProvider.getInvocationDataAccessService(this);
 		licenseService = cmrServiceProvider.getLicenseService(this);
 		exceptionDataAccessService = cmrServiceProvider.getExceptionDataAccessService(this);
-		combinedMetricsDataAccessService = cmrServiceProvider.getCombinedMetricsDataAccessService(this);
 		configurationInterfaceDataAccessService = cmrServiceProvider.getConfigurationInterfaceDataAccessService(this);
 		httpTimerDataAccessService = cmrServiceProvider.getHttpTimerDataAccessService(this);
 		cmrManagementService = cmrServiceProvider.getCmrManagementService(this);
@@ -279,14 +272,6 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	@Override
 	public IInvocationDataAccessService getInvocationDataAccessService() {
 		return invocationDataAccessService;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ICombinedMetricsDataAccessService getCombinedMetricsDataAccessService() {
-		return combinedMetricsDataAccessService;
 	}
 
 	/**

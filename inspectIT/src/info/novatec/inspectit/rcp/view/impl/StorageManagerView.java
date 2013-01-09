@@ -419,6 +419,9 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 
 	/**
 	 * Updates the storage list for all {@link CmrRepositoryDefinition}.
+	 * 
+	 * @param jobListener
+	 *            the listener.
 	 */
 	private void updateStorageList(IJobChangeListener jobListener) {
 		Job updateStorageListJob = new Job("Update Storages") {
@@ -462,6 +465,8 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	 *            {@link CmrRepositoryDefinition}
 	 * @param removeOnly
 	 *            If set to true, no storages will be loaded from the CMR.
+	 * @param jobListener
+	 *            the job listener.
 	 */
 	private void updateStorageList(final CmrRepositoryDefinition cmrRepositoryDefinition, final boolean removeOnly, IJobChangeListener jobListener) {
 		Job updateStorageListJob = new Job("Updating Storages") {

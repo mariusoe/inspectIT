@@ -241,6 +241,11 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 		sensorTypeDataDao.updateSensorType(sensorTypeData);
 	}
 
+	/**
+	 * Creates a standard set of sensor types.
+	 * 
+	 * @return a standard set of sensor types.
+	 */
 	private Set<SensorTypeData> generateStandardSensorTypes() {
 		Set<SensorTypeData> sensorTypes = new HashSet<SensorTypeData>();
 
@@ -261,6 +266,11 @@ public class ConfigurationInterfaceDataAccessService implements IConfigurationIn
 		return sensorTypes;
 	}
 
+	/**
+	 * Creates a standard set of platform sensors.
+	 * 
+	 * @return a standard set of platform sensors.
+	 */
 	private Set<PlatformSensorDefinitionData> generatePlatformSensors() {
 		Set<PlatformSensorDefinitionData> platformSensors = new HashSet<PlatformSensorDefinitionData>();
 

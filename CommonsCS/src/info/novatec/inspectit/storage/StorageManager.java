@@ -566,7 +566,7 @@ public abstract class StorageManager {
 		for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
 			try {
 				return provider.newFileSystem(path, env);
-			} catch (UnsupportedOperationException uoe) { // NOPMD
+			} catch (UnsupportedOperationException uoe) { // NOPMD NOCHK
 				// ignore
 			}
 		}

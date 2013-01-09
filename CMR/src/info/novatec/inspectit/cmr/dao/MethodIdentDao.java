@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
-
 /**
  * This DAO is used to handle all {@link MethodIdent} objects.
  * 
@@ -17,8 +16,7 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 public interface MethodIdentDao {
 
 	/**
-	 * Load a specific {@link MethodIdent} from the underlying storage by
-	 * passing the id.
+	 * Load a specific {@link MethodIdent} from the underlying storage by passing the id.
 	 * 
 	 * @param id
 	 *            The id of the object.
@@ -31,8 +29,8 @@ public interface MethodIdentDao {
 	 * 
 	 * @param methodIdent
 	 *            The {@link MethodIdent} object which serves as the example.
-	 * @return The list of {@link MethodIdent} objects which have the same
-	 *         contents as the passed example object.
+	 * @return The list of {@link MethodIdent} objects which have the same contents as the passed
+	 *         example object.
 	 * @see HibernateTemplate#findByExample(Object)
 	 */
 	List<MethodIdent> findByExample(MethodIdent methodIdent);
@@ -54,8 +52,7 @@ public interface MethodIdentDao {
 	void delete(MethodIdent methodIdent);
 
 	/**
-	 * Deletes all {@link MethodIdent} objects which are stored in the passed
-	 * list.
+	 * Deletes all {@link MethodIdent} objects which are stored in the passed list.
 	 * 
 	 * @param methodIdents
 	 *            The list containing the {@link MethodIdent} objects to delete.
@@ -63,23 +60,21 @@ public interface MethodIdentDao {
 	void deleteAll(List<MethodIdent> methodIdents);
 
 	/**
-	 * This method returns a list containing {@link MethodIdent} objects which
-	 * have an association to the given {@link PlatformIdent} object.
+	 * This method returns a list containing {@link MethodIdent} objects which have an association
+	 * to the given {@link PlatformIdent} object.
 	 * 
 	 * @param platformIdent
 	 *            The {@link PlatformIdent} object to search against.
 	 * @param methodIdentExample
-	 *            The {@link MethodIdent} example object to look for similar
-	 *            object(s).
-	 * @return A list containing the {@link MethodIdent} objects which are
-	 *         already in an association with the passed {@link PlatformIdent}
-	 *         object and have identical fields like the example object.
+	 *            The {@link MethodIdent} example object to look for similar object(s).
+	 * @return A list containing the {@link MethodIdent} objects which are already in an association
+	 *         with the passed {@link PlatformIdent} object and have identical fields like the
+	 *         example object.
 	 */
 	List<MethodIdent> findForPlatformIdent(PlatformIdent platformIdent, MethodIdent methodIdentExample);
 
 	/**
-	 * Returns all {@link MethodIdent} objects which are saved in the underlying
-	 * storage.
+	 * Returns all {@link MethodIdent} objects which are saved in the underlying storage.
 	 * 
 	 * @return Returns all stored {@link MethodIdent} objects.
 	 */

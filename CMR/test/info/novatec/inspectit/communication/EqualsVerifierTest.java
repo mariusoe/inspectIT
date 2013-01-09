@@ -29,9 +29,9 @@ import org.testng.annotations.Test;
  * Test all domain model classes to verify whether the contract for the equals and hashCode methods
  * in a class is met. The contracts are described in the Javadoc comments for the java.lang.Object
  * class.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 @SuppressWarnings("PMD")
 public class EqualsVerifierTest {
@@ -46,26 +46,21 @@ public class EqualsVerifierTest {
 
 	/**
 	 * Verify equals contract test.
-	 *
+	 * 
 	 * @param clazz
 	 *            Class to test.
 	 */
 	@Test(dataProvider = "classProvider")
 	public void equalsContract(Class<?> clazz) {
-		EqualsVerifier
-					.forClass(clazz)
-					.usingGetClass()
-					.withPrefabValues(Timestamp.class, new Timestamp(1), new Timestamp(2))
-					.withPrefabValues(ExceptionSensorData.class, new ExceptionSensorData(new Timestamp(1), 1, 1, 1), new ExceptionSensorData(new Timestamp(2), 2, 2, 2))
-					.withPrefabValues(InvocationSequenceData.class, new InvocationSequenceData(new Timestamp(1), 1, 1, 1), new InvocationSequenceData(new Timestamp(2), 2, 2, 2))
-					.withRedefinedSuperclass()
-					.suppress(Warning.NONFINAL_FIELDS)
-					.verify();
+		EqualsVerifier.forClass(clazz).usingGetClass().withPrefabValues(Timestamp.class, new Timestamp(1), new Timestamp(2))
+				.withPrefabValues(ExceptionSensorData.class, new ExceptionSensorData(new Timestamp(1), 1, 1, 1), new ExceptionSensorData(new Timestamp(2), 2, 2, 2))
+				.withPrefabValues(InvocationSequenceData.class, new InvocationSequenceData(new Timestamp(1), 1, 1, 1), new InvocationSequenceData(new Timestamp(2), 2, 2, 2)).withRedefinedSuperclass()
+				.suppress(Warning.NONFINAL_FIELDS).verify();
 	}
 
 	/**
 	 * Provides classes to be tested.
-	 *
+	 * 
 	 * @return Provides classes to be tested.
 	 */
 	@DataProvider(name = "classProvider")

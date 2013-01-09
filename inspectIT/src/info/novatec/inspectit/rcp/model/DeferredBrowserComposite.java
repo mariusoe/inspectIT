@@ -162,8 +162,7 @@ public class DeferredBrowserComposite extends DeferredComposite {
 			return false;
 		}
 		DeferredBrowserComposite that = (DeferredBrowserComposite) object;
-		return Objects.equal(this.platformIdent, that.platformIdent)
-				&& Objects.equal(this.repositoryDefinition, that.repositoryDefinition);
+		return Objects.equal(this.platformIdent, that.platformIdent) && Objects.equal(this.repositoryDefinition, that.repositoryDefinition);
 	}
 
 }

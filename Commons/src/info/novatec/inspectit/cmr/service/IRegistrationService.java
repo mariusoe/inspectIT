@@ -38,14 +38,13 @@ public interface IRegistrationService extends Remote {
 	 * @param version
 	 *            The version the agent is currently running with.
 	 * @return Returns the unique platform identifier.
-	 * @throws LicenseException
-	 *             if the registration was not successful because the registration failed.
 	 * @throws RemoteException
-	 *             If a remote exception occurs somewhere.
+	 *             If a remote exception occurs somewhere or if the registration was not successful
+	 *             because the registration failed.
 	 * @throws ServiceException
 	 *             If database contains more than one corresponding platform ident already.
 	 */
-	long registerPlatformIdent(List<String> definedIPs, String agentName, String version) throws LicenseException, RemoteException, ServiceException;
+	long registerPlatformIdent(List<String> definedIPs, String agentName, String version) throws RemoteException, ServiceException;
 
 	/**
 	 * Every instrumented method has to be registered from every Agent. This method returns a unique

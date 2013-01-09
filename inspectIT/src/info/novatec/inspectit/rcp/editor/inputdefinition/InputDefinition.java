@@ -136,9 +136,7 @@ public class InputDefinition {
 				return false;
 			}
 			IdDefinition that = (IdDefinition) object;
-			return Objects.equal(this.platformId, that.platformId)
-					&& Objects.equal(this.sensorTypeId, that.sensorTypeId)
-					&& Objects.equal(this.methodId, that.methodId);
+			return Objects.equal(this.platformId, that.platformId) && Objects.equal(this.sensorTypeId, that.sensorTypeId) && Objects.equal(this.methodId, that.methodId);
 		}
 
 		/**
@@ -146,11 +144,7 @@ public class InputDefinition {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringHelper(this)
-					.add("platformId", platformId)
-					.add("sensorTypeId", sensorTypeId)
-					.add("methodId", methodId)
-					.toString();
+			return Objects.toStringHelper(this).add("platformId", platformId).add("sensorTypeId", sensorTypeId).add("methodId", methodId).toString();
 		}
 
 	}
@@ -426,12 +420,8 @@ public class InputDefinition {
 			return false;
 		}
 		InputDefinition that = (InputDefinition) object;
-		return Objects.equal(this.updateRate, that.updateRate)
-				&& Objects.equal(this.automaticUpdate, that.automaticUpdate)
-				&& Objects.equal(this.repositoryDefinition, that.repositoryDefinition)
-				&& Objects.equal(this.idMappings, that.idMappings)
-				&& Objects.equal(this.id, that.id)
-				&& Objects.equal(this.editorPropertiesData, that.editorPropertiesData)
+		return Objects.equal(this.updateRate, that.updateRate) && Objects.equal(this.automaticUpdate, that.automaticUpdate) && Objects.equal(this.repositoryDefinition, that.repositoryDefinition)
+				&& Objects.equal(this.idMappings, that.idMappings) && Objects.equal(this.id, that.id) && Objects.equal(this.editorPropertiesData, that.editorPropertiesData)
 				&& Objects.equal(this.inputDefintionExtras, that.inputDefintionExtras);
 	}
 
@@ -440,15 +430,8 @@ public class InputDefinition {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this)
-				.add("updateRate", updateRate)
-				.add("automaticUpdate", automaticUpdate)
-				.add("repositoryDefinition", repositoryDefinition)
-				.add("idMappings", idMappings)
-				.add("id", id)
-				.add("editorPropertiesData", editorPropertiesData)
-				.add("inputDefintionExtras", inputDefintionExtras)
-				.toString();
+		return Objects.toStringHelper(this).add("updateRate", updateRate).add("automaticUpdate", automaticUpdate).add("repositoryDefinition", repositoryDefinition).add("idMappings", idMappings)
+				.add("id", id).add("editorPropertiesData", editorPropertiesData).add("inputDefintionExtras", inputDefintionExtras).toString();
 	}
 
 }

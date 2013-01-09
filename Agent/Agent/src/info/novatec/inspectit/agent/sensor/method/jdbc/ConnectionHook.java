@@ -5,8 +5,8 @@ import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
 
 /**
- * This hook records the creation of statements so that they can be later
- * retrieved by other hooks to create valid data objects with query statements.
+ * This hook records the creation of statements so that they can be later retrieved by other hooks
+ * to create valid data objects with query statements.
  * 
  * @author Patrice Bouillet
  * 

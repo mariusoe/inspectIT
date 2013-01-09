@@ -10,8 +10,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
 /**
- * This abstract class is used if the logging level needs to be changed. The
- * default of {@link Level#INFO} is most of the time not used.
+ * This abstract class is used if the logging level needs to be changed. The default of
+ * {@link Level#INFO} is most of the time not used.
  * 
  * @author Patrice Bouillet
  * 
@@ -24,8 +24,8 @@ public abstract class AbstractLogSupport extends MockInit {
 	private File file;
 
 	/**
-	 * Initializes the formatter. This method is called from the TestNG driver
-	 * and should not be called by the test implementations.
+	 * Initializes the formatter. This method is called from the TestNG driver and should not be
+	 * called by the test implementations.
 	 * 
 	 * @throws Exception
 	 */
@@ -48,8 +48,7 @@ public abstract class AbstractLogSupport extends MockInit {
 	}
 
 	/**
-	 * Needs to be implemented by all subclasses and returns the log level the
-	 * test is using.
+	 * Needs to be implemented by all subclasses and returns the log level the test is using.
 	 * 
 	 * @return The log level.
 	 */

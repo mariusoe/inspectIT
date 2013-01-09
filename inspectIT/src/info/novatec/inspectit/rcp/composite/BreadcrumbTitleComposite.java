@@ -363,6 +363,17 @@ public class BreadcrumbTitleComposite extends Composite implements CmrRepository
 			image.dispose();
 		}
 
+		/**
+		 * Returns correct number of pixels depending on the arrow orientation. If arrow is set to
+		 * be from left to right original parameter values i returned. if not then the mirrored
+		 * value is returned.
+		 * 
+		 * @param x
+		 *            Pixels.
+		 * @return Returns correct number of pixels depending on the arrow orientation. If arrow is
+		 *         set to be from left to right original parameter values i returned. if not then
+		 *         the mirrored value is returned.
+		 */
 		private int mirror(int x) {
 			if (fLTR) {
 				return x;
@@ -383,6 +394,21 @@ public class BreadcrumbTitleComposite extends Composite implements CmrRepository
 			return new Point(10, 16);
 		}
 
+		/**
+		 * Blends two colors with the given ration. The colors are represented by int values as
+		 * colors as defined in the {@link SWT} class.
+		 * 
+		 * @param color1
+		 *            First color.
+		 * @param color2
+		 *            Second color.
+		 * @param ratio
+		 *            Percentage of the first color in the blend (0-100).
+		 * @param display
+		 *            {@link Display}
+		 * @return New color.
+		 * @see FormColors#blend(RGB, RGB, int)
+		 */
 		private Color createColor(int color1, int color2, int ratio, Display display) {
 			RGB rgb1 = display.getSystemColor(color1).getRGB();
 			RGB rgb2 = display.getSystemColor(color2).getRGB();

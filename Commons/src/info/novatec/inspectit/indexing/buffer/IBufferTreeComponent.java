@@ -1,6 +1,7 @@
 package info.novatec.inspectit.indexing.buffer;
 
 import info.novatec.inspectit.indexing.ITreeComponent;
+import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
 
 import java.util.concurrent.ExecutorService;
 
@@ -13,7 +14,7 @@ import java.util.concurrent.ExecutorService;
  *            Type of the elements indexed.
  */
 public interface IBufferTreeComponent<E> extends ITreeComponent<E, E> {
-	
+
 	/**
 	 * Cleans the indexing tree by submitting the {@link Runnable} to the provided
 	 * {@link ExecutorService}.
@@ -45,7 +46,6 @@ public interface IBufferTreeComponent<E> extends ITreeComponent<E, E> {
 	 *         deletion) or false otherwise.
 	 */
 	boolean clean();
-	
 
 	/**
 	 * Returns number of elements that are indexed in this tree component.
@@ -53,5 +53,5 @@ public interface IBufferTreeComponent<E> extends ITreeComponent<E, E> {
 	 * @return Number of indexed elements.
 	 */
 	long getNumberOfElements();
-	
+
 }

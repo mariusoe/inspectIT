@@ -87,8 +87,7 @@ public class StorageLeaf extends Leaf implements IStorageDataProvider {
 			return false;
 		}
 		StorageLeaf that = (StorageLeaf) object;
-		return Objects.equal(this.storageData, that.storageData)
-				&& Objects.equal(this.cmrRepositoryDefinition, that.cmrRepositoryDefinition);
+		return Objects.equal(this.storageData, that.storageData) && Objects.equal(this.cmrRepositoryDefinition, that.cmrRepositoryDefinition);
 	}
 
 }

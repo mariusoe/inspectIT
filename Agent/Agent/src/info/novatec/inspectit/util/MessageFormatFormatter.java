@@ -6,11 +6,10 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 /**
- * The {@link MessageFormatFormatter} class is used to format the log output of
- * the standard <code>java.util.logging</code> package. To activate this
- * formatter, edit the <b>logging.properties</b> file in the <b>lib</b> folder
- * of the Java installation or pass a new Java Argument named
- * <code>-Djava.util.logging.config.file</code> in the start command line.
+ * The {@link MessageFormatFormatter} class is used to format the log output of the standard
+ * <code>java.util.logging</code> package. To activate this formatter, edit the
+ * <b>logging.properties</b> file in the <b>lib</b> folder of the Java installation or pass a new
+ * Java Argument named <code>-Djava.util.logging.config.file</code> in the start command line.
  * 
  * @author Patrice Bouillet
  * 
@@ -18,14 +17,14 @@ import java.util.logging.LogRecord;
 public class MessageFormatFormatter extends Formatter {
 
 	/**
-	 * The message format object which defines the template for the output if no
-	 * {@link Throwable} object is contained in the {@link LogRecord}.
+	 * The message format object which defines the template for the output if no {@link Throwable}
+	 * object is contained in the {@link LogRecord}.
 	 */
 	private static final MessageFormat MESSAGE_FORMAT = new MessageFormat("{0,date,HH:mm:ss,sss} {1} {2} - {3} \n");
 
 	/**
-	 * The message format object which defines the template for the output if a
-	 * {@link Throwable} object is contained in the {@link LogRecord}.
+	 * The message format object which defines the template for the output if a {@link Throwable}
+	 * object is contained in the {@link LogRecord}.
 	 */
 	private static final MessageFormat MESSAGE_FORMAT_THROWN = new MessageFormat("{0,date,HH:mm:ss,sss} {1} {2} - {3} \n {4} \n");
 

@@ -141,6 +141,11 @@ public interface TreeInputController extends SubViewClassificationController {
 
 	/**
 	 * Show some details in a pop-up to the user about the selected element.
+	 * 
+	 * @param parent
+	 *            the parent.
+	 * @param element
+	 *            the element.
 	 */
 	void showDetails(Shell parent, Object element);
 

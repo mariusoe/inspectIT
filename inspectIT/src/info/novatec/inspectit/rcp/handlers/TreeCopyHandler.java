@@ -31,7 +31,7 @@ public class TreeCopyHandler extends AbstractHandler {
 		AbstractRootEditor rootEditor = (AbstractRootEditor) HandlerUtil.getActiveEditor(event);
 		TreeSubView subView = (TreeSubView) rootEditor.getActiveSubView();
 
-		List<Integer> visibleColumnOrder =  subView.getColumnOrder();
+		List<Integer> visibleColumnOrder = subView.getColumnOrder();
 		StringBuilder sb = new StringBuilder();
 
 		// columns first

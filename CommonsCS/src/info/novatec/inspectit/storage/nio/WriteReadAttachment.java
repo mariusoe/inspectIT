@@ -48,11 +48,16 @@ public class WriteReadAttachment {
 	/**
 	 * Constructor that sets all class fields.
 	 * 
-	 * @param byteBuffer {@link ByteBuffer} where writing is taking bytes from.
-	 * @param writingPosition Writing position.
-	 * @param writingSize Writing size.
-	 * @param completionRunnable Completion {@link Runnable}.
-	 * @param fileChannel Channel where write is performed.
+	 * @param byteBuffer
+	 *            {@link ByteBuffer} where writing is taking bytes from.
+	 * @param writingPosition
+	 *            Writing position.
+	 * @param writingSize
+	 *            Writing size.
+	 * @param completionRunnable
+	 *            Completion {@link Runnable}.
+	 * @param fileChannel
+	 *            Channel where write is performed.
 	 */
 	public WriteReadAttachment(ByteBuffer byteBuffer, long writingPosition, long writingSize, WriteReadCompletionRunnable completionRunnable, AsynchronousFileChannel fileChannel) {
 		this.byteBuffer = byteBuffer;
@@ -136,7 +141,7 @@ public class WriteReadAttachment {
 	public void setFileChannel(AsynchronousFileChannel fileChannel) {
 		this.fileChannel = fileChannel;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

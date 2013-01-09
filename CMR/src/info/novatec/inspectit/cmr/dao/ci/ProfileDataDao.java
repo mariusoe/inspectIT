@@ -26,8 +26,7 @@ public interface ProfileDataDao {
 	 * @param profileId
 	 *            The id of the {@link ProfileData} object to delete.
 	 * @throws EntityNotFoundException
-	 *             If no {@link ProfileData} object matching the given id could
-	 *             be found.
+	 *             If no {@link ProfileData} object matching the given id could be found.
 	 */
 	void deleteProfile(long profileId) throws EntityNotFoundException;
 
@@ -36,8 +35,7 @@ public interface ProfileDataDao {
 	 * 
 	 * @param profileId
 	 *            The id of the {@link ProfileData} object.
-	 * @return The {@link ProfileData} object with the given id or null if no
-	 *         object could be found.
+	 * @return The {@link ProfileData} object with the given id or null if no object could be found.
 	 */
 	ProfileData getProfile(long profileId);
 

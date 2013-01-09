@@ -3,12 +3,12 @@ package info.novatec.inspectit.rcp.editor.graph.plot;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
-import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.SamplingRate;
 import info.novatec.inspectit.rcp.editor.preferences.control.SamplingRateControl;
-import info.novatec.inspectit.rcp.editor.preferences.control.SamplingRateSelecterFactory;
 import info.novatec.inspectit.rcp.editor.preferences.control.SamplingRateControl.Sensitivity;
+import info.novatec.inspectit.rcp.editor.preferences.control.SamplingRateSelecterFactory;
 import info.novatec.inspectit.rcp.editor.preferences.control.samplingrate.SamplingRateMode;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 
@@ -19,8 +19,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 
 /**
- * The abstract class of the {@link PlotController} interface to provide some
- * standard methods.
+ * The abstract class of the {@link PlotController} interface to provide some standard methods.
  * 
  * @author Eduard Tudenhoefner
  * 
@@ -102,6 +101,8 @@ public abstract class AbstractPlotController implements PlotController {
 	 *            The start time.
 	 * @param to
 	 *            The end time.
+	 * @param dataObjects
+	 *            the data objects.
 	 * @return A {@link List} with the aggregated {@link DefaultData}.
 	 */
 	protected List<? extends DefaultData> adjustSamplingRate(List<? extends DefaultData> dataObjects, Date from, Date to) {

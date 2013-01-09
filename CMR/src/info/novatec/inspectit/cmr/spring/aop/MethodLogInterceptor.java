@@ -133,7 +133,7 @@ public class MethodLogInterceptor implements MethodInterceptor {
 	}
 
 	/**
-	 * Converts the method name into something more 'readable'<br>
+	 * Converts the method name into something more 'readable'.<br>
 	 * getMyName: 'Get My Name'<br>
 	 * loadAllPersons: 'Load All Persons'
 	 * 

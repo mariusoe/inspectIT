@@ -142,8 +142,7 @@ public class DeferredClassComposite extends DeferredComposite {
 			return false;
 		}
 		DeferredClassComposite that = (DeferredClassComposite) object;
-		return Objects.equal(this.methods, that.methods)
-				&& Objects.equal(this.repositoryDefinition, that.repositoryDefinition);
+		return Objects.equal(this.methods, that.methods) && Objects.equal(this.repositoryDefinition, that.repositoryDefinition);
 	}
 
 }

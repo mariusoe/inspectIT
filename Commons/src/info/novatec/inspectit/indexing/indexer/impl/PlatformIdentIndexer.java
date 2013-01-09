@@ -12,7 +12,7 @@ import info.novatec.inspectit.indexing.indexer.IBranchIndexer;
  * @param <E>
  */
 public class PlatformIdentIndexer<E extends DefaultData> implements IBranchIndexer<E> {
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

@@ -8,6 +8,9 @@ import java.util.Map;
  * A BufferStrategy is used to define the behavior of the value objects once a connection problem
  * appears.
  * 
+ * @param <E>
+ *            The element contained in the list.
+ * 
  * @author Patrice Bouillet
  * 
  */

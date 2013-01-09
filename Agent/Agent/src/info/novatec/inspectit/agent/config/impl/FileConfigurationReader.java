@@ -60,16 +60,27 @@ public class FileConfigurationReader implements IConfigurationReader {
 	private static final String CONFIGURATION_FILE = "inspectit-agent.cfg";
 
 	// The available strings to look for a valid beginning
+	/** Starting characters to mark the line a comment. */
 	private static final String CONFIG_COMMENT = "#";
+	/** Keyword to mark the repository definition. */
 	private static final String CONFIG_REPOSITORY = "repository";
+	/** Keyword to mark the send strategy definition. */
 	private static final String CONFIG_SEND_STRATEGY = "send-strategy";
+	/** Keyword to mark the buffer strategy definition. */
 	private static final String CONFIG_BUFFER_STRATEGY = "buffer-strategy";
+	/** Keyword to mark the method sensor definition. */
 	private static final String CONFIG_METHOD_SENSOR_TYPE = "method-sensor-type";
+	/** Keyword to mark the platform sensor definition. */
 	private static final String CONFIG_PLATFORM_SENSOR_TYPE = "platform-sensor-type";
+	/** Keyword to mark the assignment of a sensor. */
 	private static final String CONFIG_SENSOR = "sensor";
+	/** Keyword to configure the exception sensor. */
 	private static final String CONFIG_EXCEPTION_SENSOR = "exception-sensor";
+	/** Keyword to define the exception sensor type. */
 	private static final String CONFIG_EXCEPTION_SENSOR_TYPE = "exception-sensor-type";
+	/** Keyword to include additional configuration files. */
 	private static final String CONFIG_INCLUDE_FILE = "$include";
+	/** Keyword to exclude certain classes from instrumentation. */
 	private static final String CONFIG_EXCLUDE_CLASS = "exclude-class";
 
 	/**
@@ -507,6 +518,8 @@ public class FileConfigurationReader implements IConfigurationReader {
 	 * 
 	 * @param tokenizer
 	 *            The tokenizer which contains the path to an additional configuration file.
+	 * @param pathToParentFile
+	 *            path to the parent file.
 	 * @throws ParserException
 	 *             Thrown if there was an exception caught by parsing the config file.
 	 */

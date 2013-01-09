@@ -46,7 +46,7 @@ public interface InvocationDataDao {
 	 * @return Returns the list of invocation sequences.
 	 */
 	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit);
-	
+
 	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
 	 * other objects in given time frame. Thus this list can be used to get an overview of the
@@ -69,8 +69,8 @@ public interface InvocationDataDao {
 
 	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
-	 * other objects in given time frame. Thus this list can be used to get an overview of the available invocation
-	 * sequences. The limit defines the size of the list.
+	 * other objects in given time frame. Thus this list can be used to get an overview of the
+	 * available invocation sequences. The limit defines the size of the list.
 	 * <p>
 	 * Compared to the above method, this service method returns all invocations for a specific
 	 * agent, not only the invocations for specific methods.
@@ -106,7 +106,7 @@ public interface InvocationDataDao {
 	 * @return Returns the list of invocation sequences.
 	 */
 	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit);
-	
+
 	/**
 	 * This service method is used to get all the details of a specific invocation sequence.
 	 * 

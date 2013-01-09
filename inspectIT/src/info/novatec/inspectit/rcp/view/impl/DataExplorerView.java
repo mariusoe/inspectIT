@@ -318,6 +318,8 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 * 
 	 * @param repositoryDefinition
 	 *            {@link RepositoryDefinition}.
+	 * @param jobListener
+	 *            the listener.
 	 */
 	private void updateAvailableAgents(final RepositoryDefinition repositoryDefinition, IJobChangeListener jobListener) {
 		Job updateAvailableAgentsJob = new Job("Updating Available Agents") {

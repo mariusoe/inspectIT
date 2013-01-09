@@ -11,13 +11,12 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
 
-
 /**
- * The default implementation of the {@link PlatformSensorTypeIdentDao}
- * interface by using the {@link HibernateDaoSupport} from Spring.
+ * The default implementation of the {@link PlatformSensorTypeIdentDao} interface by using the
+ * {@link HibernateDaoSupport} from Spring.
  * <p>
- * Delegates many calls to the {@link HibernateTemplate} returned by the
- * {@link HibernateDaoSupport} class.
+ * Delegates many calls to the {@link HibernateTemplate} returned by the {@link HibernateDaoSupport}
+ * class.
  * 
  * @author Patrice Bouillet
  * 
@@ -34,12 +33,13 @@ public class PlatformSensorTypeIdentDaoImpl extends HibernateDaoSupport implemen
 	 * -andor-jpatemplate
 	 * 
 	 * @param sessionFactory
+	 *            the hibernate session factory.
 	 */
 	@Autowired
 	public PlatformSensorTypeIdentDaoImpl(SessionFactory sessionFactory) {
 		setSessionFactory(sessionFactory);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

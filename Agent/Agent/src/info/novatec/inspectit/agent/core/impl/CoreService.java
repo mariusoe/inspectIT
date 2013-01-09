@@ -492,7 +492,7 @@ public class CoreService implements ICoreService, Startable {
 				// wait for activation if there is nothing to send
 				if (!bufferStrategy.hasNext()) {
 					synchronized (this) {
-						if (!bufferStrategy.hasNext()) {
+						if (!bufferStrategy.hasNext()) { // NOCHK: Will be fixed with another ticket
 							try {
 								wait();
 							} catch (InterruptedException e) {

@@ -13,8 +13,8 @@ import java.util.List;
 public interface IDataAggregator {
 
 	/**
-	 * Aggregates the data from fromIndex to toIndex and returns a new
-	 * {@link DefaultData} with aggregated values.
+	 * Aggregates the data from fromIndex to toIndex and returns a new {@link DefaultData} with
+	 * aggregated values.
 	 * 
 	 * @param defaultData
 	 *            The {@link List} of {@link DefaultData} to aggregate.

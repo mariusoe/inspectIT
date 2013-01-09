@@ -1,8 +1,7 @@
 package info.novatec.inspectit.rcp.formatter;
 
 /**
- * This enumeration contains strings/tooltips for the availability of different
- * sensor-types.
+ * This enumeration contains strings/tooltips for the availability of different sensor-types.
  * 
  * @author Eduard Tudenhoefner
  * 

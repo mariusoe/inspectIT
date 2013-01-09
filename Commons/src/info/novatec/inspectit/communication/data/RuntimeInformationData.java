@@ -66,10 +66,19 @@ public class RuntimeInformationData extends SystemSensorData {
 		this.count = count;
 	}
 
+	/**
+	 * increases the count by 1.
+	 */
 	public void incrementCount() {
 		this.count++;
 	}
 
+	/**
+	 * increases the uptime by the given value.
+	 * 
+	 * @param uptime
+	 *            the value to add to the uptime.
+	 */
 	public void addUptime(long uptime) {
 		this.totalUptime += uptime;
 	}

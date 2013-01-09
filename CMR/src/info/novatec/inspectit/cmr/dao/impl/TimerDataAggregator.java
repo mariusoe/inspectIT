@@ -87,6 +87,7 @@ public final class TimerDataAggregator extends HibernateDaoSupport {
 	 * -andor-jpatemplate
 	 * 
 	 * @param sessionFactory
+	 *            the hibernate session factory.
 	 */
 	@Autowired
 	public TimerDataAggregator(SessionFactory sessionFactory) {

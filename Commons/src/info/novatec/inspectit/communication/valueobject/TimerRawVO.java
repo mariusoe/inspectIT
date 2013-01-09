@@ -213,6 +213,14 @@ public class TimerRawVO extends MethodSensorData {
 			}
 		}
 
+		/**
+		 * Adds the given time and cpu time to this timer.
+		 * 
+		 * @param time
+		 *            the elapsed time.
+		 * @param cpuTime
+		 *            the cpu time.
+		 */
 		public void add(double time, double cpuTime) {
 			data[count] = time;
 			cpuData[count] = cpuTime;

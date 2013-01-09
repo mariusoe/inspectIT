@@ -31,7 +31,7 @@ public class HttpSensor implements IMethodSensor {
 	private final IIdManager idManager;
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 * 
 	 * @param timer
 	 *            the timer.

@@ -24,7 +24,7 @@ public class TableDetailsHandler extends AbstractHandler {
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
 		AbstractRootEditor rootEditor = (AbstractRootEditor) HandlerUtil.getActiveEditor(event);
 		TableSubView subView = (TableSubView) rootEditor.getActiveSubView();
-		
+
 		subView.getTableInputController().showDetails(subView.getControl().getShell(), selection.getFirstElement());
 
 		return null;

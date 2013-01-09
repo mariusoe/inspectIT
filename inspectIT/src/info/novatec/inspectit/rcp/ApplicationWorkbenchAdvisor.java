@@ -5,6 +5,13 @@ import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
+/**
+ * Our extension to the {@link WorkbenchAdvisor} where we define the workbench related things like
+ * default perspective, unchecked exceptions handling, etc.
+ * 
+ * @author Ivan Senic
+ * 
+ */
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	/**

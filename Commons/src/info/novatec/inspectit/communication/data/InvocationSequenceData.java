@@ -91,6 +91,18 @@ public class InvocationSequenceData extends MethodSensorData {
 	public InvocationSequenceData() {
 	}
 
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @param timeStamp
+	 *            the timestamp.
+	 * @param platformIdent
+	 *            the platform identifier.
+	 * @param sensorTypeIdent
+	 *            the sensor type identifier.
+	 * @param methodIdent
+	 *            the method identifier.
+	 */
 	public InvocationSequenceData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent) {
 		super(timeStamp, platformIdent, sensorTypeIdent, methodIdent);
 	}
@@ -189,6 +201,12 @@ public class InvocationSequenceData extends MethodSensorData {
 		this.exceptionSensorDataObjects = exceptionSensorDataObjects;
 	}
 
+	/**
+	 * Adds the given exception data to this invocation sequence.
+	 * 
+	 * @param data
+	 *            the exception data to add.
+	 */
 	public void addExceptionSensorData(ExceptionSensorData data) {
 		if (null == exceptionSensorDataObjects) {
 			exceptionSensorDataObjects = new ArrayList<ExceptionSensorData>();
@@ -258,6 +276,9 @@ public class InvocationSequenceData extends MethodSensorData {
 		this.nestedExceptions = nestedExceptions;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
@@ -267,6 +288,9 @@ public class InvocationSequenceData extends MethodSensorData {
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
