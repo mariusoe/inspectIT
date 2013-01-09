@@ -143,7 +143,9 @@ public abstract class AbstractHttpInputController extends AbstractTableInputCont
 			if (preferenceEvent.getPreferenceMap().containsKey(PreferenceId.HttpAggregationRequestMethod.BUTTON_HTTP_AGGREGATION_REQUESTMETHOD_ID)) {
 				httpCatorizationOnRequestMethodActive = (Boolean) preferenceEvent.getPreferenceMap().get(PreferenceId.HttpAggregationRequestMethod.BUTTON_HTTP_AGGREGATION_REQUESTMETHOD_ID);
 			}
+			break;
 		default:
+			break;
 		}
 	}
 

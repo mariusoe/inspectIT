@@ -115,7 +115,7 @@ public class CachedDataService {
 			refreshIdents();
 		}
 
-		return sensorTypeMap.get(Long.valueOf(id));
+		return sensorTypeMap.get(id);
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class CachedDataService {
 			refreshIdents();
 		}
 
-		return methodMap.get(Long.valueOf(methodId));
+		return methodMap.get(id);
 	}
 
 	/**

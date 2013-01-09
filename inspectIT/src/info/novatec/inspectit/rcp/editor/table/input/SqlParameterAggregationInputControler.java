@@ -161,6 +161,7 @@ public class SqlParameterAggregationInputControler extends AbstractTableInputCon
 			}
 			break;
 		default:
+			break;
 		}
 	}
 

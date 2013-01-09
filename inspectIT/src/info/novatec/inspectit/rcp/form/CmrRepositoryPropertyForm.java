@@ -370,49 +370,46 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	private void updateCmrManagementData(CmrStatusData cmrStatusData) {
 		boolean dataLoaded = false;
 		if (null != cmrStatusData) {
-			// buffer information
-			if (null != cmrStatusData) {
-				dataLoaded = true;
-				// Transfer to MB right away
-				double bufferMaxOccupancy = (double) cmrStatusData.getMaxBufferSize() / (1024 * 1024);
-				double bufferCurrentOccupancy = (double) cmrStatusData.getCurrentBufferSize() / (1024 * 1024);
-				bufferBar.setMaximum((int) Math.round(bufferMaxOccupancy));
-				bufferBar.setSelection((int) Math.round(bufferCurrentOccupancy));
-				int occupancy = (int) (100 * Math.round(bufferCurrentOccupancy) / Math.round(bufferMaxOccupancy));
+			dataLoaded = true;
+			// Transfer to MB right away
+			double bufferMaxOccupancy = (double) cmrStatusData.getMaxBufferSize() / (1024 * 1024);
+			double bufferCurrentOccupancy = (double) cmrStatusData.getCurrentBufferSize() / (1024 * 1024);
+			bufferBar.setMaximum((int) Math.round(bufferMaxOccupancy));
+			bufferBar.setSelection((int) Math.round(bufferCurrentOccupancy));
+			int occupancy = (int) (100 * Math.round(bufferCurrentOccupancy) / Math.round(bufferMaxOccupancy));
 
-				String occMb = NumberFormatter.humanReadableByteCount(cmrStatusData.getCurrentBufferSize());
-				String maxMb = NumberFormatter.humanReadableByteCount(cmrStatusData.getMaxBufferSize());
-				String string = occupancy + "% (" + occMb + " / " + maxMb + ")";
-				bufferSize.setText(string);
+			String occMb = NumberFormatter.humanReadableByteCount(cmrStatusData.getCurrentBufferSize());
+			String maxMb = NumberFormatter.humanReadableByteCount(cmrStatusData.getMaxBufferSize());
+			String string = occupancy + "% (" + occMb + " / " + maxMb + ")";
+			bufferSize.setText(string);
 
-				DefaultData oldestData = cmrStatusData.getBufferOldestElement();
-				if (null != oldestData) {
-					bufferDate.setText(NumberFormatter.formatTime(oldestData.getTimeStamp().getTime()));
-				} else {
-					bufferDate.setText("-");
-				}
+			DefaultData oldestData = cmrStatusData.getBufferOldestElement();
+			if (null != oldestData) {
+				bufferDate.setText(NumberFormatter.formatTime(oldestData.getTimeStamp().getTime()));
+			} else {
+				bufferDate.setText("-");
+			}
 
-				// hard drive space data
-				int spaceOccupancy = (int) (100 * (double) cmrStatusData.getStorageDataSpaceLeft() / cmrStatusData.getStorageMaxDataSpace());
-				StringBuilder spaceLeftStringBuilder = new StringBuilder(String.valueOf(spaceOccupancy));
-				spaceLeftStringBuilder.append("% (");
-				spaceLeftStringBuilder.append(NumberFormatter.humanReadableByteCount(cmrStatusData.getStorageDataSpaceLeft()));
-				spaceLeftStringBuilder.append(" / ");
-				spaceLeftStringBuilder.append(NumberFormatter.humanReadableByteCount(cmrStatusData.getStorageMaxDataSpace()));
-				spaceLeftStringBuilder.append(')');
-				spaceLeftLabel.setText(spaceLeftStringBuilder.toString());
-				spaceLeftBar.setMaximum((int) (cmrStatusData.getStorageMaxDataSpace() / 1024 / 1024));
-				spaceLeftBar.setSelection((int) (cmrStatusData.getStorageDataSpaceLeft() / 1024 / 1024));
-				if (!cmrStatusData.isCanWriteMore()) {
-					spaceLeftBar.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
-					spaceLeftBar.setToolTipText("Space left is critically low and no write is possible anymore");
-				} else if (cmrStatusData.isWarnSpaceLeftActive()) {
-					spaceLeftBar.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW));
-					spaceLeftBar.setToolTipText("Space left is reaching critical level");
-				} else {
-					spaceLeftBar.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GREEN));
-					spaceLeftBar.setToolTipText("Enough space left");
-				}
+			// hard drive space data
+			int spaceOccupancy = (int) (100 * (double) cmrStatusData.getStorageDataSpaceLeft() / cmrStatusData.getStorageMaxDataSpace());
+			StringBuilder spaceLeftStringBuilder = new StringBuilder(String.valueOf(spaceOccupancy));
+			spaceLeftStringBuilder.append("% (");
+			spaceLeftStringBuilder.append(NumberFormatter.humanReadableByteCount(cmrStatusData.getStorageDataSpaceLeft()));
+			spaceLeftStringBuilder.append(" / ");
+			spaceLeftStringBuilder.append(NumberFormatter.humanReadableByteCount(cmrStatusData.getStorageMaxDataSpace()));
+			spaceLeftStringBuilder.append(')');
+			spaceLeftLabel.setText(spaceLeftStringBuilder.toString());
+			spaceLeftBar.setMaximum((int) (cmrStatusData.getStorageMaxDataSpace() / 1024 / 1024));
+			spaceLeftBar.setSelection((int) (cmrStatusData.getStorageDataSpaceLeft() / 1024 / 1024));
+			if (!cmrStatusData.isCanWriteMore()) {
+				spaceLeftBar.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+				spaceLeftBar.setToolTipText("Space left is critically low and no write is possible anymore");
+			} else if (cmrStatusData.isWarnSpaceLeftActive()) {
+				spaceLeftBar.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW));
+				spaceLeftBar.setToolTipText("Space left is reaching critical level");
+			} else {
+				spaceLeftBar.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GREEN));
+				spaceLeftBar.setToolTipText("Enough space left");
 			}
 		}
 
@@ -440,14 +437,14 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 		recordingIcon.setImage(null);
 		// recording information
 		if (null != recordingData) {
-				RecordingState recordingState = cmrRepositoryDefinition.getStorageService().getRecordingState();
-				if (recordingState == RecordingState.ON) {
-					recordingIcon.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_RECORD));
-					recordingLabel.setText("Active");
-				} else if (recordingState == RecordingState.SCHEDULED) {
-					recordingIcon.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_RECORD_SCHEDULED));
-					recordingLabel.setText("Scheduled @ " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(recordingData.getRecordStartDate()));
-				}
+			RecordingState recordingState = cmrRepositoryDefinition.getStorageService().getRecordingState();
+			if (recordingState == RecordingState.ON) {
+				recordingIcon.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_RECORD));
+				recordingLabel.setText("Active");
+			} else if (recordingState == RecordingState.SCHEDULED) {
+				recordingIcon.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_RECORD_SCHEDULED));
+				recordingLabel.setText("Scheduled @ " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(recordingData.getRecordStartDate()));
+			}
 			// get the storage name
 			StorageData storage = recordingData.getRecordingStorage();
 			if (null != storage) {

@@ -9,9 +9,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
- * Class which encapsulates the request to the {@link Remote} object
- * {@link IRegistrationService}. The method to call is
- * {@link IRegistrationService#registerPlatformSensorTypeIdent(long, String)}.
+ * Class which encapsulates the request to the {@link Remote} object {@link IRegistrationService}.
+ * The method to call is {@link IRegistrationService#registerPlatformSensorTypeIdent(long, String)}.
  * 
  * @author Patrice Bouillet
  * 
@@ -39,8 +38,7 @@ public class RegisterPlatformSensorType extends AbstractRemoteMethodCall {
 	 * @param registrationService
 	 *            The {@link Remote} object.
 	 * @param platformSensorTypeConfig
-	 *            The {@link PlatformSensorTypeConfig} which is registered at
-	 *            the server.
+	 *            The {@link PlatformSensorTypeConfig} which is registered at the server.
 	 * @param platformId
 	 *            The ID of the platform.
 	 */
@@ -63,7 +61,7 @@ public class RegisterPlatformSensorType extends AbstractRemoteMethodCall {
 	protected Object performRemoteCall(Remote remoteObject) throws RemoteException {
 		IRegistrationService reg = (IRegistrationService) remoteObject;
 
-		return new Long(reg.registerPlatformSensorTypeIdent(platformId, platformSensorTypeConfig.getClassName()));
+		return Long.valueOf(reg.registerPlatformSensorTypeIdent(platformId, platformSensorTypeConfig.getClassName()));
 	}
 
 }

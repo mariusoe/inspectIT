@@ -68,12 +68,4 @@ public class DateAxisZoomNotify extends DateAxis {
 		notifyZoomListeners();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		return super.equals(obj);
-	}
-
 }

@@ -236,7 +236,7 @@ public class CmrRepositoryManager {
 	 * @author Ivan Senic
 	 * 
 	 */
-	public class UpdateRepositoryJob extends Job {
+	public static class UpdateRepositoryJob extends Job {
 
 		/**
 		 * CMR to update.

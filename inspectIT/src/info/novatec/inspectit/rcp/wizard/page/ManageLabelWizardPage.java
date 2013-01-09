@@ -581,7 +581,7 @@ public class ManageLabelWizardPage extends WizardPage {
 	 * @author Ivan Senic
 	 * 
 	 */
-	private class CreateLabelTypeDialog extends TitleAreaDialog {
+	private static class CreateLabelTypeDialog extends TitleAreaDialog {
 
 		/**
 		 * Available type list.
@@ -815,7 +815,7 @@ public class ManageLabelWizardPage extends WizardPage {
 	 * @author Ivan Senic
 	 * 
 	 */
-	private class CreateLabelDialog extends TitleAreaDialog {
+	private static class CreateLabelDialog extends TitleAreaDialog {
 
 		/**
 		 * List of label types that can be created.

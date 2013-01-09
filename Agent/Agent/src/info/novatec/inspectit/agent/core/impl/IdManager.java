@@ -620,8 +620,8 @@ public class IdManager implements IIdManager, Startable {
 			}
 
 			synchronized (sensorTypesToRegister) {
-				Long localId = new Long(sensorTypeIdMap.size());
-				sensorTypeIdMap.put(localId, new Long(registeredId));
+				Long localId = Long.valueOf(sensorTypeIdMap.size());
+				sensorTypeIdMap.put(localId, Long.valueOf(registeredId));
 
 				if (LOGGER.isLoggable(Level.FINE)) {
 					LOGGER.fine("Sensor type " + astc.toString() + " registered. ID (local/global): " + localId + "/" + registeredId);

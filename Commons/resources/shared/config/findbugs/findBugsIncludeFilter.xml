@@ -1,5 +1,5 @@
 <FindBugsFilter>
-     <Match>
-	<Package name="~info\.novatec\.inspectit.*" />
-     </Match>
+	<Match>
+		<Package name="~info\.novatec\.inspectit.*" />
+	</Match>
 </FindBugsFilter>

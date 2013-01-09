@@ -14,6 +14,7 @@ import info.novatec.inspectit.rcp.wizard.ManageLabelWizard;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -383,7 +384,7 @@ public class CmrRepositoryPreferencePage extends PreferencePage implements IWork
 	 * @return Where there changes performed by user.
 	 */
 	private boolean isDirty() {
-		return !inputList.equals(cmrRepositoryManager.getCmrRepositoryDefinitions());
+		return !Objects.equals(inputList.keySet(), cmrRepositoryManager.getCmrRepositoryDefinitions());
 	}
 
 	/**

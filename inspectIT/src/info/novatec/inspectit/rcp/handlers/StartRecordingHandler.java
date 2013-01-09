@@ -52,18 +52,20 @@ public class StartRecordingHandler extends AbstractHandler implements IHandler {
 		}
 
 		// check if the writing state is OK
-		try {
-			CmrStatusData cmrStatusData = cmrRepositoryDefinition.getCmrManagementService().getCmrStatusData();
-			if (cmrStatusData.isWarnSpaceLeftActive()) {
-				String leftSpace = NumberFormatter.humanReadableByteCount(cmrStatusData.getStorageDataSpaceLeft());
-				if (!MessageDialog.openQuestion(HandlerUtil.getActiveShell(event), "Confirm",
-						"For selected CMR there is an active warning about insufficient storage space left. Only " + leftSpace
-								+ " are left on the target server, are you sure you want to continue?")) {
-					return null;
+		if (null != cmrRepositoryDefinition) {
+			try {
+				CmrStatusData cmrStatusData = cmrRepositoryDefinition.getCmrManagementService().getCmrStatusData();
+				if (cmrStatusData.isWarnSpaceLeftActive()) {
+					String leftSpace = NumberFormatter.humanReadableByteCount(cmrStatusData.getStorageDataSpaceLeft());
+					if (!MessageDialog.openQuestion(HandlerUtil.getActiveShell(event), "Confirm",
+							"For selected CMR there is an active warning about insufficient storage space left. Only " + leftSpace
+									+ " are left on the target server, are you sure you want to continue?")) {
+						return null;
+					}
 				}
+			} catch (Exception e) {
+				// ignore because if we can not get the info. we will still respond to user action
 			}
-		} catch (Exception e) {
-			// ignore because if we can not get the info. we will still respond to user action
 		}
 
 		// open wizard

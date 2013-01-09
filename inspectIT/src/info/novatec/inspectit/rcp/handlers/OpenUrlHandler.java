@@ -118,11 +118,10 @@ public abstract class OpenUrlHandler extends AbstractHandler {
 		 */
 		@Override
 		protected String getUrlString(ExecutionEvent event) {
-			Object param = event.getParameter(SEARCH_DOCUMENTATION_PARAMETER);
-			if (param instanceof String && StringUtils.isNotEmpty((String) param)) {
-				String string = (String) param;
+			String param = event.getParameter(SEARCH_DOCUMENTATION_PARAMETER);
+			if (StringUtils.isNotEmpty(param)) {
 				StringBuilder stringBuilder = new StringBuilder("https://documentation.novatec-gmbh.de/dosearchsite.action?searchQuery.queryString=");
-				String[] words = StringUtils.split(string);
+				String[] words = StringUtils.split(param);
 				for (int i = 0; i < words.length; i++) {
 					stringBuilder.append(words[i]);
 					if (i < words.length - 1) {
@@ -131,9 +130,8 @@ public abstract class OpenUrlHandler extends AbstractHandler {
 				}
 				stringBuilder.append("&searchQuery.spaceKey=INSPECTIT");
 				return stringBuilder.toString();
-			} else {
-				return super.getUrlString(event);
 			}
+			return super.getUrlString(event);
 		}
 	}
 }

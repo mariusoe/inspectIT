@@ -321,7 +321,7 @@ public class HookDispatcher implements IHookDispatcher {
 
 				// rsc contains the settings of the actual constructor where the exception is
 				// catched.
-				RegisteredSensorConfig rsc = (RegisteredSensorConfig) constructorHooks.get(new Long(id));
+				RegisteredSensorConfig rsc = (RegisteredSensorConfig) constructorHooks.get(Long.valueOf(id));
 				long sensorTypeId = rsc.getExceptionSensorTypeConfig().getId();
 
 				ICoreService invocCoreService = null;

@@ -911,7 +911,7 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 	 * @author Ivan Senic
 	 * 
 	 */
-	private class TreeFilter extends ViewerFilter {
+	private static class TreeFilter extends ViewerFilter {
 
 		/**
 		 * Set of excluded repositories.

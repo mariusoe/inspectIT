@@ -181,7 +181,7 @@ public class HttpHook implements IMethodHook {
 					// timer would be off - resulting in very strange results.
 					timeStack.push(new Double(timer.getCurrentTime()));
 					if (threadCPUTimeEnabled) {
-						threadCpuTimeStack.push(new Long(threadMXBean.getCurrentThreadCpuTime()));
+						threadCpuTimeStack.push(Long.valueOf(threadMXBean.getCurrentThreadCpuTime()));
 					}
 
 					// Mark first invocation
@@ -213,7 +213,7 @@ public class HttpHook implements IMethodHook {
 			// Get the timer and store it.
 			timeStack.push(new Double(timer.getCurrentTime()));
 			if (threadCPUTimeEnabled) {
-				threadCpuTimeStack.push(new Long(threadMXBean.getCurrentThreadCpuTime()));
+				threadCpuTimeStack.push(Long.valueOf(threadMXBean.getCurrentThreadCpuTime()));
 			}
 		}
 	}

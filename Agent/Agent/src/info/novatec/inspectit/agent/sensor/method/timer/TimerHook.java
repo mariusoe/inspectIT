@@ -140,7 +140,7 @@ public class TimerHook implements IMethodHook, IConstructorHook {
 	public void beforeBody(long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc) {
 		timeStack.push(new Double(timer.getCurrentTime()));
 		if (enabled) {
-			threadCpuTimeStack.push(new Long(threadMXBean.getCurrentThreadCpuTime()));
+			threadCpuTimeStack.push(Long.valueOf(threadMXBean.getCurrentThreadCpuTime()));
 		}
 	}
 
@@ -150,7 +150,7 @@ public class TimerHook implements IMethodHook, IConstructorHook {
 	public void firstAfterBody(long methodId, long sensorTypeId, Object object, Object[] parameters, Object result, RegisteredSensorConfig rsc) {
 		timeStack.push(new Double(timer.getCurrentTime()));
 		if (enabled) {
-			threadCpuTimeStack.push(new Long(threadMXBean.getCurrentThreadCpuTime()));
+			threadCpuTimeStack.push(Long.valueOf(threadMXBean.getCurrentThreadCpuTime()));
 		}
 	}
 
@@ -213,7 +213,7 @@ public class TimerHook implements IMethodHook, IConstructorHook {
 	public void beforeConstructor(long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc) {
 		timeStack.push(new Double(timer.getCurrentTime()));
 		if (enabled) {
-			threadCpuTimeStack.push(new Long(threadMXBean.getCurrentThreadCpuTime()));
+			threadCpuTimeStack.push(Long.valueOf(threadMXBean.getCurrentThreadCpuTime()));
 		}
 	}
 
@@ -223,7 +223,7 @@ public class TimerHook implements IMethodHook, IConstructorHook {
 	public void afterConstructor(ICoreService coreService, long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc) {
 		timeStack.push(new Double(timer.getCurrentTime()));
 		if (enabled) {
-			threadCpuTimeStack.push(new Long(threadMXBean.getCurrentThreadCpuTime()));
+			threadCpuTimeStack.push(Long.valueOf(threadMXBean.getCurrentThreadCpuTime()));
 		}
 		// just call the second after body method directly
 		secondAfterBody(coreService, methodId, sensorTypeId, object, parameters, null, rsc);

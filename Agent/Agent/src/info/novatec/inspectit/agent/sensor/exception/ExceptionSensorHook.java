@@ -85,7 +85,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 				long registeredConstructorId = idManager.getRegisteredMethodId(methodId);
 				long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
-				Long identityHash = new Long(System.identityHashCode(object));
+				Long identityHash = Long.valueOf(System.identityHashCode(object));
 
 				// need to reset the exception handler id
 				exceptionHandlerId.set(null);
@@ -128,7 +128,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 				long registeredMethodId = idManager.getRegisteredMethodId(id);
 				long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
-				Long identityHash = new Long(System.identityHashCode(exceptionObject));
+				Long identityHash = Long.valueOf(System.identityHashCode(exceptionObject));
 
 				// getting the actual object with information
 				Throwable throwable = (Throwable) exceptionObject;
@@ -190,7 +190,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 				long registeredMethodId = idManager.getRegisteredMethodId(id);
 				long registeredSensorTypeId = idManager.getRegisteredSensorTypeId(sensorTypeId);
-				Long identityHash = new Long(System.identityHashCode(exceptionObject));
+				Long identityHash = Long.valueOf(System.identityHashCode(exceptionObject));
 
 				// save id of the method where the exception is catched
 				exceptionHandlerId.set(Long.valueOf(registeredMethodId));

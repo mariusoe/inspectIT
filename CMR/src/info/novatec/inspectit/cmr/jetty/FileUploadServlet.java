@@ -74,9 +74,13 @@ public class FileUploadServlet extends HttpServlet implements InitializingBean {
 				}
 				File outputDir = outputFile.getParentFile();
 				if (null != outputDir && !outputDir.exists()) {
-					outputDir.mkdirs();
+					if (!outputDir.mkdirs()) {
+						throw new IOException("Needed directory " + outputDir + " can not be created.");
+					}
 				}
-				file.renameTo(outputFile);
+				if (!file.renameTo(outputFile)) {
+					throw new IOException("Temporary file " + file + " can not be renamed to the correct upload file name " + outputFile + ".");
+				}
 			}
 		}
 	}

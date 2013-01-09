@@ -216,7 +216,7 @@ public class TaggedHttpTimerDataInputController extends AbstractHttpInputControl
 	 * 
 	 * @author Stefan Siegl
 	 */
-	private final class TaggedHttpDataTableViewerComparator extends TableViewerComparator<HttpTimerData> {
+	private static final class TaggedHttpDataTableViewerComparator extends TableViewerComparator<HttpTimerData> {
 		/**
 		 * {@inheritDoc}
 		 */

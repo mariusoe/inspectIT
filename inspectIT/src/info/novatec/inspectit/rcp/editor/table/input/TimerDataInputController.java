@@ -259,6 +259,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 			}
 			break;
 		default:
+			break;
 		}
 	}
 

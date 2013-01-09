@@ -1,5 +1,6 @@
 package info.novatec.inspectit.indexing.storage.impl;
 
+import info.novatec.inspectit.indexing.storage.AbstractStorageDescriptor;
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -11,7 +12,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * @author Ivan Senic
  * 
  */
-public class StorageDescriptor implements IStorageDescriptor {
+public class StorageDescriptor extends AbstractStorageDescriptor {
 
 	/**
 	 * Channel id.
@@ -197,22 +198,6 @@ public class StorageDescriptor implements IStorageDescriptor {
 			return false;
 		}
 		return true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public int compareTo(IStorageDescriptor other) {
-		if (this.getChannelId() - other.getChannelId() != 0) {
-			return this.getChannelId() - other.getChannelId();
-		}
-		if (this.getPosition() - other.getPosition() != 0) {
-			return (int) (this.getPosition() - other.getPosition());
-		}
-		if (this.getSize() - other.getSize() != 0) {
-			return (int) (this.getSize() - other.getSize());
-		}
-		return 0;
 	}
 
 	/**

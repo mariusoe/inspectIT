@@ -187,27 +187,25 @@ public class CmrStorageRecorder {
 			recordingState = RecordingState.ON;
 
 			// set start and end dates
-			if (null != recordingProperties) {
-				recordingProperties.setRecordStartDate(new Date());
+			recordingProperties.setRecordStartDate(new Date());
 
-				// set the task for stopping the recording if stop date is provided
-				long recordingDuration = recordingProperties.getRecordDuration();
-				if (recordingDuration > 0) {
-					Runnable stopRecordingRunnable = new Runnable() {
-						@Override
-						public void run() {
-							try {
-								cmrStorageManager.stopRecording();
-							} catch (Exception e) {
-								log.warn("Automatic stop of recording failed for the storage: " + getStorageData(), e);
-							}
+			// set the task for stopping the recording if stop date is provided
+			long recordingDuration = recordingProperties.getRecordDuration();
+			if (recordingDuration > 0) {
+				Runnable stopRecordingRunnable = new Runnable() {
+					@Override
+					public void run() {
+						try {
+							cmrStorageManager.stopRecording();
+						} catch (Exception e) {
+							log.warn("Automatic stop of recording failed for the storage: " + getStorageData(), e);
 						}
-					};
+					}
+				};
 
-					stopRecordingFuture = executorService.schedule(stopRecordingRunnable, recordingDuration, TimeUnit.MILLISECONDS);
-					Date recordEndDate = new Date(System.currentTimeMillis() + recordingDuration);
-					recordingProperties.setRecordEndDate(recordEndDate);
-				}
+				stopRecordingFuture = executorService.schedule(stopRecordingRunnable, recordingDuration, TimeUnit.MILLISECONDS);
+				Date recordEndDate = new Date(System.currentTimeMillis() + recordingDuration);
+				recordingProperties.setRecordEndDate(recordEndDate);
 			}
 
 			if (log.isDebugEnabled()) {

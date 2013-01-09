@@ -358,7 +358,7 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 	 * @author Ivan Senic
 	 * 
 	 */
-	private class DataColumnLabelProvider extends ColumnLabelProvider {
+	private static class DataColumnLabelProvider extends ColumnLabelProvider {
 
 		/**
 		 * {@inheritDoc}

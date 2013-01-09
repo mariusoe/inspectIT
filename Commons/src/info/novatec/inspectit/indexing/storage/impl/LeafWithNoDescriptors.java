@@ -4,6 +4,7 @@ import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.impl.IndexingException;
+import info.novatec.inspectit.indexing.storage.AbstractStorageDescriptor;
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
 import info.novatec.inspectit.storage.util.StorageUtil;
@@ -178,7 +179,7 @@ public class LeafWithNoDescriptors<E extends DefaultData> implements IStorageTre
 	 * @author Ivan Senic
 	 * 
 	 */
-	private class BoundedDecriptor implements IStorageDescriptor {
+	private class BoundedDecriptor extends AbstractStorageDescriptor {
 
 		/**
 		 * {@inheritDoc}
@@ -212,22 +213,6 @@ public class LeafWithNoDescriptors<E extends DefaultData> implements IStorageTre
 		 */
 		public void setPositionAndSize(long position, long size) {
 			addPositionAndSize(position, size);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		public int compareTo(IStorageDescriptor other) {
-			if (this.getChannelId() - other.getChannelId() != 0) {
-				return this.getChannelId() - other.getChannelId();
-			}
-			if (this.getPosition() - other.getPosition() != 0) {
-				return (int) (this.getPosition() - other.getPosition());
-			}
-			if (this.getSize() - other.getSize() != 0) {
-				return (int) (this.getSize() - other.getSize());
-			}
-			return 0;
 		}
 
 	}

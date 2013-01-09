@@ -20,9 +20,9 @@ import org.springframework.stereotype.Component;
 /**
  * Factory that creates the root branch for indexing tree. This root branch will be injected in
  * Spring as a bean.
- *
+ * 
  * @author Ivan Senic
- *
+ * 
  */
 @Component
 public class RootBranchFactory implements FactoryBean<RootBranch<DefaultData>> {
@@ -57,11 +57,11 @@ public class RootBranchFactory implements FactoryBean<RootBranch<DefaultData>> {
 	/**
 	 * Root branch. It has additional functionality of generating IDs for the elements that need to
 	 * be put into the indexing tree.
-	 *
+	 * 
 	 * @author Ivan Senic
-	 *
+	 * 
 	 */
-	public class RootBranch<E extends DefaultData> extends Branch<E> {
+	public static class RootBranch<E extends DefaultData> extends Branch<E> {
 
 		/**
 		 * Runnable for cutting the empty tree components.
@@ -81,7 +81,7 @@ public class RootBranchFactory implements FactoryBean<RootBranch<DefaultData>> {
 
 		/**
 		 * Default constructor.
-		 *
+		 * 
 		 * @param branchIndexer
 		 *            Branch indexer for root branch.
 		 */

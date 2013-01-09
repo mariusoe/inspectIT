@@ -293,6 +293,7 @@ public class SqlInputController extends AbstractTableInputController {
 			}
 			break;
 		default:
+			break;
 		}
 	}
 

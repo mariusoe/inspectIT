@@ -19,13 +19,15 @@ import org.springframework.stereotype.Repository;
 
 /**
  * Aggregator for the {@link TimerData} obejcts that need to be persisted to the DB.
+ * <p>
+ * The class is marked as final because in the constructor it starts a thread.
  * 
  * @author Ivan Senic
  * @see https://confluence.novatec-gmbh.de/display/INSPECTIT/TimerData+Aggregator
  * 
  */
 @Repository
-public class TimerDataAggregator extends HibernateDaoSupport {
+public final class TimerDataAggregator extends HibernateDaoSupport {
 
 	/**
 	 * Period of time in which all timer data should be aggregated. In milliseconds.

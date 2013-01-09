@@ -156,7 +156,7 @@ public class PropertyAccessor implements IPropertyAccessor {
 			if ("length".equals(methodName)) {
 				if (object.getClass().isArray()) { // ensure that we are really
 					// dealing with an array
-					return getPropertyContent(propertyPath.getPathToContinue(), new Integer(Array.getLength(object)));
+					return getPropertyContent(propertyPath.getPathToContinue(), Integer.valueOf(Array.getLength(object)));
 				} else {
 					LOGGER.severe("Trying to access the lenght() method for a non array type");
 					throw new PropertyAccessException("Trying to access the length() method for a non array type");

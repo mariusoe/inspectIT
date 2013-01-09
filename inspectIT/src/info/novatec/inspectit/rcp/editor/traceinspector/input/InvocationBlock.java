@@ -3,13 +3,8 @@ package info.novatec.inspectit.rcp.editor.traceinspector.input;
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 
-import java.io.Serializable;
+public class InvocationBlock {
 
-public class InvocationBlock implements Serializable {
-	/**
-	 * The generated serial version UID.
-	 */
-	private static final long serialVersionUID = 1839028696356159300L;
 	private Rectangle area = null;
 	private InvocationSequenceData invocationSequence = null;
 	private MethodIdent methodIdent = null;

@@ -1,5 +1,7 @@
 package info.novatec.inspectit.rcp.resource;
 
+import java.util.Arrays;
+
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -45,7 +47,7 @@ public class CombinedIcon extends CompositeImageDescriptor {
 		if (descriptors.length == 0) {
 			throw new IllegalArgumentException("Amount of given image descriptors for combined icon must be at least 1.");
 		}
-		this.descriptors = descriptors;
+		this.descriptors = Arrays.copyOf(descriptors, descriptors.length);
 		this.isVertical = (orientation == SWT.VERTICAL);
 		int width = 0;
 		int height = 0;

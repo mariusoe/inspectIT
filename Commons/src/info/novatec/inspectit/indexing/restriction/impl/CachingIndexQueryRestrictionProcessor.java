@@ -45,10 +45,8 @@ public class CachingIndexQueryRestrictionProcessor implements IIndexQueryRestric
 		try {
 			// setting marker method to point to Object.toString()
 			markerMethod = Object.class.getMethod("toString", new Class[0]);
-		} catch (SecurityException e) {
-			log.error(e.getMessage(), e);
-		} catch (NoSuchMethodException e) {
-			log.error(e.getMessage(), e);
+		} catch (Exception e) {
+			throw new IllegalStateException("Method toString() can not be found", e);
 		}
 	}
 

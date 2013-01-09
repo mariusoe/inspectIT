@@ -219,7 +219,7 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 	 * 
 	 * @author Stefan Siegl
 	 */
-	private final class HttpDataTableViewerComparator extends TableViewerComparator<HttpTimerData> {
+	private static final class HttpDataTableViewerComparator extends TableViewerComparator<HttpTimerData> {
 
 		@Override
 		protected int compareElements(Viewer viewer, HttpTimerData timer1, HttpTimerData timer2) {

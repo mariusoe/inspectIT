@@ -18,8 +18,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * The import license handler which takes care of opening a file select dialog
- * and send the content of the file as byte[] to LicenseService.
+ * The import license handler which takes care of opening a file select dialog and send the content
+ * of the file as byte[] to LicenseService.
  * 
  * @author Patrice Bouillet
  * @author Dirk Maucher
@@ -28,12 +28,12 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * @see org.eclipse.core.commands.AbstractHandler
  */
 public class ImportLicenseHandler extends AbstractHandler {
-	
+
 	/**
 	 * Command name.
 	 */
 	public static final String COMMAND = "info.novatec.inspectit.rcp.commands.importLicense";
-	
+
 	/**
 	 * Input name.
 	 */
@@ -65,7 +65,9 @@ public class ImportLicenseHandler extends AbstractHandler {
 				return null;
 			} finally {
 				try {
-					licenseFileInputStream.close();
+					if (null != licenseFileInputStream) {
+						licenseFileInputStream.close();
+					}
 				} catch (IOException e) {
 					// we do not care about this exception
 				}

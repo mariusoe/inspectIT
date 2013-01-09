@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -101,7 +102,7 @@ public class StatementStorage {
 		String[] params = parameterMap.get(object);
 		if (null != params) {
 			if (LOGGER.isLoggable(Level.FINER)) {
-				LOGGER.finer("Return preparded sql statement parameters: " + params);
+				LOGGER.finer("Return preparded sql statement parameters: " + Arrays.toString(params));
 			}
 
 			List<String> paramList = new ArrayList<String>(params.length);

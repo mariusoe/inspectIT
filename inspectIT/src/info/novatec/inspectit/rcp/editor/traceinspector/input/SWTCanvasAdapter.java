@@ -88,7 +88,7 @@ public class SWTCanvasAdapter implements CanvasAdapter {
 	}
 
 	@Override
-	public Rectangle getArea() {
+	public synchronized Rectangle getArea() {
 		org.eclipse.swt.graphics.Rectangle r = gc.getClipping();
 		Rectangle rect = new Rectangle(r.x, r.y, r.width, r.height);
 		return rect;

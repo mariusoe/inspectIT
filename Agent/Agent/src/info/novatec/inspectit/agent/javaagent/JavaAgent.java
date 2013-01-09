@@ -442,6 +442,9 @@ public class JavaAgent implements ClassFileTransformer {
 					selfFirstClasses.add(jarEntry.getName().replaceAll("/", "\\.").replace(".class", ""));
 				}
 			}
+			if (null != jarFile) {
+				jarFile.close();
+			}
 		}
 
 		/**

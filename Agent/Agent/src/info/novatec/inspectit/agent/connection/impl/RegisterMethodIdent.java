@@ -24,8 +24,8 @@ public class RegisterMethodIdent extends AbstractRemoteMethodCall {
 	private final Remote registrationService;
 
 	/**
-	 * The sensor configuration which holds all the information about the sensor
-	 * used for the registering process.
+	 * The sensor configuration which holds all the information about the sensor used for the
+	 * registering process.
 	 */
 	private final RegisteredSensorConfig rsc;
 
@@ -35,10 +35,9 @@ public class RegisterMethodIdent extends AbstractRemoteMethodCall {
 	private final long platformId;
 
 	/**
-	 * The only constructor for this class accepts two attributes. The first one
-	 * is the {@link Remote} object, which will be used to send the data. The
-	 * second one is the sensor configuration which holds the data used for the
-	 * registration.
+	 * The only constructor for this class accepts two attributes. The first one is the
+	 * {@link Remote} object, which will be used to send the data. The second one is the sensor
+	 * configuration which holds the data used for the registration.
 	 * 
 	 * @param registrationService
 	 *            The {@link Remote} object.
@@ -66,7 +65,7 @@ public class RegisterMethodIdent extends AbstractRemoteMethodCall {
 	protected Object performRemoteCall(Remote remoteObject) throws RemoteException {
 		IRegistrationService reg = (IRegistrationService) remoteObject;
 
-		return new Long(reg.registerMethodIdent(platformId, rsc.getTargetPackageName(), rsc.getTargetClassName(), rsc.getTargetMethodName(), rsc.getParameterTypes(), rsc.getReturnType(), rsc
+		return Long.valueOf(reg.registerMethodIdent(platformId, rsc.getTargetPackageName(), rsc.getTargetClassName(), rsc.getTargetMethodName(), rsc.getParameterTypes(), rsc.getReturnType(), rsc
 				.getModifiers()));
 	}
 }

@@ -131,11 +131,16 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 		E aggData = map.get(cacheHash);
 		if (null == aggData) {
 			aggData = clone(timerData, alteredTimestamp);
-			map.put(cacheHash, aggData);
-			queue.add(aggData);
-			int count = elementCount.incrementAndGet();
-			if (maxElements < count) {
-				this.writeOldest();
+			E insertedData = map.putIfAbsent(cacheHash, aggData);
+			// if put happened null will be returned
+			if (null == insertedData) {
+				queue.add(aggData);
+				int count = elementCount.incrementAndGet();
+				if (maxElements < count) {
+					this.writeOldest();
+				}
+			} else {
+				aggData = insertedData;
 			}
 		}
 		aggData.aggregateTimerData(timerData);

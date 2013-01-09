@@ -309,6 +309,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 			}
 			break;
 		default:
+			break;
 		}
 	}
 
