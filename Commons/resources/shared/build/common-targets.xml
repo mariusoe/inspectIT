@@ -175,7 +175,7 @@
 
 		<echo message="Analyse Code with tool: FindBugs" level="info" />
 		<mkdir dir="${build.qa.analysis.findbugs}" />
-		<findbugs output="xml:withMessages" classpath="${findbugs.classpath}" includefilter="${findbugs.config.include}" excludefilter="${findbugs.config.exclude}" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="findbugs.jar">
+		<findbugs output="xml:withMessages" classpath="${findbugs.classpath}" includefilter="${findbugs.config.include}" excludefilter="${findbugs.config.exclude}" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="findbugs.jar" warningsProperty="findbugsFailure">
 			<sourcePath path="${findbugs.sourcepath}" />
 			<class location="${findbugs.classlocation}" />
 			<auxClasspath>
@@ -183,6 +183,7 @@
 			</auxClasspath>
 		</findbugs>
 		<xslt in="${build.qa.analysis.findbugs}/findbugs.xml" style="${findbugs.config.fancy-hist}" out="${build.qa.analysis}/findbugs.html" />
+		<fail if="findbugsFailure" message="Findbugs has found warnings. Build will fail. For more information on warnings relate to the file ${build.qa.analysis}/findbugs.html."/>
 	</target>
 
 
