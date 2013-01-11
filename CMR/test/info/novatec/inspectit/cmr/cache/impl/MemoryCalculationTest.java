@@ -48,6 +48,7 @@ import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
  * @author Ivan Senic
  * 
  */
+@SuppressWarnings("PMD")
 public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 
 	/**

@@ -6,6 +6,7 @@ import info.novatec.inspectit.agent.analyzer.impl.SimpleMatchPattern;
 
 import org.testng.annotations.Test;
 
+@SuppressWarnings("PMD")
 public class SimpleMatchPatternTest {
 
 	@Test

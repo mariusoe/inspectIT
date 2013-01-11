@@ -19,6 +19,7 @@ import org.testng.annotations.Test;
  * 
  * @author Stefan Siegl
  */
+@SuppressWarnings("PMD")
 public class HttpDataAggregatorTest extends AbstractTestNGLogSupport {
 
 	@Test

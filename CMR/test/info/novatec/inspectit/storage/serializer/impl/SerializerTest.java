@@ -85,6 +85,7 @@ import com.esotericsoftware.kryo.io.Output;
  * @author Ivan Senic
  * 
  */
+@SuppressWarnings("PMD")
 public class SerializerTest {
 
 	/**

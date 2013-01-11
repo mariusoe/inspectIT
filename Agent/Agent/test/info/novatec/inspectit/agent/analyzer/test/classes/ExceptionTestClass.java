@@ -6,6 +6,7 @@ package info.novatec.inspectit.agent.analyzer.test.classes;
  * @author Eduard Tudenhoefner
  * 
  */
+@SuppressWarnings("PMD")
 public class ExceptionTestClass {
 
 	public void throwsAndHandlesException() {

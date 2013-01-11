@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pmd>
-    <workingSet>Sources</workingSet>
     <useProjectRuleSet>true</useProjectRuleSet>
     <ruleSetFile>shared/config/pmd/pmd_rules.xml</ruleSetFile>
     <includeDerivedFiles>false</includeDerivedFiles>

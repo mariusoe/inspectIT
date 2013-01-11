@@ -36,6 +36,7 @@ import org.testng.annotations.Test;
  * @author Ivan Senic
  * 
  */
+@SuppressWarnings("PMD")
 public class ChannelManagersTest extends AbstractTestNGLogSupport {
 
 	/**

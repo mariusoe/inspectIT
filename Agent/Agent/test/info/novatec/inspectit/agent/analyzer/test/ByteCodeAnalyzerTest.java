@@ -50,6 +50,7 @@ import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("PMD")
 public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 
 	@Mock

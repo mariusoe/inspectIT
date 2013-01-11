@@ -52,6 +52,7 @@ import de.schlichtherle.license.LicenseContentException;
  * @author Ivan Senic
  * 
  */
+@SuppressWarnings("PMD")
 public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 
 	/**

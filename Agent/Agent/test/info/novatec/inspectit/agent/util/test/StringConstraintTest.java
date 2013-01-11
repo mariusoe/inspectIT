@@ -19,6 +19,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("PMD")
 public class StringConstraintTest extends AbstractLogSupport {
 
 	private StringConstraint constraint;

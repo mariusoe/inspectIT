@@ -11,6 +11,7 @@ import info.novatec.inspectit.util.WeakList;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("PMD")
 public class WeakListTest {
 
 	private WeakList<Object> weakList;

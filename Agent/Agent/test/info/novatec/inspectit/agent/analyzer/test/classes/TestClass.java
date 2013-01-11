@@ -6,6 +6,7 @@ package info.novatec.inspectit.agent.analyzer.test.classes;
  * @author Patrice Bouillet
  * 
  */
+@SuppressWarnings("PMD")
 public class TestClass extends AbstractSubTest {
 
 	public TestClass() {

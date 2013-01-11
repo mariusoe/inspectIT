@@ -37,6 +37,7 @@ import org.testng.annotations.Test;
  * 
  */
 @ContextConfiguration(locations = { "classpath:spring/spring-context-global.xml", "classpath:spring/spring-context-database.xml" })
+@SuppressWarnings("PMD")
 public class MethodSensorDefinitionDataDaoTest extends AbstractTransactionalTestNGLogSupport {
 
 	/**

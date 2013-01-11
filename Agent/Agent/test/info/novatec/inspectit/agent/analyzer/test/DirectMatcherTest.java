@@ -31,6 +31,7 @@ import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("PMD")
 public class DirectMatcherTest extends MockInit {
 
 	@Mock

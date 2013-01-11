@@ -20,6 +20,7 @@ import org.testng.annotations.Test;
  * @author Stefan Siegl
  * 
  */
+@SuppressWarnings("PMD")
 public class StatementStorageTest extends AbstractLogSupport {
 
 	@Override

@@ -22,6 +22,7 @@ import java.util.List;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("PMD")
 public class TimeframeDividerTest {
 
 	/**

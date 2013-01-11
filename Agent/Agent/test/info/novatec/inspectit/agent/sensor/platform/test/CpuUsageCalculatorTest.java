@@ -18,6 +18,7 @@ import org.testng.annotations.Test;
 
 import com.sun.management.OperatingSystemMXBean;
 
+@SuppressWarnings("PMD")
 public class CpuUsageCalculatorTest extends AbstractLogSupport {
 
 	@Mock

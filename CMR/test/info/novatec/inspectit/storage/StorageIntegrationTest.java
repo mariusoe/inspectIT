@@ -54,6 +54,7 @@ import com.esotericsoftware.kryo.io.Input;
  */
 @ContextConfiguration(locations = { "classpath:spring/spring-context-global.xml", "classpath:spring/spring-context-database.xml", "classpath:spring/spring-context-beans.xml",
 		"classpath:spring/spring-context-storage-test.xml" })
+@SuppressWarnings("PMD")
 public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSupport {
 
 	/**
