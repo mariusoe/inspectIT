@@ -1,7 +1,6 @@
 package info.novatec.inspectit.rcp.tester;
 
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.model.storage.StorageLeaf;
 import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.storage.InspectITStorageManager;
 import info.novatec.inspectit.storage.StorageData;
@@ -10,7 +9,8 @@ import info.novatec.inspectit.storage.StorageData.StorageState;
 import org.eclipse.core.expressions.PropertyTester;
 
 /**
- * Testing the state of storage. Works if reciever is {@link StorageData} or {@link StorageLeaf}.
+ * Testing the state of storage. Works if reciever is {@link StorageData} or
+ * {@link info.novatec.inspectit.rcp.model.storage.StorageLeaf}.
  * 
  * @author Ivan Senic
  * 

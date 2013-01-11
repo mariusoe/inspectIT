@@ -1,7 +1,6 @@
 package info.novatec.inspectit.rcp.storage.util;
 
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
-import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
 import java.io.File;
 import java.io.IOException;
@@ -98,7 +97,7 @@ public class DataUploader {
 	 * Returns the URI of the server in format 'http://ip:port'.
 	 * 
 	 * @param repositoryDefinition
-	 *            {@link RepositoryDefinition}.
+	 *            {@link CmrRepositoryDefinition}.
 	 * @return URI as string.
 	 */
 	private String getServerUri(CmrRepositoryDefinition repositoryDefinition) {

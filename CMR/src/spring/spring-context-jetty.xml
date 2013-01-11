@@ -131,23 +131,6 @@
 	</bean>
 	<!-- END -->
 
-	<!-- Combined Metrics Data Access Service -->
-	<bean name="combinedMetricsDataAccessRequestHandlerServlet"
-		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
-	</bean>
-
-	<bean id="combinedMetricsDataAccessServletHolder" class="org.mortbay.jetty.servlet.ServletHolder">
-		<property name="name" value="combinedMetricsDataAccessServiceExporter" />
-		<property name="servlet"
-			ref="combinedMetricsDataAccessRequestHandlerServlet" />
-	</bean>
-
-	<bean id="combinedMetricsDataAccessServiceMapping" class="org.mortbay.jetty.servlet.ServletMapping">
-		<property name="servletName" value="combinedMetricsDataAccessServiceExporter" />
-		<property name="pathSpec" value="/remoting/CombinedMetricsDataAccessService" />
-	</bean>
-	<!-- END -->
-
 	<!-- Server Status Access Service -->
 	<bean name="serverStatusRequestHandlerServlet"
 		class="org.springframework.web.context.support.HttpRequestHandlerServlet">
@@ -346,7 +329,6 @@
 				<ref bean="sqlDataAccessServletHolder" />
 				<ref bean="exceptionDataAccessServletHolder" />
 				<ref bean="invocationDataAccessServletHolder" />
-				<ref bean="combinedMetricsDataAccessServletHolder" />
 				<ref bean="serverStatusServletHolder" />
 				<ref bean="licenseServletHolder" />
 				<ref bean="configurationInterfaceDataAccessServletHolder" />
@@ -364,7 +346,6 @@
 				<ref bean="sqlDataAccessServiceMapping" />
 				<ref bean="exceptionDataAccessServiceMapping" />
 				<ref bean="invocationDataAccessServiceMapping" />
-				<ref bean="combinedMetricsDataAccessServiceMapping" />
 				<ref bean="serverStatusServiceMapping" />
 				<ref bean="licenseServiceMapping" />
 				<ref bean="configurationInterfaceDataAccessServiceMapping" />

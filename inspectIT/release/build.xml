@@ -172,7 +172,7 @@
 	<!-- *************************************************************** -->
 
 	<!--  It depends on the release target, because we need the compiled class files from the PDE Build-->
-	<target name="functional-tests" depends="release, init-functional-tests">
+	<target name="functional-tests" depends="pdebuild, init-functional-tests">
 		<mkdir dir="${build.qa.test.testdata}" />
 		<mkdir dir="${build.test.classes}" />
 
@@ -242,7 +242,7 @@
 
 
 	<!--  It depends on the release target, because we need the compiled class files from the PDE Build-->
-	<target name="static-analysis" depends="release">
+	<target name="static-analysis" depends="pdebuild">
 		<!-- Call PDM -->
 		<fileset dir="${src.root}" includes="**/*.java" id="pmd.fileset" />
 		<antcall target="pmd" inheritrefs="true" />
@@ -255,10 +255,8 @@
 		<property name="findbugs.sourcepath" value="${src.root}" />
 		<property name="findbugs.classlocation" value="${buildDirectory}/plugins/info.novatec.inspectit.rcp/@dot" />
 		<path id="findbugs.path">
-			<pathelement path="${build.commons.classes}" />
-			<pathelement path="${build.commonscs.classes}" />
-			<path refid="lib.osgi" />
-			<path refid="lib.test" />
+			<fileset dir="${buildDirectory}/plugins" includes="**/*.class,**/*.jar" excludes="**/info.novatec.inspectit.rcp/**"/>
+			<fileset dir="${base}/eclipse/plugins" includes="**/*.jar" />
 		</path>
 		<antcall target="findbugs" inheritrefs="true" />
 
@@ -274,8 +272,7 @@
 	<!-- This target actually executes the PDE Build process by  		 -->
 	<!-- launching the Eclipse antRunner application.     				 -->
 	<!-- *************************************************************** -->
-	<target name="release" depends="init">
-		<mkdir dir="${basedir}/dist" />
+	<target name="pdebuild" depends="init">
 		<echo message="Executing ${eclipseLocation}/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
 			<arg value="-application" />
@@ -289,13 +286,17 @@
 			</classpath>
 		</java>
 
-		<copy todir="${basedir}/dist">
-			<fileset dir="${buildDirectory}/${buildLabel}" includes="*.zip" />
-		</copy>
-
 		<!--  Need to copy the compiled class files in order to later be used by the functional-tests and static-analysis targets -->
 		<copy todir="${build.rcp.classes}">
 			<fileset dir="${buildDirectory}/plugins/info.novatec.inspectit.rcp/@dot" includes="**/*.class" />
+		</copy>
+	</target>
+
+	<target name="release" depends="pdebuild">
+		<!-- Copy PDE build artifacts to our dist folder -->
+		<mkdir dir="${basedir}/dist" />
+		<copy todir="${basedir}/dist">
+			<fileset dir="${buildDirectory}/${buildLabel}" includes="*.zip" />
 		</copy>
 
 		<!-- integrate the thirdparty contributions to the release -->

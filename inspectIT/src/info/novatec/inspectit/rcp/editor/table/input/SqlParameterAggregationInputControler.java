@@ -3,7 +3,6 @@ package info.novatec.inspectit.rcp.editor.table.input;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.InspectITConstants;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
@@ -91,7 +90,8 @@ public class SqlParameterAggregationInputControler extends AbstractTableInputCon
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in {@link InspectITConstants}.
+		 *            The name of the image. Names are defined in
+		 *            {@link info.novatec.inspectit.rcp.InspectITConstants}.
 		 */
 		private Column(String name, int width, String imageName) {
 			this.name = name;

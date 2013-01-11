@@ -4,7 +4,6 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
 import info.novatec.inspectit.indexing.storage.impl.StorageDescriptor;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
-import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
@@ -371,7 +370,7 @@ public class DataRetriever {
 	 * Returns the URI of the server in format 'http://ip:port'.
 	 * 
 	 * @param repositoryDefinition
-	 *            {@link RepositoryDefinition}.
+	 *            {@link CmrRepositoryDefinition}.
 	 * @return URI as string.
 	 */
 	private String getServerUri(CmrRepositoryDefinition repositoryDefinition) {

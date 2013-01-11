@@ -10,13 +10,17 @@ import org.jfree.chart.axis.DateAxis;
  * @author Patrice Bouillet
  * 
  */
-@SuppressWarnings("serial")
 public class DateAxisZoomNotify extends DateAxis {
+
+	/**
+	 * Generated UID.
+	 */
+	private static final long serialVersionUID = 2365282634625595024L;
 
 	/**
 	 * The registered listeners.
 	 */
-	private ListenerList zoomListeners = new ListenerList();
+	private transient ListenerList zoomListeners = new ListenerList();
 
 	/**
 	 * Adds a zoom listener.

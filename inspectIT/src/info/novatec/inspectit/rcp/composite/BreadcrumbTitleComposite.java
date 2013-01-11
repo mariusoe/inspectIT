@@ -1,7 +1,6 @@
 package info.novatec.inspectit.rcp.composite;
 
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.editor.root.FormRootEditor;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryChangeListener;
@@ -31,7 +30,8 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.forms.FormColors;
 
 /**
- * A composite to be the head client of the form that {@link FormRootEditor} is made of.
+ * A composite to be the head client of the form that
+ * {@link info.novatec.inspectit.rcp.editor.root.FormRootEditor} is made of.
  * 
  * @author Ivan Senic
  * 

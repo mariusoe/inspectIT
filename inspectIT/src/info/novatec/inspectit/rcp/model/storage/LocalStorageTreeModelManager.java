@@ -4,7 +4,6 @@ import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.Composite;
 import info.novatec.inspectit.rcp.model.Leaf;
-import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
@@ -51,10 +50,11 @@ public class LocalStorageTreeModelManager {
 
 	/**
 	 * Returns objects divided either by the provided label class, or by
-	 * {@link CmrRepositoryDefinition} they are located to.
+	 * {@link info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition} they are located to.
 	 * 
 	 * @return Returns objects divided either by the provided label class, or by
-	 *         {@link CmrRepositoryDefinition} they are located to.
+	 *         {@link info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition} they are
+	 *         located to.
 	 */
 	public Object[] getRootObjects() {
 		if (CollectionUtils.isEmpty(localStorageDataCollection)) {

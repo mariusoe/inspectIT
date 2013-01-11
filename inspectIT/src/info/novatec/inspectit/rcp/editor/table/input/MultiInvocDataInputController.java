@@ -2,7 +2,6 @@ package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
-import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
@@ -22,8 +21,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * This vew only displays the {@link TimerData} that are in the invocations provided by the
- * invocationIdsList to this view via the {@link InputDefinition#getAdditionalOption(Object)}.
+ * This vew only displays the {@link info.novatec.inspectit.communication.data.TimerData} that are
+ * in the invocations provided by the invocationIdsList to this view via the
+ * {@link InputDefinition#getAdditionalOption(Object)}.
  * 
  * @author Ivan Senic
  * 

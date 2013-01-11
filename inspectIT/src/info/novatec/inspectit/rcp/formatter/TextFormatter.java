@@ -27,7 +27,6 @@ import info.novatec.inspectit.storage.label.type.impl.RatingLabelType;
 import info.novatec.inspectit.storage.label.type.impl.StatusLabelType;
 import info.novatec.inspectit.storage.label.type.impl.UseCaseLabelType;
 
-import java.sql.SQLClientInfoException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -438,7 +437,7 @@ public final class TextFormatter {
 	}
 
 	/**
-	 * Returns formated {@link String} for the {@link SQLClientInfoException} parameter values list.
+	 * Returns formated {@link String} for the {@link SqlStatementData} parameter values list.
 	 * <p>
 	 * Elements that are <code>null</code> in the list will be printed as '?'.
 	 * 

@@ -243,6 +243,8 @@ Mozilla Public License (MPL), 1.1 : javassist (3.16.1.GA) : google-guava (14.0-r
 
 	<target name="release-all" depends="release-sun1.5" description="--> releases the agent for all versions" />
 
+	<target name="release-and-analyze" depends="static-analysis, functional-tests, release-all" description="--> Calls the release target and then executes the static analysis with the functional tests" />
+
 	<target name="integrate-version-information" description="This target creates a version.log file in the commons directory.">
 		<property environment="env" />
 		<property name="version" value="${env.RELEASE_VERSION}.${env.BUILD_NUMBER}" />

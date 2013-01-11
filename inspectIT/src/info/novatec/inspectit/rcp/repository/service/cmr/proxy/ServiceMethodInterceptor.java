@@ -5,7 +5,6 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.service.cmr.ICmrService;
 
-import java.lang.reflect.Method;
 import java.net.ConnectException;
 import java.util.Collections;
 import java.util.List;
@@ -108,9 +107,9 @@ public class ServiceMethodInterceptor implements MethodInterceptor {
 	}
 
 	/**
-	 * Checks if the return type of the {@link Method} invoked by {@link MethodInvocation} is one of
-	 * tree major collection types (List, Map, Set) and if it is returns the empty collection of
-	 * correct type. Otherwise it returns null.
+	 * Checks if the return type of the {@link java.lang.reflect.Method} invoked by
+	 * {@link MethodInvocation} is one of tree major collection types (List, Map, Set) and if it is
+	 * returns the empty collection of correct type. Otherwise it returns null.
 	 * 
 	 * @param paramMethodInvocation
 	 *            {@link MethodInvocation}

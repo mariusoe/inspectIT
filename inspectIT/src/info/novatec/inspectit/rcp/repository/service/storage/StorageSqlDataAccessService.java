@@ -2,7 +2,6 @@ package info.novatec.inspectit.rcp.repository.service.storage;
 
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.communication.data.SqlStatementData;
-import info.novatec.inspectit.indexing.aggregation.IAggregator;
 import info.novatec.inspectit.indexing.aggregation.impl.SqlStatementDataAggregator;
 import info.novatec.inspectit.indexing.query.factory.impl.SqlStatementDataQueryFactory;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
@@ -26,8 +25,8 @@ public class StorageSqlDataAccessService extends AbstractStorageService<SqlState
 	private static final SqlStatementDataAggregator SQL_STATEMENT_DATA_AGGREGATOR = new SqlStatementDataAggregator(false);
 
 	/**
-	 * {@link IAggregator} used for {@link SqlStatementData} when parameters are included in
-	 * aggregation.
+	 * {@link info.novatec.inspectit.indexing.aggregation.IAggregator} used for
+	 * {@link SqlStatementData} when parameters are included in aggregation.
 	 */
 	private static final SqlStatementDataAggregator SQL_STATEMENT_DATA_PARAMETER_AGGREGATOR = new SqlStatementDataAggregator(true, true);
 
