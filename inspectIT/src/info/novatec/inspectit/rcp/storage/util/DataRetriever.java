@@ -156,6 +156,7 @@ public class DataRetriever {
 				HttpEntity entity = response.getEntity();
 				if (MultipartEntityUtil.isMultipart(entity)) {
 					inputStream = entity.getContent();
+					@SuppressWarnings("deprecation")
 					// all non-deprecated constructors have default modifier
 					MultipartStream multipartStream = new MultipartStream(inputStream, MultipartEntityUtil.getBoundary(entity).getBytes());
 					ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

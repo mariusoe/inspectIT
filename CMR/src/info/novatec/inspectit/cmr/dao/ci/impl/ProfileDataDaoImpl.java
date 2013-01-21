@@ -4,6 +4,8 @@ import info.novatec.inspectit.cmr.dao.ci.ProfileDataDao;
 import info.novatec.inspectit.communication.data.ci.ProfileData;
 import info.novatec.inspectit.communication.exception.EntityNotFoundException;
 
+import java.util.Collection;
+
 import org.hibernate.FetchMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
@@ -64,6 +66,7 @@ public class ProfileDataDaoImpl extends HibernateDaoSupport implements ProfileDa
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	public ProfileData getProfile(long profileId) {
 		DetachedCriteria profileDataCriteria = DetachedCriteria.forClass(ProfileData.class);
 		profileDataCriteria.add(Restrictions.eq("id", profileId));
@@ -72,7 +75,7 @@ public class ProfileDataDaoImpl extends HibernateDaoSupport implements ProfileDa
 		profileDataCriteria.setFetchMode("platformSensorDefinitions", FetchMode.JOIN);
 		profileDataCriteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
 
-		return (ProfileData) DataAccessUtils.uniqueResult(getHibernateTemplate().findByCriteria(profileDataCriteria));
+		return (ProfileData) DataAccessUtils.uniqueResult((Collection<ProfileData>) getHibernateTemplate().findByCriteria(profileDataCriteria));
 	}
 
 	/**

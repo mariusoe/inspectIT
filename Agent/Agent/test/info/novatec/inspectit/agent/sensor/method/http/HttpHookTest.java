@@ -14,6 +14,7 @@ import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.util.Timer;
 
 import java.lang.management.ThreadMXBean;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.collections.MapUtils;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -84,11 +86,9 @@ public class HttpHookTest extends AbstractLogSupport {
 		when(threadMXBean.isThreadCpuTimeEnabled()).thenReturn(true);
 		when(threadMXBean.isThreadCpuTimeSupported()).thenReturn(true);
 
-		httpHook = new HttpHook(timer, idManager, new HashMap<String, Object>() {
-			{
-				put("sessioncapture", "true");
-			}
-		}, threadMXBean);
+		Map<String, Object> map = new HashMap<String, Object>();
+		MapUtils.putAll(map, new String[][] { { "sessioncapture", "true" } });
+		httpHook = new HttpHook(timer, idManager, map, threadMXBean);
 	}
 
 	@Test
@@ -133,47 +133,31 @@ public class HttpHookTest extends AbstractLogSupport {
 		final String param2VReal2 = "value6";
 		final String[] param1V = new String[] { param1VReal };
 		final String[] param2V = new String[] { param2VReal1, param2VReal2 };
-		final Map<String, String[]> parameterMap = new HashMap<String, String[]>() {
-			{
-				put(param1, param1V);
-				put(param2, param2V);
-			}
-		};
+		final Map<String, String[]> parameterMap = new HashMap<String, String[]>();
+		MapUtils.putAll(parameterMap, new Object[][] { { param1, param1V }, { param2, param2V } });
 
 		final String att1 = "a1";
 		final String att2 = "a2";
 		final String att1Value = "aValue1";
 		final String att2Value = "aValue2";
-		final Vector<String> attributesList = new Vector<String>() {
-			{
-				add(att1);
-				add(att2);
-			}
-		};
+		final Vector<String> attributesList = new Vector<String>();
+		Collections.addAll(attributesList, att1, att2);
 		final Enumeration<String> attributes = attributesList.elements();
 
 		final String h1 = "h1";
 		final String h2 = "h2";
 		final String h1Value = "hValue1";
 		final String h2Value = "hValue2";
-		final Vector<String> headersList = new Vector<String>() {
-			{
-				add(h1);
-				add(h2);
-			}
-		};
+		final Vector<String> headersList = new Vector<String>();
+		Collections.addAll(headersList, h1, h2);
 		final Enumeration<String> headers = headersList.elements();
 
 		final String sa1 = "sa1";
 		final String sa2 = "sa2";
 		final String sa1Value = "saValue1";
 		final String sa2Value = "saValue2";
-		final Vector<String> sessionAttributesList = new Vector<String>() {
-			{
-				add(sa1);
-				add(sa2);
-			}
-		};
+		final Vector<String> sessionAttributesList = new Vector<String>();
+		Collections.addAll(sessionAttributesList, sa1, sa2);
 		final Enumeration<String> sessionAttributes = sessionAttributesList.elements();
 
 		Double firstTimerValue = 1000.453d;
@@ -185,30 +169,19 @@ public class HttpHookTest extends AbstractLogSupport {
 		HttpTimerData tmp = new HttpTimerData(null, platformId, registeredSensorTypeId, registeredMethodId);
 		tmp.setRequestMethod(method);
 		tmp.setUri(uri);
-		tmp.setAttributes(new HashMap<String, String>() {
-			{
-				put(att1, att1Value);
-				put(att2, att2Value);
-			}
-		});
-		tmp.setParameters(new HashMap<String, String[]>() {
-			{
-				put(param1, param1V);
-				put(param2, param2V);
-			}
-		});
-		tmp.setHeaders(new HashMap<String, String>() {
-			{
-				put(h1, h1Value);
-				put(h2, h2Value);
-			}
-		});
-		tmp.setSessionAttributes(new HashMap<String, String>() {
-			{
-				put(sa1, sa1Value);
-				put(sa2, sa2Value);
-			}
-		});
+		Map<String, String> attributeMap = new HashMap<String, String>();
+		MapUtils.putAll(attributeMap, new Object[][] { { att1, att1Value }, { att2, att2Value } });
+		tmp.setAttributes(attributeMap);
+
+		tmp.setParameters(parameterMap);
+
+		Map<String, String> headerMap = new HashMap<String, String>();
+		MapUtils.putAll(headerMap, new Object[][] { { h1, h1Value }, { h2, h2Value } });
+		tmp.setHeaders(headerMap);
+
+		Map<String, String> sessionAtrMap = new HashMap<String, String>();
+		MapUtils.putAll(sessionAtrMap, new Object[][] { { sa1, sa1Value }, { sa2, sa2Value } });
+		tmp.setSessionAttributes(sessionAtrMap);
 		MethodSensorData data = tmp;
 
 		when(timer.getCurrentTime()).thenReturn(firstTimerValue).thenReturn(secondTimerValue);
@@ -253,8 +226,6 @@ public class HttpHookTest extends AbstractLogSupport {
 
 		Long firstCpuTimerValue = 5000L;
 		Long secondCpuTimerValue = 6872L;
-
-		MethodSensorData data = new HttpTimerData(null, platformId, registeredSensorTypeId, registeredMethodId);
 
 		when(timer.getCurrentTime()).thenReturn(firstTimerValue).thenReturn(secondTimerValue);
 

@@ -176,7 +176,7 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 		unregisteredSensorConfigs.add(unregisteredSensorConfig);
 		when(configurationStorage.getUnregisteredSensorConfigs()).thenReturn(unregisteredSensorConfigs);
 
-		byte[] instrumentedByteCode = byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
+		byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
 
 		ArgumentCaptor<RegisteredSensorConfig> capturedRegisteredSensorConfig = ArgumentCaptor.forClass(RegisteredSensorConfig.class);
 		Mockito.verify(hookInstrumenter).addMethodHook(Mockito.any(CtMethod.class), capturedRegisteredSensorConfig.capture());
@@ -229,7 +229,7 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 		unregisteredSensorConfigs.add(unregisteredSensorConfig);
 		when(configurationStorage.getUnregisteredSensorConfigs()).thenReturn(unregisteredSensorConfigs);
 
-		byte[] instrumentedByteCode = byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
+		byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
 
 		ArgumentCaptor<RegisteredSensorConfig> capturedRegisteredSensorConfig = ArgumentCaptor.forClass(RegisteredSensorConfig.class);
 		Mockito.verify(hookInstrumenter).addMethodHook(Mockito.any(CtMethod.class), capturedRegisteredSensorConfig.capture());
@@ -283,7 +283,7 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 		unregisteredSensorConfigs.add(unregisteredSensorConfig);
 		when(configurationStorage.getUnregisteredSensorConfigs()).thenReturn(unregisteredSensorConfigs);
 
-		byte[] instrumentedByteCode = byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
+		byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
 
 		ArgumentCaptor<RegisteredSensorConfig> capturedRegisteredSensorConfig = ArgumentCaptor.forClass(RegisteredSensorConfig.class);
 		Mockito.verify(hookInstrumenter).addMethodHook(Mockito.any(CtMethod.class), capturedRegisteredSensorConfig.capture());

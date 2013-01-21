@@ -57,7 +57,6 @@ public class PlatformSensorTypeIdentDaoImpl extends HibernateDaoSupport implemen
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	public List<PlatformSensorTypeIdent> findAll() {
 		return getHibernateTemplate().loadAll(PlatformSensorTypeIdent.class);
 	}

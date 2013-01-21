@@ -11,6 +11,7 @@ import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.util.StringConstraint;
 
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +21,7 @@ import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.collections.MapUtils;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
@@ -40,11 +42,7 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {
-		extractor = new HttpRequestParameterExtractor(new StringConstraint(new HashMap<String, Object>() {
-			{
-				put("stringLength", "20");
-			}
-		}));
+		extractor = new HttpRequestParameterExtractor(new StringConstraint(Collections.<String, Object> singletonMap("stringLength", "20")));
 	}
 
 	@Test
@@ -56,12 +54,8 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 		final String param2VReal2 = "value6";
 		final String[] param1V = new String[] { param1VReal };
 		final String[] param2V = new String[] { param2VReal1, param2VReal2 };
-		final Map<String, String[]> parameterMap = new HashMap<String, String[]>() {
-			{
-				put(param1, param1V);
-				put(param2, param2V);
-			}
-		};
+		final Map<String, String[]> parameterMap = new HashMap<String, String[]>();
+		MapUtils.putAll(parameterMap, new Object[][] { { param1, param1V }, { param2, param2V } });
 
 		when(httpServletRequest.getParameterMap()).thenReturn(parameterMap);
 
@@ -87,12 +81,9 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 		final String h2 = "h2";
 		final String h1Value = "hValue1";
 		final String h2Value = "hValue2";
-		final Vector<String> headersList = new Vector<String>() {
-			{
-				add(h1);
-				add(h2);
-			}
-		};
+		final Vector<String> headersList = new Vector<String>();
+		Collections.addAll(headersList, h1, h2);
+
 		final Enumeration<String> headers = headersList.elements();
 
 		when(httpServletRequest.getHeaderNames()).thenReturn(headers);
@@ -101,12 +92,8 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 
 		Map<String, String> result = extractor.getHeaders(httpServletRequest.getClass(), httpServletRequest);
 
-		Map<String, String> expected = new HashMap<String, String>() {
-			{
-				put(h1, h1Value);
-				put(h2, h2Value);
-			}
-		};
+		Map<String, String> expected = new HashMap<String, String>();
+		MapUtils.putAll(expected, new Object[][] { { h1, h1Value }, { h2, h2Value } });
 		assertThat(result, is(equalTo(expected)));
 
 		// We only create a new instance of the element if we need to change it (e.g. crop)
@@ -121,12 +108,9 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 		// this will be cropped!
 		final String h1Value = "hValue1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 		final String h2Value = "hValue2";
-		final Vector<String> headersList = new Vector<String>() {
-			{
-				add(h1);
-				add(h2);
-			}
-		};
+		final Vector<String> headersList = new Vector<String>();
+		Collections.addAll(headersList, h1, h2);
+
 		final Enumeration<String> headers = headersList.elements();
 
 		when(httpServletRequest.getHeaderNames()).thenReturn(headers);
@@ -155,12 +139,9 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 		final String att2 = "a2";
 		final String att1Value = "aValue1";
 		final String att2Value = "aValue2";
-		final Vector<String> attributesList = new Vector<String>() {
-			{
-				add(att1);
-				add(att2);
-			}
-		};
+		final Vector<String> attributesList = new Vector<String>();
+		Collections.addAll(attributesList, att1, att2);
+
 		final Enumeration<String> attributes = attributesList.elements();
 
 		when(httpServletRequest.getAttributeNames()).thenReturn(attributes);
@@ -170,12 +151,8 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 
 		Map<String, String> result = extractor.getAttributes(httpServletRequest.getClass(), httpServletRequest);
 
-		Map<String, String> expected = new HashMap<String, String>() {
-			{
-				put(att1, att1Value);
-				put(att2, att2Value);
-			}
-		};
+		Map<String, String> expected = new HashMap<String, String>();
+		MapUtils.putAll(expected, new Object[][] { { att1, att1Value }, { att2, att2Value } });
 
 		assertThat(result, is(equalTo(expected)));
 		// We only create a new instance of the element if we need to change it (e.g. crop)
@@ -189,12 +166,8 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 		final String att2 = "a2";
 		final String[] att1Value = { "attValue1", "attValue2", "attValue3" };
 		final String[] att2Value = { "a1", "a2", "a3" };
-		final Vector<String> attributesList = new Vector<String>() {
-			{
-				add(att1);
-				add(att2);
-			}
-		};
+		final Vector<String> attributesList = new Vector<String>();
+		Collections.addAll(attributesList, att1, att2);
 		final Enumeration<String> attributes = attributesList.elements();
 
 		when(httpServletRequest.getAttributeNames()).thenReturn(attributes);
@@ -205,12 +178,8 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 
 		final String extractedAttribute1Value = "[attValue1, attValue2, attValue3]".substring(0, 20) + "...";
 		final String extractedAttribute2Value = "[a1, a2, a3]";
-		Map<String, String> expected = new HashMap<String, String>() {
-			{
-				put(att1, extractedAttribute1Value);
-				put(att2, extractedAttribute2Value);
-			}
-		};
+		Map<String, String> expected = new HashMap<String, String>();
+		MapUtils.putAll(expected, new Object[][] { { att1, extractedAttribute1Value }, { att2, extractedAttribute2Value } });
 
 		assertThat(result, is(equalTo(expected)));
 	}
@@ -221,12 +190,9 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 		final String att2 = "a2";
 		final int[] att1Value = { 1, 2, 3 };
 		final int[] att2Value = { 2, 3, 4 };
-		final Vector<String> attributesList = new Vector<String>() {
-			{
-				add(att1);
-				add(att2);
-			}
-		};
+		final Vector<String> attributesList = new Vector<String>();
+		Collections.addAll(attributesList, att1, att2);
+
 		final Enumeration<String> attributes = attributesList.elements();
 
 		when(httpServletRequest.getAttributeNames()).thenReturn(attributes);
@@ -237,12 +203,9 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 
 		final String extractedAttribute1Value = "[1, 2, 3]";
 		final String extractedAttribute2Value = "[2, 3, 4]";
-		Map<String, String> expected = new HashMap<String, String>() {
-			{
-				put(att1, extractedAttribute1Value);
-				put(att2, extractedAttribute2Value);
-			}
-		};
+		Map<String, String> expected = new HashMap<String, String>();
+		MapUtils.putAll(expected, new Object[][] { { att1, extractedAttribute1Value }, { att2, extractedAttribute2Value } });
+
 		assertThat(result, is(equalTo(expected)));
 	}
 
@@ -302,12 +265,8 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 		final String sa2 = "sa2";
 		final String sa1Value = "saValue1";
 		final String sa2Value = "saValue2";
-		final Vector<String> sessionAttributesList = new Vector<String>() {
-			{
-				add(sa1);
-				add(sa2);
-			}
-		};
+		final Vector<String> sessionAttributesList = new Vector<String>();
+		Collections.addAll(sessionAttributesList, sa1, sa2);
 		final Enumeration<String> sessionAttributes = sessionAttributesList.elements();
 
 		HttpSession session = Mockito.mock(HttpSession.class);
@@ -317,12 +276,9 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 		when(httpServletRequest.getSession(false)).thenReturn(session);
 
 		Map<String, String> result = extractor.getSessionAttributes(httpServletRequest.getClass(), httpServletRequest);
-		Map<String, String> expected = new HashMap<String, String>() {
-			{
-				put(sa1, sa1Value);
-				put(sa2, sa2Value);
-			}
-		};
+		Map<String, String> expected = new HashMap<String, String>();
+		MapUtils.putAll(expected, new Object[][] { { sa1, sa1Value }, { sa2, sa2Value } });
+
 		assertThat(result, is(equalTo(expected)));
 	}
 
@@ -332,12 +288,8 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 		final String sa2 = "sa2";
 		final String[] sa1Value = { "saValue1", "saValue2", "saValue3" };
 		final String[] sa2Value = { "s1", "s2", "s3" };
-		final Vector<String> sessionAttributesList = new Vector<String>() {
-			{
-				add(sa1);
-				add(sa2);
-			}
-		};
+		final Vector<String> sessionAttributesList = new Vector<String>();
+		Collections.addAll(sessionAttributesList, sa1, sa2);
 		final Enumeration<String> sessionAttributes = sessionAttributesList.elements();
 
 		HttpSession session = Mockito.mock(HttpSession.class);
@@ -350,12 +302,9 @@ public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 
 		final String extractedSa1Value = "[saValue1, saValue2, saValue3]".substring(0, 20) + "...";
 		final String extractedSa2Value = "[s1, s2, s3]";
-		Map<String, String> expected = new HashMap<String, String>() {
-			{
-				put(sa1, extractedSa1Value);
-				put(sa2, extractedSa2Value);
-			}
-		};
+		Map<String, String> expected = new HashMap<String, String>();
+		MapUtils.putAll(expected, new Object[][] { { sa1, extractedSa1Value }, { sa2, extractedSa2Value } });
+
 		assertThat(result, is(equalTo(expected)));
 	}
 }

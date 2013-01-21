@@ -48,6 +48,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 	@Mock
 	private IConnection connection;
 
+	@SuppressWarnings("rawtypes")
 	@Mock
 	private IBufferStrategy bufferStrategy;
 
@@ -64,6 +65,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		return Level.OFF;
 	}
 
+	@SuppressWarnings("unchecked")
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {
 		List<ISendingStrategy> sendingStrategies = new ArrayList<ISendingStrategy>();
@@ -99,6 +101,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 	 * This method could also <b>fail</b> due to race conditions.
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Test(dependsOnMethods = { "startStop" }, enabled = false)
 	public void sendOneMethodSensorData() throws InterruptedException, ServerUnavailableException {
 		coreService.start();
@@ -132,6 +135,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 	 * This method could also <b>fail</b> due to race conditions.
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Test(dependsOnMethods = { "startStop" }, enabled = false)
 	public void sendOnePlatformSensorData() throws InterruptedException, ServerUnavailableException {
 		coreService.start();
@@ -160,6 +164,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		verifyNoMoreInteractions(bufferStrategy, connection);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test(dependsOnMethods = { "startStop" }, enabled = false)
 	public void sendOneExceptionSensorData() throws InterruptedException, ServerUnavailableException {
 		coreService.start();
@@ -193,6 +198,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 	 * This method could also <b>fail</b> due to race conditions.
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Test(dependsOnMethods = { "startStop" }, enabled = false)
 	public void sendOneObjectStorageData() throws InterruptedException, ServerUnavailableException {
 		coreService.start();
@@ -222,9 +228,10 @@ public class CoreServiceTest extends AbstractLogSupport {
 		verifyNoMoreInteractions(bufferStrategy, connection);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void verifyListListenerMethodData() {
-		ListListener listener = mock(ListListener.class);
+		ListListener<TimerData> listener = mock(ListListener.class);
 		TimerData timerData = new TimerData();
 		List<TimerData> dataList = new ArrayList<TimerData>();
 		dataList.add(timerData);
@@ -239,9 +246,10 @@ public class CoreServiceTest extends AbstractLogSupport {
 		verifyNoMoreInteractions(listener, bufferStrategy, connection, sendingStrategy);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void verifyListListenerPlatformData() {
-		ListListener listener = mock(ListListener.class);
+		ListListener<SystemSensorData> listener = mock(ListListener.class);
 		CpuInformationData cpuInformationData = new CpuInformationData();
 		List<SystemSensorData> dataList = new ArrayList<SystemSensorData>();
 		dataList.add(cpuInformationData);
@@ -256,9 +264,10 @@ public class CoreServiceTest extends AbstractLogSupport {
 		verifyNoMoreInteractions(listener, bufferStrategy, connection, sendingStrategy);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void verifyListListenerExceptionData() {
-		ListListener listener = mock(ListListener.class);
+		ListListener<ExceptionSensorData> listener = mock(ListListener.class);
 		ExceptionSensorData exceptionSensorData = new ExceptionSensorData();
 		exceptionSensorData.setThrowableType("MyException");
 		exceptionSensorData.setThrowableIdentityHashCode(1234);
@@ -276,9 +285,10 @@ public class CoreServiceTest extends AbstractLogSupport {
 		verifyNoMoreInteractions(listener, bufferStrategy, connection, sendingStrategy);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void verifyListListenerObjectStorageData() {
-		ListListener listener = mock(ListListener.class);
+		ListListener<IObjectStorage> listener = mock(ListListener.class);
 		PlainTimerStorage timerStorage = new PlainTimerStorage(null, 0, 0, 0, Collections.<ParameterContentData> emptyList());
 		List<IObjectStorage> storageList = new ArrayList<IObjectStorage>();
 		storageList.add(timerStorage);

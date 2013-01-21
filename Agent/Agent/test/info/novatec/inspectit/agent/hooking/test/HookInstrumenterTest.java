@@ -1254,6 +1254,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 	 * Inner class used to verify the contents of MyTestException objects.
 	 */
 	private static class MyTestExceptionVerifier extends ArgumentMatcher<MyTestException> {
+		@SuppressWarnings("unused")
 		private final MyTestException myTestException;
 
 		public MyTestExceptionVerifier(MyTestException myTestException) {
@@ -1291,6 +1292,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 	 * Inner class used to verify the contents of MyTestException objects.
 	 */
 	private static class ThrowableVerifier extends ArgumentMatcher<Object> {
+		@SuppressWarnings("unused")
 		private final Object exceptionObject;
 
 		public ThrowableVerifier(Object exceptionObject) {
@@ -1309,6 +1311,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 	}
 
 	private static class ObjectVerifier extends ArgumentMatcher<Object> {
+		@SuppressWarnings("unused")
 		private final Object object;
 
 		public ObjectVerifier(Object object) {

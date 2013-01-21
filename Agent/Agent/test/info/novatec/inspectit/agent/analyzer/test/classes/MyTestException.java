@@ -3,6 +3,11 @@ package info.novatec.inspectit.agent.analyzer.test.classes;
 @SuppressWarnings("PMD")
 public class MyTestException extends Exception {
 
+	/**
+	 * Generated UID.
+	 */
+	private static final long serialVersionUID = 5733336673451228795L;
+
 	public MyTestException() {
 		super();
 	}

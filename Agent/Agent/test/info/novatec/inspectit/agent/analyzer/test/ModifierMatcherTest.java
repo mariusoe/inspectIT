@@ -45,6 +45,7 @@ public class ModifierMatcherTest extends MockInit {
 		super();
 	}
 
+	@SuppressWarnings("unused")
 	private ModifierMatcherTest(int dummy) {
 		super();
 	}
@@ -66,6 +67,7 @@ public class ModifierMatcherTest extends MockInit {
 		matcher = new ModifierMatcher(classPoolAnalyzer, unregisteredSensorConfig, delegateMatcher);
 	}
 
+	@SuppressWarnings("unused")
 	private void testPrivateMethod() {
 	}
 

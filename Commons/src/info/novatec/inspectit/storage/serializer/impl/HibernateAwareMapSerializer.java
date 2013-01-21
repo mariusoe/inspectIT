@@ -36,6 +36,7 @@ public class HibernateAwareMapSerializer extends MapSerializer {
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void write(Kryo kryo, Output output, Map map) {
 		if (null != hibernateUtil) {

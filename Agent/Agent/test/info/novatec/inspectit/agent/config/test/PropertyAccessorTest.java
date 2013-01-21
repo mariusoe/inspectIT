@@ -196,7 +196,6 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		Mockito.verifyZeroInteractions(resultValueMock);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void removePropertyAccessorFromList() {
 		// create initial object relation
@@ -297,7 +296,6 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		Mockito.verifyZeroInteractions(resultValueMock);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void invokeListSizeMethod() throws PropertyAccessException {
 		// create initial object relation
@@ -327,8 +325,6 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 
 	@Test
 	public void analyzeReturnValueString() throws PropertyAccessException {
-		List<PropertyPathStart> propertyAccessorList = new ArrayList<PropertyPathStart>();
-
 		// valid
 		PropertyPathStart start = new PropertyPathStart();
 		start.setName("returnName");
@@ -342,8 +338,6 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 	public void analyzeReturnValueVoidMethod() throws PropertyAccessException {
 		// create initial object relation
 		Person peter = new Person("Peter");
-
-		List<PropertyPathStart> propertyAccessorList = new ArrayList<PropertyPathStart>();
 
 		// valid
 		PropertyPathStart start = new PropertyPathStart();
@@ -388,7 +382,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		path.setName("getName()");
 		start.setPathToContinue(path);
 
-		String result = propertyAccessor.getPropertyContent(start, peter, null, resultValueMock);
+		propertyAccessor.getPropertyContent(start, peter, null, resultValueMock);
 		Mockito.verifyZeroInteractions(resultValueMock);
 	}
 
@@ -438,7 +432,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 		// Creating concurrent access
 		Iterator<PropertyPathStart> i = propertyAccessorList.iterator();
 		// Access via iterator
-		PropertyPathStart p = i.next();
+		i.next();
 		// Direct access
 		List<ParameterContentData> parameterContentList = propertyAccessor.getParameterContentData(propertyAccessorList, peter, new Object[] { peter }, null);
 
@@ -456,6 +450,7 @@ public class PropertyAccessorTest extends AbstractLogSupport {
 
 	}
 
+	@SuppressWarnings("unused")
 	private static class Person {
 
 		private String name;

@@ -99,9 +99,9 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 				settings);
 
 		configurationStorage.addExceptionSensorTypeParameter("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor", "info.novatec.inspectit.agent.analyzer.test.classes.My*Exception", true,
-				Collections.EMPTY_MAP);
+				Collections.<String, Object> emptyMap());
 		configurationStorage.addExceptionSensorTypeParameter("info.novatec.inspectit.agent.sensor.exception.ExceptionSensor", "info.novatec.inspectit.agent.analyzer.test.classes.MyException", false,
-				Collections.EMPTY_MAP);
+				Collections.<String, Object> emptyMap());
 
 		// sending strategies
 		Map<String, String> sendingSettings = new HashMap<String, String>(1);
@@ -278,7 +278,6 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void platformSensorTypeCheck() {
 		List<PlatformSensorTypeConfig> configs = configurationStorage.getPlatformSensorTypes();
@@ -323,7 +322,6 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void exceptionSensorCheck() {
 		List<MethodSensorTypeConfig> configs = configurationStorage.getExceptionSensorTypes();
@@ -347,7 +345,6 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void exceptionSensorParameterCheck() {
 		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
@@ -430,7 +427,6 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void sendingStrategiesCheck() {
 		List<StrategyConfig> strategies = configurationStorage.getSendingStrategyConfigs();
@@ -498,7 +494,6 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void sensorCheck() {
 		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
@@ -657,7 +652,6 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void annotationCheck() {
 		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();
@@ -670,7 +664,6 @@ public class ConfigurationStorageTest extends AbstractLogSupport {
 		verifyZeroInteractions(classPoolAnalyzer, inheritanceAnalyzer);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void modifiersCheck() {
 		List<UnregisteredSensorConfig> configs = configurationStorage.getUnregisteredSensorConfigs();

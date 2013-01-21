@@ -34,47 +34,50 @@ public class ListSizeStrategyTest extends MockInit {
 	@Test
 	public void startStop() {
 		sendingStrategy.start(coreService);
-		verify(coreService).addListListener((ListListener) sendingStrategy);
+		verify(coreService).addListListener((ListListener<?>) sendingStrategy);
 
 		sendingStrategy.stop();
-		verify(coreService).removeListListener((ListListener) sendingStrategy);
+		verify(coreService).removeListListener((ListListener<?>) sendingStrategy);
 
 		verifyNoMoreInteractions(coreService);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void contentChanged() {
 		sendingStrategy.start(coreService);
-		List<?> list = mock(List.class);
+		List<Object> list = mock(List.class);
 
-		((ListListener) sendingStrategy).contentChanged(list);
+		((ListListener<Object>) sendingStrategy).contentChanged(list);
 
 		verify(list).size();
 
 		verifyNoMoreInteractions(list);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void fireSending() {
 		sendingStrategy.start(coreService);
-		List<?> list = mock(List.class);
+		List<Object> list = mock(List.class);
 		when(list.size()).thenReturn(11);
 
-		((ListListener) sendingStrategy).contentChanged(list);
+		((ListListener<Object>) sendingStrategy).contentChanged(list);
 
 		verify(coreService).sendData();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void fireSendingModifiedListSize() {
 		Map<String, String> settings = new HashMap<String, String>();
 		settings.put("size", "3");
 		sendingStrategy.init(settings);
 		sendingStrategy.start(coreService);
-		List<?> list = mock(List.class);
+		List<Object> list = mock(List.class);
 		when(list.size()).thenReturn(5);
 
-		((ListListener) sendingStrategy).contentChanged(list);
+		((ListListener<Object>) sendingStrategy).contentChanged(list);
 
 		verify(coreService).sendData();
 	}

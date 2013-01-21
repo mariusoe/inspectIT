@@ -17,11 +17,11 @@ import org.testng.annotations.Test;
 @SuppressWarnings("PMD")
 public class ThreadLocalStackTest {
 
-	private ThreadLocalStack threadLocalStack;
+	private ThreadLocalStack<Object> threadLocalStack;
 
 	@BeforeMethod(firstTimeOnly = true)
 	public void initTestClass() {
-		threadLocalStack = new ThreadLocalStack();
+		threadLocalStack = new ThreadLocalStack<Object>();
 	}
 
 	@Test

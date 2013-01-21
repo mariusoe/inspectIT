@@ -8,7 +8,7 @@
          point="org.eclipse.core.runtime.applications">
       <application
             cardinality="singleton-global"
-            icon="icons/32x32_24bit.bmp"
+            icon="icons/32x32_32bit.bmp"
             thread="main"
             visible="true">
          <run
@@ -143,7 +143,7 @@
       </wizard>
       <wizard
             class="info.novatec.inspectit.rcp.wizard.StartRecordingWizard"
-            icon="icons/storage_recording.gif"
+            icon="icons/storage_recording.png"
             id="info.novatec.inspectit.rcp.wizard.startRecordingWizard"
             name="Start Recording Wizard">
       </wizard>
@@ -2183,16 +2183,6 @@
             </parameter>
          </command>
       </menuContribution>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.adapters">
-      <factory
-            adaptableType="info.novatec.inspectit.communication.data.ExceptionSensorData"
-            class="info.novatec.inspectit.rcp.editor.tree.input.DeferredExceptionTreeAdapterFactory">
-         <adapter
-               type="org.eclipse.ui.progress.IDeferredWorkbenchAdapter">
-         </adapter>
-      </factory>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">

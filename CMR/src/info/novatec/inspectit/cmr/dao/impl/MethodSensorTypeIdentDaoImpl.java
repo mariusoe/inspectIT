@@ -57,7 +57,6 @@ public class MethodSensorTypeIdentDaoImpl extends HibernateDaoSupport implements
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	public List<MethodSensorTypeIdent> findAll() {
 		return getHibernateTemplate().loadAll(MethodSensorTypeIdent.class);
 	}

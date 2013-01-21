@@ -9,9 +9,12 @@ import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.collections.MapUtils;
 import org.testng.annotations.Test;
 
 /**
@@ -25,29 +28,21 @@ public class HttpDataAggregatorTest extends AbstractTestNGLogSupport {
 	@Test
 	public void aggregationWithInspectITHeaderTwoDifferent() {
 		final HttpTimerData data = new HttpTimerData();
-		data.setHeaders(new HashMap<String, String>() {
-			{
-				put("inspectit", "tag1");
-			}
-		});
+		Map<String, String> map1 = new HashMap<String, String>();
+		MapUtils.putAll(map1, new String[][] { { "inspectit", "tag1" } });
+		data.setHeaders(map1);
 		data.setUri("URI");
 		data.setRequestMethod("GET");
 
 		final HttpTimerData data2 = new HttpTimerData();
-		data2.setHeaders(new HashMap<String, String>() {
-			{
-				put("inspectit", "tag2");
-			}
-		});
+		Map<String, String> map2 = new HashMap<String, String>();
+		MapUtils.putAll(map2, new String[][] { { "inspectit", "tag2" } });
+		data2.setHeaders(map2);
 		data2.setUri("URI");
 		data2.setRequestMethod("GET");
 
-		final List<HttpTimerData> input = new ArrayList<HttpTimerData>() {
-			{
-				add(data);
-				add(data2);
-			}
-		};
+		final List<HttpTimerData> input = new ArrayList<HttpTimerData>();
+		Collections.addAll(input, data, data2);
 
 		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(true, false, false));
 		aggregationPerformer.processCollection(input);
@@ -59,11 +54,10 @@ public class HttpDataAggregatorTest extends AbstractTestNGLogSupport {
 	@Test
 	public void aggregationWithInspectITHeader() {
 		final HttpTimerData data = new HttpTimerData();
-		data.setHeaders(new HashMap<String, String>() {
-			{
-				put("inspectit", "tag1");
-			}
-		});
+		Map<String, String> map = new HashMap<String, String>();
+		MapUtils.putAll(map, new String[][] { { "inspectit", "tag1" } });
+		data.setHeaders(map);
+
 		data.setUri("URI");
 		data.setRequestMethod("GET");
 		data.setDuration(100d);
@@ -74,6 +68,8 @@ public class HttpDataAggregatorTest extends AbstractTestNGLogSupport {
 
 		final HttpTimerData data2 = new HttpTimerData();
 		data2.setHeaders(new HashMap<String, String>() {
+			private static final long serialVersionUID = 6328525502662081826L;
+
 			{
 				put("inspectit", "tag1");
 			}
@@ -85,12 +81,8 @@ public class HttpDataAggregatorTest extends AbstractTestNGLogSupport {
 		data2.calculateCpuMax(20d);
 		data2.setCpuDuration(20d);
 
-		final List<HttpTimerData> input = new ArrayList<HttpTimerData>() {
-			{
-				add(data);
-				add(data2);
-			}
-		};
+		final List<HttpTimerData> input = new ArrayList<HttpTimerData>();
+		Collections.addAll(input, data, data2);
 
 		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(true, false, false));
 		aggregationPerformer.processCollection(input);
@@ -127,12 +119,8 @@ public class HttpDataAggregatorTest extends AbstractTestNGLogSupport {
 		data2.calculateCpuMax(20d);
 		data2.setCpuDuration(20d);
 
-		final List<HttpTimerData> input = new ArrayList<HttpTimerData>() {
-			{
-				add(data);
-				add(data2);
-			}
-		};
+		final List<HttpTimerData> input = new ArrayList<HttpTimerData>();
+		Collections.addAll(input, data, data2);
 
 		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(true, true, false));
 		aggregationPerformer.processCollection(input);
@@ -166,13 +154,8 @@ public class HttpDataAggregatorTest extends AbstractTestNGLogSupport {
 		data2.calculateCpuMax(20d);
 		data2.setCpuDuration(20d);
 
-		final List<HttpTimerData> input = new ArrayList<HttpTimerData>() {
-			{
-				add(data);
-				add(data2);
-			}
-		};
-
+		final List<HttpTimerData> input = new ArrayList<HttpTimerData>();
+		Collections.addAll(input, data, data2);
 		AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new HttpTimerDataAggregator(true, true, true));
 		aggregationPerformer.processCollection(input);
 		final List<HttpTimerData> output = aggregationPerformer.getResultList();

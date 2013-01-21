@@ -7,7 +7,6 @@ import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
@@ -48,6 +47,7 @@ public class PreparedStatementParameterHookTest extends AbstractLogSupport {
 	/**
 	 * Test setting of the correct index and parameter value.
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void setCorrectParameterAndIndex() {
 		List<String> parameterTypes = Mockito.mock(List.class);
@@ -71,6 +71,7 @@ public class PreparedStatementParameterHookTest extends AbstractLogSupport {
 	/**
 	 * Tests that no interaction is happening when first parameter is not 'int'.
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void wrongFirstParameter() {
 		List<String> parameterTypes = Mockito.mock(List.class);
@@ -93,6 +94,7 @@ public class PreparedStatementParameterHookTest extends AbstractLogSupport {
 	/**
 	 * Tests arbitrary method with wrong parameter count.
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void wrongMethodInstrumentation() {
 		List<String> parameterTypes = Mockito.mock(List.class);
@@ -117,6 +119,7 @@ public class PreparedStatementParameterHookTest extends AbstractLogSupport {
 	 * Test that setNull() methods of the prepare statement will set the <code>null</code> as the
 	 * parameter value.
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void setNull() {
 		List<String> parameterTypes = Mockito.mock(List.class);
@@ -141,6 +144,7 @@ public class PreparedStatementParameterHookTest extends AbstractLogSupport {
 	/**
 	 * Tests clear parameters method being invoked.
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void clearParameters() {
 		List<String> parameterTypes = Mockito.mock(List.class);
@@ -168,6 +172,7 @@ public class PreparedStatementParameterHookTest extends AbstractLogSupport {
 	 * @param methodName
 	 *            Method name that holds big structure.
 	 */
+	@SuppressWarnings("unchecked")
 	@Test(dataProvider = "methodsWithBigDataStructures")
 	public void methodWithBigData(String methodName) {
 		List<String> parameterTypes = Mockito.mock(List.class);
@@ -184,7 +189,6 @@ public class PreparedStatementParameterHookTest extends AbstractLogSupport {
 		preparedStatementParameterHook.firstAfterBody(0, 0, object, parameters, null, rsc);
 		preparedStatementParameterHook.secondAfterBody(coreService, 0, 0, object, parameters, null, rsc);
 
-		ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
 		String expected = "[" + methodName.substring("set".length()) + "]";
 		Mockito.verify(statementStorage, Mockito.times(1)).addParameter(object, 0, expected);
 		Mockito.verifyNoMoreInteractions(statementStorage);

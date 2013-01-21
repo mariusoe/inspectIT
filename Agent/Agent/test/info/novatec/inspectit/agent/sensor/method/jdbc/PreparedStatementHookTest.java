@@ -29,7 +29,7 @@ public class PreparedStatementHookTest extends AbstractLogSupport {
 	private NoSuchElementException myNoSuchElementException;
 
 	@Mock
-	private Map parameter;
+	private Map<String, Object> parameter;
 
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {

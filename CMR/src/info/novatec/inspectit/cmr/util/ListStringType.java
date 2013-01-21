@@ -88,7 +88,9 @@ public class ListStringType implements UserType {
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("deprecation")
 	public Object nullSafeGet(ResultSet rs, String[] names, Object owner) throws SQLException {
+		// INSPECTIT-511
 		String dbValue = (String) Hibernate.STRING.nullSafeGet(rs, names[0]);
 
 		if (dbValue != null) {
@@ -113,11 +115,14 @@ public class ListStringType implements UserType {
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("deprecation")
 	public void nullSafeSet(PreparedStatement st, Object value, int index) throws SQLException {
 		if (value != null) {
 			String v = concat((List<?>) value);
+			// INSPECTIT-511
 			Hibernate.STRING.nullSafeSet(st, v, index);
 		} else {
+			// INSPECTIT-511
 			Hibernate.STRING.nullSafeSet(st, null, index);
 		}
 	}

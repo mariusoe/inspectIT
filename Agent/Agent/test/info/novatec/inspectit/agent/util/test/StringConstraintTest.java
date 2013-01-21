@@ -10,11 +10,13 @@ import static org.hamcrest.Matchers.nullValue;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.util.StringConstraint;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -118,11 +120,7 @@ public class StringConstraintTest extends AbstractLogSupport {
 	@Test
 	public void cropStringMapNoCropping() {
 
-		constraint = new StringConstraint(new HashMap<String, Object>() {
-			{
-				put("stringLength", "20");
-			}
-		});
+		constraint = new StringConstraint(Collections.<String, Object> singletonMap("stringLength", "20"));
 
 		final String param1 = "p1";
 		final String param2 = "p2";
@@ -135,13 +133,8 @@ public class StringConstraintTest extends AbstractLogSupport {
 		final String[] param1V = new String[] { param1VReal };
 		final String[] param2V = new String[] { param2VReal1, param2VReal2 };
 		final String[] param3V = new String[] { param3VReal1, param3VReal2 };
-		final Map<String, String[]> parameterMap = new HashMap<String, String[]>() {
-			{
-				put(param1, param1V);
-				put(param2, param2V);
-				put(param3, param3V);
-			}
-		};
+		final Map<String, String[]> parameterMap = new HashMap<String, String[]>();
+		MapUtils.putAll(parameterMap, new Object[][] { { param1, param1V }, { param2, param2V }, { param3, param3V } });
 
 		Map<String, String[]> result = constraint.crop(parameterMap);
 
@@ -160,11 +153,7 @@ public class StringConstraintTest extends AbstractLogSupport {
 	@Test
 	/** Tests whether the first entry is correctly copied to new map */
 	public void cropStringMapCropSecondEntry() {
-		constraint = new StringConstraint(new HashMap<String, Object>() {
-			{
-				put("stringLength", "20");
-			}
-		});
+		constraint = new StringConstraint(Collections.<String, Object> singletonMap("stringLength", "20"));
 
 		final String param1 = "p1";
 		final String param2 = "p2";
@@ -177,13 +166,8 @@ public class StringConstraintTest extends AbstractLogSupport {
 		final String[] param1V = new String[] { param1VReal };
 		final String[] param2V = new String[] { param2VReal1, param2VReal2 };
 		final String[] param3V = new String[] { param3VReal1, param3VReal2 };
-		final Map<String, String[]> parameterMap = new HashMap<String, String[]>() {
-			{
-				put(param1, param1V);
-				put(param2, param2V);
-				put(param3, param3V);
-			}
-		};
+		final Map<String, String[]> parameterMap = new HashMap<String, String[]>();
+		MapUtils.putAll(parameterMap, new Object[][] { { param1, param1V }, { param2, param2V }, { param3, param3V } });
 
 		Map<String, String[]> result = constraint.crop(parameterMap);
 

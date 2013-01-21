@@ -68,7 +68,6 @@ public class MethodIdentDaoImpl extends HibernateDaoSupport implements MethodIde
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	public List<MethodIdent> findAll() {
 		return getHibernateTemplate().loadAll(MethodIdent.class);
 	}
