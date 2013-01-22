@@ -53,7 +53,7 @@
 		<ivy:settings file="${ivy.settings.file}" />
 		<ivy:resolve file="${ivy.file}" />
 		<ivy:cachepath pathid="lib.prod" conf="prod" />
-		<ivy:cachefileset setid="lib.prod.fileset" conf="prod"/>
+		<ivy:cachefileset setid="lib.prod.fileset" conf="prod" />
 		<ivy:cachepath pathid="lib.test" conf="test" />
 	</target>
 
@@ -66,15 +66,25 @@
 	<!-- environment in which the agent should be applied                -->
 	<!-- *************************************************************** -->
 
-	<target name="build-agent" depends="init, release-commons">
+	<target name="build-agent" depends="init, release-commons, execute-java1.5-runtime-download">
 		<mkdir dir="${build.agent.classes}" />
 
-		<javac source="1.5" target="1.5" debug="true" nowarn="off" destdir="${build.agent.classes}" srcdir="${src.root}" includeAntRuntime="no">
+		<!-- we integrate the rt.jar of a JDK 1.5 as bootclasspath. This ensures that the code is really tested against
+			 a 1.5 java environment. Only defining the source and target also allows a 1.6 JDK to compile the code and
+			 this jdk does not detect errors based on classes that were not available in 1.5 -->
+		<javac bootclasspath="${java15runtime.path}/${ftp.internal.java15runtime.file}" source="1.5" target="1.5" debug="true" nowarn="off" destdir="${build.agent.classes}" srcdir="${src.root}" includeAntRuntime="no">
 			<classpath refid="lib.prod" />
 			<classpath refid="path.agent.classes" />
 			<classpath refid="path.common.classes" />
 			<compilerarg compiler="org.eclipse.jdt.core.JDTCompilerAdapter" line="-warn:${list.warning.options},+unused -Xemacs" />
 		</javac>
+	</target>
+
+
+	<target name="execute-java1.5-runtime-download" depends="configure-java1.5-runtime-download, retrieve-java1.5-runtime" />
+
+	<target name="configure-java1.5-runtime-download" depends="init-antcontrib">
+		<var name="download.dir" value="${java15runtime.path}" />
 	</target>
 
 	<target name="release-commons" description="--> call the release of the commons project">
@@ -139,10 +149,10 @@
 
 		<!-- create cobertura html and xml reports and link to the interesting parts -->
 		<cobertura-report format="html" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
-			<fileset dir="${src.root}" includes="**/*.java"/>
+			<fileset dir="${src.root}" includes="**/*.java" />
 		</cobertura-report>
 		<cobertura-report format="xml" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
-			<fileset dir="${src.root}" includes="**/*.java"/>
+			<fileset dir="${src.root}" includes="**/*.java" />
 		</cobertura-report>
 		<echo file="${build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >" />
 
@@ -158,31 +168,31 @@
 			<include name="info/novatec/inspectit/**/*.java" />
 			<exclude name="info/novatec/inspectit/**/test/**" />
 		</fileset>
-		<antcall target="pmd" inheritrefs="true"/>
+		<antcall target="pmd" inheritrefs="true" />
 
 		<!-- Call Checkstyle -->
 		<fileset dir="${src.root}" id="checkstyle.fileset">
 			<include name="info/novatec/inspectit/**/*.java" />
 			<exclude name="info/novatec/inspectit/**/test/**" />
 		</fileset>
-		<antcall target="checkstyle" inheritrefs="true"/>
+		<antcall target="checkstyle" inheritrefs="true" />
 
 		<!-- Call FindBugs -->
 		<property name="findbugs.sourcepath" value="${src.root}" />
 		<property name="findbugs.classlocation" value="${build.agent.classes}" />
-		<path id="findbugs.path" >
+		<path id="findbugs.path">
 			<path refid="lib.prod" />
 			<path refid="lib.test" />
 			<pathelement path="${build.commons.classes}" />
 		</path>
-		<antcall target="findbugs" inheritrefs="true"/>
+		<antcall target="findbugs" inheritrefs="true" />
 
 		<!-- Call CPD -->
 		<fileset dir="${src.root}" id="cpd.fileset">
 			<include name="info/novatec/inspectit/**/*.java" />
 			<exclude name="info/novatec/inspectit/**/test/**" />
 		</fileset>
-		<antcall target="cpd" inheritrefs="true"/>
+		<antcall target="cpd" inheritrefs="true" />
 	</target>
 
 

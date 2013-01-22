@@ -4,6 +4,7 @@
 /build
 java-exec.properties
 /resources/ivy/install/
+/resources/java15runtime/
 version.properties
 /release
 /test-output

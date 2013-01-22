@@ -150,7 +150,7 @@
 		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.report.file}" />
 		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >" />
 
-		<fail if="checkstyle.failure" message="Build failed due to checkstyle warnings, please fix these warnings. Have a look at build/QA/static_analysis/checkstyle.html"/>
+		<fail if="checkstyle.failure" message="Build failed due to checkstyle warnings, please fix these warnings. Have a look at build/QA/static_analysis/checkstyle.html" />
 	</target>
 
 	<!-- F i n d B u g s -->
@@ -245,6 +245,38 @@
 		<input>Press Return key to continue and to overwrite the JRE: ${file}</input>
 	</target>
 
+
+
+	<!-- *************************************************************** -->
+	<!--   		 D O W N L O A D   J A V A 1.5   R U N T I M E    	     -->
+	<!-- *************************************************************** -->
+
+	<!-- Allows to download the java1.5 runtime. It is necessary to define the variable download.dir before calling this target! -->
+	<!-- Example: <var name="download.dir" value="C:\tmp" /> -->
+	<target name="retrieve-java1.5-runtime" description="Downloads the java 1.5 rt.jar" depends="init-antcontrib">
+		<var name="download.ftp.remotedir" value="${ftp.internal.java15runtime.path}" />
+		<var name="file" value="${ftp.internal.java15runtime.file}" />
+
+		<antcall target="retrieve-java1.5-internal" inheritall="true" />
+	</target>
+
+	<target name="retrieve-java1.5-internal" depends="checkFile,unpack-java1.5runtime" />
+
+	<target name="check-unpack-java1.5-runtime">
+		<condition property="should-unpack-java1.5-runtime">
+			<or>
+				<isset property="download.executed.${ftp.internal.java15runtime.file}" />
+				<not>
+					<available file="${download.dir}/${ftp.internal.java15runtime.file}" />
+				</not>
+			</or>
+		</condition>
+	</target>
+
+	<target name="unpack-java1.5runtime" depends="check-unpack-java1.5-runtime" if="should-unpack-java1.5-runtime">
+		<unzip src="${download.dir}/${ftp.internal.java15runtime.file}.zip" dest="${download.dir}" />
+	</target>
+
 	<!-- *************************************************************** -->
 	<!--   		 D O W N L O A D   &   M D 5    T A R G E T S      	     -->
 	<!-- *************************************************************** -->
@@ -261,7 +293,7 @@
 		</condition>
 	</target>
 
-	<target name="checkFile" depends="init-antcontrib,init-ftp-task,initCheckFile,check.download,check.md5" if="can-checkFile" >
+	<target name="checkFile" depends="init-antcontrib,init-ftp-task,initCheckFile,check.download,check.md5" if="can-checkFile">
 		<!-- DESCRIPTION -->
 		<!-- Downloads the zip file with the name specified in the 'file' property if MD5 on the server is not the same to the local file. -->
 		<!-- Note that is download is performed property 'download.executed.file' will be set to true, where file is the name of the file. -->
@@ -289,7 +321,7 @@
 						<include name="${zip.file}" />
 					</fileset>
 				</wptg-ftp>
-				<property name="download.executed.${file}" value="true"/>
+				<property name="download.executed.${file}" value="true" />
 			</then>
 			<else>
 				<echo message="${zip.file} already locally available, so skipping download." />
@@ -356,7 +388,7 @@
 						<move file="${download.dir}/tmp/${zip.file}" tofile="${download.dir}/tmp/${file}.newer-version.zip" overwrite="true" failonerror="true" />
 						<delete dir="${download.dir}/${zip.file}" failonerror="false" />
 						<move file="${download.dir}/tmp/${file}.newer-version.zip" tofile="${download.dir}/${zip.file}" failonerror="true" />
-						<property name="download.executed.${file}" value="true"/>
+						<property name="download.executed.${file}" value="true" />
 					</else>
 				</if>
 			</try>
