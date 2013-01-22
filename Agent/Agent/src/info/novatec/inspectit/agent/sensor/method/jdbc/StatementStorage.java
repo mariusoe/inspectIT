@@ -41,7 +41,7 @@ public class StatementStorage {
 	 * <b> Note that this data structure provides atomic access like a <code>ConcurrentMap</code>.
 	 * </b>.
 	 */
-	private Cache<Object, QueryAndParameters> preparedStatements = CacheBuilder.newBuilder().expireAfterAccess(20, TimeUnit.MINUTES).weakKeys().build();
+	private Cache<Object, QueryAndParameters> preparedStatements = CacheBuilder.newBuilder().expireAfterAccess(20 * 60, TimeUnit.SECONDS).weakKeys().build();
 
 	/**
 	 * Returns the sql thread local stack.
