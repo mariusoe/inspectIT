@@ -3,7 +3,7 @@ package info.novatec.inspectit.rcp.wizard.page;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -15,7 +15,6 @@ import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
 import info.novatec.inspectit.rcp.wizard.page.AddStorageLabelWizardPage;
 import info.novatec.inspectit.rcp.wizard.page.DefineDataProcessorsWizardPage;
@@ -26,6 +25,7 @@ import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.Collection;
 import java.util.HashSet;

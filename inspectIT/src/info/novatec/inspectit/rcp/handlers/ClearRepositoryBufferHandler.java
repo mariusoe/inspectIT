@@ -10,8 +10,8 @@ import info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider;
 import info.novatec.inspectit.rcp.provider.IInputDefinitionProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.rcp.view.impl.RepositoryManagerView;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.Collections;
 

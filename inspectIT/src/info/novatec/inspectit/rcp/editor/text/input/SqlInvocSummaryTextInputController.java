@@ -7,7 +7,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.formatter.ColorFormatter;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;

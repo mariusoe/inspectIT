@@ -11,7 +11,6 @@ import info.novatec.inspectit.rcp.storage.label.composite.impl.BooleanStorageLab
 import info.novatec.inspectit.rcp.storage.label.composite.impl.DateStorageLabelComposite;
 import info.novatec.inspectit.rcp.storage.label.composite.impl.NumberStorageLabelComposite;
 import info.novatec.inspectit.rcp.storage.label.composite.impl.StringStorageLabelComposite;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.label.management.AbstractLabelManagementAction;
 import info.novatec.inspectit.storage.label.management.impl.AddLabelManagementAction;
@@ -22,6 +21,7 @@ import info.novatec.inspectit.storage.label.type.impl.CustomBooleanLabelType;
 import info.novatec.inspectit.storage.label.type.impl.CustomDateLabelType;
 import info.novatec.inspectit.storage.label.type.impl.CustomNumberLabelType;
 import info.novatec.inspectit.storage.label.type.impl.CustomStringLabelType;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Date;

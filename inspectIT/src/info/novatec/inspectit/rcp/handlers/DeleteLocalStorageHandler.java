@@ -5,8 +5,8 @@ import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.provider.ILocalStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.storage.LocalStorageData;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;

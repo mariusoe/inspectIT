@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
@@ -10,7 +11,6 @@ import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
-import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 import info.novatec.inspectit.rcp.util.ElementOccurrenceCount;
 import info.novatec.inspectit.rcp.util.OccurrenceFinderFactory;
 

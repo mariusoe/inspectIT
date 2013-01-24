@@ -5,7 +5,7 @@ import info.novatec.inspectit.rcp.editor.search.criteria.SearchCriteria;
 import info.novatec.inspectit.rcp.editor.search.criteria.SearchResult;
 import info.novatec.inspectit.rcp.editor.search.factory.SearchFactory;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

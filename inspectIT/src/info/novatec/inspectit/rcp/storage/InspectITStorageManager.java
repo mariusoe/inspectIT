@@ -14,7 +14,6 @@ import info.novatec.inspectit.rcp.storage.listener.StorageChangeListener;
 import info.novatec.inspectit.rcp.storage.util.DataRetriever;
 import info.novatec.inspectit.rcp.storage.util.DataRetriever.StorageFileType;
 import info.novatec.inspectit.rcp.storage.util.DataUploader;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
@@ -25,6 +24,7 @@ import info.novatec.inspectit.storage.label.StringStorageLabel;
 import info.novatec.inspectit.storage.label.type.impl.ExploredByLabelType;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.io.File;
 import java.io.IOException;

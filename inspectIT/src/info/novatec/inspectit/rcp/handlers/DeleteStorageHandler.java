@@ -8,10 +8,10 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.label.type.impl.ExploredByLabelType;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;

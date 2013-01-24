@@ -2,7 +2,14 @@ package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.comparator.IDataComparator;
+import info.novatec.inspectit.communication.comparator.InvocationAwareDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.MethodSensorDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.ResultComparator;
+import info.novatec.inspectit.communication.comparator.SqlStatementDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.TimerDataComparatorEnum;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
@@ -21,7 +28,6 @@ import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
-import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -36,7 +42,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -46,6 +51,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -85,23 +91,23 @@ public class SqlInputController extends AbstractTableInputController {
 	 */
 	private static enum Column {
 		/** The statement column. */
-		STATEMENT("Statement", 600, InspectITImages.IMG_DATABASE),
+		STATEMENT("Statement", 600, InspectITImages.IMG_DATABASE, SqlStatementDataComparatorEnum.SQL),
 		/** Invocation Affiliation. */
-		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION),
+		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION, InvocationAwareDataComparatorEnum.INVOCATION_AFFILIATION),
 		/** The count column. */
-		COUNT("Count", 80, null),
+		COUNT("Count", 80, null, TimerDataComparatorEnum.COUNT),
 		/** The average column. */
-		AVERAGE("Avg (ms)", 80, null),
+		AVERAGE("Avg (ms)", 80, null, TimerDataComparatorEnum.AVERAGE),
 		/** The min column. */
-		MIN("Min (ms)", 80, null),
+		MIN("Min (ms)", 80, null, TimerDataComparatorEnum.MIN),
 		/** The max column. */
-		MAX("Max (ms)", 80, null),
+		MAX("Max (ms)", 80, null, TimerDataComparatorEnum.MAX),
 		/** The duration column. */
-		DURATION("Duration (ms)", 80, null),
+		DURATION("Duration (ms)", 80, null, TimerDataComparatorEnum.MAX),
 		/** The method column. */
-		METHOD("Method", 500, InspectITImages.IMG_METHOD_PUBLIC),
+		METHOD("Method", 500, InspectITImages.IMG_METHOD_PUBLIC, MethodSensorDataComparatorEnum.METHOD),
 		/** The prepared column. */
-		PREPARED("Prepared?", 80, null);
+		PREPARED("Prepared?", 80, null, SqlStatementDataComparatorEnum.IS_PREPARED_STATEMENT);
 
 		/** The name. */
 		private String name;
@@ -109,6 +115,8 @@ public class SqlInputController extends AbstractTableInputController {
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
 		private Image image;
+		/** Comparator for the column. */
+		private IDataComparator<? super SqlStatementData> dataComparator;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -119,11 +127,14 @@ public class SqlInputController extends AbstractTableInputController {
 		 *            The width of the column.
 		 * @param imageName
 		 *            The name of the image. Names are defined in {@link InspectITImages}.
+		 * @param dataComparator
+		 *            Comparator for the column.
 		 */
-		private Column(String name, int width, String imageName) {
+		private Column(String name, int width, String imageName, IDataComparator<? super SqlStatementData> dataComparator) {
 			this.name = name;
 			this.width = width;
 			this.image = InspectIT.getDefault().getImage(imageName);
+			this.dataComparator = dataComparator;
 		}
 
 		/**
@@ -139,6 +150,7 @@ public class SqlInputController extends AbstractTableInputController {
 			}
 			return Column.values()[i];
 		}
+
 	}
 
 	/**
@@ -243,10 +255,11 @@ public class SqlInputController extends AbstractTableInputController {
 	/**
 	 * {@inheritDoc}
 	 */
-	public TableViewerComparator<? extends DefaultData> getComparator() {
-		SqlViewerComparator sqlViewerComparator = new SqlViewerComparator();
+	public ViewerComparator getComparator() {
+		TableViewerComparator<SqlStatementData> sqlViewerComparator = new TableViewerComparator<SqlStatementData>();
 		for (Column column : Column.values()) {
-			sqlViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), column);
+			ResultComparator<SqlStatementData> resultComparator = new ResultComparator<SqlStatementData>(column.dataComparator, cachedDataService);
+			sqlViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), resultComparator);
 		}
 
 		return sqlViewerComparator;
@@ -394,50 +407,6 @@ public class SqlInputController extends AbstractTableInputController {
 		 * {@inheritDoc}
 		 */
 		public void dispose() {
-		}
-
-	}
-
-	/**
-	 * Viewer Comparator used by this input controller to display the contents of
-	 * {@link BasicSQLData}.
-	 * 
-	 * @author Patrice Bouillet
-	 * 
-	 */
-	private static final class SqlViewerComparator extends TableViewerComparator<SqlStatementData> {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected int compareElements(Viewer viewer, SqlStatementData sql1, SqlStatementData sql2) {
-			switch ((Column) getEnumSortColumn()) {
-			case STATEMENT:
-				return sql1.getSql().compareTo(sql2.getSql());
-			case INVOCATION_AFFILLIATION:
-				return Double.compare(sql1.getInvocationAffiliationPercentage(), sql2.getInvocationAffiliationPercentage());
-			case COUNT:
-				return Long.valueOf(sql1.getCount()).compareTo(Long.valueOf(sql2.getCount()));
-			case AVERAGE:
-				return Double.compare(sql1.getAverage(), sql2.getAverage());
-			case MIN:
-				return Double.compare(sql1.getMin(), sql2.getMin());
-			case MAX:
-				return Double.compare(sql1.getMax(), sql2.getMax());
-			case METHOD:
-				IBaseLabelProvider baseLabelProvider = ((ContentViewer) viewer).getLabelProvider();
-				SqlLabelProvider sqlLabelProvider = (SqlLabelProvider) baseLabelProvider;
-				String text1 = sqlLabelProvider.getStyledText(sql1, Column.METHOD.ordinal()).getString();
-				String text2 = sqlLabelProvider.getStyledText(sql2, Column.METHOD.ordinal()).getString();
-				return text1.compareTo(text2);
-			case DURATION:
-				return Double.compare(sql1.getDuration(), sql2.getDuration());
-			case PREPARED:
-				return Boolean.compare(sql1.isPreparedStatement(), sql2.isPreparedStatement());
-			default:
-				return 0;
-			}
 		}
 
 	}

@@ -12,7 +12,7 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.provider.IInputDefinitionProvider;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Timer;

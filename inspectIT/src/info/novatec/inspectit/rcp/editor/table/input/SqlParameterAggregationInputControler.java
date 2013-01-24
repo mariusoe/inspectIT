@@ -1,6 +1,12 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.comparator.IDataComparator;
+import info.novatec.inspectit.communication.comparator.InvocationAwareDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.ResultComparator;
+import info.novatec.inspectit.communication.comparator.SqlStatementDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.TimerDataComparatorEnum;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
@@ -23,7 +29,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -33,6 +38,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -61,19 +67,19 @@ public class SqlParameterAggregationInputControler extends AbstractTableInputCon
 	 */
 	private static enum Column {
 		/** The Parameters column. */
-		PARAMETERS("Parameters", 600, null),
+		PARAMETERS("Parameters", 600, null, SqlStatementDataComparatorEnum.PARAMETERS),
 		/** Invocation Affiliation. */
-		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION),
+		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION, InvocationAwareDataComparatorEnum.INVOCATION_AFFILIATION),
 		/** The count column. */
-		COUNT("Count", 80, null),
+		COUNT("Count", 80, null, TimerDataComparatorEnum.COUNT),
 		/** The average column. */
-		AVERAGE("Avg (ms)", 80, null),
+		AVERAGE("Avg (ms)", 80, null, TimerDataComparatorEnum.AVERAGE),
 		/** The min column. */
-		MIN("Min (ms)", 80, null),
+		MIN("Min (ms)", 80, null, TimerDataComparatorEnum.MIN),
 		/** The max column. */
-		MAX("Max (ms)", 80, null),
+		MAX("Max (ms)", 80, null, TimerDataComparatorEnum.MAX),
 		/** The duration column. */
-		DURATION("Duration (ms)", 80, null);
+		DURATION("Duration (ms)", 80, null, TimerDataComparatorEnum.DURATION);
 
 		/** The name. */
 		private String name;
@@ -81,6 +87,8 @@ public class SqlParameterAggregationInputControler extends AbstractTableInputCon
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
 		private Image image;
+		/** Comparator for the column. */
+		private IDataComparator<? super SqlStatementData> dataComparator;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -90,13 +98,15 @@ public class SqlParameterAggregationInputControler extends AbstractTableInputCon
 		 * @param width
 		 *            The width of the column.
 		 * @param imageName
-		 *            The name of the image. Names are defined in
-		 *            {@link info.novatec.inspectit.rcp.InspectITConstants}.
+		 *            The name of the image. Names are defined in {@link InspectITImages}.
+		 * @param dataComparator
+		 *            Comparator for the column.
 		 */
-		private Column(String name, int width, String imageName) {
+		private Column(String name, int width, String imageName, IDataComparator<? super SqlStatementData> dataComparator) {
 			this.name = name;
 			this.width = width;
 			this.image = InspectIT.getDefault().getImage(imageName);
+			this.dataComparator = dataComparator;
 		}
 
 		/**
@@ -112,6 +122,7 @@ public class SqlParameterAggregationInputControler extends AbstractTableInputCon
 			}
 			return Column.values()[i];
 		}
+
 	}
 
 	/**
@@ -210,10 +221,12 @@ public class SqlParameterAggregationInputControler extends AbstractTableInputCon
 	 * {@inheritDoc}
 	 */
 	@Override
-	public TableViewerComparator<? extends DefaultData> getComparator() {
-		SqlViewerComparator sqlViewerComparator = new SqlViewerComparator();
+	public ViewerComparator getComparator() {
+		CachedDataService cachedDataService = getInputDefinition().getRepositoryDefinition().getCachedDataService();
+		TableViewerComparator<SqlStatementData> sqlViewerComparator = new TableViewerComparator<SqlStatementData>();
 		for (Column column : Column.values()) {
-			sqlViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), column);
+			ResultComparator<SqlStatementData> resultComparator = new ResultComparator<SqlStatementData>(column.dataComparator, cachedDataService);
+			sqlViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), resultComparator);
 		}
 
 		return sqlViewerComparator;
@@ -346,45 +359,6 @@ public class SqlParameterAggregationInputControler extends AbstractTableInputCon
 			Column enumId = Column.fromOrd(index);
 
 			return getStyledTextForColumn(data, enumId);
-		}
-
-	}
-
-	/**
-	 * Viewer Comparator used by this input controller.
-	 * 
-	 * @author Ivan Senic
-	 * 
-	 */
-	private static final class SqlViewerComparator extends TableViewerComparator<SqlStatementData> {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected int compareElements(Viewer viewer, SqlStatementData sql1, SqlStatementData sql2) {
-			IBaseLabelProvider baseLabelProvider = ((ContentViewer) viewer).getLabelProvider();
-			SqlLabelProvider sqlLabelProvider = (SqlLabelProvider) baseLabelProvider;
-			switch ((Column) getEnumSortColumn()) {
-			case PARAMETERS:
-				String params1 = sqlLabelProvider.getStyledText(sql1, Column.PARAMETERS.ordinal()).getString();
-				String params2 = sqlLabelProvider.getStyledText(sql2, Column.PARAMETERS.ordinal()).getString();
-				return params1.compareTo(params2);
-			case INVOCATION_AFFILLIATION:
-				return Double.compare(sql1.getInvocationAffiliationPercentage(), sql2.getInvocationAffiliationPercentage());
-			case COUNT:
-				return Long.valueOf(sql1.getCount()).compareTo(Long.valueOf(sql2.getCount()));
-			case AVERAGE:
-				return Double.compare(sql1.getAverage(), sql2.getAverage());
-			case MIN:
-				return Double.compare(sql1.getMin(), sql2.getMin());
-			case MAX:
-				return Double.compare(sql1.getMax(), sql2.getMax());
-			case DURATION:
-				return Double.compare(sql1.getDuration(), sql2.getDuration());
-			default:
-				return 0;
-			}
 		}
 
 	}

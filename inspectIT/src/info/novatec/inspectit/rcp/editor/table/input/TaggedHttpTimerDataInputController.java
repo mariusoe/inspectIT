@@ -1,6 +1,11 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
-import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.communication.comparator.HttpTimerDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.IDataComparator;
+import info.novatec.inspectit.communication.comparator.InvocationAwareDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.ResultComparator;
+import info.novatec.inspectit.communication.comparator.TimerDataComparatorEnum;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
@@ -20,7 +25,7 @@ import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 
@@ -46,37 +51,37 @@ public class TaggedHttpTimerDataInputController extends AbstractHttpInputControl
 	 */
 	private static enum Column {
 		/** The package column. */
-		TAG_VALUE("Tag Value", 300, InspectITImages.IMG_HTTP_TAGGED),
+		TAG_VALUE("Tag Value", 300, InspectITImages.IMG_HTTP_TAGGED, HttpTimerDataComparatorEnum.TAG_VALUE),
 		/** The request method. */
-		HTTP_METHOD("Method", 80, null),
+		HTTP_METHOD("Method", 80, null, HttpTimerDataComparatorEnum.HTTP_METHOD),
 		/** Invocation Affiliation. */
-		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION),
+		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION, InvocationAwareDataComparatorEnum.INVOCATION_AFFILIATION),
 		/** The count column. */
-		COUNT("Count", 60, null),
+		COUNT("Count", 60, null, TimerDataComparatorEnum.COUNT),
 		/** The average column. */
-		AVERAGE("Avg (ms)", 60, null),
+		AVERAGE("Avg (ms)", 60, null, TimerDataComparatorEnum.AVERAGE),
 		/** The minimum column. */
-		MIN("Min (ms)", 60, null),
+		MIN("Min (ms)", 60, null, TimerDataComparatorEnum.MIN),
 		/** The maximum column. */
-		MAX("Max (ms)", 60, null),
+		MAX("Max (ms)", 60, null, TimerDataComparatorEnum.MAX),
 		/** The duration column. */
-		DURATION("Duration (ms)", 70, null),
+		DURATION("Duration (ms)", 70, null, TimerDataComparatorEnum.DURATION),
 		/** The average exclusive duration column. */
-		EXCLUSIVEAVERAGE("Exc. Avg (ms)", 80, null),
+		EXCLUSIVEAVERAGE("Exc. Avg (ms)", 80, null, TimerDataComparatorEnum.EXCLUSIVEAVERAGE),
 		/** The min exclusive duration column. */
-		EXCLUSIVEMIN("Exc. Min (ms)", 80, null),
+		EXCLUSIVEMIN("Exc. Min (ms)", 80, null, TimerDataComparatorEnum.EXCLUSIVEMIN),
 		/** The max exclusive duration column. */
-		EXCLUSIVEMAX("Exc. Max (ms)", 80, null),
+		EXCLUSIVEMAX("Exc. Max (ms)", 80, null, TimerDataComparatorEnum.EXCLUSIVEMAX),
 		/** The total exclusive duration column. */
-		EXCLUSIVESUM("Exc. duration (ms)", 80, null),
+		EXCLUSIVESUM("Exc. duration (ms)", 80, null, TimerDataComparatorEnum.EXCLUSIVEDURATION),
 		/** The cpu average column. */
-		CPUAVERAGE("Cpu Avg (ms)", 60, null),
+		CPUAVERAGE("Cpu Avg (ms)", 60, null, TimerDataComparatorEnum.CPUAVERAGE),
 		/** The cpu minimum column. */
-		CPUMIN("Cpu Min (ms)", 60, null),
+		CPUMIN("Cpu Min (ms)", 60, null, TimerDataComparatorEnum.CPUMIN),
 		/** The cpu maximum column. */
-		CPUMAX("Cpu Max (ms)", 60, null),
+		CPUMAX("Cpu Max (ms)", 60, null, TimerDataComparatorEnum.CPUMAX),
 		/** The cpu duration column. */
-		CPUDURATION("Cpu Duration (ms)", 70, null);
+		CPUDURATION("Cpu Duration (ms)", 70, null, TimerDataComparatorEnum.CPUDURATION);
 
 		/** The name. */
 		private String name;
@@ -84,6 +89,8 @@ public class TaggedHttpTimerDataInputController extends AbstractHttpInputControl
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
 		private Image image;
+		/** Comparator for the column. */
+		private IDataComparator<? super HttpTimerData> dataComparator;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -94,11 +101,14 @@ public class TaggedHttpTimerDataInputController extends AbstractHttpInputControl
 		 *            The width of the column.
 		 * @param imageName
 		 *            The name of the image. Names are defined in {@link InspectITImages}.
+		 * @param dataComparator
+		 *            Comparator for the column.
 		 */
-		private Column(String name, int width, String imageName) {
+		private Column(String name, int width, String imageName, IDataComparator<? super HttpTimerData> dataComparator) {
 			this.name = name;
 			this.width = width;
 			this.image = InspectIT.getDefault().getImage(imageName);
+			this.dataComparator = dataComparator;
 		}
 
 		/**
@@ -202,65 +212,20 @@ public class TaggedHttpTimerDataInputController extends AbstractHttpInputControl
 	 * {@inheritDoc}
 	 */
 	@Override
-	public TableViewerComparator<? extends DefaultData> getComparator() {
-		TaggedHttpDataTableViewerComparator httpTimerDataViewerComparator = new TaggedHttpDataTableViewerComparator();
+	public ViewerComparator getComparator() {
+		CachedDataService cachedDataService = getInputDefinition().getRepositoryDefinition().getCachedDataService();
+		TableViewerComparator<HttpTimerData> httpTimerDataViewerComparator = new TableViewerComparator<HttpTimerData>();
 		for (Column column : Column.values()) {
-			httpTimerDataViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), column);
+			ResultComparator<HttpTimerData> resultComparator = new ResultComparator<HttpTimerData>(column.dataComparator, cachedDataService);
+			httpTimerDataViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), resultComparator);
 		}
 
 		return httpTimerDataViewerComparator;
 	}
 
 	/**
-	 * Comparator for <code>HttpTimerData</code> in the tagged http view.
-	 * 
-	 * @author Stefan Siegl
+	 * {@inheritDoc}
 	 */
-	private static final class TaggedHttpDataTableViewerComparator extends TableViewerComparator<HttpTimerData> {
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected int compareElements(Viewer viewer, HttpTimerData timer1, HttpTimerData timer2) {
-			switch ((Column) getEnumSortColumn()) {
-			case TAG_VALUE:
-				return timer1.getInspectItTaggingHeaderValue().compareTo(timer2.getInspectItTaggingHeaderValue());
-			case HTTP_METHOD:
-				return timer1.getRequestMethod().compareTo(timer2.getRequestMethod());
-			case INVOCATION_AFFILLIATION:
-				return Double.compare(timer1.getInvocationAffiliationPercentage(), timer2.getInvocationAffiliationPercentage());
-			case COUNT:
-				return Long.valueOf(timer1.getCount()).compareTo(Long.valueOf(timer2.getCount()));
-			case AVERAGE:
-				return Double.compare(timer1.getAverage(), timer2.getAverage());
-			case MIN:
-				return Double.compare(timer1.getMin(), timer2.getMin());
-			case MAX:
-				return Double.compare(timer1.getMax(), timer2.getMax());
-			case DURATION:
-				return Double.compare(timer1.getDuration(), timer2.getDuration());
-			case CPUAVERAGE:
-				return Double.compare(timer1.getCpuAverage(), timer2.getCpuAverage());
-			case CPUMIN:
-				return Double.compare(timer1.getCpuMin(), timer2.getCpuMin());
-			case CPUMAX:
-				return Double.compare(timer1.getCpuMax(), timer2.getCpuMax());
-			case CPUDURATION:
-				return Double.compare(timer1.getCpuDuration(), timer2.getCpuDuration());
-			case EXCLUSIVEAVERAGE:
-				return Double.compare(timer1.getExclusiveAverage(), timer2.getExclusiveAverage());
-			case EXCLUSIVEMAX:
-				return Double.compare(timer1.getExclusiveMax(), timer2.getExclusiveMax());
-			case EXCLUSIVEMIN:
-				return Double.compare(timer1.getExclusiveMin(), timer2.getExclusiveMin());
-			case EXCLUSIVESUM:
-				return Double.compare(timer1.getExclusiveDuration(), timer2.getExclusiveDuration());
-			default:
-				return 0;
-			}
-		}
-	}
-
 	@Override
 	public String getReadableString(Object object) {
 		if (object instanceof HttpTimerData) {

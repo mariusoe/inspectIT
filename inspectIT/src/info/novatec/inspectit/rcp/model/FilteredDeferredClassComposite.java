@@ -7,7 +7,7 @@ import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.List;
 

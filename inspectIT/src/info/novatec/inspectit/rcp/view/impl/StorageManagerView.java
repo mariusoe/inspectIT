@@ -25,7 +25,6 @@ import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
 import info.novatec.inspectit.rcp.storage.InspectITStorageManager;
 import info.novatec.inspectit.rcp.storage.listener.StorageChangeListener;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.rcp.view.IRefreshableView;
 import info.novatec.inspectit.rcp.view.tree.StorageManagerTreeContentProvider;
 import info.novatec.inspectit.rcp.view.tree.StorageManagerTreeLabelProvider;
@@ -35,6 +34,7 @@ import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageData.StorageState;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;

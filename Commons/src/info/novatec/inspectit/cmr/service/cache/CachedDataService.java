@@ -1,4 +1,4 @@
-package info.novatec.inspectit.rcp.repository.service.cache;
+package info.novatec.inspectit.cmr.service.cache;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
@@ -6,13 +6,16 @@ import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
-import info.novatec.inspectit.rcp.InspectIT;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipse.core.runtime.Assert;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * The default implementation of the cached ident objects. Provides a protected-visible method to
@@ -21,20 +24,32 @@ import org.eclipse.core.runtime.Assert;
  * @author Patrice Bouillet
  * 
  */
-public class CachedDataService {
+@Component
+public class CachedDataService implements InitializingBean {
+
+	/**
+	 * Logger for the class. Needed to be directly assigned, because this class is used on the UI
+	 * with no Spring to enhance it.
+	 */
+	private static final Log LOG = LogFactory.getLog(CachedDataService.class);
 
 	/**
 	 * Delegated service.
 	 */
+	@Autowired
 	private IGlobalDataAccessService globalDataAccessService;
+
+	/**
+	 * No-args constructor.
+	 */
+	public CachedDataService() {
+	}
 
 	/**
 	 * @param globalDataAccessService
 	 *            Delegated service.
 	 */
 	public CachedDataService(IGlobalDataAccessService globalDataAccessService) {
-		super();
-		Assert.isNotNull(globalDataAccessService);
 		this.globalDataAccessService = globalDataAccessService;
 	}
 
@@ -143,23 +158,26 @@ public class CachedDataService {
 			try {
 				platformIdent = globalDataAccessService.getCompleteAgent(overview.getId());
 			} catch (ServiceException e) {
-				InspectIT.getDefault().createErrorDialog("Exception occured trying to refresh sensor information for the agent " + overview.getAgentName() + ".", e, -1);
+				LOG.warn("Exception occured trying to refresh sensor information for the agent " + overview.getAgentName() + ".", e);
 				continue;
 			}
 			platformMap.put(platformIdent.getId(), platformIdent);
 
 			for (MethodIdent methodIdent : (Set<MethodIdent>) platformIdent.getMethodIdents()) {
-				if (!methodMap.containsKey(methodIdent.getId())) {
-					methodMap.put(methodIdent.getId(), methodIdent);
-				}
+				methodMap.put(methodIdent.getId(), methodIdent);
 			}
 
 			for (SensorTypeIdent sensorTypeIdent : (Set<SensorTypeIdent>) platformIdent.getSensorTypeIdents()) {
-				if (!sensorTypeMap.containsKey(sensorTypeIdent.getId())) {
-					sensorTypeMap.put(sensorTypeIdent.getId(), sensorTypeIdent);
-				}
+				sensorTypeMap.put(sensorTypeIdent.getId(), sensorTypeIdent);
 			}
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void afterPropertiesSet() throws Exception {
+		refreshIdents();
 	}
 
 }

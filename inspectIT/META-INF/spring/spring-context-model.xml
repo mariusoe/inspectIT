@@ -27,7 +27,7 @@
 	<bean id="cachingPlatformAdvice"
 		class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
 		<property name="advice" ref="cachingPlatformIdentInterceptor" />
-		<property name="pattern" value=".*getCompleteAgent.*" />
+		<property name="pattern" value=".*Proxy.*getCompleteAgent.*"/>
 	</bean>
 
 	<bean id="cmrServiceProvider"

@@ -6,7 +6,6 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.Pre
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController;
-import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 
 import java.util.List;
 import java.util.Set;
@@ -16,6 +15,7 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 
@@ -89,7 +89,7 @@ public interface TableInputController extends SubViewClassificationController {
 	 * 
 	 * @return The table viewer comparator.
 	 */
-	TableViewerComparator<? extends DefaultData> getComparator();
+	ViewerComparator getComparator();
 
 	/**
 	 * Sets the limit of the displayed elements in the table.

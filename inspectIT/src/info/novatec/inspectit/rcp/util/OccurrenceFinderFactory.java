@@ -7,6 +7,7 @@ import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

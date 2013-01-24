@@ -4,12 +4,12 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.storage.InspectITStorageManager;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
 import info.novatec.inspectit.rcp.wizard.page.ImportStorageInfoPage;
 import info.novatec.inspectit.rcp.wizard.page.ImportStorageSelectPage;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.StorageException;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;

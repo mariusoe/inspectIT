@@ -2,7 +2,13 @@ package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.comparator.IDataComparator;
+import info.novatec.inspectit.communication.comparator.InvocationAwareDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.MethodSensorDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.ResultComparator;
+import info.novatec.inspectit.communication.comparator.TimerDataComparatorEnum;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
@@ -18,7 +24,6 @@ import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
-import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +40,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 
@@ -57,43 +63,44 @@ public class TimerDataInputController extends AbstractTableInputController {
 	 * nothing else has to be changed.
 	 * 
 	 * @author Patrice Bouillet
+	 * @author Ivan Senic
 	 * 
 	 */
 	private static enum Column {
 		/** The package column. */
-		PACKAGE("Package", 200, InspectITImages.IMG_PACKAGE),
+		PACKAGE("Package", 200, InspectITImages.IMG_PACKAGE, MethodSensorDataComparatorEnum.PACKAGE),
 		/** The class column. */
-		CLASS("Class", 200, InspectITImages.IMG_CLASS),
+		CLASS("Class", 200, InspectITImages.IMG_CLASS, MethodSensorDataComparatorEnum.CLASS),
 		/** The method column. */
-		METHOD("Method", 300, InspectITImages.IMG_METHOD_PUBLIC),
+		METHOD("Method", 300, InspectITImages.IMG_METHOD_PUBLIC, MethodSensorDataComparatorEnum.METHOD),
 		/** Invocation Affiliation. */
-		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION),
+		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION, InvocationAwareDataComparatorEnum.INVOCATION_AFFILIATION),
 		/** The count column. */
-		COUNT("Count", 60, null),
+		COUNT("Count", 60, null, TimerDataComparatorEnum.COUNT),
 		/** The average column. */
-		AVERAGE("Avg (ms)", 60, null),
+		AVERAGE("Avg (ms)", 60, null, TimerDataComparatorEnum.AVERAGE),
 		/** The minimum column. */
-		MIN("Min (ms)", 60, null),
+		MIN("Min (ms)", 60, null, TimerDataComparatorEnum.MIN),
 		/** The maximum column. */
-		MAX("Max (ms)", 60, null),
+		MAX("Max (ms)", 60, null, TimerDataComparatorEnum.MAX),
 		/** The duration column. */
-		DURATION("Duration (ms)", 70, null),
+		DURATION("Duration (ms)", 70, null, TimerDataComparatorEnum.DURATION),
 		/** The average exclusive duration column. */
-		EXCLUSIVEAVERAGE("Exc. Avg (ms)", 80, null),
+		EXCLUSIVEAVERAGE("Exc. Avg (ms)", 80, null, TimerDataComparatorEnum.EXCLUSIVEAVERAGE),
 		/** The min exclusive duration column. */
-		EXCLUSIVEMIN("Exc. Min (ms)", 80, null),
+		EXCLUSIVEMIN("Exc. Min (ms)", 80, null, TimerDataComparatorEnum.EXCLUSIVEMIN),
 		/** The max exclusive duration column. */
-		EXCLUSIVEMAX("Exc. Max (ms)", 80, null),
+		EXCLUSIVEMAX("Exc. Max (ms)", 80, null, TimerDataComparatorEnum.EXCLUSIVEMAX),
 		/** The total exclusive duration column. */
-		EXCLUSIVESUM("Exc. duration (ms)", 80, null),
+		EXCLUSIVESUM("Exc. duration (ms)", 80, null, TimerDataComparatorEnum.EXCLUSIVEDURATION),
 		/** The cpu average column. */
-		CPUAVERAGE("Cpu Avg (ms)", 60, null),
+		CPUAVERAGE("Cpu Avg (ms)", 60, null, TimerDataComparatorEnum.CPUAVERAGE),
 		/** The cpu minimum column. */
-		CPUMIN("Cpu Min (ms)", 60, null),
+		CPUMIN("Cpu Min (ms)", 60, null, TimerDataComparatorEnum.CPUMIN),
 		/** The cpu maximum column. */
-		CPUMAX("Cpu Max (ms)", 60, null),
+		CPUMAX("Cpu Max (ms)", 60, null, TimerDataComparatorEnum.CPUMAX),
 		/** The cpu duration column. */
-		CPUDURATION("Cpu Duration (ms)", 70, null);
+		CPUDURATION("Cpu Duration (ms)", 70, null, TimerDataComparatorEnum.CPUDURATION);
 
 		/** The name. */
 		private String name;
@@ -101,6 +108,8 @@ public class TimerDataInputController extends AbstractTableInputController {
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
 		private Image image;
+		/** Comparator for the column. */
+		private IDataComparator<? super TimerData> dataComparator;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -111,11 +120,14 @@ public class TimerDataInputController extends AbstractTableInputController {
 		 *            The width of the column.
 		 * @param imageName
 		 *            The name of the image. Names are defined in {@link InspectITImages}.
+		 * @param dataComparator
+		 *            Comparator for the column.
 		 */
-		private Column(String name, int width, String imageName) {
+		private Column(String name, int width, String imageName, IDataComparator<? super TimerData> dataComparator) {
 			this.name = name;
 			this.width = width;
 			this.image = InspectIT.getDefault().getImage(imageName);
+			this.dataComparator = dataComparator;
 		}
 
 		/**
@@ -131,6 +143,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 			}
 			return Column.values()[i];
 		}
+
 	}
 
 	/**
@@ -325,10 +338,11 @@ public class TimerDataInputController extends AbstractTableInputController {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public TableViewerComparator<? extends DefaultData> getComparator() {
-		TimerDataViewerComparator timerDataViewerComparator = new TimerDataViewerComparator();
+	public ViewerComparator getComparator() {
+		TableViewerComparator<TimerData> timerDataViewerComparator = new TableViewerComparator<TimerData>();
 		for (Column column : Column.values()) {
-			timerDataViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), column);
+			ResultComparator<TimerData> resultComparator = new ResultComparator<TimerData>(column.dataComparator, cachedDataService);
+			timerDataViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), resultComparator);
 		}
 
 		return timerDataViewerComparator;
@@ -447,73 +461,6 @@ public class TimerDataInputController extends AbstractTableInputController {
 				return false;
 			}
 		}
-	}
-
-	/**
-	 * Viewer Comparator used by this input controller to display the contents of {@link TimerData}.
-	 * 
-	 * @author Patrice Bouillet
-	 * @author Ivan Senic
-	 * 
-	 */
-	private final class TimerDataViewerComparator extends TableViewerComparator<TimerData> {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected int compareElements(Viewer viewer, TimerData timer1, TimerData timer2) {
-			MethodIdent methodIdent1 = cachedDataService.getMethodIdentForId(timer1.getMethodIdent());
-			MethodIdent methodIdent2 = cachedDataService.getMethodIdentForId(timer2.getMethodIdent());
-
-			switch ((Column) getEnumSortColumn()) {
-			case PACKAGE:
-				if (methodIdent1.getPackageName() == null || methodIdent1.getPackageName().equals("")) {
-					return -1;
-				} else if (methodIdent2.getPackageName() == null || methodIdent2.getPackageName().equals("")) {
-					return 1;
-				} else {
-					return methodIdent1.getPackageName().compareTo(methodIdent2.getPackageName());
-				}
-			case CLASS:
-				return methodIdent1.getClassName().compareTo(methodIdent2.getClassName());
-			case METHOD:
-				String method1 = TextFormatter.getMethodWithParameters(methodIdent1);
-				String method2 = TextFormatter.getMethodWithParameters(methodIdent2);
-				return method1.compareTo(method2);
-			case INVOCATION_AFFILLIATION:
-				return Double.compare(timer1.getInvocationAffiliationPercentage(), timer2.getInvocationAffiliationPercentage());
-			case COUNT:
-				return Long.valueOf(timer1.getCount()).compareTo(Long.valueOf(timer2.getCount()));
-			case AVERAGE:
-				return Double.compare(timer1.getAverage(), timer2.getAverage());
-			case MIN:
-				return Double.compare(timer1.getMin(), timer2.getMin());
-			case MAX:
-				return Double.compare(timer1.getMax(), timer2.getMax());
-			case DURATION:
-				return Double.compare(timer1.getDuration(), timer2.getDuration());
-			case CPUAVERAGE:
-				return Double.compare(timer1.getCpuAverage(), timer2.getCpuAverage());
-			case CPUMIN:
-				return Double.compare(timer1.getCpuMin(), timer2.getCpuMin());
-			case CPUMAX:
-				return Double.compare(timer1.getCpuMax(), timer2.getCpuMax());
-			case CPUDURATION:
-				return Double.compare(timer1.getCpuDuration(), timer2.getCpuDuration());
-			case EXCLUSIVEAVERAGE:
-				return Double.compare(timer1.getExclusiveAverage(), timer2.getExclusiveAverage());
-			case EXCLUSIVEMAX:
-				return Double.compare(timer1.getExclusiveMax(), timer2.getExclusiveMax());
-			case EXCLUSIVEMIN:
-				return Double.compare(timer1.getExclusiveMin(), timer2.getExclusiveMin());
-			case EXCLUSIVESUM:
-				return Double.compare(timer1.getExclusiveDuration(), timer2.getExclusiveDuration());
-			default:
-				return 0;
-			}
-		}
-
 	}
 
 	/**

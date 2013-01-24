@@ -14,12 +14,12 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.storage.label.edit.LabelValueEditingSupport;
 import info.novatec.inspectit.rcp.storage.label.edit.LabelValueEditingSupport.LabelEditListener;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.MethodIdentToSensorType;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
@@ -23,7 +24,6 @@ import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
-import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.util.ArrayList;
 import java.util.Arrays;

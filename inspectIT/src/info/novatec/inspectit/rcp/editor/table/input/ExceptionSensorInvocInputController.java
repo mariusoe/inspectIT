@@ -1,8 +1,14 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.ExceptionEvent;
+import info.novatec.inspectit.communication.comparator.AggregatedExceptionSensorDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.DefaultDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.ExceptionSensorDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.IDataComparator;
+import info.novatec.inspectit.communication.comparator.MethodSensorDataComparatorEnum;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
@@ -16,14 +22,14 @@ import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
+import info.novatec.inspectit.rcp.editor.viewers.RawAggregatedResultComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
 import info.novatec.inspectit.rcp.model.ExceptionImageFactory;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
-import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -45,6 +51,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -86,19 +93,19 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	 */
 	private static enum Column {
 		/** The timestamp column. */
-		TIMESTAMP("Timestamp", 150, InspectITImages.IMG_TIMER, false, true),
+		TIMESTAMP("Timestamp", 150, InspectITImages.IMG_TIMER, false, true, DefaultDataComparatorEnum.TIMESTAMP),
 		/** The fqn column. */
-		FQN("Fully-Qualified Name", 400, InspectITImages.IMG_CLASS, true, true),
+		FQN("Fully-Qualified Name", 400, InspectITImages.IMG_CLASS, true, true, ExceptionSensorDataComparatorEnum.FQN),
 		/** The count column. */
-		CREATED("Created", 60, null, true, false),
+		CREATED("Created", 60, null, true, false, AggregatedExceptionSensorDataComparatorEnum.CREATED),
 		/** The RETHROWN column. */
-		RETHROWN("Rethrown", 60, null, true, false),
+		RETHROWN("Rethrown", 60, null, true, false, AggregatedExceptionSensorDataComparatorEnum.RETHROWN),
 		/** The HANDLED column. */
-		HANDLED("Handled", 60, null, true, false),
+		HANDLED("Handled", 60, null, true, false, AggregatedExceptionSensorDataComparatorEnum.HANDLED),
 		/** The constructor column. */
-		CONSTRUCTOR("Constructor", 250, InspectITImages.IMG_METHOD_PUBLIC, false, true),
+		CONSTRUCTOR("Constructor", 250, InspectITImages.IMG_METHOD_PUBLIC, false, true, MethodSensorDataComparatorEnum.METHOD),
 		/** The error message column. */
-		ERROR_MESSAGE("Error Message", 250, null, false, true);
+		ERROR_MESSAGE("Error Message", 250, null, false, true, ExceptionSensorDataComparatorEnum.ERROR_MESSAGE);
 
 		/** The name. */
 		private String name;
@@ -110,6 +117,8 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		private boolean showInAggregatedMode;
 		/** If the column should be shown in raw mode. */
 		private boolean showInRawMode;
+		/** Comparator for the column. */
+		private IDataComparator<? super AggregatedExceptionSensorData> dataComparator;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -124,14 +133,17 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 		 *            If the column should be shown in aggregated mode.
 		 * @param showInRawMode
 		 *            If the column should be shown in raw mode.
+		 * @param dataComparator
+		 *            Comparator for the column.
 		 * 
 		 */
-		private Column(String name, int width, String imageName, boolean showInAggregatedMode, boolean showInRawMode) {
+		private Column(String name, int width, String imageName, boolean showInAggregatedMode, boolean showInRawMode, IDataComparator<? super AggregatedExceptionSensorData> dataComparator) {
 			this.name = name;
 			this.width = width;
 			this.image = InspectIT.getDefault().getImage(imageName);
 			this.showInAggregatedMode = showInAggregatedMode;
 			this.showInRawMode = showInRawMode;
+			this.dataComparator = dataComparator;
 		}
 
 		/**
@@ -147,6 +159,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 			}
 			return Column.values()[i];
 		}
+
 	}
 
 	/**
@@ -404,10 +417,17 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	/**
 	 * {@inheritDoc}
 	 */
-	public TableViewerComparator<? extends DefaultData> getComparator() {
-		ExceptionSensorInputViewerComparator exceptionSensorInputViewerComparator = new ExceptionSensorInputViewerComparator();
+	public ViewerComparator getComparator() {
+		TableViewerComparator<AggregatedExceptionSensorData> exceptionSensorInputViewerComparator = new TableViewerComparator<AggregatedExceptionSensorData>();
 		for (Column column : Column.values()) {
-			exceptionSensorInputViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), column);
+			RawAggregatedResultComparator<AggregatedExceptionSensorData> comparator = new RawAggregatedResultComparator<AggregatedExceptionSensorData>(column.dataComparator, cachedDataService,
+					column.showInRawMode, column.showInAggregatedMode) {
+				@Override
+				protected boolean isRawMode() {
+					return rawMode;
+				}
+			};
+			exceptionSensorInputViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), comparator);
 		}
 
 		return exceptionSensorInputViewerComparator;
@@ -572,65 +592,6 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 				return null;
 			}
 		}
-	}
-
-	/**
-	 * Viewer Comparator used by this input controller to display the contents of
-	 * {@link ExceptionSensorData}.
-	 * 
-	 * @author Eduard Tudenhoefner
-	 * 
-	 */
-	private final class ExceptionSensorInputViewerComparator extends TableViewerComparator<ExceptionSensorData> {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected int compareElements(Viewer viewer, ExceptionSensorData data1, ExceptionSensorData data2) {
-			MethodIdent methodIdent1 = cachedDataService.getMethodIdentForId(data1.getMethodIdent());
-			MethodIdent methodIdent2 = cachedDataService.getMethodIdentForId(data2.getMethodIdent());
-
-			switch ((Column) getEnumSortColumn()) {
-			case TIMESTAMP:
-				if (rawMode) {
-					return data1.getTimeStamp().compareTo(data2.getTimeStamp());
-				}
-				return 0;
-			case FQN:
-				return data1.getThrowableType().compareTo(data2.getThrowableType());
-			case CREATED:
-				if (!rawMode && data1 instanceof AggregatedExceptionSensorData && data2 instanceof AggregatedExceptionSensorData) {
-					return Long.compare(((AggregatedExceptionSensorData) data1).getCreated(), ((AggregatedExceptionSensorData) data2).getCreated());
-				}
-				return 0;
-			case RETHROWN:
-				if (!rawMode && data1 instanceof AggregatedExceptionSensorData && data2 instanceof AggregatedExceptionSensorData) {
-					return Long.compare(((AggregatedExceptionSensorData) data1).getPassed(), ((AggregatedExceptionSensorData) data2).getPassed());
-				}
-				return 0;
-			case HANDLED:
-				if (!rawMode && data1 instanceof AggregatedExceptionSensorData && data2 instanceof AggregatedExceptionSensorData) {
-					return Long.compare(((AggregatedExceptionSensorData) data1).getHandled(), ((AggregatedExceptionSensorData) data2).getHandled());
-				}
-				return 0;
-			case CONSTRUCTOR:
-				if (rawMode) {
-					String method1 = TextFormatter.getMethodWithParameters(methodIdent1);
-					String method2 = TextFormatter.getMethodWithParameters(methodIdent2);
-					return method1.compareTo(method2);
-				}
-				return 0;
-			case ERROR_MESSAGE:
-				if (rawMode) {
-					return data1.getErrorMessage().compareTo(data1.getErrorMessage());
-				}
-				return 0;
-			default:
-				return 0;
-			}
-		}
-
 	}
 
 	/**

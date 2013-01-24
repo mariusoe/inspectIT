@@ -1,7 +1,12 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.comparator.DefaultDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.IDataComparator;
+import info.novatec.inspectit.communication.comparator.SqlStatementDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.TimerDataComparatorEnum;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.indexing.aggregation.impl.AggregationPerformer;
@@ -13,11 +18,11 @@ import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
+import info.novatec.inspectit.rcp.editor.viewers.RawAggregatedResultComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
-import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +44,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -77,21 +83,21 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	 */
 	private static enum Column {
 		/** The timestamp column. */
-		TIMESTAMP("Timestamp", 130, InspectITImages.IMG_TIMER, false, true),
+		TIMESTAMP("Timestamp", 130, InspectITImages.IMG_TIMER, false, true, DefaultDataComparatorEnum.TIMESTAMP),
 		/** The statement column. */
-		STATEMENT("Statement", 600, InspectITImages.IMG_DATABASE, true, true),
+		STATEMENT("Statement", 600, InspectITImages.IMG_DATABASE, true, true, SqlStatementDataComparatorEnum.SQL_AND_PARAMETERS),
 		/** The count column. */
-		COUNT("Count", 80, null, true, false),
+		COUNT("Count", 80, null, true, false, TimerDataComparatorEnum.COUNT),
 		/** The average column. */
-		AVERAGE("Avg (ms)", 80, null, true, false),
+		AVERAGE("Avg (ms)", 80, null, true, false, TimerDataComparatorEnum.AVERAGE),
 		/** The min column. */
-		MIN("Min (ms)", 80, null, true, false),
+		MIN("Min (ms)", 80, null, true, false, TimerDataComparatorEnum.MIN),
 		/** The max column. */
-		MAX("Max (ms)", 80, null, true, false),
+		MAX("Max (ms)", 80, null, true, false, TimerDataComparatorEnum.MAX),
 		/** The duration column. */
-		DURATION("Duration (ms)", 80, null, true, true),
+		DURATION("Duration (ms)", 80, null, true, true, TimerDataComparatorEnum.DURATION),
 		/** The prepared column. */
-		PREPARED("Prepared?", 60, null, false, true);
+		PREPARED("Prepared?", 60, null, false, true, SqlStatementDataComparatorEnum.IS_PREPARED_STATEMENT);
 
 		/** The name. */
 		private String name;
@@ -103,6 +109,8 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		private boolean showInAggregatedMode;
 		/** If the column should be shown in raw mode. */
 		private boolean showInRawMode;
+		/** Comparator for the column. */
+		private IDataComparator<? super SqlStatementData> dataComparator;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -117,14 +125,17 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		 *            If the column should be shown in aggregated mode.
 		 * @param showInRawMode
 		 *            If the column should be shown in raw mode.
+		 * @param dataComparator
+		 *            Comparator for the column.
 		 * 
 		 */
-		private Column(String name, int width, String imageName, boolean showInAggregatedMode, boolean showInRawMode) {
+		private Column(String name, int width, String imageName, boolean showInAggregatedMode, boolean showInRawMode, IDataComparator<? super SqlStatementData> dataComparator) {
 			this.name = name;
 			this.width = width;
 			this.image = InspectIT.getDefault().getImage(imageName);
 			this.showInAggregatedMode = showInAggregatedMode;
 			this.showInRawMode = showInRawMode;
+			this.dataComparator = dataComparator;
 		}
 
 		/**
@@ -398,10 +409,17 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	/**
 	 * {@inheritDoc}
 	 */
-	public TableViewerComparator<? extends DefaultData> getComparator() {
-		SqlInputViewerComparator sqlInputViewerComparator = new SqlInputViewerComparator();
+	public ViewerComparator getComparator() {
+		TableViewerComparator<SqlStatementData> sqlInputViewerComparator = new TableViewerComparator<SqlStatementData>();
 		for (Column column : Column.values()) {
-			sqlInputViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), column);
+			RawAggregatedResultComparator<SqlStatementData> comparator = new RawAggregatedResultComparator<SqlStatementData>(column.dataComparator, cachedDataService, column.showInRawMode,
+					column.showInAggregatedMode) {
+				@Override
+				protected boolean isRawMode() {
+					return rawMode;
+				}
+			};
+			sqlInputViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), comparator);
 		}
 
 		return sqlInputViewerComparator;
@@ -538,56 +556,6 @@ public class SqlInvocInputController extends AbstractTableInputController {
 			Column enumId = Column.fromOrd(index);
 
 			return getStyledTextForColumn(data, enumId);
-		}
-
-	}
-
-	/**
-	 * Viewer Comparator used by this input controller to display the contents of
-	 * {@link BasicSQLData}.
-	 * 
-	 * @author Patrice Bouillet
-	 * 
-	 */
-	private final class SqlInputViewerComparator extends TableViewerComparator<SqlStatementData> {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected int compareElements(Viewer viewer, SqlStatementData sql1, SqlStatementData sql2) {
-			switch ((Column) getEnumSortColumn()) {
-			case TIMESTAMP:
-				if (rawMode) {
-					return sql1.getTimeStamp().compareTo(sql2.getTimeStamp());
-				} else {
-					return 0;
-				}
-			case STATEMENT:
-				if (rawMode) {
-					return sql1.getSqlWithParameterValues().compareTo(sql2.getSqlWithParameterValues());
-				} else {
-					return sql1.getSql().compareTo(sql2.getSql());
-				}
-			case COUNT:
-				return Long.valueOf(sql1.getCount()).compareTo(Long.valueOf(sql2.getCount()));
-			case AVERAGE:
-				return Double.compare(sql1.getAverage(), sql2.getAverage());
-			case MIN:
-				return Double.compare(sql1.getMin(), sql2.getMin());
-			case MAX:
-				return Double.compare(sql1.getMax(), sql2.getMax());
-			case DURATION:
-				return Double.compare(sql1.getDuration(), sql2.getDuration());
-			case PREPARED:
-				if (rawMode) {
-					return Boolean.compare(sql1.isPreparedStatement(), sql2.isPreparedStatement());
-				} else {
-					return 0;
-				}
-			default:
-				return 0;
-			}
 		}
 
 	}

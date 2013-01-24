@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
@@ -13,7 +14,6 @@ import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.editor.search.criteria.SearchCriteria;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
-import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.util.ArrayList;
 import java.util.Collections;

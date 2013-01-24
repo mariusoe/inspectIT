@@ -12,9 +12,9 @@ import info.novatec.inspectit.rcp.model.Component;
 import info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.recording.RecordingState;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.text.DateFormat;
 import java.util.Date;

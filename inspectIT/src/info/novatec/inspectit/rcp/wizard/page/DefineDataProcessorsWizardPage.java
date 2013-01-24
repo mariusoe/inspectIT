@@ -15,12 +15,12 @@ import info.novatec.inspectit.indexing.aggregation.impl.SqlStatementDataAggregat
 import info.novatec.inspectit.indexing.aggregation.impl.TimerDataAggregator;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.processor.impl.DataAggregatorProcessor;
 import info.novatec.inspectit.storage.processor.impl.DataSaverProcessor;
 import info.novatec.inspectit.storage.processor.impl.InvocationClonerDataProcessor;
 import info.novatec.inspectit.storage.processor.impl.InvocationExtractorDataProcessor;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;

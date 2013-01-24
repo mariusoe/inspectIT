@@ -20,9 +20,9 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatu
 import info.novatec.inspectit.rcp.repository.CmrRepositoryManager;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryManager.UpdateRepositoryJob;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.rcp.view.IRefreshableView;
 import info.novatec.inspectit.rcp.view.tree.TreeContentProvider;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

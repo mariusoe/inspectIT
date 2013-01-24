@@ -3,7 +3,6 @@ package info.novatec.inspectit.rcp.editor.table.input;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
-import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 
@@ -17,6 +16,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 
@@ -112,7 +112,7 @@ public class AggregatedTimerSummaryInputController extends AbstractTableInputCon
 	/**
 	 * {@inheritDoc}
 	 */
-	public TableViewerComparator<? extends DefaultData> getComparator() {
+	public ViewerComparator getComparator() {
 		// no sorting
 		return null;
 	}

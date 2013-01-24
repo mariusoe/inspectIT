@@ -7,7 +7,7 @@ import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
-import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 
 /**
  * The interface to the repository definition. A repository can be anywhere and anything, the

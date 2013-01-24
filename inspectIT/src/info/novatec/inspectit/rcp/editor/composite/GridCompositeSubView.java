@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.editor.composite;
 
 import info.novatec.inspectit.rcp.editor.ISubView;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -2,7 +2,13 @@ package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.comparator.DefaultDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.IDataComparator;
+import info.novatec.inspectit.communication.comparator.InvocationSequenceDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.MethodSensorDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.InvocationSequenceDataHelper;
@@ -22,8 +28,6 @@ import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
-import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -37,7 +41,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
-import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -47,6 +50,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -77,19 +81,19 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 */
 	private static enum Column {
 		/** The time column. */
-		NESTED_DATA("", 40, null),
+		NESTED_DATA("", 40, null, InvocationSequenceDataComparatorEnum.NESTED_DATA),
 		/** The time column. */
-		TIME("Start Time", 150, InspectITImages.IMG_TIMER),
+		TIME("Start Time", 150, InspectITImages.IMG_TIMER, DefaultDataComparatorEnum.TIMESTAMP),
 		/** The method column. */
-		METHOD("Method", 550, InspectITImages.IMG_METHOD_PUBLIC),
+		METHOD("Method", 550, InspectITImages.IMG_METHOD_PUBLIC, MethodSensorDataComparatorEnum.METHOD),
 		/** The duration column. */
-		DURATION("Duration (ms)", 100, InspectITImages.IMG_LAST_HOUR),
+		DURATION("Duration (ms)", 100, InspectITImages.IMG_LAST_HOUR, InvocationSequenceDataComparatorEnum.DURATION),
 		/** The count column. */
-		COUNT("Child Count", 100, null),
+		COUNT("Child Count", 100, null, InvocationSequenceDataComparatorEnum.CHILD_COUNT),
 		/** The URI column. */
-		URI("URI", 150, null),
+		URI("URI", 150, null, InvocationSequenceDataComparatorEnum.URI),
 		/** The Use case column. */
-		USE_CASE("Use case", 100, null);
+		USE_CASE("Use case", 100, null, InvocationSequenceDataComparatorEnum.USE_CASE);
 
 		/** The name. */
 		private String name;
@@ -97,6 +101,8 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
 		private Image image;
+		/** Comparator for the column. */
+		private IDataComparator<? super InvocationSequenceData> dataComparator;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -107,11 +113,14 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		 *            The width of the column.
 		 * @param imageName
 		 *            The name of the image. Names are defined in {@link InspectITImages}.
+		 * @param dataComparator
+		 *            Comparator for the column.
 		 */
-		private Column(String name, int width, String imageName) {
+		private Column(String name, int width, String imageName, IDataComparator<? super InvocationSequenceData> dataComparator) {
 			this.name = name;
 			this.width = width;
 			this.image = InspectIT.getDefault().getImage(imageName);
+			this.dataComparator = dataComparator;
 		}
 
 		/**
@@ -127,6 +136,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 			}
 			return Column.values()[i];
 		}
+
 	}
 
 	/**
@@ -264,10 +274,11 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	/**
 	 * {@inheritDoc}
 	 */
-	public TableViewerComparator<? extends DefaultData> getComparator() {
-		InvocOverviewViewerComparator invocOverviewViewerComparator = new InvocOverviewViewerComparator();
+	public ViewerComparator getComparator() {
+		TableViewerComparator<InvocationSequenceData> invocOverviewViewerComparator = new TableViewerComparator<InvocationSequenceData>();
 		for (Column column : Column.values()) {
-			invocOverviewViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), column);
+			ResultComparator<InvocationSequenceData> resultComparator = new ResultComparator<InvocationSequenceData>(column.dataComparator, cachedDataService);
+			invocOverviewViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), resultComparator);
 		}
 
 		return invocOverviewViewerComparator;
@@ -483,84 +494,6 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	}
 
 	/**
-	 * Viewer Comparator used by this input controller to display the contents of
-	 * {@link BasicSQLData}.
-	 * 
-	 * @author Patrice Bouillet
-	 * 
-	 */
-	private static final class InvocOverviewViewerComparator extends TableViewerComparator<InvocationSequenceData> {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected int compareElements(Viewer viewer, InvocationSequenceData invoc1, InvocationSequenceData invoc2) {
-			switch ((Column) getEnumSortColumn()) {
-			case NESTED_DATA:
-				int invNested1 = 0;
-				if (InvocationSequenceDataHelper.hasNestedSqlStatements(invoc1)) {
-					invNested1 += 2;
-				}
-				if (InvocationSequenceDataHelper.hasNestedExceptions(invoc1)) {
-					invNested1++;
-				}
-				int invNested2 = 0;
-				if (InvocationSequenceDataHelper.hasNestedSqlStatements(invoc2)) {
-					invNested2 += 2;
-				}
-				if (InvocationSequenceDataHelper.hasNestedExceptions(invoc2)) {
-					invNested2++;
-				}
-				return invNested1 - invNested2;
-			case TIME:
-				return invoc1.getTimeStamp().compareTo(invoc2.getTimeStamp());
-			case METHOD:
-				IBaseLabelProvider baseLabelProvider = ((ContentViewer) viewer).getLabelProvider();
-				InvocOverviewLabelProvider invocLabelProvider = (InvocOverviewLabelProvider) baseLabelProvider;
-				String text1 = invocLabelProvider.getStyledText(invoc1, Column.METHOD.ordinal()).getString();
-				String text2 = invocLabelProvider.getStyledText(invoc2, Column.METHOD.ordinal()).getString();
-				return text1.compareTo(text2);
-			case DURATION:
-				if (InvocationSequenceDataHelper.hasTimerData(invoc1) && InvocationSequenceDataHelper.hasTimerData(invoc2)) {
-					return Double.compare(invoc1.getTimerData().getDuration(), invoc2.getTimerData().getDuration());
-				} else {
-					return Double.compare(invoc1.getDuration(), invoc2.getDuration());
-				}
-			case COUNT:
-				return Long.valueOf(invoc1.getChildCount()).compareTo(Long.valueOf(invoc2.getChildCount()));
-			case URI:
-				if (isHttpDataBounded(invoc1) && isHttpDataBounded(invoc2)) {
-					String uri1 = ((HttpTimerData) invoc1.getTimerData()).getUri();
-					String uri2 = ((HttpTimerData) invoc2.getTimerData()).getUri();
-					return ObjectUtils.compare(uri1, uri2);
-				} else if (isHttpDataBounded(invoc1)) {
-					return 1;
-				} else if (isHttpDataBounded(invoc2)) {
-					return -1;
-				} else {
-					return 0;
-				}
-			case USE_CASE:
-				if (isHttpDataBounded(invoc1) && isHttpDataBounded(invoc2)) {
-					String useCase1 = ((HttpTimerData) invoc1.getTimerData()).getInspectItTaggingHeaderValue();
-					String useCase2 = ((HttpTimerData) invoc2.getTimerData()).getInspectItTaggingHeaderValue();
-					return ObjectUtils.compare(useCase1, useCase2);
-				} else if (isHttpDataBounded(invoc1)) {
-					return 1;
-				} else if (isHttpDataBounded(invoc2)) {
-					return -1;
-				} else {
-					return 0;
-				}
-			default:
-				return 0;
-			}
-		}
-
-	}
-
-	/**
 	 * Returns the styled text for a specific column.
 	 * 
 	 * @param data
@@ -591,7 +524,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		case COUNT:
 			return new StyledString(NumberFormatter.formatLong(data.getChildCount()));
 		case URI:
-			if (isHttpDataBounded(data)) {
+			if (InvocationSequenceDataHelper.hasHttpTimerData(data)) {
 				String uri = ((HttpTimerData) data.getTimerData()).getUri();
 				if (null != uri) {
 					return new StyledString(uri);
@@ -602,7 +535,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 				return emptyStyledString;
 			}
 		case USE_CASE:
-			if (isHttpDataBounded(data)) {
+			if (InvocationSequenceDataHelper.hasHttpTimerData(data)) {
 				String useCase = ((HttpTimerData) data.getTimerData()).getInspectItTaggingHeaderValue();
 				if (null != useCase) {
 					return new StyledString(useCase);
@@ -649,17 +582,6 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 			return values;
 		}
 		throw new RuntimeException("Could not create the column values!");
-	}
-
-	/**
-	 * Returns if the given invocation sequence has {@link HttpTimerData} bounded.
-	 * 
-	 * @param invocationSequenceData
-	 *            Invocation to check.
-	 * @return True if {@link HttpTimerData} is available.
-	 */
-	private static boolean isHttpDataBounded(InvocationSequenceData invocationSequenceData) {
-		return invocationSequenceData.getTimerData() instanceof HttpTimerData;
 	}
 
 	/**

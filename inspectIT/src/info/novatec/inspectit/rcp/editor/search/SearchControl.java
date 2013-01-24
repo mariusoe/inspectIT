@@ -4,7 +4,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.search.criteria.SearchCriteria;
 import info.novatec.inspectit.rcp.editor.search.criteria.SearchResult;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;

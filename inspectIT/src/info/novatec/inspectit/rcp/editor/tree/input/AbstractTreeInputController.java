@@ -4,7 +4,6 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
-import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -16,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.widgets.Shell;
 
@@ -82,7 +82,7 @@ public abstract class AbstractTreeInputController implements TreeInputController
 	 * <p>
 	 * Return <code>null</code> by default, sub-classes may override.
 	 */
-	public TreeViewerComparator<? extends DefaultData> getComparator() {
+	public ViewerComparator getComparator() {
 		return null;
 	}
 

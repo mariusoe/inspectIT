@@ -1,4 +1,7 @@
-package info.novatec.inspectit.rcp.util;
+package info.novatec.inspectit.util;
+
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Utility class for handling currently a proper equals comparison of objects.
@@ -75,6 +78,52 @@ public final class ObjectUtils {
 		} else {
 			return 0;
 		}
+	}
+
+	/**
+	 * Compares two lists of string comparing one string in the list against string ont he same
+	 * position in the other list.<br>
+	 * <br>
+	 * Examples:<br>
+	 * <br>
+	 * {"ana", "b"} vs {"awa", "b"} - negative<br>
+	 * {"ana", "b"} vs {"ana", "c"} - negative<br>
+	 * {} vs {"a"} - negative<br>
+	 * {"a"} vs {"b", "c"} - negative<br>
+	 * {"a"} vs {"a", "b"} - negative<br>
+	 * {"a"} vs <code>null</code> - negative<br>
+	 * <code>null</code> vs {} - positive<br>
+	 * <code>null</code> vs <code>null</code> - 0<br>
+	 * 
+	 * @param list1
+	 *            First list of strings.
+	 * @param list2
+	 *            Second list of strings.
+	 * @return a negative integer, zero, or a positive integer as the first argument is less than,
+	 *         equal to, or greater than the second.
+	 * @see Comparator#compare(Object, Object)
+	 */
+	public static int compare(List<String> list1, List<String> list2) {
+		if (null != list1 && null != list2) {
+			int i = 0;
+			int listSize1 = list1.size();
+			int listSize2 = list2.size();
+			while (i < listSize1 && i < listSize2) {
+				int result = ObjectUtils.compare(list1.get(i), list2.get(i));
+				if (0 != result) {
+					return result;
+				}
+				i++;
+			}
+			return listSize1 - listSize2;
+		} else if (null != list1) {
+			return 1;
+		} else if (null != list2) {
+			return -1;
+		} else {
+			return 0;
+		}
+
 	}
 
 }

@@ -4,9 +4,9 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.composite.StorageInfoComposite;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;

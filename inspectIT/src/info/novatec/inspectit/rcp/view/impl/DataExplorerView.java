@@ -17,7 +17,6 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryManager.UpdateReposito
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
 import info.novatec.inspectit.rcp.storage.listener.StorageChangeListener;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.rcp.util.SelectionProviderAdapter;
 import info.novatec.inspectit.rcp.view.IRefreshableView;
 import info.novatec.inspectit.rcp.view.listener.TreeViewDoubleClickListener;
@@ -26,6 +25,7 @@ import info.novatec.inspectit.rcp.view.tree.TreeLabelProvider;
 import info.novatec.inspectit.rcp.view.tree.TreeViewerComparator;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

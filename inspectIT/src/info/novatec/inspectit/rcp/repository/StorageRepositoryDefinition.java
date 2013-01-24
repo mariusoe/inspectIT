@@ -8,6 +8,7 @@ import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
@@ -15,7 +16,6 @@ import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
-import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 import info.novatec.inspectit.rcp.repository.service.storage.StorageServiceProvider;
 import info.novatec.inspectit.storage.LocalStorageData;
 

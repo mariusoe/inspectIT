@@ -5,7 +5,6 @@ import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController;
-import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
 
 import java.util.List;
 import java.util.Set;
@@ -14,6 +13,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.widgets.Shell;
 
@@ -74,7 +74,7 @@ public interface TreeInputController extends SubViewClassificationController {
 	 * 
 	 * @return The tree viewer comparator.
 	 */
-	TreeViewerComparator<? extends DefaultData> getComparator();
+	ViewerComparator getComparator();
 
 	/**
 	 * Refreshes the current data and updates the tree input if new items are available.

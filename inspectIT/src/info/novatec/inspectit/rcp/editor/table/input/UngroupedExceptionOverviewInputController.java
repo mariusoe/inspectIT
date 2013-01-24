@@ -2,7 +2,12 @@ package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.comparator.DefaultDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.IDataComparator;
+import info.novatec.inspectit.communication.comparator.InvocationAwareDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.MethodSensorDataComparatorEnum;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
@@ -12,14 +17,12 @@ import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
-import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
-import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -41,6 +44,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -70,13 +74,13 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	 */
 	private static enum Column {
 		/** The count column. */
-		TIMESTAMP("Timestamp", 150, InspectITImages.IMG_TIMER),
+		TIMESTAMP("Timestamp", 150, InspectITImages.IMG_TIMER, DefaultDataComparatorEnum.TIMESTAMP),
 		/** The class column. */
-		CLASS("Class", 250, InspectITImages.IMG_CLASS),
+		CLASS("Class", 250, InspectITImages.IMG_CLASS, MethodSensorDataComparatorEnum.CLASS),
 		/** The package column. */
-		PACKAGE("Package", 250, InspectITImages.IMG_PACKAGE),
+		PACKAGE("Package", 250, InspectITImages.IMG_PACKAGE, MethodSensorDataComparatorEnum.PACKAGE),
 		/** Invocation Affiliation. */
-		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION);
+		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION, InvocationAwareDataComparatorEnum.INVOCATION_AFFILIATION);
 
 		/** The name. */
 		private String name;
@@ -84,6 +88,10 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
 		private Image image;
+		/** Comparator for the column. */
+		@SuppressWarnings("unused")
+		// just until the remote sorting is not implemented
+		private IDataComparator<? super ExceptionSensorData> dataComparator;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -94,11 +102,14 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 		 *            The width of the column.
 		 * @param imageName
 		 *            The name of the image. Names are defined in {@link InspectITImages}.
+		 * @param dataComparator
+		 *            Comparator for the column.
 		 */
-		private Column(String name, int width, String imageName) {
+		private Column(String name, int width, String imageName, IDataComparator<? super ExceptionSensorData> dataComparator) {
 			this.name = name;
 			this.width = width;
 			this.image = InspectIT.getDefault().getImage(imageName);
+			this.dataComparator = dataComparator;
 		}
 
 		/**
@@ -114,6 +125,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 			}
 			return Column.values()[i];
 		}
+
 	}
 
 	/**
@@ -214,7 +226,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	/**
 	 * {@inheritDoc}
 	 */
-	public TableViewerComparator<? extends DefaultData> getComparator() {
+	public ViewerComparator getComparator() {
 		return null;
 	}
 

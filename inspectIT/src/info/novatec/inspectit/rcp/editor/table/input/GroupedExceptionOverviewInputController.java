@@ -1,7 +1,13 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.comparator.AggregatedExceptionSensorDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.ExceptionSensorDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.IDataComparator;
+import info.novatec.inspectit.communication.comparator.InvocationAwareDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
@@ -39,6 +45,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -68,15 +75,15 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	 */
 	private static enum Column {
 		/** The class column. */
-		FQN("Fully-Qualified Name", 450, InspectITImages.IMG_CLASS),
+		FQN("Fully-Qualified Name", 450, InspectITImages.IMG_CLASS, ExceptionSensorDataComparatorEnum.FQN),
 		/** Invocation Affiliation. */
-		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION),
+		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION, InvocationAwareDataComparatorEnum.INVOCATION_AFFILIATION),
 		/** The CREATED column. */
-		CREATED("Created", 70, null),
+		CREATED("Created", 70, null, AggregatedExceptionSensorDataComparatorEnum.CREATED),
 		/** The RETHROWN column. */
-		RETHROWN("Rethrown", 70, null),
+		RETHROWN("Rethrown", 70, null, AggregatedExceptionSensorDataComparatorEnum.RETHROWN),
 		/** The HANDLED column. */
-		HANDLED("Handled", 70, null);
+		HANDLED("Handled", 70, null, AggregatedExceptionSensorDataComparatorEnum.HANDLED);
 
 		/** The name. */
 		private String name;
@@ -84,6 +91,8 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		private int width;
 		/** The image descriptor. Can be <code>null</code> */
 		private Image image;
+		/** Comparator for the column. */
+		private IDataComparator<? super AggregatedExceptionSensorData> dataComparator;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -94,11 +103,14 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		 *            The width of the column.
 		 * @param imageName
 		 *            The name of the image. Names are defined in {@link InspectITImages}.
+		 * @param dataComparator
+		 *            Comparator for the column.
 		 */
-		private Column(String name, int width, String imageName) {
+		private Column(String name, int width, String imageName, IDataComparator<? super AggregatedExceptionSensorData> dataComparator) {
 			this.name = name;
 			this.width = width;
 			this.image = InspectIT.getDefault().getImage(imageName);
+			this.dataComparator = dataComparator;
 		}
 
 		/**
@@ -114,6 +126,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 			}
 			return Column.values()[i];
 		}
+
 	}
 
 	/**
@@ -210,10 +223,12 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	/**
 	 * {@inheritDoc}
 	 */
-	public TableViewerComparator<? extends DefaultData> getComparator() {
-		GroupedExceptionOverviewViewerComparator exceptionOverviewViewerComparator = new GroupedExceptionOverviewViewerComparator();
+	public ViewerComparator getComparator() {
+		CachedDataService cachedDataService = getInputDefinition().getRepositoryDefinition().getCachedDataService();
+		TableViewerComparator<AggregatedExceptionSensorData> exceptionOverviewViewerComparator = new TableViewerComparator<AggregatedExceptionSensorData>();
 		for (Column column : Column.values()) {
-			exceptionOverviewViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), column);
+			ResultComparator<AggregatedExceptionSensorData> resultComparator = new ResultComparator<AggregatedExceptionSensorData>(column.dataComparator, cachedDataService);
+			exceptionOverviewViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), resultComparator);
 		}
 
 		return exceptionOverviewViewerComparator;
@@ -490,36 +505,6 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 			return values;
 		}
 		throw new RuntimeException("Could not create the column values!");
-	}
-
-	/**
-	 * Viewer Comparator used by this input controller to display the contents.
-	 * 
-	 * @author Eduard Tudenhoefner
-	 * 
-	 */
-	private static final class GroupedExceptionOverviewViewerComparator extends TableViewerComparator<AggregatedExceptionSensorData> {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected int compareElements(Viewer viewer, AggregatedExceptionSensorData data1, AggregatedExceptionSensorData data2) {
-			switch ((Column) getEnumSortColumn()) {
-			case FQN:
-				return data1.getThrowableType().compareTo(data2.getThrowableType());
-			case INVOCATION_AFFILLIATION:
-				return Double.compare(data1.getInvocationAffiliationPercentage(), data2.getInvocationAffiliationPercentage());
-			case CREATED:
-				return Long.valueOf(data1.getCreated()).compareTo(Long.valueOf(data2.getCreated()));
-			case RETHROWN:
-				return Long.valueOf(data1.getPassed()).compareTo(Long.valueOf(data2.getPassed()));
-			case HANDLED:
-				return Long.valueOf(data1.getHandled()).compareTo(Long.valueOf(data2.getHandled()));
-			default:
-				return 0;
-			}
-		}
 	}
 
 }

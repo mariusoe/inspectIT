@@ -78,7 +78,7 @@ public final class InvocationSequenceDataHelper {
 	 * @return whether this data object contains a http timer data object.
 	 */
 	public static boolean hasHttpTimerData(InvocationSequenceData data) {
-		return hasTimerData(data) && data.getTimerData().getClass().equals(HttpTimerData.class);
+		return data.getTimerData() instanceof HttpTimerData;
 	}
 
 	/**

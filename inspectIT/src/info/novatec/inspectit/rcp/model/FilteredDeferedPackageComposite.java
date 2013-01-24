@@ -2,7 +2,7 @@ package info.novatec.inspectit.rcp.model;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.MethodIdentToSensorType;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import com.google.common.base.Objects;
 

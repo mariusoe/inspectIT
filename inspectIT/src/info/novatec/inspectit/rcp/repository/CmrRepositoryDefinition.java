@@ -11,9 +11,9 @@ import info.novatec.inspectit.cmr.service.IServerStatusService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.cmr.service.IStorageService;
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider;
-import info.novatec.inspectit.rcp.repository.service.cache.CachedDataService;
 import info.novatec.inspectit.rcp.repository.service.cmr.CmrServiceProvider;
 
 import java.util.ArrayList;

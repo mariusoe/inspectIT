@@ -11,7 +11,7 @@ import info.novatec.inspectit.rcp.handlers.MaximizeActiveViewHandler;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
-import info.novatec.inspectit.rcp.util.ObjectUtils;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
