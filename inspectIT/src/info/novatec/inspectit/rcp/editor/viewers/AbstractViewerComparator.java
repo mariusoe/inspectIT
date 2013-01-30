@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.editor.viewers;
 
-import java.util.Comparator;
+import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.comparator.ResultComparator;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -15,7 +16,7 @@ import org.eclipse.swt.SWT;
  * @param <T>
  *            Type for which comparator is created.
  */
-public abstract class AbstractViewerComparator<T> extends ViewerComparator {
+public abstract class AbstractViewerComparator<T extends DefaultData> extends ViewerComparator {
 
 	/**
 	 * The available sort states.
@@ -60,7 +61,7 @@ public abstract class AbstractViewerComparator<T> extends ViewerComparator {
 	/**
 	 * Current comparator provider.
 	 */
-	private Comparator<T> comparator;
+	private ResultComparator<T> comparator;
 
 	/**
 	 * Default sort state.
@@ -73,14 +74,16 @@ public abstract class AbstractViewerComparator<T> extends ViewerComparator {
 	 * @param id
 	 *            The comparator provider.
 	 */
-	protected void toggleSortColumn(Comparator<T> id) {
+	protected void toggleSortColumn(ResultComparator<T> id) {
 		if (comparator == id) { // NOPMD
 			switch (sortState) {
 			case NONE:
 				sortState = SortState.UP;
+				comparator.setAscending(true);
 				break;
 			case UP:
 				sortState = SortState.DOWN;
+				comparator.setAscending(false);
 				break;
 			case DOWN:
 				sortState = SortState.NONE;
@@ -91,6 +94,7 @@ public abstract class AbstractViewerComparator<T> extends ViewerComparator {
 		} else {
 			comparator = id;
 			sortState = SortState.UP;
+			comparator.setAscending(true);
 		}
 	}
 
@@ -112,13 +116,7 @@ public abstract class AbstractViewerComparator<T> extends ViewerComparator {
 		T e1 = (T) o1;
 		T e2 = (T) o2;
 
-		int result = comparator.compare(e1, e2);
-
-		if (SortState.DOWN.equals(sortState)) {
-			result = result * -1;
-		}
-
-		return result;
+		return comparator.compare(e1, e2);
 	}
 
 	/**

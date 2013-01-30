@@ -8,6 +8,7 @@ import info.novatec.inspectit.communication.comparator.DefaultDataComparatorEnum
 import info.novatec.inspectit.communication.comparator.IDataComparator;
 import info.novatec.inspectit.communication.comparator.InvocationAwareDataComparatorEnum;
 import info.novatec.inspectit.communication.comparator.MethodSensorDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
@@ -17,6 +18,7 @@ import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
+import info.novatec.inspectit.rcp.editor.table.RemoteTableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
@@ -89,8 +91,6 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 		/** The image descriptor. Can be <code>null</code> */
 		private Image image;
 		/** Comparator for the column. */
-		@SuppressWarnings("unused")
-		// just until the remote sorting is not implemented
 		private IDataComparator<? super ExceptionSensorData> dataComparator;
 
 		/**
@@ -164,6 +164,11 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	private IExceptionDataAccessService dataAccessService;
 
 	/**
+	 * Result comparator to be used on the server.
+	 */
+	private ResultComparator<ExceptionSensorData> resultComparator;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -197,6 +202,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 			if (null != column.image) {
 				viewerColumn.getColumn().setImage(column.image);
 			}
+			mapTableViewerColumn(column, viewerColumn);
 		}
 	}
 
@@ -227,7 +233,20 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	 * {@inheritDoc}
 	 */
 	public ViewerComparator getComparator() {
-		return null;
+		RemoteTableViewerComparator<ExceptionSensorData> exceptionViewerComparator = new RemoteTableViewerComparator<ExceptionSensorData>() {
+			@Override
+			protected void sortRemotely(ResultComparator<ExceptionSensorData> resultComparator) {
+				UngroupedExceptionOverviewInputController.this.resultComparator = resultComparator;
+				loadDataFromService();
+			}
+		};
+		for (Column column : Column.values()) {
+			// since it is remote sorting we do not provide local cached data service
+			ResultComparator<ExceptionSensorData> resultComparator = new ResultComparator<ExceptionSensorData>(column.dataComparator);
+			exceptionViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), resultComparator);
+		}
+
+		return exceptionViewerComparator;
 	}
 
 	/**
@@ -292,23 +311,31 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	public void doRefresh(IProgressMonitor monitor, IRootEditor rootEditor) {
 		monitor.beginTask("Updating the Ungrouped Exception Overview", IProgressMonitor.UNKNOWN);
 		monitor.subTask("Retrieving the Ungrouped Exception Overview");
+
+		loadDataFromService();
+
+		monitor.done();
+	}
+
+	/**
+	 * Reloads the data from the service.
+	 */
+	private void loadDataFromService() {
 		List<ExceptionSensorData> exData = null;
 
 		// if fromDate and toDate are set, then we retrieve only the data for
 		// this time interval
 		if (null != fromDate && null != toDate) {
-			exData = dataAccessService.getUngroupedExceptionOverview(template, limit, fromDate, toDate);
+			exData = dataAccessService.getUngroupedExceptionOverview(template, limit, fromDate, toDate, resultComparator);
 		} else {
-			exData = dataAccessService.getUngroupedExceptionOverview(template, limit);
+			exData = dataAccessService.getUngroupedExceptionOverview(template, limit, resultComparator);
 		}
 		exceptionSensorData.clear();
 
 		if ((null != exData)) {
-			monitor.subTask("Displaying the Exception Tree Overview");
 			exceptionSensorData.addAll(exData);
 		}
 
-		monitor.done();
 	}
 
 	/**

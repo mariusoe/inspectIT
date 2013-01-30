@@ -1,7 +1,9 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.ExceptionSensorDataDao;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
+import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.spring.logger.Logger;
@@ -35,11 +37,20 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	private ExceptionSensorDataDao exceptionSensorDataDao;
 
 	/**
+	 * {@link CachedDataService}.
+	 */
+	@Autowired
+	private CachedDataService cachedDataService;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit) {
-		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template, limit);
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, ResultComparator<ExceptionSensorData> resultComparator) {
+		if (null != resultComparator) {
+			resultComparator.setCachedDataService(cachedDataService);
+		}
+		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template, limit, resultComparator);
 		return result;
 	}
 
@@ -47,8 +58,11 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate) {
-		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template, limit, fromDate, toDate);
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate, ResultComparator<ExceptionSensorData> resultComparator) {
+		if (null != resultComparator) {
+			resultComparator.setCachedDataService(cachedDataService);
+		}
+		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template, limit, fromDate, toDate, resultComparator);
 		return result;
 	}
 
@@ -56,8 +70,11 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template) {
-		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template);
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, ResultComparator<ExceptionSensorData> resultComparator) {
+		if (null != resultComparator) {
+			resultComparator.setCachedDataService(cachedDataService);
+		}
+		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template, resultComparator);
 		return result;
 	}
 
@@ -65,8 +82,11 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
-		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template, fromDate, toDate);
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate, ResultComparator<ExceptionSensorData> resultComparator) {
+		if (null != resultComparator) {
+			resultComparator.setCachedDataService(cachedDataService);
+		}
+		List<ExceptionSensorData> result = exceptionSensorDataDao.getUngroupedExceptionOverview(template, fromDate, toDate, resultComparator);
 		return result;
 	}
 

@@ -1,6 +1,7 @@
 package info.novatec.inspectit.cmr.dao.impl;
 
 import info.novatec.inspectit.cmr.dao.ExceptionSensorDataDao;
+import info.novatec.inspectit.communication.comparator.DefaultDataComparatorEnum;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.indexing.IIndexQuery;
@@ -38,15 +39,6 @@ public class BufferExceptionSensorDataDaoImpl extends AbstractBufferDataDao<Exce
 	private static final ExceptionDataAggregator DISTINCT_STACK_TRACES_AGGREGATOR = new ExceptionDataAggregator(ExceptionAggregationType.DISTINCT_STACK_TRACES);
 
 	/**
-	 * Comparator used for comparing the time stamps of {@link ExceptionSensorData}.
-	 */
-	private static final Comparator<ExceptionSensorData> TIMESTAMP_COMPARATOR = new Comparator<ExceptionSensorData>() {
-		public int compare(ExceptionSensorData o1, ExceptionSensorData o2) {
-			return o2.getTimeStamp().compareTo(o1.getTimeStamp());
-		}
-	};
-
-	/**
 	 * Index query provider.
 	 */
 	@Autowired
@@ -55,30 +47,34 @@ public class BufferExceptionSensorDataDaoImpl extends AbstractBufferDataDao<Exce
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit) {
-		return this.getUngroupedExceptionOverview(template, limit, null, null);
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Comparator<? super ExceptionSensorData> comparator) {
+		return this.getUngroupedExceptionOverview(template, limit, null, null, comparator);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate) {
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate, Comparator<? super ExceptionSensorData> comparator) {
 		IIndexQuery query = exceptionSensorDataQueryFactory.getUngroupedExceptionOverviewQuery(template, limit, fromDate, toDate);
-		return super.executeQuery(query, TIMESTAMP_COMPARATOR, limit);
+		if (null != comparator) {
+			return super.executeQuery(query, comparator, limit);
+		} else {
+			return super.executeQuery(query, DefaultDataComparatorEnum.TIMESTAMP, limit);
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template) {
-		return this.getUngroupedExceptionOverview(template, -1, null, null);
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, Comparator<? super ExceptionSensorData> comparator) {
+		return this.getUngroupedExceptionOverview(template, -1, null, null, comparator);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
-		return this.getUngroupedExceptionOverview(template, -1, fromDate, toDate);
+	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate, Comparator<? super ExceptionSensorData> comparator) {
+		return this.getUngroupedExceptionOverview(template, -1, fromDate, toDate, comparator);
 	}
 
 	/**

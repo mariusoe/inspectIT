@@ -3,6 +3,7 @@ package info.novatec.inspectit.cmr.dao;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -22,10 +23,13 @@ public interface ExceptionSensorDataDao {
 	 *            The template data object.
 	 * @param limit
 	 *            The limit/size of the list.
+	 * @param comparator
+	 *            Comparator to compare results with. If <code>null</code> is passed default
+	 *            comparator will be used (in this case Timestamp comparator).
 	 * @return List of {@link ExceptionSensorData} objects to get an overview of recorded
 	 *         Exceptions.
 	 */
-	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit);
+	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Comparator<? super ExceptionSensorData> comparator);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects which are between the from and to
@@ -40,10 +44,13 @@ public interface ExceptionSensorDataDao {
 	 *            The start date.
 	 * @param toDate
 	 *            The end date.
+	 * @param comparator
+	 *            Comparator to compare results with. If <code>null</code> is passed default
+	 *            comparator will be used (in this case Timestamp comparator).
 	 * @return List of {@link ExceptionSensorData} objects to get an overview of recorded
 	 *         Exceptions.
 	 */
-	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate);
+	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate, Comparator<? super ExceptionSensorData> comparator);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects. This list can be used to get an
@@ -51,10 +58,13 @@ public interface ExceptionSensorDataDao {
 	 * 
 	 * @param template
 	 *            The template data object.
+	 * @param comparator
+	 *            Comparator to compare results with. If <code>null</code> is passed default
+	 *            comparator will be used (in this case Timestamp comparator).
 	 * @return List of {@link ExceptionSensorData} objects to get an overview of recorded
 	 *         Exceptions.
 	 */
-	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template);
+	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, Comparator<? super ExceptionSensorData> comparator);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects which are between the from and to
@@ -67,10 +77,13 @@ public interface ExceptionSensorDataDao {
 	 *            The start date.
 	 * @param toDate
 	 *            The end date.
+	 * @param comparator
+	 *            Comparator to compare results with. If <code>null</code> is passed default
+	 *            comparator will be used (in this case Timestamp comparator).
 	 * @return List of {@link ExceptionSensorData} objects to get an overview of recorded
 	 *         Exceptions.
 	 */
-	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate);
+	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate, Comparator<? super ExceptionSensorData> comparator);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects containing all details of a specific

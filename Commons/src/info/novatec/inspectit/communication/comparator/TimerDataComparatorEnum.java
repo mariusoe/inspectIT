@@ -3,13 +3,15 @@ package info.novatec.inspectit.communication.comparator;
 import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.data.TimerData;
 
+import java.util.Comparator;
+
 /**
  * Comparators for the {@link TimerData}.
  * 
  * @author Ivan Senic
  * 
  */
-public enum TimerDataComparatorEnum implements IDataComparator<TimerData> {
+public enum TimerDataComparatorEnum implements IDataComparator<TimerData>, Comparator<TimerData> {
 
 	/**
 	 * Sorts on the count.
@@ -80,6 +82,13 @@ public enum TimerDataComparatorEnum implements IDataComparator<TimerData> {
 	 * {@inheritDoc}
 	 */
 	public int compare(TimerData o1, TimerData o2, CachedDataService cachedDataService) {
+		return compare(o1, o2);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public int compare(TimerData o1, TimerData o2) {
 		switch (this) {
 		case COUNT:
 			// Java5 does not have Long.compare

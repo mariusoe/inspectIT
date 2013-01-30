@@ -1,6 +1,8 @@
 package info.novatec.inspectit.rcp.repository.service.storage;
 
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
+import info.novatec.inspectit.communication.comparator.DefaultDataComparatorEnum;
+import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.indexing.query.factory.impl.InvocationSequenceDataQueryFactory;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
@@ -8,7 +10,6 @@ import info.novatec.inspectit.indexing.storage.impl.StorageIndexQuery;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -31,51 +32,53 @@ public class StorageInvocationDataAccessService extends AbstractStorageService<I
 	private InvocationSequenceDataQueryFactory<StorageIndexQuery> invocationDataQueryFactory;
 
 	/**
-	 * Comparator used for comparing the time stamps of {@link InvocationSequenceData}.
-	 */
-	private static final Comparator<InvocationSequenceData> TIMESTAMP_COMPARATOR = new Comparator<InvocationSequenceData>() {
-		public int compare(InvocationSequenceData o1, InvocationSequenceData o2) {
-			return o2.getTimeStamp().compareTo(o1.getTimeStamp());
-		}
-	};
-
-	/**
 	 * {@inheritDoc}
 	 */
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit) {
-		return this.getInvocationSequenceOverview(platformId, methodId, limit, null, null);
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, ResultComparator<InvocationSequenceData> resultComparator) {
+		return this.getInvocationSequenceOverview(platformId, methodId, limit, null, null, resultComparator);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit) {
-		return this.getInvocationSequenceOverview(platformId, 0, limit);
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, ResultComparator<InvocationSequenceData> resultComparator) {
+		return this.getInvocationSequenceOverview(platformId, 0, limit, resultComparator);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate) {
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate, ResultComparator<InvocationSequenceData> resultComparator) {
 		StorageIndexQuery query = invocationDataQueryFactory.getInvocationSequenceOverview(platformId, methodId, limit, fromDate, toDate);
 		query.setOnlyInvocationsWithoutChildren(true);
-		return super.executeQuery(query, TIMESTAMP_COMPARATOR, limit);
+		if (null != resultComparator) {
+			resultComparator.setCachedDataService(getStorageRepositoryDefinition().getCachedDataService());
+			return super.executeQuery(query, resultComparator, limit);
+		} else {
+			return super.executeQuery(query, DefaultDataComparatorEnum.TIMESTAMP, limit);
+		}
+
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate) {
-		return this.getInvocationSequenceOverview(platformId, 0, limit, fromDate, toDate);
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate, ResultComparator<InvocationSequenceData> resultComparator) {
+		return this.getInvocationSequenceOverview(platformId, 0, limit, fromDate, toDate, resultComparator);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit) {
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit, ResultComparator<InvocationSequenceData> resultComparator) {
 		StorageIndexQuery query = invocationDataQueryFactory.getInvocationSequenceOverview(platformId, invocationIdCollection, limit);
 		query.setOnlyInvocationsWithoutChildren(true);
-		return super.executeQuery(query, TIMESTAMP_COMPARATOR, limit);
+		if (null != resultComparator) {
+			resultComparator.setCachedDataService(getStorageRepositoryDefinition().getCachedDataService());
+			return super.executeQuery(query, resultComparator, limit);
+		} else {
+			return super.executeQuery(query, DefaultDataComparatorEnum.TIMESTAMP, limit);
+		}
 	}
 
 	/**

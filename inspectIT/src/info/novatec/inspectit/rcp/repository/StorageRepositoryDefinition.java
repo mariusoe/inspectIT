@@ -177,14 +177,12 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	@SuppressWarnings("unchecked")
 	public void initServices() {
 		// init services
-		globalDataAccessService = storageServiceProvider.createStorageGlobalDataAccessService(cmrRepositoryDefinition, localStorageData, (IStorageTreeComponent<DefaultData>) indexingTree, agents);
-		exceptionDataAccessService = storageServiceProvider.createStorageExceptionDataAccessService(cmrRepositoryDefinition, localStorageData,
-				(IStorageTreeComponent<ExceptionSensorData>) indexingTree);
-		invocationDataAccessService = storageServiceProvider.createStorageInvocationDataAccessService(cmrRepositoryDefinition, localStorageData,
-				(IStorageTreeComponent<InvocationSequenceData>) indexingTree);
-		sqlDataAccessService = storageServiceProvider.createStorageSqlDataAccessService(cmrRepositoryDefinition, localStorageData, (IStorageTreeComponent<SqlStatementData>) indexingTree);
-		timerDataAccessService = storageServiceProvider.createStorageTimerDataAccessService(cmrRepositoryDefinition, localStorageData, (IStorageTreeComponent<TimerData>) indexingTree);
-		httpTimerDataAccessService = storageServiceProvider.createStorageHttpTimerDataAccessService(cmrRepositoryDefinition, localStorageData, (IStorageTreeComponent<HttpTimerData>) indexingTree);
+		globalDataAccessService = storageServiceProvider.createStorageGlobalDataAccessService(this, localStorageData, (IStorageTreeComponent<DefaultData>) indexingTree, agents);
+		exceptionDataAccessService = storageServiceProvider.createStorageExceptionDataAccessService(this, localStorageData, (IStorageTreeComponent<ExceptionSensorData>) indexingTree);
+		invocationDataAccessService = storageServiceProvider.createStorageInvocationDataAccessService(this, localStorageData, (IStorageTreeComponent<InvocationSequenceData>) indexingTree);
+		sqlDataAccessService = storageServiceProvider.createStorageSqlDataAccessService(this, localStorageData, (IStorageTreeComponent<SqlStatementData>) indexingTree);
+		timerDataAccessService = storageServiceProvider.createStorageTimerDataAccessService(this, localStorageData, (IStorageTreeComponent<TimerData>) indexingTree);
+		httpTimerDataAccessService = storageServiceProvider.createStorageHttpTimerDataAccessService(this, localStorageData, (IStorageTreeComponent<HttpTimerData>) indexingTree);
 		cachedDataService = new CachedDataService(globalDataAccessService);
 	}
 

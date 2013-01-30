@@ -4,13 +4,15 @@ import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.util.ObjectUtils;
 
+import java.util.Comparator;
+
 /**
  * Comparators for {@link HttpTimerData}.
  * 
  * @author Ivan Senic
  * 
  */
-public enum HttpTimerDataComparatorEnum implements IDataComparator<HttpTimerData> {
+public enum HttpTimerDataComparatorEnum implements IDataComparator<HttpTimerData>, Comparator<HttpTimerData> {
 
 	/**
 	 * Sort by URI.
@@ -31,6 +33,13 @@ public enum HttpTimerDataComparatorEnum implements IDataComparator<HttpTimerData
 	 * {@inheritDoc}
 	 */
 	public int compare(HttpTimerData o1, HttpTimerData o2, CachedDataService cachedDataService) {
+		return compare(o1, o2);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public int compare(HttpTimerData o1, HttpTimerData o2) {
 		switch (this) {
 		case URI:
 			return ObjectUtils.compare(o1.getUri(), o2.getUri());

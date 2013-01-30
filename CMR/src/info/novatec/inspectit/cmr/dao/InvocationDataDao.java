@@ -3,6 +3,7 @@ package info.novatec.inspectit.cmr.dao;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -25,10 +26,13 @@ public interface InvocationDataDao {
 	 *            The ID of the method.
 	 * @param limit
 	 *            The limit/size of the list.
+	 * @param comparator
+	 *            Comparator to compare results with. If <code>null</code> is passed default
+	 *            comparator will be used (in this case Timestamp comparator).
 	 * 
 	 * @return Returns the list of invocation sequences.
 	 */
-	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit);
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Comparator<? super InvocationSequenceData> comparator);
 
 	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
@@ -42,10 +46,13 @@ public interface InvocationDataDao {
 	 *            The ID of the platform.
 	 * @param limit
 	 *            The limit/size of the list.
+	 * @param comparator
+	 *            Comparator to compare results with. If <code>null</code> is passed default
+	 *            comparator will be used (in this case Timestamp comparator).
 	 * 
 	 * @return Returns the list of invocation sequences.
 	 */
-	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit);
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Comparator<? super InvocationSequenceData> comparator);
 
 	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
@@ -62,10 +69,13 @@ public interface InvocationDataDao {
 	 *            Date include invocation from.
 	 * @param toDate
 	 *            Date include invocation to.
+	 * @param comparator
+	 *            Comparator to compare results with. If <code>null</code> is passed default
+	 *            comparator will be used (in this case Timestamp comparator).
 	 * 
 	 * @return Returns the list of invocation sequences.
 	 */
-	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate);
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate, Comparator<? super InvocationSequenceData> comparator);
 
 	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
@@ -83,10 +93,13 @@ public interface InvocationDataDao {
 	 *            Date include invocation from.
 	 * @param toDate
 	 *            Date include invocation to.
+	 * @param comparator
+	 *            Comparator to compare results with. If <code>null</code> is passed default
+	 *            comparator will be used (in this case Timestamp comparator).
 	 * 
 	 * @return Returns the list of invocation sequences.
 	 */
-	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate);
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate, Comparator<? super InvocationSequenceData> comparator);
 
 	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
@@ -103,9 +116,12 @@ public interface InvocationDataDao {
 	 *            Collections of invocations IDs to search.
 	 * @param limit
 	 *            The limit/size of the list.
+	 * @param comparator
+	 *            Comparator to compare results with. If <code>null</code> is passed default
+	 *            comparator will be used (in this case Timestamp comparator).
 	 * @return Returns the list of invocation sequences.
 	 */
-	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit);
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit, Comparator<? super InvocationSequenceData> comparator);
 
 	/**
 	 * This service method is used to get all the details of a specific invocation sequence.

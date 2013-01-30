@@ -1,5 +1,6 @@
 package info.novatec.inspectit.cmr.service;
 
+import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 
@@ -24,10 +25,13 @@ public interface IExceptionDataAccessService {
 	 *            The template data object.
 	 * @param limit
 	 *            The limit/size of the list.
+	 * @param resultComparator
+	 *            Comparator that will be used to sort the results. Can be <code>null</code> and in
+	 *            that case no sorting will be done.
 	 * @return A list of {@link ExceptionSensorData} objects. This list can be used to get an
 	 *         overview over recorded Exceptions in a target application.
 	 */
-	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit);
+	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, ResultComparator<ExceptionSensorData> resultComparator);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects which are between the from and to
@@ -42,10 +46,13 @@ public interface IExceptionDataAccessService {
 	 *            The start date.
 	 * @param toDate
 	 *            The end date.
+	 * @param resultComparator
+	 *            Comparator that will be used to sort the results. Can be <code>null</code> and in
+	 *            that case no sorting will be done.
 	 * @return List of {@link ExceptionSensorData} objects to get an overview of recorded
 	 *         Exceptions.
 	 */
-	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate);
+	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Date fromDate, Date toDate, ResultComparator<ExceptionSensorData> resultComparator);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects. This list can be used to get an
@@ -53,10 +60,13 @@ public interface IExceptionDataAccessService {
 	 * 
 	 * @param template
 	 *            The template data object.
+	 * @param resultComparator
+	 *            Comparator that will be used to sort the results. Can be <code>null</code> and in
+	 *            that case no sorting will be done.
 	 * @return A list of {@link ExceptionSensorData} objects. This list can be used to get an
 	 *         overview over recorded Exceptions in a target application.
 	 */
-	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template);
+	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, ResultComparator<ExceptionSensorData> resultComparator);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects which are between the from and to
@@ -69,10 +79,13 @@ public interface IExceptionDataAccessService {
 	 *            The start date.
 	 * @param toDate
 	 *            The end date.
+	 * @param resultComparator
+	 *            Comparator that will be used to sort the results. Can be <code>null</code> and in
+	 *            that case no sorting will be done.
 	 * @return List of {@link ExceptionSensorData} objects to get an overview of recorded
 	 *         Exceptions.
 	 */
-	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate);
+	List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate, ResultComparator<ExceptionSensorData> resultComparator);
 
 	/**
 	 * Returns a list of {@link ExceptionSensorData} objects containing all details of a specific

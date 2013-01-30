@@ -20,7 +20,7 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.Pre
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
-import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
+import info.novatec.inspectit.rcp.editor.table.RemoteTableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
@@ -190,6 +190,11 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	private LocalResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources());
 
 	/**
+	 * Result comparator to be used on the server.
+	 */
+	private ResultComparator<InvocationSequenceData> resultComparator;
+
+	/**
 	 * 
 	 * @return Returns list of invocation sequence data that represents a table input.
 	 */
@@ -275,9 +280,16 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 * {@inheritDoc}
 	 */
 	public ViewerComparator getComparator() {
-		TableViewerComparator<InvocationSequenceData> invocOverviewViewerComparator = new TableViewerComparator<InvocationSequenceData>();
+		RemoteTableViewerComparator<InvocationSequenceData> invocOverviewViewerComparator = new RemoteTableViewerComparator<InvocationSequenceData>() {
+			@Override
+			protected void sortRemotely(ResultComparator<InvocationSequenceData> resultComparator) {
+				InvocOverviewInputController.this.resultComparator = resultComparator;
+				loadDataFromService();
+			}
+		};
 		for (Column column : Column.values()) {
-			ResultComparator<InvocationSequenceData> resultComparator = new ResultComparator<InvocationSequenceData>(column.dataComparator, cachedDataService);
+			// since it is remote sorting we do not provide local cached data service
+			ResultComparator<InvocationSequenceData> resultComparator = new ResultComparator<InvocationSequenceData>(column.dataComparator);
 			invocOverviewViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), resultComparator);
 		}
 
@@ -350,19 +362,29 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	public void doRefresh(IProgressMonitor monitor, IRootEditor rootEditor) {
 		monitor.beginTask("Updating Invocation Overview", IProgressMonitor.UNKNOWN);
 		monitor.subTask("Retrieving the Invocation Overview");
+
+		loadDataFromService();
+
+		monitor.done();
+	}
+
+	/**
+	 * Reloads the data from the service.
+	 */
+	private void loadDataFromService() {
 		List<InvocationSequenceData> invocData;
 
 		if (!autoUpdate) {
 			if (template.getMethodIdent() != IdDefinition.ID_NOT_USED) {
-				invocData = dataAccessService.getInvocationSequenceOverview(template.getPlatformIdent(), template.getMethodIdent(), limit, fromDate, toDate);
+				invocData = dataAccessService.getInvocationSequenceOverview(template.getPlatformIdent(), template.getMethodIdent(), limit, fromDate, toDate, resultComparator);
 			} else {
-				invocData = dataAccessService.getInvocationSequenceOverview(template.getPlatformIdent(), limit, fromDate, toDate);
+				invocData = dataAccessService.getInvocationSequenceOverview(template.getPlatformIdent(), limit, fromDate, toDate, resultComparator);
 			}
 		} else {
 			if (template.getMethodIdent() != IdDefinition.ID_NOT_USED) {
-				invocData = dataAccessService.getInvocationSequenceOverview(template.getPlatformIdent(), template.getMethodIdent(), limit);
+				invocData = dataAccessService.getInvocationSequenceOverview(template.getPlatformIdent(), template.getMethodIdent(), limit, resultComparator);
 			} else {
-				invocData = dataAccessService.getInvocationSequenceOverview(template.getPlatformIdent(), limit);
+				invocData = dataAccessService.getInvocationSequenceOverview(template.getPlatformIdent(), limit, resultComparator);
 			}
 		}
 
@@ -373,11 +395,8 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 
 		invocationSequenceData.clear();
 		if (!invocData.isEmpty()) {
-			monitor.subTask("Displaying the Invocation Overview");
 			invocationSequenceData.addAll(invocData);
 		}
-
-		monitor.done();
 	}
 
 	/**
@@ -582,6 +601,15 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 			return values;
 		}
 		throw new RuntimeException("Could not create the column values!");
+	}
+
+	/**
+	 * Gets {@link #resultComparator}.
+	 * 
+	 * @return {@link #resultComparator}
+	 */
+	public ResultComparator<InvocationSequenceData> getResultComparator() {
+		return resultComparator;
 	}
 
 	/**

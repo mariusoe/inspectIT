@@ -8,6 +8,7 @@ import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
 import info.novatec.inspectit.indexing.storage.impl.StorageIndexQuery;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
+import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
 import info.novatec.inspectit.rcp.storage.util.DataRetriever;
 import info.novatec.inspectit.storage.LocalStorageData;
 
@@ -32,9 +33,9 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 	private static final int MAX_QUERY_SIZE = 1024 * 1024 * 10;
 
 	/**
-	 * {@link CmrRepositoryDefinition}.
+	 * Storage repository definition.
 	 */
-	private CmrRepositoryDefinition cmrRepositoryDefinition;
+	private StorageRepositoryDefinition storageRepositoryDefinition;
 
 	/**
 	 * {@link LocalStorageData}.
@@ -88,7 +89,7 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 	 *            If supplied the final result list will be sorted by this comparator.
 	 * @return Result list.
 	 */
-	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, Comparator<E> comparator) {
+	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, Comparator<? super E> comparator) {
 		return this.executeQuery(storageIndexQuery, null, comparator, -1);
 	}
 
@@ -117,7 +118,7 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 	 *            If supplied the final result list will be sorted by this comparator.
 	 * @return Result list.
 	 */
-	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, IAggregator<E> aggregator, Comparator<E> comparator) {
+	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, IAggregator<E> aggregator, Comparator<? super E> comparator) {
 		return this.executeQuery(storageIndexQuery, aggregator, comparator, -1);
 	}
 
@@ -151,7 +152,7 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 	 *            Limit the number of results by given number. Value <code>-1</code> means no limit.
 	 * @return Result list.
 	 */
-	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, Comparator<E> comparator, int limit) {
+	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, Comparator<? super E> comparator, int limit) {
 		return this.executeQuery(storageIndexQuery, null, comparator, limit);
 	}
 
@@ -173,7 +174,7 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 	 *            Limit the number of results by given number. Value <code>-1</code> means no limit.
 	 * @return Return results of a query.
 	 */
-	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, IAggregator<E> aggregator, Comparator<E> comparator, int limit) {
+	protected List<E> executeQuery(StorageIndexQuery storageIndexQuery, IAggregator<E> aggregator, Comparator<? super E> comparator, int limit) {
 		List<IStorageDescriptor> descriptors = getIndexingTree().query(storageIndexQuery);
 		// sort the descriptors to optimize the number of read operations
 		Collections.sort(descriptors, new Comparator<IStorageDescriptor>() {
@@ -216,7 +217,7 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 					}
 				} else {
 					try {
-						allData = dataRetriever.getDataViaHttp(cmrRepositoryDefinition, localStorageData, limitedDescriptors);
+						allData = dataRetriever.getDataViaHttp(getCmrRepositoryDefinition(), localStorageData, limitedDescriptors);
 					} catch (Exception e) {
 						InspectIT.getDefault().createErrorDialog("Exception occured trying to load the data.", e, -1);
 						return Collections.emptyList();
@@ -276,18 +277,29 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 	}
 
 	/**
-	 * @return the cmrRepositoryDefinition
+	 * Gets {@link #storageRepositoryDefinition}.
+	 * 
+	 * @return {@link #storageRepositoryDefinition}
 	 */
-	public CmrRepositoryDefinition getCmrRepositoryDefinition() {
-		return cmrRepositoryDefinition;
+	public StorageRepositoryDefinition getStorageRepositoryDefinition() {
+		return storageRepositoryDefinition;
 	}
 
 	/**
-	 * @param cmrRepositoryDefinition
-	 *            the cmrRepositoryDefinition to set
+	 * Sets {@link #storageRepositoryDefinition}.
+	 * 
+	 * @param storageRepositoryDefinition
+	 *            New value for {@link #storageRepositoryDefinition}
 	 */
-	public void setCmrRepositoryDefinition(CmrRepositoryDefinition cmrRepositoryDefinition) {
-		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
+	public void setStorageRepositoryDefinition(StorageRepositoryDefinition storageRepositoryDefinition) {
+		this.storageRepositoryDefinition = storageRepositoryDefinition;
+	}
+
+	/**
+	 * @return the cmrRepositoryDefinition
+	 */
+	public CmrRepositoryDefinition getCmrRepositoryDefinition() {
+		return getStorageRepositoryDefinition().getCmrRepositoryDefinition();
 	}
 
 	/**

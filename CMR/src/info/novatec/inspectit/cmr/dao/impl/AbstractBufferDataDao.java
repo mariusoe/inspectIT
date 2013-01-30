@@ -94,7 +94,7 @@ public abstract class AbstractBufferDataDao<E extends DefaultData> {
 	 *            If supplied the final result list will be sorted by this comparator.
 	 * @return Result list.
 	 */
-	protected List<E> executeQuery(IIndexQuery indexQuery, IAggregator<E> aggregator, Comparator<E> comparator) {
+	protected List<E> executeQuery(IIndexQuery indexQuery, IAggregator<E> aggregator, Comparator<? super E> comparator) {
 		return this.executeQuery(indexQuery, aggregator, comparator, -1);
 	}
 
@@ -128,7 +128,7 @@ public abstract class AbstractBufferDataDao<E extends DefaultData> {
 	 *            Limit the number of results by given number. Value <code>-1</code> means no limit.
 	 * @return Result list.
 	 */
-	protected List<E> executeQuery(IIndexQuery indexQuery, Comparator<E> comparator, int limit) {
+	protected List<E> executeQuery(IIndexQuery indexQuery, Comparator<? super E> comparator, int limit) {
 		return this.executeQuery(indexQuery, null, comparator, limit);
 	}
 
@@ -147,7 +147,7 @@ public abstract class AbstractBufferDataDao<E extends DefaultData> {
 	 *            Limit the number of results by given number. Value <code>-1</code> means no limit.
 	 * @return Result list.
 	 */
-	protected List<E> executeQuery(IIndexQuery indexQuery, IAggregator<E> aggregator, Comparator<E> comparator, int limit) {
+	protected List<E> executeQuery(IIndexQuery indexQuery, IAggregator<E> aggregator, Comparator<? super E> comparator, int limit) {
 		List<E> data = indexingTree.query(indexQuery);
 
 		if (null != aggregator) {

@@ -1,8 +1,8 @@
 package info.novatec.inspectit.rcp.editor.table;
 
+import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.rcp.editor.viewers.AbstractViewerComparator;
-
-import java.util.Comparator;
 
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.TableColumn;
  * @param <T>
  *            Type for which comparator is created.
  */
-public class TableViewerComparator<T> extends AbstractViewerComparator<T> {
+public class TableViewerComparator<T extends DefaultData> extends AbstractViewerComparator<T> {
 
 	/**
 	 * Adds a column to this comparator so it can be used to sort by.
@@ -28,7 +28,7 @@ public class TableViewerComparator<T> extends AbstractViewerComparator<T> {
 	 * @param comparator
 	 *            Comparator that will be used for the given column.
 	 */
-	public final void addColumn(final TableColumn column, final Comparator<T> comparator) {
+	public final void addColumn(final TableColumn column, final ResultComparator<T> comparator) {
 		column.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {

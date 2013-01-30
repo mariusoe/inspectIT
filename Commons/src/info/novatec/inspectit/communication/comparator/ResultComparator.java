@@ -39,6 +39,16 @@ public class ResultComparator<T extends DefaultData> implements Comparator<T> {
 	}
 
 	/**
+	 * Constructor that sets only delegating constructor.
+	 * 
+	 * @param comparator
+	 *            Delegating comparator.
+	 */
+	public ResultComparator(IDataComparator<? super T> comparator) {
+		this(comparator, null, true);
+	}
+
+	/**
 	 * Secondary constructor. Initializes the {@link #ascending} with <code>true</code>.
 	 * 
 	 * @param comparator

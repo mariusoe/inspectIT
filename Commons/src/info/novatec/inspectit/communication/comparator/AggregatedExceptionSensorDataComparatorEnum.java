@@ -3,13 +3,15 @@ package info.novatec.inspectit.communication.comparator;
 import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 
+import java.util.Comparator;
+
 /**
  * Comparators for {@link AggregatedExceptionSensorData}.
  * 
  * @author Ivan Senic
  * 
  */
-public enum AggregatedExceptionSensorDataComparatorEnum implements IDataComparator<AggregatedExceptionSensorData> {
+public enum AggregatedExceptionSensorDataComparatorEnum implements IDataComparator<AggregatedExceptionSensorData>, Comparator<AggregatedExceptionSensorData> {
 
 	/**
 	 * Sort by amount of created exceptions.
@@ -30,6 +32,13 @@ public enum AggregatedExceptionSensorDataComparatorEnum implements IDataComparat
 	 * {@inheritDoc}
 	 */
 	public int compare(AggregatedExceptionSensorData o1, AggregatedExceptionSensorData o2, CachedDataService cachedDataService) {
+		return compare(o1, o2);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public int compare(AggregatedExceptionSensorData o1, AggregatedExceptionSensorData o2) {
 		switch (this) {
 		case CREATED:
 			return Long.valueOf(o1.getCreated()).compareTo(Long.valueOf(o2.getCreated()));

@@ -1,7 +1,9 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.InvocationDataDao;
+import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
+import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.spring.logger.Logger;
 
@@ -33,11 +35,20 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 	private InvocationDataDao invocationDataDao;
 
 	/**
+	 * The cached data service for {@link ResultComparator} bounding.
+	 */
+	@Autowired
+	private CachedDataService cachedDataService;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit) {
-		List<InvocationSequenceData> result = invocationDataDao.getInvocationSequenceOverview(platformId, limit);
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, ResultComparator<InvocationSequenceData> resultComparator) {
+		if (null != resultComparator) {
+			resultComparator.setCachedDataService(cachedDataService);
+		}
+		List<InvocationSequenceData> result = invocationDataDao.getInvocationSequenceOverview(platformId, limit, resultComparator);
 		return result;
 	}
 
@@ -45,8 +56,11 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit) {
-		List<InvocationSequenceData> result = invocationDataDao.getInvocationSequenceOverview(platformId, methodId, limit);
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, ResultComparator<InvocationSequenceData> resultComparator) {
+		if (null != resultComparator) {
+			resultComparator.setCachedDataService(cachedDataService);
+		}
+		List<InvocationSequenceData> result = invocationDataDao.getInvocationSequenceOverview(platformId, methodId, limit, resultComparator);
 		return result;
 	}
 
@@ -54,8 +68,11 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate) {
-		List<InvocationSequenceData> result = invocationDataDao.getInvocationSequenceOverview(platformId, limit, fromDate, toDate);
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate, ResultComparator<InvocationSequenceData> resultComparator) {
+		if (null != resultComparator) {
+			resultComparator.setCachedDataService(cachedDataService);
+		}
+		List<InvocationSequenceData> result = invocationDataDao.getInvocationSequenceOverview(platformId, limit, fromDate, toDate, resultComparator);
 		return result;
 	}
 
@@ -63,8 +80,11 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate) {
-		List<InvocationSequenceData> result = invocationDataDao.getInvocationSequenceOverview(platformId, methodId, limit, fromDate, toDate);
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate, ResultComparator<InvocationSequenceData> resultComparator) {
+		if (null != resultComparator) {
+			resultComparator.setCachedDataService(cachedDataService);
+		}
+		List<InvocationSequenceData> result = invocationDataDao.getInvocationSequenceOverview(platformId, methodId, limit, fromDate, toDate, resultComparator);
 		return result;
 	}
 
@@ -72,8 +92,11 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit) {
-		List<InvocationSequenceData> result = invocationDataDao.getInvocationSequenceOverview(platformId, invocationIdCollection, limit);
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit, ResultComparator<InvocationSequenceData> resultComparator) {
+		if (null != resultComparator) {
+			resultComparator.setCachedDataService(cachedDataService);
+		}
+		List<InvocationSequenceData> result = invocationDataDao.getInvocationSequenceOverview(platformId, invocationIdCollection, limit, resultComparator);
 		return result;
 	}
 

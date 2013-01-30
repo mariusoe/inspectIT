@@ -1,5 +1,6 @@
 package info.novatec.inspectit.cmr.service;
 
+import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 
 import java.util.Collection;
@@ -27,10 +28,12 @@ public interface IInvocationDataAccessService {
 	 *            The ID of the method.
 	 * @param limit
 	 *            The limit/size of the list.
-	 * 
+	 * @param resultComparator
+	 *            Comparator that will be used to sort the results. Can be <code>null</code> and in
+	 *            that case no sorting will be done.
 	 * @return Returns the list of invocation sequences.
 	 */
-	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit);
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, ResultComparator<InvocationSequenceData> resultComparator);
 
 	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
@@ -44,10 +47,12 @@ public interface IInvocationDataAccessService {
 	 *            The ID of the platform.
 	 * @param limit
 	 *            The limit/size of the list.
-	 * 
+	 * @param resultComparator
+	 *            Comparator that will be used to sort the results. Can be <code>null</code> and in
+	 *            that case no sorting will be done.
 	 * @return Returns the list of invocation sequences.
 	 */
-	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit);
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, ResultComparator<InvocationSequenceData> resultComparator);
 
 	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
@@ -64,10 +69,12 @@ public interface IInvocationDataAccessService {
 	 *            Date include invocation from.
 	 * @param toDate
 	 *            Date include invocation to.
-	 * 
+	 * @param resultComparator
+	 *            Comparator that will be used to sort the results. Can be <code>null</code> and in
+	 *            that case no sorting will be done.
 	 * @return Returns the list of invocation sequences.
 	 */
-	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate);
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate, ResultComparator<InvocationSequenceData> resultComparator);
 
 	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
@@ -85,10 +92,12 @@ public interface IInvocationDataAccessService {
 	 *            Date include invocation from.
 	 * @param toDate
 	 *            Date include invocation to.
-	 * 
+	 * @param resultComparator
+	 *            Comparator that will be used to sort the results. Can be <code>null</code> and in
+	 *            that case no sorting will be done.
 	 * @return Returns the list of invocation sequences.
 	 */
-	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate);
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate, ResultComparator<InvocationSequenceData> resultComparator);
 
 	/**
 	 * Returns a list of {@link InvocationSequenceData} objects which contain no associations to
@@ -105,9 +114,12 @@ public interface IInvocationDataAccessService {
 	 *            Collections of invocations IDs to search.
 	 * @param limit
 	 *            The limit/size of the list.
+	 * @param resultComparator
+	 *            Comparator that will be used to sort the results. Can be <code>null</code> and in
+	 *            that case no sorting will be done.
 	 * @return Returns the list of invocation sequences.
 	 */
-	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit);
+	List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit, ResultComparator<InvocationSequenceData> resultComparator);
 
 	/**
 	 * This service method is used to get all the details of a specific invocation sequence.

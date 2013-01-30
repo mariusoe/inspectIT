@@ -74,7 +74,7 @@ public class NavigationInvocOverviewInputController extends InvocOverviewInputCo
 			}
 		}
 		long platformIdent = getInputDefinition().getIdDefinition().getPlatformId();
-		invocData = getDataAccessService().getInvocationSequenceOverview(platformIdent, invocationIdsSet, getLimit());
+		invocData = getDataAccessService().getInvocationSequenceOverview(platformIdent, invocationIdsSet, getLimit(), getResultComparator());
 		getInvocationSequenceData().clear();
 		if (!invocData.isEmpty()) {
 			monitor.subTask("Displaying the Invocation Overview");

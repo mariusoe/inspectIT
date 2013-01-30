@@ -1,7 +1,7 @@
 package info.novatec.inspectit.cmr.dao.impl;
 
 import info.novatec.inspectit.cmr.dao.InvocationDataDao;
-import info.novatec.inspectit.communication.data.ExceptionSensorData;
+import info.novatec.inspectit.communication.comparator.DefaultDataComparatorEnum;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.query.factory.impl.InvocationSequenceDataQueryFactory;
@@ -32,42 +32,38 @@ public class BufferInvocationDataDaoImpl extends AbstractBufferDataDao<Invocatio
 	private InvocationSequenceDataQueryFactory<IIndexQuery> invocationDataQueryFactory;
 
 	/**
-	 * Comparator used for comparing the time stamps of {@link ExceptionSensorData}.
-	 */
-	private static final Comparator<InvocationSequenceData> TIMESTAMP_COMPARATOR = new Comparator<InvocationSequenceData>() {
-		public int compare(InvocationSequenceData o1, InvocationSequenceData o2) {
-			return o2.getTimeStamp().compareTo(o1.getTimeStamp());
-		}
-	};
-
-	/**
 	 * {@inheritDoc}
 	 */
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit) {
-		return this.getInvocationSequenceOverview(platformId, methodId, limit, null, null);
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Comparator<? super InvocationSequenceData> comparator) {
+		return this.getInvocationSequenceOverview(platformId, methodId, limit, null, null, comparator);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit) {
-		return this.getInvocationSequenceOverview(platformId, 0, limit);
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Comparator<? super InvocationSequenceData> comparator) {
+		return this.getInvocationSequenceOverview(platformId, 0, limit, comparator);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate) {
-		return this.getInvocationSequenceOverview(platformId, 0, limit, fromDate, toDate);
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, int limit, Date fromDate, Date toDate, Comparator<? super InvocationSequenceData> comparator) {
+		return this.getInvocationSequenceOverview(platformId, 0, limit, fromDate, toDate, comparator);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate) {
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, long methodId, int limit, Date fromDate, Date toDate, Comparator<? super InvocationSequenceData> comparator) {
 		IIndexQuery query = invocationDataQueryFactory.getInvocationSequenceOverview(platformId, methodId, limit, fromDate, toDate);
-		List<InvocationSequenceData> resultWithChildren = super.executeQuery(query, TIMESTAMP_COMPARATOR, limit);
-		List<InvocationSequenceData> realResults = new ArrayList<InvocationSequenceData>();
+		List<InvocationSequenceData> resultWithChildren;
+		if (null != comparator) {
+			resultWithChildren = super.executeQuery(query, comparator, limit);
+		} else {
+			resultWithChildren = super.executeQuery(query, DefaultDataComparatorEnum.TIMESTAMP, limit);
+		}
+		List<InvocationSequenceData> realResults = new ArrayList<InvocationSequenceData>(resultWithChildren.size());
 		for (InvocationSequenceData invocationSequenceData : resultWithChildren) {
 			realResults.add(invocationSequenceData.getClonedInvocationSequence());
 		}
@@ -79,10 +75,15 @@ public class BufferInvocationDataDaoImpl extends AbstractBufferDataDao<Invocatio
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit) {
+	public List<InvocationSequenceData> getInvocationSequenceOverview(long platformId, Collection<Long> invocationIdCollection, int limit, Comparator<? super InvocationSequenceData> comparator) {
 		IIndexQuery query = invocationDataQueryFactory.getInvocationSequenceOverview(platformId, invocationIdCollection, limit);
-		List<InvocationSequenceData> resultWithChildren = super.executeQuery(query, TIMESTAMP_COMPARATOR, limit);
-		List<InvocationSequenceData> realResults = new ArrayList<InvocationSequenceData>();
+		List<InvocationSequenceData> resultWithChildren;
+		if (null != comparator) {
+			resultWithChildren = super.executeQuery(query, comparator, limit);
+		} else {
+			resultWithChildren = super.executeQuery(query, DefaultDataComparatorEnum.TIMESTAMP, limit);
+		}
+		List<InvocationSequenceData> realResults = new ArrayList<InvocationSequenceData>(resultWithChildren.size());
 		for (InvocationSequenceData invocationSequenceData : resultWithChildren) {
 			realResults.add(invocationSequenceData.getClonedInvocationSequence());
 		}
