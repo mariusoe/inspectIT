@@ -211,14 +211,6 @@
             name="Open View">
       </command>
       <command
-            id="info.novatec.inspectit.rcp.commands.expandAll"
-            name="Expand All">
-      </command>
-      <command
-            id="info.novatec.inspectit.rcp.commands.expandThis"
-            name="Expand This">
-      </command>
-      <command
             defaultHandler="info.novatec.inspectit.rcp.handlers.ImportLicenseHandler"
             id="info.novatec.inspectit.rcp.commands.importLicense"
             name="Import License">
@@ -384,6 +376,24 @@
             id="info.novatec.inspectit.rcp.commands.uploadStorage"
             name="Upload Storage">
       </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.collapse"
+            name="Collapse">
+         <commandParameter
+               id="info.novatec.inspectit.rcp.commands.collapse.isCollapseAll"
+               name="isCollapseAll"
+               optional="false">
+         </commandParameter>
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.expand"
+            name="Expand">
+         <commandParameter
+               id="info.novatec.inspectit.rcp.commands.expand.isExpandAll"
+               name="isExpandAll"
+               optional="false">
+         </commandParameter>
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -438,48 +448,6 @@
                   <test
                         property="info.novatec.inspectit.activeSubView"
                         value="tableSubView">
-                  </test>
-               </with>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
-            class="info.novatec.inspectit.rcp.handlers.TreeExpandAllHandler"
-            commandId="info.novatec.inspectit.rcp.commands.expandAll">
-         <activeWhen>
-            <and>
-               <count
-                     value="+">
-               </count>
-               <with
-                     variable="activeEditor">
-                  <instanceof
-                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
-                  </instanceof>
-                  <test
-                        property="info.novatec.inspectit.activeSubView"
-                        value="treeSubView">
-                  </test>
-               </with>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
-            class="info.novatec.inspectit.rcp.handlers.TreeExpandThisHandler"
-            commandId="info.novatec.inspectit.rcp.commands.expandThis">
-         <activeWhen>
-            <and>
-               <count
-                     value="+">
-               </count>
-               <with
-                     variable="activeEditor">
-                  <instanceof
-                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
-                  </instanceof>
-                  <test
-                        property="info.novatec.inspectit.activeSubView"
-                        value="treeSubView">
                   </test>
                </with>
             </and>
@@ -1362,6 +1330,48 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.TreeCollapseHandler"
+            commandId="info.novatec.inspectit.rcp.commands.collapse">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.activeSubView"
+                        value="treeSubView">
+                  </test>
+               </with>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.TreeExpandHandler"
+            commandId="info.novatec.inspectit.rcp.commands.expand">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.activeSubView"
+                        value="treeSubView">
+                  </test>
+               </with>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -1549,12 +1559,44 @@
                visible="true">
          </separator>
          <command
-               commandId="info.novatec.inspectit.rcp.commands.expandAll"
+               commandId="info.novatec.inspectit.rcp.commands.expand"
+               label="Expand All"
                style="push">
+            <parameter
+                  name="info.novatec.inspectit.rcp.commands.expand.isExpandAll"
+                  value="true">
+            </parameter>
          </command>
          <command
-               commandId="info.novatec.inspectit.rcp.commands.expandThis"
+               commandId="info.novatec.inspectit.rcp.commands.expand"
+               label="Expand This"
                style="push">
+            <parameter
+                  name="info.novatec.inspectit.rcp.commands.expand.isExpandAll"
+                  value="false">
+            </parameter>
+         </command>
+         <separator
+               name="inspectit.editor.formrooteditor.treesubview.separator3"
+               visible="true">
+         </separator>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.collapse"
+               label="Collapse All"
+               style="push">
+            <parameter
+                  name="info.novatec.inspectit.rcp.commands.collapse.isCollapseAll"
+                  value="true">
+            </parameter>
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.collapse"
+               label="Collapse This"
+               style="push">
+            <parameter
+                  name="info.novatec.inspectit.rcp.commands.collapse.isCollapseAll"
+                  value="false">
+            </parameter>
          </command>
       </menuContribution>
       <menuContribution
