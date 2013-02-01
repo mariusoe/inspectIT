@@ -163,21 +163,19 @@
 
 
 	<target name="static-analysis" depends="build-agent">
-		<!-- Call PDM -->
+		<!-- Prepare PDM -->
 		<fileset dir="${src.root}" id="pmd.fileset">
 			<include name="info/novatec/inspectit/**/*.java" />
 			<exclude name="info/novatec/inspectit/**/test/**" />
 		</fileset>
-		<antcall target="pmd" inheritrefs="true" />
 
-		<!-- Call Checkstyle -->
+		<!-- Prepare Checkstyle -->
 		<fileset dir="${src.root}" id="checkstyle.fileset">
 			<include name="info/novatec/inspectit/**/*.java" />
 			<exclude name="info/novatec/inspectit/**/test/**" />
 		</fileset>
-		<antcall target="checkstyle" inheritrefs="true" />
 
-		<!-- Call FindBugs -->
+		<!-- Prepare FindBugs -->
 		<property name="findbugs.sourcepath" value="${src.root}" />
 		<property name="findbugs.classlocation" value="${build.agent.classes}" />
 		<path id="findbugs.path">
@@ -185,14 +183,14 @@
 			<path refid="lib.test" />
 			<pathelement path="${build.commons.classes}" />
 		</path>
-		<antcall target="findbugs" inheritrefs="true" />
 
-		<!-- Call CPD -->
+		<!-- Prepare CPD -->
 		<fileset dir="${src.root}" id="cpd.fileset">
 			<include name="info/novatec/inspectit/**/*.java" />
 			<exclude name="info/novatec/inspectit/**/test/**" />
 		</fileset>
-		<antcall target="cpd" inheritrefs="true" />
+
+		<antcall target="static-analysis-all" inheritrefs="true" />
 	</target>
 
 

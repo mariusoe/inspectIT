@@ -243,26 +243,24 @@
 
 	<!--  It depends on the release target, because we need the compiled class files from the PDE Build-->
 	<target name="static-analysis" depends="pdebuild">
-		<!-- Call PDM -->
+		<!-- Prepare PDM -->
 		<fileset dir="${src.root}" includes="**/*.java" id="pmd.fileset" />
-		<antcall target="pmd" inheritrefs="true" />
 
-		<!-- Call Checkstyle -->
+		<!-- Prepare Checkstyle -->
 		<fileset dir="${src.root}" includes="**/*.java" id="checkstyle.fileset" />
-		<antcall target="checkstyle" inheritrefs="true" />
 
-		<!-- Call FindBugs -->
+		<!-- Prepare FindBugs -->
 		<property name="findbugs.sourcepath" value="${src.root}" />
 		<property name="findbugs.classlocation" value="${buildDirectory}/plugins/info.novatec.inspectit.rcp/@dot" />
 		<path id="findbugs.path">
 			<fileset dir="${buildDirectory}/plugins" includes="**/*.class,**/*.jar" excludes="**/info.novatec.inspectit.rcp/**"/>
 			<fileset dir="${base}/eclipse/plugins" includes="**/*.jar" />
 		</path>
-		<antcall target="findbugs" inheritrefs="true" />
 
-		<!-- Call CPD -->
+		<!-- Prepare CPD -->
 		<fileset dir="${src.root}" includes="**/*.java" id="cpd.fileset" />
-		<antcall target="cpd" inheritrefs="true" />
+
+		<antcall target="static-analysis-all" inheritrefs="true" />
 	</target>
 
 

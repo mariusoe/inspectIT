@@ -102,6 +102,8 @@
 	<!--         S T A T I C     A N A L Y S I S     T A R G E T S  	 -->
 	<!-- *************************************************************** -->
 
+	<target name="static-analysis-all" depends="pmd,checkstyle,findbugs,cpd,static-analysis-fail-on-warnings" />
+
 	<!-- P M D -->
 	<target name="check-pmd-settings">
 		<condition property="can-run-pmd">
@@ -116,7 +118,7 @@
 	<target name="pmd" description="--> analyses the code with PDM" depends="init-static-analysis,check-pmd-settings" if="can-run-pmd">
 		<echo message="Analyse Code with tool: PMD" level="info" />
 		<mkdir dir="${build.qa.analysis.pmd}" />
-		<pmd maxRuleViolations="${pmd.maximum.violations}" rulesetfiles="${pmd.rules.file}">
+		<pmd failuresPropertyName="pmd.failure" failOnRuleViolation="false" rulesetfiles="${pmd.rules.file}">
 			<formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true" />
 			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true" />
 			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml" />
@@ -149,8 +151,6 @@
 
 		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.report.file}" />
 		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >" />
-
-		<fail if="checkstyle.failure" message="Build failed due to checkstyle warnings, please fix these warnings. Have a look at build/QA/static_analysis/checkstyle.html" />
 	</target>
 
 	<!-- F i n d B u g s -->
@@ -175,7 +175,7 @@
 
 		<echo message="Analyse Code with tool: FindBugs" level="info" />
 		<mkdir dir="${build.qa.analysis.findbugs}" />
-		<findbugs output="xml:withMessages" classpath="${findbugs.classpath}" includefilter="${findbugs.config.include}" excludefilter="${findbugs.config.exclude}" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="findbugs.jar" warningsProperty="findbugsFailure">
+		<findbugs output="xml:withMessages" classpath="${findbugs.classpath}" includefilter="${findbugs.config.include}" excludefilter="${findbugs.config.exclude}" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="findbugs.jar" warningsProperty="findbugs.failure">
 			<sourcePath path="${findbugs.sourcepath}" />
 			<class location="${findbugs.classlocation}" />
 			<auxClasspath>
@@ -183,7 +183,6 @@
 			</auxClasspath>
 		</findbugs>
 		<xslt in="${build.qa.analysis.findbugs}/findbugs.xml" style="${findbugs.config.fancy-hist}" out="${build.qa.analysis}/findbugs.html" />
-		<fail if="findbugsFailure" message="Findbugs has found warnings. Build will fail. For more information on warnings relate to the file ${build.qa.analysis}/findbugs.html."/>
 	</target>
 
 
@@ -204,6 +203,40 @@
 			<fileset refid="cpd.fileset" />
 		</cpd>
 	</target>
+
+	<!-- Target that is checking for warnings from SA tools -->
+
+	<target name="static-analysis-fail-on-warnings" depends="init-antcontrib">
+		<if>
+			<isset property="pmd.failure" />
+			<then>
+				<echo message="WARNING: PMD warnings were found, please fix these warnings. Have a look at ${build.qa.analysis}/pmd.html" />
+			</then>
+		</if>
+		<if>
+			<isset property="checkstyle.failure" />
+			<then>
+				<echo message="WARNING: Checkstyle warnings were found, please fix these warnings. Have a look at ${build.qa.analysis}/checkstyle.html" />
+			</then>
+		</if>
+		<if>
+			<isset property="findbugs.failure" />
+			<then>
+				<echo message="WARNING: Findbugs warnings were found, please fix these warnings. Have a look at ${build.qa.analysis}/findbugs.html" />
+			</then>
+		</if>
+		<if>
+			<or>
+				<isset property="pmd.failure" />
+				<isset property="checkstyle.failure" />
+				<isset property="findbugs.failure" />
+			</or>
+			<then>
+				<fail message="Failing the build since the static analysis tools have reported warnings." />
+			</then>
+		</if>
+	</target>
+
 
 	<!-- *************************************************************** -->
 	<!--           			J V M    T A R G E T S      			     -->
