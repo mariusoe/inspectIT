@@ -1,6 +1,7 @@
 package info.novatec.inspectit.storage.serializer.impl;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.cmr.model.MethodIdentToSensorType;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
@@ -333,6 +334,9 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(AggregatedHttpTimerData.class, new InvocationAwareDataSerializer<AggregatedHttpTimerData>(kryo, AggregatedHttpTimerData.class, schemaManager));
 		kryo.register(AggregatedSqlStatementData.class, new InvocationAwareDataSerializer<AggregatedSqlStatementData>(kryo, AggregatedSqlStatementData.class, schemaManager));
 		kryo.register(AggregatedTimerData.class, new InvocationAwareDataSerializer<AggregatedTimerData>(kryo, AggregatedTimerData.class, schemaManager));
+		
+		// added with INSPECTIT-853
+		kryo.register(MethodIdentToSensorType.class, new CustomCompatibleFieldSerializer<MethodIdentToSensorType>(kryo, MethodIdentToSensorType.class, schemaManager));
 	}
 
 	/**

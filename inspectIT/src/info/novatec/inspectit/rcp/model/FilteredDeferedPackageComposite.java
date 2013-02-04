@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.model;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
-import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
+import info.novatec.inspectit.cmr.model.MethodIdentToSensorType;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import com.google.common.base.Objects;
@@ -13,7 +13,7 @@ import com.google.common.base.Objects;
  * @author Ivan Senic
  * 
  */
-public class FilteredDefferedPackageComposite extends DeferredPackageComposite {
+public class FilteredDeferedPackageComposite extends DeferredPackageComposite {
 
 	/**
 	 * Sensor to show.
@@ -24,7 +24,7 @@ public class FilteredDefferedPackageComposite extends DeferredPackageComposite {
 	 * @param sensorTypeEnum
 	 *            Set the sensor type to show.
 	 */
-	public FilteredDefferedPackageComposite(SensorTypeEnum sensorTypeEnum) {
+	public FilteredDeferedPackageComposite(SensorTypeEnum sensorTypeEnum) {
 		this.sensorTypeEnumToShow = sensorTypeEnum;
 	}
 
@@ -41,10 +41,12 @@ public class FilteredDefferedPackageComposite extends DeferredPackageComposite {
 	 */
 	@Override
 	protected boolean select(MethodIdent methodIdent) {
-		for (MethodSensorTypeIdent methodSensorType : methodIdent.getMethodSensorTypeIdents()) {
-			SensorTypeEnum sensorTypeEnum = SensorTypeEnum.get(methodSensorType.getFullyQualifiedClassName());
+		for (MethodIdentToSensorType methodIdentToSensorType : methodIdent.getMethodIdentToSensorTypes()) {
+			SensorTypeEnum sensorTypeEnum = SensorTypeEnum.get(methodIdentToSensorType.getMethodSensorTypeIdent().getFullyQualifiedClassName());
 			if (ObjectUtils.equals(sensorTypeEnum, sensorTypeEnumToShow)) {
-				return true;
+				if (!isHideInactiveInstrumentations() || methodIdentToSensorType.isActive()) {
+					return super.select(methodIdent);
+				}
 			}
 		}
 		return false;
@@ -75,7 +77,7 @@ public class FilteredDefferedPackageComposite extends DeferredPackageComposite {
 		if (!super.equals(object)) {
 			return false;
 		}
-		FilteredDefferedPackageComposite that = (FilteredDefferedPackageComposite) object;
+		FilteredDeferedPackageComposite that = (FilteredDeferedPackageComposite) object;
 		return Objects.equal(this.sensorTypeEnumToShow, that.sensorTypeEnumToShow);
 	}
 

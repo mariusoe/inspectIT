@@ -37,6 +37,7 @@
 				<value>hibernate/PlatformIdent.hbm.xml</value>
 				<value>hibernate/MethodIdent.hbm.xml</value>
 				<value>hibernate/SensorTypeIdent.hbm.xml</value>
+				<value>hibernate/MethodIdentToSensorType.hbm.xml</value>
 
 				<!-- Abstract Data classes -->
 				<value>hibernate/DefaultData.hbm.xml</value>

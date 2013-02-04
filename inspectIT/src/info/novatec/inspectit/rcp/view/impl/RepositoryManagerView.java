@@ -656,8 +656,8 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		public ShowAgentsAction() {
 			super(null, AS_CHECK_BOX);
 			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_AGENT_GRAY));
-			setChecked(false);
-			setToolTipText("Show / Hide Agents which have not sent any data yet.");
+			setChecked(showOldAgents);
+			updateToolTipText();
 		}
 
 		/**
@@ -665,9 +665,21 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		 */
 		public void run() {
 			showOldAgents = isChecked();
+			updateToolTipText();
 			createInputList();
 			updateFormBody();
 		};
+
+		/**
+		 * Updates tool-tip text based on the current state.
+		 */
+		private void updateToolTipText() {
+			if (isChecked()) {
+				setToolTipText("Hide Agents which have not sent any data yet.");
+			} else {
+				setToolTipText("Show Agents which have not sent any data yet.");
+			}
+		}
 	}
 
 	/**

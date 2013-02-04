@@ -10,8 +10,8 @@
 			<column name="discriminator" />
 		</discriminator>
 
-		<set name="platformIdents" table="platform_sensor_type"
-			lazy="true" inverse="true">
+		<set name="platformIdents" table="platform_sensor_type" lazy="true"
+			cascade="all" inverse="true">
 			<key column="sensor_type_id" />
 			<many-to-many column="platform_id" class="PlatformIdent" />
 		</set>
@@ -20,16 +20,13 @@
 			<column name="fully_qualified_class_name" />
 		</property>
 
-		<subclass name="PlatformSensorTypeIdent"
-			discriminator-value="PSTI">
+		<subclass name="PlatformSensorTypeIdent" discriminator-value="PSTI">
 		</subclass>
 
-		<subclass name="MethodSensorTypeIdent"
-			discriminator-value="MSTI">
-			<set name="methodIdents" table="method_sensor_type"
-				lazy="true" inverse="true">
-				<key column="sensor_type_id" />
-				<many-to-many column="method_id" class="MethodIdent" />
+		<subclass name="MethodSensorTypeIdent" discriminator-value="MSTI">
+			<set name="methodIdentToSensorTypes" inverse="true" lazy="false">
+				<key column="method_sensor_type_ident_id" />
+				<one-to-many class="MethodIdentToSensorType" />
 			</set>
 		</subclass>
 

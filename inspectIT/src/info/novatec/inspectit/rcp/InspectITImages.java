@@ -133,5 +133,6 @@ public interface InspectITImages {
 	String IMG_IMPORT = InspectITConstants.ICON_PATH + "impor.gif";
 	String IMG_UPLOAD = InspectITConstants.ICON_PATH + "upload_storage.png";
 	String IMG_RECORD_SCHEDULED = InspectITConstants.ICON_PATH + "record_scheduled.png";
-	String IMG_FOLDER = InspectITConstants.ICON_PATH + "folder.png";;
+	String IMG_FOLDER = InspectITConstants.ICON_PATH + "folder.png";
+	String IMG_INSTRUMENTATION_BROWSER_INACTIVE = InspectITConstants.ICON_PATH + "instrumentation_browser_inactive.png";
 }

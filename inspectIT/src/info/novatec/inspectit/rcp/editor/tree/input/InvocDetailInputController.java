@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
-import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
+import info.novatec.inspectit.cmr.model.MethodIdentToSensorType;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
@@ -760,8 +760,8 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 				if (element instanceof InvocationSequenceData) {
 					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) element;
 					MethodIdent methodIdent = cachedDataService.getMethodIdentForId(invocationSequenceData.getMethodIdent());
-					Set<MethodSensorTypeIdent> methodSensorTypes = methodIdent.getMethodSensorTypeIdents();
-					Set<SensorTypeEnum> sensorTypes = SensorTypeEnum.getAllOf(methodSensorTypes);
+					Set<MethodIdentToSensorType> methodIdentToSensorTypes = methodIdent.getMethodIdentToSensorTypes();
+					Set<SensorTypeEnum> sensorTypes = SensorTypeEnum.getAllOf(methodIdentToSensorTypes);
 					sensorTypes.retainAll(selectedSensorTypes);
 					if (sensorTypes.isEmpty()) {
 						return false;
@@ -824,8 +824,8 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 				if (element instanceof InvocationSequenceData) {
 					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) element;
 					MethodIdent methodIdent = cachedDataService.getMethodIdentForId(invocationSequenceData.getMethodIdent());
-					Set<MethodSensorTypeIdent> methodSensorTypes = methodIdent.getMethodSensorTypeIdents();
-					Set<SensorTypeEnum> sensorTypes = SensorTypeEnum.getAllOf(methodSensorTypes);
+					Set<MethodIdentToSensorType> methodIdentToSensorTypes = methodIdent.getMethodIdentToSensorTypes();
+					Set<SensorTypeEnum> sensorTypes = SensorTypeEnum.getAllOf(methodIdentToSensorTypes);
 					if (sensorTypes.contains(SensorTypeEnum.JDBC_PREPARED_STATEMENT)) {
 						if (null == invocationSequenceData.getSqlStatementData() || 0 == invocationSequenceData.getSqlStatementData().getCount()) {
 							return false;

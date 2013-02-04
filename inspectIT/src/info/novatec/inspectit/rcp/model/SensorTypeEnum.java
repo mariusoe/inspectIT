@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.model;
 
+import info.novatec.inspectit.cmr.model.MethodIdentToSensorType;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
@@ -143,15 +144,17 @@ public enum SensorTypeEnum {
 	}
 
 	/**
-	 * Returns all elements of the enumeration for the given list of sensor type ident objects.
+	 * Returns all elements of the enumeration for the given list of {@link MethodIdentToSensorType}
+	 * objects.
 	 * 
-	 * @param sensorTypes
-	 *            The passed sensor type ident objects.
+	 * @param methodIdentToSensorTypes
+	 *            The passed {@link MethodIdentToSensorType} objects.
 	 * @return A set of SensorTypeEnum objects.
 	 */
-	public static Set<SensorTypeEnum> getAllOf(Set<? extends SensorTypeIdent> sensorTypes) {
+	public static Set<SensorTypeEnum> getAllOf(Set<MethodIdentToSensorType> methodIdentToSensorTypes) {
 		Set<SensorTypeEnum> sensorTypeSet = EnumSet.noneOf(SensorTypeEnum.class);
-		for (SensorTypeIdent sensorType : sensorTypes) {
+		for (MethodIdentToSensorType methodIdentToSensorType : methodIdentToSensorTypes) {
+			SensorTypeIdent sensorType = methodIdentToSensorType.getMethodSensorTypeIdent();
 			sensorTypeSet.add(get(sensorType.getFullyQualifiedClassName()));
 		}
 		return sensorTypeSet;

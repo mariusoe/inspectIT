@@ -1,10 +1,12 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.MethodIdentDao;
+import info.novatec.inspectit.cmr.dao.MethodIdentToSensorTypeDao;
 import info.novatec.inspectit.cmr.dao.MethodSensorTypeIdentDao;
 import info.novatec.inspectit.cmr.dao.PlatformIdentDao;
 import info.novatec.inspectit.cmr.dao.PlatformSensorTypeIdentDao;
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.cmr.model.MethodIdentToSensorType;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
@@ -77,6 +79,12 @@ public class RegistrationService implements IRegistrationService {
 	 */
 	@Autowired
 	PlatformSensorTypeIdentDao platformSensorTypeIdentDao;
+
+	/**
+	 * The method ident to sensor type DAO.
+	 */
+	@Autowired
+	MethodIdentToSensorTypeDao methodIdentToSensorTypeDao;
 
 	/**
 	 * The license utility to check for a valid license and abort the registration of the agent if
@@ -246,14 +254,17 @@ public class RegistrationService implements IRegistrationService {
 	@Transactional
 	@MethodLog
 	public void addSensorTypeToMethod(long methodSensorTypeId, long methodId) throws RemoteException {
-		MethodIdent methodIdent = methodIdentDao.load(methodId);
-		MethodSensorTypeIdent methodSensorTypeIdent = methodSensorTypeIdentDao.load(methodSensorTypeId);
+		MethodIdentToSensorType methodIdentToSensorType = methodIdentToSensorTypeDao.find(methodId, methodSensorTypeId);
+		if (null == methodIdentToSensorType) {
+			MethodIdent methodIdent = methodIdentDao.load(methodId);
+			MethodSensorTypeIdent methodSensorTypeIdent = methodSensorTypeIdentDao.load(methodSensorTypeId);
+			methodIdentToSensorType = new MethodIdentToSensorType(methodIdent, methodSensorTypeIdent, null);
+		}
 
-		Set<MethodSensorTypeIdent> methodSensorTypeIdents = methodIdent.getMethodSensorTypeIdents();
-		methodSensorTypeIdents.add(methodSensorTypeIdent);
+		// always update the timestamp
+		methodIdentToSensorType.setTimestamp(new Timestamp(GregorianCalendar.getInstance().getTimeInMillis()));
 
-		methodSensorTypeIdentDao.saveOrUpdate(methodSensorTypeIdent);
-		methodIdentDao.saveOrUpdate(methodIdent);
+		methodIdentToSensorTypeDao.saveOrUpdate(methodIdentToSensorType);
 	}
 
 	/**

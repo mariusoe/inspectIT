@@ -40,6 +40,11 @@ public abstract class Component {
 	private InputDefinition inputDefinition;
 
 	/**
+	 * If the component is enabled.
+	 */
+	private boolean enabled = true;
+
+	/**
 	 * Gets {@link #name}.
 	 * 
 	 * @return {@link #name}
@@ -135,11 +140,30 @@ public abstract class Component {
 	}
 
 	/**
+	 * Gets {@link #enabled}.
+	 * 
+	 * @return {@link #enabled}
+	 */
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	/**
+	 * Sets {@link #enabled}.
+	 * 
+	 * @param enabled
+	 *            New value for {@link #enabled}
+	 */
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(name, tooltip, inputDefinition, parent);
+		return Objects.hashCode(name, tooltip, inputDefinition, parent, enabled);
 	}
 
 	/**
@@ -157,7 +181,8 @@ public abstract class Component {
 			return false;
 		}
 		Component that = (Component) object;
-		return Objects.equal(this.name, that.name) && Objects.equal(this.tooltip, that.tooltip) && Objects.equal(this.inputDefinition, that.inputDefinition) && Objects.equal(this.parent, that.parent);
+		return Objects.equal(this.name, that.name) && Objects.equal(this.tooltip, that.tooltip) && Objects.equal(this.inputDefinition, that.inputDefinition) && Objects.equal(this.parent, that.parent)
+				&& Objects.equal(this.enabled, that.enabled);
 	}
 
 }

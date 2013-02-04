@@ -18,16 +18,27 @@ public class MethodSensorTypeIdent extends SensorTypeIdent {
 	private static final long serialVersionUID = -8933452676894686230L;
 
 	/**
-	 * The many-to-many association to the {@link MethodIdent} objects.
+	 * The one-to-many association to the {@link MethodIdentToSensorType} objects.
 	 */
-	private Set<MethodIdent> methodIdents = new HashSet<MethodIdent>(0);
+	private Set<MethodIdentToSensorType> methodIdentToSensorTypes = new HashSet<MethodIdentToSensorType>(0);
 
-	public Set<MethodIdent> getMethodIdents() {
-		return methodIdents;
+	/**
+	 * Gets {@link #methodIdentToSensorTypes}.
+	 * 
+	 * @return {@link #methodIdentToSensorTypes}
+	 */
+	public Set<MethodIdentToSensorType> getMethodIdentToSensorTypes() {
+		return methodIdentToSensorTypes;
 	}
 
-	public void setMethodIdents(Set<MethodIdent> methodIdents) {
-		this.methodIdents = methodIdents;
+	/**
+	 * Sets {@link #methodIdentToSensorTypes}.
+	 * 
+	 * @param methodIdentToSensorTypes
+	 *            New value for {@link #methodIdentToSensorTypes}
+	 */
+	public void setMethodIdentToSensorTypes(Set<MethodIdentToSensorType> methodIdentToSensorTypes) {
+		this.methodIdentToSensorTypes = methodIdentToSensorTypes;
 	}
 
 }

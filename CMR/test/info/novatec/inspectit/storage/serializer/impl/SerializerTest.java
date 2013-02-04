@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.cmr.model.MethodIdentToSensorType;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
@@ -98,10 +99,10 @@ public class SerializerTest {
 	public static final Object[][] TESTING_CLASSES = new Object[][] { { TimerData.class }, { SqlStatementData.class }, { ExceptionSensorData.class }, { InvocationSequenceData.class },
 			{ ClassLoadingInformationData.class }, { CompilationInformationData.class }, { MemoryInformationData.class }, { RuntimeInformationData.class }, { SystemInformationData.class },
 			{ ThreadInformationData.class }, { HttpTimerData.class }, { ParameterContentData.class }, { VmArgumentData.class }, { PlatformIdent.class }, { MethodIdent.class },
-			{ MethodSensorTypeIdent.class }, { PlatformSensorTypeIdent.class }, { SimpleStorageDescriptor.class }, { ArrayBasedStorageLeaf.class }, { StorageData.class }, { LocalStorageData.class },
-			{ PlatformIdentIndexer.class }, { ObjectTypeIndexer.class }, { MethodIdentIndexer.class }, { SensorTypeIdentIndexer.class }, { TimestampIndexer.class },
-			{ InvocationChildrenIndexer.class }, { StorageBranch.class }, { StorageBranchIndexer.class }, { BooleanStorageLabel.class }, { DateStorageLabel.class }, { NumberStorageLabel.class },
-			{ StringStorageLabel.class }, { AssigneeLabelType.class }, { CreationDateLabelType.class }, { CustomBooleanLabelType.class }, { CustomDateLabelType.class },
+			{ MethodSensorTypeIdent.class }, { MethodIdentToSensorType.class }, { PlatformSensorTypeIdent.class }, { SimpleStorageDescriptor.class }, { ArrayBasedStorageLeaf.class },
+			{ StorageData.class }, { LocalStorageData.class }, { PlatformIdentIndexer.class }, { ObjectTypeIndexer.class }, { MethodIdentIndexer.class }, { SensorTypeIdentIndexer.class },
+			{ TimestampIndexer.class }, { InvocationChildrenIndexer.class }, { StorageBranch.class }, { StorageBranchIndexer.class }, { BooleanStorageLabel.class }, { DateStorageLabel.class },
+			{ NumberStorageLabel.class }, { StringStorageLabel.class }, { AssigneeLabelType.class }, { CreationDateLabelType.class }, { CustomBooleanLabelType.class }, { CustomDateLabelType.class },
 			{ CustomNumberLabelType.class }, { CustomStringLabelType.class }, { ExploredByLabelType.class }, { RatingLabelType.class }, { StatusLabelType.class }, { UseCaseLabelType.class },
 			{ SqlStringIndexer.class }, { BooleanStorageLabel.class }, { DateStorageLabel.class }, { NumberStorageLabel.class }, { StringStorageLabel.class }, { CustomDateLabelType.class },
 			{ CmrStatusData.class }, { AgentStatusData.class }, { RecordingData.class }, { CustomBooleanLabelType.class }, { CustomNumberLabelType.class }, { CustomStringLabelType.class },

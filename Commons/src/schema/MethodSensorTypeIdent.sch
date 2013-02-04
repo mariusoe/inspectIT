@@ -6,4 +6,5 @@ class: info.novatec.inspectit.cmr.model.MethodSensorTypeIdent
 3: fullyQualifiedClassName
 
 # Method Sensor Type Ident
-4: methodIdents
+#4: methodIdents
+5: methodIdentToSensorTypes

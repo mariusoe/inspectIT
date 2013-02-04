@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.IElementCollector;
@@ -37,6 +38,11 @@ public class DeferredPackageComposite extends DeferredComposite {
 	private RepositoryDefinition repositoryDefinition;
 
 	/**
+	 * If inactive instrumentations should be hidden.
+	 */
+	private boolean hideInactiveInstrumentations;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -61,6 +67,7 @@ public class DeferredPackageComposite extends DeferredComposite {
 
 					DeferredClassComposite composite = classNames.get(className);
 					composite.addMethodToDisplay(clazz);
+					composite.setHideInactiveInstrumentations(hideInactiveInstrumentations);
 				}
 				if (monitor.isCanceled()) {
 					break;
@@ -71,6 +78,21 @@ public class DeferredPackageComposite extends DeferredComposite {
 			collector.done();
 			monitor.done();
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isEnabled() {
+		if (CollectionUtils.isNotEmpty(classes)) {
+			for (MethodIdent methodIdent : classes) {
+				if (methodIdent.hasActiveSensorTypes()) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -89,7 +111,7 @@ public class DeferredPackageComposite extends DeferredComposite {
 	 * @return Should this method ident pass the selection process.
 	 */
 	protected boolean select(MethodIdent methodIdent) {
-		return true;
+		return !hideInactiveInstrumentations || methodIdent.hasActiveSensorTypes();
 	}
 
 	/**
@@ -124,6 +146,25 @@ public class DeferredPackageComposite extends DeferredComposite {
 	@Override
 	public Image getImage() {
 		return InspectIT.getDefault().getImage(InspectITImages.IMG_PACKAGE);
+	}
+
+	/**
+	 * Gets {@link #hideInactiveInstrumentations}.
+	 * 
+	 * @return {@link #hideInactiveInstrumentations}
+	 */
+	public boolean isHideInactiveInstrumentations() {
+		return hideInactiveInstrumentations;
+	}
+
+	/**
+	 * Sets {@link #hideInactiveInstrumentations}.
+	 * 
+	 * @param hideInactiveInstrumentations
+	 *            New value for {@link #hideInactiveInstrumentations}
+	 */
+	public void setHideInactiveInstrumentations(boolean hideInactiveInstrumentations) {
+		this.hideInactiveInstrumentations = hideInactiveInstrumentations;
 	}
 
 	/**

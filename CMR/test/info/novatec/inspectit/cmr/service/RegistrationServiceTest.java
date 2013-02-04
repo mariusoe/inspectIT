@@ -2,6 +2,7 @@ package info.novatec.inspectit.cmr.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -15,11 +16,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import info.novatec.inspectit.cmr.dao.MethodIdentToSensorTypeDao;
 import info.novatec.inspectit.cmr.dao.impl.MethodIdentDaoImpl;
 import info.novatec.inspectit.cmr.dao.impl.MethodSensorTypeIdentDaoImpl;
 import info.novatec.inspectit.cmr.dao.impl.PlatformIdentDaoImpl;
 import info.novatec.inspectit.cmr.dao.impl.PlatformSensorTypeIdentDaoImpl;
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.cmr.model.MethodIdentToSensorType;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
@@ -93,6 +96,9 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 	@Mock
 	private AgentStatusDataProvider agentStatusDataProvider;
 
+	@Mock
+	private MethodIdentToSensorTypeDao methodIdentToSensorTypeDao;
+
 	/**
 	 * Initializes mocks. Has to run before each test so that mocks are clear.
 	 */
@@ -107,6 +113,7 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		registrationService.methodSensorTypeIdentDao = methodSensorTypeIdentDao;
 		registrationService.platformSensorTypeIdentDao = platformSensorTypeIdentDao;
 		registrationService.agentStatusDataProvider = agentStatusDataProvider;
+		registrationService.methodIdentToSensorTypeDao = methodIdentToSensorTypeDao;
 		registrationService.log = LogFactory.getLog(RegistrationService.class);
 	}
 
@@ -549,27 +556,57 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 	}
 
 	/**
-	 * Test the adding of the method sensor type to method ident.
+	 * Test the registering of the method sensor type to method occurring for the first time.
 	 * 
 	 * @throws RemoteException
 	 *             If {@link RemoteException} occurs.
 	 */
 	@Test
-	public void registerSensorTypeWithMethod() throws RemoteException {
+	public void registerSensorTypeWithMethodFirstTime() throws RemoteException {
 		long methodId = 20;
 		long methodSensorId = 50;
 
 		MethodIdent methodIdent = new MethodIdent();
 		MethodSensorTypeIdent methodSensorTypeIdent = new MethodSensorTypeIdent();
 
+		when(methodIdentToSensorTypeDao.find(methodId, methodSensorId)).thenReturn(null);
 		when(methodIdentDao.load(methodId)).thenReturn(methodIdent);
 		when(methodSensorTypeIdentDao.load(methodSensorId)).thenReturn(methodSensorTypeIdent);
 
 		registrationService.addSensorTypeToMethod(methodSensorId, methodId);
 
-		verify(methodIdentDao, times(1)).saveOrUpdate(methodIdent);
-		verify(methodSensorTypeIdentDao, times(1)).saveOrUpdate(methodSensorTypeIdent);
-		assertThat(methodSensorTypeIdent, is(equalTo(methodIdent.getMethodSensorTypeIdents().toArray()[0])));
+		ArgumentCaptor<MethodIdentToSensorType> argument = ArgumentCaptor.forClass(MethodIdentToSensorType.class);
+		verify(methodIdentToSensorTypeDao, times(1)).saveOrUpdate(argument.capture());
+
+		assertThat(argument.getValue().getMethodIdent(), is(equalTo(methodIdent)));
+		assertThat(argument.getValue().getMethodSensorTypeIdent(), is(equalTo(methodSensorTypeIdent)));
 	}
 
+	/**
+	 * Test the registering of the method sensor type to method occurring not for the first time.
+	 * 
+	 * @throws RemoteException
+	 *             If {@link RemoteException} occurs.
+	 */
+	@Test
+	public void registerSensorTypeWithMethodSecondTime() throws RemoteException {
+		long methodId = 20;
+		long methodSensorId = 50;
+
+		MethodIdentToSensorType methodIdentToSensorType = new MethodIdentToSensorType();
+		methodIdentToSensorType.setId(1L);
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis() - 1);
+		methodIdentToSensorType.setTimestamp(timestamp);
+		when(methodIdentToSensorTypeDao.find(methodId, methodSensorId)).thenReturn(methodIdentToSensorType);
+
+		registrationService.addSensorTypeToMethod(methodSensorId, methodId);
+
+		ArgumentCaptor<MethodIdentToSensorType> argument = ArgumentCaptor.forClass(MethodIdentToSensorType.class);
+		verify(methodIdentToSensorTypeDao, times(1)).saveOrUpdate(argument.capture());
+		verifyZeroInteractions(methodIdentDao);
+		verifyZeroInteractions(methodSensorTypeIdentDao);
+
+		assertThat(argument.getValue().getId(), is(equalTo(1L)));
+		assertThat(argument.getValue().getTimestamp().getTime(), is(greaterThan(timestamp.getTime())));
+	}
 }

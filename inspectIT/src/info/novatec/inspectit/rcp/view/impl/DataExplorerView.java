@@ -167,6 +167,11 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	private Map<Integer, List<Object>> expandedElementsPerAgent = new ConcurrentHashMap<Integer, List<Object>>();
 
 	/**
+	 * If the inactive instrumentations should be hidden.
+	 */
+	private boolean hideInactiveInstrumentations = true;
+
+	/**
 	 * Default constructor.
 	 */
 	public DataExplorerView() {
@@ -227,19 +232,19 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 *            Agent to select. Can be null. If the repository does not
 	 */
 	public void showRepository(final RepositoryDefinition repositoryDefinition, final PlatformIdent agent) {
-		displayedRepositoryDefinition = repositoryDefinition;
 		Display.getDefault().syncExec(new Runnable() {
 			@Override
 			public void run() {
 				mainForm.setBusy(true);
-				updateFormTitle();
-				agentsCombo.removeAll();
-				displayMessage("Loading agents for repository " + repositoryDefinition.getName(), Display.getDefault().getSystemImage(SWT.ICON_WORKING));
 				if (null != displayedAgent && null != displayedRepositoryDefinition) {
 					cacheExpandedObjects(displayedAgent, displayedRepositoryDefinition);
 				}
+				updateFormTitle();
+				agentsCombo.removeAll();
+				displayMessage("Loading agents for repository " + repositoryDefinition.getName(), Display.getDefault().getSystemImage(SWT.ICON_WORKING));
 			}
 		});
+		displayedRepositoryDefinition = repositoryDefinition;
 
 		PreferencesUtils.saveObject(PreferencesConstants.LAST_SELECTED_REPOSITORY, displayedRepositoryDefinition, false);
 		updateAvailableAgents(repositoryDefinition, new JobChangeAdapter() {
@@ -393,6 +398,10 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 */
 	private void createViewToolbar() {
 		toolBarManager = getViewSite().getActionBars().getToolBarManager();
+
+		ShowHideInactiveInstrumentationsAction showHideInactiveInstrumentationsAction = new ShowHideInactiveInstrumentationsAction();
+		toolBarManager.add(showHideInactiveInstrumentationsAction);
+
 		collapseAction = new CollapseAction();
 		toolBarManager.add(collapseAction);
 	}
@@ -490,7 +499,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 		clearFormBody();
 		if (null != displayedRepositoryDefinition && null != displayedAgent) {
 			TreeModelManager treeModelManager = null;
-			treeModelManager = new TreeModelManager(displayedRepositoryDefinition, displayedAgent);
+			treeModelManager = new TreeModelManager(displayedRepositoryDefinition, displayedAgent, hideInactiveInstrumentations);
 			if (null != treeModelManager && null != displayedAgent) {
 				treeViewer.setInput(treeModelManager);
 				treeViewer.getTree().setVisible(true);
@@ -823,7 +832,6 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 		 * Default constructor.
 		 */
 		public CollapseAction() {
-			super();
 			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_COLLAPSE));
 			setToolTipText("Collapse All");
 			updateEnabledState();
@@ -850,6 +858,50 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 			treeViewer.refresh();
 		}
 
+	}
+
+	/**
+	 * Class for handling the showing / hiding of the inactive instrumentations.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private class ShowHideInactiveInstrumentationsAction extends Action {
+
+		/**
+		 * Default constructor.
+		 */
+		public ShowHideInactiveInstrumentationsAction() {
+			super(null, AS_CHECK_BOX);
+			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_INSTRUMENTATION_BROWSER_INACTIVE));
+			setChecked(!hideInactiveInstrumentations);
+			updateToolTipText();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void run() {
+			hideInactiveInstrumentations = !isChecked(); // NOPMD
+			// Bug in PMD reporting inverting of boolean
+			updateToolTipText();
+			if (null != displayedAgent && null != displayedRepositoryDefinition) {
+				cacheExpandedObjects(displayedAgent, displayedRepositoryDefinition);
+			}
+			performUpdate();
+		}
+
+		/**
+		 * Updates tool-tip text based on the current state.
+		 */
+		private void updateToolTipText() {
+			if (!isChecked()) {
+				setToolTipText("Show inactive instrumentations");
+			} else {
+				setToolTipText("Hide inactive instrumentations");
+			}
+		}
 	}
 
 }

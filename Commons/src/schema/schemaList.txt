@@ -34,3 +34,4 @@ schema/NumberStorageLabel.sch
 schema/StringStorageLabel.sch
 schema/AbstractStorageLabelType.sch
 schema/AbstractCustomStorageLabelType.sch
+schema/MethodIdentToSensorType.sch

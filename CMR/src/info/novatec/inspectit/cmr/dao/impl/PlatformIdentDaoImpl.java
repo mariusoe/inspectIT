@@ -241,7 +241,8 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 		}
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		criteria.setFetchMode("methodIdents", FetchMode.JOIN);
-		criteria.setFetchMode("methodIdents.methodSensorTypeIdents", FetchMode.JOIN);
+		criteria.setFetchMode("methodIdents.methodIdentToSensorTypes", FetchMode.JOIN);
+		criteria.setFetchMode("methodIdents.methodIdentToSensorTypes.methodSensorTypeIdent", FetchMode.JOIN);
 		criteria.setFetchMode("sensorTypeIdents", FetchMode.JOIN);
 		criteria.setFetchMode("sensorTypeIdents.platformIdents", FetchMode.JOIN);
 
@@ -251,5 +252,4 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 		}
 		return platformIdents;
 	}
-
 }

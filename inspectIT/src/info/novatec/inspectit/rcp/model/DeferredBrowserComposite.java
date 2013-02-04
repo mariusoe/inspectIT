@@ -37,6 +37,11 @@ public class DeferredBrowserComposite extends DeferredComposite {
 	private RepositoryDefinition repositoryDefinition;
 
 	/**
+	 * If inactive instrumentations should be hidden.
+	 */
+	private boolean hideInactiveInstrumentations;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -72,6 +77,7 @@ public class DeferredBrowserComposite extends DeferredComposite {
 
 					DeferredPackageComposite composite = packageNames.get(packageName);
 					composite.addClassToDisplay(methodIdent);
+					composite.setHideInactiveInstrumentations(hideInactiveInstrumentations);
 				}
 
 				if (monitor.isCanceled()) {
@@ -100,7 +106,7 @@ public class DeferredBrowserComposite extends DeferredComposite {
 	 * @return Should this method ident pass the selection process.
 	 */
 	protected boolean select(MethodIdent methodIdent) {
-		return true;
+		return !hideInactiveInstrumentations || methodIdent.hasActiveSensorTypes();
 	}
 
 	/**
@@ -135,6 +141,25 @@ public class DeferredBrowserComposite extends DeferredComposite {
 	@Override
 	public Image getImage() {
 		return InspectIT.getDefault().getImage(InspectITImages.IMG_INSTRUMENTATION_BROWSER);
+	}
+
+	/**
+	 * Gets {@link #hideInactiveInstrumentations}.
+	 * 
+	 * @return {@link #hideInactiveInstrumentations}
+	 */
+	public boolean isHideInactiveInstrumentations() {
+		return hideInactiveInstrumentations;
+	}
+
+	/**
+	 * Sets {@link #hideInactiveInstrumentations}.
+	 * 
+	 * @param hideInactiveInstrumentations
+	 *            New value for {@link #hideInactiveInstrumentations}
+	 */
+	public void setHideInactiveInstrumentations(boolean hideInactiveInstrumentations) {
+		this.hideInactiveInstrumentations = hideInactiveInstrumentations;
 	}
 
 	/**

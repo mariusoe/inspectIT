@@ -8,6 +8,7 @@ import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.IElementCollector;
@@ -40,6 +41,11 @@ public class DeferredClassComposite extends DeferredComposite {
 	private RepositoryDefinition repositoryDefinition;
 
 	/**
+	 * If inactive instrumentations should be hidden.
+	 */
+	private boolean hideInactiveInstrumentations;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -49,23 +55,26 @@ public class DeferredClassComposite extends DeferredComposite {
 			monitor.beginTask("Loading of Method Elements...", methods.size());
 
 			for (MethodIdent method : methods) {
-				DeferredMethodComposite composite = new DeferredMethodComposite();
-				composite.setRepositoryDefinition(repositoryDefinition);
+				if (select(method)) {
+					DeferredMethodComposite composite = new DeferredMethodComposite();
+					composite.setRepositoryDefinition(repositoryDefinition);
 
-				if (null != method.getParameters()) {
-					String parameters = method.getParameters().toString();
-					parameters = parameters.substring(1, parameters.length() - 1);
+					if (null != method.getParameters()) {
+						String parameters = method.getParameters().toString();
+						parameters = parameters.substring(1, parameters.length() - 1);
 
-					composite.setName(String.format(METHOD_FORMAT, method.getMethodName(), parameters));
-				} else {
-					composite.setName(String.format(METHOD_FORMAT, method.getMethodName(), ""));
+						composite.setName(String.format(METHOD_FORMAT, method.getMethodName(), parameters));
+					} else {
+						composite.setName(String.format(METHOD_FORMAT, method.getMethodName(), ""));
+					}
+					composite.setMethod(method);
+					composite.setHideInactiveInstrumentations(hideInactiveInstrumentations);
+
+					collector.add(composite, monitor);
+					classComposite.addChild(composite);
 				}
-				composite.setMethod(method);
 
-				collector.add(composite, monitor);
-				classComposite.addChild(composite);
 				monitor.worked(1);
-
 				if (monitor.isCanceled()) {
 					break;
 				}
@@ -74,6 +83,28 @@ public class DeferredClassComposite extends DeferredComposite {
 			collector.done();
 			monitor.done();
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isEnabled() {
+		if (CollectionUtils.isNotEmpty(methods)) {
+			for (MethodIdent methodIdent : methods) {
+				if (methodIdent.hasActiveSensorTypes()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected boolean select(MethodIdent methodIdent) {
+		return !hideInactiveInstrumentations || methodIdent.hasActiveSensorTypes();
 	}
 
 	/**
@@ -115,6 +146,25 @@ public class DeferredClassComposite extends DeferredComposite {
 	 */
 	protected List<MethodIdent> getMethods() {
 		return methods;
+	}
+
+	/**
+	 * Gets {@link #hideInactiveInstrumentations}.
+	 * 
+	 * @return {@link #hideInactiveInstrumentations}
+	 */
+	public boolean isHideInactiveInstrumentations() {
+		return hideInactiveInstrumentations;
+	}
+
+	/**
+	 * Sets {@link #hideInactiveInstrumentations}.
+	 * 
+	 * @param hideInactiveInstrumentations
+	 *            New value for {@link #hideInactiveInstrumentations}
+	 */
+	public void setHideInactiveInstrumentations(boolean hideInactiveInstrumentations) {
+		this.hideInactiveInstrumentations = hideInactiveInstrumentations;
 	}
 
 	/**

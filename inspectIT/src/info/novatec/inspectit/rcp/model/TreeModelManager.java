@@ -41,6 +41,11 @@ public class TreeModelManager {
 	private PlatformIdent platformIdent;
 
 	/**
+	 * If inactive instrumentation should be hidden.
+	 */
+	private boolean hideInactiveInstrumentations;
+
+	/**
 	 * Every tree model manager needs a reference to a {@link RepositoryDefinition} which reflects a
 	 * CMR.
 	 * 
@@ -48,12 +53,15 @@ public class TreeModelManager {
 	 *            The definition of the repository / CMR.
 	 * @param platformIdent
 	 *            {@link PlatformIdent} to create tree for.
+	 * @param hideInactiveInstrumentations
+	 *            If inactive instrumentation should be hidden.
 	 */
-	public TreeModelManager(RepositoryDefinition repositoryDefinition, PlatformIdent platformIdent) {
+	public TreeModelManager(RepositoryDefinition repositoryDefinition, PlatformIdent platformIdent, boolean hideInactiveInstrumentations) {
 		Assert.isNotNull(repositoryDefinition);
 
 		this.repositoryDefinition = repositoryDefinition;
 		this.platformIdent = platformIdent;
+		this.hideInactiveInstrumentations = hideInactiveInstrumentations;
 	}
 
 	/**
@@ -92,6 +100,7 @@ public class TreeModelManager {
 		instrumentedMethods.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INSTRUMENTATION_BROWSER));
 		instrumentedMethods.setPlatformIdent(platformIdent);
 		instrumentedMethods.setRepositoryDefinition(definition);
+		instrumentedMethods.setHideInactiveInstrumentations(hideInactiveInstrumentations);
 		instrumentedMethods.setTooltip("In this tree, you can see all methods that were being instrumented since the first launch of the Agent. "
 				+ "It does not necessarily mean that these methods are currently instrumented and gathering data.");
 
@@ -141,6 +150,7 @@ public class TreeModelManager {
 		browser.setName("Browser");
 		browser.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INSTRUMENTATION_BROWSER));
 		browser.setTooltip("Only the starting points of invocation sequences (which are defined via the invocation sequence sensor in the agent configuration) are shown in this tree.");
+		browser.setHideInactiveInstrumentations(hideInactiveInstrumentations);
 
 		invocationSequence.addChild(showAll);
 		invocationSequence.addChild(browser);
@@ -632,6 +642,7 @@ public class TreeModelManager {
 		browser.setRepositoryDefinition(repositoryDefinition);
 		browser.setName("Browser");
 		browser.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INSTRUMENTATION_BROWSER));
+		browser.setHideInactiveInstrumentations(hideInactiveInstrumentations);
 
 		timerDataComposite.addChild(showAll);
 		timerDataComposite.addChild(browser);

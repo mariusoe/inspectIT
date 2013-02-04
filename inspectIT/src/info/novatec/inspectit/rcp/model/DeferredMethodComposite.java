@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.model;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.cmr.model.MethodIdentToSensorType;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData.PartType;
@@ -38,48 +39,56 @@ public class DeferredMethodComposite extends DeferredComposite {
 	private RepositoryDefinition repositoryDefinition;
 
 	/**
+	 * If inactive instrumentations should be hidden.
+	 */
+	private boolean hideInactiveInstrumentations;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void fetchDeferredChildren(Object object, IElementCollector collector, IProgressMonitor monitor) {
 		try {
 			Composite composite = (Composite) object;
-			Set<MethodSensorTypeIdent> methodSensorTypeIdents = method.getMethodSensorTypeIdents();
-			monitor.beginTask("Loading of Sensor Type Elements...", methodSensorTypeIdents.size());
+			Set<MethodIdentToSensorType> methodIdentToSensorTypes = method.getMethodIdentToSensorTypes();
+			monitor.beginTask("Loading of Sensor Type Elements...", methodIdentToSensorTypes.size());
 
-			for (MethodSensorTypeIdent methodSensorTypeIdent : methodSensorTypeIdents) {
-				Component targetSensorType = new Leaf();
-				String fqn = methodSensorTypeIdent.getFullyQualifiedClassName();
-				SensorTypeEnum sensorTypeEnum = SensorTypeEnum.get(fqn);
-				targetSensorType.setName(sensorTypeEnum.getDisplayName());
-				targetSensorType.setImage(sensorTypeEnum.getImage());
+			for (MethodIdentToSensorType methodIdentToSensorType : methodIdentToSensorTypes) {
+				if (!hideInactiveInstrumentations || methodIdentToSensorType.isActive()) {
+					MethodSensorTypeIdent methodSensorTypeIdent = methodIdentToSensorType.getMethodSensorTypeIdent();
+					Component targetSensorType = new Leaf();
+					String fqn = methodSensorTypeIdent.getFullyQualifiedClassName();
+					SensorTypeEnum sensorTypeEnum = SensorTypeEnum.get(fqn);
+					targetSensorType.setName(sensorTypeEnum.getDisplayName());
+					targetSensorType.setImage(sensorTypeEnum.getImage());
+					targetSensorType.setEnabled(methodIdentToSensorType.isActive());
 
-				if (sensorTypeEnum.isOpenable()) {
-					InputDefinition inputDefinition = new InputDefinition();
-					inputDefinition.setRepositoryDefinition(repositoryDefinition);
-					inputDefinition.setId(sensorTypeEnum);
+					if (sensorTypeEnum.isOpenable()) {
+						InputDefinition inputDefinition = new InputDefinition();
+						inputDefinition.setRepositoryDefinition(repositoryDefinition);
+						inputDefinition.setId(sensorTypeEnum);
 
-					EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-					editorPropertiesData.setSensorImage(sensorTypeEnum.getImage());
-					editorPropertiesData.setSensorName(sensorTypeEnum.getDisplayName());
-					MethodIdent methodIdent = repositoryDefinition.getCachedDataService().getMethodIdentForId(method.getId());
-					editorPropertiesData.setViewName(TextFormatter.getMethodString(methodIdent));
-					editorPropertiesData.setViewImage(ModifiersImageFactory.getImage(methodIdent.getModifiers()));
-					editorPropertiesData.setPartNameFlag(PartType.SENSOR);
-					inputDefinition.setEditorPropertiesData(editorPropertiesData);
+						EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+						editorPropertiesData.setSensorImage(sensorTypeEnum.getImage());
+						editorPropertiesData.setSensorName(sensorTypeEnum.getDisplayName());
+						MethodIdent methodIdent = repositoryDefinition.getCachedDataService().getMethodIdentForId(method.getId());
+						editorPropertiesData.setViewName(TextFormatter.getMethodString(methodIdent));
+						editorPropertiesData.setViewImage(ModifiersImageFactory.getImage(methodIdent.getModifiers()));
+						editorPropertiesData.setPartNameFlag(PartType.SENSOR);
+						inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
-					IdDefinition idDefinition = new IdDefinition();
-					idDefinition.setPlatformId(method.getPlatformIdent().getId());
-					idDefinition.setSensorTypeId(methodSensorTypeIdent.getId());
-					idDefinition.setMethodId(method.getId());
+						IdDefinition idDefinition = new IdDefinition();
+						idDefinition.setPlatformId(method.getPlatformIdent().getId());
+						idDefinition.setSensorTypeId(methodSensorTypeIdent.getId());
+						idDefinition.setMethodId(method.getId());
 
-					inputDefinition.setIdDefinition(idDefinition);
-					targetSensorType.setInputDefinition(inputDefinition);
+						inputDefinition.setIdDefinition(idDefinition);
+						targetSensorType.setInputDefinition(inputDefinition);
+					}
+
+					collector.add(targetSensorType, monitor);
+					composite.addChild(targetSensorType);
 				}
-
-				collector.add(targetSensorType, monitor);
-				composite.addChild(targetSensorType);
-
 				monitor.worked(1);
 				if (monitor.isCanceled()) {
 					break;
@@ -89,6 +98,14 @@ public class DeferredMethodComposite extends DeferredComposite {
 			collector.done();
 			monitor.done();
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isEnabled() {
+		return method.hasActiveSensorTypes();
 	}
 
 	/**
@@ -121,6 +138,16 @@ public class DeferredMethodComposite extends DeferredComposite {
 	@Override
 	public Image getImage() {
 		return ModifiersImageFactory.getImage(method.getModifiers());
+	}
+
+	/**
+	 * Sets {@link #hideInactiveInstrumentations}.
+	 * 
+	 * @param hideInactiveInstrumentations
+	 *            New value for {@link #hideInactiveInstrumentations}
+	 */
+	public void setHideInactiveInstrumentations(boolean hideInactiveInstrumentations) {
+		this.hideInactiveInstrumentations = hideInactiveInstrumentations;
 	}
 
 	/**

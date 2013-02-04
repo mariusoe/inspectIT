@@ -32,9 +32,9 @@ public class MethodIdent implements Serializable {
 	private Timestamp timeStamp;
 
 	/**
-	 * The many-to-many association to the {@link MethodSensorTypeIdent} objects.
+	 * The one-to-many association to the {@link MethodIdentToSensorType}.
 	 */
-	private Set<MethodSensorTypeIdent> methodSensorTypeIdents = new HashSet<MethodSensorTypeIdent>(0);
+	private Set<MethodIdentToSensorType> methodIdentToSensorTypes = new HashSet<MethodIdentToSensorType>(0);
 
 	/**
 	 * The many-to-one association to the {@link PlatformIdent} object.
@@ -71,6 +71,22 @@ public class MethodIdent implements Serializable {
 	 * The modifiers.
 	 */
 	private int modifiers;
+
+	/**
+	 * Returns true if any of the {@link MethodIdentToSensorType} objects in the
+	 * {@link #methodIdentToSensorTypes} is marked as active. Returns false otherwise.
+	 * 
+	 * @return Returns true if any of the {@link MethodIdentToSensorType} objects in the
+	 *         {@link #methodIdentToSensorTypes} is marked as active. Returns false otherwise.
+	 */
+	public boolean hasActiveSensorTypes() {
+		for (MethodIdentToSensorType methodIdentToSensorType : methodIdentToSensorTypes) {
+			if (methodIdentToSensorType.isActive()) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * Gets {@link #id}.
@@ -111,22 +127,22 @@ public class MethodIdent implements Serializable {
 	}
 
 	/**
-	 * Gets {@link #methodSensorTypeIdents}.
+	 * Gets {@link #methodIdentToSensorTypes}.
 	 * 
-	 * @return {@link #methodSensorTypeIdents}
+	 * @return {@link #methodIdentToSensorTypes}
 	 */
-	public Set<MethodSensorTypeIdent> getMethodSensorTypeIdents() {
-		return methodSensorTypeIdents;
+	public Set<MethodIdentToSensorType> getMethodIdentToSensorTypes() {
+		return methodIdentToSensorTypes;
 	}
 
 	/**
-	 * Sets {@link #methodSensorTypeIdents}.
+	 * Sets {@link #methodIdentToSensorTypes}.
 	 * 
-	 * @param methodSensorTypeIdents
-	 *            New value for {@link #methodSensorTypeIdents}
+	 * @param methodIdentToSensorTypes
+	 *            New value for {@link #methodIdentToSensorTypes}
 	 */
-	public void setMethodSensorTypeIdents(Set<MethodSensorTypeIdent> methodSensorTypeIdents) {
-		this.methodSensorTypeIdents = methodSensorTypeIdents;
+	public void setMethodIdentToSensorTypes(Set<MethodIdentToSensorType> methodIdentToSensorTypes) {
+		this.methodIdentToSensorTypes = methodIdentToSensorTypes;
 	}
 
 	/**

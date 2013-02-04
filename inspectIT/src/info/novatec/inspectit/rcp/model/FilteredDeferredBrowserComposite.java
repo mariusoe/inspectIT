@@ -1,14 +1,14 @@
 package info.novatec.inspectit.rcp.model;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
-import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
+import info.novatec.inspectit.cmr.model.MethodIdentToSensorType;
 import info.novatec.inspectit.rcp.util.ObjectUtils;
 
 import com.google.common.base.Objects;
 
 /**
  * Filtered package composite delegates the children creation to the
- * {@link FilteredDefferedPackageComposite}.
+ * {@link FilteredDeferedPackageComposite}.
  * 
  * @author Ivan Senic
  * 
@@ -33,7 +33,7 @@ public class FilteredDeferredBrowserComposite extends DeferredBrowserComposite {
 	 */
 	@Override
 	protected DeferredPackageComposite getNewChild() {
-		return new FilteredDefferedPackageComposite(sensorTypeEnumToShow);
+		return new FilteredDeferedPackageComposite(sensorTypeEnumToShow);
 	}
 
 	/**
@@ -41,10 +41,12 @@ public class FilteredDeferredBrowserComposite extends DeferredBrowserComposite {
 	 */
 	@Override
 	protected boolean select(MethodIdent methodIdent) {
-		for (MethodSensorTypeIdent methodSensorType : methodIdent.getMethodSensorTypeIdents()) {
-			SensorTypeEnum sensorTypeEnum = SensorTypeEnum.get(methodSensorType.getFullyQualifiedClassName());
+		for (MethodIdentToSensorType methodIdentToSensorType : methodIdent.getMethodIdentToSensorTypes()) {
+			SensorTypeEnum sensorTypeEnum = SensorTypeEnum.get(methodIdentToSensorType.getMethodSensorTypeIdent().getFullyQualifiedClassName());
 			if (ObjectUtils.equals(sensorTypeEnum, sensorTypeEnumToShow)) {
-				return true;
+				if (!isHideInactiveInstrumentations() || methodIdentToSensorType.isActive()) {
+					return super.select(methodIdent);
+				}
 			}
 		}
 		return false;
