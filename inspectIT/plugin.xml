@@ -1372,6 +1372,25 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.DeleteAgentHandler"
+            commandId="org.eclipse.ui.edit.delete">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.model.AgentLeaf">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.canDelete">
+                  </test>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -1457,6 +1476,13 @@
             namespace="info.novatec.inspectit"
             properties="canRefresh"
             type="info.novatec.inspectit.rcp.view.IRefreshableView">
+      </propertyTester>
+      <propertyTester
+            class="info.novatec.inspectit.rcp.tester.AgentTester"
+            id="info.inspectit.rcp.AgentTester"
+            namespace="info.novatec.inspectit"
+            properties="canDelete"
+            type="info.novatec.inspectit.rcp.model.AgentLeaf">
       </propertyTester>
    </extension>
    <extension
@@ -2146,6 +2172,15 @@
                label="License Information"
                style="push"
                tooltip="License Information">
+         </command>
+         <separator
+               name="info.novatec.inspectit.rcp.repositoryManagerToolbar.separator3"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               label="Delete Agent"
+               style="push">
          </command>
       </menuContribution>
       <menuContribution

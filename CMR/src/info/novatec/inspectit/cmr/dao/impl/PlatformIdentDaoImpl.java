@@ -70,9 +70,8 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 	 * {@inheritDoc}
 	 */
 	public void deleteAll(List<PlatformIdent> platformIdents) {
-		getHibernateTemplate().deleteAll(platformIdents);
 		for (PlatformIdent platformIdent : platformIdents) {
-			platformIdentCache.remove(platformIdent);
+			delete(platformIdent);
 		}
 	}
 

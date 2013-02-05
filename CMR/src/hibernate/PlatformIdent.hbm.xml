@@ -10,7 +10,7 @@
 		</property>
 
 		<set name="sensorTypeIdents" table="platform_sensor_type"
-			lazy="true" cascade="all">
+			lazy="true">
 			<key column="platform_id" />
 			<many-to-many column="sensor_type_id"
 				class="SensorTypeIdent" />

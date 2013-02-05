@@ -53,6 +53,17 @@ public class AgentStatusDataProvider {
 	}
 
 	/**
+	 * Informs the {@link AgentStatusDataProvider} that the platform has been deleted from the CMR.
+	 * All kept information will be deleted.
+	 * 
+	 * @param platformId
+	 *            ID of the platform ident.
+	 */
+	public synchronized void registerDeleted(long platformId) {
+		agentStatusDataMap.remove(platformId);
+	}
+
+	/**
 	 * @return Returns the map of platform ident IDs and dates when the last data was received.
 	 */
 	public Map<Long, AgentStatusData> getAgentStatusDataMap() {

@@ -84,4 +84,12 @@ public interface DefaultDataDao {
 	 */
 	DefaultData findByExampleLastData(DefaultData template);
 
+	/**
+	 * Deletes all default data objects in the database with the given platform ID.
+	 * 
+	 * @param platformId
+	 *            PLatform id of objects to be deleted.
+	 */
+	void deleteAll(Long platformId);
+
 }

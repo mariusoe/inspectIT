@@ -32,12 +32,14 @@
 		<classes>
 			<class name="info.novatec.inspectit.indexing.aggregation.impl.HttpDataAggregatorTest" />
 			<class name="info.novatec.inspectit.cmr.dao.impl.TimerDataAggregatorTest" />
+			<class name="info.novatec.inspectit.cmr.dao.impl.PlatformIdentDaoTest" />
 		</classes>
 	</test>
 	<test name="Service">
 		<classes>
 			<class name="info.novatec.inspectit.cmr.service.RegistrationServiceTest" />
 			<class name="info.novatec.inspectit.cmr.service.AgentStorageServiceTest" />
+			<class name="info.novatec.inspectit.cmr.service.GlobalDataAccessServiceTest" />
 		</classes>
 	</test>
 	<test name="Util">

@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.repository.service.storage;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
+import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
@@ -62,9 +63,16 @@ public class StorageGlobalDataAccessService extends AbstractStorageService<Defau
 	 * <p>
 	 * Returns the empty map because for the storage we don't have the information saved.
 	 */
-	@Override
 	public Map<Long, AgentStatusData> getAgentStatusDataMap() {
 		return Collections.emptyMap();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Agents can not be deleted on the Storage.
+	 */
+	public void deleteAgent(long platformId) throws ServiceException {
 	}
 
 	/**

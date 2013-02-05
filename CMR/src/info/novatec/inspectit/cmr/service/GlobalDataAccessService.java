@@ -3,10 +3,12 @@ package info.novatec.inspectit.cmr.service;
 import info.novatec.inspectit.cmr.dao.DefaultDataDao;
 import info.novatec.inspectit.cmr.dao.PlatformIdentDao;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
+import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
 import info.novatec.inspectit.cmr.util.AgentStatusDataProvider;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
+import info.novatec.inspectit.communication.data.cmr.AgentStatusData.AgentConnection;
 import info.novatec.inspectit.spring.logger.Logger;
 
 import java.util.Collections;
@@ -36,19 +38,19 @@ public class GlobalDataAccessService implements IGlobalDataAccessService {
 	 * The platform ident DAO.
 	 */
 	@Autowired
-	private PlatformIdentDao platformIdentDao;
+	PlatformIdentDao platformIdentDao;
 
 	/**
 	 * The default data DAO.
 	 */
 	@Autowired
-	private DefaultDataDao defaultDataDao;
+	DefaultDataDao defaultDataDao;
 
 	/**
 	 * {@link AgentStatusDataProvider}.
 	 */
 	@Autowired
-	private AgentStatusDataProvider agentStatusProvider;
+	AgentStatusDataProvider agentStatusProvider;
 
 	/**
 	 * {@inheritDoc}
@@ -71,6 +73,31 @@ public class GlobalDataAccessService implements IGlobalDataAccessService {
 	@MethodLog
 	public Map<Long, AgentStatusData> getAgentStatusDataMap() {
 		return agentStatusProvider.getAgentStatusDataMap();
+	}
+
+	/**
+	 * 
+	 * {@inheritDoc}
+	 */
+	@MethodLog
+	public void deleteAgent(long platformId) throws ServiceException {
+		PlatformIdent platformIdent = platformIdentDao.load(platformId);
+		if (null != platformIdent) {
+			AgentStatusData agentStatusData = agentStatusProvider.getAgentStatusDataMap().get(platformIdent.getId());
+
+			// delete is allowed only if agent is disconnected or was never connected
+			if (null != agentStatusData && agentStatusData.getAgentConnection() == AgentConnection.CONNECTED) {
+				throw new ServiceException("The Agent '" + platformIdent.getAgentName() + "' can not be deleted because it's still connected.");
+			}
+
+			platformIdentDao.delete(platformIdent);
+			defaultDataDao.deleteAll(platformIdent.getId());
+			agentStatusProvider.registerDeleted(platformId);
+
+			log.info("The Agent '" + platformIdent.getAgentName() + "' with the ID " + platformIdent.getId() + " was successfully deleted from the CMR.");
+		} else {
+			throw new ServiceException("The Agent with the ID=" + platformId + " does not exists on the CMR.");
+		}
 	}
 
 	/**

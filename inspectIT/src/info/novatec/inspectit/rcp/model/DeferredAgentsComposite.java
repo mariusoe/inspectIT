@@ -63,7 +63,7 @@ public class DeferredAgentsComposite extends DeferredComposite implements ICmrRe
 						AgentStatusData agentStatusData = entry.getValue();
 						// the agentstatusdata is null if the agent wasn't connected before
 						if (showOldAgents || (!showOldAgents && agentStatusData != null)) {
-							Component agentLeaf = new AgentLeaf(platformIdent, agentStatusData);
+							Component agentLeaf = new AgentLeaf(platformIdent, agentStatusData, cmrRepositoryDefinition);
 							collector.add(agentLeaf, monitor);
 							((Composite) object).addChild(agentLeaf);
 						}

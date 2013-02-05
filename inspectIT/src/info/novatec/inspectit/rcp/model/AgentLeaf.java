@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.model;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 
 import com.google.common.base.Objects;
 
@@ -24,16 +25,24 @@ public class AgentLeaf extends Leaf {
 	private AgentStatusData agentStatusData;
 
 	/**
+	 * {@link CmrRepositoryDefinition}.
+	 */
+	private final CmrRepositoryDefinition cmrRepositoryDefinition;
+
+	/**
 	 * Default constructor.
 	 * 
 	 * @param platformIdent
 	 *            Agent to display in leaf.
 	 * @param agentStatusData
 	 *            {@link AgentStatusData}
+	 * @param cmrRepositoryDefinition
+	 *            {@link CmrRepositoryDefinition}
 	 */
-	public AgentLeaf(PlatformIdent platformIdent, AgentStatusData agentStatusData) {
+	public AgentLeaf(PlatformIdent platformIdent, AgentStatusData agentStatusData, CmrRepositoryDefinition cmrRepositoryDefinition) {
 		this.platformIdent = platformIdent;
 		this.agentStatusData = agentStatusData;
+		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
 	}
 
 	/**
@@ -83,11 +92,20 @@ public class AgentLeaf extends Leaf {
 	}
 
 	/**
+	 * Gets {@link #cmrRepositoryDefinition}.
+	 * 
+	 * @return {@link #cmrRepositoryDefinition}
+	 */
+	public CmrRepositoryDefinition getCmrRepositoryDefinition() {
+		return cmrRepositoryDefinition;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(super.hashCode(), platformIdent);
+		return Objects.hashCode(super.hashCode(), platformIdent, cmrRepositoryDefinition);
 	}
 
 	/**
@@ -108,6 +126,6 @@ public class AgentLeaf extends Leaf {
 			return false;
 		}
 		AgentLeaf that = (AgentLeaf) object;
-		return Objects.equal(this.platformIdent, that.platformIdent);
+		return Objects.equal(this.platformIdent, that.platformIdent) && Objects.equal(this.cmrRepositoryDefinition, that.cmrRepositoryDefinition);
 	}
 }

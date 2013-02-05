@@ -11,7 +11,7 @@
 		</discriminator>
 
 		<set name="platformIdents" table="platform_sensor_type"
-			lazy="true" cascade="all" inverse="true">
+			lazy="true" inverse="true">
 			<key column="sensor_type_id" />
 			<many-to-many column="platform_id" class="PlatformIdent" />
 		</set>
@@ -27,7 +27,7 @@
 		<subclass name="MethodSensorTypeIdent"
 			discriminator-value="MSTI">
 			<set name="methodIdents" table="method_sensor_type"
-				lazy="true" cascade="all" inverse="true">
+				lazy="true" inverse="true">
 				<key column="sensor_type_id" />
 				<many-to-many column="method_id" class="MethodIdent" />
 			</set>

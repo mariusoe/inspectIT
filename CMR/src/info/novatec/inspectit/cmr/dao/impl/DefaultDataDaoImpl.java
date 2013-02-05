@@ -30,6 +30,7 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.hibernate.FetchMode;
+import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
@@ -493,6 +494,21 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 		} else {
 			return null;
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void deleteAll(Long platformId) {
+		// because H2 does not support cascading on delete we need to clear all connected data
+		Query query = getSession().createQuery("delete from VmArgumentData where systemInformationId in (select id from SystemInformationData where platformIdent = :platformIdent)");
+		query.setLong("platformIdent", platformId);
+		query.executeUpdate();
+
+		// then delete all default data
+		query = getSession().createQuery("delete from DefaultData where platformIdent = :platformIdent");
+		query.setLong("platformIdent", platformId);
+		query.executeUpdate();
 	}
 
 }

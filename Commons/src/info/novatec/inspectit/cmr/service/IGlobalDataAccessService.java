@@ -1,6 +1,7 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
+import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 
@@ -33,6 +34,17 @@ public interface IGlobalDataAccessService {
 	 * @return Returns the map of platform ident IDs and {@link AgentStatusData}.
 	 */
 	Map<Long, AgentStatusData> getAgentStatusDataMap();
+
+	/**
+	 * Deletes the Agent completely.
+	 * 
+	 * @param platformId
+	 *            Id of the Agent to be delete.
+	 * @throws ServiceException
+	 *             If Agent with provided ID does not exist or can not be deleted due to it's
+	 *             connection status.
+	 */
+	void deleteAgent(long platformId) throws ServiceException;
 
 	/**
 	 * Returns the last saved data objects (with the given time interval). Returns a list of
