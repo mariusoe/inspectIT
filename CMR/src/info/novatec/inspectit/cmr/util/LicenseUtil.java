@@ -231,6 +231,26 @@ public class LicenseUtil {
 	}
 
 	/**
+	 * Frees one agent slot if for the given definedIPs and agent name.
+	 * 
+	 * @param definedIPs
+	 *            List of IPs from the connecting agent
+	 * @param agentName
+	 *            the name of the connecting agent
+	 */
+	public void freeAgentSlot(List<String> definedIPs, String agentName) {
+		LicenseUtilData licenseUtilData = new LicenseUtilData();
+		licenseUtilData.setAgentName(agentName);
+		licenseUtilData.setDefinedIPs(definedIPs);
+		if (registeredAgents.remove(licenseUtilData)) {
+			log.info("Freeing agent slot for Agent '" + agentName + "' succeeded");
+		} else {
+			log.info("Freeing agent slot for Agent '" + agentName + "' failed");
+		}
+		log.info("Remaining Agent slots: " + (Integer.parseInt(licenseExtras.get(ALLOWED_AGENT_AMOUNT_KEY)) - registeredAgents.size()));
+	}
+
+	/**
 	 * 
 	 * @return Returns the license information for the CMR.
 	 */

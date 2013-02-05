@@ -266,13 +266,22 @@ public final class ImageFormatter {
 	 */
 	public static Image getAgentLeafImage(AgentLeaf agentLeaf) {
 		AgentStatusData agentStatusData = agentLeaf.getAgentStatusData();
-		if (null != agentStatusData && null != agentStatusData.getMillisSinceLastData()) {
-			long millis = agentStatusData.getMillisSinceLastData().longValue();
-			// at last one minute of not sending data to display as the non active
-			if (millis > 60000) {
-				return InspectIT.getDefault().getImage(InspectITImages.IMG_AGENT_YELLOW);
-			} else {
-				return InspectIT.getDefault().getImage(InspectITImages.IMG_AGENT_GREEN);
+		if (null != agentStatusData) {
+			switch (agentStatusData.getAgentConnection()) {
+			case CONNECTED:
+				if (null != agentStatusData.getMillisSinceLastData()) {
+					long millis = agentStatusData.getMillisSinceLastData().longValue();
+					// at last one minute of not sending data to display as the non active
+					if (millis > 60000) {
+						return InspectIT.getDefault().getImage(InspectITImages.IMG_AGENT_YELLOW);
+					} else {
+						return InspectIT.getDefault().getImage(InspectITImages.IMG_AGENT_GREEN);
+					}
+				} else {
+					return InspectIT.getDefault().getImage(InspectITImages.IMG_AGENT_YELLOW);
+				}
+			default:
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_AGENT_GRAY);
 			}
 		} else {
 			return InspectIT.getDefault().getImage(InspectITImages.IMG_AGENT_GRAY);

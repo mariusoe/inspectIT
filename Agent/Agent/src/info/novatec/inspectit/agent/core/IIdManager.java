@@ -42,6 +42,11 @@ public interface IIdManager {
 	long getPlatformId() throws IdNotAvailableException;
 
 	/**
+	 * Un-registers the platform if the agent is currently connected and registered.
+	 */
+	void unregisterPlatform();
+
+	/**
 	 * Returns the ID of the server for this method. Needed for the data objects so they can be
 	 * persisted properly.
 	 * 

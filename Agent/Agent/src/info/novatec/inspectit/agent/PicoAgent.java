@@ -142,7 +142,7 @@ public class PicoAgent implements IAgent {
 			// register now all other components
 			pico.registerComponentImplementation(IByteCodeAnalyzer.class, ByteCodeAnalyzer.class);
 			pico.registerComponentImplementation(ICoreService.class, CoreService.class, new Parameter[] { new ComponentParameter(), new ComponentParameter(), new ComponentParameter(),
-					new ComponentParameter(ISendingStrategy.class, false) });
+					new ComponentParameter(ISendingStrategy.class, false), new ComponentParameter() });
 			pico.registerComponentImplementation(IHookInstrumenter.class, HookInstrumenter.class);
 			pico.registerComponentImplementation(IHookDispatcher.class, HookDispatcher.class);
 

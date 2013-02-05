@@ -341,6 +341,45 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 	}
 
 	/**
+	 * Test unregistration of platform ident.
+	 */
+	@Test
+	public void unregisterPlatformIdent() throws ServiceException {
+		long platformId = 10;
+		List<String> definedIps = new ArrayList<String>();
+		definedIps.add("ip");
+		String agentName = "agentName";
+
+		PlatformIdent platformIdent = new PlatformIdent();
+		platformIdent.setId(platformId);
+		platformIdent.setAgentName(agentName);
+		platformIdent.setDefinedIPs(definedIps);
+		List<PlatformIdent> findByExampleList = new ArrayList<PlatformIdent>();
+		findByExampleList.add(platformIdent);
+
+		when(platformIdentDao.findByExample((PlatformIdent) anyObject())).thenReturn(findByExampleList);
+
+		registrationService.unregisterPlatformIdent(definedIps, agentName);
+
+		verify(licenseUtil, times(1)).freeAgentSlot(definedIps, agentName);
+		verify(agentStatusDataProvider, times(1)).registerDisconnected(platformId);
+	}
+
+	/**
+	 * Confirm that {@link ServiceException} is thrown if platform ident can not be located.
+	 */
+	@Test(expectedExceptions = { ServiceException.class })
+	public void unregisterNotExistingPlatformIdent() throws ServiceException {
+		List<String> definedIps = new ArrayList<String>();
+		definedIps.add("ip");
+		String agentName = "agentName";
+
+		when(platformIdentDao.findByExample((PlatformIdent) anyObject())).thenReturn(Collections.<PlatformIdent> emptyList());
+
+		registrationService.unregisterPlatformIdent(definedIps, agentName);
+	}
+
+	/**
 	 * Tests registration of the new {@link MethodIdent}.
 	 * 
 	 * @throws RemoteException

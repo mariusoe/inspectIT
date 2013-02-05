@@ -40,6 +40,19 @@ public class AgentStatusDataProvider {
 	}
 
 	/**
+	 * Registers that the agent has been disconnected.
+	 * 
+	 * @param platformIdent
+	 *            ID of the platform ident.
+	 */
+	public void registerDisconnected(long platformIdent) {
+		AgentStatusData agentStatusData = agentStatusDataMap.get(platformIdent);
+		if (null != agentStatusData) {
+			agentStatusData.setAgentConnection(AgentConnection.DISCONNECTED);
+		}
+	}
+
+	/**
 	 * Registers the time when last data was received for a given platform ident.
 	 * 
 	 * @param platformIdent

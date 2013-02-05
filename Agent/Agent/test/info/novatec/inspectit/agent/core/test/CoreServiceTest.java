@@ -15,6 +15,7 @@ import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.connection.IConnection;
 import info.novatec.inspectit.agent.connection.ServerUnavailableException;
 import info.novatec.inspectit.agent.core.ICoreService;
+import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IObjectStorage;
 import info.novatec.inspectit.agent.core.ListListener;
 import info.novatec.inspectit.agent.core.impl.CoreService;
@@ -55,6 +56,9 @@ public class CoreServiceTest extends AbstractLogSupport {
 	@Mock
 	private ISendingStrategy sendingStrategy;
 
+	@Mock
+	private IIdManager idManager;
+
 	private ICoreService coreService;
 
 	/**
@@ -71,7 +75,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		List<ISendingStrategy> sendingStrategies = new ArrayList<ISendingStrategy>();
 		sendingStrategies.add(sendingStrategy);
 
-		coreService = new CoreService(configurationStorage, connection, bufferStrategy, sendingStrategies);
+		coreService = new CoreService(configurationStorage, connection, bufferStrategy, sendingStrategies, idManager);
 	}
 
 	/**
@@ -94,7 +98,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		verify(configurationStorage, atLeastOnce()).getPlatformSensorTypes();
 
 		verifyNoMoreInteractions(sendingStrategy, configurationStorage);
-		verifyZeroInteractions(connection, bufferStrategy);
+		verifyZeroInteractions(connection, bufferStrategy, idManager);
 	}
 
 	/**
@@ -129,6 +133,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		verify(connection, times(1)).sendDataObjects(dataList);
 
 		verifyNoMoreInteractions(bufferStrategy, connection);
+		verifyZeroInteractions(idManager);
 	}
 
 	/**
@@ -162,6 +167,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		verify(connection, times(1)).sendDataObjects(dataList);
 
 		verifyNoMoreInteractions(bufferStrategy, connection);
+		verifyZeroInteractions(idManager);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -192,6 +198,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		verify(connection, times(1)).sendDataObjects(dataList);
 
 		verifyNoMoreInteractions(bufferStrategy, connection);
+		verifyZeroInteractions(idManager);
 	}
 
 	/**
@@ -226,6 +233,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		verify(connection, times(1)).sendDataObjects(storageList);
 
 		verifyNoMoreInteractions(bufferStrategy, connection);
+		verifyZeroInteractions(idManager);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -244,6 +252,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		coreService.removeListListener(listener);
 
 		verifyNoMoreInteractions(listener, bufferStrategy, connection, sendingStrategy);
+		verifyZeroInteractions(idManager);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -262,6 +271,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		coreService.removeListListener(listener);
 
 		verifyNoMoreInteractions(listener, bufferStrategy, connection, sendingStrategy);
+		verifyZeroInteractions(idManager);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -283,6 +293,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		coreService.removeListListener(listener);
 
 		verifyNoMoreInteractions(listener, bufferStrategy, connection, sendingStrategy);
+		verifyZeroInteractions(idManager);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -301,6 +312,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		coreService.removeListListener(listener);
 
 		verifyNoMoreInteractions(listener, bufferStrategy, connection, sendingStrategy);
+		verifyZeroInteractions(idManager);
 	}
 
 	@Test

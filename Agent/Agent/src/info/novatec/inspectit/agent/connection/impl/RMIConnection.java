@@ -76,6 +76,11 @@ public class RMIConnection implements IConnection {
 	private boolean connectionException = false;
 
 	/**
+	 * The list of all network interfaces.
+	 */
+	private List<String> networkInterfaces;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public void connect(String host, int port) throws ConnectException {
@@ -133,20 +138,9 @@ public class RMIConnection implements IConnection {
 		}
 
 		try {
-			// Enumerations aren't serializable. So we convert it into a
-			// list
-			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-			List<String> networkInterfaces = new ArrayList<String>();
-
-			while (interfaces.hasMoreElements()) {
-				NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
-				Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
-				while (addresses.hasMoreElements()) {
-					InetAddress address = (InetAddress) addresses.nextElement();
-					networkInterfaces.add(address.getHostAddress());
-				}
+			if (null == networkInterfaces) {
+				networkInterfaces = getNetworkInterfaces();
 			}
-
 			return registrationService.registerPlatformIdent(networkInterfaces, agentName, version);
 		} catch (RemoteException remoteException) {
 			LOGGER.throwing(RMIConnection.class.getName(), "registerPlatform(String)", remoteException);
@@ -162,6 +156,34 @@ public class RMIConnection implements IConnection {
 			LOGGER.throwing(ServiceException.class.getName(), "registerPlatform(String)", serviceException);
 			throw new RegistrationException("Could not register the platform", serviceException);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void unregisterPlatform(String agentName) throws RegistrationException {
+		if (!connected) {
+			return;
+		}
+
+		try {
+			if (null == networkInterfaces) {
+				networkInterfaces = getNetworkInterfaces();
+			}
+
+			registrationService.unregisterPlatformIdent(networkInterfaces, agentName);
+		} catch (SocketException socketException) {
+			LOGGER.severe("Could not obtain network interfaces from this machine!");
+			LOGGER.throwing(RMIConnection.class.getName(), "unregisterPlatform(List,String)", socketException);
+			throw new RegistrationException("Could not un-register the platform", socketException);
+		} catch (ServiceException serviceException) {
+			LOGGER.throwing(RMIConnection.class.getName(), "unregisterPlatform(List,String)", serviceException);
+			throw new RegistrationException("Could not un-register the platform", serviceException);
+		} catch (RemoteException remoteException) {
+			LOGGER.throwing(RMIConnection.class.getName(), "unregisterPlatform(List,String)", remoteException);
+			throw new RegistrationException("Could not un-register the platform", remoteException);
+		}
+
 	}
 
 	/**
@@ -253,6 +275,30 @@ public class RMIConnection implements IConnection {
 			LOGGER.throwing(RMIConnection.class.getName(), "addSensorTypeToMethod(long, long)", serverUnavailableException);
 			throw new RegistrationException("Could not add the sensor type to a method", serverUnavailableException);
 		}
+	}
+
+	/**
+	 * Loads all the network interfaces and transforms the enumeration to the list of strings
+	 * containing all addresses.
+	 * 
+	 * @return List of all network interfaces.
+	 * @throws SocketException
+	 *             If {@link SocketException} occurs.
+	 */
+	private List<String> getNetworkInterfaces() throws SocketException {
+		Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+		List<String> networkInterfaces = new ArrayList<String>();
+
+		while (interfaces.hasMoreElements()) {
+			NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
+			Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+			while (addresses.hasMoreElements()) {
+				InetAddress address = (InetAddress) addresses.nextElement();
+				networkInterfaces.add(address.getHostAddress());
+			}
+		}
+
+		return networkInterfaces;
 	}
 
 	/**

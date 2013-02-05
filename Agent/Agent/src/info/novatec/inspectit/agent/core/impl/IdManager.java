@@ -190,6 +190,20 @@ public class IdManager implements IIdManager, Startable {
 	/**
 	 * {@inheritDoc}
 	 */
+	public void unregisterPlatform() {
+		if (connection.isConnected() && isPlatformRegistered()) {
+			try {
+				connection.unregisterPlatform(configurationStorage.getAgentName());
+				platformId = -1;
+			} catch (Throwable e) { // NOPMD
+				LOGGER.warning("Could not un-register the platform.");
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public long getRegisteredMethodId(long methodId) throws IdNotAvailableException {
 		Long methodIdentifier = Long.valueOf(methodId);
 

@@ -69,6 +69,17 @@ public interface IConnection {
 	long registerPlatform(String agentName, String version) throws ServerUnavailableException, RegistrationException;
 
 	/**
+	 * Unregisters the platform in the CMR by sending the agent name and the network interfaces
+	 * defined by the machine.
+	 * 
+	 * @param agentName
+	 *            Name of the Agent.
+	 * @throws RegistrationException
+	 *             This exception is thrown when a problem with the un-registration process appears.
+	 */
+	void unregisterPlatform(String agentName) throws RegistrationException;
+
+	/**
 	 * Registers the specified parameters at the server and returns a unique identifier which will
 	 * be used throughout the sensors.
 	 * 

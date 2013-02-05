@@ -267,16 +267,30 @@ public final class TextFormatter {
 		styledString.append("[" + agentLeaf.getPlatformIdent().getVersion() + "]", StyledString.QUALIFIER_STYLER);
 		styledString.append(" - ");
 		AgentStatusData agentStatusData = agentLeaf.getAgentStatusData();
-		if (null != agentStatusData && null != agentStatusData.getMillisSinceLastData()) {
-			long millis = agentStatusData.getMillisSinceLastData().longValue();
-			// at last one minute of not sending data to display as the non active
-			if (millis > 60000) {
-				styledString.append("Last data sent " + NumberFormatter.humanReadableMillisCount(millis, true) + " ago", StyledString.DECORATIONS_STYLER);
-			} else {
-				styledString.append("Sending data", StyledString.DECORATIONS_STYLER);
+		if (null != agentStatusData) {
+			switch (agentStatusData.getAgentConnection()) {
+			case CONNECTED:
+				if (null != agentStatusData.getMillisSinceLastData()) {
+					long millis = agentStatusData.getMillisSinceLastData().longValue();
+					// at last one minute of not sending data to display as the non active
+					if (millis > 60000) {
+						styledString.append("Connected :: Last data sent " + NumberFormatter.humanReadableMillisCount(millis, true) + " ago", StyledString.DECORATIONS_STYLER);
+					} else {
+						styledString.append("Connected :: Sending data", StyledString.DECORATIONS_STYLER);
+					}
+				} else {
+					styledString.append("Connected :: No data sent", StyledString.DECORATIONS_STYLER);
+				}
+				break;
+			case DISCONNECTED:
+				styledString.append("Disconnected", StyledString.DECORATIONS_STYLER);
+				break;
+			default:
+				styledString.append("Not connected", StyledString.DECORATIONS_STYLER);
+				break;
 			}
 		} else {
-			styledString.append("No data sent", StyledString.DECORATIONS_STYLER);
+			styledString.append("Not connected", StyledString.DECORATIONS_STYLER);
 		}
 		return styledString;
 

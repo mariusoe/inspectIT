@@ -153,6 +153,43 @@ public class IdManagerTest extends AbstractLogSupport {
 	}
 
 	/**
+	 * Tests that unregister of platform is executed if connection to the server is established and
+	 * registration is performed.
+	 */
+	@Test
+	public void unregisterPlatform() throws ServerUnavailableException, RegistrationException, IOException, IdNotAvailableException {
+		// first simulate connect
+		long fakePlatformId = 3L;
+		when(connection.isConnected()).thenReturn(true);
+		when(connection.registerPlatform("testAgent", "dummyVersion")).thenReturn(fakePlatformId);
+		when(configurationStorage.getAgentName()).thenReturn("testAgent");
+		when(versioning.getVersion()).thenReturn("dummyVersion");
+
+		idManager.start();
+		idManager.getPlatformId();
+		idManager.unregisterPlatform();
+
+		verify(connection, times(1)).unregisterPlatform("testAgent");
+	}
+
+	/**
+	 * Test that unregister will not be called if there is no active connection to the server and
+	 * registration is not done at first place.
+	 */
+	@Test
+	public void noUnregisterPlatform() throws RegistrationException {
+		// no unregister if no connection
+		when(connection.isConnected()).thenReturn(false);
+		idManager.unregisterPlatform();
+
+		// no unregister if registration is not done at the first place
+		when(connection.isConnected()).thenReturn(true);
+		idManager.unregisterPlatform();
+
+		verify(connection, times(0)).unregisterPlatform(anyString());
+	}
+
+	/**
 	 * This method could <b>fail</b> if the testing machine is currently under heavy load. There is
 	 * no reliable way to make this test always successful.
 	 */

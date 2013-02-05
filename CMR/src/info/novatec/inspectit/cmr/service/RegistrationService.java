@@ -149,6 +149,40 @@ public class RegistrationService implements IRegistrationService {
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @throws ServiceException
+	 */
+	@Transactional
+	@MethodLog
+	public void unregisterPlatformIdent(List<String> definedIPs, String agentName) throws ServiceException {
+		log.info("Trying to unregister the Agent with following network interfaces:");
+		printOutDefinedIPs(definedIPs);
+
+		PlatformIdent platformIdent = new PlatformIdent();
+		platformIdent.setDefinedIPs(definedIPs);
+		platformIdent.setAgentName(agentName);
+
+		// need to reset the version number, otherwise it will be used for the query
+		platformIdent.setVersion(null);
+
+		List<PlatformIdent> platformIdentResults = platformIdentDao.findByExample(platformIdent);
+		if (1 == platformIdentResults.size()) {
+			platformIdent = platformIdentResults.get(0);
+			agentStatusDataProvider.registerDisconnected(platformIdent.getId());
+			licenseUtil.freeAgentSlot(platformIdent.getDefinedIPs(), platformIdent.getAgentName());
+			log.info("The Agent '" + platformIdent.getAgentName() + "' has been successfully unregistered.");
+		} else if (platformIdentResults.size() > 1) {
+			// this cannot occur anymore, if it occurs, then there is something totally wrong!
+			log.fatal("More than one platform ident has been retrieved! Please send your Database to the NovaTec inspectIT support!");
+			throw new ServiceException("Platform ident can not be unregistered because the inspectIT Database has more than one corresponding platform idents.");
+		} else {
+			log.warn("No registered agent with given network interfaces exists. Unregistration is aborted.");
+			throw new ServiceException("Platform can not be unregistered because there is no platform registered with given network interfaces.");
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
 	 */
 	@Transactional
 	@MethodLog

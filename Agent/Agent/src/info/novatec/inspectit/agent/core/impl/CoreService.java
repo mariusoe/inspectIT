@@ -5,6 +5,7 @@ import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.impl.PlatformSensorTypeConfig;
 import info.novatec.inspectit.agent.connection.IConnection;
 import info.novatec.inspectit.agent.core.ICoreService;
+import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IObjectStorage;
 import info.novatec.inspectit.agent.core.ListListener;
 import info.novatec.inspectit.agent.sending.ISendingStrategy;
@@ -48,6 +49,11 @@ public class CoreService implements ICoreService, Startable {
 	 * The connection to the Central Measurement Repository.
 	 */
 	private final IConnection connection;
+
+	/**
+	 * Id manager.
+	 */
+	private final IIdManager idManager;
 
 	/**
 	 * Already used data objects which can be used directly on the CMR to persist.
@@ -133,8 +139,10 @@ public class CoreService implements ICoreService, Startable {
 	 *            The used buffer strategy.
 	 * @param sendingStrategies
 	 *            The {@link List} of sending strategies.
+	 * @param idManager
+	 *            IdManager.
 	 */
-	public CoreService(IConfigurationStorage configurationStorage, IConnection connection, IBufferStrategy<DefaultData> bufferStrategy, List<ISendingStrategy> sendingStrategies) {
+	public CoreService(IConfigurationStorage configurationStorage, IConnection connection, IBufferStrategy<DefaultData> bufferStrategy, List<ISendingStrategy> sendingStrategies, IIdManager idManager) {
 		if (null == configurationStorage) {
 			throw new IllegalArgumentException("Configuration Storage cannot be null!");
 		}
@@ -151,10 +159,15 @@ public class CoreService implements ICoreService, Startable {
 			throw new IllegalArgumentException("At least one sending strategy has to be defined!");
 		}
 
+		if (null == idManager) {
+			throw new IllegalArgumentException("IdManager cannot be null!");
+		}
+
 		this.configurationStorage = configurationStorage;
 		this.connection = connection;
 		this.bufferStrategy = bufferStrategy;
 		this.sendingStrategies = sendingStrategies;
+		this.idManager = idManager;
 	}
 
 	/**
@@ -614,6 +627,10 @@ public class CoreService implements ICoreService, Startable {
 			// Try to send data for the last time. We do not set a timeout here, the user can simply
 			// kill the process for good if it takes too long.
 			CoreService.this.send();
+
+			// At the end unregister platform
+			LOGGER.info("Unregistering the Agent");
+			idManager.unregisterPlatform();
 		}
 	}
 

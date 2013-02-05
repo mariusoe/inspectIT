@@ -47,6 +47,21 @@ public interface IRegistrationService extends Remote {
 	long registerPlatformIdent(List<String> definedIPs, String agentName, String version) throws RemoteException, ServiceException;
 
 	/**
+	 * Unregisters a platform by passing the network interfaces from the target server.
+	 * 
+	 * @param definedIPs
+	 *            The list of all network interfaces.
+	 * @param agentName
+	 *            Name of the Agent.
+	 * @throws RemoteException
+	 *             If a remote exception occurs somewhere or if the registration was not successful
+	 *             because the registration failed.
+	 * @throws ServiceException
+	 *             If the agent defined IPs is not registered.
+	 */
+	void unregisterPlatformIdent(List<String> definedIPs, String agentName) throws RemoteException, ServiceException;
+
+	/**
 	 * Every instrumented method has to be registered from every Agent. This method returns a unique
 	 * value for this method so that measurements acquired from these methods can be linked in the
 	 * database.
