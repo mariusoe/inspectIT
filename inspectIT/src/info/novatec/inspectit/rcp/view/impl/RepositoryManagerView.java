@@ -513,7 +513,9 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 									treeViewer.setSelection(StructuredSelection.EMPTY);
 									StructuredSelection ss = new StructuredSelection(finalToUpdate);
 									treeViewer.setSelection(ss, true);
-									cmrPropertyForm.refresh();
+									if (null != cmrPropertyForm && !cmrPropertyForm.isDisposed()) {
+										cmrPropertyForm.refresh();
+									}
 								}
 							}
 						});
@@ -806,7 +808,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		 * Updates the agent status for each CMR and updates the displayed CMR repository.
 		 */
 		private void updateAgentsAndCmrStatus() {
-			if (!cmrPropertyForm.isDisposed()) {
+			if (null != cmrPropertyForm && !cmrPropertyForm.isDisposed()) {
 				cmrPropertyForm.refresh();
 			}
 			if (null != inputList) {
