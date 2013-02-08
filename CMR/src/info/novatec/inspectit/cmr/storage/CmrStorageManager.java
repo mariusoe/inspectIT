@@ -2,6 +2,7 @@ package info.novatec.inspectit.cmr.storage;
 
 import info.novatec.inspectit.cmr.dao.StorageDataDao;
 import info.novatec.inspectit.cmr.dao.impl.DefaultDataDaoImpl;
+import info.novatec.inspectit.cmr.service.IServerStatusService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.cmr.WritingStatus;
 import info.novatec.inspectit.spring.logger.Logger;
@@ -103,6 +104,17 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	private CmrStorageRecorder storageRecorder;
 
 	/**
+	 * {@link IServerStatusService}.
+	 */
+	@Autowired
+	private IServerStatusService serverStatusService;
+
+	/**
+	 * Current cmr version.
+	 */
+	private String cmrVersion;
+
+	/**
 	 * Creates new storage.
 	 * 
 	 * @param storageData
@@ -114,6 +126,7 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 */
 	public void createStorage(StorageData storageData) throws IOException, SerializationException {
 		storageData.setId(getRandomUUIDString());
+		storageData.setCmrVersion(cmrVersion);
 		writeStorageDataToDisk(storageData);
 		existingStoragesSet.add(storageData);
 	}
@@ -822,6 +835,8 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 						if (null != storageData) {
 							StorageData importedStorageData = new StorageData(storageData);
 							if (existingStoragesSet.add(importedStorageData)) {
+								printStorageCmrVersionWarn(storageData);
+
 								unzipStorageData(file, getStoragePath(importedStorageData));
 								Path localInformation = getStoragePath(importedStorageData).resolve(importedStorageData.getId() + StorageFileExtensions.LOCAL_STORAGE_FILE_EXT);
 								Files.deleteIfExists(localInformation);
@@ -903,6 +918,8 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 				Path storageDir = getStoragePath(storageData);
 				if (existingStoragesSet.add(storageData)) {
 					if (Files.notExists(storageDir)) {
+						printStorageCmrVersionWarn(storageData);
+
 						Files.walkFileTree(parentDir, new CopyMoveFileVisitor(parentDir, storageDir, true));
 						Path localInformation = getStoragePath(storageData).resolve(storageData.getId() + StorageFileExtensions.LOCAL_STORAGE_FILE_EXT);
 						Files.deleteIfExists(localInformation);
@@ -984,8 +1001,9 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 							Object deserialized = serializer.deserialize(input);
 							if (deserialized instanceof StorageData) {
 								StorageData storageData = (StorageData) deserialized;
+								// do not add any corrupted storages
 								if (storageData.getState() == StorageState.CLOSED) {
-									// do not add any corrupted storages
+									printStorageCmrVersionWarn(storageData);
 									existingStoragesSet.add(storageData);
 								}
 							}
@@ -1069,10 +1087,27 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	}
 
 	/**
+	 * Prints the warnings if the CMR version saved in the storage does not exists or is different
+	 * from the current CMR version.
+	 * 
+	 * @param storageData
+	 *            {@link StorageData}.
+	 */
+	private void printStorageCmrVersionWarn(IStorageData storageData) {
+		// inform if the version of the CMR differs or is not available
+		if (null == storageData.getCmrVersion()) {
+			log.warn("The storage " + storageData + " does not define the CMR version. The storage might be unstable on the CMR version " + cmrVersion + ".");
+		} else if (!Objects.equals(storageData.getCmrVersion(), cmrVersion)) {
+			log.warn("The storage " + storageData + " has different CMR version (" + storageData.getCmrVersion() + ") than the current CMR version(" + cmrVersion + "). The storage might be unstable.");
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@PostConstruct
 	public void postConstruct() throws Exception {
+		cmrVersion = serverStatusService.getVersion();
 		loadAllExistingStorages();
 		updatedStorageSpaceLeft();
 		clearUploadFolder();

@@ -57,6 +57,7 @@ public class LocalStorageData extends AbstractStorageData {
 		this.setName(storageData.getName());
 		this.setDescription(storageData.getDescription());
 		this.setDiskSize(storageData.getDiskSize());
+		this.setCmrVersion(storageData.getCmrVersion());
 		this.labelList = storageData.getLabelList();
 
 	}

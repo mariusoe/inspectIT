@@ -6,3 +6,4 @@ class: info.novatec.inspectit.storage.LocalStorageData
 4: description
 5: diskSize
 6: labelList
+7: cmrVersion

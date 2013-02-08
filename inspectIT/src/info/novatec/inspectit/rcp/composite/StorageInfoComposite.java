@@ -6,6 +6,7 @@ import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -52,6 +53,8 @@ public class StorageInfoComposite extends Composite {
 	private Label size;
 	/** Label describing if the storage was already downloaded. */
 	private Label downloaded;
+	/** Label for CMR version. */
+	private Label cmrVersion;
 
 	/**
 	 * If there should be information if storage is downloaded or not.
@@ -136,6 +139,12 @@ public class StorageInfoComposite extends Composite {
 		size = new Label(group, SWT.WRAP);
 		size.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
+		label = new Label(group, SWT.NONE);
+		label.setText("CMR version:");
+		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+		cmrVersion = new Label(group, SWT.WRAP);
+		cmrVersion.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+
 		if (showDataDownloaded) {
 			label = new Label(group, SWT.NONE);
 			label.setText("Data downloaded:");
@@ -165,6 +174,9 @@ public class StorageInfoComposite extends Composite {
 				description.setText("", false, false);
 			}
 			size.setText(NumberFormatter.humanReadableByteCount(storageData.getDiskSize()));
+			if (StringUtils.isNotEmpty(storageData.getCmrVersion())) {
+				cmrVersion.setText(storageData.getCmrVersion());
+			}
 			if (showDataDownloaded) {
 				LocalStorageData localStorageData = null;
 				if (storageData instanceof LocalStorageData) {
@@ -193,6 +205,7 @@ public class StorageInfoComposite extends Composite {
 		name.setText(NOT_AVAILABLE);
 		description.setText(NOT_AVAILABLE, false, false);
 		size.setText(NOT_AVAILABLE);
+		cmrVersion.setText(NOT_AVAILABLE);
 		if (showDataDownloaded) {
 			downloaded.setText(NOT_AVAILABLE);
 		}

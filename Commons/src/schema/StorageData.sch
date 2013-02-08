@@ -6,3 +6,4 @@ class: info.novatec.inspectit.storage.StorageData
 4: description
 5: labelList
 6: state
+7: cmrVersion

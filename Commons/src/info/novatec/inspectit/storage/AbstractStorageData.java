@@ -36,6 +36,11 @@ public abstract class AbstractStorageData implements IStorageData, Serializable 
 	private String description;
 
 	/**
+	 * Version of the CMR on which the Storage is originally created.
+	 */
+	private String cmrVersion;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public String getStorageFolder() {
@@ -114,6 +119,25 @@ public abstract class AbstractStorageData implements IStorageData, Serializable 
 	 */
 	public void setDiskSize(long diskSize) {
 		this.diskSize = diskSize;
+	}
+
+	/**
+	 * Gets {@link #cmrVersion}.
+	 * 
+	 * @return {@link #cmrVersion}
+	 */
+	public String getCmrVersion() {
+		return cmrVersion;
+	}
+
+	/**
+	 * Sets {@link #cmrVersion}.
+	 * 
+	 * @param cmrVersion
+	 *            New value for {@link #cmrVersion}
+	 */
+	public void setCmrVersion(String cmrVersion) {
+		this.cmrVersion = cmrVersion;
 	}
 
 	/**

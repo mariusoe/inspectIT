@@ -54,6 +54,7 @@ public class StorageData extends AbstractStorageData {
 		setName(storageData.getName());
 		setDescription(storageData.getDescription());
 		setDiskSize(storageData.getDiskSize());
+		setCmrVersion(storageData.getCmrVersion());
 		labelList = new ArrayList<AbstractStorageLabel<?>>(storageData.getLabelList());
 		if (storageData instanceof StorageData) {
 			state = ((StorageData) storageData).getState(); // NOPMD

@@ -4,6 +4,7 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.composite.StorageInfoComposite;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
+import info.novatec.inspectit.rcp.util.ObjectUtils;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 
@@ -128,7 +129,14 @@ public class UploadStorageWizardPage extends WizardPage {
 				} else if (!enoughSpace) {
 					setMessage("Insufficient storage space left on the selected repository", ERROR);
 				} else {
-					setMessage(DEFAULT_MESSAGE);
+					String cmrVersion = getCmrRepositoryDefinition().getVersion();
+					if (null == localStorageData.getCmrVersion()) {
+						setMessage("Selected storage does not define CMR version. The storage might be unstable on the CMR version " + cmrVersion + ".", WARNING);
+					} else if (!ObjectUtils.equals(localStorageData.getCmrVersion(), cmrVersion)) {
+						setMessage("Selected storage has different CMR version than the current CMR version " + cmrVersion + ". The storage might be unstable.", WARNING);
+					} else {
+						setMessage(DEFAULT_MESSAGE);
+					}
 				}
 			}
 		};

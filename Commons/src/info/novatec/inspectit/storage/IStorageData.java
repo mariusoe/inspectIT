@@ -55,4 +55,11 @@ public interface IStorageData {
 	 */
 	List<AbstractStorageLabel<?>> getLabelList();
 
+	/**
+	 * Returns version of the CMR on which the Storage is originally created.
+	 * 
+	 * @return Version of the CMR on which the Storage is originally created.
+	 */
+	String getCmrVersion();
+
 }

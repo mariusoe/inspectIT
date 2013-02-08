@@ -168,7 +168,16 @@ public class ImportStorageInfoPage extends WizardPage {
 
 									if (notImportedYet && enoughSpace) {
 										canImport = true;
-										setMessage(DEFAULT_MESSAGE);
+
+										// check the CMR version
+										String cmrVersion = cmrRepositoryDefinition.getVersion();
+										if (null == storageData.getCmrVersion()) {
+											setMessage("Selected storage does not define CMR version. The storage might be unstable on the CMR version " + cmrVersion + ".", WARNING);
+										} else if (!ObjectUtils.equals(storageData.getCmrVersion(), cmrVersion)) {
+											setMessage("Selected storage has different CMR version than the current CMR version " + cmrVersion + ". The storage might be unstable.", WARNING);
+										} else {
+											setMessage(DEFAULT_MESSAGE);
+										}
 									} else if (!notImportedYet) {
 										canImport = false;
 										setMessage("Selected storage to import is already available on selected CMR", ERROR);
