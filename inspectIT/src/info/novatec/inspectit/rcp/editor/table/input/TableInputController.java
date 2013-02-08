@@ -4,6 +4,7 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 
@@ -103,8 +104,10 @@ public interface TableInputController extends SubViewClassificationController {
 	 * 
 	 * @param monitor
 	 *            The progress monitor.
+	 * @param rootEditor
+	 *            RootEditor of the view that is being refreshed.
 	 */
-	void doRefresh(IProgressMonitor monitor);
+	void doRefresh(IProgressMonitor monitor, IRootEditor rootEditor);
 
 	/**
 	 * This method will be called when a double click event is executed.

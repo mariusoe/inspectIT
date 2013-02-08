@@ -274,7 +274,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void doRefresh(IProgressMonitor monitor) {
+	public void doRefresh(IProgressMonitor monitor, IRootEditor rootEditor) {
 		monitor.beginTask("Updating the Ungrouped Exception Overview", IProgressMonitor.UNKNOWN);
 		monitor.subTask("Retrieving the Ungrouped Exception Overview");
 		List<ExceptionSensorData> exData = null;

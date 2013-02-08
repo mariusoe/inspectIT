@@ -4,6 +4,7 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -90,7 +91,7 @@ public abstract class AbstractTableInputController implements TableInputControll
 	 * <p>
 	 * Do nothing by default, sub-classes may override.
 	 */
-	public void doRefresh(IProgressMonitor monitor) {
+	public void doRefresh(IProgressMonitor monitor, IRootEditor rootEditor) {
 	}
 
 	/**

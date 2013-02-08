@@ -336,7 +336,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void doRefresh(IProgressMonitor monitor) {
+	public void doRefresh(IProgressMonitor monitor, IRootEditor rootEditor) {
 		monitor.beginTask("Updating Invocation Overview", IProgressMonitor.UNKNOWN);
 		monitor.subTask("Retrieving the Invocation Overview");
 		List<InvocationSequenceData> invocData;

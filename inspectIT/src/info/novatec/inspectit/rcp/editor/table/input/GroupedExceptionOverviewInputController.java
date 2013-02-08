@@ -270,7 +270,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void doRefresh(IProgressMonitor monitor) {
+	public void doRefresh(IProgressMonitor monitor, IRootEditor rootEditor) {
 		monitor.beginTask("Updating Grouped Exception Overview", IProgressMonitor.UNKNOWN);
 		monitor.subTask("Retrieving the Grouped Exception Overview");
 		List<AggregatedExceptionSensorData> ungroupedList = null;

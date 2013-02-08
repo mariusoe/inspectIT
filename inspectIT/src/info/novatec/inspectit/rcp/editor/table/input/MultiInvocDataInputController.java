@@ -93,7 +93,7 @@ public class MultiInvocDataInputController extends InvocOverviewInputController 
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void doRefresh(IProgressMonitor monitor) {
+	public void doRefresh(IProgressMonitor monitor, IRootEditor rootEditor) {
 		monitor.beginTask("Updating Invocation Overview", invocationList.size());
 		monitor.subTask("Retrieving the Invocation Overview from the CMR");
 		loadedInvocations = new ArrayList<InvocationSequenceData>();

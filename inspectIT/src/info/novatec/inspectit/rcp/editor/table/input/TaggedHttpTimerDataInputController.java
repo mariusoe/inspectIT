@@ -5,6 +5,7 @@ import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
+import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
@@ -119,7 +120,7 @@ public class TaggedHttpTimerDataInputController extends AbstractHttpInputControl
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void doRefresh(IProgressMonitor monitor) {
+	public void doRefresh(IProgressMonitor monitor, IRootEditor rootEditor) {
 		monitor.beginTask("Getting HTTP data information", IProgressMonitor.UNKNOWN);
 		List<HttpTimerData> aggregatedTimerData;
 

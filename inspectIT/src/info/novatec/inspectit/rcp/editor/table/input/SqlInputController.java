@@ -316,7 +316,7 @@ public class SqlInputController extends AbstractTableInputController {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void doRefresh(IProgressMonitor monitor) {
+	public void doRefresh(IProgressMonitor monitor, final IRootEditor rootEditor) {
 		monitor.beginTask("Getting SQL information", IProgressMonitor.UNKNOWN);
 		List<SqlStatementData> sqlStatementList;
 		if (autoUpdate) {
@@ -332,9 +332,6 @@ public class SqlInputController extends AbstractTableInputController {
 
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-				IWorkbenchPage page = window.getActivePage();
-				IRootEditor rootEditor = (IRootEditor) page.getActiveEditor();
 				if (null != rootEditor) {
 					rootEditor.setDataInput(Collections.<DefaultData> emptyList());
 				}

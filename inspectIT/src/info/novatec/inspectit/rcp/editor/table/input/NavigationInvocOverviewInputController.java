@@ -5,6 +5,7 @@ import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 
 import java.util.EnumSet;
@@ -62,7 +63,7 @@ public class NavigationInvocOverviewInputController extends InvocOverviewInputCo
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void doRefresh(IProgressMonitor monitor) {
+	public void doRefresh(IProgressMonitor monitor, IRootEditor rootEditor) {
 		monitor.beginTask("Updating Invocation Overview", IProgressMonitor.UNKNOWN);
 		monitor.subTask("Retrieving the Invocation Overview from the CMR");
 		List<InvocationSequenceData> invocData;

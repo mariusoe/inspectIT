@@ -253,7 +253,7 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
-						tableInputController.doRefresh(monitor);
+						tableInputController.doRefresh(monitor, getRootEditor());
 						Display.getDefault().asyncExec(new Runnable() {
 							public void run() {
 								if (checkDisposed()) {
