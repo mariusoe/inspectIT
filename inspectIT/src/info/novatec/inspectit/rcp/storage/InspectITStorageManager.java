@@ -143,8 +143,7 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 * @throws Exception
 	 *             If mount fails.
 	 */
-	private void mountStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, boolean fullyDownload, boolean compressBefore, SubMonitor subMonitor)
-			throws Exception {
+	private void mountStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, boolean fullyDownload, boolean compressBefore, SubMonitor subMonitor) throws Exception {
 		LocalStorageData localStorageData = new LocalStorageData(storageData);
 
 		Path directory = getStoragePath(localStorageData);
@@ -158,7 +157,7 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 
 		if (fullyDownload) {
 			try {
-				subMonitor.setTaskName("Downloading storage files..");
+				subMonitor.setTaskName("Downloading storage files for storage '" + storageData.getName() + "'..");
 				dataRetriever.downloadAndSaveStorageFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true, subMonitor, StorageFileType.values());
 				downloadedStorages.add(localStorageData);
 				localStorageData.setFullyDownloaded(true);
@@ -168,7 +167,7 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 			}
 		} else {
 			try {
-				subMonitor.setTaskName("Downloading agent and indexing files..");
+				subMonitor.setTaskName("Downloading agent and indexing files for storage '" + storageData.getName() + "'..");
 				dataRetriever.downloadAndSaveStorageFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true, subMonitor, StorageFileType.AGENT, StorageFileType.INDEX);
 			} catch (Exception e) {
 				deleteLocalStorageData(localStorageData, false);
@@ -250,7 +249,7 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 		}
 
 		Path directory = getStoragePath(localStorageData);
-		subMonitor.setTaskName("Downloading storage data files..");
+		subMonitor.setTaskName("Downloading storage data files for storage '" + storageData.getName() + "'..");
 		dataRetriever.downloadAndSaveStorageFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true, subMonitor, StorageFileType.DATA);
 		downloadedStorages.add(localStorageData);
 		localStorageData.setFullyDownloaded(true);

@@ -106,7 +106,7 @@ public class ExportStorageWizard extends Wizard implements INewWizard {
 			if (!InspectIT.getDefault().getInspectITStorageManager().isFullyDownloaded(remoteStorageData)) {
 				String title = "Export Storage";
 				String message = "Options for exporting the storage '" + storageData.getName() + "' (size: " + NumberFormatter.formatBytesToMBytes(storageData.getDiskSize()) + ")";
-				storageCompressionWizardPage = new StorageCompressionWizardPage(storageData, title, message);
+				storageCompressionWizardPage = new StorageCompressionWizardPage(title, message);
 				addPage(storageCompressionWizardPage);
 			}
 		}

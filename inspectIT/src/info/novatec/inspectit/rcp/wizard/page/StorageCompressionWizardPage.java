@@ -1,8 +1,5 @@
 package info.novatec.inspectit.rcp.wizard.page;
 
-import info.novatec.inspectit.storage.IStorageData;
-
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
@@ -26,16 +23,13 @@ public class StorageCompressionWizardPage extends WizardPage {
 	/**
 	 * Default constructor.
 	 * 
-	 * @param storageData
-	 *            Storage to download.
 	 * @param title
 	 *            the title.
 	 * @param message
 	 *            the message.
 	 */
-	public StorageCompressionWizardPage(IStorageData storageData, String title, String message) {
+	public StorageCompressionWizardPage(String title, String message) {
 		super(title);
-		Assert.isNotNull(storageData);
 		this.setTitle(title);
 		this.setMessage(message);
 	}
