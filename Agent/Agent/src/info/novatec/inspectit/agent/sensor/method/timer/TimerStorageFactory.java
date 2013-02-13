@@ -115,18 +115,20 @@ public final class TimerStorageFactory {
 	 *            The id of the method.
 	 * @param parameterContentData
 	 *            The contents of some additional parameters. Can be <code>null</code>.
+	 * @param charting
+	 *            If TimerData's charting should be set or not.
 	 * @return A new {@link ITimerStorage} implementation object.
 	 */
-	public ITimerStorage newStorage(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData) {
+	public ITimerStorage newStorage(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData, boolean charting) {
 		switch (mode) {
 		case RAW_DATA_TRANSMISSION:
-			return new PlainTimerStorage(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);
+			return new PlainTimerStorage(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData, charting);
 		case AGGREGATE_BEFORE_SEND:
-			return new AggregateTimerStorage(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);
+			return new AggregateTimerStorage(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData, charting);
 		case OPTIMIZED:
-			return new OptimizedTimerStorage(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);
+			return new OptimizedTimerStorage(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData, charting);
 		default:
-			return new OptimizedTimerStorage(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);
+			return new OptimizedTimerStorage(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData, charting);
 		}
 	}
 

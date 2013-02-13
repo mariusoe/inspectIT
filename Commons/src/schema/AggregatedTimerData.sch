@@ -30,3 +30,6 @@ class: info.novatec.inspectit.communication.data.AggregatedTimerData
 
 # Aggregared Timer Data
 21: aggregatedIds
+
+#Charting
+22: charting

@@ -39,9 +39,9 @@ public class NavigationTester extends PropertyTester {
 				if (selectedObject instanceof InvocationSequenceData) {
 					// only navigate if a real TimerData is provided (not for HttpTimerData or SQL)
 					TimerData timerData = ((InvocationSequenceData) selectedObject).getTimerData();
-					return isTimerSensorBounded(timerData);
+					return isTimerSensorBounded(timerData) && timerData.isCharting();
 				} else if (selectedObject instanceof TimerData) {
-					return isTimerSensorBounded((TimerData) selectedObject);
+					return isTimerSensorBounded((TimerData) selectedObject) && ((TimerData) selectedObject).isCharting();
 				}
 			}
 		} else if ("canNavigateToInvocations".equals(property)) {

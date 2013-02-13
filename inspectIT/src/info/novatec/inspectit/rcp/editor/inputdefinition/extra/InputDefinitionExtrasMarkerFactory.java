@@ -61,6 +61,17 @@ public final class InputDefinitionExtrasMarkerFactory {
 	};
 
 	/**
+	 * Marker for {@link HttpChartingInputDefinitionExtra}.
+	 */
+	public static final InputDefinitionExtraMarker<HttpChartingInputDefinitionExtra> HTTP_CHARTING_EXTRAS_MARKER = new InputDefinitionExtraMarker<HttpChartingInputDefinitionExtra>() {
+		@Override
+		public Class<HttpChartingInputDefinitionExtra> getInputDefinitionExtraClass() {
+			return HttpChartingInputDefinitionExtra.class;
+		}
+
+	};
+
+	/**
 	 * Abstract class for input definition extras marker.
 	 * 
 	 * @author Ivan Senic

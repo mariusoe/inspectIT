@@ -1,12 +1,15 @@
 package info.novatec.inspectit.rcp.editor.preferences.control.samplingrate;
 
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.rcp.editor.graph.plot.aggregation.IDataAggregator;
+import info.novatec.inspectit.indexing.aggregation.IAggregator;
+import info.novatec.inspectit.indexing.aggregation.impl.AggregationPerformer;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * The enumeration for sampling rate modes.
@@ -23,7 +26,7 @@ public enum SamplingRateMode implements ISamplingRateMode {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public List<? extends DefaultData> adjustSamplingRate(List<? extends DefaultData> defaultDataList, Date from, Date to, int samplingRate) {
+		public <E extends DefaultData> List<E> adjustSamplingRate(List<E> defaultDataList, Date from, Date to, int samplingRate, IAggregator<E> aggregator) {
 			long timeframe = 0;
 
 			if ((samplingRate > 0) && (defaultDataList != null)) {
@@ -32,7 +35,7 @@ public enum SamplingRateMode implements ISamplingRateMode {
 				return defaultDataList;
 			}
 
-			List<DefaultData> resultList = new ArrayList<DefaultData>();
+			List<E> resultList = new ArrayList<E>();
 
 			// define the start and end position of the first time frame
 			long timeframeStartTime = Long.MAX_VALUE;
@@ -66,7 +69,7 @@ public enum SamplingRateMode implements ISamplingRateMode {
 				}
 			}
 
-			IDataAggregator dataAggregator = DataAggregatorFactory.getDataAggregator(defaultDataList);
+			AggregationPerformer<E> aggregationPerformer = new AggregationPerformer<E>(aggregator);
 			// iterate over time frames
 			while (timeframeStartTime < to.getTime() + timeframe) {
 				long averageTime = (timeframeStartTime + timeframeEndTime) / 2;
@@ -88,9 +91,15 @@ public enum SamplingRateMode implements ISamplingRateMode {
 				// aggregate data objects only when toIndex changed
 				if ((toIndex >= 0) && (fromIndex <= toIndex)) {
 					// aggregate data and set the average time stamp
-					DefaultData resultData = dataAggregator.aggregateData(defaultDataList, fromIndex, toIndex);
-					resultData.setTimeStamp(new Timestamp(averageTime));
-					resultList.add(resultData);
+					aggregationPerformer.reset();
+					// aggregation performer does not include toIndex to the aggregation
+					aggregationPerformer.processList(defaultDataList, fromIndex, toIndex + 1);
+					List<E> aggregatedData = aggregationPerformer.getResultList();
+					if (CollectionUtils.isNotEmpty(aggregatedData)) {
+						E data = aggregatedData.get(0);
+						data.setTimeStamp(new Timestamp(averageTime));
+						resultList.add(data);
+					}
 
 					// set the fromIndex on the actual data object
 					fromIndex = toIndex + 1;

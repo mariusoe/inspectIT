@@ -43,6 +43,7 @@
 
 				<!-- Method Data Objects -->
 				<value>hibernate/TimerData.hbm.xml</value>
+				<value>hibernate/HttpTimerData.hbm.xml</value>
 
 				<!-- Platform Data Objects -->
 				<value>hibernate/ClassLoadingInformationData.hbm.xml</value>

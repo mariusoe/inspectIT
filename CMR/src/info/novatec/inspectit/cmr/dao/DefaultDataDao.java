@@ -1,7 +1,9 @@
 package info.novatec.inspectit.cmr.dao;
 
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.HttpTimerData;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -83,6 +85,23 @@ public interface DefaultDataDao {
 	 * @return Returns the last saved data object.
 	 */
 	DefaultData findByExampleLastData(DefaultData template);
+
+	/**
+	 * Returns the {@link HttpTimerData} list that can be used as the input for the plotting. From
+	 * the template list the platfrom ident will be used as well as all URI and tagged values.
+	 * 
+	 * @param templates
+	 *            Templates.
+	 * @param fromDate
+	 *            From date.
+	 * @param toDate
+	 *            To date
+	 * @param retrieveByTag
+	 *            If tag values from the templates should be used when retrieving the data. If false
+	 *            is passed, URi will be used from templates.
+	 * @return List of {@link HttpTimerData}.
+	 */
+	List<HttpTimerData> getChartingHttpTimerDataFromDateToDate(Collection<HttpTimerData> templates, Date fromDate, Date toDate, boolean retrieveByTag);
 
 	/**
 	 * Deletes all default data objects in the database with the given platform ID.

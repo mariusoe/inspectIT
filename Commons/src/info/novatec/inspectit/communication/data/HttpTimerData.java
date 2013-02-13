@@ -92,7 +92,7 @@ public class HttpTimerData extends TimerData {
 	 * @param value
 	 *            the value for the inspectIT header.
 	 */
-	public void setInspectITTaggingHeaderValue(String value) {
+	public void setInspectItTaggingHeaderValue(String value) {
 		if (null == headers) {
 			headers = new HashMap<String, String>(1);
 		}
@@ -217,6 +217,7 @@ public class HttpTimerData extends TimerData {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
@@ -232,6 +233,7 @@ public class HttpTimerData extends TimerData {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -285,7 +287,6 @@ public class HttpTimerData extends TimerData {
 		} else if (!uri.equals(other.uri)) {
 			return false;
 		}
-
 		return true;
 	}
 

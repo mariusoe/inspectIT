@@ -27,3 +27,4 @@ class: info.novatec.inspectit.communication.data.TimerData
 18: exclusiveDuration
 19: exclusiveMax
 20: exclusiveMin
+21: charting

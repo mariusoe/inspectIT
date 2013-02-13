@@ -1,17 +1,23 @@
 package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
+import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.SystemSensorData;
 
 import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * This class provide dynamic informations about the threads running/started in the virtual machine.
+ * <p>
+ * This class implements the {@link IAggregatedData} interface but does not provide the IDs of the
+ * aggregated instances since they are not related to any data and are useless.
  * 
  * @author Eduard Tudenhoefner
  * 
  */
-public class ThreadInformationData extends SystemSensorData {
+public class ThreadInformationData extends SystemSensorData implements IAggregatedData<ThreadInformationData> {
 
 	/**
 	 * The serial version uid for this class.
@@ -254,6 +260,45 @@ public class ThreadInformationData extends SystemSensorData {
 
 	public void setTotalTotalStartedThreadCount(long totalTotalStartedThreadCount) {
 		this.totalTotalStartedThreadCount = totalTotalStartedThreadCount;
+	}
+
+	/**
+	 * Aggregates other class loading object info this object.
+	 * 
+	 * @param other
+	 *            Object to aggregate data from.
+	 */
+	public void aggregate(ThreadInformationData other) {
+		count += other.count;
+
+		minDaemonThreadCount = Math.min(other.getMinDaemonThreadCount(), minDaemonThreadCount);
+		minPeakThreadCount = Math.min(other.getMinPeakThreadCount(), minPeakThreadCount);
+		minThreadCount = Math.min(other.getMinThreadCount(), minThreadCount);
+		minTotalStartedThreadCount = Math.min(other.getMinTotalStartedThreadCount(), minTotalStartedThreadCount);
+
+		maxDaemonThreadCount = Math.max(other.getMaxDaemonThreadCount(), maxDaemonThreadCount);
+		maxPeakThreadCount = Math.max(other.getMaxPeakThreadCount(), maxPeakThreadCount);
+		maxThreadCount = Math.max(other.getMaxThreadCount(), maxThreadCount);
+		maxTotalStartedThreadCount = Math.max(other.getMaxTotalStartedThreadCount(), maxTotalStartedThreadCount);
+
+		totalDaemonThreadCount += other.getTotalDaemonThreadCount();
+		totalPeakThreadCount += other.getTotalPeakThreadCount();
+		totalThreadCount += other.getTotalThreadCount();
+		totalTotalStartedThreadCount += other.getTotalTotalStartedThreadCount();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Collection<Long> getAggregatedIds() {
+		return Collections.emptyList();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public ThreadInformationData getData() {
+		return this;
 	}
 
 	/**

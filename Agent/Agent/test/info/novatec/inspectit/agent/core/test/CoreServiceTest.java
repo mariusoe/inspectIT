@@ -212,7 +212,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 
 		long sensorTypeId = 1;
 		long methodId = 5;
-		PlainTimerStorage timerStorage = new PlainTimerStorage(null, 0, sensorTypeId, methodId, Collections.<ParameterContentData> emptyList());
+		PlainTimerStorage timerStorage = new PlainTimerStorage(null, 0, sensorTypeId, methodId, Collections.<ParameterContentData> emptyList(), false);
 		when(bufferStrategy.hasNext()).thenReturn(true).thenReturn(false);
 		List<DefaultData> storageList = new ArrayList<DefaultData>();
 		storageList.add(timerStorage.finalizeDataObject());
@@ -300,7 +300,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 	@Test
 	public void verifyListListenerObjectStorageData() {
 		ListListener<IObjectStorage> listener = mock(ListListener.class);
-		PlainTimerStorage timerStorage = new PlainTimerStorage(null, 0, 0, 0, Collections.<ParameterContentData> emptyList());
+		PlainTimerStorage timerStorage = new PlainTimerStorage(null, 0, 0, 0, Collections.<ParameterContentData> emptyList(), false);
 		List<IObjectStorage> storageList = new ArrayList<IObjectStorage>();
 		storageList.add(timerStorage);
 
@@ -371,7 +371,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		long sensorTypeId = 7;
 		long methodId = 10;
 		String prefix = null;
-		PlainTimerStorage timerStorage = new PlainTimerStorage(null, 0, 0, 0, Collections.<ParameterContentData> emptyList());
+		PlainTimerStorage timerStorage = new PlainTimerStorage(null, 0, 0, 0, Collections.<ParameterContentData> emptyList(), false);
 
 		coreService.addObjectStorage(sensorTypeId, methodId, prefix, timerStorage);
 
@@ -384,7 +384,7 @@ public class CoreServiceTest extends AbstractLogSupport {
 		long sensorTypeId = 7;
 		long methodId = 10;
 		String prefix = "prefiXX";
-		PlainTimerStorage timerStorage = new PlainTimerStorage(null, 0, 0, 0, Collections.<ParameterContentData> emptyList());
+		PlainTimerStorage timerStorage = new PlainTimerStorage(null, 0, 0, 0, Collections.<ParameterContentData> emptyList(), false);
 
 		coreService.addObjectStorage(sensorTypeId, methodId, prefix, timerStorage);
 

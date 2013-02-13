@@ -1,18 +1,24 @@
 package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
+import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.SystemSensorData;
 
 import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * This class provide dynamic informations about the class loading system of the virtual machine.
+ * <p>
+ * This class implements the {@link IAggregatedData} interface but does not provide the IDs of the
+ * aggregated instances since they are not related to any data and are useless.
  * 
  * @author Eduard Tudenhoefner
  * 
  */
 
-public class ClassLoadingInformationData extends SystemSensorData {
+public class ClassLoadingInformationData extends SystemSensorData implements IAggregatedData<ClassLoadingInformationData> {
 
 	/**
 	 * The serial version uid for this class.
@@ -204,6 +210,42 @@ public class ClassLoadingInformationData extends SystemSensorData {
 
 	public void setTotalUnloadedClassCount(long totalUnloadedClassCount) {
 		this.totalUnloadedClassCount = totalUnloadedClassCount;
+	}
+
+	/**
+	 * Aggregates other class loading object info this object.
+	 * 
+	 * @param other
+	 *            Object to aggregate data from.
+	 */
+	public void aggregate(ClassLoadingInformationData other) {
+		count += other.count;
+
+		minLoadedClassCount = Math.min(minLoadedClassCount, other.minLoadedClassCount);
+		maxLoadedClassCount = Math.max(maxLoadedClassCount, other.maxLoadedClassCount);
+		totalTotalLoadedClassCount += other.totalLoadedClassCount;
+
+		minTotalLoadedClassCount = Math.min(minTotalLoadedClassCount, other.minTotalLoadedClassCount);
+		maxTotalLoadedClassCount = Math.max(maxTotalLoadedClassCount, other.maxTotalLoadedClassCount);
+		totalTotalLoadedClassCount += other.totalTotalLoadedClassCount;
+
+		minUnloadedClassCount = Math.min(minUnloadedClassCount, other.minUnloadedClassCount);
+		maxUnloadedClassCount = Math.max(maxUnloadedClassCount, other.maxUnloadedClassCount);
+		totalUnloadedClassCount += other.maxUnloadedClassCount;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Collection<Long> getAggregatedIds() {
+		return Collections.emptyList();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public ClassLoadingInformationData getData() {
+		return this;
 	}
 
 	/**

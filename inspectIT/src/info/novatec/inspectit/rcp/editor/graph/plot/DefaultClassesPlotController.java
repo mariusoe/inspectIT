@@ -2,6 +2,8 @@ package info.novatec.inspectit.rcp.editor.graph.plot;
 
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
+import info.novatec.inspectit.indexing.aggregation.IAggregator;
+import info.novatec.inspectit.indexing.aggregation.impl.ClassLoadingInformationDataAggregator;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
@@ -103,6 +105,11 @@ public class DefaultClassesPlotController extends AbstractPlotController {
 	private Date newestDate = new Date(0);
 
 	/**
+	 * {@link IAggregator}.
+	 */
+	private IAggregator<ClassLoadingInformationData> aggregator;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -115,6 +122,7 @@ public class DefaultClassesPlotController extends AbstractPlotController {
 		template.setId(-1L);
 
 		dataAccessService = inputDefinition.getRepositoryDefinition().getGlobalDataAccessService();
+		aggregator = new ClassLoadingInformationDataAggregator();
 	}
 
 	/**
@@ -232,7 +240,7 @@ public class DefaultClassesPlotController extends AbstractPlotController {
 			List<ClassLoadingInformationData> data = (List<ClassLoadingInformationData>) dataAccessService.getDataObjectsFromToDate(template, from, to);
 
 			if (!data.isEmpty()) {
-				adjustedTimerData = (List<ClassLoadingInformationData>) adjustSamplingRate(data, from, to);
+				adjustedTimerData = adjustSamplingRate(data, from, to, aggregator);
 
 				// we got some data, thus we can set the date
 				oldFromDate = (Date) from.clone();
@@ -264,7 +272,7 @@ public class DefaultClassesPlotController extends AbstractPlotController {
 				}
 			}
 
-			adjustedTimerData = (List<ClassLoadingInformationData>) adjustSamplingRate(oldData, from, to);
+			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
 		} else if (rightAppend) {
 			// just append something on the right
 			Date rightDate = new Date(newestDate.getTime() + 1);
@@ -279,7 +287,7 @@ public class DefaultClassesPlotController extends AbstractPlotController {
 				}
 			}
 
-			adjustedTimerData = (List<ClassLoadingInformationData>) adjustSamplingRate(oldData, from, to);
+			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
 		} else if (leftAppend) {
 			// just append something on the left
 			Date leftDate = new Date(oldFromDate.getTime() - 1);
@@ -291,11 +299,11 @@ public class DefaultClassesPlotController extends AbstractPlotController {
 				oldFromDate = (Date) from.clone();
 			}
 
-			adjustedTimerData = (List<ClassLoadingInformationData>) adjustSamplingRate(oldData, from, to);
+			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
 		} else {
 			// No update is needed here because we already have all the
 			// needed data
-			adjustedTimerData = (List<ClassLoadingInformationData>) adjustSamplingRate(oldData, from, to);
+			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
 		}
 
 		setUpperPlotData(adjustedTimerData);

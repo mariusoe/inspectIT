@@ -35,3 +35,6 @@ class: info.novatec.inspectit.communication.data.AggregatedSqlStatementData
 
 # Aggregated Sql Statement Data
 24: aggregatedIds
+
+#Charting
+25: charting

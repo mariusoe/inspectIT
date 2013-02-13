@@ -76,6 +76,33 @@ public class AggregationPerformer<E extends DefaultData> {
 	}
 
 	/**
+	 * Process the list of elements starting from the fromIndex (inclusive) to toIndex (exclusive).
+	 * 
+	 * @param list
+	 *            List of elements.
+	 * @param fromIndex
+	 *            Starting index.
+	 * @param toIndex
+	 *            Ending index.
+	 */
+	public void processList(List<E> list, int fromIndex, int toIndex) {
+		int size = list.size();
+		if (fromIndex < 0 || fromIndex >= size) {
+			throw new IllegalArgumentException("Starting index " + fromIndex + " is not valid for given list of size " + size);
+		}
+
+		if (toIndex < fromIndex || toIndex > size) {
+			throw new IllegalArgumentException("Ending index " + toIndex + " is not valid for given list of size " + size + " and starting index " + fromIndex);
+		}
+
+		for (int i = fromIndex; i < toIndex; i++) {
+			E element = list.get(i);
+			processElement(element);
+		}
+
+	}
+
+	/**
 	 * Returns aggregation results.
 	 * 
 	 * @return Returns aggregation results.
@@ -86,6 +113,13 @@ public class AggregationPerformer<E extends DefaultData> {
 			returnList.add(aggregatedData.getData());
 		}
 		return returnList;
+	}
+
+	/**
+	 * Resets the current results of the aggregations so that the new clean aggregation can start.
+	 */
+	public void reset() {
+		aggregationMap.clear();
 	}
 
 }

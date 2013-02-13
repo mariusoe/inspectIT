@@ -5,6 +5,7 @@ import info.novatec.inspectit.rcp.editor.graph.plot.DefaultCpuPlotController;
 import info.novatec.inspectit.rcp.editor.graph.plot.DefaultMemoryPlotController;
 import info.novatec.inspectit.rcp.editor.graph.plot.DefaultThreadsPlotController;
 import info.novatec.inspectit.rcp.editor.graph.plot.DefaultTimerPlotController;
+import info.novatec.inspectit.rcp.editor.graph.plot.HttpTimerPlotController;
 import info.novatec.inspectit.rcp.editor.graph.plot.PlotController;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 
@@ -49,6 +50,8 @@ public final class PlotFactory {
 			return null;
 		case THREAD_INFORMATION:
 			return new DefaultThreadsPlotController();
+		case CHARTING_HTTP_TIMER_SENSOR:
+			return new HttpTimerPlotController();
 		default:
 			return null;
 		}

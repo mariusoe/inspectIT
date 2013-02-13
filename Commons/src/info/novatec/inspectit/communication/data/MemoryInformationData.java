@@ -1,18 +1,24 @@
 package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
+import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.SystemSensorData;
 
 import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * This class provide dynamic informations about the memory of the underlying operating system and
  * also heap and non-heap memory information of the virtual machine.
+ * <p>
+ * This class implements the {@link IAggregatedData} interface but does not provide the IDs of the
+ * aggregated instances since they are not related to any data and are useless.
  * 
  * @author Eduard Tudenhoefner
  * 
  */
-public class MemoryInformationData extends SystemSensorData {
+public class MemoryInformationData extends SystemSensorData implements IAggregatedData<MemoryInformationData> {
 
 	/**
 	 * The serial version uid for this class.
@@ -408,6 +414,55 @@ public class MemoryInformationData extends SystemSensorData {
 
 	public void setTotalComittedNonHeapMemorySize(long totalComittedNonHeapMemorySize) {
 		this.totalComittedNonHeapMemorySize = totalComittedNonHeapMemorySize;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void aggregate(MemoryInformationData other) {
+		count += other.count;
+
+		minComittedHeapMemorySize = Math.min(minComittedHeapMemorySize, other.minComittedHeapMemorySize);
+		maxComittedHeapMemorySize = Math.max(maxComittedHeapMemorySize, other.maxComittedHeapMemorySize);
+		totalComittedHeapMemorySize += other.totalComittedHeapMemorySize;
+
+		minComittedNonHeapMemorySize = Math.min(minComittedNonHeapMemorySize, other.minComittedNonHeapMemorySize);
+		maxComittedNonHeapMemorySize = Math.max(maxComittedNonHeapMemorySize, other.maxComittedNonHeapMemorySize);
+		totalComittedNonHeapMemorySize += other.totalComittedNonHeapMemorySize;
+
+		minComittedVirtualMemSize = Math.min(minComittedVirtualMemSize, other.minComittedVirtualMemSize);
+		maxComittedVirtualMemSize = Math.max(maxComittedVirtualMemSize, other.maxComittedVirtualMemSize);
+		totalComittedVirtualMemSize += other.totalComittedVirtualMemSize;
+
+		minFreePhysMemory = Math.min(minFreePhysMemory, other.minFreePhysMemory);
+		maxFreePhysMemory = Math.max(maxFreePhysMemory, other.maxFreePhysMemory);
+		totalFreePhysMemory += other.totalFreePhysMemory;
+
+		minFreeSwapSpace = Math.min(minFreeSwapSpace, other.minFreeSwapSpace);
+		maxFreeSwapSpace = Math.max(maxFreeSwapSpace, other.maxFreeSwapSpace);
+		totalFreeSwapSpace += other.totalFreeSwapSpace;
+
+		minUsedHeapMemorySize = Math.min(minUsedHeapMemorySize, other.minUsedHeapMemorySize);
+		maxUsedHeapMemorySize = Math.max(maxUsedHeapMemorySize, other.maxUsedHeapMemorySize);
+		totalUsedHeapMemorySize += other.totalUsedHeapMemorySize;
+
+		minFreeSwapSpace = Math.min(minFreeSwapSpace, other.minFreeSwapSpace);
+		maxFreeSwapSpace = Math.max(maxFreeSwapSpace, other.maxFreeSwapSpace);
+		totalFreeSwapSpace += other.totalFreeSwapSpace;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Collection<Long> getAggregatedIds() {
+		return Collections.emptyList();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public MemoryInformationData getData() {
+		return this;
 	}
 
 	/**

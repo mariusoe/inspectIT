@@ -102,6 +102,13 @@ public interface PlotController {
 	void preferenceEventFired(PreferenceEvent preferenceEvent);
 
 	/**
+	 * If the legend in the chart should be shown.
+	 * 
+	 * @return True if legend should be shown, otherwise false.
+	 */
+	boolean showLegend();
+
+	/**
 	 * Disposes all plots etc.
 	 */
 	void dispose();

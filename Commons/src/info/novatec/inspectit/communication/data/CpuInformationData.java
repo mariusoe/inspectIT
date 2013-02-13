@@ -1,18 +1,24 @@
 package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
+import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.SystemSensorData;
 
 import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * This class provide dynamic informations about the underlying operating system such as cpu usage
  * and cpu time.
+ * <p>
+ * This class implements the {@link IAggregatedData} interface but does not provide the IDs of the
+ * aggregated instances since they are not related to any data and are useless.
  * 
  * @author Eduard Tudenhoefner
  * 
  */
-public class CpuInformationData extends SystemSensorData {
+public class CpuInformationData extends SystemSensorData implements IAggregatedData<CpuInformationData> {
 
 	/**
 	 * The serial version uid for this class.
@@ -136,6 +142,31 @@ public class CpuInformationData extends SystemSensorData {
 	/**
 	 * {@inheritDoc}
 	 */
+	public void aggregate(CpuInformationData other) {
+		count += other.count;
+		processCpuTime += other.processCpuTime;
+		minCpuUsage = Math.min(minCpuUsage, other.minCpuUsage);
+		maxCpuUsage = Math.max(maxCpuUsage, other.maxCpuUsage);
+		totalCpuUsage += other.totalCpuUsage;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Collection<Long> getAggregatedIds() {
+		return Collections.emptyList();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public CpuInformationData getData() {
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
@@ -191,4 +222,5 @@ public class CpuInformationData extends SystemSensorData {
 			return size;
 		}
 	}
+
 }

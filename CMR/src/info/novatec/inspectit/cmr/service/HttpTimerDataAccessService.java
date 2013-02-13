@@ -1,10 +1,12 @@
 package info.novatec.inspectit.cmr.service;
 
+import info.novatec.inspectit.cmr.dao.DefaultDataDao;
 import info.novatec.inspectit.cmr.dao.HttpTimerDataDao;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.spring.logger.Logger;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -30,6 +32,12 @@ public class HttpTimerDataAccessService implements IHttpTimerDataAccessService, 
 	 */
 	@Autowired
 	private HttpTimerDataDao dao;
+
+	/**
+	 * Default data dao.
+	 */
+	@Autowired
+	private DefaultDataDao defaultDataDao;
 
 	/**
 	 * {@inheritDoc}
@@ -61,6 +69,11 @@ public class HttpTimerDataAccessService implements IHttpTimerDataAccessService, 
 	@MethodLog
 	public List<HttpTimerData> getTaggedAggregatedTimerData(HttpTimerData httpData, boolean includeRequestMethod, Date fromDate, Date toDate) {
 		return dao.getTaggedAggregatedHttpTimerData(httpData, includeRequestMethod, fromDate, toDate);
+	}
+
+	@Override
+	public List<HttpTimerData> getChartingHttpTimerDataFromDateToDate(Collection<HttpTimerData> templates, Date fromDate, Date toDate, boolean retrieveByTag) {
+		return defaultDataDao.getChartingHttpTimerDataFromDateToDate(templates, fromDate, toDate, retrieveByTag);
 	}
 
 	/**

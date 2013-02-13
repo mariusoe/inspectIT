@@ -34,9 +34,11 @@ public class PlainTimerStorage implements ITimerStorage {
 	 *            The method ID.
 	 * @param parameterContentData
 	 *            The content of the parameter/fields.
+	 * @param charting
+	 *            If TimerData's charting should be set or not.
 	 */
-	public PlainTimerStorage(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData) {
-		timerRawVO = new TimerRawVO(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);
+	public PlainTimerStorage(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData, boolean charting) {
+		timerRawVO = new TimerRawVO(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData, charting);
 	}
 
 	/**

@@ -3,6 +3,8 @@ package info.novatec.inspectit.rcp.editor.graph.plot;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.communication.data.MemoryInformationData;
 import info.novatec.inspectit.communication.data.SystemInformationData;
+import info.novatec.inspectit.indexing.aggregation.IAggregator;
+import info.novatec.inspectit.indexing.aggregation.impl.MemoryInformationDataAggregator;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
@@ -116,6 +118,11 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 	 * sometimes.
 	 */
 	private Date newestDate = new Date(0);
+
+	/**
+	 * {@link IAggregator}.
+	 */
+	private IAggregator<MemoryInformationData> aggregator = new MemoryInformationDataAggregator();
 
 	/**
 	 * {@inheritDoc}
@@ -341,7 +348,7 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 			List<MemoryInformationData> data = (List<MemoryInformationData>) dataAccessService.getDataObjectsFromToDate(memoryTemplate, from, to);
 
 			if (!data.isEmpty()) {
-				adjustedTimerData = (List<MemoryInformationData>) adjustSamplingRate(data, from, to);
+				adjustedTimerData = adjustSamplingRate(data, from, to, aggregator);
 
 				// we got some data, thus we can set the date
 				oldFromDate = (Date) from.clone();
@@ -373,7 +380,7 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 				}
 			}
 
-			adjustedTimerData = (List<MemoryInformationData>) adjustSamplingRate(oldData, from, to);
+			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
 		} else if (rightAppend) {
 			// just append something on the right
 			Date rightDate = new Date(newestDate.getTime() + 1);
@@ -388,7 +395,7 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 				}
 			}
 
-			adjustedTimerData = (List<MemoryInformationData>) adjustSamplingRate(oldData, from, to);
+			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
 		} else if (leftAppend) {
 			// just append something on the left
 			Date leftDate = new Date(oldFromDate.getTime() - 1);
@@ -400,11 +407,11 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 				oldFromDate = (Date) from.clone();
 			}
 
-			adjustedTimerData = (List<MemoryInformationData>) adjustSamplingRate(oldData, from, to);
+			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
 		} else {
 			// No update is needed here because we already have all the
 			// needed data
-			adjustedTimerData = (List<MemoryInformationData>) adjustSamplingRate(oldData, from, to);
+			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
 		}
 
 		setUpperPlotData(adjustedTimerData);

@@ -32,3 +32,6 @@ class: info.novatec.inspectit.communication.data.SqlStatementData
 21: sql
 22: preparedStatement
 23: parameterValues
+
+#TimerData - INSPECTIT-827
+24: charting

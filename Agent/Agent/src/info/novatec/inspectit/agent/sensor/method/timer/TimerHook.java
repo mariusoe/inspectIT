@@ -194,7 +194,9 @@ public class TimerHook implements IMethodHook, IConstructorHook {
 
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis() - Math.round(duration));
 
-				storage = timerStorageFactory.newStorage(timestamp, platformId, registeredSensorTypeId, registeredMethodId, parameterContentData);
+				boolean charting = "true".equals(rsc.getSettings().get("charting"));
+
+				storage = timerStorageFactory.newStorage(timestamp, platformId, registeredSensorTypeId, registeredMethodId, parameterContentData, charting);
 				storage.addData(duration, cpuDuration);
 
 				coreService.addObjectStorage(sensorTypeId, methodId, prefix, storage);

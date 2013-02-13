@@ -33,5 +33,8 @@ class: info.novatec.inspectit.communication.data.HttpTimerData
 22: parameters
 23: attributes
 24: headers
-25: sessionAttributes 
+25: sessionAttributes
 26: requestMethod
+
+#TimerData - INSPECTIT-827
+27: charting

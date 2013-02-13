@@ -2,6 +2,8 @@ package info.novatec.inspectit.rcp.editor.graph.plot;
 
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.communication.data.ThreadInformationData;
+import info.novatec.inspectit.indexing.aggregation.IAggregator;
+import info.novatec.inspectit.indexing.aggregation.impl.ThreadInformationDataAggregator;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
@@ -115,6 +117,11 @@ public class DefaultThreadsPlotController extends AbstractPlotController {
 	 * sometimes.
 	 */
 	private Date newestDate = new Date(0);
+
+	/**
+	 * {@link IAggregator}.
+	 */
+	IAggregator<ThreadInformationData> aggregator = new ThreadInformationDataAggregator();
 
 	/**
 	 * {@inheritDoc}
@@ -305,7 +312,7 @@ public class DefaultThreadsPlotController extends AbstractPlotController {
 			List<ThreadInformationData> data = (List<ThreadInformationData>) dataAccessService.getDataObjectsFromToDate(template, from, to);
 
 			if (!data.isEmpty()) {
-				adjustedTimerData = (List<ThreadInformationData>) adjustSamplingRate(data, from, to);
+				adjustedTimerData = adjustSamplingRate(data, from, to, aggregator);
 
 				// we got some data, thus we can set the date
 				oldFromDate = (Date) from.clone();
@@ -337,7 +344,7 @@ public class DefaultThreadsPlotController extends AbstractPlotController {
 				}
 			}
 
-			adjustedTimerData = (List<ThreadInformationData>) adjustSamplingRate(oldData, from, to);
+			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
 		} else if (rightAppend) {
 			// just append something on the right
 			Date rightDate = new Date(newestDate.getTime() + 1);
@@ -352,7 +359,7 @@ public class DefaultThreadsPlotController extends AbstractPlotController {
 				}
 			}
 
-			adjustedTimerData = (List<ThreadInformationData>) adjustSamplingRate(oldData, from, to);
+			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
 		} else if (leftAppend) {
 			// just append something on the left
 			Date leftDate = new Date(oldFromDate.getTime() - 1);
@@ -364,11 +371,11 @@ public class DefaultThreadsPlotController extends AbstractPlotController {
 				oldFromDate = (Date) from.clone();
 			}
 
-			adjustedTimerData = (List<ThreadInformationData>) adjustSamplingRate(oldData, from, to);
+			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
 		} else {
 			// No update is needed here because we already have all the
 			// needed data
-			adjustedTimerData = (List<ThreadInformationData>) adjustSamplingRate(oldData, from, to);
+			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
 		}
 
 		setUpperPlotData(adjustedTimerData);

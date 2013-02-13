@@ -93,6 +93,11 @@ public class TimerData extends InvocationAwareData {
 	private double exclusiveMin = -1;
 
 	/**
+	 * Defines if the data should be saved to database and available for charting.
+	 */
+	private boolean charting;
+
+	/**
 	 * Default no-args constructor.
 	 */
 	public TimerData() {
@@ -434,6 +439,25 @@ public class TimerData extends InvocationAwareData {
 	}
 
 	/**
+	 * Gets {@link #charting}.
+	 * 
+	 * @return {@link #charting}
+	 */
+	public boolean isCharting() {
+		return charting;
+	}
+
+	/**
+	 * Sets {@link #charting}.
+	 * 
+	 * @param charting
+	 *            New value for {@link #charting}
+	 */
+	public void setCharting(boolean charting) {
+		this.charting = charting;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public DefaultData finalizeData() {
@@ -446,7 +470,7 @@ public class TimerData extends InvocationAwareData {
 	 */
 	public long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
 		long size = super.getObjectSize(objectSizes, false);
-		size += objectSizes.getPrimitiveTypesSize(0, 0, 0, 0, 2, 10);
+		size += objectSizes.getPrimitiveTypesSize(0, 1, 0, 0, 2, 10);
 		if (doAlign) {
 			return objectSizes.alignTo8Bytes(size);
 		} else {
@@ -549,6 +573,7 @@ public class TimerData extends InvocationAwareData {
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		temp = Double.doubleToLongBits(variance);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + (charting ? 1231 : 1237);
 		return result;
 	}
 
@@ -601,6 +626,9 @@ public class TimerData extends InvocationAwareData {
 			return false;
 		}
 		if (Double.doubleToLongBits(variance) != Double.doubleToLongBits(other.variance)) {
+			return false;
+		}
+		if (charting != other.charting) {
 			return false;
 		}
 		return true;

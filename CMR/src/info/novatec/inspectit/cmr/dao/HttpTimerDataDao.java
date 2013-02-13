@@ -19,7 +19,7 @@ public interface HttpTimerDataDao {
 	 * @param httpData
 	 *            The template containing the platform id.
 	 * @param includeRequestMethod
-	 *            use different request method information for building categoriation pairs?
+	 *            use different request method information for building categorization pairs?
 	 * @return The list of the aggregated timer data object.
 	 */
 	List<HttpTimerData> getAggregatedHttpTimerData(HttpTimerData httpData, boolean includeRequestMethod);
@@ -31,7 +31,7 @@ public interface HttpTimerDataDao {
 	 * @param httpData
 	 *            The template containing the platform id.
 	 * @param includeRequestMethod
-	 *            use different request method information for building categoriation pairs?
+	 *            use different request method information for building categorization pairs?
 	 * @param fromDate
 	 *            Date to include data from.
 	 * @param toDate
@@ -47,7 +47,7 @@ public interface HttpTimerDataDao {
 	 * @param httpData
 	 *            The template containing the platform id.
 	 * @param includeRequestMethod
-	 *            use different request method information for building categoriation pairs?
+	 *            use different request method information for building categorization pairs?
 	 * @return The list of the aggregated timer data object.
 	 */
 	List<HttpTimerData> getTaggedAggregatedHttpTimerData(HttpTimerData httpData, boolean includeRequestMethod);
@@ -59,7 +59,7 @@ public interface HttpTimerDataDao {
 	 * @param httpData
 	 *            The template containing the platform id.
 	 * @param includeRequestMethod
-	 *            use different request method information for building categoriation pairs?
+	 *            use different request method information for building categorization pairs?
 	 * @param fromDate
 	 *            Date to include data from.
 	 * @param toDate
@@ -67,5 +67,4 @@ public interface HttpTimerDataDao {
 	 * @return The list of the aggregated timer data object.
 	 */
 	List<HttpTimerData> getTaggedAggregatedHttpTimerData(HttpTimerData httpData, boolean includeRequestMethod, Date fromDate, Date toDate);
-
 }

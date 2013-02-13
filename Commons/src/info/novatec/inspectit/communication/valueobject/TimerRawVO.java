@@ -37,6 +37,11 @@ public class TimerRawVO extends MethodSensorData {
 	private TimerRawContainer container;
 
 	/**
+	 * If TimerData's charting should be set or not.
+	 */
+	private boolean charting;
+
+	/**
 	 * The constructor creates the TimerRawVO object.
 	 * 
 	 * @param timeStamp
@@ -49,11 +54,14 @@ public class TimerRawVO extends MethodSensorData {
 	 *            The method ident.
 	 * @param parameterContentData
 	 *            The parameter content data. Can be <code>null</code>.
+	 * @param charting
+	 *            If TimerData's charting should be set or not.
 	 */
-	public TimerRawVO(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData) {
+	public TimerRawVO(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData, boolean charting) {
 		super(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);
 
 		container = new TimerRawContainer();
+		this.charting = charting;
 		data.add(container);
 	}
 
@@ -106,6 +114,7 @@ public class TimerRawVO extends MethodSensorData {
 	public DefaultData finalizeData() {
 		TimerData timerData = new TimerData(getTimeStamp(), getPlatformIdent(), getSensorTypeIdent(), getMethodIdent());
 		timerData.setParameterContentData(getParameterContentData());
+		timerData.setCharting(charting);
 
 		double[] values;
 		double value;

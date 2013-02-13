@@ -281,6 +281,9 @@ public class HttpHook implements IMethodHook {
 							data.setSessionAttributes(extractor.getSessionAttributes(servletRequestClass, httpServletRequest));
 						}
 
+						boolean charting = "true".equals(rsc.getSettings().get("charting"));
+						data.setCharting(charting);
+
 						// returning gathered information
 						coreService.addMethodSensorData(registeredSensorTypeId, registeredMethodId, null, data);
 

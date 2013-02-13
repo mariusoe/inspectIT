@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.editor.graph.plot;
 
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.indexing.aggregation.IAggregator;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
@@ -97,16 +98,20 @@ public abstract class AbstractPlotController implements PlotController {
 	/**
 	 * Adjusts the sampling rate.
 	 * 
+	 * @param <E>
+	 *            Type of element.
 	 * @param from
 	 *            The start time.
 	 * @param to
 	 *            The end time.
 	 * @param dataObjects
 	 *            the data objects.
+	 * @param aggregator
+	 *            {@link IAggregator} to be used.
 	 * @return A {@link List} with the aggregated {@link DefaultData}.
 	 */
-	protected List<? extends DefaultData> adjustSamplingRate(List<? extends DefaultData> dataObjects, Date from, Date to) {
-		return samplingRateMode.adjustSamplingRate(dataObjects, from, to, sensitivity.getValue());
+	protected <E extends DefaultData> List<E> adjustSamplingRate(List<E> dataObjects, Date from, Date to, IAggregator<E> aggregator) {
+		return samplingRateMode.adjustSamplingRate(dataObjects, from, to, sensitivity.getValue(), aggregator);
 	}
 
 	/**
@@ -164,6 +169,15 @@ public abstract class AbstractPlotController implements PlotController {
 			update(fromDate, toDate);
 		}
 
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * By default legend is not shown.
+	 */
+	public boolean showLegend() {
+		return false;
 	}
 
 	/**

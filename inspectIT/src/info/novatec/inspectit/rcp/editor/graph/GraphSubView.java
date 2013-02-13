@@ -128,7 +128,9 @@ public class GraphSubView extends AbstractSubView {
 
 		// create the chart
 		chart = createChart();
-		chart.removeLegend();
+		if (!plotController.showLegend()) {
+			chart.removeLegend();
+		}
 		Color color = new Color(toolkit.getColors().getBackground().getRed(), toolkit.getColors().getBackground().getGreen(), toolkit.getColors().getBackground().getBlue());
 		chart.setBackgroundPaint(color);
 

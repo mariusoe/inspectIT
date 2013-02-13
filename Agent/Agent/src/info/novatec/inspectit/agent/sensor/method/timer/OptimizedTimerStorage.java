@@ -34,9 +34,12 @@ public class OptimizedTimerStorage implements ITimerStorage {
 	 *            The method ID.
 	 * @param parameterContentData
 	 *            The content of the parameter/fields.
+	 * @param charting
+	 *            If TimerData's charting should be set or not.
 	 */
-	public OptimizedTimerStorage(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData) {
+	public OptimizedTimerStorage(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, List<ParameterContentData> parameterContentData, boolean charting) {
 		timerData = new TimerData(timeStamp, platformIdent, sensorTypeIdent, methodIdent, parameterContentData);
+		timerData.setCharting(charting);
 	}
 
 	/**

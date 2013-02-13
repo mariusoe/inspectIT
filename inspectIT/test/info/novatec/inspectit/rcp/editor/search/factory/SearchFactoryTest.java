@@ -148,14 +148,14 @@ public class SearchFactoryTest {
 		SearchCriteria searchCriteria = new SearchCriteria("Blah");
 		SearchCriteria wrong = new SearchCriteria("halB");
 
-		httpData.setInspectITTaggingHeaderValue("blaha");
+		httpData.setInspectItTaggingHeaderValue("blaha");
 		searchCriteria.setCaseSensitive(false);
 		assertThat(SearchFactory.isSearchCompatible(httpData, searchCriteria, repositoryDefinition), is(equalTo(true)));
 		searchCriteria.setCaseSensitive(true);
 		assertThat(SearchFactory.isSearchCompatible(httpData, searchCriteria, repositoryDefinition), is(equalTo(false)));
 		assertThat(SearchFactory.isSearchCompatible(httpData, wrong, repositoryDefinition), is(equalTo(false)));
 
-		httpData.setInspectITTaggingHeaderValue("");
+		httpData.setInspectItTaggingHeaderValue("");
 		httpData.setUri("ablah");
 		searchCriteria.setCaseSensitive(false);
 		assertThat(SearchFactory.isSearchCompatible(httpData, searchCriteria, repositoryDefinition), is(equalTo(true)));
@@ -266,7 +266,7 @@ public class SearchFactoryTest {
 
 		HttpTimerData httpData = new HttpTimerData();
 		httpData.setMethodIdent(1L);
-		httpData.setInspectITTaggingHeaderValue("blaha");
+		httpData.setInspectItTaggingHeaderValue("blaha");
 		invocationData.setTimerData(httpData);
 		searchCriteria.setCaseSensitive(false);
 		assertThat(SearchFactory.isSearchCompatible(httpData, searchCriteria, repositoryDefinition), is(equalTo(true)));

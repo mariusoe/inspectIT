@@ -193,6 +193,8 @@ public final class SubViewFactory {
 			SashCompositeSubView taggedHttpSashSubView = new SashCompositeSubView();
 			taggedHttpSashSubView.addSubView(new TableSubView(new TaggedHttpTimerDataInputController()));
 			return taggedHttpSashSubView;
+		case CHARTING_HTTP_TIMER_SENSOR:
+			return new GraphSubView(SensorTypeEnum.CHARTING_HTTP_TIMER_SENSOR);
 		default:
 			throw new IllegalArgumentException("Could not create sub-view. Not supported: " + sensorTypeEnum.toString());
 		}

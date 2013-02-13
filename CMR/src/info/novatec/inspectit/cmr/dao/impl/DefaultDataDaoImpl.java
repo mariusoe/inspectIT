@@ -9,6 +9,7 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
+import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.SystemInformationData;
@@ -23,6 +24,7 @@ import java.lang.reflect.Modifier;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +47,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.persister.entity.AbstractEntityPersister;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
@@ -99,12 +100,6 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 	 */
 	@Autowired
 	private TimerDataAggregator timerDataAggregator;
-
-	/**
-	 * Denotes if the {@link TimerData} objects have to be saved to database.
-	 */
-	@Value(value = "${cmr.saveTimerDataToDatabase}")
-	private boolean saveTimerDataToDatabase;
 
 	/**
 	 * This constructor is used to set the {@link SessionFactory} that is needed by
@@ -166,8 +161,17 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 				buffer.put(new BufferElement<MethodSensorData>(exData));
 			} else if (element instanceof TimerData) {
 				TimerData timerData = (TimerData) element;
-				if (saveTimerDataToDatabase) {
-					timerDataAggregator.processTimerData(timerData);
+				if (timerData.isCharting()) {
+					// dont add HTTP data to aggregator
+					if (element instanceof HttpTimerData) {
+						HttpTimerData httpTimerData = (HttpTimerData) element;
+						long bufferId = httpTimerData.getId();
+						httpTimerData.setId(0);
+						session.insert(httpTimerData);
+						httpTimerData.setId(bufferId);
+					} else {
+						timerDataAggregator.processTimerData(timerData);
+					}
 				}
 				buffer.put(new BufferElement<MethodSensorData>(timerData));
 			} else {
@@ -272,11 +276,16 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 			data.calculateExclusiveMax(exclusiveTime);
 			data.calculateExclusiveMin(exclusiveTime);
 
-			// Ensure not to save HttpTimerData!
-			if (saveTimerDataToDatabase && data.getClass().equals(TimerData.class)) {
-				timerDataAggregator.processTimerData(data);
-
+			if (data.isCharting()) {
+				// dont add HTTP data to aggregator
+				if (data instanceof HttpTimerData) {
+					HttpTimerData httpTimerData = (HttpTimerData) data;
+					session.insert(httpTimerData);
+				} else {
+					timerDataAggregator.processTimerData(data);
+				}
 			}
+
 			cacheIdGenerator.assignObjectAnId(data);
 			data.addInvocationParentId(topInvocationParent.getId());
 			try {
@@ -499,6 +508,43 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 			return resultList.get(0);
 		} else {
 			return null;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<HttpTimerData> getChartingHttpTimerDataFromDateToDate(Collection<HttpTimerData> templates, Date fromDate, Date toDate, boolean retrieveByTag) {
+		if (CollectionUtils.isNotEmpty(templates)) {
+			DetachedCriteria criteria = DetachedCriteria.forClass(HttpTimerData.class);
+			criteria.add(Restrictions.eq("platformIdent", templates.iterator().next().getPlatformIdent()));
+			criteria.add(Restrictions.between("timeStamp", new Timestamp(fromDate.getTime()), new Timestamp(toDate.getTime())));
+
+			if (!retrieveByTag) {
+				Set<String> uris = new HashSet<String>();
+				for (HttpTimerData httpTimerData : templates) {
+					if (!HttpTimerData.UNDEFINED.equals(httpTimerData.getUri())) {
+						uris.add(httpTimerData.getUri());
+					}
+				}
+				criteria.add(Restrictions.in("uri", uris));
+			} else {
+				Set<String> tags = new HashSet<String>();
+
+				for (HttpTimerData httpTimerData : templates) {
+					if (httpTimerData.hasInspectItTaggingHeader()) {
+						tags.add(httpTimerData.getInspectItTaggingHeaderValue());
+					}
+				}
+				criteria.add(Restrictions.in("inspectItTaggingHeaderValue", tags));
+			}
+
+			criteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
+			return getHibernateTemplate().findByCriteria(criteria);
+		} else {
+			return Collections.emptyList();
 		}
 	}
 

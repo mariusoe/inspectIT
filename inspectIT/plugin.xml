@@ -390,6 +390,10 @@
                optional="false">
          </commandParameter>
       </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.displayInChart"
+            name="Display in Chart">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -565,6 +569,10 @@
                                  value="info.novatec.inspectit.communication.data.HttpTimerData">
                            </instanceof>
                         </not>
+                        <test
+                              property="info.novatec.inspectit.canChart"
+                              value="true">
+                        </test>
                      </and>
                      <instanceof
                            value="info.novatec.inspectit.communication.data.InvocationSequenceData">
@@ -1415,6 +1423,26 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.HttpDisplayInChartHandler"
+            commandId="info.novatec.inspectit.rcp.commands.displayInChart">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.communication.data.HttpTimerData">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.canChart"
+                        value="true">
+                  </test>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -1514,6 +1542,13 @@
             namespace="info.novatec.inspectit"
             properties="canDelete"
             type="info.novatec.inspectit.rcp.model.AgentLeaf">
+      </propertyTester>
+      <propertyTester
+            class="info.novatec.inspectit.rcp.tester.TimerDataTester"
+            id="info.inspectit.rcp.TimerDataTester"
+            namespace="info.novatec.inspectit"
+            properties="canChart"
+            type="info.novatec.inspectit.communication.data.TimerData">
       </propertyTester>
    </extension>
    <extension
@@ -1816,6 +1851,18 @@
          </command>
          <separator
                name="inspectit.editor.formrooteditor.tablesubview.separator2"
+               visible="true">
+         </separator>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.displayInChart"
+               icon="icons/chart_pie.png"
+               style="push">
+            <visibleWhen
+                  checkEnabled="true">
+            </visibleWhen>
+         </command>
+         <separator
+               name="inspectit.editor.formrooteditor.tablesubview.separator3"
                visible="true">
          </separator>
          <command

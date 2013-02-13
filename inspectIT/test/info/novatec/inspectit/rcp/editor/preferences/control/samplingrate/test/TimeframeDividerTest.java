@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
+import info.novatec.inspectit.indexing.aggregation.impl.ClassLoadingInformationDataAggregator;
 import info.novatec.inspectit.rcp.editor.preferences.control.SamplingRateControl;
 import info.novatec.inspectit.rcp.editor.preferences.control.SamplingRateControl.Sensitivity;
 import info.novatec.inspectit.rcp.editor.preferences.control.samplingrate.SamplingRateMode;
@@ -28,7 +29,7 @@ public class TimeframeDividerTest {
 	/**
 	 * The list with data objects.
 	 */
-	private List<? extends DefaultData> dataObjects;
+	private List<ClassLoadingInformationData> dataObjects;
 
 	/**
 	 * The sampling rate mode.
@@ -94,7 +95,7 @@ public class TimeframeDividerTest {
 		// to time is Mon Sep 15 12:00:00 CEST 2008
 		Date toDate = new Date(1221472800000L);
 
-		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue());
+		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue(), new ClassLoadingInformationDataAggregator());
 
 		assertThat(resultList, is(notNullValue()));
 	}
@@ -140,7 +141,7 @@ public class TimeframeDividerTest {
 
 		tempList.add(data);
 
-		resultList = mode.adjustSamplingRate(tempList, fromDate, toDate, sensitivity.getValue());
+		resultList = mode.adjustSamplingRate(tempList, fromDate, toDate, sensitivity.getValue(), new ClassLoadingInformationDataAggregator());
 
 		assertThat(resultList.size(), is(equalTo(2)));
 	}
@@ -159,7 +160,7 @@ public class TimeframeDividerTest {
 		// to time is Mon Sep 15 12:00:00 CEST 2008
 		Date toDate = new Date(1221472800000L);
 
-		resultList = mode.adjustSamplingRate(null, fromDate, toDate, sensitivity.getValue());
+		resultList = mode.adjustSamplingRate(null, fromDate, toDate, sensitivity.getValue(), new ClassLoadingInformationDataAggregator());
 
 		assertThat(resultList, is(nullValue()));
 	}
@@ -179,7 +180,7 @@ public class TimeframeDividerTest {
 		// to time is Mon Sep 15 12:00:00 CEST 2008
 		Date toDate = new Date(1221472800000L);
 
-		resultList = mode.adjustSamplingRate(tempList, fromDate, toDate, sensitivity.getValue());
+		resultList = mode.adjustSamplingRate(tempList, fromDate, toDate, sensitivity.getValue(), new ClassLoadingInformationDataAggregator());
 
 		assertThat(resultList.size(), is(lessThan(sensitivity.getValue())));
 	}
@@ -197,7 +198,7 @@ public class TimeframeDividerTest {
 		// to time is Mon Sep 15 12:00:00 CEST 2008
 		Date toDate = new Date(1221472800000L);
 
-		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, 0);
+		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, 0, new ClassLoadingInformationDataAggregator());
 
 		assertThat((Object) dataObjects, is(equalTo((Object) resultList)));
 	}
@@ -216,7 +217,7 @@ public class TimeframeDividerTest {
 		// to time is Mon Sep 15 12:00:00 CEST 2008
 		Date toDate = new Date(1221472800000L);
 
-		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue());
+		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue(), new ClassLoadingInformationDataAggregator());
 
 		for (DefaultData defaultData : resultList) {
 			long dataTime = defaultData.getTimeStamp().getTime();
@@ -239,7 +240,7 @@ public class TimeframeDividerTest {
 		// to time is Mon Sep 15 12:00:00 CEST 2008
 		Date toDate = new Date(1221472800000L);
 
-		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue());
+		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue(), new ClassLoadingInformationDataAggregator());
 
 		assertThat(resultList.size(), is(lessThanOrEqualTo(sensitivity.getValue())));
 	}
@@ -259,7 +260,7 @@ public class TimeframeDividerTest {
 		// the toDate is Mon Sep 15 10:30:00 CEST 2008
 		Date toDate = new Date(1221467400000L);
 
-		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue());
+		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue(), new ClassLoadingInformationDataAggregator());
 
 		assertThat(resultList.size(), is(equalTo(0)));
 	}
@@ -278,7 +279,7 @@ public class TimeframeDividerTest {
 		// to time is Mon Sep 15 12:00:00 CEST 2008
 		Date toDate = new Date(1221472800000L);
 
-		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue());
+		resultList = mode.adjustSamplingRate(dataObjects, fromDate, toDate, sensitivity.getValue(), new ClassLoadingInformationDataAggregator());
 
 		assertThat(resultList.size(), is(equalTo(1)));
 	}

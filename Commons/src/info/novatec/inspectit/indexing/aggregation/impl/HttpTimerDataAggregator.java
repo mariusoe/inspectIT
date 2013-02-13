@@ -79,13 +79,14 @@ public class HttpTimerDataAggregator implements IAggregator<HttpTimerData>, Seri
 		clone.setPlatformIdent(httpData.getPlatformIdent());
 		clone.setSensorTypeIdent(httpData.getSensorTypeIdent());
 		clone.setMethodIdent(httpData.getMethodIdent());
+		clone.setCharting(httpData.isCharting());
 		if (uriBased) {
 			clone.setUri(httpData.getUri());
 		} else {
 			// Aggregation based on Usecase. We reset the URI so that we can easily know
 			// that use case aggregation is used.
 			clone.setUri(HttpTimerData.UNDEFINED);
-			clone.setInspectITTaggingHeaderValue(httpData.getInspectItTaggingHeaderValue());
+			clone.setInspectItTaggingHeaderValue(httpData.getInspectItTaggingHeaderValue());
 		}
 		clone.setRequestMethod(httpData.getRequestMethod());
 		return clone;

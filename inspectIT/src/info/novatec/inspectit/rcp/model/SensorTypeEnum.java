@@ -45,7 +45,8 @@ public enum SensorTypeEnum {
 	HTTP_TIMER_SENSOR("info.novatec.inspectit.agent.sensor.method.http.HttpSensor", InspectITImages.IMG_HTTP),
 	/** The Http timer sensor type. */
 	TAGGED_HTTP_TIMER_SENSOR("info.novatec.inspectit.agent.sensor.method.http.HttpSensor", InspectITImages.IMG_HTTP),
-
+	/** The charting Http timer sensor type. */
+	CHARTING_HTTP_TIMER_SENSOR("info.novatec.inspectit.agent.sensor.method.http.ChartingHttpSensor", InspectITImages.IMG_HTTP),
 	/** The classloading information sensor type. */
 	CLASSLOADING_INFORMATION("info.novatec.inspectit.agent.sensor.platform.ClassLoadingInformation", InspectITImages.IMG_CLASS_OVERVIEW),
 	/** The compilation information sensor type. */

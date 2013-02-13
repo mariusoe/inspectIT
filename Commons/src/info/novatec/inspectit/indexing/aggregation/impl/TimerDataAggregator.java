@@ -35,6 +35,7 @@ public class TimerDataAggregator implements IAggregator<TimerData>, Serializable
 		clone.setPlatformIdent(timerData.getPlatformIdent());
 		clone.setSensorTypeIdent(timerData.getSensorTypeIdent());
 		clone.setMethodIdent(timerData.getMethodIdent());
+		clone.setCharting(timerData.isCharting());
 		return clone;
 	}
 
