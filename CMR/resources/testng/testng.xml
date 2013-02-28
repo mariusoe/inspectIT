@@ -57,6 +57,7 @@
 			<class name="info.novatec.inspectit.storage.nio.ChannelManagersTest" />
 			<class name="info.novatec.inspectit.storage.nio.ByteBufferProviderTest" />
 			<class name="info.novatec.inspectit.storage.nio.stream.ExtendedByteBufferOutputStreamTest" />
+			<class name="info.novatec.inspectit.storage.nio.CompletionHandlersTest" />
 		</classes>
 	</test>
 	<test name="Storage Processors Test">

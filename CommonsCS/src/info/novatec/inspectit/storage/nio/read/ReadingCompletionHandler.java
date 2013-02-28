@@ -1,6 +1,5 @@
 package info.novatec.inspectit.storage.nio.read;
 
-import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.nio.WriteReadAttachment;
 import info.novatec.inspectit.storage.nio.WriteReadCompletionRunnable;
 
@@ -8,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Completion handler for asynchronous reading.
@@ -18,10 +18,9 @@ import org.apache.commons.logging.Log;
 public class ReadingCompletionHandler implements CompletionHandler<Integer, WriteReadAttachment> {
 
 	/**
-	 * The log of this class.
+	 * The log of this class. Can not be assigned via spring because this is not a component.
 	 */
-	@Logger
-	Log log;
+	private static final Log LOG = LogFactory.getLog(ReadingCompletionHandler.class);
 
 	/**
 	 * {@inheritDoc}
@@ -66,7 +65,7 @@ public class ReadingCompletionHandler implements CompletionHandler<Integer, Writ
 	 * {@inheritDoc}
 	 */
 	public void failed(Throwable exc, WriteReadAttachment attachment) {
-		log.error("Write to the disk failed.", exc);
+		LOG.error("Write to the disk failed.", exc);
 		WriteReadCompletionRunnable completionRunnable = attachment.getCompletionRunnable();
 		if (null != completionRunnable) {
 			completionRunnable.markFailed();
