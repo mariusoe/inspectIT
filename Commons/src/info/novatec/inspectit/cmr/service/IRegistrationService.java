@@ -5,6 +5,7 @@ import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The registration service is used and called by all inspectIT Agents. First, they have to call the
@@ -94,11 +95,13 @@ public interface IRegistrationService extends Remote {
 	 *            The unique identifier of the platform.
 	 * @param fullyQualifiedClassName
 	 *            The fully qualified class name of the sensor type.
+	 * @param parameters
+	 *            Map of parameters that sensor was assigned.
 	 * @return Returns the unique method sensor type identifier.
 	 * @throws RemoteException
 	 *             If a remote exception occurs somewhere.
 	 */
-	long registerMethodSensorTypeIdent(long platformIdent, String fullyQualifiedClassName) throws RemoteException;
+	long registerMethodSensorTypeIdent(long platformIdent, String fullyQualifiedClassName, Map<String, Object> parameters) throws RemoteException;
 
 	/**
 	 * This method is used to map a registered method sensor type to a registered method.

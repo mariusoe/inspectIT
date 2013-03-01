@@ -35,8 +35,11 @@ import java.rmi.RemoteException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.logging.LogFactory;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -509,7 +512,7 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 			}
 		}).when(methodSensorTypeIdentDao).saveOrUpdate((MethodSensorTypeIdent) anyObject());
 
-		long registeredId = registrationService.registerMethodSensorTypeIdent(platformId, fqcName);
+		long registeredId = registrationService.registerMethodSensorTypeIdent(platformId, fqcName, Collections.<String, Object> emptyMap());
 		assertThat(registeredId, is(equalTo(methodSensorId)));
 
 		ArgumentCaptor<MethodSensorTypeIdent> methodSensorArgument = ArgumentCaptor.forClass(MethodSensorTypeIdent.class);
@@ -518,6 +521,44 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 
 		verify(platformIdentDao, times(1)).saveOrUpdate(platformIdent);
 		assertThat(methodSensorArgument.getValue(), is(equalTo(platformIdent.getSensorTypeIdents().toArray()[0])));
+	}
+
+	/**
+	 * Test that the registration of the {@link MethodSensorTypeIdent} will be correct if properties
+	 * are provided.
+	 * 
+	 * @throws RemoteException
+	 *             If {@link RemoteException} occurs.
+	 */
+	@SuppressWarnings("unchecked")
+	@Test
+	public void registerMethodSensorTypeWithSettings() throws RemoteException {
+		final long methodSensorId = 30;
+		long platformId = 1;
+		String fqcName = "class";
+		String regEx = "myRegEx";
+		String regExTemplate = "myRegExTemplate";
+
+		Map<String, Object> settings = MapUtils.putAll(new HashMap<String, Object>(), new String[][] { { "regEx", regEx }, { "regExTemplate", regExTemplate } });
+
+		PlatformIdent platformIdent = new PlatformIdent();
+		when(platformIdentDao.load(platformId)).thenReturn(platformIdent);
+		when(methodSensorTypeIdentDao.findByExample((MethodSensorTypeIdent) anyObject())).thenReturn(Collections.<MethodSensorTypeIdent> emptyList());
+		Mockito.doAnswer(new Answer<Object>() {
+			@Override
+			public Object answer(InvocationOnMock invocation) throws Throwable {
+				MethodSensorTypeIdent methodSensorIdent = (MethodSensorTypeIdent) invocation.getArguments()[0];
+				methodSensorIdent.setId(Long.valueOf(methodSensorId));
+				return null;
+			}
+		}).when(methodSensorTypeIdentDao).saveOrUpdate((MethodSensorTypeIdent) anyObject());
+
+		long registeredId = registrationService.registerMethodSensorTypeIdent(platformId, fqcName, settings);
+		assertThat(registeredId, is(equalTo(methodSensorId)));
+
+		ArgumentCaptor<MethodSensorTypeIdent> methodSensorArgument = ArgumentCaptor.forClass(MethodSensorTypeIdent.class);
+		verify(methodSensorTypeIdentDao, times(1)).saveOrUpdate(methodSensorArgument.capture());
+		assertThat(methodSensorArgument.getValue().getSettings(), is(settings));
 	}
 
 	/**
@@ -609,4 +650,5 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		assertThat(argument.getValue().getId(), is(equalTo(1L)));
 		assertThat(argument.getValue().getTimestamp().getTime(), is(greaterThan(timestamp.getTime())));
 	}
+
 }

@@ -1,6 +1,7 @@
 package info.novatec.inspectit.cmr.model;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -23,6 +24,11 @@ public class MethodSensorTypeIdent extends SensorTypeIdent {
 	private Set<MethodIdentToSensorType> methodIdentToSensorTypes = new HashSet<MethodIdentToSensorType>(0);
 
 	/**
+	 * Settings of the sensor on the agent.
+	 */
+	private Map<String, Object> settings;
+
+	/**
 	 * Gets {@link #methodIdentToSensorTypes}.
 	 * 
 	 * @return {@link #methodIdentToSensorTypes}
@@ -39,6 +45,25 @@ public class MethodSensorTypeIdent extends SensorTypeIdent {
 	 */
 	public void setMethodIdentToSensorTypes(Set<MethodIdentToSensorType> methodIdentToSensorTypes) {
 		this.methodIdentToSensorTypes = methodIdentToSensorTypes;
+	}
+
+	/**
+	 * Gets {@link #settings}.
+	 * 
+	 * @return {@link #settings}
+	 */
+	public Map<String, Object> getSettings() {
+		return settings;
+	}
+
+	/**
+	 * Sets {@link #settings}.
+	 * 
+	 * @param settings
+	 *            New value for {@link #settings}
+	 */
+	public void setSettings(Map<String, Object> settings) {
+		this.settings = settings;
 	}
 
 }

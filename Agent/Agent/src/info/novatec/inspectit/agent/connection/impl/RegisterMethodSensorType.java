@@ -7,10 +7,12 @@ import info.novatec.inspectit.cmr.service.IRegistrationService;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Map;
 
 /**
  * Class which encapsulates the request to the {@link Remote} object {@link IRegistrationService}.
- * The method to call is {@link IRegistrationService#registerMethodSensorTypeIdent(long, String)}
+ * The method to call is
+ * {@link IRegistrationService#registerMethodSensorTypeIdent(long, String, Map)}
  * 
  * @author Patrice Bouillet
  * 
@@ -61,6 +63,6 @@ public class RegisterMethodSensorType extends AbstractRemoteMethodCall {
 	protected Object performRemoteCall(Remote remoteObject) throws RemoteException {
 		IRegistrationService reg = (IRegistrationService) remoteObject;
 
-		return Long.valueOf(reg.registerMethodSensorTypeIdent(platformId, methodSensorTypeConfig.getClassName()));
+		return Long.valueOf(reg.registerMethodSensorTypeIdent(platformId, methodSensorTypeConfig.getClassName(), methodSensorTypeConfig.getParameters()));
 	}
 }

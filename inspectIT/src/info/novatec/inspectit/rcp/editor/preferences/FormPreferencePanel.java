@@ -267,6 +267,10 @@ public class FormPreferencePanel implements IPreferencePanel {
 			toolBarManager.add(new SwitchHttpCategorizationRequestMethod("Include Request Method in Categorization"));
 		}
 
+		if (preferenceSet.contains(PreferenceId.HTTP_URI_TRANSFORMING)) {
+			toolBarManager.add(new SwitchHttpUriTransformation("Apply sensor regular expression on URI"));
+		}
+
 		if (preferenceSet.contains(PreferenceId.INVOCATION_SUBVIEW_MODE)) {
 			toolBarManager.add(new SwitchInvocationSubviewMode("Switch the tabbed views mode from/to aggregated/raw"));
 		}
@@ -858,6 +862,41 @@ public class FormPreferencePanel implements IPreferencePanel {
 			Map<IPreferenceGroup, Object> httpCategoriation = new HashMap<IPreferenceGroup, Object>();
 			httpCategoriation.put(PreferenceId.HttpAggregationRequestMethod.BUTTON_HTTP_AGGREGATION_REQUESTMETHOD_ID, this.isChecked());
 			event.setPreferenceMap(httpCategoriation);
+			fireEvent(event);
+
+			// perform a refresh
+			update();
+		}
+	}
+
+	/**
+	 * Option to active Http URI transformation with regular expression.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private final class SwitchHttpUriTransformation extends Action {
+
+		/**
+		 * Default Constructor.
+		 * 
+		 * @param text
+		 *            the action's text, or <code>null</code> if there is no text
+		 */
+		public SwitchHttpUriTransformation(String text) {
+			super(text, AS_CHECK_BOX);
+			setImageDescriptor(InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_APPLICATIONS));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void run() {
+			PreferenceEvent event = new PreferenceEvent(PreferenceId.HTTP_URI_TRANSFORMING);
+			Map<IPreferenceGroup, Object> preferenceMap = new HashMap<IPreferenceGroup, Object>();
+			preferenceMap.put(PreferenceId.HttpUriTransformation.URI_TRANSFORMATION_ACTIVE, this.isChecked());
+			event.setPreferenceMap(preferenceMap);
 			fireEvent(event);
 
 			// perform a refresh

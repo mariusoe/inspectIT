@@ -1,8 +1,6 @@
 package info.novatec.inspectit.cmr.model;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * The Sensor Type Ident class is the abstract base class for the {@link MethodSensorTypeIdent} and
@@ -26,33 +24,66 @@ public abstract class SensorTypeIdent implements Serializable {
 	/**
 	 * The many-to-many association to the {@link PlatformIdent} objects.
 	 */
-	private Set<PlatformIdent> platformIdents = new HashSet<PlatformIdent>(0);
+	private PlatformIdent platformIdent;
 
 	/**
 	 * The fully qualified class name of the sensor type.
 	 */
 	private String fullyQualifiedClassName;
 
-	public Set<PlatformIdent> getPlatformIdents() {
-		return platformIdents;
-	}
-
-	public void setPlatformIdents(Set<PlatformIdent> platformIdents) {
-		this.platformIdents = platformIdents;
-	}
-
+	/**
+	 * Gets {@link #id}.
+	 * 
+	 * @return {@link #id}
+	 */
 	public Long getId() {
 		return id;
 	}
 
+	/**
+	 * Sets {@link #id}.
+	 * 
+	 * @param id
+	 *            New value for {@link #id}
+	 */
 	public void setId(Long id) {
 		this.id = id;
 	}
 
+	/**
+	 * Gets {@link #platformIdent}.
+	 * 
+	 * @return {@link #platformIdent}
+	 */
+	public PlatformIdent getPlatformIdent() {
+		return platformIdent;
+	}
+
+	/**
+	 * Sets {@link #platformIdent}.
+	 * 
+	 * @param platformIdent
+	 *            New value for {@link #platformIdent}
+	 */
+	public void setPlatformIdent(PlatformIdent platformIdent) {
+		this.platformIdent = platformIdent;
+	}
+
+	/**
+	 * Gets {@link #fullyQualifiedClassName}.
+	 * 
+	 * @return {@link #fullyQualifiedClassName}
+	 */
 	public String getFullyQualifiedClassName() {
 		return fullyQualifiedClassName;
 	}
 
+	/**
+	 * Sets {@link #fullyQualifiedClassName}.
+	 * 
+	 * @param fullyQualifiedClassName
+	 *            New value for {@link #fullyQualifiedClassName}
+	 */
 	public void setFullyQualifiedClassName(String fullyQualifiedClassName) {
 		this.fullyQualifiedClassName = fullyQualifiedClassName;
 	}

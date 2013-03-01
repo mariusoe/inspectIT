@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -228,11 +229,12 @@ public class RegistrationService implements IRegistrationService {
 	 */
 	@Transactional
 	@MethodLog
-	public long registerMethodSensorTypeIdent(long platformId, String fullyQualifiedClassName) throws RemoteException {
+	public long registerMethodSensorTypeIdent(long platformId, String fullyQualifiedClassName, Map<String, Object> parameters) throws RemoteException {
 		PlatformIdent platformIdent = platformIdentDao.load(platformId);
 
 		MethodSensorTypeIdent methodSensorTypeIdent = new MethodSensorTypeIdent();
 		methodSensorTypeIdent.setFullyQualifiedClassName(fullyQualifiedClassName);
+		methodSensorTypeIdent.setPlatformIdent(platformIdent);
 
 		List<MethodSensorTypeIdent> methodSensorTypeIdents = methodSensorTypeIdentDao.findByExample(methodSensorTypeIdent);
 		if (1 == methodSensorTypeIdents.size()) {
@@ -241,6 +243,8 @@ public class RegistrationService implements IRegistrationService {
 
 		Set<SensorTypeIdent> sensorTypeIdents = platformIdent.getSensorTypeIdents();
 		sensorTypeIdents.add(methodSensorTypeIdent);
+
+		methodSensorTypeIdent.setSettings(parameters);
 
 		methodSensorTypeIdentDao.saveOrUpdate(methodSensorTypeIdent);
 		platformIdentDao.saveOrUpdate(platformIdent);
@@ -277,6 +281,7 @@ public class RegistrationService implements IRegistrationService {
 
 		PlatformSensorTypeIdent platformSensorTypeIdent = new PlatformSensorTypeIdent();
 		platformSensorTypeIdent.setFullyQualifiedClassName(fullyQualifiedClassName);
+		platformSensorTypeIdent.setPlatformIdent(platformIdent);
 
 		List<PlatformSensorTypeIdent> platformSensorTypeIdents = platformSensorTypeIdentDao.findByExample(platformSensorTypeIdent);
 		if (1 == platformSensorTypeIdents.size()) {

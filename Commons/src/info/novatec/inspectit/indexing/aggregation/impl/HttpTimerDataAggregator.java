@@ -28,7 +28,7 @@ public class HttpTimerDataAggregator implements IAggregator<HttpTimerData>, Seri
 	/**
 	 * Should request method be included in aggregation.
 	 */
-	private boolean includeRequestMethod;
+	protected boolean includeRequestMethod;
 
 	/**
 	 * No-arg constructor.

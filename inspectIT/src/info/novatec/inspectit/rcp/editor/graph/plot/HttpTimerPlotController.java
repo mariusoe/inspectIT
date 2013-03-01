@@ -1,6 +1,8 @@
 package info.novatec.inspectit.rcp.editor.graph.plot;
 
+import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
+import info.novatec.inspectit.communcation.data.RegExAggregatedHttpTimerData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.indexing.aggregation.IAggregator;
 import info.novatec.inspectit.indexing.aggregation.impl.HttpTimerDataAggregator;
@@ -37,6 +39,11 @@ public class HttpTimerPlotController extends AbstractTimerDataPlotController<Htt
 	private boolean plotByTagValue = false;
 
 	/**
+	 * If true than regular expression transformation will be performed on the template URIs.
+	 */
+	private boolean regExTransformation = false;
+
+	/**
 	 * {@link IHttpTimerDataAccessService}.
 	 */
 	private IHttpTimerDataAccessService dataAccessService;
@@ -67,6 +74,11 @@ public class HttpTimerPlotController extends AbstractTimerDataPlotController<Htt
 	Date latestDataDate = new Date(0);
 
 	/**
+	 * HTTP sensor type ident.
+	 */
+	private MethodSensorTypeIdent httpSensorTypeIdent;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -77,10 +89,15 @@ public class HttpTimerPlotController extends AbstractTimerDataPlotController<Htt
 			HttpChartingInputDefinitionExtra inputDefinitionExtra = inputDefinition.getInputDefinitionExtra(InputDefinitionExtrasMarkerFactory.HTTP_CHARTING_EXTRAS_MARKER);
 			templates = inputDefinitionExtra.getTemplates();
 			plotByTagValue = inputDefinitionExtra.isPlotByTagValue();
+			regExTransformation = inputDefinitionExtra.isRegExTransformation();
 		}
 
 		aggregator = new HttpTimerDataAggregator(true, !plotByTagValue);
 		dataAccessService = inputDefinition.getRepositoryDefinition().getHttpTimerDataAccessService();
+
+		if (0 != inputDefinition.getIdDefinition().getSensorTypeId()) {
+			httpSensorTypeIdent = (MethodSensorTypeIdent) inputDefinition.getRepositoryDefinition().getCachedDataService().getSensorTypeIdentForId(inputDefinition.getIdDefinition().getSensorTypeId());
+		}
 	}
 
 	/**
@@ -166,6 +183,8 @@ public class HttpTimerPlotController extends AbstractTimerDataPlotController<Htt
 	protected Comparable<?> getSeriesKey(HttpTimerData httpTimerData) {
 		if (plotByTagValue) {
 			return "Tag: " + httpTimerData.getInspectItTaggingHeaderValue();
+		} else if (regExTransformation) {
+			return "Transformed URI: " + RegExAggregatedHttpTimerData.getTransformedUri(httpTimerData, httpSensorTypeIdent);
 		} else {
 			return "URI: " + httpTimerData.getUri();
 		}

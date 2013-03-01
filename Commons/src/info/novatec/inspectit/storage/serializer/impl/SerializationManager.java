@@ -244,7 +244,7 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(MethodIdent.class, new CustomCompatibleFieldSerializer<MethodIdent>(kryo, MethodIdent.class, schemaManager));
 		kryo.register(SensorTypeIdent.class, new CustomCompatibleFieldSerializer<SensorTypeIdent>(kryo, SensorTypeIdent.class, schemaManager));
 		kryo.register(MethodSensorTypeIdent.class, new CustomCompatibleFieldSerializer<MethodSensorTypeIdent>(kryo, MethodSensorTypeIdent.class, schemaManager));
-		kryo.register(PlatformSensorTypeIdent.class, new FieldSerializer<PlatformSensorTypeIdent>(kryo, PlatformSensorTypeIdent.class));
+		kryo.register(PlatformSensorTypeIdent.class, new CustomCompatibleFieldSerializer<PlatformSensorTypeIdent>(kryo, PlatformSensorTypeIdent.class, schemaManager, true));
 		/** Common data classes */
 		kryo.register(MutableInt.class, new FieldSerializer<MutableInt>(kryo, MutableInt.class));
 		kryo.register(InvocationSequenceData.class, new InvocationSequenceCustomCompatibleFieldSerializer(kryo, InvocationSequenceData.class, schemaManager));

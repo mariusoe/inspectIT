@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.formatter;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
+import info.novatec.inspectit.communcation.data.RegExAggregatedHttpTimerData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationAwareData;
@@ -194,6 +195,8 @@ public final class TextFormatter {
 		if (invAwareData instanceof SqlStatementData) {
 			SqlStatementData sqlData = (SqlStatementData) invAwareData;
 			return "SQL: " + sqlData.getSql();
+		} else if (invAwareData instanceof RegExAggregatedHttpTimerData) {
+			return "transformed URI: " + ((RegExAggregatedHttpTimerData) invAwareData).getTransformedUri();
 		} else if (invAwareData instanceof HttpTimerData) {
 			HttpTimerData timerData = (HttpTimerData) invAwareData;
 			// Print either URI or Usecase (tagged value) depending on the situation (which is

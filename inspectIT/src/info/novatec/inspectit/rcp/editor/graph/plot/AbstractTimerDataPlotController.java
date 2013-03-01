@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -205,12 +206,16 @@ public abstract class AbstractTimerDataPlotController<E extends TimerData> exten
 	 * @return An instance of {@link XYPlot}.
 	 */
 	private XYPlot initializeDurationPlot() {
+		Set<Comparable<?>> keys = new HashSet<>();
 		durationSeries = new ArrayList<YIntervalSeriesImproved>();
 		YIntervalSeriesCollection yintervalseriescollection = new YIntervalSeriesCollection();
 		for (E template : getTemplates()) {
-			YIntervalSeriesImproved yIntervalSeries = new YIntervalSeriesImproved(getSeriesKey(template));
-			yintervalseriescollection.addSeries(yIntervalSeries);
-			durationSeries.add(yIntervalSeries);
+			Comparable<?> seriesKey = getSeriesKey(template);
+			if (keys.add(seriesKey)) {
+				YIntervalSeriesImproved yIntervalSeries = new YIntervalSeriesImproved(seriesKey);
+				yintervalseriescollection.addSeries(yIntervalSeries);
+				durationSeries.add(yIntervalSeries);
+			}
 		}
 
 		DeviationRenderer renderer = new DeviationRenderer(true, false);
@@ -245,12 +250,16 @@ public abstract class AbstractTimerDataPlotController<E extends TimerData> exten
 	 * @return An instance of {@link XYPlot}
 	 */
 	private XYPlot initializeCountPlot() {
+		Set<Comparable<?>> keys = new HashSet<>();
 		countSeries = new ArrayList<TimeSeries>();
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
 		for (E template : getTemplates()) {
-			TimeSeries timeSeries = new TimeSeries(getSeriesKey(template));
-			countSeries.add(timeSeries);
-			dataset.addSeries(timeSeries);
+			Comparable<?> seriesKey = getSeriesKey(template);
+			if (keys.add(seriesKey)) {
+				TimeSeries timeSeries = new TimeSeries(seriesKey);
+				countSeries.add(timeSeries);
+				dataset.addSeries(timeSeries);
+			}
 		}
 
 		// ISE: No idea why we have 30 here, used same value as in other charts

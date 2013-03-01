@@ -6,6 +6,9 @@ import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Example;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -80,7 +83,13 @@ public class PlatformSensorTypeIdentDaoImpl extends HibernateDaoSupport implemen
 	 */
 	@SuppressWarnings("unchecked")
 	public List<PlatformSensorTypeIdent> findByExample(PlatformSensorTypeIdent platformSensorTypeIdent) {
-		return getHibernateTemplate().findByExample(platformSensorTypeIdent);
+		DetachedCriteria detachedCriteria = DetachedCriteria.forClass(platformSensorTypeIdent.getClass());
+		detachedCriteria.add(Example.create(platformSensorTypeIdent));
+		if (null != platformSensorTypeIdent.getPlatformIdent()) {
+			detachedCriteria.add(Restrictions.eq("platformIdent", platformSensorTypeIdent.getPlatformIdent()));
+		}
+		detachedCriteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
+		return getHibernateTemplate().findByCriteria(detachedCriteria);
 	}
 
 }

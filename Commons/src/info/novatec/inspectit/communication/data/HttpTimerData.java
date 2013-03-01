@@ -115,6 +115,15 @@ public class HttpTimerData extends TimerData {
 		}
 	}
 
+	/**
+	 * Returns if the URI is defined for this instance.
+	 * 
+	 * @return True if {@link #uri} is not null and is different from {@value #UNDEFINED}.
+	 */
+	public boolean isUriDefined() {
+		return uri != null && !UNDEFINED.equals(uri);
+	}
+
 	public Map<String, String[]> getParameters() {
 		return parameters;
 	}

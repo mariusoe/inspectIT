@@ -1,6 +1,10 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
+import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
+import info.novatec.inspectit.cmr.model.MethodSensorTypeIdentHelper;
 import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.communcation.data.RegExAggregatedHttpTimerData;
+import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.comparator.HttpTimerDataComparatorEnum;
 import info.novatec.inspectit.communication.comparator.IDataComparator;
 import info.novatec.inspectit.communication.comparator.InvocationAwareDataComparatorEnum;
@@ -8,8 +12,13 @@ import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.communication.comparator.TimerDataComparatorEnum;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.TimerData;
+import info.novatec.inspectit.indexing.aggregation.impl.AggregationPerformer;
+import info.novatec.inspectit.indexing.aggregation.impl.HttpTimerDataAggregator;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
@@ -18,6 +27,9 @@ import info.novatec.inspectit.rcp.formatter.TextFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -128,22 +140,99 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 	}
 
 	/**
+	 * Defines if correct regular expression is defined in sensor.
+	 */
+	private boolean regExEnabledInSensor = false;
+
+	/**
+	 * If the regular expression transformation of the URI is active.
+	 */
+	private boolean regExActive = PreferenceId.HttpUriTransformation.DEFAULT;
+
+	/**
+	 * The active HTTP sensor type ident.
+	 */
+	private MethodSensorTypeIdent httpSensorTypeIdent;
+
+	/**
+	 * Cached data service.
+	 */
+	private CachedDataService cachedDataService;
+
+	@Override
+	public void setInputDefinition(InputDefinition inputDefinition) {
+		super.setInputDefinition(inputDefinition);
+
+		cachedDataService = inputDefinition.getRepositoryDefinition().getCachedDataService();
+
+		if (0 != inputDefinition.getIdDefinition().getSensorTypeId()) {
+			httpSensorTypeIdent = (MethodSensorTypeIdent) cachedDataService.getSensorTypeIdentForId(inputDefinition.getIdDefinition().getSensorTypeId());
+			String regEx = MethodSensorTypeIdentHelper.getRegEx(httpSensorTypeIdent);
+			if (null != regEx) {
+				try {
+					Pattern.compile(regEx);
+					regExEnabledInSensor = true;
+				} catch (PatternSyntaxException e) {
+					InspectIT.getDefault().createInfoDialog(
+							"The HTTP sensor defines the Regular expression " + regEx
+									+ " for URI transformation that can not be compiled. The transformation option will not be available.\n\n Reason: " + e.getMessage(), -1);
+				}
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<PreferenceId> getPreferenceIds() {
+		Set<PreferenceId> preferences = super.getPreferenceIds();
+		if (regExEnabledInSensor) {
+			preferences.add(PreferenceId.HTTP_URI_TRANSFORMING);
+		}
+		return preferences;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
+		super.preferenceEventFired(preferenceEvent);
+		switch (preferenceEvent.getPreferenceId()) {
+		case HTTP_URI_TRANSFORMING:
+			if (preferenceEvent.getPreferenceMap().containsKey(PreferenceId.HttpUriTransformation.URI_TRANSFORMATION_ACTIVE)) {
+				regExActive = (Boolean) preferenceEvent.getPreferenceMap().get(PreferenceId.HttpUriTransformation.URI_TRANSFORMATION_ACTIVE);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void doRefresh(IProgressMonitor monitor, IRootEditor rootEditor) {
 		monitor.beginTask("Getting HTTP timer data information", IProgressMonitor.UNKNOWN);
-		List<HttpTimerData> aggregatedTimerData;
+		List<HttpTimerData> aggregatedHttpData;
 
 		if (autoUpdate) {
-			aggregatedTimerData = httptimerDataAccessService.getAggregatedTimerData(template, httpCatorizationOnRequestMethodActive);
+			aggregatedHttpData = httptimerDataAccessService.getAggregatedTimerData(template, httpCatorizationOnRequestMethodActive);
 		} else {
-			aggregatedTimerData = httptimerDataAccessService.getAggregatedTimerData(template, httpCatorizationOnRequestMethodActive, fromDate, toDate);
+			aggregatedHttpData = httptimerDataAccessService.getAggregatedTimerData(template, httpCatorizationOnRequestMethodActive, fromDate, toDate);
+		}
+
+		if (regExActive && CollectionUtils.isNotEmpty(aggregatedHttpData)) {
+			AggregationPerformer<HttpTimerData> aggregationPerformer = new AggregationPerformer<HttpTimerData>(new RegExHttpAggregator(httpSensorTypeIdent, httpCatorizationOnRequestMethodActive));
+			aggregationPerformer.processCollection(aggregatedHttpData);
+			aggregatedHttpData = aggregationPerformer.getResultList();
 		}
 
 		timerDataList.clear();
-		if (CollectionUtils.isNotEmpty(aggregatedTimerData)) {
-			timerDataList.addAll(aggregatedTimerData);
+		if (CollectionUtils.isNotEmpty(aggregatedHttpData)) {
+			timerDataList.addAll(aggregatedHttpData);
 		}
 
 		monitor.done();
@@ -220,7 +309,12 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 		CachedDataService cachedDataService = getInputDefinition().getRepositoryDefinition().getCachedDataService();
 		TableViewerComparator<HttpTimerData> httpTimerDataViewerComparator = new TableViewerComparator<HttpTimerData>();
 		for (Column column : Column.values()) {
-			ResultComparator<HttpTimerData> resultComparator = new ResultComparator<HttpTimerData>(column.dataComparator, cachedDataService);
+			ResultComparator<HttpTimerData> resultComparator;
+			if (Column.URI.equals(column)) {
+				resultComparator = new ResultComparator<HttpTimerData>(new UriOrRegExComparator(column.dataComparator), cachedDataService);
+			} else {
+				resultComparator = new ResultComparator<HttpTimerData>(column.dataComparator, cachedDataService);
+			}
 			httpTimerDataViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), resultComparator);
 		}
 
@@ -273,7 +367,11 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 	private StyledString getStyledTextForColumn(HttpTimerData data, Column enumId) {
 		switch (enumId) {
 		case URI:
-			return new StyledString(data.getUri());
+			if (data instanceof RegExAggregatedHttpTimerData) {
+				return new StyledString(((RegExAggregatedHttpTimerData) data).getTransformedUri());
+			} else {
+				return new StyledString(data.getUri());
+			}
 		case HTTP_METHOD:
 			return new StyledString(data.getRequestMethod());
 		case INVOCATION_AFFILLIATION:
@@ -360,6 +458,110 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 		default:
 			return new StyledString("error");
 		}
+	}
+
+	/**
+	 * The RegEx aggregator.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	@SuppressWarnings("serial")
+	private static final class RegExHttpAggregator extends HttpTimerDataAggregator {
+
+		/**
+		 * HTTP sensor type ident.
+		 */
+		private MethodSensorTypeIdent httpSensorTypeIdent;
+
+		/**
+		 * Default constructor.
+		 * 
+		 * @param httpSensorTypeIdent
+		 *            HTTP sensor type ident.
+		 * @param includeRequestMethod
+		 *            If request method should be included.
+		 */
+		public RegExHttpAggregator(MethodSensorTypeIdent httpSensorTypeIdent, boolean includeRequestMethod) {
+			super(true, includeRequestMethod);
+			this.httpSensorTypeIdent = httpSensorTypeIdent;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void aggregate(IAggregatedData<HttpTimerData> aggregatedObject, HttpTimerData objectToAdd) {
+			super.aggregate(aggregatedObject, objectToAdd);
+			((RegExAggregatedHttpTimerData) aggregatedObject).getAggregatedDataList().add(objectToAdd);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IAggregatedData<HttpTimerData> getClone(HttpTimerData httpData) {
+			RegExAggregatedHttpTimerData clone = new RegExAggregatedHttpTimerData();
+			clone.setPlatformIdent(httpData.getPlatformIdent());
+			clone.setSensorTypeIdent(httpData.getSensorTypeIdent());
+			clone.setMethodIdent(httpData.getMethodIdent());
+			clone.setCharting(httpData.isCharting());
+			clone.setRequestMethod(httpData.getRequestMethod());
+			clone.setTransformedUri(RegExAggregatedHttpTimerData.getTransformedUri(httpData, httpSensorTypeIdent));
+			return clone;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Object getAggregationKey(HttpTimerData httpData) {
+			final int prime = 31;
+			int result = 0;
+			String transformed = RegExAggregatedHttpTimerData.getTransformedUri(httpData, httpSensorTypeIdent);
+			result = prime * result + ((transformed == null) ? 0 : transformed.hashCode());
+
+			if (includeRequestMethod) {
+				result = prime * result + ((httpData.getRequestMethod() == null) ? 0 : httpData.getRequestMethod().hashCode());
+			}
+			return result;
+		}
+
+	}
+
+	/**
+	 * Comparator that is needed for the column where URI or regular expression transformation can
+	 * be displayed.
+	 * 
+	 * @author Ivan Senic
+	 */
+	private static final class UriOrRegExComparator implements IDataComparator<HttpTimerData> {
+
+		/**
+		 * The comparator that will be used if reg ex is not active.
+		 */
+		private final IDataComparator<? super HttpTimerData> comparator;
+
+		/**
+		 * @param dataComparator
+		 *            The comparator that will be used if reg ex is not active.
+		 */
+		public UriOrRegExComparator(IDataComparator<? super HttpTimerData> dataComparator) {
+			this.comparator = dataComparator;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int compare(HttpTimerData o1, HttpTimerData o2, CachedDataService cachedDataService) {
+			if (o1 instanceof RegExAggregatedHttpTimerData && o2 instanceof RegExAggregatedHttpTimerData) {
+				return ((RegExAggregatedHttpTimerData) o1).getTransformedUri().compareToIgnoreCase(((RegExAggregatedHttpTimerData) o2).getTransformedUri());
+			} else {
+				return comparator.compare(o1, o2, cachedDataService);
+			}
+		}
+
 	}
 
 }

@@ -12,7 +12,7 @@ public enum PreferenceId {
 	/**
 	 * The identifiers of the different control groups.
 	 */
-	TIMELINE, SAMPLINGRATE, LIVEMODE, UPDATE, ITEMCOUNT, FILTERSENSORTYPE, INVOCFILTEREXCLUSIVETIME, INVOCFILTERTOTALTIME, CLEAR_BUFFER, STEPPABLE_CONTROL, TIME_RESOLUTION, HTTP_AGGREGATION_REQUESTMETHOD, INVOCATION_SUBVIEW_MODE;
+	TIMELINE, SAMPLINGRATE, LIVEMODE, UPDATE, ITEMCOUNT, FILTERSENSORTYPE, INVOCFILTEREXCLUSIVETIME, INVOCFILTERTOTALTIME, CLEAR_BUFFER, STEPPABLE_CONTROL, TIME_RESOLUTION, HTTP_AGGREGATION_REQUESTMETHOD, HTTP_URI_TRANSFORMING, INVOCATION_SUBVIEW_MODE;
 
 	/**
 	 * Inner enumeration for TIMELINE.
@@ -148,6 +148,25 @@ public enum PreferenceId {
 		 * The identifier for the switch stepping control button.
 		 */
 		BUTTON_HTTP_AGGREGATION_REQUESTMETHOD_ID;
+	}
+
+	/**
+	 * Inner enumeration for HTTP_URI_TRANSFORMING.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	public enum HttpUriTransformation implements IPreferenceGroup {
+
+		/**
+		 * The identifier that defines if URI transformation is active.
+		 */
+		URI_TRANSFORMATION_ACTIVE;
+
+		/**
+		 * Defines if the live mode is active by default.
+		 */
+		public static final boolean DEFAULT = false;
 	}
 
 	/**

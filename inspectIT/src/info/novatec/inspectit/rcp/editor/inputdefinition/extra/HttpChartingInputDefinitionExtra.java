@@ -28,6 +28,11 @@ public class HttpChartingInputDefinitionExtra implements IInputDefinitionExtra {
 	boolean plotByTagValue;
 
 	/**
+	 * If regular expression transformation should be used.
+	 */
+	boolean regExTransformation;
+
+	/**
 	 * Gets {@link #templates}.
 	 * 
 	 * @return {@link #templates}
@@ -66,11 +71,30 @@ public class HttpChartingInputDefinitionExtra implements IInputDefinitionExtra {
 	}
 
 	/**
+	 * Gets {@link #regExTransformation}.
+	 * 
+	 * @return {@link #regExTransformation}
+	 */
+	public boolean isRegExTransformation() {
+		return regExTransformation;
+	}
+
+	/**
+	 * Sets {@link #regExTransformation}.
+	 * 
+	 * @param regExTransformation
+	 *            New value for {@link #regExTransformation}
+	 */
+	public void setRegExTransformation(boolean regExTransformation) {
+		this.regExTransformation = regExTransformation;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(templates, plotByTagValue);
+		return Objects.hashCode(templates, plotByTagValue, regExTransformation);
 	}
 
 	/**
@@ -88,7 +112,7 @@ public class HttpChartingInputDefinitionExtra implements IInputDefinitionExtra {
 			return false;
 		}
 		HttpChartingInputDefinitionExtra that = (HttpChartingInputDefinitionExtra) object;
-		return Objects.equal(this.templates, that.templates) && Objects.equal(this.plotByTagValue, that.plotByTagValue);
+		return Objects.equal(this.templates, that.templates) && Objects.equal(this.plotByTagValue, that.plotByTagValue) && Objects.equal(this.regExTransformation, that.regExTransformation);
 	}
 
 	/**
@@ -96,6 +120,6 @@ public class HttpChartingInputDefinitionExtra implements IInputDefinitionExtra {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this).add("templates", templates).add("plotByTagValue", plotByTagValue).toString();
+		return Objects.toStringHelper(this).add("templates", templates).add("plotByTagValue", plotByTagValue).add("regExTransformation", regExTransformation).toString().toString();
 	}
 }

@@ -12,6 +12,7 @@ import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.formatter.SensorTypeAvailabilityEnum;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
+import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -682,6 +683,12 @@ public class TreeModelManager {
 
 		IdDefinition idDefinition = new IdDefinition();
 		idDefinition.setPlatformId(platformIdent.getId());
+		for (SensorTypeIdent sensorTypeIdent : platformIdent.getSensorTypeIdents()) {
+			if (ObjectUtils.equals(sensorTypeIdent.getFullyQualifiedClassName(), SensorTypeEnum.HTTP_TIMER_SENSOR.getFqn())) {
+				idDefinition.setSensorTypeId(sensorTypeIdent.getId());
+				break;
+			}
+		}
 
 		inputDefinition.setIdDefinition(idDefinition);
 		urlAggregationView.setInputDefinition(inputDefinition);

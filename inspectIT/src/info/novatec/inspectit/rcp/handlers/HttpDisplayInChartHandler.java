@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.handlers;
 
+import info.novatec.inspectit.communcation.data.RegExAggregatedHttpTimerData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
@@ -50,10 +51,13 @@ public class HttpDisplayInChartHandler extends AbstractHandler implements IHandl
 		InputDefinition inputDefinition = null;
 
 		List<HttpTimerData> templates = new ArrayList<HttpTimerData>();
-
+		boolean regExTransformation = false;
 		for (Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 			Object selectedObject = iterator.next();
-			if (selectedObject instanceof HttpTimerData) {
+			if (selectedObject instanceof RegExAggregatedHttpTimerData) {
+				templates.addAll(((RegExAggregatedHttpTimerData) selectedObject).getAggregatedDataList());
+				regExTransformation = true;
+			} else if (selectedObject instanceof HttpTimerData) {
 				templates.add((HttpTimerData) selectedObject);
 			}
 		}
@@ -83,11 +87,13 @@ public class HttpDisplayInChartHandler extends AbstractHandler implements IHandl
 
 			IdDefinition idDefinition = new IdDefinition();
 			idDefinition.setPlatformId(templates.get(0).getPlatformIdent());
+			idDefinition.setSensorTypeId(templates.get(0).getSensorTypeIdent());
 			inputDefinition.setIdDefinition(idDefinition);
 
 			HttpChartingInputDefinitionExtra inputDefinitionExtra = new HttpChartingInputDefinitionExtra();
 			inputDefinitionExtra.setTemplates(templates);
 			inputDefinitionExtra.setPlotByTagValue(plotByTagValue);
+			inputDefinitionExtra.setRegExTransformation(regExTransformation);
 			inputDefinition.addInputDefinitonExtra(InputDefinitionExtrasMarkerFactory.HTTP_CHARTING_EXTRAS_MARKER, inputDefinitionExtra);
 
 			// open the view via command

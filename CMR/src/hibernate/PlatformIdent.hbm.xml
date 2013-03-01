@@ -9,9 +9,9 @@
 			<column name="time_stamp" />
 		</property>
 
-		<set name="sensorTypeIdents" table="platform_sensor_type" lazy="true">
+		<set name="sensorTypeIdents" lazy="true" cascade="all">
 			<key column="platform_id" />
-			<many-to-many column="sensor_type_id" class="SensorTypeIdent" />
+			<one-to-many  class="SensorTypeIdent" />
 		</set>
 		<set name="methodIdents" inverse="true" lazy="true" cascade="all">
 			<key column="platform_id" />
