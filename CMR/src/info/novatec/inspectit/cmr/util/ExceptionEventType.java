@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
+import org.hibernate.HibernateException;
 import org.hibernate.usertype.UserType;
 
 /**
@@ -51,7 +52,7 @@ public class ExceptionEventType implements UserType {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object nullSafeGet(ResultSet resultSet, String[] names, Object owner) throws SQLException {
+	public Object nullSafeGet(ResultSet resultSet, String[] names, Object owner) throws HibernateException, SQLException {
 		ExceptionEvent result = null;
 		int dbValue = resultSet.getInt(names[0]);
 		if (dbValue != -1) {
@@ -64,7 +65,7 @@ public class ExceptionEventType implements UserType {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void nullSafeSet(PreparedStatement statement, Object value, int index) throws SQLException {
+	public void nullSafeSet(PreparedStatement statement, Object value, int index) throws HibernateException, SQLException {
 		if (null == value) {
 			statement.setInt(index, -1);
 		} else {

@@ -8,7 +8,7 @@ import java.sql.Types;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hibernate.Hibernate;
+import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.usertype.UserType;
 
 /**
@@ -88,10 +88,9 @@ public class ListStringType implements UserType {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({ "deprecation" })
 	public Object nullSafeGet(ResultSet rs, String[] names, Object owner) throws SQLException {
-		// INSPECTIT-511
-		String dbValue = (String) Hibernate.STRING.nullSafeGet(rs, names[0]);
+		String dbValue = (String) StandardBasicTypes.STRING.nullSafeGet(rs, names[0]);
 
 		if (dbValue != null) {
 			return explode(dbValue);
@@ -115,15 +114,13 @@ public class ListStringType implements UserType {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({ "deprecation" })
 	public void nullSafeSet(PreparedStatement st, Object value, int index) throws SQLException {
 		if (value != null) {
 			String v = concat((List<?>) value);
-			// INSPECTIT-511
-			Hibernate.STRING.nullSafeSet(st, v, index);
+			StandardBasicTypes.STRING.nullSafeSet(st, v, index);
 		} else {
-			// INSPECTIT-511
-			Hibernate.STRING.nullSafeSet(st, null, index);
+			StandardBasicTypes.STRING.nullSafeSet(st, null, index);
 		}
 	}
 
