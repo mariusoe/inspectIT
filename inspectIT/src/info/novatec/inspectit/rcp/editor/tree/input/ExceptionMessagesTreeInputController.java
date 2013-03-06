@@ -83,6 +83,8 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 	private static enum Column {
 		/** The error message column. */
 		ERROR_MESSAGE("Error Message with Stack Trace", 450, InspectITImages.IMG_CLASS),
+		/** Invocation Affiliation. */
+		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION),
 		/** The CREATED column. */
 		CREATED("Created", 70, null),
 		/** The RETHROWN column. */
@@ -425,6 +427,16 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 				}
 			}
 			return styledString;
+		case INVOCATION_AFFILLIATION:
+			if (data instanceof AggregatedExceptionSensorData) {
+				int percentage = (int) (data.getInvocationAffiliationPercentage() * 100);
+				int invocations = 0;
+				if (null != data.getInvocationParentsIdSet()) {
+					invocations = data.getInvocationParentsIdSet().size();
+				}
+				return TextFormatter.getInvocationAffilliationPercentageString(percentage, invocations);
+			}
+			return new StyledString("");
 		case CREATED:
 			if (data instanceof AggregatedExceptionSensorData) {
 				if (((AggregatedExceptionSensorData) data).getCreated() >= 0) {

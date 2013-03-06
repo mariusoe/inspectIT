@@ -15,6 +15,7 @@ import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
+import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
@@ -73,7 +74,9 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 		/** The class column. */
 		CLASS("Class", 250, InspectITImages.IMG_CLASS),
 		/** The package column. */
-		PACKAGE("Package", 400, InspectITImages.IMG_PACKAGE);
+		PACKAGE("Package", 250, InspectITImages.IMG_PACKAGE),
+		/** Invocation Affiliation. */
+		INVOCATION_AFFILLIATION("In Invocations", 120, InspectITImages.IMG_INVOCATION);
 
 		/** The name. */
 		private String name;
@@ -408,6 +411,13 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 			return new StyledString(methodIdent.getClassName());
 		case TIMESTAMP:
 			return new StyledString(NumberFormatter.formatTime(data.getTimeStamp()));
+		case INVOCATION_AFFILLIATION:
+			int percentage = (int) (data.getInvocationAffiliationPercentage() * 100);
+			int invocations = 0;
+			if (null != data.getInvocationParentsIdSet()) {
+				invocations = data.getInvocationParentsIdSet().size();
+			}
+			return TextFormatter.getInvocationAffilliationPercentageString(percentage, invocations);
 		default:
 			return new StyledString("error");
 		}
