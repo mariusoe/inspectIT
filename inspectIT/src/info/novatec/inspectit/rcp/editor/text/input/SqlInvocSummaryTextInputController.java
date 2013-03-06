@@ -143,46 +143,26 @@ public class SqlInvocSummaryTextInputController extends AbstractTextInputControl
 		toolkit.createLabel(main, null).setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_DATABASE));
 
 		totalSql = new StyledText(main, SWT.READ_ONLY | SWT.WRAP);
-		totalSql.setText(TOTAL_SQLS);
 		totalSql.setToolTipText("Total amount of SQL Statements executed in the invocation");
 		totalSql.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		totalSqlStyle = new StyleRange();
-		totalSqlStyle.fontStyle = SWT.BOLD;
-		totalSqlStyle.length = TOTAL_SQLS.length();
-		totalSql.setStyleRange(totalSqlStyle);
 
 		toolkit.createLabel(main, null).setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_LAST_HOUR));
 
 		totalDuration = new StyledText(main, SWT.READ_ONLY | SWT.WRAP);
-		totalDuration.setText(TOTAL_DURATION);
 		totalDuration.setToolTipText("Duration sum of all SQL Statements executed in the invocation");
 		totalDuration.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		totalDurationStyle = new StyleRange();
-		totalDurationStyle.fontStyle = SWT.BOLD;
-		totalDurationStyle.length = TOTAL_DURATION.length();
-		totalDuration.setStyleRange(totalDurationStyle);
 
 		toolkit.createLabel(main, null).setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_INVOCATION));
 
 		percentageOfDuration = new StyledText(main, SWT.READ_ONLY | SWT.WRAP);
-		percentageOfDuration.setText(SQLS_DURATION_IN_INVOCATION);
 		percentageOfDuration.setToolTipText("Percentage of the time spent in the invocation on SQL Statements execution");
 		percentageOfDuration.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		percentageOfDurationStyle = new StyleRange();
-		percentageOfDurationStyle.fontStyle = SWT.BOLD;
-		percentageOfDurationStyle.length = SQLS_DURATION_IN_INVOCATION.length();
-		percentageOfDuration.setStyleRange(percentageOfDurationStyle);
 
 		toolkit.createLabel(main, null).setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_LIGHT_BULB_ON));
 
 		slowestCount = new StyledText(main, SWT.READ_ONLY | SWT.WRAP);
-		slowestCount.setText(SLOWEST_80_20);
 		slowestCount.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		slowestCount.setToolTipText("Amount of slowest SQL Statements that take 80%/20% time of total SQL execution duration");
-		slowestCountStyle = new StyleRange();
-		slowestCountStyle.fontStyle = SWT.BOLD;
-		slowestCountStyle.length = SLOWEST_80_20.length();
-		slowestCount.setStyleRange(slowestCountStyle);
 
 		// remove left and right margins from the parent
 		Layout parentLayout = parent.getLayout();
@@ -190,6 +170,8 @@ public class SqlInvocSummaryTextInputController extends AbstractTextInputControl
 			((GridLayout) parentLayout).marginWidth = 0;
 			((GridLayout) parentLayout).marginHeight = 0;
 		}
+
+		setDefaultText();
 	}
 
 	/**
@@ -198,11 +180,13 @@ public class SqlInvocSummaryTextInputController extends AbstractTextInputControl
 	@SuppressWarnings("unchecked")
 	@Override
 	public void setDataInput(List<? extends DefaultData> data) {
-		if (null != data && !data.isEmpty()) {
+		if (CollectionUtils.isNotEmpty(data)) {
 			DefaultData defaultData = data.get(0);
 			if (defaultData instanceof InvocationSequenceData) {
 				updateRepresentation((List<InvocationSequenceData>) data);
 			}
+		} else {
+			setDefaultText();
 		}
 	}
 
@@ -257,6 +241,35 @@ public class SqlInvocSummaryTextInputController extends AbstractTextInputControl
 		}
 
 		main.layout();
+	}
+
+	/**
+	 * Sets default text that has no informations displayed.
+	 */
+	private void setDefaultText() {
+		totalSql.setText(TOTAL_SQLS);
+		totalSqlStyle = new StyleRange();
+		totalSqlStyle.fontStyle = SWT.BOLD;
+		totalSqlStyle.length = TOTAL_SQLS.length();
+		totalSql.setStyleRange(totalSqlStyle);
+
+		totalDuration.setText(TOTAL_DURATION);
+		totalDurationStyle = new StyleRange();
+		totalDurationStyle.fontStyle = SWT.BOLD;
+		totalDurationStyle.length = TOTAL_DURATION.length();
+		totalDuration.setStyleRange(totalDurationStyle);
+
+		percentageOfDuration.setText(SQLS_DURATION_IN_INVOCATION);
+		percentageOfDurationStyle = new StyleRange();
+		percentageOfDurationStyle.fontStyle = SWT.BOLD;
+		percentageOfDurationStyle.length = SQLS_DURATION_IN_INVOCATION.length();
+		percentageOfDuration.setStyleRange(percentageOfDurationStyle);
+
+		slowestCount.setText(SLOWEST_80_20);
+		slowestCountStyle = new StyleRange();
+		slowestCountStyle.fontStyle = SWT.BOLD;
+		slowestCountStyle.length = SLOWEST_80_20.length();
+		slowestCount.setStyleRange(slowestCountStyle);
 	}
 
 	/**
