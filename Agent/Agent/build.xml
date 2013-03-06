@@ -44,10 +44,9 @@
 		<delete dir="${lib.root}/test" failonerror="false" />
 	</target>
 
-	<target name="init" description="--> Creates necessary folder structure">
+	<target name="init" description="--> Creates necessary folder structure" depends="init-ivy">
 		<mkdir dir="${build.root}" />
 		<mkdir dir="${release.root}" />
-		<antcall target="init-ivy" />
 
 		<!-- ivy properties used for the agent -->
 		<ivy:settings file="${ivy.settings.file}" />

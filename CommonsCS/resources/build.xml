@@ -16,9 +16,8 @@
 		<delete dir="${build.root}" />
 	</target>
 
-	<target name="init" description="--> Creates necessary folder structure">
+	<target name="init" description="--> Creates necessary folder structure" depends="init-ivy">
 		<mkdir dir="${build.root}" />
-		<antcall target="init-ivy" />
 
 		<ivy:settings file="${ivy.settings.file}" />
 		<ivy:resolve file="${ivy.file}" />

@@ -85,11 +85,10 @@
 		</ant>
 	</target>
 
-	<target name="init" depends="retrieve-eclipse, dist-commons, dist-commonscs">
+	<target name="init" depends="init-ivy,retrieve-eclipse,dist-commons,dist-commonscs">
 		<mkdir dir="${buildDirectory}" />
 		<mkdir dir="${buildDirectory}/plugins" />
 		<mkdir dir="${buildDirectory}/features" />
-		<antcall target="init-ivy" />
 
 		<!-- ivy properties -->
 		<ivy:settings file="${ivy.settings.file}" />

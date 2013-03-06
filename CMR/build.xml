@@ -23,10 +23,8 @@
 		<delete dir="${lib.root}/test" failonerror="false" />
 	</target>
 
-	<target name="init" description="--> Creates necessary folder structure">
+	<target name="init" description="--> Creates necessary folder structure" depends="init-ivy,init-antcontrib">
 		<mkdir dir="${build.root}" />
-		<antcall target="init-ivy" />
-		<antcall target="init-antcontrib" />
 
 		<ivy:settings file="${ivy.settings.file}" />
 		<ivy:resolve file="${ivy.file}" />
