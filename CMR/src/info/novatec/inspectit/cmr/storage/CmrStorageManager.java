@@ -49,6 +49,7 @@ import org.apache.commons.lang.mutable.MutableLong;
 import org.apache.commons.lang.mutable.MutableObject;
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -69,6 +70,12 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 */
 	@Logger
 	Log log;
+
+	/**
+	 * The fixed rate of the refresh rate for gathering the statistics.
+	 */
+	@Value("${storage.updateRefreshRate}")
+	private static final int UPDATE_RATE = 30000;
 
 	/**
 	 * {@link DefaultDataDaoImpl}.

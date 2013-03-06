@@ -51,10 +51,10 @@ public abstract class StorageManager {
 	Log log;
 
 	/**
-	 * The fixed rate of the refresh rate for gathering the statistics.
+	 * The rate in milliseconds for checking the remaining hard drive space.
 	 */
-	@Value("${storage.updateRefreshRate}")
-	protected static final int UPDATE_RATE = 30000;
+	@Value("${storage.checkRemainingHardDriveSpaceRate}")
+	private static final int CHECK_HARD_DRIVE_RATE = 5000;
 
 	/**
 	 * {@link SerializationManagerProvider}.
@@ -329,7 +329,7 @@ public abstract class StorageManager {
 	 * @throws IOException
 	 *             IF {@link IOException} occurs.
 	 */
-	@Scheduled(fixedRate = UPDATE_RATE * 2)
+	@Scheduled(fixedRate = CHECK_HARD_DRIVE_RATE)
 	protected void updatedStorageSpaceLeft() throws IOException {
 		Path defaultDirectory = getDefaultStorageDirPath();
 
