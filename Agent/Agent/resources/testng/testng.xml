@@ -124,6 +124,12 @@
 				name="info.novatec.inspectit.agent.config.test.FileConfigurationReaderTest" />
 		</classes>
 	</test>
+	<test name="Configuration Files Test">
+		<classes>
+			<class
+				name="info.novatec.inspectit.agent.config.impl.ConfigurationFilesTest" />
+		</classes>
+	</test>
 	<test name="Property Accessor">
 		<classes>
 			<class name="info.novatec.inspectit.agent.config.test.PropertyAccessorTest" />

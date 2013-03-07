@@ -152,7 +152,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	 * @throws ParserException
 	 *             Thrown if there was an exception caught by parsing the config file.
 	 */
-	private void parse(Reader reader, String pathToConfig) throws ParserException {
+	void parse(Reader reader, String pathToConfig) throws ParserException {
 		// check for a valid Reader object
 		if (null == reader) {
 			throw new ParserException("Input is null! Aborting parsing.");
