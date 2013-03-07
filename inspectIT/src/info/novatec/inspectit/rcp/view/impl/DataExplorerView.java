@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.view.impl;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
+import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.tree.DeferredTreeViewer;
@@ -144,7 +145,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	private CollapseAction collapseAction;
 
 	/**
-	 * Adapter to publlich the selection to the Site.
+	 * Adapter to publish the selection to the Site.
 	 */
 	private SelectionProviderAdapter selectionProviderAdapter = new SelectionProviderAdapter();
 
@@ -226,18 +227,20 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 *            Agent to select. Can be null. If the repository does not
 	 */
 	public void showRepository(final RepositoryDefinition repositoryDefinition, final PlatformIdent agent) {
+		displayedRepositoryDefinition = repositoryDefinition;
 		Display.getDefault().syncExec(new Runnable() {
 			@Override
 			public void run() {
-				DataExplorerView.this.displayMessage("Loading agents for repository " + repositoryDefinition.getName(), Display.getDefault().getSystemImage(SWT.ICON_WORKING));
+				mainForm.setBusy(true);
+				updateFormTitle();
+				agentsCombo.removeAll();
+				displayMessage("Loading agents for repository " + repositoryDefinition.getName(), Display.getDefault().getSystemImage(SWT.ICON_WORKING));
+				if (null != displayedAgent && null != displayedRepositoryDefinition) {
+					cacheExpandedObjects(displayedAgent, displayedRepositoryDefinition);
+				}
 			}
 		});
 
-		if (null != displayedAgent && null != displayedRepositoryDefinition) {
-			cacheExpandedObjects(displayedAgent, displayedRepositoryDefinition);
-		}
-
-		displayedRepositoryDefinition = repositoryDefinition;
 		PreferencesUtils.saveObject(PreferencesConstants.LAST_SELECTED_REPOSITORY, displayedRepositoryDefinition, false);
 		updateAvailableAgents(repositoryDefinition, new JobChangeAdapter() {
 			@Override
@@ -250,6 +253,13 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 				performUpdate();
 			}
 		});
+
+		Display.getDefault().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				mainForm.setBusy(false);
+			}
+		});
 	}
 
 	/**
@@ -260,14 +270,33 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 *            Hint for agent selection.
 	 */
 	private void selectAgentForDisplay(PlatformIdent agent) {
-		if (null != agent && null != availableAgents && availableAgents.contains(agent)) {
-			displayedAgent = agent;
-			PreferencesUtils.saveLongValue(PreferencesConstants.LAST_SELECTED_AGENT, agent.getId().longValue(), false);
-		} else if (null != availableAgents && !availableAgents.isEmpty()) {
-			displayedAgent = availableAgents.iterator().next();
-		} else {
+		Display.getDefault().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				mainForm.setBusy(true);
+				displayMessage("Loading agent tree..", Display.getDefault().getSystemImage(SWT.ICON_WORKING));
+			}
+		});
+		try {
+			if (null != agent && CollectionUtils.isNotEmpty(availableAgents) && availableAgents.contains(agent)) {
+				displayedAgent = displayedRepositoryDefinition.getGlobalDataAccessService().getCompleteAgent(agent.getId());
+				PreferencesUtils.saveLongValue(PreferencesConstants.LAST_SELECTED_AGENT, agent.getId().longValue(), false);
+			} else if (CollectionUtils.isNotEmpty(availableAgents)) {
+				agent = availableAgents.iterator().next();
+				displayedAgent = displayedRepositoryDefinition.getGlobalDataAccessService().getCompleteAgent(agent.getId());
+			} else {
+				displayedAgent = null; // NOPMD
+			}
+		} catch (ServiceException e) {
+			InspectIT.getDefault().createErrorDialog("Exception occured trying to load the agent tree for the agent " + agent.getAgentName() + ".", e, -1);
 			displayedAgent = null; // NOPMD
 		}
+		Display.getDefault().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				mainForm.setBusy(false);
+			}
+		});
 	}
 
 	/**
@@ -328,14 +357,14 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 				if (repositoryDefinition instanceof CmrRepositoryDefinition) {
 					CmrRepositoryDefinition cmrRepositoryDefinition = (CmrRepositoryDefinition) repositoryDefinition;
 					if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-						availableAgents = new ArrayList<PlatformIdent>(cmrRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents().keySet());
+						availableAgents = new ArrayList<PlatformIdent>(cmrRepositoryDefinition.getGlobalDataAccessService().getAgentsOverview().keySet());
 					} else {
 						availableAgents = null; // NOPMD
 					}
 				} else if (repositoryDefinition instanceof StorageRepositoryDefinition) {
 					StorageRepositoryDefinition storageRepositoryDefinition = (StorageRepositoryDefinition) repositoryDefinition;
 					if (storageRepositoryDefinition.getLocalStorageData().isFullyDownloaded() || storageRepositoryDefinition.getCmrRepositoryDefinition().getOnlineStatus() != OnlineStatus.OFFLINE) {
-						availableAgents = new ArrayList<PlatformIdent>(storageRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents().keySet());
+						availableAgents = new ArrayList<PlatformIdent>(storageRepositoryDefinition.getGlobalDataAccessService().getAgentsOverview().keySet());
 					} else {
 						availableAgents = null; // NOPMD
 					}
@@ -691,7 +720,6 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 				Display.getDefault().asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						clearFormBody();
 						agentsCombo.removeAll();
 						agentsCombo.setEnabled(false);
 						displayMessage("Selected storage was remotely deleted and is not available anymore.", Display.getDefault().getSystemImage(SWT.ICON_WARNING));
@@ -711,7 +739,6 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 				Display.getDefault().asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						clearFormBody();
 						agentsCombo.removeAll();
 						agentsCombo.setEnabled(false);
 						displayMessage("Selected storage was locally deleted and is not available anymore.", Display.getDefault().getSystemImage(SWT.ICON_WARNING));
@@ -740,6 +767,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 *            Image to show.
 	 */
 	private void displayMessage(String text, Image image) {
+		clearFormBody();
 		if (null == messageComposite || messageComposite.isDisposed()) {
 			messageComposite = toolkit.createComposite(mainForm.getBody());
 		} else {
@@ -753,6 +781,7 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 		messageComposite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		toolkit.createLabel(messageComposite, null).setImage(image);
 		toolkit.createLabel(messageComposite, text, SWT.WRAP).setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+		mainForm.getBody().layout();
 	}
 
 	/**

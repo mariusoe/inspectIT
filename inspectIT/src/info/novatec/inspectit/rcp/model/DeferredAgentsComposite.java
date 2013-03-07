@@ -56,7 +56,7 @@ public class DeferredAgentsComposite extends DeferredComposite implements ICmrRe
 		monitor.beginTask("Loading agents..", IProgressMonitor.UNKNOWN);
 		try {
 			if (cmrRepositoryDefinition.getOnlineStatus() == OnlineStatus.ONLINE) {
-				Map<PlatformIdent, AgentStatusData> agents = cmrRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents();
+				Map<PlatformIdent, AgentStatusData> agents = cmrRepositoryDefinition.getGlobalDataAccessService().getAgentsOverview();
 				if (null != agents) {
 					for (Entry<PlatformIdent, AgentStatusData> entry : agents.entrySet()) {
 						PlatformIdent platformIdent = entry.getKey();

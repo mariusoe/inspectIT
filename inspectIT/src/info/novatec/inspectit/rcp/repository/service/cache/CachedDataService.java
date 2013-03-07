@@ -4,9 +4,10 @@ import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
+import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
+import info.novatec.inspectit.rcp.InspectIT;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,31 +57,24 @@ public class CachedDataService {
 	private Map<Long, MethodIdent> methodMap = new ConcurrentHashMap<Long, MethodIdent>();
 
 	/**
-	 * Analyzes the platform ident objects and puts these into a cache for faster retrieval of
-	 * ID->ident objects.
+	 * Updates the data in the cache for the one agent. This method should be called with care,
+	 * since it removes and inserts all the sensor data.
 	 * 
-	 * @param agents
-	 *            The list of platform ident objects to cache.
+	 * @param platformIdent
+	 *            Agento to refresh.
 	 */
-	public void putIntoCache(Collection<? extends PlatformIdent> agents) {
-		platformMap.clear();
-		methodMap.clear();
-		sensorTypeMap.clear();
+	public void refreshData(PlatformIdent platformIdent) {
+		platformMap.remove(platformIdent.getId());
+		platformMap.put(platformIdent.getId(), platformIdent);
 
-		for (PlatformIdent platformIdent : agents) {
-			platformMap.put(platformIdent.getId(), platformIdent);
+		for (MethodIdent methodIdent : (Set<MethodIdent>) platformIdent.getMethodIdents()) {
+			methodMap.remove(methodIdent.getId());
+			methodMap.put(methodIdent.getId(), methodIdent);
+		}
 
-			for (MethodIdent methodIdent : (Set<MethodIdent>) platformIdent.getMethodIdents()) {
-				if (!methodMap.containsKey(methodIdent.getId())) {
-					methodMap.put(methodIdent.getId(), methodIdent);
-				}
-			}
-
-			for (SensorTypeIdent sensorTypeIdent : (Set<SensorTypeIdent>) platformIdent.getSensorTypeIdents()) {
-				if (!sensorTypeMap.containsKey(sensorTypeIdent.getId())) {
-					sensorTypeMap.put(sensorTypeIdent.getId(), sensorTypeIdent);
-				}
-			}
+		for (SensorTypeIdent sensorTypeIdent : (Set<SensorTypeIdent>) platformIdent.getSensorTypeIdents()) {
+			sensorTypeMap.remove(sensorTypeIdent.getId());
+			sensorTypeMap.put(sensorTypeIdent.getId(), sensorTypeIdent);
 		}
 	}
 
@@ -139,8 +133,33 @@ public class CachedDataService {
 	 * Internal refresh of the idents. Currently everything is loaded again.
 	 */
 	private void refreshIdents() {
-		Map<PlatformIdent, AgentStatusData> agents = globalDataAccessService.getConnectedAgents();
-		putIntoCache(agents.keySet());
+		Map<PlatformIdent, AgentStatusData> agentMap = globalDataAccessService.getAgentsOverview();
+		platformMap.clear();
+		methodMap.clear();
+		sensorTypeMap.clear();
+
+		for (PlatformIdent overview : agentMap.keySet()) {
+			PlatformIdent platformIdent;
+			try {
+				platformIdent = globalDataAccessService.getCompleteAgent(overview.getId());
+			} catch (ServiceException e) {
+				InspectIT.getDefault().createErrorDialog("Exception occured trying to refresh sensor information for the agent " + overview.getAgentName() + ".", e, -1);
+				continue;
+			}
+			platformMap.put(platformIdent.getId(), platformIdent);
+
+			for (MethodIdent methodIdent : (Set<MethodIdent>) platformIdent.getMethodIdents()) {
+				if (!methodMap.containsKey(methodIdent.getId())) {
+					methodMap.put(methodIdent.getId(), methodIdent);
+				}
+			}
+
+			for (SensorTypeIdent sensorTypeIdent : (Set<SensorTypeIdent>) platformIdent.getSensorTypeIdents()) {
+				if (!sensorTypeMap.containsKey(sensorTypeIdent.getId())) {
+					sensorTypeMap.put(sensorTypeIdent.getId(), sensorTypeIdent);
+				}
+			}
+		}
 	}
 
 }

@@ -170,7 +170,7 @@ public class SelectAgentsWizardPage extends WizardPage {
 				Job getAgentsJob = new Job("Loading agents information..") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
-						agentList = new ArrayList<PlatformIdent>(cmrRepositoryDefinition.getGlobalDataAccessService().getConnectedAgents().keySet());
+						agentList = new ArrayList<PlatformIdent>(cmrRepositoryDefinition.getGlobalDataAccessService().getAgentsOverview().keySet());
 						Display.getDefault().asyncExec(new Runnable() {
 							@Override
 							public void run() {

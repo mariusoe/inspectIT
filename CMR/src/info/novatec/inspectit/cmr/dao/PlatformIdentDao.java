@@ -60,6 +60,8 @@ public interface PlatformIdentDao {
 
 	/**
 	 * Returns all {@link PlatformIdent} objects which are saved in the underlying storage.
+	 * <p>
+	 * Object will be sorted by agent name.
 	 * 
 	 * @return Returns all stored {@link PlatformIdent} objects.
 	 */
@@ -83,10 +85,13 @@ public interface PlatformIdentDao {
 
 	/**
 	 * Executes the same query as {@link #findAll()} but initialized the lazy collections
-	 * afterwards.
+	 * afterwards. Only for one agent.
 	 * 
-	 * @return Returns all stored {@link PlatformIdent} objects and initializes the collections.
+	 * @param id
+	 *            Id of wanted agent.
+	 * 
+	 * @return Returns one {@link PlatformIdent} object and initializes the collections.
 	 */
-	List<PlatformIdent> findAllInitialized();
+	PlatformIdent findInitialized(long id);
 
 }

@@ -817,11 +817,11 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 					CmrRepositoryDefinition cmrRepositoryDefinition = agentsComposite.getCmrRepositoryDefinition();
 					List<?> leafs = agentsComposite.getChildren();
 					if (CollectionUtils.isNotEmpty(leafs) && cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
-						Map<Long, AgentStatusData> statusMap = cmrRepositoryDefinition.getGlobalDataAccessService().getAgentStatusDataMap();
+						Map<PlatformIdent, AgentStatusData> statusMap = cmrRepositoryDefinition.getGlobalDataAccessService().getAgentsOverview();
 						for (Object child : leafs) {
 							if (child instanceof AgentLeaf) {
 								AgentLeaf agentLeaf = (AgentLeaf) child;
-								AgentStatusData agentStatusData = statusMap.get(agentLeaf.getPlatformIdent().getId());
+								AgentStatusData agentStatusData = statusMap.get(agentLeaf.getPlatformIdent());
 								agentLeaf.setAgentStatusData(agentStatusData);
 								toUpdate.add(agentLeaf);
 							}

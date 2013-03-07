@@ -22,18 +22,28 @@ public interface IGlobalDataAccessService {
 	/**
 	 * Returns all the connected Agents of this CMR. The Map contains {@link PlatformIdent} objects
 	 * with the current AgentStatusInfo.
+	 * <p>
+	 * Note that this method will not return the {@link PlatformIdent} with the complete tree of
+	 * sensors and method idents, but only the general info about the Agent. If you need the
+	 * complete sensor/method tree, please use the {@link #getCompleteAgent(long)} method.
 	 * 
 	 * @return All connected Agents with it's statues. Note that it is possible that the status of
 	 *         an agent is not available. Thus it is recommended to use the entry set of this map.
 	 */
-	Map<PlatformIdent, AgentStatusData> getConnectedAgents();
+	Map<PlatformIdent, AgentStatusData> getAgentsOverview();
 
 	/**
-	 * Returns the map of platform ident IDs and {@link AgentStatusData}.
+	 * Returns the platform ident with complete sensor/method tree.
+	 * <p>
+	 * IDs of available agents can be retrieved by executing {@link #getAgentsOverview()} method.
 	 * 
-	 * @return Returns the map of platform ident IDs and {@link AgentStatusData}.
+	 * @param id
+	 *            Id of wanted agent.
+	 * @return Agent with complete tree.
+	 * @throws ServiceException
+	 *             If given ID of the agent is not valid.
 	 */
-	Map<Long, AgentStatusData> getAgentStatusDataMap();
+	PlatformIdent getCompleteAgent(long id) throws ServiceException;
 
 	/**
 	 * Deletes the Agent completely.

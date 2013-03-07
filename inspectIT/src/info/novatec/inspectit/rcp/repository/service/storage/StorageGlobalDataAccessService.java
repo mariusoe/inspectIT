@@ -50,7 +50,7 @@ public class StorageGlobalDataAccessService extends AbstractStorageService<Defau
 	/**
 	 * {@inheritDoc}
 	 */
-	public Map<PlatformIdent, AgentStatusData> getConnectedAgents() {
+	public Map<PlatformIdent, AgentStatusData> getAgentsOverview() {
 		Map<PlatformIdent, AgentStatusData> result = new HashMap<PlatformIdent, AgentStatusData>();
 		for (PlatformIdent platformIdent : agents) {
 			result.put(platformIdent, null);
@@ -60,11 +60,14 @@ public class StorageGlobalDataAccessService extends AbstractStorageService<Defau
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
-	 * Returns the empty map because for the storage we don't have the information saved.
 	 */
-	public Map<Long, AgentStatusData> getAgentStatusDataMap() {
-		return Collections.emptyMap();
+	public PlatformIdent getCompleteAgent(long id) throws ServiceException {
+		for (PlatformIdent platformIdent : agents) {
+			if (platformIdent.getId().longValue() == id) {
+				return platformIdent;
+			}
+		}
+		throw new ServiceException("Agent with given ID=" + id + " is not existing.");
 	}
 
 	/**

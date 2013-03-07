@@ -13,10 +13,12 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -78,8 +80,12 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	public List<PlatformIdent> findAll() {
-		return getHibernateTemplate().loadAll(PlatformIdent.class);
+		DetachedCriteria criteria = DetachedCriteria.forClass(PlatformIdent.class);
+		criteria.addOrder(Order.asc("agentName"));
+		criteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
+		return getHibernateTemplate().findByCriteria(criteria);
 	}
 
 	/**
@@ -146,26 +152,23 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<PlatformIdent> findAllInitialized() {
-		List<PlatformIdent> initializedPlatformIdents = new ArrayList<PlatformIdent>();
-		List<Long> cleanIdents = new ArrayList<Long>();
+	public PlatformIdent findInitialized(long id) {
 		for (PlatformIdent platformIdent : platformIdentCache.getCleanPlatformIdents()) {
-			cleanIdents.add(platformIdent.getId());
-			initializedPlatformIdents.add(platformIdent);
-		}
-
-		if (cleanIdents.size() != platformIdentCache.getSize()) {
-			List<PlatformIdent> cleanPlatformIdents = loadIdentsFromDB(cleanIdents);
-			initializedPlatformIdents.addAll(cleanPlatformIdents);
-		}
-
-		Collections.sort(initializedPlatformIdents, new Comparator<PlatformIdent>() {
-			@Override
-			public int compare(PlatformIdent o1, PlatformIdent o2) {
-				return (int) (o1.getId().longValue() - o2.getId().longValue());
+			if (platformIdent.getId().longValue() == id) {
+				return platformIdent;
 			}
-		});
-		return initializedPlatformIdents;
+		}
+
+		List<PlatformIdent> cleanPlatformIdents = loadIdentsFromDB(Collections.<Long> emptyList(), Collections.singleton(Long.valueOf(id)));
+		if (CollectionUtils.isNotEmpty(cleanPlatformIdents)) {
+			if (1 == cleanPlatformIdents.size()) {
+				return cleanPlatformIdents.get(0);
+			} else {
+				throw new RuntimeException("More than one agent retrieved for one ID.");
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -189,12 +192,11 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 			}
 		}
 
+		wantedAgentsIds.removeAll(cleanIdents);
 		if (cleanIdents.size() != platformIdentCache.getSize()) {
-			List<PlatformIdent> cleanPlatformIdents = loadIdentsFromDB(cleanIdents);
+			List<PlatformIdent> cleanPlatformIdents = loadIdentsFromDB(cleanIdents, wantedAgentsIds);
 			for (PlatformIdent platformIdent : cleanPlatformIdents) {
-				if (wantedAgentsIds.contains(platformIdent.getId())) {
-					initializedPlatformIdents.add(platformIdent);
-				}
+				initializedPlatformIdents.add(platformIdent);
 			}
 		}
 
@@ -212,8 +214,7 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 	 */
 	@PostConstruct
 	public void postConstruct() {
-		Collection<Long> excludeList = Collections.emptyList();
-		loadIdentsFromDB(excludeList);
+		loadIdentsFromDB(Collections.<Long> emptyList(), Collections.<Long> emptyList());
 	}
 
 	/**
@@ -221,14 +222,22 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 	 * collection.
 	 * 
 	 * @param excludeIdents
-	 *            IDs of the agents that should not be loaded.
+	 *            IDs of the agents that should not be loaded. If empty or <code>null</code> it
+	 *            won't be taken into consideration.
+	 * @param includeIdents
+	 *            IDs of the agents that should be loaded. If empty or <code>null</code> it won't be
+	 *            taken into consideration.
+	 * 
 	 * @return List of {@link PlatformIdent}.
 	 */
 	@SuppressWarnings("unchecked")
-	private List<PlatformIdent> loadIdentsFromDB(Collection<Long> excludeIdents) {
+	private List<PlatformIdent> loadIdentsFromDB(Collection<Long> excludeIdents, Collection<Long> includeIdents) {
 		DetachedCriteria criteria = DetachedCriteria.forClass(PlatformIdent.class);
-		if (!excludeIdents.isEmpty()) {
+		if (CollectionUtils.isNotEmpty(excludeIdents)) {
 			criteria.add(Restrictions.not(Restrictions.in("id", excludeIdents)));
+		}
+		if (CollectionUtils.isNotEmpty(includeIdents)) {
+			criteria.add(Restrictions.in("id", includeIdents));
 		}
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		criteria.setFetchMode("methodIdents", FetchMode.JOIN);

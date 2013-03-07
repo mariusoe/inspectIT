@@ -56,8 +56,8 @@ public class GlobalDataAccessService implements IGlobalDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public Map<PlatformIdent, AgentStatusData> getConnectedAgents() {
-		List<PlatformIdent> agents = platformIdentDao.findAllInitialized();
+	public Map<PlatformIdent, AgentStatusData> getAgentsOverview() {
+		List<PlatformIdent> agents = platformIdentDao.findAll();
 		Map<Long, AgentStatusData> agentStatusMap = agentStatusProvider.getAgentStatusDataMap();
 
 		Map<PlatformIdent, AgentStatusData> resultMap = new HashMap<PlatformIdent, AgentStatusData>();
@@ -71,8 +71,13 @@ public class GlobalDataAccessService implements IGlobalDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public Map<Long, AgentStatusData> getAgentStatusDataMap() {
-		return agentStatusProvider.getAgentStatusDataMap();
+	public PlatformIdent getCompleteAgent(long id) throws ServiceException {
+		PlatformIdent platformIdent = platformIdentDao.findInitialized(id);
+		if (null != platformIdent) {
+			return platformIdent;
+		} else {
+			throw new ServiceException("Agent with given ID=" + id + " is not existing.");
+		}
 	}
 
 	/**

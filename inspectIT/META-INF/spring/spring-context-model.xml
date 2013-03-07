@@ -1,21 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xmlns:osgi="http://www.springframework.org/schema/osgi"
-   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/osgi
        http://www.springframework.org/schema/osgi/spring-osgi.xsd"
 	default-autowire="byType">
 
-	<osgi:service id="storageManagerService" ref="storageManager" interface="info.novatec.inspectit.rcp.storage.InspectITStorageManager"/>
-	<osgi:service id="cmrServiceProviderService" ref="cmrServiceProvider" interface="info.novatec.inspectit.rcp.repository.service.cmr.CmrServiceProvider"/>
+	<!-- needed for the automatic AOP usage -->
+	<bean id="advisorFactory" class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />
+
+	<osgi:service id="storageManagerService" ref="storageManager"
+		interface="info.novatec.inspectit.rcp.storage.InspectITStorageManager" />
+	<osgi:service id="cmrServiceProviderService" ref="cmrServiceProvider"
+		interface="info.novatec.inspectit.rcp.repository.service.cmr.CmrServiceProvider" />
 
 	<bean id="interfaceInterceptor"
 		class="info.novatec.inspectit.rcp.repository.service.cmr.proxy.ServiceInterfaceDelegateInterceptor" />
 
 	<bean id="serviceMethodInterceptor"
 		class="info.novatec.inspectit.rcp.repository.service.cmr.proxy.ServiceMethodInterceptor" />
+
+	<bean id="cachingPlatformIdentInterceptor"
+		class="info.novatec.inspectit.rcp.repository.service.cmr.proxy.CachingPlatformIdentInterceptor" />
+
+	<bean id="cachingPlatformAdvice"
+		class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+		<property name="advice" ref="cachingPlatformIdentInterceptor" />
+		<property name="pattern" value=".*getCompleteAgent.*" />
+	</bean>
 
 	<bean id="cmrServiceProvider"
 		class="info.novatec.inspectit.rcp.repository.service.cmr.CmrServiceProvider">
@@ -41,7 +54,8 @@
 		scope="prototype" lazy-init="true">
 		<property name="proxyInterfaces">
 			<list>
-				<value>info.novatec.inspectit.cmr.service.ICmrManagementService</value>
+				<value>info.novatec.inspectit.cmr.service.ICmrManagementService
+				</value>
 				<value>info.novatec.inspectit.rcp.repository.service.cmr.ICmrService
 				</value>
 			</list>
@@ -402,11 +416,10 @@
 	<bean id="exceptionSensorDataQueryFactory"
 		class="info.novatec.inspectit.indexing.query.factory.impl.ExceptionSensorDataQueryFactory" />
 
-	<bean id="dataRetriever"
-		class="info.novatec.inspectit.rcp.storage.util.DataRetriever" init-method="init"/>
+	<bean id="dataRetriever" class="info.novatec.inspectit.rcp.storage.util.DataRetriever"
+		init-method="init" />
 
-	<bean id="dataUploader"
-		class="info.novatec.inspectit.rcp.storage.util.DataUploader" />
+	<bean id="dataUploader" class="info.novatec.inspectit.rcp.storage.util.DataUploader" />
 
 	<bean id="storageRepositoryDefinition"
 		class="info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition"
@@ -414,13 +427,13 @@
 
 	<bean id="storageTimerDataAccessService"
 		class="info.novatec.inspectit.rcp.repository.service.storage.StorageTimerDataAccessService"
-		scope="prototype" lazy-init="true" >
+		scope="prototype" lazy-init="true">
 		<property name="timerDataQueryFactory" ref="timerDataQueryFactory" />
 	</bean>
 
 	<bean id="storageHttpTimerDataAccessService"
 		class="info.novatec.inspectit.rcp.repository.service.storage.StorageHttpTimerDataAccessService"
-		scope="prototype" lazy-init="true" >
+		scope="prototype" lazy-init="true">
 		<property name="httpDataQueryFactory" ref="httpTimerDataQueryFactory" />
 	</bean>
 
@@ -432,20 +445,20 @@
 
 	<bean id="storageExceptionDataAccessService"
 		class="info.novatec.inspectit.rcp.repository.service.storage.StorageExceptionDataAccessService"
-		scope="prototype" lazy-init="true" >
+		scope="prototype" lazy-init="true">
 		<property name="exceptionSensorDataQueryFactory" ref="exceptionSensorDataQueryFactory" />
 	</bean>
 
 	<bean id="storageInvocationDataAccessService"
 		class="info.novatec.inspectit.rcp.repository.service.storage.StorageInvocationDataAccessService"
-		scope="prototype" lazy-init="true" >
+		scope="prototype" lazy-init="true">
 		<property name="invocationDataQueryFactory" ref="invocationSequenceDataQueryFactory" />
 	</bean>
 
 	<bean id="storageGlobalDataAccessService"
 		class="info.novatec.inspectit.rcp.repository.service.storage.StorageGlobalDataAccessService"
 		scope="prototype" lazy-init="true" />
-		<!-- add the provider here directly -->
+	<!-- add the provider here directly -->
 
 	<bean id="storageServiceProvider"
 		class="info.novatec.inspectit.rcp.repository.service.storage.StorageServiceProvider">
@@ -470,26 +483,29 @@
 	</bean>
 
 	<bean id="storageExecutorService"
-		class="info.novatec.inspectit.storage.util.ExecutorServiceFactory" >
+		class="info.novatec.inspectit.storage.util.ExecutorServiceFactory">
 		<property name="executorThreads" value="3" />
 		<property name="scheduledExecutor" value="true" />
 	</bean>
 
-	<bean id="readingChannelManager" class="info.novatec.inspectit.storage.nio.read.ReadingChannelManager" depends-on="IOExecutorService">
+	<bean id="readingChannelManager"
+		class="info.novatec.inspectit.storage.nio.read.ReadingChannelManager"
+		depends-on="IOExecutorService">
 		<property name="executorService">
-			<ref bean="IOExecutorService"/>
+			<ref bean="IOExecutorService" />
 		</property>
 	</bean>
 
 	<bean id="extendedByteBufferInputStream"
 		class="info.novatec.inspectit.storage.nio.stream.ExtendedByteBufferInputStream"
-		scope="prototype" lazy-init="true" >
+		scope="prototype" lazy-init="true">
 		<property name="executorService" ref="storageExecutorService" />
 	</bean>
 
 	<bean id="streamProvider"
 		class="info.novatec.inspectit.storage.nio.stream.StreamProvider">
-		<lookup-method name="createExtendedByteBufferInputStream" bean="extendedByteBufferInputStream" />
+		<lookup-method name="createExtendedByteBufferInputStream"
+			bean="extendedByteBufferInputStream" />
 	</bean>
 
 	<bean id="serializationManagerProvider"

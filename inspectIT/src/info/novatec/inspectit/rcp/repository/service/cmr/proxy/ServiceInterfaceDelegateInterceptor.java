@@ -25,7 +25,7 @@ public class ServiceInterfaceDelegateInterceptor implements MethodInterceptor {
 		Object thisObject = methodInvocation.getThis();
 		if (thisObject instanceof ICmrService) {
 			ICmrService cmrService = (ICmrService) thisObject;
-			if (!methodInvocation.getMethod().getDeclaringClass().equals(ICmrService.class)) {
+			if (InterceptorUtils.isServiceMethod(methodInvocation)) {
 				Object concreteService = cmrService.getService();
 				Object returnVal = invokeUsingReflection(concreteService, methodInvocation.getMethod(), methodInvocation.getArguments());
 				return returnVal;
