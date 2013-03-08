@@ -589,18 +589,18 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 								boolean found = false;
 								for (PlatformIdent platformIdent : availableAgents) {
 									if (platformIdent.getId().longValue() == displayedAgent.getId()) {
-										displayedAgent = platformIdent;
+										selectAgentForDisplay(platformIdent);
 										found = true;
 										break;
 									}
 								}
 								if (!found) {
-									displayedAgent = availableAgents.get(0);
+									selectAgentForDisplay(availableAgents.get(0));
 								}
 							} else if (null != availableAgents && !availableAgents.isEmpty() && null == displayedAgent) {
-								displayedAgent = availableAgents.get(0);
+								selectAgentForDisplay(availableAgents.get(0));
 							} else {
-								displayedAgent = null; // NOPMD
+								selectAgentForDisplay(null);
 							}
 							performUpdate();
 						}
