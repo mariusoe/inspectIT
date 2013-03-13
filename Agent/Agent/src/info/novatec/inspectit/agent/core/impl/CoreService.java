@@ -528,7 +528,9 @@ public class CoreService implements ICoreService, Startable {
 				// wait for activation
 				synchronized (this) {
 					try {
-						wait();
+						if (!isInterrupted()) {
+							wait();
+						}
 					} catch (InterruptedException e) {
 						LOGGER.severe("Preparing thread interrupted and shuting down!");
 						break; // we were interrupted during waiting and close ourself down.
@@ -576,7 +578,9 @@ public class CoreService implements ICoreService, Startable {
 				if (!bufferStrategy.hasNext()) {
 					synchronized (this) {
 						try {
-							wait();
+							if (!isInterrupted()) {
+								wait();
+							}
 						} catch (InterruptedException e) {
 							LOGGER.severe("Sending thread interrupted and shuting down!");
 							break; // we were interrupted during waiting and close ourself down.
@@ -586,7 +590,6 @@ public class CoreService implements ICoreService, Startable {
 
 				// send the data
 				send();
-
 			}
 		}
 	}
@@ -606,16 +609,17 @@ public class CoreService implements ICoreService, Startable {
 
 			// wait for the shutdown of the preparing thread and sending thread to ensure thread
 			// safety on the entities used for preparing and sending. If we get interrupted while
-			// waiting, then we stop the ShutdownHook completely.
+			// waiting, then we stop the ShutdownHook completely. We'll wait only 10 seconds as
+			// a maximum for each join and then continue
 			try {
-				preparingThread.join();
+				preparingThread.join(10000);
 			} catch (InterruptedException e) {
 				LOGGER.severe("ShutdownHook was interrupted while waiting for the preparing thread to shut down. Stopping the shutdown hook");
 				return;
 			}
 
 			try {
-				sendingThread.join();
+				sendingThread.join(10000);
 			} catch (InterruptedException e) {
 				LOGGER.severe("ShutdownHook was interrupted while waiting for the sending thread to shut down. Stopping the shutdown hook");
 				return;
