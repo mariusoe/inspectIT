@@ -38,11 +38,12 @@ public class TreeContentProvider implements ITreeContentProvider {
 			Object[] children = manager.getChildren(parentElement);
 
 			return children;
-		} else {
+		} else if (parentElement instanceof Composite) {
 			// direct access to the children
 			Composite composite = (Composite) parentElement;
 			return composite.getChildren().toArray();
 		}
+		return new Object[0];
 	}
 
 	/**
