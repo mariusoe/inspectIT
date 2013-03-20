@@ -42,7 +42,7 @@ public class ServiceMethodInterceptor implements MethodInterceptor {
 			handleConnectionFailure(paramMethodInvocation, e);
 			return InterceptorUtils.getDefaultReturnValue(paramMethodInvocation);
 		} catch (Exception e) {
-			InspectIT.getDefault().createErrorDialog("Exception thrown trying to invoke a service method.", e, -1);
+			InspectIT.getDefault().createErrorDialog(e.getMessage(), e.getCause() != null ? e.getCause() : e, -1);
 			return InterceptorUtils.getDefaultReturnValue(paramMethodInvocation);
 		}
 	}

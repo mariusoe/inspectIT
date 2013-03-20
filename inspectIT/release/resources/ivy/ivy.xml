@@ -17,6 +17,7 @@
 	<!-- IMPORTANT
 		 * Any added OSGi jar has to be added in the MANIFEST.MF of this project  as a dependency
 		 * Any added OSGI jar has to be added to the inspectIT.product as a dependency
+		 * Further info on https://confluence.novatec-gmbh.de/display/INSPECTIT/Usage+of+3rd+party+libraries+in+the+plugins
 	 -->
 
 	<configurations>

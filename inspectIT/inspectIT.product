@@ -106,6 +106,7 @@ NTSales_Allgemeine_Nutzungsbedingungen_inspectIT_en.doc_V2.0 / 24.07.2012
       <plugin id="info.novatec.jfreechart-experimental"/>
       <plugin id="info.novatec.jfreechart-swt"/>
       <plugin id="info.novatec.kryo"/>
+      <plugin id="info.novatec.kryo-serializers"/>
       <plugin id="info.novatec.minlog"/>
       <plugin id="info.novatec.reflectasm"/>
       <plugin id="info.novatec.swtgraphics2d"/>

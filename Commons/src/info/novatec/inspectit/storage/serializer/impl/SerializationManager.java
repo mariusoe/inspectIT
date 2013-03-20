@@ -6,6 +6,7 @@ import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
+import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
@@ -54,6 +55,7 @@ import info.novatec.inspectit.indexing.storage.impl.StorageBranchIndexer;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageData.StorageState;
+import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.BooleanStorageLabel;
 import info.novatec.inspectit.storage.label.DateStorageLabel;
 import info.novatec.inspectit.storage.label.NumberStorageLabel;
@@ -86,7 +88,6 @@ import info.novatec.inspectit.util.IHibernateUtil;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -124,6 +125,10 @@ import com.esotericsoftware.kryo.serializers.MapSerializer;
 import com.esotericsoftware.kryo.util.DefaultClassResolver;
 import com.esotericsoftware.kryo.util.MapReferenceResolver;
 import com.esotericsoftware.kryo.util.ObjectMap;
+
+import de.javakaffee.kryoserializers.ArraysAsListSerializer;
+import de.javakaffee.kryoserializers.SynchronizedCollectionsSerializer;
+import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
 
 /**
  * Implementation of the {@link ISerializer} that uses Kryo library for serializing the objects. <br>
@@ -316,15 +321,10 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(HttpTimerDataAggregator.class, new FieldSerializer<HttpTimerDataAggregator>(kryo, HttpTimerDataAggregator.class));
 		kryo.register(ExceptionDataAggregator.class, new FieldSerializer<ExceptionDataAggregator>(kryo, ExceptionDataAggregator.class));
 
-		// INSPECTIT-849 - HIbernate uses Arrays.asList which does not have no-arg constructor
-		// we will create array list instead
-		kryo.register(Arrays.asList().getClass(), new CollectionSerializer() {
-			@Override
-			@SuppressWarnings("rawtypes")
-			protected Collection create(Kryo paramKryo, Input paramInput, Class<Collection> paramClass) {
-				return new ArrayList<Object>();
-			}
-		});
+		// INSPECTIT-849 - Hibernate uses Arrays.asList which does not have no-arg constructor
+		// changed with INSPECTIT-912 for already provided serializer
+		// this can not break us, since it relates to Hibernate problems
+		kryo.register(Arrays.asList().getClass(), new ArraysAsListSerializer());
 
 		// added with INSPECTIT-723
 		kryo.register(RecordingState.class, new EnumSerializer(RecordingState.class));
@@ -334,9 +334,16 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(AggregatedHttpTimerData.class, new InvocationAwareDataSerializer<AggregatedHttpTimerData>(kryo, AggregatedHttpTimerData.class, schemaManager));
 		kryo.register(AggregatedSqlStatementData.class, new InvocationAwareDataSerializer<AggregatedSqlStatementData>(kryo, AggregatedSqlStatementData.class, schemaManager));
 		kryo.register(AggregatedTimerData.class, new InvocationAwareDataSerializer<AggregatedTimerData>(kryo, AggregatedTimerData.class, schemaManager));
-		
+
 		// added with INSPECTIT-853
 		kryo.register(MethodIdentToSensorType.class, new CustomCompatibleFieldSerializer<MethodIdentToSensorType>(kryo, MethodIdentToSensorType.class, schemaManager));
+
+		// added with INSPECTIT-912
+		UnmodifiableCollectionsSerializer.registerSerializers(kryo);
+		SynchronizedCollectionsSerializer.registerSerializers(kryo);
+		kryo.register(StorageException.class, new FieldSerializer<StorageException>(kryo, StorageException.class));
+		kryo.register(ServiceException.class, new FieldSerializer<ServiceException>(kryo, ServiceException.class));
+		kryo.register(StackTraceElement.class, new StackTraceElementSerializer());
 	}
 
 	/**
