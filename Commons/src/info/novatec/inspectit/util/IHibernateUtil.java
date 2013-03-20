@@ -53,4 +53,22 @@ public interface IHibernateUtil {
 	 */
 	boolean isPersistentSet(Class<?> collectionClass);
 
+	/**
+	 * Returns if the class is implementing HibernateProxy interface.
+	 * 
+	 * @param proxyClass
+	 *            Class to check.
+	 * @return Returns if the class is implementing HibernateProxy interface.
+	 */
+	boolean isProxy(Class<?> proxyClass);
+
+	/**
+	 * If given object is a proxy, returns the initialized entity.
+	 * 
+	 * @param proxy
+	 *            Proxy object.
+	 * @return Initialized entity.
+	 */
+	Object getUnproxiedObject(Object proxy);
+
 }

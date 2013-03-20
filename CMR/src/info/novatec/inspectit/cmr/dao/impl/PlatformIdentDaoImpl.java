@@ -14,12 +14,10 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
+import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -232,21 +230,25 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 	 */
 	@SuppressWarnings("unchecked")
 	private List<PlatformIdent> loadIdentsFromDB(Collection<Long> excludeIdents, Collection<Long> includeIdents) {
-		DetachedCriteria criteria = DetachedCriteria.forClass(PlatformIdent.class);
-		if (CollectionUtils.isNotEmpty(excludeIdents)) {
-			criteria.add(Restrictions.not(Restrictions.in("id", excludeIdents)));
+		StringBuilder hsql = new StringBuilder(
+				"select distinct platformIdent from PlatformIdent as platformIdent left join fetch platformIdent.methodIdents methodIdent left join fetch platformIdent.sensorTypeIdents left join fetch methodIdent.methodIdentToSensorTypes");
+		if (CollectionUtils.isNotEmpty(includeIdents) && CollectionUtils.isNotEmpty(excludeIdents)) {
+			hsql.append(" where platformIdent.id in :includeIdents and platformIdent.id not in :excludeIdents");
+		} else if (CollectionUtils.isNotEmpty(includeIdents)) {
+			hsql.append(" where platformIdent.id in :includeIdents");
+		} else if (CollectionUtils.isNotEmpty(excludeIdents)) {
+			hsql.append(" where platformIdent.id not in :excludeIdents");
 		}
-		if (CollectionUtils.isNotEmpty(includeIdents)) {
-			criteria.add(Restrictions.in("id", includeIdents));
-		}
-		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		criteria.setFetchMode("methodIdents", FetchMode.JOIN);
-		criteria.setFetchMode("methodIdents.methodIdentToSensorTypes", FetchMode.JOIN);
-		criteria.setFetchMode("methodIdents.methodIdentToSensorTypes.methodSensorTypeIdent", FetchMode.JOIN);
-		criteria.setFetchMode("sensorTypeIdents", FetchMode.JOIN);
-		criteria.setFetchMode("sensorTypeIdents.platformIdents", FetchMode.JOIN);
 
-		List<PlatformIdent> platformIdents = getHibernateTemplate().findByCriteria(criteria);
+		Query query = getSession().createQuery(hsql.toString());
+		if (CollectionUtils.isNotEmpty(includeIdents)) {
+			query.setParameterList("includeIdents", includeIdents);
+		}
+		if (CollectionUtils.isNotEmpty(excludeIdents)) {
+			query.setParameterList("excludeIdents", excludeIdents);
+		}
+
+		List<PlatformIdent> platformIdents = query.list();
 		for (PlatformIdent platformIdent : platformIdents) {
 			platformIdentCache.markClean(platformIdent);
 		}

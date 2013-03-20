@@ -24,7 +24,7 @@
 		</subclass>
 
 		<subclass name="MethodSensorTypeIdent" discriminator-value="MSTI">
-			<set name="methodIdentToSensorTypes" inverse="true" lazy="false">
+			<set name="methodIdentToSensorTypes" inverse="true" lazy="true">
 				<key column="method_sensor_type_ident_id" />
 				<one-to-many class="MethodIdentToSensorType" />
 			</set>
