@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -65,22 +66,21 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	/**
 	 * List of downloaded storages.
 	 */
-	private List<LocalStorageData> downloadedStorages = Collections.synchronizedList(new ArrayList<LocalStorageData>());
+	private Set<LocalStorageData> downloadedStorages = Collections.newSetFromMap(new ConcurrentHashMap<LocalStorageData, Boolean>(16, 0.75f, 2));
 
 	/**
 	 * Map of mounted and online not available storages.
 	 */
-	private List<LocalStorageData> mountedNotAvailableStorages = Collections.synchronizedList(new ArrayList<LocalStorageData>());
-
+	private Set<LocalStorageData> mountedNotAvailableStorages = Collections.newSetFromMap(new ConcurrentHashMap<LocalStorageData, Boolean>(16, 0.75f, 2));
 	/**
 	 * Map of mounted and online not available storages.
 	 */
-	private Map<LocalStorageData, CmrRepositoryDefinition> mountedAvailableStorages = new ConcurrentHashMap<LocalStorageData, CmrRepositoryDefinition>();
+	private Map<LocalStorageData, CmrRepositoryDefinition> mountedAvailableStorages = new ConcurrentHashMap<LocalStorageData, CmrRepositoryDefinition>(16, 0.75f, 2);
 
 	/**
 	 * Cashed statuses of CMR repository definitions.
 	 */
-	private ConcurrentHashMap<CmrRepositoryDefinition, OnlineStatus> cachedRepositoriesStatus = new ConcurrentHashMap<CmrRepositoryDefinition, OnlineStatus>();
+	private ConcurrentHashMap<CmrRepositoryDefinition, OnlineStatus> cachedRepositoriesStatus = new ConcurrentHashMap<CmrRepositoryDefinition, OnlineStatus>(16, 0.75f, 2);
 
 	/**
 	 * List of {@link StorageChangeListener}s.
@@ -375,7 +375,7 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 * @return List of {@link LocalStorageData}.
 	 */
 	public Collection<LocalStorageData> getMountedUnavailableStorages() {
-		return Collections.unmodifiableList(mountedNotAvailableStorages);
+		return Collections.unmodifiableSet(mountedNotAvailableStorages);
 	}
 
 	/**
@@ -384,7 +384,7 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 * @return List of {@link LocalStorageData}.
 	 */
 	public Collection<LocalStorageData> getDownloadedStorages() {
-		return Collections.unmodifiableList(downloadedStorages);
+		return Collections.unmodifiableSet(downloadedStorages);
 	}
 
 	/**
