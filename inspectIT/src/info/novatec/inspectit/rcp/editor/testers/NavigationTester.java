@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.editor.testers;
 
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
+import info.novatec.inspectit.communication.data.AggregatedTimerData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationAwareData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
@@ -108,7 +109,7 @@ public class NavigationTester extends PropertyTester {
 	 *         registered. False otherwise.
 	 */
 	private boolean isTimerSensorBounded(TimerData timerData) {
-		if (null == timerData || !timerData.getClass().equals(TimerData.class)) {
+		if (null == timerData || (!timerData.getClass().equals(TimerData.class) && !timerData.getClass().equals(AggregatedTimerData.class))) {
 			return false;
 		}
 
