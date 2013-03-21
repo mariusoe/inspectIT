@@ -72,6 +72,7 @@ import info.novatec.inspectit.storage.label.type.impl.ExploredByLabelType;
 import info.novatec.inspectit.storage.label.type.impl.RatingLabelType;
 import info.novatec.inspectit.storage.label.type.impl.StatusLabelType;
 import info.novatec.inspectit.storage.label.type.impl.UseCaseLabelType;
+import info.novatec.inspectit.storage.processor.impl.AgentFilterDataProcessor;
 import info.novatec.inspectit.storage.processor.impl.DataAggregatorProcessor;
 import info.novatec.inspectit.storage.processor.impl.DataSaverProcessor;
 import info.novatec.inspectit.storage.processor.impl.InvocationClonerDataProcessor;
@@ -348,6 +349,9 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(StorageException.class, new FieldSerializer<StorageException>(kryo, StorageException.class));
 		kryo.register(ServiceException.class, new FieldSerializer<ServiceException>(kryo, ServiceException.class));
 		kryo.register(StackTraceElement.class, new StackTraceElementSerializer());
+
+		// added with INSPECTIT-937
+		kryo.register(AgentFilterDataProcessor.class, new FieldSerializer<AgentFilterDataProcessor>(kryo, AgentFilterDataProcessor.class));
 	}
 
 	/**

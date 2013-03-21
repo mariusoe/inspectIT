@@ -14,12 +14,17 @@ import info.novatec.inspectit.rcp.wizard.page.SelectExistingStorageWizardPage;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
+import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
+import info.novatec.inspectit.storage.processor.impl.AgentFilterDataProcessor;
 import info.novatec.inspectit.storage.recording.RecordingProperties;
 import info.novatec.inspectit.storage.recording.RecordingState;
 import info.novatec.inspectit.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -156,9 +161,17 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 			cmrRepositoryDefinition = selectStorageWizardPage.getSelectedRepository();
 		}
 
+		List<AbstractDataProcessor> recordingProcessors = defineDataPage.getProcessorList();
+		if (!selectAgentsWizardPage.isAllAgents()) {
+			Set<Long> agentsIds = new HashSet<Long>(selectAgentsWizardPage.getSelectedAgents());
+			AgentFilterDataProcessor agentFilterDataProcessor = new AgentFilterDataProcessor(recordingProcessors, agentsIds);
+			recordingProcessors = new ArrayList<AbstractDataProcessor>(1);
+			recordingProcessors.add(agentFilterDataProcessor);
+		}
+
 		if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
 			recordingProperties = new RecordingProperties();
-			recordingProperties.setRecordingDataProcessors(defineDataPage.getProcessorList());
+			recordingProperties.setRecordingDataProcessors(recordingProcessors);
 			if (timelineWizardPage.isTimerframeUsed()) {
 				Date recordStartDate = timelineWizardPage.getFromDate();
 				Date recordEndDate = timelineWizardPage.getToDate();
