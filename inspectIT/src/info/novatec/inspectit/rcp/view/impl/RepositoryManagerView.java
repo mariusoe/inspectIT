@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -749,7 +750,11 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 					throw new RuntimeException(e);
 				}
 			} else {
-				treeViewer.expandToLevel(firstElement, 1);
+				if (treeViewer.getExpandedState(firstElement)) {
+					treeViewer.collapseToLevel(firstElement, 1);
+				} else {
+					treeViewer.expandToLevel(firstElement, 1);
+				}
 			}
 		}
 	}
@@ -909,9 +914,13 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		 */
 		@Override
 		public void done(IJobChangeEvent event) {
-			if (CollectionUtils.isNotEmpty(expandedList)) {
-				for (Object o : expandedList) {
-					treeViewer.expandObject(o, 1);
+			if (CollectionUtils.isNotEmpty(expandedList) && CollectionUtils.isNotEmpty(inputList)) {
+				for (Iterator<?> it = expandedList.iterator(); it.hasNext();) {
+					Object o = it.next();
+					if (!treeViewer.getExpandedState(o)) {
+						treeViewer.expandObject(o, 1);
+						it.remove();
+					}
 				}
 			}
 		}
