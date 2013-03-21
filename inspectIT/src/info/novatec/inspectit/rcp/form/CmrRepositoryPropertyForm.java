@@ -355,7 +355,11 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	 * Refreshes the data on the view.
 	 */
 	private void refreshData() {
-		updateCmrPropertiesJob.schedule();
+		// we only schedule if the cancel returns true
+		// because cancel fails when job is currently in process
+		if (updateCmrPropertiesJob.cancel()) {
+			updateCmrPropertiesJob.schedule();
+		}
 	}
 
 	/**
@@ -515,8 +519,12 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 			super("Updating CMR Properties..");
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
+			final CmrRepositoryDefinition cmrRepositoryDefinition = CmrRepositoryPropertyForm.this.cmrRepositoryDefinition;
 			if (cmrRepositoryDefinition != null) {
 				final OnlineStatus onlineStatus = cmrRepositoryDefinition.getOnlineStatus();
 				final CmrStatusData cmrStatusData = (onlineStatus == OnlineStatus.ONLINE) ? cmrRepositoryDefinition.getCmrManagementService().getCmrStatusData() : null; // NOPMD
