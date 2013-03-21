@@ -401,8 +401,6 @@
 	<bean id="storageManager"
 		class="info.novatec.inspectit.rcp.storage.InspectITStorageManager">
 		<property name="storageDefaultFolder" value="storage"></property>
-		<lookup-method name="createStorageRepositoryDefinition"
-			bean="storageRepositoryDefinition" />
 	</bean>
 
 	<bean id="timerDataQueryFactory"
@@ -424,6 +422,11 @@
 	<bean id="storageRepositoryDefinition"
 		class="info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition"
 		scope="prototype" lazy-init="true" />
+		
+	<bean id="storageRepositoryDefinitionProvider"
+		class="info.novatec.inspectit.rcp.repository.StorageRepositoryDefinitionProvider">
+		<lookup-method name="createStorageRepositoryDefinition" bean="storageRepositoryDefinition" />
+	</bean>	
 
 	<bean id="storageTimerDataAccessService"
 		class="info.novatec.inspectit.rcp.repository.service.storage.StorageTimerDataAccessService"

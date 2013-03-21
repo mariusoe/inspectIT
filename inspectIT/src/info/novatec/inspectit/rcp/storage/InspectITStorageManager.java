@@ -10,6 +10,7 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryChangeListener;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
+import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinitionProvider;
 import info.novatec.inspectit.rcp.storage.listener.StorageChangeListener;
 import info.novatec.inspectit.rcp.storage.util.DataRetriever;
 import info.novatec.inspectit.rcp.storage.util.DataRetriever.StorageFileType;
@@ -59,7 +60,7 @@ import com.esotericsoftware.kryo.io.Input;
  * @author Ivan Senic
  * 
  */
-public abstract class InspectITStorageManager extends StorageManager implements CmrRepositoryChangeListener {
+public class InspectITStorageManager extends StorageManager implements CmrRepositoryChangeListener { // NOPMD
 
 	/**
 	 * List of downloaded storages.
@@ -102,11 +103,9 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	private DataUploader dataUploader;
 
 	/**
-	 * Returns Spring instantiated {@link StorageRepositoryDefinition}.
-	 * 
-	 * @return Spring instantiated {@link StorageRepositoryDefinition}.
+	 * {@link StorageRepositoryDefinitionProvider}.
 	 */
-	protected abstract StorageRepositoryDefinition createStorageRepositoryDefinition();
+	private StorageRepositoryDefinitionProvider storageRepositoryDefinitionProvider;
 
 	/**
 	 * Mounts a new storage locally. Same as calling
@@ -493,7 +492,7 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 		}
 
 		// create new storage repository definition
-		StorageRepositoryDefinition storageRepositoryDefinition = createStorageRepositoryDefinition();
+		StorageRepositoryDefinition storageRepositoryDefinition = storageRepositoryDefinitionProvider.createStorageRepositoryDefinition();
 		storageRepositoryDefinition.setAgents(platformIdents);
 		storageRepositoryDefinition.setIndexingTree(indexingTree);
 		storageRepositoryDefinition.setCmrRepositoryDefinition(cmrRepositoryDefinition);
@@ -768,6 +767,12 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 */
 	public void repositoryRemoved(CmrRepositoryDefinition cmrRepositoryDefinition) {
 		this.removeMountedStorages(cmrRepositoryDefinition);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void repositoryDataUpdated(CmrRepositoryDefinition cmrRepositoryDefinition) {
 	}
 
 	/**
@@ -1049,6 +1054,16 @@ public abstract class InspectITStorageManager extends StorageManager implements 
 	 */
 	public void setDataUploader(DataUploader dataUploader) {
 		this.dataUploader = dataUploader;
+	}
+
+	/**
+	 * Sets {@link #storageRepositoryDefinitionProvider}.
+	 * 
+	 * @param storageRepositoryDefinitionProvider
+	 *            New value for {@link #storageRepositoryDefinitionProvider}
+	 */
+	public void setStorageRepositoryDefinitionProvider(StorageRepositoryDefinitionProvider storageRepositoryDefinitionProvider) {
+		this.storageRepositoryDefinitionProvider = storageRepositoryDefinitionProvider;
 	}
 
 }
