@@ -6,6 +6,8 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatu
 import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -171,6 +173,12 @@ public class SelectAgentsWizardPage extends WizardPage {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						agentList = new ArrayList<PlatformIdent>(cmrRepositoryDefinition.getGlobalDataAccessService().getAgentsOverview().keySet());
+						Collections.sort(agentList, new Comparator<PlatformIdent>() {
+							@Override
+							public int compare(PlatformIdent a1, PlatformIdent a2) {
+								return a1.getAgentName().compareToIgnoreCase(a2.getAgentName());
+							}
+						});
 						Display.getDefault().asyncExec(new Runnable() {
 							@Override
 							public void run() {
