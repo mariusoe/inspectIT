@@ -317,8 +317,8 @@ public class DataRetriever {
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
 	 */
-	public void downloadAndSaveStorageFiles(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, Path directory, boolean compressBefore,
-			boolean decompressContent, SubMonitor subMonitor, StorageFileType... fileTypes) throws StorageException, IOException {
+	public void downloadAndSaveStorageFiles(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, Path directory, boolean compressBefore, boolean decompressContent,
+			SubMonitor subMonitor, StorageFileType... fileTypes) throws StorageException, IOException {
 		if (!Files.isDirectory(directory)) {
 			throw new StorageException("Directory path supplied as the data saving destination is not valid. Given path is: " + directory.toString());
 		}
@@ -328,18 +328,12 @@ public class DataRetriever {
 		// agent files
 		if (ArrayUtils.contains(fileTypes, StorageFileType.AGENT)) {
 			Map<String, Long> platformIdentsFiles = cmrRepositoryDefinition.getStorageService().getAgentFilesLocations(storageData);
-			if (MapUtils.isEmpty(platformIdentsFiles)) {
-				throw new StorageException("No agent data files could be found on the repository '" + cmrRepositoryDefinition.getName() + "' for the storage " + storageData.toString());
-			}
 			allFiles.putAll(platformIdentsFiles);
 		}
 
 		// indexing files
 		if (ArrayUtils.contains(fileTypes, StorageFileType.INDEX)) {
 			Map<String, Long> indexingTreeFiles = cmrRepositoryDefinition.getStorageService().getIndexFilesLocations(storageData);
-			if (MapUtils.isEmpty(indexingTreeFiles)) {
-				throw new StorageException("No index data files could be found on the repository '" + cmrRepositoryDefinition.getName() + "' for the storage " + storageData.toString());
-			}
 			allFiles.putAll(indexingTreeFiles);
 		}
 
@@ -384,8 +378,7 @@ public class DataRetriever {
 		final TransferDataMonitor transferDataMonitor = new TransferDataMonitor(subMonitor, files, useGzipCompression);
 		httpClient.addResponseInterceptor(new HttpResponseInterceptor() {
 			@Override
-			public void process(HttpResponse response, HttpContext context) throws HttpException,
-					IOException {
+			public void process(HttpResponse response, HttpContext context) throws HttpException, IOException {
 				response.setEntity(new TransferRateEntity(response.getEntity(), transferDataMonitor));
 			}
 		});
