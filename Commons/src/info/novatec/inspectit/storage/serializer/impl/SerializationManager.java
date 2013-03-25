@@ -88,6 +88,7 @@ import info.novatec.inspectit.util.IHibernateUtil;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -126,7 +127,6 @@ import com.esotericsoftware.kryo.util.DefaultClassResolver;
 import com.esotericsoftware.kryo.util.MapReferenceResolver;
 import com.esotericsoftware.kryo.util.ObjectMap;
 
-import de.javakaffee.kryoserializers.ArraysAsListSerializer;
 import de.javakaffee.kryoserializers.SynchronizedCollectionsSerializer;
 import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
 
@@ -296,7 +296,7 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(RemoteInvocation.class, new FieldSerializer<RemoteInvocation>(kryo, RemoteInvocation.class));
 		kryo.register(RemoteInvocationResult.class, new FieldSerializer<RemoteInvocationResult>(kryo, RemoteInvocationResult.class) {
 			@Override
-			protected RemoteInvocationResult create(Kryo arg0, Input input, Class<RemoteInvocationResult> type) {
+			protected RemoteInvocationResult create(Kryo kryo, Input input, Class<RemoteInvocationResult> type) {
 				return new RemoteInvocationResult(null);
 			}
 		});
@@ -322,9 +322,13 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(ExceptionDataAggregator.class, new FieldSerializer<ExceptionDataAggregator>(kryo, ExceptionDataAggregator.class));
 
 		// INSPECTIT-849 - Hibernate uses Arrays.asList which does not have no-arg constructor
-		// changed with INSPECTIT-912 for already provided serializer
-		// this can not break us, since it relates to Hibernate problems
-		kryo.register(Arrays.asList().getClass(), new ArraysAsListSerializer());
+		kryo.register(Arrays.asList().getClass(), new CollectionSerializer() {
+			@Override
+			@SuppressWarnings("rawtypes")
+			protected Collection create(Kryo kryo, Input input, Class<Collection> type) {
+				return new ArrayList<Object>();
+			}
+		});
 
 		// added with INSPECTIT-723
 		kryo.register(RecordingState.class, new EnumSerializer(RecordingState.class));

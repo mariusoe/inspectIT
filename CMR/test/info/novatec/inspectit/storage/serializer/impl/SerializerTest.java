@@ -2,6 +2,7 @@ package info.novatec.inspectit.storage.serializer.impl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -11,6 +12,7 @@ import info.novatec.inspectit.cmr.model.MethodIdentToSensorType;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
+import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.cmr.util.HibernateUtil;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.AggregatedHttpTimerData;
@@ -45,6 +47,7 @@ import info.novatec.inspectit.indexing.storage.impl.StorageBranch;
 import info.novatec.inspectit.indexing.storage.impl.StorageBranchIndexer;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
+import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.BooleanStorageLabel;
 import info.novatec.inspectit.storage.label.DateStorageLabel;
 import info.novatec.inspectit.storage.label.NumberStorageLabel;
@@ -65,10 +68,19 @@ import info.novatec.inspectit.storage.serializer.schema.ClassSchemaManager;
 import info.novatec.inspectit.storage.serializer.schema.SchemaManagerTestProvider;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.hibernate.collection.PersistentList;
 import org.hibernate.collection.PersistentMap;
@@ -108,6 +120,11 @@ public class SerializerTest {
 			{ CmrStatusData.class }, { AgentStatusData.class }, { RecordingData.class }, { CustomBooleanLabelType.class }, { CustomNumberLabelType.class }, { CustomStringLabelType.class },
 			{ AssigneeLabelType.class }, { RatingLabelType.class }, { ExploredByLabelType.class }, { CreationDateLabelType.class }, { StatusLabelType.class }, { UseCaseLabelType.class },
 			{ AggregatedHttpTimerData.class }, { AggregatedSqlStatementData.class }, { AggregatedTimerData.class } };
+
+	/**
+	 * Exceptions we want to test to be able to get serialized.
+	 */
+	private static final Object[][] EXCEPTION_CLASSES = new Object[][] { { StorageException.class }, { ServiceException.class } };
 
 	/**
 	 * Serializer.
@@ -184,7 +201,7 @@ public class SerializerTest {
 	 * @return Provides classes to be tested.
 	 */
 	@DataProvider(name = "classProvider")
-	public Object[][] classprovider() {
+	public Object[][] classProvider() {
 		return TESTING_CLASSES;
 	}
 
@@ -204,13 +221,7 @@ public class SerializerTest {
 	@Test(dataProvider = "classProvider")
 	public void classesPlanSerialization(Class<?> testingClass) throws InstantiationException, IllegalAccessException, SerializationException {
 		Object object = testingClass.newInstance();
-		ByteBufferOutputStream byteBufferOutputStream = new ByteBufferOutputStream(byteBuffer);
-		Output output = new Output(byteBufferOutputStream);
-		serializer.serialize(object, output);
-		byteBuffer.flip();
-		ByteBufferInputStream byteBufferInputStream = new ByteBufferInputStream(byteBuffer);
-		Input input = new Input(byteBufferInputStream);
-		Object deserialized = serializer.deserialize(input);
+		Object deserialized = serializeBackAndForth(object);
 		assertThat(deserialized, is(equalTo(object)));
 	}
 
@@ -224,13 +235,7 @@ public class SerializerTest {
 	@Test
 	public void hibernatePersistentList() throws SerializationException {
 		PersistentList object = new PersistentList();
-		ByteBufferOutputStream byteBufferOutputStream = new ByteBufferOutputStream(byteBuffer);
-		Output output = new Output(byteBufferOutputStream);
-		serializer.serialize(object, output);
-		byteBuffer.flip();
-		ByteBufferInputStream byteBufferInputStream = new ByteBufferInputStream(byteBuffer);
-		Input input = new Input(byteBufferInputStream);
-		Object deserialized = serializer.deserialize(input);
+		Object deserialized = serializeBackAndForth(object);
 		assertThat(deserialized, is(not(instanceOf(PersistentList.class))));
 		assertThat(deserialized, is(instanceOf(List.class)));
 	}
@@ -245,13 +250,7 @@ public class SerializerTest {
 	@Test
 	public void hibernatePersistentSet() throws SerializationException {
 		PersistentSet object = new PersistentSet();
-		ByteBufferOutputStream byteBufferOutputStream = new ByteBufferOutputStream(byteBuffer);
-		Output output = new Output(byteBufferOutputStream);
-		serializer.serialize(object, output);
-		byteBuffer.flip();
-		ByteBufferInputStream byteBufferInputStream = new ByteBufferInputStream(byteBuffer);
-		Input input = new Input(byteBufferInputStream);
-		Object deserialized = serializer.deserialize(input);
+		Object deserialized = serializeBackAndForth(object);
 		assertThat(deserialized, is(not(instanceOf(PersistentSet.class))));
 		assertThat(deserialized, is(instanceOf(Set.class)));
 	}
@@ -266,15 +265,172 @@ public class SerializerTest {
 	@Test
 	public void hibernatePersistentMap() throws SerializationException {
 		PersistentMap object = new PersistentMap();
+		Object deserialized = serializeBackAndForth(object);
+		assertThat(deserialized, is(not(instanceOf(PersistentMap.class))));
+		assertThat(deserialized, is(instanceOf(Map.class)));
+	}
+
+	/**
+	 * Tests the java collections. Compares array gotten from collections because the equal is
+	 * missing in those collections.
+	 */
+	@Test(dataProvider = "javaCollectionsProvider")
+	public void javaCollections(Collection<?> testCollection) throws SerializationException {
+		Collection<?> deserialized = serializeBackAndForth(testCollection);
+		assertThat(deserialized, is(instanceOf(testCollection.getClass())));
+		assertThat(deserialized.toArray(), is(equalTo(testCollection.toArray())));
+	}
+
+	@DataProvider(name = "javaCollectionsProvider")
+	public Object[][] javaCollectionsProvider() {
+		List<Collection<?>> collections = new ArrayList<Collection<?>>();
+
+		// unmodifiable empty
+		collections.add(Collections.unmodifiableCollection(new ArrayList<Object>()));
+		collections.add(Collections.unmodifiableList(new ArrayList<Object>()));
+		collections.add(Collections.unmodifiableSet(new HashSet<Object>()));
+		collections.add(Collections.unmodifiableSortedSet(new TreeSet<Object>()));
+
+		// unmodifiable with one element
+		collections.add(Collections.unmodifiableCollection(Collections.singleton("blub")));
+		collections.add(Collections.unmodifiableList(Collections.singletonList("blub")));
+		collections.add(Collections.unmodifiableSet(Collections.singleton("blub")));
+		TreeSet<Object> treeSet = new TreeSet<Object>();
+		treeSet.add("blub");
+		collections.add(Collections.unmodifiableSortedSet(treeSet));
+
+		// synchronized empty
+		collections.add(Collections.synchronizedCollection(new ArrayList<Object>()));
+		collections.add(Collections.synchronizedList(new ArrayList<Object>()));
+		collections.add(Collections.synchronizedSet(new HashSet<Object>()));
+		collections.add(Collections.synchronizedSortedSet(new TreeSet<Object>()));
+
+		// synchronized with one element
+		collections.add(Collections.synchronizedCollection(Collections.singleton("blub")));
+		collections.add(Collections.synchronizedList(Collections.singletonList("blub")));
+		collections.add(Collections.synchronizedSet(Collections.singleton("blub")));
+		collections.add(Collections.synchronizedSortedSet(treeSet));
+
+		// singletons
+		collections.add(Collections.singleton("blub"));
+		collections.add(Collections.singletonList("blub"));
+		collections.add(Collections.singleton("blub"));
+
+		Object[][] returnData = new Object[collections.size()][1];
+		for (int i = 0; i < collections.size(); i++) {
+			returnData[i][0] = collections.get(i);
+		}
+		return returnData;
+	}
+
+	/**
+	 * Tests the java maps. Compares the entries of maps.
+	 */
+	@Test(dataProvider = "javaMapsProvider")
+	public void javaMaps(Map<Object, Object> testMap) throws SerializationException {
+		Map<?, ?> deserialized = serializeBackAndForth(testMap);
+		assertThat(deserialized, is(instanceOf(testMap.getClass())));
+
+		for (Entry<Object, Object> originalEntry : testMap.entrySet()) {
+			assertThat(deserialized, hasEntry(originalEntry.getKey(), originalEntry.getValue()));
+		}
+	}
+
+	@DataProvider(name = "javaMapsProvider")
+	public Object[][] javaMapsProvider() {
+		List<Map<?, ?>> maps = new ArrayList<Map<?, ?>>();
+
+		// unmodifiable
+		maps.add(Collections.unmodifiableMap(Collections.singletonMap("Key", "Value")));
+		TreeMap<String, String> treeMap = new TreeMap<String, String>();
+		treeMap.put("Key", "Value");
+		maps.add(Collections.unmodifiableSortedMap(treeMap));
+
+		// synchronized
+		maps.add(Collections.synchronizedMap(Collections.singletonMap("Key", "Value")));
+		maps.add(Collections.synchronizedSortedMap(treeMap));
+
+		// singleton
+		maps.add(Collections.singletonMap("Key", "Value"));
+
+		Object[][] returnData = new Object[maps.size()][1];
+		for (int i = 0; i < maps.size(); i++) {
+			returnData[i][0] = maps.get(i);
+		}
+		return returnData;
+	}
+
+	/**
+	 * Tests our exception classes for serialization and de-serialization.
+	 */
+	@Test(dataProvider = "exceptionsProvider")
+	public void exceptions(Class<? extends Exception> exceptionClass) throws SerializationException, InstantiationException, IllegalAccessException, IllegalArgumentException,
+			InvocationTargetException, NoSuchMethodException, SecurityException {
+		Exception exception = new Exception("Cause message");
+		Constructor<? extends Exception> constructor = exceptionClass.getConstructor(String.class, Throwable.class);
+		Exception realException = constructor.newInstance("Test message", exception);
+		realException.printStackTrace();
+		Exception deserialized = serializeBackAndForth(realException);
+
+		// exceptions do not implement equalsTo
+		// we need to manually prove
+		assertThat(deserialized, is(instanceOf(exceptionClass)));
+		assertThat(deserialized.getMessage(), is(equalTo(realException.getMessage())));
+		assertThat(deserialized.getStackTrace(), is(equalTo(realException.getStackTrace())));
+		assertThat(deserialized.getCause(), is(instanceOf(Exception.class)));
+		assertThat(deserialized.getCause().getMessage(), is(equalTo(exception.getMessage())));
+	}
+
+	/**
+	 * Provides classes to be tested.
+	 * 
+	 * @return Provides classes to be tested.
+	 */
+	@DataProvider(name = "exceptionsProvider")
+	public Object[][] exceptionsProvider() {
+		return EXCEPTION_CLASSES;
+	}
+
+	/**
+	 * Test a {@link IOException} throw from another method.
+	 */
+	@Test
+	public void thrownException() throws SerializationException {
+		try {
+			throwIOException();
+		} catch (IOException original) {
+			original.printStackTrace();
+			Exception deserialized = serializeBackAndForth(original);
+			assertThat(deserialized, is(instanceOf(original.getClass())));
+			assertThat(deserialized.getMessage(), is(equalTo(original.getMessage())));
+			assertThat(deserialized.getStackTrace(), is(equalTo(original.getStackTrace())));
+		}
+	}
+
+	private void throwIOException() throws IOException {
+		throw new IOException("Just for testing");
+	}
+
+	/**
+	 * Performs the serialization of the given object to bytes and then performs de-serialization
+	 * from those bytes and returns the de-serialized object back.
+	 * 
+	 * @param original
+	 *            Original object.
+	 * @return De-serialized objects from bytes gotten from the serialization of original.
+	 * @throws SerializationException
+	 *             If serialization fails.
+	 */
+	@SuppressWarnings("unchecked")
+	private <T> T serializeBackAndForth(Object original) throws SerializationException {
 		ByteBufferOutputStream byteBufferOutputStream = new ByteBufferOutputStream(byteBuffer);
 		Output output = new Output(byteBufferOutputStream);
-		serializer.serialize(object, output);
+		serializer.serialize(original, output);
 		byteBuffer.flip();
 		ByteBufferInputStream byteBufferInputStream = new ByteBufferInputStream(byteBuffer);
 		Input input = new Input(byteBufferInputStream);
-		Object deserialized = serializer.deserialize(input);
-		assertThat(deserialized, is(not(instanceOf(PersistentMap.class))));
-		assertThat(deserialized, is(instanceOf(Map.class)));
+		return (T) serializer.deserialize(input);
+
 	}
 
 }
