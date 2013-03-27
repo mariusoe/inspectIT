@@ -106,6 +106,11 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 	private ScrolledForm form;
 
 	/**
+	 * Label for ID.
+	 */
+	private Label uniqueId;
+
+	/**
 	 * Label for repository.
 	 */
 	private Label repository;
@@ -237,6 +242,10 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 
 		toolkit.createLabel(generalComposite, "State:");
 		state = toolkit.createLabel(generalComposite, null, SWT.WRAP);
+
+		toolkit.createLabel(generalComposite, "Unique ID:");
+		uniqueId = toolkit.createLabel(generalComposite, null, SWT.WRAP);
+		uniqueId.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 
 		generalSection.setClient(generalComposite);
 		generalSection.setLayout(new TableWrapLayout());
@@ -469,6 +478,7 @@ public class StorageDataPropertyForm implements ISelectionChangedListener {
 					form.setText(storageData.getName());
 					form.setMessage(null, IMessageProvider.NONE);
 					mainComposite.setVisible(true);
+					uniqueId.setText(storageData.getId());
 					String desc = storageData.getDescription();
 					if (null != desc) {
 						if (desc.length() > MAX_DESCRIPTION_LENGTH) {
