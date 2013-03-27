@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.wizard;
 
+import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
@@ -21,6 +22,8 @@ import info.novatec.inspectit.storage.recording.RecordingState;
 import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -81,6 +84,12 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 	private CmrRepositoryDefinition selectedCmr;
 
 	/**
+	 * The collection of agents that will be automatically selected in the
+	 * {@link SelectExistingStorageWizardPage}.
+	 */
+	private Collection<PlatformIdent> autoSelectedAgents;
+
+	/**
 	 * Recording properties defined in the wizard.
 	 */
 	private RecordingProperties recordingProperties;
@@ -89,7 +98,6 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 	 * Public constructor.
 	 */
 	public StartRecordingWizard() {
-		super();
 		this.setWindowTitle("Start Recording Wizard");
 	}
 
@@ -108,12 +116,27 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 	/**
 	 * This constructor gets the selected {@link CmrRepositoryDefinition}.
 	 * 
-	 * @param selectedCmr
+	 * @param cmrRepositoryDefinition
 	 *            Selected {@link CmrRepositoryDefinition}.
 	 */
-	public StartRecordingWizard(CmrRepositoryDefinition selectedCmr) {
+	public StartRecordingWizard(CmrRepositoryDefinition cmrRepositoryDefinition) {
+		this(cmrRepositoryDefinition, Collections.<PlatformIdent> emptyList());
+	}
+
+	/**
+	 * The constructor sets the CMR and provides option to define yhe collection of agents that will
+	 * be automatically selected in the {@link SelectExistingStorageWizardPage}.
+	 * 
+	 * @param cmrRepositoryDefinition
+	 *            Selected {@link CmrRepositoryDefinition}.
+	 * @param autoSelectedAgents
+	 *            The collection of agents that will be automatically selected in the
+	 *            {@link SelectExistingStorageWizardPage}.
+	 */
+	public StartRecordingWizard(CmrRepositoryDefinition cmrRepositoryDefinition, Collection<PlatformIdent> autoSelectedAgents) {
 		this();
-		this.selectedCmr = selectedCmr;
+		this.selectedCmr = cmrRepositoryDefinition;
+		this.autoSelectedAgents = autoSelectedAgents;
 	}
 
 	/**
@@ -134,7 +157,7 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 		addPage(defineNewStorageWizzardPage);
 		selectStorageWizardPage = new SelectExistingStorageWizardPage(selectedCmr, true);
 		addPage(selectStorageWizardPage);
-		selectAgentsWizardPage = new SelectAgentsWizardPage("Select Agent(s) that should participate in recording");
+		selectAgentsWizardPage = new SelectAgentsWizardPage("Select Agent(s) that should participate in recording", autoSelectedAgents);
 		addPage(selectAgentsWizardPage);
 		defineDataPage = new DefineDataProcessorsWizardPage(DefineDataProcessorsWizardPage.BUFFER_DATA | DefineDataProcessorsWizardPage.SYSTEM_DATA
 				| DefineDataProcessorsWizardPage.EXTRACT_INVOCATIONS);

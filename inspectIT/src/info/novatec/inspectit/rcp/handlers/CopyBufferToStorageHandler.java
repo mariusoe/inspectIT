@@ -1,10 +1,15 @@
 package info.novatec.inspectit.rcp.handlers;
 
+import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
+import info.novatec.inspectit.rcp.provider.ICmrRepositoryAndAgentProvider;
 import info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.wizard.CopyBufferToStorageWizard;
+
+import java.util.Collection;
+import java.util.Collections;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -31,10 +36,16 @@ public class CopyBufferToStorageHandler extends AbstractHandler implements IHand
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		if (selection instanceof StructuredSelection) {
+			CmrRepositoryDefinition suggestedCmrRepositoryDefinition = null;
+			Collection<PlatformIdent> autoSelectedAgents = Collections.emptyList();
 			Object selectedObject = ((StructuredSelection) selection).getFirstElement();
 			if (selectedObject instanceof ICmrRepositoryProvider) {
-				CmrRepositoryDefinition suggestedCmrRepositoryDefinition = ((ICmrRepositoryProvider) selectedObject).getCmrRepositoryDefinition();
-
+				suggestedCmrRepositoryDefinition = ((ICmrRepositoryProvider) selectedObject).getCmrRepositoryDefinition();
+			} else if (selectedObject instanceof ICmrRepositoryAndAgentProvider) {
+				suggestedCmrRepositoryDefinition = ((ICmrRepositoryAndAgentProvider) selectedObject).getCmrRepositoryDefinition();
+				autoSelectedAgents = Collections.singletonList(((ICmrRepositoryAndAgentProvider) selectedObject).getPlatformIdent());
+			}
+			if (null != suggestedCmrRepositoryDefinition) {
 				// check if the writing state is OK
 				try {
 					CmrStatusData cmrStatusData = suggestedCmrRepositoryDefinition.getCmrManagementService().getCmrStatusData();
@@ -50,7 +61,7 @@ public class CopyBufferToStorageHandler extends AbstractHandler implements IHand
 					// action
 				}
 
-				CopyBufferToStorageWizard wizard = new CopyBufferToStorageWizard(suggestedCmrRepositoryDefinition);
+				CopyBufferToStorageWizard wizard = new CopyBufferToStorageWizard(suggestedCmrRepositoryDefinition, autoSelectedAgents);
 				WizardDialog dialog = new WizardDialog(HandlerUtil.getActiveShell(event), wizard);
 				dialog.open();
 			}

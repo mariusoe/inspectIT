@@ -745,21 +745,23 @@
                      value="1">
                </count>
                <iterate>
-                  <instanceof
-                        value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
-                  </instanceof>
-               </iterate>
-               <iterate>
+                  <or>
+                     <instanceof
+                           value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
+                     </instanceof>
+                     <instanceof
+                           value="info.novatec.inspectit.rcp.provider.ICmrRepositoryAndAgentProvider">
+                     </instanceof>
+                  </or>
                   <test
                         property="info.novatec.inspectit.onlineStatus"
                         value="ONLINE">
                   </test>
-               </iterate>
-               <iterate>
                   <test
                         property="info.novatec.inspectit.recordingActive"
                         value="false">
-                  </test></iterate>
+                  </test>
+               </iterate>
             </and>
          </activeWhen>
       </handler>
@@ -772,9 +774,14 @@
                      value="1">
                </count>
                <iterate>
-                  <instanceof
-                        value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
-                  </instanceof>
+                  <or>
+                     <instanceof
+                           value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
+                     </instanceof>
+                     <instanceof
+                           value="info.novatec.inspectit.rcp.provider.ICmrRepositoryAndAgentProvider">
+                     </instanceof>
+                  </or>
                   <test
                         property="info.novatec.inspectit.onlineStatus"
                         value="ONLINE">
@@ -845,9 +852,14 @@
                      value="1">
                </count>
                <iterate>
-                  <instanceof
-                        value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
-                  </instanceof>
+                  <or>
+                     <instanceof
+                           value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
+                     </instanceof>
+                     <instanceof
+                           value="info.novatec.inspectit.rcp.provider.ICmrRepositoryAndAgentProvider">
+                     </instanceof>
+                  </or>
                   <test
                         property="info.novatec.inspectit.onlineStatus"
                         value="ONLINE">
@@ -1460,6 +1472,13 @@
             namespace="info.novatec.inspectit"
             properties="onlineStatus, recordingActive"
             type="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
+      </propertyTester>
+      <propertyTester
+            class="info.novatec.inspectit.rcp.tester.CmrOnlineStatusTester"
+            id="info.inspectit.rcp.CmrTester"
+            namespace="info.novatec.inspectit"
+            properties="onlineStatus, recordingActive"
+            type="info.novatec.inspectit.rcp.provider.ICmrRepositoryAndAgentProvider">
       </propertyTester>
       <propertyTester
             class="info.novatec.inspectit.rcp.tester.CmrOnlineStatusTester"

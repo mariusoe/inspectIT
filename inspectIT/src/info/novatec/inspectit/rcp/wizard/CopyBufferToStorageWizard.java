@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.wizard;
 
+import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
@@ -20,6 +21,8 @@ import info.novatec.inspectit.storage.processor.impl.TimeFrameDataProcessor;
 import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -49,6 +52,12 @@ public class CopyBufferToStorageWizard extends Wizard implements INewWizard {
 	 * {@link CmrRepositoryDefinition} to perform operation on.
 	 */
 	private CmrRepositoryDefinition cmrRepositoryDefinition;
+
+	/**
+	 * The collection of agents that will be automatically selected in the
+	 * {@link SelectExistingStorageWizardPage}.
+	 */
+	private Collection<PlatformIdent> autoSelectedAgents;
 
 	/**
 	 * Should new storage be used, or an existing one.
@@ -90,8 +99,20 @@ public class CopyBufferToStorageWizard extends Wizard implements INewWizard {
 	 *            {@link CmrRepositoryDefinition} to perform operation on.
 	 */
 	public CopyBufferToStorageWizard(CmrRepositoryDefinition cmrRepositoryDefinition) {
+		this(cmrRepositoryDefinition, Collections.<PlatformIdent> emptyList());
+	}
+
+	/**
+	 * @param cmrRepositoryDefinition
+	 *            {@link CmrRepositoryDefinition} to perform operation on.
+	 * @param autoSelectedAgents
+	 *            The collection of agents that will be automatically selected in the
+	 *            {@link SelectExistingStorageWizardPage}.
+	 */
+	public CopyBufferToStorageWizard(CmrRepositoryDefinition cmrRepositoryDefinition, Collection<PlatformIdent> autoSelectedAgents) {
 		super();
 		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
+		this.autoSelectedAgents = autoSelectedAgents;
 		this.setWindowTitle("Copy Buffer to Storage Wizard");
 	}
 
@@ -113,7 +134,7 @@ public class CopyBufferToStorageWizard extends Wizard implements INewWizard {
 		addPage(defineNewStorageWizzardPage);
 		selectExistingStorageWizardPage = new SelectExistingStorageWizardPage(cmrRepositoryDefinition, false);
 		addPage(selectExistingStorageWizardPage);
-		selectAgentsPage = new SelectAgentsWizardPage("Select Agent(s) to be copied");
+		selectAgentsPage = new SelectAgentsWizardPage("Select Agent(s) to be copied", autoSelectedAgents);
 		addPage(selectAgentsPage);
 		defineProcessorsPage = new DefineDataProcessorsWizardPage(DefineDataProcessorsWizardPage.BUFFER_DATA);
 		addPage(defineProcessorsPage);

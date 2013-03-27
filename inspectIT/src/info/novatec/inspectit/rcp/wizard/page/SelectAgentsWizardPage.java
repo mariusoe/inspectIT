@@ -9,11 +9,13 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatu
 import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -76,6 +78,11 @@ public class SelectAgentsWizardPage extends WizardPage {
 	private CmrRepositoryDefinition cmrRepositoryDefinition;
 
 	/**
+	 * Collection of agents that will be automatically selected in the wizard.
+	 */
+	private Collection<PlatformIdent> autoSelectedAgents;
+
+	/**
 	 * Default constructor.
 	 */
 	public SelectAgentsWizardPage() {
@@ -89,9 +96,23 @@ public class SelectAgentsWizardPage extends WizardPage {
 	 *            Wizard page message.
 	 */
 	public SelectAgentsWizardPage(String message) {
+		this(message, Collections.<PlatformIdent> emptyList());
+	}
+
+	/**
+	 * This constructor sets the wizard page message and provides possibility to specify the agents
+	 * that will be preselected if they are available on the repository.
+	 * 
+	 * @param message
+	 *            Wizard page message.
+	 * @param autoSelectedAgents
+	 *            Collection of agents that will be automatically selected in the wizard.
+	 */
+	public SelectAgentsWizardPage(String message, Collection<PlatformIdent> autoSelectedAgents) {
 		super("Select Agent(s)");
 		this.setTitle("Select Agent(s)");
 		this.setMessage(message);
+		this.autoSelectedAgents = autoSelectedAgents;
 	}
 
 	/**
@@ -196,12 +217,17 @@ public class SelectAgentsWizardPage extends WizardPage {
 								specificAgents = new Button(main, SWT.RADIO);
 								specificAgents.setText("Select specific Agent(s)");
 
+								boolean preSelectedAgentsActive = false;
 								agentSelection = new Table(main, SWT.CHECK | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
 								for (PlatformIdent platformIdent : agentList) {
 									AgentStatusData agentStatusData = agentMap.get(platformIdent);
 									TableItem tableItem = new TableItem(agentSelection, SWT.NONE);
 									tableItem.setText(TextFormatter.getAgentDescription(platformIdent, agentStatusData));
 									tableItem.setImage(ImageFormatter.getAgentImage(agentStatusData));
+									if (CollectionUtils.isNotEmpty(autoSelectedAgents) && autoSelectedAgents.contains(platformIdent)) {
+										tableItem.setChecked(true);
+										preSelectedAgentsActive = true;
+									}
 								}
 								agentSelection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 								agentSelection.setEnabled(false);
@@ -230,6 +256,12 @@ public class SelectAgentsWizardPage extends WizardPage {
 								};
 								allAgents.addListener(SWT.Selection, agentsSelectionListener);
 								specificAgents.addListener(SWT.Selection, agentsSelectionListener);
+
+								if (preSelectedAgentsActive) {
+									specificAgents.setSelection(true);
+									allAgents.setSelection(false);
+									agentSelection.setEnabled(true);
+								}
 
 								main.layout();
 							}

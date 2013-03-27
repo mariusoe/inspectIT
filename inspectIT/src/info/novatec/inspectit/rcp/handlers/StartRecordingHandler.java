@@ -1,15 +1,20 @@
 package info.novatec.inspectit.rcp.handlers;
 
+import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
+import info.novatec.inspectit.rcp.provider.ICmrRepositoryAndAgentProvider;
 import info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.view.impl.RepositoryManagerView;
 import info.novatec.inspectit.rcp.view.impl.StorageManagerView;
 import info.novatec.inspectit.rcp.wizard.StartRecordingWizard;
 import info.novatec.inspectit.storage.recording.RecordingProperties;
+
+import java.util.Collection;
+import java.util.Collections;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -44,10 +49,15 @@ public class StartRecordingHandler extends AbstractHandler implements IHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		// try to get the CMR where recording should start.
 		CmrRepositoryDefinition cmrRepositoryDefinition = null;
+		Collection<PlatformIdent> autoSelectedAgents = Collections.emptyList();
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		if (selection instanceof StructuredSelection) {
-			if (((StructuredSelection) selection).getFirstElement() instanceof ICmrRepositoryProvider) {
-				cmrRepositoryDefinition = ((ICmrRepositoryProvider) ((StructuredSelection) selection).getFirstElement()).getCmrRepositoryDefinition();
+			Object selectedObject = ((StructuredSelection) selection).getFirstElement();
+			if (selectedObject instanceof ICmrRepositoryProvider) {
+				cmrRepositoryDefinition = ((ICmrRepositoryProvider) selectedObject).getCmrRepositoryDefinition();
+			} else if (selectedObject instanceof ICmrRepositoryAndAgentProvider) {
+				cmrRepositoryDefinition = ((ICmrRepositoryAndAgentProvider) selectedObject).getCmrRepositoryDefinition();
+				autoSelectedAgents = Collections.singletonList(((ICmrRepositoryAndAgentProvider) selectedObject).getPlatformIdent());
 			}
 		}
 
@@ -68,7 +78,7 @@ public class StartRecordingHandler extends AbstractHandler implements IHandler {
 		}
 
 		// open wizard
-		StartRecordingWizard startRecordingWizard = new StartRecordingWizard(cmrRepositoryDefinition);
+		StartRecordingWizard startRecordingWizard = new StartRecordingWizard(cmrRepositoryDefinition, autoSelectedAgents);
 		WizardDialog wizardDialog = new WizardDialog(HandlerUtil.getActiveShell(event), startRecordingWizard);
 		wizardDialog.open();
 

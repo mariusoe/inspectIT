@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.model;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
+import info.novatec.inspectit.rcp.provider.ICmrRepositoryAndAgentProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 
 import com.google.common.base.Objects;
@@ -12,7 +13,7 @@ import com.google.common.base.Objects;
  * @author Ivan Senic
  * 
  */
-public class AgentLeaf extends Leaf {
+public class AgentLeaf extends Leaf implements ICmrRepositoryAndAgentProvider {
 
 	/**
 	 * Agent.
@@ -28,7 +29,7 @@ public class AgentLeaf extends Leaf {
 	 * {@link CmrRepositoryDefinition}.
 	 */
 	private final CmrRepositoryDefinition cmrRepositoryDefinition;
-	
+
 	/**
 	 * Is this leaf part of the folder.
 	 */

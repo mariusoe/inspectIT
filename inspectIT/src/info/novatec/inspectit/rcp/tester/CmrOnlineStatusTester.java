@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.tester;
 
+import info.novatec.inspectit.rcp.provider.ICmrRepositoryAndAgentProvider;
 import info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider;
 import info.novatec.inspectit.rcp.provider.IInputDefinitionProvider;
 import info.novatec.inspectit.rcp.provider.IStorageDataProvider;
@@ -26,6 +27,8 @@ public class CmrOnlineStatusTester extends PropertyTester {
 		CmrRepositoryDefinition cmrRepositoryDefinition = null;
 		if (receiver instanceof ICmrRepositoryProvider) {
 			cmrRepositoryDefinition = ((ICmrRepositoryProvider) receiver).getCmrRepositoryDefinition();
+		} else if (receiver instanceof ICmrRepositoryAndAgentProvider) {
+			cmrRepositoryDefinition = ((ICmrRepositoryAndAgentProvider) receiver).getCmrRepositoryDefinition();
 		} else if (receiver instanceof IStorageDataProvider) {
 			cmrRepositoryDefinition = ((IStorageDataProvider) receiver).getCmrRepositoryDefinition();
 		} else if (receiver instanceof IInputDefinitionProvider) {

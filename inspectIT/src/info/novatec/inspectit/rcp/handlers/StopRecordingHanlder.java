@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.handlers;
 
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
+import info.novatec.inspectit.rcp.provider.ICmrRepositoryAndAgentProvider;
 import info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
@@ -43,8 +44,11 @@ public class StopRecordingHanlder extends AbstractHandler implements IHandler {
 		CmrRepositoryDefinition cmrRepositoryDefinition = null;
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		if (selection instanceof StructuredSelection) {
-			if (((StructuredSelection) selection).getFirstElement() instanceof ICmrRepositoryProvider) {
-				cmrRepositoryDefinition = ((ICmrRepositoryProvider) ((StructuredSelection) selection).getFirstElement()).getCmrRepositoryDefinition();
+			Object selectedObject = ((StructuredSelection) selection).getFirstElement();
+			if (selectedObject instanceof ICmrRepositoryProvider) {
+				cmrRepositoryDefinition = ((ICmrRepositoryProvider) selectedObject).getCmrRepositoryDefinition();
+			} else if (((StructuredSelection) selection).getFirstElement() instanceof ICmrRepositoryAndAgentProvider) {
+				cmrRepositoryDefinition = ((ICmrRepositoryAndAgentProvider) selectedObject).getCmrRepositoryDefinition();
 			}
 		}
 		if (null != cmrRepositoryDefinition) {
