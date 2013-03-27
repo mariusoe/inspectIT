@@ -13,6 +13,8 @@ import info.novatec.inspectit.rcp.editor.search.criteria.SearchCriteria;
 import info.novatec.inspectit.rcp.editor.search.criteria.SearchResult;
 import info.novatec.inspectit.rcp.editor.search.helper.TableViewerSearchHelper;
 import info.novatec.inspectit.rcp.editor.table.input.TableInputController;
+import info.novatec.inspectit.rcp.editor.tooltip.ColumnAwareToolTipSupport;
+import info.novatec.inspectit.rcp.editor.tooltip.IColumnToolTipProvider;
 import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
 import info.novatec.inspectit.rcp.menu.ShowHideMenuManager;
 
@@ -29,6 +31,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -118,7 +121,11 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 		tableInputController.createColumns(tableViewer);
 		tableViewer.setUseHashlookup(true);
 		tableViewer.setContentProvider(tableInputController.getContentProvider());
-		tableViewer.setLabelProvider(tableInputController.getLabelProvider());
+		IBaseLabelProvider labelProvider = tableInputController.getLabelProvider();
+		tableViewer.setLabelProvider(labelProvider);
+		if (labelProvider instanceof IColumnToolTipProvider) {
+			ColumnAwareToolTipSupport.enableFor(tableViewer);
+		}
 		tableViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
 				tableInputController.doubleClick(event);

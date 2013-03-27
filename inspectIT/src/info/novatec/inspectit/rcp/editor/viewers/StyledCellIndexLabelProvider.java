@@ -1,5 +1,7 @@
 package info.novatec.inspectit.rcp.editor.viewers;
 
+import info.novatec.inspectit.rcp.editor.tooltip.IColumnToolTipProvider;
+
 import java.util.Arrays;
 
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
@@ -18,7 +20,7 @@ import org.eclipse.ui.progress.PendingUpdateAdapter;
  * @author Patrice Bouillet
  * 
  */
-public class StyledCellIndexLabelProvider extends StyledCellLabelProvider {
+public class StyledCellIndexLabelProvider extends StyledCellLabelProvider implements IColumnToolTipProvider {
 
 	/**
 	 * {@inheritDoc}
@@ -127,6 +129,34 @@ public class StyledCellIndexLabelProvider extends StyledCellLabelProvider {
 	 *         background color
 	 */
 	protected Color getBackground(Object element, int index) {
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getToolTipText(Object element, int index) {
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Image getToolTipImage(Object element, int index) {
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * It is needed to return not <code>null</code> value when using the
+	 * {@link IColumnToolTipProvider}, so that the tips from {@link IColumnToolTipProvider} can be
+	 * displayed.
+	 */
+	@Override
+	public String getToolTipText(Object element) {
 		return null;
 	}
 

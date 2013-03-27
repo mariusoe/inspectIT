@@ -21,6 +21,7 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.table.RemoteTableViewerComparator;
+import info.novatec.inspectit.rcp.editor.tooltip.IColumnToolTipProvider;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
@@ -81,7 +82,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 */
 	private static enum Column {
 		/** The time column. */
-		NESTED_DATA("", 40, null, InvocationSequenceDataComparatorEnum.NESTED_DATA),
+		NESTED_DATA("Nested Data", 40, null, InvocationSequenceDataComparatorEnum.NESTED_DATA),
 		/** The time column. */
 		TIME("Start Time", 150, InspectITImages.IMG_TIMER, DefaultDataComparatorEnum.TIMESTAMP),
 		/** The method column. */
@@ -439,7 +440,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private final class InvocOverviewLabelProvider extends StyledCellIndexLabelProvider {
+	private final class InvocOverviewLabelProvider extends StyledCellIndexLabelProvider implements IColumnToolTipProvider {
 
 		/**
 		 * {@inheritDoc}
@@ -478,6 +479,32 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 				return super.getColumnImage(element, index);
 			}
 
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getToolTipText(Object element, int index) {
+			InvocationSequenceData data = (InvocationSequenceData) element;
+			Column enumId = Column.fromOrd(index);
+			switch (enumId) {
+			case NESTED_DATA:
+				if (InvocationSequenceDataHelper.hasNestedSqlStatements(data) || InvocationSequenceDataHelper.hasNestedExceptions(data)) {
+					StringBuilder toolTip = new StringBuilder("This invocation contains:");
+					if (InvocationSequenceDataHelper.hasNestedSqlStatements(data)) {
+						toolTip.append("\n - SQL statement(s)");
+					}
+					if (InvocationSequenceDataHelper.hasNestedExceptions(data)) {
+						toolTip.append("\n - Exception(s)");
+					}
+					return toolTip.toString();
+				} else {
+					return super.getToolTipText(element, index);
+				}
+			default:
+				return null;
+			}
 		}
 	}
 
