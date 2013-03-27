@@ -284,10 +284,6 @@
             name="Close Storage">
       </command>
       <command
-            id="info.novatec.inspectit.rcp.commands.deleteStorage"
-            name="Delete Storage">
-      </command>
-      <command
             id="info.novatec.inspectit.rcp.commands.addStorageLabel"
             name="Add Storage Label">
       </command>
@@ -409,7 +405,8 @@
                <count
                      value="+">
                </count>
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <instanceof
                         value="info.novatec.inspectit.communication.DefaultData">
                   </instanceof>
@@ -435,7 +432,8 @@
                <count
                      value="+">
                </count>
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <instanceof
                         value="info.novatec.inspectit.communication.DefaultData">
                   </instanceof>
@@ -461,7 +459,8 @@
                <count
                      value="+">
                </count>
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <instanceof
                         value="info.novatec.inspectit.communication.DefaultData">
                   </instanceof>
@@ -487,7 +486,8 @@
                <count
                      value="+">
                </count>
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <instanceof
                         value="info.novatec.inspectit.communication.DefaultData">
                   </instanceof>
@@ -532,7 +532,8 @@
                         property="info.novatec.inspectit.canNavigateToInvocations">
                   </test>
                </with>
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <instanceof
                         value="info.novatec.inspectit.communication.data.InvocationAwareData">
                   </instanceof>
@@ -678,13 +679,14 @@
       </handler>
       <handler
             class="info.novatec.inspectit.rcp.handlers.DeleteStorageHandler"
-            commandId="info.novatec.inspectit.rcp.commands.deleteStorage">
+            commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
             <and>
                <count
                      value="+">
                </count>
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <instanceof
                         value="info.novatec.inspectit.rcp.provider.IStorageDataProvider">
                   </instanceof>
@@ -794,7 +796,8 @@
             commandId="info.novatec.inspectit.rcp.commands.clearRepositoryBuffer">
          <activeWhen>
             <or>
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <instanceof
                         value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
                   </instanceof>
@@ -901,7 +904,8 @@
                <count
                      value="+">
                </count>
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <instanceof
                         value="info.novatec.inspectit.communication.MethodSensorData">
                   </instanceof>
@@ -1021,7 +1025,8 @@
                <count
                      value="+">
                </count>
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <instanceof
                         value="info.novatec.inspectit.communication.data.InvocationSequenceData">
                   </instanceof>
@@ -1073,7 +1078,8 @@
                <count
                      value="+">
                </count>
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <instanceof
                         value="info.novatec.inspectit.communication.data.SqlStatementData">
                   </instanceof>
@@ -1096,7 +1102,8 @@
                <count
                      value="+">
                </count>
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <instanceof
                         value="info.novatec.inspectit.communication.data.ExceptionSensorData">
                   </instanceof>
@@ -1119,7 +1126,8 @@
                <count
                      value="+">
                </count>
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <instanceof
                         value="info.novatec.inspectit.communication.data.InvocationSequenceData">
                   </instanceof>
@@ -1167,7 +1175,8 @@
             commandId="info.novatec.inspectit.rcp.commands.navigateToAggregatedSqlData">
             <activeWhen>
             	<and>
-            	<iterate>
+            	<iterate
+                   ifEmpty="false">
                   <or>
                      <instanceof
                            value="info.novatec.inspectit.communication.data.SqlStatementData">
@@ -1194,7 +1203,8 @@
                <count
                      value="+">
                </count>
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <not>
                      <instanceof
                            value="info.novatec.inspectit.communication.data.SqlStatementData">
@@ -1233,10 +1243,11 @@
       </handler>
       <handler
             class="info.novatec.inspectit.rcp.handlers.DeleteLocalStorageHandler"
-            commandId="info.novatec.inspectit.rcp.commands.deleteStorage">
+            commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
             <and>
-            	<iterate>
+            	<iterate
+                   ifEmpty="false">
                   <instanceof
                         value="info.novatec.inspectit.rcp.provider.ILocalStorageDataProvider">
                   </instanceof>
@@ -1380,7 +1391,8 @@
                <count
                      value="+">
                </count>
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <instanceof
                         value="info.novatec.inspectit.rcp.model.AgentLeaf">
                   </instanceof>
@@ -1916,8 +1928,7 @@
                tooltip="Finalize Storage">
          </command>
          <command
-               commandId="info.novatec.inspectit.rcp.commands.deleteStorage"
-               icon="icons/delete.png"
+               commandId="org.eclipse.ui.edit.delete"
                style="push"
                tooltip="Delete Storage">
          </command>
@@ -2063,8 +2074,7 @@
                style="push">
          </command>
          <command
-               commandId="info.novatec.inspectit.rcp.commands.deleteStorage"
-               icon="icons/delete.png"
+               commandId="org.eclipse.ui.edit.delete"
                label="Delete Storage"
                style="push">
          </command>
