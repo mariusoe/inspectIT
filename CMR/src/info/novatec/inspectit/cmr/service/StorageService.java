@@ -230,16 +230,20 @@ public class StorageService implements IStorageService {
 		if (!storageManager.isStorageOpen(storageData)) {
 			throw new StorageException("Writing to storage tried to be performed on the storage that is not opened. Please open the storage first.");
 		}
-		storageManager.writeToStorage(storageData, defaultDataCollection, dataProcessors, synchronously);
+		try {
+			storageManager.writeToStorage(storageData, defaultDataCollection, dataProcessors, synchronously);
+		} catch (IOException | SerializationException e) {
+			throw new StorageException("Copy Buffer to Storage action encountered an error.", e);
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public StorageData copyBufferToStorage(StorageData storageData, List<Long> platformIdents, Collection<AbstractDataProcessor> dataProcessors) throws StorageException {
+	public StorageData copyBufferToStorage(StorageData storageData, List<Long> platformIdents, Collection<AbstractDataProcessor> dataProcessors, boolean autoFinalize) throws StorageException {
 		try {
-			storageManager.copyBufferToStorage(storageData, platformIdents, dataProcessors);
+			storageManager.copyBufferToStorage(storageData, platformIdents, dataProcessors, autoFinalize);
 			return storageData;
 		} catch (IOException | SerializationException e) {
 			throw new StorageException("Copy Buffer to Storage action encountered an error.", e);
@@ -247,9 +251,10 @@ public class StorageService implements IStorageService {
 	}
 
 	@Override
-	public StorageData copyDataToStorage(StorageData storageData, Collection<Long> elementIds, long platformIdent, Collection<AbstractDataProcessor> dataProcessors) throws StorageException {
+	public StorageData copyDataToStorage(StorageData storageData, Collection<Long> elementIds, long platformIdent, Collection<AbstractDataProcessor> dataProcessors, boolean autoFinalize)
+			throws StorageException {
 		try {
-			storageManager.copyDataToStorage(storageData, elementIds, platformIdent, dataProcessors);
+			storageManager.copyDataToStorage(storageData, elementIds, platformIdent, dataProcessors, autoFinalize);
 			return storageData;
 		} catch (IOException | SerializationException e) {
 			throw new StorageException("Copy Data to Storage action encountered an error.", e);

@@ -162,9 +162,13 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 	 * 
 	 * @throws StorageException
 	 *             If {@link StorageException} occurs.
+	 * @throws SerializationException
+	 *             If serialization fails.
+	 * @throws IOException
+	 *             If {@link IOException} occurs.
 	 */
 	@Test(dependsOnMethods = { "createStorageTest" })
-	public void testWrite() throws StorageException {
+	public void testWrite() throws StorageException, IOException, SerializationException {
 		Random random = new Random();
 		int repeat = random.nextInt(100);
 		List<AbstractDataProcessor> processors = new ArrayList<AbstractDataProcessor>();

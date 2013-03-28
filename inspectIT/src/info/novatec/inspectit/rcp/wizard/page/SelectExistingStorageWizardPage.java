@@ -19,6 +19,7 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -70,6 +71,11 @@ public class SelectExistingStorageWizardPage extends WizardPage {
 	private boolean checkRecording;
 
 	/**
+	 * Button for choosing if storage should be auto finalized.
+	 */
+	private Button autoFinalize;
+
+	/**
 	 * Default constructor.
 	 */
 	public SelectExistingStorageWizardPage() {
@@ -111,12 +117,12 @@ public class SelectExistingStorageWizardPage extends WizardPage {
 	 */
 	public void createControl(Composite parent) {
 		Composite main = new Composite(parent, SWT.NONE);
-		main.setLayout(new GridLayout(3, false));
+		main.setLayout(new GridLayout(2, false));
 
 		Label cmrSelectLabel = new Label(main, SWT.LEFT);
 		cmrSelectLabel.setText("Repository:");
 		cmrRepositoryCombo = new Combo(main, SWT.READ_ONLY);
-		cmrRepositoryCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+		cmrRepositoryCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		Label storageLabel = new Label(main, SWT.TOP);
 		storageLabel.setText("Storage:");
@@ -125,6 +131,13 @@ public class SelectExistingStorageWizardPage extends WizardPage {
 		storageSelection = new org.eclipse.swt.widgets.List(main, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
 		storageSelection.setEnabled(false);
 		storageSelection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		new Label(main, SWT.LEFT);
+		autoFinalize = new Button(main, SWT.CHECK);
+		autoFinalize.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		autoFinalize.setText("Auto-finalize storage");
+		autoFinalize.setToolTipText("If selected the storage will be automatically finalized after the action completes");
+		autoFinalize.setSelection(true);
 
 		final Listener pageCompletedListener = new Listener() {
 			@Override
@@ -189,6 +202,15 @@ public class SelectExistingStorageWizardPage extends WizardPage {
 			return storageList.get(storageSelection.getSelectionIndex());
 		}
 		return null;
+	}
+
+	/**
+	 * Returns if auto-finalize options is selected.
+	 * 
+	 * @return Returns if auto-finalize options is selected.
+	 */
+	public boolean isAutoFinalize() {
+		return autoFinalize.getSelection();
 	}
 
 	/**

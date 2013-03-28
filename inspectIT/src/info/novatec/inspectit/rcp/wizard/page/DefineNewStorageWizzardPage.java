@@ -13,6 +13,7 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -54,9 +55,19 @@ public class DefineNewStorageWizzardPage extends WizardPage {
 	private Text descriptionBox;
 
 	/**
+	 * Button for choosing if storage should be auto finalized.
+	 */
+	private Button autoFinalize;
+
+	/**
 	 * {@link CmrRepositoryDefinition} that should be initially selected.
 	 */
 	private CmrRepositoryDefinition proposedCmrRepositoryDefinition;
+
+	/**
+	 * If auto-finalize button should be selected.
+	 */
+	private boolean autoFinalizeSelected;
 
 	/**
 	 * Default constructor.
@@ -77,8 +88,22 @@ public class DefineNewStorageWizzardPage extends WizardPage {
 	 *            {@link CmrRepositoryDefinition} to create storage on.
 	 */
 	public DefineNewStorageWizzardPage(CmrRepositoryDefinition cmrRepositoryDefinition) {
+		this(cmrRepositoryDefinition, true);
+	}
+
+	/**
+	 * This constructor will set provided {@link CmrRepositoryDefinition} as the initially selected
+	 * repository to create storage to.
+	 * 
+	 * @param cmrRepositoryDefinition
+	 *            {@link CmrRepositoryDefinition} to create storage on.
+	 * @param autoFinalizeSecelected
+	 *            If auto-finalize button should be selected.
+	 */
+	public DefineNewStorageWizzardPage(CmrRepositoryDefinition cmrRepositoryDefinition, boolean autoFinalizeSecelected) {
 		this();
 		this.proposedCmrRepositoryDefinition = cmrRepositoryDefinition;
+		this.autoFinalizeSelected = autoFinalizeSecelected;
 	}
 
 	/**
@@ -118,6 +143,13 @@ public class DefineNewStorageWizzardPage extends WizardPage {
 		descLabel.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
 		descriptionBox = new Text(main, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.WRAP);
 		descriptionBox.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		new Label(main, SWT.LEFT);
+		autoFinalize = new Button(main, SWT.CHECK);
+		autoFinalize.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		autoFinalize.setText("Auto-finalize storage");
+		autoFinalize.setToolTipText("If selected the storage will be automatically finalized after the action completes");
+		autoFinalize.setSelection(autoFinalizeSelected);
 
 		Listener listener = new Listener() {
 			@Override
@@ -175,6 +207,15 @@ public class DefineNewStorageWizzardPage extends WizardPage {
 		storageData.setName(nameBox.getText().trim());
 		storageData.setDescription(descriptionBox.getText().trim());
 		return storageData;
+	}
+
+	/**
+	 * Returns if auto-finalize options is selected.
+	 * 
+	 * @return Returns if auto-finalize options is selected.
+	 */
+	public boolean isAutoFinalize() {
+		return autoFinalize.getSelection();
 	}
 
 }

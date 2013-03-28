@@ -300,14 +300,20 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 *             If serialization fails during write {@link StorageData} to disk.
 	 * @throws IOException
 	 *             If IOException occurs during write {@link StorageData} to disk.
+	 * @throws StorageException
+	 *             If {@link StorageException} is throw during auto-finalize process.
 	 */
-	public void stopRecording() throws IOException, SerializationException {
+	public void stopRecording() throws IOException, SerializationException, StorageException {
 		synchronized (this) {
 			if (storageRecorder.isRecordingOn() || storageRecorder.isRecordingScheduled()) {
+				boolean autoFinalize = storageRecorder.getRecordingProperties().isAutoFinalize();
 				StorageWriter storageWriter = storageRecorder.getStorageWriter();
 				storageRecorder.stopRecording();
 				recorderStorageData.markOpened();
 				openedStoragesMap.put(recorderStorageData, storageWriter);
+				if (autoFinalize) {
+					this.closeStorage(recorderStorageData);
+				}
 				writeStorageDataToDisk(recorderStorageData);
 				recorderStorageData = null; // NOPMD
 			}
@@ -346,8 +352,13 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 *            If write will be done synchronously or not.
 	 * @throws StorageException
 	 *             If storage is used as a recording storage.
+	 * @throws SerializationException
+	 *             If serialization fails during auto-finalization.
+	 * @throws IOException
+	 *             If {@link IOException} occurs during auto-finalization.
 	 */
-	public void writeToStorage(StorageData storageData, Collection<? extends DefaultData> dataToWrite, Collection<AbstractDataProcessor> dataProcessors, boolean synchronously) throws StorageException {
+	public void writeToStorage(StorageData storageData, Collection<? extends DefaultData> dataToWrite, Collection<AbstractDataProcessor> dataProcessors, boolean synchronously)
+			throws StorageException, IOException, SerializationException {
 		StorageData local = getLocalStorageDataObject(storageData);
 		StorageWriter writer = openedStoragesMap.get(local);
 		if (writer != null) {
@@ -375,6 +386,8 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 *            List of agent IDs.
 	 * @param dataProcessors
 	 *            Processors that will be used for data writing.
+	 * @param autoFinalize
+	 *            If the storage where action is performed should be auto-finalized after the write.
 	 * @throws StorageException
 	 *             If storage is used as a recording storage.
 	 * @throws SerializationException
@@ -382,7 +395,8 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 * @throws IOException
 	 *             If IO exception occurs.
 	 */
-	public void copyBufferToStorage(StorageData storageData, List<Long> platformIdents, Collection<AbstractDataProcessor> dataProcessors) throws StorageException, IOException, SerializationException {
+	public void copyBufferToStorage(StorageData storageData, List<Long> platformIdents, Collection<AbstractDataProcessor> dataProcessors, boolean autoFinalize) throws StorageException, IOException,
+			SerializationException {
 		if (!isStorageExisting(storageData)) {
 			this.createStorage(storageData);
 		}
@@ -394,6 +408,10 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 		for (Long platformId : platformIdents) {
 			List<DefaultData> toWriteList = storageDataDao.getAllDefaultDataForAgent(platformId.longValue());
 			this.writeToStorage(local, toWriteList, dataProcessors, true);
+		}
+
+		if (autoFinalize) {
+			this.closeStorage(local);
 		}
 		updateExistingStorageSize(local);
 	}
@@ -411,6 +429,8 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 * @param dataProcessors
 	 *            Processors to process the data. Can be null, then the data is only copied with no
 	 *            processing.
+	 * @param autoFinalize
+	 *            If the storage where action is performed should be auto-finalized after the write.
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
 	 * @throws SerializationException
@@ -418,7 +438,7 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 * @throws StorageException
 	 *             If {@link StorageException} occurs.
 	 */
-	public void copyDataToStorage(StorageData storageData, Collection<Long> elementIds, long platformIdent, Collection<AbstractDataProcessor> dataProcessors) throws IOException,
+	public void copyDataToStorage(StorageData storageData, Collection<Long> elementIds, long platformIdent, Collection<AbstractDataProcessor> dataProcessors, boolean autoFinalize) throws IOException,
 			SerializationException, StorageException {
 		if (!isStorageExisting(storageData)) {
 			this.createStorage(storageData);
@@ -430,6 +450,9 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 
 		List<DefaultData> toWriteList = storageDataDao.getDataFromIdList(elementIds, platformIdent);
 		this.writeToStorage(local, toWriteList, dataProcessors, true);
+		if (autoFinalize) {
+			this.closeStorage(local);
+		}
 		updateExistingStorageSize(local);
 	}
 

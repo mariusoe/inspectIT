@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.wizard;
 
-import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.AggregatedHttpTimerData;
 import info.novatec.inspectit.communication.data.AggregatedSqlStatementData;
@@ -147,17 +147,19 @@ public class CopyDataToStorageWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public boolean performFinish() {
-		StorageData storageData = null;
+		final StorageData storageData;
+		final boolean autoFinalize;
 		if (newOrExistsingStorageWizardPage.useNewStorage()) {
 			storageData = defineNewStorageWizzardPage.getStorageData();
+			autoFinalize = defineNewStorageWizzardPage.isAutoFinalize();
 		} else {
 			storageData = selectExistingStorageWizardPage.getSelectedStorageData();
+			autoFinalize = selectExistingStorageWizardPage.isAutoFinalize();
 		}
 
 		if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
 			// prepare for save
 			final Collection<AbstractDataProcessor> processors = defineDataProcessorsWizardPage.getProcessorList();
-			final StorageData finalStorageData = storageData;
 			final Set<Long> idSet = new HashSet<Long>();
 			Set<Long> platformIdents = new HashSet<Long>();
 			for (DefaultData template : copyDataList) {
@@ -182,7 +184,7 @@ public class CopyDataToStorageWizard extends Wizard implements INewWizard {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
-						StorageData updatedStorageData = cmrRepositoryDefinition.getStorageService().copyDataToStorage(finalStorageData, idSet, platformIdent, processors);
+						StorageData updatedStorageData = cmrRepositoryDefinition.getStorageService().copyDataToStorage(storageData, idSet, platformIdent, processors, autoFinalize);
 						List<AbstractStorageLabel<?>> labels = addLabelWizardPage.getLabelsToAdd();
 						if (!labels.isEmpty()) {
 							cmrRepositoryDefinition.getStorageService().addLabelsToStorage(updatedStorageData, labels, true);

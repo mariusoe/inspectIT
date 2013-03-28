@@ -152,13 +152,16 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 	public boolean performFinish() {
 		StorageData storageData;
 		CmrRepositoryDefinition cmrRepositoryDefinition;
+		boolean autoFinalize;
 
 		if (newOrExistsingStorageWizardPage.useNewStorage()) {
 			storageData = defineNewStorageWizzardPage.getStorageData();
 			cmrRepositoryDefinition = defineNewStorageWizzardPage.getSelectedRepository();
+			autoFinalize = defineNewStorageWizzardPage.isAutoFinalize();
 		} else {
 			storageData = selectStorageWizardPage.getSelectedStorageData();
 			cmrRepositoryDefinition = selectStorageWizardPage.getSelectedRepository();
+			autoFinalize = selectStorageWizardPage.isAutoFinalize();
 		}
 
 		List<AbstractDataProcessor> recordingProcessors = defineDataPage.getProcessorList();
@@ -172,6 +175,7 @@ public class StartRecordingWizard extends Wizard implements INewWizard {
 		if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
 			recordingProperties = new RecordingProperties();
 			recordingProperties.setRecordingDataProcessors(recordingProcessors);
+			recordingProperties.setAutoFinalize(autoFinalize);
 			if (timelineWizardPage.isTimerframeUsed()) {
 				Date recordStartDate = timelineWizardPage.getFromDate();
 				Date recordEndDate = timelineWizardPage.getToDate();

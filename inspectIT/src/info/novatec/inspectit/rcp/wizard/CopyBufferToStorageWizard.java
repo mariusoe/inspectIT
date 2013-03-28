@@ -131,13 +131,16 @@ public class CopyBufferToStorageWizard extends Wizard implements INewWizard {
 	public boolean performFinish() {
 		final StorageData storageData;
 		final CmrRepositoryDefinition cmrRepositoryDefinition;
+		final boolean autoFinalize;
 
 		if (newOrExistsingStorageWizardPage.useNewStorage()) {
 			storageData = defineNewStorageWizzardPage.getStorageData();
 			cmrRepositoryDefinition = defineNewStorageWizzardPage.getSelectedRepository();
+			autoFinalize = defineNewStorageWizzardPage.isAutoFinalize();
 		} else {
 			storageData = selectExistingStorageWizardPage.getSelectedStorageData();
 			cmrRepositoryDefinition = selectExistingStorageWizardPage.getSelectedRepository();
+			autoFinalize = selectExistingStorageWizardPage.isAutoFinalize();
 		}
 
 		if (cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE) {
@@ -155,7 +158,7 @@ public class CopyBufferToStorageWizard extends Wizard implements INewWizard {
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
 						monitor.beginTask("Copying the content of repository buffer to storage.", IProgressMonitor.UNKNOWN);
-						StorageData copiedStorage = cmrRepositoryDefinition.getStorageService().copyBufferToStorage(storageData, agents, finalProcessors);
+						StorageData copiedStorage = cmrRepositoryDefinition.getStorageService().copyBufferToStorage(storageData, agents, finalProcessors, autoFinalize);
 						List<AbstractStorageLabel<?>> labels = addLabelWizardPage.getLabelsToAdd();
 						if (!labels.isEmpty()) {
 							cmrRepositoryDefinition.getStorageService().addLabelsToStorage(copiedStorage, labels, true);

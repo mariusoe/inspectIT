@@ -48,6 +48,11 @@ public class RecordingProperties implements Serializable {
 	private long recordDuration;
 
 	/**
+	 * If storage should be auto-finalized after the recording.
+	 */
+	private boolean autoFinalize;
+
+	/**
 	 * Gets {@link #recordStartDate}.
 	 * 
 	 * @return {@link #recordStartDate}
@@ -143,6 +148,25 @@ public class RecordingProperties implements Serializable {
 	}
 
 	/**
+	 * Gets {@link #autoFinalize}.
+	 * 
+	 * @return {@link #autoFinalize}
+	 */
+	public boolean isAutoFinalize() {
+		return autoFinalize;
+	}
+
+	/**
+	 * Sets {@link #autoFinalize}.
+	 * 
+	 * @param autoFinalize
+	 *            New value for {@link #autoFinalize}
+	 */
+	public void setAutoFinalize(boolean autoFinalize) {
+		this.autoFinalize = autoFinalize;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -152,6 +176,7 @@ public class RecordingProperties implements Serializable {
 		toStringBuilder.append("recordEndDate", recordEndDate);
 		toStringBuilder.append("recordingDataProcessors", recordingDataProcessors);
 		toStringBuilder.append("startDelay", startDelay);
+		toStringBuilder.append("autoFinalize", autoFinalize);
 		return toStringBuilder.toString();
 	}
 

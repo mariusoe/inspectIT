@@ -66,7 +66,7 @@ public class CreateStorageWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public void addPages() {
-		defineNewStoragePage = new DefineNewStorageWizzardPage(cmrRepositoryDefinition);
+		defineNewStoragePage = new DefineNewStorageWizzardPage(cmrRepositoryDefinition, false);
 		addPage(defineNewStoragePage);
 	}
 

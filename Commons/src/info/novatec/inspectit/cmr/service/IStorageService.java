@@ -159,7 +159,8 @@ public interface IStorageService {
 	 *             If storage is not opened, or the storage is currently used for recording. If
 	 *             write fails.
 	 */
-	void writeToStorage(StorageData storageData, Collection<DefaultData> defaultDataCollection, Collection<AbstractDataProcessor> dataProcessors, boolean synchronously) throws StorageException;
+	void writeToStorage(StorageData storageData, Collection<DefaultData> defaultDataCollection, Collection<AbstractDataProcessor> dataProcessors, boolean synchronously)
+			throws StorageException;
 
 	/**
 	 * Copies the complete content of the buffer to the provided storage. The storage does not have
@@ -173,11 +174,13 @@ public interface IStorageService {
 	 * @param dataProcessors
 	 *            List of processor to work on data. Can be null, then the data is only copied with
 	 *            no processing.
+	 * @param autoFinalize
+	 *            If the storage where action is performed should be auto-finalized after the write.
 	 * @return The recording storage with proper ID and status information.
 	 * @throws StorageException
 	 *             If the storage is currently used for recording. If write fails.
 	 */
-	StorageData copyBufferToStorage(StorageData storageData, List<Long> platformIdents, Collection<AbstractDataProcessor> dataProcessors) throws StorageException;
+	StorageData copyBufferToStorage(StorageData storageData, List<Long> platformIdents, Collection<AbstractDataProcessor> dataProcessors, boolean autoFinalize) throws StorageException;
 
 	/**
 	 * Copies the data with provided IDs in the storage. The buffer will be queried for the data
@@ -196,11 +199,14 @@ public interface IStorageService {
 	 * @param dataProcessors
 	 *            Processors to process the data. Can be null, then the data is only copied with no
 	 *            processing.
+	 * @param autoFinalize
+	 *            If the storage where action is performed should be auto-finalized after the write.
 	 * @return The recording storage with proper ID and status information.
 	 * @throws StorageException
 	 *             If the storage is currently used for recording. If write fails.
 	 */
-	StorageData copyDataToStorage(StorageData storageData, Collection<Long> elementIds, long platformIdent, Collection<AbstractDataProcessor> dataProcessors) throws StorageException;
+	StorageData copyDataToStorage(StorageData storageData, Collection<Long> elementIds, long platformIdent, Collection<AbstractDataProcessor> dataProcessors, boolean autoFinalize)
+			throws StorageException;
 
 	/**
 	 * Returns the map of the string/long pairs that represent the path to the index files for one
