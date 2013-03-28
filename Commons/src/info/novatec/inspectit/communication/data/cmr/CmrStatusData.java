@@ -3,6 +3,7 @@ package info.novatec.inspectit.communication.data.cmr;
 import info.novatec.inspectit.communication.DefaultData;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Class that hold all information about a Cmr status.
@@ -56,6 +57,16 @@ public class CmrStatusData implements Serializable {
 	 * If CMR has enough space to continue writing data.
 	 */
 	private boolean canWriteMore;
+
+	/**
+	 * Running time of CMR in millis.
+	 */
+	private long upTime;
+
+	/**
+	 * Date CMR was started.
+	 */
+	private Date dateStarted;
 
 	/**
 	 * Gets {@link #currentBufferSize}.
@@ -210,6 +221,44 @@ public class CmrStatusData implements Serializable {
 	}
 
 	/**
+	 * Gets {@link #upTime}.
+	 * 
+	 * @return {@link #upTime}
+	 */
+	public long getUpTime() {
+		return upTime;
+	}
+
+	/**
+	 * Sets {@link #upTime}.
+	 * 
+	 * @param upTime
+	 *            New value for {@link #upTime}
+	 */
+	public void setUpTime(long upTime) {
+		this.upTime = upTime;
+	}
+
+	/**
+	 * Gets {@link #dateStarted}.
+	 * 
+	 * @return {@link #dateStarted}
+	 */
+	public Date getDateStarted() {
+		return dateStarted;
+	}
+
+	/**
+	 * Sets {@link #dateStarted}.
+	 * 
+	 * @param dateStarted
+	 *            New value for {@link #dateStarted}
+	 */
+	public void setDateStarted(Date dateStarted) {
+		this.dateStarted = dateStarted;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -220,9 +269,11 @@ public class CmrStatusData implements Serializable {
 		result = prime * result + ((bufferOldestElement == null) ? 0 : bufferOldestElement.hashCode());
 		result = prime * result + (canWriteMore ? 1231 : 1237);
 		result = prime * result + (int) (currentBufferSize ^ (currentBufferSize >>> 32));
+		result = prime * result + ((dateStarted == null) ? 0 : dateStarted.hashCode());
 		result = prime * result + (int) (maxBufferSize ^ (maxBufferSize >>> 32));
 		result = prime * result + (int) (storageDataSpaceLeft ^ (storageDataSpaceLeft >>> 32));
 		result = prime * result + (int) (storageMaxDataSpace ^ (storageMaxDataSpace >>> 32));
+		result = prime * result + (int) (upTime ^ (upTime >>> 32));
 		result = prime * result + (warnSpaceLeftActive ? 1231 : 1237);
 		return result;
 	}
@@ -262,6 +313,13 @@ public class CmrStatusData implements Serializable {
 		if (currentBufferSize != other.currentBufferSize) {
 			return false;
 		}
+		if (dateStarted == null) {
+			if (other.dateStarted != null) {
+				return false;
+			}
+		} else if (!dateStarted.equals(other.dateStarted)) {
+			return false;
+		}
 		if (maxBufferSize != other.maxBufferSize) {
 			return false;
 		}
@@ -269,6 +327,9 @@ public class CmrStatusData implements Serializable {
 			return false;
 		}
 		if (storageMaxDataSpace != other.storageMaxDataSpace) {
+			return false;
+		}
+		if (upTime != other.upTime) {
 			return false;
 		}
 		if (warnSpaceLeftActive != other.warnSpaceLeftActive) {

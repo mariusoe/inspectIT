@@ -102,6 +102,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	private Label recTime; // NOCHK
 	private Label spaceLeftLabel; // NOCHK
 	private ProgressBar spaceLeftBar; // NOCHK
+	private Label uptimeLabel; // NOCHK
 
 	/**
 	 * Default constructor.
@@ -168,6 +169,10 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 
 		toolkit.createLabel(generalComposite, "Status:");
 		status = toolkit.createLabel(generalComposite, null, SWT.WRAP);
+
+		toolkit.createLabel(generalComposite, "Uptime:");
+		uptimeLabel = toolkit.createLabel(generalComposite, null, SWT.WRAP);
+		uptimeLabel.setToolTipText("Date started represents date/time on machine where CMR has been launched");
 
 		generalSection.setClient(generalComposite);
 		generalSection.setLayout(new TableWrapLayout());
@@ -412,6 +417,15 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 				spaceLeftBar.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GREEN));
 				spaceLeftBar.setToolTipText("Enough space left");
 			}
+
+			// uptime info
+			long uptimeMillis = cmrStatusData.getUpTime();
+			Date started = cmrStatusData.getDateStarted();
+			StringBuilder uptimeText = new StringBuilder(NumberFormatter.humanReadableMillisCount(uptimeMillis, true));
+			uptimeText.append(" (started ");
+			uptimeText.append(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(started));
+			uptimeText.append(")");
+			uptimeLabel.setText(uptimeText.toString());
 		}
 
 		if (!dataLoaded) {

@@ -7,6 +7,8 @@ import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
 import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.StorageManager;
 
+import java.util.Date;
+
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.logging.Log;
@@ -44,6 +46,16 @@ public class CmrManagementService implements ICmrManagementService {
 	private int droppedDataCount = 0;
 
 	/**
+	 * Time in milliseconds when the CMR has started.
+	 */
+	private long timeStarted;
+
+	/**
+	 * Date when the CMR has started.
+	 */
+	private Date dateStarted;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@MethodLog
@@ -66,6 +78,8 @@ public class CmrManagementService implements ICmrManagementService {
 		cmrStatusData.setStorageMaxDataSpace(storageManager.getMaxBytesHardDriveOccupancy());
 		cmrStatusData.setWarnSpaceLeftActive(storageManager.isSpaceWarnActive());
 		cmrStatusData.setCanWriteMore(storageManager.canWriteMore());
+		cmrStatusData.setUpTime(System.currentTimeMillis() - timeStarted);
+		cmrStatusData.setDateStarted(dateStarted);
 		return cmrStatusData;
 	}
 
@@ -94,6 +108,8 @@ public class CmrManagementService implements ICmrManagementService {
 	 */
 	@PostConstruct
 	public void postConstruct() throws Exception {
+		timeStarted = System.currentTimeMillis();
+		dateStarted = new Date(timeStarted);
 		if (log.isInfoEnabled()) {
 			log.info("|-CMR Management Service active...");
 		}
