@@ -6,7 +6,6 @@ import info.novatec.inspectit.rcp.editor.viewers.AbstractViewerComparator;
 
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 
@@ -24,7 +23,7 @@ public class TreeViewerComparator<T extends DefaultData> extends AbstractViewerC
 	 * Adds a column to this comparator so it can be used to sort by.
 	 * 
 	 * @param column
-	 *            The {@link TableColumn} implementation. comparatorProvider The id of the
+	 *            The {@link TreeColumn} implementation. comparatorProvider The id of the
 	 *            {@link TableColumn} (user-defined).
 	 * @param comparator
 	 *            Comparator that will be used for the given column.
