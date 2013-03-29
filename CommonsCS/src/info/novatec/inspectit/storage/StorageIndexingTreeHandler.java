@@ -228,13 +228,20 @@ public class StorageIndexingTreeHandler {
 	}
 
 	/**
+	 * Cancels the {@link #indexingTreeSavingFuture}.
+	 */
+	public void cancelIndexingTreeSavingFuture() {
+		if (!indexingTreeSavingFuture.isDone() && !indexingTreeSavingFuture.isCancelled()) {
+			indexingTreeSavingFuture.cancel(false);
+		}
+	}
+
+	/**
 	 * Signals to the {@link StorageIndexingTreeHandler} that the write is finished and current tree
 	 * should be saved.
 	 */
 	public void finish() {
-		if (!indexingTreeSavingFuture.isDone() && !indexingTreeSavingFuture.isCancelled()) {
-			indexingTreeSavingFuture.cancel(false);
-		}
+		cancelIndexingTreeSavingFuture();
 
 		IStorageTreeComponent<DefaultData> currentIndexingTree = null;
 		while (true) {

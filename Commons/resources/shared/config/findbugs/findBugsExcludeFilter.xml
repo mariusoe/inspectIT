@@ -87,15 +87,15 @@
 		<Field name="~(storageData|writingFolderPath)" />
 		<Bug pattern="IS2_INCONSISTENT_SYNC" />
 	</Match>
-	<Match>
-		<Class name="info.novatec.inspectit.storage.StorageWriter" />
-		<Method name="closeStorageWriter" />
-		<Bug pattern="SWL_SLEEP_WITH_LOCK_HELD" />
-	</Match>
 	<Match> <!-- This is a strange FindBugs behavior, since the field is read in one public method. -->
 		<Class name="info.novatec.inspectit.storage.StorageManager" />
 		<Filed name="hardDriveSize" />
 		<Bug pattern="URF_UNREAD_FIELD" />
+	</Match>
+		<Match> <!-- Meant to be so -->	
+		<Class name="info.novatec.inspectit.storage.StorageWriter" />
+		<Filed name="waitForPendingWritingTasks" />
+		<Bug pattern="SWL_SLEEP_WITH_LOCK_HELD" />
 	</Match>
 	<!-- CommonsCS ignores END -->
 

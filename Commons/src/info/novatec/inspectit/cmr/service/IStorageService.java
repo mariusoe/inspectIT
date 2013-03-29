@@ -51,12 +51,12 @@ public interface IStorageService {
 	void closeStorage(StorageData storageData) throws StorageException;
 
 	/**
-	 * Deletes a storage. Storage can be deleted only if it is in closed state.
+	 * Deletes a storage. Storage can be deleted only if it is not used for recording.
 	 * 
 	 * @param storageData
 	 *            Storage to delete.
 	 * @throws StorageException
-	 *             When storage is opened or does not exists.
+	 *             When storage is does not exists or is used for recording.
 	 */
 	void deleteStorage(StorageData storageData) throws StorageException;
 

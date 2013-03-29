@@ -188,7 +188,7 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 		StorageData local = getLocalStorageDataObject(storageData);
 		synchronized (local) {
 			if ((storageRecorder.isRecordingOn() || storageRecorder.isRecordingScheduled()) && Objects.equals(local, recorderStorageData)) {
-				throw new StorageException("Storage " + local + " can not be finalized because it is currenlty used for recording purposes.");
+				throw new StorageException("Storage " + local + " can not be finalized because it is currently used for recording purposes.");
 			} else if (isStorageClosed(local)) {
 				throw new StorageException("Already closed storage " + local + " can not be closed again.");
 			}
@@ -217,8 +217,15 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 	public void deleteStorage(StorageData storageData) throws StorageException, IOException {
 		StorageData local = getLocalStorageDataObject(storageData);
 		synchronized (local) {
-			if (isStorageOpen(local)) {
-				throw new StorageException("Writable storages can not be deleted. Please finalize the storage first.");
+			if ((storageRecorder.isRecordingOn() || storageRecorder.isRecordingScheduled()) && Objects.equals(local, recorderStorageData)) {
+				throw new StorageException("Storage " + local + " can not be finalized because it is currently used for recording purposes.");
+			}
+			if (local.isStorageOpened()) {
+				StorageWriter writer = openedStoragesMap.get(local);
+				if (writer != null) {
+					writer.cancel();
+				}
+				openedStoragesMap.remove(local);
 			}
 			deleteCompleteStorageDataFromDisk(local);
 			existingStoragesSet.remove(local);

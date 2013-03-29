@@ -1,5 +1,6 @@
 package info.novatec.inspectit.storage;
 
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
@@ -80,6 +81,7 @@ public class StorageWriterTest {
 		when(streamProvider.getExtendedByteBufferOutputStream()).thenReturn(extendedByteBufferOutputStream);
 		when(storageIndexingTreeHandler.startWrite(Mockito.<WriteTask> anyObject())).thenReturn(1);
 		when(storageManager.canWriteMore()).thenReturn(true);
+		when(storageManager.getChannelPath(Mockito.<IStorageData> anyObject(), anyInt())).thenReturn(Paths.get("test"));
 		when(serializerQueue.take()).thenReturn(serializer);
 		when(scheduledExecutorService.scheduleWithFixedDelay(Mockito.<Runnable> anyObject(), anyLong(), anyLong(), Mockito.<TimeUnit> anyObject())).thenReturn(future);
 		storageWriter.indexingTreeHandler = storageIndexingTreeHandler;

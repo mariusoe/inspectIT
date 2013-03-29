@@ -312,9 +312,55 @@ public class StorageWriter implements IWriter {
 	}
 
 	/**
+	 * Cancels the usage of this {@link StorageWriter}.
+	 * <p>
+	 * Writer will shutdown it's executor service which will disable the further writes. It will
+	 * also cancel the indexing tree handler and close all opened channel paths. This method should
+	 * only be used when Storage that has been written with this writter is no needed any more.
+	 */
+	public final synchronized void cancel() {
+		shutdown(false);
+	}
+
+	/**
 	 * Performs all operation prior to finalizing the write and then calls {@link #finalizeWrite()}.
 	 */
 	public final synchronized void closeStorageWriter() {
+		shutdown(true);
+	}
+
+	/**
+	 * This method will wait until all pending writing tasks are finished, but after it's invocation
+	 * no new tasks will be accepted.
+	 * <p>
+	 * Sub-classes can override this method to include additional writes before the storage write is
+	 * finalized. Note that the overriding of this method has to be in the way to first execute the
+	 * additional saving, and the call super.finalizeWrite(boolean).
+	 * 
+	 */
+	protected synchronized void finalizeWrite() {
+		if (!finalized) {
+			// when nothing more is left save the indexing tree
+			// save tree only if executeWrites is true
+			indexingTreeHandler.finish();
+
+			finalized = true;
+
+			if (log.isDebugEnabled()) {
+				log.debug("Finalization done for storage: " + storageData + ".");
+			}
+		}
+	}
+
+	/**
+	 * Shutdown this storage writer. If finalize is true, {@link #finalizeWrite()} will be called in
+	 * addition.
+	 * 
+	 * @param finalize
+	 *            If {@link #finalizeWrite()} should be called and thus write indexing tree and
+	 *            other needed data.
+	 */
+	private synchronized void shutdown(boolean finalize) {
 		if (writingOn) {
 			// mark writing false so that no more task are created
 			writingOn = false;
@@ -322,80 +368,77 @@ public class StorageWriter implements IWriter {
 			// cancel the check writing status task
 			checkWritingStatusFuture.cancel(false);
 
-			boolean logged = false;
-			// check amount of active tasks
-			while (true) {
-				long activeTasks = activeWritingTasks.size();
-				if (activeTasks > 0) {
-					if (log.isDebugEnabled() && !logged) {
-						log.info("Storage: " + storageData + " is waiting for finalization. Still " + activeTasks + " queued tasks need to be processed.");
-						logged = true;
-					}
-					// if still are not done sleep
-					try {
-						Thread.sleep(FINALIZATION_TASKS_SLEEP_TIME);
-					} catch (InterruptedException e) {
-						Thread.interrupted();
-					}
-				} else {
-					break;
-				}
+			// wait for pending tasks
+			waitForPendingWritingTasks();
+
+			// shut the executor
+			shutdownWritingExecutorService();
+
+			if (finalize) {
+				finalizeWrite();
 			}
 
-			if (log.isDebugEnabled()) {
-				log.info("Finalization started for storage: " + storageData + ".");
-			}
-
-			// if yes finalize
-			finalizeWrite();
-		}
-	}
-
-	/**
-	 * Stops recording if the recording is currently in process. This method will wait until all
-	 * pending writing tasks are finished, but after it's invocation no new tasks will be accepted.
-	 * <p>
-	 * Sub-classes can override this method to include additional writes before the storage write is
-	 * finalized. Note that the overriding of this method has to be in the way to first execute the
-	 * additional saving, and the call super.finalizeWrite().
-	 */
-	protected synchronized void finalizeWrite() {
-		if (!finalized) {
 			try {
-				// Disable new tasks from being submitted
-				writingExecutorService.shutdown();
-				try {
-					// Wait a while for existing tasks to terminate
-					if (!writingExecutorService.awaitTermination(5, TimeUnit.SECONDS)) {
-						// Cancel currently executing tasks
-						writingExecutorService.shutdownNow();
-						// Wait a while for tasks to respond to being canceled
-						if (!writingExecutorService.awaitTermination(5, TimeUnit.SECONDS)) {
-							log.error("Executor service of the Storage writer for the storage " + storageData + " did not terminate.");
-						}
-					}
-				} catch (InterruptedException ie) {
-					// (Re-)Cancel if current thread also interrupted
-					writingExecutorService.shutdownNow();
-					// Preserve interrupt status
-					Thread.currentThread().interrupt();
-				}
-
-				// when nothing more is left save the indexing tree
-				indexingTreeHandler.finish();
-
 				// close all opened channels
 				for (Path channelPath : openedChannelPaths) {
 					writingChannelManager.finalizeChannel(channelPath);
 				}
-
-				finalized = true;
-
-				if (log.isDebugEnabled()) {
-					log.info("Finalization done for storage: " + storageData + ".");
-				}
 			} catch (IOException e) {
-				log.error("Finalze write failed.", e);
+				log.warn("Closing one of the opened file channels failed.", e);
+			}
+
+		}
+	}
+
+	/**
+	 * Correctly shuts down the {@link #writingExecutorService}.
+	 */
+	private synchronized void shutdownWritingExecutorService() {
+		if (writingExecutorService.isShutdown()) {
+			return;
+		}
+
+		// Disable new tasks from being submitted
+		writingExecutorService.shutdown();
+		try {
+			// Wait a while for existing tasks to terminate
+			if (!writingExecutorService.awaitTermination(5, TimeUnit.SECONDS)) {
+				// Cancel currently executing tasks
+				writingExecutorService.shutdownNow();
+				// Wait a while for tasks to respond to being canceled
+				if (!writingExecutorService.awaitTermination(5, TimeUnit.SECONDS)) {
+					log.error("Executor service of the Storage writer for the storage " + storageData + " did not terminate.");
+				}
+			}
+		} catch (InterruptedException ie) {
+			// (Re-)Cancel if current thread also interrupted
+			writingExecutorService.shutdownNow();
+			// Preserve interrupt status
+			Thread.currentThread().interrupt();
+		}
+	}
+
+	/**
+	 * Blocks until all pending writing tasks to be finished.
+	 */
+	private synchronized void waitForPendingWritingTasks() {
+		boolean logged = false;
+		// check amount of active tasks
+		while (true) {
+			long activeTasks = getQueuedTaskCount();
+			if (activeTasks > 0) {
+				if (log.isDebugEnabled() && !logged) {
+					log.info("Storage: " + storageData + " is waiting for finalization. Still " + activeTasks + " queued tasks need to be processed.");
+					logged = true;
+				}
+				// if still are not done sleep
+				try {
+					Thread.sleep(FINALIZATION_TASKS_SLEEP_TIME);
+				} catch (InterruptedException e) {
+					Thread.interrupted();
+				}
+			} else {
+				break;
 			}
 		}
 	}

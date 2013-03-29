@@ -167,14 +167,6 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 	}
 
 	/**
-	 * We can not delete storage when it s in writable mode.
-	 */
-	@Test(dependsOnMethods = { "createStorageTest" }, expectedExceptions = { StorageException.class })
-	public void canNoDeleteOpened() throws IOException, StorageException {
-		storageManager.deleteStorage(storageData);
-	}
-
-	/**
 	 * Test write to storage.
 	 * 
 	 * @throws StorageException

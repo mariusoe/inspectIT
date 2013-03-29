@@ -642,16 +642,12 @@
                   <instanceof
                         value="info.novatec.inspectit.rcp.provider.IStorageDataProvider">
                   </instanceof>
-                  <or>
+                  <not>
                      <test
                            property="info.novatec.inspectit.storageState"
-                           value="CREATED">
+                           value="RECORDING">
                      </test>
-                     <test
-                           property="info.novatec.inspectit.storageState"
-                           value="CLOSED">
-                     </test>
-                  </or>
+                  </not>
                </iterate>
             </and>
          </activeWhen>
