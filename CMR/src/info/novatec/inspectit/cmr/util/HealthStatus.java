@@ -2,6 +2,7 @@ package info.novatec.inspectit.cmr.util;
 
 import info.novatec.inspectit.cmr.cache.IBuffer;
 import info.novatec.inspectit.cmr.service.AgentStorageService;
+import info.novatec.inspectit.cmr.service.ICmrManagementService;
 import info.novatec.inspectit.cmr.storage.CmrStorageManager;
 import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.StorageData;
@@ -91,7 +92,7 @@ public class HealthStatus {
 	 * {@link AgentStorageService} for reporting the amount of dropped data on the CMR.
 	 */
 	@Autowired
-	private AgentStorageService agentStorageService;
+	private ICmrManagementService cmrManagementService;
 
 	/**
 	 * {@link WritingChannelManager} for status of IO tasks.
@@ -444,7 +445,7 @@ public class HealthStatus {
 	 * Logs the amount of dropped data on CMR.
 	 */
 	private void logDroppedData() {
-		log.info("Dropped elements due to the high load on the CMR (total count): " + agentStorageService.getDroppedDataCount());
+		log.info("Dropped elements due to the high load on the CMR (total count): " + cmrManagementService.getDroppedDataCount());
 	}
 
 	/**

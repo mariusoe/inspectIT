@@ -2,25 +2,28 @@ package info.novatec.inspectit.cmr.spring.aop;
 
 import info.novatec.inspectit.cmr.util.Converter;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.springframework.aop.support.AopUtils;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.stereotype.Component;
 
 /**
- * The logging interceptor which will be actived for each method being annotated with @
+ * The logging interceptor which will be activated for each method being annotated with @
  * {@link MethodLog}.
  * 
  * @author Patrice Bouillet
  * 
  */
-public class MethodLogInterceptor implements MethodInterceptor {
+@Aspect
+@Component
+public class MethodLogInterceptor {
 
 	/**
 	 * The message printed in the log if the specified duration has been exceeded.
@@ -81,28 +84,36 @@ public class MethodLogInterceptor implements MethodInterceptor {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Advice around the method that are annotated with {@link MethodLog} that processes wanted
+	 * logging if needed.
+	 * 
+	 * @param joinPoint
+	 *            {@link ProceedingJoinPoint}.
+	 * @param methodLog
+	 *            {@link MethodLog} on the method.
+	 * @return Returns result of method invocation.
+	 * @throws Throwable
+	 *             If {@link Throwable} is result of method invocation.
 	 */
-	@Override
-	public Object invoke(MethodInvocation invoc) throws Throwable {
-		Method mostSpecificMethod = AopUtils.getMostSpecificMethod(invoc.getMethod(), invoc.getThis().getClass());
-		MethodLog log = mostSpecificMethod.getAnnotation(MethodLog.class);
-		Logger logger = Logger.getLogger(invoc.getThis().getClass());
-		Level timeLogLevel = LEVELS.get(log.timeLogLevel());
-		Level traceLogLevel = LEVELS.get(log.traceLogLevel());
+	@Around("@annotation(info.novatec.inspectit.cmr.spring.aop.MethodLog) && @annotation(methodLog)")
+	public Object doMethodLog(ProceedingJoinPoint joinPoint, MethodLog methodLog) throws Throwable {
+		MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+		Logger logger = Logger.getLogger(joinPoint.getTarget().getClass());
+		Level timeLogLevel = LEVELS.get(methodLog.timeLogLevel());
+		Level traceLogLevel = LEVELS.get(methodLog.traceLogLevel());
 
 		if (logger.isEnabledFor(traceLogLevel)) {
-			logger.log(traceLogLevel, String.format(TRACE_ENTER_FORMAT, mostSpecificMethod.getDeclaringClass().getName(), mostSpecificMethod.getName()));
+			logger.log(traceLogLevel, String.format(TRACE_ENTER_FORMAT, signature.getDeclaringType().getName(), signature.getName()));
 		}
 
 		long startTime = System.nanoTime();
-		Object object = invoc.proceed();
+		Object object = joinPoint.proceed();
 		long endTime = System.nanoTime();
 		double duration = Converter.nanoToMilliseconds(endTime - startTime);
 
 		String methodName = null;
 		if (logger.isEnabledFor(timeLogLevel)) {
-			methodName = convertMethodName(mostSpecificMethod.getName());
+			methodName = convertMethodName(signature.getName());
 			String formatString;
 			if (logger.isEnabledFor(traceLogLevel)) {
 				formatString = TIME_LOG_FORMAT_W_TRACE;
@@ -112,9 +123,9 @@ public class MethodLogInterceptor implements MethodInterceptor {
 			logger.log(timeLogLevel, String.format(formatString, methodName, duration));
 		}
 
-		if (-1 != log.durationLimit() && duration > log.durationLimit()) {
+		if (-1 != methodLog.durationLimit() && duration > methodLog.durationLimit()) {
 			if (null == methodName) {
-				methodName = convertMethodName(mostSpecificMethod.getName());
+				methodName = convertMethodName(signature.getName());
 			}
 			String formatString;
 			if (logger.isEnabledFor(traceLogLevel)) {
@@ -122,11 +133,11 @@ public class MethodLogInterceptor implements MethodInterceptor {
 			} else {
 				formatString = DURATION_THRESHOLD_MSG;
 			}
-			logger.log(Level.WARN, String.format(formatString, log.durationLimit(), methodName, duration));
+			logger.log(Level.WARN, String.format(formatString, methodLog.durationLimit(), methodName, duration));
 		}
 
 		if (logger.isEnabledFor(traceLogLevel)) {
-			logger.log(traceLogLevel, String.format(TRACE_EXIT_FORMAT, mostSpecificMethod.getDeclaringClass().getName(), mostSpecificMethod.getName()));
+			logger.log(traceLogLevel, String.format(TRACE_EXIT_FORMAT, signature.getDeclaringType().getName(), signature.getName()));
 		}
 
 		return object;

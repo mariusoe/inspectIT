@@ -39,6 +39,11 @@ public class CmrManagementService implements ICmrManagementService {
 	private StorageManager storageManager;
 
 	/**
+	 * Count of dropped data due to high volume of incoming data objects.
+	 */
+	private int droppedDataCount = 0;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@MethodLog
@@ -62,6 +67,23 @@ public class CmrManagementService implements ICmrManagementService {
 		cmrStatusData.setWarnSpaceLeftActive(storageManager.isSpaceWarnActive());
 		cmrStatusData.setCanWriteMore(storageManager.canWriteMore());
 		return cmrStatusData;
+	}
+
+	/**
+	 * Reports that an amount of data has been dropped.
+	 * 
+	 * @param count
+	 *            Dropped amount.
+	 */
+	public void addDroppedDataCount(int count) {
+		droppedDataCount += count;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public int getDroppedDataCount() {
+		return droppedDataCount;
 	}
 
 	/**

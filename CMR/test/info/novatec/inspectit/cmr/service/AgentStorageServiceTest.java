@@ -1,8 +1,5 @@
 package info.novatec.inspectit.cmr.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.cmr.util.AgentStatusDataProvider;
 import info.novatec.inspectit.communication.DefaultData;
@@ -41,12 +38,19 @@ public class AgentStorageServiceTest extends AbstractTestNGLogSupport {
 	@Mock
 	private AgentStatusDataProvider agentStatusDataProvider;
 
+	@Mock
+	private ICmrManagementService cmrManagementService;
+
 	/**
 	 * Initializes the mocks.
 	 */
 	@BeforeMethod
 	public void init() {
 		MockitoAnnotations.initMocks(this);
+		agentStorageService = new AgentStorageService(new ArrayBlockingQueue<SoftReference<List<? extends DefaultData>>>(1));
+		agentStorageService.platformIdentDateSaver = agentStatusDataProvider;
+		agentStorageService.cmrManagementService = cmrManagementService;
+		agentStorageService.log = LogFactory.getLog(AgentStorageService.class);
 	}
 
 	/**
@@ -58,10 +62,6 @@ public class AgentStorageServiceTest extends AbstractTestNGLogSupport {
 	 */
 	@Test
 	public void dropDataAfterTimeout() throws RemoteException {
-		agentStorageService = new AgentStorageService(new ArrayBlockingQueue<SoftReference<List<? extends DefaultData>>>(1));
-		agentStorageService.platformIdentDateSaver = agentStatusDataProvider;
-		agentStorageService.log = LogFactory.getLog(AgentStorageService.class);
-
 		List<DefaultData> dataList = new ArrayList<DefaultData>();
 		TimerData timerData = new TimerData();
 		timerData.setPlatformIdent(1L);
@@ -70,8 +70,8 @@ public class AgentStorageServiceTest extends AbstractTestNGLogSupport {
 		agentStorageService.addDataObjects(dataList);
 		agentStorageService.addDataObjects(dataList);
 
-		assertThat(agentStorageService.getDroppedDataCount(), is(equalTo(dataList.size())));
 		Mockito.verify(agentStatusDataProvider, Mockito.times(2)).registerDataSent(1L);
+		Mockito.verify(cmrManagementService, Mockito.times(1)).addDroppedDataCount(dataList.size());
 	}
 
 	/**
@@ -82,10 +82,6 @@ public class AgentStorageServiceTest extends AbstractTestNGLogSupport {
 	 */
 	@Test
 	public void acceptData() throws RemoteException {
-		agentStorageService = new AgentStorageService(new ArrayBlockingQueue<SoftReference<List<? extends DefaultData>>>(1));
-		agentStorageService.platformIdentDateSaver = agentStatusDataProvider;
-		agentStorageService.log = LogFactory.getLog(AgentStorageService.class);
-
 		List<DefaultData> dataList = new ArrayList<DefaultData>();
 		TimerData timerData = new TimerData();
 		timerData.setPlatformIdent(1L);
@@ -93,7 +89,7 @@ public class AgentStorageServiceTest extends AbstractTestNGLogSupport {
 
 		agentStorageService.addDataObjects(dataList);
 
-		assertThat(agentStorageService.getDroppedDataCount(), is(equalTo(0)));
 		Mockito.verify(agentStatusDataProvider, Mockito.times(1)).registerDataSent(1L);
+		Mockito.verifyZeroInteractions(cmrManagementService);
 	}
 }

@@ -1,6 +1,7 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.DefaultDataDao;
+import info.novatec.inspectit.cmr.spring.aop.MethodLog;
 import info.novatec.inspectit.cmr.util.AgentStatusDataProvider;
 import info.novatec.inspectit.cmr.util.Converter;
 import info.novatec.inspectit.communication.DefaultData;
@@ -61,6 +62,12 @@ public class AgentStorageService implements IAgentStorageService {
 	AgentStatusDataProvider platformIdentDateSaver;
 
 	/**
+	 * {@link CmrManagementService}.
+	 */
+	@Autowired
+	ICmrManagementService cmrManagementService;
+
+	/**
 	 * Queue to store and remove list of data that has to be processed.
 	 */
 	private ArrayBlockingQueue<SoftReference<List<? extends DefaultData>>> dataObjectsBlockingQueue = new ArrayBlockingQueue<SoftReference<List<? extends DefaultData>>>(QUEUE_CAPACITY);
@@ -70,11 +77,6 @@ public class AgentStorageService implements IAgentStorageService {
 	 */
 	@Value("${cmr.agentStorageServiceThreadCount}")
 	private int threadCount;
-
-	/**
-	 * Count of dropped data due to high volume of incoming data objects.
-	 */
-	private int droppedDataCount = 0;
 
 	/**
 	 * Default constructor.
@@ -95,6 +97,7 @@ public class AgentStorageService implements IAgentStorageService {
 	/**
 	 * {@inheritDoc}
 	 */
+	@MethodLog
 	public void addDataObjects(final List<? extends DefaultData> dataObjects) throws RemoteException {
 		SoftReference<List<? extends DefaultData>> softReference = new SoftReference<List<? extends DefaultData>>(dataObjects);
 		if (!dataObjects.isEmpty()) {
@@ -107,22 +110,11 @@ public class AgentStorageService implements IAgentStorageService {
 				if (log.isTraceEnabled()) {
 					log.trace("Data dropped on the CMR due to the high volume of incoming data from Agent(s). Dropped data objects count: " + droppedSize);
 				}
-				droppedDataCount += droppedSize;
+				cmrManagementService.addDroppedDataCount(droppedSize);
 			}
 		} catch (InterruptedException e) {
 			return;
 		}
-	}
-
-	/**
-	 * Returns the number of data objects that have been dropped on the CMR, due to the high
-	 * incoming load.
-	 * 
-	 * @return Returns the number of data objects that have been dropped on the CMR, due to the high
-	 *         incoming load.
-	 */
-	public int getDroppedDataCount() {
-		return droppedDataCount;
 	}
 
 	/**

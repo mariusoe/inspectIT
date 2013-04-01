@@ -33,6 +33,8 @@
 		<dependency org="org.springframework" name="spring-expression" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
 		<dependency org="org.springframework" name="spring-jdbc" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
 
+		<dependency org="org.aspectj" name="aspectjweaver" rev="1.7.2" transitive="false" conf="prod->default"/>
+		<dependency org="org.aspectj" name="aspectjrt" rev="1.7.2" transitive="false" conf="prod->default"/>
 		<dependency org="com.caucho" name="hessian" rev="3.1.5" transitive="false" conf="prod->default"/>
 		<dependency org="javax.servlet" name="servlet-api" rev="2.5" transitive="false" conf="prod->default"/>
 		<dependency org="javax.transaction" name="jta" rev="1.0.1B" transitive="false" conf="prod->default"/>

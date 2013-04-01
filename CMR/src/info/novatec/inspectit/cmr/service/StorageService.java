@@ -69,7 +69,6 @@ public class StorageService implements IStorageService {
 		try {
 			storageManager.createStorage(storageData);
 		} catch (Exception e) {
-			log.warn("Exception in storage service.", e);
 			throw new StorageException("Exception occurred trying to create storage" + storageData + ".", e);
 		}
 	}
@@ -91,7 +90,6 @@ public class StorageService implements IStorageService {
 		try {
 			storageManager.openStorage(storageData);
 		} catch (Exception e) {
-			log.warn("Exception in storage service.", e);
 			throw new StorageException("Exception occurred trying to open storage" + storageData + ".", e);
 		}
 	}
@@ -115,11 +113,7 @@ public class StorageService implements IStorageService {
 	public void closeStorage(StorageData storageData) throws StorageException {
 		try {
 			storageManager.closeStorage(storageData);
-		} catch (IOException e) {
-			log.warn("Exception in storage service.", e);
-			throw new StorageException("Exception occurred trying to close storage" + storageData + ".", e);
-		} catch (SerializationException e) {
-			log.warn("Exception in storage service.", e);
+		} catch (IOException | SerializationException e) {
 			throw new StorageException("Exception occurred trying to close storage" + storageData + ".", e);
 		}
 	}
@@ -132,7 +126,6 @@ public class StorageService implements IStorageService {
 		try {
 			storageManager.deleteStorage(storageData);
 		} catch (IOException e) {
-			log.warn("Exception in storage service.", e);
 			throw new StorageException("Exception occurred trying to delete storage" + storageData + ".", e);
 		}
 	}
@@ -190,11 +183,7 @@ public class StorageService implements IStorageService {
 			try {
 				storageManager.startOrScheduleRecording(storageData, recordingProperties);
 				return storageData;
-			} catch (IOException e) {
-				log.warn("Exception in storage service.", e);
-				throw new StorageException("Exception occurred trying to start recording on storage " + storageData + ".", e);
-			} catch (SerializationException e) {
-				log.warn("Exception in storage service.", e);
+			} catch (IOException | SerializationException e) {
 				throw new StorageException("Exception occurred trying to start recording on storage " + storageData + ".", e);
 			}
 		}
@@ -208,7 +197,6 @@ public class StorageService implements IStorageService {
 		try {
 			storageManager.stopRecording();
 		} catch (Exception e) {
-			log.warn("Exception in storage service.", e);
 			throw new StorageException("Exception occurred trying to stop recording.", e);
 		}
 	}
@@ -253,11 +241,7 @@ public class StorageService implements IStorageService {
 		try {
 			storageManager.copyBufferToStorage(storageData, platformIdents, dataProcessors);
 			return storageData;
-		} catch (IOException e) {
-			log.warn("Exception in storage service.", e);
-			throw new StorageException("Copy Buffer to Storage action encountered an error.", e);
-		} catch (SerializationException e) {
-			log.warn("Exception in storage service.", e);
+		} catch (IOException | SerializationException e) {
 			throw new StorageException("Copy Buffer to Storage action encountered an error.", e);
 		}
 	}
@@ -267,11 +251,7 @@ public class StorageService implements IStorageService {
 		try {
 			storageManager.copyDataToStorage(storageData, elementIds, platformIdent, dataProcessors);
 			return storageData;
-		} catch (IOException e) {
-			log.warn("Exception in storage service.", e);
-			throw new StorageException("Copy Data to Storage action encountered an error.", e);
-		} catch (SerializationException e) {
-			log.warn("Exception in storage service.", e);
+		} catch (IOException | SerializationException e) {
 			throw new StorageException("Copy Data to Storage action encountered an error.", e);
 		}
 	}
@@ -287,7 +267,6 @@ public class StorageService implements IStorageService {
 		try {
 			return storageManager.getIndexFilesLocations(storageData);
 		} catch (IOException e) {
-			log.warn("Exception in storage service.", e);
 			throw new StorageException("Exception occurred trying to load storages index files locations.", e);
 		}
 	}
@@ -303,7 +282,6 @@ public class StorageService implements IStorageService {
 		try {
 			return storageManager.getDataFilesLocations(storageData);
 		} catch (IOException e) {
-			log.warn("Exception in storage service.", e);
 			throw new StorageException("Exception occurred trying to load storages data files locations.", e);
 		}
 	}
@@ -319,7 +297,6 @@ public class StorageService implements IStorageService {
 		try {
 			return storageManager.getAgentFilesLocations(storageData);
 		} catch (IOException e) {
-			log.warn("Exception in storage service.", e);
 			throw new StorageException("Exception occurred trying to load storage agent files locations.", e);
 		}
 	}
@@ -333,8 +310,7 @@ public class StorageService implements IStorageService {
 			storageManager.addLabelToStorage(storageData, storageLabel, doOverwrite);
 			storageLabelDataDao.saveLabel(storageLabel);
 			return storageManager.getStorageData(storageData.getId());
-		} catch (Exception e) {
-			log.warn("Exception in storage service.", e);
+		} catch (IOException | SerializationException e) {
 			throw new StorageException("Exception occurred trying to save storage data changes to disk.", e);
 		}
 	}
@@ -350,8 +326,7 @@ public class StorageService implements IStorageService {
 				storageLabelDataDao.saveLabel(storageLabel);
 			}
 			return storageManager.getStorageData(storageData.getId());
-		} catch (Exception e) {
-			log.warn("Exception in storage service.", e);
+		} catch (IOException | SerializationException e) {
 			throw new StorageException("Exception occurred trying to save storage data changes to disk.", e);
 		}
 	}
@@ -364,8 +339,7 @@ public class StorageService implements IStorageService {
 		try {
 			storageManager.removeLabelFromStorage(storageData, storageLabel);
 			return storageManager.getStorageData(storageData.getId());
-		} catch (Exception e) {
-			log.warn("Exception in storage service.", e);
+		} catch (IOException | SerializationException e) {
 			throw new StorageException("Exception occurred trying to save storage data changes to disk.", e);
 		}
 	}
@@ -380,8 +354,7 @@ public class StorageService implements IStorageService {
 				storageManager.removeLabelFromStorage(storageData, label);
 			}
 			return storageManager.getStorageData(storageData.getId());
-		} catch (Exception e) {
-			log.warn("Exception in storage service.", e);
+		} catch (IOException | SerializationException e) {
 			throw new StorageException("Exception occurred trying to save storage data changes to disk.", e);
 		}
 	}
@@ -514,7 +487,7 @@ public class StorageService implements IStorageService {
 	public void updateStorageData(StorageData storageData) throws StorageException {
 		try {
 			storageManager.updateStorageData(storageData);
-		} catch (Exception e) {
+		} catch (IOException | SerializationException e) {
 			throw new StorageException(e);
 		}
 	}
@@ -546,7 +519,7 @@ public class StorageService implements IStorageService {
 	public void createStorageFromUploadedDir(final IStorageData localStorageData) throws StorageException {
 		try {
 			storageManager.createStorageFromUploadedDir(localStorageData);
-		} catch (Exception e) {
+		} catch (IOException | SerializationException e) {
 			throw new StorageException("Exception occurred trying to create storage from uploaded local storage.", e);
 		}
 	}

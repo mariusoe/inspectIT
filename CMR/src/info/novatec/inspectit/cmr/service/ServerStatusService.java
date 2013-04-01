@@ -38,6 +38,12 @@ public class ServerStatusService implements IServerStatusService {
 	private IVersioningService versioning;
 
 	/**
+	 * We will only log once that the version information can not be obtained, since the UI is
+	 * checking this periodically. Even in debug level it is not wanted to be logged all the time.
+	 */
+	private boolean versionNotFoundLogged = false;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@MethodLog
@@ -65,8 +71,9 @@ public class ServerStatusService implements IServerStatusService {
 		try {
 			return versioning.getVersion();
 		} catch (IOException e) {
-			if (log.isDebugEnabled()) {
+			if (!versionNotFoundLogged && log.isDebugEnabled()) {
 				log.debug("Cannot obtain current version", e);
+				versionNotFoundLogged = true;
 			}
 			return IServerStatusService.VERSION_NOT_AVAILABLE;
 		}

@@ -3,13 +3,15 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="
 	http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 	http://www.springframework.org/schema/context
 	http://www.springframework.org/schema/context/spring-context-3.1.xsd
 	http://www.springframework.org/schema/task
-	http://www.springframework.org/schema/task/spring-task-3.1.xsd">
+	http://www.springframework.org/schema/task/spring-task-3.1.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
 	<!-- activates annotation scanning -->
 	<context:annotation-config/>
@@ -18,10 +20,9 @@
 	<!-- puts all the properties into the container -->
 	<context:property-placeholder location="classpath:/config/*.properties"/>
 
-	<!-- needed for the automatic AOP usage -->
-	<bean id="advisorFactory" class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />
-
 	<!-- needed for @Scheduled annotation -->
 	<task:annotation-driven executor="executor" scheduler="scheduledExecutorService"/>
 	<task:executor id="executor" />
+	
+	<aop:aspectj-autoproxy/>
 </beans>
