@@ -14,6 +14,7 @@ import info.novatec.inspectit.util.ObjectUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -158,32 +159,24 @@ public class ImportStorageWizard extends Wizard implements INewWizard {
 			Job importStorageJob = new Job("Import Storage") {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
-					monitor.beginTask("Uploading data..", IProgressMonitor.UNKNOWN);
+					SubMonitor subMonitor = SubMonitor.convert(monitor);
+					subMonitor.setWorkRemaining(10); // 9 units for uploading, 1 for unpacking
 					InspectITStorageManager storageManager = InspectIT.getDefault().getInspectITStorageManager();
 					try {
-						storageManager.uploadZippedStorage(fileName, cmrRepositoryDefinition);
+						storageManager.uploadZippedStorage(fileName, cmrRepositoryDefinition, subMonitor.newChild(9));
 					} catch (final Exception e) {
-						Display.getDefault().asyncExec(new Runnable() {
-							@Override
-							public void run() {
-								InspectIT.getDefault().createErrorDialog("Storage data was not successfully uploaded to the CMR. Import failed.", e, -1);
-							}
-						});
-						return Status.CANCEL_STATUS;
+						return new Status(Status.ERROR, InspectIT.ID, "Storage data was not successfully uploaded to the CMR. Import failed.", e);
 					}
-					monitor.beginTask("Unpacking data..", IProgressMonitor.UNKNOWN);
+
+					IProgressMonitor unpackMonitor = subMonitor.newChild(1);
+					unpackMonitor.setTaskName("Unpacking data..");
 					try {
 						IStorageData storageData = storageManager.getStorageDataFromZip(fileName);
 						cmrRepositoryDefinition.getStorageService().unpackUploadedStorage(storageData);
 					} catch (final StorageException e) {
-						Display.getDefault().asyncExec(new Runnable() {
-							@Override
-							public void run() {
-								InspectIT.getDefault().createErrorDialog("Storage data was not successfully unpacked on the CMR. Import failed.", e, -1);
-							}
-						});
-						return Status.CANCEL_STATUS;
+						return new Status(Status.ERROR, InspectIT.ID, "Storage data was not successfully unpacked on the CMR. Import failed.", e);
 					}
+					unpackMonitor.done();
 
 					Display.getDefault().asyncExec(new Runnable() {
 						@Override

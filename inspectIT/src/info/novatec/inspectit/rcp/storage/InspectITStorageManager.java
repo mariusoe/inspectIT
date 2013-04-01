@@ -572,14 +572,18 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 *            Name of file.
 	 * @param cmrRepositoryDefinition
 	 *            {@link CmrRepositoryDefinition}.
+	 * @param subMonitor
+	 *            {@link SubMonitor} to report progress to.
 	 * @throws Exception
 	 *             If upload file does not exist or upload fails.
 	 */
-	public void uploadZippedStorage(String fileName, CmrRepositoryDefinition cmrRepositoryDefinition) throws Exception {
+	public void uploadZippedStorage(String fileName, CmrRepositoryDefinition cmrRepositoryDefinition, SubMonitor subMonitor) throws Exception {
 		Path file = Paths.get(fileName);
 		Path relativizePath = file.getParent();
 		String tmpDir = "tmp" + UUID.randomUUID().hashCode();
-		dataUploader.uploadFileToStorageUploads(file, relativizePath, tmpDir, cmrRepositoryDefinition);
+		subMonitor.setTaskName("Uploading storage file..");
+		// no compressing since it is already zipped
+		dataUploader.uploadFileToStorageUploads(file, relativizePath, tmpDir, cmrRepositoryDefinition, subMonitor);
 	}
 
 	/**
@@ -590,10 +594,12 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 *            Storage to upload.
 	 * @param cmrRepositoryDefinition
 	 *            Repository definition.
+	 * @param subMonitor
+	 *            The monitor to report upload progress to.
 	 * @throws Exception
 	 *             If storage is not fully downloaded or exception occurs during upload.
 	 */
-	public void uploadCompleteStorage(LocalStorageData localStorageData, final CmrRepositoryDefinition cmrRepositoryDefinition) throws Exception {
+	public void uploadCompleteStorage(LocalStorageData localStorageData, final CmrRepositoryDefinition cmrRepositoryDefinition, SubMonitor subMonitor) throws Exception {
 		if (!localStorageData.isFullyDownloaded()) {
 			throw new StorageException("Can not upload storage that is not fully downloaded.");
 		}
@@ -608,7 +614,8 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 				return FileVisitResult.CONTINUE;
 			}
 		});
-		dataUploader.uploadFileToStorageUploads(toUpload, storageDir, tmpDir, cmrRepositoryDefinition);
+		subMonitor.setTaskName("Uploading storage files..");
+		dataUploader.uploadFileToStorageUploads(toUpload, storageDir, tmpDir, cmrRepositoryDefinition, subMonitor);
 	}
 
 	/**

@@ -1,20 +1,23 @@
 package info.novatec.inspectit.rcp.storage.util;
 
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
+import info.novatec.inspectit.rcp.storage.http.TransferDataMonitor;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.eclipse.core.runtime.SubMonitor;
 
 /**
  * Utility class for uploading data.
@@ -43,13 +46,13 @@ public class DataUploader {
 	 *            Sub-directory in the upload folder to put files into.
 	 * @param cmrRepositoryDefinition
 	 *            {@link CmrRepositoryDefinition}.
+	 * @param subMonitor
+	 *            {@link SubMonitor} to report progress to.
 	 * @throws Exception
 	 *             If file to upload does not exist or exception occurs during the upload.
 	 */
-	public void uploadFileToStorageUploads(Path fileToUpload, Path relativizePath, String tmpDir, CmrRepositoryDefinition cmrRepositoryDefinition) throws Exception {
-		List<Path> list = new ArrayList<Path>(1);
-		list.add(fileToUpload);
-		this.uploadFileToStorageUploads(list, relativizePath, tmpDir, cmrRepositoryDefinition);
+	public void uploadFileToStorageUploads(Path fileToUpload, Path relativizePath, String tmpDir, CmrRepositoryDefinition cmrRepositoryDefinition, SubMonitor subMonitor) throws Exception {
+		this.uploadFileToStorageUploads(Collections.singletonList(fileToUpload), relativizePath, tmpDir, cmrRepositoryDefinition, subMonitor);
 	}
 
 	/**
@@ -66,16 +69,33 @@ public class DataUploader {
 	 *            Sub-directory in the upload folder to put files into.
 	 * @param cmrRepositoryDefinition
 	 *            {@link CmrRepositoryDefinition}.
+	 * @param subMonitor
+	 *            {@link SubMonitor} to report progress to.
 	 * @throws Exception
 	 *             If file to upload does not exist or exception occurs during the upload.
 	 */
-	public void uploadFileToStorageUploads(List<Path> filesToUpload, Path relativizePath, String tmpDir, CmrRepositoryDefinition cmrRepositoryDefinition) throws Exception {
+	public void uploadFileToStorageUploads(List<Path> filesToUpload, Path relativizePath, String tmpDir, CmrRepositoryDefinition cmrRepositoryDefinition, SubMonitor subMonitor) throws Exception {
+		// calculate how much is there to upload
+		Map<String, Long> files = new HashMap<String, Long>();
+		for (Path file : filesToUpload) {
+			if (Files.notExists(file)) {
+				throw new IOException("File to upload (" + file + ") does not exist.");
+			}
+			files.put(file.toString(), Files.size(file));
+		}
+		TransferDataMonitor transferDataMonitor = new TransferDataMonitor(subMonitor, files, false);
+
+		// prepare uri
 		String uri = getServerUri(cmrRepositoryDefinition) + UPLOAD_SERVLET;
-		HttpClient httpClient = new DefaultHttpClient();
-		try {
-			HttpPost httpPost = new HttpPost(uri);
-			MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
-			for (Path file : filesToUpload) {
+
+		// execute post for each file
+		for (Path file : filesToUpload) {
+			DefaultHttpClient httpClient = null;
+			try {
+				httpClient = new DefaultHttpClient();
+				HttpPost httpPost = new HttpPost(uri);
+				// create entity
+				MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 				if (Files.notExists(file)) {
 					throw new IOException("File to upload (" + file + ") does not exist.");
 				}
@@ -85,12 +105,21 @@ public class DataUploader {
 					pathString.insert(0, tmpDir + File.separator);
 				}
 				entity.addPart(pathString.toString(), bin);
+				// wrap entity
+				UploadHttpEntityWrapper entityWrapper = new UploadHttpEntityWrapper(entity, transferDataMonitor);
+				httpPost.setEntity(entityWrapper);
+
+				// execute upload
+				transferDataMonitor.startTransfer(file.toString());
+				httpClient.execute(httpPost);
+				transferDataMonitor.endTransfer(file.toString());
+			} finally {
+				if (null != httpClient) {
+					httpClient.getConnectionManager().shutdown();
+				}
 			}
-			httpPost.setEntity(entity);
-			httpClient.execute(httpPost);
-		} finally {
-			httpClient.getConnectionManager().shutdown();
 		}
+
 	}
 
 	/**

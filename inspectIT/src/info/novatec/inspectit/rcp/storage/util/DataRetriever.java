@@ -5,7 +5,6 @@ import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
 import info.novatec.inspectit.indexing.storage.impl.StorageDescriptor;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.storage.http.TransferDataMonitor;
-import info.novatec.inspectit.rcp.storage.http.TransferRateInputStream;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
@@ -457,7 +456,7 @@ public class DataRetriever {
 		httpClient.addResponseInterceptor(new HttpResponseInterceptor() {
 			@Override
 			public void process(HttpResponse response, HttpContext context) throws HttpException, IOException {
-				response.setEntity(new TransferRateEntity(response.getEntity(), transferDataMonitor));
+				response.setEntity(new DownloadHttpEntityWrapper(response.getEntity(), transferDataMonitor));
 			}
 		});
 
@@ -473,7 +472,7 @@ public class DataRetriever {
 				httpGet.addHeader("accept-encoding", "gzip");
 			}
 
-			transferDataMonitor.startDownload(fileName);
+			transferDataMonitor.startTransfer(fileName);
 			HttpResponse response = httpClient.execute(httpGet);
 			StatusLine statusLine = response.getStatusLine();
 			if (HttpStatus.valueOf(statusLine.getStatusCode()).series().equals(Series.SUCCESSFUL)) {
@@ -482,7 +481,7 @@ public class DataRetriever {
 					postDownloadRunnable.process(is, fileName);
 				}
 			}
-			transferDataMonitor.endDownload(fileName);
+			transferDataMonitor.endTransfer(fileName);
 		}
 	}
 
@@ -628,42 +627,6 @@ public class DataRetriever {
 			return -1;
 		}
 
-	}
-
-	/**
-	 * Wrapping entity to support download speed monitoring.
-	 * 
-	 * @author Ivan Senic
-	 * 
-	 */
-	private static class TransferRateEntity extends HttpEntityWrapper {
-
-		/**
-		 * {@link TransferDataMonitor} to pass to the {@link TransferRateInputStream}.
-		 */
-		private TransferDataMonitor transferDataMonitor;
-
-		/**
-		 * Default constructor.
-		 * 
-		 * @param wrapped
-		 *            Entity to be wrapped.
-		 * @param transferDataMonitor
-		 *            {@link TransferDataMonitor} to pass to the {@link TransferRateInputStream}.
-		 */
-		public TransferRateEntity(HttpEntity wrapped, TransferDataMonitor transferDataMonitor) {
-			super(wrapped);
-			this.transferDataMonitor = transferDataMonitor;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public InputStream getContent() throws IOException {
-			InputStream wrappedin = wrappedEntity.getContent();
-			return new TransferRateInputStream(wrappedin, transferDataMonitor);
-		}
 	}
 
 	/**

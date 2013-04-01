@@ -36,7 +36,7 @@
 		<dependency org="org.aspectj" name="aspectjweaver" rev="1.7.2" transitive="false" conf="prod->default"/>
 		<dependency org="org.aspectj" name="aspectjrt" rev="1.7.2" transitive="false" conf="prod->default"/>
 		<dependency org="com.caucho" name="hessian" rev="3.1.5" transitive="false" conf="prod->default"/>
-		<dependency org="javax.servlet" name="servlet-api" rev="2.5" transitive="false" conf="prod->default"/>
+		<dependency org="javax.servlet" name="javax.servlet" rev="3.0.0.v201103241009" conf="prod->default" />
 		<dependency org="javax.transaction" name="jta" rev="1.0.1B" transitive="false" conf="prod->default"/>
 		<dependency org="commons-collections" name="commons-collections" rev="3.2" transitive="false" conf="prod->default"/>
 		<dependency org="cglib" name="cglib-nodep" rev="2.2.2" transitive="false" conf="prod->default"/>

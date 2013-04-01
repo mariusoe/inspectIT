@@ -42,14 +42,14 @@ public class StorageCompressionWizardPage extends WizardPage {
 		Composite main = new Composite(parent, SWT.NONE);
 		main.setLayout(new GridLayout(1, false));
 
-		new Label(main, SWT.NONE).setText("Compress the data before download:");
+		new Label(main, SWT.NONE).setText("Compress the data before transfer:");
 
 		compress = new Button(main, SWT.RADIO);
-		compress.setText("Yes - suggested if downloading from Internet or slow network");
+		compress.setText("Yes - suggested if transferring from/to Internet or slow network");
 		compress.setSelection(true);
 
 		Button dontCompress = new Button(main, SWT.RADIO);
-		dontCompress.setText("No - suggested if downloading from fast local network");
+		dontCompress.setText("No - suggested if transferring from/to from fast local network");
 		dontCompress.setSelection(false);
 
 		setControl(main);

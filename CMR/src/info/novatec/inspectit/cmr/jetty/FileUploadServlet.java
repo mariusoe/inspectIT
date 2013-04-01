@@ -48,7 +48,6 @@ public class FileUploadServlet extends HttpServlet implements InitializingBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		List<?> files = (List<?>) req.getAttribute(MULTI_PART_FILTER_FILES);
 

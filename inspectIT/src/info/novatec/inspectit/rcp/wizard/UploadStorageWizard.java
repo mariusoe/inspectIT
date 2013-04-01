@@ -12,6 +12,7 @@ import info.novatec.inspectit.storage.LocalStorageData;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -77,18 +78,13 @@ public class UploadStorageWizard extends Wizard implements INewWizard {
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
+				SubMonitor subMonitor = SubMonitor.convert(monitor);
 				InspectITStorageManager storageManager = InspectIT.getDefault().getInspectITStorageManager();
 				try {
-					storageManager.uploadCompleteStorage(localStorageData, cmrRepositoryDefinition);
+					storageManager.uploadCompleteStorage(localStorageData, cmrRepositoryDefinition, subMonitor);
 					cmrRepositoryDefinition.getStorageService().createStorageFromUploadedDir(localStorageData);
 				} catch (final Exception e) {
-					Display.getDefault().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							InspectIT.getDefault().createErrorDialog("Exception occured during storage upload.", e, -1);
-						}
-					});
-					return Status.CANCEL_STATUS;
+					return new Status(Status.ERROR, InspectIT.ID, "Exception occured during storage upload", e);
 				}
 
 				Display.getDefault().asyncExec(new Runnable() {

@@ -132,7 +132,7 @@ public class TransferDataMonitor {
 	 * @param fileName
 	 *            Name of the file that is downloaded.
 	 */
-	public void startDownload(String fileName) {
+	public void startTransfer(String fileName) {
 		if (0 == filesCount) {
 			downloadStartTime = System.currentTimeMillis();
 		}
@@ -148,7 +148,7 @@ public class TransferDataMonitor {
 	 * @param fileName
 	 *            Name of the file that has been downloaded.
 	 */
-	public void endDownload(String fileName) {
+	public void endTransfer(String fileName) {
 		// if the file is smaller than expected (can happen with gzip) add remaining expected size
 		// to the submonitor
 		filesCount++;
@@ -164,6 +164,7 @@ public class TransferDataMonitor {
 		if (files.size() == filesCount) {
 			// when last file is finished we cancel the message job and inform submonitor
 			displayMessageJob.cancel();
+			subMonitor.subTask("");
 			subMonitor.done();
 		}
 	}
