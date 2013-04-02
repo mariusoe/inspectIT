@@ -62,7 +62,7 @@ public class AggregatedDataTest {
 		data[3][1] = exceptionSensorData;
 
 		// then aggregation of already aggregated
-		List<Long> aggregateId = new ArrayList<>();
+		List<Long> aggregateId = new ArrayList<Long>();
 		aggregateId.add(1L);
 		aggregateId.add(3L);
 

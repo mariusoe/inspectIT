@@ -20,6 +20,23 @@
 	<path id="path.test.class">
 		<pathelement location="${build.test.classes}" />
 	</path>
+	
+	<path id="compile.classpath.overwrite">
+		<pathelement location="${build.commons.classes}" />
+		<pathelement location="${build.commonscs.classes}" />
+		<pathelement location="${build.inspectit.classes}" />
+		<path refid="lib.prod" />
+	</path>
+	
+	<path id="compile.classpath">
+		<!-- this one needs to be first here! -->
+		<pathelement location="${build.overwrite.classes}" />
+		<pathelement location="${build.commons.classes}" />
+		<pathelement location="${build.commonscs.classes}" />
+		<pathelement location="${build.inspectit.classes}" />
+		<path refid="lib.prod" />
+		<path refid="lib.jmeter" />
+	</path>
 
 	<target name="clean">
 		<delete dir="${build.root}" />
@@ -69,24 +86,7 @@
 		<mkdir dir="${build.classes.root}" />
 		<mkdir dir="${build.overwrite.classes}" />
 
-		<path id="compile.classpath.overwrite">
-			<pathelement location="${build.commons.classes}" />
-			<pathelement location="${build.commonscs.classes}" />
-			<pathelement location="${build.inspectit.classes}" />
-			<path refid="lib.prod" />
-		</path>
-
 		<javac source="1.7" target="1.7" debug="true" debuglevel="lines,vars,source" destdir="${build.overwrite.classes}" srcdir="${overwrite.src.root}" classpathref="compile.classpath.overwrite" includeAntRuntime="no" />
-
-		<path id="compile.classpath">
-			<!-- this one needs to be first here! -->
-			<pathelement location="${build.overwrite.classes}" />
-			<pathelement location="${build.commons.classes}" />
-			<pathelement location="${build.commonscs.classes}" />
-			<pathelement location="${build.inspectit.classes}" />
-			<path refid="lib.prod" />
-			<path refid="lib.jmeter" />
-		</path>
 
 		<javac source="1.7" target="1.7" debug="true" debuglevel="lines,vars,source" destdir="${build.classes.root}" srcdir="${src.root}" classpathref="compile.classpath" includeAntRuntime="no" />
 
@@ -207,66 +207,54 @@
 	</target>
 
 	<target name="functional-tests-no-dep-build" depends="init, init-functional-tests">
-		<mkdir dir="${build.qa.test.testdata}" />
-		<mkdir dir="${build.qa.test.coveragedata}" />
-		<mkdir dir="${build.test.classes}" />
-
-		<javac source="1.7" target="1.7" debug="true" debuglevel="lines,vars,source" nowarn="off" includeAntRuntime="no" destdir="${build.test.classes}" srcdir="${test.root}">
-			<classpath refid="complete.classpath" />
-			<compilerarg value="-Xlint:unchecked" />
-		</javac>
-
-		<!-- instrument the classes that should be included in test coverage -->
-		<mkdir dir="${build.instrumented.classes}" />
-
-		<!-- ensure that the original class files are not touched as we do not want to -->
-		<!-- ship classes that are instrumented with cobertura to the customer -->
-		<copy todir="${build.instrumented.classes}">
-			<fileset dir="${build.classes.root}" includes="**/*.class" />
-		</copy>
-
-		<cobertura-instrument datafile="${build.qa.test.coveragedata}/cobertura.ser">
-			<includeClasses regex="info.novatec.inspectit.*" />
-			<excludeClasses regex="info.novatec.inspectit.*\.test.*" />
-			<excludeClasses regex="info.novatec.inspectit.*\.*_Stub.*" />
-			<instrumentationClasspath>
-				<path location="${build.instrumented.classes}" />
-			</instrumentationClasspath>
-			<classpath refid="complete.classpath" />
-			<classpath location="${build.instrumented.classes}" />
-		</cobertura-instrument>
-
-		<testng outputdir="${build.qa.test.testdata}" haltonfailure="${testng.haltonfailure}">
-			<!-- this absolutely needs to be the first entry, else the instrumented classes are not taken but the normal ones -->
-			<classpath location="${build.instrumented.classes}" />
-			<classpath refid="complete.classpath" />
-			<classpath refid="path.test.class" />
-			<classpath refid="path.testng" />
-			<classpath refid="path.cobertura" />
-			<!-- this entry is necessary in order to get the spring configurations needed for the test -->
-			<classpath location="${src.root}" />
-			<classpath location="${test.root}" />
-
-			<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${build.qa.test.coveragedata}/cobertura.ser" />
-			<jvmarg value="-XX:-UseSplitVerifier" />
-			<xmlfileset file="${resources.testng}/testng.xml" />
-		</testng>
-
-
-		<!-- create cobertura html and xml reports and link to the interesting parts -->
-		<cobertura-report format="html" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
-			<fileset dir="${src.root}" includes="**/*.java" />
-			<fileset dir="${test.root}" includes="**/*.java" />
-		</cobertura-report>
-		<cobertura-report format="xml" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
-			<fileset dir="${src.root}" includes="**/*.java" />
-			<fileset dir="${test.root}" includes="**/*.java" />
-		</cobertura-report>
-		<echo file="${build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >" />
-
-		<!-- create html pages that link to the interesting parts -->
-		<echo file="${build.qa.test}/testresults.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/index.html&quot; >" />
-		<echo file="${build.qa.test}/testreport.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/emailable-report.html&quot; >" />
+		<path id="test.compile.classpath">
+			<pathelement location="${build.overwrite.classes}" />
+			<pathelement location="${build.inspectit.classes}" />
+			<pathelement location="${build.classes.root}" />
+			<fileset dir="${commons.build.release}" includes="*.jar" />
+			<fileset dir="${commonscs.build.release}" includes="*.jar" />
+			<path refid="lib.prod" />
+			<path refid="lib.test" />
+			<path refid="lib.jmeter" />
+		</path>
+							
+		<fileset id="test.classes-to-instrument" dir="${build.classes.root}" includes="**/*.class" />
+		
+		<property name="test.workingDir" value="${basedir}"/>
+		<property name="test.javac.source" value="1.7"/>
+		<property name="test.javac.target" value="1.7"/>
+		<property name="test.vmargs" value=""/>
+		<property name="test.targetsuite" value="${resources.testng}/testng.xml"/>
+		
+		<execute-testng 
+			src.root="${src.root}" 
+			test.root="${test.root}" 
+			build.qa.test="${build.qa.test}"
+			build.qa.test.testdata="${build.qa.test.testdata}" 
+			build.qa.test.coveragedata="${build.qa.test.coveragedata}" 
+			build.test.classes="${build.test.classes}" 
+			build.instrumented.classes="${build.instrumented.classes}"
+			test.workingDir="${test.workingDir}"
+			test.javac.source="${test.javac.source}" 
+			test.javac.target="${test.javac.target}"
+			test.targetsuite="${test.targetsuite}"
+			test.vmargs="${test.vmargs}"
+			test.haltonfailure="${test.haltonfailure}">
+			<compile.classpath>
+				<classpath>
+					<path refid="compile.classpath"/>
+				</classpath>
+			</compile.classpath>
+			<test.compile.classpath>
+				<classpath>
+					<path refid="test.compile.classpath"/>
+				</classpath>
+			</test.compile.classpath>
+			<test.classes-to-instrument>
+				<fileset refid="test.classes-to-instrument" />
+			</test.classes-to-instrument>
+		</execute-testng>
+	
 	</target>
 
 	<target name="static-analysis" depends="build">

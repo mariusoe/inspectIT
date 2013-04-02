@@ -4,11 +4,12 @@
 
 	<configurations>
 		<conf name="prod" visibility="private" transitive="false" />
+		<conf name="test" visibility="private" extends="prod" transitive="false"/>
 	</configurations>
 
-    <!-- note that the manifest file stored in the resource sections needs to be updated to reflect any changes to the production libraries (changing of revisions is safe!) -->
+	<!-- note that the manifest file stored in the resource sections needs to be updated to reflect any changes to the production libraries (changing of revisions is safe!) -->
 
-    <!-- PLEASE UPDATE THE 3rd PARTY NOTIFICATION LIST IN inspectIT, CMR AND Agent build.xml FOR ANY CHANGE -->
+	<!-- PLEASE UPDATE THE 3rd PARTY NOTIFICATION LIST IN inspectIT, CMR AND Agent build.xml FOR ANY CHANGE -->
 
 	<!-- IMPORTANT
 		 * As from ticket INSPECTIT-971 all projects will only define the OSGi compliant libs
@@ -35,5 +36,12 @@
 		<dependency org="net.sourceforge.cglib" name="com.springsource.net.sf.cglib" rev="2.2.0" conf="prod->default" />
 
 		<dependency org="com.esotericsoftware.kryo" name="info.novatec.kryo" rev="2.20" conf="prod->default" />
+		
+		<!-- Test -->
+		<!-- Test NG should be on the build path via the Eclipse plug-in -->
+		<dependency org="org.mockito" name="mockito-core" rev="1.9.0" conf="test->default" />
+		<dependency org="org.objenesis" name="objenesis" rev="1.2" conf="test->default"/> <!-- Needed for mockito-core -->
+		<dependency org="nl.jqno.equalsverifier" name="equalsverifier" rev="1.0.2" conf="test->default"/>
+		<dependency org="org.hamcrest" name="hamcrest-all" rev="1.3" conf="test->default" />
 	</dependencies>
 </ivy-module>

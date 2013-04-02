@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.storage.serializer.schema.ClassSchema;
 import info.novatec.inspectit.storage.serializer.schema.ClassSchemaManager;
 
@@ -22,7 +21,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
 @SuppressWarnings("PMD")
-public class BackwardForwardCompatibilityTest extends AbstractTestNGLogSupport {
+public class BackwardForwardCompatibilityTest {
 
 	@Mock
 	private ClassSchemaManager classSchemaManager;

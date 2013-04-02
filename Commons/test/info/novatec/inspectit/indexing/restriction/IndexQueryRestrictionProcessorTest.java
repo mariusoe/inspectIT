@@ -2,7 +2,6 @@ package info.novatec.inspectit.indexing.restriction;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.restriction.impl.CachingIndexQueryRestrictionProcessor;
 import info.novatec.inspectit.indexing.restriction.impl.IndexQueryRestrictionFactory;
@@ -22,7 +21,7 @@ import org.testng.annotations.Test;
  * 
  */
 @SuppressWarnings("PMD")
-public class IndexQueryRestrictionProcessorTest extends AbstractTestNGLogSupport {
+public class IndexQueryRestrictionProcessorTest {
 
 	/**
 	 * The processor under test.

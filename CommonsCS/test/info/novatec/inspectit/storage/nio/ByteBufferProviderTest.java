@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 
 import java.nio.ByteBuffer;
 import java.util.Random;
@@ -22,7 +21,7 @@ import org.testng.annotations.Test;
  * 
  */
 @SuppressWarnings("PMD")
-public class ByteBufferProviderTest extends AbstractTestNGLogSupport {
+public class ByteBufferProviderTest {
 
 	/**
 	 * To be tested.

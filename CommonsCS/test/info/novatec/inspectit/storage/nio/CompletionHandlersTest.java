@@ -5,7 +5,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.storage.nio.read.ReadingCompletionHandler;
 import info.novatec.inspectit.storage.nio.write.WritingCompletionHandler;
 
@@ -21,7 +20,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("PMD")
-public class CompletionHandlersTest extends AbstractTestNGLogSupport {
+public class CompletionHandlersTest {
 
 	private WritingCompletionHandler writingCompletionHandler = new WritingCompletionHandler();
 

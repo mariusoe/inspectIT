@@ -12,10 +12,6 @@
 
 	<import file="${build.common-targets.file}" />
 
-	<path id="path.test.class">
-		<pathelement location="${build.test.classes}" />
-	</path>
-
 	<target name="clean" description="--> Cleans the project">
 		<delete dir="${build.root}" failonerror="false" />
 		<delete dir="${release.root}" failonerror="false" />
@@ -78,13 +74,9 @@
 	<!-- component.                                                      -->
 	<!-- *************************************************************** -->
 
-	<!--  It depends on the release target, because we need the compiled classes -->
-	<target name="functional-tests" depends="build, init-functional-tests, init-classmexer">
-		<mkdir dir="${build.qa.test.testdata}" />
-		<mkdir dir="${build.qa.test.coveragedata}" />
-		<mkdir dir="${build.test.classes}" />
-
-		<path id="complete.classpath">
+	<!--  It depends on the build target, because we need the compiled classes -->
+	<target name="functional-tests" depends="build,init-classmexer,init-functional-tests">
+		<path id="test.compile.classpath">
 			<pathelement location="${build.cmr.classes}" />
 			<fileset dir="${commons.build.release}" includes="*.jar" />
 			<fileset dir="${commonscs.build.release}" includes="*.jar" />
@@ -92,67 +84,46 @@
 			<path refid="lib.prod.commons" />
 			<path refid="lib.prod.commonscs" />
 			<path refid="lib.test" />
-			<path refid="path.testng" />
 		</path>
-
-		<javac source="1.7" target="1.7" debug="true" debuglevel="lines,vars,source" nowarn="off" includeAntRuntime="no" destdir="${build.test.classes}" srcdir="${test.root}">
-			<classpath refid="complete.classpath" />
-			<compilerarg value="-Xlint:unchecked" />
-		</javac>
-
-		<!-- instrument the classes that should be included in test coverage -->
-		<mkdir dir="${build.instrumented.classes}" />
 
 		<!-- ensure that the original class files are not touched as we do not want to -->
 		<!-- ship classes that are instrumented with cobertura to the customer -->
-		<copy todir="${build.instrumented.classes}">
-			<fileset dir="${build.cmr.classes}" includes="**/*.class" />
-		</copy>
-
-		<cobertura-instrument datafile="${build.qa.test.coveragedata}/cobertura.ser">
-			<includeClasses regex="info.novatec.inspectit.*" />
-			<excludeClasses regex="info.novatec.inspectit.*\.test.*" />
-			<excludeClasses regex="info.novatec.inspectit.*\.*_Stub.*" />
-			<instrumentationClasspath>
-				<path location="${build.instrumented.classes}" />
-			</instrumentationClasspath>
-			<classpath refid="compile.classpath" />
-			<classpath location="${build.instrumented.classes}" />
-		</cobertura-instrument>
-
-		<testng outputdir="${build.qa.test.testdata}" haltonfailure="${testng.haltonfailure}">
-			<!-- this absolutely needs to be the first entry, else the instrumented classes are not taken but the normal ones -->
-			<classpath location="${build.instrumented.classes}" />
-			<classpath refid="complete.classpath" />
-			<classpath refid="path.test.class" />
-			<classpath refid="path.testng" />
-			<classpath refid="path.cobertura" />
-			<!-- this entry is necessary in order to get the spring configurations needed for the test -->
-			<classpath location="${src.root}" />
-			<classpath location="${test.root}" />
-
-			<jvmarg value="-XX:-UseSplitVerifier" />
-			<!-- This is a workaround for Cobertura not supporting Java 7 source code features (http://sourceforge.net/tracker/index.php?func=detail&aid=3295711&group_id=130558&atid=720018) -->
-			<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${build.qa.test.coveragedata}/cobertura.ser" />
-			<jvmarg value="-javaagent:${string.path.classmexer}" />
-			<xmlfileset file="${resources.testng}/testng.xml" />
-		</testng>
-
-
-		<!-- create cobertura html and xml reports and link to the interesting parts -->
-		<cobertura-report format="html" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
-			<fileset dir="${src.root}" includes="**/*.java" />
-			<fileset dir="${test.root}" includes="**/*.java" />
-		</cobertura-report>
-		<cobertura-report format="xml" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
-			<fileset dir="${src.root}" includes="**/*.java" />
-			<fileset dir="${test.root}" includes="**/*.java" />
-		</cobertura-report>
-		<echo file="${build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >" />
-
-		<!-- create html pages that link to the interesting parts -->
-		<echo file="${build.qa.test}/testresults.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/index.html&quot; >" />
-		<echo file="${build.qa.test}/testreport.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/emailable-report.html&quot; >" />
+		<fileset id="test.classes-to-instrument" dir="${build.cmr.classes}" includes="**/*.class" />
+		
+		<property name="test.workingDir" value="${basedir}"/>
+		<property name="test.javac.source" value="1.7"/>
+		<property name="test.javac.target" value="1.7"/>
+		<property name="test.vmargs" value="-javaagent:${string.path.classmexer}"/>
+		<property name="test.targetsuite" value="${resources.testng}/testng.xml"/>
+		
+		<execute-testng 
+			src.root="${src.root}" 
+			test.root="${test.root}" 
+			build.qa.test="${build.qa.test}"
+			build.qa.test.testdata="${build.qa.test.testdata}" 
+			build.qa.test.coveragedata="${build.qa.test.coveragedata}" 
+			build.test.classes="${build.test.classes}" 
+			build.instrumented.classes="${build.instrumented.classes}"
+			test.workingdir="${test.workingDir}"
+			test.javac.source="${test.javac.source}" 
+			test.javac.target="${test.javac.target}"
+			test.targetsuite="${test.targetsuite}"
+			test.vmargs="${test.vmargs}"
+			test.haltonfailure="true">
+			<compile.classpath>
+				<classpath>
+					<path refid="compile.classpath"/>
+				</classpath>
+			</compile.classpath>
+			<test.compile.classpath>
+				<classpath>
+					<path refid="test.compile.classpath"/>
+				</classpath>
+			</test.compile.classpath>
+			<test.classes-to-instrument>
+				<fileset refid="test.classes-to-instrument" />
+			</test.classes-to-instrument>
+		</execute-testng>
 	</target>
 
 

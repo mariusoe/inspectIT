@@ -3,7 +3,6 @@ package info.novatec.inspectit.storage.nio;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.storage.nio.read.ReadingChannelManager;
 import info.novatec.inspectit.storage.nio.stream.ExtendedByteBufferOutputStream;
 import info.novatec.inspectit.storage.nio.write.WritingChannelManager;
@@ -37,7 +36,7 @@ import org.testng.annotations.Test;
  * 
  */
 @SuppressWarnings("PMD")
-public class ChannelManagersTest extends AbstractTestNGLogSupport {
+public class ChannelManagersTest {
 
 	/**
 	 * File where data will be written/read.

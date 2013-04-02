@@ -170,76 +170,56 @@
 	<!-- Interface.                                                      -->
 	<!-- *************************************************************** -->
 
-	<!--  It depends on the release target, because we need the compiled class files from the PDE Build-->
-	<target name="functional-tests" depends="pdebuild, init-functional-tests">
-		<mkdir dir="${build.qa.test.testdata}" />
-		<mkdir dir="${build.test.classes}" />
-
-		<javac source="1.7" target="1.7" debug="true" nowarn="off" includeAntRuntime="no" destdir="${build.test.classes}" srcdir="${test.root}">
-			<classpath refid="lib.test" />
-			<classpath refid="path.testng" />
-			<classpath refid="path.rcp" />
-			<classpath refid="path.commons.classes" />
-			<classpath refid="path.commonscs.classes" />
-			<compilerarg value="-Xlint:unchecked" />
-		</javac>
-
-		<!-- instrument the classes that should be included in test coverage -->
-		<mkdir dir="${build.instrumented.classes}" />
+	<!--  It depends on the pdebuild target, because we need the compiled class files from the PDE Build-->
+	<target name="functional-tests" depends="pdebuild,init-functional-tests">
+		<path id="test.compile.classpath">
+			<path refid="path.rcp" />
+			<path refid="path.commons.classes" />
+			<path refid="path.commonscs.classes" />
+			<path refid="lib.test" />
+		</path>
 
 		<!-- ensure that the original class files are not touched as we do not want to -->
 		<!-- ship classes that are instrumented with cobertura to the customer -->
-		<copy todir="${build.instrumented.classes}">
-			<fileset dir="${build.rcp.classes}" includes="**/*.class" />
-		</copy>
-
-		<cobertura-instrument datafile="${build.qa.test.coveragedata}/cobertura.ser">
-			<!-- Deactivate Cobertura for now ... -->
-			<!-- includeClasses regex="info.novatec.inspectit.*" /-->
-			<excludeClasses regex="info.novatec.inspectit.*\.test.*" />
-			<excludeClasses regex="info.novatec.inspectit.cmr.*" />
-			<excludeClasses regex="info.novatec.inspectit.communication.*" />
-			<!-- Deactivate Cobertura for now ... -->
-			<!--instrumentationClasspath>
-				<path location="${build.instrumented.classes}" />
-			</instrumentationClasspath-->
-			<classpath refid="lib.test" />
-			<classpath location="${build.instrumented.classes}" />
-		</cobertura-instrument>
-
-		<testng outputdir="${build.qa.test.testdata}" haltonfailure="${testng.haltonfailure}">
-			<classpath refid="lib.test" />
-			<classpath refid="path.commons.classes" />
-			<classpath refid="path.commonscs.classes" />
-			<classpath refid="path.test.class" />
-			<classpath refid="path.testng" />
-			<classpath refid="path.cobertura" />
-			<classpath location="${build.instrumented.classes}" />
-			<classpath location="${test.root}" />
-			<classpath refid="path.rcp" />
-
-			<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${build.qa.test.coveragedata}/cobertura.ser" />
-
-			<xmlfileset file="${resources.testng}/testng.xml" />
-		</testng>
-
-		<!-- create cobertura html and xml reports and link to the interesting parts -->
-		<cobertura-report format="html" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
-			<fileset dir="${src.root}" includes="**/*.java" />
-			<fileset dir="${test.root}" includes="**/*.java" />
-		</cobertura-report>
-		<cobertura-report format="xml" destdir="${build.qa.test.coveragedata}" srcdir="${src.root}" datafile="${build.qa.test.coveragedata}/cobertura.ser">
-			<fileset dir="${src.root}" includes="**/*.java" />
-			<fileset dir="${test.root}" includes="**/*.java" />
-		</cobertura-report>
-		<echo file="${build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >" />
-
-		<!-- create html pages that link to the interesting parts -->
-		<echo file="${build.qa.test}/testresults.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/index.html&quot; >" />
-		<echo file="${build.qa.test}/testreport.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/emailable-report.html&quot; >" />
+		<fileset id="test.classes-to-instrument" dir="${build.rcp.classes}" excludes="**/*.class"/>
+		<path id="compile.classpath" />
+				
+		<property name="test.workingDir" value="${basedir}/../"/>
+		<property name="test.javac.source" value="1.7"/>
+		<property name="test.javac.target" value="1.7"/>
+		<property name="test.vmargs" value=""/>
+		<property name="test.targetsuite" value="${resources.testng}/testng.xml"/>
+				
+		<execute-testng 
+			src.root="${src.root}" 
+			test.root="${test.root}" 
+			build.qa.test="${build.qa.test}"
+			build.qa.test.testdata="${build.qa.test.testdata}" 
+			build.qa.test.coveragedata="${build.qa.test.coveragedata}" 
+			build.test.classes="${build.test.classes}" 
+			build.instrumented.classes="${build.instrumented.classes}"
+			test.workingdir="${test.workingDir}"
+			test.javac.source="${test.javac.source}" 
+			test.javac.target="${test.javac.target}"
+			test.targetsuite="${test.targetsuite}"
+			test.vmargs="${test.vmargs}"
+			test.haltonfailure="true">
+			<compile.classpath>
+				<classpath>
+					<path refid="compile.classpath"/>
+				</classpath>
+			</compile.classpath>
+			<test.compile.classpath>
+				<classpath>
+					<path refid="test.compile.classpath"/>
+				</classpath>
+			</test.compile.classpath>
+			<test.classes-to-instrument>
+				<fileset refid="test.classes-to-instrument" />
+			</test.classes-to-instrument>
+		</execute-testng>
 	</target>
-
-
+					
 	<!--  It depends on the release target, because we need the compiled class files from the PDE Build-->
 	<target name="static-analysis" depends="pdebuild">
 		<!-- Prepare PDM -->

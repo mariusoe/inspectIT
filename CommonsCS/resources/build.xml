@@ -22,6 +22,7 @@
 		<ivy:settings file="${ivy.settings.file}" />
 		<ivy:resolve file="${ivy.file}" />
 		<ivy:cachepath pathid="lib.prod" conf="prod" />
+		<ivy:cachepath pathid="lib.test" conf="test" />
 
 		<ivy:resolve file="${ivy.file.commons}" />
 		<ivy:cachepath pathid="lib.prod.commons" conf="prod" />
@@ -96,6 +97,55 @@
 	<!-- *************************************************************** -->
 
 	<!-- Depends on build, because the compiled classes are needed for the analysis -->
+	<target name="functional-tests" depends="build,init-functional-tests">
+		<path id="test.compile.classpath">
+			<pathelement location="${build.commonscs.classes}" />
+			<fileset dir="${commons.build.release}" includes="*.jar" />
+			<path refid="lib.prod" />
+			<path refid="lib.prod.commons" />
+			<path refid="lib.test" />
+		</path>
+
+		<!-- ensure that the original class files are not touched as we do not want to -->
+		<!-- ship classes that are instrumented with cobertura to the customer -->
+		<fileset id="test.classes-to-instrument" dir="${build.commonscs.classes}" includes="**/*.class" />
+		
+		<property name="test.workingDir" value="${basedir}"/>
+		<property name="test.javac.source" value="1.7"/>
+		<property name="test.javac.target" value="1.7"/>		
+		<property name="test.vmargs" value=""/>
+		<property name="test.targetsuite" value="${resources.testng}/testng.xml"/>
+			
+		<execute-testng 
+			src.root="${src.root}" 
+			test.root="${test.root}" 
+			build.qa.test="${build.qa.test}"
+			build.qa.test.testdata="${build.qa.test.testdata}" 
+			build.qa.test.coveragedata="${build.qa.test.coveragedata}" 
+			build.test.classes="${build.test.classes}" 
+			build.instrumented.classes="${build.instrumented.classes}"
+			test.workingdir="${test.workingDir}"
+			test.javac.source="${test.javac.source}" 
+			test.javac.target="${test.javac.target}"
+			test.targetsuite="${test.targetsuite}"
+			test.vmargs="${test.vmargs}"
+			test.haltonfailure="true">
+			<compile.classpath>
+				<classpath>
+					<path refid="compile.classpath"/>
+				</classpath>
+			</compile.classpath>
+			<test.compile.classpath>
+				<classpath>
+					<path refid="test.compile.classpath"/>
+				</classpath>
+			</test.compile.classpath>
+			<test.classes-to-instrument>
+				<fileset refid="test.classes-to-instrument" />
+			</test.classes-to-instrument>
+		</execute-testng>
+	</target>
+	
 	<target name="static-analysis" depends="build">
 		<!-- Prepare PDM -->
 		<fileset dir="${src.root}" includes="info/novatec/inspectit/**/*.java" id="pmd.fileset" />

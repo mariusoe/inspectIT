@@ -1,0 +1,17 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+<suite name="CommonsCSTest">
+	<test name="Storage">
+		<classes>
+			<class name="info.novatec.inspectit.storage.processor.StorageDataProcessorsTest" />
+			<class name="info.novatec.inspectit.storage.StorageWriterTest" />
+		</classes>
+	</test>
+	<test name="NIO">
+		<classes>
+			<class name="info.novatec.inspectit.storage.nio.ByteBufferProviderTest" />
+			<class name="info.novatec.inspectit.storage.nio.ChannelManagersTest" />
+			<class name="info.novatec.inspectit.storage.nio.CompletionHandlersTest" />
+			<class name="info.novatec.inspectit.storage.nio.stream.ExtendedByteBufferOutputStreamTest" />
+		</classes>
+	</test>
+</suite>

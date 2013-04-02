@@ -9,7 +9,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import info.novatec.inspectit.cmr.storage.CmrStorageWriter;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.impl.IndexingException;
 import info.novatec.inspectit.storage.StorageWriter.WriteTask;
@@ -77,7 +76,7 @@ public class StorageWriterTest {
 	@BeforeMethod
 	public void init() throws IndexingException, InterruptedException {
 		MockitoAnnotations.initMocks(this);
-		storageWriter = new CmrStorageWriter();
+		storageWriter = new StorageWriter();
 		when(streamProvider.getExtendedByteBufferOutputStream()).thenReturn(extendedByteBufferOutputStream);
 		when(storageIndexingTreeHandler.startWrite(Mockito.<WriteTask> anyObject())).thenReturn(1);
 		when(storageManager.canWriteMore()).thenReturn(true);
@@ -208,6 +207,7 @@ public class StorageWriterTest {
 	@Test
 	public void objectWriteFailedSerialization() throws SerializationException {
 		doThrow(SerializationException.class).when(serializer).serialize(anyObject(), Mockito.<Output> anyObject(), Mockito.<Map<?, ?>> anyObject());
+		doThrow(SerializationException.class).when(serializer).serialize(anyObject(), Mockito.<Output> anyObject());
 		storageWriter.writeNonDefaultDataObject(new Object(), "myFile");
 
 		verify(extendedByteBufferOutputStream, times(1)).close();

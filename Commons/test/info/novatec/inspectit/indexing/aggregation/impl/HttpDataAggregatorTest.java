@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ import org.testng.annotations.Test;
  * @author Stefan Siegl
  */
 @SuppressWarnings("PMD")
-public class HttpDataAggregatorTest extends AbstractTestNGLogSupport {
+public class HttpDataAggregatorTest {
 
 	@Test
 	public void aggregationWithInspectITHeaderTwoDifferent() {

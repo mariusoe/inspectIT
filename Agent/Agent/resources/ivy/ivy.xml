@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <ivy-module version="2.0" xmlns:e="http://ant.apache.org/ivy/extra">
-    <info organisation="info.novatec.inspectit" module="Agent"/>
+	<info organisation="info.novatec.inspectit" module="Agent"/>
 
-    <!-- http://www.jarvana.com/jarvana/ is a nice page for finding projects-->
+	<!-- http://www.jarvana.com/jarvana/ is a nice page for finding projects-->
 
-    <!-- PLEASE UPDATE THE 3rd PARTY NOTIFICATION LIST IN build.xml FOR ANY CHANGE -->
+	<!-- PLEASE UPDATE THE 3rd PARTY NOTIFICATION LIST IN build.xml FOR ANY CHANGE -->
 
-    <configurations>
-    	<conf name="prod" visibility="private" transitive="false"/>
-    	<conf name="test" visibility="private" extends="prod" transitive="false"/>
-    </configurations>
+	<configurations>
+		<conf name="prod" visibility="private" transitive="false" />
+		<conf name="test" visibility="private" extends="prod" transitive="false" />
+	</configurations>
 
 	<dependencies>
 		<dependency org="org.picocontainer" name="picocontainer" rev="1.3" conf="prod->default" />

@@ -3,23 +3,11 @@
 	<test name="Cache">
 		<classes>
 			<class name="info.novatec.inspectit.cmr.cache.impl.BufferPropertiesTest" />
-			<class name="info.novatec.inspectit.cmr.cache.impl.ObjectSizesPrimitiveTypesSizeTest" />
-		</classes>
-	</test>
-	<test name="IndexingRestriction">
-		<classes>
-			<class name="info.novatec.inspectit.indexing.restriction.IndexQueryRestrictionProcessorTest" />
-		</classes>
-	</test>
-	<test name="Indexing">
-		<classes>
-			<class name="info.novatec.inspectit.indexing.impl.BufferIndexingTest" />
-			<class name="info.novatec.inspectit.indexing.impl.StorageIndexingTest" />
+			<class name="info.novatec.inspectit.cmr.cache.impl.MemoryCalculationTest" />
 		</classes>
 	</test>
 	<test name="Dao/Aggregators">
 		<classes>
-			<class name="info.novatec.inspectit.indexing.aggregation.impl.HttpDataAggregatorTest" />
 			<class name="info.novatec.inspectit.cmr.dao.impl.TimerDataAggregatorTest" />
 			<class name="info.novatec.inspectit.cmr.dao.impl.PlatformIdentDaoTest" />
 		</classes>
@@ -36,53 +24,14 @@
 			<class name="info.novatec.inspectit.cmr.util.PlatformIdentCacheTest" />
 		</classes>
 	</test>
-	<test name="Data">
-		<classes>
-			<class name="info.novatec.inspectit.communication.data.InvocationAwareDataTest" />
-			<class name="info.novatec.inspectit.communication.data.AggregatedDataTest" />
-		</classes>
-	</test>
-	<test name="NIO">
-		<classes>
-			<class name="info.novatec.inspectit.storage.nio.ChannelManagersTest" />
-			<class name="info.novatec.inspectit.storage.nio.ByteBufferProviderTest" />
-			<class name="info.novatec.inspectit.storage.nio.stream.ExtendedByteBufferOutputStreamTest" />
-			<class name="info.novatec.inspectit.storage.nio.CompletionHandlersTest" />
-		</classes>
-	</test>
-	<test name="Storage Processors Test">
-		<classes>
-			<class
-				name="info.novatec.inspectit.storage.processor.StorageDataProcessorsTest" />
-		</classes>
-	</test>
 	<test name="Serializer">
 		<classes>
-			<class name="info.novatec.inspectit.storage.serializer.impl.SerializerTest" />
-			<class name="info.novatec.inspectit.storage.serializer.impl.BackwardForwardCompatibilityTest" />
-		</classes>
-	</test>
-	<test name="Schema Test">
-		<classes>
-			<class
-				name="info.novatec.inspectit.storage.serializer.schema.SchemaTest" />
+			<class name="info.novatec.inspectit.storage.serializer.impl.HibernateSerializerTest" />
 		</classes>
 	</test>
 	<test name="Storage">
 		<classes>
 			<class name="info.novatec.inspectit.storage.StorageIntegrationTest" />
-			<class name="info.novatec.inspectit.storage.StorageWriterTest" />
-		</classes>
-	</test>
-	<test name="EqualsVerifier">
-		<classes>
-			<class name="info.novatec.inspectit.communication.EqualsVerifierTest" />
-		</classes>
-	</test>
-	<test name="Memory Calculation Test">
-		<classes>
-			<class
-				name="info.novatec.inspectit.cmr.cache.impl.MemoryCalculationTest" />
 		</classes>
 	</test>
 </suite>

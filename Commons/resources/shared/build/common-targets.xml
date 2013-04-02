@@ -61,7 +61,7 @@
 	<target name="init-functional-tests">
 		<ivy:settings file="${ivy.settings.file}" />
 		<!-- needed for TestNG & Cobertura -->
-		<ivy:cachepath pathid="path.testng" organisation="org.testng" module="testng" revision="6.3.1" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.testng" organisation="org.testng" module="testng" revision="6.8.7" conf="default" inline="true" />
 		<ivy:cachepath pathid="path.cobertura" organisation="net.sourceforge.cobertura" module="cobertura" revision="1.9.4.1" conf="default" inline="true" />
 
 		<taskdef name="testng" classpathref="path.testng" classname="org.testng.TestNGAntTask" />
@@ -97,6 +97,99 @@
 		<ivy:cleancache />
 		<delete dir="${ivy.jar.dir}" />
 	</target>
+	
+	<!-- *************************************************************** -->
+	<!--                         T E S T   N G                           -->
+	<!-- *************************************************************** -->
+	
+	<!-- This macro executes the TestNG tests and instruments the classes under test for the Corbertura report -->
+	<!-- All attributes and elements must be set for the macro to correctly execute -->
+	<macrodef name="execute-testng">
+		<attribute name="src.root" description="Main source folder" />
+		<attribute name="test.root" description="Test source folder" />
+		<attribute name="build.qa.test" />
+		<attribute name="build.qa.test.testdata" description="Folder where test data will be placed" />
+		<attribute name="build.qa.test.coveragedata" description="Folder where coverage data will be placed" />
+		<attribute name="build.test.classes" description="Destination folder for building test classes" />
+		<attribute name="build.instrumented.classes" description="Destination folder for cobertura instrumented classes" />
+		<attribute name="test.workingdir" description="The directory where the ant task should change to before running TestNG." />
+		<attribute name="test.javac.source" description="Source version of the test classes for javac" />
+		<attribute name="test.javac.target" description="Target version of the test classes for javac" />
+		<attribute name="test.targetsuite" description="File that describes test suite to be executed." />
+		<attribute name="test.vmargs" description="Additional JVM arguments to pass when executing tests." />
+		<attribute name="test.haltonfailure" description="Should test halt on failure." />
+		<element name="compile.classpath" description="Complete class path meaning test classes, plus all classes used in the classes to be tested." />
+		<element name="test.compile.classpath" description="Class path needed to compile the test classes." />
+		<element name="test.classes-to-instrument" description="Which class should be instrumented by Corbertura." />
+		<sequential>
+			<mkdir dir="@{build.qa.test.testdata}" />
+			<mkdir dir="@{build.qa.test.coveragedata}" />
+			<mkdir dir="@{build.test.classes}" />
+			<mkdir dir="@{build.instrumented.classes}" />
+
+			<javac source="@{test.javac.source}" target="@{test.javac.target}" debug="true" debuglevel="lines,vars,source" nowarn="off" includeAntRuntime="no" destdir="@{build.test.classes}" srcdir="@{test.root}">
+				<test.compile.classpath />
+				<classpath refid="path.testng" />
+				<compilerarg value="-Xlint:unchecked" />
+			</javac>
+			
+			<path id="test.classes">
+				<pathelement location="@{build.test.classes}" />
+			</path>
+
+			<!-- instrument the classes that should be included in test coverage -->
+			<!-- ensure that the original class files are not touched as we do not want to -->
+			<!-- ship classes that are instrumented with cobertura to the customer -->
+			<copy todir="@{build.instrumented.classes}">
+				<test.classes-to-instrument />
+			</copy>
+
+			<cobertura-instrument datafile="@{build.qa.test.coveragedata}/cobertura.ser">
+				<includeClasses regex="info.novatec.inspectit.*" />
+				<excludeClasses regex="info.novatec.inspectit.*\.test.*" />
+				<excludeClasses regex="info.novatec.inspectit.*\.*_Stub.*" />
+				<instrumentationClasspath>
+					<path location="@{build.instrumented.classes}" />
+				</instrumentationClasspath>
+				<compile.classpath />
+				<classpath location="@{build.instrumented.classes}" />		
+			</cobertura-instrument>
+			
+			<echo message="Starting TestNG with following JVM arguments: -XX:-UseSplitVerifier -Dnet.sourceforge.cobertura.datafile=@{build.qa.test.coveragedata}/cobertura.ser @{test.vmargs}"/>
+
+			<testng outputdir="@{build.qa.test.testdata}" haltonfailure="@{test.haltonfailure}" workingDir="@{test.workingDir}">
+				<!-- this absolutely needs to be the first entry, else the instrumented classes are not taken but the normal ones -->
+				<classpath location="@{build.instrumented.classes}" />
+				<test.compile.classpath/>
+				<classpath refid="test.classes"/>
+				<classpath refid="path.testng" />
+				<classpath refid="path.cobertura" />
+				<!-- this entry is necessary in order to get the spring configurations needed for the test -->
+				<classpath location="@{src.root}" />
+				<classpath location="@{test.root}" />
+
+				<jvmarg line="-XX:-UseSplitVerifier -Dnet.sourceforge.cobertura.datafile='@{build.qa.test.coveragedata}/cobertura.ser' @{test.vmargs}" />
+				<!-- -XX:-UseSplitVerifier is a workaround for Cobertura not supporting Java 7 source code features (http://sourceforge.net/tracker/index.php?func=detail&aid=3295711&group_id=130558&atid=720018) -->
+				<xmlfileset file="@{test.targetsuite}" />
+			</testng>
+
+
+			<!-- create cobertura html and xml reports and link to the interesting parts -->
+			<cobertura-report format="html" destdir="@{build.qa.test.coveragedata}" srcdir="@{src.root}" datafile="@{build.qa.test.coveragedata}/cobertura.ser">
+				<fileset dir="@{src.root}" includes="**/*.java" />
+				<fileset dir="@{test.root}" includes="**/*.java" />
+			</cobertura-report>
+			<cobertura-report format="xml" destdir="@{build.qa.test.coveragedata}" srcdir="@{src.root}" datafile="@{build.qa.test.coveragedata}/cobertura.ser">
+				<fileset dir="@{src.root}" includes="**/*.java" />
+				<fileset dir="@{test.root}" includes="**/*.java" />
+			</cobertura-report>
+			<echo file="@{build.qa.test}/coverage.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=coveragedata/index.html&quot; >" />
+
+			<!-- create html pages that link to the interesting parts -->
+			<echo file="@{build.qa.test}/testresults.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/index.html&quot; >" />
+			<echo file="@{build.qa.test}/testreport.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=testdata/emailable-report.html&quot; >" />
+		</sequential>
+	</macrodef>
 
 	<!-- *************************************************************** -->
 	<!--         S T A T I C     A N A L Y S I S     T A R G E T S  	 -->

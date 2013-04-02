@@ -10,7 +10,7 @@ Export-Package: info.novatec.inspectit.storage,
  info.novatec.inspectit.storage.nio.read,
  info.novatec.inspectit.storage.nio.stream,
  info.novatec.inspectit.storage.nio.write,
- info.novatec.inspectit.storage.serializer.provider,
+ info.novatec.inspectit.storage.processor,
  info.novatec.inspectit.storage.util
 Bundle-Vendor: NovaTec GmbH
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7

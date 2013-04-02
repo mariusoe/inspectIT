@@ -3,7 +3,6 @@ package info.novatec.inspectit.storage.nio.stream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.storage.nio.ByteBufferProvider;
 
 import java.io.IOException;
@@ -25,7 +24,7 @@ import org.testng.annotations.Test;
  * 
  */
 @SuppressWarnings("PMD")
-public class ExtendedByteBufferOutputStreamTest extends AbstractTestNGLogSupport {
+public class ExtendedByteBufferOutputStreamTest {
 
 	/**
 	 * Size of buffers {@link ByteBufferProvider} will return.

@@ -1,7 +1,5 @@
 package info.novatec.inspectit.storage.serializer.schema;
 
-import info.novatec.inspectit.storage.serializer.schema.ClassSchemaManager;
-
 import java.io.IOException;
 
 import org.apache.commons.logging.LogFactory;

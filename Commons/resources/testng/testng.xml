@@ -1,0 +1,35 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+<suite name="CommonsTest">
+	<test name="Data">
+		<classes>
+			<class name="info.novatec.inspectit.cmr.cache.impl.ObjectSizesPrimitiveTypesSizeTest" />
+			<class name="info.novatec.inspectit.communication.EqualsVerifierTest" />
+			<class name="info.novatec.inspectit.communication.data.InvocationAwareDataTest" />
+			<class name="info.novatec.inspectit.communication.data.AggregatedDataTest" />
+		</classes>
+	</test>
+	<test name="Aggregators">
+		<classes>
+			<class name="info.novatec.inspectit.indexing.aggregation.impl.HttpDataAggregatorTest" />
+		</classes>
+	</test>
+	<test name="Indexing">
+		<classes>
+			<class name="info.novatec.inspectit.indexing.impl.BufferIndexingTest" />
+			<class name="info.novatec.inspectit.indexing.impl.StorageIndexingTest" />
+			<class name="info.novatec.inspectit.indexing.restriction.IndexQueryRestrictionProcessorTest" />
+		</classes>
+	</test>
+	<test name="Serializer">
+		<classes>
+			<class name="info.novatec.inspectit.storage.serializer.impl.BackwardForwardCompatibilityTest" />
+			<class name="info.novatec.inspectit.storage.serializer.impl.SerializerTest" />
+		</classes>
+	</test>
+	<test name="Schema">
+		<classes>
+			<class
+				name="info.novatec.inspectit.storage.serializer.schema.SchemaTest" />
+		</classes>
+	</test>
+</suite>
