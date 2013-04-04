@@ -32,9 +32,12 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.fileupload.MultipartStream;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
@@ -317,12 +320,89 @@ public class DataRetriever {
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
 	 */
-	public void downloadAndSaveStorageFiles(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, Path directory, boolean compressBefore, boolean decompressContent,
+	public void downloadAndSaveStorageFiles(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, final Path directory, boolean compressBefore, boolean decompressContent,
 			SubMonitor subMonitor, StorageFileType... fileTypes) throws StorageException, IOException {
 		if (!Files.isDirectory(directory)) {
 			throw new StorageException("Directory path supplied as the data saving destination is not valid. Given path is: " + directory.toString());
 		}
 
+		Map<String, Long> allFiles = getFilesFromCmr(cmrRepositoryDefinition, storageData, fileTypes);
+
+		if (MapUtils.isNotEmpty(allFiles)) {
+			PostDownloadRunnable postDownloadRunnable = new PostDownloadRunnable() {
+				@Override
+				public void process(InputStream content, String fileName) throws IOException {
+					String[] splittedFileName = fileName.split("/");
+					String originalFileName = splittedFileName[splittedFileName.length - 1];
+					Path writePath = directory.resolve(originalFileName);
+					Files.copy(content, writePath, StandardCopyOption.REPLACE_EXISTING);
+				}
+			};
+			this.downloadAndSaveObjects(cmrRepositoryDefinition, allFiles, postDownloadRunnable, compressBefore, decompressContent, subMonitor);
+		}
+	}
+
+	/**
+	 * Downloads and saves locally wanted files associated with given {@link StorageData}. Files
+	 * will be saved in passed directory. The caller can specify the type of the files to download
+	 * by passing the proper {@link StorageFileType}s to the method.
+	 * 
+	 * @param cmrRepositoryDefinition
+	 *            {@link CmrRepositoryDefinition}.
+	 * @param storageData
+	 *            {@link StorageData}.
+	 * @param zos
+	 *            {@link ZipOutputStream} to place files to.
+	 * @param compressBefore
+	 *            Should data files be compressed on the fly before sent.
+	 * @param decompressContent
+	 *            If the useGzipCompression is <code>true</code>, this parameter will define if the
+	 *            received content will be de-compressed. If false is passed content will be saved
+	 *            to file in the same format as received, but the path of the file will be altered
+	 *            with additional '.gzip' extension at the end.
+	 * @param subMonitor
+	 *            {@link SubMonitor} for process reporting.
+	 * @param fileTypes
+	 *            Files that should be downloaded.
+	 * @throws StorageException
+	 *             If directory to save does not exists. If files wanted can not be found on the
+	 *             server.
+	 * @throws IOException
+	 *             If {@link IOException} occurs.
+	 */
+	public void downloadAndZipStorageFiles(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, final ZipOutputStream zos, boolean compressBefore, boolean decompressContent,
+			SubMonitor subMonitor, StorageFileType... fileTypes) throws StorageException, IOException {
+		Map<String, Long> allFiles = getFilesFromCmr(cmrRepositoryDefinition, storageData, fileTypes);
+
+		PostDownloadRunnable postDownloadRunnable = new PostDownloadRunnable() {
+			@Override
+			public void process(InputStream content, String fileName) throws IOException {
+				String[] splittedFileName = fileName.split("/");
+				String originalFileName = splittedFileName[splittedFileName.length - 1];
+				ZipEntry zipEntry = new ZipEntry(originalFileName);
+				zos.putNextEntry(zipEntry);
+				IOUtils.copy(content, zos);
+				zos.closeEntry();
+			}
+		};
+		this.downloadAndSaveObjects(cmrRepositoryDefinition, allFiles, postDownloadRunnable, compressBefore, decompressContent, subMonitor);
+	}
+
+	/**
+	 * Returns the map of the existing files for the given storage. The value in the map is file
+	 * size. Only wanted file types will be included in the map.
+	 * 
+	 * @param cmrRepositoryDefinition
+	 *            {@link CmrRepositoryDefinition}.
+	 * @param storageData
+	 *            {@link StorageData}
+	 * @param fileTypes
+	 *            Files that should be included.
+	 * @return Map of file names with their size.
+	 * @throws StorageException
+	 *             If {@link StorageException} occurs during service invocation.
+	 */
+	private Map<String, Long> getFilesFromCmr(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, StorageFileType... fileTypes) throws StorageException {
 		Map<String, Long> allFiles = new HashMap<String, Long>();
 
 		// agent files
@@ -343,9 +423,7 @@ public class DataRetriever {
 			allFiles.putAll(dataFiles);
 		}
 
-		if (MapUtils.isNotEmpty(allFiles)) {
-			this.downloadAndSaveObjects(cmrRepositoryDefinition, allFiles, directory, compressBefore, decompressContent, subMonitor);
-		}
+		return allFiles;
 	}
 
 	/**
@@ -356,8 +434,8 @@ public class DataRetriever {
 	 *            Repository.
 	 * @param files
 	 *            Map with file names and sizes.
-	 * @param path
-	 *            Directory where files will be saved.
+	 * @param postDownloadRunnable
+	 *            {@link PostDownloadRunnable} that will be executed after successful request.
 	 * @param useGzipCompression
 	 *            If the GZip compression should be used when files are downloaded.
 	 * @param decompressContent
@@ -372,8 +450,8 @@ public class DataRetriever {
 	 * @throws StorageException
 	 *             If status of HTTP response is not successful (codes 2xx).
 	 */
-	private void downloadAndSaveObjects(CmrRepositoryDefinition cmrRepositoryDefinition, Map<String, Long> files, Path path, boolean useGzipCompression, boolean decompressContent,
-			final SubMonitor subMonitor) throws IOException, StorageException {
+	private void downloadAndSaveObjects(CmrRepositoryDefinition cmrRepositoryDefinition, Map<String, Long> files, PostDownloadRunnable postDownloadRunnable, boolean useGzipCompression,
+			boolean decompressContent, final SubMonitor subMonitor) throws IOException, StorageException {
 		DefaultHttpClient httpClient = new DefaultHttpClient();
 		final TransferDataMonitor transferDataMonitor = new TransferDataMonitor(subMonitor, files, useGzipCompression);
 		httpClient.addResponseInterceptor(new HttpResponseInterceptor() {
@@ -400,17 +478,8 @@ public class DataRetriever {
 			StatusLine statusLine = response.getStatusLine();
 			if (HttpStatus.valueOf(statusLine.getStatusCode()).series().equals(Series.SUCCESSFUL)) {
 				HttpEntity entity = response.getEntity();
-				InputStream is = null;
-				try {
-					is = entity.getContent();
-					String[] splittedFileName = fileName.split("/");
-					String originalFileName = splittedFileName[splittedFileName.length - 1];
-					Path writePath = path.resolve(originalFileName);
-					Files.copy(is, writePath, StandardCopyOption.REPLACE_EXISTING);
-				} finally {
-					if (null != is) {
-						is.close();
-					}
+				try (InputStream is = entity.getContent()) {
+					postDownloadRunnable.process(is, fileName);
 				}
 			}
 			transferDataMonitor.endDownload(fileName);
@@ -615,6 +684,27 @@ public class DataRetriever {
 			}
 		}
 
+	}
+
+	/**
+	 * Simple interface to enable multiple operations after file download.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private interface PostDownloadRunnable {
+
+		/**
+		 * Process the input stream. If stream is not closed, it will be after exiting this method.
+		 * 
+		 * @param content
+		 *            {@link InputStream} that represents content of downloaded file.
+		 * @param fileName
+		 *            Name of the file being downloaded.
+		 * @throws IOException
+		 *             If {@link IOException} occurs.
+		 */
+		void process(InputStream content, String fileName) throws IOException;
 	}
 
 }

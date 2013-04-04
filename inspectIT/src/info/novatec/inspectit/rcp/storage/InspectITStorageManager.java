@@ -30,7 +30,6 @@ import info.novatec.inspectit.util.ObjectUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.FileSystem;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,6 +46,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang.mutable.MutableObject;
 import org.eclipse.core.runtime.FileLocator;
@@ -632,17 +633,12 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 				Files.delete(zipPath);
 			}
 
-			final FileSystem zipFileSystem = createZipFileSystem(zipPath, true);
-			final Path zipRoot = zipFileSystem.getPath("/");
 			try {
-				super.zipStorageData(localStorageData, zipPath, zipRoot);
+				super.zipStorageData(localStorageData, zipPath);
 			} catch (IOException e) {
-				zipFileSystem.close();
 				Files.deleteIfExists(zipPath);
 				throw e;
 			}
-
-			zipFileSystem.close();
 		}
 	}
 
@@ -672,37 +668,27 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 			Files.delete(zipPath);
 		}
 
-		final FileSystem zipFileSystem = createZipFileSystem(zipPath, true);
-		final Path zipRoot = zipFileSystem.getPath("/");
-
-		try {
+		try (final ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(zipPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))) {
+			// download and pack at the same time
 			subMonitor.setTaskName("Downloading and packing storage files..");
-			dataRetriever.downloadAndSaveStorageFiles(cmrRepositoryDefinition, storageData, zipRoot, compressBefore, false, subMonitor, StorageFileType.values());
-		} catch (IOException e) {
-			zipFileSystem.close();
-			Files.deleteIfExists(zipPath);
-			throw e;
-		} catch (StorageException e) {
-			zipFileSystem.close();
-			Files.deleteIfExists(zipPath);
-			throw e;
-		}
+			dataRetriever.downloadAndZipStorageFiles(cmrRepositoryDefinition, storageData, zos, compressBefore, false, subMonitor, StorageFileType.values());
 
-		try {
+			// add local storage data info
 			LocalStorageData localStorageData = new LocalStorageData(storageData);
 			localStorageData.setFullyDownloaded(true);
-			super.writeLocalStorageDataToDisk(localStorageData, zipRoot);
-		} catch (IOException e) {
-			zipFileSystem.close();
+			String fileName = localStorageData.getId() + StorageFileExtensions.LOCAL_STORAGE_FILE_EXT;
+			ZipEntry zipEntry = new ZipEntry(fileName);
+			zos.putNextEntry(zipEntry);
+			serializeDataToOutputStream(localStorageData, zos, false);
+			zos.closeEntry();
+		} catch (IOException | StorageException e) {
 			Files.deleteIfExists(zipPath);
 			throw e;
 		} catch (SerializationException e) {
-			zipFileSystem.close();
 			Files.deleteIfExists(zipPath);
-			throw new StorageException("Exception saving storage data information to the zip root.", e);
+			throw new StorageException("Could not write local storage data to packed storage file.", e);
 		}
 
-		zipFileSystem.close();
 	}
 
 	/**

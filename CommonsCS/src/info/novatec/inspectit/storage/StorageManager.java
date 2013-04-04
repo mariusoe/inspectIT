@@ -12,22 +12,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.FileStore;
-import java.nio.file.FileSystem;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.ProviderNotFoundException;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.spi.FileSystemProvider;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Enumeration;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang.mutable.MutableLong;
-import org.apache.commons.lang.mutable.MutableObject;
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -274,18 +273,36 @@ public abstract class StorageManager {
 		Path storageDataFile = dir.resolve(storageData.getId() + extenstion);
 		Files.deleteIfExists(storageDataFile);
 
+		serializeDataToOutputStream(storageData, Files.newOutputStream(storageDataFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE), true);
+	}
+
+	/**
+	 * Serializes given data to the {@link OutputStream}.
+	 * 
+	 * @param data
+	 *            Data to serialize.
+	 * @param outputStream
+	 *            {@link OutputStream}
+	 * @param closeStream
+	 *            If given output stream should be closed upon finish.
+	 * @throws SerializationException
+	 *             If serialization fails.
+	 */
+	protected void serializeDataToOutputStream(Object data, OutputStream outputStream, boolean closeStream) throws SerializationException {
 		ISerializer serializer = serializationManagerProvider.createSerializer();
-		OutputStream outputStream = null;
 		Output output = null;
 		try {
-			outputStream = Files.newOutputStream(storageDataFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 			output = new Output(outputStream);
-			serializer.serialize(storageData, output);
+			serializer.serialize(data, output);
 		} finally {
 			if (null != output) {
+				if (!closeStream) {
+					output.setOutputStream(null);
+				}
 				output.close();
 			}
 		}
+
 	}
 
 	/**
@@ -369,36 +386,50 @@ public abstract class StorageManager {
 	 *            {@link StorageData} to zip.
 	 * @param zipPath
 	 *            Path to the zip file.
-	 * @param zipRoot
-	 *            Path that points to the root of the zip file.
 	 * @throws IOException
 	 *             If {@link IOException} occurs during compressing.
 	 */
-	protected void zipStorageData(IStorageData storageData, final Path zipPath, final Path zipRoot) throws IOException {
+	protected void zipStorageData(IStorageData storageData, final Path zipPath) throws IOException {
 		final Path storageDir = getStoragePath(storageData);
-		if (Files.notExists(storageDir)) {
-			throw new IOException("Storage can not be packed. Storage directory " + storageDir.toString() + " does not exist.");
-		} else {
-			Files.walkFileTree(storageDir, new SimpleFileVisitor<Path>() {
+		this.zipFiles(storageDir, zipPath);
+	}
+
+	/**
+	 * Zips all files in the given directory to the provided zipPath.
+	 * 
+	 * @param directory
+	 *            Directory where files to be zipped are placed.
+	 * @param zipPath
+	 *            Path to the zip file.
+	 * @throws IOException
+	 *             If {@link IOException} occurs.
+	 */
+	protected void zipFiles(final Path directory, Path zipPath) throws IOException {
+		// check the given directory where the files are
+		if (Files.notExists(directory)) {
+			throw new IOException("Can not create zip file. The directory " + directory.toString() + " does not exist.");
+		}
+		if (!Files.isDirectory(directory)) {
+			throw new IOException("Can not create zip file. Given path " + directory.toString() + " is not the directory.");
+		}
+
+		// delete zipPath if exists
+		Files.deleteIfExists(zipPath);
+
+		// try with resources
+		try (final ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(zipPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))) {
+			Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-					if (zipPath.equals(file)) {
-						return FileVisitResult.CONTINUE;
-					}
-					Path destination = zipRoot.resolve(storageDir.relativize(file).toString());
-					Files.copy(file, destination, StandardCopyOption.REPLACE_EXISTING);
-					return FileVisitResult.CONTINUE;
-				}
-
-				@Override
-				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-					Path toCreate = zipRoot.resolve(storageDir.relativize(dir).toString());
-					if (Files.notExists(toCreate)) {
-						Files.createDirectories(toCreate);
-					}
+					String fileName = directory.relativize(file).toString();
+					ZipEntry zipEntry = new ZipEntry(fileName);
+					zos.putNextEntry(zipEntry);
+					Files.copy(file, zos);
+					zos.closeEntry();
 					return FileVisitResult.CONTINUE;
 				}
 			});
+
 		}
 	}
 
@@ -415,49 +446,41 @@ public abstract class StorageManager {
 		}
 
 		final ISerializer serializer = serializationManagerProvider.createSerializer();
-		try {
-			FileSystem zipFileSystem = createZipFileSystem(zipFilePath, false);
-			final Path zipRoot = zipFileSystem.getPath("/");
-			final MutableObject mutableStorageData = new MutableObject();
-			Files.walkFileTree(zipRoot, new SimpleFileVisitor<Path>() {
-				@Override
-				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-					if (file.equals(zipFilePath)) {
-						return FileVisitResult.CONTINUE;
+		try (ZipFile zipFile = new ZipFile(zipFilePath.toFile())) {
+			Enumeration<? extends ZipEntry> entries = zipFile.entries();
+			while (entries.hasMoreElements()) {
+				ZipEntry zipEntry = entries.nextElement();
+				if (zipEntry.getName().endsWith(StorageFileExtensions.LOCAL_STORAGE_FILE_EXT)) {
+
+					// check if data is gziped
+					boolean isGzip = false;
+					try (InputStream is = zipFile.getInputStream(zipEntry)) {
+						isGzip = isGzipCompressedData(is);
 					}
-					if (file.toString().endsWith(StorageFileExtensions.LOCAL_STORAGE_FILE_EXT)) {
-						InputStream inputStream = null;
-						Input input = null;
+
+					// then open the input stream again and copy to destination
+					try (Input input = isGzip ? new Input(new GZIPInputStream(zipFile.getInputStream(zipEntry))) : new Input(zipFile.getInputStream(zipEntry))) {
 						try {
-							inputStream = Files.newInputStream(file, StandardOpenOption.READ);
-							input = new Input(inputStream);
 							Object deserialized = serializer.deserialize(input);
 							if (deserialized instanceof IStorageData) {
-								mutableStorageData.setValue(deserialized);
+								return (IStorageData) deserialized;
 							}
 						} catch (SerializationException e) {
-							return FileVisitResult.CONTINUE;
-						} finally {
-							if (null != input) {
-								input.close();
-							}
+							continue;
 						}
-					}
-					return FileVisitResult.CONTINUE;
-				}
 
-			});
-			zipFileSystem.close();
-			return (IStorageData) mutableStorageData.getValue();
+					}
+				}
+			}
 		} catch (IOException e) {
 			return null;
 		}
+
+		return null;
 	}
 
 	/**
-	 * Unzips the content of the zip file provided to the default storage folder. The method will
-	 * first unzip the complete content of the zip file to the temporary folder and then rename the
-	 * temporary folder to match the storage ID.
+	 * Unzips the content of the zip file provided to the default storage folder.
 	 * 
 	 * @param zipFilePath
 	 *            Path to the zip file.
@@ -471,64 +494,62 @@ public abstract class StorageManager {
 	 */
 	protected void unzipStorageData(final Path zipFilePath, final Path destinationPath) throws StorageException, IOException {
 		if (Files.notExists(zipFilePath)) {
-			throw new StorageException("Can not unpack the storage zip file. File " + zipFilePath + " does not exist.");
+			throw new StorageException("Can not unpack the storage " + StorageFileExtensions.ZIP_STORAGE_EXT + " file. File " + zipFilePath + " does not exist.");
 		}
 
 		Files.createDirectories(destinationPath);
 
-		final FileSystem zipFileSystem = createZipFileSystem(zipFilePath, false);
-		final Path zipRoot = zipFileSystem.getPath("/");
-		Files.walkFileTree(zipRoot, new SimpleFileVisitor<Path>() {
-			@Override
-			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-				if (file.equals(zipFilePath)) {
-					return FileVisitResult.CONTINUE;
-				}
+		try (ZipFile zipFile = new ZipFile(zipFilePath.toFile())) {
+			Enumeration<? extends ZipEntry> entries = zipFile.entries();
+			while (entries.hasMoreElements()) {
+				ZipEntry zipEntry = entries.nextElement();
+				Path path = destinationPath.resolve(Paths.get(zipEntry.getName()));
 
-				Path destination = destinationPath.resolve(zipRoot.relativize(file).toString());
-				if (!isGzipCompressedData(file)) {
-					Files.copy(file, destination, StandardCopyOption.REPLACE_EXISTING);
-					return FileVisitResult.CONTINUE;
+				if (Files.isDirectory(path)) {
+					// if it is a directory just create
+					Files.createDirectories(path);
 				} else {
-					GZIPInputStream gzis = new GZIPInputStream(Files.newInputStream(file, StandardOpenOption.READ));
-					try {
-						Files.copy(gzis, destination, StandardCopyOption.REPLACE_EXISTING);
-					} finally {
-						if (null != gzis) {
-							gzis.close();
+					// first create directories to the file if needed
+					Path parent = path.getParent();
+					if (null != parent) {
+						if (Files.notExists(parent)) {
+							Files.createDirectories(parent);
 						}
 					}
-					return FileVisitResult.CONTINUE;
+
+					// check if data is gziped
+					boolean isGzip = false;
+					try (InputStream is = zipFile.getInputStream(zipEntry)) {
+						isGzip = isGzipCompressedData(is);
+					}
+
+					// then open the input stream again and copy to destination
+					try (InputStream is = zipFile.getInputStream(zipEntry)) {
+						if (isGzip) {
+							try (GZIPInputStream gis = new GZIPInputStream(is)) {
+								Files.copy(gis, path, StandardCopyOption.REPLACE_EXISTING);
+							}
+						} else {
+							Files.copy(is, path, StandardCopyOption.REPLACE_EXISTING);
+						}
+					}
 				}
 			}
-
-			@Override
-			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-				Path toCreate = destinationPath.resolve(zipRoot.relativize(dir).toString());
-				if (Files.notExists(toCreate)) {
-					Files.createDirectories(toCreate);
-				}
-				return FileVisitResult.CONTINUE;
-			}
-
-		});
-		zipFileSystem.close();
+		}
 	}
 
 	/**
-	 * Returns true if the data stored in the file is in a GZIP format. The input stream will be
-	 * opened on a file and two first bytes will be read.
+	 * Returns true if the data stored in the input stream is in a GZIP format. The input stream
+	 * will be closed at the end.
 	 * 
-	 * @param file
+	 * @param is
 	 *            File to check.
 	 * @return True if the data is in GZIP format, false otherwise.
 	 * @throws IOException
 	 *             If file does not exists or can not be opened for read.
 	 */
-	private boolean isGzipCompressedData(Path file) throws IOException {
-		InputStream is = null;
+	private boolean isGzipCompressedData(InputStream is) throws IOException {
 		try {
-			is = Files.newInputStream(file, StandardOpenOption.READ);
 			byte[] firsTwoBytes = new byte[2];
 			int read = 0;
 			// safety from reading one byte only
@@ -542,35 +563,6 @@ public abstract class StorageManager {
 				is.close();
 			}
 		}
-	}
-
-	/**
-	 * Creates the zip file system.
-	 * 
-	 * @param path
-	 *            Path that will hold the path to the new zip file.
-	 * @param create
-	 *            If zip file system should be created.
-	 * @return {@link FileSystem}.
-	 * @throws IOException
-	 *             If {@link IOException} occurs.
-	 */
-	protected static FileSystem createZipFileSystem(Path path, boolean create) throws IOException {
-		Map<String, String> env = new HashMap<String, String>();
-		if (create) {
-			env.put("create", "true");
-		}
-
-		// check installed providers, we cannot use the FileSystems class here as it does not
-		// allow to pass a Path object and in addition the environment properties ...
-		for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
-			try {
-				return provider.newFileSystem(path, env);
-			} catch (UnsupportedOperationException uoe) { // NOPMD NOCHK
-				// ignore
-			}
-		}
-		throw new ProviderNotFoundException("Provider not found");
 	}
 
 	/**
