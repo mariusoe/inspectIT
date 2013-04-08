@@ -57,10 +57,13 @@ public enum WritingStatus {
 	 * @return Writing status.
 	 */
 	public static WritingStatus getWritingStatus(long arrivedTasks, long finishedTasks) {
-		double ratio = (double) arrivedTasks / finishedTasks;
-		if (ratio < GOOD_STATUS_END) {
+		if (arrivedTasks == 0) {
 			return GOOD;
-		} else if (ratio < MEDIUM_STATUS_END) {
+		}
+		double ratio = (double) arrivedTasks / finishedTasks;
+		if (ratio < 1 + GOOD_STATUS_END) {
+			return GOOD;
+		} else if (ratio < 1 + MEDIUM_STATUS_END) {
 			return MEDIUM;
 		} else {
 			return BAD;

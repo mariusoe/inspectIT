@@ -26,6 +26,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +37,6 @@ import javax.annotation.Resource;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import com.esotericsoftware.kryo.io.Output;
 
@@ -117,6 +118,13 @@ public class StorageWriter implements IWriter {
 	private ScheduledThreadPoolExecutor writingExecutorService;
 
 	/**
+	 * {@link ExecutorService} for not-writing tasks.
+	 */
+	@Autowired
+	@Resource(name = "scheduledExecutorService")
+	private ScheduledExecutorService scheduledExecutorService;
+
+	/**
 	 * {@link StreamProvider}.
 	 */
 	@Autowired
@@ -141,6 +149,11 @@ public class StorageWriter implements IWriter {
 	 * If the writer is finalized.
 	 */
 	private boolean finalized = false;
+
+	/**
+	 * Future for the task of checking the writing status.
+	 */
+	private ScheduledFuture<?> checkWritingStatusFuture;
 
 	/**
 	 * Process the list of objects against the all the {@link AbstractDataProcessor}s that are
@@ -256,6 +269,16 @@ public class StorageWriter implements IWriter {
 			// prepare the indexing tree handler
 			indexingTreeHandler.prepare();
 
+			// activate check writing status task manually
+			checkWritingStatusFuture = scheduledExecutorService.scheduleWithFixedDelay(new Runnable() {
+				@Override
+				public void run() {
+					if (writingOn) {
+						checkWritingStatus();
+					}
+				}
+			}, 30, 30, TimeUnit.SECONDS);
+
 			writingOn = true;
 			return true;
 		}
@@ -269,6 +292,9 @@ public class StorageWriter implements IWriter {
 		if (writingOn) {
 			// mark writing false so that no more task are created
 			writingOn = false;
+
+			// cancel the check writing status task
+			checkWritingStatusFuture.cancel(false);
 
 			boolean logged = false;
 			// check amount of active tasks
@@ -424,8 +450,7 @@ public class StorageWriter implements IWriter {
 	/**
 	 * Updates the write status.
 	 */
-	@Scheduled(fixedDelay = 30000)
-	protected void checkWritingStatus() {
+	private void checkWritingStatus() {
 		if (null != writingExecutorService) {
 			long completedTasks = writingExecutorService.getCompletedTaskCount();
 			long queuedTasks = writingExecutorService.getTaskCount() - completedTasks;
