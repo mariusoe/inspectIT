@@ -212,8 +212,12 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 
 		// approximate capacity of each segment
 		int segmentCapacity = getSegmentCapacityFromSize(mapSize / concurrencyLevel, MAP_INITIAL_CAPACITY / concurrencyLevel);
+
+		// if map is empty there is only one segment created no matter what
+		int segments = mapSize == 0 ? 1 : concurrencyLevel;
+
 		// size of each segment based on the capacity, times number of segments
-		size += concurrencyLevel * this.getSizeOfConcurrentSeqment(segmentCapacity);
+		size += segments * this.getSizeOfConcurrentSeqment(segmentCapacity);
 
 		// and for each object in the map there is the reference to the HashEntry in Segment that we
 		// need to add

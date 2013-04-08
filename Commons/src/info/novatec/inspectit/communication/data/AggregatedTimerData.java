@@ -4,8 +4,8 @@ import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.communication.IAggregatedData;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Aggregated {@link TimerData} object.
@@ -21,9 +21,11 @@ public class AggregatedTimerData extends TimerData implements IAggregatedData<Ti
 	private static final long serialVersionUID = 5458552145998385702L;
 
 	/**
-	 * Aggregated Ids.
+	 * Aggregated IDs. We need a set functionality so we will simulate it with the Map (SetFromMap
+	 * is not available in Java5). The values in this map should always be the {@link Boolean#TRUE}
+	 * since the keys are only values we are interested in.
 	 */
-	private Set<Long> aggregatedIds;
+	private Map<Long, Boolean> aggregatedIds = new ConcurrentHashMap<Long, Boolean>(16, 0.75f, 4);
 
 	/**
 	 * {@inheritDoc}
@@ -31,10 +33,7 @@ public class AggregatedTimerData extends TimerData implements IAggregatedData<Ti
 	public void aggregate(TimerData data) {
 		this.aggregateTimerData(data);
 		if (0 != data.getId()) {
-			if (null == aggregatedIds) {
-				aggregatedIds = new HashSet<Long>();
-			}
-			aggregatedIds.add(data.getId());
+			aggregatedIds.put(data.getId(), Boolean.TRUE);
 		}
 	}
 
@@ -43,7 +42,7 @@ public class AggregatedTimerData extends TimerData implements IAggregatedData<Ti
 	 * {@inheritDoc}
 	 */
 	public Collection<Long> getAggregatedIds() {
-		return aggregatedIds;
+		return aggregatedIds.keySet();
 	}
 
 	/**
@@ -61,10 +60,8 @@ public class AggregatedTimerData extends TimerData implements IAggregatedData<Ti
 	 */
 	public void aggregateTimerData(AggregatedTimerData data) {
 		if (null != data.getAggregatedIds()) {
-			if (null != aggregatedIds) {
-				aggregatedIds.addAll(data.getAggregatedIds());
-			} else {
-				aggregatedIds = new HashSet<Long>(data.getAggregatedIds());
+			for (Long id : data.getAggregatedIds()) {
+				aggregatedIds.put(id, Boolean.TRUE);
 			}
 		}
 		super.aggregateTimerData(data);
@@ -77,7 +74,7 @@ public class AggregatedTimerData extends TimerData implements IAggregatedData<Ti
 		long size = super.getObjectSize(objectSizes, false);
 		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 0, 0);
 		if (null != aggregatedIds) {
-			size += objectSizes.getSizeOfHashSet(aggregatedIds.size());
+			size += objectSizes.getSizeOfConcurrentHashMap(aggregatedIds.size(), 4);
 			size += aggregatedIds.size() * objectSizes.getSizeOfLongObject();
 		}
 		if (doAlign) {

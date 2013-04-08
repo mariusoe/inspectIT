@@ -1,12 +1,13 @@
 package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
-import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.ExceptionEvent;
+import info.novatec.inspectit.communication.IAggregatedData;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Aggregated exception sensor data. This objects are used for the purpose of grouping the
  * {@link ExceptionSensorData} objects that have same properties.
@@ -37,9 +38,11 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData implement
 	private long handled;
 
 	/**
-	 * Aggregated Ids.
+	 * Aggregated IDs. We need a set functionality so we will simulate it with the Map (SetFromMap
+	 * is not available in Java5). The values in this map should always be the {@link Boolean#TRUE}
+	 * since the keys are only values we are interested in.
 	 */
-	private Set<Long> aggregatedIds;
+	private Map<Long, Boolean> aggregatedIds = new ConcurrentHashMap<Long, Boolean>(16, 0.75f, 4);
 
 	/**
 	 * Gets {@link #created}.
@@ -134,10 +137,8 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData implement
 	 */
 	public void aggregateExceptionData(AggregatedExceptionSensorData aggregatedExceptionData) {
 		if (null != aggregatedExceptionData.getAggregatedIds()) {
-			if (null != aggregatedIds) {
-				aggregatedIds.addAll(aggregatedExceptionData.getAggregatedIds());
-			} else {
-				aggregatedIds = new HashSet<Long>(aggregatedExceptionData.getAggregatedIds());
+			for (Long id : aggregatedExceptionData.getAggregatedIds()) {
+				aggregatedIds.put(id, Boolean.TRUE);
 			}
 		}
 		super.aggregateInvocationAwareData(aggregatedExceptionData);
@@ -152,10 +153,7 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData implement
 	public void aggregate(ExceptionSensorData data) {
 		this.aggregateExceptionData(data);
 		if (0 != data.getId()) {
-			if (null == aggregatedIds) {
-				aggregatedIds = new HashSet<Long>();
-			}
-			aggregatedIds.add(data.getId());
+			aggregatedIds.put(data.getId(), Boolean.TRUE);
 		}
 	}
 
@@ -163,7 +161,7 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData implement
 	 * {@inheritDoc}
 	 */
 	public Collection<Long> getAggregatedIds() {
-		return aggregatedIds;
+		return aggregatedIds.keySet();
 	}
 
 	/**
@@ -180,7 +178,7 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData implement
 		long size = super.getObjectSize(objectSizes, false);
 		size += objectSizes.getPrimitiveTypesSize(1, 0, 0, 0, 3, 0);
 		if (null != aggregatedIds) {
-			size += objectSizes.getSizeOfHashSet(aggregatedIds.size());
+			size += objectSizes.getSizeOfConcurrentHashMap(aggregatedIds.size(), 4);
 			size += aggregatedIds.size() * objectSizes.getSizeOfLongObject();
 		}
 		if (doAlign) {
