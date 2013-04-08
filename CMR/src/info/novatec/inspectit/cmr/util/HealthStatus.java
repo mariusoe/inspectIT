@@ -5,6 +5,7 @@ import info.novatec.inspectit.cmr.service.AgentStorageService;
 import info.novatec.inspectit.cmr.storage.CmrStorageManager;
 import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.StorageData;
+import info.novatec.inspectit.storage.nio.ByteBufferProvider;
 import info.novatec.inspectit.storage.nio.write.WritingChannelManager;
 import info.novatec.inspectit.storage.recording.RecordingState;
 
@@ -103,6 +104,12 @@ public class HealthStatus {
 	 */
 	@Autowired
 	private CmrStorageManager storageManager;
+
+	/**
+	 * Byte buffer provider for the buffers pool status.
+	 */
+	@Autowired
+	private ByteBufferProvider byteBufferProvider;
 
 	/**
 	 * Log all the statistics.
@@ -428,6 +435,9 @@ public class HealthStatus {
 		} else {
 			log.info("Recording is not active.");
 		}
+
+		log.info("Byte buffer provider has " + byteBufferProvider.getBufferPoolSize() + " available buffers in the pool with total capacity of " + byteBufferProvider.getAvailableCapacity()
+				+ " bytes. Total created capacity of the pool is " + byteBufferProvider.getCreatedCapacity() + " bytes.");
 	}
 
 	/**

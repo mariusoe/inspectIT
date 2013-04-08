@@ -30,6 +30,12 @@
 		<ivy:resolve file="${ivy.file}" />
 		<ivy:cachepath pathid="lib.prod" conf="prod" />
 		<ivy:cachepath pathid="lib.test" conf="test" />
+		
+		<ivy:resolve file="${ivy.file.commons}" />
+		<ivy:cachepath pathid="lib.prod.commons" conf="prod" />
+	
+		<ivy:resolve file="${ivy.file.commonscs}" />
+		<ivy:cachepath pathid="lib.prod.commonscs" conf="prod" />
 	</target>
 
 	<!-- *************************************************************** -->
@@ -57,6 +63,8 @@
 			<pathelement location="${build.commons.classes}" />
 			<pathelement location="${build.commonscs.classes}" />
 			<path refid="lib.prod" />
+			<path refid="lib.prod.commons" />
+			<path refid="lib.prod.commonscs" />
 		</path>
 
 		<javac source="1.6" target="1.6" debug="true" debuglevel="lines,vars,source" destdir="${build.cmr.classes}" srcdir="${src.root}" classpathref="compile.classpath" includeAntRuntime="no" />
@@ -79,9 +87,10 @@
 		<path id="complete.classpath">
 			<pathelement location="${build.cmr.classes}" />
 			<fileset dir="${commons.build.release}" includes="*.jar" />
-			<fileset dir="${commons.build.release}/lib" includes="*.jar" />
 			<fileset dir="${commonscs.build.release}" includes="*.jar" />
-			<fileset dir="${commonscs.build.release}/lib" includes="*.jar" />
+			<path refid="lib.prod" />
+			<path refid="lib.prod.commons" />
+			<path refid="lib.prod.commonscs" />
 			<path refid="lib.test" />
 			<path refid="path.testng" />
 		</path>
@@ -180,13 +189,17 @@
 		<mkdir dir="${build.release.root.cmr}" />
 		<mkdir dir="${build.scripts}" />
 
+		<!-- Include prod libs from all project -->
 		<copy todir="${build.release.root.cmr}/lib" flatten="true">
 			<path refid="lib.prod" />
+			<path refid="lib.prod.commons" />
+			<path refid="lib.prod.commonscs" />
 		</copy>
 
+		<!-- Copy Commons and CommonsCS jars only -->
 		<copy todir="${build.release.root.cmr}/lib">
+			<fileset dir="${commons.build.release}" includes="*.jar" />
 			<fileset dir="${commonscs.build.release}" includes="*.jar" />
-			<fileset dir="${commonscs.build.release}/lib" includes="*.jar" />
 		</copy>
 
 		<!-- create a property containing all .jar files, prefix lib/, and seperated with a space -->

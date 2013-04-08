@@ -75,7 +75,7 @@ public class StorageWriter implements IWriter {
 	 * {@link StorageManager}.
 	 */
 	@Autowired
-	private StorageManager storageManager;
+	StorageManager storageManager;
 
 	/**
 	 * Storage to write to.
@@ -86,7 +86,7 @@ public class StorageWriter implements IWriter {
 	 * Indexing tree handler.
 	 */
 	@Autowired
-	private StorageIndexingTreeHandler indexingTreeHandler;
+	StorageIndexingTreeHandler indexingTreeHandler;
 
 	/**
 	 * Path used for writing.
@@ -97,7 +97,7 @@ public class StorageWriter implements IWriter {
 	 * {@link WritingChannelManager}.
 	 */
 	@Autowired
-	private WritingChannelManager writingChannelManager;
+	WritingChannelManager writingChannelManager;
 
 	/**
 	 * {@link SerializationManagerProvider}.
@@ -108,7 +108,7 @@ public class StorageWriter implements IWriter {
 	/**
 	 * Queue for {@link ISerializer} that are available.
 	 */
-	private BlockingQueue<ISerializer> serializerQueue = new LinkedBlockingQueue<ISerializer>();
+	BlockingQueue<ISerializer> serializerQueue = new LinkedBlockingQueue<ISerializer>();
 
 	/**
 	 * {@link ExecutorService} for writing tasks.
@@ -122,13 +122,13 @@ public class StorageWriter implements IWriter {
 	 */
 	@Autowired
 	@Resource(name = "scheduledExecutorService")
-	private ScheduledExecutorService scheduledExecutorService;
+	ScheduledExecutorService scheduledExecutorService;
 
 	/**
 	 * {@link StreamProvider}.
 	 */
 	@Autowired
-	private StreamProvider streamProvider;
+	StreamProvider streamProvider;
 
 	/**
 	 * Opened channels {@link Paths}. These paths need to be closed when writing is finalized.
@@ -394,55 +394,67 @@ public class StorageWriter implements IWriter {
 	 * @return True if the object was written successfully, otherwise false.
 	 */
 	public boolean writeNonDefaultDataObject(Object object, String fileName) {
-		ISerializer serializer = null;
+		ExtendedByteBufferOutputStream extendedByteBufferOutputStream = null;
 		try {
-			serializer = serializerQueue.take();
-		} catch (InterruptedException e1) {
-			Thread.interrupted();
-		}
-		if (null == serializer) {
-			log.error("Serializer instance could not be obtained.");
-			return false;
-		}
+			ISerializer serializer = null;
+			try {
+				serializer = serializerQueue.take();
+			} catch (InterruptedException e1) {
+				Thread.interrupted();
+			}
+			if (null == serializer) {
+				log.error("Serializer instance could not be obtained.");
+				return false;
+			}
 
-		// final reference needed because of the runnable
-		final ExtendedByteBufferOutputStream extendedByteBufferOutputStream = streamProvider.getExtendedByteBufferOutputStream();
-		try {
-			Output output = new Output(extendedByteBufferOutputStream);
-			serializer.serialize(object, output);
-			extendedByteBufferOutputStream.flush(false);
-		} catch (SerializationException e) {
+			// final reference needed because of the runnable
+			extendedByteBufferOutputStream = streamProvider.getExtendedByteBufferOutputStream();
+			try {
+				Output output = new Output(extendedByteBufferOutputStream);
+				serializer.serialize(object, output);
+				extendedByteBufferOutputStream.flush(false);
+			} catch (SerializationException e) {
+				serializerQueue.add(serializer);
+				extendedByteBufferOutputStream.close();
+				log.error("Serialization for the object " + object + " failed. Data will be skipped.", e);
+				return false;
+			}
 			serializerQueue.add(serializer);
-			log.error("Serialization for the object " + object + " failed. Data will be skipped.", e);
-			return false;
-		}
-		serializerQueue.add(serializer);
 
-		int buffersToWrite = extendedByteBufferOutputStream.getBuffersCount();
-		WriteReadCompletionRunnable completionRunnable = new WriteReadCompletionRunnable(buffersToWrite) {
-			@Override
-			public void run() {
+			int buffersToWrite = extendedByteBufferOutputStream.getBuffersCount();
+			final ExtendedByteBufferOutputStream finalOutputStream = extendedByteBufferOutputStream;
+			WriteReadCompletionRunnable completionRunnable = new WriteReadCompletionRunnable(buffersToWrite) {
+				@Override
+				public void run() {
+					finalOutputStream.close();
+				}
+			};
+
+			// prepare path
+			Path channelPath = writingFolderPath.resolve(fileName);
+			if (Files.exists(channelPath)) {
+				try {
+					Files.delete(channelPath);
+				} catch (IOException e) {
+					log.error("Exception thrown trying to delete file from disk", e);
+				}
+			}
+			openedChannelPaths.add(channelPath);
+
+			// execute write
+			try {
+				writingChannelManager.write(extendedByteBufferOutputStream, channelPath, completionRunnable);
+				return true;
+			} catch (IOException e) {
+				extendedByteBufferOutputStream.close();
+				log.error("Exception occured while attempting to write data to disk", e);
+				return false;
+			}
+		} catch (Throwable throwable) { // NOPMD
+			if (null != extendedByteBufferOutputStream) {
 				extendedByteBufferOutputStream.close();
 			}
-		};
-
-		// prepare path
-		Path channelPath = writingFolderPath.resolve(fileName);
-		if (Files.exists(channelPath)) {
-			try {
-				Files.delete(channelPath);
-			} catch (IOException e) {
-				log.error("Exception thrown trying to delete file from disk", e);
-			}
-		}
-		openedChannelPaths.add(channelPath);
-
-		// execute write
-		try {
-			writingChannelManager.write(extendedByteBufferOutputStream, channelPath, completionRunnable);
-			return true;
-		} catch (IOException e) {
-			log.error("Execption occured while attempting to write data to disk", e);
+			log.error("Exception occured while attempting to write data to disk", throwable);
 			return false;
 		}
 	}
@@ -502,6 +514,7 @@ public class StorageWriter implements IWriter {
 		 * {@inheritDoc}
 		 */
 		public void run() {
+			ExtendedByteBufferOutputStream extendedByteBufferOutputStream = null;
 			try {
 				if (!storageManager.canWriteMore()) {
 					if (log.isWarnEnabled()) {
@@ -547,12 +560,13 @@ public class StorageWriter implements IWriter {
 					return;
 				}
 
-				final ExtendedByteBufferOutputStream extendedByteBufferOutputStream = streamProvider.getExtendedByteBufferOutputStream();
+				extendedByteBufferOutputStream = streamProvider.getExtendedByteBufferOutputStream();
 				try {
 					Output output = new Output(extendedByteBufferOutputStream);
 					serializer.serialize(data, output, kryoPreferences);
 					extendedByteBufferOutputStream.flush(false);
 				} catch (SerializationException e) {
+					extendedByteBufferOutputStream.close();
 					indexingTreeHandler.writeFailed(this);
 					serializerQueue.add(serializer);
 					if (log.isWarnEnabled()) {
@@ -564,17 +578,17 @@ public class StorageWriter implements IWriter {
 
 				// final reference needed because of the runnable
 				int buffersToWrite = extendedByteBufferOutputStream.getBuffersCount();
-
+				final ExtendedByteBufferOutputStream finalOutputStream = extendedByteBufferOutputStream;
 				WriteReadCompletionRunnable completionRunnable = new WriteReadCompletionRunnable(buffersToWrite) {
 					@Override
 					public void run() {
+						finalOutputStream.close();
 						if (isCompleted()) {
 							indexingTreeHandler.writeSuccessful(WriteTask.this, getAttemptedWriteReadPosition(), getAttemptedWriteReadSize());
 						} else {
 							indexingTreeHandler.writeFailed(WriteTask.this);
 
 						}
-						extendedByteBufferOutputStream.close();
 					}
 				};
 
@@ -586,12 +600,16 @@ public class StorageWriter implements IWriter {
 					writingChannelManager.write(extendedByteBufferOutputStream, channelPath, completionRunnable);
 				} catch (IOException e) {
 					// remove from indexing tree if exception occurs
+					extendedByteBufferOutputStream.close();
 					indexingTreeHandler.writeFailed(this);
-					log.error("Execption occured while attempting to write data to disk", e);
+					log.error("Exception occured while attempting to write data to disk", e);
 					return;
 				}
 			} catch (Throwable t) { // NOPMD
 				// catch any exception
+				if (null != extendedByteBufferOutputStream) {
+					extendedByteBufferOutputStream.close();
+				}
 				indexingTreeHandler.writeFailed(this);
 				log.error("Unknow exception occured during data write", t);
 			}

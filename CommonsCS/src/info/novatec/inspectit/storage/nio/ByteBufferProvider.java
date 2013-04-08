@@ -45,6 +45,11 @@ public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
 	public static final int DEFAULT_BUFFER_CAPACITY = 1024 * 1024;
 
 	/**
+	 * Max waiting for the buffer to be available in milliseconds.
+	 */
+	private static final long MAX_WAIT = 60000;
+
+	/**
 	 * Buffer size.
 	 */
 	@Value(value = "${storage.bufferSize}")
@@ -93,6 +98,8 @@ public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
 	protected ByteBufferProvider(ByteBufferPoolFactory poolFactory) {
 		super(poolFactory);
 		this.poolFactory = poolFactory;
+		this.setMaxWait(MAX_WAIT);
+		this.setWhenExhaustedAction(WHEN_EXHAUSTED_BLOCK);
 	}
 
 	/**
@@ -129,7 +136,7 @@ public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
 	/**
 	 * @return Returns the pool size.
 	 */
-	int getBufferPoolSize() {
+	public int getBufferPoolSize() {
 		return super.getNumIdle();
 	}
 
@@ -138,7 +145,7 @@ public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
 	 * 
 	 * @return {@link #createdCapacity}
 	 */
-	long getCreatedCapacity() {
+	public long getCreatedCapacity() {
 		return (super.getNumActive() + super.getNumIdle()) * bufferSize;
 	}
 
@@ -147,7 +154,7 @@ public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
 	 * 
 	 * @return {@link #availableCapacity}
 	 */
-	long getAvailableCapacity() {
+	public long getAvailableCapacity() {
 		return super.getNumIdle() * bufferSize;
 	}
 

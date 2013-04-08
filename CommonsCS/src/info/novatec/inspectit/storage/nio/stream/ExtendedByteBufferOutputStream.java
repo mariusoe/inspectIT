@@ -49,6 +49,11 @@ public class ExtendedByteBufferOutputStream extends ByteBufferOutputStream {
 	private long totalWriteSize = 0L;
 
 	/**
+	 * If stream has been closed.
+	 */
+	private volatile boolean closed;
+
+	/**
 	 * {@inheritDoc}
 	 * <p>
 	 * Since this method is called when the buffer currently used for writing is full, the method
@@ -115,7 +120,10 @@ public class ExtendedByteBufferOutputStream extends ByteBufferOutputStream {
 	 * Releases all byte buffers that are hold.
 	 */
 	@Override
-	public void close() {
+	public synchronized void close() {
+		if (closed) {
+			return;
+		}
 		for (ByteBuffer byteBuffer : byteBuffers) {
 			byteBufferProvider.releaseByteBuffer(byteBuffer);
 		}
@@ -126,6 +134,7 @@ public class ExtendedByteBufferOutputStream extends ByteBufferOutputStream {
 			byteBufferProvider.releaseByteBuffer(currentBuffer);
 			super.setByteBuffer(null);
 		}
+		closed = true;
 	}
 
 	/**
@@ -155,5 +164,16 @@ public class ExtendedByteBufferOutputStream extends ByteBufferOutputStream {
 	 */
 	public int getBuffersCount() {
 		return byteBuffers.size();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Closing the stream on finalize.
+	 */
+	@Override
+	protected void finalize() throws Throwable {
+		this.close();
+		super.finalize();
 	}
 }

@@ -78,10 +78,10 @@
 				name="info.novatec.inspectit.storage.serializer.schema.SchemaTest" />
 		</classes>
 	</test>
-	<test name="Storage Integration Test">
+	<test name="Storage">
 		<classes>
-			<class
-				name="info.novatec.inspectit.storage.StorageIntegrationTest" />
+			<class name="info.novatec.inspectit.storage.StorageIntegrationTest" />
+			<class name="info.novatec.inspectit.storage.StorageWriterTest" />
 		</classes>
 	</test>
 	<test name="EqualsVerifier">

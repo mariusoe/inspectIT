@@ -8,6 +8,9 @@ import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 
 import java.nio.ByteBuffer;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import nl.jqno.equalsverifier.util.Assert;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -115,5 +118,50 @@ public class ByteBufferProviderTest extends AbstractTestNGLogSupport {
 		assertThat(byteBufferProvider.getBufferPoolSize(), is(equalTo(1)));
 		assertThat(byteBufferProvider.getCreatedCapacity(), is(equalTo(1L)));
 		assertThat(byteBufferProvider.getAvailableCapacity(), is(equalTo(1L)));
+	}
+
+	/**
+	 * Stress the provider with several thread proving that the byte buffer provider won't block
+	 * under heavy load.
+	 */
+	@Test
+	public void providerStressed() throws Throwable {
+		byteBufferProvider.setBufferSize(1);
+		byteBufferProvider.setPoolMaxCapacity(2);
+		byteBufferProvider.setPoolMinCapacity(1);
+		byteBufferProvider.init();
+
+		int threadCount = 5;
+		final int iterationsPerThread = 1000000;
+		final AtomicInteger totalCount = new AtomicInteger(threadCount * iterationsPerThread);
+
+		for (int i = 0; i < threadCount; i++) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					for (int i = 0; i < iterationsPerThread; i++) {
+						ByteBuffer buffer = byteBufferProvider.acquireByteBuffer();
+						assertThat(buffer, is(notNullValue()));
+						byteBufferProvider.releaseByteBuffer(buffer);
+						totalCount.decrementAndGet();
+					}
+				}
+			}).start();
+		}
+
+		int sleepTime = 500;
+		int totalSlept = 0;
+		int maxSleepTime = 2 * 60 * 1000;
+		while (totalCount.get() > 0) {
+			try {
+				Thread.sleep(sleepTime);
+				totalSlept += sleepTime;
+				if (totalSlept > maxSleepTime) {
+					Assert.fail("Waiting for the byte buffer stressed test is over " + maxSleepTime + " milliseconds. Test is failed.");
+				}
+			} catch (InterruptedException e) {
+				Thread.interrupted();
+			}
+		}
 	}
 }

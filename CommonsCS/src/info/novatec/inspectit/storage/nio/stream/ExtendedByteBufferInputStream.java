@@ -138,6 +138,11 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 	private Set<Path> openedChannelPaths = Collections.newSetFromMap(new ConcurrentHashMap<Path, Boolean>(16, 0.75f, 1));
 
 	/**
+	 * If stream has been closed.
+	 */
+	private volatile boolean closed;
+
+	/**
 	 * No-arg constructor.
 	 */
 	public ExtendedByteBufferInputStream() {
@@ -281,7 +286,10 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 	 * Releases all byte buffers that are hold.
 	 */
 	@Override
-	public void close() throws IOException {
+	public synchronized void close() throws IOException {
+		if (closed) {
+			return;
+		}
 		// release buffers from both queues
 		while (!fullBuffers.isEmpty()) {
 			ByteBuffer byteBuffer = fullBuffers.poll();
@@ -300,6 +308,8 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 		for (Path path : openedChannelPaths) {
 			readingChannelManager.finalizeChannel(path);
 		}
+
+		closed = true;
 	}
 
 	/**
@@ -489,6 +499,17 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 				nextDescriptorIndex.incrementAndGet();
 			}
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Closing the stream on finalize.
+	 */
+	@Override
+	protected void finalize() throws Throwable {
+		this.close();
+		super.finalize();
 	}
 
 }

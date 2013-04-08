@@ -66,10 +66,6 @@
 	<target name="release" depends="build" description="--> Creates the distribution jar">
 		<mkdir dir="${build.release.root}" />
 
-		<copy todir="${build.release.root}/lib" flatten="true">
-			<path refid="lib.prod" />
-		</copy>
-
 		<jar destfile="${build.release.root}/${dist.jar.name}" basedir="${build.commons.classes}" />
 	</target>
 
