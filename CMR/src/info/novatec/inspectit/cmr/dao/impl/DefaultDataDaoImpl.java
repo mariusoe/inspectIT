@@ -19,15 +19,19 @@ import info.novatec.inspectit.indexing.impl.IndexingException;
 import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.recording.RecordingState;
 
+import java.lang.reflect.Modifier;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.hibernate.FetchMode;
 import org.hibernate.Query;
@@ -38,6 +42,8 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.persister.entity.AbstractEntityPersister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -505,10 +511,39 @@ public class DefaultDataDaoImpl extends HibernateDaoSupport implements DefaultDa
 		query.setLong("platformIdent", platformId);
 		query.executeUpdate();
 
-		// then delete all default data
-		query = getSession().createQuery("delete from DefaultData where platformIdent = :platformIdent");
-		query.setLong("platformIdent", platformId);
-		query.executeUpdate();
-	}
+		// the code below is the workaround the Hibernate batch delete problem of all DefaultData
+		// instances
+		// any batch delete or delete executed on the abstract class will raise problem with not
+		// existing temporary tables
+		Map<String, ClassMetadata> map = getSessionFactory().getAllClassMetadata();
+		for (Entry<String, ClassMetadata> entry : map.entrySet()) {
+			// for each mapped class check:
+			// * that is not abstract
+			// * that it's a default data subclass
+			// * that has platfromIdent property
+			ClassMetadata classMetadata = entry.getValue();
+			String className = entry.getKey();
+			Class<?> clazz = null;
+			try {
+				clazz = Class.forName(className);
+			} catch (ClassNotFoundException e) {
+				continue;
+			}
+			boolean isAbstract = Modifier.isAbstract(clazz.getModifiers());
+			if (!isAbstract && classMetadata instanceof AbstractEntityPersister) {
+				isAbstract = ((AbstractEntityPersister) classMetadata).isAbstract();
+			}
 
+			if (!isAbstract && DefaultData.class.isAssignableFrom(clazz)) {
+				boolean hasPlatformIdent = ArrayUtils.contains(classMetadata.getPropertyNames(), "platformIdent");
+				if (hasPlatformIdent) {
+					// then delete that default data
+					query = getSession().createQuery("delete from " + className + " where platformIdent = :platformIdent");
+					query.setLong("platformIdent", platformId);
+					query.executeUpdate();
+				}
+			}
+		}
+
+	}
 }

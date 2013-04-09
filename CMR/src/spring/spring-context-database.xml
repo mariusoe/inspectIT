@@ -47,9 +47,6 @@
 
 				<!-- Method Data Objects -->
 				<value>hibernate/TimerData.hbm.xml</value>
-				<value>hibernate/InvocationSequenceData.hbm.xml</value>
-				<value>hibernate/SqlStatementData.hbm.xml</value>
-				<value>hibernate/ExceptionSensorData.hbm.xml</value>
 
 				<!-- Platform Data Objects -->
 				<value>hibernate/ClassLoadingInformationData.hbm.xml</value>
@@ -62,12 +59,14 @@
 				<value>hibernate/ThreadInformationData.hbm.xml</value>
 
 				<!-- Configuration Interface Data Objects -->
+				<!-- Ignore for now
 				<value>hibernate/EnvironmentData.hbm.xml</value>
 				<value>hibernate/ProfileData.hbm.xml</value>
 				<value>hibernate/SensorTypeData.hbm.xml</value>
 				<value>hibernate/MethodSensorDefinitionData.hbm.xml</value>
 				<value>hibernate/PlatformSensorDefinitionData.hbm.xml</value>
 				<value>hibernate/ExceptionSensorDefinitionData.hbm.xml</value>
+				-->
 
 				<!-- Storage Data Object -->
 				<value>hibernate/StorageLabel.hbm.xml</value>
