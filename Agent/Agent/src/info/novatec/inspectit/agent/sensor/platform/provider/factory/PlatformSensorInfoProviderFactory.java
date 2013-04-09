@@ -35,7 +35,7 @@ public final class PlatformSensorInfoProviderFactory {
 	 * in the static class initialization, and then simply always return the one we have created.
 	 */
 	static {
-		if (UnderlyingSystemInfo.JVM_PROVIDER == JvmProvider.SUN) {
+		if (UnderlyingSystemInfo.JVM_PROVIDER == JvmProvider.SUN || UnderlyingSystemInfo.JVM_PROVIDER == JvmProvider.ORACLE) {
 			if (null == platformSensorInfoProvider) {
 				createSunPlatformSensorInfoProvider();
 			}
