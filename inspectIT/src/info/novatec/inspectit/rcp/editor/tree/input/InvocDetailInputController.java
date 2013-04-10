@@ -568,7 +568,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			double duration = InvocationSequenceDataHelper.calculateDuration(data);
 
 			if (-1.0d != duration) { // no duration?
-				double exclusiveTime = duration - (InvocationSequenceDataHelper.computeNestedDuration(data));
+				double exclusiveTime = duration - InvocationSequenceDataHelper.computeNestedDuration(data);
 
 				// compute the correct color
 				int colorValue = 255 - (int) ((exclusiveTime / invocationDuration) * 100);
@@ -628,7 +628,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			double dur = InvocationSequenceDataHelper.calculateDuration(data);
 
 			if (-1.0d != dur) {
-				double exclusiveTime = dur - (InvocationSequenceDataHelper.computeNestedDuration(data));
+				double exclusiveTime = dur - InvocationSequenceDataHelper.computeNestedDuration(data);
 				styledString.append(NumberFormatter.formatDouble(exclusiveTime));
 			}
 
@@ -786,9 +786,9 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 						duration = invocationSequenceData.getSqlStatementData().getDuration();
 					} else if (InvocationSequenceDataHelper.hasTimerData(invocationSequenceData)) {
 						double totalDuration = invocationSequenceData.getTimerData().getDuration();
-						duration = totalDuration - (InvocationSequenceDataHelper.computeNestedDuration(invocationSequenceData));
+						duration = totalDuration - InvocationSequenceDataHelper.computeNestedDuration(invocationSequenceData);
 					} else if (InvocationSequenceDataHelper.isRootElementInSequence(invocationSequenceData)) {
-						duration = invocationSequenceData.getDuration() - (InvocationSequenceDataHelper.computeNestedDuration(invocationSequenceData));
+						duration = invocationSequenceData.getDuration() - InvocationSequenceDataHelper.computeNestedDuration(invocationSequenceData);
 					}
 
 					if (!Double.isNaN(duration) && duration <= defaultExclusiveFilterTime) {
@@ -893,7 +893,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			for (Column column : Column.values()) {
 				sb.append(getStyledTextForColumn(data, methodIdent, column).toString());
-				sb.append("\t");
+				sb.append('\t');
 			}
 			return sb.toString();
 		}

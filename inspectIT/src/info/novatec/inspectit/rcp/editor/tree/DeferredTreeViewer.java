@@ -216,7 +216,7 @@ public class DeferredTreeViewer extends TreeViewer {
 		}
 		Object parent = getParentElement(elementOrTreePath);
 		// check if the element is already visible, or if it is root
-		if ((parent != null && getExpandedState(parent)) || isRootElement(elementOrTreePath)) {
+		if (parent != null && getExpandedState(parent) || isRootElement(elementOrTreePath)) {
 			// then only set selection
 			Widget w = internalGetWidgetToSelect(elementOrTreePath);
 			if (null != w) {

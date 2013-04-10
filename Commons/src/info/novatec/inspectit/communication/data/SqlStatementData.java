@@ -155,7 +155,7 @@ public class SqlStatementData extends TimerData {
 					char c = sql.charAt(i);
 					if ('?' == c) {
 						String parameter = parameterValues.get(index);
-						if ((null == parameter) || "".equals(parameter.trim())) {
+						if (null == parameter || "".equals(parameter.trim())) {
 							stringBuilder.append(c);
 						} else {
 							stringBuilder.append(parameter);

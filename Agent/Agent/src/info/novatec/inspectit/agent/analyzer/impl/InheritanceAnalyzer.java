@@ -93,7 +93,7 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 		 */
 		public boolean hasNext() {
 			try {
-				return (superClass.getSuperclass() != null);
+				return superClass.getSuperclass() != null;
 			} catch (NotFoundException e) {
 				return false;
 			}

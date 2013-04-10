@@ -347,7 +347,7 @@ public class DefineTimelineWizardPage extends WizardPage {
 			Calendar calendar = Calendar.getInstance();
 			calendar.set(Calendar.SECOND, 0);
 			calendar.set(Calendar.MILLISECOND, 0);
-			if ((timeStyle & FUTURE) != 0 && !((timeStyle & BOTH_DATES) != 0)) {
+			if ((timeStyle & FUTURE) != 0 && (timeStyle & BOTH_DATES) == 0) {
 				cdtPrimary.setPattern("'Till\t\t' EEEE, MMMM d YYYY '@' h:mm a");
 				calendar.add(Calendar.HOUR, 1);
 			} else {

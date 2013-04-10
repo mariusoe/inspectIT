@@ -44,20 +44,6 @@ public class CachedDataService implements InitializingBean {
 	private IGlobalDataAccessService globalDataAccessService;
 
 	/**
-	 * No-args constructor.
-	 */
-	public CachedDataService() {
-	}
-
-	/**
-	 * @param globalDataAccessService
-	 *            Delegated service.
-	 */
-	public CachedDataService(IGlobalDataAccessService globalDataAccessService) {
-		this.globalDataAccessService = globalDataAccessService;
-	}
-
-	/**
 	 * This map is needed to store the mapping between the ID's and the {@link PlatformIdent}
 	 * objects. Some views / editors need this information because they can only access the ID.
 	 */
@@ -74,6 +60,20 @@ public class CachedDataService implements InitializingBean {
 	 * Some views / editors need this information because they can only access the ID.
 	 */
 	private Map<Long, MethodIdent> methodMap = new ConcurrentHashMap<Long, MethodIdent>();
+
+	/**
+	 * No-args constructor.
+	 */
+	public CachedDataService() {
+	}
+
+	/**
+	 * @param globalDataAccessService
+	 *            Delegated service.
+	 */
+	public CachedDataService(IGlobalDataAccessService globalDataAccessService) {
+		this.globalDataAccessService = globalDataAccessService;
+	}
 
 	/**
 	 * This is a hook method for all subclasses that will be called after the idents have been

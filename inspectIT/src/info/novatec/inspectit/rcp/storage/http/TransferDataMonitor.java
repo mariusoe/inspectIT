@@ -196,7 +196,7 @@ public class TransferDataMonitor {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("File ");
 		stringBuilder.append(filesCount + 1);
-		stringBuilder.append("/");
+		stringBuilder.append('/');
 		stringBuilder.append(files.size());
 		stringBuilder.append(" (");
 		stringBuilder.append(NumberFormatter.humanReadableByteCount(totalBytesTransfered));
@@ -206,8 +206,7 @@ public class TransferDataMonitor {
 		}
 		stringBuilder.append(" @ ");
 		stringBuilder.append(NumberFormatter.humanReadableByteCount((long) getAverageTransferRate()));
-		stringBuilder.append("/s)");
-		stringBuilder.append(" Remaining time: ");
+		stringBuilder.append("/s) Remaining time: ");
 		if (gzipCompression) {
 			stringBuilder.append("app. ");
 		}

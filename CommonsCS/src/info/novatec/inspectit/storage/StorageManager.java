@@ -178,9 +178,9 @@ public abstract class StorageManager {
 	 */
 	public String getHttpFileLocation(IStorageData storageData, Integer channelId) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("/");
+		sb.append('/');
 		sb.append(storageData.getId());
-		sb.append("/");
+		sb.append('/');
 		sb.append(channelId.intValue());
 		sb.append(StorageFileExtensions.DATA_FILE_EXT);
 		return sb.toString();
@@ -557,7 +557,7 @@ public abstract class StorageManager {
 				read += is.read(firsTwoBytes, read, 2 - read);
 			}
 			int head = ((int) firsTwoBytes[0] & 0xff) | ((firsTwoBytes[1] << 8) & 0xff00);
-			return (GZIPInputStream.GZIP_MAGIC == head);
+			return GZIPInputStream.GZIP_MAGIC == head;
 		} finally {
 			if (null != is) {
 				is.close();

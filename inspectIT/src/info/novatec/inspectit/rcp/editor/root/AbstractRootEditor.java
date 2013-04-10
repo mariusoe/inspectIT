@@ -300,7 +300,7 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 	 */
 	@Override
 	public void setFocus() {
-		if ((null != getActiveSubView()) && (null != getActiveSubView().getControl())) {
+		if (null != getActiveSubView() && null != getActiveSubView().getControl()) {
 			getActiveSubView().getControl().setFocus();
 		} else if (null != subView && null != subView.getControl()) {
 			subView.getControl().setFocus();

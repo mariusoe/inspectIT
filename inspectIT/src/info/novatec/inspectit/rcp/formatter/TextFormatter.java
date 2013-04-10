@@ -128,7 +128,7 @@ public final class TextFormatter {
 		}
 
 		builder.append(methodIdent.getMethodName());
-		builder.append("(");
+		builder.append('(');
 		builder.append(parameterText);
 		builder.append(") ");
 

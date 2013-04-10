@@ -359,7 +359,7 @@ public class BreadcrumbTitleComposite extends Composite implements CmrRepository
 			if (!fLTR) {
 				offset = -1;
 			}
-			drawImage(imageData, (width / 2) - (ARROW_SIZE / 2) + offset, (height / 2) - ARROW_SIZE - 1);
+			drawImage(imageData, width / 2 - ARROW_SIZE / 2 + offset, height / 2 - ARROW_SIZE - 1);
 
 			image.dispose();
 		}

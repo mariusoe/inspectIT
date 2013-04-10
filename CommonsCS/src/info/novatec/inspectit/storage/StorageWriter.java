@@ -356,11 +356,11 @@ public class StorageWriter implements IWriter {
 	 * Shutdown this storage writer. If finalize is true, {@link #finalizeWrite()} will be called in
 	 * addition.
 	 * 
-	 * @param finalize
+	 * @param doFinalize
 	 *            If {@link #finalizeWrite()} should be called and thus write indexing tree and
 	 *            other needed data.
 	 */
-	private synchronized void shutdown(boolean finalize) {
+	private synchronized void shutdown(boolean doFinalize) {
 		if (writingOn) {
 			// mark writing false so that no more task are created
 			writingOn = false;
@@ -374,7 +374,7 @@ public class StorageWriter implements IWriter {
 			// shut the executor
 			shutdownWritingExecutorService();
 
-			if (finalize) {
+			if (doFinalize) {
 				finalizeWrite();
 			}
 

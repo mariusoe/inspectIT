@@ -120,7 +120,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 		 * @return The appropriate column.
 		 */
 		public static Column fromOrd(int i) {
-			if ((i < 0) || (i >= Column.values().length)) {
+			if (i < 0 || i >= Column.values().length) {
 				throw new IndexOutOfBoundsException("Invalid ordinal");
 			}
 			return Column.values()[i];
@@ -341,7 +341,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 		}
 		exceptionSensorData.clear();
 
-		if ((null != exData)) {
+		if (null != exData) {
 			exceptionSensorData.addAll(exData);
 		}
 
@@ -481,7 +481,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			for (Column column : Column.values()) {
 				sb.append(getStyledTextForColumn(data, methodIdent, column).toString());
-				sb.append("\t");
+				sb.append('\t');
 			}
 			return sb.toString();
 		}

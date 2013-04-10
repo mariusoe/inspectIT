@@ -166,7 +166,7 @@ public class SearchControl {
 				int width = fontMetrics.getAverageCharWidth() * string.length();
 				int height = fontMetrics.getHeight();
 				e.gc.setForeground(color);
-				e.gc.drawString(string, (point.x - width - searchTextBox.getBorderWidth() - 2), (point.y - height - searchTextBox.getBorderWidth() * 2) / 2, true);
+				e.gc.drawString(string, point.x - width - searchTextBox.getBorderWidth() - 2, (point.y - height - searchTextBox.getBorderWidth() * 2) / 2, true);
 			}
 		});
 

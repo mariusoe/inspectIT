@@ -369,7 +369,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 				StringBuilder content = new StringBuilder();
 				content.append("Fully-Qualified Name: ");
 				content.append(data.getThrowableType());
-				content.append("\n");
+				content.append('\n');
 				if (rawMode) {
 					content.append("Constructor: ");
 					content.append(TextFormatter.getMethodWithParameters(methodIdent));
@@ -673,7 +673,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			for (Column column : Column.values()) {
 				sb.append(getStyledTextForColumn(data, methodIdent, column).toString());
-				sb.append("\t");
+				sb.append('\t');
 			}
 			return sb.toString();
 		}

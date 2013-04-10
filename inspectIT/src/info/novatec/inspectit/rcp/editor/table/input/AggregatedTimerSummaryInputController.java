@@ -281,7 +281,7 @@ public class AggregatedTimerSummaryInputController extends AbstractTableInputCon
 			StringBuilder sb = new StringBuilder();
 			for (Column column : Column.values()) {
 				sb.append(getStyledTextForColumn(data, column).toString());
-				sb.append("\t");
+				sb.append('\t');
 			}
 			return sb.toString();
 		}

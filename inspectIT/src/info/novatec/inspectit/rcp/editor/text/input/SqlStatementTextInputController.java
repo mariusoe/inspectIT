@@ -117,7 +117,7 @@ public class SqlStatementTextInputController extends AbstractTextInputController
 					char c = boldSql.charAt(i);
 					if ('?' == c) {
 						String parameter = dataToDisplay.getParameterValues().get(index);
-						if ((null == parameter) || "".equals(parameter.trim())) {
+						if (null == parameter || "".equals(parameter.trim())) {
 							stringBuilder.append(c);
 						} else {
 							stringBuilder.append(parameter);

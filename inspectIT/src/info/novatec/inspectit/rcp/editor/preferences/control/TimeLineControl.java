@@ -181,7 +181,7 @@ public class TimeLineControl implements IPreferenceControl {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (slider != null) {
-					if ((spinnerDays.getSelection() == 0) && (spinnerHours.getSelection() == 0)) {
+					if (spinnerDays.getSelection() == 0 && spinnerHours.getSelection() == 0) {
 						int value = spinnerMinutes.getSelection();
 						if (minutesValueMap.containsValue(value)) {
 							slider.setSelection(getKeyFromValue(minutesValueMap, value));
@@ -228,11 +228,11 @@ public class TimeLineControl implements IPreferenceControl {
 					spinnerMinutes.setSelection(mappingTable.get(value));
 					spinnerHours.setSelection(0);
 					spinnerDays.setSelection(0);
-				} else if ((value >= minuteAreaSize) && (value < hoursArea)) {
+				} else if (value >= minuteAreaSize && value < hoursArea) {
 					spinnerHours.setSelection(mappingTable.get(value));
 					spinnerMinutes.setSelection(0);
 					spinnerDays.setSelection(0);
-				} else if ((value >= hoursArea) && (value < daysArea)) {
+				} else if (value >= hoursArea && value < daysArea) {
 					spinnerDays.setSelection(mappingTable.get(value));
 					spinnerMinutes.setSelection(0);
 					spinnerHours.setSelection(0);

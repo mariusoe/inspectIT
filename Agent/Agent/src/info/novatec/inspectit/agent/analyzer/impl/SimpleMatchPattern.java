@@ -119,7 +119,8 @@ public class SimpleMatchPattern implements IMatchPattern {
 		// next check for required trailing text
 		int limit = components.length;
 		if (isTrailText) {
-			if (match.endsWith(components[--limit])) {
+			limit--;
+			if (match.endsWith(components[limit])) {
 				end -= components[limit].length();
 			} else {
 				return false;

@@ -121,8 +121,8 @@ public class ImportStorageInfoPage extends WizardPage {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				boolean callServices = !importLocally && cmrRepositoryDefinition.getOnlineStatus() != OnlineStatus.OFFLINE;
-				final List<StorageData> existingStorages = (callServices) ? cmrRepositoryDefinition.getStorageService().getExistingStorages() : Collections.<StorageData> emptyList();
-				final long spaceLeftOnCmr = (callServices) ? cmrRepositoryDefinition.getCmrManagementService().getCmrStatusData().getStorageDataSpaceLeft() : 0;
+				final List<StorageData> existingStorages = callServices ? cmrRepositoryDefinition.getStorageService().getExistingStorages() : Collections.<StorageData> emptyList();
+				final long spaceLeftOnCmr = callServices ? cmrRepositoryDefinition.getCmrManagementService().getCmrStatusData().getStorageDataSpaceLeft() : 0;
 
 				Display.getDefault().asyncExec(new Runnable() {
 					@Override

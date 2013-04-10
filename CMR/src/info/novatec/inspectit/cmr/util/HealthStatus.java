@@ -146,9 +146,9 @@ public class HealthStatus {
 		StringBuilder sb = new StringBuilder();
 		sb.append("System: ");
 		sb.append(name);
-		sb.append(" ");
+		sb.append(' ');
 		sb.append(version);
-		sb.append(" ");
+		sb.append(' ');
 		sb.append(arch);
 		sb.append(" (");
 		sb.append(availCpus);
@@ -185,10 +185,10 @@ public class HealthStatus {
 		// print first line
 		StringBuilder sb = new StringBuilder();
 		sb.append(START_END_CHAR);
-		sb.append("-");
+		sb.append('-');
 		sb.append(title);
 		for (int i = title.length() + 1; i < WIDTH; i++) {
-			sb.append("-");
+			sb.append('-');
 		}
 		sb.append(START_END_CHAR);
 		log.info(sb.toString());
@@ -197,11 +197,11 @@ public class HealthStatus {
 		sb = new StringBuilder();
 		sb.append(START_END_CHAR);
 		for (int i = 0; i < load; i++) {
-			sb.append("/");
+			sb.append('/');
 		}
 		// now fill up the remaining space
 		for (long i = load; i < WIDTH; i++) {
-			sb.append(" ");
+			sb.append(' ');
 		}
 		sb.append(START_END_CHAR);
 		log.info(sb.toString());
@@ -210,7 +210,7 @@ public class HealthStatus {
 		sb = new StringBuilder();
 		sb.append(START_END_CHAR);
 		for (int i = 0; i < WIDTH; i++) {
-			sb.append("-");
+			sb.append('-');
 		}
 		sb.append(START_END_CHAR);
 		log.info(sb.toString());
@@ -274,10 +274,10 @@ public class HealthStatus {
 			// print first line
 			StringBuilder sb = new StringBuilder();
 			sb.append(START_END_CHAR);
-			sb.append("-");
+			sb.append('-');
 			sb.append(title);
 			for (int i = title.length() + 1; i < WIDTH; i++) {
-				sb.append("-");
+				sb.append('-');
 			}
 
 			sb.append(START_END_CHAR);
@@ -287,21 +287,21 @@ public class HealthStatus {
 			sb = new StringBuilder();
 			sb.append(START_END_CHAR);
 			for (int i = 0; i < used; i++) {
-				sb.append("/");
+				sb.append('/');
 			}
 			long pos = used;
 			if (pos <= committed) {
 				// only print the char if committed is greater or equal than the
 				// current position.
 				for (long i = pos; i < committed; i++) {
-					sb.append(" ");
+					sb.append(' ');
 				}
-				sb.append("|");
+				sb.append('|');
 				pos = committed + 1L;
 			}
 			// now fill up the remaining space
 			for (long i = pos; i < WIDTH; i++) {
-				sb.append(" ");
+				sb.append(' ');
 			}
 
 			// only print last char if committed is smaller
@@ -314,7 +314,7 @@ public class HealthStatus {
 			sb = new StringBuilder();
 			sb.append(START_END_CHAR);
 			for (int i = 0; i < WIDTH; i++) {
-				sb.append("-");
+				sb.append('-');
 			}
 			sb.append(START_END_CHAR);
 			log.info(sb.toString());
@@ -383,10 +383,10 @@ public class HealthStatus {
 		// print first line
 		StringBuilder sb = new StringBuilder();
 		sb.append(START_END_CHAR);
-		sb.append("-");
+		sb.append('-');
 		sb.append(title);
 		for (int i = title.length() + 1; i < WIDTH; i++) {
-			sb.append("-");
+			sb.append('-');
 		}
 		sb.append(START_END_CHAR);
 		log.info(sb.toString());
@@ -395,10 +395,10 @@ public class HealthStatus {
 		sb = new StringBuilder();
 		sb.append(START_END_CHAR);
 		for (int i = 0; i < used; i++) {
-			sb.append("/");
+			sb.append('/');
 		}
 		for (int j = used; j < WIDTH; j++) {
-			sb.append(" ");
+			sb.append(' ');
 		}
 		sb.append(START_END_CHAR);
 		log.info(sb.toString());
@@ -407,7 +407,7 @@ public class HealthStatus {
 		sb = new StringBuilder();
 		sb.append(START_END_CHAR);
 		for (int i = 0; i < WIDTH; i++) {
-			sb.append("-");
+			sb.append('-');
 		}
 		sb.append(START_END_CHAR);
 		log.info(sb.toString());

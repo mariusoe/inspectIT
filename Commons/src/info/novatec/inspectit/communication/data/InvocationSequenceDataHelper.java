@@ -41,7 +41,7 @@ public final class InvocationSequenceDataHelper {
 		if (hasCapturedParametersInInvocationSequence(data)) {
 			return true;
 		}
-		return (hasTimerData(data) && null != data.getTimerData().getParameterContentData() && !data.getTimerData().getParameterContentData().isEmpty());
+		return hasTimerData(data) && null != data.getTimerData().getParameterContentData() && !data.getTimerData().getParameterContentData().isEmpty();
 	}
 
 	/**

@@ -80,13 +80,13 @@ public class PreparedStatementParameterHook implements IMethodHook {
 			threadLast.set(Boolean.FALSE);
 
 			List<String> parameterTypes = rsc.getParameterTypes();
-			if (METHOD_VALUE_MAP.containsKey(rsc.getTargetMethodName()) && (parameterTypes.size() >= 1) && "int".equals(parameterTypes.get(0))) {
+			if (METHOD_VALUE_MAP.containsKey(rsc.getTargetMethodName()) && parameterTypes.size() >= 1 && "int".equals(parameterTypes.get(0))) {
 				// subtract one as the index starts at 1, and not at 0
 				int index = ((Integer) parameters[0]).intValue() - 1;
 				Object value = METHOD_VALUE_MAP.get(rsc.getTargetMethodName());
 
 				statementStorage.addParameter(object, index, value);
-			} else if ((parameterTypes.size() >= 2) && "int".equals(parameterTypes.get(0))) {
+			} else if (parameterTypes.size() >= 2 && "int".equals(parameterTypes.get(0))) {
 				// subtract one as the index starts at 1, and not at 0
 				int index = ((Integer) parameters[0]).intValue() - 1;
 				Object value = parameters[1];

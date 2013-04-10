@@ -123,7 +123,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 		 * @return The appropriate column.
 		 */
 		public static Column fromOrd(int i) {
-			if ((i < 0) || (i >= Column.values().length)) {
+			if (i < 0 || i >= Column.values().length) {
 				throw new IndexOutOfBoundsException("Invalid ordinal");
 			}
 			return Column.values()[i];
@@ -240,12 +240,13 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 				} else if (!isStackTrace) {
 					stringBuilder = new StringBuilder(NO_ERROR_MESSAGE_PROVIDED + "\n");
 				} else {
-					stringBuilder.append("\n");
+					stringBuilder.append('\n');
 				}
 
 				if (isStackTrace) {
 					if (null != data.getStackTrace()) {
-						stringBuilder.append(data.getStackTrace() + "\n");
+						stringBuilder.append(data.getStackTrace());
+						stringBuilder.append('\n');
 					} else {
 						stringBuilder = new StringBuilder(STACK_TRACK_NOT_AVAILABLE + "\n");
 					}
@@ -472,7 +473,7 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 			StringBuilder sb = new StringBuilder();
 			for (Column column : Column.values()) {
 				sb.append(getStyledTextForColumn(data, column).toString());
-				sb.append("\t");
+				sb.append('\t');
 			}
 			return sb.toString();
 		}

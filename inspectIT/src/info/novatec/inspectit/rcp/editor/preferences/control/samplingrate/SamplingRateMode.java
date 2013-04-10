@@ -29,7 +29,7 @@ public enum SamplingRateMode implements ISamplingRateMode {
 		public <E extends DefaultData> List<E> adjustSamplingRate(List<E> defaultDataList, Date from, Date to, int samplingRate, IAggregator<E> aggregator) {
 			long timeframe = 0;
 
-			if ((samplingRate > 0) && (defaultDataList != null)) {
+			if (samplingRate > 0 && defaultDataList != null) {
 				timeframe = (to.getTime() - from.getTime()) / samplingRate;
 			} else {
 				return defaultDataList;
@@ -50,8 +50,8 @@ public enum SamplingRateMode implements ISamplingRateMode {
 				// find first data object which lies in the specified time range
 				if ((dataDate.getTime() == from.getTime() || dataDate.after(from)) && dataDate.before(to)) {
 					fromIndex = i;
-					timeframeStartTime = dataDate.getTime() - (timeframe / 2);
-					timeframeEndTime = dataDate.getTime() + (timeframe / 2);
+					timeframeStartTime = dataDate.getTime() - timeframe / 2;
+					timeframeEndTime = dataDate.getTime() + timeframe / 2;
 
 					if (i - 1 >= 0) {
 						// we add a data object so that the drawn graph does not start with the
@@ -89,7 +89,7 @@ public enum SamplingRateMode implements ISamplingRateMode {
 				}
 
 				// aggregate data objects only when toIndex changed
-				if ((toIndex >= 0) && (fromIndex <= toIndex)) {
+				if (toIndex >= 0 && fromIndex <= toIndex) {
 					// aggregate data and set the average time stamp
 					aggregationPerformer.reset();
 					// aggregation performer does not include toIndex to the aggregation

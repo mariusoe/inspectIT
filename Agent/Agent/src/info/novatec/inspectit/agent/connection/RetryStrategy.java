@@ -41,7 +41,7 @@ public abstract class RetryStrategy {
 	 * @return If we will retry the sending.
 	 */
 	public final boolean shouldRetry() {
-		return (0 < numberOfTriesLeft);
+		return 0 < numberOfTriesLeft;
 	}
 
 	/**

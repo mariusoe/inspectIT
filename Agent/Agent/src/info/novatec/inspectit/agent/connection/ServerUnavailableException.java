@@ -25,13 +25,13 @@ public class ServerUnavailableException extends Exception implements Externaliza
 	/**
 	 * {@inheritDoc}
 	 */
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+	public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void writeExternal(ObjectOutput out) throws IOException {
+	public void writeExternal(ObjectOutput output) throws IOException {
 	}
 
 }

@@ -89,12 +89,12 @@ public class DownloadStorageWizard extends Wizard implements INewWizard {
 			message.append(storageData.getName());
 			message.append("' (size: ");
 			message.append(NumberFormatter.formatBytesToMBytes(storageData.getDiskSize()));
-			message.append(")");
+			message.append(')');
 		} else {
 			message.append(storageDataProviders.size());
 			message.append(" storages (total size: ");
 			message.append(NumberFormatter.formatBytesToMBytes(totalSize));
-			message.append(")");
+			message.append(')');
 		}
 		storageCompressionWizardPage = new StorageCompressionWizardPage(title, message.toString());
 		addPage(storageCompressionWizardPage);

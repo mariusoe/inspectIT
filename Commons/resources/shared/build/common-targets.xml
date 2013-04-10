@@ -21,7 +21,7 @@
 		<ivy:settings file="${ivy.settings.file}" />
 		<!-- needed for Checkstyle, PMD & Findbugs -->
 		<ivy:cachepath pathid="path.checkstyle" organisation="com.puppycrawl.tools" module="checkstyle" revision="5.6" conf="default" inline="true" />
-		<ivy:cachepath pathid="path.pmd" organisation="pmd" module="pmd" revision="4.3" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.pmd" organisation="net.sourceforge.pmd" module="pmd" revision="5.0.5" conf="default" inline="true" />
 		<ivy:cachepath pathid="path.findbugs" organisation="com.google.code.findbugs" module="findbugs-ant" revision="2.0.0" conf="default" inline="true" />
 		<!-- Ingnore path missing warnings -->
 		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.pmd" />

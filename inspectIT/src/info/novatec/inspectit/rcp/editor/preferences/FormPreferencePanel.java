@@ -159,7 +159,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		innerComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		// only add buttons and some controls if the set is not empty
-		if ((null != preferenceSet) && !preferenceSet.isEmpty()) {
+		if (null != preferenceSet && !preferenceSet.isEmpty()) {
 			if (null != toolBarManager) {
 				createButtons(preferenceSet, toolBarManager);
 			}

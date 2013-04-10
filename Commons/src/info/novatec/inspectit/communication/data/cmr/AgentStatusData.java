@@ -41,6 +41,21 @@ public class AgentStatusData implements Serializable {
 	}
 
 	/**
+	 * {@link AgentConnection}.
+	 */
+	private AgentConnection agentConnection;
+
+	/**
+	 * Time in milliseconds when last data was sent.
+	 */
+	private long lastDataSendTimestamp;
+
+	/**
+	 * Current CMR time.
+	 */
+	private long serverTimestamp;
+
+	/**
 	 * No-arg constructor. Sets {@link #agentConnection} to {@link AgentConnection#NEVER_CONNECTED}.
 	 */
 	public AgentStatusData() {
@@ -56,21 +71,6 @@ public class AgentStatusData implements Serializable {
 	public AgentStatusData(AgentConnection agentConnection) {
 		this.agentConnection = agentConnection;
 	}
-
-	/**
-	 * {@link AgentConnection}.
-	 */
-	private AgentConnection agentConnection;
-
-	/**
-	 * Time in milliseconds when last data was sent.
-	 */
-	private long lastDataSendTimestamp;
-
-	/**
-	 * Current CMR time.
-	 */
-	private long serverTimestamp;
 
 	/**
 	 * Returns the information about how much milliseconds passed since last data sending for the

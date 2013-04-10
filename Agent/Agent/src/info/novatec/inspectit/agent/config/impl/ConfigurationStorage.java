@@ -133,7 +133,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 * {@inheritDoc}
 	 */
 	public final void setRepository(String host, int port) throws StorageException {
-		if ((null == host) || "".equals(host)) {
+		if (null == host || "".equals(host)) {
 			throw new StorageException("Repository host name cannot be null or empty!");
 		}
 
@@ -162,7 +162,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 * {@inheritDoc}
 	 */
 	public final void setAgentName(String name) throws StorageException {
-		if ((null == name) || "".equals(name)) {
+		if (null == name || "".equals(name)) {
 			throw new StorageException("Agent name cannot be null or empty!");
 		}
 
@@ -187,7 +187,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 * {@inheritDoc}
 	 */
 	public void setBufferStrategy(String clazzName, Map<String, String> settings) throws StorageException {
-		if ((null == clazzName) || "".equals(clazzName)) {
+		if (null == clazzName || "".equals(clazzName)) {
 			throw new StorageException("Buffer strategy class name cannot be null or empty!");
 		}
 
@@ -213,7 +213,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 * {@inheritDoc}
 	 */
 	public void addSendingStrategy(String clazzName, Map<String, String> settings) throws StorageException {
-		if ((null == clazzName) || "".equals(clazzName)) {
+		if (null == clazzName || "".equals(clazzName)) {
 			throw new StorageException("Sending strategy class name cannot be null or empty!");
 		}
 
@@ -245,11 +245,11 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 * {@inheritDoc}
 	 */
 	public void addMethodSensorType(String sensorTypeName, String sensorTypeClass, PriorityEnum priority, Map<String, Object> settings) throws StorageException {
-		if ((null == sensorTypeName) || "".equals(sensorTypeName)) {
+		if (null == sensorTypeName || "".equals(sensorTypeName)) {
 			throw new StorageException("Method sensor type name cannot be null or empty!");
 		}
 
-		if ((null == sensorTypeClass) || "".equals(sensorTypeClass)) {
+		if (null == sensorTypeClass || "".equals(sensorTypeClass)) {
 			throw new StorageException("Method sensor type class name cannot be null or empty!");
 		}
 
@@ -285,7 +285,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 * {@inheritDoc}
 	 */
 	public void addPlatformSensorType(String sensorTypeClass, Map<String, Object> settings) throws StorageException {
-		if ((null == sensorTypeClass) || "".equals(sensorTypeClass)) {
+		if (null == sensorTypeClass || "".equals(sensorTypeClass)) {
 			throw new StorageException("Platform sensor type class name cannot be null or empty!");
 		}
 
@@ -316,15 +316,15 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 */
 	public void addSensor(String sensorTypeName, String targetClassName, String targetMethodName, List<String> parameterList, boolean ignoreSignature, Map<String, Object> settings)
 			throws StorageException {
-		if ((null == sensorTypeName) || "".equals(sensorTypeName)) {
+		if (null == sensorTypeName || "".equals(sensorTypeName)) {
 			throw new StorageException("Sensor type name for the sensor cannot be null or empty!");
 		}
 
-		if ((null == targetClassName) || "".equals(targetClassName)) {
+		if (null == targetClassName || "".equals(targetClassName)) {
 			throw new StorageException("Target class name cannot be null or empty!");
 		}
 
-		if ((null == targetMethodName) || "".equals(targetMethodName)) {
+		if (null == targetMethodName || "".equals(targetMethodName)) {
 			throw new StorageException("Target method name cannot be null or empty!");
 		}
 
@@ -541,7 +541,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 * {@inheritDoc}
 	 */
 	public void addExceptionSensorType(String sensorTypeClass, Map<String, Object> settings) throws StorageException {
-		if ((null == sensorTypeClass) || "".equals(sensorTypeClass)) {
+		if (null == sensorTypeClass || "".equals(sensorTypeClass)) {
 			throw new StorageException("Exception sensor type class name cannot be null or empty!");
 		}
 
@@ -565,11 +565,11 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 * {@inheritDoc}
 	 */
 	public void addExceptionSensorTypeParameter(String sensorTypeName, String targetClassName, boolean isVirtual, Map<String, Object> settings) throws StorageException {
-		if ((null == sensorTypeName) || "".equals(sensorTypeName)) {
+		if (null == sensorTypeName || "".equals(sensorTypeName)) {
 			throw new StorageException("Sensor type name for the sensor cannot be null or empty!");
 		}
 
-		if ((null == targetClassName) || "".equals(targetClassName)) {
+		if (null == targetClassName || "".equals(targetClassName)) {
 			throw new StorageException("Target class name cannot be null or empty!");
 		}
 

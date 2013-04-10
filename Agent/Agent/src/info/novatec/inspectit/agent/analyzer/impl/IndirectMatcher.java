@@ -101,7 +101,7 @@ public class IndirectMatcher extends AbstractMatcher {
 
 		CtMethod[] methods = classPoolAnalyzer.getMethodsForClassName(classLoader, className);
 
-		if ((null != methods) && (methods.length > 0)) {
+		if (null != methods && methods.length > 0) {
 			List<CtMethod> matchingMethods = new ArrayList<CtMethod>();
 
 			for (CtMethod method : methods) {

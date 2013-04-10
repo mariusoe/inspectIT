@@ -429,7 +429,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 			StringBuilder uptimeText = new StringBuilder(NumberFormatter.humanReadableMillisCount(uptimeMillis, true));
 			uptimeText.append(" (started ");
 			uptimeText.append(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(started));
-			uptimeText.append(")");
+			uptimeText.append(')');
 			uptimeLabel.setText(uptimeText.toString());
 
 			// database info

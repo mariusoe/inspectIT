@@ -142,7 +142,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 				if (mappingObject.getIdentityHash().equals(identityHash)) {
 					// we have to check whether the Throwable object is just passed or explicitly
 					// rethrown
-					if ((null != exceptionHandlerId.get()) && (registeredMethodId == exceptionHandlerId.get().longValue())) {
+					if (null != exceptionHandlerId.get() && registeredMethodId == exceptionHandlerId.get().longValue()) {
 						// the Throwable object is explicitly rethrown
 						data.setExceptionEvent(ExceptionEvent.RETHROWN);
 					} else {

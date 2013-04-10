@@ -615,7 +615,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 			for (Column column : Column.values()) {
 				sb.append(getStyledTextForColumn(data, methodIdent, column).toString());
-				sb.append("\t");
+				sb.append('\t');
 			}
 			return sb.toString();
 		}

@@ -175,7 +175,8 @@ public class DataRetriever {
 					if (rangeDescriptor.getEnd() + 1 == descriptor.getPosition()) {
 						rangeDescriptor.setEnd(descriptor.getPosition() + descriptor.getSize() - 1);
 					} else {
-						rangeHeader.append(rangeDescriptor.toString() + ",");
+						rangeHeader.append(rangeDescriptor.toString());
+						rangeHeader.append(',');
 						rangeDescriptor = new RangeDescriptor(descriptor);
 					}
 				}

@@ -403,7 +403,7 @@ class HttpRequestParameterExtractor {
 					stringBuilder.append(Array.get(attribute, i));
 				}
 			}
-			stringBuilder.append("]");
+			stringBuilder.append(']');
 			return stringBuilder.toString();
 		} else {
 			return attribute.toString();

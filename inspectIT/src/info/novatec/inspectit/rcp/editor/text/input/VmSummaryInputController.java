@@ -386,7 +386,7 @@ public class VmSummaryInputController extends AbstractTextInputController {
 			// split vm name
 			String vmFullName = data.getVmName();
 			String[] vmNames = vmFullName.split("@");
-			if ((vmNames != null) && (vmNames.length > 1)) {
+			if (vmNames != null && vmNames.length > 1) {
 				processId = vmNames[0];
 				pcName = vmNames[1];
 			}
@@ -475,7 +475,7 @@ public class VmSummaryInputController extends AbstractTextInputController {
 
 			// showing vm arguments
 			for (VmArgumentData argumentData : treeSet) {
-				if (!argumentData.getVmName().endsWith("path") && (!argumentData.getVmName().endsWith("separator"))) {
+				if (!argumentData.getVmName().endsWith("path") && !argumentData.getVmName().endsWith("separator")) {
 					addItemToMinimizedSection(toolkit, VM_ARGS, argumentData.getVmName() + ":");
 					addItemToMinimizedSection(toolkit, VM_ARGS, argumentData.getVmValue());
 				}

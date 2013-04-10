@@ -381,12 +381,12 @@ public class SteppingTreeSubView extends TreeSubView {
 							if (visibleOccurrences > 0) {
 								expandToObject(selectedObject, ++occurrence);
 							}
-							if (!(visibleOccurrences > occurrence)) {
+							if (visibleOccurrences <= occurrence) {
 								next.setEnabled(false);
 							} else {
 								next.setEnabled(true);
 							}
-							if (!(occurrence > 1)) {
+							if (occurrence <= 1) {
 								previous.setEnabled(false);
 							} else {
 								previous.setEnabled(true);
@@ -404,10 +404,10 @@ public class SteppingTreeSubView extends TreeSubView {
 				@Override
 				public void handleEvent(Event event) {
 					expandToObject(selectedObject, ++occurrence);
-					if (!(visibleOccurrences > occurrence)) {
+					if (visibleOccurrences <= occurrence) {
 						next.setEnabled(false);
 					}
-					if (!(occurrence > 1)) {
+					if (occurrence <= 1) {
 						previous.setEnabled(false);
 					} else {
 						previous.setEnabled(true);
@@ -421,7 +421,7 @@ public class SteppingTreeSubView extends TreeSubView {
 				public void handleEvent(Event event) {
 					expandToObject(selectedObject, --occurrence);
 					next.setEnabled(true);
-					if (!(occurrence > 1)) {
+					if (occurrence <= 1) {
 						previous.setEnabled(false);
 					}
 					updateInfoBox();

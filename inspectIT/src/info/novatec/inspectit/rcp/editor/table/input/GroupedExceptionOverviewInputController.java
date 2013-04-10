@@ -121,7 +121,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 		 * @return The appropriate column.
 		 */
 		public static Column fromOrd(int i) {
-			if ((i < 0) || (i >= Column.values().length)) {
+			if (i < 0 || i >= Column.values().length) {
 				throw new IndexOutOfBoundsException("Invalid ordinal");
 			}
 			return Column.values()[i];
@@ -326,7 +326,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 			groupedOverviewList.add(data);
 		}
 
-		if ((null != groupedOverviewList)) {
+		if (null != groupedOverviewList) {
 			exceptionSensorDataList.clear();
 			monitor.subTask("Displaying the Exception Overview");
 			exceptionSensorDataList.addAll(groupedOverviewList);
@@ -484,7 +484,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 			StringBuilder sb = new StringBuilder();
 			for (Column column : Column.values()) {
 				sb.append(getStyledTextForColumn(data, column).toString());
-				sb.append("\t");
+				sb.append('\t');
 			}
 			return sb.toString();
 		}

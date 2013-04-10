@@ -103,7 +103,9 @@ public class RemotingExporter implements BeanFactoryPostProcessor {
 		for (String beanName : beanFactory.getBeanDefinitionNames()) {
 			BeanDefinition beanDef = beanFactory.getBeanDefinition(beanName);
 			if (beanDef.isAbstract()) {
-				LOG.debug("|- RemoteExporter: Skipping abstract Bean '" + beanName + "'");
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("|- RemoteExporter: Skipping abstract Bean '" + beanName + "'");
+				}
 				continue;
 			}
 
@@ -117,7 +119,9 @@ public class RemotingExporter implements BeanFactoryPostProcessor {
 			}
 
 			if (serviceInterface != null) {
-				LOG.debug("|- RemoteExporter: Found service Bean with name '" + beanName + "' and interface " + serviceInterface);
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("|- RemoteExporter: Found service Bean with name '" + beanName + "' and interface " + serviceInterface);
+				}
 
 				// creating the bean definition so that the bean is registered in the spring
 				// container
@@ -155,9 +159,13 @@ public class RemotingExporter implements BeanFactoryPostProcessor {
 				BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 				registry.registerBeanDefinition(getNameForExporterBean(beanName, annotation), definition);
 
-				LOG.debug("|- RemoteExporter: Registered new Bean: " + beanName + "Exporter");
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("|- RemoteExporter: Registered new Bean: " + beanName + "Exporter");
+				}
 			} else {
-				LOG.debug("|- RemoteExporter: Skipping Bean because no remotable interface was found '" + beanName + "'");
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("|- RemoteExporter: Skipping Bean because no remotable interface was found '" + beanName + "'");
+				}
 			}
 		}
 	}

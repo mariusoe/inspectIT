@@ -162,7 +162,7 @@ public class MethodLogInterceptor {
 		builder.append(Character.toUpperCase(first.charAt(0)));
 		builder.append(first.substring(1));
 		for (int i = 1; i < r.length; i++) {
-			builder.append(" ");
+			builder.append(' ');
 			builder.append(r[i]);
 		}
 

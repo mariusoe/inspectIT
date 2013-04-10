@@ -90,7 +90,7 @@ public final class NumberFormatter {
 		builder.append(minutes);
 		builder.append("m ");
 		builder.append(seconds);
-		builder.append("s");
+		builder.append('s');
 
 		return builder.toString();
 	}
@@ -289,7 +289,7 @@ public final class NumberFormatter {
 		long days = TimeUnit.MILLISECONDS.toDays(millis);
 		if (days > 0) {
 			if (shortDescription) {
-				return days + " day" + ((days > 1) ? "s" : "");
+				return days + " day" + (days > 1 ? "s" : "");
 			}
 			stringBuilder.append(String.format("%dd", days));
 			started = true;
@@ -300,7 +300,7 @@ public final class NumberFormatter {
 			stringBuilder.append(String.format(" %dh", hours));
 		} else if (hours > 0) {
 			if (shortDescription) {
-				return hours + " hour" + ((hours > 1) ? "s" : "");
+				return hours + " hour" + (hours > 1 ? "s" : "");
 			}
 			stringBuilder.append(String.format("%dh", hours));
 			started = true;
@@ -311,7 +311,7 @@ public final class NumberFormatter {
 			stringBuilder.append(String.format(" %dm", min));
 		} else if (min > 0) {
 			if (shortDescription) {
-				return min + " minute" + ((min > 1) ? "s" : "");
+				return min + " minute" + (min > 1 ? "s" : "");
 			}
 			stringBuilder.append(String.format("%dm", min));
 			started = true;
@@ -322,7 +322,7 @@ public final class NumberFormatter {
 			stringBuilder.append(String.format(" %ds", sec));
 		} else if (sec > 0) {
 			if (shortDescription) {
-				return sec + " second" + ((sec > 1) ? "s" : "");
+				return sec + " second" + (sec > 1 ? "s" : "");
 			}
 			stringBuilder.append(String.format("%ds", sec));
 			started = true;

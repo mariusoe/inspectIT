@@ -129,7 +129,7 @@ public class WeakList<T> extends AbstractList<T> {
 	 * TODO: call this method periodically!
 	 */
 	public void removeAllNullElements() {
-		for (int i = size(); i-- > 0;) {
+		for (int i = size() - 1; i >= 0; i--) {
 			if (get(i) == null) {
 				remove(i);
 			}

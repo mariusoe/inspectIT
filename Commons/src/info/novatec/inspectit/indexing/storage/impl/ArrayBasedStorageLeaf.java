@@ -166,7 +166,8 @@ public class ArrayBasedStorageLeaf<E extends DefaultData> implements IStorageTre
 			SimpleStorageDescriptor[] oldDescriptors = descriptorArray;
 
 			// ensure space and increase size
-			if (size++ == capacity) {
+			size++;
+			if (size == capacity) {
 				capacity *= 2;
 				idArray = new long[capacity];
 				descriptorArray = new SimpleStorageDescriptor[capacity];

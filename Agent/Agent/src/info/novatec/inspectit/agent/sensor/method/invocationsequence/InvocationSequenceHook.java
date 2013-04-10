@@ -203,7 +203,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 				}
 			}
 
-			if ((methodId == invocationStartId.get().longValue()) && (0 == invocationStartIdCount.get().longValue())) {
+			if (methodId == invocationStartId.get().longValue() && 0 == invocationStartIdCount.get().longValue()) {
 				double endTime = timeStack.pop().doubleValue();
 				double startTime = timeStack.pop().doubleValue();
 				double duration = endTime - startTime;

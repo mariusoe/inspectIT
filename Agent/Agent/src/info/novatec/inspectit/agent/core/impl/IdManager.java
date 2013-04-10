@@ -153,7 +153,7 @@ public class IdManager implements IIdManager, Startable {
 	 * {@inheritDoc}
 	 */
 	public boolean isPlatformRegistered() {
-		return (-1 != platformId);
+		return -1 != platformId;
 	}
 
 	/**
