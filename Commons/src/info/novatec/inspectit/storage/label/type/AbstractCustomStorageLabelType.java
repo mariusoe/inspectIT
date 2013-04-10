@@ -112,10 +112,10 @@ public abstract class AbstractCustomStorageLabelType<V> extends AbstractStorageL
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
+		int result = super.hashCode();
+		result = prime * result + ((imageKey == null) ? 0 : imageKey.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + (onePerStorage ? 1231 : 1237);
-		result = prime * result + ((imageKey == null) ? 0 : imageKey.hashCode());
 		return result;
 	}
 
@@ -127,13 +127,20 @@ public abstract class AbstractCustomStorageLabelType<V> extends AbstractStorageL
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
+		if (!super.equals(obj)) {
 			return false;
 		}
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		AbstractCustomStorageLabelType<?> other = (AbstractCustomStorageLabelType<?>) obj;
+		if (imageKey == null) {
+			if (other.imageKey != null) {
+				return false;
+			}
+		} else if (!imageKey.equals(other.imageKey)) {
+			return false;
+		}
 		if (name == null) {
 			if (other.name != null) {
 				return false;
@@ -142,13 +149,6 @@ public abstract class AbstractCustomStorageLabelType<V> extends AbstractStorageL
 			return false;
 		}
 		if (onePerStorage != other.onePerStorage) {
-			return false;
-		}
-		if (imageKey == null) {
-			if (other.imageKey != null) {
-				return false;
-			}
-		} else if (!imageKey.equals(other.imageKey)) {
 			return false;
 		}
 		return true;

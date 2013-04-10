@@ -3,6 +3,7 @@ package info.novatec.inspectit.indexing.indexer.impl;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.ITreeComponent;
+import info.novatec.inspectit.indexing.indexer.AbstractSharedInstanceBranchIndexer;
 import info.novatec.inspectit.indexing.indexer.IBranchIndexer;
 
 /**
@@ -13,7 +14,7 @@ import info.novatec.inspectit.indexing.indexer.IBranchIndexer;
  * 
  * @param <E>
  */
-public class ObjectTypeIndexer<E extends DefaultData> implements IBranchIndexer<E> {
+public class ObjectTypeIndexer<E extends DefaultData> extends AbstractSharedInstanceBranchIndexer<E> implements IBranchIndexer<E> {
 
 	/**
 	 * {@inheritDoc}
@@ -42,43 +43,6 @@ public class ObjectTypeIndexer<E extends DefaultData> implements IBranchIndexer<
 	 * {@inheritDoc}
 	 */
 	public boolean sharedInstance() {
-		return true;
-	}
-
-	/**
-	 * Not supported.
-	 * 
-	 * @return Not supported.
-	 */
-	public IBranchIndexer<E> getNewInstance() {
-		throw new UnsupportedOperationException("Branch indexer can not return new instance because it uses the shared one.");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + this.getClass().hashCode();
-		return result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
 		return true;
 	}
 

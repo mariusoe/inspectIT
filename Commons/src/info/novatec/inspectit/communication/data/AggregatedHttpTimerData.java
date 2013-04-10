@@ -25,13 +25,14 @@ public class AggregatedHttpTimerData extends HttpTimerData implements IIdsAwareA
 	 * is not available in Java5). The values in this map should always be the {@link Boolean#TRUE}
 	 * since the keys are only values we are interested in.
 	 */
+	@SuppressWarnings("CPD-START")
 	private Map<Long, Boolean> aggregatedIds = new ConcurrentHashMap<Long, Boolean>(16, 0.75f, 4);
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void aggregate(HttpTimerData data) {
-		this.aggregateTimerData(data);
+		this.aggregateHttpTimerData(data);
 		if (data instanceof AggregatedHttpTimerData) {
 			AggregatedHttpTimerData aggregatedData = (AggregatedHttpTimerData) data;
 			if (null != aggregatedData.getAggregatedIds()) {
@@ -65,6 +66,16 @@ public class AggregatedHttpTimerData extends HttpTimerData implements IIdsAwareA
 	 */
 	public HttpTimerData getData() {
 		return this;
+	}
+
+	/**
+	 * Aggregates the {@link HttpTimerData}.
+	 * 
+	 * @param data
+	 *            {@link HttpTimerData}
+	 */
+	public void aggregateHttpTimerData(HttpTimerData data) {
+		super.aggregateTimerData(data);
 	}
 
 	/**

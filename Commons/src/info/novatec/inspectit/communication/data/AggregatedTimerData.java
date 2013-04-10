@@ -25,6 +25,7 @@ public class AggregatedTimerData extends TimerData implements IIdsAwareAggregate
 	 * is not available in Java5). The values in this map should always be the {@link Boolean#TRUE}
 	 * since the keys are only values we are interested in.
 	 */
+	@SuppressWarnings("CPD-START")
 	private Map<Long, Boolean> aggregatedIds = new ConcurrentHashMap<Long, Boolean>(16, 0.75f, 4);
 
 	/**

@@ -13,7 +13,7 @@ import com.google.common.base.Objects;
  * @author Ivan Senic
  * 
  */
-public class FilteredDeferedPackageComposite extends DeferredPackageComposite {
+public class FilteredDeferredPackageComposite extends DeferredPackageComposite {
 
 	/**
 	 * Sensor to show.
@@ -24,7 +24,7 @@ public class FilteredDeferedPackageComposite extends DeferredPackageComposite {
 	 * @param sensorTypeEnum
 	 *            Set the sensor type to show.
 	 */
-	public FilteredDeferedPackageComposite(SensorTypeEnum sensorTypeEnum) {
+	public FilteredDeferredPackageComposite(SensorTypeEnum sensorTypeEnum) {
 		this.sensorTypeEnumToShow = sensorTypeEnum;
 	}
 
@@ -77,7 +77,7 @@ public class FilteredDeferedPackageComposite extends DeferredPackageComposite {
 		if (!super.equals(object)) {
 			return false;
 		}
-		FilteredDeferedPackageComposite that = (FilteredDeferedPackageComposite) object;
+		FilteredDeferredPackageComposite that = (FilteredDeferredPackageComposite) object;
 		return Objects.equal(this.sensorTypeEnumToShow, that.sensorTypeEnumToShow);
 	}
 

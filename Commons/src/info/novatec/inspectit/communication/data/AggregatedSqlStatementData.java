@@ -25,13 +25,14 @@ public class AggregatedSqlStatementData extends SqlStatementData implements IIds
 	 * is not available in Java5). The values in this map should always be the {@link Boolean#TRUE}
 	 * since the keys are only values we are interested in.
 	 */
+	@SuppressWarnings("CPD-START")
 	private Map<Long, Boolean> aggregatedIds = new ConcurrentHashMap<Long, Boolean>(16, 0.75f, 4);
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void aggregate(SqlStatementData data) {
-		this.aggregateTimerData(data);
+		this.aggregateSqlStatementData(data);
 		if (data instanceof AggregatedSqlStatementData) {
 			AggregatedSqlStatementData aggregatedData = (AggregatedSqlStatementData) data;
 			if (null != aggregatedData.getAggregatedIds()) {
@@ -65,6 +66,16 @@ public class AggregatedSqlStatementData extends SqlStatementData implements IIds
 	 */
 	public SqlStatementData getData() {
 		return this;
+	}
+
+	/**
+	 * Aggregates the {@link SqlStatementData}.
+	 * 
+	 * @param data
+	 *            {@link SqlStatementData}
+	 */
+	public void aggregateSqlStatementData(SqlStatementData data) {
+		super.aggregateTimerData(data);
 	}
 
 	/**

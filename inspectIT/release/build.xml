@@ -261,15 +261,6 @@
 			</findbugs.path>
 		</execute-findbugs>
 
-		<!-- Prepare CPD -->
-		<fileset dir="${src.root}" includes="**/*.java" id="cpd.fileset" />
-
-		<execute-cpd build.qa.analysis.cpd="${build.qa.analysis.cpd}">
-			<cpd.fileset>
-				<fileset refid="cpd.fileset" />
-			</cpd.fileset>
-		</execute-cpd>
-
 		<!-- Fail on warnings -->
 		<antcall target="static-analysis-fail-on-warnings" inheritrefs="true" />
 	</target>

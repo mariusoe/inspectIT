@@ -197,7 +197,7 @@
 			<exclude name="info/novatec/inspectit/**/test/**" />
 		</fileset>
 			
-		<execute-cpd build.qa.analysis.cpd="${build.qa.analysis.cpd}">
+		<execute-cpd build.qa.analysis="${build.qa.analysis}" build.qa.analysis.cpd="${build.qa.analysis.cpd}">
 			<cpd.fileset>
 				<fileset refid="cpd.fileset" />
 			</cpd.fileset>

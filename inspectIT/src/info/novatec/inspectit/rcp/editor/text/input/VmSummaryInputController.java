@@ -122,11 +122,6 @@ public class VmSummaryInputController extends AbstractTextInputController {
 	private ThreadInformationData threadObj;
 
 	/**
-	 * The {@link HashMap} containing the different sections.
-	 */
-	private Map<String, Composite> sections = new HashMap<String, Composite>();
-
-	/**
 	 * The {@link HashMap} containing the minimized sections.
 	 */
 	private Map<String, Composite> minimizedSections = new HashMap<String, Composite>();
@@ -511,51 +506,6 @@ public class VmSummaryInputController extends AbstractTextInputController {
 			addItemToSection(toolkit, SECTION_OS, NOT_AVAILABLE, minInformationColumnWidth);
 			addItemToSection(toolkit, SECTION_OS, "Architecture: ", minTitleColumnWidth);
 			addItemToSection(toolkit, SECTION_OS, NOT_AVAILABLE, minInformationColumnWidth);
-		}
-	}
-
-	/**
-	 * Adds a section to bundle some content.
-	 * 
-	 * @param parent
-	 *            The parent used to draw the elements to.
-	 * @param toolkit
-	 *            The form toolkit.
-	 * @param sectionTitle
-	 *            The section title
-	 */
-	private void addSection(Composite parent, FormToolkit toolkit, String sectionTitle) {
-		Section section = toolkit.createSection(parent, Section.TITLE_BAR);
-		section.setText(sectionTitle);
-		section.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		Composite sectionComposite = toolkit.createComposite(section);
-		GridLayout gridLayout = new GridLayout(4, false);
-		gridLayout.marginLeft = 5;
-		gridLayout.marginTop = 5;
-		sectionComposite.setLayout(gridLayout);
-		section.setClient(sectionComposite);
-
-		if (!sections.containsKey(sectionTitle)) {
-			sections.put(sectionTitle, sectionComposite);
-		}
-	}
-
-	/**
-	 * Adds an item to the specified section.
-	 * 
-	 * @param toolkit
-	 *            The form toolkit.
-	 * @param sectionTitle
-	 *            The section title.
-	 * @param text
-	 *            The text which will be shown.
-	 * @param minColumnWidth
-	 *            the minimum width of the column.
-	 */
-	private void addItemToSection(FormToolkit toolkit, String sectionTitle, String text, int minColumnWidth) {
-		if (sections.containsKey(sectionTitle)) {
-			Label label = toolkit.createLabel(sections.get(sectionTitle), text, SWT.LEFT);
-			label.setLayoutData(new GridData(minColumnWidth, SWT.DEFAULT));
 		}
 	}
 

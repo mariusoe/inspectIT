@@ -315,11 +315,11 @@ public class BufferProperties {
 			String typeOfMemory = argument.substring(index + number.length());
 
 			double value = Double.parseDouble(number);
-			if (typeOfMemory.equalsIgnoreCase("K")) {
+			if ("K".equalsIgnoreCase(typeOfMemory)) {
 				value *= 1024;
-			} else if (typeOfMemory.equalsIgnoreCase("M")) {
+			} else if ("M".equalsIgnoreCase(typeOfMemory)) {
 				value *= 1024 * 1024;
-			} else if (typeOfMemory.equalsIgnoreCase("G")) {
+			} else if ("G".equalsIgnoreCase(typeOfMemory)) {
 				value *= 1024 * 1024 * 1024;
 			} else {
 				value *= 1;

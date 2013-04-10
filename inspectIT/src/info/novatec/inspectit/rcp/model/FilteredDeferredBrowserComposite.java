@@ -8,7 +8,7 @@ import com.google.common.base.Objects;
 
 /**
  * Filtered package composite delegates the children creation to the
- * {@link FilteredDeferedPackageComposite}.
+ * {@link FilteredDeferredPackageComposite}.
  * 
  * @author Ivan Senic
  * 
@@ -33,7 +33,7 @@ public class FilteredDeferredBrowserComposite extends DeferredBrowserComposite {
 	 */
 	@Override
 	protected DeferredPackageComposite getNewChild() {
-		return new FilteredDeferedPackageComposite(sensorTypeEnumToShow);
+		return new FilteredDeferredPackageComposite(sensorTypeEnumToShow);
 	}
 
 	/**

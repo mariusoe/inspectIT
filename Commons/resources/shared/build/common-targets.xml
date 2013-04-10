@@ -22,7 +22,7 @@
 		<ivy:settings file="${ivy.settings.file}" />
 		<!-- needed for Checkstyle, PMD & Findbugs -->
 		<ivy:cachepath pathid="path.checkstyle" organisation="com.puppycrawl.tools" module="checkstyle" revision="5.6" conf="default" inline="true" />
-		<ivy:cachepath pathid="path.pmd" organisation="net.sourceforge.pmd" module="pmd" revision="5.0.5" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.pmd" organisation="net.sourceforge.pmd" module="pmd" revision="5.1.0" conf="default" inline="true" />
 		<ivy:cachepath pathid="path.findbugs" organisation="com.google.code.findbugs" module="findbugs-ant" revision="2.0.0" conf="default" inline="true" />
 		<!-- Ingnore path missing warnings -->
 		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="path.pmd" />
@@ -263,6 +263,7 @@
 
 	<!-- C P D -->
 	<macrodef name="execute-cpd">
+		<attribute name="build.qa.analysis" description="Main QA folder" />
 		<attribute name="build.qa.analysis.cpd" description="CPD QA folder" />
 		<element name="cpd.fileset" description="File set to analyse" />
 		<sequential>
@@ -271,6 +272,7 @@
 			<cpd format="xml" language="java" minimumTokenCount="100" outputFile="@{build.qa.analysis.cpd}/cpd.xml">
 				<cpd.fileset />
 			</cpd>
+			<xslt in="@{build.qa.analysis.cpd}/cpd.xml" style="${cpd.report.file}" out="@{build.qa.analysis}/cpd.html" />
 		</sequential>
 	</macrodef>
 
