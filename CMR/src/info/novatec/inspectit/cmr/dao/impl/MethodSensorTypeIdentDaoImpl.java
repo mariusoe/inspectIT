@@ -82,12 +82,10 @@ public class MethodSensorTypeIdentDaoImpl extends HibernateDaoSupport implements
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public List<MethodSensorTypeIdent> findByExample(MethodSensorTypeIdent methodSensorTypeIdent) {
+	public List<MethodSensorTypeIdent> findByExample(long platformId, MethodSensorTypeIdent methodSensorTypeIdent) {
 		DetachedCriteria detachedCriteria = DetachedCriteria.forClass(methodSensorTypeIdent.getClass());
 		detachedCriteria.add(Example.create(methodSensorTypeIdent));
-		if (null != methodSensorTypeIdent.getPlatformIdent()) {
-			detachedCriteria.add(Restrictions.eq("platformIdent", methodSensorTypeIdent.getPlatformIdent()));
-		}
+		detachedCriteria.add(Restrictions.eq("platformIdent.id", platformId));
 		detachedCriteria.setResultTransformer(DetachedCriteria.DISTINCT_ROOT_ENTITY);
 		return getHibernateTemplate().findByCriteria(detachedCriteria);
 	}

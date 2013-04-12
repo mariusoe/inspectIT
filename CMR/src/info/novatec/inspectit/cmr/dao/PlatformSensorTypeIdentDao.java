@@ -27,13 +27,15 @@ public interface PlatformSensorTypeIdentDao {
 	/**
 	 * Execute a findByExample query against the underlying storage.
 	 * 
+	 * @param platformId
+	 *            Platform ID sensor should be bound to.
 	 * @param platformSensorTypeIdent
 	 *            The {@link PlatformSensorTypeIdent} object which serves as the example.
 	 * @return The list of {@link PlatformSensorTypeIdent} objects which have the same contents as
 	 *         the passed example object.
 	 * @see HibernateTemplate#findByExample(Object)
 	 */
-	List<PlatformSensorTypeIdent> findByExample(PlatformSensorTypeIdent platformSensorTypeIdent);
+	List<PlatformSensorTypeIdent> findByExample(long platformId, PlatformSensorTypeIdent platformSensorTypeIdent);
 
 	/**
 	 * Saves or updates this {@link PlatformSensorTypeIdent} in the underlying storage.

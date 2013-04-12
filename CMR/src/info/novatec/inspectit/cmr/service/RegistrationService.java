@@ -179,8 +179,6 @@ public class RegistrationService implements IRegistrationService {
 	@Transactional
 	@MethodLog
 	public long registerMethodIdent(long platformId, String packageName, String className, String methodName, List<String> parameterTypes, String returnType, int modifiers) throws RemoteException {
-		PlatformIdent platformIdent = platformIdentDao.load(platformId);
-
 		MethodIdent methodIdent = new MethodIdent();
 		methodIdent.setPackageName(packageName);
 		methodIdent.setClassName(className);
@@ -192,16 +190,18 @@ public class RegistrationService implements IRegistrationService {
 		methodIdent.setReturnType(returnType);
 		methodIdent.setModifiers(modifiers);
 
-		List<MethodIdent> methodIdents = methodIdentDao.findForPlatformIdent(platformIdent, methodIdent);
+		List<MethodIdent> methodIdents = methodIdentDao.findForPlatformIdent(platformId, methodIdent);
 		if (1 == methodIdents.size()) {
 			methodIdent = methodIdents.get(0);
+		} else {
+			PlatformIdent platformIdent = platformIdentDao.load(platformId);
+			methodIdent.setPlatformIdent(platformIdent);
 		}
 
 		// always update the time stamp, no matter if this is an old or new
 		// record.
 		methodIdent.setTimeStamp(new Timestamp(GregorianCalendar.getInstance().getTimeInMillis()));
 
-		methodIdent.setPlatformIdent(platformIdent);
 		methodIdentDao.saveOrUpdate(methodIdent);
 
 		return methodIdent.getId();
@@ -213,25 +213,26 @@ public class RegistrationService implements IRegistrationService {
 	@Transactional
 	@MethodLog
 	public long registerMethodSensorTypeIdent(long platformId, String fullyQualifiedClassName, Map<String, Object> parameters) throws RemoteException {
-		PlatformIdent platformIdent = platformIdentDao.load(platformId);
-
 		MethodSensorTypeIdent methodSensorTypeIdent = new MethodSensorTypeIdent();
 		methodSensorTypeIdent.setFullyQualifiedClassName(fullyQualifiedClassName);
-		methodSensorTypeIdent.setPlatformIdent(platformIdent);
 
-		List<MethodSensorTypeIdent> methodSensorTypeIdents = methodSensorTypeIdentDao.findByExample(methodSensorTypeIdent);
+		List<MethodSensorTypeIdent> methodSensorTypeIdents = methodSensorTypeIdentDao.findByExample(platformId, methodSensorTypeIdent);
 		if (1 == methodSensorTypeIdents.size()) {
 			methodSensorTypeIdent = methodSensorTypeIdents.get(0);
-		}
+		} else {
+			// only if the new sensor is register we need to update the platform ident
+			PlatformIdent platformIdent = platformIdentDao.load(platformId);
+			methodSensorTypeIdent.setPlatformIdent(platformIdent);
 
-		Set<SensorTypeIdent> sensorTypeIdents = platformIdent.getSensorTypeIdents();
-		sensorTypeIdents.add(methodSensorTypeIdent);
+			Set<SensorTypeIdent> sensorTypeIdents = platformIdent.getSensorTypeIdents();
+			sensorTypeIdents.add(methodSensorTypeIdent);
+
+			platformIdentDao.saveOrUpdate(platformIdent);
+		}
 
 		methodSensorTypeIdent.setSettings(parameters);
 
 		methodSensorTypeIdentDao.saveOrUpdate(methodSensorTypeIdent);
-		platformIdentDao.saveOrUpdate(platformIdent);
-
 		return methodSensorTypeIdent.getId();
 	}
 
@@ -260,22 +261,24 @@ public class RegistrationService implements IRegistrationService {
 	@Transactional
 	@MethodLog
 	public long registerPlatformSensorTypeIdent(long platformId, String fullyQualifiedClassName) throws RemoteException {
-		PlatformIdent platformIdent = platformIdentDao.load(platformId);
-
 		PlatformSensorTypeIdent platformSensorTypeIdent = new PlatformSensorTypeIdent();
 		platformSensorTypeIdent.setFullyQualifiedClassName(fullyQualifiedClassName);
-		platformSensorTypeIdent.setPlatformIdent(platformIdent);
 
-		List<PlatformSensorTypeIdent> platformSensorTypeIdents = platformSensorTypeIdentDao.findByExample(platformSensorTypeIdent);
+		List<PlatformSensorTypeIdent> platformSensorTypeIdents = platformSensorTypeIdentDao.findByExample(platformId, platformSensorTypeIdent);
+		PlatformIdent platformIdent;
 		if (1 == platformSensorTypeIdents.size()) {
 			platformSensorTypeIdent = platformSensorTypeIdents.get(0);
+		} else {
+			// only if it s not registered we need updating
+			platformIdent = platformIdentDao.load(platformId);
+			platformSensorTypeIdent.setPlatformIdent(platformIdent);
+
+			Set<SensorTypeIdent> sensorTypeIdents = platformIdent.getSensorTypeIdents();
+			sensorTypeIdents.add(platformSensorTypeIdent);
+
+			platformSensorTypeIdentDao.saveOrUpdate(platformSensorTypeIdent);
+			platformIdentDao.saveOrUpdate(platformIdent);
 		}
-
-		Set<SensorTypeIdent> sensorTypeIdents = platformIdent.getSensorTypeIdents();
-		sensorTypeIdents.add(platformSensorTypeIdent);
-
-		platformSensorTypeIdentDao.saveOrUpdate(platformSensorTypeIdent);
-		platformIdentDao.saveOrUpdate(platformIdent);
 
 		return platformSensorTypeIdent.getId();
 	}

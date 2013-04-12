@@ -7,7 +7,7 @@
 		</id>
 
 		<discriminator>
-			<column name="discriminator" />
+			<column name="discriminator" index="label_type_discriminator_idx"/>
 		</discriminator>
 
 		<subclass name="info.novatec.inspectit.storage.label.type.impl.AssigneeLabelType" discriminator-value="ASLT" />

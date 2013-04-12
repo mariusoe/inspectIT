@@ -8,8 +8,8 @@
 			</generator>
 		</id>
 
-		<property name="platformIdent" column="platform_ident" />
-		<property name="sensorTypeIdent" column="sensor_type_ident" />
-		<property name="timeStamp" column="time_stamp" index="time_stamp_idx" />
+		<property name="platformIdent" column="platform_ident" index="platform_ident_idx"/>
+		<property name="sensorTypeIdent" column="sensor_type_ident" index="sensor_type_ident_idx"/>
+		<property name="timeStamp" column="time_stamp" />
 	</class>
 </hibernate-mapping>

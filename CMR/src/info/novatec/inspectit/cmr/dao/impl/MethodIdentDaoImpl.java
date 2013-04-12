@@ -99,7 +99,7 @@ public class MethodIdentDaoImpl extends HibernateDaoSupport implements MethodIde
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public List<MethodIdent> findForPlatformIdent(PlatformIdent platformIdent, MethodIdent methodIdentExample) {
+	public List<MethodIdent> findForPlatformIdent(long platformId, MethodIdent methodIdentExample) {
 		DetachedCriteria methodCriteria = DetachedCriteria.forClass(MethodIdent.class);
 		if (null == methodIdentExample.getPackageName()) {
 			methodCriteria.add(Restrictions.isNull("packageName"));
@@ -113,7 +113,7 @@ public class MethodIdentDaoImpl extends HibernateDaoSupport implements MethodIde
 
 		methodCriteria.setFetchMode("platformIdent", FetchMode.JOIN);
 		DetachedCriteria platformCriteria = methodCriteria.createCriteria("platformIdent");
-		platformCriteria.add(Restrictions.eq("id", platformIdent.getId()));
+		platformCriteria.add(Restrictions.eq("id", platformId));
 
 		return getHibernateTemplate().findByCriteria(methodCriteria);
 	}

@@ -63,15 +63,15 @@ public interface MethodIdentDao {
 	 * This method returns a list containing {@link MethodIdent} objects which have an association
 	 * to the given {@link PlatformIdent} object.
 	 * 
-	 * @param platformIdent
-	 *            The {@link PlatformIdent} object to search against.
+	 * @param platformId
+	 *            The id of the platform.
 	 * @param methodIdentExample
 	 *            The {@link MethodIdent} example object to look for similar object(s).
 	 * @return A list containing the {@link MethodIdent} objects which are already in an association
 	 *         with the passed {@link PlatformIdent} object and have identical fields like the
 	 *         example object.
 	 */
-	List<MethodIdent> findForPlatformIdent(PlatformIdent platformIdent, MethodIdent methodIdentExample);
+	List<MethodIdent> findForPlatformIdent(long platformId, MethodIdent methodIdentExample);
 
 	/**
 	 * Returns all {@link MethodIdent} objects which are saved in the underlying storage.

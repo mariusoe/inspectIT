@@ -12,7 +12,9 @@
 
 	<!-- activates annotation scanning -->
 	<context:annotation-config />
-	<context:component-scan base-package="info.novatec.inspectit" />
+	<context:component-scan base-package="info.novatec.inspectit"  >
+		 <context:exclude-filter type="regex" expression="info\.novatec\.inspectit\.agent\..*"/>
+	</context:component-scan>
 
 	<!-- puts all the properties into the container -->
 	<context:property-placeholder location="classpath:/config/*.properties" />

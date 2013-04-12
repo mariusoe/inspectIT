@@ -366,7 +366,7 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 
 		PlatformIdent platformIdent = new PlatformIdent();
 		when(platformIdentDao.load(platformId)).thenReturn(platformIdent);
-		when(methodIdentDao.findForPlatformIdent(eq(platformIdent), (MethodIdent) anyObject())).thenReturn(Collections.<MethodIdent> emptyList());
+		when(methodIdentDao.findForPlatformIdent(eq(platformId), (MethodIdent) anyObject())).thenReturn(Collections.<MethodIdent> emptyList());
 		Mockito.doAnswer(new Answer<Object>() {
 			@Override
 			public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -425,8 +425,9 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		findByExampleList.add(methodIdent);
 
 		PlatformIdent platformIdent = new PlatformIdent();
+		methodIdent.setPlatformIdent(platformIdent);
 		when(platformIdentDao.load(platformId)).thenReturn(platformIdent);
-		when(methodIdentDao.findForPlatformIdent(eq(platformIdent), (MethodIdent) anyObject())).thenReturn(findByExampleList);
+		when(methodIdentDao.findForPlatformIdent(eq(platformId), (MethodIdent) anyObject())).thenReturn(findByExampleList);
 
 		long registeredId = registrationService.registerMethodIdent(platformId, packageName, className, methodName, parameterTypes, returnType, modifiers);
 		assertThat(registeredId, equalTo(methodId));
@@ -459,7 +460,7 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 
 		PlatformIdent platformIdent = new PlatformIdent();
 		when(platformIdentDao.load(platformId)).thenReturn(platformIdent);
-		when(methodSensorTypeIdentDao.findByExample((MethodSensorTypeIdent) anyObject())).thenReturn(Collections.<MethodSensorTypeIdent> emptyList());
+		when(methodSensorTypeIdentDao.findByExample(eq(platformId), (MethodSensorTypeIdent) anyObject())).thenReturn(Collections.<MethodSensorTypeIdent> emptyList());
 		Mockito.doAnswer(new Answer<Object>() {
 			@Override
 			public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -500,7 +501,7 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 
 		PlatformIdent platformIdent = new PlatformIdent();
 		when(platformIdentDao.load(platformId)).thenReturn(platformIdent);
-		when(methodSensorTypeIdentDao.findByExample((MethodSensorTypeIdent) anyObject())).thenReturn(Collections.<MethodSensorTypeIdent> emptyList());
+		when(methodSensorTypeIdentDao.findByExample(eq(platformId), (MethodSensorTypeIdent) anyObject())).thenReturn(Collections.<MethodSensorTypeIdent> emptyList());
 		Mockito.doAnswer(new Answer<Object>() {
 			@Override
 			public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -532,7 +533,7 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 
 		PlatformIdent platformIdent = new PlatformIdent();
 		when(platformIdentDao.load(platformId)).thenReturn(platformIdent);
-		when(platformSensorTypeIdentDao.findByExample((PlatformSensorTypeIdent) anyObject())).thenReturn(Collections.<PlatformSensorTypeIdent> emptyList());
+		when(platformSensorTypeIdentDao.findByExample(eq(platformId), (PlatformSensorTypeIdent) anyObject())).thenReturn(Collections.<PlatformSensorTypeIdent> emptyList());
 		Mockito.doAnswer(new Answer<Object>() {
 			@Override
 			public Object answer(InvocationOnMock invocation) throws Throwable {

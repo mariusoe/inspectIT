@@ -6,7 +6,7 @@
 			<generator class="seqhilo" />
 		</id>
 		<discriminator>
-			<column name="discriminator" />
+			<column name="discriminator" index="sensor_ident_discriminator_idx" />
 		</discriminator>
 
 		<many-to-one name="platformIdent" column="platform_id" class="PlatformIdent" />
