@@ -257,6 +257,25 @@
 		<property name="pathSpec" value="*" />
 	</bean>
 	<!-- END -->
+	
+	<!-- Dispatcher Servlet -->
+	<bean id="springDispatcherServlet" class="org.springframework.web.servlet.DispatcherServlet" />
+	
+	<bean id="springDispatcherServletHolder" class="org.mortbay.jetty.servlet.ServletHolder">
+		<property name="name" value="springDispatcherServletExporter" />
+		<property name="servlet" ref="springDispatcherServlet" />
+		<property name="initParameters">
+			<map>
+				<entry key="contextConfigLocation" value="classpath:spring/spring-context-rest.xml" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="springDispatcherServletMapping" class="org.mortbay.jetty.servlet.ServletMapping">
+		<property name="servletName" value="springDispatcherServletExporter" />
+		<property name="pathSpec" value="/rest/*"/>
+	</bean>
+	<!-- END -->
 
 	<bean id="servletHandler" class="org.mortbay.jetty.servlet.ServletHandler">
 		<property name="servlets">
@@ -272,6 +291,7 @@
 				<ref bean="storageServiceServletHolder" />
 				<ref bean="defaultServletHolder" />
 				<ref bean="uploadServletHolder" />
+				<ref bean="springDispatcherServletHolder" />
 			</list>
 		</property>
 		<property name="servletMappings">
@@ -287,6 +307,7 @@
 				<ref bean="storageServiceServiceMapping" />
 				<ref bean="defaultServletMapping" />
 				<ref bean="uploadServletMapping" />
+				<ref bean="springDispatcherServletMapping" />
 			</list>
 		</property>
 		<property name="filters">
