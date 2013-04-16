@@ -108,15 +108,24 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 	}
 
 	/**
+	 * We can not open not-existing storage.
+	 */
+	@Test(expectedExceptions = StorageException.class)
+	public void openUnexisting() throws IOException, SerializationException, StorageException {
+		storageManager.openStorage(new StorageData());
+	}
+
+	/**
 	 * Tests creation of storage.
 	 * 
 	 * @throws SerializationException
 	 *             If serialization fails.
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
+	 * @throws StorageException
 	 */
 	@Test
-	public void createStorageTest() throws IOException, SerializationException {
+	public void createStorageTest() throws IOException, SerializationException, StorageException {
 		storageManager.createStorage(storageData);
 
 		File storageDir = getStorageFolder();
@@ -155,6 +164,14 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		assertThat(storageManager.getReadableStorages(), not(hasItem(storageData)));
 		assertThat(storageData.isStorageOpened(), is(true));
 		assertThat(storageData.isStorageClosed(), is(false));
+	}
+
+	/**
+	 * We can not delete storage when it s in writable mode.
+	 */
+	@Test(dependsOnMethods = { "createStorageTest" }, expectedExceptions = { StorageException.class })
+	public void canNoDeleteOpened() throws IOException, StorageException {
+		storageManager.deleteStorage(storageData);
 	}
 
 	/**
@@ -235,6 +252,14 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 	}
 
 	/**
+	 * Test that the storage can not be opened after it has been finalized.
+	 */
+	@Test(dependsOnMethods = { "finalizeWriteTest" }, expectedExceptions = { StorageException.class })
+	public void canNotOpenClosed() throws IOException, SerializationException, StorageException {
+		storageManager.openStorage(storageData);
+	}
+
+	/**
 	 * Tests reading of data from created storage.
 	 * 
 	 * @throws SerializationException
@@ -287,9 +312,10 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 	 *             If serialization fails.
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
+	 * @throws StorageException
 	 */
 	@Test
-	public void testStorageLabels() throws IOException, SerializationException {
+	public void testStorageLabels() throws IOException, SerializationException, StorageException {
 		RatingLabelType ratingLabelType = new RatingLabelType();
 		StringStorageLabel label = new StringStorageLabel();
 		label.setStorageLabelType(ratingLabelType);

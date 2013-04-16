@@ -149,11 +149,16 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 *             If {@link IOException} occurs.
 	 * @throws SerializationException
 	 *             If exception occurs during update of storage data.
+	 * @throws StorageException
+	 *             If provided storage data does not exist or if the storage is closed.
 	 */
-	public StorageWriter openStorage(StorageData storageData) throws IOException, SerializationException {
+	public StorageWriter openStorage(StorageData storageData) throws IOException, SerializationException, StorageException {
 		StorageData local = getLocalStorageDataObject(storageData);
 		synchronized (local) {
-			if (isStorageExisting(storageData) && !isStorageOpen(storageData)) {
+			if (isStorageClosed(local)) {
+				throw new StorageException("Already closed storage " + local + " can not be opened.");
+			}
+			if (!isStorageOpen(local)) {
 				local.markOpened();
 				StorageWriter writer = storageWriterProvider.getCmrStorageWriter();
 				openedStoragesMap.put(local, writer);
@@ -171,7 +176,7 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 * @param storageData
 	 *            Storage.
 	 * @throws StorageException
-	 *             When storage that should be closed is used for recording.
+	 *             When storage that should be closed is used for recording or it is already closed.
 	 * @throws SerializationException
 	 *             If serialization fails.
 	 * @throws IOException
@@ -182,7 +187,10 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 		synchronized (local) {
 			if ((storageRecorder.isRecordingOn() || storageRecorder.isRecordingScheduled()) && Objects.equals(local, recorderStorageData)) {
 				throw new StorageException("Storage " + local + " can not be finalized because it is currenlty used for recording purposes.");
+			} else if (isStorageClosed(local)) {
+				throw new StorageException("Already closed storage " + local + " can not be closed again.");
 			}
+
 			StorageWriter writer = openedStoragesMap.get(local);
 			if (writer != null) {
 				writer.closeStorageWriter();
@@ -207,7 +215,7 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	public void deleteStorage(StorageData storageData) throws StorageException, IOException {
 		StorageData local = getLocalStorageDataObject(storageData);
 		synchronized (local) {
-			if (local.isStorageOpened()) {
+			if (isStorageOpen(local)) {
 				throw new StorageException("Writable storages can not be deleted. Please finalize the storage first.");
 			}
 			deleteCompleteStorageDataFromDisk(local);
@@ -568,6 +576,22 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	}
 
 	/**
+	 * Returns if the storage is closed.
+	 * 
+	 * @param storageData
+	 *            Storage to check.
+	 * @return True if storage is closed, in any other situation false.
+	 */
+	public boolean isStorageClosed(StorageData storageData) {
+		for (StorageData existing : existingStoragesSet) {
+			if (existing.getId().equals(storageData.getId())) {
+				return existing.isStorageClosed();
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Returns the amount of writing tasks storage still has to process. Note that this is an
 	 * approximate number.
 	 * 
@@ -577,16 +601,20 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 *         <code>0</code> will be returned.
 	 */
 	public long getStorageQueuedWriteTaskCount(StorageData storageData) {
-		StorageData local = getLocalStorageDataObject(storageData);
-		if (!isStorageOpen(local)) {
-			return 0;
-		}
+		try {
+			StorageData local = getLocalStorageDataObject(storageData);
+			if (!isStorageOpen(local)) {
+				return 0;
+			}
 
-		StorageWriter storageWriter = openedStoragesMap.get(local);
-		if (null == storageWriter) {
+			StorageWriter storageWriter = openedStoragesMap.get(local);
+			if (null == storageWriter) {
+				return 0;
+			} else {
+				return storageWriter.getQueuedTaskCount();
+			}
+		} catch (StorageException e) {
 			return 0;
-		} else {
-			return storageWriter.getQueuedTaskCount();
 		}
 	}
 
@@ -712,8 +740,10 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 *             If {@link IOException} happens.
 	 * @throws SerializationException
 	 *             If {@link SerializationException} happens.
+	 * @throws StorageException
+	 *             If provided storage data does not exist.
 	 */
-	public void addLabelToStorage(StorageData storageData, AbstractStorageLabel<?> storageLabel, boolean doOverwrite) throws IOException, SerializationException {
+	public void addLabelToStorage(StorageData storageData, AbstractStorageLabel<?> storageLabel, boolean doOverwrite) throws IOException, SerializationException, StorageException {
 		StorageData local = getLocalStorageDataObject(storageData);
 		if (null != local) {
 			local.addLabel(storageLabel, doOverwrite);
@@ -733,8 +763,10 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 *             If {@link IOException} happens.
 	 * @throws SerializationException
 	 *             If {@link SerializationException} happens.
+	 * @throws StorageException
+	 *             If provided storage data does not exist.
 	 */
-	public boolean removeLabelFromStorage(StorageData storageData, AbstractStorageLabel<?> storageLabel) throws IOException, SerializationException {
+	public boolean removeLabelFromStorage(StorageData storageData, AbstractStorageLabel<?> storageLabel) throws IOException, SerializationException, StorageException {
 		StorageData local = getLocalStorageDataObject(storageData);
 		if (null != local) {
 			boolean removed = local.removeLabel(storageLabel);
@@ -999,14 +1031,16 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	 * @param storageData
 	 *            Template.
 	 * @return Local object.
+	 * @throws StorageException
+	 *             If local object can not be found.
 	 */
-	private StorageData getLocalStorageDataObject(StorageData storageData) {
+	private StorageData getLocalStorageDataObject(StorageData storageData) throws StorageException {
 		for (StorageData existing : existingStoragesSet) {
 			if (existing.getId().equals(storageData.getId())) {
 				return existing;
 			}
 		}
-		throw new RuntimeException("Local storage object can not be found with given storage data: " + storageData);
+		throw new StorageException("Local storage object can not be found with given storage data: " + storageData);
 	}
 
 	/**
