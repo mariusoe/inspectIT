@@ -123,7 +123,10 @@ public abstract class AbstractBranch<R, E> {
 		// get key for template
 		Object key = branchIndexer.getKey(template);
 		// get the tree component for key
-		ITreeComponent<R, E> treeComponent = map.get(key);
+		ITreeComponent<R, E> treeComponent = null;
+		if (null != key) {
+			treeComponent = map.get(key);
+		}
 		if (null != treeComponent) {
 			// if component exists, get element from the component
 			return treeComponent.get(template);
@@ -153,7 +156,10 @@ public abstract class AbstractBranch<R, E> {
 		// get key for template
 		Object key = getBranchIndexer().getKey(template);
 		// get the tree component for key
-		ITreeComponent<R, E> treeComponent = map.get(key);
+		ITreeComponent<R, E> treeComponent = null;
+		if (null != key) {
+			treeComponent = map.get(key);
+		}
 		if (null != treeComponent) {
 			// if component exists, get element from the component
 			return treeComponent.getAndRemove(template);
@@ -214,7 +220,10 @@ public abstract class AbstractBranch<R, E> {
 	 */
 	protected List<R> querySingleKey(IIndexQuery query, Object key) {
 		// get tree component for key
-		ITreeComponent<R, E> treeComponent = map.get(key);
+		ITreeComponent<R, E> treeComponent = null;
+		if (null != key) {
+			treeComponent = map.get(key);
+		}
 		if (null != treeComponent) {
 			// if it is found search in that one
 			return treeComponent.query(query);

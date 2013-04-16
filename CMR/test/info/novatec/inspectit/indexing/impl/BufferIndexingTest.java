@@ -326,4 +326,42 @@ public class BufferIndexingTest {
 		assertThat(rootBranch.getNumberOfElements(), is(equalTo(0L)));
 	}
 
+	/**
+	 * Confirm {@link IndexingException} will be reaised when key can not be generated for element.
+	 * 
+	 * @throws IndexingException
+	 */
+	@Test(expectedExceptions = { IndexingException.class })
+	public void putWithNoKey() throws IndexingException {
+		IBufferTreeComponent<DefaultData> rootBranch = new Branch<DefaultData>(new BufferBranchIndexer<DefaultData>(new TimestampIndexer<DefaultData>()));
+
+		DefaultData defaultData = mock(DefaultData.class);
+		when(defaultData.getId()).thenReturn(1L);
+		rootBranch.put(defaultData);
+	}
+
+	/**
+	 * Test that get will work even when branch can not generate key for the element if ID is
+	 * correctly set.
+	 * 
+	 * @throws IndexingException
+	 */
+	@Test
+	public void getWithNoKey() throws IndexingException {
+		IBufferTreeComponent<DefaultData> rootBranch = new Branch<DefaultData>(new BufferBranchIndexer<DefaultData>(new TimestampIndexer<DefaultData>()));
+
+		DefaultData defaultData = mock(DefaultData.class);
+		when(defaultData.getId()).thenReturn(1L);
+		when(defaultData.getTimeStamp()).thenReturn(new Timestamp(new Date().getTime()));
+		rootBranch.put(defaultData);
+
+		when(defaultData.getTimeStamp()).thenReturn(null);
+		// test get
+		assertThat(rootBranch.get(defaultData), is(equalTo(defaultData)));
+		// then get and remove
+		assertThat(rootBranch.getAndRemove(defaultData), is(equalTo(defaultData)));
+		// confirm it is removed
+		assertThat(rootBranch.get(defaultData), is(nullValue()));
+	}
+
 }

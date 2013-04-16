@@ -393,4 +393,41 @@ public class StorageIndexingTest {
 		assertThat(totalReturnedSize, is(equalTo(totalSize)));
 	}
 
+	/**
+	 * Confirm {@link IndexingException} will be reaised when key can not be generated for element.
+	 * 
+	 * @throws IndexingException
+	 */
+	@Test(expectedExceptions = { IndexingException.class })
+	public void putWithNoKey() throws IndexingException {
+		IStorageTreeComponent<DefaultData> rootBranch = new StorageBranch<DefaultData>(new StorageBranchIndexer<DefaultData>(new TimestampIndexer<DefaultData>(), false));
+
+		InvocationSequenceData invocation = mock(InvocationSequenceData.class);
+		when(invocation.getId()).thenReturn(1L);
+		rootBranch.put(invocation);
+	}
+
+	/**
+	 * Test that get will work even when branch can not generate key for the element if ID is
+	 * correctly set.
+	 * 
+	 * @throws IndexingException
+	 */
+	@Test
+	public void getWithNoKey() throws IndexingException {
+		IStorageTreeComponent<DefaultData> rootBranch = new StorageBranch<DefaultData>(new StorageBranchIndexer<DefaultData>(new TimestampIndexer<DefaultData>(), false));
+
+		InvocationSequenceData invocation = mock(InvocationSequenceData.class);
+		when(invocation.getId()).thenReturn(1L);
+		when(invocation.getTimeStamp()).thenReturn(new Timestamp(new Date().getTime()));
+		IStorageDescriptor storageDescriptor = rootBranch.put(invocation);
+
+		when(invocation.getTimeStamp()).thenReturn(null);
+		// test get
+		assertThat(rootBranch.get(invocation), is(equalTo(storageDescriptor)));
+		// then get and remove
+		assertThat(rootBranch.getAndRemove(invocation), is(equalTo(storageDescriptor)));
+		// confirm it is removed
+		assertThat(rootBranch.get(invocation), is(nullValue()));
+	}
 }
