@@ -190,6 +190,25 @@ public class IdManagerTest extends AbstractLogSupport {
 	}
 
 	/**
+	 * If unregister is called with shutdown initialized marker every next call to getPlatformId
+	 * should throw an exception
+	 */
+	@Test(expectedExceptions = { IdNotAvailableException.class })
+	public void unregisterPlatformAndInitShutdown() throws ServerUnavailableException, RegistrationException, IOException, IdNotAvailableException {
+		// first simulate connect
+		long fakePlatformId = 3L;
+		when(connection.isConnected()).thenReturn(true);
+		when(connection.registerPlatform("testAgent", "dummyVersion")).thenReturn(fakePlatformId);
+		when(configurationStorage.getAgentName()).thenReturn("testAgent");
+		when(versioning.getVersion()).thenReturn("dummyVersion");
+
+		idManager.start();
+		idManager.getPlatformId();
+		idManager.unregisterPlatform();
+		idManager.getPlatformId();
+	}
+
+	/**
 	 * This method could <b>fail</b> if the testing machine is currently under heavy load. There is
 	 * no reliable way to make this test always successful.
 	 */

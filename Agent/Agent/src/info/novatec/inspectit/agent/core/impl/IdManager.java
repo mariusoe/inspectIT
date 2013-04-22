@@ -94,6 +94,12 @@ public class IdManager implements IIdManager, Startable {
 	private volatile boolean serverErrorOccured = false;
 
 	/**
+	 * If set to <code>true</code> any attempt to get the platform id will fail cause the underlying
+	 * JVM is shutting down.
+	 */
+	private volatile boolean shutdownInitialized = false;
+
+	/**
 	 * Default constructor. Needs an implementation of the {@link IConnection} interface to
 	 * establish the connection to the server.
 	 * 
@@ -156,7 +162,7 @@ public class IdManager implements IIdManager, Startable {
 	public long getPlatformId() throws IdNotAvailableException {
 		// if we are not connected to the server and the platform id was not
 		// received yet we are throwing an IdNotAvailableException
-		if (!connection.isConnected() && !isPlatformRegistered()) {
+		if (!connection.isConnected() && !isPlatformRegistered() && !shutdownInitialized) {
 			if (!serverErrorOccured) {
 				try {
 					registrationThread.connect();
@@ -168,7 +174,7 @@ public class IdManager implements IIdManager, Startable {
 			} else {
 				throw new IdNotAvailableException("Cannot retrieve platform ID");
 			}
-		} else if (!isPlatformRegistered()) {
+		} else if (!isPlatformRegistered() && !shutdownInitialized) {
 			if (!serverErrorOccured) {
 				// If the platform is not registered and no server error
 				// occurred, the registration is started
@@ -182,6 +188,8 @@ public class IdManager implements IIdManager, Startable {
 			} else {
 				throw new IdNotAvailableException("Cannot retrieve platform ID");
 			}
+		} else if (shutdownInitialized) {
+			throw new IdNotAvailableException("Cannot retrieve platform ID because the shutdown has been initialized.");
 		}
 
 		return platformId;
@@ -191,6 +199,7 @@ public class IdManager implements IIdManager, Startable {
 	 * {@inheritDoc}
 	 */
 	public void unregisterPlatform() {
+		this.shutdownInitialized = true;
 		if (connection.isConnected() && isPlatformRegistered()) {
 			try {
 				connection.unregisterPlatform(configurationStorage.getAgentName());

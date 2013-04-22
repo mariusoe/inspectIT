@@ -42,7 +42,9 @@ public interface IIdManager {
 	long getPlatformId() throws IdNotAvailableException;
 
 	/**
-	 * Un-registers the platform if the agent is currently connected and registered.
+	 * Un-registers the platform if the agent is currently connected and registered.After calling
+	 * this method {@link IIdManager} will omit any further calls to register the platform since it
+	 * will assume that the shutdown of the JVM has been started.
 	 */
 	void unregisterPlatform();
 
