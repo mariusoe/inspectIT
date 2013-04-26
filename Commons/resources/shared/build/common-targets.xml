@@ -70,6 +70,21 @@
 		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.cobertura" />
 		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.cobertura" />
 	</target>
+	
+	<target name="init-jaxb-schemagen">
+		<ivy:settings file="${ivy.settings.file}" />
+		<!-- needed for TestNG & Cobertura -->
+		<ivy:cachepath pathid="path.jaxb-schemagen" organisation="sun-jaxb" module="jaxb-xjc" revision="2.2" conf="default" inline="true" />
+		<ivy:cachepath pathid="path.jaxb-impl" organisation="sun-jaxb" module="jaxb-impl" revision="2.2" conf="default" inline="true" />
+		
+		<path id="ant-jaxb-schemagen.classpath">
+			<path refid="path.jaxb-schemagen" />
+			<path refid="path.jaxb-impl" />
+		</path>
+		
+		<classloader classpathref="ant-jaxb-schemagen.classpath" parentFirst="false" />
+		<taskdef name="schemagen" classpathref="ant-jaxb-schemagen.classpath" classname="com.sun.tools.jxc.SchemaGenTask" />
+	</target>
 
 	<!-- *************************************************************** -->
 	<!--                I V Y     T A R G E T S   		                 -->
@@ -493,6 +508,38 @@
 			<delete dir="@{download.dir}/tmp" failonerror="false" />
 		</sequential>
 	</macrodef>
+
+	<!-- *************************************************************** -->
+	<!--         	J A X B   S C H E M A   G E N E R A T I O N   	     -->
+	<!-- *************************************************************** -->
+
+	<target name="check-jaxb-schemagen">
+		<condition property="can-run-jaxb-schemagen">
+			<and>
+				<isset property="jaxb-schemagen.sources" />
+				<isset property="jaxb-schemagen.destination" />
+				<isreference refid="jaxb-schemagen.classpath" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="jaxb-schemagen" description="--> builds the XSD schema" depends="init-antcontrib,init-jaxb-schemagen,check-jaxb-schemagen" if="can-run-jaxb-schemagen">
+		<echo message="Creating the XSD schemas for the class in the ${jaxb-schemagen.sources} package and placing the schemas to the ${jaxb-schemagen.destination} dir" level="info" />
+		<mkdir dir="${jaxb-schemagen.destination}"/>
+		<schemagen srcdir="${jaxb-schemagen.sources}" destdir="${jaxb-schemagen.destination}" debug="true" debuglevel="lines,vars,source" includeAntRuntime="false" >
+			<classpath>
+				<path refid="jaxb-schemagen.classpath"/>
+			</classpath>
+		</schemagen>
+	
+		<if>
+			<isset property="jaxb-schemagen.schemafilename"/>
+			<then>
+				<move file="${jaxb-schemagen.destination}/schema1.xsd" tofile="${jaxb-schemagen.destination}/${jaxb-schemagen.schemafilename}" overwrite="true" failonerror="true" />
+			</then>
+		</if>
+	</target>
+	
 
 	<!-- *************************************************************** -->
 	<!--             I N S T A L L E R     T A R G E T S                 -->

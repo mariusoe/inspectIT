@@ -44,4 +44,9 @@
 			<class name="info.novatec.inspectit.cmr.service.rest.StorageRestfulServiceTest" />
 		</classes>
 	</test>
+	<test name="Properties">
+		<classes>
+			<class name="info.novatec.inspectit.cmr.property.PropertyManagerTest" />
+		</classes>
+	</test>
 </suite>

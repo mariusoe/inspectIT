@@ -157,7 +157,7 @@
 			<path refid="lib.prod" />
 			<path refid="lib.test" />
 		</path>
-		
+
 		<execute-findbugs build.qa.analysis="${build.qa.analysis}" build.qa.analysis.findbugs="${build.qa.analysis.findbugs}" findbugs.sourcepath="${findbugs.sourcepath}" findbugs.classlocation="${findbugs.classlocation}">
 			<findbugs.path>
 				<path refid="findbugs.path" />
@@ -166,7 +166,7 @@
 
 		<!-- Prepare CPD -->
 		<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" id="cpd.fileset" />
-		
+
 		<execute-cpd build.qa.analysis="${build.qa.analysis}" build.qa.analysis.cpd="${build.qa.analysis.cpd}">
 			<cpd.fileset>
 				<fileset refid="cpd.fileset" />
@@ -182,7 +182,7 @@
 	<!--                R E L E A S E     T A R G E T S                  -->
 	<!-- *************************************************************** -->
 
-	<target name="release" depends="build" description="--> Creates the distribution jar">
+	<target name="release" depends="build,check-for-xsd-schema-correctness" description="--> Creates the distribution jar">
 		<mkdir dir="${release.root}" />
 		<mkdir dir="${build.release.root}" />
 		<mkdir dir="${build.release.root.cmr}" />
@@ -237,7 +237,9 @@
 		<mkdir dir="${build.release.root.cmr}/license" />
 		<copy todir="${build.release.root.cmr}/license" file="${basedir}/license/publicCerts.store" />
 		<copy todir="${build.release.root.cmr}" file="${basedir}/logging-config.xml" />
-			
+
+		<copydir dest="${build.release.root.cmr}/config" src="${basedir}/config"/>
+
 		<!-- Create the third party libraries textual representation -->
 		<!-- The file is put at ${build.release.root.cmr}/thirdparty.txt -->
 		<antcall target="-create-thirdparty-notification" />
@@ -314,6 +316,41 @@ Common Development and Distribution License (CDDL), 1.0 : jta (1.0.1B) ${line.se
 GNU Lesser General Public License (LGPL), 2.1 : hibernate (3.5.3-Final), c3p0 (0.9.1.2) ${line.separator}
 MIT License : slf4j-api (1.5.6), slf4j-log4j12 (1.5.6) ${line.separator}
 Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA), h2 (1.2.148)" />
+	</target>
+
+	<target name="generate-configuration-xsd-schema" depends="init">
+		<property name="jaxb-schemagen.sources" value="${src.commons}/info/novatec/inspectit/cmr/property"/>
+		<property name="jaxb-schemagen.destination" value="${basedir}/config/schema"/>
+		<property name="jaxb-schemagen.schemafilename" value="configurationSchema.xsd"/>
+		<path id="jaxb-schemagen.classpath">
+			<path refid="lib.prod.commons" />
+		</path>
+
+		<antcall target="jaxb-schemagen" inheritrefs="true"/>
+	</target>
+
+	<target name="check-for-xsd-schema-correctness" depends="init">
+		<property name="build.configTempDir" value="${build.root}/temp/config/schema" />
+		<mkdir dir="${build.configTempDir}" />
+			
+		<!-- Build temp schema file -->
+		<property name="jaxb-schemagen.sources" value="${src.commons}/info/novatec/inspectit/cmr/property" />
+		<property name="jaxb-schemagen.destination" value="${build.configTempDir}" />
+		<property name="jaxb-schemagen.schemafilename" value="configurationSchema.xsd" />
+		<path id="jaxb-schemagen.classpath">
+			<path refid="lib.prod.commons" />
+		</path>
+		
+		<antcall target="jaxb-schemagen" inheritrefs="true"/>
+
+		<condition property="xsd-schema.notcorrect">
+			<not>
+				<filesmatch file1="${build.configTempDir}/configurationSchema.xsd" file2="${basedir}/config/schema/configurationSchema.xsd" />
+			</not>
+		</condition>
+		
+		<delete dir="${build.configTempDir}" />
+		<fail if="${xsd-schema.notcorrect}"/>
 	</target>
 
 	<!-- *************************************************************** -->

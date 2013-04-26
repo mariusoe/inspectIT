@@ -1,11 +1,12 @@
 package info.novatec.inspectit.cmr.spring.exporter;
 
+import info.novatec.inspectit.cmr.property.PropertyManager;
 import info.novatec.inspectit.cmr.service.ServiceExporterType;
 import info.novatec.inspectit.cmr.service.ServiceInterface;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.Map;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +22,8 @@ import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.env.PropertySource;
-import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.remoting.rmi.RmiServiceExporter;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -69,11 +70,6 @@ public class RemotingExporter implements BeanFactoryPostProcessor {
 	private static final String REGISTRY_PORT = "registryPort";
 
 	/**
-	 * Path to the configuration file which stores the ports.
-	 */
-	private static final String CONFIG_PATH = "/config/cmr.properties";
-
-	/**
 	 * The annotation defining a class being a service.
 	 */
 	private Class<? extends Annotation> serviceAnnotationType = Service.class;
@@ -91,22 +87,31 @@ public class RemotingExporter implements BeanFactoryPostProcessor {
 	 */
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
-		LOG.info("|- RemoteExporter: Processing Beans for remote export");
+		LOG.info("|-RemoteExporter: Processing Beans for remote export");
 
-		PropertySource<Map<String, Object>> propertySource;
+		// since no autowiring is available we will load our properties bean and pass it to the
+		// property source
+		Properties localProperties;
 		try {
-			// cannot access the global property resolver in here, thus we have to create a
-			// temporary one...
-			propertySource = new ResourcePropertySource("classpath:" + CONFIG_PATH);
-		} catch (IOException e1) {
-			throw new BeanInitializationException("Property source bean cannot be created", e1);
+			localProperties = beanFactory.getBean(PropertyManager.LOCAL_PROPERTIES_BEAN_NAME, Properties.class);
+		} catch (Exception e) {
+			throw new BeanInitializationException("Local properties bean cannot be found in bean factory", e);
 		}
+
+		PropertySource<Map<String, Object>> propertySource = new PropertiesPropertySource("localSource", localProperties);
 
 		for (String beanName : beanFactory.getBeanDefinitionNames()) {
 			BeanDefinition beanDef = beanFactory.getBeanDefinition(beanName);
 			if (beanDef.isAbstract()) {
 				if (LOG.isDebugEnabled()) {
 					LOG.debug("|- RemoteExporter: Skipping abstract Bean '" + beanName + "'");
+				}
+				continue;
+			}
+
+			if (null == beanDef.getBeanClassName()) {
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("|- RemoteExporter: Skipping Bean '" + beanName + "' which has no bean class defined");
 				}
 				continue;
 			}

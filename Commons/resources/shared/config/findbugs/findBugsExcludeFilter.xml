@@ -76,10 +76,23 @@
 		<Bug pattern="AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION" />
 	</Match>
 	<Match>
-		 <Class name="~info.novatec.inspectit.cmr.util.ShutdownService.*" />
+		<Class name="~info.novatec.inspectit.cmr.util.ShutdownService.*" />
 		<Bug pattern="DM_EXIT" />
 	</Match>
+	<Match>
+		<Class name="info.novatec.inspectit.cmr.property.PropertyManager" />
+		<Method name="unmarshall" />
+		<Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE" />
+	</Match>
 	<!-- CMR ignores END -->
+	
+	<!-- Commons ignores START -->
+	<Match><!-- There is default case, but FindBugs is still complaining -->
+		<Class name="info.novatec.inspectit.cmr.property.impl.ByteProperty" />
+		<Method name="fromString" />
+		<Bug pattern="SF_SWITCH_NO_DEFAULT" />
+	</Match>
+	<!-- Commons ignores END -->
 
 	<!-- CommonsCS ignores START -->
 	<Match>
