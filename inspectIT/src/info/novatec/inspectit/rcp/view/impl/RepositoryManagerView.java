@@ -776,7 +776,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 				CmrRepositoryDefinition cmrRepositoryDefinition = (CmrRepositoryDefinition) ((DeferredAgentsComposite) element).getRepositoryDefinition();
 				return ImageFormatter.getCmrRepositoryImage(cmrRepositoryDefinition, true);
 			} else if (element instanceof AgentLeaf) {
-				return ImageFormatter.getAgentLeafImage((AgentLeaf) element);
+				return ImageFormatter.getAgentImage(((AgentLeaf) element).getAgentStatusData());
 			} else if (element instanceof Component) {
 				return ((Component) element).getImage();
 			}

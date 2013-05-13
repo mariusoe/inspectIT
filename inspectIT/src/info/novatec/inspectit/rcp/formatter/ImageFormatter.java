@@ -4,7 +4,6 @@ import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 import info.novatec.inspectit.communication.data.cmr.WritingStatus;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
-import info.novatec.inspectit.rcp.model.AgentLeaf;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
@@ -258,14 +257,14 @@ public final class ImageFormatter {
 	}
 
 	/**
-	 * Returns the image for the agent leaf based on the last data sent date.
+	 * Returns the image for the agent based on the last data sent date.
 	 * 
-	 * @param agentLeaf
-	 *            {@link AgentLeaf}.
+	 * @param agentStatusData
+	 *            {@link AgentStatusData} golding the information or null if it's not available.
+	 * 
 	 * @return {@link Image}
 	 */
-	public static Image getAgentLeafImage(AgentLeaf agentLeaf) {
-		AgentStatusData agentStatusData = agentLeaf.getAgentStatusData();
+	public static Image getAgentImage(AgentStatusData agentStatusData) {
 		if (null != agentStatusData) {
 			switch (agentStatusData.getAgentConnection()) {
 			case CONNECTED:

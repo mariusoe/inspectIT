@@ -268,10 +268,24 @@ public final class TextFormatter {
 		} else {
 			styledString.append(agentLeaf.getPlatformIdent().getAgentName());
 		}
+		styledString.append(getStyledAgentDescription(agentLeaf.getPlatformIdent(), agentLeaf.getAgentStatusData()));
+		return styledString;
+	}
+
+	/**
+	 * Returns the styled information about the agent version and connection status.
+	 * 
+	 * @param platformIdent
+	 *            {@link PlatformIdent}
+	 * @param agentStatusData
+	 *            {@link AgentStatusData}
+	 * @return {@link StyledString}
+	 */
+	private static StyledString getStyledAgentDescription(PlatformIdent platformIdent, AgentStatusData agentStatusData) {
+		StyledString styledString = new StyledString();
 		styledString.append(" ");
-		styledString.append("[" + agentLeaf.getPlatformIdent().getVersion() + "]", StyledString.QUALIFIER_STYLER);
+		styledString.append("[" + platformIdent.getVersion() + "]", StyledString.QUALIFIER_STYLER);
 		styledString.append(" - ");
-		AgentStatusData agentStatusData = agentLeaf.getAgentStatusData();
 		if (null != agentStatusData) {
 			switch (agentStatusData.getAgentConnection()) {
 			case CONNECTED:
@@ -298,7 +312,6 @@ public final class TextFormatter {
 			styledString.append("Not connected", StyledString.DECORATIONS_STYLER);
 		}
 		return styledString;
-
 	}
 
 	/**
@@ -453,6 +466,19 @@ public final class TextFormatter {
 	 */
 	public static String getAgentDescription(PlatformIdent agent) {
 		return agent.getAgentName() + " [" + agent.getVersion() + "]";
+	}
+
+	/**
+	 * Description of the agent with the connection information.
+	 * 
+	 * @param agent
+	 *            {@link PlatformIdent}
+	 * @param agentStatusData
+	 *            {@link AgentStatusData}.
+	 * @return Description of the agent.
+	 */
+	public static String getAgentDescription(PlatformIdent agent, AgentStatusData agentStatusData) {
+		return agent.getAgentName() + getStyledAgentDescription(agent, agentStatusData).getString();
 	}
 
 	/**

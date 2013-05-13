@@ -1,6 +1,9 @@
 package info.novatec.inspectit.rcp.wizard.page;
 
 import info.novatec.inspectit.cmr.model.PlatformIdent;
+import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
+import info.novatec.inspectit.rcp.formatter.ImageFormatter;
+import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.util.ObjectUtils;
@@ -9,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -172,7 +176,8 @@ public class SelectAgentsWizardPage extends WizardPage {
 				Job getAgentsJob = new Job("Loading agents information..") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
-						agentList = new ArrayList<PlatformIdent>(cmrRepositoryDefinition.getGlobalDataAccessService().getAgentsOverview().keySet());
+						final Map<PlatformIdent, AgentStatusData> agentMap = cmrRepositoryDefinition.getGlobalDataAccessService().getAgentsOverview();
+						agentList = new ArrayList<PlatformIdent>(agentMap.keySet());
 						Collections.sort(agentList, new Comparator<PlatformIdent>() {
 							@Override
 							public int compare(PlatformIdent a1, PlatformIdent a2) {
@@ -193,7 +198,10 @@ public class SelectAgentsWizardPage extends WizardPage {
 
 								agentSelection = new Table(main, SWT.CHECK | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
 								for (PlatformIdent platformIdent : agentList) {
-									new TableItem(agentSelection, SWT.NONE).setText(platformIdent.getAgentName() + " [v. " + platformIdent.getVersion() + "]");
+									AgentStatusData agentStatusData = agentMap.get(platformIdent);
+									TableItem tableItem = new TableItem(agentSelection, SWT.NONE);
+									tableItem.setText(TextFormatter.getAgentDescription(platformIdent, agentStatusData));
+									tableItem.setImage(ImageFormatter.getAgentImage(agentStatusData));
 								}
 								agentSelection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 								agentSelection.setEnabled(false);
