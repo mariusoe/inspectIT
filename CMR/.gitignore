@@ -15,3 +15,4 @@ resources/jvm
 /reports
 /storage
 /config/configurationUpdates*.xml
+/config/configurationUpdates.xml*

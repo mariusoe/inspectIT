@@ -109,23 +109,47 @@
   </xs:complexType>
 
   <xs:complexType name="percentageValidator">
+    <xs:complexContent>
+      <xs:extension base="abstractSinglePropertyValidator">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="abstractSinglePropertyValidator" abstract="true">
     <xs:sequence/>
   </xs:complexType>
 
   <xs:complexType name="positiveValidator">
-    <xs:sequence/>
+    <xs:complexContent>
+      <xs:extension base="abstractSinglePropertyValidator">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="negativeValidator">
-    <xs:sequence/>
+    <xs:complexContent>
+      <xs:extension base="abstractSinglePropertyValidator">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="fullyQualifiedClassNameValidator">
-    <xs:sequence/>
+    <xs:complexContent>
+      <xs:extension base="abstractSinglePropertyValidator">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="notEmptyValidator">
-    <xs:sequence/>
+    <xs:complexContent>
+      <xs:extension base="abstractSinglePropertyValidator">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="stringProperty">
@@ -236,16 +260,6 @@
       </xs:element>
     </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="required"/>
-  </xs:complexType>
-
-  <xs:complexType name="propertyValidation">
-    <xs:sequence/>
-  </xs:complexType>
-
-  <xs:complexType name="validationError">
-    <xs:sequence>
-      <xs:element name="message" type="xs:string" minOccurs="0"/>
-    </xs:sequence>
   </xs:complexType>
 </xs:schema>
 

@@ -147,8 +147,9 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 				mostRecentlyAdded = aggTimerData;
 
 				int count = elementCount.incrementAndGet();
-				if (maxElements < count) {
+				while (maxElements < count) {
 					this.removeOldest();
+					count++;
 				}
 			}
 			aggTimerData.aggregateTimerData(timerData);

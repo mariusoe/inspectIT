@@ -4,7 +4,17 @@ Bundle-Name: inspectIT Client-Server Commons
 Bundle-SymbolicName: info.novatec.inspectit.commonscs
 Bundle-Version: 1.5.0
 Bundle-ClassPath: .
-Export-Package: info.novatec.inspectit.cmr.service,
+Export-Package: info.novatec.inspectit.cmr.property,
+ info.novatec.inspectit.cmr.property.configuration,
+ info.novatec.inspectit.cmr.property.configuration.impl,
+ info.novatec.inspectit.cmr.property.configuration.validation,
+ info.novatec.inspectit.cmr.property.configuration.validator,
+ info.novatec.inspectit.cmr.property.configuration.validator.impl,
+ info.novatec.inspectit.cmr.property.spring,
+ info.novatec.inspectit.cmr.property.update,
+ info.novatec.inspectit.cmr.property.update.configuration,
+ info.novatec.inspectit.cmr.property.update.impl,
+ info.novatec.inspectit.cmr.service,
  info.novatec.inspectit.cmr.service.cache,
  info.novatec.inspectit.communication.data.cmr,
  info.novatec.inspectit.indexing,
@@ -55,4 +65,5 @@ Require-Bundle: info.novatec.inspectit.commons;bundle-version="1.5.0",
  org.apache.commons.pool;bundle-version="1.6.0",
  org.apache.commons.collections;bundle-version="3.2.1",
  slf4j.api;bundle-version="1.7.5",
- com.esotericsoftware.kryo;bundle-version="2.24.0"
+ com.esotericsoftware.kryo;bundle-version="2.24.0",
+ info.novatec.hamcrest-all;bundle-version="1.3.0"

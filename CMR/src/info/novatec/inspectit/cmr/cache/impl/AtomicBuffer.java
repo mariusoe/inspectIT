@@ -4,6 +4,7 @@ import info.novatec.inspectit.cmr.cache.IBuffer;
 import info.novatec.inspectit.cmr.cache.IBufferElement;
 import info.novatec.inspectit.cmr.cache.IBufferElement.BufferElementState;
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
+import info.novatec.inspectit.cmr.property.spring.PropertyUpdate;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
 import info.novatec.inspectit.spring.logger.Log;
@@ -176,7 +177,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	/**
 	 * Amount on bytes flags for tree clean and size update will be set.
 	 */
-	long flagsSetOnBytes;
+	volatile long flagsSetOnBytes;
 
 	/**
 	 * This is the read lock that has to be acquired when the size of the buffer or indexing tree is
@@ -591,6 +592,41 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 			log.info("|-Indexing tree maintenance on " + NumberFormat.getInstance().format(flagsSetOnBytes) + " bytes added/removed...");
 			log.info("|-Using object expansion rate of " + NumberFormat.getInstance().format(objectSizes.getObjectSecurityExpansionRate() * 100) + "%");
 		}
+	}
+
+	/**
+	 * Updates value of the {@link #evictionOccupancyPercentage}.
+	 */
+	@PropertyUpdate(properties = { "buffer.evictionOccupancyPercentage", "buffer.bytesMaintenancePercentage", })
+	protected void updateEvictionOccupancyPercentage() {
+		this.evictionOccupancyPercentage.set(Float.floatToIntBits(bufferProperties.getEvictionOccupancyPercentage()));
+	}
+
+	/**
+	 * Updates value of the {@link #evictionOccupancyPercentage}.
+	 */
+	@PropertyUpdate(properties = { "buffer.bytesMaintenancePercentage", })
+	protected void updateBytesMaintenancePercentage() {
+		this.flagsSetOnBytes = bufferProperties.getFlagsSetOnBytes(this.maxSize.get());
+	}
+
+	/**
+	 * Updates the buffer size and to it related properties.
+	 */
+	@PropertyUpdate(properties = { "buffer.minOldSpaceOccupancy", "buffer.maxOldSpaceOccupancy", "buffer.minOldSpaceOccupancyActiveTillOldGenSize", "buffer.maxOldSpaceOccupancyActiveFromOldGenSize" })
+	protected void updateBufferSizeAndRelated() {
+		this.maxSize.set(bufferProperties.getInitialBufferSize());
+		this.objectSizes.setObjectSecurityExpansionRate(bufferProperties.getObjectSecurityExpansionRate(maxSize.get()));
+		this.flagsSetOnBytes = bufferProperties.getFlagsSetOnBytes(this.maxSize.get());
+	}
+
+	/**
+	 * Updates the object security expansion rate.
+	 */
+	@PropertyUpdate(properties = { "buffer.minObjectExpansionRate", "buffer.maxObjectExpansionRate", "buffer.maxObjectExpansionRateActiveTillBufferSize",
+			"buffer.minObjectExpansionRateActiveFromBufferSize", "buffer.maxObjectExpansionRateActiveFromOccupancy", "buffer.minObjectExpansionRateActiveTillOccupancy" })
+	protected void updateObjectSecurityExpansionRate() {
+		this.objectSizes.setObjectSecurityExpansionRate(bufferProperties.getObjectSecurityExpansionRate(maxSize.get()));
 	}
 
 	/**

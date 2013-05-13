@@ -80,7 +80,7 @@
 		<Bug pattern="DM_EXIT" />
 	</Match>
 	<Match>
-		<Class name="info.novatec.inspectit.cmr.property.PropertyManager" />
+		<Class name="info.novatec.inspectit.cmr.jaxb.JAXBTransformator" />
 		<Method name="unmarshall" />
 		<Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE" />
 	</Match>
@@ -88,7 +88,7 @@
 	
 	<!-- Commons ignores START -->
 	<Match><!-- There is default case, but FindBugs is still complaining -->
-		<Class name="info.novatec.inspectit.cmr.property.impl.ByteProperty" />
+		<Class name="info.novatec.inspectit.cmr.property.configuration.impl.ByteProperty" />
 		<Method name="fromString" />
 		<Bug pattern="SF_SWITCH_NO_DEFAULT" />
 	</Match>

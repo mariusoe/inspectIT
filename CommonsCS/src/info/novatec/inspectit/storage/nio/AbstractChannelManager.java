@@ -105,8 +105,8 @@ public abstract class AbstractChannelManager {
 		boolean channelOpened = customAsyncChannel.openChannel(executorService);
 		if (channelOpened) {
 			openedChannelsQueue.add(customAsyncChannel);
-			int channelsOpeded = openedChannelsCount.incrementAndGet();
-			if (channelsOpeded > getMaxOpenedChannels()) {
+			int channelsOpened = openedChannelsCount.incrementAndGet();
+			while (channelsOpened > getMaxOpenedChannels()) {
 				closeOldestAsyncChannel();
 			}
 		}

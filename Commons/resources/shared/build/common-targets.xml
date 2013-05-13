@@ -70,18 +70,18 @@
 		<taskdef name="cobertura-merge" classname="net.sourceforge.cobertura.ant.MergeTask" classpathref="path.cobertura" />
 		<taskdef name="cobertura-report" classname="net.sourceforge.cobertura.ant.ReportTask" classpathref="path.cobertura" />
 	</target>
-	
-	<target name="init-jaxb-schemagen">
+
+	<target name="init-jaxb-schemagen" depends="init-antcontrib">
 		<ivy:settings file="${ivy.settings.file}" />
 		<!-- needed for TestNG & Cobertura -->
 		<ivy:cachepath pathid="path.jaxb-schemagen" organisation="sun-jaxb" module="jaxb-xjc" revision="2.2" conf="default" inline="true" />
 		<ivy:cachepath pathid="path.jaxb-impl" organisation="sun-jaxb" module="jaxb-impl" revision="2.2" conf="default" inline="true" />
-		
+
 		<path id="ant-jaxb-schemagen.classpath">
 			<path refid="path.jaxb-schemagen" />
 			<path refid="path.jaxb-impl" />
 		</path>
-		
+
 		<classloader classpathref="ant-jaxb-schemagen.classpath" parentFirst="false" />
 		<taskdef name="schemagen" classpathref="ant-jaxb-schemagen.classpath" classname="com.sun.tools.jxc.SchemaGenTask" />
 	</target>
@@ -170,14 +170,14 @@
 				<compile.classpath />
 				<classpath location="@{build.instrumented.classes}" />
 			</cobertura-instrument>
-			
-			<echo message="Starting TestNG with following JVM arguments: -XX:-UseSplitVerifier -Dnet.sourceforge.cobertura.datafile=@{build.qa.test.coveragedata}/cobertura.ser @{test.vmargs}"/>
+
+			<echo message="Starting TestNG with following JVM arguments: -XX:-UseSplitVerifier -Dnet.sourceforge.cobertura.datafile=@{build.qa.test.coveragedata}/cobertura.ser @{test.vmargs}" />
 
 			<testng outputdir="@{build.qa.test.testdata}" haltonfailure="@{test.haltonfailure}" workingDir="@{test.workingDir}">
 				<!-- this absolutely needs to be the first entry, else the instrumented classes are not taken but the normal ones -->
 				<classpath location="@{build.instrumented.classes}" />
-				<test.compile.classpath/>
-				<classpath refid="test.classes"/>
+				<test.compile.classpath />
+				<classpath refid="test.classes" />
 				<classpath refid="path.testng" />
 				<classpath refid="path.cobertura" />
 				<!-- this entry is necessary in order to get the spring configurations needed for the test -->
@@ -343,7 +343,7 @@
 	</target>
 
 	<target name="-get-jvm-instalation" if="jvmFile">
-		<execute-ftpdownload file="${jvmFile}" download.dir="${jvm.root}" download.ftp.remotedir="${jvm.remotedir}" download.notify.target="-notify-about-jre-update"/>
+		<execute-ftpdownload file="${jvmFile}" download.dir="${jvm.root}" download.ftp.remotedir="${jvm.remotedir}" download.notify.target="-notify-about-jre-update" />
 	</target>
 
 	<target name="-notify-about-jre-update">
@@ -367,8 +367,8 @@
 
 	<!-- Allows to download the java1.5 runtime. It is necessary to define the variable download.dir before calling this target! -->
 	<!-- Example: <var name="download.dir" value="C:\tmp" /> -->
-	<target name="retrieve-java1.5-runtime" description="Downloads the java 1.5 rt.jar" depends="init-antcontrib,init-ftp-task" >
-		<execute-ftpdownload file="${ftp.internal.java15runtime.file}" download.dir="${download.dir}" download.ftp.remotedir="${ftp.internal.java15runtime.path}" download.notify.target="-notify-about-java-rt-update"/>
+	<target name="retrieve-java1.5-runtime" description="Downloads the java 1.5 rt.jar" depends="init-antcontrib,init-ftp-task">
+		<execute-ftpdownload file="${ftp.internal.java15runtime.file}" download.dir="${download.dir}" download.ftp.remotedir="${ftp.internal.java15runtime.path}" download.notify.target="-notify-about-java-rt-update" />
 		<condition property="should-unpack-java1.5-runtime">
 			<or>
 				<isset property="download.executed.${ftp.internal.java15runtime.file}" />
@@ -378,7 +378,7 @@
 			</or>
 		</condition>
 		<if>
-			<istrue value="${should-unpack-java1.5-runtime}"/>
+			<istrue value="${should-unpack-java1.5-runtime}" />
 			<then>
 				<unzip src="${download.dir}/${ftp.internal.java15runtime.file}.zip" dest="${download.dir}" />
 			</then>
@@ -411,7 +411,7 @@
 			</condition>
 
 			<if>
-				<isfalse value="${download-ok}"/>
+				<isfalse value="${download-ok}" />
 				<then>
 					<echo message="Downloading ${md5.file} from ${ftp.server} and remote dir @{download.ftp.remotedir}" />
 					<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="@{download.ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
@@ -513,33 +513,31 @@
 	<!--         	J A X B   S C H E M A   G E N E R A T I O N   	     -->
 	<!-- *************************************************************** -->
 
-	<target name="check-jaxb-schemagen">
-		<condition property="can-run-jaxb-schemagen">
-			<and>
-				<isset property="jaxb-schemagen.sources" />
-				<isset property="jaxb-schemagen.destination" />
-				<isreference refid="jaxb-schemagen.classpath" />
-			</and>
-		</condition>
-	</target>
+	<macrodef name="jaxb-schemagen">
+		<attribute name="jaxb-schemagen.src" description="Location of the source directory" />
+		<attribute name="jaxb-schemagen.dest" description="Destination of the output file" />
+		<attribute name="jaxb-schemagen.excludes" description="List of files to exclude from the generation if any" />
+		<attribute name="jaxb-schemagen.schemafilename" description="Name of the file to save schema to. Leave empty if not needed." />
+		<element name="jaxb-schemagen.classpath" description="Classpath to run with" />
+		<sequential>
+			<echo message="Creating the XSD schemas for the class in the @{jaxb-schemagen.src} package and placing the schemas to the @{jaxb-schemagen.dest} dir" level="info" />
+			<mkdir dir="@{jaxb-schemagen.dest}" />
+			<schemagen srcdir="@{jaxb-schemagen.src}" excludes="@{jaxb-schemagen.excludes}" destdir="@{jaxb-schemagen.dest}" debug="true" debuglevel="lines,vars,source" includeAntRuntime="false">
+				<classpath>
+					<jaxb-schemagen.classpath />
+				</classpath>
+			</schemagen>
 
-	<target name="jaxb-schemagen" description="--> builds the XSD schema" depends="init-antcontrib,init-jaxb-schemagen,check-jaxb-schemagen" if="can-run-jaxb-schemagen">
-		<echo message="Creating the XSD schemas for the class in the ${jaxb-schemagen.sources} package and placing the schemas to the ${jaxb-schemagen.destination} dir" level="info" />
-		<mkdir dir="${jaxb-schemagen.destination}"/>
-		<schemagen srcdir="${jaxb-schemagen.sources}" destdir="${jaxb-schemagen.destination}" debug="true" debuglevel="lines,vars,source" includeAntRuntime="false" >
-			<classpath>
-				<path refid="jaxb-schemagen.classpath"/>
-			</classpath>
-		</schemagen>
-	
-		<if>
-			<isset property="jaxb-schemagen.schemafilename"/>
-			<then>
-				<move file="${jaxb-schemagen.destination}/schema1.xsd" tofile="${jaxb-schemagen.destination}/${jaxb-schemagen.schemafilename}" overwrite="true" failonerror="true" />
-			</then>
-		</if>
-	</target>
-	
+			<if>
+				<not>
+					<matches string="@{jaxb-schemagen.schemafilename}" pattern="^\s*$"/>
+				</not>
+				<then>
+					<move file="@{jaxb-schemagen.dest}/schema1.xsd" tofile="@{jaxb-schemagen.dest}/@{jaxb-schemagen.schemafilename}" overwrite="true" failonerror="true" />
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
 
 	<!-- *************************************************************** -->
 	<!--             I N S T A L L E R     T A R G E T S                 -->

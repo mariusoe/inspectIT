@@ -1,6 +1,9 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.cache.IBuffer;
+import info.novatec.inspectit.cmr.property.PropertyManager;
+import info.novatec.inspectit.cmr.property.configuration.PropertySection;
+import info.novatec.inspectit.cmr.property.update.configuration.ConfigurationUpdate;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
 import info.novatec.inspectit.cmr.util.ShutdownService;
 import info.novatec.inspectit.communication.DefaultData;
@@ -15,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collection;
 import java.util.Date;
 
 import javax.annotation.PostConstruct;
@@ -53,6 +57,12 @@ public class CmrManagementService implements ICmrManagementService {
 	 */
 	@Autowired
 	private StorageManager storageManager;
+
+	/**
+	 * {@link PropertyManager}.
+	 */
+	@Autowired
+	private PropertyManager propertyManager;
 
 	/**
 	 * Count of dropped data due to high volume of incoming data objects.
@@ -135,6 +145,21 @@ public class CmrManagementService implements ICmrManagementService {
 	 */
 	public int getDroppedDataCount() {
 		return droppedDataCount;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Collection<PropertySection> getConfigurationPropertySections() {
+		return propertyManager.getConfigurationPropertySections();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void updateConfiguration(ConfigurationUpdate configurationUpdate, boolean executeRestart) throws Exception {
+		propertyManager.updateConfiguration(configurationUpdate, executeRestart);
 	}
 
 	/**

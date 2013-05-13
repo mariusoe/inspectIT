@@ -1,5 +1,33 @@
 package info.novatec.inspectit.storage.serializer;
 
+import info.novatec.inspectit.cmr.property.configuration.Configuration;
+import info.novatec.inspectit.cmr.property.configuration.GroupedProperty;
+import info.novatec.inspectit.cmr.property.configuration.PropertySection;
+import info.novatec.inspectit.cmr.property.configuration.impl.BooleanProperty;
+import info.novatec.inspectit.cmr.property.configuration.impl.ByteProperty;
+import info.novatec.inspectit.cmr.property.configuration.impl.LongProperty;
+import info.novatec.inspectit.cmr.property.configuration.impl.PercentageProperty;
+import info.novatec.inspectit.cmr.property.configuration.impl.StringProperty;
+import info.novatec.inspectit.cmr.property.configuration.validation.PropertyValidation;
+import info.novatec.inspectit.cmr.property.configuration.validation.PropertyValidationException;
+import info.novatec.inspectit.cmr.property.configuration.validation.ValidationError;
+import info.novatec.inspectit.cmr.property.configuration.validator.impl.FullyQualifiedClassNameValidator;
+import info.novatec.inspectit.cmr.property.configuration.validator.impl.GreaterOrEqualValidator;
+import info.novatec.inspectit.cmr.property.configuration.validator.impl.GreaterValidator;
+import info.novatec.inspectit.cmr.property.configuration.validator.impl.LessOrEqualValidator;
+import info.novatec.inspectit.cmr.property.configuration.validator.impl.LessValidator;
+import info.novatec.inspectit.cmr.property.configuration.validator.impl.NegativeValidator;
+import info.novatec.inspectit.cmr.property.configuration.validator.impl.NotEmptyValidator;
+import info.novatec.inspectit.cmr.property.configuration.validator.impl.PercentageValidator;
+import info.novatec.inspectit.cmr.property.configuration.validator.impl.PositiveValidator;
+import info.novatec.inspectit.cmr.property.update.configuration.ConfigurationUpdate;
+import info.novatec.inspectit.cmr.property.update.impl.BooleanPropertyUpdate;
+import info.novatec.inspectit.cmr.property.update.impl.BytePropertyUpdate;
+import info.novatec.inspectit.cmr.property.update.impl.LongPropertyUpdate;
+import info.novatec.inspectit.cmr.property.update.impl.PercentagePropertyUpdate;
+import info.novatec.inspectit.cmr.property.update.impl.RestoreDefaultPropertyUpdate;
+import info.novatec.inspectit.cmr.property.update.impl.StringPropertyUpdate;
+import info.novatec.inspectit.cmr.service.IServerStatusService.ServerStatus;
 import info.novatec.inspectit.communication.data.cmr.RecordingData;
 import info.novatec.inspectit.communication.data.cmr.WritingStatus;
 import info.novatec.inspectit.indexing.aggregation.impl.ExceptionDataAggregator;
@@ -50,6 +78,7 @@ import info.novatec.inspectit.storage.recording.RecordingProperties;
 import info.novatec.inspectit.storage.recording.RecordingState;
 import info.novatec.inspectit.storage.serializer.impl.CustomCompatibleFieldSerializer;
 import info.novatec.inspectit.storage.serializer.impl.SerializationManager;
+import info.novatec.inspectit.storage.serializer.impl.ServerStatusSerializer;
 import info.novatec.inspectit.storage.serializer.schema.ClassSchemaManager;
 
 import org.springframework.beans.BeansException;
@@ -173,8 +202,45 @@ public class SerializationManagerPostProcessor implements BeanPostProcessor {
 		kryo.register(AgentFilterDataProcessor.class, new FieldSerializer<AgentFilterDataProcessor>(kryo, AgentFilterDataProcessor.class), nextRegistrationId++);
 
 		// added with INSPECTIT-950
-		kryo.register(ObjectStorageLabel.class, new CustomCompatibleFieldSerializer<ObjectStorageLabel<?>>(kryo, ObjectStorageLabel.class, schemaManager));
-		kryo.register(DataTimeFrameLabelType.class, new CustomCompatibleFieldSerializer<DataTimeFrameLabelType>(kryo, DataTimeFrameLabelType.class, schemaManager, true));
+		kryo.register(ObjectStorageLabel.class, new CustomCompatibleFieldSerializer<ObjectStorageLabel<?>>(kryo, ObjectStorageLabel.class, schemaManager), nextRegistrationId++);
+		kryo.register(DataTimeFrameLabelType.class, new CustomCompatibleFieldSerializer<DataTimeFrameLabelType>(kryo, DataTimeFrameLabelType.class, schemaManager, true), nextRegistrationId++);
+
+
+		// added with INSPECTIT-991
+		kryo.register(ServerStatus.class, new ServerStatusSerializer(), nextRegistrationId++);
+		
+		// added with INSPECTIT-963
+		// CMR Configuration Properties classes
+		// this classes can be registered with FieldSerializer since they are not saved to disk
+		kryo.register(GroupedProperty.class, new FieldSerializer<GroupedProperty>(kryo, GroupedProperty.class), nextRegistrationId++);
+		kryo.register(BooleanProperty.class, new FieldSerializer<BooleanProperty>(kryo, BooleanProperty.class), nextRegistrationId++);
+		kryo.register(BooleanPropertyUpdate.class, new FieldSerializer<BooleanPropertyUpdate>(kryo, BooleanPropertyUpdate.class), nextRegistrationId++);
+		kryo.register(LongProperty.class, new FieldSerializer<LongProperty>(kryo, LongProperty.class), nextRegistrationId++);
+		kryo.register(LongPropertyUpdate.class, new FieldSerializer<LongPropertyUpdate>(kryo, LongPropertyUpdate.class), nextRegistrationId++);
+		kryo.register(PercentageProperty.class, new FieldSerializer<PercentageProperty>(kryo, PercentageProperty.class), nextRegistrationId++);
+		kryo.register(PercentagePropertyUpdate.class, new FieldSerializer<PercentagePropertyUpdate>(kryo, PercentagePropertyUpdate.class), nextRegistrationId++);
+		kryo.register(ByteProperty.class, new FieldSerializer<ByteProperty>(kryo, ByteProperty.class), nextRegistrationId++);
+		kryo.register(BytePropertyUpdate.class, new FieldSerializer<BytePropertyUpdate>(kryo, BytePropertyUpdate.class), nextRegistrationId++);
+		kryo.register(StringProperty.class, new FieldSerializer<StringProperty>(kryo, StringProperty.class), nextRegistrationId++);
+		kryo.register(StringPropertyUpdate.class, new FieldSerializer<StringPropertyUpdate>(kryo, StringPropertyUpdate.class), nextRegistrationId++);
+		kryo.register(RestoreDefaultPropertyUpdate.class, new FieldSerializer<RestoreDefaultPropertyUpdate<?>>(kryo, RestoreDefaultPropertyUpdate.class), nextRegistrationId++);
+		kryo.register(Configuration.class, new FieldSerializer<Configuration>(kryo, Configuration.class), nextRegistrationId++);
+		kryo.register(ConfigurationUpdate.class, new FieldSerializer<ConfigurationUpdate>(kryo, ConfigurationUpdate.class), nextRegistrationId++);
+		kryo.register(PropertySection.class, new FieldSerializer<PropertySection>(kryo, PropertySection.class), nextRegistrationId++);
+		// validations
+		kryo.register(PropertyValidation.class, new FieldSerializer<PropertyValidation>(kryo, PropertyValidation.class), nextRegistrationId++);
+		kryo.register(ValidationError.class, new FieldSerializer<ValidationError>(kryo, ValidationError.class), nextRegistrationId++);
+		kryo.register(PropertyValidationException.class, new FieldSerializer<PropertyValidationException>(kryo, PropertyValidationException.class), nextRegistrationId++);
+		// validators
+		kryo.register(FullyQualifiedClassNameValidator.class, new FieldSerializer<FullyQualifiedClassNameValidator>(kryo, FullyQualifiedClassNameValidator.class), nextRegistrationId++);
+		kryo.register(GreaterOrEqualValidator.class, new FieldSerializer<GreaterOrEqualValidator<?>>(kryo, GreaterOrEqualValidator.class), nextRegistrationId++);
+		kryo.register(GreaterValidator.class, new FieldSerializer<GreaterValidator<?>>(kryo, GreaterValidator.class), nextRegistrationId++);
+		kryo.register(LessOrEqualValidator.class, new FieldSerializer<LessOrEqualValidator<?>>(kryo, LessOrEqualValidator.class), nextRegistrationId++);
+		kryo.register(LessValidator.class, new FieldSerializer<LessValidator<?>>(kryo, LessValidator.class), nextRegistrationId++);
+		kryo.register(NegativeValidator.class, new FieldSerializer<NegativeValidator<?>>(kryo, NegativeValidator.class), nextRegistrationId++);
+		kryo.register(NotEmptyValidator.class, new FieldSerializer<NotEmptyValidator<?>>(kryo, NotEmptyValidator.class), nextRegistrationId++);
+		kryo.register(PercentageValidator.class, new FieldSerializer<PercentageValidator<?>>(kryo, PercentageValidator.class), nextRegistrationId++);
+		kryo.register(PositiveValidator.class, new FieldSerializer<PositiveValidator<?>>(kryo, PositiveValidator.class), nextRegistrationId++);
 	}
 
 }

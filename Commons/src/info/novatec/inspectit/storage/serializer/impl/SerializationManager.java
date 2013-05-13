@@ -6,7 +6,6 @@ import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
-import info.novatec.inspectit.cmr.service.IServerStatusService.ServerStatus;
 import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.ExceptionEvent;
@@ -272,9 +271,6 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(AggregatedExceptionSensorDataComparatorEnum.class, new EnumSerializer(AggregatedExceptionSensorDataComparatorEnum.class));
 		kryo.register(InvocationAwareDataComparatorEnum.class, new EnumSerializer(InvocationAwareDataComparatorEnum.class));
 		kryo.register(ResultComparator.class, new FieldSerializer<ResultComparator<?>>(kryo, ResultComparator.class));
-
-		// added with INSPECTIT-991
-		kryo.register(ServerStatus.class, new ServerStatusSerializer());
 		
 		// added with INSPECTIT-950
 		kryo.register(TimeFrame.class, new CustomCompatibleFieldSerializer<TimeFrame>(kryo, TimeFrame.class, schemaManager));

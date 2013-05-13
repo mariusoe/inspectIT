@@ -318,37 +318,44 @@ MIT License : slf4j-api (1.5.6), slf4j-log4j12 (1.5.6) ${line.separator}
 Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA), h2 (1.2.148)" />
 	</target>
 
-	<target name="generate-configuration-xsd-schema" depends="init">
-		<property name="jaxb-schemagen.sources" value="${src.commons}/info/novatec/inspectit/cmr/property"/>
-		<property name="jaxb-schemagen.destination" value="${basedir}/config/schema"/>
-		<property name="jaxb-schemagen.schemafilename" value="configurationSchema.xsd"/>
-		<path id="jaxb-schemagen.classpath">
-			<path refid="lib.prod.commons" />
-		</path>
-
-		<antcall target="jaxb-schemagen" inheritrefs="true"/>
+	<target name="generate-configuration-xsd-schema" depends="init,init-jaxb-schemagen">
+		<jaxb-schemagen jaxb-schemagen.src="${src.commonscs}/info/novatec/inspectit/cmr/property/configuration" jaxb-schemagen.dest="${basedir}/config/schema" jaxb-schemagen.excludes="validation/**" jaxb-schemagen.schemafilename="configurationSchema.xsd">
+			<jaxb-schemagen.classpath>
+				<path refid="lib.prod.commonscs" />
+			</jaxb-schemagen.classpath>
+		</jaxb-schemagen>
+		<jaxb-schemagen jaxb-schemagen.src="${src.commonscs}/info/novatec/inspectit/cmr/property/update" jaxb-schemagen.dest="${basedir}/config/schema" jaxb-schemagen.excludes="" jaxb-schemagen.schemafilename="configurationUpdateSchema.xsd">
+			<jaxb-schemagen.classpath>
+				<path refid="lib.prod.commonscs" />
+			</jaxb-schemagen.classpath>
+		</jaxb-schemagen>
 	</target>
 
-	<target name="check-for-xsd-schema-correctness" depends="init">
+	<target name="check-for-xsd-schema-correctness" depends="init,init-jaxb-schemagen">
 		<property name="build.configTempDir" value="${build.root}/temp/config/schema" />
 		<mkdir dir="${build.configTempDir}" />
-			
-		<!-- Build temp schema file -->
-		<property name="jaxb-schemagen.sources" value="${src.commons}/info/novatec/inspectit/cmr/property" />
-		<property name="jaxb-schemagen.destination" value="${build.configTempDir}" />
-		<property name="jaxb-schemagen.schemafilename" value="configurationSchema.xsd" />
-		<path id="jaxb-schemagen.classpath">
-			<path refid="lib.prod.commons" />
-		</path>
-		
-		<antcall target="jaxb-schemagen" inheritrefs="true"/>
+
+		<!-- Build temp schema files -->
+		<jaxb-schemagen jaxb-schemagen.src="${src.commonscs}/info/novatec/inspectit/cmr/property/configuration" jaxb-schemagen.dest="${build.configTempDir}" jaxb-schemagen.excludes="validation/**" jaxb-schemagen.schemafilename="configurationSchema.xsd">
+			<jaxb-schemagen.classpath>
+				<path refid="lib.prod.commonscs" />
+			</jaxb-schemagen.classpath>
+		</jaxb-schemagen>
+		<jaxb-schemagen jaxb-schemagen.src="${src.commonscs}/info/novatec/inspectit/cmr/property/update" jaxb-schemagen.dest="${build.configTempDir}" jaxb-schemagen.excludes="" jaxb-schemagen.schemafilename="configurationUpdateSchema.xsd">
+			<jaxb-schemagen.classpath>
+				<path refid="lib.prod.commonscs" />
+			</jaxb-schemagen.classpath>
+		</jaxb-schemagen>
 
 		<condition property="xsd-schema.notcorrect">
 			<not>
-				<filesmatch textfile="true" file1="${build.configTempDir}/configurationSchema.xsd" file2="${basedir}/config/schema/configurationSchema.xsd" />
+				<and>
+					<filesmatch textfile="true" file1="${build.configTempDir}/configurationSchema.xsd" file2="${basedir}/config/schema/configurationSchema.xsd" />
+					<filesmatch textfile="true" file1="${build.configTempDir}/configurationUpdateSchema.xsd" file2="${basedir}/config/schema/configurationUpdateSchema.xsd" />
+				</and>	
 			</not>
 		</condition>
-		
+
 		<delete dir="${build.configTempDir}" />
 		<fail if="${xsd-schema.notcorrect}"/>
 	</target>

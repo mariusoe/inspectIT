@@ -26,6 +26,13 @@
 			<class name="info.novatec.inspectit.cmr.util.AgentStatusDataProviderTest" />
 		</classes>
 	</test>
+	<test name="Properties">
+		<classes>
+			<class name="info.novatec.inspectit.cmr.property.PropertyManagerTest" />
+			<class name="info.novatec.inspectit.cmr.property.PropertyUpdateExecutorTest" />
+			<class name="info.novatec.inspectit.cmr.property.PropertyIntegrationTest" />
+		</classes>
+	</test>
 	<test name="Serializer">
 		<classes>
 			<class name="info.novatec.inspectit.storage.serializer.impl.HibernateSerializerTest" />
@@ -42,11 +49,6 @@
 			<class name="info.novatec.inspectit.cmr.storage.CmrStorageManagerTest" />
 			<class name="info.novatec.inspectit.cmr.storage.CmrStorageRecorderTest" />
 			<class name="info.novatec.inspectit.cmr.service.rest.StorageRestfulServiceTest" />
-		</classes>
-	</test>
-	<test name="Properties">
-		<classes>
-			<class name="info.novatec.inspectit.cmr.property.PropertyManagerTest" />
 		</classes>
 	</test>
 </suite>

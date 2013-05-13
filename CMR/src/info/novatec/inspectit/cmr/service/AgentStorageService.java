@@ -1,6 +1,7 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.DefaultDataDao;
+import info.novatec.inspectit.cmr.property.spring.PropertyUpdate;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
 import info.novatec.inspectit.cmr.util.AgentStatusDataProvider;
 import info.novatec.inspectit.cmr.util.Converter;
@@ -9,6 +10,7 @@ import info.novatec.inspectit.spring.logger.Log;
 
 import java.lang.ref.SoftReference;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -33,11 +35,6 @@ public class AgentStorageService implements IAgentStorageService {
 	/** The logger of this class. */
 	@Log
 	Logger log;
-
-	/**
-	 * Maximum number of threads working, so we protect against bad configuration.
-	 */
-	private static final int MAX_THREADS = 5;
 
 	/**
 	 * Queue capacity for incoming data.
@@ -79,6 +76,11 @@ public class AgentStorageService implements IAgentStorageService {
 	private int threadCount;
 
 	/**
+	 * List of currently active threads that process the data.
+	 */
+	private List<Thread> threadList = new ArrayList<>();
+
+	/**
 	 * Default constructor.
 	 */
 	public AgentStorageService() {
@@ -118,6 +120,41 @@ public class AgentStorageService implements IAgentStorageService {
 	}
 
 	/**
+	 * Updates the number of data processing threads. The new number of threads should be defined in
+	 * {@link #threadCount} before calling this method.
+	 * <p>
+	 * This is an automated properties update execution method.
+	 */
+	@PropertyUpdate(properties = { "cmr.agentStorageServiceThreadCount" })
+	public synchronized void updateThreadCount() {
+		if (threadCount <= 0) {
+			threadCount = 1;
+		}
+
+		int threadListSize = threadList.size();
+		if (threadCount < threadListSize) {
+			// remove threads
+			for (int i = 0; i < threadListSize - threadCount; i++) {
+				Thread thread = threadList.remove(i);
+				thread.interrupt();
+				try {
+					thread.join();
+				} catch (InterruptedException e) {
+					Thread.interrupted();
+				}
+			}
+		} else if (threadCount > threadListSize) {
+			// add new threads
+			for (int i = threadListSize; i < threadCount; i++) {
+				ProcessDataThread processDataThread = new ProcessDataThread();
+				processDataThread.start();
+				threadList.add(processDataThread);
+			}
+
+		}
+	}
+
+	/**
 	 * Is executed after dependency injection is done to perform any initialization.
 	 * 
 	 * @throws Exception
@@ -125,15 +162,7 @@ public class AgentStorageService implements IAgentStorageService {
 	 */
 	@PostConstruct
 	public void postConstruct() throws Exception {
-		if (threadCount <= 0) {
-			threadCount = 1;
-		} else if (threadCount > MAX_THREADS) {
-			threadCount = MAX_THREADS;
-		}
-
-		for (int i = 0; i < threadCount; i++) {
-			new ProcessDataThread().start();
-		}
+		updateThreadCount();
 
 		if (log.isInfoEnabled()) {
 			log.info("|-Agent Storage Service active...");
@@ -163,6 +192,10 @@ public class AgentStorageService implements IAgentStorageService {
 		@Override
 		public void run() {
 			while (true) {
+				if (isInterrupted()) {
+					break;
+				}
+
 				SoftReference<List<? extends DefaultData>> softReference = null;
 				try {
 					softReference = dataObjectsBlockingQueue.take();

@@ -1,5 +1,6 @@
 package info.novatec.inspectit.storage.nio;
 
+import info.novatec.inspectit.cmr.property.spring.PropertyUpdate;
 import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.storage.nio.bytebuffer.ByteBufferPoolFactory;
 import info.novatec.inspectit.util.UnderlyingSystemInfo;
@@ -222,6 +223,17 @@ public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
 					+ ")");
 		}
 
+		updatePoolProperties();
+	}
+
+	/**
+	 * Updates the buffer capacity, min & max idle buffers based on the current properties.
+	 * <p>
+	 * This is an automated properties update execution method.
+	 */
+	@PropertyUpdate(properties = { "storage.bufferSize", "storage.bufferPoolMinCapacity", "storage.bufferPoolMaxCapacity", "storage.bufferPoolMinDirectMemoryOccupancy",
+			"storage.bufferPoolMaxDirectMemoryOccupancy" })
+	protected void updatePoolProperties() {
 		// assume that the maxDirect memory is 64MB
 		long maxDirectMemory = 64 * 1024 * 1024;
 		try {
@@ -233,7 +245,7 @@ public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
 			}
 		} catch (Exception e) {
 			if (log.isDebugEnabled()) {
-				log.debug("Exception occured trying to use the class sun.misc.VM via reflection", e);
+				log.debug("Exception occurred trying to use the class sun.misc.VM via reflection", e);
 			}
 		}
 

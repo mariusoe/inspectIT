@@ -55,4 +55,14 @@
 			<class name="info.novatec.inspectit.storage.util.FileVisitorsTest" />
 		</classes>
 	</test>
+	<test name="Properties">
+		<classes>
+			<class name="info.novatec.inspectit.cmr.property.XmlTransformationTest" />
+			<class name="info.novatec.inspectit.cmr.property.configuration.GroupedPropertyTest" />
+			<class name="info.novatec.inspectit.cmr.property.configuration.SinglePropertyTest" />
+			<class name="info.novatec.inspectit.cmr.property.configuration.ConfigurationTest" />
+			<class name="info.novatec.inspectit.cmr.property.configuration.validator.ValidatorsTest" />
+			<class name="info.novatec.inspectit.cmr.property.update.ConfigurationUpdateTest" />
+		</classes>
+	</test>
 </suite>

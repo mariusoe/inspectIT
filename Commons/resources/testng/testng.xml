@@ -14,12 +14,4 @@
 			<class name="info.novatec.inspectit.storage.serializer.impl.BackwardForwardCompatibilityTest" />
 		</classes>
 	</test>
-	<test name="Properties">
-		<classes>
-			<class name="info.novatec.inspectit.cmr.property.GroupedPropertyTest" />
-			<class name="info.novatec.inspectit.cmr.property.SinglePropertyTest" />
-			<class name="info.novatec.inspectit.cmr.property.XmlTransformationTest" />
-			<class name="info.novatec.inspectit.cmr.property.validation.validators.ValidatorsTest" />
-		</classes>
-	</test>
 </suite>
