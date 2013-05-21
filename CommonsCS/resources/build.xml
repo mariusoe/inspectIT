@@ -22,7 +22,6 @@
 		<ivy:settings file="${ivy.settings.file}" />
 		<ivy:resolve file="${ivy.file}" />
 		<ivy:cachepath pathid="lib.prod" conf="prod" />
-		<ivy:cachepath pathid="lib.osgi" conf="osgi" />
 
 		<ivy:resolve file="${ivy.file.commons}" />
 		<ivy:cachepath pathid="lib.prod.commons" conf="prod" />
@@ -78,7 +77,7 @@
 		<!-- We need to separate the real jars from sources and other artifacts -->
 		<!-- that's why we need a TMP folder -->
 		<copy todir="${build.release.root}/lib/tmp" flatten="true">
-			<path refid="lib.osgi" />
+			<path refid="lib.prod" />
 		</copy>
 		<copy todir="${pluginReleaseDir}">
 			<fileset dir="${build.release.root}/lib/tmp">

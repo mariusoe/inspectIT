@@ -27,13 +27,13 @@
 
 	<dependencies>
 
-		<!-- OSGi ready from SpringSource-->
+		<!-- OSGi ready from SpringSource -->
 		<!-- Most of the artifacts on SpringSource don't have the default configuration in POM -->
 		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.logging" rev="1.1.1" conf="osgi->default" />
 		<dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="osgi->default" />
-		<dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2" conf="osgi->default"/>
-		<dependency org="commons-io" name="commons-io" rev="2.4" conf="osgi->default"/>
-		<dependency org="commons-lang" name="commons-lang" rev="2.5" conf="osgi->default"/>
+		<dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2" conf="osgi->default" />
+		<dependency org="commons-io" name="commons-io" rev="2.4" conf="osgi->default" />
+		<dependency org="commons-lang" name="commons-lang" rev="2.5" conf="osgi->default" />
 
 		<dependency org="org.springframework" name="org.springframework.core" rev="3.1.0.RELEASE" conf="osgi->default" />
 		<dependency org="org.springframework" name="org.springframework.beans" rev="3.1.0.RELEASE" conf="osgi->default" />
@@ -55,24 +55,24 @@
 
 		<!-- Libs that are transfered by us -->
 
-		<dependency org="org.hibernate" name="info.novatec.hibernate-core" rev="3.5.3-Final" transitive="false" conf="osgi->default" />
-		<dependency org="jfree" name="info.novatec.jcommon" rev="1.0.16" transitive="false" conf="osgi->default" />
-		<dependency org="jfree" name="info.novatec.jfreechart" rev="1.0.13" transitive="false" conf="osgi->default" />
-		<dependency org="jfree" name="info.novatec.jfreechart-experimental" rev="1.0.13" transitive="false" conf="osgi->default" />
-		<dependency org="jfree" name="info.novatec.jfreechart-swt" rev="1.0.13" transitive="false" conf="osgi->default" />
-		<dependency org="jfree" name="info.novatec.swtgraphics2d" rev="1.0.13" transitive="false" conf="osgi->default" />
+		<dependency org="org.hibernate" name="info.novatec.hibernate-core" rev="3.5.3-Final" conf="osgi->default" />
+		<dependency org="jfree" name="info.novatec.jcommon" rev="1.0.16" conf="osgi->default" />
+		<dependency org="jfree" name="info.novatec.jfreechart" rev="1.0.13" conf="osgi->default" />
+		<dependency org="jfree" name="info.novatec.jfreechart-experimental" rev="1.0.13" conf="osgi->default" />
+		<dependency org="jfree" name="info.novatec.jfreechart-swt" rev="1.0.13" conf="osgi->default" />
+		<dependency org="jfree" name="info.novatec.swtgraphics2d" rev="1.0.13" conf="osgi->default" />
 
-		<dependency org="org.apache.httpcomponents" name="info.novatec.httpclient" rev="4.1.1" transitive="false" conf="osgi->default" />
-		<dependency org="org.apache.httpcomponents" name="info.novatec.httpcore" rev="4.1.1" transitive="false" conf="osgi->default" />
-		<dependency org="org.apache.httpcomponents" name="info.novatec.httpmime" rev="4.1.1" transitive="false" conf="osgi->default" />
-		<dependency org="com.google.guava" name="info.novatec.guava" rev="11.0.1"  conf="osgi->default"/>
+		<dependency org="org.apache.httpcomponents" name="info.novatec.httpclient" rev="4.1.1" conf="osgi->default" />
+		<dependency org="org.apache.httpcomponents" name="info.novatec.httpcore" rev="4.1.1" conf="osgi->default" />
+		<dependency org="org.apache.httpcomponents" name="info.novatec.httpmime" rev="4.1.1" conf="osgi->default" />
+		<dependency org="com.google.guava" name="info.novatec.guava" rev="11.0.1" conf="osgi->default" />
 
-		<dependency org="com.esotericsoftware.kryo" name="info.novatec.kryo" rev="2.20" transitive="false" conf="osgi->default"/>
+		<dependency org="com.esotericsoftware.kryo" name="info.novatec.kryo" rev="2.20" conf="osgi->default" />
 
 		<!-- Test -->
 		<!-- Test NG should be on the build path via the Eclipse plug-in -->
 		<dependency org="org.mockito" name="mockito-all" rev="1.9.0" conf="test->default" />
-		<dependency org="com.ibm.icu" name="icu4j" rev="4.0.1" conf="test->default"/>
+		<dependency org="com.ibm.icu" name="icu4j" rev="4.0.1" conf="test->default" />
 		<dependency org="org.hamcrest" name="hamcrest-all" rev="1.3" conf="test->default" />
 	</dependencies>
 </ivy-module>

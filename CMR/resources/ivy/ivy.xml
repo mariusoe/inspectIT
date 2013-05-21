@@ -11,64 +11,69 @@
          any changes to the production libraries (changing of revisions is safe!) -->
 
     <!-- PLEASE UPDATE THE 3rd PARTY NOTIFICATION LIST IN build.xml FOR ANY CHANGE -->
+    
+    <!-- IMPORTANT
+		 * As from ticket INSPECTIT-971 all projects will only define the OSGi compliant libs
+		 * Please make sure that any dependency added is OSGi compliant
+		 * Further info on https://confluence.novatec-gmbh.de/display/INSPECTIT/Usage+of+3rd+party+libraries+in+the+plugins
+	 -->
 
 	<dependencies>
-		<dependency org="commons-logging" name="commons-logging" rev="1.1.1" transitive="false" conf="prod->default" />
-		<dependency org="log4j" name="log4j" force="true" rev="1.2.15" transitive="false" conf="prod->default" />
-		<!-- The org.slf4j libraries have a non-declared dependency of the log4j version!
-			BE CAREFUL when changing the version of these 3 libraries -->
-		<dependency org="org.slf4j" name="slf4j-api" rev="1.5.6" transitive="false" conf="prod->default"/>
-		<dependency org="org.slf4j" name="slf4j-log4j12" rev="1.5.6" transitive="false" conf="prod->default"/>
+		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.logging" rev="1.1.1" conf="prod->default" />
+		<dependency org="log4j" name="log4j" force="true" rev="1.2.15" conf="prod->default" />
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.5.6" conf="prod->default" />
+		<dependency org="org.slf4j" name="slf4j-log4j12" rev="1.5.6" conf="prod->default" />
 
-		<dependency org="org.springframework" name="spring-core" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-aop" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
-		<dependency org="aopalliance" name="aopalliance" rev="1.0" transitive="false" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-context" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-context-support" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-beans" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-orm" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-tx" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-web" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-asm" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-expression" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-jdbc" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
-
-		<dependency org="org.aspectj" name="aspectjweaver" rev="1.7.2" transitive="false" conf="prod->default"/>
-		<dependency org="org.aspectj" name="aspectjrt" rev="1.7.2" transitive="false" conf="prod->default"/>
-		<dependency org="com.caucho" name="hessian" rev="3.1.5" transitive="false" conf="prod->default"/>
+		<dependency org="org.springframework" name="org.springframework.core" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="org.springframework.beans" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="org.springframework.context" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="org.springframework.context.support" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="org.springframework.web" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="org.springframework.asm" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="org.springframework.expression" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="org.springframework.aop" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="org.springframework.orm" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="org.springframework.transaction" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="org.springframework.jdbc" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.aopalliance" name="com.springsource.org.aopalliance" rev="1.0.0" conf="prod->default" />
 		<dependency org="javax.servlet" name="javax.servlet" rev="3.0.0.v201103241009" conf="prod->default" />
-		<dependency org="javax.transaction" name="jta" rev="1.0.1B" transitive="false" conf="prod->default"/>
-		<dependency org="commons-collections" name="commons-collections" rev="3.2" transitive="false" conf="prod->default"/>
-		<dependency org="cglib" name="cglib-nodep" rev="2.2.2" transitive="false" conf="prod->default"/>
-		<dependency org="dom4j" name="dom4j" rev="1.6.1" transitive="false" conf="prod->default"/>
+		<dependency org="net.sourceforge.cglib" name="com.springsource.net.sf.cglib" rev="2.2.0" conf="prod->default" />
 
-		<dependency org="org.mortbay.jetty" name="jetty" rev="6.1.26" transitive="false" conf="prod->default"/>
-		<dependency org="org.mortbay.jetty" name="jetty-util" rev="6.1.26" transitive="false" conf="prod->default"/>
+		<dependency org="org.aspectj" name="aspectjweaver" rev="1.7.2" conf="prod->default" />
+		<dependency org="org.aspectj" name="aspectjrt" rev="1.7.2" conf="prod->default" />
+		<dependency org="com.caucho" name="hessian" rev="3.1.5" conf="prod->default" />
+		<dependency org="javax.transaction" name="com.springsource.javax.transaction" rev="1.1.0" conf="prod->default" />
+		<dependency org="dom4j" name="dom4j" rev="1.6.1" conf="prod->default" />
 
-		<dependency org="org.hibernate" name="hibernate-core" rev="3.6.9.Final" transitive="false" conf="prod->default"/>
-		<dependency org="org.hibernate.common" name="hibernate-commons-annotations" rev="4.0.1.Final" transitive="false" conf="prod->default"/>
-		<dependency org="org.jboss.logging" name="jboss-logging" rev="3.1.2.GA" transitive="false" conf="prod->default"/>
-		<dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.1.Final" transitive="false" conf="prod->default"/>
-		<dependency org="javassist" name="javassist" rev="3.12.0.GA" transitive="false" conf="prod->default"/>
-		<dependency org="antlr" name="antlr" rev="2.7.7" transitive="false" conf="prod->default"/>
-		<dependency org="com.h2database" name="h2" rev="1.3.171" transitive="false" conf="prod->default"/>
-		<dependency org="c3p0" name="c3p0" rev="0.9.1.2" transitive="false" conf="prod->default"/>
+		<dependency org="commons-codec" name="commons-codec" rev="1.3" conf="prod->default" />
+		<dependency org="commons-lang" name="commons-lang" rev="2.5" conf="prod->default" />
+		<dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="prod->default" />
 
-		<dependency org="commons-codec" name="commons-codec" rev="1.3" transitive="false" conf="prod->default"/>
-		<dependency org="commons-lang" name="commons-lang" rev="2.5" conf="prod->default"/>
-		<dependency org="truelicense" name="truelicense" rev="1.29" transitive="false" conf="prod->default"/>
-		<dependency org="truelicense" name="truexml" rev="1.29" transitive="false" conf="prod->default"/>
+		<dependency org="com.esotericsoftware.kryo" name="info.novatec.kryo" rev="2.20" conf="prod->default" />
 
-		<dependency org="com.esotericsoftware.kryo" name="kryo" rev="2.20" transitive="false" conf="prod->default"/>
+		<dependency org="org.mortbay.jetty" name="jetty" rev="6.1.26" conf="prod->default" />
+		<dependency org="org.mortbay.jetty" name="jetty-util" rev="6.1.26" conf="prod->default" />
+
+		<dependency org="truelicense" name="truelicense" rev="1.29" conf="prod->default" />
+		<dependency org="truelicense" name="truexml" rev="1.29" conf="prod->default" />
+
+		<dependency org="org.hibernate" name="hibernate-core" rev="3.6.9.Final" conf="prod->default" />
+		<dependency org="org.hibernate.common" name="hibernate-commons-annotations" rev="4.0.1.Final" conf="prod->default" />
+		<dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.1.Final" conf="prod->default" />
+		<dependency org="org.jboss.logging" name="jboss-logging" rev="3.1.2.GA" conf="prod->default" />
+		<dependency org="javassist" name="javassist" rev="3.12.0.GA" conf="prod->default" />
+		<dependency org="antlr" name="antlr" rev="2.7.7" conf="prod->default" />
+		<dependency org="com.h2database" name="h2" rev="1.3.171" conf="prod->default" />
+		<dependency org="c3p0" name="c3p0" rev="0.9.1.2" conf="prod->default" />
 
 		<!-- Test -->
 		<!-- Test NG should be on the build path via the Eclipse plug-in -->
-		<dependency org="org.springframework" name="spring-test" rev="3.1.0.RELEASE" conf="test->default"/>
+		<dependency org="org.springframework" name="spring-test" rev="3.1.0.RELEASE" conf="test->default" />
 		<dependency org="classmexer" name="classmexer" rev="0.0.3" conf="test->default" />
 		<dependency org="org.mockito" name="mockito-core" rev="1.9.0" conf="test->default" />
-		<dependency org="org.objenesis" name="objenesis" rev="1.2" conf="test->default"/> <!-- Needed for mockito-core -->
-		<dependency org="nl.jqno.equalsverifier" name="equalsverifier" rev="1.0.2" conf="test->default"/>
+		<dependency org="org.objenesis" name="objenesis" rev="1.2" conf="test->default" /> <!-- Needed for mockito-core -->
+		<dependency org="nl.jqno.equalsverifier" name="equalsverifier" rev="1.0.2" conf="test->default" />
 		<dependency org="org.hamcrest" name="hamcrest-all" rev="1.3" conf="test->default" />
-		<dependency org="commons-pool" name="commons-pool" rev="1.6" transitive="false" conf="test->default"/>
+		<dependency org="commons-pool" name="commons-pool" rev="1.6" conf="test->default" />
 	</dependencies>
 </ivy-module>
