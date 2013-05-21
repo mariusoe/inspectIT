@@ -7,8 +7,10 @@ import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.processor.AbstractExtractorDataProcessor;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * This is a special type of processor. It extract the children information from a
@@ -44,11 +46,12 @@ public class InvocationExtractorDataProcessor extends AbstractExtractorDataProce
 	/**
 	 * {@inheritDoc}
 	 */
-	protected void processData(DefaultData defaultData) {
+	protected Collection<Future<Void>> processData(DefaultData defaultData) {
 		if (defaultData instanceof InvocationSequenceData) {
 			InvocationSequenceData invocation = (InvocationSequenceData) defaultData;
 			extractDataFromInvocation(invocation);
 		}
+		return Collections.emptyList();
 	}
 
 	/**

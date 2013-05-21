@@ -4,6 +4,9 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.storage.IWriter;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.Future;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -32,14 +35,14 @@ public abstract class AbstractDataProcessor implements Serializable {
 	 * 
 	 * @param defaultData
 	 *            Default data object.
-	 * @return True if data was processed, false otherwise.
+	 * @return Returns list of {@link Future}s if the data processing submitted one or more writing
+	 *         tasks. Empty collection means no writing tasks were submitted.
 	 */
-	public boolean process(DefaultData defaultData) {
+	public Collection<Future<Void>> process(DefaultData defaultData) {
 		if (canBeProcessed(defaultData)) {
-			processData(defaultData);
-			return true;
+			return processData(defaultData);
 		}
-		return false;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -47,8 +50,10 @@ public abstract class AbstractDataProcessor implements Serializable {
 	 * 
 	 * @param defaultData
 	 *            Default data object.
+	 * @return Returns list of {@link Future}s if the data processing submitted one or more writing
+	 *         tasks. Empty collection means no writing tasks were submitted.
 	 */
-	protected abstract void processData(DefaultData defaultData);
+	protected abstract Collection<Future<Void>> processData(DefaultData defaultData);
 
 	/**
 	 * Returns if the {@link DefaultData} object can be processed by this
@@ -67,8 +72,12 @@ public abstract class AbstractDataProcessor implements Serializable {
 	 * <p>
 	 * Default implementation of this method does not do anything, subclasses should override it if
 	 * any specific action is needed.
+	 * 
+	 * @return Returns list of {@link Future}s if the data flushing submitted one or more writing
+	 *         tasks. Empty collection means no writing tasks were submitted.
 	 */
-	public void flush() {
+	public Collection<Future<Void>> flush() {
+		return Collections.emptyList();
 	}
 
 	/**

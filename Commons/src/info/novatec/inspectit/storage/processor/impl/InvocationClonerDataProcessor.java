@@ -4,6 +4,10 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.Future;
+
 /**
  * This processor writes an cloned invocation without children to the {@link StorageWriter}.
  * 
@@ -20,12 +24,16 @@ public class InvocationClonerDataProcessor extends AbstractDataProcessor {
 	/**
 	 * {@inheritDoc}
 	 */
-	protected void processData(DefaultData defaultData) {
+	protected Collection<Future<Void>> processData(DefaultData defaultData) {
 		if (defaultData instanceof InvocationSequenceData) {
 			InvocationSequenceData invocation = (InvocationSequenceData) defaultData;
 			InvocationSequenceData clone = invocation.getClonedInvocationSequence();
-			getStorageWriter().write(clone);
+			Future<Void> future = getStorageWriter().write(clone);
+			if (null != future) {
+				return Collections.singleton(future);
+			}
 		}
+		return Collections.emptyList();
 	}
 
 	/**

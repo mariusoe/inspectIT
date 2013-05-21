@@ -1,12 +1,15 @@
 package info.novatec.inspectit.storage.processor;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
@@ -21,11 +24,19 @@ import info.novatec.inspectit.storage.processor.impl.TimeFrameDataProcessor;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.Future;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
@@ -40,7 +51,23 @@ public class StorageDataProcessorsTest {
 	/**
 	 * Storage writer.
 	 */
+	@Mock
 	private StorageWriter storageWriter;
+
+	@BeforeMethod
+	public void init() {
+		MockitoAnnotations.initMocks(this);
+		Answer<Future<Void>> answer = new Answer<Future<Void>>() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public Future<Void> answer(InvocationOnMock invocation) throws Throwable {
+				return mock(Future.class);
+			}
+		};
+
+		when(storageWriter.write(Mockito.<DefaultData> anyObject())).thenAnswer(answer);
+		when(storageWriter.write(Mockito.<DefaultData> anyObject(), Mockito.<Map<?, ?>> anyObject())).thenAnswer(answer);
+	}
 
 	/**
 	 * Tests that the {@link DataSaverProcessor} will not save data type if type is not registered
@@ -48,7 +75,6 @@ public class StorageDataProcessorsTest {
 	 */
 	@Test
 	public void testSimpleSaverExclusive() {
-		storageWriter = mock(StorageWriter.class);
 		List<Class<? extends DefaultData>> includedClasses = new ArrayList<Class<? extends DefaultData>>();
 		includedClasses.add(InvocationSequenceData.class);
 		DataSaverProcessor dataSaverProcessor = new DataSaverProcessor(includedClasses, true);
@@ -57,7 +83,8 @@ public class StorageDataProcessorsTest {
 		TimerData timerData = new TimerData();
 		assertThat(dataSaverProcessor.canBeProcessed(timerData), is(false));
 
-		dataSaverProcessor.process(timerData);
+		Collection<Future<Void>> futures = dataSaverProcessor.process(timerData);
+		assertThat(futures, is(empty()));
 		verifyZeroInteractions(storageWriter);
 	}
 
@@ -67,7 +94,6 @@ public class StorageDataProcessorsTest {
 	 */
 	@Test
 	public void testSimpleSaverInclusive() {
-		storageWriter = mock(StorageWriter.class);
 		List<Class<? extends DefaultData>> includedClasses = new ArrayList<Class<? extends DefaultData>>();
 		includedClasses.add(InvocationSequenceData.class);
 		DataSaverProcessor dataSaverProcessor = new DataSaverProcessor(includedClasses, true);
@@ -76,7 +102,8 @@ public class StorageDataProcessorsTest {
 		InvocationSequenceData invocation = new InvocationSequenceData();
 		assertThat(dataSaverProcessor.canBeProcessed(invocation), is(true));
 
-		dataSaverProcessor.process(invocation);
+		Collection<Future<Void>> futures = dataSaverProcessor.process(invocation);
+		assertThat(futures, hasSize(1));
 		verify(storageWriter, times(1)).write(invocation);
 	}
 
@@ -86,7 +113,6 @@ public class StorageDataProcessorsTest {
 	 */
 	@Test
 	public void testInvocationCloner() {
-		storageWriter = mock(StorageWriter.class);
 		InvocationClonerDataProcessor invocationDataProcessor = new InvocationClonerDataProcessor();
 		invocationDataProcessor.setStorageWriter(storageWriter);
 
@@ -96,7 +122,8 @@ public class StorageDataProcessorsTest {
 		TimerData timerData = new TimerData();
 		assertThat(invocationDataProcessor.canBeProcessed(timerData), is(false));
 
-		invocationDataProcessor.process(invocation);
+		Collection<Future<Void>> futures = invocationDataProcessor.process(invocation);
+		assertThat(futures, hasSize(1));
 		verify(storageWriter, times(1)).write(any(InvocationSequenceData.class));
 	}
 
@@ -106,7 +133,6 @@ public class StorageDataProcessorsTest {
 	 */
 	@Test
 	public void testInvocationExtractor() {
-		storageWriter = mock(StorageWriter.class);
 		AbstractDataProcessor chainedProcessor = mock(AbstractDataProcessor.class);
 		List<AbstractDataProcessor> chainedList = new ArrayList<AbstractDataProcessor>();
 		chainedList.add(chainedProcessor);
@@ -181,7 +207,6 @@ public class StorageDataProcessorsTest {
 	@Test
 	public void testDataAggregatorProcessor() {
 		int aggregationPeriod = 100;
-		storageWriter = mock(StorageWriter.class);
 		DataAggregatorProcessor<TimerData> dataAggregatorProcessor = new DataAggregatorProcessor<TimerData>(TimerData.class, aggregationPeriod, new TimerDataAggregator(), true);
 		dataAggregatorProcessor.setStorageWriter(storageWriter);
 
@@ -199,8 +224,8 @@ public class StorageDataProcessorsTest {
 			dataAggregatorProcessor.process(timerData);
 		}
 
-		dataAggregatorProcessor.flush();
-
+		Collection<Future<Void>> futures = dataAggregatorProcessor.flush();
+		assertThat(futures, hasSize(1));
 		verify(storageWriter, times(1)).write(Mockito.<TimerData> anyObject());
 	}
 }

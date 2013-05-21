@@ -18,13 +18,18 @@ import java.lang.ref.SoftReference;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -156,6 +161,12 @@ public class StorageWriter implements IWriter {
 	private ScheduledFuture<?> checkWritingStatusFuture;
 
 	/**
+	 * The set of the currently active writing tasks represented by {@link FutureTask}. When this
+	 * set is empty, it means that no writing tasks is currently being executed.
+	 */
+	private Set<FutureTask<?>> activeWritingTasks = Collections.newSetFromMap(new ConcurrentHashMap<FutureTask<?>, Boolean>(256, 0.75f, 4));
+
+	/**
 	 * Process the list of objects against the all the {@link AbstractDataProcessor}s that are
 	 * provided. Processor define which data will be stored, when and in which format.
 	 * <p>
@@ -168,8 +179,13 @@ public class StorageWriter implements IWriter {
 	 *            List of objects to process.
 	 * @param processors
 	 *            List of processors. Can be null, and in this case direct write will be executed.
+	 * @return Returns collection of void {@link Future}s, one for each writing task that has been
+	 *         creating while data has been processed. These futures provide only the information
+	 *         when the single writing task is executed, but not when the serialized bytes are
+	 *         actually written on disk.
 	 */
-	public void process(Collection<? extends DefaultData> defaultDataList, Collection<AbstractDataProcessor> processors) {
+	public Collection<Future<Void>> process(Collection<? extends DefaultData> defaultDataList, Collection<AbstractDataProcessor> processors) {
+		List<Future<Void>> futureList = new ArrayList<>();
 		if (null != processors && !processors.isEmpty()) {
 			// first prepare processors
 			for (AbstractDataProcessor processor : processors) {
@@ -179,21 +195,23 @@ public class StorageWriter implements IWriter {
 			// the write all data
 			for (DefaultData defaultData : defaultDataList) {
 				for (AbstractDataProcessor processor : processors) {
-					processor.process(defaultData);
+					futureList.addAll(processor.process(defaultData));
 				}
 			}
 
 			// at the end flush the data from processors and reset its storage writer
 			for (AbstractDataProcessor processor : processors) {
-				processor.flush();
+				futureList.addAll(processor.flush());
 				processor.setStorageWriter(null);
 			}
 		} else {
 			// the write all data with out processing
 			for (DefaultData defaultData : defaultDataList) {
-				this.write(defaultData);
+				Future<Void> future = this.write(defaultData);
+				futureList.add(future);
 			}
 		}
+		return futureList;
 	}
 
 	/**
@@ -207,14 +225,17 @@ public class StorageWriter implements IWriter {
 	 *            List of processors. Can be null, and in this case direct write will be executed.
 	 */
 	public void processSynchronously(Collection<? extends DefaultData> defaultDataList, Collection<AbstractDataProcessor> processors) {
-		this.process(defaultDataList, processors);
-		long tasksCount = writingExecutorService.getTaskCount();
-		while (true) {
-			long tasksCompleted = writingExecutorService.getCompletedTaskCount();
-			if (tasksCompleted >= tasksCount) {
-				break;
-			} else {
-				// if still are not done sleep
+		Collection<Future<Void>> futures = this.process(defaultDataList, processors);
+		while (!futures.isEmpty()) {
+			for (Iterator<Future<Void>> it = futures.iterator(); it.hasNext();) {
+				Future<Void> future = it.next();
+				if (future.isDone()) {
+					it.remove();
+				}
+			}
+
+			// if still are not done sleep
+			if (!futures.isEmpty()) {
 				try {
 					Thread.sleep(FINALIZATION_TASKS_SLEEP_TIME);
 				} catch (InterruptedException e) {
@@ -229,8 +250,8 @@ public class StorageWriter implements IWriter {
 	 * <p>
 	 * This method is only submitting a new writing task, thus it is thread safe and very fast.
 	 */
-	public void write(DefaultData defaultData) {
-		write(defaultData, Collections.emptyMap());
+	public Future<Void> write(DefaultData defaultData) {
+		return write(defaultData, Collections.emptyMap());
 	}
 
 	/**
@@ -238,10 +259,15 @@ public class StorageWriter implements IWriter {
 	 * <p>
 	 * This method is only submitting a new writing task, thus it is thread safe and very fast.
 	 */
-	public void write(DefaultData defaultData, Map<?, ?> kryoPreferences) {
+	public Future<Void> write(DefaultData defaultData, Map<?, ?> kryoPreferences) {
 		if (writingOn && storageManager.canWriteMore()) {
 			WriteTask writeTask = new WriteTask(defaultData, kryoPreferences);
-			writingExecutorService.submit(writeTask);
+			WriteFutureTask writeFutureTask = new WriteFutureTask(writeTask);
+			activeWritingTasks.add(writeFutureTask);
+			writingExecutorService.submit(writeFutureTask);
+			return writeFutureTask;
+		} else {
+			return null;
 		}
 	}
 
@@ -299,7 +325,7 @@ public class StorageWriter implements IWriter {
 			boolean logged = false;
 			// check amount of active tasks
 			while (true) {
-				long activeTasks = getQueuedTaskCount();
+				long activeTasks = activeWritingTasks.size();
 				if (activeTasks > 0) {
 					if (log.isDebugEnabled() && !logged) {
 						log.info("Storage: " + storageData + " is waiting for finalization. Still " + activeTasks + " queued tasks need to be processed.");
@@ -380,7 +406,7 @@ public class StorageWriter implements IWriter {
 	 * @return Number of queued tasks in the executor service.
 	 */
 	public long getQueuedTaskCount() {
-		return writingExecutorService.getTaskCount() - writingExecutorService.getCompletedTaskCount();
+		return activeWritingTasks.size();
 	}
 
 	/**
@@ -620,6 +646,35 @@ public class StorageWriter implements IWriter {
 		 */
 		public DefaultData getData() {
 			return referenceToWriteData.get();
+		}
+
+	}
+
+	/**
+	 * Writing future task that will remove itself from the {@link StorageWriter#activeWritingTasks}
+	 * set after the completion of runnable it has been asigned.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private class WriteFutureTask extends FutureTask<Void> {
+
+		/**
+		 * Default constructor.
+		 * 
+		 * @param runnable
+		 *            Runnable to execute.
+		 */
+		public WriteFutureTask(Runnable runnable) {
+			super(runnable, null);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void done() {
+			activeWritingTasks.remove(this);
 		}
 
 	}

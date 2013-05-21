@@ -9,11 +9,17 @@ import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.serializer.util.KryoSerializationPreferences;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * This class aggregates data and writes only aggregated objects to the writer.
@@ -138,7 +144,7 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	protected void processData(DefaultData defaultData) {
+	protected Collection<Future<Void>> processData(DefaultData defaultData) {
 		E timerData = (E) defaultData;
 		long alteredTimestamp = getAlteredTimestamp(timerData);
 		int cacheHash = getCacheHash(timerData, alteredTimestamp);
@@ -159,6 +165,7 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 			}
 		}
 		aggData.aggregate(timerData);
+		return Collections.emptyList();
 	}
 
 	/**
@@ -187,17 +194,20 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void flush() {
+	public Collection<Future<Void>> flush() {
+		Collection<Future<Void>> futures = new ArrayList<Future<Void>>();
 		IAggregatedData<E> oldest = queue.poll();
 		while (null != oldest) {
 			E data = oldest.getData();
 			map.remove(getCacheHash(data, data.getTimeStamp().getTime()));
 			data.finalizeData();
 			elementCount.decrementAndGet();
-			passToStorageWriter(data);
+			Future<Void> future = passToStorageWriter(data);
+			CollectionUtils.addIgnoreNull(futures, future);
 
 			oldest = queue.poll();
 		}
+		return futures;
 	}
 
 	/**
@@ -205,16 +215,17 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 	 * 
 	 * @param data
 	 *            Data to be written.
+	 * @return {@link Future} received from Storage writer.
 	 */
-	private void passToStorageWriter(E data) {
+	private Future<Void> passToStorageWriter(E data) {
 		// if I am writing the InvocationAwareData and invocations are not saved
 		// make sure we don't save the invocation affiliation
 		if (!writeInvocationAffiliation) {
 			Map<String, Boolean> kryoPreferences = new HashMap<String, Boolean>(1);
 			kryoPreferences.put(KryoSerializationPreferences.WRITE_INVOCATION_AFFILIATION_DATA, Boolean.FALSE);
-			getStorageWriter().write(data, kryoPreferences);
+			return getStorageWriter().write(data, kryoPreferences);
 		} else {
-			getStorageWriter().write(data);
+			return getStorageWriter().write(data);
 		}
 	}
 

@@ -6,9 +6,12 @@ import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.serializer.util.KryoSerializationPreferences;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  * {@link DataSaverProcessor} enables definition of classes which objects need to be saved to the
@@ -60,16 +63,23 @@ public class DataSaverProcessor extends AbstractDataProcessor {
 	/**
 	 * {@inheritDoc}
 	 */
-	protected void processData(DefaultData defaultData) {
+	protected Collection<Future<Void>> processData(DefaultData defaultData) {
 		// if I am writing the InvocationAwareData and invocations are not saved
 		// make sure we don't save the invocation affiliation
 		if (defaultData instanceof InvocationAwareData && !writeInvocationAffiliation) {
 			Map<String, Boolean> kryoPreferences = new HashMap<String, Boolean>(1);
 			kryoPreferences.put(KryoSerializationPreferences.WRITE_INVOCATION_AFFILIATION_DATA, Boolean.FALSE);
-			getStorageWriter().write(defaultData, kryoPreferences);
+			Future<Void> future = getStorageWriter().write(defaultData, kryoPreferences);
+			if (null != future) {
+				return Collections.singleton(future);
+			}
 		} else {
-			getStorageWriter().write(defaultData);
+			Future<Void> future = getStorageWriter().write(defaultData);
+			if (null != future) {
+				return Collections.singleton(future);
+			}
 		}
+		return Collections.emptyList();
 	}
 
 	/**

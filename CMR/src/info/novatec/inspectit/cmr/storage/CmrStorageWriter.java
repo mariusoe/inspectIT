@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,18 +53,20 @@ public class CmrStorageWriter extends StorageWriter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void write(DefaultData defaultData) {
-		super.write(defaultData);
+	public Future<Void> write(DefaultData defaultData) {
+		Future<Void> future = super.write(defaultData);
 		involvedAgentsSet.add(defaultData.getPlatformIdent());
+		return future;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void write(DefaultData defaultData, Map<?, ?> kryoPreferences) {
-		super.write(defaultData, kryoPreferences);
+	public Future<Void> write(DefaultData defaultData, Map<?, ?> kryoPreferences) {
+		Future<Void> future = super.write(defaultData, kryoPreferences);
 		involvedAgentsSet.add(defaultData.getPlatformIdent());
+		return future;
 	}
 
 	/**

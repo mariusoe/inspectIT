@@ -4,7 +4,10 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.storage.IWriter;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -49,10 +52,11 @@ public abstract class AbstractChainedDataProcessor extends AbstractDataProcessor
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processData(DefaultData defaultData) {
+	protected Collection<Future<Void>> processData(DefaultData defaultData) {
 		if (shouldBePassedToChainedProcessors(defaultData)) {
-			passToChainedProcessors(defaultData);
+			return passToChainedProcessors(defaultData);
 		}
+		return Collections.emptyList();
 	}
 
 	/**
@@ -60,13 +64,20 @@ public abstract class AbstractChainedDataProcessor extends AbstractDataProcessor
 	 * 
 	 * @param defaultData
 	 *            Data to pass.
+	 * @return Returns list of {@link Future}s if the data processed by chained processors submitted
+	 *         one or more writing tasks. Empty collection means no writing tasks were submitted.
 	 */
-	protected void passToChainedProcessors(DefaultData defaultData) {
+	protected Collection<Future<Void>> passToChainedProcessors(DefaultData defaultData) {
 		if (null != dataProcessors) {
+			Collection<Future<Void>> futures = new ArrayList<Future<Void>>();
 			for (AbstractDataProcessor dataProcessor : dataProcessors) {
-				dataProcessor.process(defaultData);
+				futures.addAll(dataProcessor.process(defaultData));
 			}
+			return futures;
+		} else {
+			return Collections.emptyList();
 		}
+
 	}
 
 	/**
@@ -75,10 +86,12 @@ public abstract class AbstractChainedDataProcessor extends AbstractDataProcessor
 	 * Flushes all chained data processors.
 	 */
 	@Override
-	public void flush() {
+	public Collection<Future<Void>> flush() {
+		Collection<Future<Void>> futures = new ArrayList<Future<Void>>();
 		for (AbstractDataProcessor abstractDataProcessor : dataProcessors) {
-			abstractDataProcessor.flush();
+			futures.addAll(abstractDataProcessor.flush());
 		}
+		return futures;
 	}
 
 	/**
