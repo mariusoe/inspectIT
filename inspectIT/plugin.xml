@@ -394,6 +394,15 @@
             id="info.novatec.inspectit.rcp.commands.displayInChart"
             name="Display in Chart">
       </command>
+      <command
+            id="info.novatec.inspectit.rcp.shutdown"
+            name="Shutdown CMR">
+         <commandParameter
+               id="info.novatec.inspectit.rcp.commands.shutdown.shouldRestart"
+               name="Should Restart"
+               optional="false">
+         </commandParameter>
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -1443,6 +1452,26 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.ShutdownCmrHandler"
+            commandId="info.novatec.inspectit.rcp.shutdown">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.onlineStatus"
+                        value="ONLINE">
+                  </test>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -2108,6 +2137,26 @@
                style="push"
                tooltip="License Information">
          </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.shutdown"
+               icon="icons/restart.png"
+               style="push"
+               tooltip="Restart CMR">
+            <parameter
+                  name="info.novatec.inspectit.rcp.commands.shutdown.shouldRestart"
+                  value="true">
+            </parameter>
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.shutdown"
+               icon="icons/shutdown.png"
+               style="push"
+               tooltip="Shutdown CMR">
+            <parameter
+                  name="info.novatec.inspectit.rcp.commands.shutdown.shouldRestart"
+                  value="false">
+            </parameter>
+         </command>
          <separator
                name="info.novatec.inspectit.rcp.repositoryManagerToolbar.separator3"
                visible="true">
@@ -2238,6 +2287,28 @@
                label="License Information"
                style="push"
                tooltip="License Information">
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.shutdown"
+               icon="icons/restart.png"
+               label="Restart CMR"
+               style="push"
+               tooltip="Restart CMR">
+            <parameter
+                  name="info.novatec.inspectit.rcp.commands.shutdown.shouldRestart"
+                  value="true">
+            </parameter>
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.shutdown"
+               icon="icons/shutdown.png"
+               label="Shutdown CMR"
+               style="push"
+               tooltip="Shutdown CMR">
+            <parameter
+                  name="info.novatec.inspectit.rcp.commands.shutdown.shouldRestart"
+                  value="false">
+            </parameter>
          </command>
          <separator
                name="info.novatec.inspectit.rcp.repositoryManagerToolbar.separator3"

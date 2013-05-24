@@ -12,6 +12,16 @@ import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
 public interface ICmrManagementService {
 
 	/**
+	 * Restarts the CMR by starting new CMR in separate JVM prior to executing shutdown.
+	 */
+	void restart();
+
+	/**
+	 * Shuts down the CMR.
+	 */
+	void shutdown();
+
+	/**
 	 * Clear whole buffer.
 	 */
 	void clearBuffer();

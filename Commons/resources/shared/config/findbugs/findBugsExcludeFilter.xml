@@ -75,6 +75,10 @@
 		<Method name="processTimerData" />
 		<Bug pattern="AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION" />
 	</Match>
+	<Match>
+		 <Class name="~info.novatec.inspectit.cmr.util.ShutdownService.*" />
+		<Bug pattern="DM_EXIT" />
+	</Match>
 	<!-- CMR ignores END -->
 
 	<!-- CommonsCS ignores START -->

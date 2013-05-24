@@ -2,6 +2,7 @@ package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.cache.IBuffer;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
+import info.novatec.inspectit.cmr.util.ShutdownService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
 import info.novatec.inspectit.spring.logger.Logger;
@@ -59,6 +60,12 @@ public class CmrManagementService implements ICmrManagementService {
 	private int droppedDataCount = 0;
 
 	/**
+	 * {@link ShutdownService}.
+	 */
+	@Autowired
+	private ShutdownService shutdownService;
+
+	/**
 	 * Time in milliseconds when the CMR has started.
 	 */
 	private long timeStarted;
@@ -67,6 +74,22 @@ public class CmrManagementService implements ICmrManagementService {
 	 * Date when the CMR has started.
 	 */
 	private Date dateStarted;
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void restart() {
+		shutdownService.restart();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void shutdown() {
+		shutdownService.shutdown();
+	}
 
 	/**
 	 * {@inheritDoc}
