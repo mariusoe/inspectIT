@@ -437,6 +437,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 			spaceLeftBar.setSelection(0);
 			spaceLeftBar.setToolTipText("");
 			spaceLeftLabel.setText("");
+			uptimeLabel.setText("");
 		}
 	}
 
