@@ -3,6 +3,7 @@ package info.novatec.inspectit.rcp.repository.service.cmr.proxy;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
+import info.novatec.inspectit.storage.serializer.SerializationException;
 
 import java.net.ConnectException;
 
@@ -40,6 +41,11 @@ public class ServiceMethodInterceptor implements MethodInterceptor {
 			return InterceptorUtils.getDefaultReturnValue(paramMethodInvocation);
 		} catch (ConnectException e) {
 			handleConnectionFailure(paramMethodInvocation, e);
+			return InterceptorUtils.getDefaultReturnValue(paramMethodInvocation);
+		} catch (SerializationException e) {
+			CmrRepositoryDefinition cmrRepositoryDefinition = InterceptorUtils.getRepositoryDefinition(paramMethodInvocation);
+			InspectIT.getDefault().createErrorDialog(
+					"CMR repository version (" + cmrRepositoryDefinition.getVersion() + ") is not compatible with the version of the inspectIT UI. Communication between two is failing.", e, -1);
 			return InterceptorUtils.getDefaultReturnValue(paramMethodInvocation);
 		} catch (Exception e) {
 			InspectIT.getDefault().createErrorDialog(e.getMessage(), e.getCause() != null ? e.getCause() : e, -1);

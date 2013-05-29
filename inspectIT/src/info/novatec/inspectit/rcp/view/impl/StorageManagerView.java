@@ -32,10 +32,13 @@ import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageData.StorageState;
+import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
+import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.util.ObjectUtils;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -54,8 +57,8 @@ import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -103,7 +106,6 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.ui.progress.UIJob;
 
 /**
@@ -1293,80 +1295,10 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 		 */
 		private void process() {
 			StructuredSelection selection = (StructuredSelection) treeViewer.getSelection();
-			if (!selection.isEmpty() && selection.getFirstElement() instanceof StorageLeaf) {
-				final StorageLeaf storageLeaf = (StorageLeaf) selection.getFirstElement();
-				final InspectITStorageManager storageManager = InspectIT.getDefault().getInspectITStorageManager();
-				RepositoryDefinition repositoryDefinition = null;
-				if (storageManager.isStorageMounted(storageLeaf.getStorageData())) {
-					// if we already have all data needed, get the repository definition and show it
-					LocalStorageData localStorageData = storageManager.getLocalDataForStorage(storageLeaf.getStorageData());
-					try {
-						repositoryDefinition = storageManager.getStorageRepositoryDefinition(localStorageData);
-					} catch (Exception e) {
-						repositoryDefinition = null; // NOPMD
-					}
-				} else if (storageLeaf.getStorageData().getState() == StorageState.CLOSED) {
-					// if it is closed, mount it first
-					try {
-						((IProgressService) PlatformUI.getWorkbench().getService(IProgressService.class)).busyCursorWhile(new IRunnableWithProgress() {
-							@Override
-							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-								try {
-									SubMonitor subMonitor = SubMonitor.convert(monitor);
-									storageManager.mountStorage(storageLeaf.getStorageData(), storageLeaf.getCmrRepositoryDefinition(), subMonitor);
-									monitor.done();
-								} catch (Exception e) {
-									throw new InvocationTargetException(e);
-								}
-							}
-						});
-						LocalStorageData localStorageData = storageManager.getLocalDataForStorage(storageLeaf.getStorageData());
-						repositoryDefinition = storageManager.getStorageRepositoryDefinition(localStorageData);
-					} catch (Exception e) {
-						repositoryDefinition = null; // NOPMD
-						InspectIT.getDefault().createErrorDialog("Can not open storage.", e, -1);
-					}
-				} else if (storageLeaf.getStorageData().getState() == StorageState.OPENED) {
-					// if it's in writable state offer user to finalize it and explore it
-					String dialogMessage = "Storages that are in writable mode can not be explored. Do you want to finalize selected storage first and then open it?";
-					MessageDialog dialog = new MessageDialog(getSite().getShell(), "Opening Writable Storage", null, dialogMessage, MessageDialog.QUESTION, new String[] { "Yes", "No" }, 0);
-					if (0 == dialog.open()) {
-						treeViewer.setSelection(treeViewer.getSelection());
-						IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
-						ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
-
-						Command command = commandService.getCommand(CloseAndShowStorageHandler.COMMAND);
-						ExecutionEvent executionEvent = handlerService.createExecutionEvent(command, new Event());
-						IEvaluationContext context = (IEvaluationContext) executionEvent.getApplicationContext();
-						context.addVariable(CloseAndShowStorageHandler.STORAGE_DATA_PROVIDER, storageLeaf);
-						context.addVariable(ISources.ACTIVE_SITE_NAME, getSite());
-						try {
-							command.executeWithChecks(executionEvent);
-						} catch (Exception e) {
-							throw new RuntimeException(e);
-						}
-					}
-					return;
-				} else if (storageLeaf.getStorageData().getState() == StorageState.RECORDING) {
-					// if it is used for recording, just show message
-					InspectIT.getDefault().createInfoDialog("Selected storage is currently used for recording, it can not be explored.", -1);
-					return;
-				}
-
-				if (null != repositoryDefinition) {
-					executeShowRepositoryCommand(repositoryDefinition);
-				}
-			} else if (!selection.isEmpty() && selection.getFirstElement() instanceof ILocalStorageDataProvider) {
-				LocalStorageData localStorageData = ((ILocalStorageDataProvider) selection.getFirstElement()).getLocalStorageData();
-				if (localStorageData.isFullyDownloaded()) {
-					StorageRepositoryDefinition storageRepositoryDefinition;
-					try {
-						storageRepositoryDefinition = InspectIT.getDefault().getInspectITStorageManager().getStorageRepositoryDefinition(localStorageData);
-						executeShowRepositoryCommand(storageRepositoryDefinition);
-					} catch (Exception e) {
-						InspectIT.getDefault().createErrorDialog("Exception occured trying to open storage repository definition.", e, -1);
-					}
-				}
+			if (selection.getFirstElement() instanceof IStorageDataProvider) {
+				showStorage((IStorageDataProvider) selection.getFirstElement(), InspectIT.getDefault().getInspectITStorageManager());
+			} else if (selection.getFirstElement() instanceof ILocalStorageDataProvider) {
+				showStorage((ILocalStorageDataProvider) selection.getFirstElement(), InspectIT.getDefault().getInspectITStorageManager());
 			} else {
 				TreeSelection treeSelection = (TreeSelection) selection;
 				TreePath path = treeSelection.getPaths()[0];
@@ -1400,6 +1332,109 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 				command.executeWithChecks(executionEvent);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
+			}
+		}
+
+		/**
+		 * Shows storage from the {@link IStorageDataProvider}.
+		 * 
+		 * @param storageDataProvider
+		 *            {@link IStorageDataProvider}
+		 * @param storageManager
+		 *            {@link InspectITStorageManager}
+		 */
+		private void showStorage(IStorageDataProvider storageDataProvider, final InspectITStorageManager storageManager) {
+			final StorageData storageData = storageDataProvider.getStorageData();
+			final CmrRepositoryDefinition cmrRepositoryDefinition = storageDataProvider.getCmrRepositoryDefinition();
+			try {
+				if (storageManager.isStorageMounted(storageData)) {
+					// if we already have all data needed, get the repository definition and show it
+					LocalStorageData localStorageData = storageManager.getLocalDataForStorage(storageData);
+					RepositoryDefinition repositoryDefinition = storageManager.getStorageRepositoryDefinition(localStorageData);
+					executeShowRepositoryCommand(repositoryDefinition);
+				} else if (storageData.getState() == StorageState.CLOSED) {
+					// if it is closed, mount it first
+					PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
+						@Override
+						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+							try {
+								SubMonitor subMonitor = SubMonitor.convert(monitor);
+								storageManager.mountStorage(storageData, cmrRepositoryDefinition, subMonitor);
+								monitor.done();
+							} catch (Exception e) {
+								throw new InvocationTargetException(e);
+							}
+						}
+					});
+					LocalStorageData localStorageData = storageManager.getLocalDataForStorage(storageData);
+					RepositoryDefinition repositoryDefinition = storageManager.getStorageRepositoryDefinition(localStorageData);
+					executeShowRepositoryCommand(repositoryDefinition);
+				} else if (storageData.getState() == StorageState.OPENED) {
+					// if it's in writable state offer user to finalize it and explore it
+					String dialogMessage = "Storages that are in writable mode can not be explored. Do you want to finalize selected storage first and then open it?";
+					MessageDialog dialog = new MessageDialog(getSite().getShell(), "Opening Writable Storage", null, dialogMessage, MessageDialog.QUESTION, new String[] { "Yes", "No" }, 0);
+					if (0 == dialog.open()) {
+						treeViewer.setSelection(treeViewer.getSelection());
+						IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
+						ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
+
+						Command command = commandService.getCommand(CloseAndShowStorageHandler.COMMAND);
+						ExecutionEvent executionEvent = handlerService.createExecutionEvent(command, new Event());
+						IEvaluationContext context = (IEvaluationContext) executionEvent.getApplicationContext();
+						context.addVariable(CloseAndShowStorageHandler.STORAGE_DATA_PROVIDER, storageDataProvider);
+						context.addVariable(ISources.ACTIVE_SITE_NAME, getSite());
+						try {
+							command.executeWithChecks(executionEvent);
+						} catch (Exception e) {
+							throw new RuntimeException(e);
+						}
+					}
+					return;
+				} else if (storageData.getState() == StorageState.RECORDING) {
+					// if it is used for recording, just show message
+					InspectIT.getDefault().createInfoDialog("Selected storage is currently used for recording, it can not be explored.", -1);
+				}
+			} catch (InvocationTargetException | InterruptedException e) { // NOPMD
+				InspectIT.getDefault().createErrorDialog("Exception occurred trying to mount the storage", e, -1);
+			} catch (SerializationException e) {
+				String msg = "Data in the remote storage " + storageData + " can not be read with this version of inspectIT.";
+				if (null != storageData.getCmrVersion()) {
+					msg += " Version of the CMR where storage was created is " + storageData.getCmrVersion() + ".";
+				} else {
+					msg += " Version of the CMR where storage was created is unknown";
+				}
+				InspectIT.getDefault().createErrorDialog(msg, e, -1);
+			} catch (StorageException | IOException e) {
+				InspectIT.getDefault().createErrorDialog("Exception occurred trying to display the remote storage", e, -1);
+			}
+		}
+
+		/**
+		 * Shows storage from the {@link ILocalStorageDataProvider}.
+		 * 
+		 * @param localStorageDataProvider
+		 *            {@link ILocalStorageDataProvider}
+		 * @param storageManager
+		 *            {@link InspectITStorageManager}
+		 */
+		private void showStorage(ILocalStorageDataProvider localStorageDataProvider, InspectITStorageManager storageManager) {
+			LocalStorageData localStorageData = localStorageDataProvider.getLocalStorageData();
+			try {
+				if (localStorageData.isFullyDownloaded()) {
+					StorageRepositoryDefinition storageRepositoryDefinition;
+					storageRepositoryDefinition = storageManager.getStorageRepositoryDefinition(localStorageData);
+					executeShowRepositoryCommand(storageRepositoryDefinition);
+				}
+			} catch (SerializationException e) {
+				String msg = "Data in the remote storage " + localStorageData + " can not be read with this version of inspectIT.";
+				if (null != localStorageData.getCmrVersion()) {
+					msg += " Version of the CMR where storage was created is " + localStorageData.getCmrVersion() + ".";
+				} else {
+					msg += " Version of the CMR where storage was created is unknown";
+				}
+				InspectIT.getDefault().createErrorDialog(msg, e, -1);
+			} catch (StorageException | IOException e) {
+				InspectIT.getDefault().createErrorDialog("Exception occurred trying to display the downloaded storage", e, -1);
 			}
 		}
 	}

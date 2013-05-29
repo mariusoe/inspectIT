@@ -11,7 +11,9 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
 import info.novatec.inspectit.rcp.storage.util.DataRetriever;
 import info.novatec.inspectit.storage.LocalStorageData;
+import info.novatec.inspectit.storage.serializer.SerializationException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -211,14 +213,24 @@ public abstract class AbstractStorageService<E extends DefaultData> {
 				if (localStorageData.isFullyDownloaded()) {
 					try {
 						allData = dataRetriever.getDataLocally(localStorageData, descriptors);
-					} catch (Exception e) {
+					} catch (SerializationException e) {
+						String msg = "Data in the downloaded storage " + localStorageData + " can not be loaded with this version of the inspectIT. Version of the CMR where storage was created is "
+								+ localStorageData.getCmrVersion() + ".";
+						InspectIT.getDefault().createErrorDialog(msg, e, -1);
+						return Collections.emptyList();
+					} catch (IOException e) {
 						InspectIT.getDefault().createErrorDialog("Exception occured trying to load the data.", e, -1);
 						return Collections.emptyList();
 					}
 				} else {
 					try {
 						allData = dataRetriever.getDataViaHttp(getCmrRepositoryDefinition(), localStorageData, limitedDescriptors);
-					} catch (Exception e) {
+					} catch (SerializationException e) {
+						String msg = "Data in the remote storage " + localStorageData + " can not be loaded with this version of the inspectIT. Version of the CMR where storage was created is "
+								+ localStorageData.getCmrVersion() + ".";
+						InspectIT.getDefault().createErrorDialog(msg, e, -1);
+						return Collections.emptyList();
+					} catch (IOException e) {
 						InspectIT.getDefault().createErrorDialog("Exception occured trying to load the data.", e, -1);
 						return Collections.emptyList();
 					}

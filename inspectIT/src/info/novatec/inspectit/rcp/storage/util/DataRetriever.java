@@ -12,6 +12,7 @@ import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.StorageManager;
 import info.novatec.inspectit.storage.nio.stream.StreamProvider;
 import info.novatec.inspectit.storage.serializer.ISerializer;
+import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider;
 import info.novatec.inspectit.storage.serializer.util.KryoUtil;
 import info.novatec.inspectit.storage.util.RangeDescriptor;
@@ -149,11 +150,14 @@ public class DataRetriever {
 	 * @return List of objects in the supplied generic type. Note that if the data described in the
 	 *         descriptor is not of a supplied generic type, there will be a casting exception
 	 *         thrown.
-	 * @throws Exception
-	 *             If {@link Exception} occurs.
+	 * @throws SerializationException
+	 *             If {@link SerializationException} occurs.
+	 * @throws IOException
+	 *             If {@link IOException} occurs.
 	 */
 	@SuppressWarnings("unchecked")
-	public <E extends DefaultData> List<E> getDataViaHttp(CmrRepositoryDefinition cmrRepositoryDefinition, IStorageData storageData, List<IStorageDescriptor> descriptors) throws Exception {
+	public <E extends DefaultData> List<E> getDataViaHttp(CmrRepositoryDefinition cmrRepositoryDefinition, IStorageData storageData, List<IStorageDescriptor> descriptors) throws IOException,
+			SerializationException {
 		Map<Integer, List<IStorageDescriptor>> separateFilesGroup = createFilesGroup(descriptors);
 		List<E> receivedData = new ArrayList<E>();
 		String serverUri = getServerUri(cmrRepositoryDefinition);
@@ -179,7 +183,12 @@ public class DataRetriever {
 			rangeHeader.append(rangeDescriptor);
 
 			httpGet.addHeader("Range", rangeHeader.toString());
-			ISerializer serializer = serializerQueue.take();
+			ISerializer serializer = null;
+			try {
+				serializer = serializerQueue.take();
+			} catch (InterruptedException e) {
+				Thread.interrupted();
+			}
 			InputStream inputStream = null;
 			Input input = null;
 			try {
@@ -243,11 +252,13 @@ public class DataRetriever {
 	 * @return List of objects in the supplied generic type. Note that if the data described in the
 	 *         descriptor is not of a supplied generic type, there will be a casting exception
 	 *         thrown.
-	 * @throws Exception
-	 *             If {@link Exception} occurs.
+	 * @throws SerializationException
+	 *             If {@link SerializationException} occurs.
+	 * @throws IOException
+	 *             If {@link IOException} occurs.
 	 */
 	@SuppressWarnings("unchecked")
-	public <E extends DefaultData> List<E> getDataLocally(LocalStorageData localStorageData, List<IStorageDescriptor> descriptors) throws Exception {
+	public <E extends DefaultData> List<E> getDataLocally(LocalStorageData localStorageData, List<IStorageDescriptor> descriptors) throws IOException, SerializationException {
 		Map<Integer, List<IStorageDescriptor>> separateFilesGroup = createFilesGroup(descriptors);
 		List<IStorageDescriptor> optimizedDescriptors = new ArrayList<IStorageDescriptor>();
 		for (Map.Entry<Integer, List<IStorageDescriptor>> entry : separateFilesGroup.entrySet()) {
@@ -269,7 +280,12 @@ public class DataRetriever {
 
 		List<E> receivedData = new ArrayList<E>(descriptors.size());
 
-		ISerializer serializer = serializerQueue.take();
+		ISerializer serializer = null;
+		try {
+			serializer = serializerQueue.take();
+		} catch (InterruptedException e) {
+			Thread.interrupted();
+		}
 		InputStream inputStream = null;
 		Input input = null;
 		try {

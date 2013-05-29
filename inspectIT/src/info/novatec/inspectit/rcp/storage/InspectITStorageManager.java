@@ -118,10 +118,14 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 *            {@link CmrRepositoryDefinition}.
 	 * @param subMonitor
 	 *            {@link SubMonitor} to report to.
-	 * @throws Exception
-	 *             If mount fails.
+	 * @throws StorageException
+	 *             If storage directory can not be created or storage file can not be saved.
+	 * @throws IOException
+	 *             If {@link IOException} occurs.
+	 * @throws SerializationException
+	 *             If {@link SerializationException} occurs.
 	 */
-	public void mountStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, SubMonitor subMonitor) throws Exception {
+	public void mountStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, SubMonitor subMonitor) throws StorageException, IOException, SerializationException {
 		this.mountStorage(storageData, cmrRepositoryDefinition, false, false, subMonitor);
 	}
 
@@ -140,10 +144,16 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 *            should be compressed on the fly before sent.
 	 * @param subMonitor
 	 *            {@link SubMonitor} to report to.
-	 * @throws Exception
-	 *             If mount fails.
+	 * @throws StorageException
+	 *             If storage directory can not be created or storage file can not be saved.
+	 * @throws IOException
+	 *             If {@link IOException} occurs.
+	 * @throws SerializationException
+	 *             If {@link SerializationException} occurs.
+	 * 
 	 */
-	private void mountStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, boolean fullyDownload, boolean compressBefore, SubMonitor subMonitor) throws Exception {
+	private void mountStorage(StorageData storageData, CmrRepositoryDefinition cmrRepositoryDefinition, boolean fullyDownload, boolean compressBefore, SubMonitor subMonitor) throws StorageException,
+			IOException, SerializationException {
 		LocalStorageData localStorageData = new LocalStorageData(storageData);
 
 		Path directory = getStoragePath(localStorageData);
@@ -175,11 +185,7 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 			}
 		}
 
-		try {
-			writeLocalStorageDataToDisk(localStorageData);
-		} catch (Exception e) {
-			throw new StorageException("Could save local storage information to disk.", e);
-		}
+		writeLocalStorageDataToDisk(localStorageData);
 
 		final String systemUserName = getSystemUsername();
 		try {
@@ -464,11 +470,15 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 * @param localStorageData
 	 *            {@link LocalStorageData} to create the definition for.
 	 * @return {@link StorageRepositoryDefinition}.
-	 * @throws Exception
-	 *             If the wanted {@link LocalStorageData} is not available. If any exception occurs
-	 *             during definition creation.
+	 * @throws StorageException
+	 *             If the wanted {@link LocalStorageData} is not available.
+	 * @throws SerializationException
+	 *             If {@link SerializationException} occurs.
+	 * @throws IOException
+	 *             If {@link IOException} occurs.
+	 * 
 	 */
-	public StorageRepositoryDefinition getStorageRepositoryDefinition(LocalStorageData localStorageData) throws Exception {
+	public StorageRepositoryDefinition getStorageRepositoryDefinition(LocalStorageData localStorageData) throws StorageException, SerializationException, IOException {
 		// check if it is available
 		if (!mountedAvailableStorages.keySet().contains(localStorageData) && !downloadedStorages.contains(localStorageData)) {
 			throw new StorageException("The storage is not fully downloaded, and it's repository could not be found. The Storage repository definition could not be created.");
