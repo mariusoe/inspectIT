@@ -69,6 +69,11 @@ public class CmrStatusData implements Serializable {
 	private Date dateStarted;
 
 	/**
+	 * Size of the database, <code>null</code> represents no information available.
+	 */
+	private Long databaseSize;
+
+	/**
 	 * Gets {@link #currentBufferSize}.
 	 * 
 	 * @return {@link #currentBufferSize}
@@ -259,6 +264,25 @@ public class CmrStatusData implements Serializable {
 	}
 
 	/**
+	 * Gets {@link #databaseSize}.
+	 * 
+	 * @return {@link #databaseSize}
+	 */
+	public Long getDatabaseSize() {
+		return databaseSize;
+	}
+
+	/**
+	 * Sets {@link #databaseSize}.
+	 * 
+	 * @param databaseSize
+	 *            New value for {@link #databaseSize}
+	 */
+	public void setDatabaseSize(Long databaseSize) {
+		this.databaseSize = databaseSize;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -269,6 +293,7 @@ public class CmrStatusData implements Serializable {
 		result = prime * result + ((bufferOldestElement == null) ? 0 : bufferOldestElement.hashCode());
 		result = prime * result + (canWriteMore ? 1231 : 1237);
 		result = prime * result + (int) (currentBufferSize ^ (currentBufferSize >>> 32));
+		result = prime * result + ((databaseSize == null) ? 0 : databaseSize.hashCode());
 		result = prime * result + ((dateStarted == null) ? 0 : dateStarted.hashCode());
 		result = prime * result + (int) (maxBufferSize ^ (maxBufferSize >>> 32));
 		result = prime * result + (int) (storageDataSpaceLeft ^ (storageDataSpaceLeft >>> 32));
@@ -311,6 +336,13 @@ public class CmrStatusData implements Serializable {
 			return false;
 		}
 		if (currentBufferSize != other.currentBufferSize) {
+			return false;
+		}
+		if (databaseSize == null) {
+			if (other.databaseSize != null) {
+				return false;
+			}
+		} else if (!databaseSize.equals(other.databaseSize)) {
 			return false;
 		}
 		if (dateStarted == null) {

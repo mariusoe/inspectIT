@@ -103,6 +103,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 	private Label spaceLeftLabel; // NOCHK
 	private ProgressBar spaceLeftBar; // NOCHK
 	private Label uptimeLabel; // NOCHK
+	private Label databaseSizeLabel; // NOCHK
 
 	/**
 	 * Default constructor.
@@ -173,6 +174,10 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 		toolkit.createLabel(generalComposite, "Uptime:");
 		uptimeLabel = toolkit.createLabel(generalComposite, null, SWT.WRAP);
 		uptimeLabel.setToolTipText("Date started represents date/time on machine where CMR has been launched");
+
+		toolkit.createLabel(generalComposite, "Database size:");
+		databaseSizeLabel = toolkit.createLabel(generalComposite, null, SWT.WRAP);
+		databaseSizeLabel.setToolTipText("Current size of the database on the CMR");
 
 		generalSection.setClient(generalComposite);
 		generalSection.setLayout(new TableWrapLayout());
@@ -426,6 +431,14 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 			uptimeText.append(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(started));
 			uptimeText.append(")");
 			uptimeLabel.setText(uptimeText.toString());
+
+			// database info
+			Long databaseSize = cmrStatusData.getDatabaseSize();
+			if (null != databaseSize) {
+				databaseSizeLabel.setText(NumberFormatter.humanReadableByteCount(databaseSize.longValue()));
+			} else {
+				databaseSizeLabel.setText("n/a");
+			}
 		}
 
 		if (!dataLoaded) {
@@ -438,6 +451,7 @@ public class CmrRepositoryPropertyForm implements ISelectionChangedListener {
 			spaceLeftBar.setToolTipText("");
 			spaceLeftLabel.setText("");
 			uptimeLabel.setText("");
+			databaseSizeLabel.setText("");
 		}
 	}
 

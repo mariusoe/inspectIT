@@ -7,10 +7,18 @@ import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
 import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.StorageManager;
 
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang.mutable.MutableLong;
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +31,11 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class CmrManagementService implements ICmrManagementService {
+
+	/**
+	 * Name of the folder where database is stored.
+	 */
+	private static final String DATABASE_FOLDER = "db";
 
 	/** The logger of this class. */
 	@Logger
@@ -80,6 +93,7 @@ public class CmrManagementService implements ICmrManagementService {
 		cmrStatusData.setCanWriteMore(storageManager.canWriteMore());
 		cmrStatusData.setUpTime(System.currentTimeMillis() - timeStarted);
 		cmrStatusData.setDateStarted(dateStarted);
+		cmrStatusData.setDatabaseSize(getDatabaseSize());
 		return cmrStatusData;
 	}
 
@@ -98,6 +112,33 @@ public class CmrManagementService implements ICmrManagementService {
 	 */
 	public int getDroppedDataCount() {
 		return droppedDataCount;
+	}
+
+	/**
+	 * Returns the {@link Long} holding the size of the database folder or <code>null</code> if
+	 * database folder does not exists or calculation of size fails.
+	 * 
+	 * @return Returns the {@link Long} holding the size of the database folder or <code>null</code>
+	 *         if database folder does not exists or calculation of size fails.
+	 */
+	private Long getDatabaseSize() {
+		Path databaseFolder = Paths.get(DATABASE_FOLDER);
+		if (Files.notExists(databaseFolder) || !Files.isDirectory(databaseFolder)) {
+			return null;
+		}
+		final MutableLong size = new MutableLong();
+		try {
+			Files.walkFileTree(databaseFolder, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					size.add(attrs.size());
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		} catch (IOException e) {
+			return null;
+		}
+		return Long.valueOf(size.longValue());
 	}
 
 	/**
