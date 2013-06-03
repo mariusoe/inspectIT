@@ -252,7 +252,7 @@
 		<property name="findbugs.sourcepath" value="${src.root}" />
 		<property name="findbugs.classlocation" value="${buildDirectory}/plugins/info.novatec.inspectit.rcp/@dot" />
 		<path id="findbugs.path">
-			<fileset dir="${buildDirectory}/plugins" includes="**/*.class,**/*.jar" excludes="**/info.novatec.inspectit.rcp/**"/>
+			<fileset dir="${buildDirectory}/plugins" includes="**/*.class,**/*.jar" excludes="**/info.novatec.inspectit.rcp/**" />
 			<fileset dir="${base}/eclipse/plugins" includes="**/*.jar" />
 		</path>
 

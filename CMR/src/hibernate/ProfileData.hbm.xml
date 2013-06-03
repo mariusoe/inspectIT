@@ -9,8 +9,7 @@
 		<property name="name" column="name" not-null="true" />
 		<property name="description" column="description" />
 
-		<many-to-one name="environmentData" column="environment_id"
-			class="EnvironmentData" not-null="true" />
+		<many-to-one name="environmentData" column="environment_id" class="EnvironmentData" not-null="true" />
 
 		<set name="exceptionSensorDefinitions" cascade="delete">
 			<key column="profile_id" />

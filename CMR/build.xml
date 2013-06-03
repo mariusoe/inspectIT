@@ -30,10 +30,10 @@
 		<ivy:resolve file="${ivy.file}" />
 		<ivy:cachepath pathid="lib.prod" conf="prod" />
 		<ivy:cachepath pathid="lib.test" conf="test" />
-		
+
 		<ivy:resolve file="${ivy.file.commons}" />
 		<ivy:cachepath pathid="lib.prod.commons" conf="prod" />
-	
+
 		<ivy:resolve file="${ivy.file.commonscs}" />
 		<ivy:cachepath pathid="lib.prod.commonscs" conf="prod" />
 	</target>
@@ -131,7 +131,8 @@
 			<classpath location="${src.root}" />
 			<classpath location="${test.root}" />
 
-			<jvmarg value="-XX:-UseSplitVerifier" /> <!-- This is a workaround for Cobertura not supporting Java 7 source code features (http://sourceforge.net/tracker/index.php?func=detail&aid=3295711&group_id=130558&atid=720018) -->
+			<jvmarg value="-XX:-UseSplitVerifier" />
+			<!-- This is a workaround for Cobertura not supporting Java 7 source code features (http://sourceforge.net/tracker/index.php?func=detail&aid=3295711&group_id=130558&atid=720018) -->
 			<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${build.qa.test.coveragedata}/cobertura.ser" />
 			<jvmarg value="-javaagent:${string.path.classmexer}" />
 			<xmlfileset file="${resources.testng}/testng.xml" />
@@ -161,20 +162,20 @@
 		<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" id="pmd.fileset" />
 
 		<!-- Prepare Checkstyle -->
-		<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" id="checkstyle.fileset"/>
+		<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" id="checkstyle.fileset" />
 
 		<!-- Prepare FindBugs -->
 		<property name="findbugs.sourcepath" value="${src.root}" />
 		<property name="findbugs.classlocation" value="${build.cmr.classes}" />
-		<path id="findbugs.path" >
+		<path id="findbugs.path">
 			<pathelement path="${build.commons.classes}" />
 			<pathelement path="${build.commonscs.classes}" />
-			<path refid="lib.prod"/>
-			<path refid="lib.test"/>
+			<path refid="lib.prod" />
+			<path refid="lib.test" />
 		</path>
 
 		<!-- Prepare CPD -->
-		<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" id="cpd.fileset"/>
+		<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" id="cpd.fileset" />
 
 		<antcall target="static-analysis-all" inheritrefs="true" />
 	</target>
@@ -320,7 +321,7 @@ Mozilla Public License (MPL), 1.1 : Javassist (3.12.0.GA), h2 (1.2.148)" />
 		<ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
 		<ivy:cachepath pathid="path.classmexer" organisation="classmexer" module="classmexer" revision="0.0.3" conf="default" inline="true" />
 		<pathconvert property="string.path.classmexer" pathsep="">
-				<path refid="path.classmexer" />
+			<path refid="path.classmexer" />
 		</pathconvert>
 		<echo>Using Classmexer on path: ${string.path.classmexer}</echo>
 	</target>

@@ -8,13 +8,11 @@
 
 		<property name="name" column="name" unique="true" not-null="true" />
 		<property name="description" column="description" />
-		<property name="bufferStrategy" column="buffer_strategy"
-			not-null="true" />
-		<property name="sendStrategy" column="send_strategy"
-			not-null="true" />
+		<property name="bufferStrategy" column="buffer_strategy" not-null="true" />
+		<property name="sendStrategy" column="send_strategy" not-null="true" />
 
 		<set name="profiles" cascade="all" inverse="true">
-			<key column="environment_id" not-null="true"/>
+			<key column="environment_id" not-null="true" />
 			<one-to-many class="ProfileData" />
 		</set>
 

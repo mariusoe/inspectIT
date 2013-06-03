@@ -10,6 +10,6 @@
 
 		<property name="platformIdent" column="platform_ident" />
 		<property name="sensorTypeIdent" column="sensor_type_ident" />
-		<property name="timeStamp" column="time_stamp" index="time_stamp_idx"/>
+		<property name="timeStamp" column="time_stamp" index="time_stamp_idx" />
 	</class>
 </hibernate-mapping>

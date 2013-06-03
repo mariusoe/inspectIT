@@ -9,17 +9,14 @@
 			<column name="time_stamp" />
 		</property>
 
-		<set name="methodIdentToSensorTypes" inverse="true" lazy="true"
-			cascade="all">
+		<set name="methodIdentToSensorTypes" inverse="true" lazy="true" cascade="all">
 			<key column="method_ident_id" />
 			<one-to-many class="MethodIdentToSensorType" />
 		</set>
-		<many-to-one name="platformIdent" column="platform_id"
-			class="PlatformIdent" not-null="true" />
+		<many-to-one name="platformIdent" column="platform_id" class="PlatformIdent" not-null="true" />
 
-		<property name="parameters"
-			type="info.novatec.inspectit.cmr.util.ListStringType">
-			<column name="parameters" length="2000"/>
+		<property name="parameters" type="info.novatec.inspectit.cmr.util.ListStringType">
+			<column name="parameters" length="2000" />
 		</property>
 		<property name="packageName">
 			<column name="package_name" />

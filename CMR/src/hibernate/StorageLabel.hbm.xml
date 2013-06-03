@@ -9,37 +9,29 @@
 		<union-subclass name="info.novatec.inspectit.storage.label.BooleanStorageLabel" table="boolean_storage_label">
 			<properties name="uniqueKey" unique="true">
 				<property name="booleanValue" />
-				<many-to-one name="storageLabelType"
-					class="info.novatec.inspectit.storage.label.type.AbstractStorageLabelType"
-					column="label_type_id" not-null="true" lazy="false" fetch="join"/>
+				<many-to-one name="storageLabelType" class="info.novatec.inspectit.storage.label.type.AbstractStorageLabelType" column="label_type_id" not-null="true" lazy="false" fetch="join" />
 			</properties>
 		</union-subclass>
 
 		<union-subclass name="info.novatec.inspectit.storage.label.DateStorageLabel" table="date_storage_label">
 			<properties name="uniqueKey" unique="true">
 				<property name="dateValue" />
-				<many-to-one name="storageLabelType"
-					class="info.novatec.inspectit.storage.label.type.AbstractStorageLabelType"
-					column="label_type_id" not-null="true" lazy="false" fetch="join"/>
-				</properties>
+				<many-to-one name="storageLabelType" class="info.novatec.inspectit.storage.label.type.AbstractStorageLabelType" column="label_type_id" not-null="true" lazy="false" fetch="join" />
+			</properties>
 		</union-subclass>
 
 		<union-subclass name="info.novatec.inspectit.storage.label.NumberStorageLabel" table="number_storage_label">
 			<properties name="uniqueKey" unique="true">
 				<property name="numberValue" />
-				<many-to-one name="storageLabelType"
-					class="info.novatec.inspectit.storage.label.type.AbstractStorageLabelType"
-					column="label_type_id" not-null="true" lazy="false" fetch="join"/>
+				<many-to-one name="storageLabelType" class="info.novatec.inspectit.storage.label.type.AbstractStorageLabelType" column="label_type_id" not-null="true" lazy="false" fetch="join" />
 			</properties>
 		</union-subclass>
 
 		<union-subclass name="info.novatec.inspectit.storage.label.StringStorageLabel" table="string_storage_label">
 			<properties name="uniqueKey" unique="true">
 				<property name="stringValue" />
-				<many-to-one name="storageLabelType"
-					class="info.novatec.inspectit.storage.label.type.AbstractStorageLabelType"
-					column="label_type_id" not-null="true" lazy="false" fetch="join"/>
-				</properties>
+				<many-to-one name="storageLabelType" class="info.novatec.inspectit.storage.label.type.AbstractStorageLabelType" column="label_type_id" not-null="true" lazy="false" fetch="join" />
+			</properties>
 		</union-subclass>
 
 

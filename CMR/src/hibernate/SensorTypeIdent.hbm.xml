@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="info.novatec.inspectit.cmr.model">
-	<class name="SensorTypeIdent" table="sensor_type_ident"
-		polymorphism="implicit">
+	<class name="SensorTypeIdent" table="sensor_type_ident" polymorphism="implicit">
 		<id name="id" type="java.lang.Long" column="id">
 			<generator class="seqhilo" />
 		</id>
@@ -10,8 +9,7 @@
 			<column name="discriminator" />
 		</discriminator>
 
-		<set name="platformIdents" table="platform_sensor_type" lazy="true"
-			cascade="all" inverse="true">
+		<set name="platformIdents" table="platform_sensor_type" lazy="true" cascade="all" inverse="true">
 			<key column="sensor_type_id" />
 			<many-to-many column="platform_id" class="PlatformIdent" />
 		</set>
@@ -20,8 +18,7 @@
 			<column name="fully_qualified_class_name" />
 		</property>
 
-		<subclass name="PlatformSensorTypeIdent" discriminator-value="PSTI">
-		</subclass>
+		<subclass name="PlatformSensorTypeIdent" discriminator-value="PSTI" />
 
 		<subclass name="MethodSensorTypeIdent" discriminator-value="MSTI">
 			<set name="methodIdentToSensorTypes" inverse="true" lazy="true">

@@ -1,32 +1,31 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <ivy-module version="2.0" xmlns:e="http://ant.apache.org/ivy/extra">
-	<info organisation="info.novatec.inspectit" module="CommonsCS"/>
+	<info organisation="info.novatec.inspectit" module="CommonsCS" />
 
 	<configurations>
-		<conf name="osgi" visibility="private" transitive="false"/>
-    	<conf name="prod" visibility="private" transitive="false"/>
-    </configurations>
+		<conf name="osgi" visibility="private" transitive="false" />
+		<conf name="prod" visibility="private" transitive="false" />
+	</configurations>
 
-    <!-- note that the manifest file stored in the resource sections needs to be updated to reflect
-         any changes to the production libraries (changing of revisions is safe!) -->
+	<!-- note that the manifest file stored in the resource sections needs to be updated to reflect any changes to the production libraries (changing of revisions is safe!) -->
 
-    <!-- PLEASE UPDATE THE 3rd PARTY NOTIFICATION LIST IN CMR AND Agent build.xml FOR ANY CHANGE -->
+	<!-- PLEASE UPDATE THE 3rd PARTY NOTIFICATION LIST IN CMR AND Agent build.xml FOR ANY CHANGE -->
 
-	<!-- IMPORTANT
-		 * OSGI based jars are used in inspectIT UI and it is necessary to have the same list of OSGi and normal jars
-		 * The normal jars will be used when building the CMR - otherwise we could end up having same classes in different jars
-		 * The future task can be to only use the OSGi jars, thus to introduce Spring Dynamic dm Server on the CMR
-		 * Any added OSGi jar has to be added in the MANIFEST.MF of this project as a dependency
-		 * Any added OSGI jar has to be added to the inspectIT.product as a dependency
-		 * Further info on https://confluence.novatec-gmbh.de/display/INSPECTIT/Usage+of+3rd+party+libraries+in+the+plugins
-	 -->
+	<!-- IMPORTANT 
+		* OSGI based jars are used in inspectIT UI and it is necessary to have the same list of OSGi and normal jars 
+		* The normal jars will be used when building the CMR - otherwise we could end up having same classes in different jars 
+		* The future task can be to only use the OSGi jars, thus to introduce Spring Dynamic dm Server on the CMR * Any added OSGi jar has to be added in the MANIFEST.MF of this project as a dependency 
+		* Any added OSGi jar has to be added in the MANIFEST.MF of this project as a dependency
+		* Any added OSGI jar has to be added to the inspectIT.product as a dependency
+		* Further info on https://confluence.novatec-gmbh.de/display/INSPECTIT/Usage+of+3rd+party+libraries+in+the+plugins
+	-->
 
 	<dependencies>
 
 		<!-- OSGi plugins -->
 		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.logging" rev="1.1.1" conf="osgi->default" />
-		<dependency org="commons-lang" name="commons-lang" rev="2.5" conf="osgi->default"/>
-		<dependency org="commons-pool" name="commons-pool" rev="1.6" conf="osgi->default"/>
+		<dependency org="commons-lang" name="commons-lang" rev="2.5" conf="osgi->default" />
+		<dependency org="commons-pool" name="commons-pool" rev="1.6" conf="osgi->default" />
 
 		<dependency org="org.springframework" name="org.springframework.core" rev="3.1.0.RELEASE" conf="osgi->default" />
 		<dependency org="org.springframework" name="org.springframework.beans" rev="3.1.0.RELEASE" conf="osgi->default" />
@@ -39,23 +38,23 @@
 		<dependency org="javax.servlet" name="javax.servlet" rev="3.0.0.v201103241009" conf="osgi->default" />
 		<dependency org="net.sourceforge.cglib" name="com.springsource.net.sf.cglib" rev="2.2.0" conf="osgi->default" />
 
-		<dependency org="com.esotericsoftware.kryo" name="info.novatec.kryo" rev="2.20" conf="osgi->default"/>
+		<dependency org="com.esotericsoftware.kryo" name="info.novatec.kryo" rev="2.20" conf="osgi->default" />
 
 		<!-- Original jars for CMR production -->
 		<dependency org="commons-logging" name="commons-logging" rev="1.1.1" conf="prod->default" />
-		<dependency org="commons-lang" name="commons-lang" rev="2.5" conf="prod->default"/>
-		<dependency org="commons-pool" name="commons-pool" rev="1.6" conf="prod->default"/>
+		<dependency org="commons-lang" name="commons-lang" rev="2.5" conf="prod->default" />
+		<dependency org="commons-pool" name="commons-pool" rev="1.6" conf="prod->default" />
 
-		<dependency org="org.springframework" name="spring-core" rev="3.1.0.RELEASE" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-beans" rev="3.1.0.RELEASE" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-context" rev="3.1.0.RELEASE" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-web" rev="3.1.0.RELEASE" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-asm" rev="3.1.0.RELEASE" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-expression" rev="3.1.0.RELEASE" conf="prod->default"/>
-		<dependency org="org.springframework" name="spring-aop" rev="3.1.0.RELEASE" conf="prod->default"/>
-		<dependency org="aopalliance" name="aopalliance" rev="1.0" conf="prod->default"/>
-		<dependency org="cglib" name="cglib-nodep" rev="2.2.2" conf="prod->default"/>
+		<dependency org="org.springframework" name="spring-core" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="spring-beans" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="spring-context" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="spring-web" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="spring-asm" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="spring-expression" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="org.springframework" name="spring-aop" rev="3.1.0.RELEASE" conf="prod->default" />
+		<dependency org="aopalliance" name="aopalliance" rev="1.0" conf="prod->default" />
+		<dependency org="cglib" name="cglib-nodep" rev="2.2.2" conf="prod->default" />
 
-		<dependency org="com.esotericsoftware.kryo" name="kryo" rev="2.20" conf="prod->default"/>
+		<dependency org="com.esotericsoftware.kryo" name="kryo" rev="2.20" conf="prod->default" />
 	</dependencies>
 </ivy-module>

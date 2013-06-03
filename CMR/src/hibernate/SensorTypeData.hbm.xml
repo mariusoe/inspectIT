@@ -12,8 +12,7 @@
 		<property name="description" column="description" />
 		<property name="typeOption" column="type_option" not-null="true" />
 
-		<many-to-one name="environmentData" column="environment_id"
-			class="EnvironmentData" not-null="true" />
+		<many-to-one name="environmentData" column="environment_id" class="EnvironmentData" not-null="true" />
 
 		<set name="methodSensorDefinitions" table="sensor_types" inverse="true">
 			<key column="sensor_type_data_id" not-null="true" />

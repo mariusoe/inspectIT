@@ -9,8 +9,7 @@
 		<property name="description" column="description" />
 		<property name="fullyQualifiedName" column="fqn" not-null="true" />
 		<property name="activated" column="activated" not-null="true" />
-		<property name="sensorOption" column="sensor_option"
-			not-null="true" />
+		<property name="sensorOption" column="sensor_option" not-null="true" />
 
 		<many-to-one name="profileData" column="profile_id" class="ProfileData" />
 	</class>

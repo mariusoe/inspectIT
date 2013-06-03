@@ -54,7 +54,7 @@
 		<ivy:cachepath pathid="lib.prod" conf="prod" />
 		<ivy:cachefileset setid="lib.prod.fileset" conf="prod" />
 		<ivy:cachepath pathid="lib.test" conf="test" />
-		
+
 		<ivy:resolve file="${ivy.file.commons}" />
 		<ivy:cachepath pathid="lib.prod.commons" conf="prod" />
 		<ivy:cachefileset setid="lib.prod.commons.fileset" conf="prod" />
@@ -84,7 +84,6 @@
 		</javac>
 	</target>
 
-
 	<target name="execute-java1.5-runtime-download" depends="configure-java1.5-runtime-download, retrieve-java1.5-runtime" />
 
 	<target name="configure-java1.5-runtime-download" depends="init-antcontrib">
@@ -94,8 +93,6 @@
 	<target name="release-commons" description="--> call the release of the commons project">
 		<ant antfile="${build.commons.file}" target="release" inheritAll="false" useNativeBasedir="true" />
 	</target>
-
-
 
 	<!-- *************************************************************** -->
 	<!--                Q U A L I T Y     T A R G E T S                  -->

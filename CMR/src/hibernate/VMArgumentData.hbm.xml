@@ -7,6 +7,6 @@
 		</id>
 		<property name="systemInformationId" column="system_information_id" />
 		<property name="vmName" column="vm_name" length="10000" />
-		<property name="vmValue" column="vm_value" type="text"/>
+		<property name="vmValue" column="vm_value" type="text" />
 	</class>
 </hibernate-mapping>

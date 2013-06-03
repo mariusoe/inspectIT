@@ -9,21 +9,17 @@
 			<column name="time_stamp" />
 		</property>
 
-		<set name="sensorTypeIdents" table="platform_sensor_type"
-			lazy="true">
+		<set name="sensorTypeIdents" table="platform_sensor_type" lazy="true">
 			<key column="platform_id" />
-			<many-to-many column="sensor_type_id"
-				class="SensorTypeIdent" />
+			<many-to-many column="sensor_type_id" class="SensorTypeIdent" />
 		</set>
-		<set name="methodIdents" inverse="true" lazy="true"
-			cascade="all">
+		<set name="methodIdents" inverse="true" lazy="true" cascade="all">
 			<key column="platform_id" />
 			<one-to-many class="MethodIdent" />
 		</set>
 
-		<property name="definedIPs"
-			type="info.novatec.inspectit.cmr.util.ListStringType">
-			<column name="defined_ips" length="1024"/>
+		<property name="definedIPs" type="info.novatec.inspectit.cmr.util.ListStringType">
+			<column name="defined_ips" length="1024" />
 		</property>
 		<property name="agentName">
 			<column name="agent_name" />
