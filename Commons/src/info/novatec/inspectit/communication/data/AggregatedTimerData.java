@@ -32,7 +32,14 @@ public class AggregatedTimerData extends TimerData implements IAggregatedData<Ti
 	 */
 	public void aggregate(TimerData data) {
 		this.aggregateTimerData(data);
-		if (0 != data.getId()) {
+		if (data instanceof AggregatedTimerData) {
+			AggregatedTimerData aggregatedData = (AggregatedTimerData) data;
+			if (null != aggregatedData.getAggregatedIds()) {
+				for (Long id : aggregatedData.getAggregatedIds()) {
+					aggregatedIds.put(id, Boolean.TRUE);
+				}
+			}
+		} else if (0 != data.getId()) {
 			aggregatedIds.put(data.getId(), Boolean.TRUE);
 		}
 	}
@@ -50,21 +57,6 @@ public class AggregatedTimerData extends TimerData implements IAggregatedData<Ti
 	 */
 	public TimerData getData() {
 		return this;
-	}
-
-	/**
-	 * Aggregates the {@link AggregatedTimerData}.
-	 * 
-	 * @param data
-	 *            {@link AggregatedTimerData}
-	 */
-	public void aggregateTimerData(AggregatedTimerData data) {
-		if (null != data.getAggregatedIds()) {
-			for (Long id : data.getAggregatedIds()) {
-				aggregatedIds.put(id, Boolean.TRUE);
-			}
-		}
-		super.aggregateTimerData(data);
 	}
 
 	/**

@@ -32,7 +32,14 @@ public class AggregatedSqlStatementData extends SqlStatementData implements IAgg
 	 */
 	public void aggregate(SqlStatementData data) {
 		this.aggregateTimerData(data);
-		if (0 != data.getId()) {
+		if (data instanceof AggregatedSqlStatementData) {
+			AggregatedSqlStatementData aggregatedData = (AggregatedSqlStatementData) data;
+			if (null != aggregatedData.getAggregatedIds()) {
+				for (Long id : aggregatedData.getAggregatedIds()) {
+					aggregatedIds.put(id, Boolean.TRUE);
+				}
+			}
+		} else if (0 != data.getId()) {
 			aggregatedIds.put(data.getId(), Boolean.TRUE);
 		}
 	}
@@ -50,21 +57,6 @@ public class AggregatedSqlStatementData extends SqlStatementData implements IAgg
 	 */
 	public SqlStatementData getData() {
 		return this;
-	}
-
-	/**
-	 * Aggregates the {@link AggregatedSqlStatementData}.
-	 * 
-	 * @param data
-	 *            {@link AggregatedSqlStatementData}
-	 */
-	public void aggregateTimerData(AggregatedSqlStatementData data) {
-		if (null != data.getAggregatedIds()) {
-			for (Long id : data.getAggregatedIds()) {
-				aggregatedIds.put(id, Boolean.TRUE);
-			}
-		}
-		super.aggregateTimerData(data);
 	}
 
 	/**

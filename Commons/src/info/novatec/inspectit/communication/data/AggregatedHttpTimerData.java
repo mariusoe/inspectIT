@@ -32,7 +32,14 @@ public class AggregatedHttpTimerData extends HttpTimerData implements IAggregate
 	 */
 	public void aggregate(HttpTimerData data) {
 		this.aggregateTimerData(data);
-		if (0 != data.getId()) {
+		if (data instanceof AggregatedHttpTimerData) {
+			AggregatedHttpTimerData aggregatedData = (AggregatedHttpTimerData) data;
+			if (null != aggregatedData.getAggregatedIds()) {
+				for (Long id : aggregatedData.getAggregatedIds()) {
+					aggregatedIds.put(id, Boolean.TRUE);
+				}
+			}
+		} else if (0 != data.getId()) {
 			aggregatedIds.put(data.getId(), Boolean.TRUE);
 		}
 	}
@@ -50,21 +57,6 @@ public class AggregatedHttpTimerData extends HttpTimerData implements IAggregate
 	 */
 	public HttpTimerData getData() {
 		return this;
-	}
-
-	/**
-	 * Aggregates the {@link AggregatedHttpTimerData}.
-	 * 
-	 * @param data
-	 *            {@link AggregatedHttpTimerData}
-	 */
-	public void aggregateTimerData(AggregatedHttpTimerData data) {
-		if (null != data.getAggregatedIds()) {
-			for (Long id : data.getAggregatedIds()) {
-				aggregatedIds.put(id, Boolean.TRUE);
-			}
-		}
-		super.aggregateTimerData(data);
 	}
 
 	/**

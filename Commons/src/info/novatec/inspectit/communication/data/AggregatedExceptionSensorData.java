@@ -127,6 +127,9 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData implement
 				this.addInvocationParentId(parentId);
 			}
 		}
+		if (0 != exceptionData.getId()) {
+			aggregatedIds.put(exceptionData.getId(), Boolean.TRUE);
+		}
 	}
 
 	/**
@@ -151,10 +154,12 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData implement
 	 * {@inheritDoc}
 	 */
 	public void aggregate(ExceptionSensorData data) {
-		this.aggregateExceptionData(data);
-		if (0 != data.getId()) {
-			aggregatedIds.put(data.getId(), Boolean.TRUE);
+		if (data instanceof AggregatedExceptionSensorData) {
+			aggregateExceptionData((AggregatedExceptionSensorData) data);
+		} else {
+			aggregateExceptionData(data);
 		}
+
 	}
 
 	/**
