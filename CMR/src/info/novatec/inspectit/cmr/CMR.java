@@ -11,6 +11,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.access.BeanFactoryReference;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
 
 /**
@@ -49,6 +50,11 @@ public final class CMR {
 		BeanFactoryLocator beanFactoryLocator = ContextSingletonBeanFactoryLocator.getInstance();
 		BeanFactoryReference beanFactoryReference = beanFactoryLocator.useBeanFactory("ctx");
 		beanFactory = beanFactoryReference.getFactory();
+
+		if (beanFactory instanceof ConfigurableApplicationContext) {
+			((ConfigurableApplicationContext) beanFactory).registerShutdownHook();
+		}
+
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("Spring successfully initialized");
 		}

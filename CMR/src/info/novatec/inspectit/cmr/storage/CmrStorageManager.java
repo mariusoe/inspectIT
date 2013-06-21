@@ -50,6 +50,8 @@ import org.apache.commons.lang.mutable.MutableObject;
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -63,7 +65,7 @@ import com.esotericsoftware.kryo.io.Input;
  * 
  */
 @Component
-public class CmrStorageManager extends StorageManager { // NOPMD - Class can not be shorter
+public class CmrStorageManager extends StorageManager implements ApplicationListener<ContextClosedEvent> { // NOPMD
 
 	/**
 	 * The log of this class.
@@ -1131,19 +1133,6 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 	}
 
 	/**
-	 * Adds a shutdown hook to the current {@link Runtime}, so that all storages can be closed,
-	 * before the CMR is shutdown. All pending writes should be executed on shutdown.
-	 */
-	private void addShutdownHook() {
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				CmrStorageManager.this.closeAllStorages();
-			}
-		});
-	}
-
-	/**
 	 * Returns the unique String that will be used as a StorageData ID. This ID needs to be unique
 	 * not only for the current CMR, but we need to ensure that is unique for all CMRs, because the
 	 * correlation between storage and CMR will be done by this ID.
@@ -1179,7 +1168,16 @@ public class CmrStorageManager extends StorageManager { // NOPMD - Class can not
 		loadAllExistingStorages();
 		updatedStorageSpaceLeft();
 		clearUploadFolder();
-		addShutdownHook();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Close all storage on context closing.
+	 */
+	@Override
+	public void onApplicationEvent(ContextClosedEvent event) {
+		closeAllStorages();
 	}
 
 	/**
