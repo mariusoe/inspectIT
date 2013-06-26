@@ -314,7 +314,9 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		for (CmrRepositoryDefinition cmrRepositoryDefinition : repositories) {
 			inputList.add(new DeferredAgentsComposite(cmrRepositoryDefinition, showOldAgents));
 			OnlineStatus onlineStatus = cmrRepositoryDefinition.getOnlineStatus();
-			cachedStatusMap.put(cmrRepositoryDefinition, onlineStatus);
+			if (onlineStatus == OnlineStatus.ONLINE || onlineStatus == OnlineStatus.OFFLINE) {
+				cachedStatusMap.put(cmrRepositoryDefinition, onlineStatus);
+			}
 		}
 	}
 
@@ -333,7 +335,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 				treeViewer.setSelection(ss, true);
 			}
 		} else {
-			displayMessage("No CMR repositopry present. Please add the CMR repository via 'Add CMR repository' action.", Display.getDefault().getSystemImage(SWT.ICON_INFORMATION));
+			displayMessage("No CMR repository present. Please add the CMR repository via 'Add CMR repository' action.", Display.getDefault().getSystemImage(SWT.ICON_INFORMATION));
 		}
 		mainForm.getBody().layout();
 	}
@@ -400,7 +402,6 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 						@Override
 						public void run() {
 							mainForm.setBusy(true);
-							boolean update = false;
 							for (DeferredAgentsComposite composite : inputList) {
 								if (ObjectUtils.equals(composite.getRepositoryDefinition(), repositoryDefinition)) {
 									treeViewer.refresh(composite, true);
@@ -410,15 +411,11 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 											treeViewer.setSelection(StructuredSelection.EMPTY);
 											StructuredSelection ss = new StructuredSelection(lastSelectedRepository);
 											treeViewer.setSelection(ss, true);
-											update = true;
 										}
 									}
 								}
 							}
 							mainForm.setBusy(false);
-							if (update) {
-								cmrPropertyForm.refresh();
-							}
 						}
 					});
 				}
@@ -545,9 +542,6 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 							public void run() {
 								treeViewer.refresh(finalToUpdate, true);
 								if (ObjectUtils.equals(finalToUpdate, lastSelectedRepository)) {
-									treeViewer.setSelection(StructuredSelection.EMPTY);
-									StructuredSelection ss = new StructuredSelection(finalToUpdate);
-									treeViewer.setSelection(ss, true);
 									if (null != cmrPropertyForm && !cmrPropertyForm.isDisposed()) {
 										cmrPropertyForm.refresh();
 									}
