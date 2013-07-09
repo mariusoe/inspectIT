@@ -11,6 +11,8 @@ import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData.AgentConnection;
 import info.novatec.inspectit.spring.logger.Logger;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -127,12 +129,29 @@ public class GlobalDataAccessService implements IGlobalDataAccessService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public List<DefaultData> getDataObjectsFromToDate(DefaultData template, Date fromDate, Date toDate) {
+	public List<? extends DefaultData> getDataObjectsFromToDate(DefaultData template, Date fromDate, Date toDate) {
 		if (fromDate.after(toDate)) {
 			return Collections.emptyList();
 		}
 
 		List<DefaultData> result = defaultDataDao.findByExampleFromToDate(template, fromDate, toDate);
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@MethodLog
+	public List<? extends DefaultData> getTemplatesDataObjectsFromToDate(Collection<DefaultData> templates, Date fromDate, Date toDate) {
+		if (fromDate.after(toDate)) {
+			return Collections.emptyList();
+		}
+
+		List<DefaultData> result = new ArrayList<>();
+		for (DefaultData template : templates) {
+			result.addAll(this.getDataObjectsFromToDate(template, fromDate, toDate));
+		}
+
 		return result;
 	}
 

@@ -4,9 +4,9 @@ import info.novatec.inspectit.rcp.editor.graph.plot.DefaultClassesPlotController
 import info.novatec.inspectit.rcp.editor.graph.plot.DefaultCpuPlotController;
 import info.novatec.inspectit.rcp.editor.graph.plot.DefaultMemoryPlotController;
 import info.novatec.inspectit.rcp.editor.graph.plot.DefaultThreadsPlotController;
-import info.novatec.inspectit.rcp.editor.graph.plot.DefaultTimerPlotController;
 import info.novatec.inspectit.rcp.editor.graph.plot.HttpTimerPlotController;
 import info.novatec.inspectit.rcp.editor.graph.plot.PlotController;
+import info.novatec.inspectit.rcp.editor.graph.plot.TimerPlotController;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 
 /**
@@ -33,9 +33,11 @@ public final class PlotFactory {
 	public static PlotController createDefaultPlotController(SensorTypeEnum sensorTypeEnum) {
 		switch (sensorTypeEnum) {
 		case AVERAGE_TIMER:
-			return new DefaultTimerPlotController();
+			return new TimerPlotController();
 		case TIMER:
-			return new DefaultTimerPlotController();
+			return new TimerPlotController();
+		case CHARTING_MULTI_TIMER:
+			return new TimerPlotController();
 		case CLASSLOADING_INFORMATION:
 			return new DefaultClassesPlotController();
 		case COMPILATION_INFORMATION:

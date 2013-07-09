@@ -8,12 +8,19 @@ import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData.PartType;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
+import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
+import info.novatec.inspectit.rcp.editor.inputdefinition.extra.TimerDataChartingInputDefinitionExtra;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -40,44 +47,65 @@ public class NavigateToPlotting extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
-		Object selectedObject = selection.getFirstElement();
 		AbstractRootEditor rootEditor = (AbstractRootEditor) HandlerUtil.getActiveEditor(event);
 		RepositoryDefinition repositoryDefinition = rootEditor.getInputDefinition().getRepositoryDefinition();
 		InputDefinition inputDefinition = null;
-		TimerData timerData;
+		List<TimerData> templates = new ArrayList<>();
 
-		if (selectedObject instanceof TimerData) {
-			timerData = (TimerData) selectedObject;
-		} else if (selectedObject instanceof InvocationSequenceData) {
-			InvocationSequenceData invoc = (InvocationSequenceData) selectedObject;
-			if (invoc.getTimerData() != null) {
-				timerData = invoc.getTimerData();
-			} else {
-				return null;
+		for (Iterator<?> it = selection.iterator(); it.hasNext();) {
+			Object selectedObject = it.next();
+			TimerData timerData = null;
+			if (selectedObject instanceof TimerData) {
+				timerData = (TimerData) selectedObject;
+			} else if (selectedObject instanceof InvocationSequenceData) {
+				InvocationSequenceData invoc = (InvocationSequenceData) selectedObject;
+				if (invoc.getTimerData() != null) {
+					timerData = invoc.getTimerData();
+				}
 			}
-		} else {
+
+			if (null != timerData) {
+				TimerData template = new TimerData(null, timerData.getPlatformIdent(), timerData.getSensorTypeIdent(), timerData.getMethodIdent());
+				templates.add(template);
+			}
+		}
+
+		if (CollectionUtils.isEmpty(templates)) {
 			return null;
 		}
 
-		MethodIdent methodIdent = repositoryDefinition.getCachedDataService().getMethodIdentForId(timerData.getMethodIdent());
 		inputDefinition = new InputDefinition();
 		inputDefinition.setRepositoryDefinition(repositoryDefinition);
-		inputDefinition.setId(SensorTypeEnum.TIMER);
 
 		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
 		editorPropertiesData.setSensorImage(SensorTypeEnum.TIMER.getImage());
-		editorPropertiesData.setSensorName(SensorTypeEnum.TIMER.getDisplayName());
-		editorPropertiesData.setViewImage(ModifiersImageFactory.getImage(methodIdent.getModifiers()));
-		editorPropertiesData.setViewName(TextFormatter.getMethodString(methodIdent));
+		editorPropertiesData.setSensorName("Chart");
 		editorPropertiesData.setPartNameFlag(PartType.SENSOR);
 		inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 		IdDefinition idDefinition = new IdDefinition();
-		idDefinition.setPlatformId(timerData.getPlatformIdent());
-		idDefinition.setSensorTypeId(timerData.getSensorTypeIdent());
-		idDefinition.setMethodId(timerData.getMethodIdent());
-
+		idDefinition.setPlatformId(templates.get(0).getPlatformIdent());
 		inputDefinition.setIdDefinition(idDefinition);
+
+		if (templates.size() == 1) {
+			TimerData timerData = templates.get(0);
+			MethodIdent methodIdent = repositoryDefinition.getCachedDataService().getMethodIdentForId(timerData.getMethodIdent());
+
+			editorPropertiesData.setViewImage(ModifiersImageFactory.getImage(methodIdent.getModifiers()));
+			editorPropertiesData.setViewName(TextFormatter.getMethodString(methodIdent));
+
+			inputDefinition.setId(SensorTypeEnum.TIMER);
+			idDefinition.setPlatformId(timerData.getPlatformIdent());
+			idDefinition.setSensorTypeId(timerData.getSensorTypeIdent());
+			idDefinition.setMethodId(timerData.getMethodIdent());
+		} else {
+			editorPropertiesData.setViewName("Multiple Timer data");
+
+			TimerDataChartingInputDefinitionExtra definitionExtra = new TimerDataChartingInputDefinitionExtra();
+			definitionExtra.setTemplates(templates);
+			inputDefinition.setId(SensorTypeEnum.CHARTING_MULTI_TIMER);
+			inputDefinition.addInputDefinitonExtra(InputDefinitionExtrasMarkerFactory.TIMER_DATA_CHARTING_EXTRAS_MARKER, definitionExtra);
+		}
 
 		// open the view via command
 		IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);

@@ -72,6 +72,17 @@ public final class InputDefinitionExtrasMarkerFactory {
 	};
 
 	/**
+	 * Marker for {@link TimerDataChartingInputDefinitionExtra}.
+	 */
+	public static final InputDefinitionExtraMarker<TimerDataChartingInputDefinitionExtra> TIMER_DATA_CHARTING_EXTRAS_MARKER = new InputDefinitionExtraMarker<TimerDataChartingInputDefinitionExtra>() {
+		@Override
+		public Class<TimerDataChartingInputDefinitionExtra> getInputDefinitionExtraClass() {
+			return TimerDataChartingInputDefinitionExtra.class;
+		}
+
+	};
+
+	/**
 	 * Abstract class for input definition extras marker.
 	 * 
 	 * @author Ivan Senic

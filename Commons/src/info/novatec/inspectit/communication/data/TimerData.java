@@ -541,6 +541,7 @@ public class TimerData extends InvocationAwareData {
 			this.calculateExclusiveMax(timerData.getExclusiveMax());
 			this.calculateExclusiveMin(timerData.getExclusiveMin());
 		}
+		this.charting = this.charting | timerData.isCharting();
 	}
 
 	/**

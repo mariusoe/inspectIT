@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -556,6 +557,18 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 	 */
 	public boolean isActiveViewMaximized() {
 		return isMaximizedMode;
+	}
+
+	/**
+	 * Updates the name of the editor.
+	 * 
+	 * @param name
+	 *            New name.
+	 */
+	public void updateEditorName(String name) {
+		if (StringUtils.isNotEmpty(name)) {
+			setPartName(name);
+		}
 	}
 
 	/**

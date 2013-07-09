@@ -72,6 +72,8 @@ public final class SubViewFactory {
 			ISubView aggregatedTimerSummarySubView = new TableSubView(new AggregatedTimerSummaryInputController());
 			timerSubView.addSubView(aggregatedTimerSummarySubView, new GridData(SWT.FILL, SWT.FILL, true, false));
 			return timerSubView;
+		case CHARTING_MULTI_TIMER:
+			return new GraphSubView(SensorTypeEnum.CHARTING_MULTI_TIMER);
 		case CLASSLOADING_INFORMATION:
 			GridCompositeSubView classLoadingSubView = new GridCompositeSubView();
 			classLoadingSubView.addSubView(new GraphSubView(sensorTypeEnum), new GridData(SWT.FILL, SWT.FILL, true, true));

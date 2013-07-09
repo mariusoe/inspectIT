@@ -23,6 +23,8 @@ public enum SensorTypeEnum {
 	TIMER("info.novatec.inspectit.agent.sensor.method.timer.TimerSensor", InspectITImages.IMG_TIMER),
 	/** The average timer sensor type. */
 	AVERAGE_TIMER("info.novatec.inspectit.agent.sensor.method.averagetimer.AverageTimerSensor", InspectITImages.IMG_TIMER),
+	/** Charting with multiple timers. */
+	CHARTING_MULTI_TIMER("info.novatec.inspectit.agent.sensor.method.averagetimer.ChartingMultiTimer", InspectITImages.IMG_TIMER),
 	/** The invocation sequence sensor type. */
 	INVOCATION_SEQUENCE("info.novatec.inspectit.agent.sensor.method.invocationsequence.InvocationSequenceSensor", InspectITImages.IMG_INVOCATION),
 	/** The sql sensor type. */

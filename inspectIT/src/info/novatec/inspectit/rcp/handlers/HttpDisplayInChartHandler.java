@@ -59,22 +59,32 @@ public class HttpDisplayInChartHandler extends AbstractHandler implements IHandl
 		}
 
 		if (CollectionUtils.isNotEmpty(templates)) {
+			boolean plotByTagValue = null != rootEditor.getSubView().getSubViewWithInputController(TaggedHttpTimerDataInputController.class);
+
 			inputDefinition = new InputDefinition();
 			inputDefinition.setRepositoryDefinition(repositoryDefinition);
 			inputDefinition.setId(SensorTypeEnum.CHARTING_HTTP_TIMER_SENSOR);
 
 			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
 			editorPropertiesData.setSensorImage(SensorTypeEnum.CHARTING_HTTP_TIMER_SENSOR.getImage());
-			editorPropertiesData.setSensorName("Http Timer Data");
-			editorPropertiesData.setViewName("Charting");
+			editorPropertiesData.setSensorName("Chart");
 			editorPropertiesData.setPartNameFlag(PartType.SENSOR);
+			if (templates.size() == 1) {
+				if (plotByTagValue) {
+					editorPropertiesData.setViewName("Tag: " + templates.get(0).getInspectItTaggingHeaderValue());
+				} else {
+					editorPropertiesData.setViewName("URI: " + templates.get(0).getUri());
+				}
+			} else {
+				editorPropertiesData.setViewName("Multiple HTTP data");
+			}
+
 			inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
 			IdDefinition idDefinition = new IdDefinition();
 			idDefinition.setPlatformId(templates.get(0).getPlatformIdent());
 			inputDefinition.setIdDefinition(idDefinition);
 
-			boolean plotByTagValue = null != rootEditor.getSubView().getSubViewWithInputController(TaggedHttpTimerDataInputController.class);
 			HttpChartingInputDefinitionExtra inputDefinitionExtra = new HttpChartingInputDefinitionExtra();
 			inputDefinitionExtra.setTemplates(templates);
 			inputDefinitionExtra.setPlotByTagValue(plotByTagValue);

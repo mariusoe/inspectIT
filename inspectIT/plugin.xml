@@ -555,71 +555,6 @@
          </activeWhen>
       </handler>
       <handler
-            class="info.novatec.inspectit.rcp.handlers.NavigateToPlotting"
-            commandId="info.novatec.inspectit.rcp.commands.navigateToPlotting">
-         <activeWhen>
-            <and>
-               <count
-                     value="1">
-               </count>
-               <iterate>
-                  <or>
-                     <and>
-                        <instanceof
-                              value="info.novatec.inspectit.communication.data.TimerData">
-                        </instanceof>
-                        <not>
-                           <instanceof
-                                 value="info.novatec.inspectit.communication.data.SqlStatementData">
-                           </instanceof>
-                        </not>
-                        <not>
-                           <instanceof
-                                 value="info.novatec.inspectit.communication.data.HttpTimerData">
-                           </instanceof>
-                        </not>
-                        <test
-                              property="info.novatec.inspectit.canChart"
-                              value="true">
-                        </test>
-                     </and>
-                     <instanceof
-                           value="info.novatec.inspectit.communication.data.InvocationSequenceData">
-                     </instanceof>
-                  </or>
-               </iterate>
-               <with
-                     variable="activeEditor">
-                  <instanceof
-                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
-                  </instanceof>
-                  <or>
-                     <test
-                           property="info.novatec.inspectit.activeSubView"
-                           value="tableSubView">
-                     </test>
-                     <test
-                           property="info.novatec.inspectit.activeSubView"
-                           value="treeSubView">
-                     </test>
-                  </or>
-                  <not>
-                     <test
-                           property="info.novatec.inspectit.hasSubView"
-                           value="graphSubView">
-                     </test>
-                  </not>
-               </with>
-               <with
-                     variable="selection">
-                  <test
-                        property="info.novatec.inspectit.canNavigateToPlotting">
-                  </test>
-               </with>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
             class="info.novatec.inspectit.rcp.handlers.NavigateToStartMethodInvocationHandler"
             commandId="info.novatec.inspectit.rcp.commands.navigateToStartMethodInvocations">
          <activeWhen>
@@ -1472,6 +1407,84 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.NavigateToPlotting"
+            commandId="info.novatec.inspectit.rcp.commands.displayInChart">
+         <activeWhen>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <iterate>
+                  <or>
+                     <and>
+                        <instanceof
+                              value="info.novatec.inspectit.communication.data.TimerData">
+                        </instanceof>
+                        <not>
+                           <instanceof
+                                 value="info.novatec.inspectit.communication.data.SqlStatementData">
+                           </instanceof>
+                        </not>
+                        <not>
+                           <instanceof
+                                 value="info.novatec.inspectit.communication.data.HttpTimerData">
+                           </instanceof>
+                        </not>
+                        <test
+                              property="info.novatec.inspectit.canChart"
+                              value="true">
+                        </test>
+                     </and>
+                     <instanceof
+                           value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                     </instanceof>
+                  </or>
+               </iterate>
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                  </instanceof>
+                  <or>
+                     <test
+                           property="info.novatec.inspectit.activeSubView"
+                           value="tableSubView">
+                     </test>
+                     <test
+                           property="info.novatec.inspectit.activeSubView"
+                           value="treeSubView">
+                     </test>
+                  </or>
+                  <not>
+                     <test
+                           property="info.novatec.inspectit.hasSubView"
+                           value="graphSubView">
+                     </test>
+                  </not>
+               </with>
+               <with
+                     variable="selection">
+                  <test
+                        property="info.novatec.inspectit.canNavigateToPlotting">
+                  </test>
+               </with>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.RenameEditorHandler"
+            commandId="org.eclipse.ui.edit.rename">
+         <activeWhen>
+            <and>
+               <with
+                     variable="activePart">
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
+                  </instanceof>
+               </with></and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -1600,14 +1613,6 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="info.novatec.inspectit.rcp.commands.navigateToPlotting"
-                  icon="icons/timer.png"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="true">
-               </visibleWhen>
-            </command>
-            <command
                   commandId="info.novatec.inspectit.rcp.commands.navigateToAggregatedTimerData"
                   icon="icons/timer.png"
                   label="Aggregated Timer Data"
@@ -1655,6 +1660,14 @@
          <command
                commandId="info.novatec.inspectit.rcp.commands.addToSteppingObjects"
                icon="icons/right_down.png"
+               style="push">
+            <visibleWhen
+                  checkEnabled="true">
+            </visibleWhen>
+         </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.displayInChart"
+               icon="icons/chart_pie.png"
                style="push">
             <visibleWhen
                   checkEnabled="true">
@@ -1763,14 +1776,6 @@
                         </test>
                      </with>
                   </and>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="info.novatec.inspectit.rcp.commands.navigateToPlotting"
-                  icon="icons/timer.png"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="true">
                </visibleWhen>
             </command>
             <command

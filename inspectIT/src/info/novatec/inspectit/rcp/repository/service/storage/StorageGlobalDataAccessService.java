@@ -13,6 +13,7 @@ import info.novatec.inspectit.indexing.storage.impl.StorageIndexQuery;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -153,8 +154,28 @@ public class StorageGlobalDataAccessService extends AbstractStorageService<Defau
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<DefaultData> getDataObjectsFromToDate(DefaultData template, Date fromDate, Date toDate) {
+	public List<? extends DefaultData> getDataObjectsFromToDate(DefaultData template, Date fromDate, Date toDate) {
+		if (fromDate.after(toDate)) {
+			return Collections.emptyList();
+		}
+
 		return this.getDataObjectsInInterval(template, new Timestamp(fromDate.getTime()), new Timestamp(toDate.getTime()));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<? extends DefaultData> getTemplatesDataObjectsFromToDate(Collection<DefaultData> templates, Date fromDate, Date toDate) {
+		if (fromDate.after(toDate)) {
+			return Collections.emptyList();
+		}
+
+		List<DefaultData> result = new ArrayList<>();
+		for (DefaultData template : templates) {
+			result.addAll(this.getDataObjectsFromToDate(template, fromDate, toDate));
+		}
+		return result;
 	}
 
 	/**

@@ -5,6 +5,7 @@ import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -111,5 +112,19 @@ public interface IGlobalDataAccessService {
 	 * @return List of data objects.
 	 */
 	List<? extends DefaultData> getDataObjectsFromToDate(DefaultData template, Date fromDate, Date toDate);
+
+	/**
+	 * All data objects from the passed templates in the given time range.
+	 * 
+	 * @param templates
+	 *            The templates objects. Return list will include all found data that matches the
+	 *            templates.
+	 * @param fromDate
+	 *            The start date.
+	 * @param toDate
+	 *            The end date.
+	 * @return List of data objects.
+	 */
+	List<? extends DefaultData> getTemplatesDataObjectsFromToDate(Collection<DefaultData> templates, Date fromDate, Date toDate);
 
 }

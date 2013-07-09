@@ -4,10 +4,13 @@ import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.composite.BreadcrumbTitleComposite;
+import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
 import info.novatec.inspectit.rcp.editor.preferences.FormPreferencePanel;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferencePanel;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
+
+import java.util.Objects;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -106,6 +109,20 @@ public class FormRootEditor extends AbstractRootEditor {
 	 */
 	public BreadcrumbTitleComposite getBreadcrumbTitleComposite() {
 		return breadcrumbTitleComposite;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void updateEditorName(String name) {
+		EditorPropertiesData editorPropertiesData = getInputDefinition().getEditorPropertiesData();
+		if (Objects.equals(editorPropertiesData.getPartName(), editorPropertiesData.getSensorName())) {
+			breadcrumbTitleComposite.setGroup(name, editorPropertiesData.getSensorImage());
+		} else {
+			breadcrumbTitleComposite.setView(name, editorPropertiesData.getViewImage());
+		}
+		super.updateEditorName(name);
 	}
 
 }

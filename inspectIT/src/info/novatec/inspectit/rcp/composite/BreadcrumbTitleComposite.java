@@ -189,6 +189,7 @@ public class BreadcrumbTitleComposite extends Composite implements CmrRepository
 		if (null != groupdImg) {
 			groupLabel.setImage(groupdImg);
 		}
+		layoutInternal();
 	}
 
 	/**
