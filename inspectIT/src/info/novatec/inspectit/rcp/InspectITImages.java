@@ -135,4 +135,5 @@ public interface InspectITImages {
 	String IMG_RECORD_SCHEDULED = InspectITConstants.ICON_PATH + "record_scheduled.png";
 	String IMG_FOLDER = InspectITConstants.ICON_PATH + "folder.png";
 	String IMG_INSTRUMENTATION_BROWSER_INACTIVE = InspectITConstants.ICON_PATH + "instrumentation_browser_inactive.png";
+	String IMG_TIMEFRAME = InspectITConstants.ICON_PATH + "timeframe.png";
 }

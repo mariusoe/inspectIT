@@ -630,8 +630,10 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 			groupByLabelMenu.add(new LabelOrderAction("None", InspectIT.getDefault().getImageDescriptor(InspectITImages.IMG_STORAGE_DOWNLOADED), null, null == orderingLabelType));
 		}
 		for (AbstractStorageLabelType<?> labelType : availableLabelTypes) {
-			groupByLabelMenu.add(new LabelOrderAction(TextFormatter.getLabelName(labelType), ImageFormatter.getImageDescriptorForLabel(labelType), labelType, ObjectUtils.equals(labelType,
-					orderingLabelType)));
+			if (labelType.isGroupingEnabled()) {
+				groupByLabelMenu.add(new LabelOrderAction(TextFormatter.getLabelName(labelType), ImageFormatter.getImageDescriptorForLabel(labelType), labelType, ObjectUtils.equals(labelType,
+						orderingLabelType)));
+			}
 		}
 
 	}

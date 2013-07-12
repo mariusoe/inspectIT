@@ -69,6 +69,7 @@ import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.label.BooleanStorageLabel;
 import info.novatec.inspectit.storage.label.DateStorageLabel;
 import info.novatec.inspectit.storage.label.NumberStorageLabel;
+import info.novatec.inspectit.storage.label.ObjectStorageLabel;
 import info.novatec.inspectit.storage.label.StringStorageLabel;
 import info.novatec.inspectit.storage.label.management.impl.AddLabelManagementAction;
 import info.novatec.inspectit.storage.label.management.impl.RemoveLabelManagementAction;
@@ -78,6 +79,7 @@ import info.novatec.inspectit.storage.label.type.impl.CustomBooleanLabelType;
 import info.novatec.inspectit.storage.label.type.impl.CustomDateLabelType;
 import info.novatec.inspectit.storage.label.type.impl.CustomNumberLabelType;
 import info.novatec.inspectit.storage.label.type.impl.CustomStringLabelType;
+import info.novatec.inspectit.storage.label.type.impl.DataTimeFrameLabelType;
 import info.novatec.inspectit.storage.label.type.impl.ExploredByLabelType;
 import info.novatec.inspectit.storage.label.type.impl.RatingLabelType;
 import info.novatec.inspectit.storage.label.type.impl.StatusLabelType;
@@ -95,6 +97,7 @@ import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.storage.serializer.schema.ClassSchemaManager;
 import info.novatec.inspectit.util.IHibernateUtil;
+import info.novatec.inspectit.util.TimeFrame;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -377,6 +380,11 @@ public class SerializationManager implements ISerializer, InitializingBean {
 
 		// added with INSPECTIT-991
 		kryo.register(ServerStatus.class, new ServerStatusSerializer());
+		
+		// added with INSPECTIT-950
+		kryo.register(ObjectStorageLabel.class, new CustomCompatibleFieldSerializer<ObjectStorageLabel<?>>(kryo, ObjectStorageLabel.class, schemaManager));
+		kryo.register(DataTimeFrameLabelType.class, new CustomCompatibleFieldSerializer<DataTimeFrameLabelType>(kryo, DataTimeFrameLabelType.class, schemaManager, true));
+		kryo.register(TimeFrame.class, new CustomCompatibleFieldSerializer<TimeFrame>(kryo, TimeFrame.class, schemaManager));
 	}
 
 	/**

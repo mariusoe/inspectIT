@@ -16,6 +16,7 @@ import info.novatec.inspectit.storage.label.type.AbstractCustomStorageLabelType;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 import info.novatec.inspectit.storage.label.type.impl.AssigneeLabelType;
 import info.novatec.inspectit.storage.label.type.impl.CreationDateLabelType;
+import info.novatec.inspectit.storage.label.type.impl.DataTimeFrameLabelType;
 import info.novatec.inspectit.storage.label.type.impl.ExploredByLabelType;
 import info.novatec.inspectit.storage.label.type.impl.RatingLabelType;
 import info.novatec.inspectit.storage.label.type.impl.StatusLabelType;
@@ -97,6 +98,8 @@ public final class ImageFormatter {
 			return InspectITImages.IMG_STATUS_LABEL_ICON;
 		} else if (UseCaseLabelType.class.equals(labelType.getClass())) {
 			return InspectITImages.IMG_USECASE_LABEL_ICON;
+		} else if (DataTimeFrameLabelType.class.equals(labelType.getClass())) {
+			return InspectITImages.IMG_TIMEFRAME;
 		} else if (labelType instanceof AbstractCustomStorageLabelType) {
 			AbstractCustomStorageLabelType<?> customLabelType = (AbstractCustomStorageLabelType<?>) labelType;
 			if (null != customLabelType.getImageKey()) {

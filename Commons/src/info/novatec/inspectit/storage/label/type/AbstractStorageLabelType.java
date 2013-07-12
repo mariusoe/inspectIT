@@ -67,6 +67,16 @@ public abstract class AbstractStorageLabelType<V> implements Serializable, Compa
 	}
 
 	/**
+	 * If the labels of this type can be grouped. Returns <code>true</code> by default, sub-classes
+	 * may override.
+	 * 
+	 * @return If the labels of this type can be grouped.
+	 */
+	public boolean isGroupingEnabled() {
+		return true;
+	}
+
+	/**
 	 * Gets {@link #id}.
 	 * 
 	 * @return {@link #id}

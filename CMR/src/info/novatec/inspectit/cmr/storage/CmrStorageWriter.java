@@ -6,13 +6,18 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.StorageFileExtensions;
 import info.novatec.inspectit.storage.StorageWriter;
+import info.novatec.inspectit.storage.label.ObjectStorageLabel;
+import info.novatec.inspectit.storage.label.type.impl.DataTimeFrameLabelType;
+import info.novatec.inspectit.util.TimeFrame;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +49,16 @@ public class CmrStorageWriter extends StorageWriter {
 	private Set<Long> involvedAgentsSet = new HashSet<Long>();
 
 	/**
+	 * {@link AtomicLong} holding the time-stamp value of the oldest data written in the storage.
+	 */
+	private AtomicLong oldestDataTimestamp = new AtomicLong(Long.MAX_VALUE);
+
+	/**
+	 * {@link AtomicLong} holding the time-stamp value of the newest data written in the storage.
+	 */
+	private AtomicLong newestDataTimestamp = new AtomicLong(0);
+
+	/**
 	 * Platform ident dao.
 	 */
 	@Autowired
@@ -55,7 +70,7 @@ public class CmrStorageWriter extends StorageWriter {
 	@Override
 	public Future<Void> write(DefaultData defaultData) {
 		Future<Void> future = super.write(defaultData);
-		involvedAgentsSet.add(defaultData.getPlatformIdent());
+		postWriteOperations(defaultData);
 		return future;
 	}
 
@@ -65,7 +80,7 @@ public class CmrStorageWriter extends StorageWriter {
 	@Override
 	public Future<Void> write(DefaultData defaultData, Map<?, ?> kryoPreferences) {
 		Future<Void> future = super.write(defaultData, kryoPreferences);
-		involvedAgentsSet.add(defaultData.getPlatformIdent());
+		postWriteOperations(defaultData);
 		return future;
 	}
 
@@ -92,6 +107,49 @@ public class CmrStorageWriter extends StorageWriter {
 			log.error("Exception trying to write agent data to disk.", e);
 		}
 		super.finalizeWrite();
+
+		if (newestDataTimestamp.get() > 0 && oldestDataTimestamp.get() < Long.MAX_VALUE) {
+			TimeFrame timeFrame = new TimeFrame(new Date(oldestDataTimestamp.get()), new Date(newestDataTimestamp.get()));
+			ObjectStorageLabel<TimeFrame> timeframeLabel = new ObjectStorageLabel<TimeFrame>(timeFrame, new DataTimeFrameLabelType());
+			getStorageData().addLabel(timeframeLabel, true);
+		}
+	}
+
+	/**
+	 * Executes post write operations:
+	 * 
+	 * <ul>
+	 * <li>Remembers the platfrom id of the written data
+	 * <li>Updates the {@link #newestDataTimestamp} and the {@link #oldestDataTimestamp} if needed.
+	 * </ul>
+	 * 
+	 * @param defaultData
+	 *            {@link DefaultData} that has been written.
+	 */
+	private void postWriteOperations(DefaultData defaultData) {
+		involvedAgentsSet.add(defaultData.getPlatformIdent());
+
+		while (true) {
+			long oldestData = oldestDataTimestamp.get();
+			if (oldestData > defaultData.getTimeStamp().getTime()) {
+				if (oldestDataTimestamp.compareAndSet(oldestData, defaultData.getTimeStamp().getTime())) {
+					break;
+				}
+			} else {
+				break;
+			}
+		}
+
+		while (true) {
+			long newestData = newestDataTimestamp.get();
+			if (newestData < defaultData.getTimeStamp().getTime()) {
+				if (newestDataTimestamp.compareAndSet(newestData, defaultData.getTimeStamp().getTime())) {
+					break;
+				}
+			} else {
+				break;
+			}
+		}
 	}
 
 	/**

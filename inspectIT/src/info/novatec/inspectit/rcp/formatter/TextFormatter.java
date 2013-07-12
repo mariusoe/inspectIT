@@ -24,6 +24,7 @@ import info.novatec.inspectit.storage.label.type.AbstractCustomStorageLabelType;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
 import info.novatec.inspectit.storage.label.type.impl.AssigneeLabelType;
 import info.novatec.inspectit.storage.label.type.impl.CreationDateLabelType;
+import info.novatec.inspectit.storage.label.type.impl.DataTimeFrameLabelType;
 import info.novatec.inspectit.storage.label.type.impl.ExploredByLabelType;
 import info.novatec.inspectit.storage.label.type.impl.RatingLabelType;
 import info.novatec.inspectit.storage.label.type.impl.StatusLabelType;
@@ -374,6 +375,8 @@ public final class TextFormatter {
 			return "Status";
 		} else if (UseCaseLabelType.class.equals(labelType.getClass())) {
 			return "Use Case";
+		} else if (DataTimeFrameLabelType.class.equals(labelType.getClass())) {
+			return "Data Timeframe";
 		} else if (AbstractCustomStorageLabelType.class.isAssignableFrom(labelType.getClass())) {
 			return ((AbstractCustomStorageLabelType<?>) labelType).getName();
 		} else {
