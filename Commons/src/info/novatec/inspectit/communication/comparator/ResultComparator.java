@@ -49,6 +49,18 @@ public class ResultComparator<T extends DefaultData> implements Comparator<T> {
 	}
 
 	/**
+	 * Constructor that sets only comparator and ascending.
+	 * 
+	 * @param comparator
+	 *            Delegating comparator.
+	 * @param ascending
+	 *            True if ascending sorting is on, false if descending sorting is on.
+	 */
+	public ResultComparator(IDataComparator<? super T> comparator, boolean ascending) {
+		this(comparator, null, ascending);
+	}
+
+	/**
 	 * Secondary constructor. Initializes the {@link #ascending} with <code>true</code>.
 	 * 
 	 * @param comparator

@@ -129,6 +129,11 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	}
 
 	/**
+	 * Default comparator when no sorting is defined.
+	 */
+	private static final ResultComparator<ExceptionSensorData> DEFAULT_COMPARATOR = new ResultComparator<>(DefaultDataComparatorEnum.TIMESTAMP, false);
+
+	/**
 	 * The template object which is send to the server.
 	 */
 	private ExceptionSensorData template;
@@ -166,7 +171,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	/**
 	 * Result comparator to be used on the server.
 	 */
-	private ResultComparator<ExceptionSensorData> resultComparator;
+	private ResultComparator<ExceptionSensorData> resultComparator = DEFAULT_COMPARATOR;
 
 	/**
 	 * {@inheritDoc}
@@ -236,7 +241,11 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 		RemoteTableViewerComparator<ExceptionSensorData> exceptionViewerComparator = new RemoteTableViewerComparator<ExceptionSensorData>() {
 			@Override
 			protected void sortRemotely(ResultComparator<ExceptionSensorData> resultComparator) {
-				UngroupedExceptionOverviewInputController.this.resultComparator = resultComparator;
+				if (null != resultComparator) {
+					UngroupedExceptionOverviewInputController.this.resultComparator = resultComparator;
+				} else {
+					UngroupedExceptionOverviewInputController.this.resultComparator = DEFAULT_COMPARATOR;
+				}
 				loadDataFromService();
 			}
 		};

@@ -39,16 +39,21 @@ public abstract class RemoteTableViewerComparator<T extends DefaultData> extends
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				toggleSortColumn(comparator);
+				final SortState sortState = getSortState();
 
 				Table table = column.getParent();
 				table.setSortColumn(column);
-				table.setSortDirection(getSortState().getSwtDirection());
+				table.setSortDirection(sortState.getSwtDirection());
 
 				try {
 					BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 						@Override
 						public void run() {
-							sortRemotely(comparator);
+							if (sortState != SortState.NONE) {
+								sortRemotely(comparator);
+							} else {
+								sortRemotely(null);
+							}
 						}
 					});
 				} catch (Exception exception) {
@@ -63,7 +68,8 @@ public abstract class RemoteTableViewerComparator<T extends DefaultData> extends
 	 * using the given {@link ResultComparator}. Progress can be reported to given monitor.
 	 * 
 	 * @param resultComparator
-	 *            Result comparator that should be used in the remote call.
+	 *            Result comparator that should be used in the remote call. <code>null</code> can
+	 *            also be passed, meaning that no sorting or default sorting should be used.
 	 */
 	protected abstract void sortRemotely(ResultComparator<T> resultComparator);
 
