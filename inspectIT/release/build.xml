@@ -123,18 +123,8 @@
 	<!-- These targets actually download the needed Eclipse versions from-->
 	<!-- the FTP and unpack them in order to be used by the PDE Build.   -->
 	<!-- *************************************************************** -->
-	<target name="retrieve-eclipse" description="Checks if Eclipse download is necessary, downloads it and unpacks." depends="init-antcontrib">
-		<var name="download.dir" value="${release.basedir}/runtime" />
-		<var name="download.ftp.remotedir" value="${ftp.eclipsedir}" />
-		<var name="download.notify.target" value="-notify-about-eclipse-update" />
-
-		<var name="file" value="${eclipse.file}" />
-
-		<antcall target="retrieve-eclipse-internal" inheritall="true" />
-	</target>
-
-	<target name="retrieve-eclipse-internal" depends="checkFile,unpack-eclipse" />
-	<target name="check-unpack-eclipse">
+	<target name="retrieve-eclipse" description="Checks if Eclipse download is necessary, downloads it and unpacks." depends="init-antcontrib,init-ftp-task">
+		<execute-ftpdownload file="${eclipse.file}" download.dir="${release.basedir}/runtime" download.ftp.remotedir="${ftp.eclipsedir}" download.notify.target="-notify-about-eclipse-update" />
 		<condition property="should-unpack-eclipse">
 			<or>
 				<isset property="download.executed.${eclipse.file}" />
@@ -146,11 +136,14 @@
 				</and>
 			</or>
 		</condition>
-	</target>
-
-	<target name="unpack-eclipse" depends="check-unpack-eclipse" if="should-unpack-eclipse">
-		<delete dir="${base}" failonerror="false" />
-		<unzip src="${release.basedir}/runtime/${eclipse.file}.zip" dest="${release.basedir}/runtime" />
+		
+		<if>
+			<istrue value="${should-unpack-eclipse}"/>
+			<then>
+				<delete dir="${base}" failonerror="false" />
+				<unzip src="${release.basedir}/runtime/${eclipse.file}.zip" dest="${release.basedir}/runtime" />
+			</then>
+		</if>
 	</target>
 
 	<target name="-notify-about-eclipse-update">
@@ -181,14 +174,20 @@
 
 		<!-- ensure that the original class files are not touched as we do not want to -->
 		<!-- ship classes that are instrumented with cobertura to the customer -->
-		<fileset id="test.classes-to-instrument" dir="${build.rcp.classes}" excludes="**/*.class"/>
+		<fileset id="test.classes-to-instrument" dir="${build.rcp.classes}" excludes="**/*.class" />
 		<path id="compile.classpath" />
-				
-		<property name="test.workingDir" value="${basedir}/../"/>
-		<property name="test.javac.source" value="1.7"/>
-		<property name="test.javac.target" value="1.7"/>
-		<property name="test.vmargs" value=""/>
-		<property name="test.targetsuite" value="${resources.testng}/testng.xml"/>
+
+		<property name="test.workingDir" value="${basedir}/../" />
+		<property name="test.javac.source" value="1.7" />
+		<property name="test.javac.target" value="1.7" />
+		<property name="test.vmargs" value="" />
+		<property name="test.targetsuite" value="${resources.testng}/testng.xml" />
+
+		<property name="test.workingDir" value="${basedir}/../" />
+		<property name="test.javac.source" value="1.7" />
+		<property name="test.javac.target" value="1.7" />
+		<property name="test.vmargs" value="" />
+		<property name="test.targetsuite" value="${resources.testng}/testng.xml" />
 				
 		<execute-testng 
 			src.root="${src.root}" 
@@ -206,12 +205,12 @@
 			test.haltonfailure="true">
 			<compile.classpath>
 				<classpath>
-					<path refid="compile.classpath"/>
+					<path refid="compile.classpath" />
 				</classpath>
 			</compile.classpath>
 			<test.compile.classpath>
 				<classpath>
-					<path refid="test.compile.classpath"/>
+					<path refid="test.compile.classpath" />
 				</classpath>
 			</test.compile.classpath>
 			<test.classes-to-instrument>
@@ -219,14 +218,26 @@
 			</test.classes-to-instrument>
 		</execute-testng>
 	</target>
-					
+
 	<!--  It depends on the release target, because we need the compiled class files from the PDE Build-->
-	<target name="static-analysis" depends="pdebuild">
+	<target name="static-analysis" depends="pdebuild,init-static-analysis">
 		<!-- Prepare PDM -->
 		<fileset dir="${src.root}" includes="**/*.java" id="pmd.fileset" />
 
+		<execute-pmd build.qa.analysis="${build.qa.analysis}" build.qa.analysis.pmd="${build.qa.analysis.pmd}">
+			<pmd.fileset>
+				<fileset refid="pmd.fileset" />
+			</pmd.fileset>
+		</execute-pmd>
+
 		<!-- Prepare Checkstyle -->
 		<fileset dir="${src.root}" includes="**/*.java" id="checkstyle.fileset" />
+
+		<execute-checkstyle build.qa.analysis="${build.qa.analysis}" build.qa.analysis.checkstyle="${build.qa.analysis.checkstyle}">
+			<checkstyle.fileset>
+				<fileset refid="checkstyle.fileset" />
+			</checkstyle.fileset>
+		</execute-checkstyle>
 
 		<!-- Prepare FindBugs -->
 		<property name="findbugs.sourcepath" value="${src.root}" />
@@ -236,10 +247,23 @@
 			<fileset dir="${base}/eclipse/plugins" includes="**/*.jar" />
 		</path>
 
+		<execute-findbugs build.qa.analysis="${build.qa.analysis}" build.qa.analysis.findbugs="${build.qa.analysis.findbugs}" findbugs.sourcepath="${findbugs.sourcepath}" findbugs.classlocation="${findbugs.classlocation}">
+			<findbugs.path>
+				<path refid="findbugs.path" />
+			</findbugs.path>
+		</execute-findbugs>
+
 		<!-- Prepare CPD -->
 		<fileset dir="${src.root}" includes="**/*.java" id="cpd.fileset" />
 
-		<antcall target="static-analysis-all" inheritrefs="true" />
+		<execute-cpd build.qa.analysis.cpd="${build.qa.analysis.cpd}">
+			<cpd.fileset>
+				<fileset refid="cpd.fileset" />
+			</cpd.fileset>
+		</execute-cpd>
+
+		<!-- Fail on warnings -->
+		<antcall target="static-analysis-fail-on-warnings" inheritrefs="true" />
 	</target>
 
 

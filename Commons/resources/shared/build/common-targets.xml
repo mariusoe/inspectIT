@@ -97,11 +97,11 @@
 		<ivy:cleancache />
 		<delete dir="${ivy.jar.dir}" />
 	</target>
-	
+
 	<!-- *************************************************************** -->
 	<!--                         T E S T   N G                           -->
 	<!-- *************************************************************** -->
-	
+
 	<!-- This macro executes the TestNG tests and instruments the classes under test for the Corbertura report -->
 	<!-- All attributes and elements must be set for the macro to correctly execute -->
 	<macrodef name="execute-testng">
@@ -132,7 +132,7 @@
 				<classpath refid="path.testng" />
 				<compilerarg value="-Xlint:unchecked" />
 			</javac>
-			
+
 			<path id="test.classes">
 				<pathelement location="@{build.test.classes}" />
 			</path>
@@ -152,7 +152,7 @@
 					<path location="@{build.instrumented.classes}" />
 				</instrumentationClasspath>
 				<compile.classpath />
-				<classpath location="@{build.instrumented.classes}" />		
+				<classpath location="@{build.instrumented.classes}" />
 			</cobertura-instrument>
 			
 			<echo message="Starting TestNG with following JVM arguments: -XX:-UseSplitVerifier -Dnet.sourceforge.cobertura.datafile=@{build.qa.test.coveragedata}/cobertura.ser @{test.vmargs}"/>
@@ -169,7 +169,6 @@
 				<classpath location="@{test.root}" />
 
 				<jvmarg line="-XX:-UseSplitVerifier -Dnet.sourceforge.cobertura.datafile='@{build.qa.test.coveragedata}/cobertura.ser' @{test.vmargs}" />
-				<!-- -XX:-UseSplitVerifier is a workaround for Cobertura not supporting Java 7 source code features (http://sourceforge.net/tracker/index.php?func=detail&aid=3295711&group_id=130558&atid=720018) -->
 				<xmlfileset file="@{test.targetsuite}" />
 			</testng>
 
@@ -195,110 +194,86 @@
 	<!--         S T A T I C     A N A L Y S I S     T A R G E T S  	 -->
 	<!-- *************************************************************** -->
 
-	<target name="static-analysis-all" depends="pmd,checkstyle,findbugs,cpd,static-analysis-fail-on-warnings" />
-
 	<!-- P M D -->
-	<target name="check-pmd-settings">
-		<condition property="can-run-pmd">
-			<and>
-				<isset property="build.qa.analysis" />
-				<isset property="build.qa.analysis.pmd" />
-				<isreference refid="pmd.fileset" />
-			</and>
-		</condition>
-	</target>
-
-	<target name="pmd" description="--> analyses the code with PDM" depends="init-static-analysis,check-pmd-settings" if="can-run-pmd">
-		<echo message="Analyse Code with tool: PMD" level="info" />
-		<mkdir dir="${build.qa.analysis.pmd}" />
-		<pmd failuresPropertyName="pmd.failure" failOnRuleViolation="false" rulesetfiles="${pmd.rules.file}">
-			<formatter type="html" toFile="${build.qa.analysis.pmd}/default_report.html" toConsole="true" />
-			<formatter type="summaryhtml" toFile="${build.qa.analysis.pmd}/summary_report.html" toConsole="true" />
-			<formatter type="xml" toFile="${build.qa.analysis.pmd}/pmd_results.xml" />
-			<fileset refid="pmd.fileset" />
-		</pmd>
-		<xslt in="${build.qa.analysis.pmd}/pmd_results.xml" style="${pmd.report.file}" out="${build.qa.analysis.pmd}/sortable_report.html" />
-		<copy todir="${build.qa.analysis.pmd}" file="${pmd.sortable.file}" />
-		<!-- this js is used for the sortable report -->
-		<echo file="${build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >" />
-	</target>
+	<macrodef name="execute-pmd">
+		<attribute name="build.qa.analysis" description="Main QA folder" />
+		<attribute name="build.qa.analysis.pmd" description="PMD QA folder" />
+		<element name="pmd.fileset" description="File set to analyse" />
+		<sequential>
+			<echo message="Analyse Code with tool: PMD" level="info" />
+			<mkdir dir="@{build.qa.analysis.pmd}" />
+			<pmd failuresPropertyName="pmd.failure" failOnRuleViolation="false" rulesetfiles="${pmd.rules.file}">
+				<formatter type="html" toFile="@{build.qa.analysis.pmd}/default_report.html" toConsole="true" />
+				<formatter type="summaryhtml" toFile="@{build.qa.analysis.pmd}/summary_report.html" toConsole="true" />
+				<formatter type="xml" toFile="@{build.qa.analysis.pmd}/pmd_results.xml" />
+				<pmd.fileset />
+			</pmd>
+			<xslt in="@{build.qa.analysis.pmd}/pmd_results.xml" style="${pmd.report.file}" out="@{build.qa.analysis.pmd}/sortable_report.html" />
+			<copy todir="@{build.qa.analysis.pmd}" file="${pmd.sortable.file}" />
+			<!-- this js is used for the sortable report -->
+			<echo file="@{build.qa.analysis}/pmd.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=pmd/sortable_report.html&quot; >" />
+		</sequential>
+	</macrodef>
 
 	<!-- C h e c k s t y l e -->
-	<target name="check-checkstyle-settings">
-		<condition property="can-run-checkstyle">
-			<and>
-				<isset property="build.qa.analysis" />
-				<isset property="build.qa.analysis.checkstyle" />
-				<isreference refid="checkstyle.fileset" />
-			</and>
-		</condition>
-	</target>
+	<macrodef name="execute-checkstyle">
+		<attribute name="build.qa.analysis" description="Main QA folder" />
+		<attribute name="build.qa.analysis.checkstyle" description="Checkstyle QA folder" />
+		<element name="checkstyle.fileset" description="File set to analyse" />
+		<sequential>
+			<echo message="Analyse Code with tool: Checkstyle" level="info" />
+			<mkdir dir="@{build.qa.analysis.checkstyle}" />
+			<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
+				<formatter type="xml" tofile="@{build.qa.analysis.checkstyle}/checkstyle_results.xml" />
+				<checkstyle.fileset />
+			</checkstyle>
 
-	<target name="checkstyle" description="--> analyses the code with Checkstyle" depends="init-static-analysis,check-checkstyle-settings" if="can-run-checkstyle">
-		<echo message="Analyse Code with tool: Checkstyle" level="info" />
-		<mkdir dir="${build.qa.analysis.checkstyle}" />
-		<checkstyle config="${checkstyle.config.file}" failureProperty="checkstyle.failure" failOnViolation="false" maxerrors="${checkstyle.max.errors}" maxwarnings="${checkstyle.max.warnings}">
-			<formatter type="xml" tofile="${build.qa.analysis.checkstyle}/checkstyle_results.xml" />
-			<fileset refid="checkstyle.fileset" />
-		</checkstyle>
-
-		<xslt in="${build.qa.analysis.checkstyle}/checkstyle_results.xml" out="${build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.report.file}" />
-		<echo file="${build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >" />
-	</target>
+			<xslt in="@{build.qa.analysis.checkstyle}/checkstyle_results.xml" out="@{build.qa.analysis.checkstyle}/checkstyle_report.html" style="${checkstyle.report.file}" />
+			<echo file="@{build.qa.analysis}/checkstyle.html" message="&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0; url=checkstyle/checkstyle_report.html&quot; >" />
+		</sequential>
+	</macrodef>
 
 	<!-- F i n d B u g s -->
-	<target name="check-findbugs-settings">
-		<condition property="can-run-findbugs">
-			<and>
-				<isset property="build.qa.analysis" />
-				<isset property="build.qa.analysis.findbugs" />
-				<isset property="findbugs.sourcepath" />
-				<isset property="findbugs.classlocation" />
-				<isreference refid="findbugs.path" />
-			</and>
-		</condition>
-	</target>
+	<macrodef name="execute-findbugs">
+		<attribute name="build.qa.analysis" description="Main QA folder" />
+		<attribute name="build.qa.analysis.findbugs" description="Findbugs QA folder" />
+		<attribute name="findbugs.sourcepath" description="Location to find source files" />
+		<attribute name="findbugs.classlocation" description="Location to the compliled classes" />
+		<element name="findbugs.path" description="Path to use when running Findbugs" />
+		<sequential>
+			<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
+			<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
+			<pathconvert property="findbugs.classpath">
+				<path refid="path.findbugs" />
+			</pathconvert>
 
-	<target name="findbugs" description="--> analyses the code with Findbugs" depends="init-static-analysis,check-findbugs-settings" if="can-run-findbugs">
-		<!-- The path is converted to a property and enables the usage of findbugs without having a local installation-->
-		<!-- See also: http://blogs.sun.com/ritzmann/entry/running_findbugs_with_ant_tasks -->
-		<pathconvert property="findbugs.classpath">
-			<path refid="path.findbugs" />
-		</pathconvert>
-
-		<echo message="Analyse Code with tool: FindBugs" level="info" />
-		<mkdir dir="${build.qa.analysis.findbugs}" />
-		<findbugs output="xml:withMessages" classpath="${findbugs.classpath}" includefilter="${findbugs.config.include}" excludefilter="${findbugs.config.exclude}" outputFile="${build.qa.analysis.findbugs}/findbugs.xml" pluginlist="findbugs.jar" warningsProperty="findbugs.failure">
-			<sourcePath path="${findbugs.sourcepath}" />
-			<class location="${findbugs.classlocation}" />
-			<auxClasspath>
-				<path refid="findbugs.path" />
-			</auxClasspath>
-		</findbugs>
-		<xslt in="${build.qa.analysis.findbugs}/findbugs.xml" style="${findbugs.config.fancy-hist}" out="${build.qa.analysis}/findbugs.html" />
-	</target>
-
+			<echo message="Analyse Code with tool: FindBugs" level="info" />
+			<mkdir dir="@{build.qa.analysis.findbugs}" />
+			<findbugs output="xml:withMessages" classpath="${findbugs.classpath}" includefilter="${findbugs.config.include}" excludefilter="${findbugs.config.exclude}" outputFile="@{build.qa.analysis.findbugs}/findbugs.xml" pluginlist="findbugs.jar" warningsProperty="findbugs.failure">
+				<sourcePath path="@{findbugs.sourcepath}" />
+				<class location="@{findbugs.classlocation}" />
+				<auxClasspath>
+					<findbugs.path />
+				</auxClasspath>
+			</findbugs>
+			<xslt in="@{build.qa.analysis.findbugs}/findbugs.xml" style="${findbugs.config.fancy-hist}" out="@{build.qa.analysis}/findbugs.html" />
+		</sequential>
+	</macrodef>
 
 	<!-- C P D -->
-	<target name="check-cpd-settings">
-		<condition property="can-run-cpd">
-			<and>
-				<isset property="build.qa.analysis.cpd" />
-				<isreference refid="cpd.fileset" />
-			</and>
-		</condition>
-	</target>
-
-	<target name="cpd" description="--> analyses the code with CPD" depends="init-static-analysis,check-cpd-settings" if="can-run-cpd">
-		<echo message="Analyse Code with tool: CPD" level="info" />
-		<mkdir dir="${build.qa.analysis.cpd}" />
-		<cpd format="xml" language="java" minimumTokenCount="100" outputFile="${build.qa.analysis.cpd}/cpd.xml">
-			<fileset refid="cpd.fileset" />
-		</cpd>
-	</target>
+	<macrodef name="execute-cpd">
+		<attribute name="build.qa.analysis.cpd" description="CPD QA folder" />
+		<element name="cpd.fileset" description="File set to analyse" />
+		<sequential>
+			<echo message="Analyse Code with tool: CPD" level="info" />
+			<mkdir dir="@{build.qa.analysis.cpd}" />
+			<cpd format="xml" language="java" minimumTokenCount="100" outputFile="@{build.qa.analysis.cpd}/cpd.xml">
+				<cpd.fileset />
+			</cpd>
+		</sequential>
+	</macrodef>
 
 	<!-- Target that is checking for warnings from SA tools -->
-
 	<target name="static-analysis-fail-on-warnings" depends="init-antcontrib">
 		<if>
 			<isset property="pmd.failure" />
@@ -344,19 +319,13 @@
 		</condition>
 	</target>
 
-	<target name="-retrieve-jre-installations" depends="check-retrieve-jre-installations,init-antcontrib" unless="skip.jre.download" if="can-retrieve-jre-installations">
-		<var name="download.dir" value="${jvm.root}" />
-		<var name="download.notify.target" value="-notify-about-jre-update" />
-		<var name="download.ftp.remotedir" value="${jvm.remotedir}" />
-
-		<echo message="Retrieving JVMs ${jvm.list} to dir ${download.dir} from remote dir ${download.ftp.remotedir}" />
-
-		<foreach list="${jvm.list}" param="jvmFile" target="-get-jvm-instalation" inheritall="true" />
+	<target name="-retrieve-jre-installations" depends="check-retrieve-jre-installations,init-antcontrib,init-ftp-task" unless="skip.jre.download" if="can-retrieve-jre-installations">
+		<echo message="Retrieving JVMs ${jvm.list} to dir ${jvm.root} from remote dir ${jvm.remotedir}" />
+		<foreach list="${jvm.list}" param="jvmFile" target="-get-jvm-instalation" />
 	</target>
 
 	<target name="-get-jvm-instalation" if="jvmFile">
-		<var name="file" value="${jvmFile}" />
-		<antcall target="checkFile" inheritall="true" />
+		<execute-ftpdownload file="${jvmFile}" download.dir="${jvm.root}" download.ftp.remotedir="${jvm.remotedir}" download.notify.target="-notify-about-jre-update"/>
 	</target>
 
 	<target name="-notify-about-jre-update">
@@ -380,16 +349,8 @@
 
 	<!-- Allows to download the java1.5 runtime. It is necessary to define the variable download.dir before calling this target! -->
 	<!-- Example: <var name="download.dir" value="C:\tmp" /> -->
-	<target name="retrieve-java1.5-runtime" description="Downloads the java 1.5 rt.jar" depends="init-antcontrib">
-		<var name="download.ftp.remotedir" value="${ftp.internal.java15runtime.path}" />
-		<var name="file" value="${ftp.internal.java15runtime.file}" />
-
-		<antcall target="retrieve-java1.5-internal" inheritall="true" />
-	</target>
-
-	<target name="retrieve-java1.5-internal" depends="checkFile,unpack-java1.5runtime" />
-
-	<target name="check-unpack-java1.5-runtime">
+	<target name="retrieve-java1.5-runtime" description="Downloads the java 1.5 rt.jar" depends="init-antcontrib,init-ftp-task" >
+		<execute-ftpdownload file="${ftp.internal.java15runtime.file}" download.dir="${download.dir}" download.ftp.remotedir="${ftp.internal.java15runtime.path}" download.notify.target="-notify-about-java-rt-update"/>
 		<condition property="should-unpack-java1.5-runtime">
 			<or>
 				<isset property="download.executed.${ftp.internal.java15runtime.file}" />
@@ -398,135 +359,136 @@
 				</not>
 			</or>
 		</condition>
+		<if>
+			<istrue value="${should-unpack-java1.5-runtime}"/>
+			<then>
+				<unzip src="${download.dir}/${ftp.internal.java15runtime.file}.zip" dest="${download.dir}" />
+			</then>
+		</if>
 	</target>
 
-	<target name="unpack-java1.5runtime" depends="check-unpack-java1.5-runtime" if="should-unpack-java1.5-runtime">
-		<unzip src="${download.dir}/${ftp.internal.java15runtime.file}.zip" dest="${download.dir}" />
+	<target name="-notify-about-java-rt-update">
+		<echo message="--------------------------------------------------------------------------" />
+		<echo message="INFO: A newer Java 1.5 Runtime Version was found than currently available." />
+		<echo message="--------------------------------------------------------------------------" />
 	</target>
 
 	<!-- *************************************************************** -->
 	<!--   		 D O W N L O A D   &   M D 5    T A R G E T S      	     -->
 	<!-- *************************************************************** -->
 
+	<macrodef name="execute-ftpdownload">
+		<attribute name="file" description="Name of file to download" />
+		<attribute name="download.dir" description="Dir to save file to" />
+		<attribute name="download.ftp.remotedir" description="Remote folder where file could be found" />
+		<attribute name="download.notify.target" description="Nofity target to call when MD5 changes" />
+		<sequential>
+			<property name="zip.file" value="@{file}.zip" />
+			<property name="md5.file" value="@{file}.md5" />
+			<condition property="download-ok">
+				<and>
+					<available file="@{download.dir}/${zip.file}" />
+					<available file="@{download.dir}/${md5.file}" />
+				</and>
+			</condition>
 
-	<target name="initCheckFile">
-		<condition property="can-checkFile">
-			<and>
-				<isset property="file" />
-				<isset property="download.dir" />
-				<isset property="download.ftp.remotedir" />
-				<isset property="download.notify.target" />
-			</and>
-		</condition>
-	</target>
+			<if>
+				<isfalse value="${download-ok}"/>
+				<then>
+					<echo message="Downloading ${md5.file} from ${ftp.server} and remote dir @{download.ftp.remotedir}" />
+					<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="@{download.ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
+						<fileset dir="@{download.dir}/tmp">
+							<include name="${md5.file}" />
+						</fileset>
+					</wptg-ftp>
 
-	<target name="checkFile" depends="init-antcontrib,init-ftp-task,initCheckFile,check.download,check.md5" if="can-checkFile">
-		<!-- DESCRIPTION -->
-		<!-- Downloads the zip file with the name specified in the 'file' property if MD5 on the server is not the same to the local file. -->
-		<!-- Note that is download is performed property 'download.executed.file' will be set to true, where file is the name of the file. -->
+					<!-- download the JRE only if it is not already locally available -->
+					<available file="@{download.dir}/${zip.file}" property="download-file" value="true" />
+					<if>
+						<isfalse value="${download-file}" />
+						<then>
+							<echo message="Downloading ${zip.file}" />
+							<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="@{download.ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
+								<fileset dir="@{download.dir}/tmp">
+									<include name="${zip.file}" />
+								</fileset>
+							</wptg-ftp>
+							<property name="download.executed.@{file}" value="true" />
+						</then>
+						<else>
+							<echo message="${zip.file} already locally available, so skipping download." />
+						</else>
+					</if>
+				</then>
+			</if>
 
-		<!-- delete tmp folder -->
-		<delete dir="${download.dir}/tmp" failonerror="false" />
-	</target>
+			<condition property="md5-ok">
+				<isset property="${zip.file}.isValid" />
+			</condition>
 
-	<target name="check.download" unless="download-ok" depends="check.init">
-		<echo message="Downloading ${md5.file} from ${ftp.server} and remote dir ${download.ftp.remotedir}" />
-		<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${download.ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
-			<fileset dir="${download.dir}/tmp">
-				<include name="${md5.file}" />
-			</fileset>
-		</wptg-ftp>
+			<if>
+				<isfalse value="${md5-ok}" />
+				<then>
+					<trycatch>
+						<try>
+							<!-- the valid md5 value specified in the md5 file -->
+							<loadfile srcFile="@{download.dir}/tmp/${md5.file}" property="md5.valid">
+								<!-- need to filter whitespace in the md5sum -->
+								<filterchain>
+									<striplinebreaks />
+									<tokenfilter>
+										<stringtokenizer />
+										<replaceregex pattern="${zip.file}" replace="" />
+									</tokenfilter>
+									<tokenfilter>
+										<trim />
+									</tokenfilter>
+								</filterchain>
+							</loadfile>
 
-		<!-- download the JRE only if it is not already locally available -->
-		<available file="${download.dir}/${zip.file}" property="download-file" value="true" />
-		<if>
-			<isfalse value="${download-file}" />
-			<then>
-				<echo message="Downloading ${zip.file}" />
-				<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${download.ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
-					<fileset dir="${download.dir}/tmp">
-						<include name="${zip.file}" />
-					</fileset>
-				</wptg-ftp>
-				<property name="download.executed.${file}" value="true" />
-			</then>
-			<else>
-				<echo message="${zip.file} already locally available, so skipping download." />
-			</else>
-		</if>
-	</target>
+							<!-- the actual md5 value -->
+							<checksum file="@{download.dir}/${zip.file}" property="md5.actual" />
+							<!-- compare them -->
+							<condition property="md5.isValid">
+								<equals arg1="${md5.valid}" arg2="${md5.actual}" />
+							</condition>
 
-	<target name="check.init">
-		<property name="zip.file" value="${file}.zip" />
-		<property name="md5.file" value="${file}.md5" />
-		<condition property="md5-ok">
-			<isset property="${zip.file}.isValid" />
-		</condition>
-		<condition property="download-ok">
-			<and>
-				<available file="${download.dir}/${zip.file}" />
-				<available file="${download.dir}/${md5.file}" />
-			</and>
-		</condition>
-	</target>
+							<if>
+								<istrue value="${md5.isValid}" />
+								<then />
+								<else>
+									<!-- updates where found, so notify the user -->
+									<echo message="${zip.file}: Different MD5 checksum !!!" />
+									<echo message="-> expected: ${md5.valid}" />
+									<echo message="-> actual  : ${md5.actual}" />
+									<!-- rename the file to indicate that it is a newer version -->
 
-	<target name="check.md5" unless="md5-ok" depends="check.init">
-		<trycatch>
-			<try>
-				<!-- the valid md5 value specified in the md5 file -->
-				<loadfile srcFile="${download.dir}/tmp/${md5.file}" property="md5.valid">
-					<!-- need to filter whitespace in the md5sum -->
-					<filterchain>
-						<striplinebreaks />
-						<tokenfilter>
-							<stringtokenizer />
-							<replaceregex pattern="${zip.file}" replace="" />
-						</tokenfilter>
-						<tokenfilter>
-							<trim />
-						</tokenfilter>
-					</filterchain>
-				</loadfile>
+									<antcall target="@{download.notify.target}" />
+									<echo message="Downloading ${zip.file}" />
+									<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="@{download.ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
+										<fileset dir="@{download.dir}/tmp">
+											<include name="${zip.file}" />
+										</fileset>
+									</wptg-ftp>
+									<move file="@{download.dir}/tmp/${zip.file}" tofile="@{download.dir}/tmp/@{file}.newer-version.zip" overwrite="true" failonerror="true" />
+									<delete file="@{download.dir}/${zip.file}" failonerror="false" />
+									<move file="@{download.dir}/tmp/@{file}.newer-version.zip" tofile="@{download.dir}/${zip.file}" failonerror="true" />
+									<property name="download.executed.@{file}" value="true" />
+								</else>
+							</if>
+						</try>
+						<catch>
+							<!-- the file was not there in the first place, so just put it into the correct folder -->
+							<echo message="${zip.file} was not available, so moving it to the correct location." />
+							<move file="@{download.dir}/tmp/${zip.file}" tofile="@{download.dir}/${zip.file}" overwrite="true" failonerror="true" />
+						</catch>
+					</trycatch>
+				</then>
+			</if>
 
-				<!-- the actual md5 value -->
-				<checksum file="${download.dir}/${zip.file}" property="md5.actual" />
-				<!-- compare them -->
-				<condition property="md5.isValid">
-					<equals arg1="${md5.valid}" arg2="${md5.actual}" />
-				</condition>
-
-				<if>
-					<istrue value="${md5.isValid}" />
-					<then />
-					<else>
-						<!-- updates where found, so notify the user -->
-						<echo message="${zip.file}: Different MD5 checksum !!!" />
-						<echo message="-> expected: ${md5.valid}" />
-						<echo message="-> actual  : ${md5.actual}" />
-						<!-- rename the file to indicate that it is a newer version -->
-
-						<antcall target="${download.notify.target}" />
-						<echo message="Downloading ${zip.file}" />
-						<wptg-ftp server="${ftp.server}" verbose="true" password="${ftp.pw}" userid="${ftp.user}" action="get" remotedir="${download.ftp.remotedir}" newer="true" retriesAllowed="5" passive="true">
-							<fileset dir="${download.dir}/tmp">
-								<include name="${zip.file}" />
-							</fileset>
-						</wptg-ftp>
-						<move file="${download.dir}/tmp/${zip.file}" tofile="${download.dir}/tmp/${file}.newer-version.zip" overwrite="true" failonerror="true" />
-						<delete dir="${download.dir}/${zip.file}" failonerror="false" />
-						<move file="${download.dir}/tmp/${file}.newer-version.zip" tofile="${download.dir}/${zip.file}" failonerror="true" />
-						<property name="download.executed.${file}" value="true" />
-					</else>
-				</if>
-			</try>
-			<catch>
-				<!-- the file was not there in the first place, so just put it into the correct folder -->
-				<echo message="${zip.file} was not available, so moving it to the correct location." />
-				<move file="${download.dir}/tmp/${zip.file}" tofile="${download.dir}/${zip.file}" overwrite="true" failonerror="true" />
-			</catch>
-		</trycatch>
-		<!-- now just delete the MD5 file -->
-		<delete dir="${download.dir}/tmp/${md5.file}" failonerror="false" />
-	</target>
+			<!-- delete tmp folder -->
+			<delete dir="@{download.dir}/tmp" failonerror="false" />
+		</sequential>
+	</macrodef>
 
 </project>

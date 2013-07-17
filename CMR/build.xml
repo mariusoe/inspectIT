@@ -89,13 +89,13 @@
 		<!-- ensure that the original class files are not touched as we do not want to -->
 		<!-- ship classes that are instrumented with cobertura to the customer -->
 		<fileset id="test.classes-to-instrument" dir="${build.cmr.classes}" includes="**/*.class" />
-		
+
 		<property name="test.workingDir" value="${basedir}"/>
 		<property name="test.javac.source" value="1.7"/>
 		<property name="test.javac.target" value="1.7"/>
 		<property name="test.vmargs" value="-javaagent:${string.path.classmexer}"/>
 		<property name="test.targetsuite" value="${resources.testng}/testng.xml"/>
-		
+
 		<execute-testng 
 			src.root="${src.root}" 
 			test.root="${test.root}" 
@@ -128,12 +128,24 @@
 
 
 	<!-- Depends on release, because the compiled classes are needed for the analysis -->
-	<target name="static-analysis" depends="build">
+	<target name="static-analysis" depends="build,init-static-analysis">
 		<!-- Prepare PDM -->
 		<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" id="pmd.fileset" />
 
+		<execute-pmd build.qa.analysis="${build.qa.analysis}" build.qa.analysis.pmd="${build.qa.analysis.pmd}">
+			<pmd.fileset>
+				<fileset refid="pmd.fileset" />
+			</pmd.fileset>
+		</execute-pmd>
+
 		<!-- Prepare Checkstyle -->
 		<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" id="checkstyle.fileset" />
+
+		<execute-checkstyle build.qa.analysis="${build.qa.analysis}" build.qa.analysis.checkstyle="${build.qa.analysis.checkstyle}">
+			<checkstyle.fileset>
+				<fileset refid="checkstyle.fileset" />
+			</checkstyle.fileset>
+		</execute-checkstyle>
 
 		<!-- Prepare FindBugs -->
 		<property name="findbugs.sourcepath" value="${src.root}" />
@@ -144,11 +156,24 @@
 			<path refid="lib.prod" />
 			<path refid="lib.test" />
 		</path>
+		
+		<execute-findbugs build.qa.analysis="${build.qa.analysis}" build.qa.analysis.findbugs="${build.qa.analysis.findbugs}" findbugs.sourcepath="${findbugs.sourcepath}" findbugs.classlocation="${findbugs.classlocation}">
+			<findbugs.path>
+				<path refid="findbugs.path" />
+			</findbugs.path>
+		</execute-findbugs>
 
 		<!-- Prepare CPD -->
 		<fileset dir="${src.root}" includes="**/*.java" excludes="**/*_Stub.java" id="cpd.fileset" />
+		
+		<execute-cpd build.qa.analysis.cpd="${build.qa.analysis.cpd}">
+			<cpd.fileset>
+				<fileset refid="cpd.fileset" />
+			</cpd.fileset>
+		</execute-cpd>
 
-		<antcall target="static-analysis-all" inheritrefs="true" />
+		<!-- Fail on warnings -->
+		<antcall target="static-analysis-fail-on-warnings" inheritrefs="true" />
 	</target>
 
 
@@ -232,7 +257,7 @@
 
 	<target name="-linux-x86">
 		<copy file="${basedir}/startup.sh" tofile="${build.scripts}/startup.sh"/>
-		<replaceregexp file="${build.scripts}/startup.sh" match="#COMMAND#" replace="${java.command.linux} ${java.memory.32bit} ${java.opts.32bit} ${java.opts.linux} ${java.locgc.linux} -jar ${dist.jar.name}" byline="true"/>	
+		<replaceregexp file="${build.scripts}/startup.sh" match="#COMMAND#" replace="${java.command.linux} ${java.memory.32bit} ${java.opts.32bit} ${java.opts.linux} ${java.locgc.linux} -jar ${dist.jar.name}" byline="true"/>
 		<tar destfile="${release.root}/inspectit-cmr.linux.x86.tar.gz" compression="gzip">
 			<fileset dir="${build.release.root}" />
 			<tarfileset file="${build.scripts}/startup.sh" prefix="CMR" filemode="755" />
@@ -244,7 +269,7 @@
 
 	<target name="-linux-x64">
 		<copy file="${basedir}/startup.sh" tofile="${build.scripts}/startup.sh"/>
-		<replaceregexp file="${build.scripts}/startup.sh" match="#COMMAND#" replace="${java.command.linux} ${java.memory.64bit} ${java.opts.64bit} ${java.opts.linux} ${java.locgc.linux} -jar ${dist.jar.name}" byline="true"/>	
+		<replaceregexp file="${build.scripts}/startup.sh" match="#COMMAND#" replace="${java.command.linux} ${java.memory.64bit} ${java.opts.64bit} ${java.opts.linux} ${java.locgc.linux} -jar ${dist.jar.name}" byline="true"/>
 		<tar destfile="${release.root}/inspectit-cmr.linux.x64.tar.gz" compression="gzip">
 			<fileset dir="${build.release.root}" />
 			<tarfileset file="${build.scripts}/startup.sh" prefix="CMR" filemode="755" />
