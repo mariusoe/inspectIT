@@ -2349,6 +2349,11 @@
                   tooltip="Details">
             </command>
             <command
+                  commandId="info.novatec.inspectit.rcp.commands.clearRepositoryBuffer"
+                  icon="icons/clean_buffer.png"
+                  style="push">
+            </command>
+            <command
                   commandId="org.eclipse.ui.file.save"
                   style="push"
                   tooltip="Save on Server">
