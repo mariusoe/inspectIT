@@ -2,8 +2,8 @@
 <suite name="CommonsCSTest">
 	<test name="Storage">
 		<classes>
-			<class name="info.novatec.inspectit.storage.processor.StorageDataProcessorsTest" />
 			<class name="info.novatec.inspectit.storage.StorageWriterTest" />
+			<class name="info.novatec.inspectit.storage.StorageIndexingTreeHandlerTest" />
 		</classes>
 	</test>
 	<test name="NIO">
@@ -12,6 +12,7 @@
 			<class name="info.novatec.inspectit.storage.nio.ChannelManagersTest" />
 			<class name="info.novatec.inspectit.storage.nio.CompletionHandlersTest" />
 			<class name="info.novatec.inspectit.storage.nio.stream.ExtendedByteBufferOutputStreamTest" />
+			<class name="info.novatec.inspectit.storage.nio.stream.ExtendedByteBufferInputStreamTest" />
 		</classes>
 	</test>
 </suite>

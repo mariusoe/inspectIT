@@ -185,6 +185,11 @@
 			<class name="info.novatec.inspectit.agent.sensor.method.timer.test.TimerHookTest" />
 		</classes>
 	</test>
+	<test name="Invocation Hook">
+		<classes>
+			<class name="info.novatec.inspectit.agent.sensor.method.invocationsequence.InvocationSequenceHookTest" />
+		</classes>	
+	</test>
 	<test name="HTTP Timer Hook">
 		<classes>
 			<class name="info.novatec.inspectit.agent.sensor.method.http.HttpHookTest" />

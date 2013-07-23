@@ -81,10 +81,10 @@ public class StorageData extends AbstractStorageData {
 
 	/**
 	 * 
-	 * @return If the storage is opened, and thus available for writing.s
+	 * @return If the storage is opened, and thus available for writing.
 	 */
 	public boolean isStorageOpened() {
-		return state.equals(StorageState.OPENED);
+		return state.equals(StorageState.OPENED) || state.equals(StorageState.RECORDING);
 	}
 
 	/**

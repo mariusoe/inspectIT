@@ -277,7 +277,7 @@ public abstract class AbstractBranch<R, E> {
 	/**
 	 * @return Returns component map, so that subclasses can handle specific tasks.
 	 */
-	protected Map<Object, ITreeComponent<R, E>> getComponentMap() {
+	public Map<Object, ITreeComponent<R, E>> getComponentMap() {
 		return map;
 	}
 

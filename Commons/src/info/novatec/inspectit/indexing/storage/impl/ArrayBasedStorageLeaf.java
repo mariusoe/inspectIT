@@ -117,6 +117,11 @@ public class ArrayBasedStorageLeaf<E extends DefaultData> implements IStorageTre
 	 * {@inheritDoc}
 	 */
 	public IStorageDescriptor put(E element) throws IndexingException {
+		if (null == element) {
+			throw new IndexingException("Element to index can not be null.");
+		} else if (0 == element.getId()) {
+			throw new IndexingException("Element to index can not have ID that is equal to zero.");
+		}
 		StorageDescriptor descriptor = new StorageDescriptor(this.id);
 		if (insertIntoArrays(element.getId(), descriptor.getSimpleStorageDescriptor())) {
 			return descriptor;

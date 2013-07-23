@@ -1,36 +1,41 @@
-package info.novatec.inspectit.storage.processor;
+package info.novatec.inspectit.storage.processor.impl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.IAggregatedData;
+import info.novatec.inspectit.communication.data.AggregatedTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
+import info.novatec.inspectit.indexing.aggregation.IAggregator;
 import info.novatec.inspectit.indexing.aggregation.impl.TimerDataAggregator;
-import info.novatec.inspectit.storage.StorageWriter;
-import info.novatec.inspectit.storage.processor.impl.DataAggregatorProcessor;
-import info.novatec.inspectit.storage.processor.impl.DataSaverProcessor;
-import info.novatec.inspectit.storage.processor.impl.InvocationClonerDataProcessor;
-import info.novatec.inspectit.storage.processor.impl.InvocationExtractorDataProcessor;
-import info.novatec.inspectit.storage.processor.impl.TimeFrameDataProcessor;
+import info.novatec.inspectit.storage.IWriter;
+import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
+import info.novatec.inspectit.storage.serializer.util.KryoSerializationPreferences;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Future;
 
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -52,14 +57,13 @@ public class StorageDataProcessorsTest {
 	 * Storage writer.
 	 */
 	@Mock
-	private StorageWriter storageWriter;
+	private IWriter storageWriter;
 
 	@BeforeMethod
 	public void init() {
 		MockitoAnnotations.initMocks(this);
 		Answer<Future<Void>> answer = new Answer<Future<Void>>() {
 			@SuppressWarnings("unchecked")
-			@Override
 			public Future<Void> answer(InvocationOnMock invocation) throws Throwable {
 				return mock(Future.class);
 			}
@@ -108,23 +112,48 @@ public class StorageDataProcessorsTest {
 	}
 
 	/**
-	 * Test that the {@link InvocationClonerDataProcessor} will clone the
-	 * {@link InvocationSequenceData}.
+	 * Test that the agent filtering is correct.
 	 */
 	@Test
-	public void testInvocationCloner() {
-		InvocationClonerDataProcessor invocationDataProcessor = new InvocationClonerDataProcessor();
-		invocationDataProcessor.setStorageWriter(storageWriter);
+	public void agentFilterDataProcessor() {
+		AbstractDataProcessor abstractDataProcessor = mock(AbstractDataProcessor.class);
+		AgentFilterDataProcessor dataProcessor = new AgentFilterDataProcessor(Collections.singletonList(abstractDataProcessor), Collections.singleton(10L));
+		DefaultData data1 = mock(DefaultData.class);
+		DefaultData data2 = mock(DefaultData.class);
+		when(data1.getPlatformIdent()).thenReturn(10L);
+		when(data2.getPlatformIdent()).thenReturn(20L);
 
-		InvocationSequenceData invocation = new InvocationSequenceData();
-		assertThat(invocationDataProcessor.canBeProcessed(invocation), is(true));
+		dataProcessor.process(data1);
+		dataProcessor.process(data2);
 
-		TimerData timerData = new TimerData();
-		assertThat(invocationDataProcessor.canBeProcessed(timerData), is(false));
+		assertThat(dataProcessor.canBeProcessed(data1), is(true));
+		assertThat(dataProcessor.canBeProcessed(data2), is(true));
 
-		Collection<Future<Void>> futures = invocationDataProcessor.process(invocation);
-		assertThat(futures, hasSize(1));
-		verify(storageWriter, times(1)).write(any(InvocationSequenceData.class));
+		verify(abstractDataProcessor, times(1)).process(data1);
+		verify(abstractDataProcessor, times(0)).process(data2);
+	}
+
+	/**
+	 * Test the {@link InvocationClonerDataProcessor}.
+	 */
+	@Test
+	public void invocationClonerDataProcessor() {
+		InvocationClonerDataProcessor dataProcessor = new InvocationClonerDataProcessor();
+
+		InvocationSequenceData invocationSequenceData = mock(InvocationSequenceData.class);
+		DefaultData defaultData = mock(DefaultData.class);
+		IWriter writer = mock(IWriter.class);
+		dataProcessor.setStorageWriter(writer);
+
+		assertThat(dataProcessor.canBeProcessed(invocationSequenceData), is(true));
+		assertThat(dataProcessor.canBeProcessed(defaultData), is(false));
+
+		dataProcessor.process(invocationSequenceData);
+		dataProcessor.process(defaultData);
+
+		verify(invocationSequenceData, times(1)).getClonedInvocationSequence();
+		verify(writer, times(1)).write(invocationSequenceData.getClonedInvocationSequence());
+		verify(writer, times(0)).write(invocationSequenceData);
 	}
 
 	/**
@@ -205,7 +234,7 @@ public class StorageDataProcessorsTest {
 	 * Test the {@link DataAggregatorProcessor} for a correct aggregation of data.
 	 */
 	@Test
-	public void testDataAggregatorProcessor() {
+	public void dataAggregatorProcessorAggregation() {
 		int aggregationPeriod = 100;
 		DataAggregatorProcessor<TimerData> dataAggregatorProcessor = new DataAggregatorProcessor<TimerData>(TimerData.class, aggregationPeriod, new TimerDataAggregator(), true);
 		dataAggregatorProcessor.setStorageWriter(storageWriter);
@@ -227,5 +256,45 @@ public class StorageDataProcessorsTest {
 		Collection<Future<Void>> futures = dataAggregatorProcessor.flush();
 		assertThat(futures, hasSize(1));
 		verify(storageWriter, times(1)).write(Mockito.<TimerData> anyObject());
+	}
+
+	/**
+	 * Test that aggregation processor will write elements when needed.
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	public void dataAggregationProcessorWritting() {
+		IAggregator<TimerData> aggregator = mock(IAggregator.class);
+		when(aggregator.getAggregationKey(Mockito.<TimerData> anyObject())).thenReturn(1L);
+		// setting max elements to 1, aggreation to 1000
+		DataAggregatorProcessor<TimerData> dataProcessor = new DataAggregatorProcessor<TimerData>(TimerData.class, 1000, 1, aggregator, false);
+		IWriter writer = mock(IWriter.class);
+		dataProcessor.setStorageWriter(writer);
+
+		TimerData timerData1 = new TimerData();
+		timerData1.setId(1L);
+		timerData1.setTimeStamp(new Timestamp(new Date().getTime()));
+		when(aggregator.getClone(Mockito.<TimerData> anyObject())).thenReturn(new AggregatedTimerData());
+
+		dataProcessor.process(timerData1);
+		dataProcessor.process(timerData1);
+
+		// no interaction with the writer at this point
+		verify(aggregator, times(2)).aggregate(Mockito.<IAggregatedData<TimerData>> anyObject(), eq(timerData1));
+		verifyNoMoreInteractions(writer);
+
+		// now process same element with the too diff time stamp
+		Timestamp newTimestamp = new Timestamp(timerData1.getTimeStamp().getTime() + 2000L);
+		timerData1.setTimeStamp(newTimestamp);
+
+		dataProcessor.process(timerData1);
+
+		ArgumentCaptor<DefaultData> writtenObject = ArgumentCaptor.forClass(DefaultData.class);
+		ArgumentCaptor<Map> kryoMap = ArgumentCaptor.forClass(Map.class);
+		verify(writer, times(1)).write(writtenObject.capture(), kryoMap.capture());
+
+		assertThat(writtenObject.getValue(), is(instanceOf(AggregatedTimerData.class)));
+		assertThat(((AggregatedTimerData) writtenObject.getValue()).getId(), is(1L));
+		assertThat(((Map<String, Boolean>) kryoMap.getValue()), hasEntry(KryoSerializationPreferences.WRITE_INVOCATION_AFFILIATION_DATA, Boolean.FALSE));
 	}
 }

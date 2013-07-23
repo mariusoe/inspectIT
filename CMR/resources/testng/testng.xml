@@ -2,6 +2,7 @@
 <suite name="CMRTest">
 	<test name="Cache">
 		<classes>
+			<class name="info.novatec.inspectit.cmr.cache.impl.AtomicBufferTest" />
 			<class name="info.novatec.inspectit.cmr.cache.impl.BufferPropertiesTest" />
 			<class name="info.novatec.inspectit.cmr.cache.impl.MemoryCalculationTest" />
 		</classes>

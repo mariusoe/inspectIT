@@ -1,14 +1,19 @@
 package info.novatec.inspectit.storage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.impl.IndexingException;
 import info.novatec.inspectit.storage.StorageWriter.WriteTask;
@@ -16,6 +21,7 @@ import info.novatec.inspectit.storage.nio.WriteReadCompletionRunnable;
 import info.novatec.inspectit.storage.nio.stream.ExtendedByteBufferOutputStream;
 import info.novatec.inspectit.storage.nio.stream.StreamProvider;
 import info.novatec.inspectit.storage.nio.write.WritingChannelManager;
+import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 
@@ -23,9 +29,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -90,6 +98,45 @@ public class StorageWriterTest {
 		storageWriter.serializerQueue = serializerQueue;
 		storageWriter.scheduledExecutorService = scheduledExecutorService;
 		storageWriter.log = LogFactory.getLog(storageWriter.getClass());
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void nonSyncProcessing() {
+		DefaultData defaultData = mock(DefaultData.class);
+		AbstractDataProcessor dataProcessor = mock(AbstractDataProcessor.class);
+		Future<Void> future1 = mock(Future.class);
+		Future<Void> future2 = mock(Future.class);
+		when(dataProcessor.process(defaultData)).thenReturn(Collections.singletonList(future1));
+		when(dataProcessor.flush()).thenReturn(Collections.singletonList(future2));
+
+		Collection<Future<Void>> futures = storageWriter.process(Collections.singletonList(defaultData), Collections.singletonList(dataProcessor));
+
+		verify(dataProcessor, times(1)).setStorageWriter(storageWriter);
+		verify(dataProcessor, times(1)).process(defaultData);
+		verify(dataProcessor, times(1)).flush();
+		verify(dataProcessor, times(1)).setStorageWriter(null);
+
+		assertThat(futures, hasSize(2));
+		assertThat(futures, hasItem(future1));
+		assertThat(futures, hasItem(future2));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void syncProcessing() {
+		DefaultData defaultData = mock(DefaultData.class);
+		AbstractDataProcessor dataProcessor = mock(AbstractDataProcessor.class);
+		Future<Void> future1 = mock(Future.class);
+		when(dataProcessor.process(defaultData)).thenReturn(Collections.singletonList(future1));
+		when(future1.isDone()).thenReturn(true);
+
+		storageWriter.process(Collections.singletonList(defaultData), Collections.singletonList(dataProcessor));
+
+		verify(dataProcessor, times(1)).setStorageWriter(storageWriter);
+		verify(dataProcessor, times(1)).process(defaultData);
+		verify(dataProcessor, times(1)).flush();
+		verify(dataProcessor, times(1)).setStorageWriter(null);
 	}
 
 	@Test

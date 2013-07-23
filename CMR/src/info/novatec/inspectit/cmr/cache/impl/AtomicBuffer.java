@@ -49,19 +49,19 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	 * Buffer properties.
 	 */
 	@Autowired
-	private BufferProperties bufferProperties;
+	BufferProperties bufferProperties;
 
 	/**
 	 * Correct interface for calculating object sizes.
 	 */
 	@Autowired
-	private IObjectSizes objectSizes;
+	IObjectSizes objectSizes;
 
 	/**
 	 * Indexing tree where the elements will be indexed.
 	 */
 	@Autowired
-	private IBufferTreeComponent<E> indexingTree;
+	IBufferTreeComponent<E> indexingTree;
 
 	/**
 	 * Max size of the buffer in atomic long.

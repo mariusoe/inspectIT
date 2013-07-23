@@ -164,7 +164,7 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 				aggData = insertedData;
 			}
 		}
-		aggData.aggregate(timerData);
+		dataAggregator.aggregate(aggData, timerData);
 		return Collections.emptyList();
 	}
 

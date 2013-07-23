@@ -93,14 +93,14 @@ public class StorageIndexingTreeHandler {
 	 * {@link StorageIndexTreeProvider}.
 	 */
 	@Autowired
-	private StorageIndexTreeProvider<DefaultData> storageIndexTreeProvider;
+	StorageIndexTreeProvider<DefaultData> storageIndexTreeProvider;
 
 	/**
 	 * {@link ExecutorService} for tasks of the tree handling.
 	 */
 	@Autowired
 	@Resource(name = "scheduledExecutorService")
-	private ScheduledExecutorService executorService;
+	ScheduledExecutorService executorService;
 
 	/**
 	 * Indexing tree of the Storage.
@@ -116,13 +116,13 @@ public class StorageIndexingTreeHandler {
 	 * Object size for indexing tree size calculation.
 	 */
 	@Autowired
-	private IObjectSizes objectSizes;
+	IObjectSizes objectSizes;
 
 	/**
 	 * Max size of indexing tree after which a new tree is needed, and the old one is saved.
 	 */
 	@Value(value = "${storage.maximumIndexingTreeSize}")
-	private long maximumIndexingTreeSize;
+	long maximumIndexingTreeSize;
 
 	/**
 	 * Future for the task of saving the indexing tree.
@@ -279,6 +279,15 @@ public class StorageIndexingTreeHandler {
 	}
 
 	/**
+	 * Returns amount of write tasks in progress.
+	 * 
+	 * @return Returns amount of write tasks in progress.
+	 */
+	int getWriteTaskInProgressCount() {
+		return writeTasksInProcess.size();
+	}
+
+	/**
 	 * Returns random file name.
 	 * 
 	 * @return Returns random file name.
@@ -296,7 +305,7 @@ public class StorageIndexingTreeHandler {
 	 * @author Ivan Senic
 	 * 
 	 */
-	private class IndexingTreeSavingTask implements Runnable {
+	class IndexingTreeSavingTask implements Runnable {
 
 		/**
 		 * {@inheritDoc}

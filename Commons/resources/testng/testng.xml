@@ -18,6 +18,8 @@
 			<class name="info.novatec.inspectit.indexing.impl.BufferIndexingTest" />
 			<class name="info.novatec.inspectit.indexing.impl.StorageIndexingTest" />
 			<class name="info.novatec.inspectit.indexing.restriction.IndexQueryRestrictionProcessorTest" />
+			<class name="info.novatec.inspectit.indexing.buffer.impl.BranchTest" />
+			<class name="info.novatec.inspectit.indexing.storage.impl.ArrayBasedStorageLeafTest" />
 		</classes>
 	</test>
 	<test name="Serializer">
@@ -28,8 +30,13 @@
 	</test>
 	<test name="Schema">
 		<classes>
-			<class
-				name="info.novatec.inspectit.storage.serializer.schema.SchemaTest" />
+			<class name="info.novatec.inspectit.storage.serializer.schema.SchemaTest" />
+		</classes>
+	</test>
+	<test name="Storage">
+		<classes>
+			<class name="info.novatec.inspectit.storage.processor.impl.StorageDataProcessorsTest" />
+			<class name="info.novatec.inspectit.storage.StorageDataTest" />
 		</classes>
 	</test>
 </suite>
