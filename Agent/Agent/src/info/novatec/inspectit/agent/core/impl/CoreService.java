@@ -528,7 +528,7 @@ public class CoreService implements ICoreService, Startable {
 							wait();
 						}
 					} catch (InterruptedException e) {
-						LOGGER.severe("Preparing thread interrupted and shuting down!");
+						LOGGER.severe("Preparing thread interrupted and shutting down!");
 						break; // we were interrupted during waiting and close ourself down.
 					}
 				}

@@ -23,6 +23,7 @@
 	<test name="Util">
 		<classes>
 			<class name="info.novatec.inspectit.cmr.util.PlatformIdentCacheTest" />
+			<class name="info.novatec.inspectit.cmr.util.AgentStatusDataProviderTest" />
 		</classes>
 	</test>
 	<test name="Serializer">
@@ -33,6 +34,8 @@
 	<test name="Storage">
 		<classes>
 			<class name="info.novatec.inspectit.storage.StorageIntegrationTest" />
+			<class name="info.novatec.inspectit.cmr.storage.CmrStorageManagerTest" />
+			<class name="info.novatec.inspectit.cmr.storage.CmrStorageRecorderTest" />
 		</classes>
 	</test>
 </suite>

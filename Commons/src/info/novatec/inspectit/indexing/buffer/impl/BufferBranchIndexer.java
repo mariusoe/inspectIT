@@ -9,8 +9,8 @@ import info.novatec.inspectit.indexing.indexer.IBranchIndexer;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * Implementation of branch indexer for the {@link IBufferTreeComponent}. This indexer is
- * delegatinggeneration of the indexing keys to the {@link IBranchIndexer}.
+ * Implementation of branch indexer for the {@link IBufferTreeComponent}. This indexer is delegating
+ * generation of the indexing keys to the {@link IBranchIndexer}.
  * 
  * @author Ivan Senic
  * 
@@ -27,7 +27,7 @@ public class BufferBranchIndexer<E extends DefaultData> implements IBufferBranch
 	/**
 	 * Child indexer.
 	 */
-	private IBufferBranchIndexer<E> childBufferIndexer;
+	private BufferBranchIndexer<E> childBufferIndexer;
 
 	/**
 	 * Default constructor.
@@ -47,7 +47,7 @@ public class BufferBranchIndexer<E extends DefaultData> implements IBufferBranch
 	 * @param childBufferIndexer
 	 *            Indexer to be used in the child branch.
 	 */
-	public BufferBranchIndexer(IBranchIndexer<E> delegateIndexer, IBufferBranchIndexer<E> childBufferIndexer) {
+	public BufferBranchIndexer(IBranchIndexer<E> delegateIndexer, BufferBranchIndexer<E> childBufferIndexer) {
 		this.delegateIndexer = delegateIndexer;
 		this.childBufferIndexer = childBufferIndexer;
 	}
@@ -97,14 +97,23 @@ public class BufferBranchIndexer<E extends DefaultData> implements IBufferBranch
 	 */
 	public IBufferTreeComponent<E> getNextTreeComponent() {
 		if (null != childBufferIndexer) {
-			if (sharedInstance()) {
+			if (childBufferIndexer.sharedInstance()) {
 				return new Branch<E>(childBufferIndexer);
 			} else {
-				return new Branch<E>(getNewInstance());
+				return new Branch<E>(childBufferIndexer.getNewInstance());
 			}
 		} else {
 			return new Leaf<E>();
 		}
+	}
+
+	/**
+	 * Gets {@link #delegateIndexer}.
+	 * 
+	 * @return {@link #delegateIndexer}
+	 */
+	IBranchIndexer<E> getDelegateIndexer() {
+		return delegateIndexer;
 	}
 
 	/**

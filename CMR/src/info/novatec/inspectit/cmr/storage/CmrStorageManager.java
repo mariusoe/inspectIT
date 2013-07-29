@@ -83,7 +83,7 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 	 * {@link DefaultDataDaoImpl}.
 	 */
 	@Autowired
-	private StorageDataDao storageDataDao;
+	StorageDataDao storageDataDao;
 
 	/**
 	 * {@link StorageData} for currently active recorder.
@@ -94,7 +94,7 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 	 * {@link StorageWriter} provider.
 	 */
 	@Autowired
-	private CmrStorageWriterProvider storageWriterProvider;
+	CmrStorageWriterProvider storageWriterProvider;
 
 	/**
 	 * Opened storages and their writers.
@@ -110,13 +110,13 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 	 * {@link StorageRecorder} to deal with recording.
 	 */
 	@Autowired
-	private CmrStorageRecorder storageRecorder;
+	CmrStorageRecorder storageRecorder;
 
 	/**
 	 * {@link IServerStatusService}.
 	 */
 	@Autowired
-	private IServerStatusService serverStatusService;
+	IServerStatusService serverStatusService;
 
 	/**
 	 * Current cmr version.

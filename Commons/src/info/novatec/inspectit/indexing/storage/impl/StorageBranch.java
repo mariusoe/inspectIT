@@ -69,6 +69,15 @@ public class StorageBranch<E extends DefaultData> extends AbstractBranch<IStorag
 	}
 
 	/**
+	 * Gets {@link #storageBranchIndexer}.
+	 * 
+	 * @return {@link #storageBranchIndexer}
+	 */
+	IStorageBranchIndexer<E> getStorageBranchIndexer() {
+		return storageBranchIndexer;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

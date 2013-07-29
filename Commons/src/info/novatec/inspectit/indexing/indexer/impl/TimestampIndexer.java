@@ -19,16 +19,21 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TimestampIndexer<E extends DefaultData> implements IBranchIndexer<E> {
 
 	/**
+	 * Constant for empty keys.
+	 */
+	private static final Object[] EMPTY_KEYS = new Object[0];
+
+	/**
 	 * Indexing period. Value is {@value #INDEXING_PERIOD} milliseconds.
 	 * <p>
-	 * ISE: Increased to 15 minutes, because it s not necessary to have such s strict limit
+	 * ISE: Increased to 15 minutes, because it s not necessary to have such a strict limit.
 	 */
 	private static final long INDEXING_PERIOD = 15 * 60 * 1000;
 
 	/**
 	 * To make this class serializable and support concurrency we have to serialize the map, and can
 	 * not use set because there is not concurrent set. The java.util.Collections$SetFromMap is not
-	 * being able to be serialized because it has no no-arg consturctor.
+	 * being able to be serialized because it has no no-arg constructor.
 	 */
 	private ConcurrentHashMap<Long, Boolean> createdKeysMap = new ConcurrentHashMap<Long, Boolean>(8, 0.75f, 1);
 
@@ -66,7 +71,7 @@ public class TimestampIndexer<E extends DefaultData> implements IBranchIndexer<E
 
 	public Object[] getKeys(IIndexQuery query) {
 		if (!query.isIntervalSet()) {
-			return null;
+			return EMPTY_KEYS; // NOPMD
 		}
 
 		long startKey = 0;

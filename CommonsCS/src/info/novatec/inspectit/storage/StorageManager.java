@@ -47,6 +47,8 @@ public abstract class StorageManager {
 
 	/**
 	 * The log of this class.
+	 * <p>
+	 * Set to public because of the tests.
 	 */
 	@Logger
 	Log log;

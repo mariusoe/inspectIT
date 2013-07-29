@@ -82,7 +82,7 @@ public class AgentStatusData implements Serializable {
 	 * @return Milliseconds or <code>null</code>.
 	 */
 	public Long getMillisSinceLastData() {
-		if (0 < lastDataSendTimestamp && lastDataSendTimestamp < serverTimestamp) {
+		if (0 < lastDataSendTimestamp && lastDataSendTimestamp <= serverTimestamp) {
 			return serverTimestamp - lastDataSendTimestamp;
 		} else {
 			return null;

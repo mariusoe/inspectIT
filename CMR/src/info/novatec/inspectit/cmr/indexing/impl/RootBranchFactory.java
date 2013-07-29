@@ -32,9 +32,9 @@ public class RootBranchFactory implements FactoryBean<RootBranch<DefaultData>> {
 	 */
 	@Override
 	public RootBranch<DefaultData> getObject() throws Exception {
-		IBufferBranchIndexer<DefaultData> timestampIndexer = new BufferBranchIndexer<DefaultData>(new TimestampIndexer<DefaultData>());
-		IBufferBranchIndexer<DefaultData> objectTypeIndexer = new BufferBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>(), timestampIndexer);
-		IBufferBranchIndexer<DefaultData> platformIndexer = new BufferBranchIndexer<DefaultData>(new PlatformIdentIndexer<DefaultData>(), objectTypeIndexer);
+		BufferBranchIndexer<DefaultData> timestampIndexer = new BufferBranchIndexer<DefaultData>(new TimestampIndexer<DefaultData>());
+		BufferBranchIndexer<DefaultData> objectTypeIndexer = new BufferBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>(), timestampIndexer);
+		BufferBranchIndexer<DefaultData> platformIndexer = new BufferBranchIndexer<DefaultData>(new PlatformIdentIndexer<DefaultData>(), objectTypeIndexer);
 		return new RootBranch<DefaultData>(platformIndexer);
 	}
 

@@ -6,6 +6,12 @@
 			<class name="info.novatec.inspectit.communication.EqualsVerifierTest" />
 			<class name="info.novatec.inspectit.communication.data.InvocationAwareDataTest" />
 			<class name="info.novatec.inspectit.communication.data.AggregatedDataTest" />
+			<class name="info.novatec.inspectit.communication.valueobject.TimerRawVOTest" />
+		</classes>
+	</test>
+	<test name="Service">
+		<classes>
+			<class name="info.novatec.inspectit.cmr.service.cache.CachedDataServiceTest" />
 		</classes>
 	</test>
 	<test name="Aggregators">
@@ -20,6 +26,9 @@
 			<class name="info.novatec.inspectit.indexing.restriction.IndexQueryRestrictionProcessorTest" />
 			<class name="info.novatec.inspectit.indexing.buffer.impl.BranchTest" />
 			<class name="info.novatec.inspectit.indexing.storage.impl.ArrayBasedStorageLeafTest" />
+			<class name="info.novatec.inspectit.indexing.indexer.impl.BranchIndexersTest" />
+			<class name="info.novatec.inspectit.indexing.buffer.impl.BufferBranchIndexerTest" />
+			<class name="info.novatec.inspectit.indexing.storage.impl.StorageBranchIndexerTest" />
 		</classes>
 	</test>
 	<test name="Serializer">
@@ -37,6 +46,7 @@
 		<classes>
 			<class name="info.novatec.inspectit.storage.processor.impl.StorageDataProcessorsTest" />
 			<class name="info.novatec.inspectit.storage.StorageDataTest" />
+			<class name="info.novatec.inspectit.storage.label.management.impl.LabelManagementActionsTest" />
 		</classes>
 	</test>
 </suite>

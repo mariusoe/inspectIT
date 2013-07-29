@@ -31,7 +31,7 @@ public class MethodIdentIndexer<E extends DefaultData> implements IBranchIndexer
 	 */
 	public Object[] getKeys(IIndexQuery query) {
 		if (0 == query.getMethodIdent()) {
-			return null;
+			return new Object[0];
 		}
 		Object[] keys = new Object[1];
 		keys[0] = query.getMethodIdent();

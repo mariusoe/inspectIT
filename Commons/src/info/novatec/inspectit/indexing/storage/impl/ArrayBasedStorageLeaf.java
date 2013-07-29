@@ -354,6 +354,15 @@ public class ArrayBasedStorageLeaf<E extends DefaultData> implements IStorageTre
 	}
 
 	/**
+	 * Gets {@link #id}.
+	 * 
+	 * @return {@link #id}
+	 */
+	int getId() {
+		return id;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

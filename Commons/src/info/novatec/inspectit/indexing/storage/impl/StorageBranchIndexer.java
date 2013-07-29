@@ -62,7 +62,7 @@ public class StorageBranchIndexer<E extends DefaultData> implements IStorageBran
 	}
 
 	/**
-	 * This constructor allows setting of all properties except ID that will be uniqly generated.
+	 * This constructor allows setting of all properties except ID that will be uniquely generated.
 	 * 
 	 * @param delegateIndexer
 	 *            Provides delegate indexer with a constructor.
@@ -151,7 +151,6 @@ public class StorageBranchIndexer<E extends DefaultData> implements IStorageBran
 				}
 				return new StorageBranch<E>(indexer);
 			}
-
 		} else {
 			// if not we need to create Leaf, and pass id is necessary
 			if (object instanceof InvocationSequenceData) {
@@ -208,6 +207,15 @@ public class StorageBranchIndexer<E extends DefaultData> implements IStorageBran
 	 */
 	public void setPassId(boolean sharedId) {
 		this.passId = sharedId;
+	}
+
+	/**
+	 * Gets {@link #delegateIndexer}.
+	 * 
+	 * @return {@link #delegateIndexer}
+	 */
+	IBranchIndexer<E> getDelegateIndexer() {
+		return delegateIndexer;
 	}
 
 	/**

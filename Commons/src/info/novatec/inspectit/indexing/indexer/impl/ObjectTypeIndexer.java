@@ -28,7 +28,7 @@ public class ObjectTypeIndexer<E extends DefaultData> implements IBranchIndexer<
 
 	public Object[] getKeys(IIndexQuery query) {
 		if (null == query.getObjectClasses()) {
-			return null;
+			return new Object[0];
 		}
 		Object[] keys = new Object[query.getObjectClasses().size()];
 		int index = 0;

@@ -28,7 +28,7 @@ public class SensorTypeIdentIndexer<E extends DefaultData> implements IBranchInd
 	 */
 	public Object[] getKeys(IIndexQuery query) {
 		if (0 == query.getSensorTypeIdent()) {
-			return null;
+			return new Object[0];
 		}
 		Object[] keys = new Object[1];
 		keys[0] = query.getSensorTypeIdent();

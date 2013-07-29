@@ -179,7 +179,7 @@ public class CachedDataService implements InitializingBean {
 			try {
 				platformIdent = globalDataAccessService.getCompleteAgent(overview.getId());
 			} catch (ServiceException e) {
-				LOG.warn("Exception occured trying to refresh sensor information for the agent " + overview.getAgentName() + ".", e);
+				LOG.warn("Exception occurred trying to refresh sensor information for the agent " + overview.getAgentName() + ".", e);
 				continue;
 			}
 			platformMap.put(platformIdent.getId(), platformIdent);

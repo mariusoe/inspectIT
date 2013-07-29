@@ -172,6 +172,15 @@ public class LeafWithNoDescriptors<E extends DefaultData> implements IStorageTre
 	}
 
 	/**
+	 * Gets {@link #id}.
+	 * 
+	 * @return {@link #id}
+	 */
+	int getId() {
+		return id;
+	}
+
+	/**
 	 * This is the private implementation of {@link IStorageDescriptor} that reflects operations
 	 * directly to the leaf. The usage of descriptor outside of this class should not be changed,
 	 * but calling some methods won't create any actions.

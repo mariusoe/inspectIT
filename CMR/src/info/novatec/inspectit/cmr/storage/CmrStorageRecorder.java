@@ -48,20 +48,20 @@ public class CmrStorageRecorder {
 	 * CMR storage manager.
 	 */
 	@Autowired
-	private CmrStorageManager cmrStorageManager;
+	CmrStorageManager cmrStorageManager;
 
 	/**
 	 * {@link StorageDataDao}.
 	 */
 	@Autowired
-	private StorageDataDao storageDataDao;
+	StorageDataDao storageDataDao;
 
 	/**
 	 * {@link ExecutorService} for tasks of the tree handling.
 	 */
 	@Autowired
 	@Resource(name = "scheduledExecutorService")
-	private ScheduledExecutorService executorService;
+	ScheduledExecutorService executorService;
 
 	/**
 	 * Future for the task of recording stop.

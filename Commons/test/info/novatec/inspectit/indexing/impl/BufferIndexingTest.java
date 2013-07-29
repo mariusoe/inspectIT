@@ -15,7 +15,6 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
-import info.novatec.inspectit.indexing.buffer.IBufferBranchIndexer;
 import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
 import info.novatec.inspectit.indexing.buffer.impl.Branch;
 import info.novatec.inspectit.indexing.buffer.impl.BufferBranchIndexer;
@@ -251,9 +250,9 @@ public class BufferIndexingTest {
 	 */
 	@Test
 	public void queryDifferentLevels() throws IndexingException {
-		IBufferBranchIndexer<DefaultData> sensorTypeIndexer = new BufferBranchIndexer<DefaultData>(new SensorTypeIdentIndexer<DefaultData>());
-		IBufferBranchIndexer<DefaultData> objectTypeIndexer = new BufferBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>(), sensorTypeIndexer);
-		IBufferBranchIndexer<DefaultData> platformTypeIndexer = new BufferBranchIndexer<DefaultData>(new PlatformIdentIndexer<DefaultData>(), objectTypeIndexer);
+		BufferBranchIndexer<DefaultData> sensorTypeIndexer = new BufferBranchIndexer<DefaultData>(new SensorTypeIdentIndexer<DefaultData>());
+		BufferBranchIndexer<DefaultData> objectTypeIndexer = new BufferBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>(), sensorTypeIndexer);
+		BufferBranchIndexer<DefaultData> platformTypeIndexer = new BufferBranchIndexer<DefaultData>(new PlatformIdentIndexer<DefaultData>(), objectTypeIndexer);
 		IBufferTreeComponent<DefaultData> rootBranch = new Branch<DefaultData>(platformTypeIndexer);
 
 		TimerData defaultData1 = mock(TimerData.class);

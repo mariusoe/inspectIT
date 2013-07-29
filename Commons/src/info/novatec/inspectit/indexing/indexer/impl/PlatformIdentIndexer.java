@@ -28,7 +28,7 @@ public class PlatformIdentIndexer<E extends DefaultData> implements IBranchIndex
 	 */
 	public Object[] getKeys(IIndexQuery query) {
 		if (0 == query.getPlatformIdent()) {
-			return null;
+			return new Object[0];
 		}
 		Object[] keys = new Object[1];
 		keys[0] = query.getPlatformIdent();
