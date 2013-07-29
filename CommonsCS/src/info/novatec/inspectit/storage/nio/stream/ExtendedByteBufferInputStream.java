@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -224,7 +225,7 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 	 */
 	@Override
 	public int read() throws IOException {
-		if (hasRemaining() && null == super.getByteBuffer()) {
+		if (hasRemaining() || null == super.getByteBuffer()) {
 			bufferChange();
 		}
 
@@ -250,6 +251,11 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 	 */
 	@Override
 	public int read(byte[] b, int off, int len) throws IOException {
+		// if we are empty, return -1 by the input stream contract
+		if (0 == totalSize) {
+			return -1;
+		}
+
 		if (hasRemaining() && null == super.getByteBuffer()) {
 			bufferChange();
 		}
@@ -318,6 +324,7 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 	private synchronized void bufferChange() {
 		ByteBuffer current = super.getByteBuffer();
 		if (null != current) {
+			current.clear();
 			emptyBuffers.add(current);
 		}
 
@@ -421,9 +428,15 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 		private Lock continueReadLock = new ReentrantLock();
 
 		/**
-		 * Condition for signaling countinue reading can occur.
+		 * Condition for signaling continue reading can occur.
 		 */
 		private Condition canContinueRead = continueReadLock.newCondition();
+
+		/**
+		 * Flag for waiting, since signal/await is problematic due it's unknown if the waiting
+		 * thread will go into the await state before the signal comes.
+		 */
+		private AtomicBoolean wait = new AtomicBoolean();
 
 		/**
 		 * {@inheritDoc}
@@ -465,6 +478,7 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 							// signal continue reading if await is active
 							continueReadLock.lock();
 							try {
+								wait.set(false);
 								canContinueRead.signal();
 							} finally {
 								continueReadLock.unlock();
@@ -474,6 +488,7 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 
 					try {
 						// execute read
+						wait.set(true);
 						readingChannelManager.read(finalByteBuffer, readPosition, singleReadSize, channelPath, completionRunnable);
 						// update the position and size for this descriptor
 						readSize += singleReadSize;
@@ -482,20 +497,21 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 							// if the descriptor has not been read completely we have to block until
 							// the read is finished
 							// this ensures that the data for one descriptor will be read in order
-							continueReadLock.lock();
-							try {
-								canContinueRead.await();
-							} catch (InterruptedException e) {
-								Thread.interrupted();
-							} finally {
-								continueReadLock.unlock();
+							while (wait.get()) {
+								continueReadLock.lock();
+								try {
+									canContinueRead.awaitNanos(5000);
+								} catch (InterruptedException e) {
+									Thread.interrupted();
+								} finally {
+									continueReadLock.unlock();
+								}
 							}
 						}
 					} catch (IOException e) {
 						log.warn("Exception occurred trying to read in the ReadTask.", e);
 					}
 				}
-
 				nextDescriptorIndex.incrementAndGet();
 			}
 		}
