@@ -1,13 +1,12 @@
 package info.novatec.inspectit.rcp.editor.preferences.control;
 
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
+import info.novatec.inspectit.rcp.editor.preferences.IPreferencePanel;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.GregorianCalendar;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.nebula.widgets.cdatetime.CDT;
@@ -15,257 +14,148 @@ import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Scale;
-import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.Section;
 
 /**
- * This class creates a control group for the preference panel. It contains a time line where you
- * can select a time range for a historical view.
+ * The time line control for the views that has set of links for fast setting of the time-frame, as
+ * well as two date boxes for seting the time-frame directly.
  * 
- * @author Eduard Tudenhoefner
+ * @author Ivan Senic
  * 
  */
-public class TimeLineControl implements IPreferenceControl {
+public class TimeLineControl extends AbstractPreferenceControl implements IPreferenceControl, PreferenceEventCallback {
 
 	/**
-	 * The unique id of this preference control.
+	 * From date widget.
 	 */
-	private static final PreferenceId CONTROL_GROUP_ID = PreferenceId.TIMELINE;
+	private CDateTime fromDateTime;
 
 	/**
-	 * The map containing all configurable values by the slider for the day spinner.
+	 * To date widget.
 	 */
-	private Map<Integer, Integer> daysValueMap;
+	private CDateTime toDateTime;
 
 	/**
-	 * The map containing all configurable values by the slider for the hour spinner.
+	 * Old from date.
 	 */
-	private Map<Integer, Integer> hoursValueMap;
+	private Date oldToDate;
 
 	/**
-	 * The map containing all configurable values by the slider for the minute spinner.
+	 * Old to date.
 	 */
-	private Map<Integer, Integer> minutesValueMap;
+	private Date oldFromDate;
 
 	/**
-	 * The slider used for adjusting the three spinnners.
+	 * Main composite in the preference control.
 	 */
-	private Scale slider = null;
+	private Composite mainComposite;
 
 	/**
-	 * The spinner for day selection.
+	 * Default constructor.
+	 * 
+	 * @param preferencePanel
+	 *            Preference panel.
 	 */
-	private Spinner spinnerDays;
-
-	/**
-	 * The spinner for hour selection.
-	 */
-	private Spinner spinnerHours;
-
-	/**
-	 * The spinner for minute selection.
-	 */
-	private Spinner spinnerMinutes;
-
-	/**
-	 * The date/time selection.
-	 */
-	private CDateTime cDateTime;
-
-	/**
-	 * Indicates the time range start time.
-	 */
-	private GregorianCalendar toDate = new GregorianCalendar();
-
-	/**
-	 * Indicates the time range end time.
-	 */
-	private GregorianCalendar fromDate = new GregorianCalendar();
-
-	/**
-	 * Used for temporary saving the old value.
-	 */
-	private GregorianCalendar oldFromDate = new GregorianCalendar();
-
-	/**
-	 * Used for temporary saving the old value.
-	 */
-	private GregorianCalendar oldToDate = new GregorianCalendar();
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Composite createControls(Composite parent, FormToolkit toolkit) {
-		Section section = toolkit.createSection(parent, Section.TITLE_BAR);
-		section.setText("Timerange / Until");
-		section.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		Composite timeLineRow = toolkit.createComposite(section);
-		section.setClient(timeLineRow);
-
-		GridLayout timelineRowLayout = new GridLayout(4, false);
-		timelineRowLayout.marginLeft = 15;
-		timelineRowLayout.horizontalSpacing = 25;
-		GridData firstGrid = new GridData(SWT.MAX, SWT.DEFAULT);
-		firstGrid.grabExcessHorizontalSpace = true;
-		timeLineRow.setLayout(timelineRowLayout);
-		timeLineRow.setLayoutData(firstGrid);
-
-		Composite innerComposite = new Composite(timeLineRow, SWT.NONE);
-		GridLayout innerCompLayout = new GridLayout(7, true);
-		innerCompLayout.marginLeft = 10;
-		innerComposite.setLayout(innerCompLayout);
-		innerComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-
-		final Map<Integer, Integer> mappingTable = createMappingTable();
-
-		spinnerDays = new Spinner(innerComposite, SWT.HORIZONTAL | SWT.BORDER);
-		spinnerDays.setMaximum(999);
-		toolkit.adapt(spinnerDays, false, true);
-		toolkit.createLabel(innerComposite, "Days", SWT.LEFT);
-
-		spinnerDays.addSelectionListener(new SelectionAdapter() {
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				if (slider != null) {
-					int value = spinnerDays.getSelection();
-					if (daysValueMap.containsValue(value)) {
-						slider.setSelection(getKeyFromValue(daysValueMap, value));
-					}
-				}
-			}
-
-		});
-
-		spinnerHours = new Spinner(innerComposite, SWT.HORIZONTAL | SWT.BORDER);
-		spinnerHours.setMaximum(23);
-		spinnerHours.setSelection(1);
-		toolkit.adapt(spinnerHours, false, true);
-		spinnerHours.addSelectionListener(new SelectionAdapter() {
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				if (slider != null) {
-					if (spinnerDays.getSelection() == 0) {
-						int value = spinnerHours.getSelection();
-						if (hoursValueMap.containsValue(value)) {
-							slider.setSelection(getKeyFromValue(hoursValueMap, value));
-						}
-					}
-				}
-			}
-		});
-
-		toolkit.createLabel(innerComposite, "Hours", SWT.LEFT);
-		spinnerMinutes = new Spinner(innerComposite, SWT.HORIZONTAL | SWT.BORDER);
-		spinnerMinutes.setMaximum(59);
-		toolkit.adapt(spinnerMinutes, false, true);
-		toolkit.createLabel(innerComposite, "Minutes", SWT.LEFT);
-
-		spinnerMinutes.addSelectionListener(new SelectionAdapter() {
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				if (slider != null) {
-					if (spinnerDays.getSelection() == 0 && spinnerHours.getSelection() == 0) {
-						int value = spinnerMinutes.getSelection();
-						if (minutesValueMap.containsValue(value)) {
-							slider.setSelection(getKeyFromValue(minutesValueMap, value));
-						}
-					}
-				}
-			}
-
-		});
-
-		toolkit.createLabel(timeLineRow, "to Date:");
-		cDateTime = new CDateTime(timeLineRow, CDT.BORDER | CDT.DROP_DOWN | SWT.RIGHT);
-		toolkit.adapt(cDateTime, false, true);
-		cDateTime.setFormat(CDT.DATE_SHORT | CDT.TIME_SHORT);
-		cDateTime.setSelection(toDate.getTime());
-		GridData cdtGrid = new GridData(150, 30);
-		cdtGrid.grabExcessHorizontalSpace = true;
-		cdtGrid.grabExcessVerticalSpace = true;
-		cDateTime.setLayoutData(cdtGrid);
-		cDateTime.setEnabled(true);
-
-		toolkit.createLabel(timeLineRow, "", SWT.NONE);
-		slider = new Scale(timeLineRow, SWT.HORIZONTAL);
-		slider.setMinimum(0);
-		slider.setMaximum(30);
-		slider.setIncrement(1);
-		slider.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		slider.setSelection(5);
-
-		slider.addSelectionListener(new SelectionAdapter() {
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				int value = slider.getSelection();
-				int minuteAreaSize = minutesValueMap.size();
-				int hoursAreaSize = hoursValueMap.size();
-				int hoursArea = hoursAreaSize + minuteAreaSize;
-				int daysAreaSize = daysValueMap.size();
-				int daysArea = daysAreaSize + hoursArea;
-
-				if (value < minuteAreaSize) {
-					spinnerMinutes.setSelection(mappingTable.get(value));
-					spinnerHours.setSelection(0);
-					spinnerDays.setSelection(0);
-				} else if (value >= minuteAreaSize && value < hoursArea) {
-					spinnerHours.setSelection(mappingTable.get(value));
-					spinnerMinutes.setSelection(0);
-					spinnerDays.setSelection(0);
-				} else if (value >= hoursArea && value < daysArea) {
-					spinnerDays.setSelection(mappingTable.get(value));
-					spinnerMinutes.setSelection(0);
-					spinnerHours.setSelection(0);
-				}
-			}
-		});
-
-		oldToDate.setTime(cDateTime.getSelection());
-		oldFromDate.setTime(oldToDate.getTime());
-		// default state is 10 minutes before the current time
-		oldFromDate.add(GregorianCalendar.MINUTE, -10);
-
-		return timeLineRow;
+	public TimeLineControl(IPreferencePanel preferencePanel) {
+		super(preferencePanel);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
+	public PreferenceId getControlGroupId() {
+		return PreferenceId.TIMELINE;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Composite createControls(Composite parent, FormToolkit toolkit) {
+		Section section = toolkit.createSection(parent, Section.TITLE_BAR);
+		section.setText("Time Range");
+		section.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		mainComposite = toolkit.createComposite(section);
+		mainComposite.setLayout(new GridLayout(1, false));
+		section.setClient(mainComposite);
+
+		Composite linksComposite = toolkit.createComposite(mainComposite);
+		linksComposite.setLayout(new GridLayout(14, false));
+		linksComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+
+		toolkit.createLabel(linksComposite, "Last: ");
+		createTimeHyperlink(linksComposite, toolkit, "15 minutes", 15 * 60 * 1000L);
+		toolkit.createLabel(linksComposite, " | ");
+		createTimeHyperlink(linksComposite, toolkit, "1 hour", 60 * 60 * 1000L);
+		toolkit.createLabel(linksComposite, " | ");
+		createTimeHyperlink(linksComposite, toolkit, "6 hours", 6 * 60 * 60 * 1000L);
+		toolkit.createLabel(linksComposite, " | ");
+		createTimeHyperlink(linksComposite, toolkit, "12 hours", 12 * 60 * 60 * 1000L);
+		toolkit.createLabel(linksComposite, " | ");
+		createTimeHyperlink(linksComposite, toolkit, "1 day", 24 * 60 * 60 * 1000L);
+		toolkit.createLabel(linksComposite, " | ");
+		createTimeHyperlink(linksComposite, toolkit, "7 days", 7 * 24 * 60 * 60 * 1000L);
+		toolkit.createLabel(linksComposite, " | ");
+		createTimeHyperlink(linksComposite, toolkit, "30 days", 30 * 24 * 60 * 60 * 1000L);
+
+		Composite timeComposite = toolkit.createComposite(mainComposite);
+		timeComposite.setLayout(new GridLayout(4, false));
+		timeComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+
+		Date toDate = new Date();
+		Date fromDate = new Date(toDate.getTime() - PreferenceId.TimeLine.TIMELINE_DEFAULT);
+
+		toolkit.createLabel(timeComposite, "From: ");
+		fromDateTime = new CDateTime(timeComposite, CDT.BORDER | CDT.DROP_DOWN);
+		fromDateTime.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		fromDateTime.setFormat(CDT.DATE_SHORT | CDT.TIME_SHORT);
+		fromDateTime.setSelection(fromDate);
+
+		toolkit.createLabel(timeComposite, "To: ");
+		toDateTime = new CDateTime(timeComposite, CDT.BORDER | CDT.DROP_DOWN);
+		toDateTime.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		toDateTime.setFormat(CDT.DATE_SHORT | CDT.TIME_SHORT);
+		toDateTime.setSelection(toDate);
+
+		SelectionListener selectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				getPreferencePanel().update();
+			}
+		};
+		fromDateTime.addSelectionListener(selectionListener);
+		toDateTime.addSelectionListener(selectionListener);
+
+		getPreferencePanel().registerCallback(this);
+
+		return mainComposite;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Map<IPreferenceGroup, Object> eventFired() {
 		Map<IPreferenceGroup, Object> preferenceControlMap = new HashMap<IPreferenceGroup, Object>();
-		toDate.setTime(cDateTime.getSelection());
-		fromDate.setTime(toDate.getTime());
-		fromDate.add(GregorianCalendar.DAY_OF_WEEK, -(spinnerDays.getSelection()));
-		fromDate.add(GregorianCalendar.HOUR_OF_DAY, -(spinnerHours.getSelection()));
-		fromDate.add(GregorianCalendar.MINUTE, -(spinnerMinutes.getSelection()));
+		Date toDate = toDateTime.getSelection();
+		Date fromDate = fromDateTime.getSelection();
 
-		if (oldToDate.getTime().getTime() != toDate.getTime().getTime()) {
-			preferenceControlMap.put(PreferenceId.TimeLine.TO_DATE_ID, toDate.getTime());
-			oldToDate.setTime(toDate.getTime());
+		if (null == oldToDate || oldToDate.getTime() != toDate.getTime()) {
+			preferenceControlMap.put(PreferenceId.TimeLine.TO_DATE_ID, toDate);
+			oldToDate = new Date(toDate.getTime());
 		}
-		if (oldFromDate.getTime().getTime() != fromDate.getTime().getTime()) {
-			preferenceControlMap.put(PreferenceId.TimeLine.FROM_DATE_ID, fromDate.getTime());
-			oldFromDate.setTime(fromDate.getTime());
+		if (null == oldFromDate || oldFromDate.getTime() != fromDate.getTime()) {
+			preferenceControlMap.put(PreferenceId.TimeLine.FROM_DATE_ID, fromDate);
+			oldFromDate = new Date(fromDate.getTime());
 		}
 
 		return preferenceControlMap;
@@ -274,76 +164,65 @@ public class TimeLineControl implements IPreferenceControl {
 	/**
 	 * {@inheritDoc}
 	 */
-	public PreferenceId getControlGroupId() {
-		return CONTROL_GROUP_ID;
+	@Override
+	public void dispose() {
+		getPreferencePanel().removeCallback(this);
+	}
+
+	/**
+	 * Creates {@link Hyperlink} that when clicked sets the last specified time to the timeframe
+	 * control.
+	 * 
+	 * @param parent
+	 *            Parent composite.
+	 * @param toolkit
+	 *            {@link FormToolkit}
+	 * @param text
+	 *            Text on the {@link Hyperlink}.
+	 * @param time
+	 *            Wanted time frame to set on click.
+	 * @return Created {@link Hyperlink}.
+	 */
+	private Hyperlink createTimeHyperlink(Composite parent, FormToolkit toolkit, String text, final long time) {
+		Hyperlink hyperlink = toolkit.createHyperlink(parent, text, SWT.NONE);
+		hyperlink.addHyperlinkListener(new HyperlinkAdapter() {
+			@Override
+			public void linkActivated(HyperlinkEvent e) {
+				Date toDate = new Date();
+				Date fromDate = new Date(toDate.getTime() - time);
+				toDateTime.setSelection(toDate);
+				fromDateTime.setSelection(fromDate);
+				getPreferencePanel().update();
+			}
+		});
+		return hyperlink;
+	}
+
+	/**
+	 * Sets control enabled or not.
+	 * 
+	 * @param enabled
+	 *            If control is enabled or not.
+	 */
+	private void setEnabled(boolean enabled) {
+		fromDateTime.setEnabled(enabled);
+		toDateTime.setEnabled(enabled);
 	}
 
 	/**
 	 * {@inheritDoc}
+	 * <p>
+	 * If live is set on we disable this preference.
 	 */
-	public void dispose() {
-	}
-
-	/**
-	 * Creates a mapping table for the slider and the three spinners.
-	 * 
-	 * @return the map containing the mapping table.
-	 */
-	private Map<Integer, Integer> createMappingTable() {
-		List<Integer> daysValueList = new ArrayList<Integer>();
-		Collections.addAll(daysValueList, 1, 2, 4, 8, 15, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360);
-
-		List<Integer> hoursValueList = new ArrayList<Integer>();
-		Collections.addAll(hoursValueList, 1, 2, 4, 8, 11, 15, 18, 21, 23);
-
-		List<Integer> minutesValueList = new ArrayList<Integer>();
-		Collections.addAll(minutesValueList, 1, 12, 24, 36, 48);
-
-		daysValueMap = new HashMap<Integer, Integer>();
-		hoursValueMap = new HashMap<Integer, Integer>();
-		minutesValueMap = new HashMap<Integer, Integer>();
-		Map<Integer, Integer> mappingTable = new HashMap<Integer, Integer>();
-		int counter = 0;
-
-		for (Integer value : minutesValueList) {
-			minutesValueMap.put(counter, value);
-			++counter;
-		}
-
-		counter = minutesValueList.size();
-		for (Integer value : hoursValueList) {
-			hoursValueMap.put(counter, value);
-			++counter;
-		}
-
-		counter = minutesValueList.size() + hoursValueList.size();
-		for (Integer value : daysValueList) {
-			daysValueMap.put(counter, value);
-			++counter;
-		}
-
-		mappingTable.putAll(minutesValueMap);
-		mappingTable.putAll(hoursValueMap);
-		mappingTable.putAll(daysValueMap);
-
-		return mappingTable;
-	}
-
-	/**
-	 * Gets a key from a value.
-	 * 
-	 * @param map
-	 *            The Map in which the search will be performed.
-	 * @param value
-	 *            the value to be searched for.
-	 * @return the value.
-	 */
-	private Integer getKeyFromValue(Map<Integer, Integer> map, Integer value) {
-		for (Map.Entry<Integer, Integer> entrySet : map.entrySet()) {
-			if (entrySet.getValue().equals(value)) {
-				return entrySet.getKey();
+	@Override
+	public void eventFired(PreferenceEvent preferenceEvent) {
+		if (PreferenceId.LIVEMODE.equals(preferenceEvent.getPreferenceId())) {
+			Boolean liveOn = (Boolean) preferenceEvent.getPreferenceMap().get(PreferenceId.LiveMode.BUTTON_LIVE_ID);
+			if (null != liveOn && liveOn.booleanValue()) {
+				setEnabled(false);
+			} else {
+				setEnabled(true);
 			}
 		}
-		return null;
 	}
 }

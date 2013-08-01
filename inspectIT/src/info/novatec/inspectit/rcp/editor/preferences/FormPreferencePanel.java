@@ -232,7 +232,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 	 */
 	private void createPreferenceControls(Composite parent, Set<PreferenceId> preferenceSet) {
 		for (PreferenceId preferenceIdEnum : preferenceSet) {
-			IPreferenceControl preferenceControl = PreferenceControlFactory.createPreferenceControls(parent, toolkit, preferenceIdEnum);
+			IPreferenceControl preferenceControl = PreferenceControlFactory.createPreferenceControls(parent, toolkit, preferenceIdEnum, this);
 			if (null != preferenceControl) {
 				preferenceControlList.add(preferenceControl);
 			}

@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.editor.preferences.control;
 
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
+import info.novatec.inspectit.rcp.editor.preferences.IPreferencePanel;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 
 import java.util.HashMap;
@@ -25,7 +26,7 @@ import org.eclipse.ui.forms.widgets.Section;
  * @author Eduard Tudenhoefner
  * 
  */
-public class SamplingRateControl implements IPreferenceControl {
+public class SamplingRateControl extends AbstractPreferenceControl implements IPreferenceControl {
 
 	/**
 	 * The unique id of this preference control.
@@ -105,6 +106,16 @@ public class SamplingRateControl implements IPreferenceControl {
 	 * The default sensitivity.
 	 */
 	public static final Sensitivity DEFAULT_SENSITIVITY = Sensitivity.MEDIUM;
+
+	/**
+	 * Default constructor.
+	 * 
+	 * @param preferencePanel
+	 *            Preference panel.
+	 */
+	public SamplingRateControl(IPreferencePanel preferencePanel) {
+		super(preferencePanel);
+	}
 
 	/**
 	 * {@inheritDoc}

@@ -31,16 +31,18 @@ public final class PreferenceControlFactory {
 	 *            The used toolkit.
 	 * @param preferenceIdEnum
 	 *            The {@link PreferenceId} by which the {@link IPreferenceControl} will be created.
+	 * @param preferencePanel
+	 *            Preference panel
 	 * @return An instance of {@link IPreferenceControl}.
 	 */
-	public static IPreferenceControl createPreferenceControls(Composite parent, FormToolkit toolkit, PreferenceId preferenceIdEnum) {
+	public static IPreferenceControl createPreferenceControls(Composite parent, FormToolkit toolkit, PreferenceId preferenceIdEnum, IPreferencePanel preferencePanel) {
 		switch (preferenceIdEnum) {
 		case TIMELINE:
-			IPreferenceControl timeLineControl = new TimeLineControl();
+			IPreferenceControl timeLineControl = new TimeLineControl(preferencePanel);
 			timeLineControl.createControls(parent, toolkit);
 			return timeLineControl;
 		case SAMPLINGRATE:
-			IPreferenceControl samplingRateControl = new SamplingRateControl();
+			IPreferenceControl samplingRateControl = new SamplingRateControl(preferencePanel);
 			samplingRateControl.createControls(parent, toolkit);
 			return samplingRateControl;
 		default:

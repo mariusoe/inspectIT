@@ -26,6 +26,11 @@ public enum PreferenceId {
 		 * {@link info.novatec.inspectit.rcp.editor.preferences.control.TimeLineControl}.
 		 */
 		FROM_DATE_ID, TO_DATE_ID;
+
+		/**
+		 * Defines the default time line period displayed.
+		 */
+		public static final long TIMELINE_DEFAULT = 10 * 60 * 1000;
 	}
 
 	/**

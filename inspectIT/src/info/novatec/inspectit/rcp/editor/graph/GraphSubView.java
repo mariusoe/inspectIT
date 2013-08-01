@@ -74,11 +74,6 @@ public class GraphSubView extends AbstractSubView {
 	private static final long TEN_MINUTES = ONE_MINUTE * 10;
 
 	/**
-	 * The chart composite frame.
-	 */
-	private ChartComposite frame;
-
-	/**
 	 * The zoom listener.
 	 */
 	private ZoomListener zoomListener;
@@ -135,8 +130,8 @@ public class GraphSubView extends AbstractSubView {
 		Color color = new Color(toolkit.getColors().getBackground().getRed(), toolkit.getColors().getBackground().getGreen(), toolkit.getColors().getBackground().getBlue());
 		chart.setBackgroundPaint(color);
 
-		frame = new ChartComposite(composite, SWT.NONE, chart, ChartComposite.DEFAULT_WIDTH, ChartComposite.DEFAULT_HEIGHT, 0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, true, true, true, true, true,
-				true) {
+		new ChartComposite(composite, SWT.NONE, chart, ChartComposite.DEFAULT_WIDTH, ChartComposite.DEFAULT_HEIGHT, 0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, true, true,
+				true, true, true, true) {
 
 			/**
 			 * {@inheritDoc}
@@ -204,16 +199,6 @@ public class GraphSubView extends AbstractSubView {
 	}
 
 	/**
-	 * Removes the zoom listener from the domain axis.
-	 * 
-	 * @param domainAxis
-	 *            The domain axis.
-	 */
-	private void removeZoomListener(DateAxisZoomNotify domainAxis) {
-		domainAxis.removeZoomListener(zoomListener);
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	public Control getControl() {
@@ -265,11 +250,6 @@ public class GraphSubView extends AbstractSubView {
 			if (preferenceMap.containsKey(PreferenceId.LiveMode.BUTTON_LIVE_ID)) {
 				autoUpdate = (Boolean) preferenceMap.get(PreferenceId.LiveMode.BUTTON_LIVE_ID);
 				if (autoUpdate) {
-					XYPlot plot = (XYPlot) chart.getPlot();
-					DateAxisZoomNotify domainAxis = (DateAxisZoomNotify) plot.getDomainAxis();
-					removeZoomListener(domainAxis);
-					frame.restoreAutoBounds();
-					addZoomListener(domainAxis);
 					doRefresh();
 				}
 			}
@@ -286,8 +266,10 @@ public class GraphSubView extends AbstractSubView {
 			XYPlot plot = (XYPlot) chart.getPlot();
 			if (autoUpdate) {
 				long now = System.currentTimeMillis();
-				plot.getDomainAxis().setRange(new Range(now - TEN_MINUTES, now + ONE_MINUTE));
-				plotController.doRefresh();
+				DateAxis axis = (DateAxis) plot.getDomainAxis();
+				Date minDate = axis.getMinimumDate();
+				Date maxDate = new Date(now);
+				plotController.update(minDate, maxDate);
 			} else {
 				DateAxis axis = (DateAxis) plot.getDomainAxis();
 				Date minDate = axis.getMinimumDate();
