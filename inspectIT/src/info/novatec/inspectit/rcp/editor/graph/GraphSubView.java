@@ -13,6 +13,7 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 
 import java.awt.Color;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.DateTickUnit;
+import org.jfree.chart.axis.DateTickUnitType;
+import org.jfree.chart.axis.TickUnits;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -159,6 +163,21 @@ public class GraphSubView extends AbstractSubView {
 		domainAxis.setAutoRangeMinimumSize(100000.0d);
 		long now = System.currentTimeMillis();
 		domainAxis.setRange(new Range(now - TEN_MINUTES, now + ONE_MINUTE), true, false);
+
+		// set the ticks to display in the date axis
+		TickUnits source = new TickUnits();
+		source.add(new DateTickUnit(DateTickUnitType.MINUTE, 1, DateFormat.getTimeInstance(DateFormat.SHORT)));
+		source.add(new DateTickUnit(DateTickUnitType.MINUTE, 5, DateFormat.getTimeInstance(DateFormat.SHORT)));
+		source.add(new DateTickUnit(DateTickUnitType.MINUTE, 30, DateFormat.getTimeInstance(DateFormat.SHORT)));
+		source.add(new DateTickUnit(DateTickUnitType.HOUR, 1, DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)));
+		source.add(new DateTickUnit(DateTickUnitType.HOUR, 3, DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)));
+		source.add(new DateTickUnit(DateTickUnitType.DAY, 1, DateFormat.getDateInstance(DateFormat.SHORT)));
+		source.add(new DateTickUnit(DateTickUnitType.DAY, 7, DateFormat.getDateInstance(DateFormat.MEDIUM)));
+		source.add(new DateTickUnit(DateTickUnitType.MONTH, 1, DateFormat.getDateInstance(DateFormat.MEDIUM)));
+		source.add(new DateTickUnit(DateTickUnitType.YEAR, 1, DateFormat.getDateInstance(DateFormat.MEDIUM)));
+		source.add(new DateTickUnit(DateTickUnitType.YEAR, 10, DateFormat.getDateInstance(DateFormat.MEDIUM)));
+		domainAxis.setStandardTickUnits(source);
+		domainAxis.setAutoTickUnitSelection(true);
 
 		addZoomListener(domainAxis);
 
