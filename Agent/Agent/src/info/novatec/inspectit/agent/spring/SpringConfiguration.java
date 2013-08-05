@@ -5,13 +5,21 @@ import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
 import info.novatec.inspectit.agent.config.impl.PlatformSensorTypeConfig;
 import info.novatec.inspectit.agent.config.impl.StrategyConfig;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  * Post process configuration storage to define buffer and sending strategy beans.
@@ -45,6 +53,29 @@ public class SpringConfiguration implements BeanDefinitionRegistryPostProcessor 
 	 */
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		this.registry = registry;
+	}
+
+	/**
+	 * Returns {@link PropertyPlaceholderConfigurer} for the Agent.
+	 * 
+	 * @return Returns {@link PropertyPlaceholderConfigurer} for the Agent.
+	 */
+	@Bean
+	public static PropertyPlaceholderConfigurer properties() {
+		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
+		ClassPathResource[] resources = new ClassPathResource[] { new ClassPathResource("/config/bytebufferpool.properties") };
+		ppc.setLocations(resources);
+		ppc.setIgnoreUnresolvablePlaceholders(true);
+		return ppc;
+	}
+
+	/**
+	 * @return Returns socketReadExecutorService
+	 */
+	@Bean(name = "socketReadExecutorService")
+	@Scope(BeanDefinition.SCOPE_SINGLETON)
+	public ExecutorService getSocketReadExecutorService() {
+		return Executors.newFixedThreadPool(1);
 	}
 
 	/**

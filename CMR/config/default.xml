@@ -74,12 +74,7 @@
 	</section>
 	<section name="General settings">
 		<properties>
-			<long-property name="Registry Port" default-value="9070" server-restart-required="true" logical-name="cmr.registryPort" advanced="false" description="The port used for RMI service registry.">
-				<validators>
-					<isPositive />
-				</validators>
-			</long-property>
-			<long-property name="Service Port" default-value="9071" server-restart-required="true" logical-name="cmr.servicePort" advanced="false" description="The port used for actual communication with the Agent.">
+			<long-property name="Port" default-value="9070" server-restart-required="true" logical-name="cmr.port" advanced="false" description="The port used for communicating with agents.">
 				<validators>
 					<isPositive />
 				</validators>

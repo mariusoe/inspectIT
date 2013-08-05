@@ -252,6 +252,8 @@
 
 	<bean id="serializationManager" class="info.novatec.inspectit.storage.serializer.impl.SerializationManager" scope="prototype" lazy-init="true" />
 
+	<bean id="kryoNetNetwork" class="info.novatec.inspectit.util.KryoNetNetwork" />
+	
 	<bean id="byteBufferProvider" class="info.novatec.inspectit.storage.nio.ByteBufferProvider" init-method="init">
 		<property name="poolMaxCapacity" value="52428800" />
 		<property name="poolMinCapacity" value="10485760" />
@@ -331,7 +333,7 @@
 		<property name="executorService" ref="storageExecutorService" />
 	</bean>
 
-	<bean id="streamProvider" class="info.novatec.inspectit.storage.nio.stream.StreamProvider">
+	<bean id="inputStreamProvider" class="info.novatec.inspectit.storage.nio.stream.InputStreamProvider">
 		<lookup-method name="createExtendedByteBufferInputStream" bean="extendedByteBufferInputStream" />
 	</bean>
 

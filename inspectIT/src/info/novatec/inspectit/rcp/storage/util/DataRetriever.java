@@ -11,7 +11,7 @@ import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.StorageFileType;
 import info.novatec.inspectit.storage.StorageManager;
-import info.novatec.inspectit.storage.nio.stream.StreamProvider;
+import info.novatec.inspectit.storage.nio.stream.InputStreamProvider;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider;
@@ -91,7 +91,7 @@ public class DataRetriever {
 	/**
 	 * Stream provider needed for local data reading.
 	 */
-	private StreamProvider streamProvider;
+	private InputStreamProvider streamProvider;
 
 	/**
 	 * Initializes the retriever.
@@ -700,7 +700,7 @@ public class DataRetriever {
 	 * @param streamProvider
 	 *            New value for {@link #streamProvider}
 	 */
-	public void setStreamProvider(StreamProvider streamProvider) {
+	public void setStreamProvider(InputStreamProvider streamProvider) {
 		this.streamProvider = streamProvider;
 	}
 

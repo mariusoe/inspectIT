@@ -43,10 +43,12 @@ import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData.AgentConnection;
 import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
 import info.novatec.inspectit.storage.serializer.HibernateAwareClassResolver;
+import info.novatec.inspectit.storage.serializer.IKryoProvider;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.storage.serializer.schema.ClassSchemaManager;
 import info.novatec.inspectit.util.IHibernateUtil;
+import info.novatec.inspectit.util.KryoNetNetwork;
 import info.novatec.inspectit.util.TimeFrame;
 
 import java.sql.Timestamp;
@@ -105,7 +107,7 @@ import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Lazy
-public class SerializationManager implements ISerializer, InitializingBean {
+public class SerializationManager implements ISerializer, IKryoProvider, InitializingBean {
 
 	/**
 	 * Main {@link Kryo} instance.
@@ -113,15 +115,21 @@ public class SerializationManager implements ISerializer, InitializingBean {
 	private Kryo kryo;
 
 	/**
+	 * {@link KryoNetNetwork} for registering needed classes for communication.
+	 */
+	@Autowired
+	private KryoNetNetwork kryoNetNetwork;
+
+	/**
 	 * Schema manager that holds all schemas for the {@link DefaultData} objects to be serialized.
 	 */
 	@Autowired
-	ClassSchemaManager schemaManager;
+	private ClassSchemaManager schemaManager;
 
 	/**
 	 * {@link IHibernateUtil} if needed for Hibernate persistent collections/maps solving.
 	 */
-	@Autowired
+	@Autowired(required = false)
 	IHibernateUtil hibernateUtil;
 
 	/**
@@ -274,6 +282,10 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		
 		// added with INSPECTIT-950
 		kryo.register(TimeFrame.class, new CustomCompatibleFieldSerializer<TimeFrame>(kryo, TimeFrame.class, schemaManager));
+		
+		// added with INSPECTIT-480
+		// needed for KryoNet
+		kryoNetNetwork.register(kryo);
 	}
 
 	/**
@@ -332,6 +344,16 @@ public class SerializationManager implements ISerializer, InitializingBean {
 	 */
 	public void setSchemaManager(ClassSchemaManager schemaManager) {
 		this.schemaManager = schemaManager;
+	}
+
+	/**
+	 * Sets {@link #kryoNetNetwork}.
+	 * 
+	 * @param kryoNetNetwork
+	 *            New value for {@link #kryoNetNetwork}
+	 */
+	public void setKryoNetNetwork(KryoNetNetwork kryoNetNetwork) {
+		this.kryoNetNetwork = kryoNetNetwork;
 	}
 
 	/**

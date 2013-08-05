@@ -245,6 +245,7 @@ Mozilla Public License (MPL), 1.1 : javassist (3.16.1.GA) : google-guava (14.0-r
 		<jar destfile="${build.release}/sun1.5-data/agent/${dist.jar.name}" manifest="${basedir}/META-INF/MANIFEST.MF">
 			<fileset dir="${build.agent.classes}" includes="**/*.class" />
 			<fileset dir="${src.root}" includes="**/*.xml" />
+			<fileset dir="${src.root}" includes="**/*.properties" />
 			<fileset dir="${commons.src}" includes="version.log" />
 		</jar>
 

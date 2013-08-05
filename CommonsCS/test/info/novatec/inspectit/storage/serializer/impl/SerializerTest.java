@@ -64,6 +64,7 @@ import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.storage.serializer.schema.ClassSchemaManager;
 import info.novatec.inspectit.storage.serializer.schema.SchemaManagerTestProvider;
+import info.novatec.inspectit.util.KryoNetNetwork;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -140,7 +141,8 @@ public class SerializerTest {
 	public void initSerializer() throws IOException {
 		ClassSchemaManager schemaManager = SchemaManagerTestProvider.getClassSchemaManagerForTests();
 		serializer = new SerializationManager();
-		serializer.schemaManager = schemaManager;
+		serializer.setSchemaManager(schemaManager);
+		serializer.setKryoNetNetwork(new KryoNetNetwork());
 		serializer.initKryo();
 	}
 

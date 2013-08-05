@@ -21,7 +21,7 @@ import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
 import info.novatec.inspectit.indexing.storage.impl.StorageIndexQuery;
 import info.novatec.inspectit.storage.label.StringStorageLabel;
 import info.novatec.inspectit.storage.label.type.impl.RatingLabelType;
-import info.novatec.inspectit.storage.nio.stream.StreamProvider;
+import info.novatec.inspectit.storage.nio.stream.InputStreamProvider;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.processor.impl.DataSaverProcessor;
 import info.novatec.inspectit.storage.serializer.ISerializer;
@@ -68,10 +68,10 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 	private CmrStorageManager storageManager;
 
 	/**
-	 * {@link StorageReader} for reading the saved data.
+	 * {@link InputStreamProvider}.
 	 */
 	@Autowired
-	private StreamProvider streamProvider;
+	InputStreamProvider inputStreamProvider;
 
 	/**
 	 * {@link ISerializer}.
@@ -305,7 +305,7 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 			assertThat("Size of the descriptor is wrong.", descriptor.getSize(), is(greaterThan(0L)));
 		}
 
-		InputStream result = streamProvider.getExtendedByteBufferInputStream(storageData, descriptors);
+		InputStream result = inputStreamProvider.getExtendedByteBufferInputStream(storageData, descriptors);
 		Input input = new Input(result);
 		int count = 0;
 		try {

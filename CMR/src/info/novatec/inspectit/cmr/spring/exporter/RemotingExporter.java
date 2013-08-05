@@ -1,18 +1,14 @@
 package info.novatec.inspectit.cmr.spring.exporter;
 
-import info.novatec.inspectit.cmr.property.PropertyManager;
 import info.novatec.inspectit.cmr.service.ServiceExporterType;
 import info.novatec.inspectit.cmr.service.ServiceInterface;
 
 import java.lang.annotation.Annotation;
-import java.util.Map;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -22,9 +18,6 @@ import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.core.env.PropertiesPropertySource;
-import org.springframework.core.env.PropertySource;
-import org.springframework.remoting.rmi.RmiServiceExporter;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -60,16 +53,6 @@ public class RemotingExporter implements BeanFactoryPostProcessor {
 	private static final Logger LOG = LoggerFactory.getLogger(RemotingExporter.class);
 
 	/**
-	 * String definition of the service port.
-	 */
-	private static final String SERVICE_PORT = "servicePort";
-
-	/**
-	 * String definition of the registry port.
-	 */
-	private static final String REGISTRY_PORT = "registryPort";
-
-	/**
 	 * The annotation defining a class being a service.
 	 */
 	private Class<? extends Annotation> serviceAnnotationType = Service.class;
@@ -88,17 +71,6 @@ public class RemotingExporter implements BeanFactoryPostProcessor {
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		LOG.info("|-RemoteExporter: Processing Beans for remote export");
-
-		// since no autowiring is available we will load our properties bean and pass it to the
-		// property source
-		Properties localProperties;
-		try {
-			localProperties = beanFactory.getBean(PropertyManager.LOCAL_PROPERTIES_BEAN_NAME, Properties.class);
-		} catch (Exception e) {
-			throw new BeanInitializationException("Local properties bean cannot be found in bean factory", e);
-		}
-
-		PropertySource<Map<String, Object>> propertySource = new PropertiesPropertySource("localSource", localProperties);
 
 		for (String beanName : beanFactory.getBeanDefinitionNames()) {
 			BeanDefinition beanDef = beanFactory.getBeanDefinition(beanName);
@@ -147,15 +119,10 @@ public class RemotingExporter implements BeanFactoryPostProcessor {
 				ServiceExporterType type = (ServiceExporterType) AnnotationUtils.getValue(annotation, "exporter");
 				switch (type) {
 				case RMI:
-					definition = new RootBeanDefinition(RmiServiceExporter.class);
-					values.add("serviceName", new TypedStringValue(serviceInterface.getCanonicalName()));
-					if (annotationPropertySet(annotation, REGISTRY_PORT)) {
-						String registryPort = (String) propertySource.getProperty((String) AnnotationUtils.getValue(annotation, REGISTRY_PORT));
-						values.add(REGISTRY_PORT, new TypedStringValue(registryPort));
-					}
-					if (annotationPropertySet(annotation, SERVICE_PORT)) {
-						String servicePort = (String) propertySource.getProperty((String) AnnotationUtils.getValue(annotation, SERVICE_PORT));
-						values.add(SERVICE_PORT, new TypedStringValue(servicePort));
+					definition = new RootBeanDefinition(KryoNetRmiServiceExporter.class);
+					if (annotationPropertySet(annotation, "serviceId")) {
+						int serviceId = (int) AnnotationUtils.getValue(annotation, "serviceId");
+						values.add("serviceId", serviceId);
 					}
 					break;
 				case HTTP:

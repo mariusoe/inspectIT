@@ -7,35 +7,43 @@ import info.novatec.inspectit.agent.connection.AbstractRemoteMethodCall;
 import info.novatec.inspectit.agent.connection.IConnection;
 import info.novatec.inspectit.agent.connection.RegistrationException;
 import info.novatec.inspectit.agent.connection.ServerUnavailableException;
+import info.novatec.inspectit.agent.spring.PrototypesProvider;
 import info.novatec.inspectit.cmr.service.IAgentStorageService;
 import info.novatec.inspectit.cmr.service.IRegistrationService;
+import info.novatec.inspectit.cmr.service.ServiceInterface;
 import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.kryonet.Client;
+import info.novatec.inspectit.kryonet.ExtendedSerializationImpl;
+import info.novatec.inspectit.kryonet.IExtendedSerialization;
+import info.novatec.inspectit.kryonet.rmi.ObjectSpace;
 import info.novatec.inspectit.spring.logger.Log;
+import info.novatec.inspectit.storage.serializer.impl.SerializationManager;
 
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryonet.rmi.RemoteObject;
+
 /**
- * Implements the {@link IConnection} interface using RMI.
+ * Implements the {@link IConnection} interface using the kryo-net.
  * 
  * @author Patrice Bouillet
  * 
  */
 @Component
-public class RMIConnection implements IConnection {
+public class KryoNetConnection implements IConnection {
 
 	/**
 	 * The logger of the class.
@@ -44,27 +52,23 @@ public class RMIConnection implements IConnection {
 	Logger log;
 
 	/**
-	 * The name of the repository service.
+	 * {@link PrototypesProvider}.
 	 */
-	private String agentStorageName = IAgentStorageService.class.getCanonicalName();
+	@Autowired
+	private PrototypesProvider prototypesProvider;
 
 	/**
-	 * The name of the registration service.
+	 * The kryonet client to connect to the CMR.
 	 */
-	private String registrationName = IRegistrationService.class.getCanonicalName();
+	private Client client;
 
 	/**
-	 * The RMI registry.
-	 */
-	private Registry registry;
-
-	/**
-	 * The agent storage rmi object which will be used to send the measurements to.
+	 * The agent storage remote object which will be used to send the measurements to.
 	 */
 	private IAgentStorageService agentStorageService;
 
 	/**
-	 * The registration rmi object which will be used for the registration of the sensors.
+	 * The registration remote object which will be used for the registration of the sensors.
 	 */
 	private IRegistrationService registrationService;
 
@@ -88,50 +92,70 @@ public class RMIConnection implements IConnection {
 	 * {@inheritDoc}
 	 */
 	public void connect(String host, int port) throws ConnectException {
-		if (null == registry) {
+		if (null == client) {
 			try {
 				if (!connectionException) {
-					log.info("RMI: Connecting to " + host + ":" + port);
+					log.info("KryoNet: Connecting to " + host + ":" + port);
 				}
-				registry = LocateRegistry.getRegistry(host, port);
-				agentStorageService = (IAgentStorageService) registry.lookup(agentStorageName);
-				registrationService = (IRegistrationService) registry.lookup(registrationName);
-				log.info("RMI: Connection established!");
+				initClient(host, port);
+
+				int agentStorageServiceId = IAgentStorageService.class.getAnnotation(ServiceInterface.class).serviceId();
+				agentStorageService = ObjectSpace.getRemoteObject(client, agentStorageServiceId, IAgentStorageService.class);
+				((RemoteObject) agentStorageService).setNonBlocking(true);
+				((RemoteObject) agentStorageService).setTransmitReturnValue(false);
+
+				int registrationServiceServiceId = IRegistrationService.class.getAnnotation(ServiceInterface.class).serviceId();
+				registrationService = ObjectSpace.getRemoteObject(client, registrationServiceServiceId, IRegistrationService.class);
+				((RemoteObject) registrationService).setNonBlocking(false);
+				((RemoteObject) registrationService).setTransmitReturnValue(true);
+
+				log.info("KryoNet: Connection established!");
 				connected = true;
 				connectionException = false;
-			} catch (RemoteException remoteException) {
+			} catch (Exception exception) {
 				if (!connectionException) {
-					log.info("RMI: Connection to the server failed.");
+					log.info("KryoNet: Connection to the server failed.");
 				}
 				connectionException = true;
 				disconnect();
 				if (log.isTraceEnabled()) {
-					log.trace("connect()", remoteException);
+					log.trace("connect()", exception);
 				}
-				ConnectException e = new ConnectException(remoteException.getMessage());
-				e.initCause(remoteException);
-				throw e; // NOPMD root cause exception is set
-			} catch (NotBoundException notBoundException) {
-				if (!connectionException) {
-					log.info("RMI: Needed services are not bound on the server.");
-				}
-				connectionException = true;
-				disconnect();
-				if (log.isTraceEnabled()) {
-					log.trace("connect()", notBoundException);
-				}
-				ConnectException e = new ConnectException(notBoundException.getMessage());
-				e.initCause(notBoundException);
+				ConnectException e = new ConnectException(exception.getMessage());
+				e.initCause(exception);
 				throw e; // NOPMD root cause exception is set
 			}
 		}
 	}
 
 	/**
+	 * Creates new client and tries to connect to host.
+	 * 
+	 * @param host
+	 *            Host IP address.
+	 * @param port
+	 *            Port to connect to.
+	 * @throws Exception
+	 *             If {@link Exception} occurs during communication.
+	 */
+	private void initClient(String host, int port) throws Exception {
+		SerializationManager serializationManager = prototypesProvider.createSerializer();
+		Kryo kryo = serializationManager.getKryo();
+		IExtendedSerialization serialization = new ExtendedSerializationImpl(kryo);
+
+		client = new Client(serialization, prototypesProvider);
+		client.start();
+		client.connect(5000, host, port);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public void disconnect() {
-		registry = null; // NOPMD
+		if (null != client) {
+			client.stop();
+			client = null; // NOPMD
+		}
 		agentStorageService = null; // NOPMD
 		registrationService = null; // NOPMD
 		connected = false;
@@ -151,16 +175,9 @@ public class RMIConnection implements IConnection {
 			}
 			return registrationService.registerPlatformIdent(networkInterfaces, agentName, version);
 		} catch (RemoteException remoteException) {
-<<<<<<< HEAD
-			LOGGER.throwing(RMIConnection.class.getName(), "registerPlatform(String)", remoteException);
-=======
 			if (log.isTraceEnabled()) {
 				log.trace("registerPlatform(String)", remoteException);
 			}
-			if (remoteException.getCause() instanceof LicenseException) {
-				log.error("License could not be obtained, inspectIT agent will not start! Cause: " + remoteException.getCause().getMessage());
-			}
->>>>>>> INSPECTIT-766: New logging approach on agent
 			throw new RegistrationException("Could not register the platform", remoteException);
 		} catch (SocketException socketException) {
 			log.error("Could not obtain network interfaces from this machine!");

@@ -10,7 +10,7 @@ import org.apache.commons.pool.PoolableObjectFactory;
  * @author Ivan Senic
  * 
  */
-public class ByteBufferPoolFactory implements PoolableObjectFactory<ByteBuffer> {
+public class ByteBufferFactory implements PoolableObjectFactory<ByteBuffer> {
 
 	/**
 	 * Capacity of each buffer that will be made.
@@ -23,14 +23,13 @@ public class ByteBufferPoolFactory implements PoolableObjectFactory<ByteBuffer> 
 	 * @param bufferCapacity
 	 *            Capacity of each buffer that is created from this factory.
 	 */
-	public ByteBufferPoolFactory(int bufferCapacity) {
+	public ByteBufferFactory(int bufferCapacity) {
 		this.bufferCapacity = bufferCapacity;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public ByteBuffer makeObject() throws Exception {
 		return ByteBuffer.allocateDirect(bufferCapacity);
 	}
@@ -38,14 +37,12 @@ public class ByteBufferPoolFactory implements PoolableObjectFactory<ByteBuffer> 
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void destroyObject(ByteBuffer buffer) throws Exception {
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public boolean validateObject(ByteBuffer buffer) {
 		return true;
 	}
@@ -53,14 +50,12 @@ public class ByteBufferPoolFactory implements PoolableObjectFactory<ByteBuffer> 
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void activateObject(ByteBuffer buffer) throws Exception {
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void passivateObject(ByteBuffer buffer) throws Exception {
 		buffer.clear();
 	}
@@ -70,18 +65,18 @@ public class ByteBufferPoolFactory implements PoolableObjectFactory<ByteBuffer> 
 	 * 
 	 * @return {@link #bufferCapacity}
 	 */
-	public int getBufferCpacity() {
+	public int getBufferCapacity() {
 		return bufferCapacity;
 	}
 
 	/**
 	 * Sets {@link #bufferCapacity}.
 	 * 
-	 * @param bufferCpacity
+	 * @param bufferCapacity
 	 *            New value for {@link #bufferCapacity}
 	 */
-	public void setBufferCpacity(int bufferCpacity) {
-		this.bufferCapacity = bufferCpacity;
+	public void setBufferCapacity(int bufferCapacity) {
+		this.bufferCapacity = bufferCapacity;
 	}
 
 }

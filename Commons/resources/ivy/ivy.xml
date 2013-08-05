@@ -25,6 +25,7 @@
 
 		<dependency org="commons-lang" name="commons-lang" rev="2.5" conf="prod->default" />
 		<dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="prod->default" />
+		<dependency org="commons-pool" name="commons-pool" rev="1.6" conf="prod->default" />
 
 		<dependency org="org.springframework" name="org.springframework.core" rev="3.1.0.RELEASE" conf="prod->default" />
 		<dependency org="org.springframework" name="org.springframework.beans" rev="3.1.0.RELEASE" conf="prod->default" />
@@ -38,7 +39,8 @@
 		<dependency org="net.sourceforge.cglib" name="com.springsource.net.sf.cglib" rev="2.2.0" conf="prod->default" />
 
 		<dependency org="com.esotericsoftware.kryo" name="kryo" rev="2.24.0" conf="prod->default" />
-		<dependency org="de.javakaffee" name="info.novatec.kryo-serializers" rev="0.22" conf="prod->default" />
+		<dependency org="com.esotericsoftware.kryonet" name="info.novatec.kryonet" rev="2.21" conf="prod->default" />
+		<dependency org="de.javakaffee" name="info.novatec.kryo-serializers" rev="0.23" conf="prod->default" />
 		<dependency org="com.esotericsoftware.reflectasm" name="info.novatec.reflectasm" rev="1.07" conf="prod->default" />
 		<dependency org="com.esotericsoftware.minlog" name="info.novatec.minlog" rev="1.2" conf="prod->default" />
 		<dependency org="org.ow2.asm" name="info.novatec.asm" rev="4.0" conf="prod->default" />

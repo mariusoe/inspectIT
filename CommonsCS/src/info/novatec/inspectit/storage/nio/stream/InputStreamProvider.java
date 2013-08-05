@@ -6,28 +6,13 @@ import info.novatec.inspectit.storage.IStorageData;
 import java.util.List;
 
 /**
- * Class that is used for providing the correct instance of {@link ExtendedByteBufferOutputStream}
+ * Class that is used for providing the correct instance of {@link ExtendedByteBufferInputStream}
  * via Spring framework.
  * 
  * @author Ivan Senic
  * 
  */
-public abstract class StreamProvider {
-
-	/**
-	 * @return Returns the newly initialized instance of the {@link ExtendedByteBufferOutputStream}
-	 *         that has been prepared for use.
-	 */
-	public ExtendedByteBufferOutputStream getExtendedByteBufferOutputStream() {
-		ExtendedByteBufferOutputStream stream = createExtendedByteBufferOutputStream();
-		stream.prepare();
-		return stream;
-	}
-
-	/**
-	 * @return Returns the newly initialized instance of the {@link ExtendedByteBufferOutputStream}.
-	 */
-	protected abstract ExtendedByteBufferOutputStream createExtendedByteBufferOutputStream();
+public abstract class InputStreamProvider {
 
 	/**
 	 * @param storageData

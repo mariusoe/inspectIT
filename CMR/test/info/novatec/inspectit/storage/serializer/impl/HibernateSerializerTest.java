@@ -9,6 +9,7 @@ import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.storage.serializer.schema.ClassSchemaManager;
 import info.novatec.inspectit.storage.serializer.schema.SchemaManagerTestProvider;
+import info.novatec.inspectit.util.KryoNetNetwork;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -58,7 +59,8 @@ public class HibernateSerializerTest {
 		ClassSchemaManager schemaManager = SchemaManagerTestProvider.getClassSchemaManagerForTests();
 		serializer = new SerializationManager();
 		serializer.hibernateUtil = new HibernateUtil();
-		serializer.schemaManager = schemaManager;
+		serializer.setSchemaManager(schemaManager);
+		serializer.setKryoNetNetwork(new KryoNetNetwork());
 		serializer.initKryo();
 	}
 

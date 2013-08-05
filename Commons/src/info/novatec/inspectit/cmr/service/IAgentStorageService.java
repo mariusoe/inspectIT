@@ -13,7 +13,7 @@ import java.util.List;
  * @author Patrice Bouillet
  * 
  */
-@ServiceInterface(exporter = ServiceExporterType.RMI, registryPort = "cmr.registryPort", servicePort = "cmr.servicePort")
+@ServiceInterface(exporter = ServiceExporterType.RMI, serviceId = 2)
 public interface IAgentStorageService extends Remote {
 
 	/**

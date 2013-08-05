@@ -2,19 +2,18 @@ package info.novatec.inspectit.storage.nio;
 
 import info.novatec.inspectit.cmr.property.spring.PropertyUpdate;
 import info.novatec.inspectit.spring.logger.Log;
-import info.novatec.inspectit.storage.nio.bytebuffer.ByteBufferPoolFactory;
+import info.novatec.inspectit.storage.nio.bytebuffer.ByteBufferFactory;
 import info.novatec.inspectit.util.UnderlyingSystemInfo;
 import info.novatec.inspectit.util.UnderlyingSystemInfo.JvmProvider;
 
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.BeanInitializationException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +30,7 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
-public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
+public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> implements InitializingBean {
 
 	/**
 	 * The log of this class.
@@ -59,7 +58,7 @@ public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
 	/**
 	 * Pool factory.
 	 */
-	private ByteBufferPoolFactory poolFactory;
+	private ByteBufferFactory poolFactory;
 
 	/**
 	 * Amount of bytes this pool should have at minimum.
@@ -89,14 +88,14 @@ public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
 	 * Default constructor.
 	 */
 	public ByteBufferProvider() {
-		this(new ByteBufferPoolFactory(DEFAULT_BUFFER_CAPACITY));
+		this(new ByteBufferFactory(DEFAULT_BUFFER_CAPACITY));
 	}
 
 	/**
 	 * @param poolFactory
 	 *            Pool factory to be used.
 	 */
-	protected ByteBufferProvider(ByteBufferPoolFactory poolFactory) {
+	protected ByteBufferProvider(ByteBufferFactory poolFactory) {
 		super(poolFactory);
 		this.poolFactory = poolFactory;
 		this.setMaxWait(MAX_WAIT);
@@ -212,7 +211,6 @@ public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
 	/**
 	 * Initializes the pool.
 	 */
-	@PostConstruct
 	protected void init() {
 		if (bufferPoolMinDirectMemoryOccupancy > bufferPoolMaxDirectMemoryOccupancy) {
 			throw new BeanInitializationException("Settings for the byte buffer pool are not correct. bufferPoolMinDirectMemoryOccupancy (" + bufferPoolMaxDirectMemoryOccupancy
@@ -255,11 +253,18 @@ public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
 		if (poolMaxCapacity > (long) (maxDirectMemory * bufferPoolMaxDirectMemoryOccupancy)) {
 			poolMaxCapacity = (long) (maxDirectMemory * bufferPoolMaxDirectMemoryOccupancy);
 		}
-		poolFactory.setBufferCpacity(bufferSize);
+		poolFactory.setBufferCapacity(bufferSize);
 		int maxIdle = (int) (poolMinCapacity / bufferSize);
 		int maxActive = (int) (poolMaxCapacity / bufferSize);
 		super.setMaxIdle(maxIdle);
 		super.setMaxActive(maxActive);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void afterPropertiesSet() throws Exception {
+		init();
 	}
 
 	/**

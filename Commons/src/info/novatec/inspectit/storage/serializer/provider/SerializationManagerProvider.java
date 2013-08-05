@@ -1,5 +1,6 @@
 package info.novatec.inspectit.storage.serializer.provider;
 
+import info.novatec.inspectit.storage.serializer.IKryoProvider;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 
 /**
@@ -14,7 +15,9 @@ public abstract class SerializationManagerProvider {
 	/**
 	 * Returns the new {@link ISerializer} enhanced by Spring.
 	 * 
+	 * @param <E>
+	 *            what can be returned
 	 * @return Returns the new {@link ISerializer} enhanced by Spring.
 	 */
-	public abstract ISerializer createSerializer();
+	public abstract <E extends ISerializer & IKryoProvider> E createSerializer();
 }

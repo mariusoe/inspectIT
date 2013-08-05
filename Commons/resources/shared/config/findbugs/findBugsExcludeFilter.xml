@@ -87,6 +87,11 @@
 	<!-- CMR ignores END -->
 	
 	<!-- Commons ignores START -->
+	<!-- KryoNet complete -->
+	<Match>
+		<Package name="~info\.novatec\.inspectit\.kryonet.*"/>
+	</Match>
+	
 	<Match><!-- There is default case, but FindBugs is still complaining -->
 		<Class name="info.novatec.inspectit.cmr.property.configuration.impl.ByteProperty" />
 		<Method name="fromString" />

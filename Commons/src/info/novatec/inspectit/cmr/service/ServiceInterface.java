@@ -46,17 +46,11 @@ public @interface ServiceInterface {
 	ServiceExporterType exporter();
 
 	/**
-	 * The service port if type {@link ServiceExporterType#RMI} is used.
+	 * Service id for kryonet remote export. This must be a unique value, thus two different
+	 * services must not share the same id.
 	 * 
-	 * @return the specified service port. //NOCHK
+	 * @return Service id for kryonet remote export. //NOCHK
 	 */
-	String servicePort() default "";
-
-	/**
-	 * The registry port if type {@link ServiceExporterType#RMI} is used.
-	 * 
-	 * @return the specified registry port. //NOCHK
-	 */
-	String registryPort() default "";
+	int serviceId() default 0;
 
 }

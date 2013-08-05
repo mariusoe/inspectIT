@@ -21,7 +21,7 @@ import java.util.Map;
  * @author Patrice Bouillet
  * 
  */
-@ServiceInterface(exporter = ServiceExporterType.RMI, registryPort = "cmr.registryPort", servicePort = "cmr.servicePort")
+@ServiceInterface(exporter = ServiceExporterType.RMI, serviceId = 1)
 public interface IRegistrationService extends Remote {
 
 	/**

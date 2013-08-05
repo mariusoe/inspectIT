@@ -14,4 +14,9 @@
 			<class name="info.novatec.inspectit.storage.serializer.impl.BackwardForwardCompatibilityTest" />
 		</classes>
 	</test>
+	<test name="NIO">
+		<classes>
+			<class name="info.novatec.inspectit.storage.nio.stream.SocketExtendedByteBufferInputStreamTest" />
+		</classes>
+	</test>
 </suite>

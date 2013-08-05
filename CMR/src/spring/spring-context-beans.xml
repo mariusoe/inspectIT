@@ -14,6 +14,10 @@
 	
 	<bean id="streamProvider" class="info.novatec.inspectit.storage.nio.stream.StreamProvider">
 		<lookup-method name="createExtendedByteBufferOutputStream" bean="extendedByteBufferOutputStream" />
+		<lookup-method name="createSocketExtendedByteBufferInputStream" bean="socketExtendedByteBufferInputStream" />
+	</bean>
+	
+	<bean id="inputStreamProvider" class="info.novatec.inspectit.storage.nio.stream.InputStreamProvider">
 		<lookup-method name="createExtendedByteBufferInputStream" bean="extendedByteBufferInputStream" />
 	</bean>
 
@@ -46,5 +50,16 @@
 		<property name="scheduledExecutor" value="true" />
 		<property name="beanSingleton" value="true" />
 	</bean>
+	
+	<bean id="socketReadExecutorService" class="info.novatec.inspectit.storage.util.ExecutorServiceFactory">
+		<property name="executorThreads" value="2" />
+		<property name="scheduledExecutor" value="false" />
+		<property name="beanSingleton" value="true" />
+	</bean>
 
+	<bean id="kryoNetObjectSpaceExecutorService" class="info.novatec.inspectit.storage.util.ExecutorServiceFactory">
+		<property name="executorThreads" value="3" />
+		<property name="scheduledExecutor" value="false" />
+		<property name="beanSingleton" value="true" />
+	</bean>
 </beans>
