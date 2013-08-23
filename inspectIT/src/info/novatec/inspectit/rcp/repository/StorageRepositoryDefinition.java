@@ -183,6 +183,8 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 		sqlDataAccessService = storageServiceProvider.createStorageSqlDataAccessService(this, localStorageData, (IStorageTreeComponent<SqlStatementData>) indexingTree);
 		timerDataAccessService = storageServiceProvider.createStorageTimerDataAccessService(this, localStorageData, (IStorageTreeComponent<TimerData>) indexingTree);
 		httpTimerDataAccessService = storageServiceProvider.createStorageHttpTimerDataAccessService(this, localStorageData, (IStorageTreeComponent<HttpTimerData>) indexingTree);
+
+		// for storage we use the regular cached data service because ids can never change
 		cachedDataService = new CachedDataService(globalDataAccessService);
 	}
 

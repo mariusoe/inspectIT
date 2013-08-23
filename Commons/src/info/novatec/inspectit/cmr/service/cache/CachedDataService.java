@@ -20,8 +20,12 @@ import org.springframework.stereotype.Component;
 /**
  * The default implementation of the cached ident objects. Provides a protected-visible method to
  * analyze and put a list of platform ident objects into the cache.
+ * <p>
+ * The implementing classes should realize the {@link #shouldRefreshIdents()} method to properly
+ * instruct clearing of cache when needed.
  * 
  * @author Patrice Bouillet
+ * @author Ivan Senic
  * 
  */
 @Component
@@ -70,6 +74,23 @@ public class CachedDataService implements InitializingBean {
 	 * Some views / editors need this information because they can only access the ID.
 	 */
 	private Map<Long, MethodIdent> methodMap = new ConcurrentHashMap<Long, MethodIdent>();
+
+	/**
+	 * This is a hook method for all subclasses that will be called after the idents have been
+	 * refreshed due to the fact that {@link #shouldRefreshIdents()} reports ident should be
+	 * refreshed.
+	 */
+	protected void postRefreshIdents() {
+	}
+
+	/**
+	 * Triggers the refresh of the idents. After refresh {@link #postRefreshIdents()} will be
+	 * executed.
+	 */
+	public void triggerRefreshIdents() {
+		refreshIdents();
+		postRefreshIdents();
+	}
 
 	/**
 	 * Updates the data in the cache for the one agent. This method should be called with care,
@@ -147,7 +168,7 @@ public class CachedDataService implements InitializingBean {
 	/**
 	 * Internal refresh of the idents. Currently everything is loaded again.
 	 */
-	private void refreshIdents() {
+	protected void refreshIdents() {
 		Map<PlatformIdent, AgentStatusData> agentMap = globalDataAccessService.getAgentsOverview();
 		platformMap.clear();
 		methodMap.clear();

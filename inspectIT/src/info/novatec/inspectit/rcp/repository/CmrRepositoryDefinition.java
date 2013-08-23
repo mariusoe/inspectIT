@@ -8,16 +8,19 @@ import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.IServerStatusService;
+import info.novatec.inspectit.cmr.service.IServerStatusService.ServerStatus;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.cmr.service.IStorageService;
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
 import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider;
+import info.novatec.inspectit.rcp.repository.service.RefreshEditorsCachedDataService;
 import info.novatec.inspectit.rcp.repository.service.cmr.CmrServiceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The CMR repository definition initializes the services exposed by the CMR.
@@ -121,6 +124,12 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	 * State of the CMR.
 	 */
 	private OnlineStatus onlineStatus;
+
+	/**
+	 * Key received from the serverStatusService for checking the validation of the registered IDs
+	 * on the CMR.
+	 */
+	private String registrationIdKey;
 
 	/**
 	 * CMR name assigned by user.
@@ -239,7 +248,7 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 		globalDataAccessService = cmrServiceProvider.getGlobalDataAccessService(this);
 		storageService = cmrServiceProvider.getStorageService(this);
 
-		cachedDataService = new CachedDataService(globalDataAccessService);
+		cachedDataService = new RefreshEditorsCachedDataService(globalDataAccessService, this);
 	}
 
 	/**
@@ -465,8 +474,9 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	 */
 	private boolean isOnline() {
 		try {
-			int status = serverStatusService.getServerStatus();
-			if (IServerStatusService.SERVER_ONLINE == status) {
+			ServerStatus status = serverStatusService.getServerStatus();
+			if (ServerStatus.SERVER_ONLINE == status) {
+				checkKey(status.getRegistrationIdsValidationKey());
 				return true;
 			}
 			return false;
@@ -480,6 +490,26 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	 */
 	public CmrRepositoryDefinition getCmrRepositoryDefinition() {
 		return this;
+	}
+
+	/**
+	 * Check if key has chnaged and fire the refresh idents if necessary.
+	 * 
+	 * @param newKey
+	 *            New key received from status.
+	 */
+	private void checkKey(String newKey) {
+		boolean isRefreshIdents = false;
+		if (null == registrationIdKey) {
+			registrationIdKey = newKey;
+		} else {
+			isRefreshIdents = !Objects.equals(registrationIdKey, newKey); // NOPMD
+			registrationIdKey = newKey;
+		}
+
+		if (isRefreshIdents) {
+			cachedDataService.triggerRefreshIdents();
+		}
 	}
 
 	/**

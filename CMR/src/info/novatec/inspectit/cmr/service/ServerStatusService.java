@@ -5,6 +5,7 @@ import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.versioning.IVersioningService;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 
@@ -29,7 +30,7 @@ public class ServerStatusService implements IServerStatusService {
 	/**
 	 * The status of the CMR.
 	 */
-	private int status = IServerStatusService.SERVER_STARTING;
+	private ServerStatus status = ServerStatus.SERVER_STARTING;
 
 	/**
 	 * The versioning Service.
@@ -47,8 +48,24 @@ public class ServerStatusService implements IServerStatusService {
 	 * {@inheritDoc}
 	 */
 	@MethodLog
-	public int getServerStatus() {
+	public ServerStatus getServerStatus() {
 		return status;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@MethodLog
+	public String getVersion() {
+		try {
+			return versioning.getVersion();
+		} catch (IOException e) {
+			if (!versionNotFoundLogged && log.isDebugEnabled()) {
+				log.debug("Cannot obtain current version", e);
+				versionNotFoundLogged = true;
+			}
+			return IServerStatusService.VERSION_NOT_AVAILABLE;
+		}
 	}
 
 	/**
@@ -59,23 +76,11 @@ public class ServerStatusService implements IServerStatusService {
 	 */
 	@PostConstruct
 	public void postConstruct() throws Exception {
-		status = IServerStatusService.SERVER_ONLINE;
+		status = ServerStatus.SERVER_ONLINE;
+		status.setRegistrationIdsValidationKey(UUID.randomUUID().toString());
 
 		if (log.isInfoEnabled()) {
 			log.info("|-Server Status Service active...");
-		}
-	}
-
-	@Override
-	public String getVersion() {
-		try {
-			return versioning.getVersion();
-		} catch (IOException e) {
-			if (!versionNotFoundLogged && log.isDebugEnabled()) {
-				log.debug("Cannot obtain current version", e);
-				versionNotFoundLogged = true;
-			}
-			return IServerStatusService.VERSION_NOT_AVAILABLE;
 		}
 	}
 
