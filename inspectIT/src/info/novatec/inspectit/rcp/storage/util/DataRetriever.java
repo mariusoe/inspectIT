@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -285,6 +286,110 @@ public class DataRetriever {
 	}
 
 	/**
+	 * Returns cached data for the storage from the CMR if the cached data exists for given hash. If
+	 * data does not exist <code>null</code> is returned.
+	 * 
+	 * @param <E>
+	 *            Type of the objects are wanted.
+	 * @param cmrRepositoryDefinition
+	 *            {@link CmrRepositoryDefinition}.
+	 * @param storageData
+	 *            {@link StorageData} that points to the wanted storage.
+	 * @param hash
+	 *            Hash under which the chached data is stored.
+	 * @return Returns cached data for the storage from the CMR if the cached data exists for given
+	 *         hash. If data does not exist <code>null</code> is returned.
+	 * @throws StorageException
+	 *             If {@link StorageException} occured.
+	 * @throws SerializationException
+	 *             If {@link SerializationException} occurs.
+	 * @throws IOException
+	 *             If {@link IOException} occurs.
+	 */
+	@SuppressWarnings("unchecked")
+	public <E extends DefaultData> List<E> getCachedDataViaHttp(CmrRepositoryDefinition cmrRepositoryDefinition, StorageData storageData, int hash) throws StorageException, IOException,
+			SerializationException {
+		String cachedFileLocation = cmrRepositoryDefinition.getStorageService().getCachedStorageDataFileLocation(storageData, hash);
+		if (null == cachedFileLocation) {
+			return null;
+		} else {
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpGet httpGet = new HttpGet(getServerUri(cmrRepositoryDefinition) + cachedFileLocation);
+			ISerializer serializer = null;
+			try {
+				serializer = serializerQueue.take();
+			} catch (InterruptedException e) {
+				Thread.interrupted();
+			}
+			InputStream inputStream = null;
+			Input input = null;
+			try {
+				HttpResponse response = httpClient.execute(httpGet);
+				HttpEntity entity = response.getEntity();
+				inputStream = entity.getContent();
+				input = new Input(inputStream);
+				Object object = serializer.deserialize(input);
+				List<E> receivedData = (List<E>) object;
+				return receivedData;
+			} finally {
+				if (null != inputStream) {
+					inputStream.close();
+				}
+				if (null != input) {
+					input.close();
+				}
+				serializerQueue.add(serializer);
+			}
+		}
+	}
+
+	/**
+	 * Returns cached data for the given hash locally. This method can be used when storage if fully
+	 * downloaded.
+	 * 
+	 * @param <E>
+	 *            Type of the objects are wanted.
+	 * 
+	 * @param localStorageData
+	 *            {@link LocalStorageData} that points to the wanted storage.
+	 * @param hash
+	 *            Hash under which the chached data is stored.
+	 * @return Returns cached data for the storageif the cached data exists for given hash. If data
+	 *         does not exist <code>null</code> is returned.
+	 * @throws SerializationException
+	 *             If {@link SerializationException} occurs.
+	 * @throws IOException
+	 *             If {@link IOException} occurs.
+	 */
+	@SuppressWarnings("unchecked")
+	public <E extends DefaultData> List<E> getCachedDataLocally(LocalStorageData localStorageData, int hash) throws IOException, SerializationException {
+		Path path = storageManager.getCachedDataPath(localStorageData, hash);
+		if (Files.notExists(path)) {
+			return null;
+		} else {
+			ISerializer serializer = null;
+			try {
+				serializer = serializerQueue.take();
+			} catch (InterruptedException e) {
+				Thread.interrupted();
+			}
+
+			Input input = null;
+			try (InputStream inputStream = Files.newInputStream(path, StandardOpenOption.READ)) {
+				input = new Input(inputStream);
+				Object object = serializer.deserialize(input);
+				List<E> receivedData = (List<E>) object;
+				return receivedData;
+			} finally {
+				if (null != input) {
+					input.close();
+				}
+				serializerQueue.add(serializer);
+			}
+		}
+	}
+
+	/**
 	 * Downloads and saves locally wanted files associated with given {@link StorageData}. Files
 	 * will be saved in passed directory. The caller can specify the type of the files to download
 	 * by passing the proper {@link StorageFileType}s to the method.
@@ -326,8 +431,15 @@ public class DataRetriever {
 				@Override
 				public void process(InputStream content, String fileName) throws IOException {
 					String[] splittedFileName = fileName.split("/");
-					String originalFileName = splittedFileName[splittedFileName.length - 1];
-					Path writePath = directory.resolve(originalFileName);
+					Path writePath = directory;
+					// first part is empty, second is storage id, we don't need it
+					for (int i = 2; i < splittedFileName.length; i++) {
+						writePath = writePath.resolve(splittedFileName[i]);
+					}
+					// ensure all dirs are created
+					if (Files.notExists(writePath.getParent())) {
+						Files.createDirectories(writePath.getParent());
+					}
 					Files.copy(content, writePath, StandardCopyOption.REPLACE_EXISTING);
 				}
 			};
@@ -413,6 +525,12 @@ public class DataRetriever {
 		if (ArrayUtils.contains(fileTypes, StorageFileType.DATA_FILE)) {
 			// data files
 			Map<String, Long> dataFiles = cmrRepositoryDefinition.getStorageService().getDataFilesLocations(storageData);
+			allFiles.putAll(dataFiles);
+		}
+
+		if (ArrayUtils.contains(fileTypes, StorageFileType.CACHED_DATA_FILE)) {
+			// data files
+			Map<String, Long> dataFiles = cmrRepositoryDefinition.getStorageService().getCachedDataFilesLocations(storageData);
 			allFiles.putAll(dataFiles);
 		}
 

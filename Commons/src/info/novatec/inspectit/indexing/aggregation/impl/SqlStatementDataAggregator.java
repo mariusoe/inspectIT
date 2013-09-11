@@ -77,4 +77,36 @@ public class SqlStatementDataAggregator implements IAggregator<SqlStatementData>
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (includeParameters ? 1231 : 1237);
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		SqlStatementDataAggregator other = (SqlStatementDataAggregator) obj;
+		if (includeParameters != other.includeParameters) {
+			return false;
+		}
+		return true;
+	}
+
 }

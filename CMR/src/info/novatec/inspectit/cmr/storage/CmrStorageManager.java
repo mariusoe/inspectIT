@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -643,75 +644,18 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 	}
 
 	/**
-	 * Returns the map of the string/long pairs that represent the path to the index files for one
-	 * storage and their size in bytes. The paths are in form "/directory/file.extension". These
-	 * paths can be used in combination to CMR's ip and port to get the files via HTTP.
-	 * <p>
-	 * For example, if the CMR has the ip localhost and port 8080, the address for the file would
-	 * be: http://localhost:8080/directory/file.extension
-	 * 
-	 * @param storageData
-	 *            Storage to get index files for.
-	 * @return Returns the map of the string/long pairs that represent the path to the index files
-	 *         and their size.
-	 * @throws IOException
-	 *             If {@link IOException} occurs.
-	 */
-	public Map<String, Long> getIndexFilesLocations(StorageData storageData) throws IOException {
-		return getFilesHttpLocation(storageData, StorageFileType.INDEX_FILE.getExtension());
-	}
-
-	/**
-	 * Returns the map of the string/long pairs that represent the path to the data files for one
-	 * storage and their size in bytes. The paths are in form "/directory/file.extension". These
-	 * paths can be used in combination to CMR's ip and port to get the files via HTTP.
-	 * <p>
-	 * For example, if the CMR has the ip localhost and port 8080, the address for the file would
-	 * be: http://localhost:8080/directory/file.extension
-	 * 
-	 * @param storageData
-	 *            Storage to get index files for.
-	 * @return Returns the map of the string/long pairs that represent the path to the data files
-	 *         and their size.
-	 * @throws IOException
-	 *             If {@link IOException} occurs.
-	 */
-	public Map<String, Long> getDataFilesLocations(StorageData storageData) throws IOException {
-		return getFilesHttpLocation(storageData, StorageFileType.DATA_FILE.getExtension());
-	}
-
-	/**
-	 * Returns the map of the string/long pairs that represent the path to the agent files for one
-	 * storage and their size in bytes. The paths are in form "/directory/file.extension". These
-	 * paths can be used in combination to CMR's ip and port to get the files via HTTP.
-	 * <p>
-	 * For example, if the CMR has the ip localhost and port 8080, the address for the file would
-	 * be: http://localhost:8080/directory/file.extension
-	 * 
-	 * @param storageData
-	 *            Storage to get index files for.
-	 * @return Returns the map of the string/long pairs that represent the path to the agent files
-	 *         and their size.
-	 * @throws IOException
-	 *             If {@link IOException} occurs.
-	 */
-	public Map<String, Long> getAgentFilesLocations(StorageData storageData) throws IOException {
-		return getFilesHttpLocation(storageData, StorageFileType.AGENT_FILE.getExtension());
-	}
-
-	/**
 	 * Returns list of files paths with given extension for a storage in HTTP form.
 	 * 
 	 * @param storageData
 	 *            Storage.
 	 * @param extension
 	 *            Files extension.
-	 * @return Returns the map conating pair with file name with given extension for a storage in
+	 * @return Returns the map containing pair with file name with given extension for a storage in
 	 *         HTTP form and size of each file.
 	 * @throws IOException
 	 *             If {@link IOException} occurs.
 	 */
-	private Map<String, Long> getFilesHttpLocation(StorageData storageData, final String extension) throws IOException {
+	public Map<String, Long> getFilesHttpLocation(StorageData storageData, final String extension) throws IOException {
 		Path storagePath = getStoragePath(storageData);
 		if (storagePath == null || !Files.isDirectory(storagePath)) {
 			return Collections.emptyMap();
@@ -730,7 +674,7 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 
 		Map<String, Long> result = new HashMap<String, Long>();
 		for (Path path : filesPaths) {
-			result.put("/" + storageData.getStorageFolder() + "/" + path.getFileName(), Files.size(path));
+			result.put(getPathAsHttp(path), Files.size(path));
 		}
 
 		return result;
@@ -1008,6 +952,52 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 				}
 			}
 		}
+	}
+
+	/**
+	 * Returns location of the file where the cached data for given storage and hash is cached.
+	 * Returns <code>null</code> if no data is cached for given storage and hash.
+	 * <p>
+	 * The path is in form "/directory/file.extension". The path can be used in combination to CMR's
+	 * ip and port to get the files via HTTP.
+	 * <p>
+	 * For example, if the CMR has the ip localhost and port 8080, the address for the file would
+	 * be: http://localhost:8080/directory/file.extension
+	 * 
+	 * @param storageData
+	 *            Storage
+	 * @param hash
+	 *            Hash that was used for caching.
+	 * @return Returns location of the file where the cached data for given storage and hash is
+	 *         cached. Returns <code>null</code> if no data is cached for given storage and hash.
+	 */
+	public String getCachedStorageDataFileLocation(StorageData storageData, int hash) {
+		Path path = super.getCachedDataPath(storageData, hash);
+		if (Files.exists(path)) {
+			return getPathAsHttp(path);
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Returns path in the storage folder that can be used in HTTP requests.
+	 * <p>
+	 * Note that for Jetty, root folder to deliver files is /storage/ thus path must be relative
+	 * from it.
+	 * 
+	 * @param path
+	 *            Path to convert.
+	 * @return String that attached to server ip and port dentes HTTP location of file.
+	 */
+	private String getPathAsHttp(Path path) {
+		StringBuilder stringBuilder = new StringBuilder();
+		for (Iterator<Path> it = getDefaultStorageDirPath().relativize(path).iterator(); it.hasNext();) {
+			Path pathPart = it.next();
+			stringBuilder.append('/');
+			stringBuilder.append(pathPart.toString());
+		}
+		return stringBuilder.toString();
 	}
 
 	/**

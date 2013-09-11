@@ -9,6 +9,7 @@ import info.novatec.inspectit.storage.nio.stream.ExtendedByteBufferOutputStream;
 import info.novatec.inspectit.storage.nio.stream.StreamProvider;
 import info.novatec.inspectit.storage.nio.write.WritingChannelManager;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
+import info.novatec.inspectit.storage.processor.write.AbstractWriteDataProcessor;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider;
@@ -136,6 +137,12 @@ public class StorageWriter implements IWriter {
 	StreamProvider streamProvider;
 
 	/**
+	 * List of finalization data processors.
+	 */
+	@Autowired
+	List<AbstractWriteDataProcessor> writeDataProcessors;
+
+	/**
 	 * Opened channels {@link Paths}. These paths need to be closed when writing is finalized.
 	 */
 	private Set<Path> openedChannelPaths = Collections.newSetFromMap(new ConcurrentHashMap<Path, Boolean>(32, 0.75f, 1));
@@ -261,6 +268,14 @@ public class StorageWriter implements IWriter {
 	 */
 	public Future<Void> write(DefaultData defaultData, Map<?, ?> kryoPreferences) {
 		if (writingOn && storageManager.canWriteMore()) {
+			for (AbstractWriteDataProcessor processor : writeDataProcessors) {
+				try {
+					processor.process(defaultData);
+				} catch (Exception e) {
+					log.error("Exception occurred processing the data with the finalization data processor " + processor.getClass().getName(), e);
+				}
+			}
+
 			WriteTask writeTask = new WriteTask(defaultData, kryoPreferences);
 			WriteFutureTask writeFutureTask = new WriteFutureTask(writeTask);
 			activeWritingTasks.add(writeFutureTask);
@@ -305,6 +320,14 @@ public class StorageWriter implements IWriter {
 				}
 			}, 30, 30, TimeUnit.SECONDS);
 
+			for (AbstractWriteDataProcessor processor : writeDataProcessors) {
+				try {
+					processor.onPrepare(storageManager, this, storageData);
+				} catch (Exception e) {
+					log.error("Exception occurred trying to process onPrepare of the finalization data processor " + processor.getClass().getName(), e);
+				}
+			}
+
 			writingOn = true;
 			return true;
 		}
@@ -340,6 +363,14 @@ public class StorageWriter implements IWriter {
 	 */
 	protected synchronized void finalizeWrite() {
 		if (!finalized) {
+			for (AbstractWriteDataProcessor processor : writeDataProcessors) {
+				try {
+					processor.onFinalization(storageManager, this, storageData);
+				} catch (Exception e) {
+					log.error("Exception occurred trying to process onFinalize of the finalization data processor " + processor.getClass().getName(), e);
+				}
+			}
+
 			// when nothing more is left save the indexing tree
 			// save tree only if executeWrites is true
 			indexingTreeHandler.finish();
@@ -516,14 +547,14 @@ public class StorageWriter implements IWriter {
 				return true;
 			} catch (IOException e) {
 				extendedByteBufferOutputStream.close();
-				log.error("Exception occured while attempting to write data to disk", e);
+				log.error("Exception occurred while attempting to write data to disk", e);
 				return false;
 			}
 		} catch (Throwable throwable) { // NOPMD
 			if (null != extendedByteBufferOutputStream) {
 				extendedByteBufferOutputStream.close();
 			}
-			log.error("Exception occured while attempting to write data to disk", throwable);
+			log.error("Exception occurred while attempting to write data to disk", throwable);
 			return false;
 		}
 	}
@@ -606,7 +637,7 @@ public class StorageWriter implements IWriter {
 				} catch (IndexingException e) {
 					indexingTreeHandler.writeFailed(this);
 					if (log.isDebugEnabled()) {
-						log.debug("Indexing exception occured while attempting to write data to disk.", e);
+						log.debug("Indexing exception occurred while attempting to write data to disk.", e);
 					}
 					return;
 				}

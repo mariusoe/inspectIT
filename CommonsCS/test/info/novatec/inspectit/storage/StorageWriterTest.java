@@ -22,6 +22,7 @@ import info.novatec.inspectit.storage.nio.stream.ExtendedByteBufferOutputStream;
 import info.novatec.inspectit.storage.nio.stream.StreamProvider;
 import info.novatec.inspectit.storage.nio.write.WritingChannelManager;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
+import info.novatec.inspectit.storage.processor.write.AbstractWriteDataProcessor;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 
@@ -75,6 +76,9 @@ public class StorageWriterTest {
 
 	@Mock
 	private ScheduledExecutorService scheduledExecutorService;
+	
+	@Mock
+	private AbstractWriteDataProcessor writeDataProcessor;
 
 	@SuppressWarnings("rawtypes")
 	@Mock
@@ -97,6 +101,7 @@ public class StorageWriterTest {
 		storageWriter.streamProvider = streamProvider;
 		storageWriter.serializerQueue = serializerQueue;
 		storageWriter.scheduledExecutorService = scheduledExecutorService;
+		storageWriter.writeDataProcessors = Collections.singletonList(writeDataProcessor);
 		storageWriter.log = LogFactory.getLog(storageWriter.getClass());
 	}
 

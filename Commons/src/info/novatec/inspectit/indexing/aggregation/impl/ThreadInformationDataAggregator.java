@@ -50,4 +50,33 @@ public class ThreadInformationDataAggregator implements IAggregator<ThreadInform
 		return object.getPlatformIdent();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		// we must make constant hashCode because of the caching
+		result = prime * result + this.getClass().getName().hashCode();
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		return true;
+	}
+
 }

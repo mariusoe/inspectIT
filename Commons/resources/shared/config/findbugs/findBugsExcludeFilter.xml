@@ -109,6 +109,10 @@
 		<Class name="info.novatec.inspectit.rcp.editor.graph.plot.DateAxisZoomNotify" />
 		<Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS" />
 	</Match>
+	<Match>
+		<Class name="info.novatec.inspectit.rcp.editor.table.input.HttpTimerDataInputController$RegExHttpAggregator" />
+		<Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS" />
+	</Match>
 	<!-- RCP ignores END -->
 
 </FindBugsFilter>

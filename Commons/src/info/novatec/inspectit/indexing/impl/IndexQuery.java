@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -237,6 +238,89 @@ public class IndexQuery implements IIndexQuery {
 	 */
 	public void setRestrictionProcessor(IIndexQueryRestrictionProcessor restrictionProcessor) {
 		this.restrictionProcessor = restrictionProcessor;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((fromDate == null) ? 0 : fromDate.hashCode());
+		result = prime * result + ((CollectionUtils.isEmpty(indexingRestrictionList)) ? 0 : indexingRestrictionList.hashCode());
+		result = prime * result + (int) (methodIdent ^ (methodIdent >>> 32));
+		result = prime * result + (int) (minId ^ (minId >>> 32));
+		result = prime * result + (int) (platformIdent ^ (platformIdent >>> 32));
+		result = prime * result + (int) (sensorTypeIdent ^ (sensorTypeIdent >>> 32));
+		result = prime * result + ((toDate == null) ? 0 : toDate.hashCode());
+
+		// manually create the hash code for object class, cause we can not relly on Class.hashCode
+		if (CollectionUtils.isNotEmpty(objectClasses)) {
+			for (Class<?> clazz : objectClasses) {
+				result = prime * result + clazz.getName().hashCode();
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		IndexQuery other = (IndexQuery) obj;
+		if (fromDate == null) {
+			if (other.fromDate != null) {
+				return false;
+			}
+		} else if (!fromDate.equals(other.fromDate)) {
+			return false;
+		}
+		if (indexingRestrictionList == null) {
+			if (other.indexingRestrictionList != null) {
+				return false;
+			}
+		} else if (!indexingRestrictionList.equals(other.indexingRestrictionList)) {
+			return false;
+		}
+		if (methodIdent != other.methodIdent) {
+			return false;
+		}
+		if (minId != other.minId) {
+			return false;
+		}
+		if (objectClasses == null) {
+			if (other.objectClasses != null) {
+				return false;
+			}
+		} else if (!objectClasses.equals(other.objectClasses)) {
+			return false;
+		}
+		if (platformIdent != other.platformIdent) {
+			return false;
+		}
+		if (sensorTypeIdent != other.sensorTypeIdent) {
+			return false;
+		}
+		if (toDate == null) {
+			if (other.toDate != null) {
+				return false;
+			}
+		} else if (!toDate.equals(other.toDate)) {
+			return false;
+		}
+		return true;
 	}
 
 	/**

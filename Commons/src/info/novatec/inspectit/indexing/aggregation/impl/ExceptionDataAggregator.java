@@ -133,4 +133,36 @@ public class ExceptionDataAggregator implements IAggregator<ExceptionSensorData>
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((exceptionAggregationType == null) ? 0 : exceptionAggregationType.hashCode());
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		ExceptionDataAggregator other = (ExceptionDataAggregator) obj;
+		if (exceptionAggregationType != other.exceptionAggregationType) {
+			return false;
+		}
+		return true;
+	}
+
 }

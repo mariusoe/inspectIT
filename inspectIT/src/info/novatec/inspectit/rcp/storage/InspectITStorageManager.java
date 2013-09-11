@@ -255,7 +255,7 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 
 		Path directory = getStoragePath(localStorageData);
 		subMonitor.setTaskName("Downloading storage data files for storage '" + storageData.getName() + "'..");
-		dataRetriever.downloadAndSaveStorageFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true, subMonitor, StorageFileType.DATA_FILE);
+		dataRetriever.downloadAndSaveStorageFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true, subMonitor, StorageFileType.DATA_FILE, StorageFileType.CACHED_DATA_FILE);
 		downloadedStorages.add(localStorageData);
 		localStorageData.setFullyDownloaded(true);
 		try {

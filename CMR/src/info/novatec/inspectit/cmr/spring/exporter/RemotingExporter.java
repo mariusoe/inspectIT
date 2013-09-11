@@ -111,8 +111,13 @@ public class RemotingExporter implements BeanFactoryPostProcessor {
 
 			Class<?> serviceInterface = null;
 			Class<?> serviceClass;
+			String beanClassName = beanDef.getBeanClassName();
+			if (null == beanClassName) {
+				// bean class name is null for beans defined via @Configuration
+				continue;
+			}
 			try {
-				serviceClass = Class.forName(beanDef.getBeanClassName());
+				serviceClass = Class.forName(beanClassName);
 				serviceInterface = findServiceInterface(serviceClass);
 			} catch (ClassNotFoundException e) {
 				throw new BeanCreationException("class of bean " + beanName + " not found", e);

@@ -2,7 +2,7 @@ package info.novatec.inspectit.rcp.repository.service.storage;
 
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.communication.data.SqlStatementData;
-import info.novatec.inspectit.indexing.aggregation.impl.SqlStatementDataAggregator;
+import info.novatec.inspectit.indexing.aggregation.Aggregators;
 import info.novatec.inspectit.indexing.query.factory.impl.SqlStatementDataQueryFactory;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
 import info.novatec.inspectit.indexing.storage.impl.StorageIndexQuery;
@@ -17,18 +17,6 @@ import java.util.List;
  * 
  */
 public class StorageSqlDataAccessService extends AbstractStorageService<SqlStatementData> implements ISqlDataAccessService {
-
-	/**
-	 * {@link info.novatec.inspectit.indexing.aggregation.IAggregator} used for
-	 * {@link SqlStatementData}.
-	 */
-	private static final SqlStatementDataAggregator SQL_STATEMENT_DATA_AGGREGATOR = new SqlStatementDataAggregator();
-
-	/**
-	 * {@link info.novatec.inspectit.indexing.aggregation.IAggregator} used for
-	 * {@link SqlStatementData} when parameters are included in aggregation.
-	 */
-	private static final SqlStatementDataAggregator SQL_STATEMENT_DATA_PARAMETER_AGGREGATOR = new SqlStatementDataAggregator(true);
 
 	/**
 	 * Indexing tree.
@@ -52,7 +40,7 @@ public class StorageSqlDataAccessService extends AbstractStorageService<SqlState
 	 */
 	public List<SqlStatementData> getAggregatedSqlStatements(SqlStatementData sqlStatementData, Date fromDate, Date toDate) {
 		StorageIndexQuery query = sqlDataQueryFactory.getAggregatedSqlStatementsQuery(sqlStatementData, fromDate, toDate);
-		return super.executeQuery(query, SQL_STATEMENT_DATA_AGGREGATOR);
+		return super.executeQuery(query, Aggregators.SQL_STATEMENT_DATA_AGGREGATOR);
 	}
 
 	/**
@@ -68,7 +56,7 @@ public class StorageSqlDataAccessService extends AbstractStorageService<SqlState
 	public List<SqlStatementData> getParameterAggregatedSqlStatements(SqlStatementData sqlStatementData, Date fromDate, Date toDate) {
 		StorageIndexQuery query = sqlDataQueryFactory.getAggregatedSqlStatementsQuery(sqlStatementData, fromDate, toDate);
 		query.setSql(sqlStatementData.getSql());
-		return super.executeQuery(query, SQL_STATEMENT_DATA_PARAMETER_AGGREGATOR);
+		return super.executeQuery(query, Aggregators.SQL_STATEMENT_DATA_PARAMETER_AGGREGATOR);
 	}
 
 	/**

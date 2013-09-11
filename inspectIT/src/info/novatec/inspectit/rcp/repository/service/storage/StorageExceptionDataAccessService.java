@@ -5,8 +5,7 @@ import info.novatec.inspectit.communication.comparator.DefaultDataComparatorEnum
 import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
-import info.novatec.inspectit.indexing.aggregation.impl.ExceptionDataAggregator;
-import info.novatec.inspectit.indexing.aggregation.impl.ExceptionDataAggregator.ExceptionAggregationType;
+import info.novatec.inspectit.indexing.aggregation.Aggregators;
 import info.novatec.inspectit.indexing.query.factory.impl.ExceptionSensorDataQueryFactory;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
 import info.novatec.inspectit.indexing.storage.impl.StorageIndexQuery;
@@ -23,18 +22,6 @@ import java.util.List;
  * 
  */
 public class StorageExceptionDataAccessService extends AbstractStorageService<ExceptionSensorData> implements IExceptionDataAccessService {
-
-	/**
-	 * {@link info.novatec.inspectit.indexing.aggregation.IAggregator} for
-	 * {@link ExceptionSensorData} for the grouped overview.
-	 */
-	private static final ExceptionDataAggregator GROUP_EXCEPTION_OVERVIEW_AGGREGATOR = new ExceptionDataAggregator(ExceptionAggregationType.GROUP_EXCEPTION_OVERVIEW);
-
-	/**
-	 * {@link info.novatec.inspectit.indexing.aggregation.IAggregator} for
-	 * {@link ExceptionSensorData} for the distinct stack traces.
-	 */
-	private static final ExceptionDataAggregator DISTINCT_STACK_TRACES_AGGREGATOR = new ExceptionDataAggregator(ExceptionAggregationType.DISTINCT_STACK_TRACES);
 
 	/**
 	 * Indexing tree.
@@ -104,7 +91,7 @@ public class StorageExceptionDataAccessService extends AbstractStorageService<Ex
 	 */
 	public List<AggregatedExceptionSensorData> getDataForGroupedExceptionOverview(ExceptionSensorData template, Date fromDate, Date toDate) {
 		StorageIndexQuery query = exceptionSensorDataQueryFactory.getDataForGroupedExceptionOverviewQuery(template, fromDate, toDate);
-		List<ExceptionSensorData> resultList = super.executeQuery(query, GROUP_EXCEPTION_OVERVIEW_AGGREGATOR);
+		List<ExceptionSensorData> resultList = super.executeQuery(query, Aggregators.GROUP_EXCEPTION_OVERVIEW_AGGREGATOR);
 		List<AggregatedExceptionSensorData> filterList = new ArrayList<AggregatedExceptionSensorData>(resultList.size());
 		for (ExceptionSensorData data : resultList) {
 			if (data instanceof AggregatedExceptionSensorData) {
@@ -121,7 +108,7 @@ public class StorageExceptionDataAccessService extends AbstractStorageService<Ex
 	public List<ExceptionSensorData> getStackTraceMessagesForThrowableType(ExceptionSensorData template) {
 		// same problem again, we need to de-serialize all exceptions
 		StorageIndexQuery query = exceptionSensorDataQueryFactory.getStackTraceMessagesForThrowableTypeQuery(template);
-		return super.executeQuery(query, DISTINCT_STACK_TRACES_AGGREGATOR);
+		return super.executeQuery(query, Aggregators.DISTINCT_STACK_TRACES_AGGREGATOR);
 	}
 
 	/**

@@ -6,6 +6,10 @@ import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
 import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * Extended index query that fits better when querying the {@link IStorageTreeComponent}.
@@ -13,6 +17,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * @author Ivan Senic
  * 
  */
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Lazy
 public class StorageIndexQuery extends IndexQuery {
 
 	/**
@@ -97,6 +104,62 @@ public class StorageIndexQuery extends IndexQuery {
 	 */
 	public void setSql(String sql) {
 		this.sql = sql;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((excludeIds == null) ? 0 : excludeIds.hashCode());
+		result = prime * result + ((includeIds == null) ? 0 : includeIds.hashCode());
+		result = prime * result + (onlyInvocationsWithoutChildren ? 1231 : 1237);
+		result = prime * result + ((sql == null) ? 0 : sql.hashCode());
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		StorageIndexQuery other = (StorageIndexQuery) obj;
+		if (excludeIds == null) {
+			if (other.excludeIds != null) {
+				return false;
+			}
+		} else if (!excludeIds.equals(other.excludeIds)) {
+			return false;
+		}
+		if (includeIds == null) {
+			if (other.includeIds != null) {
+				return false;
+			}
+		} else if (!includeIds.equals(other.includeIds)) {
+			return false;
+		}
+		if (onlyInvocationsWithoutChildren != other.onlyInvocationsWithoutChildren) {
+			return false;
+		}
+		if (sql == null) {
+			if (other.sql != null) {
+				return false;
+			}
+		} else if (!sql.equals(other.sql)) {
+			return false;
+		}
+		return true;
 	}
 
 	/**

@@ -9,6 +9,7 @@ import info.novatec.inspectit.spring.logger.Logger;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
+import info.novatec.inspectit.storage.StorageFileType;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
 import info.novatec.inspectit.storage.label.management.AbstractLabelManagementAction;
 import info.novatec.inspectit.storage.label.type.AbstractStorageLabelType;
@@ -267,12 +268,12 @@ public class StorageService implements IStorageService {
 	@MethodLog
 	public Map<String, Long> getIndexFilesLocations(StorageData storageData) throws StorageException {
 		if (!storageManager.isStorageExisting(storageData)) {
-			throw new StorageException("The storage " + storageData + " does not exsist on the CMR.");
+			throw new StorageException("The storage " + storageData + " does not exist on the CMR.");
 		}
 		try {
-			return storageManager.getIndexFilesLocations(storageData);
+			return storageManager.getFilesHttpLocation(storageData, StorageFileType.INDEX_FILE.getExtension());
 		} catch (IOException e) {
-			throw new StorageException("Exception occurred trying to load storages index files locations.", e);
+			throw new StorageException("Exception occurred trying to load storage index files locations.", e);
 		}
 	}
 
@@ -282,12 +283,27 @@ public class StorageService implements IStorageService {
 	@MethodLog
 	public Map<String, Long> getDataFilesLocations(StorageData storageData) throws StorageException {
 		if (!storageManager.isStorageExisting(storageData)) {
-			throw new StorageException("The storage " + storageData + " does not exsist on the CMR.");
+			throw new StorageException("The storage " + storageData + " does not exist on the CMR.");
 		}
 		try {
-			return storageManager.getDataFilesLocations(storageData);
+			return storageManager.getFilesHttpLocation(storageData, StorageFileType.DATA_FILE.getExtension());
 		} catch (IOException e) {
-			throw new StorageException("Exception occurred trying to load storages data files locations.", e);
+			throw new StorageException("Exception occurred trying to load storage data files locations.", e);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@MethodLog
+	public Map<String, Long> getCachedDataFilesLocations(StorageData storageData) throws StorageException {
+		if (!storageManager.isStorageExisting(storageData)) {
+			throw new StorageException("The storage " + storageData + " does not exist on the CMR.");
+		}
+		try {
+			return storageManager.getFilesHttpLocation(storageData, StorageFileType.CACHED_DATA_FILE.getExtension());
+		} catch (IOException e) {
+			throw new StorageException("Exception occurred trying to load storage cached data files locations.", e);
 		}
 	}
 
@@ -297,10 +313,10 @@ public class StorageService implements IStorageService {
 	@MethodLog
 	public Map<String, Long> getAgentFilesLocations(StorageData storageData) throws StorageException {
 		if (!storageManager.isStorageExisting(storageData)) {
-			throw new StorageException("The storage " + storageData + " does not exsist on the CMR.");
+			throw new StorageException("The storage " + storageData + " does not exist on the CMR.");
 		}
 		try {
-			return storageManager.getAgentFilesLocations(storageData);
+			return storageManager.getFilesHttpLocation(storageData, StorageFileType.AGENT_FILE.getExtension());
 		} catch (IOException e) {
 			throw new StorageException("Exception occurred trying to load storage agent files locations.", e);
 		}
@@ -527,6 +543,36 @@ public class StorageService implements IStorageService {
 		} catch (IOException | SerializationException e) {
 			throw new StorageException("Exception occurred trying to create storage from uploaded local storage.", e);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@MethodLog
+	public void cacheStorageData(StorageData storageData, Collection<? extends DefaultData> data, int hash) throws StorageException {
+		if (!storageManager.isStorageExisting(storageData)) {
+			throw new StorageException("The storage " + storageData + " does not exsist on the CMR. Data caching is not possible.");
+		}
+		if (!storageManager.isStorageClosed(storageData)) {
+			throw new StorageException("The storage " + storageData + " is still not finalized.  Data caching is not possible.");
+		}
+		try {
+			storageManager.cacheStorageData(storageData, data, hash);
+		} catch (IOException | SerializationException e) {
+			throw new StorageException("Exception occurred trying to cache data fpr storage.", e);
+		}
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@MethodLog
+	public String getCachedStorageDataFileLocation(StorageData storageData, int hash) throws StorageException {
+		if (!storageManager.isStorageExisting(storageData)) {
+			throw new StorageException("The storage " + storageData + " does not exsist on the CMR. Cached data file can not be resolved.");
+		}
+		return storageManager.getCachedStorageDataFileLocation(storageData, hash);
 	}
 
 	/**

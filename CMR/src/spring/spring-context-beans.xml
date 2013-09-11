@@ -8,6 +8,10 @@
 		<lookup-method name="createNewIndexQuery" bean="indexQuery" />
 	</bean>
 
+	<bean id="storageIndexQueryProvider" class="info.novatec.inspectit.indexing.query.provider.impl.StorageIndexQueryProvider">
+		<lookup-method name="createNewStorageIndexQuery" bean="storageIndexQuery" />
+	</bean>
+	
 	<bean id="streamProvider" class="info.novatec.inspectit.storage.nio.stream.StreamProvider">
 		<lookup-method name="createExtendedByteBufferOutputStream" bean="extendedByteBufferOutputStream" />
 		<lookup-method name="createExtendedByteBufferInputStream" bean="extendedByteBufferInputStream" />

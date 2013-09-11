@@ -3,8 +3,7 @@ package info.novatec.inspectit.cmr.dao.impl;
 import info.novatec.inspectit.cmr.dao.TimerDataDao;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.IIndexQuery;
-import info.novatec.inspectit.indexing.aggregation.IAggregator;
-import info.novatec.inspectit.indexing.aggregation.impl.TimerDataAggregator;
+import info.novatec.inspectit.indexing.aggregation.Aggregators;
 import info.novatec.inspectit.indexing.query.factory.impl.TimerDataQueryFactory;
 
 import java.util.Date;
@@ -21,11 +20,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class BufferTimerDataDaoImpl extends AbstractBufferDataDao<TimerData> implements TimerDataDao {
-
-	/**
-	 * {@link IAggregator} used for {@link TimerData}.
-	 */
-	private static final TimerDataAggregator TIMER_DATA_AGGREGATOR = new TimerDataAggregator();
 
 	/**
 	 * Index query factory.
@@ -45,6 +39,6 @@ public class BufferTimerDataDaoImpl extends AbstractBufferDataDao<TimerData> imp
 	 */
 	public List<TimerData> getAggregatedTimerData(TimerData timerData, Date fromDate, Date toDate) {
 		IIndexQuery query = timerDataQueryFactory.getAggregatedTimerDataQuery(timerData, fromDate, toDate);
-		return super.executeQuery(query, TIMER_DATA_AGGREGATOR);
+		return super.executeQuery(query, Aggregators.TIMER_DATA_AGGREGATOR);
 	}
 }

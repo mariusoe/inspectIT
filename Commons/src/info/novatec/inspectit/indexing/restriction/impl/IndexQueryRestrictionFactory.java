@@ -528,6 +528,42 @@ public final class IndexQueryRestrictionFactory {
 			return collection != null && collection.contains(fieldValue);
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = super.hashCode();
+			result = prime * result + ((collection == null) ? 0 : collection.hashCode());
+			return result;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (!super.equals(obj)) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			IsInCollection other = (IsInCollection) obj;
+			if (collection == null) {
+				if (other.collection != null) {
+					return false;
+				}
+			} else if (!collection.equals(other.collection)) {
+				return false;
+			}
+			return true;
+		}
+
 	}
 
 	/**
@@ -567,6 +603,42 @@ public final class IndexQueryRestrictionFactory {
 				return collection.containsAll((Collection<?>) fieldValue);
 			}
 			return false;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = super.hashCode();
+			result = prime * result + ((collection == null) ? 0 : collection.hashCode());
+			return result;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (!super.equals(obj)) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			AreAllInCollection other = (AreAllInCollection) obj;
+			if (collection == null) {
+				if (other.collection != null) {
+					return false;
+				}
+			} else if (!collection.equals(other.collection)) {
+				return false;
+			}
+			return true;
 		}
 
 	}

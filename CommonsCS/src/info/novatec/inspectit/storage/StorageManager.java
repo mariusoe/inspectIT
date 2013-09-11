@@ -1,5 +1,8 @@
 package info.novatec.inspectit.storage;
 
+import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.indexing.IIndexQuery;
+import info.novatec.inspectit.indexing.aggregation.IAggregator;
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
 import info.novatec.inspectit.indexing.storage.impl.StorageDescriptor;
 import info.novatec.inspectit.spring.logger.Logger;
@@ -21,6 +24,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -58,6 +62,11 @@ public abstract class StorageManager {
 	 */
 	@Value("${storage.checkRemainingHardDriveSpaceRate}")
 	private static final int CHECK_HARD_DRIVE_RATE = 5000;
+
+	/**
+	 * Name of the cached data folder.
+	 */
+	private static final String CACHED_DATA_FOLDER = "cache";
 
 	/**
 	 * {@link SerializationManagerProvider}.
@@ -150,6 +159,20 @@ public abstract class StorageManager {
 	 */
 	public Path getChannelPath(IStorageData storageData, int channelId) {
 		return getStoragePath(storageData).resolve(channelId + StorageFileType.DATA_FILE.getExtension());
+	}
+
+	/**
+	 * Returns path for the cached storage data file.
+	 * 
+	 * @param storageData
+	 *            {@link StorageData}
+	 * @param hash
+	 *            Hash to be used for hashing.
+	 * @return Returns path for the cached storage data file.
+	 */
+	public Path getCachedDataPath(IStorageData storageData, int hash) {
+		Path path = getStoragePath(storageData).resolve(CACHED_DATA_FOLDER).resolve(hash + StorageFileType.CACHED_DATA_FILE.getExtension());
+		return path;
 	}
 
 	/**
@@ -590,6 +613,86 @@ public abstract class StorageManager {
 				is.close();
 			}
 		}
+	}
+
+	/**
+	 * Caches the given collection of {@link DefaultData} for the storage. Data will be cached under
+	 * the given hash. After caching the service can provide the file where the data is cached if
+	 * the same hash is used.
+	 * <p>
+	 * Note that if the data is already cached with the same hash, no action will be performed.
+	 * 
+	 * @param storageData
+	 *            Storage to hash data for.
+	 * @param data
+	 *            Data to be cached.
+	 * @param hash
+	 *            Hash to use for caching.
+	 * @throws IOException
+	 *             If {@link IOException} is thrown during operation.
+	 * @throws SerializationException
+	 *             If {@link SerializationException} is thrown during operation.
+	 */
+	public void cacheStorageData(IStorageData storageData, Collection<? extends DefaultData> data, int hash) throws IOException, SerializationException {
+		Path path = getCachedDataPath(storageData, hash);
+		if (Files.notExists(path)) {
+			Path parent = path.getParent();
+			if (Files.notExists(parent)) {
+				Files.createDirectories(parent);
+			}
+
+			try (OutputStream outputStream = Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+				serializeDataToOutputStream(data, outputStream, true);
+			}
+		}
+	}
+
+	/**
+	 * Returns if the results of this query/aggregator combinaton can be used for caching.
+	 * 
+	 * @param indexQuery
+	 *            {@link IIndexQuery}
+	 * @param aggregator
+	 *            {@link IAggregator}
+	 * @return Returns if the results of this query/aggregator combinaton can be used for caching.
+	 */
+	public boolean canBeCached(IIndexQuery indexQuery, IAggregator<?> aggregator) {
+		// we don't want to cache results that are not aggregated, there is no point
+		if (null == aggregator) {
+			return false;
+		}
+
+		// we won't cache if interval is set, simply because to many cached sets can occur due to
+		// the graph views and live mode
+		if (indexQuery.isIntervalSet()) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns hash for the storage data to be cached for given query and aggregator.
+	 * <p>
+	 * <B>WARNING:</b> There is small possibility that we get the hash collision. We are aware of
+	 * this, but we are taking our chances.
+	 * 
+	 * @param indexQuery
+	 *            {@link IIndexQuery}, must not be <code>null</code>
+	 * @param aggregator
+	 *            {@link IAggregator}
+	 * @return Hash
+	 */
+	public int getCachedDataHash(IIndexQuery indexQuery, IAggregator<?> aggregator) {
+		if (null == indexQuery) {
+			throw new IllegalArgumentException("Can not create cached data hash when index query is null.");
+		}
+
+		final int prime = 31;
+		int result = 0;
+		result = prime * result + indexQuery.hashCode();
+		result = prime * result + ((aggregator == null) ? 0 : aggregator.hashCode());
+		return result;
 	}
 
 	/**

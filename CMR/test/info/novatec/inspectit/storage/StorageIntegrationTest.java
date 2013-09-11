@@ -9,6 +9,8 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import info.novatec.inspectit.cmr.storage.CmrStorageManager;
 import info.novatec.inspectit.cmr.test.AbstractTransactionalTestNGLogSupport;
 import info.novatec.inspectit.communication.DefaultData;
@@ -32,7 +34,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -241,6 +245,30 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		storageIndexingTree = (IStorageTreeComponent<?>) indexingTree;
 
 		assertThat(storageManager.getReadableStorages(), hasItem(storageData));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test(dependsOnMethods = { "testWrite" })
+	public void storageDataCaching() throws IOException, SerializationException {
+		int myHash = 13;
+		storageManager.cacheStorageData(storageData, createdInvocations, myHash);
+
+		Path cachedFile = storageManager.getCachedDataPath(storageData, myHash);
+		assertThat(Files.exists(cachedFile), is(true));
+
+		try (InputStream inputStream = Files.newInputStream(cachedFile, StandardOpenOption.READ)) {
+			Input input = new Input(inputStream);
+			List<InvocationSequenceData> deserialized = (List<InvocationSequenceData>) serializer.deserialize(input);
+			assertThat(deserialized, is(equalTo(createdInvocations)));
+		}
+
+		String pathHttp = storageManager.getCachedStorageDataFileLocation(storageData, myHash);
+		assertThat(pathHttp, is(notNullValue()));
+
+		Files.deleteIfExists(cachedFile);
+
+		pathHttp = storageManager.getCachedStorageDataFileLocation(storageData, myHash);
+		assertThat(pathHttp, is(nullValue()));
 	}
 
 	/**

@@ -40,7 +40,12 @@ public enum StorageFileType {
 	/**
 	 * Files that are zipped for export/import.
 	 */
-	ZIP_STORAGE_FILE(".itds");
+	ZIP_STORAGE_FILE(".itds"),
+
+	/**
+	 * Cached data files.
+	 */
+	CACHED_DATA_FILE(".cached");
 
 	/**
 	 * The LOOKUP map which is used to get an element of the enumeration when passing the full
