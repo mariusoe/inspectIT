@@ -31,6 +31,11 @@
 			<class name="info.novatec.inspectit.storage.serializer.impl.HibernateSerializerTest" />
 		</classes>
 	</test>
+	<test name="CmrProcessors">
+		<classes>
+			<class name="info.novatec.inspectit.cmr.processor.impl.CmrDataProcessorsTest" />
+		</classes>
+	</test>
 	<test name="Storage">
 		<classes>
 			<class name="info.novatec.inspectit.storage.StorageIntegrationTest" />

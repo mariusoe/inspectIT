@@ -190,10 +190,8 @@ public final class InvocationSequenceDataHelper {
 			} else if (hasSQLData(nestedData)) {
 				nestedDuration = nestedDuration + nestedData.getSqlStatementData().getDuration();
 				added = true;
-			} else if (isRootElementInSequence(nestedData)) {
-				nestedDuration = nestedDuration + nestedData.getDuration();
-				added = true;
 			}
+
 			if (!added && !nestedData.getNestedSequences().isEmpty()) {
 				// nothing was added, but there could be child elements with
 				// time measurements
@@ -227,4 +225,5 @@ public final class InvocationSequenceDataHelper {
 			}
 		}
 	}
+
 }

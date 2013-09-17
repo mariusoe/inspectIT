@@ -10,6 +10,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.annotation.PostConstruct;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
@@ -19,7 +21,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
 
 /**
- * Aggregator for the {@link TimerData} obejcts that need to be persisted to the DB.
+ * Aggregator for the {@link TimerData} objects that need to be persisted to the DB.
  * <p>
  * The class is marked as final because in the constructor it starts a thread.
  * 
@@ -28,7 +30,7 @@ import org.springframework.stereotype.Repository;
  * 
  */
 @Repository
-public final class TimerDataAggregator extends HibernateDaoSupport {
+public class TimerDataAggregator extends HibernateDaoSupport {
 
 	/**
 	 * Period of time in which all timer data should be aggregated. In milliseconds.
@@ -92,16 +94,11 @@ public final class TimerDataAggregator extends HibernateDaoSupport {
 	 */
 	@Autowired
 	public TimerDataAggregator(SessionFactory sessionFactory) {
-		super();
-
 		elementCount = new AtomicInteger(0);
 		map = new HashMap<Integer, TimerData>();
 		queue = new ConcurrentLinkedQueue<TimerData>();
 		persistList = new ConcurrentLinkedQueue<TimerData>();
 		persistAllLock = new ReentrantLock();
-
-		CacheCleaner cacheCleaner = new CacheCleaner();
-		cacheCleaner.start();
 
 		setSessionFactory(sessionFactory);
 	}
@@ -252,7 +249,16 @@ public final class TimerDataAggregator extends HibernateDaoSupport {
 	}
 
 	/**
-	 * Cache cleaner, or thread that is constantly checking uf there is something to be persisted.
+	 * Starting the thread in post construct, not in constructor.
+	 */
+	@PostConstruct
+	public void postConstruct() {
+		CacheCleaner cacheCleaner = new CacheCleaner();
+		cacheCleaner.start();
+	}
+
+	/**
+	 * Cache cleaner, or thread that is constantly checking if there is something to be persisted.
 	 * 
 	 * @author Ivan Senic
 	 * 
