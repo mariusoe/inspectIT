@@ -143,6 +143,12 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * @return Capacity of the array that holds elements.
 	 */
 	private int getArrayCapacity(int size, int initialCapacity) {
+		// from JDK1.7.0_40 the empty list has 0 initial capacity
+		// capacity goes to initial when first element is added
+		if (0 == size) {
+			return 0;
+		}
+
 		while (initialCapacity < size) {
 			if (initialCapacity == 0 || initialCapacity == 1) {
 				initialCapacity = initialCapacity + 1;
@@ -188,7 +194,7 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 */
 	public long getSizeOfHashMap(int hashMapSize, int initialCapacity) {
 		long size = this.getSizeOfObjectHeader();
-		size += this.getPrimitiveTypesSize(4, 1, 4, 1, 0, 0);
+		size += this.getPrimitiveTypesSize(4, 0, 4, 1, 0, 0);
 		int mapCapacity = this.getHashMapCapacityFromSize(hashMapSize, initialCapacity);
 
 		// size of the map array for the entries
@@ -398,11 +404,17 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * @param hashMapSize
 	 *            Size of hash map.
 	 * @param initialCapacity
-	 *            Inital map capacity.
+	 *            Initial map capacity.
 	 * @return Returns the capacity of the HashMap from it size. The calculations take the default
 	 *         capacity of 16 and default load factor of 0.75.
 	 */
 	public int getHashMapCapacityFromSize(int hashMapSize, int initialCapacity) {
+		// from JDK1.7.0_40 the map has 0 initial capacity
+		// capacity goes to initial when first entry is added
+		if (hashMapSize == 0) {
+			return 0;
+		}
+
 		int capacity = 1;
 		if (initialCapacity > 0) {
 			capacity = initialCapacity;
