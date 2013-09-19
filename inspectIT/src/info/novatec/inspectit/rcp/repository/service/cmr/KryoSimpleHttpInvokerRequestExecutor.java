@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.repository.service.cmr;
 
+import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider;
@@ -37,6 +38,7 @@ public class KryoSimpleHttpInvokerRequestExecutor extends SimpleHttpInvokerReque
 			ISerializer serializer = serializationManagerProvider.createSerializer();
 			serializer.serialize(invocation, new Output(os));
 		} catch (SerializationException e) {
+			InspectIT.getDefault().createErrorDialog(e.getMessage(), e, -1);
 			throw new IOException(e);
 		}
 	}
@@ -50,6 +52,7 @@ public class KryoSimpleHttpInvokerRequestExecutor extends SimpleHttpInvokerReque
 			ISerializer serializer = serializationManagerProvider.createSerializer();
 			return (RemoteInvocationResult) serializer.deserialize(new Input(is));
 		} catch (SerializationException e) {
+			InspectIT.getDefault().createErrorDialog(e.getMessage(), e, -1);
 			throw new IOException(e);
 		}
 	}

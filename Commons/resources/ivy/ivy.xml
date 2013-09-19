@@ -20,7 +20,9 @@
 	 -->
 
 	<dependencies>
-		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.logging" rev="1.1.1" conf="prod->default" />
+		<!-- logging dependencies -->
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.5" conf="prod->default" />
+
 		<dependency org="commons-lang" name="commons-lang" rev="2.5" conf="prod->default" />
 		<dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="prod->default" />
 

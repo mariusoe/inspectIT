@@ -5,7 +5,7 @@ import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.aggregation.IAggregator;
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
 import info.novatec.inspectit.indexing.storage.impl.StorageDescriptor;
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider;
@@ -33,7 +33,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.mutable.MutableLong;
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -54,8 +54,8 @@ public abstract class StorageManager {
 	 * <p>
 	 * Set to public because of the tests.
 	 */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * The rate in milliseconds for checking the remaining hard drive space.

@@ -1,6 +1,6 @@
 package info.novatec.inspectit.storage.nio.read;
 
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.storage.nio.AbstractChannelManager;
 import info.novatec.inspectit.storage.nio.CustomAsyncChannel;
 import info.novatec.inspectit.storage.nio.WriteReadAttachment;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 
 /**
  * Channel manager that performs reading.
@@ -23,8 +23,8 @@ public class ReadingChannelManager extends AbstractChannelManager {
 	/**
 	 * The log of this class.
 	 */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * Max opened channels.

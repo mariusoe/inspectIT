@@ -26,7 +26,6 @@ import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.util.ObjectUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileVisitResult;
@@ -49,7 +48,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang.mutable.MutableObject;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.widgets.Display;
 
@@ -91,11 +89,6 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 * {@link DataRetriever}.
 	 */
 	private DataRetriever dataRetriever;
-
-	/**
-	 * Bundle file need for the proper path resolving when in development mode.
-	 */
-	private File bundleFile;
 
 	/**
 	 * {@link DataUploader}.
@@ -421,13 +414,6 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 * Loads initial local mounted storage information.
 	 */
 	public void startUp() {
-		// this will return directory if we are in development, and jar if in release
-		try {
-			bundleFile = FileLocator.getBundleFile(InspectIT.getDefault().getBundle());
-		} catch (IOException e) {
-			bundleFile = null; // NOPMD
-		}
-
 		List<LocalStorageData> mountedStorages;
 		try {
 			mountedStorages = getMountedStoragesFromDisk();
@@ -1038,14 +1024,7 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 * {@inheritDoc}
 	 */
 	protected Path getDefaultStorageDirPath() {
-		if (bundleFile != null && bundleFile.isDirectory()) {
-			// if bundle file is directory that we can use it for the storage folder
-			// as we are in development
-			return Paths.get(bundleFile.getAbsolutePath(), getStorageDefaultFolder()).toAbsolutePath();
-		} else {
-			// if not then we fail to the default eclipse folder
-			return Paths.get(getStorageDefaultFolder()).toAbsolutePath();
-		}
+		return InspectIT.getDefault().getRuntimeDir().resolve(getStorageDefaultFolder()).toAbsolutePath();
 	}
 
 	/**

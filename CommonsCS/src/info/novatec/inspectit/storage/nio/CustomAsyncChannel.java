@@ -17,11 +17,11 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Class that difines special need operation with {@link AsynchronousFileChannel}.
+ * Class that defines special need operation with {@link AsynchronousFileChannel}.
  * 
  * @author Ivan Senic
  * 
@@ -31,7 +31,7 @@ public class CustomAsyncChannel {
 	/**
 	 * The log of this class. Can not be assigned via spring because this is not a component.
 	 */
-	private Log log = LogFactory.getLog(CustomAsyncChannel.class);
+	private Logger log = LoggerFactory.getLogger(CustomAsyncChannel.class);;
 
 	/**
 	 * Path where the channel's file is.

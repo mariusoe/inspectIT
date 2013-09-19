@@ -6,16 +6,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.LoggerFactory;
+import org.slf4j.spi.LocationAwareLogger;
 import org.springframework.stereotype.Component;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+
 /**
- * The logging interceptor which will be activated for each method being annotated with @
+ * The logging interceptor which will be active for each method being annotated with @
  * {@link MethodLog}.
  * 
  * @author Patrice Bouillet
@@ -28,32 +31,32 @@ public class MethodLogInterceptor {
 	/**
 	 * The message printed in the log if the specified duration has been exceeded.
 	 */
-	private static final String DURATION_THRESHOLD_MSG = "WARNING: Duration threshold (%s ms) exceeded for method '%s': %s ms";
+	private static final String DURATION_THRESHOLD_MSG = "WARNING: Duration threshold (%s ms) exceeded for method '{}': {} ms";
 
 	/**
 	 * The message printed in the log if the specified duration has been exceeded.
 	 */
-	private static final String DURATION_THRESHOLD_MSG_W_TRACE = "    WARNING: Duration threshold (%s ms) exceeded for method '%s': %s ms";
+	private static final String DURATION_THRESHOLD_MSG_W_TRACE = "    WARNING: Duration threshold ({} ms) exceeded for method '{}': {} ms";
 
 	/**
 	 * The log format for the printing of the method duration.
 	 */
-	private static final String TIME_LOG_FORMAT = "'%s' duration: %s ms";
+	private static final String TIME_LOG_FORMAT = "'{}' duration: {} ms";
 
 	/**
 	 * The log format for the printing of the method duration if the trace level is active, too.
 	 */
-	private static final String TIME_LOG_FORMAT_W_TRACE = "    '%s' duration: %s ms";
+	private static final String TIME_LOG_FORMAT_W_TRACE = "    '{}' duration: {} ms";
 
 	/**
 	 * The enter format String for the trace level.
 	 */
-	private static final String TRACE_ENTER_FORMAT = "--> %s#%s()";
+	private static final String TRACE_ENTER_FORMAT = "--> {}#{}()";
 
 	/**
 	 * The exit format String for the trace level.
 	 */
-	private static final String TRACE_EXIT_FORMAT = "<-- %s#%s()";
+	private static final String TRACE_EXIT_FORMAT = "<-- {}#{}()";
 
 	/**
 	 * The regular expression to split the method names.
@@ -66,7 +69,7 @@ public class MethodLogInterceptor {
 	private static final Pattern SPLIT_METHOD_PATTERN = Pattern.compile(SPLIT_METHOD_REGEX);
 
 	/**
-	 * This map holds the mapping between the log levels defined in the aop log and the log4j log
+	 * This map holds the mapping between the log levels defined in the aop log and the logback log
 	 * level. Please look at class {@link MethodLog} for the reason for this.
 	 */
 	private static final Map<MethodLog.Level, Level> LEVELS = new HashMap<MethodLog.Level, Level>(8, 1.0f);
@@ -76,7 +79,6 @@ public class MethodLogInterceptor {
 		LEVELS.put(MethodLog.Level.ALL, Level.ALL);
 		LEVELS.put(MethodLog.Level.DEBUG, Level.DEBUG);
 		LEVELS.put(MethodLog.Level.ERROR, Level.ERROR);
-		LEVELS.put(MethodLog.Level.FATAL, Level.FATAL);
 		LEVELS.put(MethodLog.Level.INFO, Level.INFO);
 		LEVELS.put(MethodLog.Level.OFF, Level.OFF);
 		LEVELS.put(MethodLog.Level.TRACE, Level.TRACE);
@@ -98,12 +100,13 @@ public class MethodLogInterceptor {
 	@Around("@annotation(info.novatec.inspectit.cmr.spring.aop.MethodLog) && @annotation(methodLog)")
 	public Object doMethodLog(ProceedingJoinPoint joinPoint, MethodLog methodLog) throws Throwable {
 		MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-		Logger logger = Logger.getLogger(joinPoint.getTarget().getClass());
+		Logger logger = (Logger) LoggerFactory.getLogger(joinPoint.getTarget().getClass());
 		Level timeLogLevel = LEVELS.get(methodLog.timeLogLevel());
 		Level traceLogLevel = LEVELS.get(methodLog.traceLogLevel());
 
 		if (logger.isEnabledFor(traceLogLevel)) {
-			logger.log(traceLogLevel, String.format(TRACE_ENTER_FORMAT, signature.getDeclaringType().getName(), signature.getName()));
+			logger.log(null, signature.getDeclaringType().getName(), LocationAwareLogger.TRACE_INT, TRACE_ENTER_FORMAT, new Object[] { signature.getDeclaringType().getName(), signature.getName() },
+					null);
 		}
 
 		long startTime = System.nanoTime();
@@ -120,7 +123,7 @@ public class MethodLogInterceptor {
 			} else {
 				formatString = TIME_LOG_FORMAT;
 			}
-			logger.log(timeLogLevel, String.format(formatString, methodName, duration));
+			logger.log(null, signature.getDeclaringType().getName(), LocationAwareLogger.WARN_INT, formatString, new Object[] { methodName, duration }, null);
 		}
 
 		if (-1 != methodLog.durationLimit() && duration > methodLog.durationLimit()) {
@@ -133,11 +136,12 @@ public class MethodLogInterceptor {
 			} else {
 				formatString = DURATION_THRESHOLD_MSG;
 			}
-			logger.log(Level.WARN, String.format(formatString, methodLog.durationLimit(), methodName, duration));
+			logger.log(null, signature.getDeclaringType().getName(), LocationAwareLogger.WARN_INT, formatString, new Object[] { methodLog.durationLimit(), methodName, duration }, null);
 		}
 
 		if (logger.isEnabledFor(traceLogLevel)) {
-			logger.log(traceLogLevel, String.format(TRACE_EXIT_FORMAT, signature.getDeclaringType().getName(), signature.getName()));
+			logger.log(null, signature.getDeclaringType().getName(), LocationAwareLogger.TRACE_INT, TRACE_EXIT_FORMAT, new Object[] { signature.getDeclaringType().getName(), signature.getName() },
+					null);
 		}
 
 		return object;

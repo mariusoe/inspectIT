@@ -18,10 +18,13 @@
 	 -->
 
 	<dependencies>
-		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.logging" rev="1.1.1" conf="prod->default" />
-		<dependency org="log4j" name="log4j" force="true" rev="1.2.15" conf="prod->default" />
-		<dependency org="org.slf4j" name="slf4j-api" rev="1.5.6" conf="prod->default" />
-		<dependency org="org.slf4j" name="slf4j-log4j12" rev="1.5.6" conf="prod->default" />
+		<!-- logging dependencies -->
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.5" conf="prod->default" />
+		<dependency org="org.slf4j" name="jcl-over-slf4j" rev="1.7.5" conf="prod->default" />
+		<dependency org="org.slf4j" name="log4j-over-slf4j" rev="1.7.5" conf="prod->default" />
+		<dependency org="ch.qos.logback" name="logback-core" rev="1.0.13" conf="prod->default" />
+		<dependency org="ch.qos.logback" name="logback-classic" rev="1.0.13" conf="prod->default" />
+		<dependency org="uk.org.lidalia" name="info.novatec.sysout-over-slf4j" rev="1.0.2" conf="prod->default" />
 
 		<dependency org="org.springframework" name="org.springframework.core" rev="3.1.0.RELEASE" conf="prod->default" />
 		<dependency org="org.springframework" name="org.springframework.beans" rev="3.1.0.RELEASE" conf="prod->default" />

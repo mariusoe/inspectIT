@@ -5,7 +5,7 @@ import info.novatec.inspectit.cmr.spring.aop.MethodLog;
 import info.novatec.inspectit.cmr.storage.CmrStorageManager;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.cmr.RecordingData;
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
@@ -28,7 +28,7 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,8 +42,8 @@ import org.springframework.stereotype.Service;
 public class StorageService implements IStorageService {
 
 	/** The logger of this class. */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * Storage manager.

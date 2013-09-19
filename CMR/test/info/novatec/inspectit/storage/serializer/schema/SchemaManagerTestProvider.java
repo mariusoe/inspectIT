@@ -4,7 +4,7 @@ import info.novatec.inspectit.storage.serializer.schema.ClassSchemaManager;
 
 import java.io.IOException;
 
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 /**
@@ -30,7 +30,7 @@ public final class SchemaManagerTestProvider {
 	 */
 	public static ClassSchemaManager getClassSchemaManagerForTests() throws IOException {
 		ClassSchemaManager schemaManager = new ClassSchemaManager();
-		schemaManager.log = LogFactory.getLog(ClassSchemaManager.class);
+		schemaManager.log = LoggerFactory.getLogger(ClassSchemaManager.class);
 		schemaManager.setSchemaListFile(new ClassPathResource(ClassSchemaManager.SCHEMA_DIR + "/" + ClassSchemaManager.SCHEMA_LIST_FILE, schemaManager.getClass().getClassLoader()));
 		schemaManager.loadSchemasFromLocations();
 		return schemaManager;

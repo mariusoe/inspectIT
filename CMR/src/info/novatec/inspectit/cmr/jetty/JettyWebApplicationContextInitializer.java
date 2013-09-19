@@ -1,12 +1,12 @@
 package info.novatec.inspectit.cmr.jetty;
 
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 
-import org.apache.commons.logging.Log;
 import org.mortbay.jetty.servlet.Context;
+import org.slf4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.context.support.GenericWebApplicationContext;
@@ -29,8 +29,8 @@ import org.springframework.web.context.support.GenericWebApplicationContext;
 public class JettyWebApplicationContextInitializer implements ApplicationContextAware {
 
 	/** The logger of this class. */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * The context attribute.

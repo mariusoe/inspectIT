@@ -35,13 +35,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.logging.LogFactory;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -103,7 +103,7 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		registrationService.platformSensorTypeIdentDao = platformSensorTypeIdentDao;
 		registrationService.agentStatusDataProvider = agentStatusDataProvider;
 		registrationService.methodIdentToSensorTypeDao = methodIdentToSensorTypeDao;
-		registrationService.log = LogFactory.getLog(RegistrationService.class);
+		registrationService.log = LoggerFactory.getLogger(RegistrationService.class);
 	}
 
 	/**

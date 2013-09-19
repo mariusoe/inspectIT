@@ -235,7 +235,8 @@
 
 		<mkdir dir="${build.release.root.cmr}/license" />
 		<copy todir="${build.release.root.cmr}/license" file="${basedir}/license/publicCerts.store" />
-
+		<copy todir="${build.release.root.cmr}" file="${basedir}/logging-config.xml" />
+			
 		<!-- Create the third party libraries textual representation -->
 		<!-- The file is put at ${build.release.root.cmr}/thirdparty.txt -->
 		<antcall target="-create-thirdparty-notification" />

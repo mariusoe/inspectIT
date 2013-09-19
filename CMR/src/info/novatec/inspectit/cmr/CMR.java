@@ -4,15 +4,25 @@ import info.novatec.inspectit.cmr.util.Converter;
 import info.novatec.inspectit.versioning.IVersioningService;
 
 import java.io.IOException;
-import java.util.Properties;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.access.BeanFactoryReference;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
+
+import uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
 
 /**
  * Main class of the Central Measurement Repository. The main method is used to start the
@@ -26,12 +36,17 @@ public final class CMR {
 	/**
 	 * The logger of this class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(CMR.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CMR.class);
 
 	/**
-	 * Name and path of the log4j configuration file.
+	 * Default name of the log file.
 	 */
-	private static final String LOG4J_FILE = "/config/log4j.properties";
+	public static final String DEFAULT_LOG_FILE_NAME = "logging-config.xml";
+
+	/**
+	 * JVM property for the log file location.
+	 */
+	private static final String LOG_FILE_PROPERTY = "inspectit.logging.config";
 
 	/**
 	 * The spring bean factory to get the registered beans.
@@ -39,13 +54,16 @@ public final class CMR {
 	private static BeanFactory beanFactory; // NOPMD
 
 	/**
-	 * This class will start the Repository.
+	 * Private constructor to prevent instantiation.
 	 */
 	private CMR() {
+	}
 
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("Initializing Spring...");
-		}
+	/**
+	 * This class will start the Repository.
+	 */
+	private static void start() {
+		LOGGER.info("Initializing Spring...");
 
 		BeanFactoryLocator beanFactoryLocator = ContextSingletonBeanFactoryLocator.getInstance();
 		BeanFactoryReference beanFactoryReference = beanFactoryLocator.useBeanFactory("ctx");
@@ -55,9 +73,7 @@ public final class CMR {
 			((ConfigurableApplicationContext) beanFactory).registerShutdownHook();
 		}
 
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("Spring successfully initialized");
-		}
+		LOGGER.info("Spring successfully initialized");
 
 		if (LOGGER.isInfoEnabled()) {
 			IVersioningService versioning = (IVersioningService) getBeanFactory().getBean("versioning");
@@ -65,12 +81,57 @@ public final class CMR {
 			try {
 				currentVersion = versioning.getVersion();
 			} catch (IOException e) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Versioning information could not be read");
-				}
+				LOGGER.debug("Versioning information could not be read");
 			}
 			LOGGER.info("Starting CMR in version " + currentVersion);
 		}
+	}
+
+	/**
+	 * Initializes the logger.
+	 */
+	private static void initLogger() {
+		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+		JoranConfigurator configurator = new JoranConfigurator();
+		configurator.setContext(context);
+		context.reset();
+
+		InputStream is = null;
+
+		try {
+			// first check if it's supplied as parameter
+			String logFileLocation = System.getProperty(LOG_FILE_PROPERTY);
+			if (null != logFileLocation) {
+				Path logPath = Paths.get(logFileLocation).toAbsolutePath();
+				if (Files.exists(logPath)) {
+					is = Files.newInputStream(logPath, StandardOpenOption.READ);
+				}
+			}
+
+			// then fail to default if none is specified
+			if (null == is) {
+				Path logPath = Paths.get(DEFAULT_LOG_FILE_NAME).toAbsolutePath();
+				if (Files.exists(logPath)) {
+					is = Files.newInputStream(logPath, StandardOpenOption.READ);
+				}
+			}
+
+			if (null != is) {
+				try {
+					configurator.doConfigure(is);
+				} catch (JoranException e) { // NOPMD NOCHK StatusPrinter will handle this
+				} finally {
+					is.close();
+				}
+			}
+		} catch (IOException e) { // NOPMD NOCHK StatusPrinter will handle this
+		}
+
+		StatusPrinter.printInCaseOfErrorsOrWarnings(context);
+
+		// use sysout-over-slf4j to redirect out and err calls to logger
+		SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
 	}
 
 	/**
@@ -80,22 +141,15 @@ public final class CMR {
 	 *            The arguments.
 	 */
 	public static void main(String[] args) {
-		// Initialize log4j system
-		try {
-			Properties p = new Properties();
-			p.load(CMR.class.getResourceAsStream(LOG4J_FILE));
-			PropertyConfigurator.configure(p);
-		} catch (IOException e) {
-			LOGGER.error("Could not load log4j.properties file: " + e.getMessage());
-		}
+		initLogger();
 
-		long start = System.nanoTime();
+		long startTime = System.nanoTime();
 		LOGGER.info("Central Measurement Repository is starting up!");
 		LOGGER.info("==============================================");
 
-		new CMR();
+		start();
 
-		LOGGER.info("CMR started in " + Converter.nanoToMilliseconds(System.nanoTime() - start) + " ms");
+		LOGGER.info("CMR started in " + Converter.nanoToMilliseconds(System.nanoTime() - startTime) + " ms");
 	}
 
 	/**

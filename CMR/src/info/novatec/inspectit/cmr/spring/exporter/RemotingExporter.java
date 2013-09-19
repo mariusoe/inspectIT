@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -53,8 +53,10 @@ import org.springframework.stereotype.Service;
 @Component
 public class RemotingExporter implements BeanFactoryPostProcessor {
 
-	/** The logger. */
-	private static final Log LOG = LogFactory.getLog(RemotingExporter.class);
+	/**
+	 * The logger for this class. Cannot be injected via Spring.
+	 */
+	private static final Logger LOG = LoggerFactory.getLogger(RemotingExporter.class);
 
 	/**
 	 * String definition of the service port.

@@ -34,11 +34,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.LogFactory;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeMethod;
@@ -98,14 +98,14 @@ public class CmrStorageManagerTest extends AbstractTestNGLogSupport {
 		storageManager.storageRecorder = storageRecorder;
 		storageManager.setSerializationManagerProvider(serializationManagerProvider);
 		storageManager.serverStatusService = serverStatusService;
-		storageManager.log = LogFactory.getLog(CmrStorageManager.class);
+		storageManager.log = LoggerFactory.getLogger(CmrStorageManager.class);
 		when(storageWriterProvider.getCmrStorageWriter()).thenReturn(storageWriter);
 		when(serializationManagerProvider.createSerializer()).thenReturn(serializer);
 		when(serverStatusService.getVersion()).thenReturn(CMR_VERSION);
 
 		Field field = StorageManager.class.getDeclaredField("log");
 		field.setAccessible(true);
-		field.set(storageManager, LogFactory.getLog(CmrStorageManager.class));
+		field.set(storageManager, LoggerFactory.getLogger(CmrStorageManager.class));
 		
 		field = StorageManager.class.getDeclaredField("storageUploadsFolder");
 		field.setAccessible(true);

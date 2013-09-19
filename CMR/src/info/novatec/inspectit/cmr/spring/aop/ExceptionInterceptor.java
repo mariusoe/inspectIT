@@ -1,13 +1,13 @@
 package info.novatec.inspectit.cmr.spring.aop;
 
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.util.Arrays;
 
-import org.apache.commons.logging.Log;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,8 +26,8 @@ public class ExceptionInterceptor {
 	/**
 	 * Logger for logging purposes.
 	 */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * The advice.

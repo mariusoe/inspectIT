@@ -15,12 +15,14 @@
 		 * As from ticket INSPECTIT-971 all projects will only define the OSGi compliant libs
 		 * Please make sure that any dependency added is OSGi compliant
 		 * Any added OSGi jar has to be added in the MANIFEST.MF of this project  as a dependency
-		 * Any added OSGI jar has to be added to the inspectIT.product as a dependency
+		 * Any added OSGi jar has to be added to the inspectIT.product as a dependency
 		 * Further info on https://confluence.novatec-gmbh.de/display/INSPECTIT/Usage+of+3rd+party+libraries+in+the+plugins
 	 -->
 
 	<dependencies>
-		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.logging" rev="1.1.1" conf="prod->default" />
+		<!-- logging dependencies -->
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.5" conf="prod->default" />
+
 		<dependency org="commons-lang" name="commons-lang" rev="2.5" conf="prod->default" />
 		<dependency org="commons-pool" name="commons-pool" rev="1.6" conf="prod->default" />
 

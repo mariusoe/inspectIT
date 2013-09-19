@@ -19,14 +19,14 @@ import java.lang.annotation.Target;
 public @interface MethodLog {
 
 	/**
-	 * The log level which can be used. The level from log4j cannot be used directly as it is not
+	 * The log level which can be used. The level from logback cannot be used directly as it is not
 	 * allowed as a return type.
 	 * 
 	 * @author Patrice Bouillet
 	 * 
 	 */
 	public enum Level {
-		OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL; // NOCHK
+		OFF, ERROR, WARN, INFO, DEBUG, TRACE, ALL; // NOCHK
 	}
 
 	/**

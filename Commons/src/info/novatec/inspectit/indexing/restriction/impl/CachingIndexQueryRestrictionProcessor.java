@@ -2,14 +2,14 @@ package info.novatec.inspectit.indexing.restriction.impl;
 
 import info.novatec.inspectit.indexing.restriction.IIndexQueryRestriction;
 import info.novatec.inspectit.indexing.restriction.IIndexQueryRestrictionProcessor;
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,8 +26,8 @@ public class CachingIndexQueryRestrictionProcessor implements IIndexQueryRestric
 	/**
 	 * The logger.
 	 */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * Map for caching methods.

@@ -1,7 +1,7 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.versioning.IVersioningService;
 
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +24,8 @@ import org.springframework.stereotype.Service;
 public class ServerStatusService implements IServerStatusService {
 
 	/** The logger of this class. */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * The status of the CMR.

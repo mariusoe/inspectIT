@@ -5,7 +5,7 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.indexing.impl.IndexingException;
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
 import info.novatec.inspectit.indexing.storage.IStorageTreeComponent;
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.storage.StorageWriter.WriteTask;
 import info.novatec.inspectit.storage.util.StorageIndexTreeProvider;
 
@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -58,8 +58,8 @@ public class StorageIndexingTreeHandler {
 	/**
 	 * The log of this class.
 	 */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * Time to wait in milliseconds for all operations on indexing tree to be finished, so that tree

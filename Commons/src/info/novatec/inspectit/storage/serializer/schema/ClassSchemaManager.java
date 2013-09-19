@@ -1,6 +1,6 @@
 package info.novatec.inspectit.storage.serializer.schema;
 
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.storage.serializer.impl.SerializationManager;
 
 import java.io.BufferedReader;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -34,8 +34,8 @@ public class ClassSchemaManager implements InitializingBean {
 	/**
 	 * The log of this class.
 	 */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * Default directory location of all schemas.

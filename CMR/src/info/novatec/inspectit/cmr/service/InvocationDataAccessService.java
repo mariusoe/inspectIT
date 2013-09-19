@@ -5,7 +5,7 @@ import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
 import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.util.Collection;
 import java.util.Date;
@@ -13,7 +13,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +25,8 @@ import org.springframework.stereotype.Service;
 public class InvocationDataAccessService implements IInvocationDataAccessService {
 
 	/** The logger of this class. */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * The invocation DAO.

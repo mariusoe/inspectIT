@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,7 +35,7 @@ public class CachedDataService implements InitializingBean {
 	 * Logger for the class. Needed to be directly assigned, because this class is used on the UI
 	 * with no Spring to enhance it.
 	 */
-	private static final Log LOG = LogFactory.getLog(CachedDataService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CachedDataService.class);
 
 	/**
 	 * Delegated service.

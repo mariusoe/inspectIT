@@ -3,11 +3,19 @@ package info.novatec.inspectit.rcp;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryManager;
 import info.novatec.inspectit.rcp.storage.InspectITStorageManager;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
@@ -22,6 +30,13 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.slf4j.LoggerFactory;
+
+import uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -32,6 +47,16 @@ public class InspectIT extends AbstractUIPlugin {
 	 * The id of this plugin.
 	 */
 	public static final String ID = "info.novatec.inspectit.rcp";
+
+	/**
+	 * Default name of the log file.
+	 */
+	private static final String DEFAULT_LOG_FILE_NAME = "logging-config.xml";
+
+	/**
+	 * JVM property for the log file location.
+	 */
+	private static final String LOG_FILE_PROPERTY = "inspectit.logging.config";
 
 	/**
 	 * The shared instance.
@@ -63,6 +88,11 @@ public class InspectIT extends AbstractUIPlugin {
 	private List<IPropertyChangeListener> propertyChangeListeners = new ArrayList<IPropertyChangeListener>();
 
 	/**
+	 * Runtime directory of plug-in depending if we are in development or not.
+	 */
+	private Path runtimeDir;
+
+	/**
 	 * This method is called upon plug-in activation.
 	 * 
 	 * @param context
@@ -74,7 +104,75 @@ public class InspectIT extends AbstractUIPlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		plugin = this;
+
+		locateRuntimeDir();
+		initLogger();
+
 		super.start(context);
+	}
+
+	/**
+	 * Locates the runtime directory. It's needed for distinguish between development and runtime.
+	 */
+	private void locateRuntimeDir() {
+		File bundleFile = null;
+		try {
+			bundleFile = FileLocator.getBundleFile(getBundle());
+		} catch (IOException e) { // NOPMD //NOCHK
+		}
+
+		if (null != bundleFile && bundleFile.isDirectory()) {
+			runtimeDir = Paths.get(bundleFile.getAbsolutePath());
+		} else {
+			runtimeDir = Paths.get("");
+		}
+	}
+
+	/**
+	 * Initializes the logger.
+	 */
+	private void initLogger() {
+		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+		JoranConfigurator configurator = new JoranConfigurator();
+		configurator.setContext(context);
+		context.reset();
+
+		InputStream is = null;
+
+		try {
+			// first check if it's supplied as parameter
+			String logFileLocation = System.getProperty(LOG_FILE_PROPERTY);
+			if (null != logFileLocation) {
+				Path logPath = Paths.get(logFileLocation).toAbsolutePath();
+				if (Files.exists(logPath)) {
+					is = Files.newInputStream(logPath, StandardOpenOption.READ);
+				}
+			}
+
+			// then fail to default if none is specified
+			if (null == is) {
+				Path logPath = getRuntimeDir().resolve(DEFAULT_LOG_FILE_NAME).toAbsolutePath();
+				if (Files.exists(logPath)) {
+					is = Files.newInputStream(logPath, StandardOpenOption.READ);
+				}
+			}
+
+			if (null != is) {
+				try {
+					configurator.doConfigure(is);
+				} catch (JoranException e) { // NOPMD NOCHK StatusPrinter will handle this
+				} finally {
+					is.close();
+				}
+			}
+		} catch (IOException e) { // NOPMD NOCHK StatusPrinter will handle this
+		}
+
+		StatusPrinter.printInCaseOfErrorsOrWarnings(context);
+
+		// use sysout-over-slf4j to redirect out and err calls to logger
+		SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
 	}
 
 	/**
@@ -249,6 +347,25 @@ public class InspectIT extends AbstractUIPlugin {
 			}
 		}
 		return storageManager;
+	}
+
+	/**
+	 * Gets {@link #runtimeDir}.
+	 * 
+	 * @return {@link #runtimeDir}
+	 */
+	public Path getRuntimeDir() {
+		return runtimeDir;
+	}
+
+	/**
+	 * Sets {@link #runtimeDir}.
+	 * 
+	 * @param runtimeDir
+	 *            New value for {@link #runtimeDir}
+	 */
+	public void setRuntimeDir(Path runtimeDir) {
+		this.runtimeDir = runtimeDir;
 	}
 
 	/**

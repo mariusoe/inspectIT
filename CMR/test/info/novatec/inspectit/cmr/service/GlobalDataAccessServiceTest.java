@@ -15,9 +15,9 @@ import info.novatec.inspectit.communication.data.cmr.AgentStatusData.AgentConnec
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.LogFactory;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -49,7 +49,7 @@ public class GlobalDataAccessServiceTest extends AbstractTestNGLogSupport {
 		globalDataAccessService.platformIdentDao = platformIdentDao;
 		globalDataAccessService.agentStatusProvider = agentStatusProvider;
 		globalDataAccessService.defaultDataDao = defaultDataDao;
-		globalDataAccessService.log = LogFactory.getLog(GlobalDataAccessService.class);
+		globalDataAccessService.log = LoggerFactory.getLogger(GlobalDataAccessService.class);
 	}
 
 	/**

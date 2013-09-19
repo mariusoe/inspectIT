@@ -17,10 +17,10 @@ import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
 
 import java.util.concurrent.ExecutorService;
 
-import org.apache.commons.logging.LogFactory;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -59,7 +59,7 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 		buffer.bufferProperties = bufferProperties;
 		buffer.objectSizes = objectSizes;
 		buffer.indexingTree = indexingTree;
-		buffer.log = LogFactory.getLog(AtomicBuffer.class);
+		buffer.log = LoggerFactory.getLogger(AtomicBuffer.class);
 		when(bufferProperties.getIndexingTreeCleaningThreads()).thenReturn(1);
 		buffer.postConstruct();
 	}

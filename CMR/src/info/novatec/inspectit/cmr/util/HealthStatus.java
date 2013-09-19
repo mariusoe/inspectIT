@@ -4,7 +4,7 @@ import info.novatec.inspectit.cmr.cache.IBuffer;
 import info.novatec.inspectit.cmr.service.AgentStorageService;
 import info.novatec.inspectit.cmr.service.ICmrManagementService;
 import info.novatec.inspectit.cmr.storage.CmrStorageManager;
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.nio.ByteBufferProvider;
 import info.novatec.inspectit.storage.nio.write.WritingChannelManager;
@@ -20,7 +20,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -37,8 +37,8 @@ import org.springframework.stereotype.Component;
 public class HealthStatus {
 
 	/** The logger of this class. */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * Are the beans that are responsible for creating the Health Status available.

@@ -1,6 +1,6 @@
 package info.novatec.inspectit.storage.nio.write;
 
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.storage.nio.AbstractChannelManager;
 import info.novatec.inspectit.storage.nio.CustomAsyncChannel;
 import info.novatec.inspectit.storage.nio.WriteReadAttachment;
@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -28,8 +28,8 @@ public class WritingChannelManager extends AbstractChannelManager {
 	/**
 	 * The log of this class.
 	 */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * Max opened channels.

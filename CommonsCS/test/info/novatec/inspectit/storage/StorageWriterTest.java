@@ -39,10 +39,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.LogFactory;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -102,7 +102,7 @@ public class StorageWriterTest {
 		storageWriter.serializerQueue = serializerQueue;
 		storageWriter.scheduledExecutorService = scheduledExecutorService;
 		storageWriter.writeDataProcessors = Collections.singletonList(writeDataProcessor);
-		storageWriter.log = LogFactory.getLog(storageWriter.getClass());
+		storageWriter.log = LoggerFactory.getLogger(storageWriter.getClass());
 	}
 
 	@SuppressWarnings("unchecked")

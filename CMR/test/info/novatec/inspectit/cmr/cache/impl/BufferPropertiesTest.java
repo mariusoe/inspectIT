@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.mockito.Mockito.mock;
 import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -39,7 +39,7 @@ public class BufferPropertiesTest extends AbstractTestNGLogSupport {
 	@BeforeClass
 	public void init() throws Exception {
 		bufferProperties = new BufferProperties();
-		bufferProperties.log = mock(Log.class);
+		bufferProperties.log = mock(Logger.class);
 		bufferProperties.bytesMaintenancePercentage = 0.2f;
 		bufferProperties.evictionFragmentSizePercentage = 0.1f;
 		bufferProperties.evictionOccupancyPercentage = 0.8f;

@@ -3,14 +3,14 @@ package info.novatec.inspectit.cmr.service;
 import info.novatec.inspectit.cmr.dao.SqlDataDao;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
 import info.novatec.inspectit.communication.data.SqlStatementData;
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +22,8 @@ import org.springframework.stereotype.Service;
 public class SqlDataAccessService implements ISqlDataAccessService {
 
 	/** The logger of this class. */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * The sql DAO.

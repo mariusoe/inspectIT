@@ -3,7 +3,7 @@ package info.novatec.inspectit.cmr.storage;
 import info.novatec.inspectit.cmr.dao.StorageDataDao;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.SystemInformationData;
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
 import info.novatec.inspectit.storage.StorageWriter;
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,8 +41,8 @@ public class CmrStorageRecorder {
 	/**
 	 * The log of this class.
 	 */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * CMR storage manager.

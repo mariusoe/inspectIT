@@ -5,7 +5,7 @@ import info.novatec.inspectit.cmr.dao.impl.DefaultDataDaoImpl;
 import info.novatec.inspectit.cmr.service.IServerStatusService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.cmr.WritingStatus;
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageData.StorageState;
@@ -48,7 +48,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.mutable.MutableLong;
 import org.apache.commons.lang.mutable.MutableObject;
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
@@ -71,8 +71,8 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 	/**
 	 * The log of this class.
 	 */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * The fixed rate of the refresh rate for gathering the statistics.

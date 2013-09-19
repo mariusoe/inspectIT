@@ -5,8 +5,8 @@ import info.novatec.inspectit.storage.nio.WriteReadCompletionRunnable;
 
 import java.nio.channels.CompletionHandler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Completion handler for asynchronous writing.
@@ -19,7 +19,7 @@ public class WritingCompletionHandler implements CompletionHandler<Integer, Writ
 	/**
 	 * The log of this class. Can not be assigned via spring because this is not a component.
 	 */
-	private static final Log LOG = LogFactory.getLog(WritingCompletionHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(WritingCompletionHandler.class);
 
 	/**
 	 * {@inheritDoc}

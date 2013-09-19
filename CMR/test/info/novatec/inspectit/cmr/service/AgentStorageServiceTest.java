@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.apache.commons.logging.LogFactory;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -50,7 +50,7 @@ public class AgentStorageServiceTest extends AbstractTestNGLogSupport {
 		agentStorageService = new AgentStorageService(new ArrayBlockingQueue<SoftReference<List<? extends DefaultData>>>(1));
 		agentStorageService.platformIdentDateSaver = agentStatusDataProvider;
 		agentStorageService.cmrManagementService = cmrManagementService;
-		agentStorageService.log = LogFactory.getLog(AgentStorageService.class);
+		agentStorageService.log = LoggerFactory.getLogger(AgentStorageService.class);
 	}
 
 	/**

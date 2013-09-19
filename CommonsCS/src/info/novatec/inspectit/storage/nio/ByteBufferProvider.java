@@ -1,6 +1,6 @@
 package info.novatec.inspectit.storage.nio;
 
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.storage.nio.bytebuffer.ByteBufferPoolFactory;
 import info.novatec.inspectit.util.UnderlyingSystemInfo;
 import info.novatec.inspectit.util.UnderlyingSystemInfo.JvmProvider;
@@ -11,8 +11,8 @@ import java.nio.ByteBuffer;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.logging.Log;
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -35,8 +35,8 @@ public class ByteBufferProvider extends GenericObjectPool<ByteBuffer> {
 	/**
 	 * The log of this class.
 	 */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * Default buffer size that will be used if not initial buffer list size is provided to create

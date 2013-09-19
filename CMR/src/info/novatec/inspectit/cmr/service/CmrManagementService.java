@@ -5,7 +5,7 @@ import info.novatec.inspectit.cmr.spring.aop.MethodLog;
 import info.novatec.inspectit.cmr.util.ShutdownService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.storage.StorageManager;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ import java.util.Date;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang.mutable.MutableLong;
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,8 +39,8 @@ public class CmrManagementService implements ICmrManagementService {
 	private static final String DATABASE_FOLDER = "db";
 
 	/** The logger of this class. */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * Buffer data dao.

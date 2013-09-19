@@ -1,6 +1,6 @@
 package info.novatec.inspectit.cmr.util;
 
-import info.novatec.inspectit.spring.logger.Logger;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,8 +31,8 @@ public class ShutdownService {
 	/**
 	 * The logger of this class.
 	 */
-	@Logger
-	Log log;
+	@Log
+	Logger log;
 
 	/**
 	 * Flag for shutdown initialization.

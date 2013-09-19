@@ -87,10 +87,11 @@ NTSales_Allgemeine_Nutzungsbedingungen_inspectIT_en.doc_V2.0 / 24.07.2012
    </license>
 
    <plugins>
+      <plugin id="ch.qos.logback.classic"/>
+      <plugin id="ch.qos.logback.core"/>
       <plugin id="com.ibm.icu"/>
       <plugin id="com.springsource.net.sf.cglib"/>
       <plugin id="com.springsource.org.aopalliance"/>
-      <plugin id="com.springsource.org.apache.commons.logging"/>
       <plugin id="com.springsource.org.objenesis"/>
       <plugin id="info.novatec.asm"/>
       <plugin id="info.novatec.guava"/>
@@ -110,7 +111,10 @@ NTSales_Allgemeine_Nutzungsbedingungen_inspectIT_en.doc_V2.0 / 24.07.2012
       <plugin id="info.novatec.minlog"/>
       <plugin id="info.novatec.reflectasm"/>
       <plugin id="info.novatec.swtgraphics2d"/>
+      <plugin id="info.novatec.sysout-over-slf4j"/>
       <plugin id="javax.servlet"/>
+      <plugin id="jcl.over.slf4j"/>
+      <plugin id="log4j.over.slf4j"/>
       <plugin id="org.apache.commons.collections"/>
       <plugin id="org.apache.commons.fileupload"/>
       <plugin id="org.apache.commons.io"/>
@@ -165,6 +169,7 @@ NTSales_Allgemeine_Nutzungsbedingungen_inspectIT_en.doc_V2.0 / 24.07.2012
       <plugin id="org.springframework.osgi.extender"/>
       <plugin id="org.springframework.osgi.io"/>
       <plugin id="org.springframework.web"/>
+      <plugin id="slf4j.api"/>
    </plugins>
 
    <configurations>

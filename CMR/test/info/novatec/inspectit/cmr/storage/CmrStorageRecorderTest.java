@@ -24,10 +24,10 @@ import java.util.Collections;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.LogFactory;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -73,7 +73,7 @@ public class CmrStorageRecorderTest extends AbstractTestNGLogSupport {
 		cmrStorageRecorder.storageDataDao = storageDataDao;
 		cmrStorageRecorder.cmrStorageManager = cmrStorageManager;
 		cmrStorageRecorder.executorService = executorService;
-		cmrStorageRecorder.log = LogFactory.getLog(CmrStorageRecorder.class);
+		cmrStorageRecorder.log = LoggerFactory.getLogger(CmrStorageRecorder.class);
 		when(storageWriter.isWritingOn()).thenReturn(true);
 	}
 
