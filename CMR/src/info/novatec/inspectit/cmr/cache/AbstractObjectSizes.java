@@ -20,6 +20,12 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 
 	/**
 	 * General sizes of primitive types.
+	 * <p>
+	 * Boolean info: Although the Java Virtual Machine defines a boolean type, it only provides very
+	 * limited support for it. There are no Java Virtual Machine instructions solely dedicated to
+	 * operations on boolean values. Instead, expressions in the Java programming language that
+	 * operate on boolean values are compiled to use values of the Java Virtual Machine int data
+	 * type.
 	 */
 	private static final long BOOLEAN_SIZE = 1, CHAR_SIZE = 2, SHORT_SIZE = 2, INT_SIZE = 4, FLOAT_SIZE = 4, LONG_SIZE = 8, DOUBLE_SIZE = 8;
 
@@ -296,7 +302,13 @@ public abstract class AbstractObjectSizes implements IObjectSizes {
 	 * {@inheritDoc}
 	 */
 	public long getPrimitiveTypesSize(int referenceCount, int booleanCount, int intCount, int floatCount, int longCount, int doubleCount) {
-		return referenceCount * getReferenceSize() + booleanCount * BOOLEAN_SIZE + intCount * INT_SIZE + floatCount * FLOAT_SIZE + longCount * LONG_SIZE + doubleCount * DOUBLE_SIZE;
+		// note that the size of the booleans must be alligned to the int size
+		// thus 1 boolean is in 4 bytes, but are also 2, 3 and 4 booleans in an object packed to int
+		long booleanSize = 0;
+		if (booleanCount > 0) {
+			booleanSize = booleanCount * BOOLEAN_SIZE + INT_SIZE - (booleanCount * BOOLEAN_SIZE) % INT_SIZE;
+		}
+		return booleanSize + referenceCount * getReferenceSize() + intCount * INT_SIZE + floatCount * FLOAT_SIZE + longCount * LONG_SIZE + doubleCount * DOUBLE_SIZE;
 	}
 
 	/**

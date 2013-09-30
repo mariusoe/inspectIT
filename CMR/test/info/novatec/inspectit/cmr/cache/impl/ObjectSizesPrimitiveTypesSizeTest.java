@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.AggregatedHttpTimerData;
 import info.novatec.inspectit.communication.data.AggregatedSqlStatementData;
@@ -15,6 +16,7 @@ import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
 import info.novatec.inspectit.communication.data.CompilationInformationData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
+import info.novatec.inspectit.communication.data.InvocationAwareData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.MemoryInformationData;
 import info.novatec.inspectit.communication.data.RuntimeInformationData;
@@ -45,10 +47,10 @@ public class ObjectSizesPrimitiveTypesSizeTest {
 	/**
 	 * Classes to be tested.
 	 */
-	public static final Object[][] TESTING_CLASSES = new Object[][] { { TimerData.class }, { SqlStatementData.class }, { ExceptionSensorData.class }, { InvocationSequenceData.class },
-			{ ClassLoadingInformationData.class }, { CompilationInformationData.class }, { MemoryInformationData.class }, { RuntimeInformationData.class }, { SystemInformationData.class },
-			{ ThreadInformationData.class }, { HttpTimerData.class }, { AggregatedExceptionSensorData.class }, { AggregatedHttpTimerData.class }, { AggregatedSqlStatementData.class },
-			{ AggregatedTimerData.class } };
+	public static final Object[][] TESTING_CLASSES = new Object[][] { { TestDefaultData.class }, { TestMethodSensorData.class }, { TestInvocationAwareData.class }, { TimerData.class },
+			{ SqlStatementData.class }, { ExceptionSensorData.class }, { InvocationSequenceData.class }, { ClassLoadingInformationData.class }, { CompilationInformationData.class },
+			{ MemoryInformationData.class }, { RuntimeInformationData.class }, { SystemInformationData.class }, { ThreadInformationData.class }, { HttpTimerData.class },
+			{ AggregatedExceptionSensorData.class }, { AggregatedHttpTimerData.class }, { AggregatedSqlStatementData.class }, { AggregatedTimerData.class } };
 
 	/**
 	 * Mocked {@link IObjectSizes}.
@@ -212,4 +214,21 @@ public class ObjectSizesPrimitiveTypesSizeTest {
 		}
 
 	}
+
+	@SuppressWarnings("serial")
+	public static class TestDefaultData extends DefaultData {
+	};
+
+	@SuppressWarnings("serial")
+	public static class TestMethodSensorData extends MethodSensorData {
+	};
+
+	@SuppressWarnings("serial")
+	public static class TestInvocationAwareData extends InvocationAwareData {
+
+		@Override
+		public double getInvocationAffiliationPercentage() {
+			return 0;
+		}
+	};
 }

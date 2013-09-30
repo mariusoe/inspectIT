@@ -1,7 +1,6 @@
 package info.novatec.inspectit.cmr.cache.impl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
@@ -9,6 +8,7 @@ import info.novatec.inspectit.cmr.cache.AbstractObjectSizes;
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.Sizeable;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.AggregatedHttpTimerData;
@@ -18,6 +18,7 @@ import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
 import info.novatec.inspectit.communication.data.CompilationInformationData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
+import info.novatec.inspectit.communication.data.InvocationAwareData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.MemoryInformationData;
 import info.novatec.inspectit.communication.data.RuntimeInformationData;
@@ -58,10 +59,10 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 	/**
 	 * Our classes to be tested.
 	 */
-	public static final Object[][] TESTING_CLASSES = new Object[][] { { TimerData.class }, { SqlStatementData.class }, { ExceptionSensorData.class }, { InvocationSequenceData.class },
-			{ ClassLoadingInformationData.class }, { CompilationInformationData.class }, { MemoryInformationData.class }, { RuntimeInformationData.class }, { SystemInformationData.class },
-			{ ThreadInformationData.class }, { HttpTimerData.class }, { AggregatedExceptionSensorData.class }, { AggregatedHttpTimerData.class }, { AggregatedSqlStatementData.class },
-			{ AggregatedTimerData.class } };
+	public static final Object[][] TESTING_CLASSES = new Object[][] { { TestDefaultData.class }, { TestMethodSensorData.class }, { TestInvocationAwareData.class }, { TimerData.class },
+			{ SqlStatementData.class }, { ExceptionSensorData.class }, { InvocationSequenceData.class }, { ClassLoadingInformationData.class }, { CompilationInformationData.class },
+			{ MemoryInformationData.class }, { RuntimeInformationData.class }, { SystemInformationData.class }, { ThreadInformationData.class }, { HttpTimerData.class },
+			{ AggregatedExceptionSensorData.class }, { AggregatedHttpTimerData.class }, { AggregatedSqlStatementData.class }, { AggregatedTimerData.class } };
 
 	/**
 	 * Amount that we add to each hash map because of the entry, key and value set safety.
@@ -359,6 +360,18 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 	}
 
 	/**
+	 * Tests the special boolean test class to assuer boolean sizes in JVM are in fact compiled as
+	 * int.
+	 */
+	@Test
+	public void booleanTestClass() {
+		BooleanTestClass testObject = new BooleanTestClass();
+		long ourSize = objectSizes.getSizeOf(testObject);
+		long theirSize = MemoryUtil.deepMemoryUsageOf(testObject, VisibilityFilter.ALL);
+		assertThat("Boolean test class", ourSize, is(equalTo(theirSize)));
+	}
+
+	/**
 	 * Tests the inspectIT classes instances created by reflection.
 	 * <p>
 	 * <b>Important:</b> The {@link SqlStatementData} class has a problem with calculation when Sun
@@ -378,7 +391,7 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		DefaultData object = defaultDataClass.newInstance();
 		long ourSize = objectSizes.getSizeOf(object);
 		long theirSize = MemoryUtil.deepMemoryUsageOf(object, VisibilityFilter.ALL);
-		assertThat("Size of " + defaultDataClass.getName(), (double) ourSize, is(closeTo(theirSize, 8d)));
+		assertThat("Size of " + defaultDataClass.getName(), ourSize, is(theirSize));
 	}
 
 	/**
@@ -479,4 +492,33 @@ public class MemoryCalculationTest extends AbstractTestNGLogSupport {
 		}
 	}
 
+	@SuppressWarnings("unused")
+	private static class BooleanTestClass implements Sizeable {
+
+		private boolean b1, b2, b3, b4, b5, b6, b7, b8, b9;
+
+		@Override
+		public long getObjectSize(IObjectSizes objectSizes) {
+			long size = objectSizes.getSizeOfObjectHeader();
+			size += objectSizes.getPrimitiveTypesSize(0, 9, 0, 0, 0, 0);
+			return objectSizes.alignTo8Bytes(size);
+		}
+	}
+
+	@SuppressWarnings("serial")
+	public static class TestDefaultData extends DefaultData {
+	};
+
+	@SuppressWarnings("serial")
+	public static class TestMethodSensorData extends MethodSensorData {
+	};
+
+	@SuppressWarnings("serial")
+	public static class TestInvocationAwareData extends InvocationAwareData {
+
+		@Override
+		public double getInvocationAffiliationPercentage() {
+			return 0;
+		}
+	};
 }
