@@ -56,11 +56,11 @@
 		<!-- Libs that are transfered by us -->
 
 		<dependency org="org.hibernate" name="info.novatec.hibernate-core" rev="3.5.3-Final" conf="osgi->default" />
-		<dependency org="jfree" name="info.novatec.jcommon" rev="1.0.16" conf="osgi->default" />
-		<dependency org="jfree" name="info.novatec.jfreechart" rev="1.0.13" conf="osgi->default" />
-		<dependency org="jfree" name="info.novatec.jfreechart-experimental" rev="1.0.13" conf="osgi->default" />
-		<dependency org="jfree" name="info.novatec.jfreechart-swt" rev="1.0.13" conf="osgi->default" />
-		<dependency org="jfree" name="info.novatec.swtgraphics2d" rev="1.0.13" conf="osgi->default" />
+		<dependency org="jfree" name="info.novatec.jcommon" rev="1.0.20" conf="osgi->default" />
+		<dependency org="jfree" name="info.novatec.jfreechart" rev="1.0.16" conf="osgi->default" />
+		<dependency org="jfree" name="info.novatec.jfreechart-experimental" rev="1.0.16" conf="osgi->default" />
+		<dependency org="jfree" name="info.novatec.jfreechart-swt" rev="1.0.16" conf="osgi->default" />
+		<dependency org="jfree" name="info.novatec.swtgraphics2d" rev="1.0.16" conf="osgi->default" />
 
 		<dependency org="org.apache.httpcomponents" name="info.novatec.httpclient" rev="4.1.1" conf="osgi->default" />
 		<dependency org="org.apache.httpcomponents" name="info.novatec.httpcore" rev="4.1.1" conf="osgi->default" />

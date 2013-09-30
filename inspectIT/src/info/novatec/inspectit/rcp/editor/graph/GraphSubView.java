@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -134,8 +135,22 @@ public class GraphSubView extends AbstractSubView {
 		Color color = new Color(toolkit.getColors().getBackground().getRed(), toolkit.getColors().getBackground().getGreen(), toolkit.getColors().getBackground().getBlue());
 		chart.setBackgroundPaint(color);
 
-		frame = new ChartComposite(composite, SWT.NONE, chart, ChartComposite.DEFAULT_WIDTH, ChartComposite.DEFAULT_HEIGHT, 0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, true, true, true, false, true,
-				true);
+		frame = new ChartComposite(composite, SWT.NONE, chart, ChartComposite.DEFAULT_WIDTH, ChartComposite.DEFAULT_HEIGHT, 0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, true, true, true, true, true,
+				true) {
+
+			/**
+			 * {@inheritDoc}
+			 * <p>
+			 * On print we want to set the title so it's visible in the print page.
+			 */
+			@Override
+			public boolean print(GC gc) {
+				chart.setTitle(getRootEditor().getTitle());
+				boolean res = super.print(gc);
+				chart.setTitle("");
+				return res;
+			}
+		};
 	}
 
 	/**
