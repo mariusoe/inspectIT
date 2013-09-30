@@ -41,7 +41,7 @@ public class GridCompositeSubView extends AbstractCompositeSubView {
 	/**
 	 * The layout of the contained composite.
 	 */
-	private GridLayout layout;
+	private GridLayout gridLayout;
 
 	/**
 	 * Default constructor which calls
@@ -62,7 +62,7 @@ public class GridCompositeSubView extends AbstractCompositeSubView {
 	 * @see GridLayout
 	 */
 	public GridCompositeSubView(int numColumns, boolean makeColumnsEqualWidth) {
-		layout = new GridLayout(numColumns, makeColumnsEqualWidth);
+		gridLayout = new GridLayout(numColumns, makeColumnsEqualWidth);
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class GridCompositeSubView extends AbstractCompositeSubView {
 	 */
 	public void createPartControl(Composite parent, FormToolkit toolkit) {
 		composite = toolkit.createComposite(parent);
-		composite.setLayout(layout);
+		composite.setLayout(gridLayout);
 
 		for (final ISubView subView : getSubViews()) {
 			subView.createPartControl(composite, toolkit);
@@ -143,7 +143,7 @@ public class GridCompositeSubView extends AbstractCompositeSubView {
 				view.getControl().setLayoutData(gd);
 			}
 		}
-		composite.layout();
+		layout();
 	}
 
 	/**
@@ -154,6 +154,14 @@ public class GridCompositeSubView extends AbstractCompositeSubView {
 		for (ISubView view : getSubViews()) {
 			view.getControl().setLayoutData(layoutDataMap.get(view));
 		}
+		layout();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void layout() {
 		composite.layout();
 	}
 

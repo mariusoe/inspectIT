@@ -157,7 +157,7 @@ public class SashCompositeSubView extends AbstractCompositeSubView {
 			i++;
 		}
 		sashForm.setWeights(weights);
-		sashForm.layout();
+		layout();
 	}
 
 	/**
@@ -173,6 +173,14 @@ public class SashCompositeSubView extends AbstractCompositeSubView {
 			i++;
 		}
 		sashForm.setWeights(weights);
+		layout();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void layout() {
 		sashForm.layout();
 	}
 

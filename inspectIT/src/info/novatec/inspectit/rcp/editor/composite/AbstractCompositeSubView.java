@@ -44,6 +44,11 @@ public abstract class AbstractCompositeSubView extends AbstractSubView {
 	public abstract void restoreMaximization();
 
 	/**
+	 * Layouts the sub-views.
+	 */
+	public abstract void layout();
+
+	/**
 	 * Adds a new sub-view to this composite view.
 	 * 
 	 * @param subView
@@ -147,6 +152,7 @@ public abstract class AbstractCompositeSubView extends AbstractSubView {
 		for (ISubView subView : subViews) {
 			subView.setDataInput(data);
 		}
+		layout();
 	}
 
 	/**

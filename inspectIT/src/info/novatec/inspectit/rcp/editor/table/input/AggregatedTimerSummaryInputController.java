@@ -2,6 +2,8 @@ package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.TimerData;
+import info.novatec.inspectit.indexing.aggregation.impl.AggregationPerformer;
+import info.novatec.inspectit.indexing.aggregation.impl.TimerDataAggregator;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
@@ -133,35 +135,19 @@ public class AggregatedTimerSummaryInputController extends AbstractTableInputCon
 	private static final class ContentProvider implements IStructuredContentProvider {
 
 		/**
+		 * Aggregation performer.
+		 */
+		private final AggregationPerformer<TimerData> aggregationPerformer = new AggregationPerformer<>(new TimerDataAggregator());
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@SuppressWarnings("unchecked")
 		public Object[] getElements(Object inputElement) {
 			List<TimerData> timerData = (List<TimerData>) inputElement;
-			return aggregateData(timerData);
-		}
-
-		/**
-		 * Aggregates the timer data to one object.
-		 * 
-		 * @param timerData
-		 *            The data to aggregate.
-		 * @return The aggregated data.
-		 */
-		private Object[] aggregateData(List<TimerData> timerData) {
-			if (!timerData.isEmpty()) {
-				TimerData aggregatedData = new TimerData();
-
-				for (TimerData data : timerData) {
-					aggregatedData.aggregateTimerData(data);
-				}
-
-				Object[] result = new Object[1];
-				result[0] = aggregatedData;
-				return result;
-			} else {
-				return new Object[0];
-			}
+			aggregationPerformer.reset();
+			aggregationPerformer.processCollection(timerData);
+			return aggregationPerformer.getResultList().toArray();
 		}
 
 		/**

@@ -181,6 +181,15 @@ public class TabbedCompositeSubView extends AbstractCompositeSubView {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void layout() {
+		tabFolder.layout();
+
+	}
+
+	/**
 	 * In the Windows the visibility of the controls is mixed up if the controls that are in the
 	 * tabs are accessed outside. This method fixes the visibility by setting the currently selected
 	 * tab's control visible and all other not visible.

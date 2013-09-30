@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * {@link PlotController} for displaying many Http requests in the graph.
@@ -168,6 +169,22 @@ public class TimerPlotController extends AbstractTimerDataPlotController<TimerDa
 
 		setDurationPlotData(map);
 		setCountPlotData(map);
+
+		// if we have only one list then we pass it to the root editor so that sub-views can set it
+		if (1 == map.size()) {
+			final List<? extends DefaultData> datas = map.entrySet().iterator().next().getValue();
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					getRootEditor().setDataInput(datas);
+				}
+			});
+		} else {
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					getRootEditor().setDataInput(Collections.<DefaultData> emptyList());
+				}
+			});
+		}
 	}
 
 	/**
