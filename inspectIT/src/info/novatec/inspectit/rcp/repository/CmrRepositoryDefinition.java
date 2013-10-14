@@ -1,7 +1,6 @@
 package info.novatec.inspectit.rcp.repository;
 
 import info.novatec.inspectit.cmr.service.ICmrManagementService;
-import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
@@ -162,11 +161,6 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	private final IExceptionDataAccessService exceptionDataAccessService;
 
 	/**
-	 * The configuration interface data access service.
-	 */
-	private final IConfigurationInterfaceDataAccessService configurationInterfaceDataAccessService;
-
-	/**
 	 * The server status service exposed by the CMR and initialized by Spring.
 	 */
 	private final IServerStatusService serverStatusService;
@@ -241,7 +235,6 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 		invocationDataAccessService = cmrServiceProvider.getInvocationDataAccessService(this);
 		licenseService = cmrServiceProvider.getLicenseService(this);
 		exceptionDataAccessService = cmrServiceProvider.getExceptionDataAccessService(this);
-		configurationInterfaceDataAccessService = cmrServiceProvider.getConfigurationInterfaceDataAccessService(this);
 		httpTimerDataAccessService = cmrServiceProvider.getHttpTimerDataAccessService(this);
 		cmrManagementService = cmrServiceProvider.getCmrManagementService(this);
 		timerDataAccessService = cmrServiceProvider.getTimerDataAccessService(this);
@@ -281,13 +274,6 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	@Override
 	public IInvocationDataAccessService getInvocationDataAccessService() {
 		return invocationDataAccessService;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public IConfigurationInterfaceDataAccessService getConfigurationInterfaceDataAccessService() {
-		return configurationInterfaceDataAccessService;
 	}
 
 	/**

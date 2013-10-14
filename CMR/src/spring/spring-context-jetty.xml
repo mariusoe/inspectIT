@@ -149,21 +149,6 @@
 	</bean>
 	<!-- END -->
 
-	<!-- Configuration Interface Data Access Service -->
-	<bean name="configurationInterfaceDataAccessRequestHandlerServlet" class="org.springframework.web.context.support.HttpRequestHandlerServlet">
-	</bean>
-
-	<bean id="configurationInterfaceDataAccessServletHolder" class="org.mortbay.jetty.servlet.ServletHolder">
-		<property name="name" value="configurationInterfaceDataAccessServiceExporter" />
-		<property name="servlet" ref="configurationInterfaceDataAccessRequestHandlerServlet" />
-	</bean>
-
-	<bean id="configurationInterfaceDataAccessServiceMapping" class="org.mortbay.jetty.servlet.ServletMapping">
-		<property name="servletName" value="configurationInterfaceDataAccessServiceExporter" />
-		<property name="pathSpec" value="/remoting/ConfigurationInterfaceDataAccessService" />
-	</bean>
-	<!-- END -->
-
 	<!-- Timer Data Access Service -->
 	<bean name="timerDataAccessServiceRequestHandlerServlet" class="org.springframework.web.context.support.HttpRequestHandlerServlet">
 	</bean>
@@ -297,7 +282,6 @@
 				<ref bean="invocationDataAccessServletHolder" />
 				<ref bean="serverStatusServletHolder" />
 				<ref bean="licenseServletHolder" />
-				<ref bean="configurationInterfaceDataAccessServletHolder" />
 				<ref bean="cmrManagementServiceServletHolder" />
 				<ref bean="timerDataAccessServiceServletHolder" />
 				<ref bean="httpTimerDataAccessServiceServletHolder" />
@@ -314,7 +298,6 @@
 				<ref bean="invocationDataAccessServiceMapping" />
 				<ref bean="serverStatusServiceMapping" />
 				<ref bean="licenseServiceMapping" />
-				<ref bean="configurationInterfaceDataAccessServiceMapping" />
 				<ref bean="cmrManagementServiceServiceMapping" />
 				<ref bean="timerDataAccessServiceServiceMapping" />
 				<ref bean="httpTimerDataAccessServiceServiceMapping" />

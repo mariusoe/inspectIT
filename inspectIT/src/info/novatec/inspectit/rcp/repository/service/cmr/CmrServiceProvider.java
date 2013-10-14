@@ -1,7 +1,6 @@
 package info.novatec.inspectit.rcp.repository.service.cmr;
 
 import info.novatec.inspectit.cmr.service.ICmrManagementService;
-import info.novatec.inspectit.cmr.service.IConfigurationInterfaceDataAccessService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
@@ -200,26 +199,6 @@ public abstract class CmrServiceProvider {
 	 * @return Returns Spring created {@link TimerDataAccessService}.
 	 */
 	protected abstract IHttpTimerDataAccessService getHttpTimerDataAccessService();
-
-	/**
-	 * Returns properly initialized {@link ConfigurationInterfaceDataAccessService}.
-	 * 
-	 * @param cmrRepositoryDefinition
-	 *            {@link CmrRepositoryDefinition} to bound service to.
-	 * @return Returns {@link ConfigurationInterfaceDataAccessService}.
-	 */
-	public IConfigurationInterfaceDataAccessService getConfigurationInterfaceDataAccessService(CmrRepositoryDefinition cmrRepositoryDefinition) {
-		IConfigurationInterfaceDataAccessService configurationInterfaceDataAccessService = getConfigurationInterfaceDataAccessService();
-		((ICmrService) configurationInterfaceDataAccessService).initService(cmrRepositoryDefinition);
-		return configurationInterfaceDataAccessService;
-	}
-
-	/**
-	 * Returns Spring created {@link ConfigurationInterfaceDataAccessService}.
-	 * 
-	 * @return Returns Spring created {@link ConfigurationInterfaceDataAccessService}.
-	 */
-	protected abstract IConfigurationInterfaceDataAccessService getConfigurationInterfaceDataAccessService();
 
 	/**
 	 * Returns properly initialized {@link StorageService}.

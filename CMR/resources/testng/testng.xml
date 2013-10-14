@@ -17,17 +17,6 @@
 			<class name="info.novatec.inspectit.indexing.impl.StorageIndexingTest" />
 		</classes>
 	</test>
-	<!-- test name="Configuration Interface">
-		<classes>
-			<class name="info.novatec.inspectit.cmr.dao.ci.impl.EnvironmentDataDaoTest" />
-			<class name="info.novatec.inspectit.cmr.dao.ci.impl.ExceptionSensorDefinitionDataDaoTest" />
-			<class name="info.novatec.inspectit.cmr.dao.ci.impl.MethodSensorDefinitionDataDaoTest" />
-			<class name="info.novatec.inspectit.cmr.dao.ci.impl.PlatformSensorDefinitionDataDaoTest" />
-			<class name="info.novatec.inspectit.cmr.dao.ci.impl.ProfileDataDaoTest" />
-			<class name="info.novatec.inspectit.cmr.dao.ci.impl.SensorTypeDataDaoTest" />
-			<class name="info.novatec.inspectit.cmr.dao.ci.impl.LazyInitializationTest" />
-		</classes>
-	</test-->
 	<test name="Dao/Aggregators">
 		<classes>
 			<class name="info.novatec.inspectit.indexing.aggregation.impl.HttpDataAggregatorTest" />
