@@ -15,6 +15,7 @@ import info.novatec.inspectit.communication.data.ParameterContentType;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,8 @@ import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.LoaderClassPath;
 import javassist.NotFoundException;
+
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * The default implementation of the {@link IByteCodeAnalyzer} interface. First it tries to analyze
@@ -113,8 +116,20 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 			byte[] instrumentedByteCode = null;
 			Map<CtBehavior, List<UnregisteredSensorConfig>> behaviorToConfigMap = analyze(className, classLoader);
 
+			// class loader delegation behaviors
+			List<? extends CtBehavior> classLoaderDelegationBehaviors = analyzeForClassLoaderDelegation(className, classLoader);
+
+			CtBehavior ctBehavior = null;
 			if (!behaviorToConfigMap.isEmpty()) {
-				instrumentedByteCode = instrument(behaviorToConfigMap);
+				ctBehavior = instrumentSensors(behaviorToConfigMap);
+			}
+
+			if (!classLoaderDelegationBehaviors.isEmpty()) {
+				ctBehavior = instrumentClassLoader(classLoaderDelegationBehaviors);
+			}
+
+			if (null != ctBehavior) {
+				instrumentedByteCode = ctBehavior.getDeclaringClass().toBytecode();
 			}
 
 			return instrumentedByteCode;
@@ -144,6 +159,29 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 				classPool.removeClassPath(loaderClassPath);
 			}
 		}
+	}
+
+	/**
+	 * Returns the list of {@link CtBehavior} that relate to the class loader delegation.
+	 * 
+	 * @param className
+	 *            The name of the class.
+	 * @param classLoader
+	 *            The class loader of the passed class.
+	 * @return Returns the list of {@link CtBehavior} that relate to the class loader delegation.
+	 * @throws NotFoundException
+	 *             Something could not be found.
+	 */
+	private List<? extends CtBehavior> analyzeForClassLoaderDelegation(String className, ClassLoader classLoader) throws NotFoundException {
+		IMatcher matcher = configurationStorage.getClassLoaderDelegationMatcher();
+		if (matcher.compareClassName(classLoader, className)) {
+			List<? extends CtBehavior> behaviors = matcher.getMatchingMethods(classLoader, className);
+			if (CollectionUtils.isNotEmpty(behaviors)) {
+				matcher.checkParameters(behaviors);
+				return behaviors;
+			}
+		}
+		return Collections.emptyList();
 	}
 
 	/**
@@ -218,7 +256,7 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 	 * @throws CannotCompileException
 	 *             The byte code could not be generated.
 	 */
-	private byte[] instrument(Map<CtBehavior, List<UnregisteredSensorConfig>> methodToConfigMap) throws NotFoundException, HookException, IOException, CannotCompileException {
+	private CtBehavior instrumentSensors(Map<CtBehavior, List<UnregisteredSensorConfig>> methodToConfigMap) throws NotFoundException, HookException, IOException, CannotCompileException {
 		CtBehavior ctBehavior = null;
 		for (Map.Entry<CtBehavior, List<UnregisteredSensorConfig>> entry : methodToConfigMap.entrySet()) {
 			ctBehavior = entry.getKey();
@@ -279,8 +317,35 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 				hookInstrumenter.addConstructorHook((CtConstructor) ctBehavior, rsc);
 			}
 		}
+		return ctBehavior;
+	}
 
-		return ctBehavior.getDeclaringClass().toBytecode();
+	/**
+	 * Instruments the methods in the {@link List} with the class loader delegation hook.
+	 * 
+	 * @param classLoaderDelegationBehaviors
+	 *            {@link CtBehavior}s that relate to the class loader boot delegation and have to be
+	 *            instrumented in different way that the normal user specified instrumentation.
+	 * 
+	 * @return Returns the {@link CtBehavior}.
+	 * @throws NotFoundException
+	 *             Something could not be found.
+	 * @throws HookException
+	 *             The hook instrumenter generated an exception.
+	 * @throws IOException
+	 *             The byte code could not be generated.
+	 * @throws CannotCompileException
+	 *             The byte code could not be generated.
+	 */
+	private CtBehavior instrumentClassLoader(List<? extends CtBehavior> classLoaderDelegationBehaviors) throws NotFoundException, HookException, IOException, CannotCompileException {
+		CtBehavior ctBehavior = null;
+		if (CollectionUtils.isNotEmpty(classLoaderDelegationBehaviors)) {
+			for (CtBehavior clDelegationBehavior : classLoaderDelegationBehaviors) {
+				ctBehavior = clDelegationBehavior;
+				hookInstrumenter.addClassLoaderDelegationHook((CtMethod) ctBehavior);
+			}
+		}
+		return ctBehavior;
 	}
 
 	/**

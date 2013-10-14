@@ -34,4 +34,17 @@ public interface IAgent {
 	 */
 	IHookDispatcher getHookDispatcher();
 
+	/**
+	 * Loads class with the given parameters that have been passed to the target class loader.
+	 * <p>
+	 * Loading will be delegated only if parameters are of size 1 and that single parameter is
+	 * String type.
+	 * 
+	 * @see info.novatec.inspectit.agent.PicoAgent#loadClass(String)
+	 * @param params
+	 *            Original parameters passed to class loader.
+	 * @return Loaded class or <code>null</code>.
+	 */
+	Class<?> loadClass(Object[] params);
+
 }

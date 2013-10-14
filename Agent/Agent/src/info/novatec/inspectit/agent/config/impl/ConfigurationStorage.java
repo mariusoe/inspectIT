@@ -3,8 +3,10 @@ package info.novatec.inspectit.agent.config.impl;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatchPattern;
+import info.novatec.inspectit.agent.analyzer.IMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.ModifierMatcher;
 import info.novatec.inspectit.agent.analyzer.impl.SimpleMatchPattern;
+import info.novatec.inspectit.agent.analyzer.impl.SuperclassMatcher;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.PriorityEnum;
 import info.novatec.inspectit.agent.config.StorageException;
@@ -116,6 +118,12 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	private List<IMatchPattern> ignoreClassesPatterns = new ArrayList<IMatchPattern>();
 
 	/**
+	 * The matcher that can be used to test if the ClassLoader class should be instrumented in the
+	 * way that class loading is delegated if the class to be loaded is inspectIT class.
+	 */
+	private IMatcher classLoaderDelegationMatcher;
+
+	/**
 	 * Default constructor which takes 2 parameter.
 	 * 
 	 * @param classPoolAnalyzer
@@ -127,6 +135,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		this.classPoolAnalyzer = classPoolAnalyzer;
 		this.inheritanceAnalyzer = inheritanceAnalyzer;
 		loadConfigurationFromJvmParameters();
+		createClassLoaderDelegationMatcher();
 	}
 
 	/**
@@ -648,6 +657,13 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public IMatcher getClassLoaderDelegationMatcher() {
+		return classLoaderDelegationMatcher;
+	}
+
+	/**
 	 * Checks if the JVM parameters have the repository and agent information.
 	 */
 	private void loadConfigurationFromJvmParameters() {
@@ -689,5 +705,18 @@ public class ConfigurationStorage implements IConfigurationStorage {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Creates the {@link #classLoaderDelegationMatcher}.
+	 */
+	private void createClassLoaderDelegationMatcher() {
+		UnregisteredSensorConfig fakeSensorConfig = new UnregisteredSensorConfig(classPoolAnalyzer, inheritanceAnalyzer);
+		fakeSensorConfig.setSuperclass(true);
+		fakeSensorConfig.setTargetClassName("java.lang.ClassLoader");
+		fakeSensorConfig.setTargetMethodName("loadClass");
+		fakeSensorConfig.setParameterTypes(Collections.singletonList("java.lang.String"));
+		fakeSensorConfig.setModifiers(Modifier.PUBLIC);
+		this.classLoaderDelegationMatcher = new SuperclassMatcher(inheritanceAnalyzer, classPoolAnalyzer, fakeSensorConfig);
 	}
 }

@@ -1,6 +1,7 @@
 package info.novatec.inspectit.agent.config;
 
 import info.novatec.inspectit.agent.analyzer.IMatchPattern;
+import info.novatec.inspectit.agent.analyzer.IMatcher;
 import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
 import info.novatec.inspectit.agent.config.impl.PlatformSensorTypeConfig;
 import info.novatec.inspectit.agent.config.impl.RepositoryConfig;
@@ -263,4 +264,14 @@ public interface IConfigurationStorage {
 	 *            String that will be used as pattern for ignoring.
 	 */
 	void addIgnoreClassesPattern(String patternString);
+
+	/**
+	 * Returns the matcher that can be used to test if the ClassLoader class should be instrumented
+	 * in the way that class loading is delegated if the class to be loaded is inspectIT class.
+	 * 
+	 * @return Returns the matcher that can be used to test if the ClassLoader class should be
+	 *         instrumented in the way that class loading is delegated if the class to be loaded is
+	 *         inspectIT class.
+	 */
+	IMatcher getClassLoaderDelegationMatcher();
 }

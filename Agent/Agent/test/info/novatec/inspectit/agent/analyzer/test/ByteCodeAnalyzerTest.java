@@ -9,6 +9,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
@@ -33,6 +35,7 @@ import info.novatec.inspectit.communication.data.ParameterContentType;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +81,7 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {
 		byteCodeAnalyzer = new ByteCodeAnalyzer(configurationStorage, hookInstrumenter, classPoolAnalyzer);
+		when(configurationStorage.getClassLoaderDelegationMatcher()).thenReturn(mock(IMatcher.class));
 	}
 
 	private byte[] getByteCode(String className) throws NotFoundException, IOException, CannotCompileException {
@@ -388,5 +392,28 @@ public class ByteCodeAnalyzerTest extends AbstractLogSupport {
 		// instrumented
 		byte[] instrumentedByteCode = byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
 		assertThat(instrumentedByteCode, is(notNullValue()));
+	}
+
+	@Test
+	public void classLoaderInstumentation() throws NotFoundException, IOException, CannotCompileException, HookException {
+		ClassLoader classLoader = this.getClass().getClassLoader();
+		Class<?> classLoaderClass = classLoader.getClass();
+		String className = classLoaderClass.getName();
+		byte[] byteCode = getByteCode(className);
+
+		ClassPool classPool = ClassPool.getDefault();
+		when(classPoolAnalyzer.getClassPool(classLoader)).thenReturn(classPool);
+		when(configurationStorage.getUnregisteredSensorConfigs()).thenReturn(Collections.<UnregisteredSensorConfig> emptyList());
+		List<CtMethod> methodList = new ArrayList<CtMethod>();
+		methodList.add(classPool.getMethod(className, "loadClass"));
+
+		IMatcher matcher = mock(IMatcher.class);
+		when(matcher.compareClassName(classLoader, className)).thenReturn(true);
+		when(matcher.getMatchingMethods(classLoader, className)).thenReturn(methodList);
+		when(configurationStorage.getClassLoaderDelegationMatcher()).thenReturn(matcher);
+
+		byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
+
+		verify(hookInstrumenter, times(1)).addClassLoaderDelegationHook(methodList.get(0));
 	}
 }

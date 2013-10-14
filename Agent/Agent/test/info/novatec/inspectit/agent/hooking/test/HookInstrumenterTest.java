@@ -1,5 +1,9 @@
 package info.novatec.inspectit.agent.hooking.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
@@ -9,11 +13,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import info.novatec.inspectit.agent.IAgent;
 import info.novatec.inspectit.agent.analyzer.test.classes.ExceptionTestClass;
 import info.novatec.inspectit.agent.analyzer.test.classes.ExceptionalTestClass;
 import info.novatec.inspectit.agent.analyzer.test.classes.ITest;
 import info.novatec.inspectit.agent.analyzer.test.classes.MyTestException;
 import info.novatec.inspectit.agent.analyzer.test.classes.TestClass;
+import info.novatec.inspectit.agent.analyzer.test.classes.TestClassLoader;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
@@ -55,6 +61,9 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 	@Mock
 	private IConfigurationStorage configurationStorage;
 
+	@Mock
+	private static IAgent agent;
+
 	private HookInstrumenter hookInstrumenter;
 
 	/**
@@ -71,10 +80,18 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		Field field = hookInstrumenter.getClass().getDeclaredField("hookDispatcherTarget");
 		field.setAccessible(true);
 		field.set(hookInstrumenter, "info.novatec.inspectit.agent.hooking.test.HookInstrumenterTest#getHookDispatcher()");
+
+		field = hookInstrumenter.getClass().getDeclaredField("agentTarget");
+		field.setAccessible(true);
+		field.set(hookInstrumenter, "info.novatec.inspectit.agent.hooking.test.HookInstrumenterTest#getAgent()");
 	}
 
 	public static IHookDispatcher getHookDispatcher() {
 		return hookDispatcher;
+	}
+
+	public static IAgent getAgent() {
+		return agent;
 	}
 
 	private Loader createLoader() {
@@ -82,6 +99,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		Loader loader = new Loader(this.getClass().getClassLoader(), classPool);
 		loader.delegateLoadingOf(HookInstrumenterTest.class.getName());
 		loader.delegateLoadingOf(IHookDispatcher.class.getName());
+		loader.delegateLoadingOf(IAgent.class.getName());
 		return loader;
 	}
 
@@ -106,7 +124,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		return clazz.newInstance();
 	}
 
-	private void callMethod(Object object, String methodName, Object[] parameters) throws Exception {
+	private Object callMethod(Object object, String methodName, Object[] parameters) throws Exception {
 		if (null == parameters) {
 			parameters = new Object[0];
 		}
@@ -127,7 +145,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		}
 		Method method = clazz.getDeclaredMethod(methodName, parameterClasses);
 		method.setAccessible(true);
-		method.invoke(object, parameters);
+		return method.invoke(object, parameters);
 	}
 
 	@Test
@@ -228,6 +246,53 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 	// above tests were used to find out if the hookinstrumenter seems to work,
 	// the lower ones are needed to verify if all methods are instrumented
 	// correctly.
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	public void classLoaderClassDelegated() throws Exception {
+		String methodName = "loadClass";
+		Loader loader = this.createLoader();
+		CtMethod ctMethod = this.getCtMethod(loader, TestClassLoader.class.getName(), methodName);
+	
+		hookInstrumenter.addClassLoaderDelegationHook(ctMethod);
+		
+		Class loadedByUs = String.class;
+		String className = "java.lang.String";
+		Object[] parameters = new Object[] { className };
+		when(agent.loadClass(parameters)).thenReturn(loadedByUs);
+
+		// we expect that agent delivers loadedByUs, thus also the class loader
+
+		Object testClass = this.createInstance(loader, ctMethod);
+		Object result = this.callMethod(testClass, methodName, parameters);
+
+		verify(agent, times(1)).loadClass(new Object[] { className });
+		assertThat(result, is(instanceOf(Class.class)));
+		assertThat((Class) result, is(equalTo(loadedByUs)));
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Test
+	public void classLoaderClassNotDelegated() throws Exception {
+		String methodName = "loadClass";
+		Loader loader = this.createLoader();
+		CtMethod ctMethod = this.getCtMethod(loader, TestClassLoader.class.getName(), methodName);
+
+		hookInstrumenter.addClassLoaderDelegationHook(ctMethod);
+
+		String className = "java.lang.String";
+		Object[] parameters = new Object[] { className };
+		when(agent.loadClass(parameters)).thenReturn(null);
+
+		// we expect that agent delivers null, thus the class loader returns his own class
+
+		Object testClass = this.createInstance(loader, ctMethod);
+		Object result = this.callMethod(testClass, methodName, parameters);
+
+		verify(agent, times(1)).loadClass(new Object[] { className });
+		Class expected = testClass.getClass();
+		assertThat((Class) result, is(equalTo(expected)));
+	}
 
 	@Test
 	public void voidNullParameter() throws Exception {

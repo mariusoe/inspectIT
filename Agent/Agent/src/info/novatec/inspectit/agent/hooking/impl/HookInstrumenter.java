@@ -42,6 +42,11 @@ public class HookInstrumenter implements IHookInstrumenter {
 	private static String hookDispatcherTarget = "info.novatec.inspectit.agent.Agent#agent.getHookDispatcher()";
 
 	/**
+	 * The agent target as string.
+	 */
+	private static String agentTarget = "info.novatec.inspectit.agent.Agent#agent";
+
+	/**
 	 * The hook dispatching service.
 	 */
 	private final IHookDispatcher hookDispatcher;
@@ -182,6 +187,26 @@ public class HookInstrumenter implements IHookInstrumenter {
 			throw new HookException("Could not insert the bytecode into the constructor/class", cannotCompileException);
 		} catch (NotFoundException notFoundException) {
 			throw new HookException("Could not insert the bytecode into the constructor/class", notFoundException);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addClassLoaderDelegationHook(CtMethod ctMethod) throws HookException {
+		if (LOGGER.isLoggable(Level.FINE)) {
+			LOGGER.fine("Class loader delegation match found! Method signature: " + ctMethod.getSignature());
+		}
+
+		if (ctMethod.getDeclaringClass().isFrozen()) {
+			// defrost before we are adding any instructions
+			ctMethod.getDeclaringClass().defrost();
+		}
+
+		try {
+			ctMethod.insertBefore("Class c = " + agentTarget + ".loadClass($args); if (null != c) { return c; }");
+		} catch (CannotCompileException cannotCompileException) {
+			throw new HookException("Could not insert the bytecode into the method/class for class loader delegation", cannotCompileException);
 		}
 	}
 

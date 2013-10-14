@@ -45,4 +45,15 @@ public interface IHookInstrumenter {
 	 *             instrumentation was not completed successfully.
 	 */
 	void addConstructorHook(CtConstructor constructor, RegisteredSensorConfig rsc) throws HookException;
+
+	/**
+	 * Adds a class loader delegation check on this method and delegates class loading if necessary.
+	 * 
+	 * @param ctMethod
+	 *            {@link CtMethod} to instrument. Note that the method will be replaced.
+	 * @throws HookException
+	 *             A {@link HookException} is thrown if something unexpected happens, like the
+	 *             instrumentation was not completed successfully.
+	 */
+	void addClassLoaderDelegationHook(CtMethod ctMethod) throws HookException;
 }

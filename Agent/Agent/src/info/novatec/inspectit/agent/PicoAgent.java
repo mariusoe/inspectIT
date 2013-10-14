@@ -69,6 +69,11 @@ public class PicoAgent implements IAgent {
 	private static final Logger LOGGER = Logger.getLogger(PicoAgent.class.getName());
 
 	/**
+	 * Our class start with {@value #CLASS_NAME_PREFIX}.
+	 */
+	private static final String CLASS_NAME_PREFIX = "info.novatec.inspectit";
+
+	/**
 	 * The pico container.
 	 */
 	private MutablePicoContainer pico;
@@ -283,6 +288,56 @@ public class PicoAgent implements IAgent {
 			throwable.printStackTrace(); // NOPMD
 			return byteCode;
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Class<?> loadClass(Object[] params) {
+		try {
+			if (null != params && params.length == 1) {
+				Object p = params[0];
+				if (p instanceof String) {
+					return loadClass((String) p);
+				}
+			}
+			return null;
+		} catch (Throwable e) { // NOPMD
+			return null;
+		}
+	}
+
+	/**
+	 * Delegates the class loading to the {@link #inspectItClassLoader} if the class name starts
+	 * with {@value #CLASS_NAME_PREFIX}. Otherwise loads the class with the target class loader. If
+	 * the inspectIT class loader throws {@link ClassNotFoundException}, the target class loader
+	 * will be used.
+	 * 
+	 * @param className
+	 *            Class name.
+	 * @return Loaded class or <code>null</code> if it can not be found with inspectIT class loader.
+	 */
+	private Class<?> loadClass(String className) {
+		if (loadWithInspectItClassLoader(className)) {
+			try {
+				return getClass().getClassLoader().loadClass(className);
+			} catch (ClassNotFoundException e) {
+				return null;
+			}
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Defines if the class should be loaded with our class loader.
+	 * 
+	 * @param className
+	 *            Name of the class to load.
+	 * @return True if class name starts with {@value #CLASS_NAME_PREFIX}.
+	 */
+	private boolean loadWithInspectItClassLoader(String className) {
+		return className.startsWith(CLASS_NAME_PREFIX);
 	}
 
 	/**
