@@ -55,7 +55,6 @@ public class SqlStatementDataAggregator implements IAggregator<SqlStatementData>
 	public IAggregatedData<SqlStatementData> getClone(SqlStatementData sqlStatementData) {
 		AggregatedSqlStatementData clone = new AggregatedSqlStatementData();
 		clone.setPlatformIdent(sqlStatementData.getPlatformIdent());
-		clone.setMethodIdent(sqlStatementData.getMethodIdent());
 		clone.setPreparedStatement(sqlStatementData.isPreparedStatement());
 		clone.setSql(sqlStatementData.getSql());
 		if (includeParameters && null != sqlStatementData.getParameterValues()) {
@@ -70,7 +69,6 @@ public class SqlStatementDataAggregator implements IAggregator<SqlStatementData>
 	public Object getAggregationKey(SqlStatementData sqlStatementData) {
 		final int prime = 31;
 		int result = 0;
-		result = prime * result + (int) (sqlStatementData.getMethodIdent() ^ (sqlStatementData.getMethodIdent() >>> 32));
 		result = prime * result + (sqlStatementData.isPreparedStatement() ? 1231 : 1237);
 		result = prime * result + ((sqlStatementData.getSql() == null) ? 0 : sqlStatementData.getSql().hashCode());
 		if (includeParameters) {

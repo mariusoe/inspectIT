@@ -104,8 +104,6 @@ public class SqlInputController extends AbstractTableInputController {
 		MAX("Max (ms)", 80, null, TimerDataComparatorEnum.MAX),
 		/** The duration column. */
 		DURATION("Duration (ms)", 80, null, TimerDataComparatorEnum.MAX),
-		/** The method column. */
-		METHOD("Method", 500, InspectITImages.IMG_METHOD_PUBLIC, MethodSensorDataComparatorEnum.METHOD),
 		/** The prepared column. */
 		PREPARED("Prepared?", 80, null, SqlStatementDataComparatorEnum.IS_PREPARED_STATEMENT);
 
@@ -603,9 +601,6 @@ public class SqlInputController extends AbstractTableInputController {
 			return new StyledString(NumberFormatter.formatDouble(data.getMin(), timeDecimalPlaces));
 		case MAX:
 			return new StyledString(NumberFormatter.formatDouble(data.getMax(), timeDecimalPlaces));
-		case METHOD:
-			MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
-			return TextFormatter.getStyledMethodString(methodIdent);
 		case DURATION:
 			return new StyledString(NumberFormatter.formatDouble(data.getDuration(), timeDecimalPlaces));
 		case PREPARED:
