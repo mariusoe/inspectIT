@@ -77,7 +77,7 @@ public class FormRootEditor extends AbstractRootEditor {
 		form.setHeadClient(breadcrumbTitleComposite);
 
 		// create an preference area if the subviews are requesting it
-		preferencePanel.createPartControl(form.getBody(), getSubView().getPreferenceIds(), breadcrumbTitleComposite.getToolBarManager());
+		preferencePanel.createPartControl(form.getBody(), getSubView().getPreferenceIds(), getInputDefinition(), breadcrumbTitleComposite.getToolBarManager());
 
 		// go further with creating the subview(s)
 		getSubView().createPartControl(form.getBody(), toolkit);

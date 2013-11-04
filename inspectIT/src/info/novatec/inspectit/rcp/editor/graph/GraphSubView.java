@@ -11,15 +11,22 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.Pre
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
+import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
+import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
+import info.novatec.inspectit.storage.label.AbstractStorageLabel;
+import info.novatec.inspectit.storage.label.type.impl.DataTimeFrameLabelType;
+import info.novatec.inspectit.util.TimeFrame;
 
 import java.awt.Color;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
@@ -192,6 +199,21 @@ public class GraphSubView extends AbstractSubView {
 
 		plot.setOrientation(PlotOrientation.VERTICAL);
 
+		TimeFrame  timeFrame = getInitialDataTimeFrame();
+		if (null != timeFrame) {
+			// set min/max dates
+			((DateAxis) plot.getDomainAxis()).setMinimumDate(timeFrame.getFrom());
+			((DateAxis) plot.getDomainAxis()).setMaximumDate(timeFrame.getTo());
+
+			// inform the time-line widget via event
+			PreferenceEvent preferenceEvent = new PreferenceEvent(PreferenceId.TIMELINE);
+			Map<IPreferenceGroup, Object> map = new HashMap<>();
+			map.put(PreferenceId.TimeLine.FROM_DATE_ID, timeFrame.getFrom());
+			map.put(PreferenceId.TimeLine.TO_DATE_ID, timeFrame.getTo());
+			preferenceEvent.setPreferenceMap(map);
+			getRootEditor().getPreferencePanel().fireEvent(preferenceEvent);
+		}
+
 		// return a new chart containing the overlaid plot...
 		return new JFreeChart(plot);
 	}
@@ -215,6 +237,23 @@ public class GraphSubView extends AbstractSubView {
 			};
 		}
 		domainAxis.addZoomListener(zoomListener);
+	}
+
+	/**
+	 * Returns initial data time frame if one is defined.
+	 * 
+	 * @return Returns initial data time frame if one is defined.
+	 */
+	private TimeFrame getInitialDataTimeFrame() {
+		RepositoryDefinition repositoryDefinition = getRootEditor().getInputDefinition().getRepositoryDefinition();
+		if (repositoryDefinition instanceof StorageRepositoryDefinition) {
+			StorageRepositoryDefinition storageRepositoryDefinition = (StorageRepositoryDefinition) repositoryDefinition;
+			List<AbstractStorageLabel<TimeFrame>> labels = storageRepositoryDefinition.getLocalStorageData().getLabels(new DataTimeFrameLabelType());
+			if (CollectionUtils.isNotEmpty(labels)) {
+				return labels.get(0).getValue();
+			}
+		}
+		return null;
 	}
 
 	/**

@@ -1,5 +1,8 @@
 package info.novatec.inspectit.rcp.editor.preferences;
 
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
+import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+
 import java.util.Set;
 
 import org.eclipse.jface.action.IToolBarManager;
@@ -29,12 +32,14 @@ public interface IPreferencePanel {
 	 *            The parent used to draw the elements to.
 	 * @param preferenceSet
 	 *            The set containing the preference IDs which are used to show the correct options.
+	 * @param inputDefinition
+	 *            {@link InputDefinition} of the editor where preference panel will be created.
 	 * @param toolBarManager
 	 *            The toolbar manager is needed if buttons are going to be displayed. Otherwise it
 	 *            can be <code>null</code>.
 	 * 
 	 */
-	void createPartControl(Composite parent, Set<PreferenceId> preferenceSet, IToolBarManager toolBarManager);
+	void createPartControl(Composite parent, Set<PreferenceId> preferenceSet, InputDefinition inputDefinition, IToolBarManager toolBarManager);
 
 	/**
 	 * Registers a callback at this preference panel.
@@ -51,6 +56,14 @@ public interface IPreferencePanel {
 	 *            The callback to remove.
 	 */
 	void removeCallback(PreferenceEventCallback callback);
+
+	/**
+	 * Fires the event for all registered callbacks.
+	 * 
+	 * @param event
+	 *            The event to fire.
+	 */
+	void fireEvent(PreferenceEvent event);
 
 	/**
 	 * Sets the visibility of the preference panel to show/hide.

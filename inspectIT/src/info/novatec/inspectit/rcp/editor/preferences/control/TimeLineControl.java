@@ -223,6 +223,13 @@ public class TimeLineControl extends AbstractPreferenceControl implements IPrefe
 			} else {
 				setEnabled(true);
 			}
+		} else if (PreferenceId.TIMELINE.equals(preferenceEvent.getPreferenceId())) {
+			if (preferenceEvent.getPreferenceMap().containsKey(PreferenceId.TimeLine.FROM_DATE_ID)) {
+				fromDateTime.setSelection((Date) preferenceEvent.getPreferenceMap().get(PreferenceId.TimeLine.FROM_DATE_ID));
+			}
+			if (preferenceEvent.getPreferenceMap().containsKey(PreferenceId.TimeLine.TO_DATE_ID)) {
+				fromDateTime.setSelection((Date) preferenceEvent.getPreferenceMap().get(PreferenceId.TimeLine.TO_DATE_ID));
+			}
 		}
 	}
 }

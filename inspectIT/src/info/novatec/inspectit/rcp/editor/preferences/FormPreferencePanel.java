@@ -3,6 +3,7 @@ package info.novatec.inspectit.rcp.editor.preferences;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.action.MenuAction;
+import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.TimeResolution;
@@ -133,12 +134,9 @@ public class FormPreferencePanel implements IPreferencePanel {
 	}
 
 	/**
-	 * Fires the event for all registered callbacks.
-	 * 
-	 * @param event
-	 *            The event to fire.
+	 * {@inheritDoc}
 	 */
-	private void fireEvent(PreferenceEvent event) {
+	public void fireEvent(PreferenceEvent event) {
 		for (PreferenceEventCallback callback : callbacks) {
 			callback.eventFired(event);
 		}
@@ -147,7 +145,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void createPartControl(Composite parent, Set<PreferenceId> preferenceSet, IToolBarManager toolBarManager) {
+	public void createPartControl(Composite parent, Set<PreferenceId> preferenceSet, InputDefinition inputDefinition, IToolBarManager toolBarManager) {
 		section = toolkit.createSection(parent, Section.NO_TITLE);
 		section.setText("Preferences");
 		section.setLayout(new GridLayout(1, false));
