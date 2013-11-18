@@ -146,10 +146,12 @@
 
 
 	<target name="release-commonscs" description="--> call the release of the commonscs project">
+		<ant antfile="${build.commonscs.file}" target="clean" inheritAll="false" useNativeBasedir="true" />
 		<ant antfile="${build.commonscs.file}" target="release" inheritAll="false" useNativeBasedir="true" />
 	</target>
 
 	<target name="build-inspectit" description="--> call the release of the inspectit project">
+		<ant antfile="${build.inspectit.file}" target="clean" inheritAll="false" useNativeBasedir="true" />
 		<ant antfile="${build.inspectit.file}" target="pdebuild" inheritAll="false" useNativeBasedir="true" />
 	</target>
 

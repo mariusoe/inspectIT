@@ -123,7 +123,8 @@ public final class ObjectConverter {
 		try {
 			return to.cast(converter.invoke(to, from));
 		} catch (Exception e) {
-			throw new RuntimeException("Cannot convert from " + from.getClass().getName() + " to " + to.getName() + ". Conversion failed with " + e.getMessage(), e); // NOPMD
+			throw new RuntimeException("Cannot convert from " + from.getClass().getName() + " to " + to.getName() + ". Object to convert was " + from.toString() + ". Conversion failed with "
+					+ e.getMessage(), e); // NOPMD
 		}
 	}
 
