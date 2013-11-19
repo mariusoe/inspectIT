@@ -286,10 +286,6 @@ public class CoreService implements ICoreService, Startable {
 			// if a data object with the same hash code was already created, then it has to be
 			// removed, because it was created from a constructor delegation. For us only the
 			// last-most data object is relevant
-			if (sensorDataObjects.containsKey(key)) {
-				sensorDataObjects.remove(key);
-			}
-
 			sensorDataObjects.put(key, exceptionSensorData);
 			notifyListListeners();
 		}

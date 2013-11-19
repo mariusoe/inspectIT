@@ -538,17 +538,24 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 
 		// if clean flag is set thread should try to perform indexing tree cleaning
 		// only thread that successfully executes the compare and set will do the cleaning
-		if (dataRemovedInBytes.get() > flagsSetOnBytes) {
-			dataRemovedInBytes.set(0);
-			long time = 0;
-			if (log.isDebugEnabled()) {
-				time = System.nanoTime();
-			}
+		while (true) {
+			long dataRemoveInBytesCurrent = dataRemovedInBytes.get();
+			if (dataRemoveInBytesCurrent > flagsSetOnBytes) {
+				if (dataRemovedInBytes.compareAndSet(dataRemoveInBytesCurrent, 0)) {
+					long time = 0;
+					if (log.isDebugEnabled()) {
+						time = System.nanoTime();
+					}
 
-			indexingTree.cleanWithRunnable(indexingTreeCleaningExecutorService);
+					indexingTree.cleanWithRunnable(indexingTreeCleaningExecutorService);
 
-			if (log.isDebugEnabled()) {
-				log.debug("Indexing tree cleaning duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+					if (log.isDebugEnabled()) {
+						log.debug("Indexing tree cleaning duration: " + Converter.nanoToMilliseconds(System.nanoTime() - time));
+					}
+					break;
+				}
+			} else {
+				break;
 			}
 		}
 

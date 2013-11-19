@@ -83,26 +83,10 @@ public class CustomAsyncChannel {
 	}
 
 	/**
-	 * @param path
-	 *            the path to set
-	 */
-	public void setPath(Path path) {
-		this.path = path;
-	}
-
-	/**
 	 * @return the fileChannel
 	 */
 	public AsynchronousFileChannel getFileChannel() {
 		return fileChannel;
-	}
-
-	/**
-	 * @param fileChannel
-	 *            the fileChannel to set
-	 */
-	public void setFileChannel(AsynchronousFileChannel fileChannel) {
-		this.fileChannel = fileChannel;
 	}
 
 	/**

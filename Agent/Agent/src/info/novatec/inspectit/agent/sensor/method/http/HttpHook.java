@@ -13,7 +13,6 @@ import info.novatec.inspectit.util.Timer;
 
 import java.lang.management.ThreadMXBean;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -97,14 +96,14 @@ public class HttpHook implements IMethodHook {
 	 * HttpServletMetrics and do. We are talking about the class of the ServletRequest here. This
 	 * list is extended if a new Class that provides this interface is found.
 	 */
-	private static final List<Class<?>> WHITE_LIST = new CopyOnWriteArrayList<Class<?>>();
+	private static final CopyOnWriteArrayList<Class<?>> WHITE_LIST = new CopyOnWriteArrayList<Class<?>>();
 
 	/**
 	 * Blacklist that contains all classes that we already checked if they provide
 	 * HttpServletMetrics and do not. We are talking about the class of the ServletRequest here.
 	 * This list is extended if a new Class that does not provides this interface is found.
 	 */
-	private static final List<Class<?>> BLACK_LIST = new CopyOnWriteArrayList<Class<?>>();
+	private static final CopyOnWriteArrayList<Class<?>> BLACK_LIST = new CopyOnWriteArrayList<Class<?>>();
 
 	/**
 	 * Helps us to ensure that we only store on http metric per request.
@@ -316,9 +315,9 @@ public class HttpHook implements IMethodHook {
 		}
 		boolean realizesInterface = checkForInterface(c, HTTP_SERVLET_REQUEST_CLASS);
 		if (realizesInterface) {
-			WHITE_LIST.add(c);
+			WHITE_LIST.addIfAbsent(c);
 		} else {
-			BLACK_LIST.add(c);
+			BLACK_LIST.addIfAbsent(c);
 		}
 		return realizesInterface;
 	}

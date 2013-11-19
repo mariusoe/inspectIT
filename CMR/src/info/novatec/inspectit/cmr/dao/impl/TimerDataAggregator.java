@@ -4,7 +4,8 @@ import info.novatec.inspectit.communication.data.DatabaseAggregatedTimerData;
 import info.novatec.inspectit.communication.data.TimerData;
 
 import java.sql.Timestamp;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
@@ -56,7 +57,7 @@ public final class TimerDataAggregator extends HibernateDaoSupport {
 	/**
 	 * Map for caching.
 	 */
-	private ConcurrentHashMap<Integer, TimerData> map;
+	private Map<Integer, TimerData> map;
 
 	/**
 	 * Queue for knowing the order.
@@ -76,7 +77,7 @@ public final class TimerDataAggregator extends HibernateDaoSupport {
 	/**
 	 * Pointer to the most recently added {@link TimerData} to the cache.
 	 */
-	private TimerData mostRecentlyAdded;
+	private volatile TimerData mostRecentlyAdded;
 
 	/**
 	 * This constructor is used to set the {@link SessionFactory} that is needed by
@@ -94,7 +95,7 @@ public final class TimerDataAggregator extends HibernateDaoSupport {
 		super();
 
 		elementCount = new AtomicInteger(0);
-		map = new ConcurrentHashMap<Integer, TimerData>();
+		map = new HashMap<Integer, TimerData>();
 		queue = new ConcurrentLinkedQueue<TimerData>();
 		persistList = new ConcurrentLinkedQueue<TimerData>();
 		persistAllLock = new ReentrantLock();

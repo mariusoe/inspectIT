@@ -30,7 +30,7 @@ public class SimpleBufferStrategy implements IBufferStrategy<MethodSensorData> {
 	/**
 	 * True if measurements were added and available.
 	 */
-	private boolean newMeasurements = false;
+	private volatile boolean newMeasurements = false;
 
 	/**
 	 * {@inheritDoc}

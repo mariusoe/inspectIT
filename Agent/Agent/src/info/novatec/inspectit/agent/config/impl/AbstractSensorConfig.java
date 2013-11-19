@@ -196,16 +196,6 @@ public abstract class AbstractSensorConfig {
 	}
 
 	/**
-	 * Sets the {@link List} of {@link PropertyPathStart} objects.
-	 * 
-	 * @param propertyAccessorList
-	 *            The {@link List} of {@link PropertyPathStart} objects to set.
-	 */
-	public void setPropertyAccessorList(List<PropertyPathStart> propertyAccessorList) {
-		this.propertyAccessorList = propertyAccessorList;
-	}
-
-	/**
 	 * If this sensor config defines a constructor.
 	 * 
 	 * @param isConstructor

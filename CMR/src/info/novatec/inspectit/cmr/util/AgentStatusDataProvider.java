@@ -22,7 +22,7 @@ public class AgentStatusDataProvider {
 	/**
 	 * Map that holds IDs of the platform idents and {@link AgentStatusData} objects.
 	 */
-	private Map<Long, AgentStatusData> agentStatusDataMap = new ConcurrentHashMap<Long, AgentStatusData>(8, 0.75f, 1);
+	private ConcurrentHashMap<Long, AgentStatusData> agentStatusDataMap = new ConcurrentHashMap<Long, AgentStatusData>(8, 0.75f, 1);
 
 	/**
 	 * Registers that the agent was connected.
@@ -30,13 +30,16 @@ public class AgentStatusDataProvider {
 	 * @param platformIdent
 	 *            ID of the platform ident.
 	 */
-	public synchronized void registerConnected(long platformIdent) {
+	public void registerConnected(long platformIdent) {
 		AgentStatusData agentStatusData = agentStatusDataMap.get(platformIdent);
-		if (null != agentStatusData) {
-			agentStatusData.setAgentConnection(AgentConnection.CONNECTED);
-		} else {
-			agentStatusDataMap.put(platformIdent, new AgentStatusData(AgentConnection.CONNECTED));
+		if (null == agentStatusData) {
+			agentStatusData = new AgentStatusData(AgentConnection.CONNECTED);
+			AgentStatusData existing = agentStatusDataMap.putIfAbsent(platformIdent, agentStatusData);
+			if (null != existing) {
+				agentStatusData = existing;
+			}
 		}
+		agentStatusData.setAgentConnection(AgentConnection.CONNECTED);
 	}
 
 	/**
@@ -58,7 +61,7 @@ public class AgentStatusDataProvider {
 	 * @param platformIdent
 	 *            ID of the platform ident.
 	 */
-	public synchronized void registerDataSent(long platformIdent) {
+	public void registerDataSent(long platformIdent) {
 		AgentStatusData agentStatusData = agentStatusDataMap.get(platformIdent);
 		if (null != agentStatusData) {
 			agentStatusData.setLastDataSendTimestamp(System.currentTimeMillis());
@@ -72,7 +75,7 @@ public class AgentStatusDataProvider {
 	 * @param platformId
 	 *            ID of the platform ident.
 	 */
-	public synchronized void registerDeleted(long platformId) {
+	public void registerDeleted(long platformId) {
 		agentStatusDataMap.remove(platformId);
 	}
 

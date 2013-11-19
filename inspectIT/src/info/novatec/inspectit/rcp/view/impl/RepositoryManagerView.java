@@ -518,7 +518,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 				parent = ((ITreeContentProvider) treeViewer.getContentProvider()).getParent(parent);
 			}
 		}
-		expandedList = Collections.synchronizedList(new ArrayList<Object>(Arrays.asList(expandedElements)));
+		expandedList = new ArrayList<Object>(Arrays.asList(expandedElements));
 		expandedList.removeAll(parents);
 
 		// execute refresh
@@ -908,12 +908,14 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		 */
 		@Override
 		public void done(IJobChangeEvent event) {
-			if (CollectionUtils.isNotEmpty(expandedList) && CollectionUtils.isNotEmpty(inputList)) {
-				for (Iterator<?> it = expandedList.iterator(); it.hasNext();) {
-					Object o = it.next();
-					if (!treeViewer.getExpandedState(o)) {
-						treeViewer.expandObject(o, 1);
-						it.remove();
+			synchronized (RepositoryManagerView.this) {
+				if (CollectionUtils.isNotEmpty(expandedList) && CollectionUtils.isNotEmpty(inputList)) {
+					for (Iterator<?> it = expandedList.iterator(); it.hasNext();) {
+						Object o = it.next();
+						if (!treeViewer.getExpandedState(o)) {
+							treeViewer.expandObject(o, 1);
+							it.remove();
+						}
 					}
 				}
 			}

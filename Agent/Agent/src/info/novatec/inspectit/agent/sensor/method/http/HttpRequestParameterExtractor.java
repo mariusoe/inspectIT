@@ -25,14 +25,11 @@ class HttpRequestParameterExtractor {
 	private StringConstraint strConstraint;
 
 	/**
-	 * Constructor.
-	 * 
-	 * @param strConstraint
-	 *            the string constraints.
+	 * Marker method. This method severs for marking the cache key in {@link #methodCache} as
+	 * unavailable. Since we can not put <code>null</code> to a {@link ConcurrentHashMap} we need to
+	 * put some method to serve as a marker.
 	 */
-	public HttpRequestParameterExtractor(StringConstraint strConstraint) {
-		this.strConstraint = strConstraint;
-	}
+	private Method markerMethod;
 
 	/**
 	 * The logger of the class.
@@ -43,7 +40,7 @@ class HttpRequestParameterExtractor {
 	 * Keeps track of already looked up <code>Method</code> objects for faster access. Get and Put
 	 * operations are synchronized by the concurrent hash map.
 	 */
-	private Map<String, Method> methodCache = new ConcurrentHashMap<String, Method>();
+	private ConcurrentHashMap<String, Method> methodCache = new ConcurrentHashMap<String, Method>();
 
 	/**
 	 * Structure to store all necessary methods that we can invoke to get http information. These
@@ -90,6 +87,23 @@ class HttpRequestParameterExtractor {
 		private String methodName;
 		/** parameters of the methods. */
 		private Class<?>[] parameters;
+	}
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param strConstraint
+	 *            the string constraints.
+	 */
+	public HttpRequestParameterExtractor(StringConstraint strConstraint) {
+		this.strConstraint = strConstraint;
+		try {
+			// setting marker method to point to Object.toString()
+			// this will represent non existing cache method
+			markerMethod = Object.class.getMethod("toString", new Class[0]);
+		} catch (Exception e) {
+			throw new IllegalStateException("Method toString() can not be found", e);
+		}
 	}
 
 	/**
@@ -343,20 +357,27 @@ class HttpRequestParameterExtractor {
 	 * @return the <code>Method</code> object or <code>null</code> if the method cannot be found.
 	 */
 	private Method retrieveMethod(HttpMethods httpMethod, Class<?> clazzUsedToLookup) {
-		Method m = methodCache.get(getCacheLookupName(httpMethod, clazzUsedToLookup));
+		String cacheLookupName = getCacheLookupName(httpMethod, clazzUsedToLookup);
+		Method m = methodCache.get(cacheLookupName);
 
 		if (null == m) {
 			// We do not yet have the method in the Cache
 			try {
 				m = clazzUsedToLookup.getMethod(httpMethod.methodName, httpMethod.parameters);
 				m.setAccessible(true);
-				methodCache.put(getCacheLookupName(httpMethod, clazzUsedToLookup), m);
+				Method existing = methodCache.putIfAbsent(cacheLookupName, m);
+				if (null != existing) {
+					m = existing;
+				}
 			} catch (Exception e) {
 				LOGGER.log(Level.SEVERE, "The provided class " + clazzUsedToLookup.getCanonicalName() + " did not provide the desired method.", e);
 
 				// Do not try to look up every time.
-				methodCache.put(getCacheLookupName(httpMethod, clazzUsedToLookup), null);
+				// Can not place null as value anyway
+				methodCache.putIfAbsent(cacheLookupName, markerMethod);
 			}
+		} else if (markerMethod.equals(m)) {
+			return null;
 		}
 
 		return m;

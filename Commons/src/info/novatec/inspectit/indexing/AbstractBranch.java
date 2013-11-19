@@ -11,8 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -42,14 +40,7 @@ public abstract class AbstractBranch<R, E> {
 	/**
 	 * Map for holding references.
 	 */
-	private Map<Object, ITreeComponent<R, E>> map;
-
-	/**
-	 * Lock for creating a new {@link ITreeComponent}. Problem can occur when two different threads
-	 * want to create a component with same key. We have to insure that lock is forbidding to create
-	 * to next tree components with the same key.
-	 */
-	private transient Lock createComponentLock = new ReentrantLock();
+	private ConcurrentHashMap<Object, ITreeComponent<R, E>> map;
 
 	/**
 	 * Default constructor. {@link Branch} can only be initialized with proper branch indexer
@@ -96,23 +87,17 @@ public abstract class AbstractBranch<R, E> {
 			// if component exists, put element into the component
 			return treeComponent.put(element);
 		} else {
-			// if not, acquire lock first
-			createComponentLock.lock();
-			try {
-				// check again if the new component already exists
-				treeComponent = map.get(key);
-				if (null != treeComponent) {
-					// if so just put element
-					return treeComponent.put(element);
-				} else {
-					// otherwise create new tree component, add it to the map and put element into
-					treeComponent = this.getNextTreeComponent(element);
-					map.put(key, treeComponent);
-					return treeComponent.put(element);
+			// check again if the new component already exists
+			treeComponent = map.get(key);
+			if (null == treeComponent) {
+				// otherwise create new tree component, add it to the map and put element into
+				treeComponent = this.getNextTreeComponent(element);
+				ITreeComponent<R, E> existing = map.putIfAbsent(key, treeComponent);
+				if (null != existing) {
+					treeComponent = existing;
 				}
-			} finally {
-				createComponentLock.unlock();
 			}
+			return treeComponent.put(element);
 		}
 	}
 

@@ -7,7 +7,6 @@ import info.novatec.inspectit.spring.logger.Logger;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
@@ -33,7 +32,7 @@ public class CachingIndexQueryRestrictionProcessor implements IIndexQueryRestric
 	/**
 	 * Map for caching methods.
 	 */
-	private Map<Integer, Method> cacheMap;
+	private ConcurrentHashMap<Integer, Method> cacheMap;
 
 	/**
 	 * Marker method.
@@ -63,6 +62,10 @@ public class CachingIndexQueryRestrictionProcessor implements IIndexQueryRestric
 			if (method == null) { // method has not yet in cache
 				try {
 					Method methodFromClass = object.getClass().getMethod(indexingRestriction.getQualifiedMethodName(), new Class<?>[0]);
+					Method existing = cacheMap.putIfAbsent(cacheKey, methodFromClass);
+					if (null != existing) {
+						methodFromClass = existing;
+					}
 					Object fieldValue = methodFromClass.invoke(object, new Object[0]);
 					if (!indexingRestriction.isFulfilled(fieldValue)) {
 						return false;
@@ -71,7 +74,7 @@ public class CachingIndexQueryRestrictionProcessor implements IIndexQueryRestric
 					log.error(e.getMessage(), e);
 				} catch (NoSuchMethodException e) {
 					// not found, put marker method at this place in map
-					cacheMap.put(cacheKey, markerMethod);
+					cacheMap.putIfAbsent(cacheKey, markerMethod);
 				} catch (IllegalArgumentException e) {
 					log.error(e.getMessage(), e);
 				} catch (IllegalAccessException e) {

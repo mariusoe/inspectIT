@@ -66,15 +66,14 @@ public abstract class AbstractChannelManager {
 	protected CustomAsyncChannel getChannel(Path channelPath) throws IOException {
 		CustomAsyncChannel channel = writingChannelsMap.get(channelPath);
 		if (channel == null) {
-			synchronized (this) {
-				channel = createNewChannel(channelPath);
-			}
+			channel = createNewChannel(channelPath);
 		}
 		return channel;
 	}
 
 	/**
-	 * Creates a new channel.
+	 * Creates a new channel. We need to do this in synhronized method since the channel also has to
+	 * be opened, thus we can not use putIfAbsent.
 	 * 
 	 * @param channelPath
 	 *            Path.
@@ -82,7 +81,7 @@ public abstract class AbstractChannelManager {
 	 * @throws IOException
 	 *             If exception occurs during channel creation.
 	 */
-	private CustomAsyncChannel createNewChannel(Path channelPath) throws IOException {
+	private synchronized CustomAsyncChannel createNewChannel(Path channelPath) throws IOException {
 		CustomAsyncChannel channel = writingChannelsMap.get(channelPath);
 		if (channel == null) {
 			channel = new CustomAsyncChannel(channelPath);
