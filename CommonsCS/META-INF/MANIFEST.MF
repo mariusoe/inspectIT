@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: inspectIT Client-Server Commons
 Bundle-SymbolicName: info.novatec.inspectit.commonscs
-Bundle-Version: 1.4.0
+Bundle-Version: 1.5.0
 Bundle-ClassPath: .
 Export-Package: info.novatec.inspectit.storage,
  info.novatec.inspectit.storage.nio,
@@ -10,11 +10,10 @@ Export-Package: info.novatec.inspectit.storage,
  info.novatec.inspectit.storage.nio.read,
  info.novatec.inspectit.storage.nio.stream,
  info.novatec.inspectit.storage.nio.write,
- info.novatec.inspectit.storage.processor,
  info.novatec.inspectit.storage.util
 Bundle-Vendor: NovaTec GmbH
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Require-Bundle: info.novatec.inspectit.commons;bundle-version="1.4.0",
+Require-Bundle: info.novatec.inspectit.commons;bundle-version="1.5.0",
  com.springsource.net.sf.cglib;bundle-version="2.2.0",
  info.novatec.kryo;bundle-version="2.20.0",
  com.springsource.org.aopalliance;bundle-version="1.0.0",

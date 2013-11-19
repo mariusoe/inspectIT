@@ -6,7 +6,6 @@ import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.comparator.IDataComparator;
 import info.novatec.inspectit.communication.comparator.InvocationAwareDataComparatorEnum;
-import info.novatec.inspectit.communication.comparator.MethodSensorDataComparatorEnum;
 import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.communication.comparator.SqlStatementDataComparatorEnum;
 import info.novatec.inspectit.communication.comparator.TimerDataComparatorEnum;
