@@ -3,7 +3,6 @@ package info.novatec.inspectit.rcp.preferences.page;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.dialog.AddCmrRepositoryDefinitionDialog;
-import info.novatec.inspectit.rcp.dialog.LicenseInformationDialog;
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryChangeListener;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
@@ -78,11 +77,6 @@ public class CmrRepositoryPreferencePage extends PreferencePage implements IWork
 	 * Refresh button.
 	 */
 	private Button refreshButton;
-
-	/**
-	 * License info button.
-	 */
-	private Button licenseInfoButton;
 
 	/**
 	 * Manage labels button.
@@ -222,23 +216,6 @@ public class CmrRepositoryPreferencePage extends PreferencePage implements IWork
 			}
 		});
 
-		licenseInfoButton = new Button(buttonComposite, SWT.PUSH);
-		licenseInfoButton.setText("License Info");
-		licenseInfoButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		licenseInfoButton.setEnabled(false);
-		licenseInfoButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				StructuredSelection selection = (StructuredSelection) tableViewer.getSelection();
-				for (Object selectedObject : selection.toArray()) {
-					if (selectedObject instanceof CmrRepositoryDefinition) {
-						LicenseInformationDialog licenseInformationDialog = new LicenseInformationDialog(getShell(), (CmrRepositoryDefinition) selectedObject);
-						licenseInformationDialog.open();
-					}
-				}
-			}
-		});
-
 		manageLabelsButton = new Button(buttonComposite, SWT.PUSH);
 		manageLabelsButton.setText("Manage Labels");
 		manageLabelsButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
@@ -331,15 +308,12 @@ public class CmrRepositoryPreferencePage extends PreferencePage implements IWork
 		StructuredSelection structuredSelection = (StructuredSelection) tableViewer.getSelection();
 		if (structuredSelection.isEmpty()) {
 			removeButton.setEnabled(false);
-			licenseInfoButton.setEnabled(false);
 			manageLabelsButton.setEnabled(false);
 		} else {
 			removeButton.setEnabled(true);
 			if (structuredSelection.size() == 1 && ((CmrRepositoryDefinition) structuredSelection.getFirstElement()).getOnlineStatus() == OnlineStatus.ONLINE) {
-				licenseInfoButton.setEnabled(true);
 				manageLabelsButton.setEnabled(true);
 			} else {
-				licenseInfoButton.setEnabled(false);
 				manageLabelsButton.setEnabled(false);
 			}
 		}

@@ -211,11 +211,6 @@
             name="Open View">
       </command>
       <command
-            defaultHandler="info.novatec.inspectit.rcp.handlers.ImportLicenseHandler"
-            id="info.novatec.inspectit.rcp.commands.importLicense"
-            name="Import License">
-      </command>
-      <command
             id="info.novatec.inspectit.rcp.commands.details"
             name="Details">
       </command>
@@ -318,10 +313,6 @@
       <command
             id="info.novatec.inspectit.rcp.commands.showLabelsManager"
             name="Show Labels Manager">
-      </command>
-      <command
-            id="info.novatec.inspectit.rcp.commands.licenseInfo"
-            name="License Information">
       </command>
       <command
             id="info.novatec.inspectit.rcp.commands.closeAndShowStorage"
@@ -819,26 +810,6 @@
       <handler
             class="info.novatec.inspectit.rcp.handlers.ShowLabelsManagerHandler"
             commandId="info.novatec.inspectit.rcp.commands.showLabelsManager">
-         <activeWhen>
-            <and>
-               <count
-                     value="1">
-               </count>
-               <iterate>
-                  <instanceof
-                        value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
-                  </instanceof>
-                  <test
-                        property="info.novatec.inspectit.onlineStatus"
-                        value="ONLINE">
-                  </test>
-               </iterate>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
-            class="info.novatec.inspectit.rcp.handlers.LicenseInfoHandler"
-            commandId="info.novatec.inspectit.rcp.commands.licenseInfo">
          <activeWhen>
             <and>
                <count
@@ -2133,12 +2104,6 @@
                tooltip="Manage Labels on Repository">
          </command>
          <command
-               commandId="info.novatec.inspectit.rcp.commands.licenseInfo"
-               icon="icons/license.png"
-               style="push"
-               tooltip="License Information">
-         </command>
-         <command
                commandId="info.novatec.inspectit.rcp.shutdown"
                icon="icons/restart.png"
                style="push"
@@ -2281,13 +2246,6 @@
                label="Manage Labels on Repository"
                style="push"
                tooltip="Manage Labels on Repository">
-         </command>
-         <command
-               commandId="info.novatec.inspectit.rcp.commands.licenseInfo"
-               icon="icons/license.png"
-               label="License Information"
-               style="push"
-               tooltip="License Information">
          </command>
          <command
                commandId="info.novatec.inspectit.rcp.shutdown"

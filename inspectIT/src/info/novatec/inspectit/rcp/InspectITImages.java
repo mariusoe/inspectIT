@@ -102,7 +102,6 @@ public interface InspectITImages {
 	String IMG_OVERLAY_PRIORITY = InspectITConstants.ICON_PATH + "overlay_priority.gif"; //$NON-NLS-1$
 	String IMG_OVERLAY_UP = InspectITConstants.ICON_PATH + "overlay_up.png"; //$NON-NLS-1$
 	String IMG_OVERLAY_ERROR = InspectITConstants.ICON_PATH + "overlay_error.gif"; //$NON-NLS-1$
-	String IMG_LICENSE_INFO = InspectITConstants.ICON_PATH + "license.png";
 	String IMG_LIGHT_BULB_ON = InspectITConstants.ICON_PATH + "light_bulb_on.png";
 	String IMG_AGENT_YELLOW = InspectITConstants.ICON_PATH + "agent_yellow.png";
 	String IMG_AGENT_GREEN = InspectITConstants.ICON_PATH + "agent_green.png";

@@ -43,7 +43,6 @@ import info.novatec.inspectit.communication.data.VmArgumentData;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData.AgentConnection;
 import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
-import info.novatec.inspectit.communication.data.cmr.LicenseInfoData;
 import info.novatec.inspectit.communication.data.cmr.RecordingData;
 import info.novatec.inspectit.communication.data.cmr.WritingStatus;
 import info.novatec.inspectit.indexing.aggregation.impl.ExceptionDataAggregator;
@@ -317,7 +316,6 @@ public class SerializationManager implements ISerializer, InitializingBean {
 
 		// data classes between CMR and UI
 		// this classes can be registered with FieldSerializer since they are not saved to disk
-		kryo.register(LicenseInfoData.class, new FieldSerializer<LicenseInfoData>(kryo, LicenseInfoData.class));
 		kryo.register(CmrStatusData.class, new FieldSerializer<CmrStatusData>(kryo, CmrStatusData.class));
 		kryo.register(AgentStatusData.class, new FieldSerializer<AgentStatusData>(kryo, AgentStatusData.class));
 		kryo.register(AgentConnection.class, new EnumSerializer(AgentConnection.class));

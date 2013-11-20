@@ -4,7 +4,6 @@ import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
-import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
 import info.novatec.inspectit.cmr.service.cache.CachedDataService;
@@ -37,13 +36,6 @@ public interface RepositoryDefinition {
 	 * @return Returns the repository symbolic name.
 	 */
 	String getName();
-
-	/**
-	 * Returns the license service for this repository definition.
-	 * 
-	 * @return The license service.
-	 */
-	ILicenseService getLicenseService();
 
 	/**
 	 * Returns the invocation data access service for this repository definition.

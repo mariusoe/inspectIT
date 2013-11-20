@@ -5,7 +5,6 @@ import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
-import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.IServerStatusService;
 import info.novatec.inspectit.cmr.service.IServerStatusService.ServerStatus;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
@@ -166,11 +165,6 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	private final IServerStatusService serverStatusService;
 
 	/**
-	 * The license service.
-	 */
-	private final ILicenseService licenseService;
-
-	/**
 	 * The buffer data access service.
 	 */
 	private ICmrManagementService cmrManagementService;
@@ -233,7 +227,6 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 		sqlDataAccessService = cmrServiceProvider.getSqlDataAccessService(this);
 		serverStatusService = cmrServiceProvider.getServerStatusService(this);
 		invocationDataAccessService = cmrServiceProvider.getInvocationDataAccessService(this);
-		licenseService = cmrServiceProvider.getLicenseService(this);
 		exceptionDataAccessService = cmrServiceProvider.getExceptionDataAccessService(this);
 		httpTimerDataAccessService = cmrServiceProvider.getHttpTimerDataAccessService(this);
 		cmrManagementService = cmrServiceProvider.getCmrManagementService(this);
@@ -274,14 +267,6 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	@Override
 	public IInvocationDataAccessService getInvocationDataAccessService() {
 		return invocationDataAccessService;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ILicenseService getLicenseService() {
-		return licenseService;
 	}
 
 	/**

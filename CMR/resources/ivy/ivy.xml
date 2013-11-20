@@ -53,9 +53,6 @@
 		<dependency org="org.mortbay.jetty" name="jetty" rev="6.1.26" conf="prod->default" />
 		<dependency org="org.mortbay.jetty" name="jetty-util" rev="6.1.26" conf="prod->default" />
 
-		<dependency org="truelicense" name="truelicense" rev="1.29" conf="prod->default" />
-		<dependency org="truelicense" name="truexml" rev="1.29" conf="prod->default" />
-
 		<dependency org="org.hibernate" name="hibernate-core" rev="3.6.9.Final" conf="prod->default" />
 		<dependency org="org.hibernate.common" name="hibernate-commons-annotations" rev="4.0.1.Final" conf="prod->default" />
 		<dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.1.Final" conf="prod->default" />

@@ -5,7 +5,6 @@ import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
-import info.novatec.inspectit.cmr.service.ILicenseService;
 import info.novatec.inspectit.cmr.service.IServerStatusService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.cmr.service.IStorageService;
@@ -99,26 +98,6 @@ public abstract class CmrServiceProvider {
 	 * @return Returns Spring created {@link InvocationDataAccessService}.
 	 */
 	protected abstract IInvocationDataAccessService getInvocationDataAccessService();
-
-	/**
-	 * Returns properly initialized {@link LicenseService}.
-	 * 
-	 * @param cmrRepositoryDefinition
-	 *            {@link CmrRepositoryDefinition} to bound service to.
-	 * @return Returns {@link LicenseService}.
-	 */
-	public ILicenseService getLicenseService(CmrRepositoryDefinition cmrRepositoryDefinition) {
-		ILicenseService licenceService = getLicenseService();
-		((ICmrService) licenceService).initService(cmrRepositoryDefinition);
-		return licenceService;
-	}
-
-	/**
-	 * Returns Spring created {@link LicenseService}.
-	 * 
-	 * @return Returns Spring created {@link LicenseService}.
-	 */
-	protected abstract ILicenseService getLicenseService();
 
 	/**
 	 * Returns properly initialized {@link ServerStatusService}.

@@ -1,14 +1,9 @@
 package info.novatec.inspectit.rcp.wizard.page;
 
-import info.novatec.inspectit.communication.data.cmr.LicenseInfoData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
-import info.novatec.inspectit.rcp.dialog.LicenseInformationDialog;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
-
-import java.text.DateFormat;
-import java.util.Date;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -21,9 +16,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.internal.forms.widgets.BusyIndicator;
 import org.eclipse.ui.progress.IProgressConstants;
 
@@ -77,16 +69,6 @@ public class PreviewCmrDataWizardPage extends WizardPage {
 	private Label version;
 
 	/**
-	 * License info label.
-	 */
-	private FormText license;
-
-	/**
-	 * Cmr that is under test/preview.
-	 */
-	private CmrRepositoryDefinition cmrRepositoryDefinition;
-
-	/**
 	 * Default constructor.
 	 */
 	public PreviewCmrDataWizardPage() {
@@ -130,22 +112,6 @@ public class PreviewCmrDataWizardPage extends WizardPage {
 		version = new Label(main, SWT.NONE);
 		version.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
-		Label licenseLabel = new Label(main, SWT.NONE);
-		licenseLabel.setText("License info:");
-		license = new FormText(main, SWT.NONE);
-		license.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-		license.addHyperlinkListener(new HyperlinkAdapter() {
-			@Override
-			public void linkActivated(HyperlinkEvent e) {
-				LicenseInformationDialog licenseInformationDialog = new LicenseInformationDialog(getShell(), cmrRepositoryDefinition);
-				licenseInformationDialog.open();
-				LicenseInfoData licenseInfoData = licenseInformationDialog.getLicenseInfoData();
-				if (null != licenseInfoData) {
-					updateLicenseInfo(licenseInfoData);
-				}
-			}
-		});
-
 		setControl(main);
 	}
 
@@ -156,13 +122,11 @@ public class PreviewCmrDataWizardPage extends WizardPage {
 	 *            {@link CmrRepositoryDefinition}.
 	 */
 	public void update(final CmrRepositoryDefinition cmrRepositoryDefinition) {
-		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
 		name.setText(cmrRepositoryDefinition.getName());
 		ip.setText(cmrRepositoryDefinition.getIp() + ":" + cmrRepositoryDefinition.getPort());
 		description.setText(cmrRepositoryDefinition.getDescription());
 		connectionTest.setText("Checking..");
 		busyIndicator.setBusy(true);
-		license.setText("", false, false);
 		version.setText("");
 		main.layout();
 		checkCmrJob = new CheckCmrJob(cmrRepositoryDefinition);
@@ -178,23 +142,6 @@ public class PreviewCmrDataWizardPage extends WizardPage {
 		}
 		busyIndicator.setBusy(false);
 		main.layout();
-	}
-
-	/**
-	 * Updates the license information in the page.
-	 * 
-	 * @param licenseInfoData
-	 *            {@link LicenseInfoData}.
-	 */
-	private void updateLicenseInfo(LicenseInfoData licenseInfoData) {
-		if (null == licenseInfoData) {
-			license.setText("<form><p><a>No license</a></p></form>", true, false);
-		} else if (licenseInfoData.getNotAfter().before(new Date())) {
-			license.setText("<form><p><a>License expired on " + DateFormat.getDateInstance().format(licenseInfoData.getNotAfter()) + "</a></p></form>", true, false);
-		} else {
-			license.setText("<form><p><a>License vaild till " + DateFormat.getDateInstance().format(licenseInfoData.getNotAfter()) + "</a></p></form>", true, false);
-		}
-		license.setToolTipText("Click here to open the License Info Dialog");
 	}
 
 	/**
@@ -245,17 +192,14 @@ public class PreviewCmrDataWizardPage extends WizardPage {
 			}
 
 			String ver = null;
-			LicenseInfoData lid = null;
 			if (isCanceled) {
 				return Status.CANCEL_STATUS;
 			} else if (testOk) {
 				ver = cmrRepositoryDefinition.getVersion();
-				lid = cmrRepositoryDefinition.getLicenseService().getLicenseInfoData();
 			}
 
 			final boolean testOkFinal = testOk;
 			final String verFinal = ver;
-			final LicenseInfoData licenseInfoDataFinal = lid;
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -264,12 +208,9 @@ public class PreviewCmrDataWizardPage extends WizardPage {
 						if (testOkFinal) {
 							connectionTest.setText("Succeeded");
 							version.setText(verFinal);
-							updateLicenseInfo(licenseInfoDataFinal);
 						} else {
 							connectionTest.setText("Failed");
 							version.setText("n/a");
-							license.setText("n/a", false, false);
-							license.setToolTipText("");
 						}
 						main.layout();
 					}

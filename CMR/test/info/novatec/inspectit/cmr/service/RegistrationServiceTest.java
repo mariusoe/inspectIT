@@ -6,12 +6,8 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -29,7 +25,6 @@ import info.novatec.inspectit.cmr.model.PlatformSensorTypeIdent;
 import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.cmr.util.AgentStatusDataProvider;
-import info.novatec.inspectit.cmr.util.LicenseUtil;
 
 import java.rmi.RemoteException;
 import java.sql.Timestamp;
@@ -50,8 +45,6 @@ import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import de.schlichtherle.license.LicenseContentException;
-
 /**
  * Thesting the {@link RegistrationService} of CMR.
  * 
@@ -65,12 +58,6 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 	 * Service to test.
 	 */
 	private RegistrationService registrationService;
-
-	/**
-	 * Mocked {@link LicenseUtil}.
-	 */
-	@Mock
-	private LicenseUtil licenseUtil;
 
 	/**
 	 * Mocked {@link PlatformIdentDaoImpl}.
@@ -110,7 +97,6 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		MockitoAnnotations.initMocks(this);
 
 		registrationService = new RegistrationService();
-		registrationService.licenseUtil = licenseUtil;
 		registrationService.platformIdentDao = platformIdentDao;
 		registrationService.methodIdentDao = methodIdentDao;
 		registrationService.methodSensorTypeIdentDao = methodSensorTypeIdentDao;
@@ -118,28 +104,6 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		registrationService.agentStatusDataProvider = agentStatusDataProvider;
 		registrationService.methodIdentToSensorTypeDao = methodIdentToSensorTypeDao;
 		registrationService.log = LogFactory.getLog(RegistrationService.class);
-	}
-
-	/**
-	 * Test that no registration will be done if the {@link LicenseUtil} does not validate license.
-	 * 
-	 * @throws LicenseContentException
-	 *             If {@link LicenseContentException} occurs.
-	 * @throws RemoteException
-	 *             If remote exception occurs.
-	 * @throws ServiceException
-	 *             If {@link ServiceException} occurs.
-	 */
-	@Test(expectedExceptions = { LicenseException.class })
-	@SuppressWarnings("unchecked")
-	public void noRegistrationAllowedByLicenseUtil() throws LicenseContentException, RemoteException, ServiceException {
-		doThrow(LicenseContentException.class).when(licenseUtil).validateLicense(anyList(), anyString());
-		try {
-			registrationService.registerPlatformIdent(new ArrayList<String>(), "agentName", "version");
-		} catch (LicenseException e) {
-			verifyZeroInteractions(platformIdentDao);
-			throw e;
-		}
 	}
 
 	/**
@@ -153,13 +117,11 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 	 * @throws ServiceException
 	 */
 	@Test(expectedExceptions = { ServiceException.class })
-	public void noRegistrationTwoAgents() throws LicenseContentException, RemoteException, ServiceException {
+	public void noRegistrationTwoAgents() throws RemoteException, ServiceException {
 		List<String> definedIps = new ArrayList<String>();
 		definedIps.add("ip");
 		String agentName = "agentName";
 		String version = "version";
-
-		doNothing().when(licenseUtil).validateLicense(definedIps, agentName);
 
 		List<PlatformIdent> dbResponseList = new ArrayList<PlatformIdent>();
 		dbResponseList.add(new PlatformIdent());
@@ -180,14 +142,13 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 	 *             If {@link ServiceException} occurs.
 	 */
 	@Test
-	public void registerNewPlatformIdent() throws LicenseContentException, RemoteException, ServiceException {
+	public void registerNewPlatformIdent() throws RemoteException, ServiceException {
 		final long platformId = 10;
 		List<String> definedIps = new ArrayList<String>();
 		definedIps.add("ip");
 		String agentName = "agentName";
 		String version = "version";
 
-		doNothing().when(licenseUtil).validateLicense(definedIps, agentName);
 		when(platformIdentDao.findByExample((PlatformIdent) anyObject())).thenReturn(Collections.<PlatformIdent> emptyList());
 		Mockito.doAnswer(new Answer<Object>() {
 			@Override
@@ -223,7 +184,7 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 	 *             If {@link ServiceException} occurs.
 	 */
 	@Test
-	public void registerExistingPlatformIdent() throws LicenseContentException, RemoteException, ServiceException {
+	public void registerExistingPlatformIdent() throws RemoteException, ServiceException {
 		long platformId = 10;
 		List<String> definedIps = new ArrayList<String>();
 		definedIps.add("ip");
@@ -240,7 +201,6 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		List<PlatformIdent> findByExampleList = new ArrayList<PlatformIdent>();
 		findByExampleList.add(platformIdent);
 
-		doNothing().when(licenseUtil).validateLicense(definedIps, agentName);
 		when(platformIdentDao.findByExample((PlatformIdent) anyObject())).thenReturn(findByExampleList);
 
 		long registeredId = registrationService.registerPlatformIdent(definedIps, agentName, version);
@@ -269,7 +229,7 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 	 *             If {@link ServiceException} occurs.
 	 */
 	@Test
-	public void registerNewPlatformIdentNoIpBased() throws LicenseContentException, LicenseException, RemoteException, ServiceException {
+	public void registerNewPlatformIdentNoIpBased() throws LicenseException, RemoteException, ServiceException {
 		final long platformId = 10;
 		List<String> definedIps = new ArrayList<String>();
 		definedIps.add("ip");
@@ -277,7 +237,6 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		String version = "version";
 
 		registrationService.ipBasedAgentRegistration = false;
-		doNothing().when(licenseUtil).validateLicense(definedIps, agentName);
 		when(platformIdentDao.findByExample((PlatformIdent) anyObject())).thenReturn(Collections.<PlatformIdent> emptyList());
 		Mockito.doAnswer(new Answer<Object>() {
 			@Override
@@ -314,7 +273,7 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 	 *             If {@link ServiceException} occurs.
 	 */
 	@Test
-	public void registerExistingPlatformIdentNoIpBased() throws LicenseContentException, RemoteException, ServiceException {
+	public void registerExistingPlatformIdentNoIpBased() throws RemoteException, ServiceException {
 		long platformId = 10;
 		List<String> definedIps = new ArrayList<String>();
 		definedIps.add("ip");
@@ -332,7 +291,6 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 		findByExampleList.add(platformIdent);
 
 		registrationService.ipBasedAgentRegistration = false;
-		doNothing().when(licenseUtil).validateLicense(definedIps, agentName);
 		when(platformIdentDao.findByExample((PlatformIdent) anyObject())).thenReturn(findByExampleList);
 
 		long registeredId = registrationService.registerPlatformIdent(definedIps, agentName, version);
@@ -371,7 +329,6 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 
 		registrationService.unregisterPlatformIdent(definedIps, agentName);
 
-		verify(licenseUtil, times(1)).freeAgentSlot(definedIps, agentName);
 		verify(agentStatusDataProvider, times(1)).registerDisconnected(platformId);
 	}
 

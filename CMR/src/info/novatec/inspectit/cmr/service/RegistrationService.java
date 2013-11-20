@@ -14,7 +14,6 @@ import info.novatec.inspectit.cmr.model.SensorTypeIdent;
 import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
 import info.novatec.inspectit.cmr.util.AgentStatusDataProvider;
-import info.novatec.inspectit.cmr.util.LicenseUtil;
 import info.novatec.inspectit.spring.logger.Logger;
 
 import java.rmi.RemoteException;
@@ -33,8 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import de.schlichtherle.license.LicenseContentException;
 
 /**
  * This class is used as a delegator to the real registration service. It is needed because Spring
@@ -88,13 +85,6 @@ public class RegistrationService implements IRegistrationService {
 	MethodIdentToSensorTypeDao methodIdentToSensorTypeDao;
 
 	/**
-	 * The license utility to check for a valid license and abort the registration of the agent if
-	 * necessary.
-	 */
-	@Autowired
-	LicenseUtil licenseUtil;
-
-	/**
 	 * {@link AgentStatusDataProvider}.
 	 */
 	@Autowired
@@ -106,54 +96,48 @@ public class RegistrationService implements IRegistrationService {
 	@Transactional
 	@MethodLog
 	public synchronized long registerPlatformIdent(List<String> definedIPs, String agentName, String version) throws RemoteException, ServiceException {
-		try {
-			if (log.isInfoEnabled()) {
-				log.info("Trying to register Agent '" + agentName + "'");
-			}
-
-			licenseUtil.validateLicense(definedIPs, agentName);
-			PlatformIdent platformIdent = new PlatformIdent();
-			if (ipBasedAgentRegistration) {
-				platformIdent.setDefinedIPs(definedIPs);
-			}
-			platformIdent.setAgentName(agentName);
-
-			// need to reset the version number, otherwise it will be used for the query
-			platformIdent.setVersion(null);
-
-			// we will not set the version for the platformIdent object here as we use this object
-			// for a QBE (Query by example) and this query should not be performed based on the
-			// version information.
-
-			List<PlatformIdent> platformIdentResults = platformIdentDao.findByExample(platformIdent);
-			if (1 == platformIdentResults.size()) {
-				platformIdent = platformIdentResults.get(0);
-			} else if (platformIdentResults.size() > 1) {
-				// this cannot occur anymore, if it occurs, then there is something totally wrong!
-				log.fatal("More than one platform ident has been retrieved! Please send your Database to the NovaTec inspectIT support!");
-				throw new ServiceException("Platform ident can not be registered because the inspectIT Database has more than one corresponding platform ident already.");
-			}
-
-			// always update the time stamp and ips, no matter if this is an old or new record.
-			platformIdent.setTimeStamp(new Timestamp(GregorianCalendar.getInstance().getTimeInMillis()));
-			platformIdent.setDefinedIPs(definedIPs);
-
-			// also always update the version information of the agent
-			platformIdent.setVersion(version);
-
-			platformIdentDao.saveOrUpdate(platformIdent);
-
-			agentStatusDataProvider.registerConnected(platformIdent.getId());
-
-			if (log.isInfoEnabled()) {
-				log.info("Successfully registered Agent '" + agentName + "' with id " + platformIdent.getId() + ", version " + version + " and following network interfaces:");
-				printOutDefinedIPs(definedIPs);
-			}
-			return platformIdent.getId();
-		} catch (LicenseContentException e) {
-			log.error("Could not register the Agent, due to a license problem: " + e.getMessage());
-			throw new LicenseException(e.getMessage()); // NOPMD
+		if (log.isInfoEnabled()) {
+			log.info("Trying to register Agent '" + agentName + "'");
 		}
+
+		PlatformIdent platformIdent = new PlatformIdent();
+		if (ipBasedAgentRegistration) {
+			platformIdent.setDefinedIPs(definedIPs);
+		}
+		platformIdent.setAgentName(agentName);
+
+		// need to reset the version number, otherwise it will be used for the query
+		platformIdent.setVersion(null);
+
+		// we will not set the version for the platformIdent object here as we use this object
+		// for a QBE (Query by example) and this query should not be performed based on the
+		// version information.
+
+		List<PlatformIdent> platformIdentResults = platformIdentDao.findByExample(platformIdent);
+		if (1 == platformIdentResults.size()) {
+			platformIdent = platformIdentResults.get(0);
+		} else if (platformIdentResults.size() > 1) {
+			// this cannot occur anymore, if it occurs, then there is something totally wrong!
+			log.fatal("More than one platform ident has been retrieved! Please send your Database to the NovaTec inspectIT support!");
+			throw new ServiceException("Platform ident can not be registered because the inspectIT Database has more than one corresponding platform ident already.");
+		}
+
+		// always update the time stamp and ips, no matter if this is an old or new record.
+		platformIdent.setTimeStamp(new Timestamp(GregorianCalendar.getInstance().getTimeInMillis()));
+		platformIdent.setDefinedIPs(definedIPs);
+
+		// also always update the version information of the agent
+		platformIdent.setVersion(version);
+
+		platformIdentDao.saveOrUpdate(platformIdent);
+
+		agentStatusDataProvider.registerConnected(platformIdent.getId());
+
+		if (log.isInfoEnabled()) {
+			log.info("Successfully registered Agent '" + agentName + "' with id " + platformIdent.getId() + ", version " + version + " and following network interfaces:");
+			printOutDefinedIPs(definedIPs);
+		}
+		return platformIdent.getId();
 	}
 
 	/**
@@ -178,7 +162,6 @@ public class RegistrationService implements IRegistrationService {
 		if (1 == platformIdentResults.size()) {
 			platformIdent = platformIdentResults.get(0);
 			agentStatusDataProvider.registerDisconnected(platformIdent.getId());
-			licenseUtil.freeAgentSlot(platformIdent.getDefinedIPs(), platformIdent.getAgentName());
 			log.info("The Agent '" + platformIdent.getAgentName() + "' has been successfully unregistered.");
 		} else if (platformIdentResults.size() > 1) {
 			// this cannot occur anymore, if it occurs, then there is something totally wrong!
