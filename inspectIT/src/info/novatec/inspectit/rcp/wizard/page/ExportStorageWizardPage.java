@@ -5,7 +5,7 @@ import info.novatec.inspectit.rcp.composite.StorageInfoComposite;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
-import info.novatec.inspectit.storage.StorageFileExtensions;
+import info.novatec.inspectit.storage.StorageFileType;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
@@ -79,7 +79,7 @@ public class ExportStorageWizardPage extends WizardPage {
 				FileDialog fileDialog = new FileDialog(getShell(), SWT.SAVE);
 				fileDialog.setOverwrite(true);
 				fileDialog.setText("Select File for Export");
-				fileDialog.setFilterExtensions(new String[] { "*" + StorageFileExtensions.ZIP_STORAGE_EXT });
+				fileDialog.setFilterExtensions(new String[] { "*" + StorageFileType.ZIP_STORAGE_FILE.getExtension() });
 				fileDialog.setFileName(storageData.getName());
 				String file = fileDialog.open();
 				if (null != file) {

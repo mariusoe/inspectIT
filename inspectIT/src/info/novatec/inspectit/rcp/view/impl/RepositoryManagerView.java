@@ -477,7 +477,7 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void repositoryRemoved(CmrRepositoryDefinition cmrRepositoryDefinition) {
+	public void repositoryRemoved(final CmrRepositoryDefinition cmrRepositoryDefinition) {
 		DeferredAgentsComposite toRemove = null;
 		for (DeferredAgentsComposite composite : inputList) {
 			if (ObjectUtils.equals(composite.getRepositoryDefinition(), cmrRepositoryDefinition)) {
@@ -493,6 +493,10 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
+				if (ObjectUtils.equals(cmrRepositoryDefinition, lastSelectedRepository.getRepositoryDefinition())) {
+					// reset selection if removed repository is selected
+					treeViewer.setSelection(StructuredSelection.EMPTY);
+				}
 				if (inputList.isEmpty()) {
 					updateFormBody();
 				} else {
@@ -500,6 +504,38 @@ public class RepositoryManagerView extends ViewPart implements IRefreshableView,
 				}
 			}
 		});
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void repositoryAgentDeleted(CmrRepositoryDefinition cmrRepositoryDefinition, PlatformIdent agent) {
+		DeferredAgentsComposite toUpdate = null;
+		for (DeferredAgentsComposite composite : inputList) {
+			if (ObjectUtils.equals(composite.getRepositoryDefinition(), cmrRepositoryDefinition)) {
+				toUpdate = composite;
+				break;
+			}
+		}
+
+		if (null != toUpdate) {
+			final DeferredAgentsComposite finalToUpdate = toUpdate;
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					treeViewer.refresh(finalToUpdate, true);
+					if (ObjectUtils.equals(finalToUpdate, lastSelectedRepository)) {
+						treeViewer.setSelection(StructuredSelection.EMPTY);
+						StructuredSelection ss = new StructuredSelection(finalToUpdate);
+						treeViewer.setSelection(ss, true);
+						if (null != cmrPropertyForm && !cmrPropertyForm.isDisposed()) {
+							cmrPropertyForm.refresh();
+						}
+					}
+				}
+			});
+		}
 	}
 
 	/**

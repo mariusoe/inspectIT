@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.editor.root;
 
+import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.editor.ISubView;
@@ -12,6 +13,14 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.provider.IInputDefinitionProvider;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryChangeListener;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
+import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
+import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
+import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
+import info.novatec.inspectit.rcp.storage.listener.StorageChangeListener;
+import info.novatec.inspectit.storage.IStorageData;
+import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.util.ObjectUtils;
 
 import java.util.List;
@@ -48,7 +57,7 @@ import org.eclipse.ui.part.EditorPart;
  * @author Patrice Bouillet
  * 
  */
-public abstract class AbstractRootEditor extends EditorPart implements IRootEditor, IInputDefinitionProvider {
+public abstract class AbstractRootEditor extends EditorPart implements IRootEditor, IInputDefinitionProvider, CmrRepositoryChangeListener, StorageChangeListener {
 
 	/**
 	 * The inner class for the update timer which just calls the
@@ -191,6 +200,9 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 		this.subView.setRootEditor(this);
 		this.subView.init();
 		editorSite.setSelectionProvider(new MultiSubViewSelectionProvider(this));
+
+		InspectIT.getDefault().getCmrRepositoryManager().addCmrRepositoryChangeListener(this);
+		InspectIT.getDefault().getInspectITStorageManager().addStorageChangeListener(this);
 	}
 
 	/**
@@ -574,8 +586,102 @@ public abstract class AbstractRootEditor extends EditorPart implements IRootEdit
 	/**
 	 * {@inheritDoc}
 	 */
+	public void repositoryOnlineStatusUpdated(CmrRepositoryDefinition repositoryDefinition, OnlineStatus oldStatus, OnlineStatus newStatus) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void repositoryAdded(CmrRepositoryDefinition cmrRepositoryDefinition) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void repositoryRemoved(CmrRepositoryDefinition cmrRepositoryDefinition) {
+		if (ObjectUtils.equals(cmrRepositoryDefinition, getInputDefinition().getRepositoryDefinition())) {
+			close();
+		} else if (getInputDefinition().getRepositoryDefinition() instanceof StorageRepositoryDefinition) {
+			// close also if storage is displayed from the repository that is removed
+			StorageRepositoryDefinition storageRepositoryDefinition = (StorageRepositoryDefinition) getInputDefinition().getRepositoryDefinition();
+			if (ObjectUtils.equals(cmrRepositoryDefinition, storageRepositoryDefinition.getCmrRepositoryDefinition()) && !storageRepositoryDefinition.getLocalStorageData().isFullyDownloaded()) {
+				close();
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void repositoryDataUpdated(CmrRepositoryDefinition cmrRepositoryDefinition) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void repositoryAgentDeleted(CmrRepositoryDefinition cmrRepositoryDefinition, PlatformIdent agent) {
+		if (ObjectUtils.equals(cmrRepositoryDefinition, getInputDefinition().getRepositoryDefinition())) {
+			if (agent.getId() == getInputDefinition().getIdDefinition().getPlatformId()) {
+				close();
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void storageDataUpdated(IStorageData storageData) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void storageRemotelyDeleted(IStorageData storageData) {
+		RepositoryDefinition repositoryDefinition = getInputDefinition().getRepositoryDefinition();
+		if (repositoryDefinition instanceof StorageRepositoryDefinition) {
+			LocalStorageData localStorageData = ((StorageRepositoryDefinition) repositoryDefinition).getLocalStorageData();
+			if (!localStorageData.isFullyDownloaded() && ObjectUtils.equals(localStorageData.getId(), storageData.getId())) {
+				close();
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void storageLocallyDeleted(IStorageData storageData) {
+		RepositoryDefinition repositoryDefinition = getInputDefinition().getRepositoryDefinition();
+		if (repositoryDefinition instanceof StorageRepositoryDefinition) {
+			LocalStorageData localStorageData = ((StorageRepositoryDefinition) repositoryDefinition).getLocalStorageData();
+			if (ObjectUtils.equals(localStorageData.getId(), storageData.getId())) {
+				if (!InspectIT.getDefault().getInspectITStorageManager().getMountedAvailableStorages().contains(storageData)) {
+					// close only if the remote one is also not available
+					close();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Closes the editor.
+	 */
+	protected void close() {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				getEditorSite().getPage().closeEditor(AbstractRootEditor.this, false);
+			}
+		});
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void dispose() {
+		InspectIT.getDefault().getCmrRepositoryManager().removeCmrRepositoryChangeListener(this);
+		InspectIT.getDefault().getInspectITStorageManager().removeStorageChangeListener(this);
+
 		// stop the timer if it is active
 		stopUpdateTimer();
 

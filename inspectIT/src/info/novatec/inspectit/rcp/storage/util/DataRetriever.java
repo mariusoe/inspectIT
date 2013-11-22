@@ -9,6 +9,7 @@ import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
+import info.novatec.inspectit.storage.StorageFileType;
 import info.novatec.inspectit.storage.StorageManager;
 import info.novatec.inspectit.storage.nio.stream.StreamProvider;
 import info.novatec.inspectit.storage.serializer.ISerializer;
@@ -65,30 +66,6 @@ import com.esotericsoftware.kryo.io.Input;
  * 
  */
 public class DataRetriever {
-
-	/**
-	 * Enumeration for different storage file types that can be downloaded.
-	 * 
-	 * @author Ivan Senic
-	 * 
-	 */
-	public enum StorageFileType {
-
-		/**
-		 * Agent files.
-		 */
-		AGENT,
-
-		/**
-		 * Indexing files.
-		 */
-		INDEX,
-
-		/**
-		 * Data files.
-		 */
-		DATA;
-	}
 
 	/**
 	 * Amount of serializers to be available to this class.
@@ -422,18 +399,18 @@ public class DataRetriever {
 		Map<String, Long> allFiles = new HashMap<String, Long>();
 
 		// agent files
-		if (ArrayUtils.contains(fileTypes, StorageFileType.AGENT)) {
+		if (ArrayUtils.contains(fileTypes, StorageFileType.AGENT_FILE)) {
 			Map<String, Long> platformIdentsFiles = cmrRepositoryDefinition.getStorageService().getAgentFilesLocations(storageData);
 			allFiles.putAll(platformIdentsFiles);
 		}
 
 		// indexing files
-		if (ArrayUtils.contains(fileTypes, StorageFileType.INDEX)) {
+		if (ArrayUtils.contains(fileTypes, StorageFileType.INDEX_FILE)) {
 			Map<String, Long> indexingTreeFiles = cmrRepositoryDefinition.getStorageService().getIndexFilesLocations(storageData);
 			allFiles.putAll(indexingTreeFiles);
 		}
 
-		if (ArrayUtils.contains(fileTypes, StorageFileType.DATA)) {
+		if (ArrayUtils.contains(fileTypes, StorageFileType.DATA_FILE)) {
 			// data files
 			Map<String, Long> dataFiles = cmrRepositoryDefinition.getStorageService().getDataFilesLocations(storageData);
 			allFiles.putAll(dataFiles);

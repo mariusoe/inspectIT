@@ -7,6 +7,7 @@ import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
 import info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider;
 import info.novatec.inspectit.storage.util.DeleteFileVisitor;
+import info.novatec.inspectit.storage.util.StorageDeleteFileVisitor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +27,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.mutable.MutableLong;
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,7 +134,7 @@ public abstract class StorageManager {
 	 * @return {@link Path} that can be used in IO operations.
 	 */
 	public Path getChannelPath(IStorageData storageData, IStorageDescriptor descriptor) {
-		return getStoragePath(storageData).resolve(descriptor.getChannelId() + StorageFileExtensions.DATA_FILE_EXT);
+		return getStoragePath(storageData).resolve(descriptor.getChannelId() + StorageFileType.DATA_FILE.getExtension());
 	}
 
 	/**
@@ -145,7 +147,7 @@ public abstract class StorageManager {
 	 * @return {@link Path} that can be used in IO operations.
 	 */
 	public Path getChannelPath(IStorageData storageData, int channelId) {
-		return getStoragePath(storageData).resolve(channelId + StorageFileExtensions.DATA_FILE_EXT);
+		return getStoragePath(storageData).resolve(channelId + StorageFileType.DATA_FILE.getExtension());
 	}
 
 	/**
@@ -182,7 +184,7 @@ public abstract class StorageManager {
 		sb.append(storageData.getId());
 		sb.append('/');
 		sb.append(channelId.intValue());
-		sb.append(StorageFileExtensions.DATA_FILE_EXT);
+		sb.append(StorageFileType.DATA_FILE.getExtension());
 		return sb.toString();
 	}
 
@@ -198,7 +200,7 @@ public abstract class StorageManager {
 	 *             If serialization fails.
 	 */
 	protected void writeStorageDataToDisk(StorageData storageData) throws IOException, SerializationException {
-		this.writeStorageDataToDisk(storageData, getStoragePath(storageData), StorageFileExtensions.STORAGE_FILE_EXT);
+		this.writeStorageDataToDisk(storageData, getStoragePath(storageData), StorageFileType.STORAGE_FILE.getExtension());
 	}
 
 	/**
@@ -213,7 +215,7 @@ public abstract class StorageManager {
 	 *             If serialization fails.
 	 */
 	protected void writeLocalStorageDataToDisk(LocalStorageData localStorageData) throws IOException, SerializationException {
-		this.writeStorageDataToDisk(localStorageData, getStoragePath(localStorageData), StorageFileExtensions.LOCAL_STORAGE_FILE_EXT);
+		this.writeStorageDataToDisk(localStorageData, getStoragePath(localStorageData), StorageFileType.LOCAL_STORAGE_FILE.getExtension());
 	}
 
 	/**
@@ -230,7 +232,7 @@ public abstract class StorageManager {
 	 *             If serialization fails.
 	 */
 	protected void writeStorageDataToDisk(StorageData storageData, Path dir) throws IOException, SerializationException {
-		this.writeStorageDataToDisk(storageData, dir, StorageFileExtensions.STORAGE_FILE_EXT);
+		this.writeStorageDataToDisk(storageData, dir, StorageFileType.STORAGE_FILE.getExtension());
 	}
 
 	/**
@@ -247,7 +249,7 @@ public abstract class StorageManager {
 	 *             If serialization fails.
 	 */
 	protected void writeLocalStorageDataToDisk(LocalStorageData localStorageData, Path dir) throws IOException, SerializationException {
-		this.writeStorageDataToDisk(localStorageData, dir, StorageFileExtensions.LOCAL_STORAGE_FILE_EXT);
+		this.writeStorageDataToDisk(localStorageData, dir, StorageFileType.LOCAL_STORAGE_FILE.getExtension());
 	}
 
 	/**
@@ -318,11 +320,34 @@ public abstract class StorageManager {
 		Path storageDir = getStoragePath(storageData);
 
 		if (log.isDebugEnabled()) {
-			log.info("Deleting the storage data from disk. Path: " + storageDir);
+			log.info("Deleting the complete storage data from disk. Path: " + storageDir);
 		}
 
 		if (Files.exists(storageDir)) {
 			Files.walkFileTree(storageDir, new DeleteFileVisitor());
+		}
+	}
+
+	/**
+	 * Deletes all files associated with given {@link StorageData}, but only of a types supplied
+	 * with a fileTypes parameter.
+	 * 
+	 * @param storageData
+	 *            Storage to delete data for.
+	 * @param fileTypes
+	 *            File types to delete.
+	 * @throws IOException
+	 *             If {@link IOException} happens.
+	 */
+	protected void deleteStorageDataFromDisk(IStorageData storageData, StorageFileType... fileTypes) throws IOException {
+		Path storageDir = getStoragePath(storageData);
+
+		if (log.isDebugEnabled()) {
+			log.info("Deleting the storage data from disk. Path: " + storageDir + ". File types to delete: " + ArrayUtils.toString(fileTypes));
+		}
+
+		if (Files.exists(storageDir)) {
+			Files.walkFileTree(storageDir, new StorageDeleteFileVisitor(fileTypes, false));
 		}
 	}
 
@@ -450,7 +475,7 @@ public abstract class StorageManager {
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
 			while (entries.hasMoreElements()) {
 				ZipEntry zipEntry = entries.nextElement();
-				if (zipEntry.getName().endsWith(StorageFileExtensions.LOCAL_STORAGE_FILE_EXT)) {
+				if (zipEntry.getName().endsWith(StorageFileType.LOCAL_STORAGE_FILE.getExtension())) {
 
 					// check if data is gziped
 					boolean isGzip = false;
@@ -494,7 +519,7 @@ public abstract class StorageManager {
 	 */
 	protected void unzipStorageData(final Path zipFilePath, final Path destinationPath) throws StorageException, IOException {
 		if (Files.notExists(zipFilePath)) {
-			throw new StorageException("Can not unpack the storage " + StorageFileExtensions.ZIP_STORAGE_EXT + " file. File " + zipFilePath + " does not exist.");
+			throw new StorageException("Can not unpack the storage " + StorageFileType.ZIP_STORAGE_FILE.getExtension() + " file. File " + zipFilePath + " does not exist.");
 		}
 
 		Files.createDirectories(destinationPath);

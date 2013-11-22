@@ -10,7 +10,7 @@ import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageData.StorageState;
 import info.novatec.inspectit.storage.StorageException;
-import info.novatec.inspectit.storage.StorageFileExtensions;
+import info.novatec.inspectit.storage.StorageFileType;
 import info.novatec.inspectit.storage.StorageManager;
 import info.novatec.inspectit.storage.StorageWriter;
 import info.novatec.inspectit.storage.label.AbstractStorageLabel;
@@ -658,7 +658,7 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 	 *             If {@link IOException} occurs.
 	 */
 	public Map<String, Long> getIndexFilesLocations(StorageData storageData) throws IOException {
-		return getFilesHttpLocation(storageData, StorageFileExtensions.INDEX_FILE_EXT);
+		return getFilesHttpLocation(storageData, StorageFileType.INDEX_FILE.getExtension());
 	}
 
 	/**
@@ -677,7 +677,7 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 	 *             If {@link IOException} occurs.
 	 */
 	public Map<String, Long> getDataFilesLocations(StorageData storageData) throws IOException {
-		return getFilesHttpLocation(storageData, StorageFileExtensions.DATA_FILE_EXT);
+		return getFilesHttpLocation(storageData, StorageFileType.DATA_FILE.getExtension());
 	}
 
 	/**
@@ -696,7 +696,7 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 	 *             If {@link IOException} occurs.
 	 */
 	public Map<String, Long> getAgentFilesLocations(StorageData storageData) throws IOException {
-		return getFilesHttpLocation(storageData, StorageFileExtensions.AGENT_FILE_EXT);
+		return getFilesHttpLocation(storageData, StorageFileType.AGENT_FILE.getExtension());
 	}
 
 	/**
@@ -896,7 +896,7 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 					try {
 						// skip all other files
-						if (!file.toString().endsWith(StorageFileExtensions.ZIP_STORAGE_EXT)) {
+						if (!file.toString().endsWith(StorageFileType.ZIP_STORAGE_FILE.getExtension())) {
 							return FileVisitResult.CONTINUE;
 						}
 
@@ -913,7 +913,7 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 								printStorageCmrVersionWarn(storageData);
 
 								unzipStorageData(file, getStoragePath(importedStorageData));
-								Path localInformation = getStoragePath(importedStorageData).resolve(importedStorageData.getId() + StorageFileExtensions.LOCAL_STORAGE_FILE_EXT);
+								Path localInformation = getStoragePath(importedStorageData).resolve(importedStorageData.getId() + StorageFileType.LOCAL_STORAGE_FILE.getExtension());
 								Files.deleteIfExists(localInformation);
 								writeStorageDataToDisk(importedStorageData);
 							} else {
@@ -959,7 +959,7 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 					// skip all other files, search for the local data
-					if (!file.toString().endsWith(localStorageData.getId() + StorageFileExtensions.LOCAL_STORAGE_FILE_EXT)) {
+					if (!file.toString().endsWith(localStorageData.getId() + StorageFileType.LOCAL_STORAGE_FILE.getExtension())) {
 						return FileVisitResult.CONTINUE;
 					}
 
@@ -996,7 +996,7 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 						printStorageCmrVersionWarn(storageData);
 
 						Files.walkFileTree(parentDir, new CopyMoveFileVisitor(parentDir, storageDir, true));
-						Path localInformation = getStoragePath(storageData).resolve(storageData.getId() + StorageFileExtensions.LOCAL_STORAGE_FILE_EXT);
+						Path localInformation = getStoragePath(storageData).resolve(storageData.getId() + StorageFileType.LOCAL_STORAGE_FILE.getExtension());
 						Files.deleteIfExists(localInformation);
 						writeStorageDataToDisk(storageData);
 					} else {
@@ -1068,7 +1068,7 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 			Files.walkFileTree(defaultDirectory, new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-					if (file.toString().endsWith(StorageFileExtensions.STORAGE_FILE_EXT)) {
+					if (file.toString().endsWith(StorageFileType.STORAGE_FILE.getExtension())) {
 
 						InputStream inputStream = null;
 						Input input = null;

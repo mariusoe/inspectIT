@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.repository;
 
+import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 
 /**
@@ -46,4 +47,14 @@ public interface CmrRepositoryChangeListener {
 	 *            {@link CmrRepositoryDefinition} that was updated.
 	 */
 	void repositoryDataUpdated(CmrRepositoryDefinition cmrRepositoryDefinition);
+
+	/**
+	 * Informs the listener that the provided agent on the repository has been deleted.
+	 * 
+	 * @param cmrRepositoryDefinition
+	 *            the repository definition.
+	 * @param agent
+	 *            Agent that was deleted.
+	 */
+	void repositoryAgentDeleted(CmrRepositoryDefinition cmrRepositoryDefinition, PlatformIdent agent);
 }

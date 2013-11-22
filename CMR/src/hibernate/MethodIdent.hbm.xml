@@ -13,7 +13,7 @@
 			<key column="method_ident_id" />
 			<one-to-many class="MethodIdentToSensorType" />
 		</set>
-		<many-to-one name="platformIdent" column="platform_id" class="PlatformIdent" not-null="true" />
+		<many-to-one name="platformIdent" column="platform_id" class="PlatformIdent" />
 
 		<property name="parameters" type="info.novatec.inspectit.cmr.util.ListStringType">
 			<column name="parameters" length="2000" />

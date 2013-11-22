@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.composite;
 
+import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.formatter.ImageFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
@@ -8,6 +9,8 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
+import info.novatec.inspectit.rcp.storage.listener.StorageChangeListener;
+import info.novatec.inspectit.storage.IStorageData;
 
 import java.util.Objects;
 
@@ -36,7 +39,7 @@ import org.eclipse.ui.forms.FormColors;
  * @author Ivan Senic
  * 
  */
-public class BreadcrumbTitleComposite extends Composite implements CmrRepositoryChangeListener {
+public class BreadcrumbTitleComposite extends Composite implements CmrRepositoryChangeListener, StorageChangeListener {
 
 	/**
 	 * Maximum text length for the label content.
@@ -154,6 +157,7 @@ public class BreadcrumbTitleComposite extends Composite implements CmrRepository
 			InspectIT.getDefault().getCmrRepositoryManager().addCmrRepositoryChangeListener(this);
 		} else if (repositoryDefinition instanceof StorageRepositoryDefinition) {
 			repositoryLabel.setImage(ImageFormatter.getStorageRepositoryImage((StorageRepositoryDefinition) repositoryDefinition));
+			InspectIT.getDefault().getInspectITStorageManager().addStorageChangeListener(this);
 		}
 	}
 
@@ -244,6 +248,13 @@ public class BreadcrumbTitleComposite extends Composite implements CmrRepository
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void repositoryAgentDeleted(CmrRepositoryDefinition cmrRepositoryDefinition, PlatformIdent agent) {
+	}
+
+	/**
 	 * Layouts the widget so that the text is properly displayed on the composite.
 	 */
 	private void layoutInternal() {
@@ -268,9 +279,56 @@ public class BreadcrumbTitleComposite extends Composite implements CmrRepository
 	 * {@inheritDoc}
 	 */
 	@Override
+	public void storageDataUpdated(IStorageData storageData) {
+		updateStorageDetailsIfDisplayed(storageData);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void storageRemotelyDeleted(IStorageData storageData) {
+		updateStorageDetailsIfDisplayed(storageData);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void storageLocallyDeleted(IStorageData storageData) {
+		updateStorageDetailsIfDisplayed(storageData);
+	}
+
+	/**
+	 * Updates storage name and icon if given storageData is displayed currently on the breadcrumb.
+	 * 
+	 * @param storageData
+	 *            {@link IStorageData}
+	 */
+	private void updateStorageDetailsIfDisplayed(IStorageData storageData) {
+		if (repositoryDefinition instanceof StorageRepositoryDefinition) {
+			final StorageRepositoryDefinition storageRepositoryDefinition = (StorageRepositoryDefinition) repositoryDefinition;
+			if (Objects.equals(storageRepositoryDefinition.getLocalStorageData(), storageData)) {
+				getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						repositoryLabel.setText(repositoryDefinition.getName());
+						repositoryLabel.setImage(ImageFormatter.getStorageRepositoryImage(storageRepositoryDefinition));
+						layoutInternal();
+					}
+				});
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void dispose() {
 		arrow.dispose();
 		InspectIT.getDefault().getCmrRepositoryManager().removeCmrRepositoryChangeListener(this);
+		InspectIT.getDefault().getInspectITStorageManager().removeStorageChangeListener(this);
 		super.dispose();
 	}
 
@@ -419,4 +477,5 @@ public class BreadcrumbTitleComposite extends Composite implements CmrRepository
 			return new Color(display, blend);
 		}
 	}
+
 }

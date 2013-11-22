@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.preferences.page;
 
+import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.dialog.AddCmrRepositoryDefinitionDialog;
@@ -298,6 +299,13 @@ public class CmrRepositoryPreferencePage extends PreferencePage implements IWork
 				tableViewer.refresh(cmrRepositoryDefinition);
 			}
 		});
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void repositoryAgentDeleted(CmrRepositoryDefinition cmrRepositoryDefinition, PlatformIdent agent) {
 	}
 
 	/**

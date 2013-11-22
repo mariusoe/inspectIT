@@ -135,7 +135,7 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 
 			@Override
 			public boolean accept(File dir, String name) {
-				return name.endsWith(StorageFileExtensions.STORAGE_FILE_EXT);
+				return name.endsWith(StorageFileType.STORAGE_FILE.getExtension());
 			}
 		});
 
@@ -224,7 +224,7 @@ public class StorageIntegrationTest extends AbstractTransactionalTestNGLogSuppor
 		File[] indexFiles = storageFolder.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
-				return name.endsWith(StorageFileExtensions.INDEX_FILE_EXT);
+				return name.endsWith(StorageFileType.INDEX_FILE.getExtension());
 			}
 		});
 		assertThat(indexFiles.length, is(equalTo(1)));

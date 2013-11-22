@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.view.impl;
 
+import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.action.MenuAction;
@@ -775,6 +776,13 @@ public class StorageManagerView extends ViewPart implements CmrRepositoryChangeL
 				updateViewToolbar();
 			}
 		});
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void repositoryAgentDeleted(CmrRepositoryDefinition cmrRepositoryDefinition, PlatformIdent agent) {
 	}
 
 	/**

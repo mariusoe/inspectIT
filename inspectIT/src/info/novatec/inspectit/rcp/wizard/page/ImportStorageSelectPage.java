@@ -3,7 +3,7 @@ package info.novatec.inspectit.rcp.wizard.page;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition.OnlineStatus;
-import info.novatec.inspectit.storage.StorageFileExtensions;
+import info.novatec.inspectit.storage.StorageFileType;
 
 import java.util.List;
 
@@ -85,7 +85,7 @@ public class ImportStorageSelectPage extends WizardPage {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
 				fileDialog.setText("Select File to Import");
-				fileDialog.setFilterExtensions(new String[] { "*" + StorageFileExtensions.ZIP_STORAGE_EXT });
+				fileDialog.setFilterExtensions(new String[] { "*" + StorageFileType.ZIP_STORAGE_FILE.getExtension() });
 				String file = fileDialog.open();
 				if (null != file) {
 					fileText.setText(file);

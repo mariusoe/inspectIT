@@ -13,13 +13,12 @@ import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.StorageRepositoryDefinitionProvider;
 import info.novatec.inspectit.rcp.storage.listener.StorageChangeListener;
 import info.novatec.inspectit.rcp.storage.util.DataRetriever;
-import info.novatec.inspectit.rcp.storage.util.DataRetriever.StorageFileType;
 import info.novatec.inspectit.rcp.storage.util.DataUploader;
 import info.novatec.inspectit.storage.IStorageData;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageException;
-import info.novatec.inspectit.storage.StorageFileExtensions;
+import info.novatec.inspectit.storage.StorageFileType;
 import info.novatec.inspectit.storage.StorageManager;
 import info.novatec.inspectit.storage.label.StringStorageLabel;
 import info.novatec.inspectit.storage.label.type.impl.ExploredByLabelType;
@@ -178,7 +177,7 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 		} else {
 			try {
 				subMonitor.setTaskName("Downloading agent and indexing files for storage '" + storageData.getName() + "'..");
-				dataRetriever.downloadAndSaveStorageFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true, subMonitor, StorageFileType.AGENT, StorageFileType.INDEX);
+				dataRetriever.downloadAndSaveStorageFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true, subMonitor, StorageFileType.AGENT_FILE, StorageFileType.INDEX_FILE);
 			} catch (Exception e) {
 				deleteLocalStorageData(localStorageData, false);
 				throw e;
@@ -256,7 +255,7 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 
 		Path directory = getStoragePath(localStorageData);
 		subMonitor.setTaskName("Downloading storage data files for storage '" + storageData.getName() + "'..");
-		dataRetriever.downloadAndSaveStorageFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true, subMonitor, StorageFileType.DATA);
+		dataRetriever.downloadAndSaveStorageFiles(cmrRepositoryDefinition, storageData, directory, compressBefore, true, subMonitor, StorageFileType.DATA_FILE);
 		downloadedStorages.add(localStorageData);
 		localStorageData.setFullyDownloaded(true);
 		try {
@@ -274,8 +273,10 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 *            {@link LocalStorageData}.
 	 * @throws IOException
 	 *             If deleting of the local data fails.
+	 * @throws StorageException
+	 *             If serialization fails.
 	 */
-	public void deleteLocalStorageData(LocalStorageData localStorageData) throws IOException {
+	public void deleteLocalStorageData(LocalStorageData localStorageData) throws IOException, StorageException {
 		this.deleteLocalStorageData(localStorageData, true);
 	}
 
@@ -288,12 +289,22 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 *            Should the listeners be informed.
 	 * @throws IOException
 	 *             If deleting of the local data fails.
+	 * @throws StorageException
+	 *             If serialization fails.
 	 */
-	private void deleteLocalStorageData(LocalStorageData localStorageData, boolean informListeners) throws IOException {
-		this.deleteCompleteStorageDataFromDisk(localStorageData);
-		mountedAvailableStorages.remove(localStorageData);
-		mountedNotAvailableStorages.remove(localStorageData);
+	private void deleteLocalStorageData(LocalStorageData localStorageData, boolean informListeners) throws IOException, StorageException {
+		localStorageData.setFullyDownloaded(false);
 		downloadedStorages.remove(localStorageData);
+		if (mountedAvailableStorages.containsKey(localStorageData) || mountedNotAvailableStorages.contains(localStorageData)) {
+			super.deleteStorageDataFromDisk(localStorageData, StorageFileType.DATA_FILE);
+			try {
+				writeLocalStorageDataToDisk(localStorageData);
+			} catch (SerializationException e) {
+				throw new StorageException(e);
+			}
+		} else {
+			super.deleteCompleteStorageDataFromDisk(localStorageData);
+		}
 
 		if (informListeners) {
 			synchronized (storageChangeListeners) {
@@ -484,11 +495,9 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 			throw new StorageException("The storage is not fully downloaded, and it's repository could not be found. The Storage repository definition could not be created.");
 		}
 
-		// find CMR repository def, allow null for downloaded storages
+		// find CMR repository def, allow null for downloaded and not mounted storages
 		CmrRepositoryDefinition cmrRepositoryDefinition = null;
-		if (!downloadedStorages.contains(localStorageData)) {
-			cmrRepositoryDefinition = mountedAvailableStorages.get(localStorageData);
-		}
+		cmrRepositoryDefinition = mountedAvailableStorages.get(localStorageData);
 
 		// get agents
 		List<PlatformIdent> platformIdents = getPlatformIdentsLocally(localStorageData);
@@ -693,7 +702,7 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 			// add local storage data info
 			LocalStorageData localStorageData = new LocalStorageData(storageData);
 			localStorageData.setFullyDownloaded(true);
-			String fileName = localStorageData.getId() + StorageFileExtensions.LOCAL_STORAGE_FILE_EXT;
+			String fileName = localStorageData.getId() + StorageFileType.LOCAL_STORAGE_FILE.getExtension();
 			ZipEntry zipEntry = new ZipEntry(fileName);
 			zos.putNextEntry(zipEntry);
 			serializeDataToOutputStream(localStorageData, zos, false);
@@ -776,6 +785,12 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 * {@inheritDoc}
 	 */
 	public void repositoryDataUpdated(CmrRepositoryDefinition cmrRepositoryDefinition) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void repositoryAgentDeleted(CmrRepositoryDefinition cmrRepositoryDefinition, PlatformIdent agent) {
 	}
 
 	/**
@@ -887,7 +902,7 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 */
 	private List<PlatformIdent> getPlatformIdentsLocally(final IStorageData storageData) throws IOException, SerializationException {
 		Path storagePath = getStoragePath(storageData);
-		List<PlatformIdent> returnList = this.getObjectsByFileTreeWalk(storagePath, StorageFileExtensions.AGENT_FILE_EXT);
+		List<PlatformIdent> returnList = this.getObjectsByFileTreeWalk(storagePath, StorageFileType.AGENT_FILE.getExtension());
 		if (!returnList.isEmpty()) {
 			return returnList;
 		} else {
@@ -908,7 +923,7 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 */
 	private IStorageTreeComponent<DefaultData> getIndexingTree(final IStorageData storageData) throws IOException, SerializationException {
 		Path storagePath = getStoragePath(storageData);
-		List<IStorageTreeComponent<DefaultData>> indexingTrees = this.getObjectsByFileTreeWalk(storagePath, StorageFileExtensions.INDEX_FILE_EXT);
+		List<IStorageTreeComponent<DefaultData>> indexingTrees = this.getObjectsByFileTreeWalk(storagePath, StorageFileType.INDEX_FILE.getExtension());
 		if (!indexingTrees.isEmpty()) {
 			if (indexingTrees.size() == 1) {
 				return indexingTrees.get(0);
@@ -932,7 +947,7 @@ public class InspectITStorageManager extends StorageManager implements CmrReposi
 	 *             If data can not be deserialized.
 	 */
 	private List<LocalStorageData> getMountedStoragesFromDisk() throws IOException, SerializationException {
-		return this.getObjectsByFileTreeWalk(getDefaultStorageDirPath(), StorageFileExtensions.LOCAL_STORAGE_FILE_EXT);
+		return this.getObjectsByFileTreeWalk(getDefaultStorageDirPath(), StorageFileType.LOCAL_STORAGE_FILE.getExtension());
 	}
 
 	/**

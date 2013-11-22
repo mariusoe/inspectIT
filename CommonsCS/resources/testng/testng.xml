@@ -15,4 +15,9 @@
 			<class name="info.novatec.inspectit.storage.nio.stream.ExtendedByteBufferInputStreamTest" />
 		</classes>
 	</test>
+	<test name="Util">
+		<classes>
+			<class name="info.novatec.inspectit.storage.util.FileVisitorsTest" />
+		</classes>
+	</test>
 </suite>

@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.repository;
 
+import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
@@ -218,14 +219,26 @@ public class CmrRepositoryManager {
 	}
 
 	/**
+	 * Informs all listener that the provided agent on the repository has been deleted.
+	 * 
+	 * @param cmrRepositoryDefinition
+	 *            the repository definition.
+	 * @param agent
+	 *            Agent that was deleted.
+	 */
+	public void repositoryAgentDeleted(CmrRepositoryDefinition cmrRepositoryDefinition, PlatformIdent agent) {
+		for (CmrRepositoryChangeListener listener : cmrRepositoryChangeListeners) {
+			listener.repositoryAgentDeleted(cmrRepositoryDefinition, agent);
+		}
+	}
+
+	/**
 	 * Save the preferences to the backend store.
 	 */
 	private void savePreference() {
 		List<CmrRepositoryDefinition> toSave = new ArrayList<CmrRepositoryDefinition>();
 		for (CmrRepositoryDefinition repositoryDefinition : cmrRepositoryDefinitions) {
-			if (repositoryDefinition instanceof CmrRepositoryDefinition) {
-				toSave.add((CmrRepositoryDefinition) repositoryDefinition);
-			}
+			toSave.add(repositoryDefinition);
 		}
 		PreferencesUtils.saveCmrRepositoryDefinitions(toSave, false);
 	}

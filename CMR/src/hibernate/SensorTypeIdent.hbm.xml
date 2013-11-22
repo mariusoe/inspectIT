@@ -9,7 +9,7 @@
 			<column name="discriminator" />
 		</discriminator>
 
-		<many-to-one name="platformIdent" column="platform_id" class="PlatformIdent" not-null="true" />
+		<many-to-one name="platformIdent" column="platform_id" class="PlatformIdent" />
 
 		<property name="fullyQualifiedClassName">
 			<column name="fully_qualified_class_name" />
@@ -18,7 +18,7 @@
 		<subclass name="PlatformSensorTypeIdent" discriminator-value="PSTI" />
 
 		<subclass name="MethodSensorTypeIdent" discriminator-value="MSTI">
-			<set name="methodIdentToSensorTypes" inverse="true" lazy="true">
+			<set name="methodIdentToSensorTypes" inverse="true" lazy="true" cascade="all">
 				<key column="method_sensor_type_ident_id" />
 				<one-to-many class="MethodIdentToSensorType" />
 			</set>

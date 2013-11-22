@@ -700,6 +700,46 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 	 * {@inheritDoc}
 	 */
 	public void repositoryRemoved(CmrRepositoryDefinition cmrRepositoryDefinition) {
+		if (ObjectUtils.equals(cmrRepositoryDefinition, displayedRepositoryDefinition)) {
+			displayedRepositoryDefinition = null; // NOPMD
+			displayedAgent = null; // NOPMD
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					performUpdate();
+				}
+			});
+		} else if (displayedRepositoryDefinition instanceof StorageRepositoryDefinition) {
+			StorageRepositoryDefinition storageRepositoryDefinition = (StorageRepositoryDefinition) displayedRepositoryDefinition;
+			if (ObjectUtils.equals(cmrRepositoryDefinition, storageRepositoryDefinition.getCmrRepositoryDefinition()) && !storageRepositoryDefinition.getLocalStorageData().isFullyDownloaded()) {
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						agentsCombo.removeAll();
+						agentsCombo.setEnabled(false);
+						displayMessage("CMR Repository for selected storage was removed.", Display.getDefault().getSystemImage(SWT.ICON_WARNING));
+					}
+				});
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void repositoryAgentDeleted(CmrRepositoryDefinition cmrRepositoryDefinition, PlatformIdent agent) {
+		if (ObjectUtils.equals(cmrRepositoryDefinition, displayedRepositoryDefinition)) {
+			if (ObjectUtils.equals(agent, displayedAgent)) {
+				displayedAgent = null; // NOPMD
+			}
+			availableAgents.remove(agent);
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					performUpdate();
+				}
+			});
+		}
 	}
 
 	/**
@@ -745,14 +785,20 @@ public class DataExplorerView extends ViewPart implements CmrRepositoryChangeLis
 		if (displayedRepositoryDefinition instanceof StorageRepositoryDefinition) {
 			final StorageRepositoryDefinition storageRepositoryDefinition = (StorageRepositoryDefinition) displayedRepositoryDefinition;
 			if (ObjectUtils.equals(storageData.getId(), storageRepositoryDefinition.getLocalStorageData().getId())) {
-				Display.getDefault().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						agentsCombo.removeAll();
-						agentsCombo.setEnabled(false);
-						displayMessage("Selected storage was locally deleted and is not available anymore.", Display.getDefault().getSystemImage(SWT.ICON_WARNING));
-					}
-				});
+				if (InspectIT.getDefault().getInspectITStorageManager().getMountedAvailableStorages().contains(storageData)) {
+					// if remote one is available, just update
+					performUpdate();
+				} else {
+					// if it is not available on the CMR, remove everything
+					Display.getDefault().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							agentsCombo.removeAll();
+							agentsCombo.setEnabled(false);
+							displayMessage("Selected storage was locally deleted and is not available anymore.", Display.getDefault().getSystemImage(SWT.ICON_WARNING));
+						}
+					});
+				}
 			}
 		}
 	}

@@ -4,7 +4,7 @@ import info.novatec.inspectit.cmr.dao.impl.PlatformIdentDaoImpl;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.spring.logger.Logger;
-import info.novatec.inspectit.storage.StorageFileExtensions;
+import info.novatec.inspectit.storage.StorageFileType;
 import info.novatec.inspectit.storage.StorageWriter;
 import info.novatec.inspectit.storage.label.ObjectStorageLabel;
 import info.novatec.inspectit.storage.label.type.impl.DataTimeFrameLabelType;
@@ -92,7 +92,7 @@ public class CmrStorageWriter extends StorageWriter {
 	protected void writeAgentData() throws IOException {
 		List<PlatformIdent> involvedPlatformIdents = platformIdentDao.findAllInitialized(involvedAgentsSet);
 		for (PlatformIdent agent : involvedPlatformIdents) {
-			super.writeNonDefaultDataObject(agent, agent.getId() + StorageFileExtensions.AGENT_FILE_EXT);
+			super.writeNonDefaultDataObject(agent, agent.getId() + StorageFileType.AGENT_FILE.getExtension());
 		}
 	}
 
