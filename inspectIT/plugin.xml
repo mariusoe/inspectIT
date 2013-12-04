@@ -2375,5 +2375,33 @@
             sequence="M1+M2+M">
       </key>
    </extension>
+   <extension
+         point="org.eclipse.ui.intro">
+      <intro
+            class="org.eclipse.ui.intro.config.CustomizableIntroPart"
+            icon="icons/16x16.png"
+            id="info.novatec.inspectit.rcp.intro">
+      </intro>
+      <introProductBinding
+            introId="info.novatec.inspectit.rcp.intro"
+            productId="info.novatec.inspectit.rcp.product">
+      </introProductBinding>
+   </extension>
+   <extension
+         point="org.eclipse.ui.intro.config">
+      <config
+            content="content/introContent.xml"
+            id="info.novatec.inspectit.rcp.introConfigId"
+            introId="info.novatec.inspectit.rcp.intro">
+         <presentation
+               home-page-id="root">
+            <implementation
+                  kind="html"
+                  os="win32,linux,macosx"
+                  style="content/shared.css">
+            </implementation>
+         </presentation>
+      </config>
+   </extension>
 
 </plugin>

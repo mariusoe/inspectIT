@@ -33,6 +33,8 @@
       </win>
    </launcher>
 
+   <intro introId="info.novatec.inspectit.rcp.intro"/>
+
    <vm>
    </vm>
 
@@ -157,6 +159,7 @@ NTSales_Allgemeine_Nutzungsbedingungen_inspectIT_en.doc_V2.0 / 24.07.2012
       <plugin id="org.eclipse.ui"/>
       <plugin id="org.eclipse.ui.cocoa" fragment="true"/>
       <plugin id="org.eclipse.ui.forms"/>
+      <plugin id="org.eclipse.ui.intro"/>
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.objenesis"/>
       <plugin id="org.springframework.aop"/>
