@@ -654,13 +654,18 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			if (InvocationSequenceDataHelper.hasCapturedParameters(data)) {
 				Set<ParameterContentData> parameters = InvocationSequenceDataHelper.getCapturedParameters(data);
 
+				boolean isFirst = true;
 				for (ParameterContentData parameterContentData : parameters) {
 					// shorten the representation here.
+					if (!isFirst) {
+						styledString.append(", ");
+					} else {
+						isFirst = false;
+					}
 					styledString.append("'");
 					styledString.append(parameterContentData.getName());
 					styledString.append("': ");
-					styledString.append(parameterContentData.getContent());
-					styledString.append(", ");
+					styledString.append(TextFormatter.clearLineBreaks(parameterContentData.getContent()));
 				}
 			}
 
