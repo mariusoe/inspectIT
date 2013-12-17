@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -305,6 +306,7 @@ public class CmrStorageManagerTest extends AbstractTestNGLogSupport {
 		DefaultData defaultData = mock(DefaultData.class);
 		when(storageManager.canWriteMore()).thenReturn(false);
 		when(storageRecorder.isRecordingOn()).thenReturn(true);
+		Mockito.doNothing().when(storageManager).stopRecording();
 		storageManager.record(defaultData);
 		verify(storageManager, times(1)).stopRecording();
 	}

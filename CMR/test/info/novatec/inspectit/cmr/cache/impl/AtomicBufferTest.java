@@ -15,6 +15,7 @@ import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
 
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 
 import org.mockito.Mock;
@@ -85,10 +86,15 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 	 * 
 	 * @throws Exception
 	 */
-	@Test
+	@Test(invocationCount = 5)
 	public void eviction() throws Exception {
+		Random random = new Random();
+		long elements = 1 + random.nextInt(10000);
+		elements += elements % 2;
+		int analyzers = 1 + random.nextInt(3);
+
 		// evict half of the buffer
-		when(bufferProperties.getInitialBufferSize()).thenReturn(100L);
+		when(bufferProperties.getInitialBufferSize()).thenReturn(elements);
 		when(bufferProperties.getEvictionOccupancyPercentage()).thenReturn(0.1f);
 		when(bufferProperties.getEvictionFragmentSizePercentage()).thenReturn(0.5f);
 		buffer.postConstruct();
@@ -96,24 +102,32 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 		DefaultData defaultData = mock(DefaultData.class);
 		when(defaultData.getObjectSize(objectSizes)).thenReturn(1L);
 
-		BufferAnalyzer bufferAnalyzer = new BufferAnalyzer(buffer);
-		bufferAnalyzer.start();
+		BufferAnalyzer[] analyzerArray = new BufferAnalyzer[analyzers];
+		for (int i = 0; i < analyzers; i++) {
+			BufferAnalyzer bufferAnalyzer = new BufferAnalyzer(buffer);
+			bufferAnalyzer.start();
+			analyzerArray[i] = bufferAnalyzer;
+		}
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < elements; i++) {
 			IBufferElement<DefaultData> bufferElement = new BufferElement<DefaultData>(defaultData);
 			buffer.put(bufferElement);
 		}
 
-		// wait for the elements to be analyzed
-		Thread.sleep(500);
-
-		bufferAnalyzer.interrupt();
+		// wait to be analyzed
+		while (buffer.getAnalyzedElements() < elements) {
+			Thread.sleep(50);
+		}
 
 		buffer.evict();
 
-		assertThat(buffer.getCurrentSize(), is(50L));
-		assertThat(buffer.getInsertedElemenets(), is(100L));
-		assertThat(buffer.getEvictedElemenets(), is(50L));
+		for (BufferAnalyzer bufferAnalyzer : analyzerArray) {
+			bufferAnalyzer.interrupt();
+		}
+
+		assertThat(buffer.getCurrentSize(), is(elements / 2));
+		assertThat(buffer.getInsertedElemenets(), is(elements));
+		assertThat(buffer.getEvictedElemenets(), is(elements / 2));
 	}
 
 	/**
@@ -121,21 +135,32 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 	 * 
 	 * @throws Exception
 	 */
-	@Test
+	@Test(invocationCount = 5)
 	public void analysisAndSize() throws Exception {
+		Random random = new Random();
+		long elements = 1 + random.nextInt(10000);
+		elements += elements % 2;
+		int analyzers = 1 + random.nextInt(3);
+
 		// eviction needed when 99% of the buffer is full
-		when(bufferProperties.getInitialBufferSize()).thenReturn(100L);
+		when(bufferProperties.getInitialBufferSize()).thenReturn(elements);
 		when(bufferProperties.getEvictionOccupancyPercentage()).thenReturn(0.99f);
 		buffer.postConstruct();
 
 		DefaultData defaultData = mock(DefaultData.class);
 		when(defaultData.getObjectSize(objectSizes)).thenReturn(1L);
 
-		BufferAnalyzer bufferAnalyzer = new BufferAnalyzer(buffer);
-		bufferAnalyzer.start();
-		IBufferElement<DefaultData> first = null;
+		// start analyzers
+		BufferAnalyzer[] analyzerArray = new BufferAnalyzer[analyzers];
+		for (int i = 0; i < analyzers; i++) {
+			BufferAnalyzer bufferAnalyzer = new BufferAnalyzer(buffer);
+			bufferAnalyzer.start();
+			analyzerArray[i] = bufferAnalyzer;
+		}
 
-		for (int i = 0; i < 99; i++) {
+		IBufferElement<DefaultData> first = null;
+		long firstRunElements = (long) (elements * 0.99f) - 1;
+		for (int i = 0; i < firstRunElements; i++) {
 			IBufferElement<DefaultData> bufferElement = new BufferElement<DefaultData>(defaultData);
 			if (0 == i) {
 				first = bufferElement;
@@ -143,27 +168,38 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 			buffer.put(bufferElement);
 		}
 
-		// wait for the elements to be analyzed
-		Thread.sleep(500);
+		// wait to be analyzed
+		while (buffer.getAnalyzedElements() < firstRunElements) {
+			Thread.sleep(50);
+		}
 
-		assertThat(buffer.getCurrentSize(), is(99L));
-		assertThat(buffer.getOccupancyPercentage(), is(0.99f));
+		assertThat(buffer.getCurrentSize(), is(firstRunElements));
+		assertThat(buffer.getOccupancyPercentage(), is((float) firstRunElements / elements));
 		assertThat(buffer.shouldEvict(), is(false));
 
-		// add one for activating eviction
-		IBufferElement<DefaultData> bufferElement = new BufferElement<DefaultData>(defaultData);
-		buffer.put(bufferElement);
+		// add rest for activating eviction
+		for (int i = 0; i < elements - firstRunElements; i++) {
+			IBufferElement<DefaultData> bufferElement = new BufferElement<DefaultData>(defaultData);
+			buffer.put(bufferElement);
+		}
 
-		// wait for the elements to be analyzed
-		Thread.sleep(500);
+		// wait to be analyzed
+		while (buffer.getAnalyzedElements() < elements) {
+			Thread.sleep(50);
+		}
 
-		assertThat(buffer.getCurrentSize(), is(100L));
+		// interrupt analyzers
+		for (BufferAnalyzer bufferAnalyzer : analyzerArray) {
+			bufferAnalyzer.interrupt();
+		}
+
+		assertThat(buffer.getCurrentSize(), is(elements));
 		assertThat(buffer.getOccupancyPercentage(), is(1f));
 		assertThat(buffer.shouldEvict(), is(true));
 
-		bufferAnalyzer.interrupt();
 
-		for (int i = 0; i < 100; i++) {
+		assertThat(buffer.getAnalyzedElements(), is(elements));
+		for (int i = 0; i < elements; i++) {
 			assertThat(first.isAnalyzed(), is(true));
 			first = first.getNextElement();
 		}
@@ -174,8 +210,13 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 	 * 
 	 * @throws Exception
 	 */
-	@Test
+	@Test(invocationCount = 5)
 	public void analysisAndSizeWithExpansionRate() throws Exception {
+		Random random = new Random();
+		long elements = 1 + random.nextInt(10000);
+		elements += elements % 2;
+		int analyzers = 1 + random.nextInt(3);
+
 		float expansionRate = 0.1f;
 		long elementSize = 10;
 		when(objectSizes.getObjectSecurityExpansionRate()).thenReturn(expansionRate);
@@ -184,20 +225,30 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 		DefaultData defaultData = mock(DefaultData.class);
 		when(defaultData.getObjectSize(objectSizes)).thenReturn(elementSize);
 
-		BufferAnalyzer bufferAnalyzer = new BufferAnalyzer(buffer);
-		bufferAnalyzer.start();
+		// start analyzers
+		BufferAnalyzer[] analyzerArray = new BufferAnalyzer[analyzers];
+		for (int i = 0; i < analyzers; i++) {
+			BufferAnalyzer bufferAnalyzer = new BufferAnalyzer(buffer);
+			bufferAnalyzer.start();
+			analyzerArray[i] = bufferAnalyzer;
+		}
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < elements; i++) {
 			IBufferElement<DefaultData> bufferElement = new BufferElement<DefaultData>(defaultData);
 			buffer.put(bufferElement);
 		}
 
-		// wait for the elements to be analyzed
-		Thread.sleep(500);
+		// wait to be analyzed
+		while (buffer.getAnalyzedElements() < elements) {
+			Thread.sleep(50);
+		}
 
-		bufferAnalyzer.interrupt();
+		// interrupt analyzers
+		for (BufferAnalyzer bufferAnalyzer : analyzerArray) {
+			bufferAnalyzer.interrupt();
+		}
 
-		assertThat(buffer.getCurrentSize(), is((long) (100 * elementSize * (1 + expansionRate))));
+		assertThat(buffer.getCurrentSize(), is((long) (elements * elementSize * (1 + expansionRate))));
 	}
 
 	/**
@@ -205,20 +256,33 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 	 * 
 	 * @throws Exception
 	 */
-	@Test
+	@Test(invocationCount = 5)
 	public void indexing() throws Exception {
+		Random random = new Random();
+		long elements = 1 + random.nextInt(10000);
+		elements += elements % 2;
+		int indexers = 1 + random.nextInt(3);
+
+		when(bufferProperties.getIndexingWaitTime()).thenReturn(10L);
+
 		DefaultData defaultData = mock(DefaultData.class);
 		when(defaultData.getObjectSize(objectSizes)).thenReturn(1L);
 
+		// start analyzer
 		BufferAnalyzer bufferAnalyzer = new BufferAnalyzer(buffer);
 		bufferAnalyzer.start();
 
-		BufferIndexer bufferIndexer = new BufferIndexer(buffer);
-		bufferIndexer.start();
+		// start indexers
+		BufferIndexer[] indexerArray = new BufferIndexer[indexers];
+		for (int i = 0; i < indexers; i++) {
+			BufferIndexer bufferIndexer = new BufferIndexer(buffer);
+			bufferIndexer.start();
+			indexerArray[i] = bufferIndexer;
+		}
 
 		IBufferElement<DefaultData> first = null;
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < elements; i++) {
 			IBufferElement<DefaultData> bufferElement = new BufferElement<DefaultData>(defaultData);
 			if (0 == i) {
 				first = bufferElement;
@@ -227,18 +291,23 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 		}
 
 		// wait for the elements to be analyzed and indexed
-		Thread.sleep(500);
+		while (buffer.getAnalyzedElements() < elements || buffer.getIndexedElements() < elements) {
+			Thread.sleep(50);
+		}
 
+		// interrupt workers
 		bufferAnalyzer.interrupt();
-		bufferIndexer.interrupt();
+		for (BufferIndexer bufferIndexer : indexerArray) {
+			bufferIndexer.interrupt();
+		}
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < elements; i++) {
 			assertThat(first.isIndexed(), is(true));
 			first = first.getNextElement();
 		}
 
-		assertThat(buffer.getIndexedElements(), is(100L));
-		verify(indexingTree, times(100)).put(defaultData);
+		assertThat(buffer.getIndexedElements(), is(elements));
+		verify(indexingTree, times((int) elements)).put(defaultData);
 	}
 
 	/**
@@ -246,14 +315,18 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 	 * 
 	 * @throws Exception
 	 */
-	@Test
+	@Test(invocationCount = 5)
 	public void indexingTreeMaintenance() throws Exception {
+		Random random = new Random();
+		long elements = 1 + random.nextInt(10000);
+
 		// when adding 30 bytes, maintenance should be done
 		// indexing tree always reports 10 bytes size
-		when(bufferProperties.getInitialBufferSize()).thenReturn(100L);
+		when(bufferProperties.getInitialBufferSize()).thenReturn(elements);
 		when(bufferProperties.getEvictionOccupancyPercentage()).thenReturn(0.5f);
 		when(bufferProperties.getEvictionFragmentSizePercentage()).thenReturn(0.35f);
 		when(bufferProperties.getFlagsSetOnBytes(anyLong())).thenReturn(30L);
+		when(bufferProperties.getIndexingWaitTime()).thenReturn(10L);
 		when(indexingTree.getComponentSize(objectSizes)).thenReturn(10L);
 		buffer.postConstruct();
 
@@ -266,27 +339,87 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 		BufferIndexer bufferIndexer = new BufferIndexer(buffer);
 		bufferIndexer.start();
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < elements; i++) {
 			IBufferElement<DefaultData> bufferElement = new BufferElement<DefaultData>(defaultData);
 			buffer.put(bufferElement);
 		}
 
 		// wait for the elements to be analyzed and indexed
-		Thread.sleep(500);
+		while (buffer.getAnalyzedElements() < elements || buffer.getIndexedElements() < elements) {
+			Thread.sleep(50);
+		}
 
-		assertThat(buffer.getCurrentSize(), is(100L + 10L));
+		assertThat(buffer.getCurrentSize(), is(elements + 10L));
 		verify(indexingTree, atLeast(1)).getComponentSize(objectSizes);
 
 		// evict
 		assertThat(buffer.shouldEvict(), is(true));
 		buffer.evict();
 
-		// now add one more element to active the cleaning of the indexing tree
+		// now add two more element to active the cleaning of the indexing tree
+		// the cleaning should be done after adding the first one, so we can execute the verify
+		// afterwards
+		buffer.put(new BufferElement<DefaultData>(defaultData));
 		buffer.put(new BufferElement<DefaultData>(defaultData));
 
 		// wait for the element to be analyzed and indexed
-		Thread.sleep(500);
+		while (buffer.getAnalyzedElements() < elements + 2 || buffer.getIndexedElements() < elements + 2) {
+			Thread.sleep(50);
+		}
+
+		bufferAnalyzer.interrupt();
+		bufferIndexer.interrupt();
 
 		verify(indexingTree, times(1)).cleanWithRunnable(Mockito.<ExecutorService> anyObject());
+	}
+
+	/**
+	 * Tests that the clean works properly.
+	 * 
+	 * @throws Exception
+	 */
+	@Test(invocationCount = 5)
+	public void clean() throws Exception {
+		Random random = new Random();
+		long elements = 1 + random.nextInt(10000);
+
+		when(bufferProperties.getInitialBufferSize()).thenReturn(elements);
+		when(bufferProperties.getIndexingWaitTime()).thenReturn(5L);
+
+		DefaultData defaultData = mock(DefaultData.class);
+		when(defaultData.getObjectSize(objectSizes)).thenReturn(1L);
+
+		BufferAnalyzer bufferAnalyzer = new BufferAnalyzer(buffer);
+		bufferAnalyzer.start();
+
+		BufferIndexer bufferIndexer = new BufferIndexer(buffer);
+		bufferIndexer.start();
+
+		for (int i = 0; i < elements / 2; i++) {
+			IBufferElement<DefaultData> bufferElement = new BufferElement<DefaultData>(defaultData);
+			buffer.put(bufferElement);
+			buffer.put(bufferElement);
+
+			// execute clear all the time, let s push this all threads
+			buffer.clearAll();
+		}
+
+		for (int i = 0; i < elements; i++) {
+			IBufferElement<DefaultData> bufferElement = new BufferElement<DefaultData>(defaultData);
+			buffer.put(bufferElement);
+		}
+
+		// wait for the elements to be analyzed and indexed
+		while (buffer.getAnalyzedElements() < elements || buffer.getIndexedElements() < elements) {
+			Thread.sleep(500);
+		}
+
+		bufferAnalyzer.interrupt();
+		bufferIndexer.interrupt();
+
+		assertThat(buffer.getCurrentSize(), is(elements));
+		assertThat(buffer.getAnalyzedElements(), is(elements));
+		assertThat(buffer.getIndexedElements(), is(elements));
+		assertThat(buffer.getEvictedElemenets(), is(0L));
 	}
 }

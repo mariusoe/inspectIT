@@ -51,6 +51,11 @@ public abstract class BufferWorker extends Thread {
 	@Override
 	public void run() {
 		while (true) {
+			// if we go again to the run and we are interrupted we will break;
+			if (Thread.currentThread().isInterrupted()) {
+				break;
+			}
+
 			try {
 				work();
 			} catch (InterruptedException interruptedException) {
