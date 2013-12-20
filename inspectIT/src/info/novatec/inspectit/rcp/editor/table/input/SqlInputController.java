@@ -1,6 +1,5 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
-import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
@@ -479,7 +478,6 @@ public class SqlInputController extends AbstractTableInputController {
 	 */
 	public void showDetails(Shell parent, Object element) {
 		final SqlStatementData data = (SqlStatementData) element;
-		final MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 
 		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
 		boolean takeFocusOnOpen = true;
@@ -487,7 +485,7 @@ public class SqlInputController extends AbstractTableInputController {
 		boolean persistLocation = true;
 		boolean showDialogMenu = false;
 		boolean showPersistActions = true;
-		String titleText = TextFormatter.getMethodString(methodIdent);
+		String titleText = "SQL Details";
 		String infoText = "SQL Details";
 
 		PopupDialog dialog = new PopupDialog(parent, shellStyle, takeFocusOnOpen, persistSize, persistLocation, showDialogMenu, showPersistActions, titleText, infoText) {
@@ -536,18 +534,7 @@ public class SqlInputController extends AbstractTableInputController {
 			}
 
 			private void addText(Text text) {
-				String content;
-				if (methodIdent.getPackageName() != null && !methodIdent.getPackageName().equals("")) {
-					content = "Package: " + methodIdent.getPackageName() + "\n";
-				} else {
-					content = "Package: (default)\n";
-				}
-				content += "Class: " + methodIdent.getClassName() + "\n";
-				content += "Method: " + methodIdent.getMethodName() + "\n";
-				content += "Parameters: " + methodIdent.getParameters() + "\n";
-
-				content += "\n";
-				content += "Count: " + data.getCount() + "\n";
+				String content = "Count: " + data.getCount() + "\n";
 				content += "Avg (ms): " + data.getAverage() + "\n";
 				content += "Min (ms): " + data.getMin() + "\n";
 				content += "Max (ms): " + data.getMax() + "\n";

@@ -309,7 +309,12 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		boolean persistLocation = true;
 		boolean showDialogMenu = false;
 		boolean showPersistActions = true;
-		String titleText = TextFormatter.getMethodString(methodIdent);
+		String titleText;
+		if (null != methodIdent) {
+			titleText = TextFormatter.getMethodString(methodIdent);
+		} else {
+			titleText = "SQL Details";
+		}
 		String infoText = "SQL Details";
 
 		PopupDialog dialog = new PopupDialog(parent, shellStyle, takeFocusOnOpen, persistSize, persistLocation, showDialogMenu, showPersistActions, titleText, infoText) {
@@ -358,17 +363,19 @@ public class SqlInvocInputController extends AbstractTableInputController {
 			}
 
 			private void addText(Text text) {
-				String content;
-				if (methodIdent.getPackageName() != null && !methodIdent.getPackageName().equals("")) {
-					content = "Package: " + methodIdent.getPackageName() + "\n";
-				} else {
-					content = "Package: (default)\n";
+				String content = "";
+				if (methodIdent != null) {
+					if (methodIdent.getPackageName() != null && !methodIdent.getPackageName().equals("")) {
+						content = "Package: " + methodIdent.getPackageName() + "\n";
+					} else {
+						content = "Package: (default)\n";
+					}
+					content += "Class: " + methodIdent.getClassName() + "\n";
+					content += "Method: " + methodIdent.getMethodName() + "\n";
+					content += "Parameters: " + methodIdent.getParameters() + "\n";
+					content += "\n";
 				}
-				content += "Class: " + methodIdent.getClassName() + "\n";
-				content += "Method: " + methodIdent.getMethodName() + "\n";
-				content += "Parameters: " + methodIdent.getParameters() + "\n";
 
-				content += "\n";
 				content += "Avg (ms): " + data.getAverage() + "\n";
 				content += "Min (ms): " + data.getMin() + "\n";
 				content += "Max (ms): " + data.getMax() + "\n";
@@ -445,11 +452,17 @@ public class SqlInvocInputController extends AbstractTableInputController {
 			return true;
 		}
 
-		if (!(data.get(0) instanceof InvocationSequenceData)) {
-			return false;
+		// we accept one invocation sequence
+		if (data.get(0) instanceof InvocationSequenceData) {
+			return true;
 		}
 
-		return true;
+		// or list of SQLs
+		if (data.get(0) instanceof SqlStatementData) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -478,8 +491,12 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		 */
 		@SuppressWarnings("unchecked")
 		public Object[] getElements(Object inputElement) {
-			List<InvocationSequenceData> invocationSequenceDataList = (List<InvocationSequenceData>) inputElement;
-			sqlStatementDataList = getRawInputList(invocationSequenceDataList, new ArrayList<SqlStatementData>());
+			List<? extends DefaultData> input = (List<? extends DefaultData>) inputElement;
+			if (input.get(0) instanceof InvocationSequenceData) {
+				sqlStatementDataList = getRawInputList((List<InvocationSequenceData>) input, new ArrayList<SqlStatementData>());
+			} else {
+				sqlStatementDataList = (List<SqlStatementData>) input;
+			}
 			if (!rawMode) {
 				AggregationPerformer<SqlStatementData> aggregationPerformer = new AggregationPerformer<SqlStatementData>(new SqlStatementDataAggregator());
 				aggregationPerformer.processCollection(sqlStatementDataList);

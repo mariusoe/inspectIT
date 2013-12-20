@@ -4,6 +4,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.mutable.MutableDouble;
+
 /**
  * Helper class to easier query {@link InvocationSequenceData} objects.
  * 
@@ -200,5 +203,28 @@ public final class InvocationSequenceDataHelper {
 		}
 
 		return nestedDuration;
+	}
+
+	/**
+	 * Processes all the {@link SqlStatementData}s in the given invocations creating the list of the
+	 * existing statement and calculating the total duration of the statements.
+	 * 
+	 * @param invocationSequenceDataList
+	 *            Input as list of invocations
+	 * @param sqlStatementDataList
+	 *            List where results will be stored. Needed because of reflection.
+	 * @param totalDuration
+	 *            {@link MutableDouble} where total duration will be stored.
+	 */
+	public static void collectSqlsInInvocations(List<InvocationSequenceData> invocationSequenceDataList, List<SqlStatementData> sqlStatementDataList, MutableDouble totalDuration) {
+		for (InvocationSequenceData invocationSequenceData : invocationSequenceDataList) {
+			if (null != invocationSequenceData.getSqlStatementData()) {
+				sqlStatementDataList.add(invocationSequenceData.getSqlStatementData());
+				totalDuration.add(invocationSequenceData.getSqlStatementData().getDuration());
+			}
+			if (CollectionUtils.isNotEmpty(invocationSequenceDataList)) {
+				collectSqlsInInvocations(invocationSequenceData.getNestedSequences(), sqlStatementDataList, totalDuration);
+			}
+		}
 	}
 }
