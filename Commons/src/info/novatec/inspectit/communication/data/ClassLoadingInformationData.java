@@ -5,8 +5,6 @@ import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.SystemSensorData;
 
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * This class provide dynamic informations about the class loading system of the virtual machine.
@@ -232,13 +230,6 @@ public class ClassLoadingInformationData extends SystemSensorData implements IAg
 		minUnloadedClassCount = Math.min(minUnloadedClassCount, other.minUnloadedClassCount);
 		maxUnloadedClassCount = Math.max(maxUnloadedClassCount, other.maxUnloadedClassCount);
 		totalUnloadedClassCount += other.maxUnloadedClassCount;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Collection<Long> getAggregatedIds() {
-		return Collections.emptyList();
 	}
 
 	/**

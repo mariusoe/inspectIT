@@ -1,7 +1,7 @@
 package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
-import info.novatec.inspectit.communication.IAggregatedData;
+import info.novatec.inspectit.communication.IIdsAwareAggregatedData;
 
 import java.util.Collection;
 import java.util.Map;
@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Ivan Senic
  * 
  */
-public class AggregatedTimerData extends TimerData implements IAggregatedData<TimerData> {
+public class AggregatedTimerData extends TimerData implements IIdsAwareAggregatedData<TimerData> {
 
 	/**
 	 * Generated UID.
@@ -50,6 +50,14 @@ public class AggregatedTimerData extends TimerData implements IAggregatedData<Ti
 	 */
 	public Collection<Long> getAggregatedIds() {
 		return aggregatedIds.keySet();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void clearAggregatedIds() {
+		aggregatedIds.clear();
+
 	}
 
 	/**

@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.IAggregatedData;
+import info.novatec.inspectit.communication.IIdsAwareAggregatedData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +26,10 @@ public class AggregatedDataTest {
 	 */
 	@SuppressWarnings("unchecked")
 	@Test(dataProvider = "normalDataProvider")
-	public <E extends DefaultData> void idAggregation(IAggregatedData<E> aggregated, E data) {
+	public <E extends DefaultData> void idAggregation(IIdsAwareAggregatedData<E> aggregated, E data) {
 		aggregated.aggregate(data);
-		if (data instanceof IAggregatedData) {
-			for (long id : ((IAggregatedData<E>) data).getAggregatedIds()) {
+		if (data instanceof IIdsAwareAggregatedData) {
+			for (long id : ((IIdsAwareAggregatedData<E>) data).getAggregatedIds()) {
 				assertThat(aggregated.getAggregatedIds(), hasItem(id));
 			}
 		} else {

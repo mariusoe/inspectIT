@@ -5,8 +5,6 @@ import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.SystemSensorData;
 
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * This class provide dynamic informations about the memory of the underlying operating system and
@@ -449,13 +447,6 @@ public class MemoryInformationData extends SystemSensorData implements IAggregat
 		minFreeSwapSpace = Math.min(minFreeSwapSpace, other.minFreeSwapSpace);
 		maxFreeSwapSpace = Math.max(maxFreeSwapSpace, other.maxFreeSwapSpace);
 		totalFreeSwapSpace += other.totalFreeSwapSpace;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Collection<Long> getAggregatedIds() {
-		return Collections.emptyList();
 	}
 
 	/**

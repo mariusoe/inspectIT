@@ -2,7 +2,7 @@ package info.novatec.inspectit.communication.data;
 
 import info.novatec.inspectit.cmr.cache.IObjectSizes;
 import info.novatec.inspectit.communication.ExceptionEvent;
-import info.novatec.inspectit.communication.IAggregatedData;
+import info.novatec.inspectit.communication.IIdsAwareAggregatedData;
 
 import java.util.Collection;
 import java.util.Map;
@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Ivan Senic
  * 
  */
-public class AggregatedExceptionSensorData extends ExceptionSensorData implements IAggregatedData<ExceptionSensorData> {
+public class AggregatedExceptionSensorData extends ExceptionSensorData implements IIdsAwareAggregatedData<ExceptionSensorData> {
 
 	/**
 	 * Generated UID.
@@ -167,6 +167,14 @@ public class AggregatedExceptionSensorData extends ExceptionSensorData implement
 	 */
 	public Collection<Long> getAggregatedIds() {
 		return aggregatedIds.keySet();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void clearAggregatedIds() {
+		aggregatedIds.clear();
+		
 	}
 
 	/**

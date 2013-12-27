@@ -1,6 +1,5 @@
 package info.novatec.inspectit.communication;
 
-import java.util.Collection;
 
 /**
  * Interface that marks that the data is aggregated.
@@ -19,13 +18,6 @@ public interface IAggregatedData<E extends DefaultData> {
 	 *            To be aggregated.
 	 */
 	void aggregate(E data);
-
-	/**
-	 * Returns the collection that contains the IDs of the originally aggregated data.
-	 * 
-	 * @return Returns the collection that contains the IDs of the originally aggregated data.
-	 */
-	Collection<Long> getAggregatedIds();
 
 	/**
 	 * Returns the aggregated data.

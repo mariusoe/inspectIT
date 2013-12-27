@@ -5,8 +5,6 @@ import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.SystemSensorData;
 
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * This class provide dynamic informations about the underlying operating system such as cpu usage
@@ -148,13 +146,6 @@ public class CpuInformationData extends SystemSensorData implements IAggregatedD
 		minCpuUsage = Math.min(minCpuUsage, other.minCpuUsage);
 		maxCpuUsage = Math.max(maxCpuUsage, other.maxCpuUsage);
 		totalCpuUsage += other.totalCpuUsage;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Collection<Long> getAggregatedIds() {
-		return Collections.emptyList();
 	}
 
 	/**

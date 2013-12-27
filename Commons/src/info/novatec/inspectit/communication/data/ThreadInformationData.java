@@ -5,8 +5,6 @@ import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.SystemSensorData;
 
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * This class provide dynamic informations about the threads running/started in the virtual machine.
@@ -285,13 +283,6 @@ public class ThreadInformationData extends SystemSensorData implements IAggregat
 		totalPeakThreadCount += other.getTotalPeakThreadCount();
 		totalThreadCount += other.getTotalThreadCount();
 		totalTotalStartedThreadCount += other.getTotalTotalStartedThreadCount();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Collection<Long> getAggregatedIds() {
-		return Collections.emptyList();
 	}
 
 	/**

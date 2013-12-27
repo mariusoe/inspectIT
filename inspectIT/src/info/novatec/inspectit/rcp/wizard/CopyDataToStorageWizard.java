@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.wizard;
 
 import info.novatec.inspectit.communication.DefaultData;
-import info.novatec.inspectit.communication.IAggregatedData;
+import info.novatec.inspectit.communication.IIdsAwareAggregatedData;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 import info.novatec.inspectit.communication.data.AggregatedHttpTimerData;
 import info.novatec.inspectit.communication.data.AggregatedSqlStatementData;
@@ -163,10 +163,10 @@ public class CopyDataToStorageWizard extends Wizard implements INewWizard {
 			final Set<Long> idSet = new HashSet<Long>();
 			Set<Long> platformIdents = new HashSet<Long>();
 			for (DefaultData template : copyDataList) {
-				if (template instanceof IAggregatedData<?>) {
+				if (template instanceof IIdsAwareAggregatedData<?>) {
 					// if we have aggregated data add all objects that were included in the
 					// aggregation
-					idSet.addAll(((IAggregatedData<?>) template).getAggregatedIds());
+					idSet.addAll(((IIdsAwareAggregatedData<?>) template).getAggregatedIds());
 				} else if (0 != template.getId()) {
 					idSet.add(template.getId());
 				}

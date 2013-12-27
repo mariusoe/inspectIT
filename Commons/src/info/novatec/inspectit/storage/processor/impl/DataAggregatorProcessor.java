@@ -2,6 +2,7 @@ package info.novatec.inspectit.storage.processor.impl;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.IAggregatedData;
+import info.novatec.inspectit.communication.IIdsAwareAggregatedData;
 import info.novatec.inspectit.communication.data.InvocationAwareData;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.indexing.aggregation.IAggregator;
@@ -218,6 +219,11 @@ public class DataAggregatorProcessor<E extends TimerData> extends AbstractDataPr
 	 * @return {@link Future} received from Storage writer.
 	 */
 	private Future<Void> passToStorageWriter(E data) {
+		// clear aggregated ids when saving to storage
+		if (data instanceof IIdsAwareAggregatedData) {
+			((IIdsAwareAggregatedData<?>) data).clearAggregatedIds();
+		}
+
 		// if I am writing the InvocationAwareData and invocations are not saved
 		// make sure we don't save the invocation affiliation
 		if (!writeInvocationAffiliation) {
