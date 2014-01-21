@@ -174,7 +174,7 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 	 */
 	private List<? extends CtBehavior> analyzeForClassLoaderDelegation(String className, ClassLoader classLoader) throws NotFoundException {
 		IMatcher matcher = configurationStorage.getClassLoaderDelegationMatcher();
-		if (matcher.compareClassName(classLoader, className)) {
+		if (null != matcher && matcher.compareClassName(classLoader, className)) {
 			List<? extends CtBehavior> behaviors = matcher.getMatchingMethods(classLoader, className);
 			if (CollectionUtils.isNotEmpty(behaviors)) {
 				matcher.checkParameters(behaviors);

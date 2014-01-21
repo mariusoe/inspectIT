@@ -346,6 +346,8 @@ public class JavaAgent implements ClassFileTransformer {
 
 			// ignore IAgent because this is the interface for the SUD to access the real agent
 			ignoreClasses.add(IAgent.class.getCanonicalName());
+			ignoreClasses.add(Agent.class.getCanonicalName());
+
 			// ignore hook dispatcher because it is defined in the IAgent interface and thus must be
 			// available in the standard classloader.
 			ignoreClasses.add(IHookDispatcher.class.getCanonicalName());
