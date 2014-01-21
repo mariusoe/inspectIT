@@ -143,7 +143,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	/**
 	 * Default comparator when no sorting is defined.
 	 */
-	private static final ResultComparator<InvocationSequenceData> DEFAULT_COMPARATOR = new ResultComparator<>(DefaultDataComparatorEnum.TIMESTAMP, false);
+	private final ResultComparator<InvocationSequenceData> defaultComparator = new ResultComparator<>(DefaultDataComparatorEnum.TIMESTAMP, false);
 
 	/**
 	 * The template object which is send to the server.
@@ -198,7 +198,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	/**
 	 * Result comparator to be used on the server.
 	 */
-	private ResultComparator<InvocationSequenceData> resultComparator = DEFAULT_COMPARATOR;
+	private ResultComparator<InvocationSequenceData> resultComparator = defaultComparator;
 
 	/**
 	 * 
@@ -292,7 +292,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 				if (null != resultComparator) {
 					InvocOverviewInputController.this.resultComparator = resultComparator;
 				} else {
-					InvocOverviewInputController.this.resultComparator = DEFAULT_COMPARATOR;
+					InvocOverviewInputController.this.resultComparator = defaultComparator;
 				}
 				loadDataFromService();
 			}

@@ -131,7 +131,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	/**
 	 * Default comparator when no sorting is defined.
 	 */
-	private static final ResultComparator<ExceptionSensorData> DEFAULT_COMPARATOR = new ResultComparator<>(DefaultDataComparatorEnum.TIMESTAMP, false);
+	private final ResultComparator<ExceptionSensorData> defaultComparator = new ResultComparator<>(DefaultDataComparatorEnum.TIMESTAMP, false);
 
 	/**
 	 * The template object which is send to the server.
@@ -171,7 +171,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	/**
 	 * Result comparator to be used on the server.
 	 */
-	private ResultComparator<ExceptionSensorData> resultComparator = DEFAULT_COMPARATOR;
+	private ResultComparator<ExceptionSensorData> resultComparator = defaultComparator;
 
 	/**
 	 * {@inheritDoc}
@@ -244,7 +244,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 				if (null != resultComparator) {
 					UngroupedExceptionOverviewInputController.this.resultComparator = resultComparator;
 				} else {
-					UngroupedExceptionOverviewInputController.this.resultComparator = DEFAULT_COMPARATOR;
+					UngroupedExceptionOverviewInputController.this.resultComparator = defaultComparator;
 				}
 				loadDataFromService();
 			}
