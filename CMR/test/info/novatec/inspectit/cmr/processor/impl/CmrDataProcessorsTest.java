@@ -36,9 +36,7 @@ import info.novatec.inspectit.indexing.buffer.IBufferTreeComponent;
 import info.novatec.inspectit.indexing.impl.IndexingException;
 import info.novatec.inspectit.storage.recording.RecordingState;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import org.hibernate.StatelessSession;
 import org.mockito.ArgumentCaptor;
@@ -526,97 +524,4 @@ public class CmrDataProcessorsTest {
 		assertThat(exceptionSensorData.getInvocationParentsIdSet(), is(empty()));
 	}
 
-	/**
-	 * Exception processing with constructor delegation problem in
-	 * {@link InvocationModifierCmrProcessor} with two exceptions.
-	 */
-	@Test
-	public void invocationProcessorExceptionDataConstructorDelegation() {
-		InvocationModifierCmrProcessor processor = new InvocationModifierCmrProcessor(Collections.singletonList(chainedProcessor));
-		ExceptionMessageCmrProcessor exceptionMessageCmrProcessor = mock(ExceptionMessageCmrProcessor.class);
-		processor.exceptionMessageCmrProcessor = exceptionMessageCmrProcessor;
-
-		InvocationSequenceData parent = new InvocationSequenceData();
-		parent.setId(10L);
-		parent.setChildCount(2L);
-
-		InvocationSequenceData firstChild = new InvocationSequenceData();
-		firstChild.setId(20L);
-		ExceptionSensorData firstException = new ExceptionSensorData();
-		firstException.setExceptionEvent(ExceptionEvent.CREATED);
-		firstException.setThrowableIdentityHashCode(1L);
-		firstChild.setExceptionSensorDataObjects(Collections.singletonList(firstException));
-		firstChild.setParentSequence(parent);
-
-		InvocationSequenceData secondChild = new InvocationSequenceData();
-		secondChild.setId(20L);
-		ExceptionSensorData secondException = new ExceptionSensorData();
-		secondException.setExceptionEvent(ExceptionEvent.CREATED);
-		secondException.setThrowableIdentityHashCode(1L);
-		secondChild.setExceptionSensorDataObjects(Collections.singletonList(secondException));
-		secondChild.setParentSequence(parent);
-
-		List<InvocationSequenceData> children = new ArrayList<>();
-		children.add(firstChild);
-		children.add(secondChild);
-
-		parent.setNestedSequences(children);
-
-		processor.process(parent, session);
-
-		// correctly passed to the chained
-		verify(chainedProcessor, times(1)).process(firstChild, session);
-		verify(chainedProcessor, times(1)).process(secondChild, session);
-		verify(exceptionMessageCmrProcessor, times(1)).process(firstException, session);
-		verify(exceptionMessageCmrProcessor, times(1)).process(secondException, session);
-		// only second exception is processed by chained due to the constructor delegation
-		verify(chainedProcessor, times(1)).process(secondException, session);
-		verifyNoMoreInteractions(chainedProcessor, exceptionMessageCmrProcessor);
-		verifyZeroInteractions(session);
-
-		// amount of children altered
-		assertThat(parent.getChildCount(), is(1L));
-		assertThat(parent.getNestedSequences(), hasSize(1));
-	}
-
-	/**
-	 * Exception processing with constructor delegation problem in
-	 * {@link InvocationModifierCmrProcessor} with only one exception.
-	 */
-	@Test
-	public void invocationProcessorOneExceptionDataConstructorDelegation() {
-		InvocationModifierCmrProcessor processor = new InvocationModifierCmrProcessor(Collections.singletonList(chainedProcessor));
-		ExceptionMessageCmrProcessor exceptionMessageCmrProcessor = mock(ExceptionMessageCmrProcessor.class);
-		processor.exceptionMessageCmrProcessor = exceptionMessageCmrProcessor;
-
-		InvocationSequenceData parent = new InvocationSequenceData();
-		parent.setId(10L);
-		parent.setChildCount(1L);
-
-		InvocationSequenceData firstChild = new InvocationSequenceData();
-		firstChild.setId(20L);
-		ExceptionSensorData firstException = new ExceptionSensorData();
-		firstException.setExceptionEvent(ExceptionEvent.CREATED);
-		firstException.setThrowableIdentityHashCode(1L);
-		firstChild.setExceptionSensorDataObjects(Collections.singletonList(firstException));
-		firstChild.setParentSequence(parent);
-
-		List<InvocationSequenceData> children = new ArrayList<>();
-		children.add(firstChild);
-
-		parent.setNestedSequences(children);
-
-		processor.process(parent, session);
-
-		// correctly passed to the chained
-		verify(chainedProcessor, times(1)).process(firstChild, session);
-		verify(chainedProcessor, times(1)).process(firstException, session);
-		verify(exceptionMessageCmrProcessor, times(1)).process(firstException, session);
-		verifyNoMoreInteractions(chainedProcessor, exceptionMessageCmrProcessor);
-		verifyZeroInteractions(session);
-
-		// amount of children altered
-		assertThat(parent.getChildCount(), is(1L));
-		assertThat(parent.getNestedSequences(), hasSize(1));
-	}
 }

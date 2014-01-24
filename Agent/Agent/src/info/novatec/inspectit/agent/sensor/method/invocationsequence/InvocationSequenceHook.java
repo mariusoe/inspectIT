@@ -2,6 +2,7 @@ package info.novatec.inspectit.agent.sensor.method.invocationsequence;
 
 import info.novatec.inspectit.agent.buffer.IBufferStrategy;
 import info.novatec.inspectit.agent.config.IPropertyAccessor;
+import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
 import info.novatec.inspectit.agent.config.impl.PlatformSensorTypeConfig;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
@@ -12,6 +13,9 @@ import info.novatec.inspectit.agent.core.ListListener;
 import info.novatec.inspectit.agent.hooking.IConstructorHook;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
 import info.novatec.inspectit.agent.sending.ISendingStrategy;
+import info.novatec.inspectit.agent.sensor.exception.ExceptionSensor;
+import info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionSensor;
+import info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementParameterSensor;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.SystemSensorData;
@@ -124,6 +128,10 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * {@inheritDoc}
 	 */
 	public void beforeBody(long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc) {
+		if (skip(object, rsc)) {
+			return;
+		}
+
 		try {
 			long platformId = idManager.getPlatformId();
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -172,6 +180,10 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * {@inheritDoc}
 	 */
 	public void firstAfterBody(long methodId, long sensorTypeId, Object object, Object[] parameters, Object result, RegisteredSensorConfig rsc) {
+		if (skip(object, rsc)) {
+			return;
+		}
+
 		InvocationSequenceData invocationSequenceData = threadLocalInvocationData.get();
 
 		if (null != invocationSequenceData) {
@@ -190,6 +202,10 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * {@inheritDoc}
 	 */
 	public void secondAfterBody(ICoreService coreService, long methodId, long sensorTypeId, Object object, Object[] parameters, Object result, RegisteredSensorConfig rsc) {
+		if (skip(object, rsc)) {
+			return;
+		}
+
 		InvocationSequenceData invocationSequenceData = threadLocalInvocationData.get();
 
 		if (null != invocationSequenceData) {
@@ -241,7 +257,45 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	}
 
 	/**
-	 * This checks if the invocation has to be saved or not (like the minduration is set and the
+	 * Defines if the invocation container should skip the creation and processing of the invocation
+	 * for the given object and {@link RegisteredSensorConfig}. We will skip if any of following
+	 * conditions are met:
+	 * <ul>
+	 * <li>{@link RegisteredSensorConfig} has only exception sensor and object class does not match
+	 * the target class name.
+	 * <li>{@link RegisteredSensorConfig} has only prepared statement parameter sensor.
+	 * <li>{@link RegisteredSensorConfig} has only connection sensor.
+	 * </ul>
+	 * 
+	 * @param object
+	 *            Object being passed.
+	 * @param rsc
+	 *            {@link RegisteredSensorConfig}.
+	 * @return Return <code>true</code> if hook should skip creation and processing, false
+	 *         otherwise.
+	 */
+	private boolean skip(Object object, RegisteredSensorConfig rsc) {
+		if (1 == rsc.getSensorTypeConfigs().size()) {
+			MethodSensorTypeConfig methodSensorTypeConfig = rsc.getSensorTypeConfigs().get(0);
+			if (ExceptionSensor.class.getCanonicalName().equals(methodSensorTypeConfig.getClassName())) {
+				String throwableClass = object.getClass().getName();
+				String rscTragetClassname = rsc.getQualifiedTargetClassName();
+				return !throwableClass.equals(rscTragetClassname);
+			}
+
+			if (PreparedStatementParameterSensor.class.getCanonicalName().equals(methodSensorTypeConfig.getClassName())) {
+				return true;
+			}
+
+			if (ConnectionSensor.class.getCanonicalName().equals(methodSensorTypeConfig.getClassName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * This checks if the invocation has to be saved or not (like the min duration is set and the
 	 * invocation is faster than the specified time).
 	 * 
 	 * @param coreService

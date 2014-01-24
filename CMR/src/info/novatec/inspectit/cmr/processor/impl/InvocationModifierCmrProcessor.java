@@ -10,11 +10,7 @@ import info.novatec.inspectit.communication.data.InvocationSequenceDataHelper;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.StatelessSession;
@@ -86,8 +82,6 @@ public class InvocationModifierCmrProcessor extends AbstractChainedCmrDataProces
 	 */
 	private void extractDataFromInvocation(StatelessSession session, InvocationSequenceData invData, InvocationSequenceData topInvocationParent) {
 		double exclusiveDurationDelta = 0d;
-		Collection<InvocationSequenceData> childRemoveCollection = null;
-		Set<Long> identityHashCodeSet = null;
 
 		for (InvocationSequenceData child : (List<InvocationSequenceData>) invData.getNestedSequences()) {
 			// pass child to chained processors
@@ -105,12 +99,6 @@ public class InvocationModifierCmrProcessor extends AbstractChainedCmrDataProces
 				exclusiveDurationDelta += InvocationSequenceDataHelper.computeNestedDuration(child);
 			}
 
-			// deal with exceptions
-			if (null == identityHashCodeSet && CollectionUtils.isNotEmpty(child.getExceptionSensorDataObjects())) {
-				identityHashCodeSet = new HashSet<>();
-			}
-			childRemoveCollection = processExceptionSensorData(session, child, topInvocationParent, identityHashCodeSet, childRemoveCollection);
-
 			// go to the recursion
 			extractDataFromInvocation(session, child, topInvocationParent);
 		}
@@ -118,20 +106,7 @@ public class InvocationModifierCmrProcessor extends AbstractChainedCmrDataProces
 		// process the SQL Statement and Timer
 		processSqlStatementData(session, invData, topInvocationParent);
 		processTimerData(session, invData, topInvocationParent, exclusiveDurationDelta);
-
-		// alter size if some were removed
-		if (CollectionUtils.isNotEmpty(childRemoveCollection)) {
-			int oldChildrenListSize = invData.getNestedSequences().size();
-			invData.getNestedSequences().removeAll(childRemoveCollection);
-			int newChildrenListSize = invData.getNestedSequences().size();
-
-			InvocationSequenceData alterChildCountInvocation = invData;
-			int alterSize = oldChildrenListSize - newChildrenListSize;
-			while (null != alterChildCountInvocation) {
-				alterChildCountInvocation.setChildCount(alterChildCountInvocation.getChildCount() - alterSize);
-				alterChildCountInvocation = alterChildCountInvocation.getParentSequence();
-			}
-		}
+		processExceptionSensorData(session, invData, topInvocationParent);
 	}
 
 	/**
@@ -181,26 +156,7 @@ public class InvocationModifierCmrProcessor extends AbstractChainedCmrDataProces
 	}
 
 	/**
-	 * Process all the exceptions in the invData, deal with constructor delegation and passes
-	 * exceptions that survive to the chained processors.<br>
-	 * <br>
-	 * Only the exceptions which identity hash code was not yet processed will be processed. Due to
-	 * the
-	 * {@link #manageExceptionConstructorDelegation(InvocationSequenceData, ExceptionSensorData, Collection)
-	 * constructor delegation problem} it can happen than exception in the invocation has already
-	 * been processed when it's super exception has been processed. For example when we have
-	 * constructor delegation problem as following: <br>
-	 * <br>
-	 * Parent invocation:
-	 * <ul>
-	 * <li>Child 1 -> Exception: new Exception() PROCESSED</li>
-	 * <li>Child 2 -> Exception: new BusinessException() PROCESSED IN CDM</li>
-	 * <li>Child 3 -> Exception: new ConcreteBusinessException() PROCESSED IN CDM</li>
-	 * </ul>
-	 * the second and third exceptions are skipped by this method cause they are already processed
-	 * in
-	 * {@link #manageExceptionConstructorDelegation(InvocationSequenceData, ExceptionSensorData, Collection)
-	 * constructor delegation management}.<br>
+	 * Process all the exceptions in the invData and passes exceptions to the chained processors.<br>
 	 * <br>
 	 * Note also that only exception data with CREATED event are processed, since the PASSED and
 	 * HANDLED should be connected as children to the CREATED one.
@@ -211,17 +167,8 @@ public class InvocationModifierCmrProcessor extends AbstractChainedCmrDataProces
 	 *            Invocation data to be processed.
 	 * @param topInvocationParent
 	 *            Top invocation object.
-	 * @param identityHashCodeSet
-	 *            Set of all throwable identity hash code that have been already been processed.
-	 *            This set might be updated in the method. Can be <code>null</code>.
-	 * @param childRemoveCollection
-	 *            List to add all children that should be removed from invocation. Can be
-	 *            <code>null</code>.
-	 * @return Returns back the child remove collection. It might happen that it's initialized in
-	 *         the method and thus must be correctly returned to the caller.
 	 */
-	private Collection<InvocationSequenceData> processExceptionSensorData(StatelessSession session, InvocationSequenceData invData, InvocationSequenceData topInvocationParent,
-			Set<Long> identityHashCodeSet, Collection<InvocationSequenceData> childRemoveCollection) {
+	private void processExceptionSensorData(StatelessSession session, InvocationSequenceData invData, InvocationSequenceData topInvocationParent) {
 		if (CollectionUtils.isNotEmpty(invData.getExceptionSensorDataObjects())) {
 			for (ExceptionSensorData exceptionData : invData.getExceptionSensorDataObjects()) {
 				if (exceptionData.getExceptionEvent() == ExceptionEvent.CREATED) {
@@ -231,122 +178,11 @@ public class InvocationModifierCmrProcessor extends AbstractChainedCmrDataProces
 					// we need to directly call Exception message processor, cause it can not be
 					// chained
 					exceptionMessageCmrProcessor.process(exceptionData, session);
-
-					// manage constructor delegation
-					if (identityHashCodeSet.add(exceptionData.getThrowableIdentityHashCode())) {
-						Pair<ExceptionSensorData, Collection<InvocationSequenceData>> result = manageExceptionConstructorDelegation(invData.getParentSequence(), exceptionData, childRemoveCollection);
-						childRemoveCollection = result.getSecond();
-						ExceptionSensorData dataToIndex = result.getFirst();
-						if (null != dataToIndex) {
-							dataToIndex.addInvocationParentId(topInvocationParent.getId());
-							passToChainedProcessors(dataToIndex, session);
-						}
-					}
+					exceptionData.addInvocationParentId(topInvocationParent.getId());
+					passToChainedProcessors(exceptionData, session);
 				}
 			}
 		}
-		return childRemoveCollection;
-	}
-
-	/**
-	 * This method checks if the one invocation has as children the exceptions that are wrongly
-	 * created as effect of constructor delegation. For example:<br>
-	 * <br>
-	 * Parent invocation:
-	 * <ul>
-	 * <li>Child 1 -> Exception: new Exception()</li>
-	 * <li>Child 2 -> Exception: new BusinessException()</li>
-	 * <li>Child 3 -> Exception: new ConcreteBusinessException()</li>
-	 * </ul>
-	 * Cause all there exception classes are instrumented, here we wrongly get three exception
-	 * objects, instead of just one (ConcreteBusinessException) which was in fact created. Thus we
-	 * need to remove the first two from the invocation. <br>
-	 * <br>
-	 * The removed ones will be added to the child remove collection.
-	 * 
-	 * @param parent
-	 *            Invocation parent where the exception data is found.
-	 * @param firstExceptionData
-	 *            Exception that needs to be handled.
-	 * @param childRemoveCollection
-	 *            Collection where invocation children for removal will be added.
-	 * @return Returns exception data to be indexed (ConcreteBusinessException in example) and child
-	 *         remove collection as a {@link Pair}. It might happen that collection might be
-	 *         initialized in the method and thus must be correctly returned to the caller.
-	 */
-	private Pair<ExceptionSensorData, Collection<InvocationSequenceData>> manageExceptionConstructorDelegation(InvocationSequenceData parent, ExceptionSensorData firstExceptionData,
-			Collection<InvocationSequenceData> childRemoveCollection) {
-		InvocationSequenceData lastInvocationChild = null;
-		ExceptionSensorData lastExceptionData = null;
-		long identityHashCode = firstExceptionData.getThrowableIdentityHashCode();
-		long sensorTypeIdent = -1;
-		int lastExceptionDataChildIndex = -1;
-
-		for (int i = 0, j = parent.getNestedSequences().size(); i < j; i++) {
-			InvocationSequenceData invData = (InvocationSequenceData) parent.getNestedSequences().get(i);
-			if (null != invData.getExceptionSensorDataObjects()) {
-				for (ExceptionSensorData exData : (List<ExceptionSensorData>) invData.getExceptionSensorDataObjects()) {
-					if (exData.getThrowableIdentityHashCode() == identityHashCode) {
-						if (null != lastInvocationChild) {
-							lastInvocationChild.setExceptionSensorDataObjects(null);
-						}
-						lastInvocationChild = invData;
-						lastExceptionData = exData;
-						lastExceptionDataChildIndex = i;
-						sensorTypeIdent = invData.getSensorTypeIdent();
-					}
-				}
-			}
-		}
-
-		lastExceptionDataChildIndex--;
-		while (lastExceptionDataChildIndex >= 0) {
-			InvocationSequenceData invData = (InvocationSequenceData) parent.getNestedSequences().get(lastExceptionDataChildIndex);
-			if (invData.getSensorTypeIdent() != sensorTypeIdent || null != invData.getTimerData() || null != invData.getSqlStatementData() || null != invData.getExceptionSensorDataObjects()) {
-				break;
-			}
-			// init the child collection if it's not been yet initialized
-			if (null == childRemoveCollection) {
-				childRemoveCollection = new ArrayList<>();
-			}
-			childRemoveCollection.add(invData);
-			lastExceptionDataChildIndex--;
-		}
-
-		if (null != lastExceptionData) {
-			return new Pair<ExceptionSensorData, Collection<InvocationSequenceData>>(lastExceptionData, childRemoveCollection);
-		} else {
-			return new Pair<ExceptionSensorData, Collection<InvocationSequenceData>>(firstExceptionData, childRemoveCollection);
-		}
-	}
-
-	/**
-	 * Simple utility class to help returning two objects from method.
-	 * 
-	 * @author Ivan Senic
-	 * 
-	 * @param <P>
-	 *            First object
-	 * @param <R>
-	 *            Second object
-	 */
-	private static final class Pair<P, R> {
-		private P first; // NOCHK
-		private R second; // NOCHK
-
-		public Pair(P first, R second) { // NOCHK
-			this.first = first;
-			this.second = second;
-		}
-
-		public P getFirst() {
-			return first;
-		}
-
-		public R getSecond() {
-			return second;
-		}
-
 	}
 
 }

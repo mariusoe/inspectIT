@@ -321,8 +321,6 @@ public class FormPreferencePanel implements IPreferencePanel {
 			sensorTypeMenuManager.add(new Separator());
 			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Statement", SensorTypeEnum.JDBC_STATEMENT, activeSensors));
 			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Prep Statement", SensorTypeEnum.JDBC_PREPARED_STATEMENT, activeSensors));
-			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Connection", SensorTypeEnum.JDBC_CONNECTION, activeSensors));
-			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Prep Parameter", SensorTypeEnum.JDBC_PREPARED_STATEMENT_PARAMETER, activeSensors));
 			menuAction.addContributionItem(sensorTypeMenuManager);
 		}
 		if (preferenceSet.contains(PreferenceId.INVOCFILTEREXCLUSIVETIME)) {
