@@ -121,6 +121,9 @@
 		<copy todir="${build.release.root}/tmp" overwrite="true" failonerror="true" verbose="yes">
 			<fileset dir="${build.overwrite.classes}" includes="**/*.class" />
 		</copy>
+		<copy todir="${build.release.root}/tmp" overwrite="true" failonerror="true" verbose="yes">
+			<fileset dir="${overwrite.src.root}" includes="**/*.xml" />
+		</copy>
 		<jar destfile="${build.release.dependencies}/inspectit.jar" basedir="${build.release.root}/tmp" />
 		<delete dir="${build.release.root}/tmp" />
 

@@ -33,7 +33,14 @@
 		<dependency org="org.springframework" name="spring-core" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
 		<dependency org="org.springframework" name="spring-context" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
 		<dependency org="org.springframework" name="spring-beans" rev="3.1.0.RELEASE" transitive="false" conf="prod->default"/>
-				
+
+		<!-- logging dependencies -->
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.5" conf="prod->default" />
+		<dependency org="org.slf4j" name="jcl-over-slf4j" rev="1.7.5" conf="prod->default" />
+		<dependency org="org.slf4j" name="log4j-over-slf4j" rev="1.7.5" conf="prod->default" />
+		<dependency org="ch.qos.logback" name="logback-core" rev="1.0.13" conf="prod->default" />
+		<dependency org="ch.qos.logback" name="logback-classic" rev="1.0.13" conf="prod->default" />
+
 		<!-- Test -->
 		<dependency org="commons-collections" name="commons-collections" rev="3.2" transitive="false" conf="test->default"/>
 		
