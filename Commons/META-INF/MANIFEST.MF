@@ -54,10 +54,9 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: .
 Require-Bundle: com.springsource.net.sf.cglib;bundle-version="2.2.0",
  info.novatec.asm;bundle-version="4.0.0",
- info.novatec.kryo;bundle-version="2.20.0",
  info.novatec.minlog;bundle-version="1.2.0",
  info.novatec.reflectasm;bundle-version="1.7.0",
- com.springsource.org.objenesis;bundle-version="1.2.0",
+ org.objenesis;bundle-version="2.1.0",
  com.springsource.org.aopalliance;bundle-version="1.0.0",
  org.springframework.aop;bundle-version="3.1.0",
  org.springframework.asm;bundle-version="3.1.0",
@@ -68,5 +67,6 @@ Require-Bundle: com.springsource.net.sf.cglib;bundle-version="2.2.0",
  org.springframework.web;bundle-version="3.1.0",
  org.apache.commons.lang;bundle-version="2.5.0",
  org.apache.commons.collections;bundle-version="3.2.1",
+ com.esotericsoftware.kryo;bundle-version="2.23.0",
  info.novatec.kryo-serializers;bundle-version="0.22.0",
  slf4j.api;bundle-version="1.7.5"

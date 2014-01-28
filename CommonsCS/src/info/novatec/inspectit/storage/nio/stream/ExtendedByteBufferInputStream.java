@@ -225,6 +225,12 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 	 */
 	@Override
 	public int read() throws IOException {
+		// if we are empty, return -1 by the input stream contract
+		if (0 == totalSize || !hasRemaining()) {
+			return -1;
+		}
+
+		// change the buffer if necessary
 		if (hasRemaining() || null == super.getByteBuffer()) {
 			bufferChange();
 		}
@@ -252,10 +258,16 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 	@Override
 	public int read(byte[] b, int off, int len) throws IOException {
 		// if we are empty, return -1 by the input stream contract
-		if (0 == totalSize) {
+		if (0 == totalSize || !hasRemaining()) {
 			return -1;
 		}
 
+		// don't try to read anything if the required length is 0
+		if (0 == len) {
+			return 0;
+		}
+
+		// change the buffer if necessary
 		if (hasRemaining() && null == super.getByteBuffer()) {
 			bufferChange();
 		}

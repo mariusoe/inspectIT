@@ -126,12 +126,12 @@ public class ByteBufferProviderTest {
 	@Test
 	public void providerStressed() throws Throwable {
 		byteBufferProvider.setBufferSize(1);
-		byteBufferProvider.setPoolMaxCapacity(2);
+		byteBufferProvider.setPoolMaxCapacity(3);
 		byteBufferProvider.setPoolMinCapacity(1);
 		byteBufferProvider.init();
 
 		int threadCount = 5;
-		final int iterationsPerThread = 1000000;
+		final int iterationsPerThread = 100000;
 		final AtomicInteger totalCount = new AtomicInteger(threadCount * iterationsPerThread);
 
 		for (int i = 0; i < threadCount; i++) {

@@ -15,7 +15,6 @@ Bundle-Vendor: NovaTec GmbH
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: info.novatec.inspectit.commons;bundle-version="1.5.0",
  com.springsource.net.sf.cglib;bundle-version="2.2.0",
- info.novatec.kryo;bundle-version="2.20.0",
  com.springsource.org.aopalliance;bundle-version="1.0.0",
  org.springframework.aop;bundle-version="3.1.0",
  org.springframework.asm;bundle-version="3.1.0",
@@ -26,4 +25,5 @@ Require-Bundle: info.novatec.inspectit.commons;bundle-version="1.5.0",
  org.springframework.web;bundle-version="3.1.0",
  org.apache.commons.lang;bundle-version="2.5.0",
  org.apache.commons.pool;bundle-version="1.6.0",
- slf4j.api;bundle-version="1.7.5"
+ slf4j.api;bundle-version="1.7.5",
+ com.esotericsoftware.kryo;bundle-version="2.23.0"

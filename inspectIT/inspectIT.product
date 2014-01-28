@@ -89,10 +89,10 @@ NTSales_Allgemeine_Nutzungsbedingungen_inspectIT_en.doc_V2.0 / 24.07.2012
    <plugins>
       <plugin id="ch.qos.logback.classic"/>
       <plugin id="ch.qos.logback.core"/>
+      <plugin id="com.esotericsoftware.kryo"/>
       <plugin id="com.ibm.icu"/>
       <plugin id="com.springsource.net.sf.cglib"/>
       <plugin id="com.springsource.org.aopalliance"/>
-      <plugin id="com.springsource.org.objenesis"/>
       <plugin id="info.novatec.asm"/>
       <plugin id="info.novatec.guava"/>
       <plugin id="info.novatec.hibernate-core"/>
@@ -106,7 +106,6 @@ NTSales_Allgemeine_Nutzungsbedingungen_inspectIT_en.doc_V2.0 / 24.07.2012
       <plugin id="info.novatec.jfreechart"/>
       <plugin id="info.novatec.jfreechart-experimental"/>
       <plugin id="info.novatec.jfreechart-swt"/>
-      <plugin id="info.novatec.kryo"/>
       <plugin id="info.novatec.kryo-serializers"/>
       <plugin id="info.novatec.minlog"/>
       <plugin id="info.novatec.reflectasm"/>
@@ -159,6 +158,7 @@ NTSales_Allgemeine_Nutzungsbedingungen_inspectIT_en.doc_V2.0 / 24.07.2012
       <plugin id="org.eclipse.ui.cocoa" fragment="true"/>
       <plugin id="org.eclipse.ui.forms"/>
       <plugin id="org.eclipse.ui.workbench"/>
+      <plugin id="org.objenesis"/>
       <plugin id="org.springframework.aop"/>
       <plugin id="org.springframework.asm"/>
       <plugin id="org.springframework.beans"/>

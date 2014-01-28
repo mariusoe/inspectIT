@@ -39,14 +39,14 @@ Require-Bundle: org.eclipse.ui,
  org.apache.commons.collections;bundle-version="3.2.1",
  org.apache.commons.fileupload;bundle-version="1.2.2",
  org.apache.commons.lang;bundle-version="2.5.0",
- info.novatec.kryo;bundle-version="2.20.0",
  org.apache.commons.io;bundle-version="2.4.0",
  jcl.over.slf4j;bundle-version="1.7.5",
  log4j.over.slf4j;bundle-version="1.7.5",
  slf4j.api;bundle-version="1.7.5",
  ch.qos.logback.classic;bundle-version="1.0.13",
  ch.qos.logback.core;bundle-version="1.0.13",
- info.novatec.sysout-over-slf4j;bundle-version="1.0.2"
+ info.novatec.sysout-over-slf4j;bundle-version="1.0.2",
+ com.esotericsoftware.kryo;bundle-version="2.23.0"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7

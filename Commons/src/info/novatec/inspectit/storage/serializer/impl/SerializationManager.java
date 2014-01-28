@@ -241,7 +241,7 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(AtomicLong.class, new FieldSerializer<AtomicLong>(kryo, AtomicLong.class));
 		/** Arrays */
 		kryo.register(long[].class, new LongArraySerializer());
-		kryo.register(SimpleStorageDescriptor[].class, new ObjectArraySerializer());
+		kryo.register(SimpleStorageDescriptor[].class, new ObjectArraySerializer(kryo, SimpleStorageDescriptor[].class));
 		/** inspectIT model classes */
 		kryo.register(PlatformIdent.class, new CustomCompatibleFieldSerializer<PlatformIdent>(kryo, PlatformIdent.class, schemaManager));
 		kryo.register(MethodIdent.class, new CustomCompatibleFieldSerializer<MethodIdent>(kryo, MethodIdent.class, schemaManager));
