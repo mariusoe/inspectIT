@@ -20,25 +20,8 @@
 	 -->
 
 	<dependencies>
-		<!-- logging dependencies -->
-		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.5" conf="prod->default" />
-
-		<dependency org="commons-lang" name="commons-lang" rev="2.5" conf="prod->default" />
 		<dependency org="commons-pool" name="commons-pool" rev="1.6" conf="prod->default" />
-
-		<dependency org="org.springframework" name="org.springframework.core" rev="3.1.0.RELEASE" conf="prod->default" />
-		<dependency org="org.springframework" name="org.springframework.beans" rev="3.1.0.RELEASE" conf="prod->default" />
-		<dependency org="org.springframework" name="org.springframework.context" rev="3.1.0.RELEASE" conf="prod->default" />
-		<dependency org="org.springframework" name="org.springframework.web" rev="3.1.0.RELEASE" conf="prod->default" />
-		<dependency org="org.springframework" name="org.springframework.asm" rev="3.1.0.RELEASE" conf="prod->default" />
-		<dependency org="org.springframework" name="org.springframework.expression" rev="3.1.0.RELEASE" conf="prod->default" />
-		<dependency org="org.springframework" name="org.springframework.aop" rev="3.1.0.RELEASE" conf="prod->default" />
-		<dependency org="org.aopalliance" name="com.springsource.org.aopalliance" rev="1.0.0" conf="prod->default" />
-		<dependency org="javax.servlet" name="javax.servlet" rev="3.0.0.v201103241009" conf="prod->default" />
-		<dependency org="net.sourceforge.cglib" name="com.springsource.net.sf.cglib" rev="2.2.0" conf="prod->default" />
-
-		<dependency org="com.esotericsoftware.kryo" name="kryo" rev="2.23.0" conf="prod->default" />
-
+		
 		<!-- Test -->
 		<!-- Test NG should be on the build path via the Eclipse plug-in -->
 		<dependency org="org.mockito" name="mockito-core" rev="1.9.0" conf="test->default" />

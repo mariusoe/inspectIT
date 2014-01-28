@@ -26,6 +26,8 @@
 		<pathelement location="${build.commonscs.classes}" />
 		<pathelement location="${build.inspectit.classes}" />
 		<path refid="lib.prod" />
+		<path refid="lib.prod.commons" />
+		<path refid="lib.prod.commonscs" />
 	</path>
 
 	<path id="compile.classpath">
@@ -36,6 +38,8 @@
 		<pathelement location="${build.inspectit.classes}" />
 		<path refid="lib.prod" />
 		<path refid="lib.jmeter" />
+		<path refid="lib.prod.commons" />
+		<path refid="lib.prod.commonscs" />
 	</path>
 
 	<target name="clean">
@@ -219,6 +223,8 @@
 			<fileset dir="${commons.build.release}" includes="*.jar" />
 			<fileset dir="${commonscs.build.release}" includes="*.jar" />
 			<path refid="lib.prod" />
+			<path refid="lib.prod.commons" />
+			<path refid="lib.prod.commonscs" />
 			<path refid="lib.test" />
 			<path refid="lib.jmeter" />
 		</path>

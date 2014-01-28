@@ -90,7 +90,7 @@
 	</target>
 
 	<!-- Calls the release target and then the analysis targets -->
-	<target name="release-and-analyze" depends="static-analysis, release" description="--> Calls the release target and then executes the static analysis" />
+	<target name="release-and-analyze" depends="static-analysis, functional-tests, release" description="--> Calls the release target and then executes the static analysis" />
 
 	<!-- *************************************************************** -->
 	<!--                Q U A L I T Y     T A R G E T S                  -->

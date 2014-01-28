@@ -95,6 +95,12 @@
 		<ivy:resolve file="${ivy.file}" />
 		<ivy:cachepath pathid="lib.osgi" conf="osgi" />
 		<ivy:cachepath pathid="lib.test" conf="test" />
+		
+		<ivy:resolve file="${ivy.file.commons}" />
+		<ivy:cachepath pathid="lib.prod.commons" conf="prod" />
+
+		<ivy:resolve file="${ivy.file.commonscs}" />
+		<ivy:cachepath pathid="lib.prod.commonscs" conf="prod" />
 
 		<copy todir="${buildDirectory}/plugins/${topLevelElementId}">
 			<fileset dir="${basedir}/..">
@@ -166,6 +172,8 @@
 	<!--  It depends on the pdebuild target, because we need the compiled class files from the PDE Build-->
 	<target name="functional-tests" depends="pdebuild,init-functional-tests">
 		<path id="test.compile.classpath">
+			<path refid="lib.prod.commons" />
+			<path refid="lib.prod.commonscs" />
 			<path refid="path.rcp" />
 			<path refid="path.commons.classes" />
 			<path refid="path.commonscs.classes" />
