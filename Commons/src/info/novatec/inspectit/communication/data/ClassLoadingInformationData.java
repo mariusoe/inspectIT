@@ -221,7 +221,7 @@ public class ClassLoadingInformationData extends SystemSensorData implements IAg
 
 		minLoadedClassCount = Math.min(minLoadedClassCount, other.minLoadedClassCount);
 		maxLoadedClassCount = Math.max(maxLoadedClassCount, other.maxLoadedClassCount);
-		totalTotalLoadedClassCount += other.totalLoadedClassCount;
+		totalLoadedClassCount += other.totalLoadedClassCount;
 
 		minTotalLoadedClassCount = Math.min(minTotalLoadedClassCount, other.minTotalLoadedClassCount);
 		maxTotalLoadedClassCount = Math.max(maxTotalLoadedClassCount, other.maxTotalLoadedClassCount);
