@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -492,6 +493,11 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		@SuppressWarnings("unchecked")
 		public Object[] getElements(Object inputElement) {
 			List<? extends DefaultData> input = (List<? extends DefaultData>) inputElement;
+
+			if (CollectionUtils.isEmpty(input)) {
+				return new Object[0];
+			}
+
 			if (input.get(0) instanceof InvocationSequenceData) {
 				sqlStatementDataList = getRawInputList((List<InvocationSequenceData>) input, new ArrayList<SqlStatementData>());
 			} else {

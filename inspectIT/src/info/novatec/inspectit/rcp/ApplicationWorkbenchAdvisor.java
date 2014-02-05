@@ -4,6 +4,8 @@ import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Our extension to the {@link WorkbenchAdvisor} where we define the workbench related things like
@@ -13,6 +15,11 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
  * 
  */
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
+
+	/**
+	 * Logger.
+	 */
+	private static final Logger LOG = LoggerFactory.getLogger(ApplicationWorkbenchAdvisor.class);
 
 	/**
 	 * The initial perspective ID.
@@ -50,6 +57,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 	@Override
 	public void eventLoopException(Throwable exception) {
 		super.eventLoopException(exception);
+		LOG.error("Unchecked exception occurred during program execution.", exception);
 		InspectIT.getDefault().createErrorDialog("Unchecked exception occurred during program execution.", exception, -1);
 	}
 
