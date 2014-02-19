@@ -2,6 +2,8 @@ package info.novatec.inspectit.agent.config.impl;
 
 import info.novatec.inspectit.agent.config.PriorityEnum;
 
+import org.apache.commons.collections.MapUtils;
+
 /**
  * Container for the values of a sensor type configuration. stores all the values defined in a
  * config file for later access.
@@ -69,6 +71,21 @@ public class MethodSensorTypeConfig extends AbstractSensorTypeConfig {
 	 */
 	public String toString() {
 		return getId() + " :: name: " + name + " (" + priority + ")";
+	}
+
+	/**
+	 * Returns if jRebel property is activated on the sensor.
+	 * 
+	 * @return Returns if jRebel property is activated on the sensor.
+	 */
+	public boolean isJRebelActive() {
+		if (MapUtils.isNotEmpty(getParameters())) {
+			Object jRebelValue = getParameters().get("jRebel");
+			if ("true".equals(jRebelValue)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

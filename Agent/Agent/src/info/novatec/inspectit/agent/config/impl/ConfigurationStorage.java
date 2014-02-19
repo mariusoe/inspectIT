@@ -10,6 +10,7 @@ import info.novatec.inspectit.agent.analyzer.impl.SuperclassMatcher;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.PriorityEnum;
 import info.novatec.inspectit.agent.config.StorageException;
+import info.novatec.inspectit.agent.jrebel.JRebelUtil;
 import info.novatec.inspectit.communication.data.ParameterContentType;
 
 import java.util.ArrayList;
@@ -350,7 +351,9 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		sensorConfig.setIgnoreSignature(ignoreSignature);
 		sensorConfig.setParameterTypes(parameterList);
 		sensorConfig.setSettings(settings);
-		sensorConfig.setSensorTypeConfig(getMethodSensorTypeConfigForName(sensorTypeName));
+
+		MethodSensorTypeConfig methodSensorTypeConfig = getMethodSensorTypeConfigForName(sensorTypeName);
+		sensorConfig.setSensorTypeConfig(methodSensorTypeConfig);
 
 		// check for a virtual definition
 		if (ignoreSignature) {
@@ -479,6 +482,16 @@ public class ConfigurationStorage implements IConfigurationStorage {
 
 		if (LOGGER.isLoggable(Level.FINE)) {
 			LOGGER.fine("Sensor configuration added: " + sensorConfig.toString());
+		}
+
+		if (methodSensorTypeConfig.isJRebelActive()) {
+			UnregisteredSensorConfig jRebelSensorConfig = JRebelUtil.getJRebelSensorConfiguration(sensorConfig, classPoolAnalyzer, inheritanceAnalyzer);
+			jRebelSensorConfig.completeConfiguration();
+			unregisteredSensorConfigs.add(jRebelSensorConfig);
+
+			if (LOGGER.isLoggable(Level.FINE)) {
+				LOGGER.fine("Sensor configuration for JRebel enhanced classes added: " + jRebelSensorConfig.toString());
+			}
 		}
 	}
 

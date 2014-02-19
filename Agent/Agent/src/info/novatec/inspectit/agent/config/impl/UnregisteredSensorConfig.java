@@ -240,6 +240,15 @@ public class UnregisteredSensorConfig extends AbstractSensorConfig {
 	}
 
 	/**
+	 * Gets {@link #exceptionSensorActivated}.
+	 * 
+	 * @return {@link #exceptionSensorActivated}
+	 */
+	public boolean isExceptionSensorActivated() {
+		return exceptionSensorActivated;
+	}
+
+	/**
 	 * Returns the integer value that defines the modifiers of methods to be instrumented. The
 	 * values are defined in {@link Modifier} class. Default value is 0, and this means no modifiers
 	 * are set.
