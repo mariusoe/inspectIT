@@ -23,6 +23,9 @@ import java.util.logging.Logger;
 
 import javassist.Modifier;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 /**
  * The default configuration storage implementation which stores everything in the memory.
  * <p>
@@ -33,6 +36,7 @@ import javassist.Modifier;
  * @author Eduard Tudenhoefner
  * 
  */
+@Component
 public class ConfigurationStorage implements IConfigurationStorage {
 
 	/**
@@ -132,6 +136,7 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 * @param inheritanceAnalyzer
 	 *            The inheritance analyzer used by the sensor configuration.
 	 */
+	@Autowired
 	public ConfigurationStorage(IClassPoolAnalyzer classPoolAnalyzer, IInheritanceAnalyzer inheritanceAnalyzer) {
 		this.classPoolAnalyzer = classPoolAnalyzer;
 		this.inheritanceAnalyzer = inheritanceAnalyzer;
@@ -732,4 +737,5 @@ public class ConfigurationStorage implements IConfigurationStorage {
 		fakeSensorConfig.setModifiers(Modifier.PUBLIC);
 		this.classLoaderDelegationMatcher = new SuperclassMatcher(inheritanceAnalyzer, classPoolAnalyzer, fakeSensorConfig);
 	}
+
 }

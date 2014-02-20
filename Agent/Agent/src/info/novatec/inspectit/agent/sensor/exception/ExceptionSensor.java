@@ -2,8 +2,11 @@ package info.novatec.inspectit.agent.sensor.exception;
 
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.hooking.IHook;
+import info.novatec.inspectit.agent.sensor.method.AbstractMethodSensor;
 
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The {@link ExceptionSensor} which initializes and returns the {@link ExceptionSensorHook} class.
@@ -11,17 +14,24 @@ import java.util.Map;
  * @author Eduard Tudenhoefner
  * 
  */
-public class ExceptionSensor implements IExceptionSensor {
+public class ExceptionSensor extends AbstractMethodSensor implements IExceptionSensor {
 
 	/**
 	 * The ID manager.
 	 */
-	private final IIdManager idManager;
+	@Autowired
+	private IIdManager idManager;
 
 	/**
 	 * The used exception sensor hook.
 	 */
 	private ExceptionSensorHook exceptionSensorHook = null;
+
+	/**
+	 * No-arg constructor needed for Spring.
+	 */
+	public ExceptionSensor() {
+	}
 
 	/**
 	 * The default constructor which needs 3 parameter for initialization.

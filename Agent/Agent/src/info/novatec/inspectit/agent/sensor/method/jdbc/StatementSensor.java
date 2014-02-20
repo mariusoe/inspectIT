@@ -2,10 +2,13 @@ package info.novatec.inspectit.agent.sensor.method.jdbc;
 
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.hooking.IHook;
+import info.novatec.inspectit.agent.sensor.method.AbstractMethodSensor;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 import info.novatec.inspectit.util.Timer;
 
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The SQL timer sensor which initializes and returns the {@link StatementHook} class.
@@ -13,17 +16,19 @@ import java.util.Map;
  * @author Christian Herzog
  * 
  */
-public class StatementSensor implements IMethodSensor {
+public class StatementSensor extends AbstractMethodSensor implements IMethodSensor {
 
 	/**
 	 * The timer used for accurate measuring.
 	 */
-	private final Timer timer;
+	@Autowired
+	private Timer timer;
 
 	/**
 	 * The ID manager.
 	 */
-	private final IIdManager idManager;
+	@Autowired
+	private IIdManager idManager;
 
 	/**
 	 * The used statement hook.
@@ -31,7 +36,13 @@ public class StatementSensor implements IMethodSensor {
 	private StatementHook statementHook = null;
 
 	/**
-	 * The default constructor which needs 3 parameter for initialization.
+	 * No-arg constructor needed for Spring.
+	 */
+	public StatementSensor() {
+	}
+
+	/**
+	 * The default constructor which needs 2 parameter for initialization.
 	 * 
 	 * @param timer
 	 *            The timer used for accurate measuring.

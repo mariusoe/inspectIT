@@ -3,11 +3,14 @@ package info.novatec.inspectit.agent.sensor.method.timer;
 import info.novatec.inspectit.agent.config.IPropertyAccessor;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.hooking.IHook;
+import info.novatec.inspectit.agent.sensor.method.AbstractMethodSensor;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 import info.novatec.inspectit.util.Timer;
 
 import java.lang.management.ManagementFactory;
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The timer sensor which initializes and returns the {@link TimerHook} class.
@@ -15,27 +18,36 @@ import java.util.Map;
  * @author Patrice Bouillet
  * 
  */
-public class TimerSensor implements IMethodSensor {
+public class TimerSensor extends AbstractMethodSensor implements IMethodSensor {
 
 	/**
 	 * The timer used for accurate measuring.
 	 */
-	private final Timer timer;
+	@Autowired
+	private Timer timer;
 
 	/**
 	 * The ID manager.
 	 */
-	private final IIdManager idManager;
+	@Autowired
+	private IIdManager idManager;
 
 	/**
 	 * The property accessor.
 	 */
-	private final IPropertyAccessor propertyAccessor;
+	@Autowired
+	private IPropertyAccessor propertyAccessor;
 
 	/**
 	 * The used timer hook.
 	 */
 	private TimerHook timerHook = null;
+
+	/**
+	 * No-arg constructor needed for Spring.
+	 */
+	public TimerSensor() {
+	}
 
 	/**
 	 * The default constructor which needs 3 parameter for initialization.

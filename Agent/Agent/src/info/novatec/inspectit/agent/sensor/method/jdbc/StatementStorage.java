@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.stereotype.Component;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -20,6 +22,7 @@ import com.google.common.cache.CacheBuilder;
  * @author Patrice Bouillet
  * @author Stefan Siegl
  */
+@Component
 public class StatementStorage {
 
 	/**

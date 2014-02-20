@@ -13,13 +13,15 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * This class provides dynamic information about the class loading system through MXBeans.
  * 
  * @author Eduard Tudenhoefner
  * 
  */
-public class ClassLoadingInformation implements IPlatformSensor {
+public class ClassLoadingInformation extends AbstractPlatformSensor implements IPlatformSensor {
 
 	/**
 	 * The logger of the class.
@@ -29,12 +31,19 @@ public class ClassLoadingInformation implements IPlatformSensor {
 	/**
 	 * The ID Manager used to get the correct IDs.
 	 */
-	private final IIdManager idManager;
+	@Autowired
+	private IIdManager idManager;
 
 	/**
 	 * The {@link RuntimeInfoProvider} used to retrieve information from the class loading system.
 	 */
 	private RuntimeInfoProvider runtimeBean = PlatformSensorInfoProviderFactory.getPlatformSensorInfoProvider().getRuntimeInfoProvider();
+
+	/**
+	 * No-arg constructor needed for Spring.
+	 */
+	public ClassLoadingInformation() {
+	}
 
 	/**
 	 * The default constructor which needs one parameter.

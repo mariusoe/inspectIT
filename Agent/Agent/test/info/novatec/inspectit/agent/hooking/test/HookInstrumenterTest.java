@@ -25,6 +25,7 @@ import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.hooking.IHookDispatcher;
+import info.novatec.inspectit.agent.hooking.IHookDispatcherMapper;
 import info.novatec.inspectit.agent.hooking.impl.HookException;
 import info.novatec.inspectit.agent.hooking.impl.HookInstrumenter;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
@@ -52,8 +53,11 @@ import org.testng.annotations.Test;
 @SuppressWarnings("PMD")
 public class HookInstrumenterTest extends AbstractLogSupport {
 
+	private interface ITestHookDispatcher extends IHookDispatcher, IHookDispatcherMapper {
+	}
+
 	@Mock
-	private static IHookDispatcher hookDispatcher;
+	private static ITestHookDispatcher hookDispatcher;
 
 	@Mock
 	private IIdManager idManager;
@@ -86,7 +90,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		field.set(hookInstrumenter, "info.novatec.inspectit.agent.hooking.test.HookInstrumenterTest#getAgent()");
 	}
 
-	public static IHookDispatcher getHookDispatcher() {
+	public static ITestHookDispatcher getHookDispatcher() {
 		return hookDispatcher;
 	}
 

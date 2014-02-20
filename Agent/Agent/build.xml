@@ -94,6 +94,7 @@
 	</target>
 
 	<target name="release-commons" description="--> call the release of the commons project">
+		<ant antfile="${build.commons.file}" target="clean" inheritAll="false" useNativeBasedir="true" />
 		<ant antfile="${build.commons.file}" target="release" inheritAll="false" useNativeBasedir="true" />
 	</target>
 
@@ -239,10 +240,11 @@ Mozilla Public License (MPL), 1.1 : javassist (3.16.1.GA) : google-guava (14.0-r
 
 		<jar destfile="${build.release}/sun1.5-data/agent/${dist.jar.name}" manifest="${basedir}/META-INF/MANIFEST.MF">
 			<fileset dir="${build.agent.classes}" includes="**/*.class" />
+			<fileset dir="${src.root}" includes="**/*.xml" />
 			<fileset dir="${commons.src}" includes="version.log" />
 		</jar>
 
-		<zip destfile="${build.release}/sun1.5-data/agent/${dist.jar.name}" update="true">
+		<zip destfile="${build.release}/sun1.5-data/agent/${dist.jar.name}" update="true" duplicate="preserve">
 			<zipfileset refid="lib.prod.fileset" prefix="lib" />
 			<zipfileset refid="lib.prod.commons.fileset" prefix="lib" />
 			<zipfileset dir="${commons.build.release}" prefix="lib" includes="inspectit-commons.jar" />

@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.stereotype.Component;
+
 /**
  * This class is used to programatically build the path to access a specific method parameter or a
  * field of a class.
@@ -23,6 +25,7 @@ import java.util.logging.Logger;
  * @author Stefan Siegl
  * 
  */
+@Component
 public class PropertyAccessor implements IPropertyAccessor {
 
 	/**

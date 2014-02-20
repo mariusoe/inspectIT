@@ -1,5 +1,6 @@
 package info.novatec.inspectit.agent.buffer.impl;
 
+import info.novatec.inspectit.agent.buffer.AbstractBufferStrategy;
 import info.novatec.inspectit.agent.buffer.IBufferStrategy;
 import info.novatec.inspectit.communication.MethodSensorData;
 
@@ -15,7 +16,7 @@ import java.util.logging.Logger;
  * @author Patrice Bouillet
  * 
  */
-public class SimpleBufferStrategy implements IBufferStrategy<MethodSensorData> {
+public class SimpleBufferStrategy extends AbstractBufferStrategy<MethodSensorData> implements IBufferStrategy<MethodSensorData> {
 
 	/**
 	 * The logger of the class.

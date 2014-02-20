@@ -24,7 +24,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.picocontainer.Startable;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
 
 /**
  * Default implementation of the {@link ICoreService} interface.
@@ -33,7 +37,9 @@ import org.picocontainer.Startable;
  * @author Eduard Tudenhoefner
  * 
  */
-public class CoreService implements ICoreService, Startable {
+@Component
+@DependsOn({ "strategyAndSensorConfiguration" })
+public class CoreService implements ICoreService, InitializingBean, DisposableBean {
 
 	/**
 	 * The logger of the class.
@@ -142,6 +148,7 @@ public class CoreService implements ICoreService, Startable {
 	 * @param idManager
 	 *            IdManager.
 	 */
+	@Autowired
 	public CoreService(IConfigurationStorage configurationStorage, IConnection connection, IBufferStrategy<DefaultData> bufferStrategy, List<ISendingStrategy> sendingStrategies, IIdManager idManager) {
 		if (null == configurationStorage) {
 			throw new IllegalArgumentException("Configuration Storage cannot be null!");
@@ -632,6 +639,20 @@ public class CoreService implements ICoreService, Startable {
 			LOGGER.info("Unregistering the Agent");
 			idManager.unregisterPlatform();
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void afterPropertiesSet() throws Exception {
+		start();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void destroy() throws Exception {
+		stop();
 	}
 
 }

@@ -17,12 +17,15 @@ import javassist.LoaderClassPath;
 import javassist.Modifier;
 import javassist.NotFoundException;
 
+import org.springframework.stereotype.Component;
+
 /**
  * This class provides some methods to help to work with the {@link ClassPool}.
  * 
  * @author Patrice Bouillet
  * 
  */
+@Component
 public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 
 	/**

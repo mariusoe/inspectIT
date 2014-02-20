@@ -215,7 +215,7 @@
 		<ant target="functional-tests-no-dep-build" inheritrefs="true" />
 	</target>
 
-	<target name="functional-tests-no-dep-build" depends="init, init-functional-tests">
+	<target name="functional-tests-no-dep-build" depends="init, init-functional-tests, release-commonscs">
 		<path id="test.compile.classpath">
 			<pathelement location="${build.overwrite.classes}" />
 			<pathelement location="${build.inspectit.classes}" />

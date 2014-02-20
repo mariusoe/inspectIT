@@ -1,6 +1,11 @@
 package info.novatec.inspectit.agent.sending;
 
+import info.novatec.inspectit.agent.config.IConfigurationStorage;
+import info.novatec.inspectit.agent.config.impl.StrategyConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
+
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Every send strategy has to extend this abstract class. The first method that is called after
@@ -11,12 +16,18 @@ import info.novatec.inspectit.agent.core.ICoreService;
  * @author Patrice Bouillet
  * 
  */
-public abstract class AbstractSendingStrategy implements ISendingStrategy {
+public abstract class AbstractSendingStrategy implements ISendingStrategy, InitializingBean {
 
 	/**
 	 * The {@link ICoreService} implementation. Needed to actually trigger the sending of the data.
 	 */
 	private ICoreService coreService;
+
+	/**
+	 * Configuration storage to read settings from.
+	 */
+	@Autowired
+	private IConfigurationStorage configurationStorage;
 
 	/**
 	 * Send the data to the server.
@@ -51,6 +62,18 @@ public abstract class AbstractSendingStrategy implements ISendingStrategy {
 	 */
 	protected final ICoreService getCoreService() {
 		return coreService;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void afterPropertiesSet() throws Exception {
+		for (StrategyConfig sendingStrategyConfig : configurationStorage.getSendingStrategyConfigs()) {
+			if (sendingStrategyConfig.getClazzName().equals(this.getClass().getName())) {
+				this.init(sendingStrategyConfig.getSettings());
+				break;
+			}
+		}
 	}
 
 }

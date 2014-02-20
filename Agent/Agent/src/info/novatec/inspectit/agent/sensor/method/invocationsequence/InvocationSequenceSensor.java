@@ -3,10 +3,13 @@ package info.novatec.inspectit.agent.sensor.method.invocationsequence;
 import info.novatec.inspectit.agent.config.IPropertyAccessor;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.hooking.IHook;
+import info.novatec.inspectit.agent.sensor.method.AbstractMethodSensor;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
 import info.novatec.inspectit.util.Timer;
 
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The invocation sequence sensor which initializes and returns the {@link InvocationSequenceHook}
@@ -15,27 +18,36 @@ import java.util.Map;
  * @author Patrice Bouillet
  * 
  */
-public class InvocationSequenceSensor implements IMethodSensor {
+public class InvocationSequenceSensor extends AbstractMethodSensor implements IMethodSensor {
 
 	/**
 	 * The timer used for accurate measuring.
 	 */
-	private final Timer timer;
+	@Autowired
+	private Timer timer;
 
 	/**
 	 * The ID manager.
 	 */
-	private final IIdManager idManager;
+	@Autowired
+	private IIdManager idManager;
 
 	/**
 	 * The property accessor.
 	 */
-	private final IPropertyAccessor propertyAccessor;
+	@Autowired
+	private IPropertyAccessor propertyAccessor;
 
 	/**
 	 * The invocation sequence hook.
 	 */
 	private InvocationSequenceHook invocationSequenceHook = null;
+
+	/**
+	 * No-arg constructor needed for Spring.
+	 */
+	public InvocationSequenceSensor() {
+	}
 
 	/**
 	 * The default constructor which needs 2 parameter for initialization.

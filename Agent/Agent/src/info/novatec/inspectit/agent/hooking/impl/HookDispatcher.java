@@ -3,6 +3,7 @@ package info.novatec.inspectit.agent.hooking.impl;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.hooking.IConstructorHook;
+import info.novatec.inspectit.agent.hooking.IHookDispatcherMapper;
 import info.novatec.inspectit.agent.hooking.IHook;
 import info.novatec.inspectit.agent.hooking.IHookDispatcher;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
@@ -13,6 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 /**
  * The hook dispatching service which is called by all the hooks throughout the instrumented target
  * application.
@@ -21,7 +25,8 @@ import java.util.logging.Logger;
  * @author Eduard Tudenhoefner
  * 
  */
-public class HookDispatcher implements IHookDispatcher {
+@Component
+public class HookDispatcher implements IHookDispatcherMapper, IHookDispatcher {
 
 	/**
 	 * The logger of this class.
@@ -66,6 +71,7 @@ public class HookDispatcher implements IHookDispatcher {
 	 * @param coreService
 	 *            The core service.
 	 */
+	@Autowired
 	public HookDispatcher(ICoreService coreService) {
 		this.coreService = coreService;
 	}

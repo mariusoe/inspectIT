@@ -15,7 +15,6 @@ import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.hooking.IConstructorHook;
 import info.novatec.inspectit.agent.hooking.IHook;
-import info.novatec.inspectit.agent.hooking.IHookDispatcher;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
 import info.novatec.inspectit.agent.hooking.impl.HookDispatcher;
 import info.novatec.inspectit.agent.sensor.exception.ExceptionSensorHook;
@@ -38,7 +37,7 @@ public class HookDispatcherTest extends AbstractLogSupport {
 	@Mock
 	private ICoreService coreService;
 
-	private IHookDispatcher hookDispatcher;
+	private HookDispatcher hookDispatcher;
 
 	/**
 	 * {@inheritDoc}

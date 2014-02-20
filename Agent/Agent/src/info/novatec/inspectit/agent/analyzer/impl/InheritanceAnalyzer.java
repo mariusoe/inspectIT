@@ -16,6 +16,9 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 /**
  * The default implementation of the {@link IInheritanceAnalyzer} interface.
  * 
@@ -23,6 +26,7 @@ import javassist.NotFoundException;
  * @author Eduard Tudenhoefner
  * 
  */
+@Component
 public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 
 	/**
@@ -48,6 +52,7 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 	 * @param classPoolAnalyzer
 	 *            The class pool analyzer.
 	 */
+	@Autowired
 	public InheritanceAnalyzer(IClassPoolAnalyzer classPoolAnalyzer) {
 		this.classPoolAnalyzer = classPoolAnalyzer;
 	}

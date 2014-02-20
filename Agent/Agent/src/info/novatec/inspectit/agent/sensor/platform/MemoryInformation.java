@@ -14,13 +14,15 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * This class provides dynamic information about the memory system through MXBeans.
  * 
  * @author Eduard Tudenhoefner
  * 
  */
-public class MemoryInformation implements IPlatformSensor {
+public class MemoryInformation extends AbstractPlatformSensor implements IPlatformSensor {
 
 	/**
 	 * The logger of the class.
@@ -30,7 +32,8 @@ public class MemoryInformation implements IPlatformSensor {
 	/**
 	 * The ID Manager used to get the correct IDs.
 	 */
-	private final IIdManager idManager;
+	@Autowired
+	private IIdManager idManager;
 
 	/**
 	 * The {@link MemoryInfoProvider} used to retrieve heap memory information.
@@ -41,6 +44,12 @@ public class MemoryInformation implements IPlatformSensor {
 	 * The {@link OperatingSystemInfoProvider} used to retrieve physical memory information.
 	 */
 	private OperatingSystemInfoProvider osBean = PlatformSensorInfoProviderFactory.getPlatformSensorInfoProvider().getOperatingSystemInfoProvider();
+
+	/**
+	 * No-arg constructor needed for Spring.
+	 */
+	public MemoryInformation() {
+	}
 
 	/**
 	 * The default constructor which needs one parameter.

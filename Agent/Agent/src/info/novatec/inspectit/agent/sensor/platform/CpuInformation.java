@@ -13,13 +13,15 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * This class provides dynamic information about the underlying operating system through MXBeans.
  * 
  * @author Eduard Tudenhoefner
  * 
  */
-public class CpuInformation implements IPlatformSensor {
+public class CpuInformation extends AbstractPlatformSensor implements IPlatformSensor {
 
 	/**
 	 * The logger of the class.
@@ -29,13 +31,20 @@ public class CpuInformation implements IPlatformSensor {
 	/**
 	 * The ID Manager used to get the correct IDs.
 	 */
-	private final IIdManager idManager;
+	@Autowired
+	private IIdManager idManager;
 
 	/**
 	 * The {@link OperatingSystemInfoProvider} used to retrieve information from the operating
 	 * system.
 	 */
 	private OperatingSystemInfoProvider osBean = PlatformSensorInfoProviderFactory.getPlatformSensorInfoProvider().getOperatingSystemInfoProvider();
+
+	/**
+	 * No-arg constructor needed for Spring.
+	 */
+	public CpuInformation() {
+	}
 
 	/**
 	 * The default constructor which needs one parameter.

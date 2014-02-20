@@ -24,6 +24,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 /**
  * This config reader class reads simple config files. Simple in the way as you don't need any
  * additional java libraries and every statement is in one line.
@@ -31,7 +35,8 @@ import java.util.regex.Pattern;
  * @author Patrice Bouillet
  * 
  */
-public class FileConfigurationReader implements IConfigurationReader {
+@Component("configurationReader")
+public class FileConfigurationReader implements IConfigurationReader, InitializingBean {
 
 	/**
 	 * The logger of the class.
@@ -101,6 +106,7 @@ public class FileConfigurationReader implements IConfigurationReader {
 	 * @param configurationStorage
 	 *            The configuration storage implementation.
 	 */
+	@Autowired
 	public FileConfigurationReader(IConfigurationStorage configurationStorage) {
 		this.configurationStorage = configurationStorage;
 	}
@@ -559,6 +565,13 @@ public class FileConfigurationReader implements IConfigurationReader {
 			String patternString = tokenizer.nextToken();
 			configurationStorage.addIgnoreClassesPattern(patternString);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void afterPropertiesSet() throws Exception {
+		load();
 	}
 
 }

@@ -4,7 +4,7 @@ import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.impl.MethodSensorTypeConfig;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.IIdManager;
-import info.novatec.inspectit.agent.hooking.IHookDispatcher;
+import info.novatec.inspectit.agent.hooking.IHookDispatcherMapper;
 import info.novatec.inspectit.agent.hooking.IHookInstrumenter;
 
 import java.util.logging.Level;
@@ -20,6 +20,9 @@ import javassist.NotFoundException;
 import javassist.expr.ExprEditor;
 import javassist.expr.Handler;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 /**
  * The byte code instrumenter class. Used to instrument the additional instructions into the target
  * byte code.
@@ -28,6 +31,7 @@ import javassist.expr.Handler;
  * @author Eduard Tudenhoefner
  * 
  */
+@Component
 public class HookInstrumenter implements IHookInstrumenter {
 
 	/**
@@ -49,7 +53,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 	/**
 	 * The hook dispatching service.
 	 */
-	private final IHookDispatcher hookDispatcher;
+	private final IHookDispatcherMapper hookDispatcher;
 
 	/**
 	 * The ID manager used to register the methods and the mapping between the method sensor type id
@@ -82,7 +86,8 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 * @param configurationStorage
 	 *            The configuration storage where all definitions of the user are stored.
 	 */
-	public HookInstrumenter(IHookDispatcher hookDispatcher, IIdManager idManager, IConfigurationStorage configurationStorage) {
+	@Autowired
+	public HookInstrumenter(IHookDispatcherMapper hookDispatcher, IIdManager idManager, IConfigurationStorage configurationStorage) {
 		this.hookDispatcher = hookDispatcher;
 		this.idManager = idManager;
 		this.configurationStorage = configurationStorage;

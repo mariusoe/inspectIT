@@ -13,13 +13,15 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * This class provides dynamic information about the thread system through MXBeans.
  * 
  * @author Eduard Tudenhoefner
  * 
  */
-public class ThreadInformation implements IPlatformSensor {
+public class ThreadInformation extends AbstractPlatformSensor implements IPlatformSensor {
 
 	/**
 	 * The logger of the class.
@@ -29,12 +31,19 @@ public class ThreadInformation implements IPlatformSensor {
 	/**
 	 * The ID Manager used to get the correct IDs.
 	 */
-	private final IIdManager idManager;
+	@Autowired
+	private IIdManager idManager;
 
 	/**
 	 * The {@link ThreadInfoProvider} used to retrieve information from the thread system.
 	 */
 	private ThreadInfoProvider threadBean = PlatformSensorInfoProviderFactory.getPlatformSensorInfoProvider().getThreadInfoProvider();
+
+	/**
+	 * No-arg constructor needed for Spring.
+	 */
+	public ThreadInformation() {
+	}
 
 	/**
 	 * The default constructor which needs one parameter.

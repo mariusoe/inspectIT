@@ -32,6 +32,8 @@ import javassist.LoaderClassPath;
 import javassist.NotFoundException;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * The default implementation of the {@link IByteCodeAnalyzer} interface. First it tries to analyze
@@ -43,6 +45,7 @@ import org.apache.commons.collections.CollectionUtils;
  * @author Eduard Tudenhoefner
  * 
  */
+@Component
 public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 
 	/**
@@ -71,6 +74,7 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 	 * @param classPoolAnalyzer
 	 *            The class pool analyzer reference.
 	 */
+	@Autowired
 	public ByteCodeAnalyzer(IConfigurationStorage configurationStorage, IHookInstrumenter hookInstrumenter, IClassPoolAnalyzer classPoolAnalyzer) {
 		if (null == configurationStorage) {
 			throw new IllegalArgumentException("Configuration storage cannot be null!");

@@ -16,6 +16,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * This class provides static information about heap memory/operating system/runtime through
  * MXBeans.
@@ -23,7 +25,7 @@ import java.util.logging.Logger;
  * @author Eduard Tudenhoefner
  * 
  */
-public class SystemInformation implements IPlatformSensor {
+public class SystemInformation extends AbstractPlatformSensor implements IPlatformSensor {
 
 	/**
 	 * The logger of the class.
@@ -38,7 +40,8 @@ public class SystemInformation implements IPlatformSensor {
 	/**
 	 * The ID Manager used to get the correct IDs.
 	 */
-	private final IIdManager idManager;
+	@Autowired
+	private IIdManager idManager;
 
 	/**
 	 * After the first update()-call the static information will only be updated when the update is
@@ -61,6 +64,12 @@ public class SystemInformation implements IPlatformSensor {
 	 * The {@link RuntimeInfoProvider} used to retrieve information from the runtime VM.
 	 */
 	private RuntimeInfoProvider runtimeBean = PlatformSensorInfoProviderFactory.getPlatformSensorInfoProvider().getRuntimeInfoProvider();
+
+	/**
+	 * No-arg constructor needed for Spring.
+	 */
+	public SystemInformation() {
+	}
 
 	/**
 	 * The default constructor which needs one parameter.

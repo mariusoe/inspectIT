@@ -1,5 +1,7 @@
 package info.novatec.inspectit.util;
 
+import org.springframework.stereotype.Component;
+
 /**
  * Class which was used as a wrapper arount a timer factory. As the move to Java 5 was done, the
  * factory is currently not needed anymore, but this class stays if some new timer implementations
@@ -8,6 +10,7 @@ package info.novatec.inspectit.util;
  * @author Patrice Bouillet
  * 
  */
+@Component
 public class Timer {
 
 	/**

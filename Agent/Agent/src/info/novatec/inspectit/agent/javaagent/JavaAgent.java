@@ -68,7 +68,7 @@ public class JavaAgent implements ClassFileTransformer {
 	/**
 	 * Defines the class of our current real agent to use.
 	 */
-	private static final String INSPECTIT_AGENT = "info.novatec.inspectit.agent.PicoAgent";
+	private static final String INSPECTIT_AGENT = "info.novatec.inspectit.agent.SpringAgent";
 
 	/**
 	 * Defines the self first classes which should be loaded by this class loader instead of

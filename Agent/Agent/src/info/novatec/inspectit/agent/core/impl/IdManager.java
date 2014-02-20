@@ -21,7 +21,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.picocontainer.Startable;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * The default implementation of the ID Manager.
@@ -30,7 +33,8 @@ import org.picocontainer.Startable;
  * @author Eduard Tudenhoefner
  * 
  */
-public class IdManager implements IIdManager, Startable {
+@Component
+public class IdManager implements IIdManager, InitializingBean, DisposableBean {
 
 	/**
 	 * The logger of the class.
@@ -110,6 +114,7 @@ public class IdManager implements IIdManager, Startable {
 	 * @param versioning
 	 *            The versioning service.
 	 */
+	@Autowired
 	public IdManager(IConfigurationStorage configurationStorage, IConnection connection, IVersioningService versioning) {
 		this.configurationStorage = configurationStorage;
 		this.connection = connection;
@@ -710,6 +715,20 @@ public class IdManager implements IIdManager, Startable {
 			}
 		}
 
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void afterPropertiesSet() throws Exception {
+		start();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void destroy() throws Exception {
+		stop();
 	}
 
 }
