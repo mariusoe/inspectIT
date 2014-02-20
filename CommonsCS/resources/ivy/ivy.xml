@@ -21,6 +21,7 @@
 
 	<dependencies>
 		<dependency org="commons-pool" name="commons-pool" rev="1.6" conf="prod->default" />
+		<dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="prod->default" />
 		
 		<!-- Test -->
 		<!-- Test NG should be on the build path via the Eclipse plug-in -->

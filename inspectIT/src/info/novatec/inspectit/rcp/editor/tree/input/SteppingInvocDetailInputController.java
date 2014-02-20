@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
@@ -42,7 +42,7 @@ public class SteppingInvocDetailInputController extends InvocDetailInputControll
 	/**
 	 * Global data access service.
 	 */
-	private CachedDataService cachedDataService;
+	private ICachedDataService cachedDataService;
 
 	/**
 	 * Is stepping control be initially visible.

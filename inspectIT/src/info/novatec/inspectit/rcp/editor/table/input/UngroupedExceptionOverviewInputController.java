@@ -1,8 +1,8 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.comparator.DefaultDataComparatorEnum;
 import info.novatec.inspectit.communication.comparator.IDataComparator;
@@ -161,7 +161,7 @@ public class UngroupedExceptionOverviewInputController extends AbstractTableInpu
 	/**
 	 * This data access service is needed because of the ID mappings.
 	 */
-	private CachedDataService cachedDataService;
+	private ICachedDataService cachedDataService;
 
 	/**
 	 * The data access service to access the data on the CMR.

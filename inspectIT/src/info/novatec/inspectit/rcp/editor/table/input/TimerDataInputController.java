@@ -1,8 +1,8 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.comparator.IDataComparator;
 import info.novatec.inspectit.communication.comparator.InvocationAwareDataComparatorEnum;
@@ -154,7 +154,7 @@ public class TimerDataInputController extends AbstractTableInputController {
 	/**
 	 * Global data access service.
 	 */
-	private CachedDataService cachedDataService;
+	private ICachedDataService cachedDataService;
 
 	/**
 	 * List of Timer data to be displayed.

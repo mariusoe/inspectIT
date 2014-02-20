@@ -1,7 +1,7 @@
 package info.novatec.inspectit.communication.comparator;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.util.ObjectUtils;
 
@@ -34,7 +34,7 @@ public enum MethodSensorDataComparatorEnum implements IDataComparator<MethodSens
 	/**
 	 * {@inheritDoc}
 	 */
-	public int compare(MethodSensorData o1, MethodSensorData o2, CachedDataService cachedDataService) {
+	public int compare(MethodSensorData o1, MethodSensorData o2, ICachedDataService cachedDataService) {
 		if (null == cachedDataService) {
 			return 0;
 		}

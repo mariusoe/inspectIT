@@ -9,44 +9,9 @@
 			<class name="info.novatec.inspectit.communication.valueobject.TimerRawVOTest" />
 		</classes>
 	</test>
-	<test name="Service">
-		<classes>
-			<class name="info.novatec.inspectit.cmr.service.cache.CachedDataServiceTest" />
-		</classes>
-	</test>
-	<test name="Aggregators">
-		<classes>
-			<class name="info.novatec.inspectit.indexing.aggregation.impl.HttpDataAggregatorTest" />
-		</classes>
-	</test>
-	<test name="Indexing">
-		<classes>
-			<class name="info.novatec.inspectit.indexing.impl.BufferIndexingTest" />
-			<class name="info.novatec.inspectit.indexing.impl.StorageIndexingTest" />
-			<class name="info.novatec.inspectit.indexing.restriction.IndexQueryRestrictionProcessorTest" />
-			<class name="info.novatec.inspectit.indexing.buffer.impl.BranchTest" />
-			<class name="info.novatec.inspectit.indexing.storage.impl.ArrayBasedStorageLeafTest" />
-			<class name="info.novatec.inspectit.indexing.indexer.impl.BranchIndexersTest" />
-			<class name="info.novatec.inspectit.indexing.buffer.impl.BufferBranchIndexerTest" />
-			<class name="info.novatec.inspectit.indexing.storage.impl.StorageBranchIndexerTest" />
-		</classes>
-	</test>
 	<test name="Serializer">
 		<classes>
 			<class name="info.novatec.inspectit.storage.serializer.impl.BackwardForwardCompatibilityTest" />
-			<class name="info.novatec.inspectit.storage.serializer.impl.SerializerTest" />
-		</classes>
-	</test>
-	<test name="Schema">
-		<classes>
-			<class name="info.novatec.inspectit.storage.serializer.schema.SchemaTest" />
-		</classes>
-	</test>
-	<test name="Storage">
-		<classes>
-			<class name="info.novatec.inspectit.storage.processor.impl.StorageDataProcessorsTest" />
-			<class name="info.novatec.inspectit.storage.StorageDataTest" />
-			<class name="info.novatec.inspectit.storage.label.management.impl.LabelManagementActionsTest" />
 		</classes>
 	</test>
 	<test name="Properties">

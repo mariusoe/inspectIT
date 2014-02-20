@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.springframework.stereotype.Component;
+
 /**
  * This utility searches for the versioning file and provides the current version of this release
  * for display.
@@ -14,6 +16,7 @@ import java.io.InputStreamReader;
  * 
  * @author Stefan Siegl
  */
+@Component
 public class FileBasedVersioningServiceImpl implements IVersioningService {
 
 	/**

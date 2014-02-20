@@ -1,6 +1,6 @@
 package info.novatec.inspectit.communication.comparator;
 
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 
 import java.util.Comparator;
@@ -25,7 +25,7 @@ public class ResultComparator<T extends DefaultData> implements Comparator<T> {
 	/**
 	 * {@link CachedDataService}.
 	 */
-	private CachedDataService cachedDataService;
+	private ICachedDataService cachedDataService;
 
 	/**
 	 * True if ascending sorting is on, false if descending sorting is on.
@@ -68,7 +68,7 @@ public class ResultComparator<T extends DefaultData> implements Comparator<T> {
 	 * @param cachedDataService
 	 *            {@link CachedDataService}.
 	 */
-	public ResultComparator(IDataComparator<? super T> comparator, CachedDataService cachedDataService) {
+	public ResultComparator(IDataComparator<? super T> comparator, ICachedDataService cachedDataService) {
 		this(comparator, cachedDataService, true);
 	}
 
@@ -83,7 +83,7 @@ public class ResultComparator<T extends DefaultData> implements Comparator<T> {
 	 *            True if ascending sorting is on, false if descending sorting is on.
 	 * 
 	 */
-	public ResultComparator(IDataComparator<? super T> comparator, CachedDataService cachedDataService, boolean ascending) {
+	public ResultComparator(IDataComparator<? super T> comparator, ICachedDataService cachedDataService, boolean ascending) {
 		this.comparator = comparator;
 		this.ascending = ascending;
 		this.cachedDataService = cachedDataService;
@@ -106,7 +106,7 @@ public class ResultComparator<T extends DefaultData> implements Comparator<T> {
 	 * 
 	 * @return {@link #cachedDataService}
 	 */
-	public CachedDataService getCachedDataService() {
+	public ICachedDataService getCachedDataService() {
 		return cachedDataService;
 	}
 
@@ -116,7 +116,7 @@ public class ResultComparator<T extends DefaultData> implements Comparator<T> {
 	 * @param cachedDataService
 	 *            New value for {@link #cachedDataService}
 	 */
-	public void setCachedDataService(CachedDataService cachedDataService) {
+	public void setCachedDataService(ICachedDataService cachedDataService) {
 		this.cachedDataService = cachedDataService;
 	}
 

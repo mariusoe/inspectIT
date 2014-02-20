@@ -1,6 +1,6 @@
 package info.novatec.inspectit.communication.comparator;
 
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.data.InvocationAwareData;
 
 import java.util.Comparator;
@@ -21,7 +21,7 @@ public enum InvocationAwareDataComparatorEnum implements IDataComparator<Invocat
 	/**
 	 * {@inheritDoc}
 	 */
-	public int compare(InvocationAwareData o1, InvocationAwareData o2, CachedDataService cachedDataService) {
+	public int compare(InvocationAwareData o1, InvocationAwareData o2, ICachedDataService cachedDataService) {
 		return compare(o1, o2);
 	}
 

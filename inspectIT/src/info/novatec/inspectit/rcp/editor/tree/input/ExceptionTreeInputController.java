@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.rcp.InspectIT;
@@ -119,7 +119,7 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 	/**
 	 * The cached service is needed because of the ID mappings.
 	 */
-	private CachedDataService cachedDataService;
+	private ICachedDataService cachedDataService;
 
 	/**
 	 * {@inheritDoc}

@@ -3,7 +3,7 @@ package info.novatec.inspectit.indexing.storage;
 import info.novatec.inspectit.indexing.ITreeComponent;
 
 /**
- * Special tree component for purposes of indxing for storage.
+ * Special tree component for purposes of indexing for storage.
  * 
  * @author Ivan Senic
  * 

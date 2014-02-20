@@ -1,6 +1,6 @@
 package info.novatec.inspectit.communication.comparator;
 
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.data.TimerData;
 
 import java.util.Comparator;
@@ -81,7 +81,7 @@ public enum TimerDataComparatorEnum implements IDataComparator<TimerData>, Compa
 	/**
 	 * {@inheritDoc}
 	 */
-	public int compare(TimerData o1, TimerData o2, CachedDataService cachedDataService) {
+	public int compare(TimerData o1, TimerData o2, ICachedDataService cachedDataService) {
 		return compare(o1, o2);
 	}
 

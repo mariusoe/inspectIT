@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.comparator.AggregatedExceptionSensorDataComparatorEnum;
 import info.novatec.inspectit.communication.comparator.ExceptionSensorDataComparatorEnum;
@@ -224,7 +224,7 @@ public class GroupedExceptionOverviewInputController extends AbstractTableInputC
 	 * {@inheritDoc}
 	 */
 	public ViewerComparator getComparator() {
-		CachedDataService cachedDataService = getInputDefinition().getRepositoryDefinition().getCachedDataService();
+		ICachedDataService cachedDataService = getInputDefinition().getRepositoryDefinition().getCachedDataService();
 		TableViewerComparator<AggregatedExceptionSensorData> exceptionOverviewViewerComparator = new TableViewerComparator<AggregatedExceptionSensorData>();
 		for (Column column : Column.values()) {
 			ResultComparator<AggregatedExceptionSensorData> resultComparator = new ResultComparator<AggregatedExceptionSensorData>(column.dataComparator, cachedDataService);

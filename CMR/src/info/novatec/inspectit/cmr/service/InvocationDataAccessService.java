@@ -1,7 +1,6 @@
 package info.novatec.inspectit.cmr.service;
 
 import info.novatec.inspectit.cmr.dao.InvocationDataDao;
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.cmr.spring.aop.MethodLog;
 import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
@@ -38,7 +37,7 @@ public class InvocationDataAccessService implements IInvocationDataAccessService
 	 * The cached data service for {@link ResultComparator} bounding.
 	 */
 	@Autowired
-	private CachedDataService cachedDataService;
+	private ICachedDataService cachedDataService;
 
 	/**
 	 * {@inheritDoc}

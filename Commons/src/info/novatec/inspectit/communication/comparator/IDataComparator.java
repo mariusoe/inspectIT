@@ -1,6 +1,6 @@
 package info.novatec.inspectit.communication.comparator;
 
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 
 /**
@@ -21,11 +21,11 @@ public interface IDataComparator<T extends DefaultData> {
 	 * @param o2
 	 *            Second objects.
 	 * @param cachedDataService
-	 *            {@link CachedDataService} for needed relations to other objects.
+	 *            {@link ICachedDataService} for needed relations to other objects.
 	 * @return a negative integer, zero, or a positive integer as the first argument is less than,
 	 *         equal to, or greater than the second.
 	 * @see {@link java.util.Comparator#compare(Object, Object)}
 	 */
-	int compare(T o1, T o2, CachedDataService cachedDataService);
+	int compare(T o1, T o2, ICachedDataService cachedDataService);
 
 }

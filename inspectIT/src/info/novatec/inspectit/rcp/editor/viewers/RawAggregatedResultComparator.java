@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp.editor.viewers;
 
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.comparator.IDataComparator;
@@ -36,7 +37,7 @@ public abstract class RawAggregatedResultComparator<T extends DefaultData> exten
 	 * @param compareInAggregatedMode
 	 *            If compare should be execute in aggregated mode.
 	 */
-	public RawAggregatedResultComparator(IDataComparator<? super T> comparator, CachedDataService cachedDataService, boolean compareInRawMode, boolean compareInAggregatedMode) {
+	public RawAggregatedResultComparator(IDataComparator<? super T> comparator, ICachedDataService cachedDataService, boolean compareInRawMode, boolean compareInAggregatedMode) {
 		this(comparator, cachedDataService, compareInRawMode, compareInAggregatedMode, true);
 	}
 
@@ -53,7 +54,7 @@ public abstract class RawAggregatedResultComparator<T extends DefaultData> exten
 	 * @param ascending
 	 *            True if ascending sorting is on, false if descending sorting is on.
 	 */
-	public RawAggregatedResultComparator(IDataComparator<? super T> comparator, CachedDataService cachedDataService, boolean compareInRawMode, boolean compareInAggregatedMode, boolean ascending) {
+	public RawAggregatedResultComparator(IDataComparator<? super T> comparator, ICachedDataService cachedDataService, boolean compareInRawMode, boolean compareInAggregatedMode, boolean ascending) {
 		super(comparator, cachedDataService, ascending);
 		this.compareInRawMode = compareInRawMode;
 		this.compareInAggregatedMode = compareInAggregatedMode;

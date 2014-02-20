@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.editor.graph.plot;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
 import info.novatec.inspectit.cmr.service.cache.CachedDataService;
@@ -45,7 +46,7 @@ public class TimerPlotController extends AbstractTimerDataPlotController<TimerDa
 	/**
 	 * {@link CachedDataService}.
 	 */
-	private CachedDataService cachedDataService;
+	private ICachedDataService cachedDataService;
 
 	/**
 	 * {@link IAggregator}.

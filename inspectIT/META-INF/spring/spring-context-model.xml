@@ -338,4 +338,6 @@
 	<bean id="serializationManagerProvider" class="info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider">
 		<lookup-method name="createSerializer" bean="serializationManager" />
 	</bean>
+	
+	<bean id="serializationManagerPostProcessor" class="info.novatec.inspectit.storage.serializer.SerializationManagerPostProcessor"/>
 </beans>

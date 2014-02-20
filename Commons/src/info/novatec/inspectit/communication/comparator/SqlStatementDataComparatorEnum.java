@@ -1,6 +1,6 @@
 package info.novatec.inspectit.communication.comparator;
 
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.util.ObjectUtils;
 
@@ -38,7 +38,7 @@ public enum SqlStatementDataComparatorEnum implements IDataComparator<SqlStateme
 	/**
 	 * {@inheritDoc}
 	 */
-	public int compare(SqlStatementData o1, SqlStatementData o2, CachedDataService cachedDataService) {
+	public int compare(SqlStatementData o1, SqlStatementData o2, ICachedDataService cachedDataService) {
 		return compare(o1, o2);
 	}
 

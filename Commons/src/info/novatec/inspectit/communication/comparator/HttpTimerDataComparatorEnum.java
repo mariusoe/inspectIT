@@ -1,6 +1,6 @@
 package info.novatec.inspectit.communication.comparator;
 
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.util.ObjectUtils;
 
@@ -32,7 +32,7 @@ public enum HttpTimerDataComparatorEnum implements IDataComparator<HttpTimerData
 	/**
 	 * {@inheritDoc}
 	 */
-	public int compare(HttpTimerData o1, HttpTimerData o2, CachedDataService cachedDataService) {
+	public int compare(HttpTimerData o1, HttpTimerData o2, ICachedDataService cachedDataService) {
 		return compare(o1, o2);
 	}
 

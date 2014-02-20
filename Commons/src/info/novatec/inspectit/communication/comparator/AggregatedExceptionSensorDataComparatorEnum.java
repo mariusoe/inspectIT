@@ -1,6 +1,6 @@
 package info.novatec.inspectit.communication.comparator;
 
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.data.AggregatedExceptionSensorData;
 
 import java.util.Comparator;
@@ -31,7 +31,7 @@ public enum AggregatedExceptionSensorDataComparatorEnum implements IDataComparat
 	/**
 	 * {@inheritDoc}
 	 */
-	public int compare(AggregatedExceptionSensorData o1, AggregatedExceptionSensorData o2, CachedDataService cachedDataService) {
+	public int compare(AggregatedExceptionSensorData o1, AggregatedExceptionSensorData o2, ICachedDataService cachedDataService) {
 		return compare(o1, o2);
 	}
 

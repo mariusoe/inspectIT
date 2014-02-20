@@ -1,12 +1,12 @@
 package info.novatec.inspectit.rcp.repository;
 
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.cmr.service.IExceptionDataAccessService;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
 import info.novatec.inspectit.cmr.service.IInvocationDataAccessService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
 import info.novatec.inspectit.cmr.service.ITimerDataAccessService;
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 
 /**
  * The interface to the repository definition. A repository can be anywhere and anything, the
@@ -63,7 +63,7 @@ public interface RepositoryDefinition {
 	 * 
 	 * @return The global data access service.
 	 */
-	CachedDataService getCachedDataService();
+	ICachedDataService getCachedDataService();
 
 	/**
 	 * Returns the timer data access service for this repository definition.

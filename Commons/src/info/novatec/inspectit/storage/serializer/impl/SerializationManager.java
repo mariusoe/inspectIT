@@ -43,54 +43,6 @@ import info.novatec.inspectit.communication.data.VmArgumentData;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData.AgentConnection;
 import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
-import info.novatec.inspectit.communication.data.cmr.RecordingData;
-import info.novatec.inspectit.communication.data.cmr.WritingStatus;
-import info.novatec.inspectit.indexing.aggregation.impl.ExceptionDataAggregator;
-import info.novatec.inspectit.indexing.aggregation.impl.HttpTimerDataAggregator;
-import info.novatec.inspectit.indexing.aggregation.impl.SqlStatementDataAggregator;
-import info.novatec.inspectit.indexing.aggregation.impl.TimerDataAggregator;
-import info.novatec.inspectit.indexing.indexer.impl.InvocationChildrenIndexer;
-import info.novatec.inspectit.indexing.indexer.impl.MethodIdentIndexer;
-import info.novatec.inspectit.indexing.indexer.impl.ObjectTypeIndexer;
-import info.novatec.inspectit.indexing.indexer.impl.PlatformIdentIndexer;
-import info.novatec.inspectit.indexing.indexer.impl.SensorTypeIdentIndexer;
-import info.novatec.inspectit.indexing.indexer.impl.SqlStringIndexer;
-import info.novatec.inspectit.indexing.indexer.impl.TimestampIndexer;
-import info.novatec.inspectit.indexing.storage.impl.ArrayBasedStorageLeaf;
-import info.novatec.inspectit.indexing.storage.impl.LeafWithNoDescriptors;
-import info.novatec.inspectit.indexing.storage.impl.SimpleStorageDescriptor;
-import info.novatec.inspectit.indexing.storage.impl.StorageBranch;
-import info.novatec.inspectit.indexing.storage.impl.StorageBranchIndexer;
-import info.novatec.inspectit.storage.LocalStorageData;
-import info.novatec.inspectit.storage.StorageData;
-import info.novatec.inspectit.storage.StorageData.StorageState;
-import info.novatec.inspectit.storage.StorageException;
-import info.novatec.inspectit.storage.label.BooleanStorageLabel;
-import info.novatec.inspectit.storage.label.DateStorageLabel;
-import info.novatec.inspectit.storage.label.NumberStorageLabel;
-import info.novatec.inspectit.storage.label.ObjectStorageLabel;
-import info.novatec.inspectit.storage.label.StringStorageLabel;
-import info.novatec.inspectit.storage.label.management.impl.AddLabelManagementAction;
-import info.novatec.inspectit.storage.label.management.impl.RemoveLabelManagementAction;
-import info.novatec.inspectit.storage.label.type.impl.AssigneeLabelType;
-import info.novatec.inspectit.storage.label.type.impl.CreationDateLabelType;
-import info.novatec.inspectit.storage.label.type.impl.CustomBooleanLabelType;
-import info.novatec.inspectit.storage.label.type.impl.CustomDateLabelType;
-import info.novatec.inspectit.storage.label.type.impl.CustomNumberLabelType;
-import info.novatec.inspectit.storage.label.type.impl.CustomStringLabelType;
-import info.novatec.inspectit.storage.label.type.impl.DataTimeFrameLabelType;
-import info.novatec.inspectit.storage.label.type.impl.ExploredByLabelType;
-import info.novatec.inspectit.storage.label.type.impl.RatingLabelType;
-import info.novatec.inspectit.storage.label.type.impl.StatusLabelType;
-import info.novatec.inspectit.storage.label.type.impl.UseCaseLabelType;
-import info.novatec.inspectit.storage.processor.impl.AgentFilterDataProcessor;
-import info.novatec.inspectit.storage.processor.impl.DataAggregatorProcessor;
-import info.novatec.inspectit.storage.processor.impl.DataSaverProcessor;
-import info.novatec.inspectit.storage.processor.impl.InvocationClonerDataProcessor;
-import info.novatec.inspectit.storage.processor.impl.InvocationExtractorDataProcessor;
-import info.novatec.inspectit.storage.processor.impl.TimeFrameDataProcessor;
-import info.novatec.inspectit.storage.recording.RecordingProperties;
-import info.novatec.inspectit.storage.recording.RecordingState;
 import info.novatec.inspectit.storage.serializer.HibernateAwareClassResolver;
 import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
@@ -130,7 +82,6 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CollectionSerializer;
 import com.esotericsoftware.kryo.serializers.DefaultArraySerializers.LongArraySerializer;
-import com.esotericsoftware.kryo.serializers.DefaultArraySerializers.ObjectArraySerializer;
 import com.esotericsoftware.kryo.serializers.DefaultSerializers.ClassSerializer;
 import com.esotericsoftware.kryo.serializers.DefaultSerializers.DateSerializer;
 import com.esotericsoftware.kryo.serializers.DefaultSerializers.EnumSerializer;
@@ -241,7 +192,6 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(AtomicLong.class, new FieldSerializer<AtomicLong>(kryo, AtomicLong.class));
 		/** Arrays */
 		kryo.register(long[].class, new LongArraySerializer());
-		kryo.register(SimpleStorageDescriptor[].class, new ObjectArraySerializer(kryo, SimpleStorageDescriptor[].class));
 		/** inspectIT model classes */
 		kryo.register(PlatformIdent.class, new CustomCompatibleFieldSerializer<PlatformIdent>(kryo, PlatformIdent.class, schemaManager));
 		kryo.register(MethodIdent.class, new CustomCompatibleFieldSerializer<MethodIdent>(kryo, MethodIdent.class, schemaManager));
@@ -267,39 +217,6 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(CompilationInformationData.class, new CustomCompatibleFieldSerializer<CompilationInformationData>(kryo, CompilationInformationData.class, schemaManager));
 		kryo.register(ClassLoadingInformationData.class, new CustomCompatibleFieldSerializer<ClassLoadingInformationData>(kryo, ClassLoadingInformationData.class, schemaManager));
 		kryo.register(ParameterContentType.class, new EnumSerializer(ParameterContentType.class));
-		/** Storage classes */
-		kryo.register(StorageBranch.class, new CustomCompatibleFieldSerializer<StorageBranch<?>>(kryo, StorageBranch.class, schemaManager));
-		kryo.register(StorageBranchIndexer.class, new CustomCompatibleFieldSerializer<StorageBranchIndexer<?>>(kryo, StorageBranchIndexer.class, schemaManager));
-		kryo.register(SimpleStorageDescriptor.class, new CustomCompatibleFieldSerializer<SimpleStorageDescriptor>(kryo, SimpleStorageDescriptor.class, schemaManager));
-		kryo.register(ArrayBasedStorageLeaf.class, new CustomCompatibleFieldSerializer<ArrayBasedStorageLeaf<?>>(kryo, ArrayBasedStorageLeaf.class, schemaManager));
-		kryo.register(LeafWithNoDescriptors.class, new CustomCompatibleFieldSerializer<LeafWithNoDescriptors<?>>(kryo, LeafWithNoDescriptors.class, schemaManager));
-		kryo.register(StorageData.class, new CustomCompatibleFieldSerializer<StorageData>(kryo, StorageData.class, schemaManager));
-		kryo.register(LocalStorageData.class, new CustomCompatibleFieldSerializer<LocalStorageData>(kryo, LocalStorageData.class, schemaManager));
-		kryo.register(StorageState.class, new EnumSerializer(StorageState.class));
-		/** Storage labels */
-		kryo.register(BooleanStorageLabel.class, new CustomCompatibleFieldSerializer<BooleanStorageLabel>(kryo, BooleanStorageLabel.class, schemaManager));
-		kryo.register(DateStorageLabel.class, new CustomCompatibleFieldSerializer<DateStorageLabel>(kryo, DateStorageLabel.class, schemaManager));
-		kryo.register(NumberStorageLabel.class, new CustomCompatibleFieldSerializer<NumberStorageLabel>(kryo, NumberStorageLabel.class, schemaManager));
-		kryo.register(StringStorageLabel.class, new CustomCompatibleFieldSerializer<StringStorageLabel>(kryo, StringStorageLabel.class, schemaManager));
-		/** Storage labels type */
-		kryo.register(AssigneeLabelType.class, new CustomCompatibleFieldSerializer<AssigneeLabelType>(kryo, AssigneeLabelType.class, schemaManager, true));
-		kryo.register(CreationDateLabelType.class, new CustomCompatibleFieldSerializer<CreationDateLabelType>(kryo, CreationDateLabelType.class, schemaManager, true));
-		kryo.register(CustomBooleanLabelType.class, new CustomCompatibleFieldSerializer<CustomBooleanLabelType>(kryo, CustomBooleanLabelType.class, schemaManager, true));
-		kryo.register(CustomDateLabelType.class, new CustomCompatibleFieldSerializer<CustomDateLabelType>(kryo, CustomDateLabelType.class, schemaManager, true));
-		kryo.register(CustomNumberLabelType.class, new CustomCompatibleFieldSerializer<CustomNumberLabelType>(kryo, CustomNumberLabelType.class, schemaManager, true));
-		kryo.register(CustomStringLabelType.class, new CustomCompatibleFieldSerializer<CustomStringLabelType>(kryo, CustomStringLabelType.class, schemaManager, true));
-		kryo.register(ExploredByLabelType.class, new CustomCompatibleFieldSerializer<ExploredByLabelType>(kryo, ExploredByLabelType.class, schemaManager, true));
-		kryo.register(RatingLabelType.class, new CustomCompatibleFieldSerializer<RatingLabelType>(kryo, RatingLabelType.class, schemaManager, true));
-		kryo.register(StatusLabelType.class, new CustomCompatibleFieldSerializer<StatusLabelType>(kryo, StatusLabelType.class, schemaManager, true));
-		kryo.register(UseCaseLabelType.class, new CustomCompatibleFieldSerializer<UseCaseLabelType>(kryo, UseCaseLabelType.class, schemaManager, true));
-		/** Branch indexers */
-		kryo.register(PlatformIdentIndexer.class, new FieldSerializer<PlatformIdentIndexer<?>>(kryo, PlatformIdentIndexer.class));
-		kryo.register(ObjectTypeIndexer.class, new FieldSerializer<ObjectTypeIndexer<?>>(kryo, ObjectTypeIndexer.class));
-		kryo.register(MethodIdentIndexer.class, new FieldSerializer<MethodIdentIndexer<?>>(kryo, MethodIdentIndexer.class));
-		kryo.register(SensorTypeIdentIndexer.class, new FieldSerializer<SensorTypeIdentIndexer<?>>(kryo, SensorTypeIdentIndexer.class));
-		kryo.register(TimestampIndexer.class, new CustomCompatibleFieldSerializer<TimestampIndexer<?>>(kryo, TimestampIndexer.class, schemaManager));
-		kryo.register(InvocationChildrenIndexer.class, new FieldSerializer<InvocationChildrenIndexer<?>>(kryo, InvocationChildrenIndexer.class));
-		kryo.register(SqlStringIndexer.class, new FieldSerializer<SqlStringIndexer<?>>(kryo, SqlStringIndexer.class));
 
 		// aggregation classes
 		kryo.register(AggregatedExceptionSensorData.class, new InvocationAwareDataSerializer<AggregatedExceptionSensorData>(kryo, AggregatedExceptionSensorData.class, schemaManager));
@@ -319,19 +236,6 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(CmrStatusData.class, new FieldSerializer<CmrStatusData>(kryo, CmrStatusData.class));
 		kryo.register(AgentStatusData.class, new FieldSerializer<AgentStatusData>(kryo, AgentStatusData.class));
 		kryo.register(AgentConnection.class, new EnumSerializer(AgentConnection.class));
-		kryo.register(RecordingData.class, new FieldSerializer<RecordingData>(kryo, RecordingData.class));
-		kryo.register(WritingStatus.class, new EnumSerializer(WritingStatus.class));
-		kryo.register(AddLabelManagementAction.class, new FieldSerializer<AddLabelManagementAction>(kryo, AddLabelManagementAction.class));
-		kryo.register(RemoveLabelManagementAction.class, new FieldSerializer<RemoveLabelManagementAction>(kryo, RemoveLabelManagementAction.class));
-		kryo.register(DataAggregatorProcessor.class, new FieldSerializer<DataAggregatorProcessor<?>>(kryo, DataAggregatorProcessor.class));
-		kryo.register(DataSaverProcessor.class, new FieldSerializer<DataSaverProcessor>(kryo, DataSaverProcessor.class));
-		kryo.register(InvocationClonerDataProcessor.class, new FieldSerializer<InvocationClonerDataProcessor>(kryo, InvocationClonerDataProcessor.class));
-		kryo.register(InvocationExtractorDataProcessor.class, new FieldSerializer<InvocationExtractorDataProcessor>(kryo, InvocationExtractorDataProcessor.class));
-		kryo.register(TimeFrameDataProcessor.class, new FieldSerializer<TimeFrameDataProcessor>(kryo, TimeFrameDataProcessor.class));
-		kryo.register(TimerDataAggregator.class, new FieldSerializer<TimerDataAggregator>(kryo, TimerDataAggregator.class));
-		kryo.register(SqlStatementDataAggregator.class, new FieldSerializer<SqlStatementDataAggregator>(kryo, SqlStatementDataAggregator.class));
-		kryo.register(HttpTimerDataAggregator.class, new FieldSerializer<HttpTimerDataAggregator>(kryo, HttpTimerDataAggregator.class));
-		kryo.register(ExceptionDataAggregator.class, new FieldSerializer<ExceptionDataAggregator>(kryo, ExceptionDataAggregator.class));
 
 		// INSPECTIT-849 - Hibernate uses Arrays.asList which does not have no-arg constructor
 		kryo.register(Arrays.asList().getClass(), new CollectionSerializer() {
@@ -341,10 +245,6 @@ public class SerializationManager implements ISerializer, InitializingBean {
 				return new ArrayList<Object>();
 			}
 		});
-
-		// added with INSPECTIT-723
-		kryo.register(RecordingState.class, new EnumSerializer(RecordingState.class));
-		kryo.register(RecordingProperties.class, new FieldSerializer<RecordingProperties>(kryo, RecordingProperties.class));
 
 		// INSPECTIT-846
 		kryo.register(AggregatedHttpTimerData.class, new InvocationAwareDataSerializer<AggregatedHttpTimerData>(kryo, AggregatedHttpTimerData.class, schemaManager));
@@ -357,12 +257,9 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		// added with INSPECTIT-912
 		UnmodifiableCollectionsSerializer.registerSerializers(kryo);
 		SynchronizedCollectionsSerializer.registerSerializers(kryo);
-		kryo.register(StorageException.class, new FieldSerializer<StorageException>(kryo, StorageException.class));
 		kryo.register(ServiceException.class, new FieldSerializer<ServiceException>(kryo, ServiceException.class));
 		kryo.register(StackTraceElement.class, new StackTraceElementSerializer());
 
-		// added with INSPECTIT-937
-		kryo.register(AgentFilterDataProcessor.class, new FieldSerializer<AgentFilterDataProcessor>(kryo, AgentFilterDataProcessor.class));
 
 		// added with INSPECTIT-887
 		kryo.register(DefaultDataComparatorEnum.class, new EnumSerializer(DefaultDataComparatorEnum.class));
@@ -380,8 +277,6 @@ public class SerializationManager implements ISerializer, InitializingBean {
 		kryo.register(ServerStatus.class, new ServerStatusSerializer());
 		
 		// added with INSPECTIT-950
-		kryo.register(ObjectStorageLabel.class, new CustomCompatibleFieldSerializer<ObjectStorageLabel<?>>(kryo, ObjectStorageLabel.class, schemaManager));
-		kryo.register(DataTimeFrameLabelType.class, new CustomCompatibleFieldSerializer<DataTimeFrameLabelType>(kryo, DataTimeFrameLabelType.class, schemaManager, true));
 		kryo.register(TimeFrame.class, new CustomCompatibleFieldSerializer<TimeFrame>(kryo, TimeFrame.class, schemaManager));
 	}
 
@@ -425,6 +320,15 @@ public class SerializationManager implements ISerializer, InitializingBean {
 	}
 
 	/**
+	 * Gets {@link #schemaManager}.
+	 * 
+	 * @return {@link #schemaManager}
+	 */
+	public ClassSchemaManager getSchemaManager() {
+		return schemaManager;
+	}
+
+	/**
 	 * <i>This setter can be removed when the Spring3.0 on the GUI side is working properly.</i>
 	 * 
 	 * @param schemaManager
@@ -432,6 +336,15 @@ public class SerializationManager implements ISerializer, InitializingBean {
 	 */
 	public void setSchemaManager(ClassSchemaManager schemaManager) {
 		this.schemaManager = schemaManager;
+	}
+
+	/**
+	 * Gets {@link #kryo}.
+	 * 
+	 * @return {@link #kryo}
+	 */
+	public Kryo getKryo() {
+		return kryo;
 	}
 
 	/**

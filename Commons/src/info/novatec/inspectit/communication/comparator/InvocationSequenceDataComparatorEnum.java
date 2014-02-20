@@ -1,6 +1,6 @@
 package info.novatec.inspectit.communication.comparator;
 
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.InvocationSequenceDataHelper;
@@ -42,7 +42,7 @@ public enum InvocationSequenceDataComparatorEnum implements IDataComparator<Invo
 	/**
 	 * {@inheritDoc}
 	 */
-	public int compare(InvocationSequenceData o1, InvocationSequenceData o2, CachedDataService cachedDataService) {
+	public int compare(InvocationSequenceData o1, InvocationSequenceData o2, ICachedDataService cachedDataService) {
 		switch (this) {
 		case CHILD_COUNT:
 			return Long.valueOf(o1.getChildCount()).compareTo(Long.valueOf(o2.getChildCount()));

@@ -40,7 +40,7 @@ public class ExceptionDataAccessService implements IExceptionDataAccessService {
 	 * {@link CachedDataService}.
 	 */
 	@Autowired
-	private CachedDataService cachedDataService;
+	private ICachedDataService cachedDataService;
 
 	/**
 	 * {@inheritDoc}

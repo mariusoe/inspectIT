@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.comparator.AggregatedExceptionSensorDataComparatorEnum;
@@ -165,7 +165,7 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 	/**
 	 * This data access service is needed because of the ID mappings.
 	 */
-	private CachedDataService cachedDataService;
+	private ICachedDataService cachedDataService;
 
 	/**
 	 * List that is displayed after processing the invocation.

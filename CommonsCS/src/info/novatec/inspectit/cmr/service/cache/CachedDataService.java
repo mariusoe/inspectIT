@@ -3,6 +3,7 @@ package info.novatec.inspectit.cmr.service.cache;
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
 import info.novatec.inspectit.cmr.model.SensorTypeIdent;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.cmr.service.IGlobalDataAccessService;
 import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.communication.data.cmr.AgentStatusData;
@@ -29,7 +30,7 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
-public class CachedDataService implements InitializingBean {
+public class CachedDataService implements InitializingBean, ICachedDataService {
 
 	/**
 	 * Logger for the class. Needed to be directly assigned, because this class is used on the UI
@@ -115,11 +116,7 @@ public class CachedDataService implements InitializingBean {
 	}
 
 	/**
-	 * Returns the mapped {@link PlatformIdent} object for the passed platform id.
-	 * 
-	 * @param platformId
-	 *            The long value.
-	 * @return The {@link PlatformIdent} object.
+	 * {@inheritDoc}
 	 */
 	public PlatformIdent getPlatformIdentForId(long platformId) {
 		Long id = Long.valueOf(platformId);
@@ -132,11 +129,7 @@ public class CachedDataService implements InitializingBean {
 	}
 
 	/**
-	 * Returns the mapped {@link SensorTypeIdent} object for the passed sensor type id.
-	 * 
-	 * @param sensorTypeId
-	 *            The long value.
-	 * @return The {@link SensorTypeIdent} object.
+	 * {@inheritDoc}
 	 */
 	public SensorTypeIdent getSensorTypeIdentForId(long sensorTypeId) {
 		Long id = Long.valueOf(sensorTypeId);
@@ -149,11 +142,7 @@ public class CachedDataService implements InitializingBean {
 	}
 
 	/**
-	 * Returns the mapped {@link MethodIdent} object for the passed method id.
-	 * 
-	 * @param methodId
-	 *            The long value.
-	 * @return The {@link MethodIdent} object.
+	 * {@inheritDoc}
 	 */
 	public MethodIdent getMethodIdentForId(long methodId) {
 		Long id = Long.valueOf(methodId);

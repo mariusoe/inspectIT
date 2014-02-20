@@ -1,6 +1,6 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.comparator.HttpTimerDataComparatorEnum;
 import info.novatec.inspectit.communication.comparator.IDataComparator;
 import info.novatec.inspectit.communication.comparator.InvocationAwareDataComparatorEnum;
@@ -213,7 +213,7 @@ public class TaggedHttpTimerDataInputController extends AbstractHttpInputControl
 	 */
 	@Override
 	public ViewerComparator getComparator() {
-		CachedDataService cachedDataService = getInputDefinition().getRepositoryDefinition().getCachedDataService();
+		ICachedDataService cachedDataService = getInputDefinition().getRepositoryDefinition().getCachedDataService();
 		TableViewerComparator<HttpTimerData> httpTimerDataViewerComparator = new TableViewerComparator<HttpTimerData>();
 		for (Column column : Column.values()) {
 			ResultComparator<HttpTimerData> resultComparator = new ResultComparator<HttpTimerData>(column.dataComparator, cachedDataService);

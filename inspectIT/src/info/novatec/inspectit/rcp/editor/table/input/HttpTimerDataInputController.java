@@ -2,7 +2,7 @@ package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdentHelper;
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communcation.data.RegExAggregatedHttpTimerData;
 import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.comparator.HttpTimerDataComparatorEnum;
@@ -157,7 +157,7 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 	/**
 	 * Cached data service.
 	 */
-	private CachedDataService cachedDataService;
+	private ICachedDataService cachedDataService;
 
 	@Override
 	public void setInputDefinition(InputDefinition inputDefinition) {
@@ -306,7 +306,7 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 	 */
 	@Override
 	public ViewerComparator getComparator() {
-		CachedDataService cachedDataService = getInputDefinition().getRepositoryDefinition().getCachedDataService();
+		ICachedDataService cachedDataService = getInputDefinition().getRepositoryDefinition().getCachedDataService();
 		TableViewerComparator<HttpTimerData> httpTimerDataViewerComparator = new TableViewerComparator<HttpTimerData>();
 		for (Column column : Column.values()) {
 			ResultComparator<HttpTimerData> resultComparator;
@@ -554,7 +554,7 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int compare(HttpTimerData o1, HttpTimerData o2, CachedDataService cachedDataService) {
+		public int compare(HttpTimerData o1, HttpTimerData o2, ICachedDataService cachedDataService) {
 			if (o1 instanceof RegExAggregatedHttpTimerData && o2 instanceof RegExAggregatedHttpTimerData) {
 				return ((RegExAggregatedHttpTimerData) o1).getTransformedUri().compareToIgnoreCase(((RegExAggregatedHttpTimerData) o2).getTransformedUri());
 			} else {

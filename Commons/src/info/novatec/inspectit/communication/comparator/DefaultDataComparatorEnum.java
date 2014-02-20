@@ -1,6 +1,6 @@
 package info.novatec.inspectit.communication.comparator;
 
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.util.ObjectUtils;
 
@@ -22,7 +22,7 @@ public enum DefaultDataComparatorEnum implements IDataComparator<DefaultData>, C
 	/**
 	 * {@inheritDoc}
 	 */
-	public int compare(DefaultData o1, DefaultData o2, CachedDataService cachedDataService) {
+	public int compare(DefaultData o1, DefaultData o2, ICachedDataService cachedDataService) {
 		return compare(o1, o2);
 	}
 

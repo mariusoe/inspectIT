@@ -1,7 +1,7 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.comparator.IDataComparator;
 import info.novatec.inspectit.communication.comparator.InvocationAwareDataComparatorEnum;
@@ -167,7 +167,7 @@ public class SqlInputController extends AbstractTableInputController {
 	/**
 	 * The cached service is needed because of the ID mappings.
 	 */
-	private CachedDataService cachedDataService;
+	private ICachedDataService cachedDataService;
 
 	/**
 	 * Date to display invocations from.

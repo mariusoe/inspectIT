@@ -1,6 +1,6 @@
 package info.novatec.inspectit.communication.comparator;
 
-import info.novatec.inspectit.cmr.service.cache.CachedDataService;
+import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.util.ObjectUtils;
 
@@ -27,7 +27,7 @@ public enum ExceptionSensorDataComparatorEnum implements IDataComparator<Excepti
 	/**
 	 * {@inheritDoc}
 	 */
-	public int compare(ExceptionSensorData o1, ExceptionSensorData o2, CachedDataService cachedDataService) {
+	public int compare(ExceptionSensorData o1, ExceptionSensorData o2, ICachedDataService cachedDataService) {
 		return compare(o1, o2);
 	}
 
