@@ -39,14 +39,11 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -54,15 +51,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * This input controller displays the contents of {@link ExceptionSensorData} objects in an
@@ -277,134 +266,6 @@ public class ExceptionSensorInvocInputController extends AbstractTableInputContr
 				}
 			}
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void doubleClick(final DoubleClickEvent event) {
-		if (canShowDetails()) {
-			// double click on an exception item will open a details window
-			Display.getDefault().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					TableViewer tableViewer = (TableViewer) event.getSource();
-					IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-					Shell parent = tableViewer.getTable().getShell();
-					showDetails(parent, selection.getFirstElement());
-				}
-			});
-		}
-	}
-
-	/**
-	 * shows the details.
-	 * 
-	 * @param parent
-	 *            the parent.
-	 * @param element
-	 *            the element.
-	 */
-	@Override
-	public void showDetails(Shell parent, Object element) {
-		final ExceptionSensorData data = (ExceptionSensorData) element;
-		final MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
-
-		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
-		boolean takeFocusOnOpen = true;
-		boolean persistSize = true;
-		boolean persistLocation = true;
-		boolean showDialogMenu = false;
-		boolean showPersistActions = true;
-		String titleText = TextFormatter.getMethodString(methodIdent);
-		String infoText = "Exception Details";
-
-		PopupDialog dialog = new PopupDialog(parent, shellStyle, takeFocusOnOpen, persistSize, persistLocation, showDialogMenu, showPersistActions, titleText, infoText) {
-			private static final int CURSOR_SIZE = 15;
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected Point getInitialLocation(Point initialSize) {
-				// show popup relative to cursor
-				Display display = getShell().getDisplay();
-				Point location = display.getCursorLocation();
-				location.x += CURSOR_SIZE;
-				location.y += CURSOR_SIZE;
-				return location;
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected Point getInitialSize() {
-				return new Point(400, 200);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected Control createDialogArea(Composite parent) {
-				FormToolkit toolkit = new FormToolkit(parent.getDisplay());
-
-				Text text = toolkit.createText(parent, null, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL);
-				GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-				text.setLayoutData(gridData);
-				this.addText(text);
-
-				// Use the compact margins employed by PopupDialog.
-				GridData gd = new GridData(GridData.BEGINNING | GridData.FILL_BOTH);
-				gd.horizontalIndent = PopupDialog.POPUP_HORIZONTALSPACING;
-				gd.verticalIndent = PopupDialog.POPUP_VERTICALSPACING;
-				text.setLayoutData(gd);
-
-				return text;
-			}
-
-			private void addText(Text text) {
-				StringBuilder content = new StringBuilder();
-				content.append("Fully-Qualified Name: ");
-				content.append(data.getThrowableType());
-				content.append('\n');
-				if (rawMode) {
-					content.append("Constructor: ");
-					content.append(TextFormatter.getMethodWithParameters(methodIdent));
-					content.append('\n');
-				}
-
-				content.append("Error Message: ");
-				content.append(data.getErrorMessage());
-				content.append('\n');
-
-				if (rawMode) {
-					content.append("\nException Hierarchy:\n");
-					ExceptionSensorData child = data;
-
-					while (null != child) {
-						content.append(child.getExceptionEvent().toString().toLowerCase());
-						content.append(" in ");
-						content.append(TextFormatter.getMethodWithParameters(cachedDataService.getMethodIdentForId(child.getMethodIdent())));
-						content.append('\n');
-						child = child.getChild();
-					}
-
-					content.append("\nStack Trace: \n");
-					content.append(data.getStackTrace());
-
-				}
-				text.setText(content.toString());
-			}
-		};
-		dialog.open();
-	}
-
-	@Override
-	public boolean canShowDetails() {
-		return rawMode;
 	}
 
 	/**

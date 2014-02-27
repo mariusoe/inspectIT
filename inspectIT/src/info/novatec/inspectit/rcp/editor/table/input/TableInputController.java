@@ -16,7 +16,6 @@ import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 
 /**
@@ -164,23 +163,6 @@ public interface TableInputController extends SubViewClassificationController {
 	 * @return List of string representing the values.
 	 */
 	List<String> getColumnValues(Object object);
-
-	/**
-	 * Show some details in a pop-up to the user about the selected element.
-	 * 
-	 * @param parent
-	 *            the parent.
-	 * @param element
-	 *            the element.
-	 */
-	void showDetails(Shell parent, Object element);
-
-	/**
-	 * Defines if a selection can show some details or not.
-	 * 
-	 * @return <code>true</code> if some details can be shown.
-	 */
-	boolean canShowDetails();
 
 	/**
 	 * Returns the list of the objects that should be searched.

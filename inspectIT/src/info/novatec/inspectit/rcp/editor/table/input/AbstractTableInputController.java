@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 
 /**
@@ -117,24 +116,6 @@ public abstract class AbstractTableInputController implements TableInputControll
 	 * Do nothing by default, sub-classes may override.
 	 */
 	public void setLimit(int limit) {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * Do nothing by default, sub-classes may override.
-	 */
-	public void showDetails(Shell parent, Object element) {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * Returns false by default, sub-classes may override.
-	 */
-	@Override
-	public boolean canShowDetails() {
-		return false;
 	}
 
 	/**

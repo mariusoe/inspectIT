@@ -460,66 +460,6 @@
          </activeWhen>
       </handler>
       <handler
-            class="info.novatec.inspectit.rcp.handlers.TreeDetailsHandler"
-            commandId="info.novatec.inspectit.rcp.commands.details">
-         <activeWhen>
-            <and>
-               <count
-                     value="+">
-               </count>
-               <iterate
-                     ifEmpty="false">
-                  <instanceof
-                        value="info.novatec.inspectit.communication.DefaultData">
-                  </instanceof>
-               </iterate>
-               <with
-                     variable="activeEditor">
-                  <instanceof
-                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
-                  </instanceof>
-                  <test
-                        property="info.novatec.inspectit.activeSubView"
-                        value="treeSubView">
-                  </test>
-                  <test
-                        property="info.novatec.inspectit.treeShowDetails">
-                  </test>
-               </with>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
-            class="info.novatec.inspectit.rcp.handlers.TableDetailsHandler"
-            commandId="info.novatec.inspectit.rcp.commands.details">
-         <activeWhen>
-            <and>
-               <count
-                     value="+">
-               </count>
-               <iterate
-                     ifEmpty="false">
-                  <instanceof
-                        value="info.novatec.inspectit.communication.DefaultData">
-                  </instanceof>
-               </iterate>
-               <with
-                     variable="activeEditor">
-                  <instanceof
-                        value="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
-                  </instanceof>
-                  <test
-                        property="info.novatec.inspectit.activeSubView"
-                        value="tableSubView">
-                  </test>
-                  <test
-                        property="info.novatec.inspectit.tableShowDetails">
-                  </test>
-               </with>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
             class="info.novatec.inspectit.rcp.handlers.OpenUrlHandler$OpenDocumentationHandler"
             commandId="info.novatec.inspectit.rcp.commands.documentation">
 	  </handler>
@@ -1479,6 +1419,22 @@
                </with></and>
          </activeWhen>
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.DetailsHandler"
+            commandId="info.novatec.inspectit.rcp.commands.details">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.communication.DefaultData">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -1487,13 +1443,6 @@
             id="info.novatec.inspectit.ActiveSubViewTester"
             namespace="info.novatec.inspectit"
             properties="activeSubView, hasSubView"
-            type="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
-      </propertyTester>
-      <propertyTester
-            class="info.novatec.inspectit.rcp.editor.testers.ShowDetailsTester"
-            id="info.novatec.inspectit.showDetailsTester"
-            namespace="info.novatec.inspectit"
-            properties="tableShowDetails, treeShowDetails"
             type="info.novatec.inspectit.rcp.editor.root.AbstractRootEditor">
       </propertyTester>
       <propertyTester

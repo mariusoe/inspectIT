@@ -42,7 +42,6 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -56,19 +55,10 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.hibernate.jdbc.util.FormatStyle;
-import org.hibernate.jdbc.util.Formatter;
 
 /**
  * This input controller displays the contents of {@link SqlStatementData} objects.
@@ -535,99 +525,6 @@ public class SqlInputController extends AbstractTreeInputController {
 	@Override
 	public int getExpandLevel() {
 		return TreeViewer.ALL_LEVELS;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean canShowDetails() {
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc}.
-	 * <p>
-	 * 
-	 * @see TreeInputController#showDetails(Shell, Object)
-	 */
-	public void showDetails(Shell parent, Object element) {
-		if (element instanceof SqlStatementData) {
-			final SqlStatementData data = (SqlStatementData) element;
-
-			int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
-			boolean takeFocusOnOpen = true;
-			boolean persistSize = true;
-			boolean persistLocation = true;
-			boolean showDialogMenu = false;
-			boolean showPersistActions = true;
-			String titleText = "SQL Details";
-			String infoText = "SQL Details";
-
-			PopupDialog dialog = new PopupDialog(parent, shellStyle, takeFocusOnOpen, persistSize, persistLocation, showDialogMenu, showPersistActions, titleText, infoText) {
-				private static final int CURSOR_SIZE = 15;
-
-				/**
-				 * {@inheritDoc}
-				 */
-				@Override
-				protected Point getInitialLocation(Point initialSize) {
-					// show popup relative to cursor
-					Display display = getShell().getDisplay();
-					Point location = display.getCursorLocation();
-					location.x += CURSOR_SIZE;
-					location.y += CURSOR_SIZE;
-					return location;
-				}
-
-				/**
-				 * {@inheritDoc}
-				 */
-				@Override
-				protected Point getInitialSize() {
-					return new Point(400, 200);
-				}
-
-				/**
-				 * {@inheritDoc}
-				 */
-				@Override
-				protected Control createDialogArea(Composite parent) {
-					FormToolkit toolkit = new FormToolkit(parent.getDisplay());
-
-					Text text = toolkit.createText(parent, null, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL);
-					GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-					text.setLayoutData(gridData);
-					this.addText(text);
-
-					// Use the compact margins employed by PopupDialog.
-					GridData gd = new GridData(GridData.BEGINNING | GridData.FILL_BOTH);
-					gd.horizontalIndent = PopupDialog.POPUP_HORIZONTALSPACING;
-					gd.verticalIndent = PopupDialog.POPUP_VERTICALSPACING;
-					text.setLayoutData(gd);
-
-					return text;
-				}
-
-				private void addText(Text text) {
-					String content = "Count: " + data.getCount() + "\n";
-					content += "Avg (ms): " + data.getAverage() + "\n";
-					content += "Min (ms): " + data.getMin() + "\n";
-					content += "Max (ms): " + data.getMax() + "\n";
-					content += "Total duration (ms): " + data.getDuration() + "\n";
-
-					Formatter sqlFormatter = FormatStyle.BASIC.getFormatter();
-					content += "\n";
-					content += "Database URL: " + TextFormatter.emptyStringIfNull(data.getDatabaseUrl()) + "\n";
-					content += "Database Product: " + TextFormatter.emptyStringIfNull(data.getDatabaseProductName()) + "\n";
-					content += "Database Version: " + TextFormatter.emptyStringIfNull(data.getDatabaseProductVersion()) + "\n";
-					content += "SQL: " + sqlFormatter.format(data.getSql()) + "\n";
-
-					text.setText(content);
-				}
-			};
-			dialog.open();
-		}
 	}
 
 	/**

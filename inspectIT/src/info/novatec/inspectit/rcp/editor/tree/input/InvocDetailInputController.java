@@ -8,8 +8,6 @@ import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.InvocationSequenceDataHelper;
 import info.novatec.inspectit.communication.data.ParameterContentData;
-import info.novatec.inspectit.communication.data.SqlStatementData;
-import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
@@ -25,14 +23,11 @@ import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
@@ -47,18 +42,8 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.progress.DeferredTreeContentManager;
-import org.hibernate.jdbc.util.FormatStyle;
-import org.hibernate.jdbc.util.Formatter;
 
 /**
  * This input controller displays the detail contents of {@link InvocationSequenceData} objects.
@@ -250,230 +235,6 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 			// nothing to do by default
 			break;
 		}
-	}
-
-	/**
-	 * Sorts a given collection. As the JDK Collections class only provides to sort for
-	 * <code>List</code> classes we initially create a list based on the given collection, sort this
-	 * list and return it.
-	 * 
-	 * @param <T>
-	 *            The type
-	 * @param c
-	 *            The collection to be sorted
-	 * @return a sorted <code>ArrayList</code> of the elements contained in the given collection.
-	 */
-	private <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {
-		List<T> list = new ArrayList<T>(c);
-		java.util.Collections.sort(list);
-		return list;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean canShowDetails() {
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc}.
-	 * 
-	 * @see AbstractTreeInputController#showDetails(Shell, Object)
-	 */
-	public void showDetails(Shell parent, Object element) {
-		final InvocationSequenceData data = (InvocationSequenceData) element;
-		final MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
-
-		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
-		boolean takeFocusOnOpen = true;
-		boolean persistSize = true;
-		boolean persistLocation = true;
-		boolean showDialogMenu = false;
-		boolean showPersistActions = true;
-		String titleText = TextFormatter.getMethodString(methodIdent);
-		String infoText = "Invocation Sequence Details";
-
-		PopupDialog dialog = new PopupDialog(parent, shellStyle, takeFocusOnOpen, persistSize, persistLocation, showDialogMenu, showPersistActions, titleText, infoText) {
-			private static final int CURSOR_SIZE = 15;
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected Point getInitialLocation(Point initialSize) {
-				// show popup relative to cursor
-				Display display = getShell().getDisplay();
-				Point location = display.getCursorLocation();
-				location.x += CURSOR_SIZE;
-				location.y += CURSOR_SIZE;
-				return location;
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected Control createDialogArea(Composite parent) {
-				FormToolkit toolkit = new FormToolkit(parent.getDisplay());
-
-				Text text = toolkit.createText(parent, null, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL);
-				GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-				text.setLayoutData(gridData);
-				this.addText(text);
-
-				// Use the compact margins employed by PopupDialog.
-				GridData gd = new GridData(GridData.BEGINNING | GridData.FILL_BOTH);
-				gd.horizontalIndent = PopupDialog.POPUP_HORIZONTALSPACING;
-				gd.verticalIndent = PopupDialog.POPUP_VERTICALSPACING;
-				text.setLayoutData(gd);
-
-				return text;
-			}
-
-			private void addText(Text text) {
-				String content;
-				if (methodIdent.getPackageName() != null && !methodIdent.getPackageName().equals("")) {
-					content = "Package: " + methodIdent.getPackageName() + "\n";
-				} else {
-					content = "Package: (default)\n";
-				}
-				content += "Class: " + methodIdent.getClassName() + "\n";
-				content += "Method: " + methodIdent.getMethodName() + "\n";
-				content += "Parameters: " + methodIdent.getParameters() + "\n";
-
-				if (InvocationSequenceDataHelper.hasTimerData(data)) {
-					if (InvocationSequenceDataHelper.hasHttpTimerData(data)) {
-						HttpTimerData httpData = (HttpTimerData) data.getTimerData();
-						content += "\n";
-						content += "URI: " + httpData.getUri() + "\n";
-						content += "Request-method: " + httpData.getRequestMethod() + "\n";
-
-						// -- Parameters
-						content += "Parameters:";
-						Map<String, String[]> paramMap = httpData.getParameters();
-						if (null == paramMap) {
-							content += " <none>\n";
-						} else {
-							content += "\n";
-							List<String> paramKeys = asSortedList(paramMap.keySet());
-							for (String string : paramKeys) {
-								String[] value = paramMap.get(string);
-								String paramValueDisplay = "";
-								for (int i = 0; i < value.length; i++) {
-									paramValueDisplay += "[" + value[i] + "]";
-									if (i + 1 < value.length) {
-										paramValueDisplay += ", ";
-									}
-								}
-								content += "  " + string + ": " + paramValueDisplay + "\n";
-							}
-						}
-
-						// -- Attributes
-						content += "Attributes:";
-						Map<String, String> attrMap = httpData.getAttributes();
-						if (null == attrMap) {
-							content += " <none>\n";
-						} else {
-							content += "\n";
-							List<String> attrKeys = asSortedList(attrMap.keySet());
-							for (String string : attrKeys) {
-								content += "  " + string + ": " + attrMap.get(string) + "\n";
-							}
-						}
-
-						// -- Headers
-						content += "Headers:";
-						Map<String, String> headerMap = httpData.getHeaders();
-						if (null == headerMap) {
-							content += " <none>\n";
-						} else {
-							content += "\n";
-							List<String> headerKeys = asSortedList(headerMap.keySet());
-							for (String string : headerKeys) {
-								content += "  " + string + ": " + headerMap.get(string) + "\n";
-							}
-						}
-
-						// -- Session Attributes
-						content += "Session Attributes:";
-						Map<String, String> sessionAttributeMap = httpData.getSessionAttributes();
-						if (null == sessionAttributeMap) {
-							content += " <none>\n";
-						} else {
-							content += "\n";
-							List<String> sessionAttKeys = asSortedList(sessionAttributeMap.keySet());
-							for (String string : sessionAttKeys) {
-								content += "  " + string + ": " + sessionAttributeMap.get(string) + "\n";
-							}
-						}
-
-						content += "\n";
-					}
-
-					// add data for the "normal" timer data
-					TimerData timer = data.getTimerData();
-					content += "\n";
-					content += "Method duration: " + timer.getDuration() + "\n";
-				} else if (InvocationSequenceDataHelper.isRootElementInSequence(data)) {
-					content += "\n";
-					content += "Invocation duration: " + data.getDuration() + "\n";
-				}
-
-				if (InvocationSequenceDataHelper.hasSQLData(data)) {
-					SqlStatementData sql = data.getSqlStatementData();
-					Formatter sqlFormatter = FormatStyle.BASIC.getFormatter();
-					content += "\n";
-					content += "Database URL: " + TextFormatter.emptyStringIfNull(sql.getDatabaseUrl()) + "\n";
-					content += "Database Product: " + TextFormatter.emptyStringIfNull(sql.getDatabaseProductName()) + "\n";
-					content += "Database Version: " + TextFormatter.emptyStringIfNull(sql.getDatabaseProductVersion()) + "\n";
-					content += "SQL: " + sqlFormatter.format(sql.getSqlWithParameterValues()) + "\n";
-
-				}
-
-				// Integrate parameter information from both invocation sequence and timer data
-				if (InvocationSequenceDataHelper.hasCapturedParameters(data)) {
-					content += "\n";
-					content += "Captured parameters:\n";
-					Set<ParameterContentData> parameterContents = InvocationSequenceDataHelper.getCapturedParameters(data);
-
-					for (ParameterContentData parameterContentData : parameterContents) {
-						switch (parameterContentData.getContentType()) {
-						case FIELD:
-							content += "Field '" + parameterContentData.getName() + "': " + parameterContentData.getContent() + "\n";
-							break;
-						case PARAM:
-							content += "Method Parameter #" + parameterContentData.getSignaturePosition() + " '" + parameterContentData.getName() + "': " + parameterContentData.getContent() + "\n";
-							break;
-						case RETURN:
-							content += "Return '" + parameterContentData.getName() + "': " + parameterContentData.getContent() + "\n";
-							break;
-						default:
-							break;
-						}
-					}
-				}
-
-				if (InvocationSequenceDataHelper.hasExceptionData(data)) {
-					content += "\n";
-					content += "Exception Details:\n";
-					for (ExceptionSensorData exceptionSensorData : data.getExceptionSensorDataObjects()) {
-						content += exceptionSensorData.getExceptionEvent().toString().toLowerCase() + " " + exceptionSensorData.getThrowableType() + "\n";
-
-						String stackTrace = exceptionSensorData.getStackTrace();
-						if (null != stackTrace && !"".equals(stackTrace)) {
-							content += "\n";
-							content += stackTrace;
-						}
-					}
-				}
-
-				text.setText(content);
-			}
-		};
-		dialog.open();
 	}
 
 	/**

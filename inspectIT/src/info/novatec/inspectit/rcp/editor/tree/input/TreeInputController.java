@@ -17,7 +17,6 @@ import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TreeColumn;
 
 /**
@@ -164,23 +163,6 @@ public interface TreeInputController extends SubViewClassificationController {
 	 * @return the filter array.
 	 */
 	ViewerFilter[] getFilters();
-
-	/**
-	 * Show some details in a pop-up to the user about the selected element.
-	 * 
-	 * @param parent
-	 *            the parent.
-	 * @param element
-	 *            the element.
-	 */
-	void showDetails(Shell parent, Object element);
-
-	/**
-	 * Defines if a selection can show some details or not.
-	 * 
-	 * @return <code>true</code> if some details can be shown.
-	 */
-	boolean canShowDetails();
 
 	/**
 	 * Returns the level to which the viewer's tree should be expanded.

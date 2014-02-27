@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -26,14 +25,6 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * 
@@ -161,109 +152,6 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 	 */
 	public int getExpandLevel() {
 		return 0;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean canShowDetails() {
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc}.
-	 * <P>
-	 * 
-	 * @see TreeInputController#showDetails(Shell, Object).
-	 */
-	@Override
-	public void showDetails(Shell parent, Object element) {
-		final ExceptionSensorData data = (ExceptionSensorData) element;
-		final boolean isStackTrace = !parentChildrenMap.containsKey(data);
-
-		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
-		boolean takeFocusOnOpen = true;
-		boolean persistSize = true;
-		boolean persistLocation = true;
-		boolean showDialogMenu = false;
-		boolean showPersistActions = true;
-		String titleText = null;
-		String infoText = "Exception sensor data";
-		if (isStackTrace) {
-			titleText = "Stack trace";
-		} else {
-			titleText = "Error message";
-		}
-
-		PopupDialog dialog = new PopupDialog(parent, shellStyle, takeFocusOnOpen, persistSize, persistLocation, showDialogMenu, showPersistActions, titleText, infoText) {
-			private static final int CURSOR_SIZE = 15;
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected Point getInitialLocation(Point initialSize) {
-				// show popup relative to cursor
-				Display display = getShell().getDisplay();
-				Point location = display.getCursorLocation();
-				location.x += CURSOR_SIZE;
-				location.y += CURSOR_SIZE;
-				return location;
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected Point getInitialSize() {
-				return new Point(600, 400);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected Control createDialogArea(Composite parent) {
-				FormToolkit toolkit = new FormToolkit(parent.getDisplay());
-
-				Text text = toolkit.createText(parent, null, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL);
-				GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-				text.setLayoutData(gridData);
-				this.addText(text);
-
-				// Use the compact margins employed by PopupDialog.
-				GridData gd = new GridData(GridData.BEGINNING | GridData.FILL_BOTH);
-				gd.horizontalIndent = PopupDialog.POPUP_HORIZONTALSPACING;
-				gd.verticalIndent = PopupDialog.POPUP_VERTICALSPACING;
-				text.setLayoutData(gd);
-
-				return text;
-			}
-
-			private void addText(Text text) {
-				StringBuilder stringBuilder = new StringBuilder(data.getThrowableType());
-				if (null != data.getErrorMessage()) {
-					stringBuilder.append(": " + data.getErrorMessage() + "\n");
-				} else if (!isStackTrace) {
-					stringBuilder = new StringBuilder(NO_ERROR_MESSAGE_PROVIDED + "\n");
-				} else {
-					stringBuilder.append('\n');
-				}
-
-				if (isStackTrace) {
-					if (null != data.getStackTrace()) {
-						stringBuilder.append(data.getStackTrace());
-						stringBuilder.append('\n');
-					} else {
-						stringBuilder = new StringBuilder(STACK_TRACK_NOT_AVAILABLE + "\n");
-					}
-				}
-
-				text.setText(stringBuilder.toString());
-			}
-		};
-		dialog.open();
 	}
 
 	/**

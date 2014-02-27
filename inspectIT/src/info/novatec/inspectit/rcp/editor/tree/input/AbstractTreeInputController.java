@@ -22,7 +22,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TreeColumn;
 
 /**
@@ -166,24 +165,6 @@ public abstract class AbstractTreeInputController implements TreeInputController
 	 * Do nothing by default, sub-classes may override.
 	 */
 	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * Do nothing by default, sub-classes may override.
-	 */
-	public void showDetails(Shell parent, Object element) {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * Returns false by default, sub-classes may override.
-	 */
-	@Override
-	public boolean canShowDetails() {
-		return false;
 	}
 
 	/**
