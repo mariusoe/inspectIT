@@ -235,15 +235,6 @@
             name="Locate in Call Hierarchy">
       </command>
       <command
-            id="info.novatec.inspectit.rcp.commands.navigateToExceptionType"
-            name="Navigate To Exception Type">
-         <commandParameter
-               id="info.novatec.inspectit.rcp.commands.navigateToExceptionType.ViewType"
-               name="View Type"
-               optional="true">
-         </commandParameter>
-      </command>
-      <command
             id="info.novatec.inspectit.rcp.commands.invocationsAggregatedTimerData"
             name="Invocations Aggregated Timer Data">
       </command>
@@ -397,6 +388,14 @@
                name="Should Restart"
                optional="false">
          </commandParameter>
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.navigateToSingleExceptionType"
+            name="Navigate To Single Exception Type">
+      </command>
+      <command
+            id="info.novatec.inspectit.rcp.commands.navigateToGroupedExceptionType"
+            name="Navigate To Grouped Exception Type">
       </command>
    </extension>
    <extension
@@ -826,33 +825,6 @@
                   <test
                         property="info.novatec.inspectit.hasSubView"
                         value="searchExecutor">
-                  </test>
-               </with>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
-            class="info.novatec.inspectit.rcp.handlers.NavigateToExceptionTypeHandler"
-            commandId="info.novatec.inspectit.rcp.commands.navigateToExceptionType">
-         <activeWhen>
-            <and>
-               <count
-                     value="1">
-               </count>
-               <iterate>
-                  <or>
-                     <instanceof
-                           value="info.novatec.inspectit.communication.data.ExceptionSensorData">
-                     </instanceof>
-                     <instanceof
-                           value="info.novatec.inspectit.communication.data.InvocationSequenceData">
-                     </instanceof>
-                  </or>
-               </iterate>
-               <with
-                     variable="selection">
-                  <test
-                        property="info.novatec.inspectit.canNavigateToExceptionType">
                   </test>
                </with>
             </and>
@@ -1435,6 +1407,60 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.NavigateToExceptionTypeHandler$NavigateToSingleExceptionTypeHandler"
+            commandId="info.novatec.inspectit.rcp.commands.navigateToSingleExceptionType">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <or>
+                     <instanceof
+                           value="info.novatec.inspectit.communication.data.ExceptionSensorData">
+                     </instanceof>
+                     <instanceof
+                           value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                     </instanceof>
+                  </or>
+               </iterate>
+               <with
+                     variable="selection">
+                  <test
+                        property="info.novatec.inspectit.canNavigateToExceptionType">
+                  </test>
+               </with>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="info.novatec.inspectit.rcp.handlers.NavigateToExceptionTypeHandler$NavigateToGroupedExceptionTypeHandler"
+            commandId="info.novatec.inspectit.rcp.commands.navigateToGroupedExceptionType">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <or>
+                     <instanceof
+                           value="info.novatec.inspectit.communication.data.ExceptionSensorData">
+                     </instanceof>
+                     <instanceof
+                           value="info.novatec.inspectit.communication.data.InvocationSequenceData">
+                     </instanceof>
+                  </or>
+               </iterate>
+               <with
+                     variable="selection">
+                  <test
+                        property="info.novatec.inspectit.canNavigateToExceptionType">
+                  </test>
+               </with>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -1565,30 +1591,22 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="info.novatec.inspectit.rcp.commands.navigateToExceptionType"
+                  commandId="info.novatec.inspectit.rcp.commands.navigateToSingleExceptionType"
                   icon="icons/exceptiontracer.gif"
                   label="Exception Type"
                   style="push">
                <visibleWhen
                      checkEnabled="true">
                </visibleWhen>
-               <parameter
-                     name="info.novatec.inspectit.rcp.commands.navigateToExceptionType.ViewType"
-                     value="single">
-               </parameter>
             </command>
             <command
-                  commandId="info.novatec.inspectit.rcp.commands.navigateToExceptionType"
+                  commandId="info.novatec.inspectit.rcp.commands.navigateToGroupedExceptionType"
                   icon="icons/exceptiontracer.gif"
                   label="Grouped Exception View"
                   style="push">
                <visibleWhen
                      checkEnabled="true">
                </visibleWhen>
-               <parameter
-                     name="info.novatec.inspectit.rcp.commands.navigateToExceptionType.ViewType"
-                     value="grouped">
-               </parameter>
             </command>
             <command
                   commandId="info.novatec.inspectit.rcp.commands.navigateToAggregatedSqlData"
@@ -1743,30 +1761,22 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="info.novatec.inspectit.rcp.commands.navigateToExceptionType"
+                  commandId="info.novatec.inspectit.rcp.commands.navigateToSingleExceptionType"
                   icon="icons/exceptiontracer.gif"
                   label="Exception Type"
                   style="push">
                <visibleWhen
                      checkEnabled="true">
                </visibleWhen>
-               <parameter
-                     name="info.novatec.inspectit.rcp.commands.navigateToExceptionType.ViewType"
-                     value="single">
-               </parameter>
             </command>
             <command
-                  commandId="info.novatec.inspectit.rcp.commands.navigateToExceptionType"
+                  commandId="info.novatec.inspectit.rcp.commands.navigateToGroupedExceptionType"
                   icon="icons/exceptiontracer.gif"
                   label="Grouped Exception View"
                   style="push">
                <visibleWhen
                      checkEnabled="true">
                </visibleWhen>
-               <parameter
-                     name="info.novatec.inspectit.rcp.commands.navigateToExceptionType.ViewType"
-                     value="grouped">
-               </parameter>
             </command>
             <command
                   commandId="info.novatec.inspectit.rcp.commands.navigateToAggregatedSqlData"

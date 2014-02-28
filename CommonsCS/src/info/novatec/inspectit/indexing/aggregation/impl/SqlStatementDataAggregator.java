@@ -55,6 +55,7 @@ public class SqlStatementDataAggregator implements IAggregator<SqlStatementData>
 	public IAggregatedData<SqlStatementData> getClone(SqlStatementData sqlStatementData) {
 		AggregatedSqlStatementData clone = new AggregatedSqlStatementData();
 		clone.setPlatformIdent(sqlStatementData.getPlatformIdent());
+		clone.setSensorTypeIdent(sqlStatementData.getSensorTypeIdent());
 		clone.setPreparedStatement(sqlStatementData.isPreparedStatement());
 		clone.setSql(sqlStatementData.getSql());
 		clone.setDatabaseProductName(sqlStatementData.getDatabaseProductName());

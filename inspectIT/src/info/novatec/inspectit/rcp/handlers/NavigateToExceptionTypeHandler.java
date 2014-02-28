@@ -34,20 +34,13 @@ import org.eclipse.ui.handlers.IHandlerService;
  * @author Ivan Senic
  * 
  */
-public class NavigateToExceptionTypeHandler extends AbstractHandler implements IHandler {
-
-	/**
-	 * Parameter that defines if view should be single or grouped.
-	 */
-	private static final String VIEW_PARAM_ID = "info.novatec.inspectit.rcp.commands.navigateToExceptionType.ViewType";
+public abstract class NavigateToExceptionTypeHandler extends AbstractHandler implements IHandler {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		String viewType = event.getParameter(VIEW_PARAM_ID);
-
 		StructuredSelection selection = (StructuredSelection) HandlerUtil.getCurrentSelectionChecked(event);
 		AbstractRootEditor rootEditor = (AbstractRootEditor) HandlerUtil.getActiveEditor(event);
 		RepositoryDefinition repositoryDefinition = rootEditor.getInputDefinition().getRepositoryDefinition();
@@ -76,43 +69,7 @@ public class NavigateToExceptionTypeHandler extends AbstractHandler implements I
 				return null;
 			}
 
-			InputDefinition inputDefinition = new InputDefinition();
-			inputDefinition.setRepositoryDefinition(repositoryDefinition);
-			if ("single".equals(viewType)) {
-				inputDefinition.setId(SensorTypeEnum.EXCEPTION_SENSOR);
-
-				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-				editorPropertiesData.setSensorImage(SensorTypeEnum.EXCEPTION_SENSOR.getImage());
-				editorPropertiesData.setSensorName(SensorTypeEnum.EXCEPTION_SENSOR.getDisplayName());
-				editorPropertiesData.setViewName(exceptionSensorData.getThrowableType());
-				editorPropertiesData.setPartNameFlag(PartType.SENSOR);
-				inputDefinition.setEditorPropertiesData(editorPropertiesData);
-
-				IdDefinition idDefinition = new IdDefinition();
-				idDefinition.setPlatformId(exceptionSensorData.getPlatformIdent());
-				inputDefinition.setIdDefinition(idDefinition);
-
-				ExceptionTypeInputDefinitionExtra exceptionTypeInputDefinitionExtra = new ExceptionTypeInputDefinitionExtra();
-				exceptionTypeInputDefinitionExtra.setThrowableType(exceptionSensorData.getThrowableType());
-				inputDefinition.addInputDefinitonExtra(InputDefinitionExtrasMarkerFactory.EXCEPTION_TYPE_EXTRAS_MARKER, exceptionTypeInputDefinitionExtra);
-			} else if ("grouped".equals(viewType)) {
-				inputDefinition.setId(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED);
-
-				EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-				editorPropertiesData.setSensorImage(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED.getImage());
-				editorPropertiesData.setSensorName(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED.getDisplayName());
-				editorPropertiesData.setViewName(exceptionSensorData.getThrowableType());
-				editorPropertiesData.setPartNameFlag(PartType.SENSOR);
-				inputDefinition.setEditorPropertiesData(editorPropertiesData);
-
-				IdDefinition idDefinition = new IdDefinition();
-				idDefinition.setPlatformId(exceptionSensorData.getPlatformIdent());
-				inputDefinition.setIdDefinition(idDefinition);
-
-				ExceptionTypeInputDefinitionExtra exceptionTypeInputDefinitionExtra = new ExceptionTypeInputDefinitionExtra();
-				exceptionTypeInputDefinitionExtra.setThrowableType(exceptionSensorData.getThrowableType());
-				inputDefinition.addInputDefinitonExtra(InputDefinitionExtrasMarkerFactory.EXCEPTION_TYPE_EXTRAS_MARKER, exceptionTypeInputDefinitionExtra);
-			}
+			InputDefinition inputDefinition = getInputDefinition(repositoryDefinition, exceptionSensorData);
 
 			// open the view via command
 			IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
@@ -130,5 +87,90 @@ public class NavigateToExceptionTypeHandler extends AbstractHandler implements I
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Returns input definition. Sub-classes should only implement this method.
+	 * 
+	 * @param repositoryDefinition
+	 *            {@link RepositoryDefinition}
+	 * @param exceptionSensorData
+	 *            Data to navigate to.
+	 * @return {@link InputDefinition}
+	 */
+	protected abstract InputDefinition getInputDefinition(RepositoryDefinition repositoryDefinition, ExceptionSensorData exceptionSensorData);
+
+	/**
+	 * Handler for navigating to single exception view.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	public static final class NavigateToSingleExceptionTypeHandler extends NavigateToExceptionTypeHandler {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected InputDefinition getInputDefinition(RepositoryDefinition repositoryDefinition, ExceptionSensorData exceptionSensorData) {
+			InputDefinition inputDefinition = new InputDefinition();
+			inputDefinition.setRepositoryDefinition(repositoryDefinition);
+			inputDefinition.setId(SensorTypeEnum.EXCEPTION_SENSOR);
+
+			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+			editorPropertiesData.setSensorImage(SensorTypeEnum.EXCEPTION_SENSOR.getImage());
+			editorPropertiesData.setSensorName(SensorTypeEnum.EXCEPTION_SENSOR.getDisplayName());
+			editorPropertiesData.setViewName(exceptionSensorData.getThrowableType());
+			editorPropertiesData.setPartNameFlag(PartType.SENSOR);
+			inputDefinition.setEditorPropertiesData(editorPropertiesData);
+
+			IdDefinition idDefinition = new IdDefinition();
+			idDefinition.setPlatformId(exceptionSensorData.getPlatformIdent());
+			inputDefinition.setIdDefinition(idDefinition);
+
+			ExceptionTypeInputDefinitionExtra exceptionTypeInputDefinitionExtra = new ExceptionTypeInputDefinitionExtra();
+			exceptionTypeInputDefinitionExtra.setThrowableType(exceptionSensorData.getThrowableType());
+			inputDefinition.addInputDefinitonExtra(InputDefinitionExtrasMarkerFactory.EXCEPTION_TYPE_EXTRAS_MARKER, exceptionTypeInputDefinitionExtra);
+
+			return inputDefinition;
+		}
+
+	}
+
+	/**
+	 * Handler for navigating to grouped exception view.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	public static final class NavigateToGroupedExceptionTypeHandler extends NavigateToExceptionTypeHandler {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected InputDefinition getInputDefinition(RepositoryDefinition repositoryDefinition, ExceptionSensorData exceptionSensorData) {
+			InputDefinition inputDefinition = new InputDefinition();
+			inputDefinition.setRepositoryDefinition(repositoryDefinition);
+			inputDefinition.setId(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED);
+
+			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+			editorPropertiesData.setSensorImage(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED.getImage());
+			editorPropertiesData.setSensorName(SensorTypeEnum.EXCEPTION_SENSOR_GROUPED.getDisplayName());
+			editorPropertiesData.setViewName(exceptionSensorData.getThrowableType());
+			editorPropertiesData.setPartNameFlag(PartType.SENSOR);
+			inputDefinition.setEditorPropertiesData(editorPropertiesData);
+
+			IdDefinition idDefinition = new IdDefinition();
+			idDefinition.setPlatformId(exceptionSensorData.getPlatformIdent());
+			inputDefinition.setIdDefinition(idDefinition);
+
+			ExceptionTypeInputDefinitionExtra exceptionTypeInputDefinitionExtra = new ExceptionTypeInputDefinitionExtra();
+			exceptionTypeInputDefinitionExtra.setThrowableType(exceptionSensorData.getThrowableType());
+			inputDefinition.addInputDefinitonExtra(InputDefinitionExtrasMarkerFactory.EXCEPTION_TYPE_EXTRAS_MARKER, exceptionTypeInputDefinitionExtra);
+
+			return inputDefinition;
+		}
+
 	}
 }

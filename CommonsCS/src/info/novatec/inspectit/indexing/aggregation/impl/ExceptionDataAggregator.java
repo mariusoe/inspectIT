@@ -80,6 +80,7 @@ public class ExceptionDataAggregator implements IAggregator<ExceptionSensorData>
 	public IAggregatedData<ExceptionSensorData> getClone(ExceptionSensorData exceptionData) {
 		AggregatedExceptionSensorData clone = new AggregatedExceptionSensorData();
 		clone.setPlatformIdent(exceptionData.getPlatformIdent());
+		clone.setSensorTypeIdent(exceptionData.getSensorTypeIdent());
 		clone.setThrowableType(exceptionData.getThrowableType());
 		if (exceptionAggregationType == ExceptionAggregationType.GROUP_EXCEPTION_OVERVIEW || exceptionAggregationType == ExceptionAggregationType.DISTINCT_STACK_TRACES) {
 			clone.setErrorMessage(exceptionData.getErrorMessage());

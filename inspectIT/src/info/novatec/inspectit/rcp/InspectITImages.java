@@ -137,4 +137,7 @@ public interface InspectITImages {
 	String IMG_TIMEFRAME = InspectITConstants.ICON_PATH + "timeframe.png";
 	String IMG_COMPILATION_OVERVIEW = InspectITConstants.ICON_PATH + "workset.gif";
 	String IMG_CHART_PIE = InspectITConstants.ICON_PATH + "chart_pie.png";
+	String IMG_RETURN = InspectITConstants.ICON_PATH + "return.png";
+	String IMG_PARAMETER = InspectITConstants.ICON_PATH + "parameter.png";
+	String IMG_FIELD = InspectITConstants.ICON_PATH + "field.png";
 }

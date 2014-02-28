@@ -11,5 +11,7 @@
 		interface="info.novatec.inspectit.rcp.storage.InspectITStorageManager" />
 	<osgi:service id="cmrServiceProviderService" ref="cmrServiceProvider"
 		interface="info.novatec.inspectit.rcp.repository.service.cmr.CmrServiceProvider" />
+	<osgi:service id="detailsGenerationFactoryService" ref="detailsGenerationFactory"
+		interface="info.novatec.inspectit.rcp.details.DetailsGenerationFactory" />
 
 </beans>
