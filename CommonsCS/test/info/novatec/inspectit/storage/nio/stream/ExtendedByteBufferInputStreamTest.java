@@ -7,6 +7,8 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import info.novatec.inspectit.indexing.storage.IStorageDescriptor;
 import info.novatec.inspectit.indexing.storage.impl.StorageDescriptor;
@@ -42,6 +44,8 @@ import org.testng.annotations.Test;
 @SuppressWarnings("PMD")
 public class ExtendedByteBufferInputStreamTest {
 
+	private static final int NUMBER_OF_BUFFERS = 2;
+
 	/**
 	 * Class under test.
 	 */
@@ -70,10 +74,9 @@ public class ExtendedByteBufferInputStreamTest {
 	@BeforeMethod
 	public void init() {
 		MockitoAnnotations.initMocks(this);
-		inputStream = new ExtendedByteBufferInputStream();
+		inputStream = new ExtendedByteBufferInputStream(storageData, null, NUMBER_OF_BUFFERS);
 		inputStream.setByteBufferProvider(byteBufferProvider);
 		inputStream.setReadingChannelManager(readingChannelManager);
-		inputStream.setStorageData(storageData);
 		inputStream.setStorageManager(storageManager);
 		inputStream.setExecutorService(executorService);
 		when(storageManager.getChannelPath(eq(storageData), Mockito.<IStorageDescriptor> anyObject())).thenReturn(Paths.get("/"));
@@ -126,11 +129,14 @@ public class ExtendedByteBufferInputStreamTest {
 
 		byte[] bytes = new byte[readSize];
 		inputStream.read(bytes, 0, readSize);
+		inputStream.close();
 
 		try {
 			assertThat(bytes, is(equalTo(array)));
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
+
+		verify(byteBufferProvider, times(NUMBER_OF_BUFFERS)).releaseByteBuffer(Mockito.<ByteBuffer> anyObject());
 	}
 }

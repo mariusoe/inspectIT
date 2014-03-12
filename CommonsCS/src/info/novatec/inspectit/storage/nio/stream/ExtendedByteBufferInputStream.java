@@ -322,6 +322,13 @@ public class ExtendedByteBufferInputStream extends ByteBufferInputStream {
 			}
 		}
 
+		// also release the one we could have set for current reading
+		ByteBuffer currentBuffer = super.getByteBuffer();
+		if (null != currentBuffer) {
+			byteBufferProvider.releaseByteBuffer(currentBuffer);
+			super.setByteBuffer(null);
+		}
+
 		// close opened channel paths
 		for (Path path : openedChannelPaths) {
 			readingChannelManager.finalizeChannel(path);
