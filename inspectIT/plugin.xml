@@ -1929,9 +1929,17 @@
                id="helpMenu"
                label="&amp;Help">
             <command
+                  commandId="org.eclipse.ui.help.quickStartAction"
+                  style="push">
+            </command>
+            <command
                   commandId="info.novatec.inspectit.rcp.commands.documentation"
                   style="push">
             </command>
+            <separator
+                  name="org.eclipse.ui.main.menu.help.separator1"
+                  visible="true">
+            </separator>
             <command
                   commandId="org.eclipse.ui.help.aboutAction"
                   style="push">
