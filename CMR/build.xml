@@ -94,7 +94,7 @@
 		<property name="test.workingDir" value="${basedir}"/>
 		<property name="test.javac.source" value="1.7"/>
 		<property name="test.javac.target" value="1.7"/>
-		<property name="test.vmargs" value="-javaagent:${string.path.classmexer}"/>
+		<property name="test.vmargs" value="-javaagent:${string.path.classmexer} ${cmr.java.opts.32bit}"/>
 		<property name="test.targetsuite" value="${resources.testng}/testng.xml"/>
 
 		<execute-testng 
