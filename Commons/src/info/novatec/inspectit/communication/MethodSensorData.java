@@ -32,7 +32,7 @@ public abstract class MethodSensorData extends DefaultData {
 	/**
 	 * Contains optional information about the contents of some fields / parameters etc.
 	 */
-	private Set<ParameterContentData> parameterContentData = new HashSet<ParameterContentData>(0);
+	private Set<ParameterContentData> parameterContentData;
 
 	/**
 	 * Default no-args constructor.
@@ -95,6 +95,10 @@ public abstract class MethodSensorData extends DefaultData {
 	 *            the data to add.
 	 */
 	public void addParameterContentData(ParameterContentData parameterContent) {
+		if (null == parameterContentData) {
+			parameterContentData = new HashSet<ParameterContentData>();
+		}
+
 		parameterContentData.add(parameterContent);
 	}
 

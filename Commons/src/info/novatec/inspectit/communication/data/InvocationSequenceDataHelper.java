@@ -1,5 +1,6 @@
 package info.novatec.inspectit.communication.data;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,7 +56,16 @@ public final class InvocationSequenceDataHelper {
 	 * @return the captured data of the invocation sequence.
 	 */
 	public static Set<ParameterContentData> getCapturedParameters(InvocationSequenceData data) {
-		Set<ParameterContentData> parameterContents = new HashSet<ParameterContentData>(data.getParameterContentData());
+		if (!hasCapturedParameters(data)) {
+			return Collections.emptySet();
+		}
+
+		Set<ParameterContentData> parameterContents = new HashSet<ParameterContentData>();
+
+		if (null != data.getParameterContentData()) {
+			parameterContents.addAll(data.getParameterContentData());
+		}
+
 		if (hasTimerData(data)) {
 			parameterContents.addAll(data.getTimerData().getParameterContentData());
 		}

@@ -25,6 +25,7 @@ import info.novatec.inspectit.agent.sensor.method.averagetimer.AverageTimerHook;
 import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.TimerData;
+import info.novatec.inspectit.util.ObjectUtils;
 import info.novatec.inspectit.util.Timer;
 
 import java.util.Map;
@@ -342,7 +343,7 @@ public class AverageTimerHookTest extends AbstractLogSupport {
 				return false;
 			} else if (timerData.getAverage() != otherTimerData.getAverage()) {
 				return false;
-			} else if (!timerData.getParameterContentData().equals(otherTimerData.getParameterContentData())) {
+			} else if (!ObjectUtils.equals(timerData.getParameterContentData(), otherTimerData.getParameterContentData())) {
 				return false;
 			} else if (timerData.getVariance() != otherTimerData.getVariance()) {
 				return false;

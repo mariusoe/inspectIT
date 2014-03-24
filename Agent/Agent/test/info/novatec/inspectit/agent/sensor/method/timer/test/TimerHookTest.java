@@ -31,6 +31,7 @@ import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.communication.valueobject.TimerRawVO;
 import info.novatec.inspectit.communication.valueobject.TimerRawVO.TimerRawContainer;
+import info.novatec.inspectit.util.ObjectUtils;
 import info.novatec.inspectit.util.Timer;
 
 import java.lang.management.ManagementFactory;
@@ -176,7 +177,7 @@ public class TimerHookTest extends AbstractLogSupport {
 				return false;
 			} else if (timerRawVO.getSensorTypeIdent() != otherTimerRawVO.getSensorTypeIdent()) {
 				return false;
-			} else if (!timerRawVO.getParameterContentData().equals(otherTimerRawVO.getParameterContentData())) {
+			} else if (!ObjectUtils.equals(timerRawVO.getParameterContentData(), otherTimerRawVO.getParameterContentData())) {
 				return false;
 			} else if (!timerRawVO.getData().equals(otherTimerRawVO.getData())) {
 				return false;
@@ -362,7 +363,7 @@ public class TimerHookTest extends AbstractLogSupport {
 					return false;
 				} else if (timerRawVO.getSensorTypeIdent() != otherTimerRawVO.getSensorTypeIdent()) {
 					return false;
-				} else if (!timerRawVO.getParameterContentData().equals(otherTimerRawVO.getParameterContentData())) {
+				} else if (!ObjectUtils.equals(timerRawVO.getParameterContentData(), otherTimerRawVO.getParameterContentData())) {
 					return false;
 				}
 				return true;
@@ -454,7 +455,7 @@ public class TimerHookTest extends AbstractLogSupport {
 				return false;
 			} else if (timerData.getAverage() != otherTimerData.getAverage()) {
 				return false;
-			} else if (!timerData.getParameterContentData().equals(otherTimerData.getParameterContentData())) {
+			} else if (!ObjectUtils.equals(timerData.getParameterContentData(), otherTimerData.getParameterContentData())) {
 				return false;
 			} else if (timerData.getVariance() != otherTimerData.getVariance()) {
 				return false;
