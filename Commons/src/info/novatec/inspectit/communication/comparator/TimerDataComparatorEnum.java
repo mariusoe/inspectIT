@@ -116,7 +116,7 @@ public enum TimerDataComparatorEnum implements IDataComparator<TimerData>, Compa
 		case EXCLUSIVEMAX:
 			return Double.compare(o1.getExclusiveMax(), o2.getExclusiveMax());
 		case EXCLUSIVEDURATION:
-			return Double.compare(o1.getExclusiveAverage(), o2.getExclusiveAverage());
+			return Double.compare(o1.getExclusiveDuration(), o2.getExclusiveDuration());
 		default:
 			return 0;
 		}
