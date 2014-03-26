@@ -1,5 +1,6 @@
 package info.novatec.inspectit.cmr.util;
 
+import info.novatec.inspectit.cmr.CMR;
 import info.novatec.inspectit.spring.logger.Log;
 
 import java.io.IOException;
@@ -27,6 +28,18 @@ public class ShutdownService {
 	 * and changing it requires the change of the CMR startup script.
 	 */
 	private static final int RESTART_EXIT_CODE = 10;
+	
+	/**
+	 * Command for restarting the CMR on Windows machines. Note that this command is used only if the CMR was started as
+	 * a Windows Service (Procrun).
+	 */
+	private static final String RESTART_CMR_COMMAND = "cmd.exe /c net stop inspectITCMR >NUL & net start inspectITCMR >NUL";
+	
+	/**
+	 * Command for shutting down the CMR on Windows machines. Note that this command is used only if the CMR was started as
+	 * a Windows Service (Procrun).
+	 */
+	private static final String SHUTDOWN_CMR_COMMAND = "cmd.exe /c net stop inspectITCMR >NUL";
 
 	/**
 	 * The logger of this class.
@@ -97,9 +110,28 @@ public class ShutdownService {
 			@Override
 			public void run() {
 				if (restart) {
-					System.exit(RESTART_EXIT_CODE);
+					if (CMR.isStartedAsService()) {
+						try {
+							// Not the best solution.
+							// Start the Windows console due to the restart of the CMR Windows Service through inspectIT UI.
+							Runtime.getRuntime().exec(RESTART_CMR_COMMAND);
+						} catch (IOException e) {
+							log.error(e.getMessage());
+						}
+					} else {
+						System.exit(RESTART_EXIT_CODE);
+					}
 				} else {
-					System.exit(0);
+					if (CMR.isStartedAsService()) {
+						try {
+							// Start the Windows console due to the shutdown of the CMR Windows Service through inspectIT UI.
+							Runtime.getRuntime().exec(SHUTDOWN_CMR_COMMAND);
+						} catch (IOException e) {
+							log.error(e.getMessage());
+						}
+					} else {
+						System.exit(0);
+					}
 				}
 			}
 		};

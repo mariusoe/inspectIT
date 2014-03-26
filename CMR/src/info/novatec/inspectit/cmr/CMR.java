@@ -24,6 +24,8 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 
+import org.apache.commons.lang.SystemUtils;
+
 /**
  * Main class of the Central Measurement Repository. The main method is used to start the
  * application.
@@ -54,15 +56,35 @@ public final class CMR {
 	private static BeanFactory beanFactory; // NOPMD
 
 	/**
-	 * Private constructor to prevent instantiation.
+	 * startedAsService holds the value if CMR was started as a Windows Service.
+	 */
+	private static boolean startedAsService;
+
+	/**
+	 * This class will start the Repository.
 	 */
 	private CMR() {
 	}
 
 	/**
+	 * Pseudo main method of class.
+	 */
+	private static void startCMR() {
+		initLogger();
+
+		long startTime = System.nanoTime();
+		LOGGER.info("Central Measurement Repository is starting up!");
+		LOGGER.info("==============================================");
+
+		startRepository();
+
+		LOGGER.info("CMR started in " + Converter.nanoToMilliseconds(System.nanoTime() - startTime) + " ms");
+	}
+
+	/**
 	 * This class will start the Repository.
 	 */
-	private static void start() {
+	private static void startRepository() {
 		LOGGER.info("Initializing Spring...");
 
 		BeanFactoryLocator beanFactoryLocator = ContextSingletonBeanFactoryLocator.getInstance();
@@ -85,6 +107,27 @@ public final class CMR {
 			}
 			LOGGER.info("Starting CMR in version " + currentVersion);
 		}
+	}
+
+	/**
+	 * Start function. Needed by Procrun.
+	 * 
+	 * @param args
+	 *            The arguments.
+	 */
+	public static void start(String[] args) {
+		startedAsService = true;
+		startCMR();
+	}
+
+	/**
+	 * Stop function. Needed by Procrun.
+	 * 
+	 * @param args
+	 *            The arguments.
+	 */
+	public static void stop(String[] args) {
+		System.exit(0);
 	}
 
 	/**
@@ -141,15 +184,21 @@ public final class CMR {
 	 *            The arguments.
 	 */
 	public static void main(String[] args) {
-		initLogger();
-
-		long startTime = System.nanoTime();
-		LOGGER.info("Central Measurement Repository is starting up!");
-		LOGGER.info("==============================================");
-
-		start();
-
-		LOGGER.info("CMR started in " + Converter.nanoToMilliseconds(System.nanoTime() - startTime) + " ms");
+		// Start Apache Procrun only if it's a Windows operating system.
+		if (args.length == 1 && SystemUtils.IS_OS_WINDOWS) {
+			switch (args[0]) {
+			case "start":
+				start(args);
+				break;
+			case "stop":
+				stop(args);
+				break;
+			default:
+				startCMR();
+			}
+		} else {
+			startCMR();
+		}
 	}
 
 	/**
@@ -161,4 +210,12 @@ public final class CMR {
 		return beanFactory;
 	}
 
+	/**
+	 * Getter method for property <code>startedAsService</code>.
+	 * 
+	 * @return startedAsService.
+	 */
+	public static boolean isStartedAsService() {
+		return startedAsService;
+	}
 }

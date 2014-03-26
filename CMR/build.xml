@@ -9,6 +9,7 @@
 	</description>
 
 	<property file="${basedir}/build.properties" />
+	<property file="${crm.startup.properties}" />
 
 	<import file="${build.common-targets.file}" />
 
@@ -258,7 +259,7 @@
 
 	<target name="-linux-x86">
 		<copy file="${basedir}/startup.sh" tofile="${build.scripts}/startup.sh"/>
-		<replaceregexp file="${build.scripts}/startup.sh" match="#COMMAND#" replace="${java.command.linux} ${java.memory.32bit} ${java.opts.32bit} ${java.opts.linux} ${java.locgc.linux} -jar ${dist.jar.name}" byline="true"/>
+		<replaceregexp file="${build.scripts}/startup.sh" match="#COMMAND#" replace="${cmr.java.command.linux} ${cmr.java.memory.32bit} ${cmr.java.opts.32bit} ${cmr.java.opts.linux} ${cmr.java.locgc.linux} -jar ${dist.jar.name}" byline="true"/>
 		<tar destfile="${release.root}/inspectit-cmr.linux.x86.tar.gz" compression="gzip">
 			<fileset dir="${build.release.root}" />
 			<tarfileset file="${build.scripts}/startup.sh" prefix="CMR" filemode="755" />
@@ -270,7 +271,7 @@
 
 	<target name="-linux-x64">
 		<copy file="${basedir}/startup.sh" tofile="${build.scripts}/startup.sh"/>
-		<replaceregexp file="${build.scripts}/startup.sh" match="#COMMAND#" replace="${java.command.linux} ${java.memory.64bit} ${java.opts.64bit} ${java.opts.linux} ${java.locgc.linux} -jar ${dist.jar.name}" byline="true"/>
+		<replaceregexp file="${build.scripts}/startup.sh" match="#COMMAND#" replace="${cmr.java.command.linux} ${cmr.java.memory.64bit} ${cmr.java.opts.64bit} ${cmr.java.opts.linux} ${cmr.java.locgc.linux} -jar ${dist.jar.name}" byline="true"/>
 		<tar destfile="${release.root}/inspectit-cmr.linux.x64.tar.gz" compression="gzip">
 			<fileset dir="${build.release.root}" />
 			<tarfileset file="${build.scripts}/startup.sh" prefix="CMR" filemode="755" />
@@ -282,7 +283,7 @@
 
 	<target name="-windows-x86">
 		<copy file="${basedir}/startup.bat" tofile="${build.scripts}/startup.bat"/>
-		<replaceregexp file="${build.scripts}/startup.bat" match="#COMMAND#" replace="${java.command.win} ${java.memory.32bit} ${java.opts.32bit} ${java.opts.win} ${java.locgc.win} -jar ${dist.jar.name}" byline="true"/>
+		<replaceregexp file="${build.scripts}/startup.bat" match="#COMMAND#" replace="${cmr.java.command.win} ${cmr.java.memory.32bit} ${cmr.java.opts.32bit} ${cmr.java.opts.win} ${cmr.java.locgc.win} -jar ${dist.jar.name}" byline="true"/>
 		<zip destfile="${release.root}/inspectit-cmr.windows.x86.zip">
 			<fileset dir="${build.release.root}" />
 			<zipfileset file="${build.scripts}/startup.bat" prefix="CMR" />
@@ -294,7 +295,7 @@
 
 	<target name="-windows-x64">
 		<copy file="${basedir}/startup.bat" tofile="${build.scripts}/startup.bat"/>
-		<replaceregexp file="${build.scripts}/startup.bat" match="#COMMAND#" replace="${java.command.win} ${java.memory.64bit} ${java.opts.64bit} ${java.opts.win} ${java.locgc.win} -jar ${dist.jar.name}" byline="true"/>
+		<replaceregexp file="${build.scripts}/startup.bat" match="#COMMAND#" replace="${cmr.java.command.win} ${cmr.java.memory.64bit} ${cmr.java.opts.64bit} ${cmr.java.opts.win} ${cmr.java.locgc.win} -jar ${dist.jar.name}" byline="true"/>
 		<zip destfile="${release.root}/inspectit-cmr.windows.x64.zip">
 			<fileset dir="${build.release.root}" />
 			<zipfileset file="${build.scripts}/startup.bat" prefix="CMR" />

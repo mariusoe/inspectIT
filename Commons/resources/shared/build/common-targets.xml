@@ -10,6 +10,7 @@
 
 	<dirname property="commontargets.basedir" file="${ant.file.CommonTargets}" />
 	<property file="${commontargets.basedir}/common-targets.properties" />
+	<property file="${commontargets.basedir}/cmr-startup.properties" />
 
 	<!-- *************************************************************** -->
 	<!--                I N I T     T A R G E T S  	                     -->
@@ -491,4 +492,174 @@
 		</sequential>
 	</macrodef>
 
+	<!-- *************************************************************** -->
+	<!--             I N S T A L L E R     T A R G E T S                 -->
+	<!-- *************************************************************** -->
+
+	<!-- INSPECTIT INSTALLER WINDOWS 64 -->
+	<target name="release-installer-win64" description="--> Creates an all-component wizard installer for Windows (64 Bits) operating system." depends="init-installer, prepare-templates">
+		<!-- Target OS specification -->
+		<property name="target.os" value="Windows" />
+		<property name="target.os.arch" value="64" />
+
+		<!-- Procrun settings -->
+		<split value="${cmr.java.memory.64bit}" delimiter=" " prefix="${procrun.jvmopts.prefix}" result="cmr.java.memory.64bit_prefix" />
+		<split value="${cmr.java.opts.64bit}" delimiter=" " prefix="${procrun.jvmopts.prefix}" result="cmr.java.opts.64bit_prefix" />
+		<split value="${cmr.java.opts.win}" delimiter=" " prefix="${procrun.jvmopts.prefix}" result="cmr.java.opts.win_prefix" />
+		<split value="${cmr.java.locgc.win}" delimiter=" " prefix="${procrun.jvmopts.prefix}" result="cmr.java.locgc.win_prefix" />
+
+		<!-- Unpacking CMR Archive for preparation -->
+		<unzip src="${cmr.build.win64}" dest="${cmr.installer.working.dir}" />
+
+		<!-- Setting pointers on the right directories and names -->
+		<property name="installer.ui.pointer" value="${inspectit.build.win64}" />
+		<property name="installer.cmr.pointer" value="${cmr.installer.working.dir}/CMR" />
+		<property name="installer.name.pointer" value="${installer.windows64.name}" />
+		<property name="inspectit.windows.service.display.name.pointer" value="${inspectit.windows.service.64.display.name}" />
+
+		<!-- Setting right java start parameters for CMR -->
+		<replaceregexp file="${cmr.installer.working.dir}/CMR/installService.bat" match="#COMMAND_OPTS#" replace="${cmr.java.memory.64bit_prefix} ${cmr.java.opts.64bit_prefix} ${cmr.java.opts.win_prefix} ${cmr.java.locgc.win_prefix}" byline="true" />
+
+		<!-- Create installer -->
+		<antcall target="release-installer" inheritall="true" />
+	</target>
+
+	<!-- INSPECTIT INSTALLER WINDOWS 32 -->
+	<target name="release-installer-win32" description="--> Creates an all-component wizard installer for Windows (32 Bits) operating system." depends="init-installer, prepare-templates">
+		<!-- Target OS specification -->
+		<property name="target.os" value="Windows" />
+		<property name="target.os.arch" value="32" />
+
+		<!-- Procrun settings -->
+		<split value="${cmr.java.memory.32bit}" delimiter=" " prefix="${procrun.jvmopts.prefix}" result="cmr.java.memory.32bit_prefix" />
+		<split value="${cmr.java.opts.32bit}" delimiter=" " prefix="${procrun.jvmopts.prefix}" result="cmr.java.opts.32bit_prefix" />
+		<split value="${cmr.java.opts.win}" delimiter=" " prefix="${procrun.jvmopts.prefix}" result="cmr.java.opts.win_prefix" />
+		<split value="${cmr.java.locgc.win}" delimiter=" " prefix="${procrun.jvmopts.prefix}" result="cmr.java.locgc.win_prefix" />
+
+		<!-- Unpacking CMR Archive for preparation -->
+		<unzip src="${cmr.build.win86}" dest="${cmr.installer.working.dir}" />
+
+		<!-- Setting pointers on the right directories and names -->
+		<property name="installer.ui.pointer" value="${inspectit.build.win86}" />
+		<property name="installer.cmr.pointer" value="${cmr.installer.working.dir}/CMR" />
+		<property name="installer.name.pointer" value="${installer.windows32.name}" />
+		<property name="inspectit.windows.service.display.name.pointer" value="${inspectit.windows.service.32.display.name}" />
+
+		<!-- Setting right java start parameters for CMR -->
+		<replaceregexp file="${cmr.installer.working.dir}/CMR/installService.bat" match="#COMMAND_OPTS#" replace="${cmr.java.memory.32bit_prefix} ${cmr.java.opts.32bit_prefix} ${cmr.java.opts.win_prefix} ${cmr.java.locgc.win_prefix}" byline="true" />
+
+		<!-- Create installer -->
+		<antcall target="release-installer" inheritall="true" />
+	</target>
+
+	<!-- INSPECTIT INSTALLER LINUX 64 -->
+	<target name="release-installer-linux64" description="--> Creates an all-component wizard installer for GNU/Linux (64 Bits) operating system." depends="init-installer">
+		<!-- Target OS specification -->
+		<property name="target.os" value="Linux" />
+		<property name="target.os.arch" value="64" />
+
+		<!-- Unpacking CMR Archive for preparation -->
+		<untar src="${cmr.build.linux64}" dest="${cmr.installer.working.dir}" compression="gzip" />
+
+		<!-- Setting pointers on the right directories and names -->
+		<property name="installer.ui.pointer" value="${inspectit.build.linux64}" />
+		<property name="installer.cmr.pointer" value="${cmr.installer.working.dir}/CMR" />
+		<property name="installer.name.pointer" value="${installer.linux64.name}" />
+
+		<!-- Create installer -->
+		<antcall target="release-installer" inheritall="true" />
+	</target>
+
+	<!-- INSPECTIT INSTALLER LINUX 32 -->
+	<target name="release-installer-linux32" description="--> Creates an all-component wizard installer for GNU/Linux (32 Bits) operating system." depends="init-installer">
+		<!-- Target OS specification -->
+		<property name="target.os" value="Linux" />
+		<property name="target.os.arch" value="32" />
+
+		<!-- Unpacking CMR Archive for preparation -->
+		<untar src="${cmr.build.linux86}" dest="${cmr.installer.working.dir}" compression="gzip" />
+
+		<!-- Setting pointers on the right directories and names -->
+		<property name="installer.ui.pointer" value="${inspectit.build.linux86}" />
+		<property name="installer.cmr.pointer" value="${cmr.installer.working.dir}/CMR" />
+		<property name="installer.name.pointer" value="${installer.linux32.name}" />
+
+		<!-- Create installer -->
+		<antcall target="release-installer" inheritall="true" />
+	</target>
+
+	<!-- INSPECTIT INSTALLER ALL PLATFORMS-->
+	<target name="release-installers" description="--> Creates four wizard installers for Windows and GNU/Linux operating systems.">
+		<!-- Remove old installers -->
+		<delete dir="${output.dir}" />
+
+		<!-- Call installer targets for every operating system -->
+		<antcall target="release-installer-win64" />
+		<antcall target="release-installer-win32" />
+		<antcall target="release-installer-linux64" />
+		<antcall target="release-installer-linux32" />
+	</target>
+
+	<!-- Define installer target -->
+	<target name="init-installer" depends="init-ivy">
+		<ivy:settings file="${ivy.settings.file}" />
+		<ivy:cachepath pathid="path.izpack" organisation="org.codehaus.izpack" module="izpack-standalone-compiler" revision="4.3.5" conf="default" inline="true" />
+		<taskdef name="mk-installer" classname="com.izforge.izpack.ant.IzPackTask" classpathref="path.izpack">
+			<classpath>
+				<pathelement location="${commons.dir}/resources/installer/installer-commons" />
+			</classpath>
+		</taskdef>
+	</target>
+
+	<!-- Prepare template files for parsing -->
+	<target name="prepare-templates">
+		<copy file="${inspectit.windows.service.install.template}" tofile="${cmr.installer.working.dir}/CMR/installService.bat" />
+		<copy file="${inspectit.windows.service.uninstall.template}" tofile="${cmr.installer.working.dir}/CMR/uninstallService.bat" />
+	</target>
+
+	<!-- Main target for installer creation artifact -->
+	<target name="release-installer">
+		<mkdir dir="${output.dir}" />
+		<!-- Remove old artifacts -->
+		<delete file="${output.dir}/${installer.name.pointer}" />
+
+		<!-- Creation Process -->
+		<mk-installer input="${commons.dir}/resources/installer/installer-commons/install.xml" output="${output.dir}/${installer.name.pointer}" basedir="${commons.dir}/resources/installer/" inheritAll="true" />
+		<!-- Tidy up -->
+		<antcall target="tidy-up" />
+	</target>
+
+	<!-- Cleaning up the working directories and unneeded resources -->
+	<target name="tidy-up">
+		<delete dir="${cmr.installer.working.dir}" />
+		<delete file="${commons.installer.resources}/service/installService.bat" />
+		<delete file="${commons.installer.resources}/service/uninstallService.bat" />
+	</target>
+
+	<!-- Split java parameters and add a procrun specific prefix -->
+	<scriptdef name="split" language="javascript">
+		<!-- Parameters to split -->
+		<attribute name="value" />
+		<!-- Splitting delimiter -->
+		<attribute name="delimiter" />
+		<!-- Prefix for every parameter -->
+		<attribute name="prefix" />
+		<!-- Result value to return -->
+		<attribute name="result" />
+		<!-- Splitting function in JavaScript -->
+		<![CDATA[
+			var results = "";
+			if(attributes.get("value") != "") {
+				values = attributes.get("value").split(attributes.get("delimiter"));
+				for(i = 0; i < values.length; i++) {
+					if(i != values.length -1) {
+						results += attributes.get("prefix") + values[i] + " ";
+					} else {
+						results += attributes.get("prefix") + values[i];
+					}
+				}
+			}
+			project.setNewProperty(attributes.get("result"), results);
+		]]>
+	</scriptdef>
 </project>
