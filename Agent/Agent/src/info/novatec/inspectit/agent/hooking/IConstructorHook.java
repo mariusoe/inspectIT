@@ -20,15 +20,13 @@ public interface IConstructorHook extends IHook {
 	 *            The unique method id.
 	 * @param sensorTypeId
 	 *            The unique sensor type id.
-	 * @param object
-	 *            The class itself which contains the hook.
 	 * @param parameters
 	 *            The array of parameters.
 	 * @param rsc
 	 *            The {@link RegisteredSensorConfig} object which holds all the information of the
 	 *            executed method.
 	 */
-	void beforeConstructor(long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc);
+	void beforeConstructor(long methodId, long sensorTypeId, Object[] parameters, RegisteredSensorConfig rsc);
 
 	/**
 	 * The bytecode is inserted after the constructor calls.

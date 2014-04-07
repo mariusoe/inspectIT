@@ -213,7 +213,7 @@ public class TimerHook implements IMethodHook, IConstructorHook {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void beforeConstructor(long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc) {
+	public void beforeConstructor(long methodId, long sensorTypeId, Object[] parameters, RegisteredSensorConfig rsc) {
 		timeStack.push(new Double(timer.getCurrentTime()));
 		if (enabled) {
 			threadCpuTimeStack.push(Long.valueOf(threadMXBean.getCurrentThreadCpuTime()));

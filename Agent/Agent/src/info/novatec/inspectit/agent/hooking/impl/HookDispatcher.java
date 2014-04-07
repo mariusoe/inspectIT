@@ -347,7 +347,7 @@ public class HookDispatcher implements IHookDispatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void dispatchConstructorBeforeBody(long id, Object object, Object[] parameters) {
+	public void dispatchConstructorBeforeBody(long id, Object[] parameters) {
 		if (!executionMarker.isActive()) {
 			try {
 				executionMarker.active();
@@ -372,13 +372,13 @@ public class HookDispatcher implements IHookDispatcher {
 
 						// The sensor type ID is not important here, thus we are passing a -1. It is
 						// already stored in the data object
-						invocationHook.beforeConstructor(id, -1, object, parameters, rsc);
+						invocationHook.beforeConstructor(id, -1, parameters, rsc);
 					}
 
 					// Now iterate over all registered sensor types and execute them
 					for (Map.Entry<Long, IHook> entry : rsc.getReverseMethodHooks().entrySet()) {
 						IConstructorHook constructorHook = (IConstructorHook) entry.getValue();
-						constructorHook.beforeConstructor(id, entry.getKey().longValue(), object, parameters, rsc);
+						constructorHook.beforeConstructor(id, entry.getKey().longValue(), parameters, rsc);
 					}
 				} catch (Throwable throwable) { // NOPMD
 					LOGGER.severe("An error happened in the Hook Dispatcher! (before constructor)");

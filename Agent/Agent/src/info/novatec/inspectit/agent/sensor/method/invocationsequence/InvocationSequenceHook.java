@@ -37,6 +37,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.collections.CollectionUtils;
+
 /**
  * The invocation sequence hook stores the record of the invocation sequences in a
  * {@link ThreadLocal} object.
@@ -128,7 +130,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * {@inheritDoc}
 	 */
 	public void beforeBody(long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc) {
-		if (skip(object, rsc)) {
+		if (skip(rsc)) {
 			return;
 		}
 
@@ -180,7 +182,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * {@inheritDoc}
 	 */
 	public void firstAfterBody(long methodId, long sensorTypeId, Object object, Object[] parameters, Object result, RegisteredSensorConfig rsc) {
-		if (skip(object, rsc)) {
+		if (skip(rsc)) {
 			return;
 		}
 
@@ -202,7 +204,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * {@inheritDoc}
 	 */
 	public void secondAfterBody(ICoreService coreService, long methodId, long sensorTypeId, Object object, Object[] parameters, Object result, RegisteredSensorConfig rsc) {
-		if (skip(object, rsc)) {
+		if (skip(rsc)) {
 			return;
 		}
 
@@ -245,15 +247,42 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 
 				threadLocalInvocationData.set(null);
 			} else {
-				// just close the nested sequence and set the correct child
-				// count
+				// just close the nested sequence and set the correct child count
 				InvocationSequenceData parentSequence = invocationSequenceData.getParentSequence();
-				invocationSequenceData.setEnd(timer.getCurrentTime());
-				invocationSequenceData.setDuration(invocationSequenceData.getEnd() - invocationSequenceData.getStart());
-				parentSequence.setChildCount(parentSequence.getChildCount() + invocationSequenceData.getChildCount());
+				// check if we should not include this invocation because of exception delegation
+				if (removeDueToExceptionDelegation(rsc, invocationSequenceData)) {
+					parentSequence.getNestedSequences().remove(invocationSequenceData);
+					parentSequence.setChildCount(parentSequence.getChildCount() - 1);
+				} else {
+					invocationSequenceData.setEnd(timer.getCurrentTime());
+					invocationSequenceData.setDuration(invocationSequenceData.getEnd() - invocationSequenceData.getStart());
+					parentSequence.setChildCount(parentSequence.getChildCount() + invocationSequenceData.getChildCount());
+				}
 				threadLocalInvocationData.set(parentSequence);
 			}
 		}
+	}
+
+	/**
+	 * Returns if the given {@link InvocationSequenceData} should be removed due to the exception
+	 * constructor delegation.
+	 * 
+	 * @param rsc
+	 *            {@link RegisteredSensorConfig}
+	 * @param invocationSequenceData
+	 *            {@link InvocationSequenceData} to check.
+	 * @return True if the invocation should be removed.
+	 */
+	private boolean removeDueToExceptionDelegation(RegisteredSensorConfig rsc, InvocationSequenceData invocationSequenceData) {
+		if (1 == rsc.getSensorTypeConfigs().size()) {
+			MethodSensorTypeConfig methodSensorTypeConfig = rsc.getSensorTypeConfigs().get(0);
+
+			if (ExceptionSensor.class.getCanonicalName().equals(methodSensorTypeConfig.getClassName())) {
+				return CollectionUtils.isEmpty(invocationSequenceData.getExceptionSensorDataObjects());
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -266,22 +295,15 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * <li>{@link RegisteredSensorConfig} has only prepared statement parameter sensor.
 	 * <li>{@link RegisteredSensorConfig} has only connection sensor.
 	 * </ul>
-	 * 
-	 * @param object
-	 *            Object being passed.
 	 * @param rsc
 	 *            {@link RegisteredSensorConfig}.
+	 * 
 	 * @return Return <code>true</code> if hook should skip creation and processing, false
 	 *         otherwise.
 	 */
-	private boolean skip(Object object, RegisteredSensorConfig rsc) {
+	private boolean skip(RegisteredSensorConfig rsc) {
 		if (1 == rsc.getSensorTypeConfigs().size()) {
 			MethodSensorTypeConfig methodSensorTypeConfig = rsc.getSensorTypeConfigs().get(0);
-			if (ExceptionSensor.class.getCanonicalName().equals(methodSensorTypeConfig.getClassName())) {
-				String throwableClass = object.getClass().getName();
-				String rscTragetClassname = rsc.getQualifiedTargetClassName();
-				return !throwableClass.equals(rscTragetClassname);
-			}
 
 			if (PreparedStatementParameterSensor.class.getCanonicalName().equals(methodSensorTypeConfig.getClassName())) {
 				return true;
@@ -337,8 +359,8 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	/**
 	 * {@inheritDoc}
 	 */
-	public void beforeConstructor(long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc) {
-		beforeBody(methodId, sensorTypeId, object, parameters, rsc);
+	public void beforeConstructor(long methodId, long sensorTypeId, Object[] parameters, RegisteredSensorConfig rsc) {
+		beforeBody(methodId, sensorTypeId, null, parameters, rsc);
 	}
 
 	/**

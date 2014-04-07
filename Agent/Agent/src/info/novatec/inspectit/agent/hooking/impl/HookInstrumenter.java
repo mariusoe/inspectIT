@@ -174,7 +174,7 @@ public class HookInstrumenter implements IHookInstrumenter {
 			// instrument as finally if exception sensor is deactivated or activated in simple mode
 			boolean asFinally = !(exceptionSensorActivated && exceptionSensorEnhanced);
 
-			constructor.insertBeforeBody(hookDispatcherTarget + ".dispatchConstructorBeforeBody(" + constructorId + "l, $0, $args);");
+			constructor.insertBefore(hookDispatcherTarget + ".dispatchConstructorBeforeBody(" + constructorId + "l, $args);");
 			constructor.insertAfter(hookDispatcherTarget + ".dispatchConstructorAfterBody(" + constructorId + "l, $0, $args);", asFinally);
 
 			if (!asFinally) {

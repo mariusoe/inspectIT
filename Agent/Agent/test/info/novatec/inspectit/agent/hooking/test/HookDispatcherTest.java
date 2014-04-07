@@ -277,7 +277,7 @@ public class HookDispatcherTest extends AbstractLogSupport {
 
 		hookDispatcher.addConstructorMapping(methodId, registeredSensorConfig);
 
-		hookDispatcher.dispatchConstructorBeforeBody(methodId, object, parameters);
+		hookDispatcher.dispatchConstructorBeforeBody(methodId, parameters);
 		verify(registeredSensorConfig, times(1)).startsInvocationSequence();
 		verify(registeredSensorConfig, times(1)).getReverseMethodHooks();
 
@@ -305,10 +305,10 @@ public class HookDispatcherTest extends AbstractLogSupport {
 
 		hookDispatcher.addConstructorMapping(methodId, registeredSensorConfig);
 
-		hookDispatcher.dispatchConstructorBeforeBody(methodId, object, parameters);
+		hookDispatcher.dispatchConstructorBeforeBody(methodId, parameters);
 		verify(registeredSensorConfig, times(1)).startsInvocationSequence();
 		verify(registeredSensorConfig, times(1)).getReverseMethodHooks();
-		verify(constructorHook, times(1)).beforeConstructor(methodId, sensorTypeId, object, parameters, registeredSensorConfig);
+		verify(constructorHook, times(1)).beforeConstructor(methodId, sensorTypeId, parameters, registeredSensorConfig);
 
 		hookDispatcher.dispatchConstructorAfterBody(methodId, object, parameters);
 		verify(registeredSensorConfig, times(2)).startsInvocationSequence();
@@ -345,13 +345,13 @@ public class HookDispatcherTest extends AbstractLogSupport {
 
 		hookDispatcher.addConstructorMapping(methodId, registeredSensorConfig);
 
-		hookDispatcher.dispatchConstructorBeforeBody(methodId, object, parameters);
+		hookDispatcher.dispatchConstructorBeforeBody(methodId, parameters);
 		verify(registeredSensorConfig, times(1)).startsInvocationSequence();
 		verify(registeredSensorConfig, times(1)).getReverseMethodHooks();
 		InOrder inOrder = inOrder(constructorHookOne, constructorHookTwo, constructorHookThree);
-		inOrder.verify(constructorHookThree, times(1)).beforeConstructor(methodId, sensorTypeIdThree, object, parameters, registeredSensorConfig);
-		inOrder.verify(constructorHookTwo, times(1)).beforeConstructor(methodId, sensorTypeIdTwo, object, parameters, registeredSensorConfig);
-		inOrder.verify(constructorHookOne, times(1)).beforeConstructor(methodId, sensorTypeIdOne, object, parameters, registeredSensorConfig);
+		inOrder.verify(constructorHookThree, times(1)).beforeConstructor(methodId, sensorTypeIdThree, parameters, registeredSensorConfig);
+		inOrder.verify(constructorHookTwo, times(1)).beforeConstructor(methodId, sensorTypeIdTwo, parameters, registeredSensorConfig);
+		inOrder.verify(constructorHookOne, times(1)).beforeConstructor(methodId, sensorTypeIdOne, parameters, registeredSensorConfig);
 
 		hookDispatcher.dispatchConstructorAfterBody(methodId, object, parameters);
 		verify(registeredSensorConfig, times(2)).startsInvocationSequence();
@@ -420,12 +420,12 @@ public class HookDispatcherTest extends AbstractLogSupport {
 		// CONSTRUCTOR DISPATCHER
 
 		// dispatch the constructor - before constructor
-		hookDispatcher.dispatchConstructorBeforeBody(methodIdTwo, object, parameters);
+		hookDispatcher.dispatchConstructorBeforeBody(methodIdTwo, parameters);
 		verify(registeredSensorConfig, times(1)).startsInvocationSequence();
 		verify(registeredSensorConfig, times(1)).getReverseMethodHooks();
 		verify(methodSensor, times(1)).getHook();
-		verify(constructorHook, times(1)).beforeConstructor(methodIdTwo, methodSensorTypeId, object, parameters, registeredSensorConfigTwo);
-		verify((IConstructorHook) invocHook, times(1)).beforeConstructor(eq(methodIdTwo), anyLong(), eq(object), eq(parameters), eq(registeredSensorConfigTwo));
+		verify(constructorHook, times(1)).beforeConstructor(methodIdTwo, methodSensorTypeId, parameters, registeredSensorConfigTwo);
+		verify((IConstructorHook) invocHook, times(1)).beforeConstructor(eq(methodIdTwo), anyLong(), eq(parameters), eq(registeredSensorConfigTwo));
 		verify(invocSensorType, times(1)).getSensorType();
 
 		// dispatch the constructor - after constructor
@@ -506,8 +506,8 @@ public class HookDispatcherTest extends AbstractLogSupport {
 		verify(registeredSensorConfig, times(1)).getReverseMethodHooks();
 		verify(methodHook, times(1)).beforeBody(methodId, sensorTypeId, object, parameters, registeredSensorConfig);
 
-		hookDispatcher.dispatchConstructorBeforeBody(constructorId, exceptionObject, parameters);
-		verify(exceptionHook, times(1)).beforeConstructor(constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredConstructorSensorConfig);
+		hookDispatcher.dispatchConstructorBeforeBody(constructorId, parameters);
+		verify(exceptionHook, times(1)).beforeConstructor(constructorId, exceptionSensorTypeId, parameters, registeredConstructorSensorConfig);
 
 		// first method of exception sensor
 		hookDispatcher.dispatchConstructorAfterBody(constructorId, exceptionObject, parameters);
@@ -601,8 +601,8 @@ public class HookDispatcherTest extends AbstractLogSupport {
 		inOrder.verify(methodHookTwo, times(1)).beforeBody(methodId, sensorTypeIdTwo, object, parameters, registeredSensorConfig);
 		inOrder.verify(methodHookOne, times(1)).beforeBody(methodId, sensorTypeIdOne, object, parameters, registeredSensorConfig);
 
-		hookDispatcher.dispatchConstructorBeforeBody(constructorId, exceptionObject, parameters);
-		verify(exceptionHook, times(1)).beforeConstructor(constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredConstructorSensorConfig);
+		hookDispatcher.dispatchConstructorBeforeBody(constructorId, parameters);
+		verify(exceptionHook, times(1)).beforeConstructor(constructorId, exceptionSensorTypeId, parameters, registeredConstructorSensorConfig);
 
 		// first method of exception sensor
 		hookDispatcher.dispatchConstructorAfterBody(constructorId, exceptionObject, parameters);
@@ -726,8 +726,8 @@ public class HookDispatcherTest extends AbstractLogSupport {
 		verify(invocHook, times(1)).beforeBody(eq(methodIdTwo), anyLong(), eq(object), eq(parameters), eq(registeredSensorConfigTwo));
 		verify(invocSensorType, times(1)).getSensorType();
 
-		hookDispatcher.dispatchConstructorBeforeBody(constructorId, exceptionObject, parameters);
-		verify(exceptionHook, times(1)).beforeConstructor(constructorId, exceptionSensorTypeId, exceptionObject, parameters, registeredConstructorSensorConfig);
+		hookDispatcher.dispatchConstructorBeforeBody(constructorId, parameters);
+		verify(exceptionHook, times(1)).beforeConstructor(constructorId, exceptionSensorTypeId, parameters, registeredConstructorSensorConfig);
 
 		// /////////////////////////////////////////////////////////
 		// ///////////// EXCEPTION SENSOR STARTS HERE

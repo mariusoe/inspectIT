@@ -125,12 +125,10 @@ public interface IHookDispatcher {
 	 * 
 	 * @param id
 	 *            The id of the method.
-	 * @param object
-	 *            The instance of the class itself.
 	 * @param parameters
 	 *            The parameters of the method.
 	 */
-	void dispatchConstructorBeforeBody(long id, Object object, Object[] parameters);
+	void dispatchConstructorBeforeBody(long id, Object[] parameters);
 
 	/**
 	 * Dispatches the 'after' constructor statement.

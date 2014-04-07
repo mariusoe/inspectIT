@@ -653,7 +653,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		Class<?> clazz = ctClass.toClass(loader, null);
 		Object testClass = clazz.newInstance();
 
-		verify(hookDispatcher).dispatchConstructorBeforeBody(methodId, testClass, new Object[0]);
+		verify(hookDispatcher).dispatchConstructorBeforeBody(methodId, new Object[0]);
 		verify(hookDispatcher).dispatchConstructorAfterBody(methodId, testClass, new Object[0]);
 	}
 
@@ -674,7 +674,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		Constructor<?> constructor = clazz.getConstructor(new Class[] { String.class });
 		Object testClass = constructor.newInstance(parameters);
 
-		verify(hookDispatcher).dispatchConstructorBeforeBody(methodId, testClass, parameters);
+		verify(hookDispatcher).dispatchConstructorBeforeBody(methodId, parameters);
 		verify(hookDispatcher).dispatchConstructorAfterBody(methodId, testClass, parameters);
 	}
 
@@ -699,9 +699,9 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		Constructor<?> constructor = clazz.getConstructor(new Class[] { Boolean.TYPE });
 		Object testClass = constructor.newInstance(parameters);
 
-		verify(hookDispatcher).dispatchConstructorBeforeBody(nestedMethodId, testClass, nestedParameters);
+		verify(hookDispatcher).dispatchConstructorBeforeBody(nestedMethodId, nestedParameters);
 		verify(hookDispatcher).dispatchConstructorAfterBody(nestedMethodId, testClass, nestedParameters);
-		verify(hookDispatcher).dispatchConstructorBeforeBody(methodId, testClass, parameters);
+		verify(hookDispatcher).dispatchConstructorBeforeBody(methodId, parameters);
 		verify(hookDispatcher).dispatchConstructorAfterBody(methodId, testClass, parameters);
 	}
 
@@ -787,7 +787,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		Object testClass = this.createInstance(loader, ctMethod);
 		this.callMethod(testClass, methodName, null);
 
-		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
+		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), (Object[]) anyObject());
 		verify(hookDispatcher).dispatchConstructorAfterBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
 		verifyNoMoreInteractions(hookDispatcher);
 	}
@@ -890,7 +890,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		verify(hookDispatcher).dispatchSecondMethodAfterBody(methodId, testClass, new Object[0], null);
 		verify(hookDispatcher).dispatchConstructorOnThrowInBody(eq(constructorId), argThat(new ObjectVerifier(testConstructor)), (Object[]) anyObject(),
 				argThat(new MyTestExceptionVerifier(exceptionObject)));
-		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), argThat(new ObjectVerifier(testConstructor)), (Object[]) anyObject());
+		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), (Object[]) anyObject());
 		verify(hookDispatcher).dispatchConstructorAfterBody(eq(constructorId), argThat(new ObjectVerifier(testConstructor)), (Object[]) anyObject());
 		verify(hookDispatcher).dispatchBeforeCatch(eq(methodId), argThat(new MyTestExceptionVerifier(exceptionObject)));
 
@@ -1041,7 +1041,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		verify(hookDispatcher).dispatchFirstMethodAfterBody(innerMethodId, testClass, new Object[0], null);
 		verify(hookDispatcher).dispatchSecondMethodAfterBody(innerMethodId, testClass, new Object[0], null);
 
-		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
+		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), (Object[]) anyObject());
 		verify(hookDispatcher).dispatchConstructorAfterBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
 		verify(hookDispatcher).dispatchOnThrowInBody(eq(innerMethodId), eq(testClass), (Object[]) anyObject(), argThat(new MyTestExceptionVerifier(exceptionObject)));
 		verify(hookDispatcher).dispatchBeforeCatch(eq(methodId), argThat(new MyTestExceptionVerifier(exceptionObject)));
@@ -1130,7 +1130,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		verify(hookDispatcher).dispatchFirstMethodAfterBody(innerMethodId, testClass, new Object[0], null);
 		verify(hookDispatcher).dispatchSecondMethodAfterBody(innerMethodId, testClass, new Object[0], null);
 
-		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
+		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), (Object[]) anyObject());
 		verify(hookDispatcher).dispatchConstructorAfterBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
 		verify(hookDispatcher).dispatchOnThrowInBody(eq(innerMethodId), eq(testClass), (Object[]) anyObject(), argThat(new MyTestExceptionVerifier(exceptionObject)));
 		verify(hookDispatcher).dispatchBeforeCatch(eq(methodId), argThat(new MyTestExceptionVerifier(exceptionObject)));
@@ -1219,7 +1219,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		verify(hookDispatcher).dispatchFirstMethodAfterBody(innerMethodId, testClass, new Object[0], null);
 		verify(hookDispatcher).dispatchSecondMethodAfterBody(innerMethodId, testClass, new Object[0], null);
 
-		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
+		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), (Object[]) anyObject());
 		verify(hookDispatcher).dispatchConstructorAfterBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
 		// verify that no exception event is dispatched
 		verify(hookDispatcher, times(0)).dispatchOnThrowInBody(eq(innerMethodId), eq(testClass), (Object[]) anyObject(), argThat(new MyTestExceptionVerifier(exceptionObject)));
@@ -1308,7 +1308,7 @@ public class HookInstrumenterTest extends AbstractLogSupport {
 		verify(hookDispatcher).dispatchFirstMethodAfterBody(innerMethodId, null, new Object[0], null);
 		verify(hookDispatcher).dispatchSecondMethodAfterBody(innerMethodId, null, new Object[0], null);
 
-		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
+		verify(hookDispatcher).dispatchConstructorBeforeBody(eq(constructorId), (Object[]) anyObject());
 		verify(hookDispatcher).dispatchConstructorAfterBody(eq(constructorId), argThat(new MyTestExceptionVerifier(exceptionObject)), (Object[]) anyObject());
 		verify(hookDispatcher).dispatchOnThrowInBody(eq(innerMethodId), isNull(), (Object[]) anyObject(), argThat(new ThrowableVerifier(exceptionObject)));
 		verify(hookDispatcher).dispatchBeforeCatch(eq(methodId), argThat(new ThrowableVerifier(exceptionObject)));

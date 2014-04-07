@@ -67,7 +67,7 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void beforeConstructor(long methodId, long sensorTypeId, Object object, Object[] parameters, RegisteredSensorConfig rsc) {
+	public void beforeConstructor(long methodId, long sensorTypeId, Object[] parameters, RegisteredSensorConfig rsc) {
 		// nothing to do here
 	}
 
