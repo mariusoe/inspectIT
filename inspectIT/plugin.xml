@@ -386,6 +386,10 @@
             name="Display in Chart">
       </command>
       <command
+            id="info.novatec.inspectit.rcp.commands.cmrConfiguration"
+            name="CMR Configuration">
+      </command>
+      <command
             id="info.novatec.inspectit.rcp.shutdown"
             name="Shutdown CMR">
          <commandParameter
@@ -1358,6 +1362,26 @@
          </activeWhen>
       </handler>
       <handler
+            class="info.novatec.inspectit.rcp.handlers.CmrConfigurationHandler"
+            commandId="info.novatec.inspectit.rcp.commands.cmrConfiguration">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <instanceof
+                        value="info.novatec.inspectit.rcp.provider.ICmrRepositoryProvider">
+                  </instanceof>
+                  <test
+                        property="info.novatec.inspectit.onlineStatus"
+                        value="ONLINE">
+                  </test>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
             class="info.novatec.inspectit.rcp.handlers.ShutdownCmrHandler"
             commandId="info.novatec.inspectit.rcp.shutdown">
          <activeWhen>
@@ -2146,6 +2170,13 @@
                   value="false">
             </parameter>
          </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.cmrConfiguration"
+               icon="icons/tool.png"
+               label="Configure Repository"
+               style="push"
+               tooltip="Configure Repository">
+         </command>
          <separator
                name="info.novatec.inspectit.rcp.repositoryManagerToolbar.separator3"
                visible="true">
@@ -2292,6 +2323,13 @@
                   value="false">
             </parameter>
          </command>
+         <command
+               commandId="info.novatec.inspectit.rcp.commands.cmrConfiguration"
+               icon="icons/tool.png"
+               label="Configure Repository"
+               style="push"
+               tooltip="Configure Repository">
+         </command>         
          <separator
                name="info.novatec.inspectit.rcp.repositoryManagerToolbar.separator3"
                visible="true">

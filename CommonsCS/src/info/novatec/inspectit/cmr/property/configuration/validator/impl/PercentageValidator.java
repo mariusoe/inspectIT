@@ -30,6 +30,6 @@ public class PercentageValidator<T extends Number> extends AbstractSinglePropert
 	 */
 	@Override
 	protected String getErrorMessage(SingleProperty<? extends T> property) {
-		return "Value of property '" + property.getLogicalName() + "' must be a percentage value";
+		return "Value of property '" + property.getName() + "' must be a percentage value";
 	}
 }

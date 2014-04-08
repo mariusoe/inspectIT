@@ -29,6 +29,6 @@ public class FullyQualifiedClassNameValidator extends AbstractSinglePropertyVali
 	 */
 	@Override
 	protected String getErrorMessage(SingleProperty<? extends String> property) {
-		return "Value of property '" + property.getLogicalName() + "' must be a fully qualified class name";
+		return "Value of property '" + property.getName() + "' must be a fully qualified class name";
 	}
 }

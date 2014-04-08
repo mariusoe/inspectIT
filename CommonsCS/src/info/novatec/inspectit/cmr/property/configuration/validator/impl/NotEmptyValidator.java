@@ -43,6 +43,6 @@ public class NotEmptyValidator<T extends Object> extends AbstractSinglePropertyV
 	 */
 	@Override
 	protected String getErrorMessage(SingleProperty<? extends T> property) {
-		return "Value of property '" + property.getLogicalName() + "' must not be empty String/Collection/Map";
+		return "Value of property '" + property.getName() + "' must not be empty String/Collection/Map";
 	}
 }

@@ -11,10 +11,8 @@ import info.novatec.inspectit.cmr.property.update.IPropertyUpdate;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -125,27 +123,18 @@ public class GroupedProperty extends AbstractProperty {
 
 	/**
 	 * Validates with the group validators this property, based on the changes of the single
-	 * properties.
+	 * properties reported by update list.
 	 * 
 	 * @param propertyUpdates
 	 *            Information about updates.
 	 * @throws PropertyValidationException
 	 *             If validation fails.
 	 */
-	@SuppressWarnings("unchecked")
-	public void validatePropertiesUpdate(Collection<IPropertyUpdate<?>> propertyUpdates) throws PropertyValidationException {
-		Map<SingleProperty<Object>, Object> currentValues = new HashMap<SingleProperty<Object>, Object>();
-		for (IPropertyUpdate<?> propertyUpdate : propertyUpdates) {
-			SingleProperty<Object> property = (SingleProperty<Object>) this.forLogicalname(propertyUpdate.getPropertyLogicalName());
-			if (null != property) {
-				currentValues.put(property, property.getUsedValue());
-				property.setUsedValue(propertyUpdate.getUpdateValue());
-			}
-		}
+	public void validateForPropertiesUpdate(Collection<IPropertyUpdate<?>> propertyUpdates) throws PropertyValidationException {
+		PropertyValidation propertyValidation = PropertyValidation.createFor(this);
 
-		PropertyValidation propertyValidation = this.validate();
-		for (Map.Entry<SingleProperty<Object>, Object> entry : currentValues.entrySet()) {
-			entry.getKey().setUsedValue(entry.getValue());
+		for (IGroupedProperyValidator groupedProperyValidator : validators) {
+			groupedProperyValidator.validateForPropertyUpdates(this, propertyUpdates, propertyValidation);
 		}
 
 		// if has errors raise exception, otherwise create property update

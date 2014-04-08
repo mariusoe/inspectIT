@@ -22,7 +22,6 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +38,22 @@ public class HealthStatus {
 	/** The logger of this class. */
 	@Log
 	Logger log;
+
+	/**
+	 * For the visualization of the memory and load average, a graphical visualization is put into
+	 * the log for easier analysis. This char is used as the start and the end of the printed lines.
+	 */
+	private static final char START_END_CHAR = '+';
+
+	/**
+	 * The width of the visualization of the memory and load average.
+	 */
+	private static final int WIDTH = 30;
+
+	/**
+	 * The fixed rate of the refresh rate for gathering the statistics.
+	 */
+	private static final int FIXED_RATE = 60000;
 
 	/**
 	 * Are the beans that are responsible for creating the Health Status available.
@@ -64,23 +79,6 @@ public class HealthStatus {
 	 * The runtime mx bean.
 	 */
 	private RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-
-	/**
-	 * For the visualization of the memory and load average, a graphical visualization is put into
-	 * the log for easier analysis. This char is used as the start and the end of the printed lines.
-	 */
-	private static final char START_END_CHAR = '+';
-
-	/**
-	 * The width of the visualization of the memory and load average.
-	 */
-	private static final int WIDTH = 30;
-
-	/**
-	 * The fixed rate of the refresh rate for gathering the statistics.
-	 */
-	@Value("${cmr.statusRefreshRate}")
-	private static final int FIXED_RATE = 60000;
 
 	/**
 	 * Buffer that reports status.

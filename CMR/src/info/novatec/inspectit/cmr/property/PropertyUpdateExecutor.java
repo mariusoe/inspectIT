@@ -5,6 +5,7 @@ import info.novatec.inspectit.cmr.property.spring.PropertyUpdate;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -117,7 +118,7 @@ public class PropertyUpdateExecutor implements BeanPostProcessor, BeanFactoryAwa
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object postProcessAfterInitialization(final Object bean, String beanName) throws BeansException {
+	public Object postProcessAfterInitialization(final Object bean, final String beanName) throws BeansException {
 		// process methods for @PropertyUpdate
 		ReflectionUtils.doWithMethods(bean.getClass(), new MethodCallback() {
 			@Override
@@ -139,6 +140,13 @@ public class PropertyUpdateExecutor implements BeanPostProcessor, BeanFactoryAwa
 			@Override
 			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
 				if (field.isAnnotationPresent(Value.class)) {
+					// we must skip final fields
+					if (Modifier.isFinal(field.getModifiers())) {
+						LOG.warn("Field " + field.getName() + " of bean " + beanName
+								+ " defines @Value annotation, although it's declared as final. This field can not be updated if its property value is changed.");
+						return;
+					}
+
 					Value value = field.getAnnotation(Value.class);
 					String placeholder = value.value();
 					int startChar = placeholder.indexOf('{');

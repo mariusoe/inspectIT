@@ -361,6 +361,15 @@ public abstract class SingleProperty<T> extends AbstractProperty {
 	}
 
 	/**
+	 * Returns property value as human-readable string .
+	 * 
+	 * @return Returns property value as human-readable string .
+	 */
+	public String getFormattedValue() {
+		return getValue().toString();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

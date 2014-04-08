@@ -119,6 +119,18 @@ public class ByteProperty extends SingleProperty<Long> {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getFormattedValue() {
+		if (null != usedValue) {
+			return usedValue;
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * Returns the bytes number from human readable string.
 	 * 
 	 * @param str

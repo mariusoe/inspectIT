@@ -50,7 +50,6 @@ import org.apache.commons.lang.mutable.MutableLong;
 import org.apache.commons.lang.mutable.MutableObject;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -77,7 +76,6 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 	/**
 	 * The fixed rate of the refresh rate for gathering the statistics.
 	 */
-	@Value("${storage.updateRefreshRate}")
 	private static final int UPDATE_RATE = 30000;
 
 	/**

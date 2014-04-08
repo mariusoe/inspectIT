@@ -60,7 +60,6 @@ public abstract class StorageManager {
 	/**
 	 * The rate in milliseconds for checking the remaining hard drive space.
 	 */
-	@Value("${storage.checkRemainingHardDriveSpaceRate}")
 	private static final int CHECK_HARD_DRIVE_RATE = 5000;
 
 	/**
@@ -755,7 +754,7 @@ public abstract class StorageManager {
 	 * @return {@link #maxHardDriveOccupancy}
 	 */
 	public long getMaxBytesHardDriveOccupancy() {
-		if (maxHardDriveOccupancy > -1) {
+		if (maxHardDriveOccupancy > 0) {
 			return maxHardDriveOccupancy;
 		} else {
 			return hardDriveSize;

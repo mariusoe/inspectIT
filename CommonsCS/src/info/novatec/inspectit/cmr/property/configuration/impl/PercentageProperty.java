@@ -124,4 +124,16 @@ public class PercentageProperty extends SingleProperty<Float> {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getFormattedValue() {
+		if (null != usedValue) {
+			return usedValue + "%";
+		} else {
+			return defaultValue + "%";
+		}
+	}
+
 }

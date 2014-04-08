@@ -28,14 +28,13 @@ public class LessOrEqualValidator<T extends Number> extends AbstractComparingVal
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void compare(SingleProperty<? extends T> property, SingleProperty<? extends T> against, PropertyValidation propertyValidation) {
-		if (!matches(property.getValue(), against.getValue())) {
+	protected void compare(SingleProperty<? extends T> property, SingleProperty<? extends T> againstProperty, T value, T against, PropertyValidation propertyValidation) {
+		if (!matches(value, against)) {
 			List<SingleProperty<?>> properties = new ArrayList<SingleProperty<?>>(2);
 			properties.add(property);
-			properties.add(against);
-			ValidationError validationError = new ValidationError(properties, "Value of property '" + property.getLogicalName() + "' must be less or equal than value of property '"
-					+ against.getLogicalName()
-					+ "'");
+			properties.add(againstProperty);
+			ValidationError validationError = new ValidationError(properties, "Value of property '" + property.getName() + "' must be less or equal than value of property '"
+					+ againstProperty.getName() + "'");
 			propertyValidation.addValidationError(validationError);
 		}
 	}
@@ -44,10 +43,10 @@ public class LessOrEqualValidator<T extends Number> extends AbstractComparingVal
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void compare(SingleProperty<? extends T> property, T against, PropertyValidation propertyValidation) {
-		if (!matches(property.getValue(), against)) {
-			ValidationError validationError = new ValidationError(Collections.<SingleProperty<?>> singletonList(property), "Value of property '" + property.getLogicalName()
-					+ "' must be less or equal than " + against);
+	protected void compare(SingleProperty<? extends T> property, T value, T against, PropertyValidation propertyValidation) {
+		if (!matches(value, against)) {
+			ValidationError validationError = new ValidationError(Collections.<SingleProperty<?>> singletonList(property), "Value of property '" + property.getName() + "' must be less or equal than "
+					+ against);
 			propertyValidation.addValidationError(validationError);
 		}
 	}

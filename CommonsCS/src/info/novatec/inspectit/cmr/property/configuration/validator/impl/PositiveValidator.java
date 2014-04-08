@@ -30,6 +30,6 @@ public class PositiveValidator<T extends Number> extends AbstractSinglePropertyV
 	 */
 	@Override
 	protected String getErrorMessage(SingleProperty<? extends T> property) {
-		return "Value of property '" + property.getLogicalName() + "' must be positive";
+		return "Value of property '" + property.getName() + "' must be positive";
 	}
 }

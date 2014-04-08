@@ -88,12 +88,6 @@
 					<isLessOrEqual than="10" />
 				</validators>
 			</long-property>
-			<long-property name="Health Status Print-out Rate" default-value="60000" server-restart-required="true" logical-name="cmr.statusRefreshRate" advanced="false"
-				description="The period in milliseconds between printing the health status of the CMR.">
-				<validators>
-					<isGreaterOrEqual than="5000" />
-				</validators>
-			</long-property>
 			<group-property name="Timer Data Aggregation" description="Defines properties for Timer data aggregation before saveing to the database.">
 				<properties>
 					<long-property name="Aggregation Period" default-value="10000" server-restart-required="false" logical-name="cmr.aggregationPeriod" advanced="true"
@@ -126,18 +120,12 @@
 					<isNotEmpty />
 				</validators>
 			</string-property>
-			<long-property name="Update Rate" default-value="30000" server-restart-required="true" logical-name="storage.updateRefreshRate" advanced="false"
-				description="The refresh rate of updating the storage sizes in milliseconds.">
-				<validators>
-					<isGreaterOrEqual than="5000" />
-				</validators>
-			</long-property>
 			<byte-property name="Min GZIP Size" default-value="1MB" server-restart-required="true" logical-name="storage.minGzipSize" advanced="false"
 				description="Min size in bytes for which the storage data will be served compressed." ></byte-property>
 			<group-property name="Hard drive space protection" description="Defines properties that will protect against using all remaning space on the hard drive where CMR is running.">
 				<properties>
-					<byte-property name="Max Hard Drive Occupancy" default-value="-1MB" server-restart-required="false" logical-name="storage.maxHardDriveOccupancy" advanced="false"
-						description="Amount of bytes that CMR can occupy on the Hard drive for the storage data. Negative values define no limit, thus all available space will be used."></byte-property>
+					<byte-property name="Max Hard Drive Occupancy" default-value="0B" server-restart-required="false" logical-name="storage.maxHardDriveOccupancy" advanced="false"
+						description="Amount of bytes that CMR can occupy on the Hard drive for the storage data. Zero value defines no limit, thus all available space will be used."></byte-property>
 					<byte-property name="Warn on Bytes Left" default-value="1GB" server-restart-required="false" logical-name="storage.warnHardDriveByteLeft" advanced="false"
 						description="Defines amount of bytes left to reach the maximum hard drive occupancy when user will be warned that the left space for storage data is low. ">
 						<validators>
@@ -150,12 +138,6 @@
 							<isPositive />
 						</validators>
 					</byte-property>
-					<long-property name="Left Space Check Rate" default-value="5000" server-restart-required="true" logical-name="storage.checkRemainingHardDriveSpaceRate" advanced="false"
-						description="The rate in milliseconds left space on the hard drive will be checked.">
-						<validators>
-							<isGreaterOrEqual than="1000" />
-						</validators>
-					</long-property>
 				</properties>
 				<group-validators>
 					<isLess property="storage.stopWriteHardDriveBytesLeft" than="storage.warnHardDriveByteLeft" />

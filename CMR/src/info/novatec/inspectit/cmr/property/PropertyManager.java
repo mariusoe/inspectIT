@@ -169,6 +169,10 @@ public class PropertyManager {
 				property.setValue(propertyUpdate.getUpdateValue());
 			}
 			updatedProperties.add(property);
+
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Property '" + property.getName() + "' successfully updated, new value is " + property.getFormattedValue());
+			}
 		}
 
 		// merge the update file
