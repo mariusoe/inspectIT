@@ -1,4 +1,9 @@
-@import url(http://fonts.googleapis.com/css?family=Abel);
+@font-face {
+  font-family: 'Abel';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Abel'), local('Abel-Regular'), url(fonts/Abel.woff) format('woff');
+}
 
 html {
 	margin: 0;
