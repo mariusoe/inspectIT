@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -16,13 +17,20 @@ import org.testng.annotations.Test;
 @SuppressWarnings("PMD")
 public class StatementSensorTest extends AbstractLogSupport {
 
+	@InjectMocks
 	StatementSensor sqlTimerSensor;
+	
+	@Mock
+	private ConnectionMetaDataStorage connectionMetaDataStorage;
 
 	@Mock
 	Timer timer;
 
 	@Mock
 	IIdManager idManager;
+	
+	@Mock
+	StatementReflectionCache statementReflectionCache;
 
 	@Override
 	protected Level getLogLevel() {
@@ -31,7 +39,6 @@ public class StatementSensorTest extends AbstractLogSupport {
 
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {
-		sqlTimerSensor = new StatementSensor(timer, idManager);
 	}
 
 	@Test

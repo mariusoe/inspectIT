@@ -36,23 +36,17 @@ public class StatementSensor extends AbstractMethodSensor implements IMethodSens
 	private StatementHook statementHook = null;
 
 	/**
-	 * No-arg constructor needed for Spring.
+	 * The default constructor which needs 2 parameter for initialization.
+	 * Caches the calls to getConnection().
 	 */
-	public StatementSensor() {
-	}
+	@Autowired
+	private StatementReflectionCache statementReflectionCache;
 
 	/**
-	 * The default constructor which needs 2 parameter for initialization.
-	 * 
-	 * @param timer
-	 *            The timer used for accurate measuring.
-	 * @param idManager
-	 *            The ID manager.
+	 * Storage for connection meta data.
 	 */
-	public StatementSensor(Timer timer, IIdManager idManager) {
-		this.timer = timer;
-		this.idManager = idManager;
-	}
+	@Autowired
+	private ConnectionMetaDataStorage connectionMetaDataStorage;
 
 	/**
 	 * Returns the method hook.
@@ -67,7 +61,7 @@ public class StatementSensor extends AbstractMethodSensor implements IMethodSens
 	 * {@inheritDoc}
 	 */
 	public void init(Map<String, Object> parameter) {
-		statementHook = new StatementHook(timer, idManager, parameter);
+		statementHook = new StatementHook(timer, idManager, connectionMetaDataStorage, statementReflectionCache, parameter);
 	}
 
 }

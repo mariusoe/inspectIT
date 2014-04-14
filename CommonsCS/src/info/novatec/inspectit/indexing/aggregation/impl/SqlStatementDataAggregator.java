@@ -57,6 +57,9 @@ public class SqlStatementDataAggregator implements IAggregator<SqlStatementData>
 		clone.setPlatformIdent(sqlStatementData.getPlatformIdent());
 		clone.setPreparedStatement(sqlStatementData.isPreparedStatement());
 		clone.setSql(sqlStatementData.getSql());
+		clone.setDatabaseProductName(sqlStatementData.getDatabaseProductName());
+		clone.setDatabaseProductVersion(sqlStatementData.getDatabaseProductVersion());
+		clone.setDatabaseUrl(sqlStatementData.getDatabaseUrl());
 		if (includeParameters && null != sqlStatementData.getParameterValues()) {
 			clone.setParameterValues(new ArrayList<String>(sqlStatementData.getParameterValues()));
 		}
@@ -71,6 +74,7 @@ public class SqlStatementDataAggregator implements IAggregator<SqlStatementData>
 		int result = 0;
 		result = prime * result + (sqlStatementData.isPreparedStatement() ? 1231 : 1237);
 		result = prime * result + ((sqlStatementData.getSql() == null) ? 0 : sqlStatementData.getSql().hashCode());
+		result = prime * result + ((sqlStatementData.getDatabaseUrl() == null) ? 0 : sqlStatementData.getDatabaseUrl().hashCode());
 		if (includeParameters) {
 			result = prime * result + ((sqlStatementData.getParameterValues() == null) ? 0 : sqlStatementData.getParameterValues().hashCode());
 		}

@@ -35,3 +35,8 @@ class: info.novatec.inspectit.communication.data.SqlStatementData
 
 #TimerData - INSPECTIT-827
 24: charting
+
+# Connection meta information
+25: databaseUrl
+26: databaseProductName
+27: databaseProductVersion

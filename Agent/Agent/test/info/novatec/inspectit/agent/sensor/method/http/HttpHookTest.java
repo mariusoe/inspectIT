@@ -113,7 +113,7 @@ public class HttpHookTest extends AbstractLogSupport {
 
 		httpHook.firstAfterBody(methodId, sensorTypeId, servlet, parameters, result, registeredSensorConfig);
 
-		httpHook.secondAfterBody(coreService, methodId, sensorTypeId, servlet, parameters, parameters, registeredSensorConfig);
+		httpHook.secondAfterBody(coreService, methodId, sensorTypeId, servlet, parameters, result, registeredSensorConfig);
 
 		Mockito.verify(coreService).addMethodSensorData(Mockito.eq(registeredSensorTypeId), Mockito.eq(registeredMethodId), (String) Mockito.eq(null),
 				Mockito.argThat(new HttpTimerDataVerifier((HttpTimerData) data)));
@@ -212,7 +212,7 @@ public class HttpHookTest extends AbstractLogSupport {
 
 		httpHook.firstAfterBody(methodId, sensorTypeId, servlet, parameters, result, registeredSensorConfig);
 
-		httpHook.secondAfterBody(coreService, methodId, sensorTypeId, servlet, parameters, parameters, registeredSensorConfig);
+		httpHook.secondAfterBody(coreService, methodId, sensorTypeId, servlet, parameters, result, registeredSensorConfig);
 
 		Mockito.verify(coreService).addMethodSensorData(Mockito.eq(registeredSensorTypeId), Mockito.eq(registeredMethodId), (String) Mockito.eq(null),
 				Mockito.argThat(new HttpTimerDataVerifier((HttpTimerData) data)));
@@ -240,7 +240,7 @@ public class HttpHookTest extends AbstractLogSupport {
 
 		httpHook.firstAfterBody(methodId, sensorTypeId, servlet, parameters, result, registeredSensorConfig);
 
-		httpHook.secondAfterBody(coreService, methodId, sensorTypeId, servlet, parameters, parameters, registeredSensorConfig);
+		httpHook.secondAfterBody(coreService, methodId, sensorTypeId, servlet, parameters, result, registeredSensorConfig);
 
 		// Data must not be pushed!
 		Mockito.verifyNoMoreInteractions(coreService);

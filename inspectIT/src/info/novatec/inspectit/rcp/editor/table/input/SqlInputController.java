@@ -103,7 +103,13 @@ public class SqlInputController extends AbstractTableInputController {
 		/** The duration column. */
 		DURATION("Duration (ms)", 80, null, TimerDataComparatorEnum.MAX),
 		/** The prepared column. */
-		PREPARED("Prepared?", 80, null, SqlStatementDataComparatorEnum.IS_PREPARED_STATEMENT);
+		PREPARED("Prepared?", 80, null, SqlStatementDataComparatorEnum.IS_PREPARED_STATEMENT),
+		/** The column containing the name of the database. */
+		DATABASE_NAME("Database Name", 80, null, SqlStatementDataComparatorEnum.DATABASE_NAME),
+		/** The column containing the version of the database. */
+		DATABASE_VERSION("Database Version", 80, null, SqlStatementDataComparatorEnum.DATABASE_VERSION),
+		/** The column containing the url of the database. */
+		DATABASE_URL("Database URL", 80, null, SqlStatementDataComparatorEnum.DATABASE_URL);
 
 		/** The name. */
 		private String name;
@@ -595,6 +601,12 @@ public class SqlInputController extends AbstractTableInputController {
 			} else {
 				return new StyledString("false");
 			}
+		case DATABASE_NAME:
+			return TextFormatter.getStyledStringForNullableText(data.getDatabaseProductName());
+		case DATABASE_URL:
+			return TextFormatter.getStyledStringForNullableText(data.getDatabaseUrl());
+		case DATABASE_VERSION:
+			return TextFormatter.getStyledStringForNullableText(data.getDatabaseProductVersion());
 		default:
 			return new StyledString("error");
 		}

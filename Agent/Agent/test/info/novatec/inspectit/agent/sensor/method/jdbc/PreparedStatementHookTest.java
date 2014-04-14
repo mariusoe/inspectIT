@@ -24,9 +24,15 @@ public class PreparedStatementHookTest extends AbstractLogSupport {
 
 	@Mock
 	private StatementStorage statementStorage;
+	
+	@Mock
+	private ConnectionMetaDataStorage connectionMetaDataStorage;
 
 	@Mock
 	private NoSuchElementException myNoSuchElementException;
+	
+	@Mock
+	private StatementReflectionCache statementReflectionCache;
 
 	@Mock
 	private Map<String, Object> parameter;
@@ -38,7 +44,7 @@ public class PreparedStatementHookTest extends AbstractLogSupport {
 
 	@Test
 	public void exceptionLoggingTest() {
-		PreparedStatementHook hook = new PreparedStatementHook(timer, idManager, statementStorage, parameter);
+		PreparedStatementHook hook = new PreparedStatementHook(timer, idManager, statementStorage, connectionMetaDataStorage, statementReflectionCache, parameter);
 
 		// Throwing the same exception a few times... (as statement storage always raises the
 		// exception)

@@ -1,5 +1,6 @@
 package info.novatec.inspectit.agent.sensor.method.jdbc;
 
+import info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionMetaDataStorage.ConnectionMetaData;
 import info.novatec.inspectit.util.ThreadLocalStack;
 
 import java.sql.Date;
@@ -44,7 +45,7 @@ public class StatementStorage {
 	 * <b> Note that this data structure provides atomic access like a <code>ConcurrentMap</code>.
 	 * </b>.
 	 */
-	private Cache<Object, QueryAndParameters> preparedStatements = CacheBuilder.newBuilder().expireAfterAccess(20 * 60, TimeUnit.SECONDS).weakKeys().build();
+	private Cache<Object, QueryInformation> preparedStatements = CacheBuilder.newBuilder().expireAfterAccess(20 * 60, TimeUnit.SECONDS).weakKeys().build();
 
 	/**
 	 * Returns the sql thread local stack.
@@ -59,7 +60,7 @@ public class StatementStorage {
 	 */
 	public void addPreparedStatement(Object object) {
 		String sql = sqlThreadLocalStack.getLast();
-		preparedStatements.put(object, new QueryAndParameters(sql));
+		preparedStatements.put(object, new QueryInformation(sql));
 
 		if (LOGGER.isLoggable(Level.FINER)) {
 			LOGGER.finer("Recorded preparded sql statement: " + sql);
@@ -75,7 +76,7 @@ public class StatementStorage {
 	 *         storage.
 	 */
 	protected String getPreparedStatement(Object object) {
-		QueryAndParameters queryAndParameters = preparedStatements.getIfPresent(object);
+		QueryInformation queryAndParameters = preparedStatements.getIfPresent(object);
 
 		String query = null;
 		if (null != queryAndParameters) {
@@ -98,7 +99,7 @@ public class StatementStorage {
 	 *         SQL statement or there are no parameters captured within this SQL statement.
 	 */
 	protected List<String> getParameters(Object object) {
-		QueryAndParameters queryAndParameters = preparedStatements.getIfPresent(object);
+		QueryInformation queryAndParameters = preparedStatements.getIfPresent(object);
 		if (null == queryAndParameters) {
 			return null;
 		} else {
@@ -117,7 +118,7 @@ public class StatementStorage {
 	 *            The value to be inserted.
 	 */
 	protected void addParameter(Object preparedStatement, int index, Object value) {
-		QueryAndParameters queryAndParameters = preparedStatements.getIfPresent(preparedStatement);
+		QueryInformation queryAndParameters = preparedStatements.getIfPresent(preparedStatement);
 
 		if (null == queryAndParameters) {
 			if (LOGGER.isLoggable(Level.FINE)) {
@@ -158,7 +159,7 @@ public class StatementStorage {
 	 *            The prepared statement for which all parameters are going to be cleared.
 	 */
 	protected void clearParameters(Object preparedStatement) {
-		QueryAndParameters queryAndParameters = preparedStatements.getIfPresent(preparedStatement);
+		QueryInformation queryAndParameters = preparedStatements.getIfPresent(preparedStatement);
 
 		if (null == queryAndParameters) {
 			if (LOGGER.isLoggable(Level.FINE)) {
@@ -208,7 +209,7 @@ public class StatementStorage {
 	 * 
 	 * @author Stefan Siegl
 	 */
-	private static class QueryAndParameters {
+	private static class QueryInformation {
 		/** the SQL query. */
 		private String query;
 
@@ -226,7 +227,7 @@ public class StatementStorage {
 		 * @param query
 		 *            The SQL query.
 		 */
-		public QueryAndParameters(String query) {
+		public QueryInformation(String query) {
 			this.query = query;
 		}
 

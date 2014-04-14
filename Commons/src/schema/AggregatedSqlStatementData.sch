@@ -38,3 +38,8 @@ class: info.novatec.inspectit.communication.data.AggregatedSqlStatementData
 
 #Charting
 25: charting
+
+# Connection meta information
+26: databaseUrl
+27: databaseProductName
+28: databaseProductVersion

@@ -35,31 +35,21 @@ public class PreparedStatementSensor extends AbstractMethodSensor implements IMe
 	private StatementStorage statementStorage;
 
 	/**
+	 * Caches the calls to getConnection().
+	 */
+	@Autowired
+	private StatementReflectionCache statementReflectionCache;
+
+	/**
+	 * Storage for connection meta data.
+	 */
+	@Autowired
+	private ConnectionMetaDataStorage connectionMetaDataStorage;
+
+	/**
 	 * The used prepared statement hook.
 	 */
 	private PreparedStatementHook preparedStatementHook = null;
-
-	/**
-	 * No-arg constructor needed for Spring.
-	 */
-	public PreparedStatementSensor() {
-	}
-
-	/**
-	 * The default constructor which needs 3 parameter for initialization.
-	 * 
-	 * @param timer
-	 *            The timer used for accurate measuring.
-	 * @param idManager
-	 *            The ID manager.
-	 * @param statementStorage
-	 *            The statement storage.
-	 */
-	public PreparedStatementSensor(Timer timer, IIdManager idManager, StatementStorage statementStorage) {
-		this.timer = timer;
-		this.idManager = idManager;
-		this.statementStorage = statementStorage;
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -72,7 +62,7 @@ public class PreparedStatementSensor extends AbstractMethodSensor implements IMe
 	 * {@inheritDoc}
 	 */
 	public void init(Map<String, Object> parameter) {
-		preparedStatementHook = new PreparedStatementHook(timer, idManager, statementStorage, parameter);
+		preparedStatementHook = new PreparedStatementHook(timer, idManager, statementStorage, connectionMetaDataStorage, statementReflectionCache, parameter);
 	}
 
 }

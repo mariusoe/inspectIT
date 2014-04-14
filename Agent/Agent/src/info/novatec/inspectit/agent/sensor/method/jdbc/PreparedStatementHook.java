@@ -6,6 +6,7 @@ import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.hooking.IConstructorHook;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
+import info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionMetaDataStorage.ConnectionMetaData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.util.StringConstraint;
 import info.novatec.inspectit.util.ThreadLocalStack;
@@ -58,6 +59,11 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 	private final StatementStorage statementStorage;
 
 	/**
+	 * Storage for connection meta data.
+	 */
+	private final ConnectionMetaDataStorage connectionMetaDataStorage;
+
+	/**
 	 * The ThreadLocal for a boolean value so only the last before and first after hook of an
 	 * invocation is measured.
 	 */
@@ -67,6 +73,11 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 	 * The StringConstraint to ensure a maximum length of strings.
 	 */
 	private StringConstraint strConstraint;
+
+	/**
+	 * Caches the calls to getConnection().
+	 */
+	private StatementReflectionCache statementReflectionCache;
 
 	/**
 	 * Contains all methodidents of all prepared statements that had a problem finding the stored
@@ -86,12 +97,19 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 	 *            The statement storage.
 	 * @param parameter
 	 *            Additional parameters.
+	 * @param connectionMetaDataStorage
+	 *            the meta information storage for connections.
+	 * @param statementReflectionCache
+	 *            Caches the calls to getConnection().
 	 */
-	public PreparedStatementHook(Timer timer, IIdManager idManager, StatementStorage statementStorage, Map<String, Object> parameter) {
+	public PreparedStatementHook(Timer timer, IIdManager idManager, StatementStorage statementStorage, ConnectionMetaDataStorage connectionMetaDataStorage,
+			StatementReflectionCache statementReflectionCache, Map<String, Object> parameter) {
 		this.timer = timer;
 		this.idManager = idManager;
 		this.statementStorage = statementStorage;
+		this.connectionMetaDataStorage = connectionMetaDataStorage;
 		this.strConstraint = new StringConstraint(parameter);
+		this.statementReflectionCache = statementReflectionCache;
 	}
 
 	/**
@@ -139,6 +157,10 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 						sqlData.calculateMax(duration);
 						sqlData.setCount(1L);
 						sqlData.setParameterValues(params);
+
+						// populate the connection meta data.
+						connectionMetaDataStorage.populate(sqlData, statementReflectionCache.getConnection(object.getClass(), object));
+
 						coreService.addMethodSensorData(sensorTypeId, methodId, sql, sqlData);
 					} catch (IdNotAvailableException e) {
 						if (LOGGER.isLoggable(Level.FINER)) {

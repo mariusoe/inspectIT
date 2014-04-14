@@ -33,7 +33,22 @@ public enum SqlStatementDataComparatorEnum implements IDataComparator<SqlStateme
 	/**
 	 * Sort by both SQL string and parameter values.
 	 */
-	SQL_AND_PARAMETERS;
+	SQL_AND_PARAMETERS,
+	
+	/**
+	 * Sort by the name of the database. 
+	 */
+	DATABASE_NAME,
+	
+	/**
+	 * Sort by the database version.
+	 */
+	DATABASE_VERSION,
+	
+	/**
+	 * Sort by the database url.
+	 */
+	DATABASE_URL;
 
 	/**
 	 * {@inheritDoc}
@@ -51,6 +66,12 @@ public enum SqlStatementDataComparatorEnum implements IDataComparator<SqlStateme
 			return Boolean.valueOf(o1.isPreparedStatement()).compareTo(Boolean.valueOf(o2.isPreparedStatement()));
 		case SQL:
 			return ObjectUtils.compare(o1.getSql(), o2.getSql());
+		case DATABASE_NAME:
+			return ObjectUtils.compare(o1.getDatabaseProductName(), o2.getDatabaseProductName());
+		case DATABASE_VERSION:
+			return ObjectUtils.compare(o1.getDatabaseProductVersion(), o2.getDatabaseProductVersion());
+		case DATABASE_URL:
+			return ObjectUtils.compare(o1.getDatabaseUrl(), o2.getDatabaseUrl());
 		case PARAMETERS:
 			List<String> parameterList1 = o1.getParameterValues();
 			List<String> parameterList2 = o2.getParameterValues();

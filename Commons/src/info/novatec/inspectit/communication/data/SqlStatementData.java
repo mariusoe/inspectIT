@@ -26,6 +26,21 @@ public class SqlStatementData extends TimerData {
 	private String sql;
 
 	/**
+	 * The URL that the connection uses.
+	 */
+	private String databaseUrl = null;
+
+	/**
+	 * The name of the database product.
+	 */
+	private String databaseProductName = null;
+
+	/**
+	 * The version of the database product.
+	 */
+	private String databaseProductVersion = null;
+
+	/**
 	 * Defines if this is a container for a prepared statement or not.
 	 */
 	private boolean preparedStatement = false;
@@ -81,6 +96,35 @@ public class SqlStatementData extends TimerData {
 	public SqlStatementData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, String sqlQueryString) {
 		super(timeStamp, platformIdent, sensorTypeIdent, methodIdent);
 		this.sql = sqlQueryString;
+	}
+
+	/**
+	 * Additional constructor. Sets the main information about the data object and SQL query string
+	 * and the connection information.
+	 * 
+	 * @param timeStamp
+	 *            Time-stamp holding the information when the SQL execution started.
+	 * @param platformIdent
+	 *            Platform/agent.
+	 * @param sensorTypeIdent
+	 *            Assigned sensor type ident.
+	 * @param methodIdent
+	 *            Assigned method ident.
+	 * @param sqlQueryString
+	 *            Query string.
+	 * @param databaseUrl
+	 *            the database url.
+	 * @param databaseProductVersion
+	 *            the product version of the database being accessed.
+	 * @param databaseProductName
+	 *            the product name of the database being accessed.
+	 */
+	public SqlStatementData(Timestamp timeStamp, long platformIdent, long sensorTypeIdent, long methodIdent, String sqlQueryString, String databaseUrl, String databaseProductVersion, // NOCHK
+			String databaseProductName) { 
+		this(timeStamp, platformIdent, sensorTypeIdent, methodIdent, sqlQueryString);
+		this.databaseUrl = databaseUrl;
+		this.databaseProductVersion = databaseProductVersion;
+		this.databaseProductName = databaseProductName;
 	}
 
 	/**
@@ -172,6 +216,102 @@ public class SqlStatementData extends TimerData {
 	}
 
 	/**
+	 * Gets {@link #databaseUrl}.
+	 * 
+	 * @return {@link #databaseUrl}
+	 */
+	public String getDatabaseUrl() {
+		return databaseUrl;
+	}
+
+	/**
+	 * Returns the database url, if it is <null> an empty string is returned.
+	 * 
+	 * @return the database url, if it is <null> an empty string is returned.
+	 */
+	public String getDatabaseUrlView() {
+		if (databaseUrl == null) {
+			return "";
+		} else {
+			return databaseUrl;
+		}
+	}
+
+	/**
+	 * Sets {@link #databaseUrl}.
+	 * 
+	 * @param databaseUrl
+	 *            New value for {@link #databaseUrl}
+	 */
+	public void setDatabaseUrl(String databaseUrl) {
+		this.databaseUrl = databaseUrl;
+	}
+
+	/**
+	 * Gets {@link #databaseProductName}.
+	 * 
+	 * @return {@link #databaseProductName}
+	 */
+	public String getDatabaseProductName() {
+		return databaseProductName;
+	}
+
+	/**
+	 * Returns the database product name, if it is <null> an empty string is returned.
+	 * 
+	 * @return the database product name, if it is <null> an empty string is returned.
+	 */
+	public String getDatabaseProductNameView() {
+		if (databaseProductName == null) {
+			return "";
+		} else {
+			return databaseProductName;
+		}
+	}
+
+	/**
+	 * Sets {@link #databaseProductName}.
+	 * 
+	 * @param databaseProductName
+	 *            New value for {@link #databaseProductName}
+	 */
+	public void setDatabaseProductName(String databaseProductName) {
+		this.databaseProductName = databaseProductName;
+	}
+
+	/**
+	 * Gets {@link #databaseProductVersion}.
+	 * 
+	 * @return {@link #databaseProductVersion}
+	 */
+	public String getDatabaseProductVersion() {
+		return databaseProductVersion;
+	}
+
+	/**
+	 * Returns the database product version, if it is <null> an empty string is returned.
+	 * 
+	 * @return the database product version, if it is <null> an empty string is returned.
+	 */
+	public String getDatabaseProductVersionView() {
+		if (databaseProductVersion == null) {
+			return "";
+		} else {
+			return databaseProductVersion;
+		}
+	}
+
+	/**
+	 * Sets {@link #databaseProductVersion}.
+	 * 
+	 * @param databaseProductVersion
+	 *            New value for {@link #databaseProductVersion}
+	 */
+	public void setDatabaseProductVersion(String databaseProductVersion) {
+		this.databaseProductVersion = databaseProductVersion;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -181,6 +321,7 @@ public class SqlStatementData extends TimerData {
 		result = prime * result + ((parameterValues == null) ? 0 : parameterValues.hashCode());
 		result = prime * result + (preparedStatement ? 1231 : 1237);
 		result = prime * result + ((sql == null) ? 0 : sql.hashCode());
+		result = prime * result + ((databaseUrl == null) ? 0 : databaseUrl.hashCode());
 		return result;
 	}
 
@@ -216,6 +357,13 @@ public class SqlStatementData extends TimerData {
 		} else if (!sql.equals(other.sql)) {
 			return false;
 		}
+		if (databaseUrl == null) {
+			if (other.databaseUrl != null) {
+				return false;
+			}
+		} else if (!databaseUrl.equals(other.databaseUrl)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -224,8 +372,11 @@ public class SqlStatementData extends TimerData {
 	 */
 	public long getObjectSize(IObjectSizes objectSizes, boolean doAlign) {
 		long size = super.getObjectSize(objectSizes, false);
-		size += objectSizes.getPrimitiveTypesSize(3, 1, 0, 0, 0, 0);
+		size += objectSizes.getPrimitiveTypesSize(6, 1, 0, 0, 0, 0);
 		size += objectSizes.getSizeOf(sql);
+		size += objectSizes.getSizeOf(databaseProductName);
+		size += objectSizes.getSizeOf(databaseProductVersion);
+		size += objectSizes.getSizeOf(databaseUrl);
 		if (parameterValues != null) {
 			size += objectSizes.getSizeOf(parameterValues);
 			for (String str : parameterValues) {

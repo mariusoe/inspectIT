@@ -180,6 +180,14 @@
 			<class name="info.novatec.inspectit.agent.sensor.method.jdbc.StatementSensorTest" />
 		</classes>
 	</test>
+	<test name="Connection Meta Data Extraction">
+		<classes>
+			<class name="info.novatec.inspectit.agent.sensor.method.jdbc.JDBCUrlExtractorTest" />
+			<class name="info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionMetaDataExtractorTest" />
+			<class name="info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionMetaDataHookTest" />
+			<class name="info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionMetaDataStorageTest" />
+		</classes>
+	</test>
 	<test name="Timer Hook">
 		<classes>
 			<class name="info.novatec.inspectit.agent.sensor.method.timer.test.TimerHookTest" />
@@ -218,6 +226,11 @@
 	<test name="CPU Usage calculator test">
 		<classes>
 			<class name="info.novatec.inspectit.agent.sensor.platform.test.CpuUsageCalculatorTest" />
+		</classes>
+	</test>
+	<test name="Reflection Cache test">
+		<classes>
+			<class name="info.novatec.inspectit.util.ReflectionCacheTest" />
 		</classes>
 	</test>
 </suite>

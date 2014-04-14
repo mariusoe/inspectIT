@@ -568,5 +568,21 @@ public final class TextFormatter {
 	public static String crop(String string, int maxLength) {
 		return StringUtils.abbreviate(string, maxLength);
 	}
+	
+	/**
+	 * returns a new StyledString that contains the given text or "null" if the given
+	 * text was in fact null. 
+	 * 
+	 * @param text the text to display, may be null.
+	 * @return a new StyledString that contains the given text or "null" if the given
+	 * text was in fact null. 
+	 */
+	public static StyledString getStyledStringForNullableText(String text) {
+		if (null == text) {
+			return new StyledString("");
+		} else {
+			return new StyledString(text);
+		}
+	}
 
 }

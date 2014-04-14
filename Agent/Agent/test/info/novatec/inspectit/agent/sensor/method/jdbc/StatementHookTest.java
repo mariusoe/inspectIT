@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.hamcrest.Condition.Step;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
@@ -50,6 +51,12 @@ public class StatementHookTest extends AbstractLogSupport {
 
 	@Mock
 	private Map<String, Object> parameter;
+	
+	@Mock
+	private ConnectionMetaDataStorage connectionMetaDataStorage;
+	
+	@Mock
+	private StatementReflectionCache statementReflectionCache;
 
 	private StatementHook statementHook;
 
@@ -65,8 +72,8 @@ public class StatementHookTest extends AbstractLogSupport {
 
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {
-		statementHook = new StatementHook(timer, idManager, parameter);
-		statementHook2 = new StatementHook(timer, idManager, parameter);
+		statementHook = new StatementHook(timer, idManager, connectionMetaDataStorage, statementReflectionCache, parameter);
+		statementHook2 = new StatementHook(timer, idManager, connectionMetaDataStorage, statementReflectionCache, parameter);
 
 		List<String> list = new ArrayList<String>();
 		list.add("java.lang.String");

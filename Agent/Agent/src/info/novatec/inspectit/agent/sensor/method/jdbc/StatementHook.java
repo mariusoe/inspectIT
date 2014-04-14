@@ -6,6 +6,7 @@ import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.core.impl.CoreService;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
+import info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionMetaDataStorage.ConnectionMetaData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.util.StringConstraint;
 import info.novatec.inspectit.util.ThreadLocalStack;
@@ -50,6 +51,11 @@ public class StatementHook implements IMethodHook {
 	private final IIdManager idManager;
 
 	/**
+	 * Storage for connection meta data.
+	 */
+	private final ConnectionMetaDataStorage connectionMetaDataStorage;
+
+	/**
 	 * The ThreadLocal for a boolean value so only the last before and first after hook of an
 	 * invocation is measured.
 	 */
@@ -61,6 +67,11 @@ public class StatementHook implements IMethodHook {
 	private StringConstraint strConstraint;
 
 	/**
+	 * Caches the calls to getConnection().
+	 */
+	private StatementReflectionCache statementReflectionCache;
+
+	/**
 	 * The only constructor which needs the {@link Timer}.
 	 * 
 	 * @param timer
@@ -69,11 +80,17 @@ public class StatementHook implements IMethodHook {
 	 *            The ID manager.
 	 * @param parameter
 	 *            Additional parameters.
+	 * @param connectionMetaDataStorage
+	 *            the storage containing meta information on the connection.
+	 * @param statementReflectionCache
+	 *            Caches the calls to getConnection()
 	 */
-	public StatementHook(Timer timer, IIdManager idManager, Map<String, Object> parameter) {
+	public StatementHook(Timer timer, IIdManager idManager, ConnectionMetaDataStorage connectionMetaDataStorage, StatementReflectionCache statementReflectionCache, Map<String, Object> parameter) {
 		this.timer = timer;
 		this.idManager = idManager;
+		this.connectionMetaDataStorage = connectionMetaDataStorage;
 		this.strConstraint = new StringConstraint(parameter);
+		this.statementReflectionCache = statementReflectionCache;
 	}
 
 	/**
@@ -119,6 +136,9 @@ public class StatementHook implements IMethodHook {
 					sqlData.calculateMin(duration);
 					sqlData.calculateMax(duration);
 					sqlData.setCount(1L);
+
+					// populate the connection meta data.
+					connectionMetaDataStorage.populate(sqlData, statementReflectionCache.getConnection(object.getClass(), object));
 					coreService.addMethodSensorData(sensorTypeId, methodId, sql, sqlData);
 				} catch (IdNotAvailableException e) {
 					if (LOGGER.isLoggable(Level.FINER)) {

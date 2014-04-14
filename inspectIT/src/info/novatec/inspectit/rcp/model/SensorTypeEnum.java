@@ -31,6 +31,8 @@ public enum SensorTypeEnum {
 	SQL("info.novatec.inspectit.agent.sensor.method.jdbc.SQLTimerSensor", InspectITImages.IMG_DATABASE),
 	/** The jdbc connection sensor type. */
 	JDBC_CONNECTION("info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionSensor", InspectITImages.IMG_DATABASE, false),
+	/** Meta data from the connection. */
+	JDBC_CONNECTION_META_DATA("info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionMetaDataConstructorSensor", InspectITImages.IMG_DATABASE, false),
 	/** The jdbc statement sensor type. */
 	JDBC_STATEMENT("info.novatec.inspectit.agent.sensor.method.jdbc.StatementSensor", InspectITImages.IMG_DATABASE, false),
 	/** The jdbc prepared statement sensor type. */
