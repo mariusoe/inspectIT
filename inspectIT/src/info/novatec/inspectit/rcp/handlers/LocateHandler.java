@@ -127,20 +127,48 @@ public abstract class LocateHandler extends AbstractTemplateHandler {
 			for (Object selected : structuredSelection.toList()) {
 				if (selected instanceof InvocationSequenceData) {
 					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) selected;
+
 					if (null != invocationSequenceData.getSqlStatementData()) {
-						results.add(super.getTemplate(invocationSequenceData.getSqlStatementData(), false, true, true));
-						results.add(super.getTemplate(invocationSequenceData.getTimerData(), false, true));
+						// if we have SQL add it to list without parameters, cause we want to find
+						// same in invocation tree
+						results.add(super.getTemplate(invocationSequenceData.getSqlStatementData(), false, true, false));
+
+						// add also a timer data or created timer data, so that we can find method
+						if (null != invocationSequenceData.getTimerData() && TimerData.class.equals(invocationSequenceData.getTimerData().getClass())) {
+							results.add(super.getTemplate(invocationSequenceData.getTimerData(), false, true));
+						} else {
+							results.add(super.getTemplate(getTimerDataForSql(invocationSequenceData.getSqlStatementData()), false, true));
+						}
 					} else if (null != invocationSequenceData.getExceptionSensorDataObjects() && !invocationSequenceData.getExceptionSensorDataObjects().isEmpty()) {
+						// locate all exceptions of the same throwable type
+						// we don't care here for stake trace, message and exception event
 						ExceptionSensorData data = invocationSequenceData.getExceptionSensorDataObjects().get(0);
-						results.add(super.getTemplate(data, false, true, true, true, true));
+						results.add(super.getTemplate(data, false, true, false, false, false));
 					} else if (null != invocationSequenceData.getTimerData() && TimerData.class.equals(invocationSequenceData.getTimerData().getClass())) {
+						// if we have timer and not http timer data add
 						results.add(super.getTemplate(invocationSequenceData.getTimerData(), false, true));
 					} else {
+						// at the end if we have nothing add the invocation itself
 						results.add(super.getTemplate(invocationSequenceData, false, true));
 					}
 				}
 			}
 			return results;
+		}
+
+		/**
+		 * Returns {@link TimerData} instance with the same method ident as given
+		 * {@link SqlStatementData}.
+		 * 
+		 * @param sqlStatementData
+		 *            {@link SqlStatementData}.
+		 * @return Returns {@link TimerData} instance with the same method ident as given
+		 *         {@link SqlStatementData}.
+		 */
+		private TimerData getTimerDataForSql(SqlStatementData sqlStatementData) {
+			TimerData timerData = new TimerData();
+			timerData.setMethodIdent(sqlStatementData.getMethodIdent());
+			return timerData;
 		}
 
 	}
