@@ -270,7 +270,7 @@ public class StorageWriter implements IWriter {
 		if (writingOn && storageManager.canWriteMore()) {
 			for (AbstractWriteDataProcessor processor : writeDataProcessors) {
 				try {
-					processor.process(defaultData);
+					processor.process(defaultData, kryoPreferences);
 				} catch (Exception e) {
 					log.error("Exception occurred processing the data with the finalization data processor " + processor.getClass().getName(), e);
 				}

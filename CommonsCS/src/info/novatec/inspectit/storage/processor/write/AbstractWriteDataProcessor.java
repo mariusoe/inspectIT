@@ -6,6 +6,8 @@ import info.novatec.inspectit.storage.StorageManager;
 import info.novatec.inspectit.storage.StorageWriter;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 
+import java.util.Map;
+
 /**
  * Special type of processor that performs operations on the elements that have been written to
  * storage.
@@ -22,10 +24,13 @@ public abstract class AbstractWriteDataProcessor {
 	 * 
 	 * @param defaultData
 	 *            Default data object.
+	 * @param kryoPreferences
+	 *            Map of preferences to be passed to the Kryo serializer. Classes can check for if
+	 *            some preferences are set or not during the processing.
 	 */
-	public void process(DefaultData defaultData) {
+	public void process(DefaultData defaultData, Map<?, ?> kryoPreferences) {
 		if (canBeProcessed(defaultData)) {
-			processData(defaultData);
+			processData(defaultData, kryoPreferences);
 		}
 	}
 
@@ -34,8 +39,11 @@ public abstract class AbstractWriteDataProcessor {
 	 * 
 	 * @param defaultData
 	 *            Default data object.
+	 * @param kryoPreferences
+	 *            Map of preferences to be passed to the Kryo serializer. Classes can check for if
+	 *            some preferences are set or not during the processing.
 	 */
-	protected abstract void processData(DefaultData defaultData);
+	protected abstract void processData(DefaultData defaultData, Map<?, ?> kryoPreferences);
 
 	/**
 	 * Returns if the {@link DefaultData} object can be processed by this

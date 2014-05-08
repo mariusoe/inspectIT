@@ -1,6 +1,8 @@
 package info.novatec.inspectit.storage.processor.write.impl;
 
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.InvocationAwareData;
+import info.novatec.inspectit.communication.data.InvocationAwareData.MutableInt;
 import info.novatec.inspectit.indexing.IIndexQuery;
 import info.novatec.inspectit.indexing.aggregation.IAggregator;
 import info.novatec.inspectit.indexing.aggregation.impl.AggregationPerformer;
@@ -8,7 +10,9 @@ import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageManager;
 import info.novatec.inspectit.storage.StorageWriter;
 import info.novatec.inspectit.storage.processor.write.AbstractWriteDataProcessor;
+import info.novatec.inspectit.storage.serializer.util.KryoSerializationPreferences;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -54,7 +58,7 @@ public class QueryCachingDataProcessor<E extends DefaultData> extends AbstractWr
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	protected void processData(DefaultData defaultData) {
+	protected void processData(DefaultData defaultData, Map<?, ?> kryoPreferences) {
 		Long key = Long.valueOf(defaultData.getPlatformIdent());
 		AggregationPerformer<E> aggregationPerformer = aggregationPerformerMap.get(key);
 		if (null == aggregationPerformer) {
@@ -63,7 +67,17 @@ public class QueryCachingDataProcessor<E extends DefaultData> extends AbstractWr
 				aggregationPerformer = aggregationPerformerMap.get(key);
 			}
 		}
-		aggregationPerformer.processElement((E) defaultData);
+
+		// deal with no saving of the invocation affiliation for cached views as well
+		if (Boolean.FALSE.equals(kryoPreferences.get(KryoSerializationPreferences.WRITE_INVOCATION_AFFILIATION_DATA)) && defaultData instanceof InvocationAwareData) {
+			InvocationAwareData invocationAwareData = (InvocationAwareData) defaultData;
+			Map<Long, MutableInt> temp = invocationAwareData.getInvocationsParentsIdMap();
+			invocationAwareData.setInvocationsParentsIdMap(Collections.<Long, MutableInt> emptyMap());
+			aggregationPerformer.processElement((E) defaultData);
+			invocationAwareData.setInvocationsParentsIdMap(temp);
+		} else {
+			aggregationPerformer.processElement((E) defaultData);
+		}
 	}
 
 	/**
