@@ -194,7 +194,9 @@ public class PlatformIdentDaoImpl extends HibernateDaoSupport implements Platfor
 		if (cleanIdents.size() != platformIdentCache.getSize()) {
 			List<PlatformIdent> cleanPlatformIdents = loadIdentsFromDB(cleanIdents, wantedAgentsIds);
 			for (PlatformIdent platformIdent : cleanPlatformIdents) {
-				initializedPlatformIdents.add(platformIdent);
+				if (wantedAgentsIds.contains(platformIdent.getId())) {
+					initializedPlatformIdents.add(platformIdent);
+				}
 			}
 		}
 
