@@ -55,9 +55,9 @@ import org.eclipse.ui.PlatformUI;
 public class CopyDataToStorageWizard extends Wizard implements INewWizard {
 
 	/**
-	 * List of data to be copied.
+	 * Collection of data to be copied.
 	 */
-	private List<DefaultData> copyDataList;
+	private Collection<DefaultData> copyDataList;
 
 	/**
 	 * CMR for the action.
@@ -95,9 +95,9 @@ public class CopyDataToStorageWizard extends Wizard implements INewWizard {
 	 * @param cmrRepositoryDefinition
 	 *            {@link CmrRepositoryDefinition} to execute action on.
 	 * @param copyDataList
-	 *            List of data to be copied.
+	 *            Collection of data to be copied.
 	 */
-	public CopyDataToStorageWizard(CmrRepositoryDefinition cmrRepositoryDefinition, List<DefaultData> copyDataList) {
+	public CopyDataToStorageWizard(CmrRepositoryDefinition cmrRepositoryDefinition, Collection<DefaultData> copyDataList) {
 		this.copyDataList = copyDataList;
 		this.cmrRepositoryDefinition = cmrRepositoryDefinition;
 		this.setWindowTitle("Save Data to Storage Wizard");

@@ -1,6 +1,7 @@
 package info.novatec.inspectit.rcp.handlers;
 
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.cmr.CmrStatusData;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
@@ -8,9 +9,9 @@ import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 import info.novatec.inspectit.rcp.wizard.CopyDataToStorageWizard;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -38,15 +39,22 @@ public class CopyDataToStorageHandler extends AbstractHandler implements IHandle
 		RepositoryDefinition repositoryDefinition = rootEditor.getInputDefinition().getRepositoryDefinition();
 		StructuredSelection selection = (StructuredSelection) HandlerUtil.getCurrentSelection(event);
 
-		List<DefaultData> copyDataList = new ArrayList<DefaultData>(selection.size());
+		Set<DefaultData> copyDataSet = new HashSet<DefaultData>(selection.size());
 		for (Iterator<?> it = selection.iterator(); it.hasNext();) {
 			Object nextObject = it.next();
-			if (nextObject instanceof DefaultData) {
-				copyDataList.add((DefaultData) nextObject);
+
+			if (nextObject instanceof InvocationSequenceData) {
+				InvocationSequenceData invocationSequenceData = (InvocationSequenceData) nextObject;
+				while (null != invocationSequenceData.getParentSequence()) {
+					invocationSequenceData = invocationSequenceData.getParentSequence();
+				}
+				copyDataSet.add(invocationSequenceData);
+			} else if (nextObject instanceof DefaultData) {
+				copyDataSet.add((DefaultData) nextObject);
 			}
 		}
 
-		if (!copyDataList.isEmpty() && repositoryDefinition instanceof CmrRepositoryDefinition) {
+		if (!copyDataSet.isEmpty() && repositoryDefinition instanceof CmrRepositoryDefinition) {
 			CmrRepositoryDefinition cmrRepositoryDefinition = (CmrRepositoryDefinition) repositoryDefinition;
 
 			// check if the writing state is OK
@@ -64,7 +72,7 @@ public class CopyDataToStorageHandler extends AbstractHandler implements IHandle
 				// action
 			}
 
-			CopyDataToStorageWizard wizard = new CopyDataToStorageWizard(cmrRepositoryDefinition, copyDataList);
+			CopyDataToStorageWizard wizard = new CopyDataToStorageWizard(cmrRepositoryDefinition, copyDataSet);
 			WizardDialog dialog = new WizardDialog(HandlerUtil.getActiveShell(event), wizard);
 			dialog.open();
 		}

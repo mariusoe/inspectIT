@@ -1645,6 +1645,18 @@
                visible="true">
          </separator>
          <command
+               commandId="org.eclipse.ui.file.save"
+               label="Save on Server"
+               style="push">
+            <visibleWhen
+                  checkEnabled="true">
+            </visibleWhen>
+         </command>
+         <separator
+               name="inspectit.editor.formrooteditor.treesubview.separator2"
+               visible="true">
+         </separator>
+         <command
                commandId="org.eclipse.ui.edit.copy"
                style="push">
          </command>
@@ -1656,7 +1668,7 @@
             </visibleWhen>
          </command>
          <separator
-               name="inspectit.editor.formrooteditor.treesubview.separator2"
+               name="inspectit.editor.formrooteditor.treesubview.separator3"
                visible="true">
          </separator>
          <command
@@ -1678,7 +1690,7 @@
             </parameter>
          </command>
          <separator
-               name="inspectit.editor.formrooteditor.treesubview.separator3"
+               name="inspectit.editor.formrooteditor.treesubview.separator4"
                visible="true">
          </separator>
          <command
