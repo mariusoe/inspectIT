@@ -251,6 +251,26 @@ public class SqlParameterAggregationInputControler extends AbstractTableInputCon
 
 	/**
 	 * {@inheritDoc}
+	 * <p>
+	 * We don't search the input directly.
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public Object[] getObjectsToSearch(Object tableInput) {
+		if (null != tableInput) {
+			List<SqlStatementData> sqlStatementDatas = new ArrayList<>();
+			// we can cast here safely cause only this can be input
+			List<SqlHolderHelper> helpers = (List<SqlHolderHelper>) tableInput;
+			for (SqlHolderHelper helper : helpers) {
+				sqlStatementDatas.addAll(helper.getSqlStatementDataList());
+			}
+			return sqlStatementDatas.toArray(new SqlStatementData[sqlStatementDatas.size()]);
+		}
+		return new Object[0];
+	}
+
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public List<String> getColumnValues(Object object) {
