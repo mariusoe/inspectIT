@@ -228,7 +228,7 @@ public class TimeLineControl extends AbstractPreferenceControl implements IPrefe
 				fromDateTime.setSelection((Date) preferenceEvent.getPreferenceMap().get(PreferenceId.TimeLine.FROM_DATE_ID));
 			}
 			if (preferenceEvent.getPreferenceMap().containsKey(PreferenceId.TimeLine.TO_DATE_ID)) {
-				fromDateTime.setSelection((Date) preferenceEvent.getPreferenceMap().get(PreferenceId.TimeLine.TO_DATE_ID));
+				toDateTime.setSelection((Date) preferenceEvent.getPreferenceMap().get(PreferenceId.TimeLine.TO_DATE_ID));
 			}
 		}
 	}
