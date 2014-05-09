@@ -815,7 +815,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 
 					// filter by the exclusive duration
 					double duration = InvocationSequenceDataHelper.calculateDuration(invocationSequenceData);
-					if (duration != -1.0d && duration <= defaultExclusiveFilterTime) {
+					if (duration != -1.0d && duration <= defaultTotalFilterTime) {
 						return false;
 					}
 				}

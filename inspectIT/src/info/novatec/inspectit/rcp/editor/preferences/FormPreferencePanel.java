@@ -622,7 +622,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		public FilterByExclusiveTimeAction(String text, double time, double currentInvocFilterExclusive) {
 			super(text, Action.AS_RADIO_BUTTON);
 			this.time = time;
-			setChecked(currentInvocFilterExclusive == time);
+			setChecked(currentInvocFilterExclusive == time || (Double.isNaN(time)) && Double.isNaN(currentInvocFilterExclusive));
 		}
 
 		/**
@@ -664,7 +664,7 @@ public class FormPreferencePanel implements IPreferencePanel {
 		public FilterByTotalTimeAction(String text, double time, double currentInvocFilterTotal) {
 			super(text, Action.AS_RADIO_BUTTON);
 			this.time = time;
-			setChecked(currentInvocFilterTotal == time);
+			setChecked(currentInvocFilterTotal == time || (Double.isNaN(time)) && Double.isNaN(currentInvocFilterTotal));
 		}
 
 		/**
