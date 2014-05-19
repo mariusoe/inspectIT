@@ -15,6 +15,8 @@ import info.novatec.inspectit.rcp.editor.search.helper.TableViewerSearchHelper;
 import info.novatec.inspectit.rcp.editor.table.input.TableInputController;
 import info.novatec.inspectit.rcp.editor.tooltip.ColumnAwareToolTipSupport;
 import info.novatec.inspectit.rcp.editor.tooltip.IColumnToolTipProvider;
+import info.novatec.inspectit.rcp.editor.viewers.CheckedDelegatingIndexLabelProvider;
+import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
 import info.novatec.inspectit.rcp.menu.ShowHideMenuManager;
 
@@ -35,6 +37,7 @@ import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -118,10 +121,22 @@ public class TableSubView extends AbstractSubView implements ISearchExecutor {
 		table.setLinesVisible(true);
 
 		tableViewer = new TableViewer(table);
+
+		if (tableInputController.isCheckStyle()) {
+			TableViewerColumn viewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+			viewerColumn.getColumn().setMoveable(false);
+			viewerColumn.getColumn().setResizable(true);
+			viewerColumn.getColumn().setWidth(30);
+			viewerColumn.getColumn().setText("Selected");
+		}
+
 		tableInputController.createColumns(tableViewer);
 		tableViewer.setUseHashlookup(true);
 		tableViewer.setContentProvider(tableInputController.getContentProvider());
 		IBaseLabelProvider labelProvider = tableInputController.getLabelProvider();
+		if (tableInputController.isCheckStyle() && labelProvider instanceof StyledCellIndexLabelProvider) {
+			labelProvider = new CheckedDelegatingIndexLabelProvider((StyledCellIndexLabelProvider) labelProvider);
+		}
 		tableViewer.setLabelProvider(labelProvider);
 		if (labelProvider instanceof IColumnToolTipProvider) {
 			ColumnAwareToolTipSupport.enableFor(tableViewer);
