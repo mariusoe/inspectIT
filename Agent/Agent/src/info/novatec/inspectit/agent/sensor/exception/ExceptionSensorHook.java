@@ -13,8 +13,9 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.sql.Timestamp;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class adds additional code to a constructor of type {@link Throwable}, to the
@@ -27,9 +28,9 @@ import java.util.logging.Logger;
 public class ExceptionSensorHook implements IExceptionSensorHook {
 
 	/**
-	 * The logger of this class.
+	 * The logger of this class. Initialized manually.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(ExceptionSensorHook.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ExceptionSensorHook.class);
 
 	/**
 	 * The ID manager.
@@ -108,8 +109,8 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 				// adding the data object to the core service
 				coreService.addExceptionSensorData(registeredSensorTypeId, data.getThrowableIdentityHashCode(), data);
 			} catch (IdNotAvailableException e) {
-				if (LOGGER.isLoggable(Level.FINER)) {
-					LOGGER.finer("Could not start exception sequence because of a (currently) not mapped ID");
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Could not start exception sequence because of a (currently) not mapped ID");
 				}
 			}
 		}
@@ -170,8 +171,8 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 				// adding the data object to the core service
 				coreService.addExceptionSensorData(registeredSensorTypeId, data.getThrowableIdentityHashCode(), data);
 			} catch (IdNotAvailableException e) {
-				if (LOGGER.isLoggable(Level.FINER)) {
-					LOGGER.finer("Could not start exception sequence because of a (currently) not mapped ID");
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Could not start exception sequence because of a (currently) not mapped ID");
 				}
 			}
 		}
@@ -225,8 +226,8 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 				// adding the data object to the core service
 				coreService.addExceptionSensorData(registeredSensorTypeId, data.getThrowableIdentityHashCode(), data);
 			} catch (IdNotAvailableException e) {
-				if (LOGGER.isLoggable(Level.FINER)) {
-					LOGGER.finer("Could not start exception sequence because of a (currently) not mapped ID");
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Could not start exception sequence because of a (currently) not mapped ID");
 				}
 			}
 		}
@@ -255,19 +256,25 @@ public class ExceptionSensorHook implements IExceptionSensorHook {
 				exceptionSensorData.setCause(strConstraint.crop(cause.getClass().getName()));
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.FINER, "It was not possible to retrieve the exception cause from " + throwable.getClass().getName(), e);
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("It was not possible to retrieve the exception cause from " + throwable.getClass().getName(), e);
+			}
 		}
 
 		try {
 			exceptionSensorData.setErrorMessage(strConstraint.crop(throwable.getMessage()));
 		} catch (Exception e) {
-			LOGGER.log(Level.FINER, "It was not possible to retrieve the error message from " + throwable.getClass().getName(), e);
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("It was not possible to retrieve the error message from " + throwable.getClass().getName(), e);
+			}
 		}
 
 		try {
 			exceptionSensorData.setStackTrace(strConstraint.crop(stackTraceToString(throwable)));
 		} catch (Exception e) {
-			LOGGER.log(Level.FINER, "It was not possible to retrieve the stack trace from " + throwable.getClass().getName(), e);
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("It was not possible to retrieve the stack trace from " + throwable.getClass().getName(), e);
+			}
 		}
 	}
 

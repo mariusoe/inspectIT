@@ -1,13 +1,12 @@
 package info.novatec.inspectit.agent.sensor.method.jdbc;
 
+import info.novatec.inspectit.agent.AbstractLogSupport;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.impl.IdManager;
-import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.util.Timer;
 
 import java.sql.Connection;
-import java.util.logging.Level;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -57,10 +56,5 @@ public class ConnectionMetaDataHookTest extends AbstractLogSupport {
 		hook.afterConstructor(coreService, registeredMethodId, registeredSensorTypeId, myConnection, parameters, registeredSensorConfig);
 		Mockito.verify(storage, Mockito.timeout(1)).add(myConnection);
 		Mockito.verifyNoMoreInteractions(storage);
-	}
-
-	@Override
-	protected Level getLogLevel() {
-		return Level.INFO;
 	}
 }

@@ -2,8 +2,9 @@ package info.novatec.inspectit.util;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class provides methods for string manipulation purposes as cropping a string to a specified
@@ -14,9 +15,9 @@ import java.util.logging.Logger;
 public class StringConstraint {
 
 	/**
-	 * The logger of this class.
+	 * The logger of this class. Initialized manually.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(StringConstraint.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(StringConstraint.class);
 
 	/**
 	 * Boolean indicating whether to use three trailing dots or not.
@@ -53,8 +54,8 @@ public class StringConstraint {
 					effectiveStringLength = configStringLength;
 				}
 			} catch (NumberFormatException e) {
-				if (LOGGER.isLoggable(Level.WARNING)) {
-					LOGGER.warning("Property 'stringLength' is not defined correctly. Using unlimited string length.");
+				if (LOG.isWarnEnabled()) {
+					LOG.warn("Property 'stringLength' is not defined correctly. Using unlimited string length.");
 				}
 			}
 		}

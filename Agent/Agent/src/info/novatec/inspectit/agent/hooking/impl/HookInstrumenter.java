@@ -6,10 +6,7 @@ import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.hooking.IHookDispatcherMapper;
 import info.novatec.inspectit.agent.hooking.IHookInstrumenter;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import info.novatec.inspectit.spring.logger.Log;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -20,6 +17,7 @@ import javassist.NotFoundException;
 import javassist.expr.ExprEditor;
 import javassist.expr.Handler;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +35,8 @@ public class HookInstrumenter implements IHookInstrumenter {
 	/**
 	 * The logger of the class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(HookInstrumenter.class.getName());
+	@Log
+	Logger log;
 
 	/**
 	 * The hook dispatcher. This string shouldn't be touched. For changing the dispatcher, alter the
@@ -97,8 +96,8 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 * {@inheritDoc}
 	 */
 	public void addMethodHook(CtMethod method, RegisteredSensorConfig rsc) throws HookException {
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.fine("Match found! Class: " + rsc.getTargetClassName() + " Method: " + rsc.getTargetMethodName() + " Parameter: " + rsc.getParameterTypes() + " id: " + rsc.getId());
+		if (log.isDebugEnabled()) {
+			log.debug("Match found! Class: " + rsc.getTargetClassName() + " Method: " + rsc.getTargetMethodName() + " Parameter: " + rsc.getParameterTypes() + " id: " + rsc.getId());
 		}
 
 		if (method.getDeclaringClass().isFrozen()) {
@@ -157,8 +156,8 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 * {@inheritDoc}
 	 */
 	public void addConstructorHook(CtConstructor constructor, RegisteredSensorConfig rsc) throws HookException {
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.fine("Constructor match found! Class: " + rsc.getTargetClassName() + " Parameter: " + rsc.getParameterTypes() + " id: " + rsc.getId());
+		if (log.isDebugEnabled()) {
+			log.debug("Constructor match found! Class: " + rsc.getTargetClassName() + " Parameter: " + rsc.getParameterTypes() + " id: " + rsc.getId());
 		}
 
 		if (constructor.getDeclaringClass().isFrozen()) {
@@ -199,8 +198,8 @@ public class HookInstrumenter implements IHookInstrumenter {
 	 * {@inheritDoc}
 	 */
 	public void addClassLoaderDelegationHook(CtMethod ctMethod) throws HookException {
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.fine("Class loader delegation match found! Method signature: " + ctMethod.getSignature());
+		if (log.isDebugEnabled()) {
+			log.debug("Class loader delegation match found! Method signature: " + ctMethod.getSignature());
 		}
 
 		if (ctMethod.getDeclaringClass().isFrozen()) {

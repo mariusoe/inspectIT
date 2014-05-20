@@ -34,10 +34,10 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The invocation sequence hook stores the record of the invocation sequences in a
@@ -54,9 +54,9 @@ import org.apache.commons.collections.CollectionUtils;
 public class InvocationSequenceHook implements IMethodHook, IConstructorHook, ICoreService {
 
 	/**
-	 * The logger of this class.
+	 * The logger of this class. Initialized manually.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(InvocationSequenceHook.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(InvocationSequenceHook.class);
 
 	/**
 	 * The ID manager.
@@ -172,8 +172,8 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 				threadLocalInvocationData.set(nestedInvocationSequenceData);
 			}
 		} catch (IdNotAvailableException idNotAvailableException) {
-			if (LOGGER.isLoggable(Level.FINER)) {
-				LOGGER.finer("Could not start invocation sequence because of a (currently) not mapped ID");
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Could not start invocation sequence because of a (currently) not mapped ID");
 			}
 		}
 	}
@@ -342,16 +342,16 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 			double endTime, double duration) {
 		double minduration = minDurationMap.get(invocationStartId.get()).doubleValue();
 		if (duration >= minduration) {
-			if (LOGGER.isLoggable(Level.FINE)) {
-				LOGGER.fine("Saving invocation. " + duration + " > " + minduration + " ID(local): " + rsc.getId());
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Saving invocation. " + duration + " > " + minduration + " ID(local): " + rsc.getId());
 			}
 			invocationSequenceData.setDuration(duration);
 			invocationSequenceData.setStart(startTime);
 			invocationSequenceData.setEnd(endTime);
 			coreService.addMethodSensorData(sensorTypeId, methodId, String.valueOf(System.currentTimeMillis()), invocationSequenceData);
 		} else {
-			if (LOGGER.isLoggable(Level.FINE)) {
-				LOGGER.fine("Not saving invocation. " + duration + " < " + minduration + " ID(local): " + rsc.getId());
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Not saving invocation. " + duration + " < " + minduration + " ID(local): " + rsc.getId());
 			}
 		}
 	}
@@ -417,7 +417,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 */
 	public void addMethodSensorData(long sensorTypeId, long methodId, String prefix, MethodSensorData methodSensorData) {
 		if (null == threadLocalInvocationData.get()) {
-			LOGGER.severe("thread data NULL!!!!");
+			LOG.error("thread data NULL!!!!");
 			return;
 		}
 		saveDataObject(methodSensorData.finalizeData());
@@ -428,7 +428,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 */
 	public void addObjectStorage(long sensorTypeId, long methodId, String prefix, IObjectStorage objectStorage) {
 		if (null == threadLocalInvocationData.get()) {
-			LOGGER.severe("thread data NULL!!!!");
+			LOG.error("thread data NULL!!!!");
 			return;
 		}
 		DefaultData defaultData = objectStorage.finalizeDataObject();
@@ -447,7 +447,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 */
 	public void addExceptionSensorData(long sensorTypeIdent, long throwableIdentityHashCode, ExceptionSensorData exceptionSensorData) {
 		if (null == threadLocalInvocationData.get()) {
-			LOGGER.info("thread data NULL!!!!");
+			LOG.info("thread data NULL!!!!");
 			return;
 		}
 		saveDataObject(exceptionSensorData.finalizeData());

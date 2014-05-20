@@ -10,12 +10,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import info.novatec.inspectit.agent.AbstractLogSupport;
 import info.novatec.inspectit.agent.config.IPropertyAccessor;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.core.impl.CoreService;
-import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.communication.data.TimerData;
@@ -24,7 +24,6 @@ import info.novatec.inspectit.util.Timer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -219,11 +218,6 @@ public class InvocationSequenceHookTest extends AbstractLogSupport {
 
 		verify(timer, times(4)).getCurrentTime();
 		verify(coreService, times(1)).addMethodSensorData(eq(sensorTypeId), eq(methodId), Mockito.<String> anyObject(), Mockito.<InvocationSequenceData> anyObject());
-	}
-
-	@Override
-	protected Level getLogLevel() {
-		return Level.INFO;
 	}
 
 }

@@ -6,7 +6,6 @@ import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.hooking.IConstructorHook;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
-import info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionMetaDataStorage.ConnectionMetaData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.util.StringConstraint;
 import info.novatec.inspectit.util.ThreadLocalStack;
@@ -17,8 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This hook is intended to intercept the created prepared statement calls to the database. To not
@@ -34,9 +34,9 @@ import java.util.logging.Logger;
 public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 
 	/**
-	 * The logger of this class.
+	 * The logger of this class. Initialized manually.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(PreparedStatementHook.class.getName());
+	Logger log = LoggerFactory.getLogger(PreparedStatementHook.class);
 
 	/**
 	 * The stack containing the start time values.
@@ -163,8 +163,8 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 
 						coreService.addMethodSensorData(sensorTypeId, methodId, sql, sqlData);
 					} catch (IdNotAvailableException e) {
-						if (LOGGER.isLoggable(Level.FINER)) {
-							LOGGER.finer("Could not save the sql data because of an unavailable id. " + e.getMessage());
+						if (log.isDebugEnabled()) {
+							log.debug("Could not save the sql data because of an unavailable id. " + e.getMessage());
 						}
 					}
 				} else {
@@ -206,9 +206,8 @@ public class PreparedStatementHook implements IMethodHook, IConstructorHook {
 			// it is possible that this exception is thrown in a 'normal' way,
 			// as everyone could instantiate a prepared statement object without
 			// calling first a method on the connection (prepareStatement...)
-			LOGGER.info("Could not add prepared statement, no sql available! Method ID(local): " + methodId);
-			LOGGER.info("This is not an inspectIT issue, but you forget to integrate the Connection creating the SQL statement in the configuration, please consult the management of inspectIT and send the following stacktrace!");
-			e.printStackTrace(); // NOPMD
+			log.info("Could not add prepared statement, no sql available! Method ID(local): " + methodId);
+			log.info("This is not an inspectIT issue, but you forget to integrate the Connection creating the SQL statement in the configuration, please consult the management of inspectIT and send the following stacktrace!", e);
 
 			// we need to ensure thread safety for the list and do not care for lost updates, so
 			// we simply create a new list based on the old list and change references after we

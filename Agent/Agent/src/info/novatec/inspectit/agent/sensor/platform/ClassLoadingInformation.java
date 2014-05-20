@@ -6,13 +6,13 @@ import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.sensor.platform.provider.RuntimeInfoProvider;
 import info.novatec.inspectit.agent.sensor.platform.provider.factory.PlatformSensorInfoProviderFactory;
 import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -26,7 +26,8 @@ public class ClassLoadingInformation extends AbstractPlatformSensor implements I
 	/**
 	 * The logger of the class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(ClassLoadingInformation.class.getName());
+	@Log
+	Logger log;
 
 	/**
 	 * The ID Manager used to get the correct IDs.
@@ -121,8 +122,8 @@ public class ClassLoadingInformation extends AbstractPlatformSensor implements I
 
 				coreService.addPlatformSensorData(sensorTypeIdent, classLoadingData);
 			} catch (IdNotAvailableException e) {
-				if (LOGGER.isLoggable(Level.FINER)) {
-					LOGGER.finer("Could not save the class loading information because of an unavailable id. " + e.getMessage());
+				if (log.isDebugEnabled()) {
+					log.debug("Could not save the class loading information because of an unavailable id. " + e.getMessage());
 				}
 			}
 		} else {

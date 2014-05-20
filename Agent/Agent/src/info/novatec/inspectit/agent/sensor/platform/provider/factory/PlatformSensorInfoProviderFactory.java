@@ -8,8 +8,8 @@ import info.novatec.inspectit.util.UnderlyingSystemInfo;
 import info.novatec.inspectit.util.UnderlyingSystemInfo.JavaVersion;
 import info.novatec.inspectit.util.UnderlyingSystemInfo.JvmProvider;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class decides which {@link PlatformSensorInfoProvider} will be used.
@@ -20,9 +20,9 @@ import java.util.logging.Logger;
 public final class PlatformSensorInfoProviderFactory {
 
 	/**
-	 * The logger of the class.
+	 * The logger of this class. Initialized manually.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(PlatformSensorInfoProviderFactory.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(PlatformSensorInfoProviderFactory.class);
 
 	/**
 	 * {@link PlatformSensorInfoProvider} when the agent is running on the Sun JVM.
@@ -44,7 +44,7 @@ public final class PlatformSensorInfoProviderFactory {
 				try {
 					createIbmJava6PlatformSensorInfoProvider();
 				} catch (Exception e) {
-					LOGGER.log(Level.WARNING, "Creation of the Platform Sensor Info Provider for IBM virtual machine failed.", e);
+					LOG.warn("Creation of the Platform Sensor Info Provider for IBM virtual machine failed.", e);
 				}
 			}
 		}

@@ -12,17 +12,17 @@ import info.novatec.inspectit.agent.config.PriorityEnum;
 import info.novatec.inspectit.agent.config.StorageException;
 import info.novatec.inspectit.agent.jrebel.JRebelUtil;
 import info.novatec.inspectit.communication.data.ParameterContentType;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javassist.Modifier;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,7 +42,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	/**
 	 * The logger of the class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(ConfigurationStorage.class.getName());
+	@Log
+	Logger log;
 
 	/**
 	 * The name of the property for the repository IP.
@@ -161,8 +162,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 			this.repository = new RepositoryConfig(host, port);
 		}
 
-		if (LOGGER.isLoggable(Level.INFO)) {
-			LOGGER.info("Repository definition added. Host: " + host + " Port: " + port);
+		if (log.isInfoEnabled()) {
+			log.info("Repository definition added. Host: " + host + " Port: " + port);
 		}
 	}
 
@@ -186,8 +187,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 			agentName = name;
 		}
 
-		if (LOGGER.isLoggable(Level.INFO)) {
-			LOGGER.info("Agent name set to: " + name);
+		if (log.isInfoEnabled()) {
+			log.info("Agent name set to: " + name);
 		}
 	}
 
@@ -212,8 +213,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 
 		this.bufferStrategy = new StrategyConfig(clazzName, settings);
 
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.fine("Buffer strategy set to: " + clazzName);
+		if (log.isDebugEnabled()) {
+			log.debug("Buffer strategy set to: " + clazzName);
 		}
 	}
 
@@ -244,8 +245,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 
 		sendingStrategies.add(new StrategyConfig(clazzName, settings));
 
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.fine("Sending strategy added: " + clazzName);
+		if (log.isDebugEnabled()) {
+			log.debug("Sending strategy added: " + clazzName);
 		}
 	}
 
@@ -284,8 +285,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 
 		methodSensorTypes.add(sensorTypeConfig);
 
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.fine("Method sensor type added: " + sensorTypeName + " prio: " + priority);
+		if (log.isDebugEnabled()) {
+			log.debug("Method sensor type added: " + sensorTypeName + " prio: " + priority);
 		}
 	}
 
@@ -314,8 +315,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 
 		platformSensorTypes.add(sensorTypeConfig);
 
-		if (LOGGER.isLoggable(Level.INFO)) {
-			LOGGER.info("Platform sensor type added: " + sensorTypeClass);
+		if (log.isInfoEnabled()) {
+			log.info("Platform sensor type added: " + sensorTypeClass);
 		}
 	}
 
@@ -485,8 +486,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 
 		unregisteredSensorConfigs.add(sensorConfig);
 
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.fine("Sensor configuration added: " + sensorConfig.toString());
+		if (log.isDebugEnabled()) {
+			log.debug("Sensor configuration added: " + sensorConfig.toString());
 		}
 
 		if (methodSensorTypeConfig.isJRebelActive()) {
@@ -494,8 +495,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 			jRebelSensorConfig.completeConfiguration();
 			unregisteredSensorConfigs.add(jRebelSensorConfig);
 
-			if (LOGGER.isLoggable(Level.FINE)) {
-				LOGGER.fine("Sensor configuration for JRebel enhanced classes added: " + jRebelSensorConfig.toString());
+			if (log.isDebugEnabled()) {
+				log.debug("Sensor configuration for JRebel enhanced classes added: " + jRebelSensorConfig.toString());
 			}
 		}
 	}
@@ -583,8 +584,8 @@ public class ConfigurationStorage implements IConfigurationStorage {
 
 		methodSensorTypes.add(sensorTypeConfig);
 
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.fine("Exception sensor type added: " + sensorTypeClass);
+		if (log.isDebugEnabled()) {
+			log.debug("Exception sensor type added: " + sensorTypeClass);
 		}
 	}
 
@@ -644,11 +645,11 @@ public class ConfigurationStorage implements IConfigurationStorage {
 	 */
 	public void setEnhancedExceptionSensorActivated(boolean isEnhanced) {
 		this.enhancedExceptionSensorActivated = isEnhanced;
-		if (LOGGER.isLoggable(Level.FINE)) {
+		if (log.isDebugEnabled()) {
 			if (isEnhanced) {
-				LOGGER.fine("Using enhanced exception sensor mode");
+				log.debug("Using enhanced exception sensor mode");
 			} else {
-				LOGGER.fine("Using simple exception sensor mode");
+				log.debug("Using simple exception sensor mode");
 			}
 		}
 	}
@@ -702,12 +703,12 @@ public class ConfigurationStorage implements IConfigurationStorage {
 				String repositoryIp = repositoryIpHost[0];
 				String repositoryPort = repositoryIpHost[1];
 				if (null != repositoryIp && !"".equals(repositoryIp) && null != repositoryPort && !"".equals(repositoryPort)) {
-					LOGGER.info("Repository information found in the JVM parameters: IP=" + repositoryIp + " Port=" + repositoryPort);
+					log.info("Repository information found in the JVM parameters: IP=" + repositoryIp + " Port=" + repositoryPort);
 					try {
 						int port = Integer.parseInt(repositoryPort);
 						setRepository(repositoryIp, port);
 					} catch (Exception e) {
-						LOGGER.log(Level.WARNING, "Repository could not be defined from the data in the JVM parameters", e);
+						log.warn("Repository could not be defined from the data in the JVM parameters", e);
 					}
 				}
 			}
@@ -716,10 +717,10 @@ public class ConfigurationStorage implements IConfigurationStorage {
 			String agentName = tokenizer.nextToken();
 			if (null != agentName && !"".equals(agentName)) {
 				try {
-					LOGGER.info("Agent name found in the JVM parameters: AgentName=" + agentName);
+					log.info("Agent name found in the JVM parameters: AgentName=" + agentName);
 					setAgentName(agentName);
 				} catch (Exception e) {
-					LOGGER.log(Level.WARNING, "Agent name could not be defined from the data in the JVM parameters", e);
+					log.warn("Agent name could not be defined from the data in the JVM parameters", e);
 				}
 			}
 		}

@@ -1,8 +1,8 @@
 package info.novatec.inspectit.agent.config.impl;
 
+import info.novatec.inspectit.agent.AbstractLogSupport;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.ParserException;
-import info.novatec.inspectit.agent.test.AbstractLogSupport;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -13,10 +13,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -30,15 +30,11 @@ public class ConfigurationFilesTest extends AbstractLogSupport {
 	@Mock
 	private IConfigurationStorage configurationStorage;
 
-	@Override
-	protected Level getLogLevel() {
-		return Level.OFF;
-	}
-
 	@BeforeMethod
 	public void init() {
 		MockitoAnnotations.initMocks(this);
 		fileConfigurationReader = new FileConfigurationReader(configurationStorage);
+		fileConfigurationReader.log = LoggerFactory.getLogger(FileConfigurationReader.class);
 	}
 
 	@Test(dataProvider = "Paths-To-Config-Files-Provider")

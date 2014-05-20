@@ -15,15 +15,15 @@ import info.novatec.inspectit.communication.ExceptionEvent;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.SystemSensorData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,8 @@ public class CoreService implements ICoreService, InitializingBean, DisposableBe
 	/**
 	 * The logger of the class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(CoreService.class.getName());
+	@Log
+	Logger log;
 
 	/**
 	 * The configuration storage. Used to access the platform sensor types.
@@ -398,7 +399,7 @@ public class CoreService implements ICoreService, InitializingBean, DisposableBe
 						wait(platformSensorRefreshTime);
 					}
 				} catch (InterruptedException e) {
-					LOGGER.severe("Platform sensor refresher was interrupted!");
+					log.error("Platform sensor refresher was interrupted!");
 				}
 
 				// iterate the platformSensors and update the information
@@ -498,7 +499,7 @@ public class CoreService implements ICoreService, InitializingBean, DisposableBe
 		} catch (Throwable e) { // NOPMD NOCHK
 			if (!sendingException) {
 				sendingException = true;
-				LOGGER.log(Level.SEVERE, "Connection problem appeared, stopping sending actual data!", e);
+				log.error("Connection problem appeared, stopping sending actual data!", e);
 			}
 		}
 	}
@@ -535,7 +536,7 @@ public class CoreService implements ICoreService, InitializingBean, DisposableBe
 							wait();
 						}
 					} catch (InterruptedException e) {
-						LOGGER.severe("Preparing thread interrupted and shutting down!");
+						log.error("Preparing thread interrupted and shutting down!");
 						break; // we were interrupted during waiting and close ourself down.
 					}
 				}
@@ -585,7 +586,7 @@ public class CoreService implements ICoreService, InitializingBean, DisposableBe
 								wait();
 							}
 						} catch (InterruptedException e) {
-							LOGGER.severe("Sending thread interrupted and shuting down!");
+							log.error("Sending thread interrupted and shuting down!");
 							break; // we were interrupted during waiting and close ourself down.
 						}
 					}
@@ -606,7 +607,7 @@ public class CoreService implements ICoreService, InitializingBean, DisposableBe
 	private class ShutdownHookSender extends Thread {
 		@Override
 		public void run() {
-			LOGGER.info("Shutdown initialized, sending remaining data");
+			log.info("Shutdown initialized, sending remaining data");
 			// Stop the CoreService services
 			CoreService.this.stop();
 
@@ -617,14 +618,14 @@ public class CoreService implements ICoreService, InitializingBean, DisposableBe
 			try {
 				preparingThread.join(10000);
 			} catch (InterruptedException e) {
-				LOGGER.severe("ShutdownHook was interrupted while waiting for the preparing thread to shut down. Stopping the shutdown hook");
+				log.error("ShutdownHook was interrupted while waiting for the preparing thread to shut down. Stopping the shutdown hook");
 				return;
 			}
 
 			try {
 				sendingThread.join(10000);
 			} catch (InterruptedException e) {
-				LOGGER.severe("ShutdownHook was interrupted while waiting for the sending thread to shut down. Stopping the shutdown hook");
+				log.error("ShutdownHook was interrupted while waiting for the sending thread to shut down. Stopping the shutdown hook");
 				return;
 			}
 
@@ -636,7 +637,7 @@ public class CoreService implements ICoreService, InitializingBean, DisposableBe
 			CoreService.this.send();
 
 			// At the end unregister platform
-			LOGGER.info("Unregistering the Agent");
+			log.info("Unregistering the Agent");
 			idManager.unregisterPlatform();
 		}
 	}

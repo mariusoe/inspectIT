@@ -237,6 +237,10 @@ Mozilla Public License (MPL), 1.1 : javassist (3.16.1.GA) : google-guava (14.0-r
 		<copy todir="${build.release}/sun1.5-data/agent">
 			<fileset dir="${build.release}" includes="thirdparty.txt" />
 		</copy>
+		
+		<copy todir="${build.release}/sun1.5-data/agent">
+			<fileset dir="${basedir}" includes="logging-config.xml" />
+		</copy>
 
 		<jar destfile="${build.release}/sun1.5-data/agent/${dist.jar.name}" manifest="${basedir}/META-INF/MANIFEST.MF">
 			<fileset dir="${build.agent.classes}" includes="**/*.class" />

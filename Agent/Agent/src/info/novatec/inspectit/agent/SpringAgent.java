@@ -4,14 +4,15 @@ import info.novatec.inspectit.agent.analyzer.IByteCodeAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IMatchPattern;
 import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.hooking.IHookDispatcher;
+import info.novatec.inspectit.agent.logback.LogInitializer;
 import info.novatec.inspectit.agent.spring.SpringConfiguration;
 import info.novatec.inspectit.versioning.IVersioningService;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -32,9 +33,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 public class SpringAgent implements IAgent {
 
 	/**
-	 * The logger of this class.
+	 * The logger of this class. Initialized manually.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(SpringAgent.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(SpringAgent.class);
 
 	/**
 	 * Our class start with {@value #CLASS_NAME_PREFIX}.
@@ -58,8 +59,13 @@ public class SpringAgent implements IAgent {
 
 	/**
 	 * Constructor initializing this agent.
+	 * 
+	 * @param inspectitJarLocation
+	 *            location of inspectIT jar needed for proper logging
 	 */
-	public SpringAgent() {
+	public SpringAgent(String inspectitJarLocation) {
+		LogInitializer.setInspectitJarLocation(inspectitJarLocation);
+		LogInitializer.initLogging();
 		this.initSpring();
 	}
 
@@ -67,8 +73,8 @@ public class SpringAgent implements IAgent {
 	 * Initializes the spring.
 	 */
 	private void initSpring() {
-		if (LOGGER.isLoggable(Level.INFO)) {
-			LOGGER.info("Initializing Spring on inspectIT Agent...");
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Initializing Spring on inspectIT Agent...");
 		}
 
 		// set inspectIT class loader to be the context class loader
@@ -82,21 +88,21 @@ public class SpringAgent implements IAgent {
 		ctx.refresh();
 		beanFactory = ctx;
 
-		if (LOGGER.isLoggable(Level.INFO)) {
-			LOGGER.info("Spring successfully initialized");
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Spring successfully initialized");
 		}
 
 		// log version
-		if (LOGGER.isLoggable(Level.INFO)) {
+		if (LOG.isInfoEnabled()) {
 			String currentVersion = "n/a";
 			try {
 				currentVersion = beanFactory.getBean(IVersioningService.class).getVersion();
 			} catch (IOException e) {
-				if (LOGGER.isLoggable(Level.FINE)) {
-					LOGGER.log(Level.FINE, "Versioning information could not be read", e);
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Versioning information could not be read", e);
 				}
 			}
-			LOGGER.info("Using agent version " + currentVersion);
+			LOG.info("Using agent version " + currentVersion);
 		}
 
 		hookDispatcher = beanFactory.getBean(IHookDispatcher.class);
@@ -129,8 +135,7 @@ public class SpringAgent implements IAgent {
 			byte[] instrumentedByteCode = byteCodeAnalyzer.analyzeAndInstrument(byteCode, className, classLoader);
 			return instrumentedByteCode;
 		} catch (Throwable throwable) { // NOPMD
-			LOGGER.severe("Something unexpected happened while trying to analyze or instrument the bytecode with the class name: " + className);
-			throwable.printStackTrace(); // NOPMD
+			LOG.error("Something unexpected happened while trying to analyze or instrument the bytecode with the class name: " + className, throwable);
 			return byteCode;
 		}
 	}

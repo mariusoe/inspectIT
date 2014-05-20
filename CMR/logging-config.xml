@@ -6,7 +6,7 @@
 	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
 		<Target>System.out</Target>
 		<encoder>
-			<pattern>%d{ISO8601}: %-6r [%15.15t] %-5p %30.30c - %m%n</pattern>
+			<pattern>%d{ISO8601}: %-6r [%15.15t] %-5p %30.30c - %m%n%rEx</pattern>
 		</encoder>
 	</appender>
 
@@ -31,7 +31,7 @@
 	<appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>logs/cmr.log</file>
 		<encoder>
-			<pattern>%d{ISO8601}: %-6r [%15.15t] %-5p %30.30c - %m%n</pattern>
+			<pattern>%d{ISO8601}: %-6r [%15.15t] %-5p %30.30c - %m%n%rEx</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>logs/cmr.%d{yyyy-MM-dd}.%i.zip</fileNamePattern>
@@ -48,7 +48,7 @@
 	<appender name="exceptions" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>logs/exceptions.log</file>
 		<encoder>
-			<pattern>%d{ISO8601}: %-6r [%15.15t] %-5p %30.30c - %m%n</pattern>
+			<pattern>%d{ISO8601}: %-6r [%15.15t] %-5p %30.30c - %m%n%rEx</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>logs/exceptions.%d{yyyy-MM-dd}.%i.zip</fileNamePattern>

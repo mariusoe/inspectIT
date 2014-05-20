@@ -11,6 +11,7 @@ import info.novatec.inspectit.agent.connection.RegistrationException;
 import info.novatec.inspectit.agent.connection.ServerUnavailableException;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
+import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.versioning.IVersioningService;
 
 import java.io.IOException;
@@ -18,9 +19,8 @@ import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,8 @@ public class IdManager implements IIdManager, InitializingBean, DisposableBean {
 	/**
 	 * The logger of the class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(IdManager.class.getName());
+	@Log
+	Logger log;
 
 	/**
 	 * The configuration storage used to access some information which needs to be registered at the
@@ -187,7 +188,7 @@ public class IdManager implements IIdManager, InitializingBean, DisposableBean {
 					registrationThread.registerPlatform();
 				} catch (Throwable throwable) { // NOPMD
 					serverErrorOccured = true;
-					LOGGER.warning("Could not register the platform even though the connection seems to be established, will try later!");
+					log.warn("Could not register the platform even though the connection seems to be established, will try later!");
 					throw new IdNotAvailableException("Could not register the platform even though the connection seems to be established, will try later!", throwable);
 				}
 			} else {
@@ -210,7 +211,7 @@ public class IdManager implements IIdManager, InitializingBean, DisposableBean {
 				connection.unregisterPlatform(configurationStorage.getAgentName());
 				platformId = -1;
 			} catch (Throwable e) { // NOPMD
-				LOGGER.warning("Could not un-register the platform.");
+				log.warn("Could not un-register the platform.");
 			}
 		}
 	}
@@ -499,22 +500,28 @@ public class IdManager implements IIdManager, InitializingBean, DisposableBean {
 				serverErrorOccured = false;
 			} catch (ServerUnavailableException serverUnavailableException) {
 				if (!serverErrorOccured) {
-					LOGGER.severe("Server unavailable while trying to register something at the server.");
+					log.error("Server unavailable while trying to register something at the server.");
 				}
 				serverErrorOccured = true;
-				LOGGER.throwing(RegistrationThread.class.getName(), "run()", serverUnavailableException);
+				if (log.isTraceEnabled()) {
+					log.trace("run()", serverUnavailableException);
+				}
 			} catch (RegistrationException registrationException) {
 				if (!serverErrorOccured) {
-					LOGGER.severe("Registration exception occured while trying to register something at the server.");
+					log.error("Registration exception occurred while trying to register something at the server.");
 				}
 				serverErrorOccured = true;
-				LOGGER.throwing(RegistrationThread.class.getName(), "run()", registrationException);
+				if (log.isTraceEnabled()) {
+					log.trace("run()", registrationException);
+				}
 			} catch (ConnectException connectException) {
 				if (!serverErrorOccured) {
-					LOGGER.severe("Connection to the server failed.");
+					log.error("Connection to the server failed.");
 				}
 				serverErrorOccured = true;
-				LOGGER.throwing(RegistrationThread.class.getName(), "run()", connectException);
+				if (log.isTraceEnabled()) {
+					log.trace("run()", connectException);
+				}
 			}
 		}
 
@@ -543,8 +550,8 @@ public class IdManager implements IIdManager, InitializingBean, DisposableBean {
 		private void registerPlatform() throws ServerUnavailableException, RegistrationException {
 			platformId = connection.registerPlatform(configurationStorage.getAgentName(), getVersion());
 
-			if (LOGGER.isLoggable(Level.FINE)) {
-				LOGGER.fine("Received platform ID: " + platformId);
+			if (log.isDebugEnabled()) {
+				log.debug("Received platform ID: " + platformId);
 			}
 		}
 
@@ -557,8 +564,8 @@ public class IdManager implements IIdManager, InitializingBean, DisposableBean {
 			try {
 				return versioningService.getVersion();
 			} catch (IOException e) {
-				if (LOGGER.isLoggable(Level.FINE)) {
-					LOGGER.log(Level.FINE, "Versioning information could not be read", e);
+				if (log.isDebugEnabled()) {
+					log.debug("Versioning information could not be read", e);
 				}
 				return "n/a";
 			}
@@ -615,8 +622,8 @@ public class IdManager implements IIdManager, InitializingBean, DisposableBean {
 
 			connection.addSensorTypeToMethod(serverSensorTypeId.longValue(), serverMethodId.longValue());
 
-			if (LOGGER.isLoggable(Level.FINE)) {
-				LOGGER.fine("Mapping registered (method -> sensor type) :: local:" + methodId + "->" + sensorTypeId + " global:" + serverMethodId + "->" + serverSensorTypeId);
+			if (log.isDebugEnabled()) {
+				log.debug("Mapping registered (method -> sensor type) :: local:" + methodId + "->" + sensorTypeId + " global:" + serverMethodId + "->" + serverSensorTypeId);
 			}
 		}
 
@@ -666,8 +673,8 @@ public class IdManager implements IIdManager, InitializingBean, DisposableBean {
 				Long localId = Long.valueOf(sensorTypeIdMap.size());
 				sensorTypeIdMap.put(localId, Long.valueOf(registeredId));
 
-				if (LOGGER.isLoggable(Level.FINE)) {
-					LOGGER.fine("Sensor type " + astc.toString() + " registered. ID (local/global): " + localId + "/" + registeredId);
+				if (log.isDebugEnabled()) {
+					log.debug("Sensor type " + astc.toString() + " registered. ID (local/global): " + localId + "/" + registeredId);
 				}
 			}
 		}
@@ -709,8 +716,8 @@ public class IdManager implements IIdManager, InitializingBean, DisposableBean {
 				Long localId = Long.valueOf(methodIdMap.size());
 				methodIdMap.put(localId, Long.valueOf(registeredId));
 
-				if (LOGGER.isLoggable(Level.FINE)) {
-					LOGGER.fine("Method " + rsc.toString() + " registered. ID (local/global): " + localId + "/" + registeredId);
+				if (log.isDebugEnabled()) {
+					log.debug("Method " + rsc.toString() + " registered. ID (local/global): " + localId + "/" + registeredId);
 				}
 			}
 		}

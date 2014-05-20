@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.when;
-import info.novatec.inspectit.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.agent.AbstractLogSupport;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.util.StringConstraint;
 
@@ -16,7 +16,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
-import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -31,11 +30,6 @@ import org.testng.annotations.Test;
 public class HttpRequestParameterExtractorTest extends AbstractLogSupport {
 
 	private HttpRequestParameterExtractor extractor;
-
-	@Override
-	protected Level getLogLevel() {
-		return Level.OFF;
-	}
 
 	@Mock
 	private HttpServletRequest httpServletRequest;

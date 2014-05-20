@@ -1,13 +1,12 @@
 package info.novatec.inspectit.agent.sensor.method.jdbc;
 
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import info.novatec.inspectit.agent.AbstractLogSupport;
 import info.novatec.inspectit.agent.core.IIdManager;
-import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.util.Timer;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -31,11 +30,6 @@ public class StatementSensorTest extends AbstractLogSupport {
 	
 	@Mock
 	StatementReflectionCache statementReflectionCache;
-
-	@Override
-	protected Level getLogLevel() {
-		return Level.OFF;
-	}
 
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {

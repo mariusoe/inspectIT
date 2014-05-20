@@ -2,6 +2,7 @@ package info.novatec.inspectit.agent.analyzer.impl;
 
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
 import info.novatec.inspectit.agent.analyzer.IInheritanceAnalyzer;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,13 +10,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +32,8 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 	/**
 	 * The logger of this class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(InheritanceAnalyzer.class.getName());
+	@Log
+	Logger log;
 
 	/**
 	 * Set of logged classes for which the interfaces can not be found in
@@ -164,7 +165,7 @@ public class InheritanceAnalyzer implements IInheritanceAnalyzer {
 		} catch (Exception e) {
 			String className = ctClass.getName();
 			if (loggedClassesSet.add(className)) {
-				LOGGER.log(Level.WARNING, "Not possible to load inetrafces for class " + className + ".");
+				log.warn("Not possible to load interfaces for class " + className + ".");
 			}
 		}
 		if (null != ifs) {

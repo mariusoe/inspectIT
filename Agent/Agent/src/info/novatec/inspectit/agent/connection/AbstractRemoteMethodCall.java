@@ -4,8 +4,9 @@ import info.novatec.inspectit.agent.connection.impl.AdditiveWaitRetryStrategy;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * See http://www.onjava.com/pub/a/onjava/2001/10/17/rmi.html?page=3 for more details.
@@ -16,9 +17,9 @@ import java.util.logging.Logger;
 public abstract class AbstractRemoteMethodCall {
 
 	/**
-	 * The logger of this class.
+	 * The logger of this class. Initialized manually.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(AbstractRemoteMethodCall.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(AbstractRemoteMethodCall.class);
 
 	/**
 	 * Performs the actual call to the server.
@@ -94,8 +95,8 @@ public abstract class AbstractRemoteMethodCall {
 	 *             method is entered.
 	 */
 	protected final void handleRetryException(final Remote remoteObject) throws ServerUnavailableException {
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.fine("Repeated attempts to communicate with " + remoteObject + " failed.");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Repeated attempts to communicate with " + remoteObject + " failed.");
 		}
 		throw new ServerUnavailableException();
 	}

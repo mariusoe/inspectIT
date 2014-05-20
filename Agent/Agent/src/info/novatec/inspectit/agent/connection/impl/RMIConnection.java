@@ -11,6 +11,7 @@ import info.novatec.inspectit.cmr.service.IAgentStorageService;
 import info.novatec.inspectit.cmr.service.IRegistrationService;
 import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -23,8 +24,8 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,7 +40,8 @@ public class RMIConnection implements IConnection {
 	/**
 	 * The logger of the class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(RMIConnection.class.getName());
+	@Log
+	Logger log;
 
 	/**
 	 * The name of the repository service.
@@ -89,31 +91,35 @@ public class RMIConnection implements IConnection {
 		if (null == registry) {
 			try {
 				if (!connectionException) {
-					LOGGER.info("RMI: Connecting to " + host + ":" + port);
+					log.info("RMI: Connecting to " + host + ":" + port);
 				}
 				registry = LocateRegistry.getRegistry(host, port);
 				agentStorageService = (IAgentStorageService) registry.lookup(agentStorageName);
 				registrationService = (IRegistrationService) registry.lookup(registrationName);
-				LOGGER.info("RMI: Connection established!");
+				log.info("RMI: Connection established!");
 				connected = true;
 				connectionException = false;
 			} catch (RemoteException remoteException) {
 				if (!connectionException) {
-					LOGGER.info("RMI: Connection to the server failed.");
+					log.info("RMI: Connection to the server failed.");
 				}
 				connectionException = true;
 				disconnect();
-				LOGGER.throwing(RMIConnection.class.getName(), "connect()", remoteException);
+				if (log.isTraceEnabled()) {
+					log.trace("connect()", remoteException);
+				}
 				ConnectException e = new ConnectException(remoteException.getMessage());
 				e.initCause(remoteException);
 				throw e; // NOPMD root cause exception is set
 			} catch (NotBoundException notBoundException) {
 				if (!connectionException) {
-					LOGGER.info("RMI: Needed services are not bound on the server.");
+					log.info("RMI: Needed services are not bound on the server.");
 				}
 				connectionException = true;
 				disconnect();
-				LOGGER.throwing(RMIConnection.class.getName(), "connect()", notBoundException);
+				if (log.isTraceEnabled()) {
+					log.trace("connect()", notBoundException);
+				}
 				ConnectException e = new ConnectException(notBoundException.getMessage());
 				e.initCause(notBoundException);
 				throw e; // NOPMD root cause exception is set
@@ -145,14 +151,20 @@ public class RMIConnection implements IConnection {
 			}
 			return registrationService.registerPlatformIdent(networkInterfaces, agentName, version);
 		} catch (RemoteException remoteException) {
-			LOGGER.throwing(RMIConnection.class.getName(), "registerPlatform(String)", remoteException);
+			if (log.isTraceEnabled()) {
+				log.trace("registerPlatform(String)", remoteException);
+			}
 			throw new RegistrationException("Could not register the platform", remoteException);
 		} catch (SocketException socketException) {
-			LOGGER.severe("Could not obtain network interfaces from this machine!");
-			LOGGER.throwing(RMIConnection.class.getName(), "Constructor", socketException);
+			log.error("Could not obtain network interfaces from this machine!");
+			if (log.isTraceEnabled()) {
+				log.trace("Constructor", socketException);
+			}
 			throw new RegistrationException("Could not register the platform", socketException);
 		} catch (ServiceException serviceException) {
-			LOGGER.throwing(ServiceException.class.getName(), "registerPlatform(String)", serviceException);
+			if (log.isTraceEnabled()) {
+				log.trace("registerPlatform(String)", serviceException);
+			}
 			throw new RegistrationException("Could not register the platform", serviceException);
 		}
 	}
@@ -172,14 +184,20 @@ public class RMIConnection implements IConnection {
 
 			registrationService.unregisterPlatformIdent(networkInterfaces, agentName);
 		} catch (SocketException socketException) {
-			LOGGER.severe("Could not obtain network interfaces from this machine!");
-			LOGGER.throwing(RMIConnection.class.getName(), "unregisterPlatform(List,String)", socketException);
+			log.error("Could not obtain network interfaces from this machine!");
+			if (log.isTraceEnabled()) {
+				log.trace("unregisterPlatform(List,String)", socketException);
+			}
 			throw new RegistrationException("Could not un-register the platform", socketException);
 		} catch (ServiceException serviceException) {
-			LOGGER.throwing(RMIConnection.class.getName(), "unregisterPlatform(List,String)", serviceException);
+			if (log.isTraceEnabled()) {
+				log.trace("unregisterPlatform(List,String)", serviceException);
+			}
 			throw new RegistrationException("Could not un-register the platform", serviceException);
 		} catch (RemoteException remoteException) {
-			LOGGER.throwing(RMIConnection.class.getName(), "unregisterPlatform(List,String)", remoteException);
+			if (log.isTraceEnabled()) {
+				log.trace("unregisterPlatform(List,String)", remoteException);
+			}
 			throw new RegistrationException("Could not un-register the platform", remoteException);
 		}
 
@@ -198,7 +216,9 @@ public class RMIConnection implements IConnection {
 				AbstractRemoteMethodCall remote = new AddDataObjects(agentStorageService, measurements);
 				remote.makeCall();
 			} catch (ServerUnavailableException serverUnavailableException) {
-				LOGGER.throwing(RMIConnection.class.getName(), "sendDataObjects(List)", serverUnavailableException);
+				if (log.isTraceEnabled()) {
+					log.trace("sendDataObjects(List)", serverUnavailableException);
+				}
 				throw serverUnavailableException;
 			}
 		}
@@ -217,7 +237,9 @@ public class RMIConnection implements IConnection {
 			Long id = (Long) register.makeCall();
 			return id.longValue();
 		} catch (ServerUnavailableException serverUnavailableException) {
-			LOGGER.throwing(RMIConnection.class.getName(), "registerMethod(RegisteredSensorConfig)", serverUnavailableException);
+			if (log.isTraceEnabled()) {
+				log.trace("registerMethod(RegisteredSensorConfig)", serverUnavailableException);
+			}
 			throw new RegistrationException("Could not register the method", serverUnavailableException);
 		}
 
@@ -236,7 +258,9 @@ public class RMIConnection implements IConnection {
 			Long id = (Long) register.makeCall();
 			return id.longValue();
 		} catch (ServerUnavailableException serverUnavailableException) {
-			LOGGER.throwing(RMIConnection.class.getName(), "registerMethod(RegisteredSensorConfig)", serverUnavailableException);
+			if (log.isTraceEnabled()) {
+				log.trace("registerMethod(RegisteredSensorConfig)", serverUnavailableException);
+			}
 			throw new RegistrationException("Could not register the method sensor type", serverUnavailableException);
 		}
 	}
@@ -254,7 +278,9 @@ public class RMIConnection implements IConnection {
 			Long id = (Long) register.makeCall();
 			return id.longValue();
 		} catch (ServerUnavailableException serverUnavailableException) {
-			LOGGER.throwing(RMIConnection.class.getName(), "registerPlatformSensorType(PlatformSensorTypeConfig)", serverUnavailableException);
+			if (log.isTraceEnabled()) {
+				log.trace("registerPlatformSensorType(PlatformSensorTypeConfig)", serverUnavailableException);
+			}
 			throw new RegistrationException("Could not register the platform sensor type", serverUnavailableException);
 		}
 	}
@@ -271,7 +297,9 @@ public class RMIConnection implements IConnection {
 		try {
 			addTypeToSensor.makeCall();
 		} catch (ServerUnavailableException serverUnavailableException) {
-			LOGGER.throwing(RMIConnection.class.getName(), "addSensorTypeToMethod(long, long)", serverUnavailableException);
+			if (log.isTraceEnabled()) {
+				log.trace("addSensorTypeToMethod(long, long)", serverUnavailableException);
+			}
 			throw new RegistrationException("Could not add the sensor type to a method", serverUnavailableException);
 		}
 	}

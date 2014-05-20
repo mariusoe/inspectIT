@@ -11,12 +11,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import info.novatec.inspectit.agent.AbstractLogSupport;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IObjectStorage;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
 import info.novatec.inspectit.agent.core.impl.IdManager;
-import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.util.Timer;
@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.hamcrest.Condition.Step;
 import org.mockito.Mock;
@@ -61,14 +60,6 @@ public class StatementHookTest extends AbstractLogSupport {
 	private StatementHook statementHook;
 
 	private StatementHook statementHook2;
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected Level getLogLevel() {
-		return Level.OFF;
-	}
 
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {

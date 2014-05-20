@@ -9,10 +9,9 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import info.novatec.inspectit.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.agent.AbstractLogSupport;
 
 import java.util.List;
-import java.util.logging.Level;
 
 import org.testng.annotations.Test;
 
@@ -22,11 +21,6 @@ import org.testng.annotations.Test;
  */
 @SuppressWarnings("PMD")
 public class StatementStorageTest extends AbstractLogSupport {
-
-	@Override
-	protected Level getLogLevel() {
-		return Level.OFF;
-	}
 
 	@Test
 	public void addSQLWithParameterAndRead() {

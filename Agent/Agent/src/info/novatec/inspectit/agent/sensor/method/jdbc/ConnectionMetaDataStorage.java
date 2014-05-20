@@ -3,7 +3,6 @@ package info.novatec.inspectit.agent.sensor.method.jdbc;
 import info.novatec.inspectit.communication.data.SqlStatementData;
 import info.novatec.inspectit.util.ReflectionCache;
 
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

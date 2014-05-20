@@ -9,9 +9,9 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.google.common.cache.Cache;
@@ -27,9 +27,9 @@ import com.google.common.cache.CacheBuilder;
 public class StatementStorage {
 
 	/**
-	 * The logger of this class.
+	 * The logger of this class. Initialized manually.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(StatementStorage.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(StatementStorage.class);
 
 	/** representation of a null value. */
 	private static final String NULL_VALUE = "null";
@@ -62,8 +62,8 @@ public class StatementStorage {
 		String sql = sqlThreadLocalStack.getLast();
 		preparedStatements.put(object, new QueryInformation(sql));
 
-		if (LOGGER.isLoggable(Level.FINER)) {
-			LOGGER.finer("Recorded preparded sql statement: " + sql);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Recorded prepared sql statement: " + sql);
 		}
 	}
 
@@ -83,8 +83,8 @@ public class StatementStorage {
 			query = queryAndParameters.query;
 		}
 
-		if (LOGGER.isLoggable(Level.FINER)) {
-			LOGGER.finer("Return preparded sql statement: " + query);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Return prepared sql statement: " + query);
 		}
 
 		return query;
@@ -121,8 +121,8 @@ public class StatementStorage {
 		QueryInformation queryAndParameters = preparedStatements.getIfPresent(preparedStatement);
 
 		if (null == queryAndParameters) {
-			if (LOGGER.isLoggable(Level.FINE)) {
-				LOGGER.fine("Could not get the prepared statement from the cache to add a parameter! Prepared Statement:" + preparedStatement + " index:" + index + " value:" + value);
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Could not get the prepared statement from the cache to add a parameter! Prepared Statement:" + preparedStatement + " index:" + index + " value:" + value);
 			}
 			return;
 		}
@@ -130,8 +130,8 @@ public class StatementStorage {
 		String[] parameters = queryAndParameters.getParameters();
 
 		if (parameters.length <= index) {
-			if (LOGGER.isLoggable(Level.WARNING)) {
-				LOGGER.warning("Trying to set the parameter with value " + value + " at index " + index + ", but the prepared statement did not have this parameter.");
+			if (LOG.isWarnEnabled()) {
+				LOG.warn("Trying to set the parameter with value " + value + " at index " + index + ", but the prepared statement did not have this parameter.");
 			}
 			return;
 		}
@@ -147,8 +147,8 @@ public class StatementStorage {
 			parameters[index] = (String) value;
 		}
 
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.finer("Prepared Statement :: Added value:" + value.toString() + " with index:" + index + " to prepared statement:" + preparedStatement);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Prepared Statement :: Added value:" + value.toString() + " with index:" + index + " to prepared statement:" + preparedStatement);
 		}
 	}
 
@@ -162,8 +162,8 @@ public class StatementStorage {
 		QueryInformation queryAndParameters = preparedStatements.getIfPresent(preparedStatement);
 
 		if (null == queryAndParameters) {
-			if (LOGGER.isLoggable(Level.FINE)) {
-				LOGGER.fine("Could not get the prepared statement from the cache to clear the parameters! Prepared Statement:" + preparedStatement);
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Could not get the prepared statement from the cache to clear the parameters! Prepared Statement:" + preparedStatement);
 			}
 			return;
 		}

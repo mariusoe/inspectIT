@@ -12,6 +12,7 @@ import info.novatec.inspectit.agent.config.impl.UnregisteredSensorConfig;
 import info.novatec.inspectit.agent.hooking.IHookInstrumenter;
 import info.novatec.inspectit.agent.hooking.impl.HookException;
 import info.novatec.inspectit.communication.data.ParameterContentType;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import javassist.LoaderClassPath;
 import javassist.NotFoundException;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,6 +49,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
+
+	/**
+	 * Log for the class.
+	 */
+	@Log
+	Logger log;
 
 	/**
 	 * The implementation of the hook instrumenter.
@@ -138,19 +146,19 @@ public class ByteCodeAnalyzer implements IByteCodeAnalyzer {
 
 			return instrumentedByteCode;
 		} catch (NotFoundException notFoundException) {
-			notFoundException.printStackTrace(); // NOPMD
+			log.error("Error occurred instrumenting the byte code of class " + className, notFoundException);
 			return null;
 		} catch (IOException iOException) {
-			iOException.printStackTrace(); // NOPMD
+			log.error("Error occurred instrumenting the byte code of class " + className, iOException);
 			return null;
 		} catch (CannotCompileException cannotCompileException) {
-			cannotCompileException.printStackTrace(); // NOPMD
+			log.error("Error occurred instrumenting the byte code of class " + className, cannotCompileException);
 			return null;
 		} catch (HookException hookException) {
-			hookException.printStackTrace(); // NOPMD
+			log.error("Error occurred instrumenting the byte code of class " + className, hookException);
 			return null;
 		} catch (StorageException storageException) {
-			storageException.printStackTrace(); // NOPMD
+			log.error("Error occurred instrumenting the byte code of class " + className, storageException);
 			return null;
 		} finally {
 			// Remove the byte array class path from the class pool. The class

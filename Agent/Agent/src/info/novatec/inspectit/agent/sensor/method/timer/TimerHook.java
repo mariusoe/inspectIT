@@ -17,8 +17,9 @@ import java.lang.management.ThreadMXBean;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The hook implementation for the timer sensor. It uses the {@link ThreadLocalStack} class to save
@@ -34,9 +35,9 @@ import java.util.logging.Logger;
 public class TimerHook implements IMethodHook, IConstructorHook {
 
 	/**
-	 * The logger of the class.
+	 * The logger of this class. Initialized manually.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(TimerHook.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(TimerHook.class);
 
 	/**
 	 * The stack containing the start time values.
@@ -127,8 +128,7 @@ public class TimerHook implements IMethodHook, IConstructorHook {
 		} catch (RuntimeException e) {
 			// catching the runtime exceptions which could be thrown by the
 			// above statements.
-			LOGGER.log(Level.WARNING, "Exception in the TimerHook.", e);
-			e.printStackTrace(); // NOPMD
+			LOG.warn("Exception in the TimerHook.", e);
 		}
 
 		timerStorageFactory.setParameters(param);
@@ -201,8 +201,8 @@ public class TimerHook implements IMethodHook, IConstructorHook {
 
 				coreService.addObjectStorage(sensorTypeId, methodId, prefix, storage);
 			} catch (IdNotAvailableException e) {
-				if (LOGGER.isLoggable(Level.FINER)) {
-					LOGGER.finer("Could not save the timer data because of an unavailable id. " + e.getMessage());
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Could not save the timer data because of an unavailable id. " + e.getMessage());
 				}
 			}
 		} else {

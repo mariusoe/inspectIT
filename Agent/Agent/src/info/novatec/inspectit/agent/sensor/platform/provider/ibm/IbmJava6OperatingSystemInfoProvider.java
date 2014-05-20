@@ -6,8 +6,9 @@ import info.novatec.inspectit.agent.sensor.platform.provider.util.CpuUsageCalcul
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Method;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class provide the information about the operating system when the
@@ -24,14 +25,14 @@ import java.util.logging.Logger;
 public class IbmJava6OperatingSystemInfoProvider extends DefaultOperatingSystemInfoProvider {
 
 	/**
+	 * The logger of this class. Initialized manually.
+	 */
+	private static final Logger LOG = LoggerFactory.getLogger(IbmJava6OperatingSystemInfoProvider.class);
+
+	/**
 	 * FQN name of the IBMs class that provides operating system management.
 	 */
 	private static final String IBM_OPERATING_SYSTEM_MX_BEAN_CLASS = "com.ibm.lang.management.OperatingSystemMXBeanImpl";
-
-	/**
-	 * The logger of the class.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(IbmJava6OperatingSystemInfoProvider.class.getName());
 
 	/**
 	 * The managed bean to retrieve information about the uptime of the JVM.
@@ -215,7 +216,7 @@ public class IbmJava6OperatingSystemInfoProvider extends DefaultOperatingSystemI
 		try {
 			return (V) method.invoke(instance, args);
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Exception throw during method invocation.", e);
+			LOG.warn("Exception throw during method invocation.", e);
 			return null;
 		}
 	}

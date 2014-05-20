@@ -3,17 +3,18 @@ package info.novatec.inspectit.agent.hooking.impl;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.hooking.IConstructorHook;
-import info.novatec.inspectit.agent.hooking.IHookDispatcherMapper;
 import info.novatec.inspectit.agent.hooking.IHook;
 import info.novatec.inspectit.agent.hooking.IHookDispatcher;
+import info.novatec.inspectit.agent.hooking.IHookDispatcherMapper;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
 import info.novatec.inspectit.agent.sensor.exception.IExceptionSensorHook;
 import info.novatec.inspectit.agent.sensor.method.IMethodSensor;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +32,8 @@ public class HookDispatcher implements IHookDispatcherMapper, IHookDispatcher {
 	/**
 	 * The logger of this class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(HookDispatcher.class.getName());
+	@Log
+	Logger log;
 
 	/**
 	 * The default core service.
@@ -129,8 +131,7 @@ public class HookDispatcher implements IHookDispatcherMapper, IHookDispatcher {
 						methodHook.beforeBody(id, entry.getKey().longValue(), object, parameters, rsc);
 					}
 				} catch (Throwable throwable) { // NOPMD
-					LOGGER.severe("An error happened in the Hook Dispatcher! (before body)");
-					throwable.printStackTrace(); // NOPMD
+					log.error("An error happened in the Hook Dispatcher! (before body)", throwable);
 				}
 			} finally {
 				executionMarker.deactive();
@@ -153,8 +154,7 @@ public class HookDispatcher implements IHookDispatcherMapper, IHookDispatcher {
 						methodHook.firstAfterBody(id, entry.getKey().longValue(), object, parameters, returnValue, rsc);
 					}
 				} catch (Throwable throwable) { // NOPMD
-					LOGGER.severe("An error happened in the Hook Dispatcher! (after body)");
-					throwable.printStackTrace(); // NOPMD
+					log.error("An error happened in the Hook Dispatcher! (after body)", throwable);
 				}
 			} finally {
 				executionMarker.deactive();
@@ -211,8 +211,7 @@ public class HookDispatcher implements IHookDispatcherMapper, IHookDispatcher {
 						invocationHook.secondAfterBody(coreService, id, -1, object, parameters, returnValue, rsc);
 					}
 				} catch (Throwable throwable) { // NOPMD
-					LOGGER.severe("An error happened in the Hook Dispatcher! (second after body)");
-					throwable.printStackTrace(); // NOPMD
+					log.error("An error happened in the Hook Dispatcher! (second after body)", throwable);
 				}
 			} finally {
 				executionMarker.deactive();
@@ -387,8 +386,7 @@ public class HookDispatcher implements IHookDispatcherMapper, IHookDispatcher {
 						constructorHook.beforeConstructor(id, entry.getKey().longValue(), parameters, rsc);
 					}
 				} catch (Throwable throwable) { // NOPMD
-					LOGGER.severe("An error happened in the Hook Dispatcher! (before constructor)");
-					throwable.printStackTrace(); // NOPMD
+					log.error("An error happened in the Hook Dispatcher! (before constructor)", throwable);
 				}
 			} finally {
 				executionMarker.deactive();
@@ -446,8 +444,7 @@ public class HookDispatcher implements IHookDispatcherMapper, IHookDispatcher {
 						invocationHook.afterConstructor(coreService, id, -1, object, parameters, rsc);
 					}
 				} catch (Throwable throwable) { // NOPMD
-					LOGGER.severe("An error happened in the Hook Dispatcher! (after constructor)");
-					throwable.printStackTrace(); // NOPMD
+					log.error("An error happened in the Hook Dispatcher! (after constructor)", throwable);
 				}
 			} finally {
 				executionMarker.deactive();

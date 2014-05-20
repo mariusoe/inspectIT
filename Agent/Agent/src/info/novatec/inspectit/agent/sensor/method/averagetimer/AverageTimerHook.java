@@ -17,8 +17,9 @@ import info.novatec.inspectit.util.Timer;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The hook implementation for the average timer sensor. It uses the {@link ThreadLocalStack} class
@@ -32,9 +33,9 @@ import java.util.logging.Logger;
 public class AverageTimerHook implements IMethodHook, IConstructorHook {
 
 	/**
-	 * The logger of this class.
+	 * The logger of this class. Initialized manually.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(AverageTimerHook.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(AverageTimerHook.class);
 
 	/**
 	 * The stack containing the start time values.
@@ -133,8 +134,8 @@ public class AverageTimerHook implements IMethodHook, IConstructorHook {
 
 				coreService.addMethodSensorData(sensorTypeId, methodId, prefix, timerData);
 			} catch (IdNotAvailableException e) {
-				if (LOGGER.isLoggable(Level.FINER)) {
-					LOGGER.finer("Could not save the average timer data because of an unavailable id. " + e.getMessage());
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Could not save the average timer data because of an unavailable id. " + e.getMessage());
 				}
 			}
 		} else {

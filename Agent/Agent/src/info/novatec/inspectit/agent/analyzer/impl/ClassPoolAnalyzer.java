@@ -1,13 +1,13 @@
 package info.novatec.inspectit.agent.analyzer.impl;
 
 import info.novatec.inspectit.agent.analyzer.IClassPoolAnalyzer;
+import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.util.WeakList;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
-import java.util.logging.Logger;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -17,6 +17,7 @@ import javassist.LoaderClassPath;
 import javassist.Modifier;
 import javassist.NotFoundException;
 
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,7 +32,8 @@ public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 	/**
 	 * The logger of this class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(ClassPoolAnalyzer.class.getName());
+	@Log
+	Logger log;
 
 	/**
 	 * A weak list to save references to the class loaders.
@@ -55,10 +57,10 @@ public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 				return cc.getDeclaredMethods();
 			}
 		} catch (NotFoundException e) {
-			LOGGER.severe("NotFoundException caught for class: " + className);
+			log.error("NotFoundException caught for class: " + className);
 		} catch (RuntimeException e) {
-			LOGGER.severe("Class which generated a runtime exception: " + className);
-			LOGGER.severe(e.getMessage());
+			log.error("Class which generated a runtime exception: " + className);
+			log.error(e.getMessage());
 		}
 
 		return new CtMethod[0];
@@ -85,10 +87,10 @@ public class ClassPoolAnalyzer implements IClassPoolAnalyzer {
 				return constructorList.toArray(new CtConstructor[constructorList.size()]);
 			}
 		} catch (NotFoundException e) {
-			LOGGER.severe("NotFoundException caught for class: " + className);
+			log.error("NotFoundException caught for class: " + className);
 		} catch (RuntimeException e) {
-			LOGGER.severe("Class which generated a runtime exception: " + className);
-			LOGGER.severe(e.getMessage());
+			log.error("Class which generated a runtime exception: " + className);
+			log.error(e.getMessage());
 		}
 
 		return new CtConstructor[0];

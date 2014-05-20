@@ -15,8 +15,9 @@ import java.lang.management.ThreadMXBean;
 import java.sql.Timestamp;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The hook implementation for the http sensor. It uses the {@link ThreadLocalStack} class to save
@@ -32,9 +33,9 @@ import java.util.logging.Logger;
 public class HttpHook implements IMethodHook {
 
 	/**
-	 * The logger of the class.
+	 * The logger of this class. Initialized manually.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(HttpHook.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(HttpHook.class);
 
 	/**
 	 * The stack containing the start time values.
@@ -129,7 +130,9 @@ public class HttpHook implements IMethodHook {
 		this.extractor = new HttpRequestParameterExtractor(new StringConstraint(parameters));
 
 		if (null != parameters && "true".equals(parameters.get("sessioncapture"))) {
-			LOGGER.finer("Enabling session capturing for the http sensor");
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Enabling session capturing for the http sensor");
+			}
 			captureSessionData = true;
 		} else {
 			captureSessionData = false;
@@ -151,7 +154,7 @@ public class HttpHook implements IMethodHook {
 		} catch (RuntimeException e) {
 			// catching the runtime exceptions which could be thrown by the
 			// above statements.
-			LOGGER.warning("Your environment does not support to capture CPU timings.");
+			LOG.warn("Your environment does not support to capture CPU timings.");
 		}
 	}
 
@@ -287,8 +290,8 @@ public class HttpHook implements IMethodHook {
 						// returning gathered information
 						coreService.addMethodSensorData(registeredSensorTypeId, registeredMethodId, null, data);
 					} catch (IdNotAvailableException e) {
-						if (LOGGER.isLoggable(Level.FINER)) {
-							LOGGER.finer("Could not save the timer data because of an unavailable id. " + e.getMessage());
+						if (LOG.isDebugEnabled()) {
+							LOG.debug("Could not save the timer data because of an unavailable id. " + e.getMessage());
 						}
 					}
 				}

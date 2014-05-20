@@ -14,8 +14,9 @@ import info.novatec.inspectit.util.Timer;
 
 import java.sql.Timestamp;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The hook implementation for the statement sensor. It uses the {@link ThreadLocalStack} class to
@@ -31,9 +32,9 @@ import java.util.logging.Logger;
 public class StatementHook implements IMethodHook {
 
 	/**
-	 * The logger of this class.
+	 * The logger of this class. Initialized manually.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(StatementHook.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(StatementHook.class);
 
 	/**
 	 * The stack containing the start time values.
@@ -141,8 +142,8 @@ public class StatementHook implements IMethodHook {
 					connectionMetaDataStorage.populate(sqlData, statementReflectionCache.getConnection(object.getClass(), object));
 					coreService.addMethodSensorData(sensorTypeId, methodId, sql, sqlData);
 				} catch (IdNotAvailableException e) {
-					if (LOGGER.isLoggable(Level.FINER)) {
-						LOGGER.finer("Could not save the sql data because of an unavailable id. " + e.getMessage());
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("Could not save the sql data because of an unavailable id. " + e.getMessage());
 					}
 				}
 			} else {

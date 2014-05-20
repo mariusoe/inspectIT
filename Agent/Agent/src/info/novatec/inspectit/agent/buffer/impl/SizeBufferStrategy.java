@@ -3,11 +3,13 @@ package info.novatec.inspectit.agent.buffer.impl;
 import info.novatec.inspectit.agent.buffer.AbstractBufferStrategy;
 import info.novatec.inspectit.agent.buffer.IBufferStrategy;
 import info.novatec.inspectit.communication.MethodSensorData;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
 
 /**
  * This implementation will hold all list of measurements for the given size. It works as a FILO
@@ -21,7 +23,8 @@ public class SizeBufferStrategy extends AbstractBufferStrategy<MethodSensorData>
 	/**
 	 * The logger of the class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(SizeBufferStrategy.class.getName());
+	@Log
+	Logger log;
 
 	/**
 	 * The default count if none is specified.
@@ -72,7 +75,7 @@ public class SizeBufferStrategy extends AbstractBufferStrategy<MethodSensorData>
 				// the old ones, because we can not let the data pile up if the sending of the data
 				// is not fast enough
 				stack.removeFirst();
-				LOGGER.info("Possible data loss due to the excessive data creation on the Agent!");
+				log.info("Possible data loss due to the excessive data creation on the Agent!");
 			}
 
 			stack.addLast(measurements);

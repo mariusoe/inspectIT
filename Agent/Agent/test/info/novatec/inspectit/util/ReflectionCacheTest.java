@@ -3,11 +3,9 @@ package info.novatec.inspectit.util;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import info.novatec.inspectit.agent.test.AbstractLogSupport;
+import info.novatec.inspectit.agent.AbstractLogSupport;
 
-import java.util.logging.Level;
-
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("PMD")
@@ -15,12 +13,7 @@ public class ReflectionCacheTest extends AbstractLogSupport {
 	
 	private ReflectionCache cache;
 	
-	@Override
-	protected Level getLogLevel() {
-		return Level.INFO;
-	}
-	
-	@BeforeTest
+	@BeforeMethod
 	public void init() {
 		cache = new ReflectionCache();
 	}

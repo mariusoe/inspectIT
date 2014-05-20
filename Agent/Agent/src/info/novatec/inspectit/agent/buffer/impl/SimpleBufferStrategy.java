@@ -3,11 +3,13 @@ package info.novatec.inspectit.agent.buffer.impl;
 import info.novatec.inspectit.agent.buffer.AbstractBufferStrategy;
 import info.novatec.inspectit.agent.buffer.IBufferStrategy;
 import info.novatec.inspectit.communication.MethodSensorData;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
 
 /**
  * The simplest version of a buffer strategy contains just the reference to one measurement list.
@@ -21,7 +23,8 @@ public class SimpleBufferStrategy extends AbstractBufferStrategy<MethodSensorDat
 	/**
 	 * The logger of the class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(SimpleBufferStrategy.class.getName());
+	@Log
+	Logger log;
 
 	/**
 	 * Stores the reference to the last given measurements.
@@ -45,7 +48,9 @@ public class SimpleBufferStrategy extends AbstractBufferStrategy<MethodSensorDat
 				// if the measurements already exist, this buffer strategy will simply drop the old
 				// ones, because we can not let the data pile up if the sending of the data is not
 				// fast enough
-				LOGGER.fine("Possible data loss due to the excessive data creation on the Agent!");
+				if (log.isDebugEnabled()) {
+					log.debug("Possible data loss due to the excessive data creation on the Agent!");
+				}
 			}
 			this.measurements = measurements;
 			newMeasurements = true;

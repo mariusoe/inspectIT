@@ -4,11 +4,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
+import info.novatec.inspectit.agent.AbstractLogSupport;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
 import info.novatec.inspectit.agent.core.IIdManager;
 import info.novatec.inspectit.agent.core.IdNotAvailableException;
-import info.novatec.inspectit.agent.test.AbstractLogSupport;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.util.Timer;
@@ -19,7 +19,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
-import java.util.logging.Level;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServlet;
@@ -73,11 +72,6 @@ public class HttpHookTest extends AbstractLogSupport {
 	private long sensorTypeId = 3L;
 	private long registeredMethodId = 13L;
 	private long registeredSensorTypeId = 7L;
-
-	@Override
-	protected Level getLogLevel() {
-		return Level.OFF;
-	}
 
 	@BeforeMethod(dependsOnMethods = { "initMocks" })
 	public void initTestClass() {

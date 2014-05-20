@@ -16,6 +16,7 @@ import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -96,7 +97,8 @@ public class JavaAgent implements ClassFileTransformer {
 			// now we load the PicoAgent via our own classloader
 			InspectItClassLoader classLoader = new InspectItClassLoader(new URL[0], JavaAgent.class.getClassLoader());
 			Class<?> agentClazz = classLoader.loadClass(INSPECTIT_AGENT);
-			Object realAgent = agentClazz.newInstance();
+			Constructor<?> constructor = agentClazz.getConstructor(String.class);
+			Object realAgent = constructor.newInstance(getInspectItAgentJarFileLocation());
 
 			// we can reference the Agent now here because it should have been added to the
 			// bootclasspath and thus available from anywhere in the application

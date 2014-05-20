@@ -1,11 +1,10 @@
 package info.novatec.inspectit.agent.sensor.method.jdbc;
 
+import info.novatec.inspectit.agent.AbstractLogSupport;
 import info.novatec.inspectit.agent.config.impl.RegisteredSensorConfig;
 import info.novatec.inspectit.agent.core.ICoreService;
-import info.novatec.inspectit.agent.test.AbstractLogSupport;
 
 import java.util.List;
-import java.util.logging.Level;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -203,11 +202,4 @@ public class PreparedStatementParameterHookTest extends AbstractLogSupport {
 		return new Object[][] { { "setAsciiStream" }, { "setBinaryStream" }, { "setBlob" }, { "setCharacterStream" }, { "setClob" }, { "setNCharacterStream" }, { "setNClob" }, { "setUnicodeStream" } };
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected Level getLogLevel() {
-		return Level.OFF;
-	}
 }

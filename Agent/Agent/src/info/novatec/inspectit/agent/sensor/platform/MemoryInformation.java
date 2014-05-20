@@ -7,13 +7,13 @@ import info.novatec.inspectit.agent.sensor.platform.provider.MemoryInfoProvider;
 import info.novatec.inspectit.agent.sensor.platform.provider.OperatingSystemInfoProvider;
 import info.novatec.inspectit.agent.sensor.platform.provider.factory.PlatformSensorInfoProviderFactory;
 import info.novatec.inspectit.communication.data.MemoryInformationData;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -27,7 +27,8 @@ public class MemoryInformation extends AbstractPlatformSensor implements IPlatfo
 	/**
 	 * The logger of the class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(MemoryInformation.class.getName());
+	@Log
+	Logger log;
 
 	/**
 	 * The ID Manager used to get the correct IDs.
@@ -186,8 +187,8 @@ public class MemoryInformation extends AbstractPlatformSensor implements IPlatfo
 
 				coreService.addPlatformSensorData(sensorTypeIdent, memoryData);
 			} catch (IdNotAvailableException e) {
-				if (LOGGER.isLoggable(Level.FINER)) {
-					LOGGER.finer("Could not save the memory information because of an unavailable id. " + e.getMessage());
+				if (log.isDebugEnabled()) {
+					log.debug("Could not save the memory information because of an unavailable id. " + e.getMessage());
 				}
 			}
 		} else {

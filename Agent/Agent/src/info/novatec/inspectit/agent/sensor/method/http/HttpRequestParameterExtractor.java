@@ -9,8 +9,9 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Thread-safe realization to extract information from <code>HttpServletRequests</code>.
@@ -18,6 +19,11 @@ import java.util.logging.Logger;
  * @author Stefan Siegl
  */
 class HttpRequestParameterExtractor {
+
+	/**
+	 * The logger of this class. Initialized manually.
+	 */
+	private static final Logger LOG = LoggerFactory.getLogger(HttpRequestParameterExtractor.class);
 
 	/**
 	 * Constraint for String length.
@@ -30,11 +36,6 @@ class HttpRequestParameterExtractor {
 	 * put some method to serve as a marker.
 	 */
 	private Method markerMethod;
-
-	/**
-	 * The logger of the class.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(HttpRequestParameterExtractor.class.getName());
 
 	/**
 	 * Keeps track of already looked up <code>Method</code> objects for faster access. Get and Put
@@ -131,7 +132,7 @@ class HttpRequestParameterExtractor {
 				return HttpTimerData.UNDEFINED;
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Invocation on given object failed.", e);
+			LOG.error("Invocation on given object failed.", e);
 			return HttpTimerData.UNDEFINED;
 		}
 	}
@@ -161,7 +162,7 @@ class HttpRequestParameterExtractor {
 				return HttpTimerData.UNDEFINED;
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Invocation on given object failed.", e);
+			LOG.error("Invocation on given object failed.", e);
 			return HttpTimerData.UNDEFINED;
 		}
 	}
@@ -193,7 +194,7 @@ class HttpRequestParameterExtractor {
 
 			return strConstraint.crop(parameterMap);
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Invocation on given object failed.", e);
+			LOG.error("Invocation on given object failed.", e);
 			return null;
 		}
 	}
@@ -225,7 +226,9 @@ class HttpRequestParameterExtractor {
 			Enumeration<String> params = (Enumeration<String>) attributesMethod.invoke(httpServletRequest, (Object[]) null);
 			Map<String, String> attributes = new HashMap<String, String>();
 			if (null == params) {
-				LOGGER.finer("Attribute enumeration was <null>");
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Attribute enumeration was <null>");
+				}
 				return null;
 			}
 			while (params.hasMoreElements()) {
@@ -235,7 +238,7 @@ class HttpRequestParameterExtractor {
 			}
 			return attributes;
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Invocation of " + attributesMethod.getName() + " to get attributes on given object failed.", e);
+			LOG.error("Invocation of " + attributesMethod.getName() + " to get attributes on given object failed.", e);
 			return null;
 		}
 	}
@@ -275,7 +278,7 @@ class HttpRequestParameterExtractor {
 				return headersResult;
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Invocation of to get attributes on given object failed.", e);
+			LOG.error("Invocation of to get attributes on given object failed.", e);
 		}
 		return null;
 	}
@@ -305,13 +308,15 @@ class HttpRequestParameterExtractor {
 			httpSession = getSessionMethod.invoke(httpServletRequest, new Object[] { Boolean.FALSE });
 			if (httpSession == null) {
 				// Currently we do not have a session and thus cannot get any session attributes
-				LOGGER.finer("No session can be found");
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("No session can be found");
+				}
 				return null;
 			}
 			httpSessionClass = httpSession.getClass();
 
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Invocation of to get attributes on given object failed.", e);
+			LOG.error("Invocation of to get attributes on given object failed.", e);
 			// we cannot go on!
 			return null;
 		}
@@ -340,7 +345,7 @@ class HttpRequestParameterExtractor {
 				return sessionAttributes;
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Invocation of to get attributes on given object failed.", e);
+			LOG.error("Invocation of to get attributes on given object failed.", e);
 		}
 		return null;
 	}
@@ -370,7 +375,7 @@ class HttpRequestParameterExtractor {
 					m = existing;
 				}
 			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, "The provided class " + clazzUsedToLookup.getCanonicalName() + " did not provide the desired method.", e);
+				LOG.error("The provided class " + clazzUsedToLookup.getCanonicalName() + " did not provide the desired method.", e);
 
 				// Do not try to look up every time.
 				// Can not place null as value anyway

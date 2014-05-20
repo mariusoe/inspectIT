@@ -6,6 +6,8 @@ import info.novatec.inspectit.agent.config.IConfigurationStorage;
 import info.novatec.inspectit.agent.config.ParserException;
 import info.novatec.inspectit.agent.config.PriorityEnum;
 import info.novatec.inspectit.agent.config.StorageException;
+import info.novatec.inspectit.agent.logback.LogInitializer;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,10 +22,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -41,7 +43,8 @@ public class FileConfigurationReader implements IConfigurationReader, Initializi
 	/**
 	 * The logger of the class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(FileConfigurationReader.class.getName());
+	@Log
+	Logger log;
 
 	/**
 	 * Default ignore classes patterns. These will be used if no patterns is supplied by the user.
@@ -128,8 +131,10 @@ public class FileConfigurationReader implements IConfigurationReader, Initializi
 		// Load and parse the file
 		try {
 			File configFile = new File(pathToConfig);
+			if (log.isDebugEnabled()) {
+				log.debug("Agent Configuration file found at: " + configFile.getAbsolutePath());
+			}
 			InputStream is = new FileInputStream(configFile);
-			LOGGER.finer("Agent Configuration file found at: " + configFile.getAbsolutePath());
 			InputStreamReader reader = new InputStreamReader(is);
 			this.parse(reader, pathToConfig);
 
@@ -143,7 +148,7 @@ public class FileConfigurationReader implements IConfigurationReader, Initializi
 			}
 
 		} catch (FileNotFoundException e) {
-			LOGGER.info("Agent Configuration file not found at " + pathToConfig + ", aborting!");
+			log.info("Agent Configuration file not found at " + pathToConfig + ", aborting!");
 			throw new ParserException("Agent Configuration file not found at " + pathToConfig, e);
 		}
 	}
@@ -238,7 +243,7 @@ public class FileConfigurationReader implements IConfigurationReader, Initializi
 				}
 			}
 		} catch (Throwable throwable) { // NOPMD
-			LOGGER.severe("Error reading config on line : " + line);
+			log.error("Error reading config on line : " + line);
 			throw new ParserException("Error reading config on line : " + line, throwable);
 		}
 	}
@@ -459,6 +464,9 @@ public class FileConfigurationReader implements IConfigurationReader, Initializi
 		int port = Integer.parseInt(tokenizer.nextToken());
 		String name = tokenizer.nextToken();
 
+		// when we know the name init the logging
+		LogInitializer.setAgentNameAndInitLogging(name);
+
 		try {
 			configurationStorage.setAgentName(name);
 			configurationStorage.setRepository(host, port);
@@ -539,17 +547,17 @@ public class FileConfigurationReader implements IConfigurationReader, Initializi
 			file = new File(new File(pathToParentFile).getParent() + File.separator + fileName);
 		}
 		if (file.isDirectory()) {
-			LOGGER.info("Specified additional configuration is a folder: " + file.getAbsolutePath() + ", aborting!");
+			log.info("Specified additional configuration is a folder: " + file.getAbsolutePath() + ", aborting!");
 			throw new ParserException("Specified additional configuration is a folder: " + file.getAbsolutePath());
 		}
 
 		try {
+			log.info("Additional agent configuration file found at: " + file.getAbsolutePath());
 			InputStream is = new FileInputStream(file);
-			LOGGER.info("Additional agent configuration file found at: " + file.getAbsolutePath());
 			InputStreamReader reader = new InputStreamReader(is);
 			this.parse(reader, file.getAbsolutePath());
 		} catch (FileNotFoundException e) {
-			LOGGER.info("Additional agent configuration file not found at " + file.getAbsolutePath() + ", aborting!");
+			log.info("Additional agent configuration file not found at " + file.getAbsolutePath() + ", aborting!");
 			throw new ParserException("Additional agent Configuration file not found at " + file.getAbsolutePath(), e);
 		}
 	}

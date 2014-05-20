@@ -2,8 +2,9 @@ package info.novatec.inspectit.util;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -15,8 +16,10 @@ import com.google.common.cache.CacheBuilder;
  */
 public class ReflectionCache {
 
-	/** The Logger. */
-	private static final Logger LOGGER = Logger.getLogger(ReflectionCache.class.getName());
+	/**
+	 * The logger of this class. Initialized manually.
+	 */
+	private static final Logger LOG = LoggerFactory.getLogger(ReflectionCache.class);
 
 	/**
 	 * Cache that holds the <code> Method </code> instances for the Class and method Names.
@@ -71,7 +74,7 @@ public class ReflectionCache {
 			try {
 				method = clazz.getMethod(methodName, parameterTypes);
 			} catch (Exception e) {
-				LOGGER.log(Level.WARNING, "Could not lookup method " + methodName + " on class " + clazz.getName(), e);
+				LOG.warn("Could not lookup method " + methodName + " on class " + clazz.getName(), e);
 				return errorValue;
 			}
 			classCache.put(methodName, method);
@@ -81,7 +84,7 @@ public class ReflectionCache {
 		try {
 			return method.invoke(instance, values);
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Could not invoke method " + methodName + " on instance " + instance, e);
+			LOG.warn("Could not invoke method " + methodName + " on instance " + instance, e);
 			return errorValue;
 		}
 	}

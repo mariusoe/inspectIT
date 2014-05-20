@@ -4,6 +4,7 @@ import info.novatec.inspectit.agent.config.IPropertyAccessor;
 import info.novatec.inspectit.agent.config.PropertyAccessException;
 import info.novatec.inspectit.communication.data.ParameterContentData;
 import info.novatec.inspectit.communication.data.ParameterContentType;
+import info.novatec.inspectit.spring.logger.Log;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -12,9 +13,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,7 +31,8 @@ public class PropertyAccessor implements IPropertyAccessor {
 	/**
 	 * The logger of this class.
 	 */
-	private static final Logger LOGGER = Logger.getLogger(PropertyAccessor.class.getName());
+	@Log
+	Logger log;
 
 	/**
 	 * Static null value for return value capturing in case the returned value was <code>null</code>
@@ -161,7 +162,7 @@ public class PropertyAccessor implements IPropertyAccessor {
 					// dealing with an array
 					return getPropertyContent(propertyPath.getPathToContinue(), Integer.valueOf(Array.getLength(object)));
 				} else {
-					LOGGER.severe("Trying to access the lenght() method for a non array type");
+					log.error("Trying to access the lenght() method for a non array type");
 					throw new PropertyAccessException("Trying to access the length() method for a non array type");
 				}
 			}
@@ -179,8 +180,8 @@ public class PropertyAccessor implements IPropertyAccessor {
 						// We are only calling methods that do not take an
 						// argument
 						if (method.getParameterTypes().length != 0) {
-							if (LOGGER.isLoggable(Level.FINE)) {
-								LOGGER.fine("Skipping matching method " + method.getName() + " as it is not a no argument method");
+							if (log.isDebugEnabled()) {
+								log.debug("Skipping matching method " + method.getName() + " as it is not a no argument method");
 							}
 							continue;
 						}
@@ -189,13 +190,13 @@ public class PropertyAccessor implements IPropertyAccessor {
 							Object result = method.invoke(object, (Object[]) null);
 							return getPropertyContent(propertyPath.getPathToContinue(), result);
 						} catch (IllegalArgumentException e) {
-							LOGGER.severe(e.getMessage());
+							log.error(e.getMessage());
 							throw new PropertyAccessException("Illegal Argument Exception!", e);
 						} catch (IllegalAccessException e) {
-							LOGGER.severe(e.getMessage());
+							log.error(e.getMessage());
 							throw new PropertyAccessException("IllegalAccessException!", e);
 						} catch (InvocationTargetException e) {
-							LOGGER.severe(e.getMessage());
+							log.error(e.getMessage());
 							throw new PropertyAccessException("InvocationTargetException!", e);
 						}
 
@@ -217,13 +218,13 @@ public class PropertyAccessor implements IPropertyAccessor {
 							Object fieldObject = field.get(object);
 							return getPropertyContent(propertyPath.getPathToContinue(), fieldObject);
 						} catch (SecurityException e) {
-							LOGGER.severe(e.getMessage());
+							log.error(e.getMessage());
 							throw new PropertyAccessException("Security Exception was thrown while accessing a field!", e);
 						} catch (IllegalArgumentException e) {
-							LOGGER.severe(e.getMessage());
+							log.error(e.getMessage());
 							throw new PropertyAccessException("Illegal Argument Exception!", e);
 						} catch (IllegalAccessException e) {
-							LOGGER.severe(e.getMessage());
+							log.error(e.getMessage());
 							throw new PropertyAccessException("Illegal Access Exception!", e);
 						}
 					}
@@ -253,8 +254,8 @@ public class PropertyAccessor implements IPropertyAccessor {
 				paramContentData.setSignaturePosition(start.getSignaturePosition());
 				parameterContentData.add(paramContentData);
 			} catch (PropertyAccessException e) {
-				if (LOGGER.isLoggable(Level.SEVERE)) {
-					LOGGER.severe("Cannot access the property: " + start + " for class " + clazz + ". Will be removed from the list to prevent further errors! (" + e.getMessage() + ")");
+				if (log.isErrorEnabled()) {
+					log.error("Cannot access the property: " + start + " for class " + clazz + ". Will be removed from the list to prevent further errors! (" + e.getMessage() + ")");
 				}
 
 				propertyAccessorList.remove(start);
