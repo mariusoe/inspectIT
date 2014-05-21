@@ -9,7 +9,6 @@ import info.novatec.inspectit.agent.connection.RegistrationException;
 import info.novatec.inspectit.agent.connection.ServerUnavailableException;
 import info.novatec.inspectit.cmr.service.IAgentStorageService;
 import info.novatec.inspectit.cmr.service.IRegistrationService;
-import info.novatec.inspectit.cmr.service.LicenseException;
 import info.novatec.inspectit.cmr.service.exception.ServiceException;
 import info.novatec.inspectit.communication.DefaultData;
 
@@ -147,9 +146,6 @@ public class RMIConnection implements IConnection {
 			return registrationService.registerPlatformIdent(networkInterfaces, agentName, version);
 		} catch (RemoteException remoteException) {
 			LOGGER.throwing(RMIConnection.class.getName(), "registerPlatform(String)", remoteException);
-			if (remoteException.getCause() instanceof LicenseException) {
-				LOGGER.severe("License could not be obtained, inspectIT agent will not start! Cause: " + remoteException.getCause().getMessage());
-			}
 			throw new RegistrationException("Could not register the platform", remoteException);
 		} catch (SocketException socketException) {
 			LOGGER.severe("Could not obtain network interfaces from this machine!");

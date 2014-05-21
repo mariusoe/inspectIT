@@ -110,8 +110,6 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 	 * Tests that an exception will be thrown if the database returns two or more platform idents
 	 * after findByExample search.
 	 * 
-	 * @throws LicenseContentException
-	 *             If {@link LicenseContentException} occurs.
 	 * @throws RemoteException
 	 *             If remote exception occurs.
 	 * @throws ServiceException
@@ -229,7 +227,7 @@ public class RegistrationServiceTest extends AbstractTestNGLogSupport {
 	 *             If {@link ServiceException} occurs.
 	 */
 	@Test
-	public void registerNewPlatformIdentNoIpBased() throws LicenseException, RemoteException, ServiceException {
+	public void registerNewPlatformIdentNoIpBased() throws RemoteException, ServiceException {
 		final long platformId = 10;
 		List<String> definedIps = new ArrayList<String>();
 		definedIps.add("ip");
