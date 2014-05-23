@@ -44,8 +44,6 @@
 		<dependency org="org.eclipse.nebula" name="cwt" rev="0.9.0.201311081230" conf="osgi->default" />
 		<dependency org="org.eclipse.nebula" name="cdatetime" rev="0.14.0.201311081230" conf="osgi->default" />
 
-		<dependency org="com.esotericsoftware.kryo" name="kryo" rev="2.23.0" conf="osgi->default" />
-
 		<!-- Libs that are transfered by us -->
 
 		<dependency org="org.hibernate" name="info.novatec.hibernate-core" rev="3.5.3-Final" conf="osgi->default" />

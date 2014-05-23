@@ -37,7 +37,7 @@
 		<dependency org="javax.servlet" name="javax.servlet" rev="3.0.0.v201103241009" conf="prod->default" />
 		<dependency org="net.sourceforge.cglib" name="com.springsource.net.sf.cglib" rev="2.2.0" conf="prod->default" />
 
-		<dependency org="com.esotericsoftware.kryo" name="kryo" rev="2.23.0" conf="prod->default" />
+		<dependency org="com.esotericsoftware.kryo" name="kryo" rev="2.24.0" conf="prod->default" />
 		<dependency org="de.javakaffee" name="info.novatec.kryo-serializers" rev="0.22" conf="prod->default" />
 		<dependency org="com.esotericsoftware.reflectasm" name="info.novatec.reflectasm" rev="1.07" conf="prod->default" />
 		<dependency org="com.esotericsoftware.minlog" name="info.novatec.minlog" rev="1.2" conf="prod->default" />
