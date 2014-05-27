@@ -191,7 +191,6 @@ public class HttpHook implements IMethodHook {
 				}
 			}
 		} else {
-
 			// Mark sub invocation, first already marked.
 			refMarker.markCall();
 		}
@@ -226,6 +225,8 @@ public class HttpHook implements IMethodHook {
 
 		// check if in the right(first) invocation
 		if (refMarker.isMarkerSet() && refMarker.matchesFirst()) {
+			// call ended, remove the marker.
+			refMarker.remove();
 
 			// double check if nothing changed
 			if (parameters.length != 0) {
@@ -285,9 +286,6 @@ public class HttpHook implements IMethodHook {
 
 						// returning gathered information
 						coreService.addMethodSensorData(registeredSensorTypeId, registeredMethodId, null, data);
-
-						refMarker.remove();
-
 					} catch (IdNotAvailableException e) {
 						if (LOGGER.isLoggable(Level.FINER)) {
 							LOGGER.finer("Could not save the timer data because of an unavailable id. " + e.getMessage());
