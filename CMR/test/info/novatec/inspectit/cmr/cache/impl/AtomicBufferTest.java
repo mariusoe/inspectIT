@@ -318,6 +318,7 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 	@Test(invocationCount = 5)
 	public void indexingTreeMaintenance() throws Exception {
 		Random random = new Random();
+		long flagsSetOnBytes = 30L;
 		long elements = 1 + random.nextInt(10000);
 
 		// when adding 30 bytes, maintenance should be done
@@ -325,7 +326,7 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 		when(bufferProperties.getInitialBufferSize()).thenReturn(elements);
 		when(bufferProperties.getEvictionOccupancyPercentage()).thenReturn(0.5f);
 		when(bufferProperties.getEvictionFragmentSizePercentage()).thenReturn(0.35f);
-		when(bufferProperties.getFlagsSetOnBytes(anyLong())).thenReturn(30L);
+		when(bufferProperties.getFlagsSetOnBytes(anyLong())).thenReturn(flagsSetOnBytes);
 		when(bufferProperties.getIndexingWaitTime()).thenReturn(10L);
 		when(indexingTree.getComponentSize(objectSizes)).thenReturn(10L);
 		buffer.postConstruct();
@@ -349,12 +350,18 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 			Thread.sleep(50);
 		}
 
-		assertThat(buffer.getCurrentSize(), is(elements + 10L));
-		verify(indexingTree, atLeast(1)).getComponentSize(objectSizes);
+		if (elements > flagsSetOnBytes) {
+			assertThat(buffer.getCurrentSize(), is(elements + 10L));
+			verify(indexingTree, atLeast(1)).getComponentSize(objectSizes);
+		} else {
+			assertThat(buffer.getCurrentSize(), is(elements));
+			verify(indexingTree, times(0)).getComponentSize(objectSizes);
+		}
 
 		// evict
 		assertThat(buffer.shouldEvict(), is(true));
 		buffer.evict();
+		long evicted = buffer.getEvictedElemenets();
 
 		// now add two more element to active the cleaning of the indexing tree
 		// the cleaning should be done after adding the first one, so we can execute the verify
@@ -370,7 +377,12 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 		bufferAnalyzer.interrupt();
 		bufferIndexer.interrupt();
 
-		verify(indexingTree, times(1)).cleanWithRunnable(Mockito.<ExecutorService> anyObject());
+		// only if we evicted enough we can expect the clean
+		if (evicted > flagsSetOnBytes) {
+			verify(indexingTree, times(1)).cleanWithRunnable(Mockito.<ExecutorService> anyObject());
+		} else {
+			verify(indexingTree, times(0)).cleanWithRunnable(Mockito.<ExecutorService> anyObject());
+		}
 	}
 
 	/**
