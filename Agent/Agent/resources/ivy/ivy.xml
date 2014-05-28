@@ -12,7 +12,7 @@
 	</configurations>
 
 	<dependencies>
-		<dependency org="org.javassist" name="info.novatec.javassist" rev="3.18.1-GA" conf="prod->default" />
+		<dependency org="org.javassist" name="javassist" rev="3.18.2-GA" conf="prod->default" />
 		<dependency org="com.google.guava" name="guava-jdk5" rev="13.0" conf="prod->default" />
 		
 		<!-- logging dependencies, will be changed when logging is changed on agent -->
