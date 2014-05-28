@@ -174,6 +174,14 @@ public class ExceptionTreeInputController extends AbstractTreeInputController {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean canShowDetails() {
+		return true;
+	}
+
+	/**
 	 * {@inheritDoc}.
 	 * <p>
 	 * 

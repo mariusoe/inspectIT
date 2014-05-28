@@ -15,8 +15,6 @@ import info.novatec.inspectit.rcp.editor.table.input.InvocOverviewInputControlle
 import info.novatec.inspectit.rcp.editor.table.input.MethodInvocInputController;
 import info.novatec.inspectit.rcp.editor.table.input.MultiInvocDataInputController;
 import info.novatec.inspectit.rcp.editor.table.input.NavigationInvocOverviewInputController;
-import info.novatec.inspectit.rcp.editor.table.input.SqlInputController;
-import info.novatec.inspectit.rcp.editor.table.input.SqlInvocInputController;
 import info.novatec.inspectit.rcp.editor.table.input.SqlParameterAggregationInputControler;
 import info.novatec.inspectit.rcp.editor.table.input.TaggedHttpTimerDataInputController;
 import info.novatec.inspectit.rcp.editor.table.input.TimerDataInputController;
@@ -34,6 +32,8 @@ import info.novatec.inspectit.rcp.editor.tree.SteppingTreeSubView;
 import info.novatec.inspectit.rcp.editor.tree.TreeSubView;
 import info.novatec.inspectit.rcp.editor.tree.input.ExceptionMessagesTreeInputController;
 import info.novatec.inspectit.rcp.editor.tree.input.ExceptionTreeInputController;
+import info.novatec.inspectit.rcp.editor.tree.input.SqlInputController;
+import info.novatec.inspectit.rcp.editor.tree.input.SqlInvocInputController;
 import info.novatec.inspectit.rcp.editor.tree.input.SteppingInvocDetailInputController;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 
@@ -98,7 +98,7 @@ public final class SubViewFactory {
 			return threadSubView;
 		case INVOCATION_SEQUENCE:
 			GridCompositeSubView sqlCombinedView = new GridCompositeSubView();
-			ISubView invocSql = new TableSubView(new SqlInvocInputController());
+			ISubView invocSql = new TreeSubView(new SqlInvocInputController());
 			ISubView invocSqlSummary = new TextSubView(new SqlInvocSummaryTextInputController());
 			sqlCombinedView.addSubView(invocSql, new GridData(SWT.FILL, SWT.FILL, true, true));
 			sqlCombinedView.addSubView(invocSqlSummary, new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -120,7 +120,7 @@ public final class SubViewFactory {
 			return invocSubView;
 		case SQL:
 			SashCompositeSubView sqlSashSubView = new SashCompositeSubView();
-			sqlSashSubView.addSubView(new TableSubView(new SqlInputController()), 10);
+			sqlSashSubView.addSubView(new TreeSubView(new SqlInputController()), 10);
 			sqlSashSubView.addSubView(new TableSubView(new SqlParameterAggregationInputControler()), 5);
 			sqlSashSubView.addSubView(new TextSubView(new SqlStatementTextInputController()), 1);
 			return sqlSashSubView;
@@ -147,7 +147,7 @@ public final class SubViewFactory {
 			return groupedExceptionSensorSubView;
 		case NAVIGATION_INVOCATION:
 			GridCompositeSubView sqlCombinedView1 = new GridCompositeSubView();
-			ISubView invocSql1 = new TableSubView(new SqlInvocInputController());
+			ISubView invocSql1 = new TreeSubView(new SqlInvocInputController());
 			ISubView invocSqlSummary1 = new TextSubView(new SqlInvocSummaryTextInputController());
 			sqlCombinedView1.addSubView(invocSql1, new GridData(SWT.FILL, SWT.FILL, true, true));
 			sqlCombinedView1.addSubView(invocSqlSummary1, new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -175,7 +175,7 @@ public final class SubViewFactory {
 			SashCompositeSubView multiInvocSubView = new SashCompositeSubView();
 			ISubView multiInvocOverview = new TableSubView(new MultiInvocDataInputController());
 			TabbedCompositeSubView multiInvocTabbedSubView = new TabbedCompositeSubView();
-			ISubView multiInvocSql = new TableSubView(new SqlInvocInputController());
+			ISubView multiInvocSql = new TreeSubView(new SqlInvocInputController());
 			ISubView multiInvocMethods = new TableSubView(new MethodInvocInputController());
 			ISubView multiInvocExceptions = new TableSubView(new ExceptionSensorInvocInputController());
 

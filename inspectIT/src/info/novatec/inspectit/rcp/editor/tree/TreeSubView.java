@@ -6,10 +6,13 @@ import info.novatec.inspectit.rcp.editor.ISubView;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.FormRootEditor;
+import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController.SubViewClassification;
 import info.novatec.inspectit.rcp.editor.search.ISearchExecutor;
 import info.novatec.inspectit.rcp.editor.search.criteria.SearchCriteria;
 import info.novatec.inspectit.rcp.editor.search.criteria.SearchResult;
 import info.novatec.inspectit.rcp.editor.search.helper.DeferredTreeViewerSearchHelper;
+import info.novatec.inspectit.rcp.editor.tooltip.ColumnAwareToolTipSupport;
+import info.novatec.inspectit.rcp.editor.tooltip.IColumnToolTipProvider;
 import info.novatec.inspectit.rcp.editor.tree.input.TreeInputController;
 import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
 import info.novatec.inspectit.rcp.menu.ShowHideMenuManager;
@@ -21,8 +24,13 @@ import java.util.Set;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreePath;
@@ -64,6 +72,11 @@ public class TreeSubView extends AbstractSubView implements ISearchExecutor {
 	private TreeViewer treeViewer;
 
 	/**
+	 * Defines if a job is currently already executing.
+	 */
+	private volatile boolean jobInSchedule = false;
+
+	/**
 	 * {@link DeferredTreeViewerSearchHelper}.
 	 */
 	private DeferredTreeViewerSearchHelper searchHelper;
@@ -99,9 +112,14 @@ public class TreeSubView extends AbstractSubView implements ISearchExecutor {
 		treeInputController.createColumns(treeViewer);
 		treeViewer.setUseHashlookup(true);
 		treeViewer.setContentProvider(treeInputController.getContentProvider());
-		treeViewer.setLabelProvider(treeInputController.getLabelProvider());
+		IBaseLabelProvider labelProvider = treeInputController.getLabelProvider();
+		treeViewer.setLabelProvider(labelProvider);
+		if (labelProvider instanceof IColumnToolTipProvider) {
+			ColumnAwareToolTipSupport.enableFor(treeViewer);
+		}
 		treeViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
+				treeInputController.doubleClick(event);
 				TreeSelection selection = (TreeSelection) event.getSelection();
 				TreePath path = selection.getPaths()[0];
 				if (null != path) {
@@ -192,15 +210,17 @@ public class TreeSubView extends AbstractSubView implements ISearchExecutor {
 		};
 
 		for (TreeColumn column : tree.getColumns()) {
-			Integer rememberedWidth = ShowHideColumnsHandler.getRememberedColumnWidth(treeInputController.getClass(), column.getText());
-			boolean isColumnHidden = ShowHideColumnsHandler.isColumnHidden(treeInputController.getClass(), column.getText());
+			if (treeInputController.canAlterColumnWidth(column)) {
+				Integer rememberedWidth = ShowHideColumnsHandler.getRememberedColumnWidth(treeInputController.getClass(), column.getText());
+				boolean isColumnHidden = ShowHideColumnsHandler.isColumnHidden(treeInputController.getClass(), column.getText());
 
-			if (rememberedWidth != null && !isColumnHidden) {
-				column.setWidth(rememberedWidth.intValue());
-				column.setResizable(true);
-			} else if (isColumnHidden) {
-				column.setWidth(0);
-				column.setResizable(false);
+				if (rememberedWidth != null && !isColumnHidden) {
+					column.setWidth(rememberedWidth.intValue());
+					column.setResizable(true);
+				} else if (isColumnHidden) {
+					column.setWidth(0);
+					column.setResizable(false);
+				}
 			}
 
 			column.addControlListener(columnResizeListener);
@@ -224,10 +244,40 @@ public class TreeSubView extends AbstractSubView implements ISearchExecutor {
 	 * {@inheritDoc}
 	 */
 	public void doRefresh() {
-		// I added the disposed check anyway because one day somebody might add something to this
-		// method and forget about check disposed
-		if (checkDisposed()) {
-			return;
+		if (!jobInSchedule) {
+			jobInSchedule = true;
+
+			Job job = new Job(getDataLoadingJobName()) {
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					try {
+						treeInputController.doRefresh(monitor, getRootEditor());
+						Display.getDefault().asyncExec(new Runnable() {
+							public void run() {
+								if (checkDisposed()) {
+									return;
+								}
+
+								// refresh should only influence the master sub views
+								if (treeInputController.getSubViewClassification() == SubViewClassification.MASTER) {
+									Object input = treeInputController.getTreeInput();
+									treeViewer.setInput(input);
+									if (treeViewer.getTree().isVisible()) {
+										treeViewer.refresh();
+										treeViewer.expandToLevel(treeInputController.getExpandLevel());
+									}
+								}
+							}
+						});
+					} catch (Throwable throwable) { // NOPMD
+						throw new RuntimeException("Unknown exception occurred trying to refresh the view.", throwable);
+					} finally {
+						jobInSchedule = false;
+					}
+					return Status.OK_STATUS;
+				}
+			};
+			job.schedule();
 		}
 	}
 
@@ -284,9 +334,27 @@ public class TreeSubView extends AbstractSubView implements ISearchExecutor {
 		case FILTERSENSORTYPE:
 		case INVOCFILTEREXCLUSIVETIME:
 		case INVOCFILTERTOTALTIME:
-			// we have to reapply the filter if there is one
+			// we have to re-apply the filter if there is one
 			if (ArrayUtils.isNotEmpty(treeInputController.getFilters())) {
 				treeViewer.setFilters(treeInputController.getFilters());
+			}
+			break;
+		case CLEAR_BUFFER:
+			if (treeInputController.getPreferenceIds().contains(PreferenceId.CLEAR_BUFFER)) {
+				treeViewer.refresh();
+				treeViewer.expandToLevel(treeInputController.getExpandLevel());
+			}
+			break;
+		case TIME_RESOLUTION:
+			if (treeInputController.getPreferenceIds().contains(PreferenceId.TIME_RESOLUTION)) {
+				treeViewer.refresh();
+				treeViewer.expandToLevel(treeInputController.getExpandLevel());
+			}
+			break;
+		case INVOCATION_SUBVIEW_MODE:
+			if (treeInputController.getPreferenceIds().contains(PreferenceId.INVOCATION_SUBVIEW_MODE)) {
+				treeViewer.refresh();
+				treeViewer.expandToLevel(treeInputController.getExpandLevel());
 			}
 			break;
 		default:

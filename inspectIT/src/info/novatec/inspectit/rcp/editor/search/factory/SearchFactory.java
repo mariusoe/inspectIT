@@ -201,6 +201,12 @@ public final class SearchFactory {
 						return true;
 					}
 				}
+			} else if (stringMatches(element.getDatabaseProductName(), searchCriteria)) {
+				return true;
+			} else if (stringMatches(element.getDatabaseProductVersion(), searchCriteria)) {
+				return true;
+			} else if (stringMatches(element.getDatabaseUrl(), searchCriteria)) {
+				return true;
 			}
 			MethodIdent methodIdent = repositoryDefinition.getCachedDataService().getMethodIdentForId(element.getMethodIdent());
 			return super.isSearchCompatible(methodIdent, searchCriteria);

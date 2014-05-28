@@ -44,6 +44,15 @@ public class SqlStatementDataQueryFactory<E extends IIndexQuery> extends Abstrac
 		if (null != sqlStatementData.getSql()) {
 			query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("sql", sqlStatementData.getSql()));
 		}
+		if (null != sqlStatementData.getDatabaseProductName()) {
+			query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("databaseProductName", sqlStatementData.getDatabaseProductName()));
+		}
+		if (null != sqlStatementData.getDatabaseProductVersion()) {
+			query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("databaseProductVersion", sqlStatementData.getDatabaseProductVersion()));
+		}
+		if (null != sqlStatementData.getDatabaseUrl()) {
+			query.addIndexingRestriction(IndexQueryRestrictionFactory.equal("databaseUrl", sqlStatementData.getDatabaseUrl()));
+		}
 		if (null != fromDate) {
 			query.setFromDate(new Timestamp(fromDate.getTime()));
 		}

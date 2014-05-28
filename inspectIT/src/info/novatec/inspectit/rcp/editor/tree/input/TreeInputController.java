@@ -4,18 +4,21 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 import info.novatec.inspectit.rcp.editor.root.SubViewClassificationController;
 
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TreeColumn;
 
 /**
  * The interface for all tree input controller.
@@ -40,6 +43,27 @@ public interface TreeInputController extends SubViewClassificationController {
 	 *            The tree viewer.
 	 */
 	void createColumns(TreeViewer treeViewer);
+
+	/**
+	 * The {@link info.novatec.inspectit.rcp.editor.tree.TreeSubView} might need to alter the column
+	 * width/visibility if the column has the remembered size. With this method the controller gives
+	 * or denies the {@link info.novatec.inspectit.rcp.editor.tree.TreeSubView} to alter the column
+	 * width.
+	 * 
+	 * @param treeColumn
+	 *            {@link TreeColumn}
+	 * 
+	 * @return Returns true if the {@link TreeColumn} can be altered.
+	 */
+	boolean canAlterColumnWidth(TreeColumn treeColumn);
+
+	/**
+	 * This method will be called when a double click event is executed.
+	 * 
+	 * @param event
+	 *            The event object.
+	 */
+	void doubleClick(DoubleClickEvent event);
 
 	/**
 	 * Generates and returns the input for the tree. Returning <code>null</code> is possible and
@@ -81,8 +105,10 @@ public interface TreeInputController extends SubViewClassificationController {
 	 * 
 	 * @param monitor
 	 *            The progress monitor.
+	 * @param rootEditor
+	 *            RootEditor of the view that is being refreshed.
 	 */
-	void doRefresh(IProgressMonitor monitor);
+	void doRefresh(IProgressMonitor monitor, IRootEditor rootEditor);
 
 	/**
 	 * Returns <code>true</code> if the controller can open the input which consists of one or
@@ -150,6 +176,13 @@ public interface TreeInputController extends SubViewClassificationController {
 	void showDetails(Shell parent, Object element);
 
 	/**
+	 * Defines if a selection can show some details or not.
+	 * 
+	 * @return <code>true</code> if some details can be shown.
+	 */
+	boolean canShowDetails();
+
+	/**
 	 * Returns the level to which the viewer's tree should be expanded.
 	 * 
 	 * @return The level to which the viewer's tree should be expanded.
@@ -170,4 +203,5 @@ public interface TreeInputController extends SubViewClassificationController {
 	 * Disposes the tree input.
 	 */
 	void dispose();
+
 }

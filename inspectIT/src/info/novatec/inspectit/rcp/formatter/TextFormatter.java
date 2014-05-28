@@ -570,18 +570,30 @@ public final class TextFormatter {
 	}
 	
 	/**
-	 * returns a new StyledString that contains the given text or "null" if the given
-	 * text was in fact null. 
+	 * Returns a new StyledString that contains the given text or "" if the given
+	 * text was in fact <code>null</code>. 
 	 * 
 	 * @param text the text to display, may be null.
-	 * @return a new StyledString that contains the given text or "null" if the given
-	 * text was in fact null. 
+	 * @return a new StyledString that contains the given text or "" if the given
+	 * text was in fact <code>null</code>. 
 	 */
-	public static StyledString getStyledStringForNullableText(String text) {
-		if (null == text) {
-			return new StyledString("");
+	public static StyledString emptyStyledStringIfNull(String text) {
+		return new StyledString(emptyStringIfNull(text));
+	}
+
+	/**
+	 * Returns a String that contains the given text or "" if the given
+	 * text was in fact <code>null</code>. 
+	 * 
+	 * @param text the text to display, may be null.
+	 * @return a new StyledString that contains the given text or "" if the given
+	 * text was in fact <code>null</code>. 
+	 */
+	public static String emptyStringIfNull(String text) {
+		if (!StringUtils.isEmpty(text)) {
+			return text;
 		} else {
-			return new StyledString(text);
+			return "";
 		}
 	}
 

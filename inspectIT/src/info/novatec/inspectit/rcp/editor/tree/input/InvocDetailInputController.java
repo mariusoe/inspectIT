@@ -272,6 +272,14 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean canShowDetails() {
+		return true;
+	}
+
+	/**
 	 * {@inheritDoc}.
 	 * 
 	 * @see AbstractTreeInputController#showDetails(Shell, Object)
@@ -420,17 +428,11 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 					SqlStatementData sql = data.getSqlStatementData();
 					Formatter sqlFormatter = FormatStyle.BASIC.getFormatter();
 					content += "\n";
-					if (sql != null) {
-						content += "SQL: " + sqlFormatter.format(sql.getSqlWithParameterValues()) + "\n";
-						content += "Database URL: " + sql.getDatabaseUrlView() + "\n";
-						content += "Database Product: " + sql.getDatabaseProductNameView() + "\n";
-						content += "Database Version: " + sql.getDatabaseProductVersionView() + "\n";
-					} else {
-						content += "SQL: \n";
-						content += "Database URL: \n";
-						content += "Database Product: \n";
-						content += "Database Version: \n";
-					}
+					content += "Database URL: " + TextFormatter.emptyStringIfNull(sql.getDatabaseUrl()) + "\n";
+					content += "Database Product: " + TextFormatter.emptyStringIfNull(sql.getDatabaseProductName()) + "\n";
+					content += "Database Version: " + TextFormatter.emptyStringIfNull(sql.getDatabaseProductVersion()) + "\n";
+					content += "SQL: " + sqlFormatter.format(sql.getSqlWithParameterValues()) + "\n";
+
 				}
 
 				// Integrate parameter information from both invocation sequence and timer data

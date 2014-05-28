@@ -164,6 +164,14 @@ public class ExceptionMessagesTreeInputController extends AbstractTreeInputContr
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean canShowDetails() {
+		return true;
+	}
+
+	/**
 	 * {@inheritDoc}.
 	 * <P>
 	 * 

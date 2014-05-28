@@ -1,4 +1,4 @@
-package info.novatec.inspectit.rcp.editor.table.input;
+package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.cmr.service.ISqlDataAccessService;
@@ -18,21 +18,25 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.Pre
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
-import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.text.input.SqlStatementTextInputController.SqlHolderHelper;
+import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
+import info.novatec.inspectit.rcp.editor.tree.util.DatabaseSqlTreeComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
+import info.novatec.inspectit.rcp.util.data.DatabaseInfoHelper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -40,15 +44,15 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -72,12 +76,17 @@ import org.hibernate.jdbc.util.Formatter;
  * @author Patrice Bouillet
  * 
  */
-public class SqlInputController extends AbstractTableInputController {
+public class SqlInputController extends AbstractTreeInputController {
 
 	/**
 	 * The ID of this subview / controller.
 	 */
-	public static final String ID = "inspectit.subview.table.sql";
+	public static final String ID = "inspectit.subview.tree.sql";
+
+	/**
+	 * Empty {@link StyledString}.
+	 */
+	private static final StyledString EMPTY_STYLED_STRING = new StyledString("");
 
 	/**
 	 * The private inner enumeration used to define the used IDs which are mapped into the columns.
@@ -88,6 +97,9 @@ public class SqlInputController extends AbstractTableInputController {
 	 * 
 	 */
 	private static enum Column {
+
+		/** The column containing the name of the database. */
+		DATABASE_URL("Database URL", 120, null, null),
 		/** The statement column. */
 		STATEMENT("Statement", 600, InspectITImages.IMG_DATABASE, SqlStatementDataComparatorEnum.SQL),
 		/** Invocation Affiliation. */
@@ -103,13 +115,7 @@ public class SqlInputController extends AbstractTableInputController {
 		/** The duration column. */
 		DURATION("Duration (ms)", 80, null, TimerDataComparatorEnum.MAX),
 		/** The prepared column. */
-		PREPARED("Prepared?", 80, null, SqlStatementDataComparatorEnum.IS_PREPARED_STATEMENT),
-		/** The column containing the name of the database. */
-		DATABASE_NAME("Database Name", 80, null, SqlStatementDataComparatorEnum.DATABASE_NAME),
-		/** The column containing the version of the database. */
-		DATABASE_VERSION("Database Version", 80, null, SqlStatementDataComparatorEnum.DATABASE_VERSION),
-		/** The column containing the url of the database. */
-		DATABASE_URL("Database URL", 80, null, SqlStatementDataComparatorEnum.DATABASE_URL);
+		PREPARED("Prepared?", 80, null, SqlStatementDataComparatorEnum.IS_PREPARED_STATEMENT);
 
 		/** The name. */
 		private String name;
@@ -161,9 +167,9 @@ public class SqlInputController extends AbstractTableInputController {
 	private SqlStatementData template;
 
 	/**
-	 * The loaded data from the server which will be displayed.
+	 * Input map.
 	 */
-	private List<SqlStatementData> sqlData = new ArrayList<SqlStatementData>();
+	private Map<DatabaseInfoHelper, List<SqlStatementData>> inputMap = new HashMap<>();
 
 	/**
 	 * The data access service to access the data on the CMR.
@@ -218,9 +224,9 @@ public class SqlInputController extends AbstractTableInputController {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void createColumns(TableViewer tableViewer) {
+	public void createColumns(TreeViewer treeViewer) {
 		for (Column column : Column.values()) {
-			TableViewerColumn viewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+			TreeViewerColumn viewerColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
 			viewerColumn.getColumn().setMoveable(true);
 			viewerColumn.getColumn().setResizable(true);
 			viewerColumn.getColumn().setText(column.name);
@@ -228,7 +234,7 @@ public class SqlInputController extends AbstractTableInputController {
 			if (null != column.image) {
 				viewerColumn.getColumn().setImage(column.image);
 			}
-			mapTableViewerColumn(column, viewerColumn);
+			mapTreeViewerColumn(column, viewerColumn);
 		}
 	}
 
@@ -236,8 +242,8 @@ public class SqlInputController extends AbstractTableInputController {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object getTableInput() {
-		return sqlData;
+	public Object getTreeInput() {
+		return inputMap.keySet();
 	}
 
 	/**
@@ -258,10 +264,12 @@ public class SqlInputController extends AbstractTableInputController {
 	 * {@inheritDoc}
 	 */
 	public ViewerComparator getComparator() {
-		TableViewerComparator<SqlStatementData> sqlViewerComparator = new TableViewerComparator<SqlStatementData>();
+		TreeViewerComparator<SqlStatementData> sqlViewerComparator = new DatabaseSqlTreeComparator();
 		for (Column column : Column.values()) {
-			ResultComparator<SqlStatementData> resultComparator = new ResultComparator<SqlStatementData>(column.dataComparator, cachedDataService);
-			sqlViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), resultComparator);
+			if (null != column.dataComparator) {
+				ResultComparator<SqlStatementData> resultComparator = new ResultComparator<SqlStatementData>(column.dataComparator, cachedDataService);
+				sqlViewerComparator.addColumn(getMappedTreeViewerColumn(column).getColumn(), resultComparator);
+			}
 		}
 
 		return sqlViewerComparator;
@@ -340,9 +348,9 @@ public class SqlInputController extends AbstractTableInputController {
 			sqlStatementList = dataAccessService.getAggregatedSqlStatements(template, fromDate, toDate);
 		}
 
-		sqlData.clear();
+		inputMap.clear();
 		if (CollectionUtils.isNotEmpty(sqlStatementList)) {
-			sqlData.addAll(sqlStatementList);
+			inputMap.putAll(createInputMap(sqlStatementList));
 		}
 
 		Display.getDefault().asyncExec(new Runnable() {
@@ -353,6 +361,27 @@ public class SqlInputController extends AbstractTableInputController {
 			}
 		});
 		monitor.done();
+	}
+
+	/**
+	 * Create input map from list of {@link SqlStatementData}s.
+	 * 
+	 * @param sqlStatementDatas
+	 *            {@link SqlStatementData}s
+	 * @return Input map
+	 */
+	private Map<DatabaseInfoHelper, List<SqlStatementData>> createInputMap(List<SqlStatementData> sqlStatementDatas) {
+		Map<DatabaseInfoHelper, List<SqlStatementData>> map = new HashMap<>();
+		for (SqlStatementData sqlStatementData : sqlStatementDatas) {
+			DatabaseInfoHelper helper = new DatabaseInfoHelper(sqlStatementData);
+			List<SqlStatementData> list = map.get(helper);
+			if (null == list) {
+				list = new ArrayList<>();
+				map.put(helper, list);
+			}
+			list.add(sqlStatementData);
+		}
+		return map;
 	}
 
 	/**
@@ -374,12 +403,27 @@ public class SqlInputController extends AbstractTableInputController {
 		 */
 		@Override
 		public StyledString getStyledText(Object element, int index) {
-			SqlStatementData data = (SqlStatementData) element;
 			Column enumId = Column.fromOrd(index);
 
-			return getStyledTextForColumn(data, enumId);
+			if (element instanceof SqlStatementData) {
+				return getSqlStyledTextForColumn((SqlStatementData) element, enumId);
+			} else if (element instanceof DatabaseInfoHelper) {
+				return getDatabaseStyledTextForColumn((DatabaseInfoHelper) element, enumId);
+			}
+			return EMPTY_STYLED_STRING;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getToolTipText(Object element, int index) {
+			if (element instanceof DatabaseInfoHelper) {
+				DatabaseInfoHelper helper = (DatabaseInfoHelper) element;
+				return helper.getLongText();
+			}
+			return super.getToolTipText(element, index);
+		}
 	}
 
 	/**
@@ -388,27 +432,36 @@ public class SqlInputController extends AbstractTableInputController {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private static final class SqlContentProvider implements IStructuredContentProvider {
+	private final class SqlContentProvider extends ArrayContentProvider implements ITreeContentProvider {
 
 		/**
 		 * {@inheritDoc}
 		 */
-		@SuppressWarnings("unchecked")
-		public Object[] getElements(Object inputElement) {
-			List<SqlStatementData> sqlData = (List<SqlStatementData>) inputElement;
-			return sqlData.toArray();
+		@Override
+		public Object[] getChildren(Object parentElement) {
+			if (parentElement instanceof DatabaseInfoHelper) {
+				return inputMap.get(parentElement).toArray();
+			}
+			return new Object[0];
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		@Override
+		public Object getParent(Object element) {
+			if (element instanceof SqlStatementData) {
+				return new DatabaseInfoHelper((SqlStatementData) element);
+			}
+			return null;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
-		public void dispose() {
+		@Override
+		public boolean hasChildren(Object element) {
+			return element instanceof DatabaseInfoHelper;
 		}
 
 	}
@@ -477,10 +530,26 @@ public class SqlInputController extends AbstractTableInputController {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getExpandLevel() {
+		return TreeViewer.ALL_LEVELS;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean canShowDetails() {
+		return true;
+	}
+
+	/**
 	 * {@inheritDoc}.
 	 * <p>
 	 * 
-	 * @see TableInputController#showDetails(Shell, Object)
+	 * @see TreeInputController#showDetails(Shell, Object)
 	 */
 	public void showDetails(Shell parent, Object element) {
 		final SqlStatementData data = (SqlStatementData) element;
@@ -548,20 +617,15 @@ public class SqlInputController extends AbstractTableInputController {
 
 				Formatter sqlFormatter = FormatStyle.BASIC.getFormatter();
 				content += "\n";
+				content += "Database URL: " + TextFormatter.emptyStringIfNull(data.getDatabaseUrl()) + "\n";
+				content += "Database Product: " + TextFormatter.emptyStringIfNull(data.getDatabaseProductName()) + "\n";
+				content += "Database Version: " + TextFormatter.emptyStringIfNull(data.getDatabaseProductVersion()) + "\n";
 				content += "SQL: " + sqlFormatter.format(data.getSql()) + "\n";
 
 				text.setText(content);
 			}
 		};
 		dialog.open();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean canShowDetails() {
-		return true;
 	}
 
 	/**
@@ -573,7 +637,7 @@ public class SqlInputController extends AbstractTableInputController {
 	 *            The enumeration ID.
 	 * @return The styled string containing the information from the data object.
 	 */
-	private StyledString getStyledTextForColumn(SqlStatementData data, Column enumId) {
+	private StyledString getSqlStyledTextForColumn(SqlStatementData data, Column enumId) {
 		switch (enumId) {
 		case STATEMENT:
 			String sql = data.getSql().replaceAll("[\r\n]+", " ");
@@ -601,14 +665,26 @@ public class SqlInputController extends AbstractTableInputController {
 			} else {
 				return new StyledString("false");
 			}
-		case DATABASE_NAME:
-			return TextFormatter.getStyledStringForNullableText(data.getDatabaseProductName());
-		case DATABASE_URL:
-			return TextFormatter.getStyledStringForNullableText(data.getDatabaseUrl());
-		case DATABASE_VERSION:
-			return TextFormatter.getStyledStringForNullableText(data.getDatabaseProductVersion());
 		default:
-			return new StyledString("error");
+			return EMPTY_STYLED_STRING;
+		}
+	}
+
+	/**
+	 * Returns the styled text for a specific column.
+	 * 
+	 * @param data
+	 *            {@link DatabaseInfoHelper}.
+	 * @param enumId
+	 *            The enumeration ID.
+	 * @return The styled string containing the information from the data object.
+	 */
+	private StyledString getDatabaseStyledTextForColumn(DatabaseInfoHelper data, Column enumId) {
+		switch (enumId) {
+		case DATABASE_URL:
+			return new StyledString(data.getDatabaseUrl());
+		default:
+			return EMPTY_STYLED_STRING;
 		}
 	}
 
@@ -620,7 +696,15 @@ public class SqlInputController extends AbstractTableInputController {
 			SqlStatementData data = (SqlStatementData) object;
 			StringBuilder sb = new StringBuilder();
 			for (Column column : Column.values()) {
-				sb.append(getStyledTextForColumn(data, column).toString());
+				sb.append(getSqlStyledTextForColumn(data, column).toString());
+				sb.append('\t');
+			}
+			return sb.toString();
+		} else if (object instanceof DatabaseInfoHelper) {
+			DatabaseInfoHelper data = (DatabaseInfoHelper) object;
+			StringBuilder sb = new StringBuilder();
+			for (Column column : Column.values()) {
+				sb.append(getDatabaseStyledTextForColumn(data, column).toString());
 				sb.append('\t');
 			}
 			return sb.toString();
@@ -637,7 +721,14 @@ public class SqlInputController extends AbstractTableInputController {
 			SqlStatementData data = (SqlStatementData) object;
 			List<String> values = new ArrayList<String>();
 			for (Column column : Column.values()) {
-				values.add(getStyledTextForColumn(data, column).toString());
+				values.add(getSqlStyledTextForColumn(data, column).toString());
+			}
+			return values;
+		} else if (object instanceof DatabaseInfoHelper) {
+			DatabaseInfoHelper data = (DatabaseInfoHelper) object;
+			List<String> values = new ArrayList<String>();
+			for (Column column : Column.values()) {
+				values.add(getDatabaseStyledTextForColumn(data, column).toString());
 			}
 			return values;
 		}
@@ -648,8 +739,19 @@ public class SqlInputController extends AbstractTableInputController {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void dispose() {
-		sqlData.clear();
+	public Object[] getObjectsToSearch(Object treeInput) {
+		List<SqlStatementData> sqlStatementDatas = new ArrayList<>();
+		for (List<SqlStatementData> datas : inputMap.values()) {
+			sqlStatementDatas.addAll(datas);
+		}
+		return sqlStatementDatas.toArray();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void dispose() {
+		inputMap.clear();
+	}
 }

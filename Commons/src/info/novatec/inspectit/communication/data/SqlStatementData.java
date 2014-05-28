@@ -28,17 +28,17 @@ public class SqlStatementData extends TimerData {
 	/**
 	 * The URL that the connection uses.
 	 */
-	private String databaseUrl = null;
+	private String databaseUrl;
 
 	/**
 	 * The name of the database product.
 	 */
-	private String databaseProductName = null;
+	private String databaseProductName;
 
 	/**
 	 * The version of the database product.
 	 */
-	private String databaseProductVersion = null;
+	private String databaseProductVersion;
 
 	/**
 	 * Defines if this is a container for a prepared statement or not.
@@ -225,19 +225,6 @@ public class SqlStatementData extends TimerData {
 	}
 
 	/**
-	 * Returns the database url, if it is <null> an empty string is returned.
-	 * 
-	 * @return the database url, if it is <null> an empty string is returned.
-	 */
-	public String getDatabaseUrlView() {
-		if (databaseUrl == null) {
-			return "";
-		} else {
-			return databaseUrl;
-		}
-	}
-
-	/**
 	 * Sets {@link #databaseUrl}.
 	 * 
 	 * @param databaseUrl
@@ -257,19 +244,6 @@ public class SqlStatementData extends TimerData {
 	}
 
 	/**
-	 * Returns the database product name, if it is <null> an empty string is returned.
-	 * 
-	 * @return the database product name, if it is <null> an empty string is returned.
-	 */
-	public String getDatabaseProductNameView() {
-		if (databaseProductName == null) {
-			return "";
-		} else {
-			return databaseProductName;
-		}
-	}
-
-	/**
 	 * Sets {@link #databaseProductName}.
 	 * 
 	 * @param databaseProductName
@@ -286,19 +260,6 @@ public class SqlStatementData extends TimerData {
 	 */
 	public String getDatabaseProductVersion() {
 		return databaseProductVersion;
-	}
-
-	/**
-	 * Returns the database product version, if it is <null> an empty string is returned.
-	 * 
-	 * @return the database product version, if it is <null> an empty string is returned.
-	 */
-	public String getDatabaseProductVersionView() {
-		if (databaseProductVersion == null) {
-			return "";
-		} else {
-			return databaseProductVersion;
-		}
 	}
 
 	/**

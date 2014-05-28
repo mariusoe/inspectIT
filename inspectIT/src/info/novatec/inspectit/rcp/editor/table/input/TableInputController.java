@@ -178,7 +178,7 @@ public interface TableInputController extends SubViewClassificationController {
 	/**
 	 * Defines if a selection can show some details or not.
 	 * 
-	 * @return <code>true</code> if shome details can be shown.
+	 * @return <code>true</code> if some details can be shown.
 	 */
 	boolean canShowDetails();
 

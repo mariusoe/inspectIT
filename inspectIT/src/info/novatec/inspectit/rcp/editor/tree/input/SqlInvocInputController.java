@@ -1,4 +1,4 @@
-package info.novatec.inspectit.rcp.editor.table.input;
+package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.service.ICachedDataService;
@@ -17,17 +17,20 @@ import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.IPreferenceGroup;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
-import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
+import info.novatec.inspectit.rcp.editor.tree.TreeViewerComparator;
+import info.novatec.inspectit.rcp.editor.tree.util.DatabaseSqlTreeComparator;
 import info.novatec.inspectit.rcp.editor.viewers.RawAggregatedResultComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.handlers.ShowHideColumnsHandler;
+import info.novatec.inspectit.rcp.util.data.DatabaseInfoHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -36,14 +39,15 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
@@ -54,8 +58,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.hibernate.jdbc.util.FormatStyle;
 import org.hibernate.jdbc.util.Formatter;
@@ -67,12 +71,12 @@ import org.hibernate.jdbc.util.Formatter;
  * @author Patrice Bouillet
  * 
  */
-public class SqlInvocInputController extends AbstractTableInputController {
+public class SqlInvocInputController extends AbstractTreeInputController {
 
 	/**
 	 * The ID of this subview / controller.
 	 */
-	public static final String ID = "inspectit.subview.table.sqlinvoc";
+	public static final String ID = "inspectit.subview.tree.sqlinvoc";
 
 	/**
 	 * The private inner enumeration used to define the used IDs which are mapped into the columns.
@@ -85,6 +89,8 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	private static enum Column {
 		/** The timestamp column. */
 		TIMESTAMP("Timestamp", 130, InspectITImages.IMG_TIMER, false, true, DefaultDataComparatorEnum.TIMESTAMP),
+		/** The column containing the name of the database. */
+		DATABASE_URL("Database URL", 120, null, true, true, null),
 		/** The statement column. */
 		STATEMENT("Statement", 600, InspectITImages.IMG_DATABASE, true, true, SqlStatementDataComparatorEnum.SQL_AND_PARAMETERS),
 		/** The count column. */
@@ -165,6 +171,11 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	private List<SqlStatementData> sqlStatementDataList;
 
 	/**
+	 * Map of SQls and the database they belong to.
+	 */
+	private Map<DatabaseInfoHelper, List<SqlStatementData>> databaseSqlMap;
+
+	/**
 	 * Empty styled string.
 	 */
 	private final StyledString emptyStyledString = new StyledString();
@@ -187,9 +198,9 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void createColumns(TableViewer tableViewer) {
+	public void createColumns(TreeViewer treeViewer) {
 		for (Column column : Column.values()) {
-			TableViewerColumn viewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+			TreeViewerColumn viewerColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
 			viewerColumn.getColumn().setMoveable(true);
 			viewerColumn.getColumn().setResizable(true);
 			viewerColumn.getColumn().setText(column.name);
@@ -201,7 +212,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 			if (null != column.image) {
 				viewerColumn.getColumn().setImage(column.image);
 			}
-			mapTableViewerColumn(column, viewerColumn);
+			mapTreeViewerColumn(column, viewerColumn);
 		}
 	}
 
@@ -209,9 +220,9 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean canAlterColumnWidth(TableColumn tableColumn) {
+	public boolean canAlterColumnWidth(TreeColumn treeColumn) {
 		for (Column column : Column.values()) {
-			if (Objects.equals(getMappedTableViewerColumn(column).getColumn(), tableColumn)) {
+			if (Objects.equals(getMappedTreeViewerColumn(column).getColumn(), treeColumn)) {
 				return (column.showInRawMode && rawMode) || (column.showInAggregatedMode && !rawMode);
 			}
 		}
@@ -256,16 +267,16 @@ public class SqlInvocInputController extends AbstractTableInputController {
 			if (rawMode) {
 				if (column.showInRawMode && !column.showInAggregatedMode && !ShowHideColumnsHandler.isColumnHidden(this.getClass(), column.name)) {
 					Integer width = ShowHideColumnsHandler.getRememberedColumnWidth(this.getClass(), column.name);
-					getMappedTableViewerColumn(column).getColumn().setWidth((null != width) ? width.intValue() : column.width);
+					getMappedTreeViewerColumn(column).getColumn().setWidth((null != width) ? width.intValue() : column.width);
 				} else if (!column.showInRawMode && column.showInAggregatedMode) {
-					getMappedTableViewerColumn(column).getColumn().setWidth(0);
+					getMappedTreeViewerColumn(column).getColumn().setWidth(0);
 				}
 			} else {
 				if (!column.showInRawMode && column.showInAggregatedMode && !ShowHideColumnsHandler.isColumnHidden(this.getClass(), column.name)) {
 					Integer width = ShowHideColumnsHandler.getRememberedColumnWidth(this.getClass(), column.name);
-					getMappedTableViewerColumn(column).getColumn().setWidth((null != width) ? width.intValue() : column.width);
+					getMappedTreeViewerColumn(column).getColumn().setWidth((null != width) ? width.intValue() : column.width);
 				} else if (column.showInRawMode && !column.showInAggregatedMode) {
-					getMappedTableViewerColumn(column).getColumn().setWidth(0);
+					getMappedTreeViewerColumn(column).getColumn().setWidth(0);
 				}
 			}
 		}
@@ -282,9 +293,9 @@ public class SqlInvocInputController extends AbstractTableInputController {
 				@Override
 				public void run() {
 					// double click on an sql item will open a details window
-					TableViewer tableViewer = (TableViewer) event.getSource();
+					ColumnViewer viewer = (ColumnViewer) event.getSource();
 					IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-					Shell parent = tableViewer.getTable().getShell();
+					Shell parent = viewer.getControl().getShell();
 					showDetails(parent, selection.getFirstElement());
 				}
 			});
@@ -301,105 +312,110 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	 */
 	@Override
 	public void showDetails(Shell parent, Object element) {
-		final SqlStatementData data = (SqlStatementData) element;
-		final MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
+		if (element instanceof SqlStatementData) {
+			final SqlStatementData data = (SqlStatementData) element;
+			final MethodIdent methodIdent = cachedDataService.getMethodIdentForId(data.getMethodIdent());
 
-		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
-		boolean takeFocusOnOpen = true;
-		boolean persistSize = true;
-		boolean persistLocation = true;
-		boolean showDialogMenu = false;
-		boolean showPersistActions = true;
-		String titleText;
-		if (null != methodIdent) {
-			titleText = TextFormatter.getMethodString(methodIdent);
-		} else {
-			titleText = "SQL Details";
-		}
-		String infoText = "SQL Details";
-
-		PopupDialog dialog = new PopupDialog(parent, shellStyle, takeFocusOnOpen, persistSize, persistLocation, showDialogMenu, showPersistActions, titleText, infoText) {
-			private static final int CURSOR_SIZE = 15;
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected Point getInitialLocation(Point initialSize) {
-				// show popup relative to cursor
-				Display display = getShell().getDisplay();
-				Point location = display.getCursorLocation();
-				location.x += CURSOR_SIZE;
-				location.y += CURSOR_SIZE;
-				return location;
+			int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
+			boolean takeFocusOnOpen = true;
+			boolean persistSize = true;
+			boolean persistLocation = true;
+			boolean showDialogMenu = false;
+			boolean showPersistActions = true;
+			String titleText;
+			if (null != methodIdent) {
+				titleText = TextFormatter.getMethodString(methodIdent);
+			} else {
+				titleText = "SQL Details";
 			}
+			String infoText = "SQL Details";
 
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected Point getInitialSize() {
-				return new Point(400, 200);
-			}
+			PopupDialog dialog = new PopupDialog(parent, shellStyle, takeFocusOnOpen, persistSize, persistLocation, showDialogMenu, showPersistActions, titleText, infoText) {
+				private static final int CURSOR_SIZE = 15;
 
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected Control createDialogArea(Composite parent) {
-				FormToolkit toolkit = new FormToolkit(parent.getDisplay());
+				/**
+				 * {@inheritDoc}
+				 */
+				@Override
+				protected Point getInitialLocation(Point initialSize) {
+					// show popup relative to cursor
+					Display display = getShell().getDisplay();
+					Point location = display.getCursorLocation();
+					location.x += CURSOR_SIZE;
+					location.y += CURSOR_SIZE;
+					return location;
+				}
 
-				Text text = toolkit.createText(parent, null, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL);
-				GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-				text.setLayoutData(gridData);
-				this.addText(text);
+				/**
+				 * {@inheritDoc}
+				 */
+				@Override
+				protected Point getInitialSize() {
+					return new Point(400, 200);
+				}
 
-				// Use the compact margins employed by PopupDialog.
-				GridData gd = new GridData(GridData.BEGINNING | GridData.FILL_BOTH);
-				gd.horizontalIndent = PopupDialog.POPUP_HORIZONTALSPACING;
-				gd.verticalIndent = PopupDialog.POPUP_VERTICALSPACING;
-				text.setLayoutData(gd);
+				/**
+				 * {@inheritDoc}
+				 */
+				@Override
+				protected Control createDialogArea(Composite parent) {
+					FormToolkit toolkit = new FormToolkit(parent.getDisplay());
 
-				return text;
-			}
+					Text text = toolkit.createText(parent, null, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL);
+					GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+					text.setLayoutData(gridData);
+					this.addText(text);
 
-			private void addText(Text text) {
-				String content = "";
-				if (methodIdent != null) {
-					if (methodIdent.getPackageName() != null && !methodIdent.getPackageName().equals("")) {
-						content = "Package: " + methodIdent.getPackageName() + "\n";
-					} else {
-						content = "Package: (default)\n";
+					// Use the compact margins employed by PopupDialog.
+					GridData gd = new GridData(GridData.BEGINNING | GridData.FILL_BOTH);
+					gd.horizontalIndent = PopupDialog.POPUP_HORIZONTALSPACING;
+					gd.verticalIndent = PopupDialog.POPUP_VERTICALSPACING;
+					text.setLayoutData(gd);
+
+					return text;
+				}
+
+				private void addText(Text text) {
+					String content = "";
+					if (methodIdent != null) {
+						if (methodIdent.getPackageName() != null && !methodIdent.getPackageName().equals("")) {
+							content = "Package: " + methodIdent.getPackageName() + "\n";
+						} else {
+							content = "Package: (default)\n";
+						}
+						content += "Class: " + methodIdent.getClassName() + "\n";
+						content += "Method: " + methodIdent.getMethodName() + "\n";
+						content += "Parameters: " + methodIdent.getParameters() + "\n";
+						content += "\n";
 					}
-					content += "Class: " + methodIdent.getClassName() + "\n";
-					content += "Method: " + methodIdent.getMethodName() + "\n";
-					content += "Parameters: " + methodIdent.getParameters() + "\n";
+
+					content += "Avg (ms): " + data.getAverage() + "\n";
+					content += "Min (ms): " + data.getMin() + "\n";
+					content += "Max (ms): " + data.getMax() + "\n";
+					content += "Max (ms): " + data.getMax() + "\n";
+					content += "Total duration (ms): " + data.getDuration() + "\n";
+
+					if (rawMode) {
+						content += "\n";
+						content += "Is Prepared Statement: " + data.isPreparedStatement() + "\n";
+					}
+
+					Formatter sqlFormatter = FormatStyle.BASIC.getFormatter();
 					content += "\n";
+					content += "Database URL: " + TextFormatter.emptyStringIfNull(data.getDatabaseUrl()) + "\n";
+					content += "Database Product: " + TextFormatter.emptyStringIfNull(data.getDatabaseProductName()) + "\n";
+					content += "Database Version: " + TextFormatter.emptyStringIfNull(data.getDatabaseProductVersion()) + "\n";
+					if (rawMode) {
+						content += "SQL: " + sqlFormatter.format(data.getSqlWithParameterValues()) + "\n";
+					} else {
+						content += "SQL: " + sqlFormatter.format(data.getSql()) + "\n";
+					}
+
+					text.setText(content);
 				}
-
-				content += "Avg (ms): " + data.getAverage() + "\n";
-				content += "Min (ms): " + data.getMin() + "\n";
-				content += "Max (ms): " + data.getMax() + "\n";
-				content += "Max (ms): " + data.getMax() + "\n";
-				content += "Total duration (ms): " + data.getDuration() + "\n";
-
-				if (rawMode) {
-					content += "\n";
-					content += "Is Prepared Statement: " + data.isPreparedStatement() + "\n";
-				}
-
-				Formatter sqlFormatter = FormatStyle.BASIC.getFormatter();
-				content += "\n";
-				if (rawMode) {
-					content += "SQL: " + sqlFormatter.format(data.getSqlWithParameterValues()) + "\n";
-				} else {
-					content += "SQL: " + sqlFormatter.format(data.getSql()) + "\n";
-				}
-
-				text.setText(content);
-			}
-		};
-		dialog.open();
+			};
+			dialog.open();
+		}
 	}
 
 	@Override
@@ -418,7 +434,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	 * {@inheritDoc}
 	 */
 	public ViewerComparator getComparator() {
-		TableViewerComparator<SqlStatementData> sqlInputViewerComparator = new TableViewerComparator<SqlStatementData>();
+		TreeViewerComparator<SqlStatementData> sqlInputViewerComparator = new DatabaseSqlTreeComparator();
 		for (Column column : Column.values()) {
 			RawAggregatedResultComparator<SqlStatementData> comparator = new RawAggregatedResultComparator<SqlStatementData>(column.dataComparator, cachedDataService, column.showInRawMode,
 					column.showInAggregatedMode) {
@@ -427,7 +443,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 					return rawMode;
 				}
 			};
-			sqlInputViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), comparator);
+			sqlInputViewerComparator.addColumn(getMappedTreeViewerColumn(column).getColumn(), comparator);
 		}
 
 		return sqlInputViewerComparator;
@@ -469,13 +485,6 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
-	public void setLimit(int limit) {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public void update(IProgressMonitor monitor) {
 	}
 
@@ -485,7 +494,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private final class SqlInvocContentProvider implements IStructuredContentProvider {
+	private final class SqlInvocContentProvider implements ITreeContentProvider {
 
 		/**
 		 * {@inheritDoc}
@@ -507,6 +516,8 @@ public class SqlInvocInputController extends AbstractTableInputController {
 				AggregationPerformer<SqlStatementData> aggregationPerformer = new AggregationPerformer<SqlStatementData>(new SqlStatementDataAggregator());
 				aggregationPerformer.processCollection(sqlStatementDataList);
 				sqlStatementDataList = aggregationPerformer.getResultList();
+				databaseSqlMap = createInputMap(sqlStatementDataList);
+				return databaseSqlMap.keySet().toArray();
 			} else {
 				Collections.sort(sqlStatementDataList, new Comparator<SqlStatementData>() {
 					@Override
@@ -514,9 +525,30 @@ public class SqlInvocInputController extends AbstractTableInputController {
 						return o1.getTimeStamp().compareTo(o2.getTimeStamp());
 					}
 				});
+				return sqlStatementDataList.toArray();
 			}
 
-			return sqlStatementDataList.toArray();
+		}
+
+		/**
+		 * Create input map from list of {@link SqlStatementData}s.
+		 * 
+		 * @param sqlStatementDatas
+		 *            {@link SqlStatementData}s
+		 * @return Input map
+		 */
+		private Map<DatabaseInfoHelper, List<SqlStatementData>> createInputMap(List<SqlStatementData> sqlStatementDatas) {
+			Map<DatabaseInfoHelper, List<SqlStatementData>> map = new HashMap<>();
+			for (SqlStatementData sqlStatementData : sqlStatementDatas) {
+				DatabaseInfoHelper helper = new DatabaseInfoHelper(sqlStatementData);
+				List<SqlStatementData> list = map.get(helper);
+				if (null == list) {
+					list = new ArrayList<>();
+					map.put(helper, list);
+				}
+				list.add(sqlStatementData);
+			}
+			return map;
 		}
 
 		/**
@@ -554,6 +586,38 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		public void dispose() {
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		public Object[] getChildren(Object parentElement) {
+			if (parentElement instanceof DatabaseInfoHelper) {
+				List<SqlStatementData> children = databaseSqlMap.get(parentElement);
+				if (CollectionUtils.isNotEmpty(children)) {
+					return children.toArray();
+				}
+			}
+			return new Object[0];
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Object getParent(Object element) {
+			if (!rawMode && element instanceof SqlStatementData) {
+				return new DatabaseInfoHelper((SqlStatementData) element);
+			}
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean hasChildren(Object element) {
+			return element instanceof DatabaseInfoHelper;
+		}
+
 	}
 
 	/**
@@ -575,10 +639,27 @@ public class SqlInvocInputController extends AbstractTableInputController {
 		 */
 		@Override
 		public StyledString getStyledText(Object element, int index) {
-			SqlStatementData data = (SqlStatementData) element;
 			Column enumId = Column.fromOrd(index);
 
-			return getStyledTextForColumn(data, enumId);
+			if (element instanceof SqlStatementData) {
+				return getStyledTextForColumn((SqlStatementData) element, enumId);
+			} else if (element instanceof DatabaseInfoHelper) {
+				return getDatabaseStyledTextForColumn((DatabaseInfoHelper) element, enumId);
+			} else {
+				return emptyStyledString;
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getToolTipText(Object element, int index) {
+			if (element instanceof DatabaseInfoHelper) {
+				DatabaseInfoHelper helper = (DatabaseInfoHelper) element;
+				return helper.getLongText();
+			}
+			return super.getToolTipText(element, index);
 		}
 
 	}
@@ -594,6 +675,12 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	 */
 	private StyledString getStyledTextForColumn(SqlStatementData data, Column enumId) {
 		switch (enumId) {
+		case DATABASE_URL:
+			if (rawMode) {
+				return new StyledString(data.getDatabaseUrl());
+			} else {
+				return emptyStyledString;
+			}
 		case TIMESTAMP:
 			if (rawMode) {
 				return new StyledString(NumberFormatter.formatTimeWithMillis(data.getTimeStamp()));
@@ -630,6 +717,32 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	}
 
 	/**
+	 * Returns the styled text for a specific column.
+	 * 
+	 * @param data
+	 *            {@link DatabaseInfoHelper}.
+	 * @param enumId
+	 *            The enumeration ID.
+	 * @return The styled string containing the information from the data object.
+	 */
+	private StyledString getDatabaseStyledTextForColumn(DatabaseInfoHelper data, Column enumId) {
+		switch (enumId) {
+		case DATABASE_URL:
+			return new StyledString(data.getDatabaseUrl());
+		default:
+			return emptyStyledString;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getExpandLevel() {
+		return TreeViewer.ALL_LEVELS;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public String getReadableString(Object object) {
@@ -638,6 +751,14 @@ public class SqlInvocInputController extends AbstractTableInputController {
 			StringBuilder sb = new StringBuilder();
 			for (Column column : Column.values()) {
 				sb.append(getStyledTextForColumn(data, column).toString());
+				sb.append('\t');
+			}
+			return sb.toString();
+		} else if (object instanceof DatabaseInfoHelper) {
+			DatabaseInfoHelper data = (DatabaseInfoHelper) object;
+			StringBuilder sb = new StringBuilder();
+			for (Column column : Column.values()) {
+				sb.append(getDatabaseStyledTextForColumn(data, column).toString());
 				sb.append('\t');
 			}
 			return sb.toString();
@@ -657,6 +778,13 @@ public class SqlInvocInputController extends AbstractTableInputController {
 				values.add(getStyledTextForColumn(data, column).toString());
 			}
 			return values;
+		} else if (object instanceof DatabaseInfoHelper) {
+			DatabaseInfoHelper data = (DatabaseInfoHelper) object;
+			List<String> values = new ArrayList<String>();
+			for (Column column : Column.values()) {
+				values.add(getDatabaseStyledTextForColumn(data, column).toString());
+			}
+			return values;
 		}
 		throw new RuntimeException("Could not create the column values!");
 	}
@@ -665,7 +793,7 @@ public class SqlInvocInputController extends AbstractTableInputController {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object[] getObjectsToSearch(Object tableInput) {
+	public Object[] getObjectsToSearch(Object treeInput) {
 		return sqlStatementDataList.toArray();
 	}
 

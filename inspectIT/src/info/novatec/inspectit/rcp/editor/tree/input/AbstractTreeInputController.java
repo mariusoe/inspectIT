@@ -4,20 +4,26 @@ import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
+import info.novatec.inspectit.rcp.editor.root.IRootEditor;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TreeColumn;
 
 /**
  * The abstract class of the {@link TreeInputController} interface to provide some standard methods.
@@ -26,6 +32,12 @@ import org.eclipse.swt.widgets.Shell;
  * 
  */
 public abstract class AbstractTreeInputController implements TreeInputController {
+
+	/**
+	 * Map of the enumeration keys and {@link TreeViewerColumn}s. Subclasses can use utility methods
+	 * to bound columns for later use.
+	 */
+	private Map<Enum<?>, TreeViewerColumn> treeViewerColumnMap = new HashMap<Enum<?>, TreeViewerColumn>();
 
 	/**
 	 * The input definition.
@@ -74,7 +86,15 @@ public abstract class AbstractTreeInputController implements TreeInputController
 	 * <p>
 	 * Do nothing by default, sub-classes may override.
 	 */
-	public void doRefresh(IProgressMonitor monitor) {
+	public void doRefresh(IProgressMonitor monitor, IRootEditor rootEditor) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Do nothing by default, sub-classes may override.
+	 */
+	public void doubleClick(DoubleClickEvent event) {
 	}
 
 	/**
@@ -159,6 +179,16 @@ public abstract class AbstractTreeInputController implements TreeInputController
 	/**
 	 * {@inheritDoc}
 	 * <p>
+	 * Returns false by default, sub-classes may override.
+	 */
+	@Override
+	public boolean canShowDetails() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
 	 * Return <b>2</b> by default, sub-classes may override.
 	 */
 	public int getExpandLevel() {
@@ -195,6 +225,43 @@ public abstract class AbstractTreeInputController implements TreeInputController
 	@Override
 	public SubViewClassification getSubViewClassification() {
 		return SubViewClassification.MASTER;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Returns true, classes may override.
+	 */
+	@Override
+	public boolean canAlterColumnWidth(TreeColumn treeColumn) {
+		return true;
+	}
+
+	/**
+	 * Maps a column with the enumeration key. The implementing classes should map each column they
+	 * create to the enum that represents that column. Later on the column can be retrieved with the
+	 * enum key if needed.
+	 * 
+	 * @param key
+	 *            Enumeration that represents the column.
+	 * @param column
+	 *            Created column to be mapped.
+	 */
+	public void mapTreeViewerColumn(Enum<?> key, TreeViewerColumn column) {
+		treeViewerColumnMap.put(key, column);
+	}
+
+	/**
+	 * Returns the column that has been mapped with the given enum key. Enum should represent the
+	 * wanted column.
+	 * 
+	 * @param key
+	 *            Enumeration that represents the column.
+	 * @return Returns the column that has been mapped with the given enum key or <code>null</code>
+	 *         if no mapping has been done.
+	 */
+	public TreeViewerColumn getMappedTreeViewerColumn(Enum<?> key) {
+		return treeViewerColumnMap.get(key);
 	}
 
 }

@@ -208,7 +208,7 @@ public abstract class AbstractTableInputController implements TableInputControll
 
 	/**
 	 * Maps a column with the enumeration key. The implementing classes should map each column they
-	 * create to the enum that represents that column. Later on the column can be retireved with the
+	 * create to the enum that represents that column. Later on the column can be retrieved with the
 	 * enum key if needed.
 	 * 
 	 * @param key
