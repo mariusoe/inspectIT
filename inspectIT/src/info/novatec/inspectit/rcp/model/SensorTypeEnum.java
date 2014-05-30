@@ -32,7 +32,7 @@ public enum SensorTypeEnum {
 	/** The jdbc connection sensor type. */
 	JDBC_CONNECTION("info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionSensor", InspectITImages.IMG_DATABASE, false),
 	/** Meta data from the connection. */
-	JDBC_CONNECTION_META_DATA("info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionMetaDataConstructorSensor", InspectITImages.IMG_DATABASE, false),
+	JDBC_CONNECTION_META_DATA("info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionMetaDataSensor", InspectITImages.IMG_DATABASE, false),
 	/** The jdbc statement sensor type. */
 	JDBC_STATEMENT("info.novatec.inspectit.agent.sensor.method.jdbc.StatementSensor", InspectITImages.IMG_DATABASE, false),
 	/** The jdbc prepared statement sensor type. */
@@ -160,7 +160,14 @@ public enum SensorTypeEnum {
 		Set<SensorTypeEnum> sensorTypeSet = EnumSet.noneOf(SensorTypeEnum.class);
 		for (MethodIdentToSensorType methodIdentToSensorType : methodIdentToSensorTypes) {
 			SensorTypeIdent sensorType = methodIdentToSensorType.getMethodSensorTypeIdent();
-			sensorTypeSet.add(get(sensorType.getFullyQualifiedClassName()));
+			SensorTypeEnum sensorTypeEnum = get(sensorType.getFullyQualifiedClassName());
+			if (null != sensorTypeEnum) {
+				sensorTypeSet.add(sensorTypeEnum);
+			} else {
+				// This might happen if we realize a new sensor type and forget to add it to the
+				// sensor type enum. We put this here as a failfast reminder.
+				throw new RuntimeException("Lookup for the enum of sensor type " + sensorType.getFullyQualifiedClassName() + " fails");
+			}
 		}
 		return sensorTypeSet;
 	}
