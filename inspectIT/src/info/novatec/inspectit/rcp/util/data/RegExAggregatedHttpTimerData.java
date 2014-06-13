@@ -1,4 +1,4 @@
-package info.novatec.inspectit.communcation.data;
+package info.novatec.inspectit.rcp.util.data;
 
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdentHelper;

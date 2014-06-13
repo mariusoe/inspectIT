@@ -3,7 +3,6 @@ package info.novatec.inspectit.rcp.editor.table.input;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdentHelper;
 import info.novatec.inspectit.cmr.service.ICachedDataService;
-import info.novatec.inspectit.communcation.data.RegExAggregatedHttpTimerData;
 import info.novatec.inspectit.communication.IAggregatedData;
 import info.novatec.inspectit.communication.comparator.HttpTimerDataComparatorEnum;
 import info.novatec.inspectit.communication.comparator.IDataComparator;
@@ -24,6 +23,7 @@ import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.editor.viewers.StyledCellIndexLabelProvider;
 import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
+import info.novatec.inspectit.rcp.util.data.RegExAggregatedHttpTimerData;
 
 import java.util.ArrayList;
 import java.util.List;

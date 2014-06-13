@@ -1,6 +1,5 @@
 package info.novatec.inspectit.rcp.handlers;
 
-import info.novatec.inspectit.communcation.data.RegExAggregatedHttpTimerData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.editor.inputdefinition.EditorPropertiesData;
@@ -13,6 +12,7 @@ import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.editor.table.input.TaggedHttpTimerDataInputController;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
+import info.novatec.inspectit.rcp.util.data.RegExAggregatedHttpTimerData;
 
 import java.util.ArrayList;
 import java.util.Iterator;

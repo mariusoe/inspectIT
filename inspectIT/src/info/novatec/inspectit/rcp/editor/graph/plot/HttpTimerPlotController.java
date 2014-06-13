@@ -2,13 +2,13 @@ package info.novatec.inspectit.rcp.editor.graph.plot;
 
 import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
-import info.novatec.inspectit.communcation.data.RegExAggregatedHttpTimerData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.indexing.aggregation.IAggregator;
 import info.novatec.inspectit.indexing.aggregation.impl.HttpTimerDataAggregator;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.HttpChartingInputDefinitionExtra;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
+import info.novatec.inspectit.rcp.util.data.RegExAggregatedHttpTimerData;
 
 import java.util.ArrayList;
 import java.util.Collections;

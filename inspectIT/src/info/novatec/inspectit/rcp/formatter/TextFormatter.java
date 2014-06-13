@@ -2,7 +2,6 @@ package info.novatec.inspectit.rcp.formatter;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
 import info.novatec.inspectit.cmr.model.PlatformIdent;
-import info.novatec.inspectit.communcation.data.RegExAggregatedHttpTimerData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationAwareData;
@@ -15,6 +14,7 @@ import info.novatec.inspectit.rcp.model.AgentFolderFactory;
 import info.novatec.inspectit.rcp.model.AgentLeaf;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
+import info.novatec.inspectit.rcp.util.data.RegExAggregatedHttpTimerData;
 import info.novatec.inspectit.storage.LocalStorageData;
 import info.novatec.inspectit.storage.StorageData;
 import info.novatec.inspectit.storage.StorageData.StorageState;
