@@ -472,7 +472,7 @@ public class SqlInputController extends AbstractTreeInputController {
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
 		final StructuredSelection selection = (StructuredSelection) event.getSelection();
-		if (!selection.isEmpty()) {
+		if (!selection.isEmpty() && selection.getFirstElement() instanceof SqlStatementData) {
 			try {
 				PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
 					public void run(final IProgressMonitor monitor) {
@@ -552,80 +552,82 @@ public class SqlInputController extends AbstractTreeInputController {
 	 * @see TreeInputController#showDetails(Shell, Object)
 	 */
 	public void showDetails(Shell parent, Object element) {
-		final SqlStatementData data = (SqlStatementData) element;
+		if (element instanceof SqlStatementData) {
+			final SqlStatementData data = (SqlStatementData) element;
 
-		int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
-		boolean takeFocusOnOpen = true;
-		boolean persistSize = true;
-		boolean persistLocation = true;
-		boolean showDialogMenu = false;
-		boolean showPersistActions = true;
-		String titleText = "SQL Details";
-		String infoText = "SQL Details";
+			int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE;
+			boolean takeFocusOnOpen = true;
+			boolean persistSize = true;
+			boolean persistLocation = true;
+			boolean showDialogMenu = false;
+			boolean showPersistActions = true;
+			String titleText = "SQL Details";
+			String infoText = "SQL Details";
 
-		PopupDialog dialog = new PopupDialog(parent, shellStyle, takeFocusOnOpen, persistSize, persistLocation, showDialogMenu, showPersistActions, titleText, infoText) {
-			private static final int CURSOR_SIZE = 15;
+			PopupDialog dialog = new PopupDialog(parent, shellStyle, takeFocusOnOpen, persistSize, persistLocation, showDialogMenu, showPersistActions, titleText, infoText) {
+				private static final int CURSOR_SIZE = 15;
 
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected Point getInitialLocation(Point initialSize) {
-				// show popup relative to cursor
-				Display display = getShell().getDisplay();
-				Point location = display.getCursorLocation();
-				location.x += CURSOR_SIZE;
-				location.y += CURSOR_SIZE;
-				return location;
-			}
+				/**
+				 * {@inheritDoc}
+				 */
+				@Override
+				protected Point getInitialLocation(Point initialSize) {
+					// show popup relative to cursor
+					Display display = getShell().getDisplay();
+					Point location = display.getCursorLocation();
+					location.x += CURSOR_SIZE;
+					location.y += CURSOR_SIZE;
+					return location;
+				}
 
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected Point getInitialSize() {
-				return new Point(400, 200);
-			}
+				/**
+				 * {@inheritDoc}
+				 */
+				@Override
+				protected Point getInitialSize() {
+					return new Point(400, 200);
+				}
 
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected Control createDialogArea(Composite parent) {
-				FormToolkit toolkit = new FormToolkit(parent.getDisplay());
+				/**
+				 * {@inheritDoc}
+				 */
+				@Override
+				protected Control createDialogArea(Composite parent) {
+					FormToolkit toolkit = new FormToolkit(parent.getDisplay());
 
-				Text text = toolkit.createText(parent, null, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL);
-				GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-				text.setLayoutData(gridData);
-				this.addText(text);
+					Text text = toolkit.createText(parent, null, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL);
+					GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+					text.setLayoutData(gridData);
+					this.addText(text);
 
-				// Use the compact margins employed by PopupDialog.
-				GridData gd = new GridData(GridData.BEGINNING | GridData.FILL_BOTH);
-				gd.horizontalIndent = PopupDialog.POPUP_HORIZONTALSPACING;
-				gd.verticalIndent = PopupDialog.POPUP_VERTICALSPACING;
-				text.setLayoutData(gd);
+					// Use the compact margins employed by PopupDialog.
+					GridData gd = new GridData(GridData.BEGINNING | GridData.FILL_BOTH);
+					gd.horizontalIndent = PopupDialog.POPUP_HORIZONTALSPACING;
+					gd.verticalIndent = PopupDialog.POPUP_VERTICALSPACING;
+					text.setLayoutData(gd);
 
-				return text;
-			}
+					return text;
+				}
 
-			private void addText(Text text) {
-				String content = "Count: " + data.getCount() + "\n";
-				content += "Avg (ms): " + data.getAverage() + "\n";
-				content += "Min (ms): " + data.getMin() + "\n";
-				content += "Max (ms): " + data.getMax() + "\n";
-				content += "Total duration (ms): " + data.getDuration() + "\n";
+				private void addText(Text text) {
+					String content = "Count: " + data.getCount() + "\n";
+					content += "Avg (ms): " + data.getAverage() + "\n";
+					content += "Min (ms): " + data.getMin() + "\n";
+					content += "Max (ms): " + data.getMax() + "\n";
+					content += "Total duration (ms): " + data.getDuration() + "\n";
 
-				Formatter sqlFormatter = FormatStyle.BASIC.getFormatter();
-				content += "\n";
-				content += "Database URL: " + TextFormatter.emptyStringIfNull(data.getDatabaseUrl()) + "\n";
-				content += "Database Product: " + TextFormatter.emptyStringIfNull(data.getDatabaseProductName()) + "\n";
-				content += "Database Version: " + TextFormatter.emptyStringIfNull(data.getDatabaseProductVersion()) + "\n";
-				content += "SQL: " + sqlFormatter.format(data.getSql()) + "\n";
+					Formatter sqlFormatter = FormatStyle.BASIC.getFormatter();
+					content += "\n";
+					content += "Database URL: " + TextFormatter.emptyStringIfNull(data.getDatabaseUrl()) + "\n";
+					content += "Database Product: " + TextFormatter.emptyStringIfNull(data.getDatabaseProductName()) + "\n";
+					content += "Database Version: " + TextFormatter.emptyStringIfNull(data.getDatabaseProductVersion()) + "\n";
+					content += "SQL: " + sqlFormatter.format(data.getSql()) + "\n";
 
-				text.setText(content);
-			}
-		};
-		dialog.open();
+					text.setText(content);
+				}
+			};
+			dialog.open();
+		}
 	}
 
 	/**
