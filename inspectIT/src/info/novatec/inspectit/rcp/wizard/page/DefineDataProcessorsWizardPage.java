@@ -2,6 +2,7 @@ package info.novatec.inspectit.rcp.wizard.page;
 
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ClassLoadingInformationData;
+import info.novatec.inspectit.communication.data.CompilationInformationData;
 import info.novatec.inspectit.communication.data.CpuInformationData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
@@ -173,6 +174,7 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 			inputList.add(MemoryInformationData.class);
 			inputList.add(CpuInformationData.class);
 			inputList.add(ClassLoadingInformationData.class);
+			inputList.add(CompilationInformationData.class);
 			inputList.add(ThreadInformationData.class);
 			inputList.add(SystemInformationData.class);
 		}
@@ -450,6 +452,8 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 				return "Thread Informartion Data";
 			} else if (ObjectUtils.equals(element, SystemInformationData.class)) {
 				return "System Information Data";
+			} else if (ObjectUtils.equals(element, CompilationInformationData.class)) {
+				return "Compilation Information Data";
 			}
 			return super.getText(element);
 		}
@@ -479,6 +483,8 @@ public class DefineDataProcessorsWizardPage extends WizardPage {
 				return InspectIT.getDefault().getImage(InspectITImages.IMG_THREADS_OVERVIEW);
 			} else if (ObjectUtils.equals(element, SystemInformationData.class)) {
 				return InspectIT.getDefault().getImage(InspectITImages.IMG_SYSTEM_OVERVIEW);
+			} else if (ObjectUtils.equals(element, CompilationInformationData.class)) {
+				return InspectIT.getDefault().getImage(InspectITImages.IMG_COMPILATION_OVERVIEW);
 			}
 			return super.getImage(element);
 		}
