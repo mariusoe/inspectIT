@@ -2,8 +2,11 @@ package info.novatec.inspectit.rcp.editor.inputdefinition.extra;
 
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.rcp.InspectIT;
+import info.novatec.inspectit.rcp.util.data.RegExAggregatedHttpTimerData;
 
 import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import com.google.common.base.Objects;
 
@@ -21,16 +24,16 @@ public class HttpChartingInputDefinitionExtra implements IInputDefinitionExtra {
 	private List<HttpTimerData> templates;
 
 	/**
+	 * List of {@link RegExAggregatedHttpTimerData} if regular expression should be defined.
+	 */
+	private List<RegExAggregatedHttpTimerData> regExTemplates;
+
+	/**
 	 * Defines if plotting should be based on the {@link InspectIT} tag value.
 	 * 
 	 * @see HttpTimerData#hasInspectItTaggingHeader()
 	 */
 	boolean plotByTagValue;
-
-	/**
-	 * If regular expression transformation should be used.
-	 */
-	boolean regExTransformation;
 
 	/**
 	 * Gets {@link #templates}.
@@ -49,6 +52,25 @@ public class HttpChartingInputDefinitionExtra implements IInputDefinitionExtra {
 	 */
 	public void setTemplates(List<HttpTimerData> templates) {
 		this.templates = templates;
+	}
+
+	/**
+	 * Gets {@link #regExTemplates}.
+	 * 
+	 * @return {@link #regExTemplates}
+	 */
+	public List<RegExAggregatedHttpTimerData> getRegExTemplates() {
+		return regExTemplates;
+	}
+
+	/**
+	 * Sets {@link #regExTemplates}.
+	 * 
+	 * @param regExTemplates
+	 *            New value for {@link #regExTemplates}
+	 */
+	public void setRegExTemplates(List<RegExAggregatedHttpTimerData> regExTemplates) {
+		this.regExTemplates = regExTemplates;
 	}
 
 	/**
@@ -71,22 +93,10 @@ public class HttpChartingInputDefinitionExtra implements IInputDefinitionExtra {
 	}
 
 	/**
-	 * Gets {@link #regExTransformation}.
-	 * 
-	 * @return {@link #regExTransformation}
+	 * @return Returns if reg ex transformation should be included in the graph.
 	 */
 	public boolean isRegExTransformation() {
-		return regExTransformation;
-	}
-
-	/**
-	 * Sets {@link #regExTransformation}.
-	 * 
-	 * @param regExTransformation
-	 *            New value for {@link #regExTransformation}
-	 */
-	public void setRegExTransformation(boolean regExTransformation) {
-		this.regExTransformation = regExTransformation;
+		return CollectionUtils.isNotEmpty(regExTemplates);
 	}
 
 	/**
@@ -94,7 +104,7 @@ public class HttpChartingInputDefinitionExtra implements IInputDefinitionExtra {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(templates, plotByTagValue, regExTransformation);
+		return Objects.hashCode(templates, regExTemplates, plotByTagValue);
 	}
 
 	/**
@@ -112,7 +122,7 @@ public class HttpChartingInputDefinitionExtra implements IInputDefinitionExtra {
 			return false;
 		}
 		HttpChartingInputDefinitionExtra that = (HttpChartingInputDefinitionExtra) object;
-		return Objects.equal(this.templates, that.templates) && Objects.equal(this.plotByTagValue, that.plotByTagValue) && Objects.equal(this.regExTransformation, that.regExTransformation);
+		return Objects.equal(this.templates, that.templates) && Objects.equal(this.regExTemplates, that.regExTemplates) && Objects.equal(this.plotByTagValue, that.plotByTagValue);
 	}
 
 	/**
@@ -120,6 +130,6 @@ public class HttpChartingInputDefinitionExtra implements IInputDefinitionExtra {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this).add("templates", templates).add("plotByTagValue", plotByTagValue).add("regExTransformation", regExTransformation).toString().toString();
+		return Objects.toStringHelper(this).add("templates", templates).add("regExTemplates", regExTemplates).add("plotByTagValue", plotByTagValue).toString().toString();
 	}
 }

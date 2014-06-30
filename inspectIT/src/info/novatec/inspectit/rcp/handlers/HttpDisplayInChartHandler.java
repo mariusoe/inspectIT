@@ -50,12 +50,14 @@ public class HttpDisplayInChartHandler extends AbstractHandler implements IHandl
 		RepositoryDefinition repositoryDefinition = rootEditor.getInputDefinition().getRepositoryDefinition();
 		InputDefinition inputDefinition = null;
 
-		List<HttpTimerData> templates = new ArrayList<HttpTimerData>();
+		List<HttpTimerData> templates = new ArrayList<>();
+		List<RegExAggregatedHttpTimerData> regExTemplates = new ArrayList<>();
 		boolean regExTransformation = false;
 		for (Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 			Object selectedObject = iterator.next();
 			if (selectedObject instanceof RegExAggregatedHttpTimerData) {
 				templates.addAll(((RegExAggregatedHttpTimerData) selectedObject).getAggregatedDataList());
+				regExTemplates.add((RegExAggregatedHttpTimerData) selectedObject);
 				regExTransformation = true;
 			} else if (selectedObject instanceof HttpTimerData) {
 				templates.add((HttpTimerData) selectedObject);
@@ -73,12 +75,16 @@ public class HttpDisplayInChartHandler extends AbstractHandler implements IHandl
 			editorPropertiesData.setSensorImage(SensorTypeEnum.CHARTING_HTTP_TIMER_SENSOR.getImage());
 			editorPropertiesData.setSensorName("Chart");
 			editorPropertiesData.setPartNameFlag(PartType.SENSOR);
-			if (templates.size() == 1) {
+			if (templates.size() == 1 && !regExTransformation) {
+				HttpTimerData template = templates.get(0);
 				if (plotByTagValue) {
-					editorPropertiesData.setViewName("Tag: " + templates.get(0).getInspectItTaggingHeaderValue());
+					editorPropertiesData.setViewName("Tag: " + template.getInspectItTaggingHeaderValue() + " [" + template.getRequestMethod() + "]");
 				} else {
-					editorPropertiesData.setViewName("URI: " + templates.get(0).getUri());
+					editorPropertiesData.setViewName("URI: " + template.getUri() + " [" + template.getRequestMethod() + "]");
 				}
+			} else if (regExTemplates.size() == 1 && regExTransformation) {
+				RegExAggregatedHttpTimerData regExTemplate = regExTemplates.get(0);
+				editorPropertiesData.setViewName("Transformed URI: " + regExTemplate.getTransformedUri() + " [" + regExTemplate.getRequestMethod() + "]");
 			} else {
 				editorPropertiesData.setViewName("Multiple HTTP data");
 			}
@@ -92,8 +98,8 @@ public class HttpDisplayInChartHandler extends AbstractHandler implements IHandl
 
 			HttpChartingInputDefinitionExtra inputDefinitionExtra = new HttpChartingInputDefinitionExtra();
 			inputDefinitionExtra.setTemplates(templates);
+			inputDefinitionExtra.setRegExTemplates(regExTemplates);
 			inputDefinitionExtra.setPlotByTagValue(plotByTagValue);
-			inputDefinitionExtra.setRegExTransformation(regExTransformation);
 			inputDefinition.addInputDefinitonExtra(InputDefinitionExtrasMarkerFactory.HTTP_CHARTING_EXTRAS_MARKER, inputDefinitionExtra);
 
 			// open the view via command

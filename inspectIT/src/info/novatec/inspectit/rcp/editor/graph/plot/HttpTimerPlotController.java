@@ -1,10 +1,10 @@
 package info.novatec.inspectit.rcp.editor.graph.plot;
 
-import info.novatec.inspectit.cmr.model.MethodSensorTypeIdent;
 import info.novatec.inspectit.cmr.service.IHttpTimerDataAccessService;
+import info.novatec.inspectit.communication.IAggregatedData;
+import info.novatec.inspectit.communication.data.AggregatedHttpTimerData;
 import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.indexing.aggregation.IAggregator;
-import info.novatec.inspectit.indexing.aggregation.impl.HttpTimerDataAggregator;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.HttpChartingInputDefinitionExtra;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -29,9 +30,19 @@ import org.apache.commons.collections.CollectionUtils;
 public class HttpTimerPlotController extends AbstractTimerDataPlotController<HttpTimerData> {
 
 	/**
+	 * {@link IAggregator}.
+	 */
+	private static final IAggregator<HttpTimerData> AGGREGATOR = new SimpleHttpAggregator();
+
+	/**
 	 * Templates that will be used for data display. Every template is one line in line chart.
 	 */
 	private List<HttpTimerData> templates;
+
+	/**
+	 * List of {@link RegExAggregatedHttpTimerData} if regular expression is defined.
+	 */
+	private List<RegExAggregatedHttpTimerData> regExTemplates;
 
 	/**
 	 * If true tag values from templates will be used in plotting. Otherwise URI is used.
@@ -47,11 +58,6 @@ public class HttpTimerPlotController extends AbstractTimerDataPlotController<Htt
 	 * {@link IHttpTimerDataAccessService}.
 	 */
 	private IHttpTimerDataAccessService dataAccessService;
-
-	/**
-	 * {@link IAggregator}.
-	 */
-	private IAggregator<HttpTimerData> aggregator;
 
 	/**
 	 * List of displayed data.
@@ -74,11 +80,6 @@ public class HttpTimerPlotController extends AbstractTimerDataPlotController<Htt
 	Date latestDataDate = new Date(0);
 
 	/**
-	 * HTTP sensor type ident.
-	 */
-	private MethodSensorTypeIdent httpSensorTypeIdent;
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -90,14 +91,12 @@ public class HttpTimerPlotController extends AbstractTimerDataPlotController<Htt
 			templates = inputDefinitionExtra.getTemplates();
 			plotByTagValue = inputDefinitionExtra.isPlotByTagValue();
 			regExTransformation = inputDefinitionExtra.isRegExTransformation();
+			if (regExTransformation) {
+				regExTemplates = inputDefinitionExtra.getRegExTemplates();
+			}
 		}
 
-		aggregator = new HttpTimerDataAggregator(true, !plotByTagValue);
 		dataAccessService = inputDefinition.getRepositoryDefinition().getHttpTimerDataAccessService();
-
-		if (0 != inputDefinition.getIdDefinition().getSensorTypeId()) {
-			httpSensorTypeIdent = (MethodSensorTypeIdent) inputDefinition.getRepositoryDefinition().getCachedDataService().getSensorTypeIdentForId(inputDefinition.getIdDefinition().getSensorTypeId());
-		}
 	}
 
 	/**
@@ -156,20 +155,72 @@ public class HttpTimerPlotController extends AbstractTimerDataPlotController<Htt
 
 		Map<Object, List<HttpTimerData>> map = new HashMap<Object, List<HttpTimerData>>();
 		for (HttpTimerData data : displayedData) {
-			List<HttpTimerData> list = map.get(getSeriesKey(data));
+			HttpTimerData template = findTemplateForData(data);
+			if (null == template) {
+				continue;
+			}
+			Object seriesKey = getSeriesKey(template);
+			List<HttpTimerData> list = map.get(seriesKey);
 			if (null == list) {
 				list = new ArrayList<HttpTimerData>();
-				map.put(getSeriesKey(data), list);
+				map.put(seriesKey, list);
 			}
 			list.add(data);
 		}
 
 		for (Entry<Object, List<HttpTimerData>> entry : map.entrySet()) {
-			entry.setValue(adjustSamplingRate(entry.getValue(), from, to, aggregator));
+			entry.setValue(adjustSamplingRate(entry.getValue(), from, to, AGGREGATOR));
 		}
 
 		setDurationPlotData(map);
 		setCountPlotData(map);
+	}
+
+	/**
+	 * Finds matching template for the given {@link HttpTimerData} based on if regular expression
+	 * transformation is active or not.
+	 * 
+	 * @param httpTimerData
+	 *            Data to find matching template.
+	 * @return Matching template of <code>null</code> if one can not be found.
+	 */
+	private HttpTimerData findTemplateForData(HttpTimerData httpTimerData) {
+		if (regExTransformation) {
+			for (RegExAggregatedHttpTimerData regExTemplate : regExTemplates) {
+				if (HttpTimerData.REQUEST_METHOD_MULTIPLE.equals(regExTemplate.getRequestMethod()) || Objects.equals(regExTemplate.getRequestMethod(), httpTimerData.getRequestMethod())) {
+					if (null != findTemplateForData(httpTimerData, regExTemplate.getAggregatedDataList(), true)) {
+						return regExTemplate;
+					}
+				}
+			}
+		} else {
+			return findTemplateForData(httpTimerData, templates, false);
+		}
+		return null;
+	}
+
+	/**
+	 * Finds matching template for the given {@link HttpTimerData}.
+	 * 
+	 * @param httpTimerData
+	 *            Data to find matching template.
+	 * @param templates
+	 *            List of templates to search.
+	 * @param checkOnlyUri
+	 *            If matching should be done only by uri.
+	 * @return Matching template of <code>null</code> if one can not be found.
+	 */
+	private HttpTimerData findTemplateForData(HttpTimerData httpTimerData, List<HttpTimerData> templates, boolean checkOnlyUri) {
+		for (HttpTimerData template : templates) {
+			if (Objects.equals(template.getUri(), httpTimerData.getUri())) {
+				if (!checkOnlyUri && HttpTimerData.REQUEST_METHOD_MULTIPLE.equals(template.getRequestMethod())) {
+					return template;
+				} else if (Objects.equals(template.getRequestMethod(), httpTimerData.getRequestMethod())) {
+					return template;
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -181,12 +232,14 @@ public class HttpTimerPlotController extends AbstractTimerDataPlotController<Htt
 	 *         added to.
 	 */
 	protected Comparable<?> getSeriesKey(HttpTimerData httpTimerData) {
-		if (plotByTagValue) {
-			return "Tag: " + httpTimerData.getInspectItTaggingHeaderValue();
-		} else if (regExTransformation) {
-			return "Transformed URI: " + RegExAggregatedHttpTimerData.getTransformedUri(httpTimerData, httpSensorTypeIdent);
+		if (regExTransformation && httpTimerData instanceof RegExAggregatedHttpTimerData) {
+			return "Transformed URI: " + ((RegExAggregatedHttpTimerData) httpTimerData).getTransformedUri() + " [" + httpTimerData.getRequestMethod() + "]";
 		} else {
-			return "URI: " + httpTimerData.getUri();
+			if (plotByTagValue) {
+				return "Tag: " + httpTimerData.getInspectItTaggingHeaderValue() + " [" + httpTimerData.getRequestMethod() + "]";
+			} else {
+				return "URI: " + httpTimerData.getUri() + " [" + httpTimerData.getRequestMethod() + "]";
+			}
 		}
 	}
 
@@ -195,6 +248,46 @@ public class HttpTimerPlotController extends AbstractTimerDataPlotController<Htt
 	 */
 	@Override
 	protected List<HttpTimerData> getTemplates() {
-		return templates;
+		if (regExTransformation) {
+			return new ArrayList<HttpTimerData>(regExTemplates);
+		} else {
+			return templates;
+		}
+	}
+
+	/**
+	 * Simple {@link IAggregator} to use for {@link HttpTimerData} aggregation, since we separate
+	 * the data correctly before aggregation.
+	 * 
+	 * @author Ivan Senic
+	 * 
+	 */
+	private static class SimpleHttpAggregator implements IAggregator<HttpTimerData> {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void aggregate(IAggregatedData<HttpTimerData> aggregatedObject, HttpTimerData objectToAdd) {
+			aggregatedObject.aggregate(objectToAdd);
+
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IAggregatedData<HttpTimerData> getClone(HttpTimerData object) {
+			return new AggregatedHttpTimerData();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Object getAggregationKey(HttpTimerData object) {
+			return 1;
+		}
+
 	}
 }
