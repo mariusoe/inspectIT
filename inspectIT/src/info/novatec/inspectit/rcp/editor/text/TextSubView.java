@@ -13,6 +13,10 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -39,12 +43,19 @@ public class TextSubView extends AbstractSubView {
 	private TextInputController textInputController;
 
 	/**
+	 * Defines if a refresh job is currently already executing.
+	 */
+	private volatile boolean jobInSchedule = false;
+
+	/**
 	 * The constructor accepting one parameter.
 	 * 
 	 * @param textInputController
 	 *            An instance of the {@link TextInputController}.
 	 */
 	public TextSubView(TextInputController textInputController) {
+		Assert.isNotNull(textInputController);
+
 		this.textInputController = textInputController;
 	}
 
@@ -72,7 +83,6 @@ public class TextSubView extends AbstractSubView {
 		if (checkDisposed()) {
 			return;
 		}
-		Assert.isNotNull(textInputController);
 
 		textInputController.doRefresh();
 	}
@@ -108,7 +118,24 @@ public class TextSubView extends AbstractSubView {
 			return;
 		}
 
-		textInputController.setDataInput(data);
+		if (!jobInSchedule) {
+			jobInSchedule = true;
+
+			Job job = new Job(getDataLoadingJobName()) {
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					try {
+						textInputController.doRefresh();
+						return Status.OK_STATUS;
+					} catch (Throwable throwable) { // NOPMD
+						throw new RuntimeException("Unknown exception occurred trying to refresh the view.", throwable);
+					} finally {
+						jobInSchedule = false;
+					}
+				}
+			};
+			job.schedule();
+		}
 	}
 
 	/**

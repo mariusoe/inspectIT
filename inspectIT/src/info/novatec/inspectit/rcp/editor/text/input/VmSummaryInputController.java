@@ -22,6 +22,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
@@ -615,72 +616,77 @@ public class VmSummaryInputController extends AbstractTextInputController {
 	 * @param threadData
 	 *            The {@link ThreadInformationData} object.
 	 */
-	private void updateLabels(ClassLoadingInformationData classLoadingData, CpuInformationData cpuData, CompilationInformationData compilationData, MemoryInformationData memoryData,
-			RuntimeInformationData runtimeData, ThreadInformationData threadData) {
-		if (classLoadingData != null) {
-			int count = classLoadingData.getCount();
-			loadedClassCount.setText(NumberFormatter.formatInteger(classLoadingData.getTotalLoadedClassCount() / count));
-			totalLoadedClassCount.setText(NumberFormatter.formatLong(classLoadingData.getTotalTotalLoadedClassCount() / count));
-			unloadedClassCount.setText(NumberFormatter.formatLong(classLoadingData.getTotalUnloadedClassCount() / count));
-		}
+	private void updateLabels(final ClassLoadingInformationData classLoadingData, final CpuInformationData cpuData, final CompilationInformationData compilationData,
+			final MemoryInformationData memoryData, final RuntimeInformationData runtimeData, final ThreadInformationData threadData) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				if (classLoadingData != null) {
+					int count = classLoadingData.getCount();
+					loadedClassCount.setText(NumberFormatter.formatInteger(classLoadingData.getTotalLoadedClassCount() / count));
+					totalLoadedClassCount.setText(NumberFormatter.formatLong(classLoadingData.getTotalTotalLoadedClassCount() / count));
+					unloadedClassCount.setText(NumberFormatter.formatLong(classLoadingData.getTotalUnloadedClassCount() / count));
+				}
 
-		if (cpuData != null) {
-			if (cpuData.getProcessCpuTime() > 0) {
-				processCpuTime.setText(NumberFormatter.formatNanosToSeconds(cpuData.getProcessCpuTime()));
-			} else {
-				processCpuTime.setText(NOT_AVAILABLE);
-			}
-		}
+				if (cpuData != null) {
+					if (cpuData.getProcessCpuTime() > 0) {
+						processCpuTime.setText(NumberFormatter.formatNanosToSeconds(cpuData.getProcessCpuTime()));
+					} else {
+						processCpuTime.setText(NOT_AVAILABLE);
+					}
+				}
 
-		if (compilationData != null) {
-			totalCompilationTime.setText(NumberFormatter.formatMillisToSeconds(compilationData.getTotalTotalCompilationTime() / compilationData.getCount()));
-		}
+				if (compilationData != null) {
+					totalCompilationTime.setText(NumberFormatter.formatMillisToSeconds(compilationData.getTotalTotalCompilationTime() / compilationData.getCount()));
+				}
 
-		if (memoryData != null) {
-			int count = memoryData.getCount();
-			if (memoryData.getTotalFreePhysMemory() > 0) {
-				freePhysMemory.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalFreePhysMemory() / count));
-			} else {
-				freePhysMemory.setText(NOT_AVAILABLE);
-			}
-			if (memoryData.getTotalFreeSwapSpace() > 0) {
-				freeSwapSpace.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalFreeSwapSpace() / count));
-			} else {
-				freeSwapSpace.setText(NOT_AVAILABLE);
-			}
-			if (memoryData.getTotalComittedHeapMemorySize() > 0) {
-				committedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalComittedHeapMemorySize() / count));
-			} else {
-				committedHeapMemorySize.setText(NOT_AVAILABLE);
-			}
-			if (memoryData.getTotalComittedNonHeapMemorySize() > 0) {
-				committedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalComittedNonHeapMemorySize() / count));
-			} else {
-				committedNonHeapMemorySize.setText(NOT_AVAILABLE);
-			}
-			if (memoryData.getTotalUsedHeapMemorySize() > 0) {
-				usedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalUsedHeapMemorySize() / count));
-			} else {
-				usedHeapMemorySize.setText(NOT_AVAILABLE);
-			}
-			if (memoryData.getTotalUsedNonHeapMemorySize() > 0) {
-				usedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalUsedNonHeapMemorySize() / count));
-			} else {
-				usedNonHeapMemorySize.setText(NOT_AVAILABLE);
-			}
-		}
+				if (memoryData != null) {
+					int count = memoryData.getCount();
+					if (memoryData.getTotalFreePhysMemory() > 0) {
+						freePhysMemory.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalFreePhysMemory() / count));
+					} else {
+						freePhysMemory.setText(NOT_AVAILABLE);
+					}
+					if (memoryData.getTotalFreeSwapSpace() > 0) {
+						freeSwapSpace.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalFreeSwapSpace() / count));
+					} else {
+						freeSwapSpace.setText(NOT_AVAILABLE);
+					}
+					if (memoryData.getTotalComittedHeapMemorySize() > 0) {
+						committedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalComittedHeapMemorySize() / count));
+					} else {
+						committedHeapMemorySize.setText(NOT_AVAILABLE);
+					}
+					if (memoryData.getTotalComittedNonHeapMemorySize() > 0) {
+						committedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalComittedNonHeapMemorySize() / count));
+					} else {
+						committedNonHeapMemorySize.setText(NOT_AVAILABLE);
+					}
+					if (memoryData.getTotalUsedHeapMemorySize() > 0) {
+						usedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalUsedHeapMemorySize() / count));
+					} else {
+						usedHeapMemorySize.setText(NOT_AVAILABLE);
+					}
+					if (memoryData.getTotalUsedNonHeapMemorySize() > 0) {
+						usedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(memoryData.getTotalUsedNonHeapMemorySize() / count));
+					} else {
+						usedNonHeapMemorySize.setText(NOT_AVAILABLE);
+					}
+				}
 
-		if (runtimeData != null) {
-			uptime.setText(NumberFormatter.millisecondsToString(runtimeData.getTotalUptime() / runtimeData.getCount()));
-		}
+				if (runtimeData != null) {
+					uptime.setText(NumberFormatter.millisecondsToString(runtimeData.getTotalUptime() / runtimeData.getCount()));
+				}
 
-		if (threadData != null) {
-			int count = threadData.getCount();
-			liveThreadCount.setText(NumberFormatter.formatInteger(threadData.getTotalThreadCount() / count));
-			daemonThreadCount.setText(NumberFormatter.formatInteger(threadData.getTotalDaemonThreadCount() / count));
-			peakThreadCount.setText(NumberFormatter.formatInteger(threadData.getTotalPeakThreadCount() / count));
-			totalStartedThreadCount.setText(NumberFormatter.formatLong(threadData.getTotalTotalStartedThreadCount() / count));
-		}
+				if (threadData != null) {
+					int count = threadData.getCount();
+					liveThreadCount.setText(NumberFormatter.formatInteger(threadData.getTotalThreadCount() / count));
+					daemonThreadCount.setText(NumberFormatter.formatInteger(threadData.getTotalDaemonThreadCount() / count));
+					peakThreadCount.setText(NumberFormatter.formatInteger(threadData.getTotalPeakThreadCount() / count));
+					totalStartedThreadCount.setText(NumberFormatter.formatLong(threadData.getTotalTotalStartedThreadCount() / count));
+				}
+			}
+		});
 	}
 
 	/**

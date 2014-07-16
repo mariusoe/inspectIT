@@ -8,6 +8,7 @@ import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -92,14 +93,19 @@ public class ClassesInputController extends AbstractTextInputController {
 	 * {@inheritDoc}
 	 */
 	public void doRefresh() {
-		ClassLoadingInformationData data = (ClassLoadingInformationData) dataAccessService.getLastDataObject(classLoadingObj);
+		final ClassLoadingInformationData data = (ClassLoadingInformationData) dataAccessService.getLastDataObject(classLoadingObj);
 
 		if (null != data) {
-			// updates the labels
-			int count = data.getCount();
-			loadedClassCount.setText(NumberFormatter.formatInteger(data.getTotalLoadedClassCount() / count));
-			totalLoadedClassCount.setText(NumberFormatter.formatLong(data.getTotalTotalLoadedClassCount() / count));
-			unloadedClassCount.setText(NumberFormatter.formatLong(data.getTotalUnloadedClassCount() / count));
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					// updates the labels
+					int count = data.getCount();
+					loadedClassCount.setText(NumberFormatter.formatInteger(data.getTotalLoadedClassCount() / count));
+					totalLoadedClassCount.setText(NumberFormatter.formatLong(data.getTotalTotalLoadedClassCount() / count));
+					unloadedClassCount.setText(NumberFormatter.formatLong(data.getTotalUnloadedClassCount() / count));
+				}
+			});
 		}
 	}
 

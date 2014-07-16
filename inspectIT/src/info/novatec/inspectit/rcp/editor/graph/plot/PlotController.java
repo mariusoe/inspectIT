@@ -56,16 +56,14 @@ public interface PlotController {
 	int getWeight(XYPlot subPlot);
 
 	/**
-	 * The do refresh method is called at least one time to fill the plots with some initial data.
-	 * It depends on several settings if this method is called repeatedly.
-	 */
-	void doRefresh();
-
-	/**
 	 * This method obtains historical information from the DB for the timeframe denoted by its
 	 * parameters.
 	 * <p>
 	 * After fetching the historical data the upper and lower plot graphs get updated.
+	 * <p>
+	 * <b>Note that this method is not called in the UI thread because it is expected that this can
+	 * be long running operation. Any access to the widgets in this method must be run in UI thread
+	 * to ensure no InvalidThreadException occurs.</b>
 	 * 
 	 * @param from
 	 *            the timeframe's start date.

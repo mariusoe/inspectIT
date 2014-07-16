@@ -38,16 +38,6 @@ public abstract class AbstractPlotController implements PlotController {
 	private IRootEditor rootEditor;
 
 	/**
-	 * Indicates the ending time of the time range.
-	 */
-	private Date fromDate = new Date();
-
-	/**
-	 * Indicates the starting time of the time range.
-	 */
-	private Date toDate = new Date();
-
-	/**
 	 * The sensitivity.
 	 */
 	private Sensitivity sensitivity = SamplingRateControl.DEFAULT_SENSITIVITY;
@@ -158,16 +148,6 @@ public abstract class AbstractPlotController implements PlotController {
 			}
 		}
 
-		if (PreferenceId.TIMELINE.equals(preferenceEvent.getPreferenceId())) {
-			Map<IPreferenceGroup, Object> preferenceMap = preferenceEvent.getPreferenceMap();
-			if (preferenceMap.containsKey(PreferenceId.TimeLine.TO_DATE_ID)) {
-				toDate = (Date) preferenceMap.get(PreferenceId.TimeLine.TO_DATE_ID);
-			}
-			if (preferenceMap.containsKey(PreferenceId.TimeLine.FROM_DATE_ID)) {
-				fromDate = (Date) preferenceMap.get(PreferenceId.TimeLine.FROM_DATE_ID);
-			}
-			update(fromDate, toDate);
-		}
 
 	}
 

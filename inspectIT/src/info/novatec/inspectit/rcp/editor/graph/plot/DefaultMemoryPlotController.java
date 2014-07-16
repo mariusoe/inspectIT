@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.swt.widgets.Display;
 import org.jfree.chart.axis.AxisLocation;
-import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
@@ -314,23 +314,8 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void doRefresh() {
-		DateAxis dateAxis = (DateAxis) upperPlot.getDomainAxis();
-		Date from = dateAxis.getMinimumDate();
-		Date to = dateAxis.getMaximumDate();
-
-		update(from, to);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@SuppressWarnings("unchecked")
-	public void update(Date from, Date to) {
-		DateAxis dateAxis = (DateAxis) upperPlot.getDomainAxis();
-		dateAxis.setMinimumDate(from);
-		dateAxis.setMaximumDate(to);
-
+	public void update(final Date from, final Date to) {
 		Date dataNewestDate = new Date(0);
 		if (!oldData.isEmpty()) {
 			dataNewestDate = oldData.get(oldData.size() - 1).getTimeStamp();
@@ -340,7 +325,7 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 		// (to.equals(newestDate) || to.after(newestDate));
 		boolean rightAppend = to.after(newestDate) || oldToDate.before(to);
 
-		List<MemoryInformationData> adjustedTimerData = Collections.emptyList();
+		List<MemoryInformationData> adjustedMemoryInformationData = Collections.emptyList();
 
 		if (oldData.isEmpty() || to.before(oldFromDate) || from.after(dataNewestDate)) {
 			// the old data is empty or the range does not fit, thus we need
@@ -348,7 +333,7 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 			List<MemoryInformationData> data = (List<MemoryInformationData>) dataAccessService.getDataObjectsFromToDate(memoryTemplate, from, to);
 
 			if (!data.isEmpty()) {
-				adjustedTimerData = adjustSamplingRate(data, from, to, aggregator);
+				adjustedMemoryInformationData = adjustSamplingRate(data, from, to, aggregator);
 
 				// we got some data, thus we can set the date
 				oldFromDate = (Date) from.clone();
@@ -380,7 +365,7 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 				}
 			}
 
-			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
+			adjustedMemoryInformationData = adjustSamplingRate(oldData, from, to, aggregator);
 		} else if (rightAppend) {
 			// just append something on the right
 			Date rightDate = new Date(newestDate.getTime() + 1);
@@ -395,7 +380,7 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 				}
 			}
 
-			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
+			adjustedMemoryInformationData = adjustSamplingRate(oldData, from, to, aggregator);
 		} else if (leftAppend) {
 			// just append something on the left
 			Date leftDate = new Date(oldFromDate.getTime() - 1);
@@ -407,15 +392,24 @@ public class DefaultMemoryPlotController extends AbstractPlotController {
 				oldFromDate = (Date) from.clone();
 			}
 
-			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
+			adjustedMemoryInformationData = adjustSamplingRate(oldData, from, to, aggregator);
 		} else {
 			// No update is needed here because we already have all the
 			// needed data
-			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
+			adjustedMemoryInformationData = adjustSamplingRate(oldData, from, to, aggregator);
 		}
 
-		setUpperPlotData(adjustedTimerData);
-		setLowerPlotData(adjustedTimerData);
+		final List<MemoryInformationData> finalAdjustedMemoryInformationData = adjustedMemoryInformationData;
+
+		// updating the plots in the UI thread
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				setUpperPlotData(finalAdjustedMemoryInformationData);
+				setLowerPlotData(finalAdjustedMemoryInformationData);
+			}
+		});
+
 	}
 
 	/**

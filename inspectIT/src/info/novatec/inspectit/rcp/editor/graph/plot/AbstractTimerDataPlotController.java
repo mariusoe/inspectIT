@@ -11,7 +11,6 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,7 +23,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.jfree.chart.axis.AxisLocation;
-import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
@@ -132,28 +130,6 @@ public abstract class AbstractTimerDataPlotController<E extends TimerData> exten
 	@Override
 	public int getWeight(XYPlot subPlot) {
 		return weights.get(subPlot);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void doRefresh() {
-		DateAxis dateAxis = (DateAxis) durationPlot.getDomainAxis();
-		Date from = dateAxis.getMinimumDate();
-		Date to = dateAxis.getMaximumDate();
-
-		update(from, to);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void update(Date from, Date to) {
-		DateAxis dateAxis = (DateAxis) durationPlot.getDomainAxis();
-		dateAxis.setMinimumDate(from);
-		dateAxis.setMaximumDate(to);
 	}
 
 	/**

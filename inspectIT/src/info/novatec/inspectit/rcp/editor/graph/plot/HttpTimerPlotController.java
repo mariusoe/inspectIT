@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * {@link PlotController} for displaying many Http requests in the graph.
@@ -112,8 +113,6 @@ public class HttpTimerPlotController extends AbstractTimerDataPlotController<Htt
 	 */
 	@Override
 	public void update(Date from, Date to) {
-		super.update(from, to);
-
 		// complete load if we have no data, or wanted time range is completly outside the current
 		boolean completeLoad = CollectionUtils.isEmpty(displayedData) || fromDate.after(to) || toDate.before(from);
 		// left append if currently displayed from date is after the new from date
@@ -172,8 +171,17 @@ public class HttpTimerPlotController extends AbstractTimerDataPlotController<Htt
 			entry.setValue(adjustSamplingRate(entry.getValue(), from, to, AGGREGATOR));
 		}
 
-		setDurationPlotData(map);
-		setCountPlotData(map);
+		final Map<Object, List<HttpTimerData>> finalMap = map;
+
+		// update plots in UI thread
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				setDurationPlotData(finalMap);
+				setCountPlotData(finalMap);
+			}
+		});
+		
 	}
 
 	/**

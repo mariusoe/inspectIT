@@ -37,6 +37,10 @@ public interface TextInputController {
 	/**
 	 * The do refresh method is called at least one time to fill the labels with some initial data.
 	 * It depends on several settings if this method is called repeatedly.
+	 * <p>
+	 * <b>Note that this method is not called in the UI thread because it is expected that this can
+	 * be long running operation. Any access to the widgets in this method must be run in UI thread
+	 * to ensure no InvalidThreadException occurs.</b>
 	 */
 	void doRefresh();
 

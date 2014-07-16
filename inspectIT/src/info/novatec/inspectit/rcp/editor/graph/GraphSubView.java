@@ -27,6 +27,10 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
@@ -90,9 +94,9 @@ public class GraphSubView extends AbstractSubView {
 	private ZoomListener zoomListener;
 
 	/**
-	 * Defines if this view is disposed.
+	 * Defines if a refresh job is currently already executing.
 	 */
-	private boolean isDisposed = false;
+	private volatile boolean jobInSchedule = false;
 
 	/**
 	 * The constructor taking one parameter and creating a {@link PlotController}.
@@ -141,8 +145,7 @@ public class GraphSubView extends AbstractSubView {
 		Color color = new Color(toolkit.getColors().getBackground().getRed(), toolkit.getColors().getBackground().getGreen(), toolkit.getColors().getBackground().getBlue());
 		chart.setBackgroundPaint(color);
 
-		new ChartComposite(composite, SWT.NONE, chart, ChartComposite.DEFAULT_WIDTH, ChartComposite.DEFAULT_HEIGHT, 0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, true, true,
-				true, true, true, true) {
+		new ChartComposite(composite, SWT.NONE, chart, ChartComposite.DEFAULT_WIDTH, ChartComposite.DEFAULT_HEIGHT, 0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, true, true, true, true, true, true) {
 
 			/**
 			 * {@inheritDoc}
@@ -199,7 +202,7 @@ public class GraphSubView extends AbstractSubView {
 
 		plot.setOrientation(PlotOrientation.VERTICAL);
 
-		TimeFrame  timeFrame = getInitialDataTimeFrame();
+		TimeFrame timeFrame = getInitialDataTimeFrame();
 		if (null != timeFrame) {
 			// set min/max dates
 			((DateAxis) plot.getDomainAxis()).setMinimumDate(timeFrame.getFrom());
@@ -301,6 +304,8 @@ public class GraphSubView extends AbstractSubView {
 				Date fromDate = (Date) preferenceMap.get(PreferenceId.TimeLine.FROM_DATE_ID);
 				axis.setMinimumDate(fromDate);
 			}
+
+			doRefresh();
 		}
 
 		if (PreferenceId.LIVEMODE.equals(preferenceEvent.getPreferenceId())) {
@@ -320,20 +325,34 @@ public class GraphSubView extends AbstractSubView {
 	 * {@inheritDoc}
 	 */
 	public void doRefresh() {
-		if (!isDisposed) {
+		if (checkDisposed()) {
+			return;
+		}
+		if (!jobInSchedule) {
+			jobInSchedule = true;
+			
 			XYPlot plot = (XYPlot) chart.getPlot();
+			DateAxis axis = (DateAxis) plot.getDomainAxis();
+			final Date minDate = axis.getMinimumDate();
+			final Date maxDate = autoUpdate ? new Date(System.currentTimeMillis()) : axis.getMaximumDate();
 			if (autoUpdate) {
-				long now = System.currentTimeMillis();
-				DateAxis axis = (DateAxis) plot.getDomainAxis();
-				Date minDate = axis.getMinimumDate();
-				Date maxDate = new Date(now);
-				plotController.update(minDate, maxDate);
-			} else {
-				DateAxis axis = (DateAxis) plot.getDomainAxis();
-				Date minDate = axis.getMinimumDate();
-				Date maxDate = axis.getMaximumDate();
-				plotController.update(minDate, maxDate);
+				axis.setMaximumDate(maxDate);
 			}
+
+			Job job = new Job(getDataLoadingJobName()) {
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					try {
+						plotController.update(minDate, maxDate);
+						return Status.OK_STATUS;
+					} catch (Throwable throwable) { // NOPMD
+						throw new RuntimeException("Unknown exception occurred trying to refresh the view.", throwable);
+					} finally {
+						jobInSchedule = false;
+					}
+				}
+			};
+			job.schedule();
 		}
 	}
 
@@ -349,11 +368,20 @@ public class GraphSubView extends AbstractSubView {
 	}
 
 	/**
+	 * Returns true if the composite holding the chart in the sub-view is disposed. False otherwise.
+	 * 
+	 * @return Returns true if the composite holding the chart in the sub-view is disposed. False
+	 *         otherwise.
+	 */
+	private boolean checkDisposed() {
+		return composite.isDisposed();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void dispose() {
-		isDisposed = true;
 		plotController.dispose();
 	}
 

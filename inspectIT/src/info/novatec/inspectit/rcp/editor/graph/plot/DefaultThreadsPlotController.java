@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.swt.widgets.Display;
 import org.jfree.chart.axis.AxisLocation;
-import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
@@ -278,23 +278,8 @@ public class DefaultThreadsPlotController extends AbstractPlotController {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void doRefresh() {
-		DateAxis dateAxis = (DateAxis) upperPlot.getDomainAxis();
-		Date from = dateAxis.getMinimumDate();
-		Date to = dateAxis.getMaximumDate();
-
-		update(from, to);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@SuppressWarnings("unchecked")
 	public void update(Date from, Date to) {
-		DateAxis dateAxis = (DateAxis) upperPlot.getDomainAxis();
-		dateAxis.setMinimumDate(from);
-		dateAxis.setMaximumDate(to);
-
 		Date dataNewestDate = new Date(0);
 		if (!oldData.isEmpty()) {
 			dataNewestDate = oldData.get(oldData.size() - 1).getTimeStamp();
@@ -304,7 +289,7 @@ public class DefaultThreadsPlotController extends AbstractPlotController {
 		// (to.equals(newestDate) || to.after(newestDate));
 		boolean rightAppend = to.after(newestDate) || oldToDate.before(to);
 
-		List<ThreadInformationData> adjustedTimerData = Collections.emptyList();
+		List<ThreadInformationData> adjustedThreadData = Collections.emptyList();
 
 		if (oldData.isEmpty() || to.before(oldFromDate) || from.after(dataNewestDate)) {
 			// the old data is empty or the range does not fit, thus we need
@@ -312,7 +297,7 @@ public class DefaultThreadsPlotController extends AbstractPlotController {
 			List<ThreadInformationData> data = (List<ThreadInformationData>) dataAccessService.getDataObjectsFromToDate(template, from, to);
 
 			if (!data.isEmpty()) {
-				adjustedTimerData = adjustSamplingRate(data, from, to, aggregator);
+				adjustedThreadData = adjustSamplingRate(data, from, to, aggregator);
 
 				// we got some data, thus we can set the date
 				oldFromDate = (Date) from.clone();
@@ -344,7 +329,7 @@ public class DefaultThreadsPlotController extends AbstractPlotController {
 				}
 			}
 
-			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
+			adjustedThreadData = adjustSamplingRate(oldData, from, to, aggregator);
 		} else if (rightAppend) {
 			// just append something on the right
 			Date rightDate = new Date(newestDate.getTime() + 1);
@@ -359,7 +344,7 @@ public class DefaultThreadsPlotController extends AbstractPlotController {
 				}
 			}
 
-			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
+			adjustedThreadData = adjustSamplingRate(oldData, from, to, aggregator);
 		} else if (leftAppend) {
 			// just append something on the left
 			Date leftDate = new Date(oldFromDate.getTime() - 1);
@@ -371,15 +356,24 @@ public class DefaultThreadsPlotController extends AbstractPlotController {
 				oldFromDate = (Date) from.clone();
 			}
 
-			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
+			adjustedThreadData = adjustSamplingRate(oldData, from, to, aggregator);
 		} else {
 			// No update is needed here because we already have all the
 			// needed data
-			adjustedTimerData = adjustSamplingRate(oldData, from, to, aggregator);
+			adjustedThreadData = adjustSamplingRate(oldData, from, to, aggregator);
 		}
+		
+		final List<ThreadInformationData> finalAdjustedThreadData = adjustedThreadData;
 
-		setUpperPlotData(adjustedTimerData);
-		setLowerPlotData(adjustedTimerData);
+		// updating the plots in the UI thread
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				setUpperPlotData(finalAdjustedThreadData);
+				setLowerPlotData(finalAdjustedThreadData);
+			}
+		});
+		
 	}
 
 	/**

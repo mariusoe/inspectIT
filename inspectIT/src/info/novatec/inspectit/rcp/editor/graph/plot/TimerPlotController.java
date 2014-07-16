@@ -112,8 +112,6 @@ public class TimerPlotController extends AbstractTimerDataPlotController<TimerDa
 	@SuppressWarnings("unchecked")
 	@Override
 	public void update(Date from, Date to) {
-		super.update(from, to);
-
 		List<DefaultData> templates = new ArrayList<DefaultData>(this.templates);
 		// complete load if we have no data, or wanted time range is completly outside the current
 		boolean completeLoad = CollectionUtils.isEmpty(displayedData) || fromDate.after(to) || toDate.before(from);
@@ -168,24 +166,23 @@ public class TimerPlotController extends AbstractTimerDataPlotController<TimerDa
 			entry.setValue(adjustSamplingRate(entry.getValue(), from, to, aggregator));
 		}
 
-		setDurationPlotData(map);
-		setCountPlotData(map);
+		// update plots in UI thread
+		final Map<Object, List<TimerData>> finalMap = map;
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				setDurationPlotData(finalMap);
+				setCountPlotData(finalMap);
 
-		// if we have only one list then we pass it to the root editor so that sub-views can set it
-		if (1 == map.size()) {
-			final List<? extends DefaultData> datas = map.entrySet().iterator().next().getValue();
-			Display.getDefault().asyncExec(new Runnable() {
-				public void run() {
+				// if we have only one list then we pass it to the root editor so that sub-views can
+				// set it
+				if (1 == finalMap.size()) {
+					final List<? extends DefaultData> datas = finalMap.entrySet().iterator().next().getValue();
 					getRootEditor().setDataInput(datas);
-				}
-			});
-		} else {
-			Display.getDefault().asyncExec(new Runnable() {
-				public void run() {
+				} else {
 					getRootEditor().setDataInput(Collections.<DefaultData> emptyList());
 				}
-			});
-		}
+			}
+		});
 	}
 
 	/**

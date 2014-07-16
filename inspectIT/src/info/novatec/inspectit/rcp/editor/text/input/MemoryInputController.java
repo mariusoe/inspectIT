@@ -9,6 +9,7 @@ import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -172,41 +173,46 @@ public class MemoryInputController extends AbstractTextInputController {
 	 * {@inheritDoc}
 	 */
 	public void doRefresh() {
-		MemoryInformationData data = (MemoryInformationData) dataAccessService.getLastDataObject(memoryObj);
+		final MemoryInformationData data = (MemoryInformationData) dataAccessService.getLastDataObject(memoryObj);
 
 		if (null != data) {
-			// updates the labels
-			int count = data.getCount();
-			if (data.getTotalFreePhysMemory() > 0) {
-				freePhysMemory.setText(NumberFormatter.formatBytesToKBytes(data.getTotalFreePhysMemory() / count));
-			} else {
-				freePhysMemory.setText(NOT_AVAILABLE);
-			}
-			if (data.getTotalFreeSwapSpace() > 0) {
-				freeSwapSpace.setText(NumberFormatter.formatBytesToKBytes(data.getTotalFreeSwapSpace() / count));
-			} else {
-				freeSwapSpace.setText(NOT_AVAILABLE);
-			}
-			if (data.getTotalComittedHeapMemorySize() > 0) {
-				committedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalComittedHeapMemorySize() / count));
-			} else {
-				committedHeapMemorySize.setText(NOT_AVAILABLE);
-			}
-			if (data.getTotalComittedNonHeapMemorySize() > 0) {
-				committedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalComittedNonHeapMemorySize() / count));
-			} else {
-				committedNonHeapMemorySize.setText(NOT_AVAILABLE);
-			}
-			if (data.getTotalUsedHeapMemorySize() > 0) {
-				usedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalUsedHeapMemorySize() / count));
-			} else {
-				usedHeapMemorySize.setText(NOT_AVAILABLE);
-			}
-			if (data.getTotalUsedNonHeapMemorySize() > 0) {
-				usedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalUsedNonHeapMemorySize() / count));
-			} else {
-				usedNonHeapMemorySize.setText(NOT_AVAILABLE);
-			}
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					// updates the labels
+					int count = data.getCount();
+					if (data.getTotalFreePhysMemory() > 0) {
+						freePhysMemory.setText(NumberFormatter.formatBytesToKBytes(data.getTotalFreePhysMemory() / count));
+					} else {
+						freePhysMemory.setText(NOT_AVAILABLE);
+					}
+					if (data.getTotalFreeSwapSpace() > 0) {
+						freeSwapSpace.setText(NumberFormatter.formatBytesToKBytes(data.getTotalFreeSwapSpace() / count));
+					} else {
+						freeSwapSpace.setText(NOT_AVAILABLE);
+					}
+					if (data.getTotalComittedHeapMemorySize() > 0) {
+						committedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalComittedHeapMemorySize() / count));
+					} else {
+						committedHeapMemorySize.setText(NOT_AVAILABLE);
+					}
+					if (data.getTotalComittedNonHeapMemorySize() > 0) {
+						committedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalComittedNonHeapMemorySize() / count));
+					} else {
+						committedNonHeapMemorySize.setText(NOT_AVAILABLE);
+					}
+					if (data.getTotalUsedHeapMemorySize() > 0) {
+						usedHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalUsedHeapMemorySize() / count));
+					} else {
+						usedHeapMemorySize.setText(NOT_AVAILABLE);
+					}
+					if (data.getTotalUsedNonHeapMemorySize() > 0) {
+						usedNonHeapMemorySize.setText(NumberFormatter.formatBytesToKBytes(data.getTotalUsedNonHeapMemorySize() / count));
+					} else {
+						usedNonHeapMemorySize.setText(NOT_AVAILABLE);
+					}
+				}
+			});
 		}
 	}
 

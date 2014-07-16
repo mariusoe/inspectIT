@@ -8,6 +8,7 @@ import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -88,20 +89,25 @@ public class CpuInputController extends AbstractTextInputController {
 	 * {@inheritDoc}
 	 */
 	public void doRefresh() {
-		CpuInformationData data = (CpuInformationData) dataAccessService.getLastDataObject(cpuObj);
+		final CpuInformationData data = (CpuInformationData) dataAccessService.getLastDataObject(cpuObj);
 
 		if (null != data) {
-			int count = data.getCount();
-			if (data.getTotalCpuUsage() > 0) {
-				cpuUsage.setText(NumberFormatter.formatCpuPercent(data.getTotalCpuUsage() / count));
-			} else {
-				cpuUsage.setText(NOT_AVAILABLE);
-			}
-			if (data.getProcessCpuTime() > 0) {
-				processCpuTime.setText(NumberFormatter.formatNanosToSeconds(data.getProcessCpuTime()));
-			} else {
-				processCpuTime.setText(NOT_AVAILABLE);
-			}
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					int count = data.getCount();
+					if (data.getTotalCpuUsage() > 0) {
+						cpuUsage.setText(NumberFormatter.formatCpuPercent(data.getTotalCpuUsage() / count));
+					} else {
+						cpuUsage.setText(NOT_AVAILABLE);
+					}
+					if (data.getProcessCpuTime() > 0) {
+						processCpuTime.setText(NumberFormatter.formatNanosToSeconds(data.getProcessCpuTime()));
+					} else {
+						processCpuTime.setText(NOT_AVAILABLE);
+					}
+				}
+			});
 		}
 	}
 
