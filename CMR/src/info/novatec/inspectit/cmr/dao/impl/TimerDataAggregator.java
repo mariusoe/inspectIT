@@ -104,27 +104,6 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 	}
 
 	/**
-	 * @return the aggregationPeriod
-	 */
-	public long getAggregationPeriod() {
-		return aggregationPeriod;
-	}
-
-	/**
-	 * @return the maxElements
-	 */
-	public int getMaxElements() {
-		return maxElements;
-	}
-
-	/**
-	 * @return the cacheCleanSleepingPeriod
-	 */
-	public long getCacheCleanSleepingPeriod() {
-		return cacheCleanSleepingPeriod;
-	}
-
-	/**
 	 * Aggregates the {@link TimerData} object and updates the cache. Note that the given object
 	 * will not be modified by this method.
 	 * 
@@ -147,9 +126,14 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 				mostRecentlyAdded = aggTimerData;
 
 				int count = elementCount.incrementAndGet();
+				// remove oldest as long as number of elements is higher than maximum
 				while (maxElements < count) {
-					this.removeOldest();
-					count++;
+					TimerData oldest = queue.poll();
+					if (null != oldest) {
+						map.remove(getCacheHash(oldest.getPlatformIdent(), oldest.getMethodIdent(), oldest.getTimeStamp().getTime()));
+						persistList.add(oldest);
+						count = elementCount.decrementAndGet();
+					}
 				}
 			}
 			aggTimerData.aggregateTimerData(timerData);
@@ -186,20 +170,9 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 	}
 
 	/**
-	 * Removes the oldest element from the cache and puts it to the persistence list, so that
-	 * element can be persisted next time persistence is done.
-	 */
-	private void removeOldest() {
-		TimerData oldest = queue.poll();
-		map.remove(getCacheHash(oldest.getPlatformIdent(), oldest.getMethodIdent(), oldest.getTimeStamp().getTime()));
-		persistList.add(oldest);
-		elementCount.decrementAndGet();
-	}
-
-	/**
 	 * Persists all objects in the persistence list.
 	 */
-	private void saveAllInPersistList() {
+	void saveAllInPersistList() {
 		if (!persistList.isEmpty()) {
 			StatelessSession session = getHibernateTemplate().getSessionFactory().openStatelessSession();
 			Transaction tx = session.beginTransaction();
@@ -256,6 +229,36 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 	public void postConstruct() {
 		CacheCleaner cacheCleaner = new CacheCleaner();
 		cacheCleaner.start();
+	}
+
+	/**
+	 * @return the aggregationPeriod
+	 */
+	public long getAggregationPeriod() {
+		return aggregationPeriod;
+	}
+
+	/**
+	 * @return the maxElements
+	 */
+	public int getMaxElements() {
+		return maxElements;
+	}
+
+	/**
+	 * @return the cacheCleanSleepingPeriod
+	 */
+	public long getCacheCleanSleepingPeriod() {
+		return cacheCleanSleepingPeriod;
+	}
+
+	/**
+	 * Gets {@link #elementCount}.
+	 * 
+	 * @return {@link #elementCount}
+	 */
+	public int getElementCount() {
+		return elementCount.get();
 	}
 
 	/**

@@ -2,15 +2,16 @@ package info.novatec.inspectit.cmr.dao.impl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import info.novatec.inspectit.cmr.test.AbstractTestNGLogSupport;
 import info.novatec.inspectit.communication.data.DatabaseAggregatedTimerData;
@@ -25,8 +26,9 @@ import java.util.Set;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
@@ -48,7 +50,7 @@ public class TimerDataAggregatorTest extends AbstractTestNGLogSupport {
 	/**
 	 * Initialize.
 	 */
-	@BeforeClass
+	@BeforeMethod
 	public void init() {
 		SessionFactory factory = mock(SessionFactory.class);
 		session = mock(StatelessSession.class);
@@ -63,9 +65,69 @@ public class TimerDataAggregatorTest extends AbstractTestNGLogSupport {
 	}
 
 	/**
+	 * Tests that after maximum amount of elements is reached we move them to persist list.
+	 */
+	@Test
+	public void maxElementsReached() {
+		aggregator.maxElements = 1;
+
+		TimerData timerData1 = new TimerData(new Timestamp(System.currentTimeMillis()), 10L, 20L, 30L);
+		TimerData timerData2 = new TimerData(new Timestamp(System.currentTimeMillis()), 100L, 200L, 300L);
+
+		aggregator.processTimerData(timerData1);
+		aggregator.processTimerData(timerData2);
+
+		assertThat(aggregator.getElementCount(), is(1));
+		verifyZeroInteractions(session);
+	}
+
+	/**
+	 * Tests that if we place many time same amount of elements, maximum will not be reached.
+	 */
+	@Test
+	public void noMaxElementsReached() {
+		aggregator.maxElements = 2;
+
+		TimerData timerData1 = new TimerData(new Timestamp(System.currentTimeMillis()), 10L, 20L, 30L);
+		TimerData timerData2 = new TimerData(new Timestamp(System.currentTimeMillis()), 100L, 200L, 300L);
+
+		for (int i = 0; i < 100; i++) {
+			aggregator.processTimerData(timerData1);
+			aggregator.processTimerData(timerData2);
+		}
+
+		assertThat(aggregator.getElementCount(), is(2));
+		verifyZeroInteractions(session);
+	}
+
+	/**
+	 * Tests that persist list saving includes correct elements being saved.
+	 */
+	@Test
+	public void saveAllInPersistList() {
+		aggregator.maxElements = 1;
+
+		TimerData timerData1 = new TimerData(new Timestamp(System.currentTimeMillis()), 10L, 20L, 30L);
+		TimerData timerData2 = new TimerData(new Timestamp(System.currentTimeMillis()), 100L, 200L, 300L);
+
+		aggregator.processTimerData(timerData1);
+		aggregator.processTimerData(timerData2);
+
+		aggregator.saveAllInPersistList();
+
+		ArgumentCaptor<DatabaseAggregatedTimerData> argument = ArgumentCaptor.forClass(DatabaseAggregatedTimerData.class);
+		verify(session, times(1)).insert(argument.capture());
+
+		assertThat(argument.getValue(), is(instanceOf(DatabaseAggregatedTimerData.class)));
+		assertThat(argument.getValue().getPlatformIdent(), is(timerData1.getPlatformIdent()));
+		assertThat(argument.getValue().getSensorTypeIdent(), is(timerData1.getSensorTypeIdent()));
+		assertThat(argument.getValue().getMethodIdent(), is(timerData1.getMethodIdent()));
+	}
+
+	/**
 	 * Test for the validity of aggregation.
 	 */
-	@Test(enabled = false)
+	@Test
 	public void aggregation() {
 		long timestampValue = new Date().getTime();
 		long platformIdent = new Random().nextLong();
@@ -118,7 +180,9 @@ public class TimerDataAggregatorTest extends AbstractTestNGLogSupport {
 			aggregator.processTimerData(timerData2);
 		}
 
-		verify(session, timeout(10000).times(2)).insert(argThat(new ArgumentMatcher<TimerData>() {
+		aggregator.removeAndPersistAll();
+
+		verify(session, times(2)).insert(argThat(new ArgumentMatcher<TimerData>() {
 			@Override
 			public boolean matches(Object argument) {
 				if (!DatabaseAggregatedTimerData.class.equals(argument.getClass())) {
