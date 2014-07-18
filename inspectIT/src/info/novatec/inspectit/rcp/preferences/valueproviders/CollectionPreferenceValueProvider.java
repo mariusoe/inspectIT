@@ -6,7 +6,6 @@ import info.novatec.inspectit.rcp.preferences.valueproviders.PreferenceValueProv
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.StringTokenizer;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -42,7 +41,7 @@ public class CollectionPreferenceValueProvider extends PreferenceValueProvider<C
 		} else {
 			StringBuilder stringBuilder = new StringBuilder();
 			for (Object object : collection) {
-				stringBuilder.append(object + PreferencesConstants.PREF_OBJECT_SEPARATION_TOKEN);
+				stringBuilder.append(getValueForCollectionMember(object) + PreferencesConstants.PREF_OBJECT_SEPARATION_TOKEN);
 			}
 			return stringBuilder.toString();
 		}
@@ -53,15 +52,50 @@ public class CollectionPreferenceValueProvider extends PreferenceValueProvider<C
 	 */
 	public Collection<?> getObjectFromValue(String value) throws PreferenceException {
 		if (EMPTY_COLLECTION.equals(value)) {
-			return Collections.emptyList();
+			return getCollectionForResults();
 		} else {
-			Collection<String> results = new ArrayList<String>();
+			Collection<Object> results = getCollectionForResults();
 			StringTokenizer tokenizer = new StringTokenizer(value, PreferencesConstants.PREF_OBJECT_SEPARATION_TOKEN);
 			while (tokenizer.hasMoreElements()) {
-				results.add(tokenizer.nextToken());
+				results.add(getObjectForCollectionMember(tokenizer.nextToken()));
 			}
 			return results;
 		}
+	}
+
+	/**
+	 * Returns Collection type to use when creating resulting collection from strings.
+	 * 
+	 * @return Returns Collection type to use when creating resulting collection from strings.
+	 */
+	protected Collection<Object> getCollectionForResults() {
+		return new ArrayList<Object>();
+	}
+
+	/**
+	 * Returns String value for collection member.
+	 * <p>
+	 * Sub-classes can override.
+	 * 
+	 * @param object
+	 *            Member.
+	 * @return String value.
+	 */
+	protected String getValueForCollectionMember(Object object) {
+		return object.toString();
+	}
+
+	/**
+	 * Returns collection member for saved String value.
+	 * <p>
+	 * Sub-classes can override.
+	 * 
+	 * @param value
+	 *            String value as object was saved..
+	 * @return Collection member..
+	 */
+	protected Object getObjectForCollectionMember(String value) {
+		return value;
 	}
 
 }

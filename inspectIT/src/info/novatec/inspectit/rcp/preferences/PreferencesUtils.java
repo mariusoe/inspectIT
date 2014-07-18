@@ -51,7 +51,7 @@ public final class PreferencesUtils {
 		try {
 			preferenceStore.save();
 		} catch (IOException e) {
-			InspectIT.getDefault().createErrorDialog("Error occured trying to save setting with name '" + name + "' to preference store.", e, -1);
+			InspectIT.getDefault().createErrorDialog("Error occurred trying to save setting with name '" + name + "' to preference store.", e, -1);
 		}
 	}
 
@@ -107,7 +107,7 @@ public final class PreferencesUtils {
 		try {
 			preferenceStore.save();
 		} catch (IOException e) {
-			InspectIT.getDefault().createErrorDialog("Error occured trying to save setting with name '" + name + "' to preference store.", e, -1);
+			InspectIT.getDefault().createErrorDialog("Error occurred trying to save setting with name '" + name + "' to preference store.", e, -1);
 		}
 	}
 
@@ -163,7 +163,7 @@ public final class PreferencesUtils {
 		try {
 			preferenceStore.save();
 		} catch (IOException e) {
-			InspectIT.getDefault().createErrorDialog("Error occured trying to save setting with name '" + name + "' to preference store.", e, -1);
+			InspectIT.getDefault().createErrorDialog("Error occurred trying to save setting with name '" + name + "' to preference store.", e, -1);
 		}
 	}
 

@@ -1,11 +1,16 @@
 package info.novatec.inspectit.rcp.preferences;
 
-import info.novatec.inspectit.rcp.model.SensorTypeEnum;
+import info.novatec.inspectit.communication.data.ExceptionSensorData;
+import info.novatec.inspectit.communication.data.HttpTimerData;
+import info.novatec.inspectit.communication.data.InvocationSequenceData;
+import info.novatec.inspectit.communication.data.SqlStatementData;
+import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 
@@ -35,8 +40,13 @@ public class InspectITPreferenceInitializer extends AbstractPreferenceInitialize
 		PreferencesUtils.saveIntValue(PreferencesConstants.ITEMS_COUNT_TO_SHOW, 100, true);
 		PreferencesUtils.saveDoubleValue(PreferencesConstants.INVOCATION_FILTER_EXCLUSIVE_TIME, Double.NaN, true);
 		PreferencesUtils.saveDoubleValue(PreferencesConstants.INVOCATION_FILTER_TOTAL_TIME, Double.NaN, true);
-		PreferencesUtils.saveObject(PreferencesConstants.INVOCATION_FILTER_SENSOR_TYPES,
-				EnumSet.of(SensorTypeEnum.TIMER, SensorTypeEnum.INVOCATION_SEQUENCE, SensorTypeEnum.EXCEPTION_SENSOR, SensorTypeEnum.JDBC_STATEMENT, SensorTypeEnum.JDBC_PREPARED_STATEMENT), true);
+		Set<Class<?>> invocDataTypes = new HashSet<>();
+		invocDataTypes.add(InvocationSequenceData.class);
+		invocDataTypes.add(TimerData.class);
+		invocDataTypes.add(HttpTimerData.class);
+		invocDataTypes.add(SqlStatementData.class);
+		invocDataTypes.add(ExceptionSensorData.class);
+		PreferencesUtils.saveObject(PreferencesConstants.INVOCATION_FILTER_DATA_TYPES, invocDataTypes, true);
 	}
 
 }

@@ -136,7 +136,7 @@ public class SteppingTreeSubView extends TreeSubView {
 			}
 			break;
 		case CLEAR_BUFFER:
-		case FILTERSENSORTYPE:
+		case FILTERDATATYPE:
 		case INVOCFILTEREXCLUSIVETIME:
 		case INVOCFILTERTOTALTIME:
 			steppingControl.inputChanged();

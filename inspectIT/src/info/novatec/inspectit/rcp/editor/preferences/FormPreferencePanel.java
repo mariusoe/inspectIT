@@ -1,5 +1,10 @@
 package info.novatec.inspectit.rcp.editor.preferences;
 
+import info.novatec.inspectit.communication.data.ExceptionSensorData;
+import info.novatec.inspectit.communication.data.HttpTimerData;
+import info.novatec.inspectit.communication.data.InvocationSequenceData;
+import info.novatec.inspectit.communication.data.SqlStatementData;
+import info.novatec.inspectit.communication.data.TimerData;
 import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.action.MenuAction;
@@ -9,7 +14,6 @@ import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.LiveMode;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId.TimeResolution;
 import info.novatec.inspectit.rcp.editor.preferences.control.IPreferenceControl;
 import info.novatec.inspectit.rcp.handlers.MaximizeActiveViewHandler;
-import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 import info.novatec.inspectit.util.ObjectUtils;
@@ -312,16 +316,15 @@ public class FormPreferencePanel implements IPreferencePanel {
 			countMenuManager.add(new SetItemCountAction("All...", -1, currentItemsToShow));
 			menuAction.addContributionItem(countMenuManager);
 		}
-		if (preferenceSet.contains(PreferenceId.FILTERSENSORTYPE)) {
-			Set<SensorTypeEnum> activeSensors = PreferencesUtils.getObject(PreferencesConstants.INVOCATION_FILTER_SENSOR_TYPES);
-			MenuManager sensorTypeMenuManager = new MenuManager("Filter by SensorType");
-			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Timer", SensorTypeEnum.TIMER, activeSensors));
-			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Invocation Seq", SensorTypeEnum.INVOCATION_SEQUENCE, activeSensors));
-			sensorTypeMenuManager.add(new FilterBySensorTypeAction("Exception", SensorTypeEnum.EXCEPTION_SENSOR, activeSensors));
-			sensorTypeMenuManager.add(new Separator());
-			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Statement", SensorTypeEnum.JDBC_STATEMENT, activeSensors));
-			sensorTypeMenuManager.add(new FilterBySensorTypeAction("JDBC Prep Statement", SensorTypeEnum.JDBC_PREPARED_STATEMENT, activeSensors));
-			menuAction.addContributionItem(sensorTypeMenuManager);
+		if (preferenceSet.contains(PreferenceId.FILTERDATATYPE)) {
+			Set<Class<?>> activeDataTypes = PreferencesUtils.getObject(PreferencesConstants.INVOCATION_FILTER_DATA_TYPES);
+			MenuManager dataTypeMenuManager = new MenuManager("Filter by DataType");
+			dataTypeMenuManager.add(new FilterByDataTypeAction("Invocation Sequence Data", InvocationSequenceData.class, activeDataTypes));
+			dataTypeMenuManager.add(new FilterByDataTypeAction("Timer Data", TimerData.class, activeDataTypes));
+			dataTypeMenuManager.add(new FilterByDataTypeAction("Sql Statement Data", SqlStatementData.class, activeDataTypes));
+			dataTypeMenuManager.add(new FilterByDataTypeAction("Http Timer Data", HttpTimerData.class, activeDataTypes));
+			dataTypeMenuManager.add(new FilterByDataTypeAction("Exception Sensor Data", ExceptionSensorData.class, activeDataTypes));
+			menuAction.addContributionItem(dataTypeMenuManager);
 		}
 		if (preferenceSet.contains(PreferenceId.INVOCFILTEREXCLUSIVETIME)) {
 			double currentInvocFilterExclusive = PreferencesUtils.getDoubleValue(PreferencesConstants.INVOCATION_FILTER_EXCLUSIVE_TIME);
@@ -552,30 +555,30 @@ public class FormPreferencePanel implements IPreferencePanel {
 	}
 
 	/**
-	 * Filters by sensor type.
+	 * Filters by data type.
 	 * 
-	 * @author Stefan Siegl
+	 * @author Ivan Senic
 	 */
-	private final class FilterBySensorTypeAction extends Action {
+	private final class FilterByDataTypeAction extends Action {
 
 		/** The sensor type. */
-		private SensorTypeEnum sensorType;
+		private Class<?> dataClass;
 
 		/**
 		 * Constructor.
 		 * 
 		 * @param text
 		 *            the text
-		 * @param sensorType
-		 *            the sensor type
-		 * @param activeSensors
-		 *            currently active sensor types, button will be checked if the given sensor type
-		 *            is contained in the set
+		 * @param dataClass
+		 *            the data type
+		 * @param activeDatas
+		 *            currently active data types, button will be checked if the given data type is
+		 *            contained in the set
 		 */
-		public FilterBySensorTypeAction(String text, SensorTypeEnum sensorType, Set<SensorTypeEnum> activeSensors) {
+		public FilterByDataTypeAction(String text, Class<?> dataClass, Set<Class<?>> activeDatas) {
 			super(text, Action.AS_CHECK_BOX);
-			this.sensorType = sensorType;
-			setChecked(activeSensors.contains(sensorType));
+			this.dataClass = dataClass;
+			setChecked(activeDatas.contains(dataClass));
 		}
 
 		/**
@@ -583,17 +586,17 @@ public class FormPreferencePanel implements IPreferencePanel {
 		 */
 		@Override
 		public void run() {
-			Set<SensorTypeEnum> activeSensors = PreferencesUtils.getObject(PreferencesConstants.INVOCATION_FILTER_SENSOR_TYPES);
-			if (isChecked() && !activeSensors.contains(sensorType)) {
-				activeSensors.add(sensorType);
-				PreferencesUtils.saveObject(PreferencesConstants.INVOCATION_FILTER_SENSOR_TYPES, activeSensors, false);
-			} else if (!isChecked() && activeSensors.contains(sensorType)) {
-				activeSensors.remove(sensorType);
-				PreferencesUtils.saveObject(PreferencesConstants.INVOCATION_FILTER_SENSOR_TYPES, activeSensors, false);
+			Set<Class<?>> activeDatas = PreferencesUtils.getObject(PreferencesConstants.INVOCATION_FILTER_DATA_TYPES);
+			if (isChecked() && !activeDatas.contains(dataClass)) {
+				activeDatas.add(dataClass);
+				PreferencesUtils.saveObject(PreferencesConstants.INVOCATION_FILTER_DATA_TYPES, activeDatas, false);
+			} else if (!isChecked() && activeDatas.contains(dataClass)) {
+				activeDatas.remove(dataClass);
+				PreferencesUtils.saveObject(PreferencesConstants.INVOCATION_FILTER_DATA_TYPES, activeDatas, false);
 			}
 			Map<IPreferenceGroup, Object> sensorTypePreference = new HashMap<IPreferenceGroup, Object>();
-			sensorTypePreference.put(PreferenceId.SensorTypeSelection.SENSOR_TYPE_SELECTION_ID, sensorType);
-			PreferenceEvent event = new PreferenceEvent(PreferenceId.FILTERSENSORTYPE);
+			sensorTypePreference.put(PreferenceId.DataTypeSelection.SENSOR_DATA_SELECTION_ID, dataClass);
+			PreferenceEvent event = new PreferenceEvent(PreferenceId.FILTERDATATYPE);
 			event.setPreferenceMap(sensorTypePreference);
 			fireEvent(event);
 		}

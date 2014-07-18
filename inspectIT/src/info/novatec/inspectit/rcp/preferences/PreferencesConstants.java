@@ -64,9 +64,9 @@ public interface PreferencesConstants {
 	String INVOCATION_FILTER_TOTAL_TIME = "INVOCATION_FILTER_TOTAL_TIME";
 
 	/**
-	 * Invocation filter sensor types preference.
+	 * Invocation filter data types preference.
 	 */
-	String INVOCATION_FILTER_SENSOR_TYPES = "INVOCATION_FILTER_SENSOR_TYPES";
+	String INVOCATION_FILTER_DATA_TYPES = "INVOCATION_FILTER_DATA_TYPES";
 
 	/**
 	 * Last selected repository in data explorer view.

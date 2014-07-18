@@ -12,7 +12,7 @@ public enum PreferenceId {
 	/**
 	 * The identifiers of the different control groups.
 	 */
-	TIMELINE, SAMPLINGRATE, LIVEMODE, UPDATE, ITEMCOUNT, FILTERSENSORTYPE, INVOCFILTEREXCLUSIVETIME, INVOCFILTERTOTALTIME, CLEAR_BUFFER, STEPPABLE_CONTROL, TIME_RESOLUTION, HTTP_AGGREGATION_REQUESTMETHOD, HTTP_URI_TRANSFORMING, INVOCATION_SUBVIEW_MODE;
+	TIMELINE, SAMPLINGRATE, LIVEMODE, UPDATE, ITEMCOUNT, FILTERDATATYPE, INVOCFILTEREXCLUSIVETIME, INVOCFILTERTOTALTIME, CLEAR_BUFFER, STEPPABLE_CONTROL, TIME_RESOLUTION, HTTP_AGGREGATION_REQUESTMETHOD, HTTP_URI_TRANSFORMING, INVOCATION_SUBVIEW_MODE;
 
 	/**
 	 * Inner enumeration for TIMELINE.
@@ -79,16 +79,16 @@ public enum PreferenceId {
 	}
 
 	/**
-	 * Inner enumeration for the SENSORTYPESELECTION.
+	 * Inner enumeration for the FILTERDATATYPE.
 	 * 
-	 * @author Patrice Bouillet
+	 * @author Ivan Senic
 	 * 
 	 */
-	public enum SensorTypeSelection implements IPreferenceGroup {
+	public enum DataTypeSelection implements IPreferenceGroup {
 		/**
-		 * The identifier for the sensor type selections.
+		 * The identifier for the sensor data selections.
 		 */
-		SENSOR_TYPE_SELECTION_ID;
+		SENSOR_DATA_SELECTION_ID;
 	}
 
 	/**

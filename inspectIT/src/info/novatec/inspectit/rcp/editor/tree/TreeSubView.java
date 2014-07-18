@@ -331,7 +331,7 @@ public class TreeSubView extends AbstractSubView implements ISearchExecutor {
 
 		treeInputController.preferenceEventFired(preferenceEvent);
 		switch (preferenceEvent.getPreferenceId()) {
-		case FILTERSENSORTYPE:
+		case FILTERDATATYPE:
 		case INVOCFILTEREXCLUSIVETIME:
 		case INVOCFILTERTOTALTIME:
 			// we have to re-apply the filter if there is one

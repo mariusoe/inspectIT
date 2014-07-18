@@ -1,7 +1,6 @@
 package info.novatec.inspectit.rcp.editor.tree.input;
 
 import info.novatec.inspectit.cmr.model.MethodIdent;
-import info.novatec.inspectit.cmr.model.MethodIdentToSensorType;
 import info.novatec.inspectit.cmr.service.ICachedDataService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.ExceptionSensorData;
@@ -21,7 +20,6 @@ import info.novatec.inspectit.rcp.formatter.NumberFormatter;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
 import info.novatec.inspectit.rcp.model.ExceptionImageFactory;
 import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
-import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 import info.novatec.inspectit.rcp.preferences.PreferencesConstants;
 import info.novatec.inspectit.rcp.preferences.PreferencesUtils;
 
@@ -33,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -85,9 +84,9 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	private LocalResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources());
 
 	/**
-	 * The value of the selected sensor types.
+	 * The value of the selected data types.
 	 */
-	private Set<SensorTypeEnum> selectedSensorTypes = PreferencesUtils.getObject(PreferencesConstants.INVOCATION_FILTER_SENSOR_TYPES);
+	private Set<Class<?>> selectedDataTypes = PreferencesUtils.getObject(PreferencesConstants.INVOCATION_FILTER_DATA_TYPES);
 
 	/**
 	 * The value for the exclusive time filter.
@@ -222,7 +221,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	 */
 	public Set<PreferenceId> getPreferenceIds() {
 		Set<PreferenceId> preferences = EnumSet.noneOf(PreferenceId.class);
-		preferences.add(PreferenceId.FILTERSENSORTYPE);
+		preferences.add(PreferenceId.FILTERDATATYPE);
 		preferences.add(PreferenceId.INVOCFILTEREXCLUSIVETIME);
 		preferences.add(PreferenceId.INVOCFILTERTOTALTIME);
 		return preferences;
@@ -233,13 +232,12 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 	 */
 	public void preferenceEventFired(PreferenceEvent preferenceEvent) {
 		switch (preferenceEvent.getPreferenceId()) {
-		case FILTERSENSORTYPE:
-			SensorTypeEnum sensorType = (SensorTypeEnum) preferenceEvent.getPreferenceMap().get(PreferenceId.SensorTypeSelection.SENSOR_TYPE_SELECTION_ID);
-			// add or remove the sensor type from the selected set
-			if (selectedSensorTypes.contains(sensorType)) {
-				selectedSensorTypes.remove(sensorType);
+		case FILTERDATATYPE:
+			Class<?> dataTypeClass = (Class<?>) preferenceEvent.getPreferenceMap().get(PreferenceId.DataTypeSelection.SENSOR_DATA_SELECTION_ID);
+			if (selectedDataTypes.contains(dataTypeClass)) {
+				selectedDataTypes.remove(dataTypeClass);
 			} else {
-				selectedSensorTypes.add(sensorType);
+				selectedDataTypes.add(dataTypeClass);
 			}
 			break;
 		case INVOCFILTEREXCLUSIVETIME:
@@ -769,22 +767,39 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public ViewerFilter[] getFilters() {
-		ViewerFilter sensorTypeFilter = new InvocationViewerFilter() {
+		ViewerFilter sensorDataFilter = new InvocationViewerFilter() {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				if (element instanceof InvocationSequenceData) {
 					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) element;
-					MethodIdent methodIdent = cachedDataService.getMethodIdentForId(invocationSequenceData.getMethodIdent());
-					Set<MethodIdentToSensorType> methodIdentToSensorTypes = methodIdent.getMethodIdentToSensorTypes();
-					Set<SensorTypeEnum> sensorTypes = SensorTypeEnum.getAllOf(methodIdentToSensorTypes);
-					sensorTypes.retainAll(selectedSensorTypes);
-					if (sensorTypes.isEmpty()) {
-						return false;
+					if (checkIsOnlyInvocation(invocationSequenceData) && checkSensorDataTypeForObject(invocationSequenceData)) {
+						return true;
+					} else if (checkSensorDataTypeForObject(invocationSequenceData.getTimerData())) {
+						return true;
+					} else if (checkSensorDataTypeForObject(invocationSequenceData.getSqlStatementData())) {
+						return true;
+					} else if (CollectionUtils.isNotEmpty(invocationSequenceData.getExceptionSensorDataObjects())) {
+						return checkSensorDataTypeForObject(invocationSequenceData.getExceptionSensorDataObjects().get(0));
 					}
+					return false;
 				}
 				return true;
+			}
+
+			private boolean checkSensorDataTypeForObject(Object object) {
+				if (null != object) {
+					return selectedDataTypes.contains(object.getClass());
+				}
+				return false;
+			}
+
+			private boolean checkIsOnlyInvocation(InvocationSequenceData data) {
+				return null == data.getTimerData() && null == data.getSqlStatementData() && CollectionUtils.isEmpty(data.getExceptionSensorDataObjects());
 			}
 		};
 		ViewerFilter exclusiveTimeFilter = new InvocationViewerFilter() {
@@ -834,25 +849,7 @@ public class InvocDetailInputController extends AbstractTreeInputController {
 				return true;
 			}
 		};
-		// TODO this filter must be removed in the future! ... edit SSL: why?
-		ViewerFilter wrapperFilter = new InvocationViewerFilter() {
-			@Override
-			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				if (element instanceof InvocationSequenceData) {
-					InvocationSequenceData invocationSequenceData = (InvocationSequenceData) element;
-					MethodIdent methodIdent = cachedDataService.getMethodIdentForId(invocationSequenceData.getMethodIdent());
-					Set<MethodIdentToSensorType> methodIdentToSensorTypes = methodIdent.getMethodIdentToSensorTypes();
-					Set<SensorTypeEnum> sensorTypes = SensorTypeEnum.getAllOf(methodIdentToSensorTypes);
-					if (sensorTypes.contains(SensorTypeEnum.JDBC_PREPARED_STATEMENT)) {
-						if (null == invocationSequenceData.getSqlStatementData() || 0 == invocationSequenceData.getSqlStatementData().getCount()) {
-							return false;
-						}
-					}
-				}
-				return true;
-			}
-		};
-		return new ViewerFilter[] { sensorTypeFilter, exclusiveTimeFilter, totalTimeFilter, wrapperFilter };
+		return new ViewerFilter[] { sensorDataFilter, exclusiveTimeFilter, totalTimeFilter };
 	}
 
 	/**
