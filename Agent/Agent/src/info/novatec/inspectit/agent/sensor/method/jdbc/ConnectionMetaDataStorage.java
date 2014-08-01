@@ -6,6 +6,8 @@ import info.novatec.inspectit.util.ReflectionCache;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.google.common.cache.Cache;
@@ -45,6 +47,7 @@ public class ConnectionMetaDataStorage {
 	 * Package access for easier testing.
 	 */
 	ConnectionMetaDataExtractor dataExtractor = new ConnectionMetaDataExtractor();
+	
 
 	/**
 	 * Retrieves the <code>ConnectionMetaData</code> stored with this connection.
@@ -64,8 +67,10 @@ public class ConnectionMetaDataStorage {
 	 * Populates the given SQL Statement data with the meta information from the storage if this
 	 * data exist.
 	 * 
-	 * @param sqlData the data object to populate.
-	 * @param connection the connection.
+	 * @param sqlData
+	 *            the data object to populate.
+	 * @param connection
+	 *            the connection.
 	 */
 	public void populate(SqlStatementData sqlData, Object connection) {
 		ConnectionMetaData connectionMetaData = get(connection);
@@ -132,6 +137,11 @@ public class ConnectionMetaDataStorage {
 		static JDBCUrlExtractor urlExtractor = new JDBCUrlExtractor();
 		/** Cache for the <code> Method </code> elements. */
 		static ReflectionCache cache = new ReflectionCache();
+		
+		/**
+		 * The logger of this class. Initialized manually.
+		 */
+		static Logger logger = LoggerFactory.getLogger(ConnectionMetaDataExtractor.class);
 
 		/**
 		 * Parses a given <code>Connection</code> and retrieves the monitoring-related meta
@@ -143,7 +153,17 @@ public class ConnectionMetaDataStorage {
 		 */
 		public ConnectionMetaData parse(Object connection) {
 			ConnectionMetaData data = new ConnectionMetaData();
+			if (null == connection) {
+				logger.warn("Meta Information on database cannot be read. No database details like URL or Vendor will be displayed.");
+				return data;
+			}
+			
 			Object metaData = getMetaData(connection.getClass(), connection);
+			if (null == metaData) {
+				logger.warn("Meta Information on database cannot be read. No database details like URL or Vendor will be displayed.");
+				return data;
+			}
+			
 			Class<?> metaDataClass = metaData.getClass();
 
 			data.version = parseVersion(metaDataClass, metaData);
@@ -160,7 +180,8 @@ public class ConnectionMetaDataStorage {
 		 *            the connection class.
 		 * @param connection
 		 *            the connection instance.
-		 * @return the meta information object from the connection.
+		 * @return the meta information object from the connection or <code>null</code> in case of
+		 *         problems.
 		 */
 		private Object getMetaData(Class<?> connectionClass, Object connection) {
 			return cache.invokeMethod(connectionClass, GET_META_DATA, null, connection, null, null);

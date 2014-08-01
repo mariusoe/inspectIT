@@ -2,6 +2,8 @@ package info.novatec.inspectit.agent.sensor.method.jdbc;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionMetaDataStorage.ConnectionMetaData;
 import info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionMetaDataStorage.ConnectionMetaDataExtractor;
 import info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionMetaDataStorage.JDBCUrlExtractor;
@@ -11,6 +13,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import org.mockito.Mockito;
+import org.slf4j.Logger;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -49,5 +52,17 @@ public class ConnectionMetaDataExtractorTest {
 		assertThat(data.product, is(name));
 		assertThat(data.version, is(version));
 		assertThat(data.url, is(url));
+	}
+	
+	@SuppressWarnings("static-access")
+	@Test
+	public void extractInformationForNullConnectionResultsInNoErrorButAWarningMessage() {
+		Logger mockedLogger = Mockito.mock(Logger.class);
+		extractor.logger = mockedLogger;
+		
+		ConnectionMetaData data = extractor.parse(null);
+		
+		assertThat(data, is(not(nullValue())));
+		Mockito.verify(mockedLogger).warn(Mockito.anyString());
 	}
 }
