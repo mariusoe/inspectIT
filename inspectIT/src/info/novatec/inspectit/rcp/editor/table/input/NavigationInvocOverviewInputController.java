@@ -1,11 +1,13 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
+import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.communication.data.InvocationAwareData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
+import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 
 import java.util.EnumSet;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.ViewerComparator;
 
 /**
  * A extension of the {@link InvocOverviewInputController} that displays the invocations that are
@@ -57,6 +60,20 @@ public class NavigationInvocOverviewInputController extends InvocOverviewInputCo
 		}
 		preferences.add(PreferenceId.ITEMCOUNT);
 		return preferences;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ViewerComparator getComparator() {
+		TableViewerComparator<InvocationSequenceData> invocationDataViewerComparator = new TableViewerComparator<InvocationSequenceData>();
+		for (Column column : Column.values()) {
+			ResultComparator<InvocationSequenceData> resultComparator = new ResultComparator<InvocationSequenceData>(column.dataComparator, getCachedDataService());
+			invocationDataViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), resultComparator);
+		}
+
+		return invocationDataViewerComparator;
 	}
 
 	/**

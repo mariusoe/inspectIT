@@ -80,7 +80,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 * @author Patrice Bouillet
 	 * 
 	 */
-	private static enum Column {
+	protected static enum Column {
 		/** The time column. */
 		NESTED_DATA("Nested Data", 40, null, InvocationSequenceDataComparatorEnum.NESTED_DATA),
 		/** The time column. */
@@ -103,7 +103,7 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 		/** The image descriptor. Can be <code>null</code> */
 		private Image image;
 		/** Comparator for the column. */
-		private IDataComparator<? super InvocationSequenceData> dataComparator;
+		protected IDataComparator<? super InvocationSequenceData> dataComparator;
 
 		/**
 		 * Default constructor which creates a column enumeration object.
@@ -215,6 +215,15 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 	 */
 	protected IInvocationDataAccessService getDataAccessService() {
 		return dataAccessService;
+	}
+
+	/**
+	 * Gets {@link #cachedDataService}.
+	 * 
+	 * @return {@link #cachedDataService}
+	 */
+	protected ICachedDataService getCachedDataService() {
+		return cachedDataService;
 	}
 
 	/**

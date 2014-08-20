@@ -1,11 +1,13 @@
 package info.novatec.inspectit.rcp.editor.table.input;
 
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.comparator.ResultComparator;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.extra.InputDefinitionExtrasMarkerFactory;
 import info.novatec.inspectit.rcp.editor.preferences.PreferenceId;
 import info.novatec.inspectit.rcp.editor.root.IRootEditor;
+import info.novatec.inspectit.rcp.editor.table.TableViewerComparator;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryDefinition;
 
 import java.util.ArrayList;
@@ -15,13 +17,14 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * This vew only displays the {@link info.novatec.inspectit.communication.data.TimerData} that are
+ * This view only displays the {@link info.novatec.inspectit.communication.data.TimerData} that are
  * in the invocations provided by the invocationIdsList to this view via the
  * {@link InputDefinition#getAdditionalOption(Object)}.
  * 
@@ -41,7 +44,7 @@ public class MultiInvocDataInputController extends InvocOverviewInputController 
 	private List<InvocationSequenceData> invocationList;
 
 	/**
-	 * List of loaded invocations thar are complete.
+	 * List of loaded invocations that are complete.
 	 */
 	private List<InvocationSequenceData> loadedInvocations;
 
@@ -87,6 +90,20 @@ public class MultiInvocDataInputController extends InvocOverviewInputController 
 	@Override
 	public boolean canOpenInput(List<? extends DefaultData> data) {
 		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ViewerComparator getComparator() {
+		TableViewerComparator<InvocationSequenceData> invocationDataViewerComparator = new TableViewerComparator<InvocationSequenceData>();
+		for (Column column : Column.values()) {
+			ResultComparator<InvocationSequenceData> resultComparator = new ResultComparator<InvocationSequenceData>(column.dataComparator, getCachedDataService());
+			invocationDataViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), resultComparator);
+		}
+
+		return invocationDataViewerComparator;
 	}
 
 	/**
