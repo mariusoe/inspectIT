@@ -22,9 +22,8 @@ import info.novatec.inspectit.storage.StorageManager;
 import info.novatec.inspectit.storage.processor.AbstractDataProcessor;
 import info.novatec.inspectit.storage.recording.RecordingProperties;
 import info.novatec.inspectit.storage.recording.RecordingState;
-import info.novatec.inspectit.storage.serializer.IKryoProvider;
-import info.novatec.inspectit.storage.serializer.ISerializer;
 import info.novatec.inspectit.storage.serializer.SerializationException;
+import info.novatec.inspectit.storage.serializer.impl.SerializationManager;
 import info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider;
 
 import java.io.IOException;
@@ -53,7 +52,7 @@ import org.testng.annotations.Test;
  * 
  */
 @SuppressWarnings("PMD")
-public class CmrStorageManagerTest<E extends ISerializer & IKryoProvider> extends AbstractTestNGLogSupport {
+public class CmrStorageManagerTest extends AbstractTestNGLogSupport {
 
 	private static final String CMR_VERSION = "v1";
 
@@ -78,7 +77,7 @@ public class CmrStorageManagerTest<E extends ISerializer & IKryoProvider> extend
 	private SerializationManagerProvider serializationManagerProvider;
 
 	@Mock
-	private E serializer;
+	private SerializationManager serializer;
 
 	@Mock
 	private IServerStatusService serverStatusService;

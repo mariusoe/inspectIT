@@ -18,7 +18,6 @@ import info.novatec.inspectit.kryonet.ExtendedSerializationImpl;
 import info.novatec.inspectit.kryonet.IExtendedSerialization;
 import info.novatec.inspectit.kryonet.rmi.ObjectSpace;
 import info.novatec.inspectit.spring.logger.Log;
-import info.novatec.inspectit.storage.serializer.impl.SerializationManager;
 
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -33,7 +32,6 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.rmi.RemoteObject;
 
 /**
@@ -139,9 +137,7 @@ public class KryoNetConnection implements IConnection {
 	 *             If {@link Exception} occurs during communication.
 	 */
 	private void initClient(String host, int port) throws Exception {
-		SerializationManager serializationManager = prototypesProvider.createSerializer();
-		Kryo kryo = serializationManager.getKryo();
-		IExtendedSerialization serialization = new ExtendedSerializationImpl(kryo);
+		IExtendedSerialization serialization = new ExtendedSerializationImpl(prototypesProvider);
 
 		client = new Client(serialization, prototypesProvider);
 		client.start();

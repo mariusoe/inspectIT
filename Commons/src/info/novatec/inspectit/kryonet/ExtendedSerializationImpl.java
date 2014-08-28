@@ -1,8 +1,13 @@
 package info.novatec.inspectit.kryonet;
 
+import info.novatec.inspectit.storage.serializer.IKryoProvider;
+import info.novatec.inspectit.storage.serializer.ISerializerProvider;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -21,16 +26,48 @@ import com.esotericsoftware.kryo.io.Output;
 public class ExtendedSerializationImpl implements IExtendedSerialization {
 
 	/**
-	 * Kryo to use for the serialization.
+	 * Default initial number of created serializers.
 	 */
-	private final Kryo kryo;
+	private static final int INIT_CREATED_SERIALIZERS = 2;
 
 	/**
-	 * @param kryo
-	 *            Kryo to use for the serialization.
+	 * Queue for {@link IKryoProvider} that are available.
 	 */
-	public ExtendedSerializationImpl(Kryo kryo) {
-		this.kryo = kryo;
+	private Queue<IKryoProvider> serializerQueue = new ConcurrentLinkedQueue<IKryoProvider>();
+
+	/**
+	 * {@link ISerializerProvider} for create new instances.
+	 */
+	private ISerializerProvider<? extends IKryoProvider> serializerProvider;
+
+	/**
+	 * One argument constructor. Same as calling
+	 * {@link #ExtendedSerializationImpl(ISerializerProvider, int)} with init serializers value of
+	 * {@value #INIT_CREATED_SERIALIZERS}.
+	 * 
+	 * @param serializerProvider
+	 *            {@link ISerializerProvider} needed for creation of the {@link IKryoProvider}
+	 *            instances.
+	 */
+	public ExtendedSerializationImpl(ISerializerProvider<? extends IKryoProvider> serializerProvider) {
+		this(serializerProvider, INIT_CREATED_SERIALIZERS);
+	}
+
+	/**
+	 * Default constructor.
+	 * 
+	 * @param serializerProvider
+	 *            {@link ISerializerProvider} needed for creation of the {@link IKryoProvider}
+	 *            instances.
+	 * @param initialSerializersCreated
+	 *            Amount of {@link IKryoProvider}s to be created immediatelly.
+	 */
+	public ExtendedSerializationImpl(ISerializerProvider<? extends IKryoProvider> serializerProvider, int initialSerializersCreated) {
+		this.serializerProvider = serializerProvider;
+
+		for (int i = 0; i < initialSerializersCreated; i++) {
+			serializerQueue.offer(serializerProvider.createSerializer());
+		}
 	}
 
 	/**
@@ -80,11 +117,23 @@ public class ExtendedSerializationImpl implements IExtendedSerialization {
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized void write(Connection connection, OutputStream outputStream, Object object) {
+	public void write(Connection connection, OutputStream outputStream, Object object) {
 		Output output = new Output(outputStream);
-		kryo.getContext().put("connection", connection);
-		kryo.writeClassAndObject(output, object);
-		output.flush();
+		IKryoProvider kryoProvider = serializerQueue.poll();
+
+		// if nothing is available in queue don't wait, create new one
+		if (null == kryoProvider) {
+			kryoProvider = serializerProvider.createSerializer();
+		}
+
+		try {
+			Kryo kryo = kryoProvider.getKryo();
+			kryo.getContext().put("connection", connection);
+			kryo.writeClassAndObject(output, object);
+			output.flush();
+		} finally {
+			serializerQueue.offer(kryoProvider);
+		}
 	}
 
 	/**
@@ -94,8 +143,20 @@ public class ExtendedSerializationImpl implements IExtendedSerialization {
 	@SuppressWarnings("unchecked")
 	public Object read(Connection connection, InputStream inputStream) {
 		Input input = new Input(inputStream);
-		kryo.getContext().put("connection", connection);
-		return kryo.readClassAndObject(input);
+		IKryoProvider kryoProvider = serializerQueue.poll();
+
+		// if nothing is available in queue don't wait, create new one
+		if (null == kryoProvider) {
+			kryoProvider = serializerProvider.createSerializer();
+		}
+
+		try {
+			Kryo kryo = kryoProvider.getKryo();
+			kryo.getContext().put("connection", connection);
+			return kryo.readClassAndObject(input);
+		} finally {
+			serializerQueue.offer(kryoProvider);
+		}
 	}
 
 }

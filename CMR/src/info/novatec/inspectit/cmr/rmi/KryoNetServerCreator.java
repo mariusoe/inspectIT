@@ -8,7 +8,6 @@ import info.novatec.inspectit.kryonet.Server;
 import info.novatec.inspectit.kryonet.rmi.ObjectSpace;
 import info.novatec.inspectit.spring.logger.Log;
 import info.novatec.inspectit.storage.nio.stream.StreamProvider;
-import info.novatec.inspectit.storage.serializer.IKryoProvider;
 import info.novatec.inspectit.storage.serializer.provider.SerializationManagerProvider;
 
 import java.io.IOException;
@@ -73,9 +72,7 @@ public class KryoNetServerCreator {
 	 */
 	@Bean(name = "kryonet-server", destroyMethod = "stop")
 	public Server createServer() {
-		IKryoProvider kryoProvider = serializationManagerProvider.createSerializer();
-		Kryo kryo = kryoProvider.getKryo();
-		IExtendedSerialization serialization = new ExtendedSerializationImpl(kryo);
+		IExtendedSerialization serialization = new ExtendedSerializationImpl(serializationManagerProvider);
 
 		Server server = new Server(serialization, streamProvider);
 		server.start();

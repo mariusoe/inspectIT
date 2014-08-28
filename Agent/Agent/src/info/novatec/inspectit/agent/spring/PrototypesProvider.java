@@ -3,6 +3,7 @@ package info.novatec.inspectit.agent.spring;
 import info.novatec.inspectit.storage.nio.stream.ExtendedByteBufferOutputStream;
 import info.novatec.inspectit.storage.nio.stream.SocketExtendedByteBufferInputStream;
 import info.novatec.inspectit.storage.nio.stream.StreamProvider;
+import info.novatec.inspectit.storage.serializer.ISerializerProvider;
 import info.novatec.inspectit.storage.serializer.impl.SerializationManager;
 
 import org.springframework.beans.factory.ObjectFactory;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
-public class PrototypesProvider extends StreamProvider {
+public class PrototypesProvider extends StreamProvider implements ISerializerProvider<SerializationManager> {
 
 	/**
 	 * Factory for {@link SerializationManager}.
