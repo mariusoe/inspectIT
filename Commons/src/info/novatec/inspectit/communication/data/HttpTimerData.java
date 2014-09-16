@@ -23,6 +23,10 @@ public class HttpTimerData extends TimerData {
 	public static final String UNDEFINED = "n.a.";
 	/** String used to represent multiple request methods in an aggregation. */
 	public static final String REQUEST_METHOD_MULTIPLE = "MULTIPLE";
+	/**
+	 * Max URI chars size.
+	 */
+	private static final int MAX_URI_SIZE = 1000;
 
 	/** The uri. */
 	private String uri = UNDEFINED;
@@ -111,7 +115,11 @@ public class HttpTimerData extends TimerData {
 	 */
 	public void setUri(String uri) {
 		if (null != uri) {
-			this.uri = uri;
+			if (uri.length() > MAX_URI_SIZE) {
+				this.uri = uri.substring(0, MAX_URI_SIZE);
+			} else {
+				this.uri = uri;
+			}
 		}
 	}
 

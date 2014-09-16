@@ -4,7 +4,7 @@
 	<union-subclass name="HttpTimerData"
 		extends="TimerData"
 		table="http_timer_data">
-		<property name="uri" column="uri" index="uriIndex"/>
+		<property name="uri" column="uri" length="1000" index="uriIndex"/>
 		<property name="requestMethod" column="request_method" />
 		<property name="inspectItTaggingHeaderValue" column="inspectit_tagging_header" index="tagIndex"/>
 	</union-subclass>
