@@ -14,8 +14,10 @@ import info.novatec.inspectit.agent.hooking.IConstructorHook;
 import info.novatec.inspectit.agent.hooking.IMethodHook;
 import info.novatec.inspectit.agent.sending.ISendingStrategy;
 import info.novatec.inspectit.agent.sensor.exception.ExceptionSensor;
+import info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionMetaDataSensor;
 import info.novatec.inspectit.agent.sensor.method.jdbc.ConnectionSensor;
 import info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementParameterSensor;
+import info.novatec.inspectit.agent.sensor.method.jdbc.PreparedStatementSensor;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.MethodSensorData;
 import info.novatec.inspectit.communication.SystemSensorData;
@@ -107,6 +109,11 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	private StringConstraint strConstraint;
 
 	/**
+	 * If enhanced exception sensor is ON.
+	 */
+	private final boolean enhancedExceptionSensor;
+
+	/**
 	 * The default constructor is initialized with a reference to the original {@link ICoreService}
 	 * implementation to delegate all calls to if the data needs to be sent.
 	 * 
@@ -118,12 +125,15 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 *            The property accessor.
 	 * @param param
 	 *            Additional parameters.
+	 * @param enhancedExceptionSensor
+	 *            If enhanced exception sensor is ON.
 	 */
-	public InvocationSequenceHook(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor, Map<String, Object> param) {
+	public InvocationSequenceHook(Timer timer, IIdManager idManager, IPropertyAccessor propertyAccessor, Map<String, Object> param, boolean enhancedExceptionSensor) {
 		this.timer = timer;
 		this.idManager = idManager;
 		this.propertyAccessor = propertyAccessor;
 		this.strConstraint = new StringConstraint(param);
+		this.enhancedExceptionSensor = enhancedExceptionSensor;
 	}
 
 	/**
@@ -249,10 +259,17 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 			} else {
 				// just close the nested sequence and set the correct child count
 				InvocationSequenceData parentSequence = invocationSequenceData.getParentSequence();
-				// check if we should not include this invocation because of exception delegation
-				if (removeDueToExceptionDelegation(rsc, invocationSequenceData)) {
+				// check if we should not include this invocation because of exception delegation or
+				// SQL wrapping
+				if (removeDueToExceptionDelegation(rsc, invocationSequenceData) || removeDueToWrappedSqls(rsc, invocationSequenceData)) {
 					parentSequence.getNestedSequences().remove(invocationSequenceData);
 					parentSequence.setChildCount(parentSequence.getChildCount() - 1);
+					// but connect all possible children to the parent then
+					// we are eliminating one level here
+					if (CollectionUtils.isNotEmpty(invocationSequenceData.getNestedSequences())) {
+						parentSequence.getNestedSequences().addAll(invocationSequenceData.getNestedSequences());
+						parentSequence.setChildCount(parentSequence.getChildCount() + invocationSequenceData.getChildCount());
+					}
 				} else {
 					invocationSequenceData.setEnd(timer.getCurrentTime());
 					invocationSequenceData.setDuration(invocationSequenceData.getEnd() - invocationSequenceData.getStart());
@@ -286,6 +303,31 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	}
 
 	/**
+	 * Returns if the given {@link InvocationSequenceData} should be removed due to the wrapping of
+	 * the prepared SQL statements.
+	 * 
+	 * @param rsc
+	 *            {@link RegisteredSensorConfig}
+	 * @param invocationSequenceData
+	 *            {@link InvocationSequenceData} to check.
+	 * @return True if the invocation should be removed.
+	 */
+	private boolean removeDueToWrappedSqls(RegisteredSensorConfig rsc, InvocationSequenceData invocationSequenceData) {
+		if (1 == rsc.getSensorTypeConfigs().size() || (2 == rsc.getSensorTypeConfigs().size() && enhancedExceptionSensor)) {
+			for (MethodSensorTypeConfig methodSensorTypeConfig : rsc.getSensorTypeConfigs()) {
+
+				if (PreparedStatementSensor.class.getCanonicalName().equals(methodSensorTypeConfig.getClassName())) {
+					if (null == invocationSequenceData.getSqlStatementData() || 0 == invocationSequenceData.getSqlStatementData().getCount()) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Defines if the invocation container should skip the creation and processing of the invocation
 	 * for the given object and {@link RegisteredSensorConfig}. We will skip if any of following
 	 * conditions are met:
@@ -294,7 +336,9 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * the target class name.
 	 * <li>{@link RegisteredSensorConfig} has only prepared statement parameter sensor.
 	 * <li>{@link RegisteredSensorConfig} has only connection sensor.
+	 * <li>{@link RegisteredSensorConfig} has only connection meta data sensor.
 	 * </ul>
+	 * 
 	 * @param rsc
 	 *            {@link RegisteredSensorConfig}.
 	 * 
@@ -302,15 +346,20 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 *         otherwise.
 	 */
 	private boolean skip(RegisteredSensorConfig rsc) {
-		if (1 == rsc.getSensorTypeConfigs().size()) {
-			MethodSensorTypeConfig methodSensorTypeConfig = rsc.getSensorTypeConfigs().get(0);
+		if (1 == rsc.getSensorTypeConfigs().size() || (2 == rsc.getSensorTypeConfigs().size() && enhancedExceptionSensor)) {
 
-			if (PreparedStatementParameterSensor.class.getCanonicalName().equals(methodSensorTypeConfig.getClassName())) {
-				return true;
-			}
+			for (MethodSensorTypeConfig methodSensorTypeConfig : rsc.getSensorTypeConfigs()) {
+				if (PreparedStatementParameterSensor.class.getCanonicalName().equals(methodSensorTypeConfig.getClassName())) {
+					return true;
+				}
 
-			if (ConnectionSensor.class.getCanonicalName().equals(methodSensorTypeConfig.getClassName())) {
-				return true;
+				if (ConnectionSensor.class.getCanonicalName().equals(methodSensorTypeConfig.getClassName())) {
+					return true;
+				}
+
+				if (ConnectionMetaDataSensor.class.getCanonicalName().equals(methodSensorTypeConfig.getClassName())) {
+					return true;
+				}
 			}
 		}
 		return false;

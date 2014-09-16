@@ -64,7 +64,7 @@ public class InvocationSequenceHookTest extends AbstractLogSupport {
 	@BeforeMethod
 	public void init() {
 		MockitoAnnotations.initMocks(this);
-		invocationSequenceHook = new InvocationSequenceHook(timer, idManager, propertyAccessor, Collections.<String, Object> emptyMap());
+		invocationSequenceHook = new InvocationSequenceHook(timer, idManager, propertyAccessor, Collections.<String, Object> emptyMap(), false);
 	}
 
 	/**
