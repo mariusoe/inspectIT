@@ -37,6 +37,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -677,7 +678,11 @@ public class SqlInvocInputController extends AbstractTreeInputController {
 		switch (enumId) {
 		case DATABASE_URL:
 			if (rawMode) {
-				return new StyledString(data.getDatabaseUrl());
+				if (StringUtils.isNotEmpty(data.getDatabaseUrl())) {
+					return new StyledString(data.getDatabaseUrl());
+				} else {
+					return new StyledString("Unknown");
+				}
 			} else {
 				return emptyStyledString;
 			}
