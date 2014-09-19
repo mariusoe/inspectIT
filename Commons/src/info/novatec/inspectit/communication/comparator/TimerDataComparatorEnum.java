@@ -76,7 +76,12 @@ public enum TimerDataComparatorEnum implements IDataComparator<TimerData>, Compa
 	/**
 	 * Sorts on the total exclusive duration.
 	 */
-	EXCLUSIVEDURATION;
+	EXCLUSIVEDURATION,
+
+	/**
+	 * Sorts on charting true/false.
+	 */
+	CHARTING;
 
 	/**
 	 * {@inheritDoc}
@@ -117,6 +122,9 @@ public enum TimerDataComparatorEnum implements IDataComparator<TimerData>, Compa
 			return Double.compare(o1.getExclusiveMax(), o2.getExclusiveMax());
 		case EXCLUSIVEDURATION:
 			return Double.compare(o1.getExclusiveDuration(), o2.getExclusiveDuration());
+		case CHARTING:
+			// Java5 does not have Boolean.compare
+			return Boolean.valueOf(o1.isCharting()).compareTo(Boolean.valueOf(o2.isCharting()));
 		default:
 			return 0;
 		}

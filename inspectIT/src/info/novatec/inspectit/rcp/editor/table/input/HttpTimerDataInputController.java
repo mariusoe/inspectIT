@@ -62,6 +62,8 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 	 * 
 	 */
 	private static enum Column {
+		/** The time column. */
+		CHARTING("Charting", 20, null, TimerDataComparatorEnum.CHARTING),
 		/** The package column. */
 		URI("URI", 300, InspectITImages.IMG_HTTP_AGGREGATE, HttpTimerDataComparatorEnum.URI),
 		/** The http method. */
@@ -298,6 +300,44 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 					return false;
 				}
 			}
+
+			/**
+			 * 
+			 * {@inheritDoc}
+			 */
+			@Override
+			protected Image getColumnImage(Object element, int index) {
+				HttpTimerData data = (HttpTimerData) element;
+				Column enumId = Column.fromOrd(index);
+
+				switch (enumId) {
+				case CHARTING:
+					if (data.isCharting()) {
+						return InspectIT.getDefault().getImage(InspectITImages.IMG_CHART_PIE);
+					}
+				default:
+					return super.getColumnImage(element, index);
+				}
+
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String getToolTipText(Object element, int index) {
+				HttpTimerData data = (HttpTimerData) element;
+				Column enumId = Column.fromOrd(index);
+
+				switch (enumId) {
+				case CHARTING:
+					if (data.isCharting()) {
+						return "Duration chart can be displayed for this HTTP data.";
+					}
+				default:
+					return super.getToolTipText(element, index);
+				}
+			}
 		};
 	}
 
@@ -366,6 +406,8 @@ public class HttpTimerDataInputController extends AbstractHttpInputController {
 	 */
 	private StyledString getStyledTextForColumn(HttpTimerData data, Column enumId) {
 		switch (enumId) {
+		case CHARTING:
+			return emptyStyledString;
 		case URI:
 			if (data instanceof RegExAggregatedHttpTimerData) {
 				return new StyledString(((RegExAggregatedHttpTimerData) data).getTransformedUri());

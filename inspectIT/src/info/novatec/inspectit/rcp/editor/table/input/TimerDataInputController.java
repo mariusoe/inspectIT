@@ -67,6 +67,8 @@ public class TimerDataInputController extends AbstractTableInputController {
 	 * 
 	 */
 	private static enum Column {
+		/** The time column. */
+		CHARTING("Charting", 20, null, TimerDataComparatorEnum.CHARTING),
 		/** The package column. */
 		PACKAGE("Package", 200, InspectITImages.IMG_PACKAGE, MethodSensorDataComparatorEnum.PACKAGE),
 		/** The class column. */
@@ -461,6 +463,44 @@ public class TimerDataInputController extends AbstractTableInputController {
 				return false;
 			}
 		}
+
+		/**
+		 * 
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected Image getColumnImage(Object element, int index) {
+			TimerData data = (TimerData) element;
+			Column enumId = Column.fromOrd(index);
+
+			switch (enumId) {
+			case CHARTING:
+				if (data.isCharting()) {
+					return InspectIT.getDefault().getImage(InspectITImages.IMG_CHART_PIE);
+				}
+			default:
+				return super.getColumnImage(element, index);
+			}
+
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getToolTipText(Object element, int index) {
+			TimerData data = (TimerData) element;
+			Column enumId = Column.fromOrd(index);
+
+			switch (enumId) {
+			case CHARTING:
+				if (data.isCharting()) {
+					return "Duration chart can be displayed for this timer data.";
+				}
+			default:
+				return super.getToolTipText(element, index);
+			}
+		}
 	}
 
 	/**
@@ -476,6 +516,8 @@ public class TimerDataInputController extends AbstractTableInputController {
 	 */
 	private StyledString getStyledTextForColumn(TimerData data, MethodIdent methodIdent, Column enumId) {
 		switch (enumId) {
+		case CHARTING:
+			return emptyStyledString;
 		case PACKAGE:
 			if (methodIdent.getPackageName() != null && !methodIdent.getPackageName().equals("")) {
 				return new StyledString(methodIdent.getPackageName());

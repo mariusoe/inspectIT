@@ -136,4 +136,5 @@ public interface InspectITImages {
 	String IMG_INSTRUMENTATION_BROWSER_INACTIVE = InspectITConstants.ICON_PATH + "instrumentation_browser_inactive.png";
 	String IMG_TIMEFRAME = InspectITConstants.ICON_PATH + "timeframe.png";
 	String IMG_COMPILATION_OVERVIEW = InspectITConstants.ICON_PATH + "workset.gif";
+	String IMG_CHART_PIE = InspectITConstants.ICON_PATH + "chart_pie.png";
 }
