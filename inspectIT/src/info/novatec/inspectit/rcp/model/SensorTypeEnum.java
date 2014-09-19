@@ -23,6 +23,8 @@ public enum SensorTypeEnum {
 	TIMER("info.novatec.inspectit.agent.sensor.method.timer.TimerSensor", InspectITImages.IMG_TIMER),
 	/** The average timer sensor type. */
 	AVERAGE_TIMER("info.novatec.inspectit.agent.sensor.method.averagetimer.AverageTimerSensor", InspectITImages.IMG_TIMER),
+	/** Charting with single timers. */
+	CHARTING_TIMER("info.novatec.inspectit.agent.sensor.method.averagetimer.ChartingTimer", InspectITImages.IMG_TIMER),
 	/** Charting with multiple timers. */
 	CHARTING_MULTI_TIMER("info.novatec.inspectit.agent.sensor.method.averagetimer.ChartingMultiTimer", InspectITImages.IMG_TIMER),
 	/** The invocation sequence sensor type. */
@@ -67,8 +69,6 @@ public enum SensorTypeEnum {
 	THREAD_INFORMATION("info.novatec.inspectit.agent.sensor.platform.ThreadInformation", InspectITImages.IMG_THREADS_OVERVIEW),
 	/** The navigation invocation sequence sensor type. */
 	NAVIGATION_INVOCATION("info.novatec.inspectit.agent.sensor.method.invocationsequence.NavigationInvocationSequenceSensor", InspectITImages.IMG_INVOCATION),
-	/** The aggregated timer data sensor type. */
-	AGGREGATED_TIMER_DATA("info.novatec.inspectit.agent.sensor.method.AggregatedTimerSensor", InspectITImages.IMG_TIMER),
 	/** The multi invocation timer data sensor type. */
 	MULTI_INVOC_DATA("info.novatec.inspectit.agent.sensor.method.MultiInvocSensor", InspectITImages.IMG_INVOCATION);
 

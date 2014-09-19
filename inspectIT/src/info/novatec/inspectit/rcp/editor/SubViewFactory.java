@@ -67,6 +67,10 @@ public final class SubViewFactory {
 		case AVERAGE_TIMER:
 			// same as Timer
 		case TIMER:
+			SashCompositeSubView timerSashSubView = new SashCompositeSubView();
+			timerSashSubView.addSubView(new TableSubView(new TimerDataInputController()));
+			return timerSashSubView;
+		case CHARTING_TIMER:
 			GridCompositeSubView timerSubView = new GridCompositeSubView();
 			timerSubView.addSubView(new GraphSubView(sensorTypeEnum), new GridData(SWT.FILL, SWT.FILL, true, true));
 			ISubView aggregatedTimerSummarySubView = new TableSubView(new AggregatedTimerSummaryInputController());
@@ -167,10 +171,6 @@ public final class SubViewFactory {
 			invocSubView1.addSubView(invocTabbedSubView1, 2);
 
 			return invocSubView1;
-		case AGGREGATED_TIMER_DATA:
-			SashCompositeSubView timerSashSubView = new SashCompositeSubView();
-			timerSashSubView.addSubView(new TableSubView(new TimerDataInputController()));
-			return timerSashSubView;
 		case MULTI_INVOC_DATA:
 			SashCompositeSubView multiInvocSubView = new SashCompositeSubView();
 			ISubView multiInvocOverview = new TableSubView(new MultiInvocDataInputController());

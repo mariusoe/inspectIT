@@ -32,10 +32,7 @@ public final class PlotFactory {
 	 */
 	public static PlotController createDefaultPlotController(SensorTypeEnum sensorTypeEnum) {
 		switch (sensorTypeEnum) {
-		case AVERAGE_TIMER:
-			return new TimerPlotController();
-		case TIMER:
-			return new TimerPlotController();
+		case CHARTING_TIMER:
 		case CHARTING_MULTI_TIMER:
 			return new TimerPlotController();
 		case CLASSLOADING_INFORMATION:

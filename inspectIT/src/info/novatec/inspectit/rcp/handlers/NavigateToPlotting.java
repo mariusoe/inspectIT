@@ -78,7 +78,7 @@ public class NavigateToPlotting extends AbstractHandler {
 		inputDefinition.setRepositoryDefinition(repositoryDefinition);
 
 		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-		editorPropertiesData.setSensorImage(SensorTypeEnum.TIMER.getImage());
+		editorPropertiesData.setSensorImage(SensorTypeEnum.CHARTING_TIMER.getImage());
 		editorPropertiesData.setSensorName("Chart");
 		editorPropertiesData.setPartNameFlag(PartType.SENSOR);
 		inputDefinition.setEditorPropertiesData(editorPropertiesData);
@@ -94,7 +94,7 @@ public class NavigateToPlotting extends AbstractHandler {
 			editorPropertiesData.setViewImage(ModifiersImageFactory.getImage(methodIdent.getModifiers()));
 			editorPropertiesData.setViewName(TextFormatter.getMethodString(methodIdent));
 
-			inputDefinition.setId(SensorTypeEnum.TIMER);
+			inputDefinition.setId(SensorTypeEnum.CHARTING_TIMER);
 			idDefinition.setPlatformId(timerData.getPlatformIdent());
 			idDefinition.setSensorTypeId(timerData.getSensorTypeIdent());
 			idDefinition.setMethodId(timerData.getMethodIdent());

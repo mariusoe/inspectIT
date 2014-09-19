@@ -623,10 +623,10 @@ public class TreeModelManager {
 
 		InputDefinition inputDefinition = new InputDefinition();
 		inputDefinition.setRepositoryDefinition(definition);
-		inputDefinition.setId(SensorTypeEnum.AGGREGATED_TIMER_DATA);
+		inputDefinition.setId(SensorTypeEnum.TIMER);
 
 		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-		editorPropertiesData.setSensorImage(SensorTypeEnum.AGGREGATED_TIMER_DATA.getImage());
+		editorPropertiesData.setSensorImage(SensorTypeEnum.TIMER.getImage());
 		editorPropertiesData.setSensorName("Timer Data");
 		editorPropertiesData.setViewImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SHOW_ALL));
 		editorPropertiesData.setViewName("Show All");

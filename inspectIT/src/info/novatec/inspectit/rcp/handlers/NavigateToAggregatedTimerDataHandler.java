@@ -10,6 +10,7 @@ import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition;
 import info.novatec.inspectit.rcp.editor.inputdefinition.InputDefinition.IdDefinition;
 import info.novatec.inspectit.rcp.editor.root.AbstractRootEditor;
 import info.novatec.inspectit.rcp.formatter.TextFormatter;
+import info.novatec.inspectit.rcp.model.ModifiersImageFactory;
 import info.novatec.inspectit.rcp.model.SensorTypeEnum;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
@@ -56,12 +57,13 @@ public class NavigateToAggregatedTimerDataHandler extends AbstractHandler implem
 
 			InputDefinition inputDefinition = new InputDefinition();
 			inputDefinition.setRepositoryDefinition(repositoryDefinition);
-			inputDefinition.setId(SensorTypeEnum.AGGREGATED_TIMER_DATA);
+			inputDefinition.setId(SensorTypeEnum.TIMER);
 
 			EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
-			editorPropertiesData.setSensorName("Aggregated Timer Data");
-			editorPropertiesData.setSensorImage(SensorTypeEnum.AGGREGATED_TIMER_DATA.getImage());
-			editorPropertiesData.setViewName(TextFormatter.getMethodWithParameters(methodIdent));
+			editorPropertiesData.setSensorName(SensorTypeEnum.TIMER.getDisplayName());
+			editorPropertiesData.setSensorImage(SensorTypeEnum.TIMER.getImage());
+			editorPropertiesData.setViewName(TextFormatter.getMethodString(methodIdent));
+			editorPropertiesData.setViewImage(ModifiersImageFactory.getImage(methodIdent.getModifiers()));
 			editorPropertiesData.setPartNameFlag(PartType.SENSOR);
 			inputDefinition.setEditorPropertiesData(editorPropertiesData);
 
