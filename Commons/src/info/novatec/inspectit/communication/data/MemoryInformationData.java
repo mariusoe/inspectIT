@@ -444,9 +444,9 @@ public class MemoryInformationData extends SystemSensorData implements IAggregat
 		maxUsedHeapMemorySize = Math.max(maxUsedHeapMemorySize, other.maxUsedHeapMemorySize);
 		totalUsedHeapMemorySize += other.totalUsedHeapMemorySize;
 
-		minFreeSwapSpace = Math.min(minFreeSwapSpace, other.minFreeSwapSpace);
-		maxFreeSwapSpace = Math.max(maxFreeSwapSpace, other.maxFreeSwapSpace);
-		totalFreeSwapSpace += other.totalFreeSwapSpace;
+		minUsedNonHeapMemorySize = Math.min(minUsedNonHeapMemorySize, other.minUsedNonHeapMemorySize);
+		maxUsedNonHeapMemorySize = Math.max(maxUsedNonHeapMemorySize, other.maxUsedNonHeapMemorySize);
+		totalUsedNonHeapMemorySize += other.totalUsedNonHeapMemorySize;
 	}
 
 	/**
