@@ -13,7 +13,6 @@
 
 	<dependencies>
 		<dependency org="org.javassist" name="javassist" rev="3.18.2-GA" conf="prod->default" />
-		<dependency org="com.google.guava" name="guava-jdk5" rev="13.0" conf="prod->default" />
 		
 		<!-- logging dependencies -->
 		<dependency org="org.slf4j" name="jcl-over-slf4j" rev="1.7.5" conf="prod->default" />

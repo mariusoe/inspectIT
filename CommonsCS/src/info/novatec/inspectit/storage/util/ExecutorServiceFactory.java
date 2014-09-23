@@ -4,8 +4,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
 
 import org.springframework.beans.factory.FactoryBean;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * Bean factory for providing the executor service.
@@ -14,6 +17,16 @@ import org.springframework.beans.factory.FactoryBean;
  * 
  */
 public class ExecutorServiceFactory implements FactoryBean<ExecutorService> {
+
+	/**
+	 * Prefix to be added to the name of each thread.
+	 */
+	private String threadNamePrefix;
+
+	/**
+	 * Should created threads be daemons.
+	 */
+	private boolean daemon;
 
 	/**
 	 * Number of threads in the executor.
@@ -34,12 +47,17 @@ public class ExecutorServiceFactory implements FactoryBean<ExecutorService> {
 	 * {@inheritDoc}
 	 */
 	public ExecutorService getObject() throws Exception {
+		ThreadFactory threadFactory = new ThreadFactoryBuilder()
+			.setNameFormat(threadNamePrefix + "-thread-%d")
+			.setDaemon(daemon)
+			.build();
+		
 		if (!isScheduledExecutor) {
-			return Executors.newFixedThreadPool(executorThreads);
+			return Executors.newFixedThreadPool(executorThreads, threadFactory);
 		} else {
 			// I set remove on cancel policy, because i don't want to have the canceled tasks still
 			// in the queue
-			ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(executorThreads);
+			ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(executorThreads, threadFactory);
 			scheduledExecutor.setRemoveOnCancelPolicy(true);
 			return scheduledExecutor;
 		}
@@ -61,6 +79,26 @@ public class ExecutorServiceFactory implements FactoryBean<ExecutorService> {
 	 */
 	public boolean isSingleton() {
 		return isBeanSingleton;
+	}
+
+	/**
+	 * Sets {@link #threadNamePrefix}.
+	 * 
+	 * @param threadNamePrefix
+	 *            New value for {@link #threadNamePrefix}
+	 */
+	public void setThreadNamePrefix(String threadNamePrefix) {
+		this.threadNamePrefix = threadNamePrefix;
+	}
+
+	/**
+	 * Sets {@link #daemon}.
+	 * 
+	 * @param daemon
+	 *            New value for {@link #daemon}
+	 */
+	public void setDaemon(boolean daemon) {
+		this.daemon = daemon;
 	}
 
 	/**

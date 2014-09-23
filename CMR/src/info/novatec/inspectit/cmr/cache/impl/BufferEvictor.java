@@ -24,7 +24,7 @@ public class BufferEvictor extends BufferWorker {
 	 */
 	@Autowired
 	public BufferEvictor(IBuffer<?> buffer) {
-		super(buffer);
+		super(buffer, "buffer-evicting-thread");
 	}
 
 	/**

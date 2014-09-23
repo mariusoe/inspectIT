@@ -21,9 +21,12 @@ public abstract class BufferWorker extends Thread {
 	 * 
 	 * @param buffer
 	 *            Buffer to work on.
+	 * @param threadName
+	 *            How to name the thread.
 	 */
-	public BufferWorker(IBuffer<?> buffer) {
+	public BufferWorker(IBuffer<?> buffer, String threadName) {
 		this.buffer = buffer;
+		setName(threadName);
 		setDaemon(true);
 		setPriority(MAX_PRIORITY);
 	}

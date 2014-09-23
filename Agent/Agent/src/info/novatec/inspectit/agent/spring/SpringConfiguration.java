@@ -7,6 +7,7 @@ import info.novatec.inspectit.agent.config.impl.StrategyConfig;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -20,6 +21,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ClassPathResource;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * Post process configuration storage to define buffer and sending strategy beans.
@@ -75,7 +78,11 @@ public class SpringConfiguration implements BeanDefinitionRegistryPostProcessor 
 	@Bean(name = "socketReadExecutorService")
 	@Scope(BeanDefinition.SCOPE_SINGLETON)
 	public ExecutorService getSocketReadExecutorService() {
-		return Executors.newFixedThreadPool(1);
+		ThreadFactory threadFactory = new ThreadFactoryBuilder()
+			.setNameFormat("inspectit-socket-read-executor-service-thread-%d")
+			.setDaemon(true)
+			.build();
+		return Executors.newFixedThreadPool(1, threadFactory);
 	}
 
 	/**

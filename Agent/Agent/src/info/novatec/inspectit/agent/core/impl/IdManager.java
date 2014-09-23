@@ -447,6 +447,7 @@ public class IdManager implements IIdManager, InitializingBean, DisposableBean {
 		 * Creates a new instance of the <code>RegistrationThread</code> as a daemon thread.
 		 */
 		public RegistrationThread() {
+			setName("inspectit-registration-thread");
 			setDaemon(true);
 		}
 

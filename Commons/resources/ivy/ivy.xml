@@ -46,6 +46,8 @@
 		<dependency org="org.ow2.asm" name="info.novatec.asm" rev="4.0" conf="prod->default" />
 		<dependency org="org.objenesis" name="objenesis" rev="2.1" conf="prod->default" />
 		
+		<dependency org="com.google.guava" name="guava-jdk5" rev="13.0" conf="prod->default" />
+		
 		<!-- Test -->
 		<!-- Test NG should be on the build path via the Eclipse plug-in -->
 		<dependency org="org.mockito" name="mockito-core" rev="1.9.0" conf="test->default" />

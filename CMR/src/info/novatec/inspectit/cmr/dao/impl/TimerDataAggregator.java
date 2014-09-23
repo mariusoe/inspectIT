@@ -279,6 +279,7 @@ public class TimerDataAggregator extends HibernateDaoSupport {
 		 * Constructor. Set thread as daemon and gives it minimum priority.
 		 */
 		public CacheCleaner() {
+			setName("timer-data-aggregator-cache-cleaner-thread");
 			setDaemon(true);
 			setPriority(MIN_PRIORITY);
 		}

@@ -66,6 +66,7 @@ public class TimeStrategy extends AbstractSendingStrategy {
 		 * Creates a new <code>Trigger</code> as daemon thread.
 		 */
 		public Trigger() {
+			setName("inspectit-timer-strategy-trigger-thread");
 			setDaemon(true);
 		}
 

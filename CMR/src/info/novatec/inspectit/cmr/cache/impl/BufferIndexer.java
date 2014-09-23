@@ -24,7 +24,7 @@ public class BufferIndexer extends BufferWorker {
 	 */
 	@Autowired
 	public BufferIndexer(IBuffer<?> buffer) {
-		super(buffer);
+		super(buffer, "buffer-indexing-thread");
 		setPriority(NORM_PRIORITY);
 	}
 

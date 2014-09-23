@@ -385,6 +385,7 @@ public class CoreService implements ICoreService, InitializingBean, DisposableBe
 		 * Creates a new instance of the <code>PlatformSensorRefresher</code> as a daemon thread.
 		 */
 		public PlatformSensorRefresher() {
+			setName("inspectit-platform-sensor-refresher-thread");
 			setDaemon(true);
 		}
 
@@ -521,6 +522,7 @@ public class CoreService implements ICoreService, InitializingBean, DisposableBe
 		 * Creates a new <code>PreparingThread</code> as daemon.
 		 */
 		public PreparingThread() {
+			setName("inspectit-preparing-thread");
 			setDaemon(true);
 		}
 
@@ -570,6 +572,7 @@ public class CoreService implements ICoreService, InitializingBean, DisposableBe
 		 * Creates a new <code>SendingThread</code> as daemon.
 		 */
 		public SendingThread() {
+			setName("inspectit-sending-thread");
 			setDaemon(true);
 		}
 

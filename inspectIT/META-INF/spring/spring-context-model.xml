@@ -314,11 +314,15 @@
 	</bean>
 
 	<bean id="IOExecutorService" class="info.novatec.inspectit.storage.util.ExecutorServiceFactory">
+		<property name="threadNamePrefix" value="io-executor-service" />
+		<property name="daemon" value="true" />
 		<property name="executorThreads" value="2" />
 		<property name="beanSingleton" value="true" />
 	</bean>
 
 	<bean id="storageExecutorService" class="info.novatec.inspectit.storage.util.ExecutorServiceFactory">
+		<property name="threadNamePrefix" value="storage-executor-service" />
+		<property name="daemon" value="true" />
 		<property name="executorThreads" value="3" />
 		<property name="scheduledExecutor" value="true" />
 	</bean>

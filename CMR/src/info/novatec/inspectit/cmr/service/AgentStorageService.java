@@ -146,7 +146,7 @@ public class AgentStorageService implements IAgentStorageService {
 		} else if (threadCount > threadListSize) {
 			// add new threads
 			for (int i = threadListSize; i < threadCount; i++) {
-				ProcessDataThread processDataThread = new ProcessDataThread();
+				ProcessDataThread processDataThread = new ProcessDataThread(i);
 				processDataThread.start();
 				threadList.add(processDataThread);
 			}
@@ -181,8 +181,12 @@ public class AgentStorageService implements IAgentStorageService {
 
 		/**
 		 * Default constructor.
+		 * 
+		 * @param threadId
+		 *            Id of the thread that will be added to the thread name.
 		 */
-		public ProcessDataThread() {
+		public ProcessDataThread(int threadId) {
+			setName("agent-storage-service-process-data-thread-" + threadId);
 			setDaemon(true);
 		}
 

@@ -24,7 +24,7 @@ public class BufferAnalyzer extends BufferWorker {
 	 */
 	@Autowired
 	public BufferAnalyzer(IBuffer<?> buffer) {
-		super(buffer);
+		super(buffer, "buffer-analyzing-thread");
 	}
 
 	/**
