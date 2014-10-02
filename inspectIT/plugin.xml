@@ -2464,5 +2464,16 @@
          </presentation>
       </config>
    </extension>
+   <extension
+         point="org.eclipse.ui.statusHandlers">
+      <statusHandler
+            class="info.novatec.inspectit.rcp.statushandlers.CustomStatusHandler"
+            id="info.novatec.inspectit.customStatusHandler">
+      </statusHandler>
+      <statusHandlerProductBinding
+            handlerId="info.novatec.inspectit.customStatusHandler"
+            productId="info.novatec.inspectit.rcp.product">
+      </statusHandlerProductBinding>
+   </extension>
 
 </plugin>

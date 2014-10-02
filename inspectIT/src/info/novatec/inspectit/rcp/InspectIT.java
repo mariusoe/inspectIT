@@ -1,5 +1,6 @@
 package info.novatec.inspectit.rcp;
 
+import info.novatec.inspectit.rcp.log.LogListener;
 import info.novatec.inspectit.rcp.repository.CmrRepositoryManager;
 import info.novatec.inspectit.rcp.storage.InspectITStorageManager;
 
@@ -16,7 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.ILogListener;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -93,6 +96,11 @@ public class InspectIT extends AbstractUIPlugin {
 	private Path runtimeDir;
 
 	/**
+	 * {@link ILogListener} used for logging.
+	 */
+	private ILogListener logListener;
+
+	/**
 	 * This method is called upon plug-in activation.
 	 * 
 	 * @param context
@@ -107,6 +115,10 @@ public class InspectIT extends AbstractUIPlugin {
 
 		locateRuntimeDir();
 		initLogger();
+
+		// add log listener once logger is initialized
+		logListener = new LogListener();
+		Platform.addLogListener(logListener);
 
 		super.start(context);
 	}
@@ -189,6 +201,11 @@ public class InspectIT extends AbstractUIPlugin {
 		if (null != cmrRepositoryManager) {
 			cmrRepositoryManager.cancelAllUpdateRepositoriesJobs();
 		}
+
+		// remove log listener
+		Platform.removeLogListener(logListener);
+		logListener = null; // NOPMD
+
 		super.stop(context);
 		plugin = null; // NOPMD
 	}
@@ -380,7 +397,7 @@ public class InspectIT extends AbstractUIPlugin {
 	 */
 	public void createErrorDialog(String message, Throwable throwable, int code) {
 		IStatus status = new Status(IStatus.ERROR, ID, code, message, throwable);
-		StatusManager.getManager().handle(status, StatusManager.SHOW);
+		StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.LOG);
 	}
 
 	/**
@@ -394,7 +411,7 @@ public class InspectIT extends AbstractUIPlugin {
 	public void createErrorDialog(String message, int code) {
 		// Status sets exception to <code>null</code> internally.
 		IStatus status = new Status(IStatus.ERROR, ID, code, message, null);
-		StatusManager.getManager().handle(status, StatusManager.SHOW);
+		StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.LOG);
 	}
 
 	/**
