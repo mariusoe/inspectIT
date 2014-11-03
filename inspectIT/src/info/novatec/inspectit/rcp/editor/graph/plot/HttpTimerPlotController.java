@@ -196,19 +196,21 @@ public class HttpTimerPlotController extends AbstractTimerDataPlotController<Htt
 		if (regExTransformation) {
 			for (RegExAggregatedHttpTimerData regExTemplate : regExTemplates) {
 				if (HttpTimerData.REQUEST_METHOD_MULTIPLE.equals(regExTemplate.getRequestMethod()) || Objects.equals(regExTemplate.getRequestMethod(), httpTimerData.getRequestMethod())) {
-					if (null != findTemplateForData(httpTimerData, regExTemplate.getAggregatedDataList(), true)) {
+					if (null != findTemplateForUriData(httpTimerData, regExTemplate.getAggregatedDataList(), true)) {
 						return regExTemplate;
 					}
 				}
 			}
+		} else if (plotByTagValue) {
+			return findTemplateForTagData(httpTimerData, templates);
 		} else {
-			return findTemplateForData(httpTimerData, templates, false);
+			return findTemplateForUriData(httpTimerData, templates, false);
 		}
 		return null;
 	}
 
 	/**
-	 * Finds matching template for the given {@link HttpTimerData}.
+	 * Finds matching template for the given {@link HttpTimerData} by uri.
 	 * 
 	 * @param httpTimerData
 	 *            Data to find matching template.
@@ -218,12 +220,32 @@ public class HttpTimerPlotController extends AbstractTimerDataPlotController<Htt
 	 *            If matching should be done only by uri.
 	 * @return Matching template of <code>null</code> if one can not be found.
 	 */
-	private HttpTimerData findTemplateForData(HttpTimerData httpTimerData, List<HttpTimerData> templates, boolean checkOnlyUri) {
+	private HttpTimerData findTemplateForUriData(HttpTimerData httpTimerData, List<HttpTimerData> templates, boolean checkOnlyUri) {
 		for (HttpTimerData template : templates) {
 			if (Objects.equals(template.getUri(), httpTimerData.getUri())) {
 				if (!checkOnlyUri && HttpTimerData.REQUEST_METHOD_MULTIPLE.equals(template.getRequestMethod())) {
 					return template;
 				} else if (Objects.equals(template.getRequestMethod(), httpTimerData.getRequestMethod())) {
+					return template;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Finds matching template for the given {@link HttpTimerData} by tag value.
+	 * 
+	 * @param httpTimerData
+	 *            Data to find matching template.
+	 * @param templates
+	 *            List of templates to search.
+	 * @return Matching template of <code>null</code> if one can not be found.
+	 */
+	private HttpTimerData findTemplateForTagData(HttpTimerData httpTimerData, List<HttpTimerData> templates) {
+		for (HttpTimerData template : templates) {
+			if (Objects.equals(template.getInspectItTaggingHeaderValue(), httpTimerData.getInspectItTaggingHeaderValue())) {
+				if (HttpTimerData.REQUEST_METHOD_MULTIPLE.equals(template.getRequestMethod()) || Objects.equals(template.getRequestMethod(), httpTimerData.getRequestMethod())) {
 					return template;
 				}
 			}
