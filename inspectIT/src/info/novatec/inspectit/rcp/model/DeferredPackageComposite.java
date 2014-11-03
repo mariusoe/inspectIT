@@ -5,10 +5,10 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -30,7 +30,7 @@ public class DeferredPackageComposite extends DeferredComposite {
 	/**
 	 * All the classes which are being displayed in the sub-tree.
 	 */
-	private List<MethodIdent> classes = new ArrayList<MethodIdent>();
+	private List<MethodIdent> classes = new CopyOnWriteArrayList<MethodIdent>();
 
 	/**
 	 * The repository definition.

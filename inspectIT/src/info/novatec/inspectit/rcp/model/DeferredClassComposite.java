@@ -5,8 +5,8 @@ import info.novatec.inspectit.rcp.InspectIT;
 import info.novatec.inspectit.rcp.InspectITImages;
 import info.novatec.inspectit.rcp.repository.RepositoryDefinition;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,7 +28,7 @@ public class DeferredClassComposite extends DeferredComposite {
 	/**
 	 * All the methods which are displayed in the tree.
 	 */
-	private List<MethodIdent> methods = new ArrayList<MethodIdent>();
+	private List<MethodIdent> methods = new CopyOnWriteArrayList<MethodIdent>();
 
 	/**
 	 * The format string of the output.
