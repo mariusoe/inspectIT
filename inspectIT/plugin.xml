@@ -1617,18 +1617,18 @@
                      checkEnabled="true">
                </visibleWhen>
             </command>
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.displayInChart"
+                  icon="icons/chart_pie.png"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="true">
+               </visibleWhen>
+            </command>
          </menu>
          <command
                commandId="info.novatec.inspectit.rcp.commands.addToSteppingObjects"
                icon="icons/right_down.png"
-               style="push">
-            <visibleWhen
-                  checkEnabled="true">
-            </visibleWhen>
-         </command>
-         <command
-               commandId="info.novatec.inspectit.rcp.commands.displayInChart"
-               icon="icons/chart_pie.png"
                style="push">
             <visibleWhen
                   checkEnabled="true">
@@ -1787,6 +1787,14 @@
                      checkEnabled="true">
                </visibleWhen>
             </command>
+            <command
+                  commandId="info.novatec.inspectit.rcp.commands.displayInChart"
+                  icon="icons/chart_pie.png"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="true">
+               </visibleWhen>
+            </command>
          </menu>
          <menu
                icon="icons/chart_bar.png"
@@ -1850,18 +1858,6 @@
          </command>
          <separator
                name="inspectit.editor.formrooteditor.tablesubview.separator2"
-               visible="true">
-         </separator>
-         <command
-               commandId="info.novatec.inspectit.rcp.commands.displayInChart"
-               icon="icons/chart_pie.png"
-               style="push">
-            <visibleWhen
-                  checkEnabled="true">
-            </visibleWhen>
-         </command>
-         <separator
-               name="inspectit.editor.formrooteditor.tablesubview.separator3"
                visible="true">
          </separator>
          <command
