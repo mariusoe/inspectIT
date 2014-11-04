@@ -15,7 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /** Used to be notified about connection events. */
-@SuppressWarnings("all")
+@SuppressWarnings({ "all", "unchecked" })
 // NOCHKALL
 public class Listener {
 	/**

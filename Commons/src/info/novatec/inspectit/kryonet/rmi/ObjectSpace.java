@@ -47,7 +47,7 @@ import com.esotericsoftware.kryonet.rmi.TimeoutException;
  * value which is not {@link RemoteObject#setNonBlocking(boolean) ignored}, an extra byte is written. If the type of a parameter is
  * not final (note primitives are final) then an extra byte is written for that parameter.
  * @author Nathan Sweet <misc@n4te.com> */
-@SuppressWarnings("all")
+@SuppressWarnings({ "all", "unchecked" })
 // NOCHKALL
 public class ObjectSpace {
 	static private final byte kReturnValMask = (byte)0x80; // 1000 0000

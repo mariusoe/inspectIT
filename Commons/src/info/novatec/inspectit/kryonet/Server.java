@@ -39,7 +39,7 @@ import com.esotericsoftware.kryonet.KryoSerialization;
  * 
  * @author Nathan Sweet <misc@n4te.com>
  */
-@SuppressWarnings("all")
+@SuppressWarnings({ "all", "unchecked" })
 // NOCHKALL
 public class Server implements EndPoint {
 
