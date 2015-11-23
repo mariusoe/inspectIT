@@ -121,7 +121,7 @@
 				</validators>
 			</string-property>
 			<byte-property name="Min GZIP Size" default-value="1MB" server-restart-required="true" logical-name="storage.minGzipSize" advanced="false"
-				description="Min size in bytes for which the storage data will be served compressed." ></byte-property>
+				description="Min size in bytes for which the storage data will be served compressed."></byte-property>
 			<group-property name="Hard drive space protection" description="Defines properties that will protect against using all remaning space on the hard drive where CMR is running.">
 				<properties>
 					<byte-property name="Max Hard Drive Occupancy" default-value="0B" server-restart-required="false" logical-name="storage.maxHardDriveOccupancy" advanced="false"
@@ -253,14 +253,14 @@
 							<isPercentage />
 						</validators>
 					</percentage-property>
-					<byte-property name="Min Occupancy till OldGen Size" default-value="384MB" server-restart-required="false" logical-name="buffer.minOldSpaceOccupancyActiveTillOldGenSize"
-						advanced="true" description="Size of old generation heap space in bytes till which min buffer occupancy will be active.">
+					<byte-property name="Min Occupancy till OldGen Size" default-value="384MB" server-restart-required="false" logical-name="buffer.minOldSpaceOccupancyActiveTillOldGenSize" advanced="true"
+						description="Size of old generation heap space in bytes till which min buffer occupancy will be active.">
 						<validators>
 							<isPositive />
 						</validators>
 					</byte-property>
-					<byte-property name="Max Occupancy from OldGen Size" default-value="2GB" server-restart-required="false" logical-name="buffer.maxOldSpaceOccupancyActiveFromOldGenSize"
-						advanced="true" description="Size of old generation heap space in bytes from which max occupancy will be active.">
+					<byte-property name="Max Occupancy from OldGen Size" default-value="2GB" server-restart-required="false" logical-name="buffer.maxOldSpaceOccupancyActiveFromOldGenSize" advanced="true"
+						description="Size of old generation heap space in bytes from which max occupancy will be active.">
 					</byte-property>
 				</properties>
 				<group-validators>
@@ -313,6 +313,20 @@
 					<isLess property="buffer.minObjectExpansionRateActiveTillOccupancy" than="buffer.maxObjectExpansionRateActiveFromOccupancy" />
 				</group-validators>
 			</group-property>
+		</properties>
+	</section>
+	<section name="InfluxDB">
+		<properties>
+			<string-property name="Host" default-value="192.168.56.101" server-restart-required="true" logical-name="influxdb.host" advanced="false"></string-property>
+			<long-property name="Port" default-value="8086" server-restart-required="true" logical-name="influxdb.port" advanced="false" description="The port used for communicating with agents.">
+				<validators>
+					<isPositive />
+				</validators>
+			</long-property>
+			<string-property name="Username" default-value="inflx" server-restart-required="true" logical-name="influxdb.user" advanced="false"></string-property>
+			<string-property name="Password" default-value="p4ssw0rd" server-restart-required="true" logical-name="influxdb.passwd" advanced="false"></string-property>
+			<string-property name="Database" default-value="inspectit" server-restart-required="true" logical-name="influxdb.database" advanced="false"></string-property>
+			<string-property name="RetentionPolicy" default-value="default" server-restart-required="true" logical-name="influxdb.retentionPolicy" advanced="true"></string-property>
 		</properties>
 	</section>
 </cmr-configuration>

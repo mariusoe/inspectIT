@@ -4,6 +4,10 @@
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
+	<!-- InfluxDB -->
+	<bean id="cpuMetricProcessor" class="info.novatec.inspectit.cmr.processor.influxdb.CpuMetricProcessor" />
+	<bean id="memoryMetricProcessor" class="info.novatec.inspectit.cmr.processor.influxdb.MemoryMetricProcessor" />
+
 	<bean id="cacheIdGeneratorCmrProcessor" class="info.novatec.inspectit.cmr.processor.impl.CacheIdGeneratorCmrProcessor" />
 	<bean id="bufferInserterCmrProcessor" class="info.novatec.inspectit.cmr.processor.impl.BufferInserterCmrProcessor" />
 	<bean id="exceptionMessageCmrProcessor" class="info.novatec.inspectit.cmr.processor.impl.ExceptionMessageCmrProcessor" />
@@ -44,6 +48,8 @@
 		<ref bean="sqlExclusiveTimeCmrProcessor" />
 		<ref bean="timerDataChartingCmrProcessor" />
 		<ref bean="invocationModifierCmrProcessor" />
+		<ref bean="cpuMetricProcessor" />
+		<ref bean="memoryMetricProcessor" />
 		<ref bean="recorderCmrProcessor" /> <!-- Must be last when all are processed -->
 	</util:list>
 	

@@ -58,6 +58,14 @@
 		<dependency org="com.mchange" name="c3p0" rev="0.9.5.1" conf="prod->default" />
 		<dependency org="com.mchange" name="mchange-commons-java" rev="0.2.10" conf="prod->default" />
 
+		<!-- InfluxDB -->
+		<dependency org="org.influxdb" name="influxdb-java" rev="2.0" conf="prod->default" transitive="true" />
+		<dependency org="com.google.guava" name="guava" rev="18.0" conf="prod->default" />
+		<dependency org="com.google.code.gson" name="gson" rev="2.3.1" conf="prod->default" />
+		<dependency org="com.squareup.retrofit" name="retrofit" rev="1.9.0" conf="prod->default" />
+		<dependency org="com.squareup.okhttp" name="okhttp" rev="2.4.0" conf="prod->default" />
+		<dependency org="com.squareup.okio" name="okio" rev="1.4.0" conf="prod->default" />
+
 		<!-- Test -->
 		<!-- Test NG should be on the build path via the Eclipse plug-in -->
 		<dependency org="org.springframework" name="spring-test" rev="3.2.4.RELEASE" conf="test->default" />
