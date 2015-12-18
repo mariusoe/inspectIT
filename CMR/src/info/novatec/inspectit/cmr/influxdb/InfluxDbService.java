@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
+import org.influxdb.dto.Query;
+import org.influxdb.dto.QueryResult;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -101,5 +103,9 @@ public class InfluxDbService implements InitializingBean {
 	 */
 	public void write(Point dataPoint) {
 		influxDB.write(database, retentionPolicy, dataPoint);
+	}
+
+	public QueryResult query(String query) {
+		return influxDB.query(new Query(query, database));
 	}
 }
