@@ -16,12 +16,12 @@ import org.springframework.stereotype.Component;
 
 /**
  * Service class to access and push data to an InfluxDB.
- * 
+ *
  * @author Marius Oehler
  *
  */
 @Component
-public class InfluxDbService implements InitializingBean {
+public class InfluxDBService implements InitializingBean {
 
 	/**
 	 * After this duration, the batch have to be flushed.
@@ -97,14 +97,22 @@ public class InfluxDbService implements InitializingBean {
 
 	/**
 	 * Inserts the given {@link Point} into the database.
-	 * 
+	 *
 	 * @param dataPoint
 	 *            {@link Point} to insert
 	 */
 	public void write(Point dataPoint) {
+		log.info(dataPoint.toString());
 		influxDB.write(database, retentionPolicy, dataPoint);
 	}
 
+	/**
+	 * Executes the given query against the connected InfluxDb.
+	 *
+	 * @param query
+	 *            the query to execute
+	 * @return the result of the query
+	 */
 	public QueryResult query(String query) {
 		return influxDB.query(new Query(query, database));
 	}

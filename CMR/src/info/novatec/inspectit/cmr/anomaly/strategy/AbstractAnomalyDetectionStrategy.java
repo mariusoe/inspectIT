@@ -1,20 +1,76 @@
 package info.novatec.inspectit.cmr.anomaly.strategy;
 
-import info.novatec.inspectit.cmr.influxdb.InfluxDbService;
+import info.novatec.inspectit.cmr.influxdb.InfluxDBService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * Abstract anomaly detection strategy to investigate data for anomalies.
+ *
+ * @author Marius Oehler
+ *
+ */
 public abstract class AbstractAnomalyDetectionStrategy {
 
 	/**
-	 * Instance of the {@link InfluxDbService}.
+	 * Placeholder class for the Java keyword void.
+	 *
 	 */
-	protected InfluxDbService influxDb;
-
-	public AbstractAnomalyDetectionStrategy(InfluxDbService influxDb) {
-		super();
-		this.influxDb = influxDb;
+	public static final class Void {
+		/**
+		 * Hidden constructor.
+		 */
+		private Void() {
+		}
 	}
 
-	public abstract void detect();
+	/**
+	 * Logger for the class.
+	 */
+	private final Logger log = LoggerFactory.getLogger(AbstractAnomalyDetectionStrategy.class);
+
+	/**
+	 * Instance of the {@link InfluxDBService}.
+	 */
+	protected InfluxDBService influx;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param influxDb
+	 *            the influx db service
+	 */
+	public AbstractAnomalyDetectionStrategy(InfluxDBService influxDb) {
+		super();
+		influx = influxDb;
+	}
+
+	/**
+	 * Starts the anomaly detection.
+	 */
+	public void execute() {
+		onPreExecution();
+		onAnalysis();
+		onPostExecution();
+	}
+
+	/**
+	 * Will be executed before the {@link #onAnalysis()}.
+	 */
+	protected void onPreExecution() {
+		log.info("onPreExecution");
+	}
+
+	/**
+	 * The actual logic to analyze the data.
+	 */
+	protected abstract void onAnalysis();
+
+	/**
+	 * Will be executed after the {@link #onAnalysis()}.
+	 */
+	protected void onPostExecution() {
+		log.info("onPostExecution");
+	}
 }

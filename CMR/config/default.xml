@@ -329,4 +329,13 @@
 			<string-property name="RetentionPolicy" default-value="default" server-restart-required="true" logical-name="influxdb.retentionPolicy" advanced="true"></string-property>
 		</properties>
 	</section>
+	<section name="AnomalyDetection">
+		<properties>
+			<long-property name="AnalyzeRate" default-value="5000" server-restart-required="true" logical-name="anomaly.analyzeRate" advanced="false" description="The rate of the execution of the anomaly detector.">
+				<validators>
+					<isPositive />
+				</validators>
+			</long-property>
+		</properties>
+	</section>
 </cmr-configuration>

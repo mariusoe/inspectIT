@@ -1,8 +1,8 @@
 package info.novatec.inspectit.cmr.anomaly;
 
-import info.novatec.inspectit.cmr.anomaly.strategy.DummyStrategy;
 import info.novatec.inspectit.cmr.anomaly.strategy.AbstractAnomalyDetectionStrategy;
-import info.novatec.inspectit.cmr.influxdb.InfluxDbService;
+import info.novatec.inspectit.cmr.anomaly.strategy.impl.DummyStrategy;
+import info.novatec.inspectit.cmr.influxdb.InfluxDBService;
 import info.novatec.inspectit.cmr.util.Converter;
 import info.novatec.inspectit.spring.logger.Log;
 
@@ -15,10 +15,11 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * 
+ *
  * @author Marius Oehler
  *
  */
@@ -44,36 +45,46 @@ public class AnomalyDetector implements InitializingBean, Runnable {
 	private AbstractAnomalyDetectionStrategy detectionStrategy;
 
 	/**
-	 * Instance of the {@link InfluxDbService}.
+	 * The rate of the execution of the anomaly detector.
+	 */
+	@Value("${anomaly.analyzeRate}")
+	private long analyzeRate;
+
+	/**
+	 * Instance of the {@link InfluxDBService}.
 	 */
 	@Autowired
-	InfluxDbService influxDb;
+	InfluxDBService influxDb;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		executorService.scheduleAtFixedRate(this, 5000, 5000, TimeUnit.MILLISECONDS);
+		executorService.scheduleAtFixedRate(this, analyzeRate, analyzeRate, TimeUnit.MILLISECONDS);
 
 		detectionStrategy = new DummyStrategy(influxDb);
 
 		if (log.isInfoEnabled()) {
 			log.info("|-Anomaly Detector active...");
+			log.info("||-Anomaly Detector will be executed in a rate of {}ms...", analyzeRate);
 		}
 	}
 
 	@Override
 	public void run() {
 		if (log.isInfoEnabled()) {
-			log.info("Run anomaly detection...");
+			log.info("Run anomaly detection. Detection strategy: {}", detectionStrategy.getClass().getSimpleName());
 		}
+
 		long startTime = System.nanoTime();
 
+		// try to prevent a crash of the executor service
 		try {
-			detectionStrategy.detect();
+			detectionStrategy.execute();
 		} catch (Exception e) {
 			log.error("Exception during anomaly detection!", e);
 		}
 
 		long totalDuration = System.nanoTime() - startTime;
+
 		if (log.isInfoEnabled()) {
 			log.info("Anomaly detection took " + Converter.nanoToMilliseconds(totalDuration) + " ms");
 		}

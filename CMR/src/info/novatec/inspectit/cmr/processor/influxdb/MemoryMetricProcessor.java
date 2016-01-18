@@ -1,6 +1,6 @@
 package info.novatec.inspectit.cmr.processor.influxdb;
 
-import info.novatec.inspectit.cmr.influxdb.InfluxDbService;
+import info.novatec.inspectit.cmr.influxdb.InfluxDBService;
 import info.novatec.inspectit.cmr.processor.AbstractCmrDataProcessor;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.MemoryInformationData;
@@ -8,13 +8,14 @@ import info.novatec.inspectit.spring.logger.Log;
 
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.StatelessSession;
+import javax.persistence.EntityManager;
+
 import org.influxdb.dto.Point;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * 
+ *
  * @author Marius Oehler
  *
  */
@@ -27,16 +28,24 @@ public class MemoryMetricProcessor extends AbstractCmrDataProcessor {
 	Logger log;
 
 	/**
-	 * Instance of the {@link InfluxDbService}.
+	 * Instance of the {@link InfluxDBService}.
 	 */
 	@Autowired
-	InfluxDbService influxDb;
+	InfluxDBService influxDb;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processData(DefaultData defaultData, StatelessSession session) {
+	public boolean canBeProcessed(DefaultData defaultData) {
+		return defaultData instanceof MemoryInformationData;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void processData(DefaultData defaultData, EntityManager entityManager) {
 		MemoryInformationData data = (MemoryInformationData) defaultData;
 
 		Point point = Point.measurement("memory_information").time(data.getTimeStamp().getTime(), TimeUnit.MILLISECONDS).tag("platform_ident", String.valueOf(data.getPlatformIdent()))
@@ -47,13 +56,4 @@ public class MemoryMetricProcessor extends AbstractCmrDataProcessor {
 
 		influxDb.write(point);
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean canBeProcessed(DefaultData defaultData) {
-		return defaultData instanceof MemoryInformationData;
-	}
-
 }
