@@ -9,6 +9,7 @@
 	<bean id="memoryMetricProcessor" class="info.novatec.inspectit.cmr.processor.influxdb.MemoryMetricProcessor" />
 	<bean id="exceptionProcessor" class="info.novatec.inspectit.cmr.processor.influxdb.ExceptionProcessor" />
 	<bean id="threadMetricProcessor" class="info.novatec.inspectit.cmr.processor.influxdb.ThreadMetricProcessor" />
+	<bean id="invocationSequenceProcessor" class="info.novatec.inspectit.cmr.processor.influxdb.InvocationSequenceProcessor" />
 
 	<bean id="cacheIdGeneratorCmrProcessor" class="info.novatec.inspectit.cmr.processor.impl.CacheIdGeneratorCmrProcessor" />
 	<bean id="bufferInserterCmrProcessor" class="info.novatec.inspectit.cmr.processor.impl.BufferInserterCmrProcessor" />
@@ -54,6 +55,7 @@
 		<ref bean="memoryMetricProcessor" />
 		<ref bean="exceptionProcessor"/>
 		<ref bean="threadMetricProcessor"/>
+		<ref bean="invocationSequenceProcessor"/>
 		<ref bean="recorderCmrProcessor" /> <!-- Must be last when all are processed -->
 	</util:list>
 	

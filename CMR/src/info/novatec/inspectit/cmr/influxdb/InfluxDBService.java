@@ -102,7 +102,9 @@ public class InfluxDBService implements InitializingBean {
 	 *            {@link Point} to insert
 	 */
 	public void write(Point dataPoint) {
-		log.info(dataPoint.toString());
+		if (log.isDebugEnabled()) {
+			log.debug("Write data to InfluxDB: {}", dataPoint.toString());
+		}
 		influxDB.write(database, retentionPolicy, dataPoint);
 	}
 
