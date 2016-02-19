@@ -5,6 +5,7 @@ import info.novatec.inspectit.cmr.influxdb.InfluxDBService;
 
 import java.util.List;
 
+import org.influxdb.dto.Point;
 import org.influxdb.dto.QueryResult;
 import org.influxdb.dto.QueryResult.Result;
 import org.influxdb.dto.QueryResult.Series;
@@ -42,7 +43,7 @@ public class DummyStrategy extends AbstractAnomalyDetectionStrategy {
 	public void onAnalysis() {
 		log.info("start analysis..");
 
-		QueryResult queryResult = influx.query("select mean(total_cpu_usage) from cpu_information where time > now() - 1h group by time(15s)");
+		QueryResult queryResult = influx.query("select mean(total_cpu_usage) from cpu_information where time > now() - 90m group by time(3s)");
 
 		if (queryResult.hasError()) {
 			log.warn("query was not successful. Erro: {}", queryResult.getError());
@@ -73,6 +74,9 @@ public class DummyStrategy extends AbstractAnomalyDetectionStrategy {
 					} else {
 						log.info("Max. system load was {} at {}", maxValue, maxValueTime);
 					}
+
+					Point build = Point.measurement(s.getName() + "_base").field("maxMean", maxValue).build();
+					influx.write(build);
 
 					/*
 					 * List<String> columns = s.getColumns(); List<List<Object>> values =
