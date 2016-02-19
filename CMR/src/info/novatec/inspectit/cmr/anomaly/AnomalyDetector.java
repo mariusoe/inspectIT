@@ -1,7 +1,7 @@
 package info.novatec.inspectit.cmr.anomaly;
 
 import info.novatec.inspectit.cmr.anomaly.strategy.AbstractAnomalyDetectionStrategy;
-import info.novatec.inspectit.cmr.anomaly.strategy.impl.DummyStrategy;
+import info.novatec.inspectit.cmr.anomaly.strategy.impl.SimpleStrategy;
 import info.novatec.inspectit.cmr.influxdb.InfluxDBService;
 import info.novatec.inspectit.cmr.util.Converter;
 import info.novatec.inspectit.spring.logger.Log;
@@ -60,7 +60,7 @@ public class AnomalyDetector implements InitializingBean, Runnable {
 	public void afterPropertiesSet() throws Exception {
 		executorService.scheduleAtFixedRate(this, analyzeRate, analyzeRate, TimeUnit.MILLISECONDS);
 
-		detectionStrategy = new DummyStrategy(influxDb);
+		detectionStrategy = new SimpleStrategy(influxDb);
 
 		if (log.isInfoEnabled()) {
 			log.info("|-Anomaly Detector active...");
@@ -71,7 +71,7 @@ public class AnomalyDetector implements InitializingBean, Runnable {
 	@Override
 	public void run() {
 		if (log.isInfoEnabled()) {
-			log.info("Run anomaly detection. Detection strategy: {}", detectionStrategy.getClass().getSimpleName());
+			log.info("Run anomaly detection. Detection strategy: {}", detectionStrategy.getStrategyName());
 		}
 
 		long startTime = System.nanoTime();

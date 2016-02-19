@@ -118,4 +118,47 @@ public class InfluxDBService implements InitializingBean {
 	public QueryResult query(String query) {
 		return influxDB.query(new Query(query, database));
 	}
+
+	/**
+	 * Queries the database for a single value. Only the first field will be returned!
+	 *
+	 * @param query
+	 *            query to execute
+	 * @return the found object or <code>null</code> if the result was empty
+	 */
+	public Object querySingle(String query) {
+		QueryResult queryResult = query(query);
+		if (queryResult.hasError()) {
+			log.warn("Query [{}] failed - Error: {}", query, queryResult.getError());
+			return null;
+		} else {
+			try {
+				return queryResult.getResults().get(0).getSeries().get(0).getValues().get(0).get(1);
+			} catch (NullPointerException e) {
+				return null;
+			}
+		}
+	}
+
+	/**
+	 * Queries the database for a single double value. Only the first field will be returned!
+	 * Basically, this is a wrapper of the {@link #querySingle(String)} method.
+	 *
+	 * @param query
+	 *            query to execute
+	 * @return the found double or <code>Double.NaN</code> if the result was empty
+	 */
+	public double querySingleDouble(String query) {
+		Object resultObject = querySingle(query);
+
+		if (resultObject == null) {
+			return Double.NaN;
+		}
+
+		if (resultObject instanceof Double) {
+			return (double) resultObject;
+		} else {
+			return Double.parseDouble(resultObject.toString());
+		}
+	}
 }

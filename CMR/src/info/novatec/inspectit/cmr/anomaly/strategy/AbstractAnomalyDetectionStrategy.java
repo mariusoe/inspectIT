@@ -51,9 +51,16 @@ public abstract class AbstractAnomalyDetectionStrategy {
 	 */
 	public void execute() {
 		onPreExecution();
-		onAnalysis();
-		onPostExecution();
+		DetectionResult detectionResult = onAnalysis();
+		onPostExecution(detectionResult);
 	}
+
+	/**
+	 * Returns the name of this detection strategy.
+	 *
+	 * @return the name
+	 */
+	public abstract String getStrategyName();
 
 	/**
 	 * Will be executed before the {@link #onAnalysis()}.
@@ -64,13 +71,22 @@ public abstract class AbstractAnomalyDetectionStrategy {
 
 	/**
 	 * The actual logic to analyze the data.
+	 *
+	 * @return the detection result
 	 */
-	protected abstract void onAnalysis();
+	protected abstract DetectionResult onAnalysis();
 
 	/**
 	 * Will be executed after the {@link #onAnalysis()}.
+	 *
+	 * @param detectionResult
+	 *            the result of the current analysis
 	 */
-	protected void onPostExecution() {
+	protected void onPostExecution(DetectionResult detectionResult) {
 		log.info("onPostExecution");
+
+		if (log.isInfoEnabled()) {
+			log.info("Result of the anomaly detection: {}", detectionResult);
+		}
 	}
 }

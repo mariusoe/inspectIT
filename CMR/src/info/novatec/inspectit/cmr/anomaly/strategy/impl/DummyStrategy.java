@@ -1,8 +1,12 @@
 package info.novatec.inspectit.cmr.anomaly.strategy.impl;
 
 import info.novatec.inspectit.cmr.anomaly.strategy.AbstractAnomalyDetectionStrategy;
+import info.novatec.inspectit.cmr.anomaly.strategy.DetectionResult;
+import info.novatec.inspectit.cmr.anomaly.strategy.DetectionResult.Status;
 import info.novatec.inspectit.cmr.influxdb.InfluxDBService;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.influxdb.dto.Point;
@@ -40,55 +44,80 @@ public class DummyStrategy extends AbstractAnomalyDetectionStrategy {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onAnalysis() {
+	public String getStrategyName() {
+		return "DummyStrategy";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public DetectionResult onAnalysis() {
 		log.info("start analysis..");
 
 		QueryResult queryResult = influx.query("select mean(total_cpu_usage) from cpu_information where time > now() - 90m group by time(3s)");
+
+		String resultMessage = null;
 
 		if (queryResult.hasError()) {
 			log.warn("query was not successful. Erro: {}", queryResult.getError());
 		} else {
 			for (Result r : queryResult.getResults()) {
 				List<Series> series = r.getSeries();
-				for (Series s : series) {
-					List<List<Object>> values = s.getValues();
+				if (series != null) {
+					for (Series s : series) {
+						List<List<Object>> values = s.getValues();
 
-					double maxValue = Double.NaN;
-					String maxValueTime = null;
+						double maxValue = Double.NaN;
+						String maxValueTime = null;
 
-					for (int i = 0; i < values.size(); i++) {
-						Object meanObject = values.get(i).get(1);
-						if (meanObject == null) {
-							continue;
+						for (int i = 0; i < values.size(); i++) {
+							Object meanObject = values.get(i).get(1);
+							if (meanObject == null) {
+								continue;
+							}
+
+							double mean = ((Double) meanObject).doubleValue();
+							if (Double.isNaN(maxValue) || mean > maxValue) {
+								maxValue = mean;
+								maxValueTime = (String) values.get(i).get(0);
+							}
 						}
 
-						double mean = ((Double) meanObject).doubleValue();
-						if (Double.isNaN(maxValue) || mean > maxValue) {
-							maxValue = mean;
-							maxValueTime = (String) values.get(i).get(0);
+						if (maxValueTime == null) {
+							resultMessage = "No max system load found";
+						} else {
+							resultMessage = String.format("Maximum system load was %.2f%% at %s", maxValue, maxValueTime);
 						}
+
+						Point build = Point.measurement(s.getName() + "_base").field("maxMean", maxValue).build();
+						influx.write(build);
+
+						/*
+						 * List<String> columns = s.getColumns(); List<List<Object>> values =
+						 * s.getValues(); for (List<Object> valueList : values) {
+						 * System.out.println( " {"); for (int i = 0; i < columns.size(); i++) {
+						 * System.out.println("  " + columns.get(i) + ": " + valueList.get(i)); }
+						 * System.out.println(" }"); }
+						 */
+
 					}
-
-					if (maxValueTime == null) {
-						log.info("No max system load found");
-					} else {
-						log.info("Max. system load was {} at {}", maxValue, maxValueTime);
-					}
-
-					Point build = Point.measurement(s.getName() + "_base").field("maxMean", maxValue).build();
-					influx.write(build);
-
-					/*
-					 * List<String> columns = s.getColumns(); List<List<Object>> values =
-					 * s.getValues(); for (List<Object> valueList : values) { System.out.println(
-					 * " {"); for (int i = 0; i < columns.size(); i++) { System.out.println("  " +
-					 * columns.get(i) + ": " + valueList.get(i)); } System.out.println(" }"); }
-					 */
-
 				}
 			}
 
 		}
 
+		return DetectionResult.make(Status.UNKNOWN, resultMessage);
+	}
+
+	public long parseTimeString(String dateString) {
+		try {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
+			Date parsedDate = dateFormat.parse(dateString);
+			return parsedDate.getTime();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
 	}
 }
