@@ -3,6 +3,7 @@
  */
 package info.novatec.inspectit.cmr.anomaly.strategy.impl;
 
+import info.novatec.inspectit.cmr.anomaly.AnomalyUtils;
 import info.novatec.inspectit.cmr.anomaly.strategy.AbstractAnomalyDetectionStrategy;
 import info.novatec.inspectit.cmr.anomaly.strategy.DetectionResult;
 import info.novatec.inspectit.cmr.anomaly.strategy.DetectionResult.Status;
@@ -27,6 +28,11 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 	private final Logger log = LoggerFactory.getLogger(SimpleStrategy.class);
 
 	/**
+	 * The decay factor used to calculate the ewma.
+	 */
+	private double ewmaDecayFactor;
+
+	/**
 	 * @param influxDb
 	 *            the InfluxDB service
 	 */
@@ -43,18 +49,11 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 	}
 
 	/**
-	 * Calculates the new exponentially weighted moving average based on the given data.
-	 *
-	 * @param decayFactor
-	 *            the decay factor of old data
-	 * @param currentEwma
-	 *            the current ewma value
-	 * @param currentDataValue
-	 *            the current data value
-	 * @return the new exponentially weighted moving average
+	 * {@inheritDoc}
 	 */
-	private double calculateEwma(double decayFactor, double currentEwma, double currentDataValue) {
-		return decayFactor * currentDataValue + (1 - decayFactor) * currentEwma;
+	@Override
+	protected void onPreExecution() {
+		ewmaDecayFactor = 0.1D;
 	}
 
 	/**
@@ -69,7 +68,8 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 			log.debug("Cannot query current data.");
 			return DetectionResult.make(Status.UNKNOWN);
 		} else {
-			Builder dataBuilder = Point.measurement("anomaly_meta").time(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+			long currentTime = System.currentTimeMillis();
+			Builder dataBuilder = Point.measurement("anomaly_meta").time(currentTime, TimeUnit.MILLISECONDS);
 
 			// requesting data for ewma
 			double latestEwma = influx.querySingleDouble("select LAST(ewma) from anomaly_meta where time > now() - 30s");
@@ -78,12 +78,13 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 			}
 
 			// calculating ewma
-			double newEwma = calculateEwma(0.1D, latestEwma, currentData);
+			double newEwma = AnomalyUtils.calculateExponentialMovingAverage(ewmaDecayFactor, latestEwma, currentData);
 			dataBuilder.field("ewma", newEwma);
 
 			// calculating alerting tube
 			double dynamicStdDev = influx.querySingleDouble("SELECT STDDEV(total_cpu_usage) FROM cpu_information WHERE time > now() - 600s");
 			if (!Double.isNaN(dynamicStdDev)) {
+				dataBuilder.field("stddev", dynamicStdDev);
 
 				double latestStdDevEwma = influx.querySingleDouble("SELECT LAST(ewma_stddev) FROM anomaly_meta WHERE time > now() - 30s");
 				if (Double.isNaN(latestStdDevEwma)) {
@@ -91,12 +92,38 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 				}
 
 				// calculating stddev ewma
-				double newStdDevEwma = calculateEwma(0.1D, latestStdDevEwma, dynamicStdDev);
+				double newStdDevEwma = AnomalyUtils.calculateExponentialMovingAverage(ewmaDecayFactor, latestStdDevEwma, dynamicStdDev);
 				dataBuilder.field("ewma_stddev", newStdDevEwma);
+
+				// ############## check for an anomaly
+
+				boolean problemIsActive = influx.querySingleBoolean("SELECT LAST(problem) FROM anomaly_problems");
+
+				if (Math.abs(newEwma - currentData) > dynamicStdDev) {
+					if (!problemIsActive) {
+						// problem detected
+						Builder problemBuilder = Point.measurement("anomaly_problems").time(currentTime, TimeUnit.MILLISECONDS);
+
+						problemBuilder.tag("description", "out of stddev-tube");
+						problemBuilder.field("problem", true);
+
+						influx.write(problemBuilder.build());
+					}
+				} else {
+					if (problemIsActive) {
+						// problem is over
+						Builder problemBuilder = Point.measurement("anomaly_problems").time(currentTime, TimeUnit.MILLISECONDS);
+
+						problemBuilder.tag("description", "back to normal");
+						problemBuilder.field("problem", false);
+
+						influx.write(problemBuilder.build());
+					}
+				}
+
 			}
 
 			influx.write(dataBuilder.build());
-
 			return DetectionResult.make(Status.NORMAL);
 		}
 	}

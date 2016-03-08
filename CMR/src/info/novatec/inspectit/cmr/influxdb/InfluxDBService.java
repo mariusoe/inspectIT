@@ -161,4 +161,26 @@ public class InfluxDBService implements InitializingBean {
 			return Double.parseDouble(resultObject.toString());
 		}
 	}
+
+	/**
+	 * Queries the database for a single boolean value. Only the first field will be returned!
+	 * Basically, this is a wrapper of the {@link #querySingle(String)} method.
+	 *
+	 * @param query
+	 *            query to execute
+	 * @return the found boolean or <code>false</code> if the result was empty
+	 */
+	public boolean querySingleBoolean(String query) {
+		Object resultObject = querySingle(query);
+
+		if (resultObject == null) {
+			return false;
+		}
+
+		if (resultObject instanceof Boolean) {
+			return ((Boolean) resultObject).booleanValue();
+		} else {
+			return Boolean.parseBoolean(resultObject.toString());
+		}
+	}
 }
