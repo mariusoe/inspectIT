@@ -3,7 +3,6 @@ package info.novatec.inspectit.cmr.anomaly.strategy.impl;
 import info.novatec.inspectit.cmr.anomaly.strategy.AbstractAnomalyDetectionStrategy;
 import info.novatec.inspectit.cmr.anomaly.strategy.DetectionResult;
 import info.novatec.inspectit.cmr.anomaly.strategy.DetectionResult.Status;
-import info.novatec.inspectit.cmr.influxdb.InfluxDBService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,16 +28,6 @@ public class DummyStrategy extends AbstractAnomalyDetectionStrategy {
 	 * Logger for the class.
 	 */
 	private final Logger log = LoggerFactory.getLogger(AbstractAnomalyDetectionStrategy.class);
-
-	/**
-	 * Constructor.
-	 *
-	 * @param influxDb
-	 *            the influx db service
-	 */
-	public DummyStrategy(InfluxDBService influxDb) {
-		super(influxDb);
-	}
 
 	/**
 	 * {@inheritDoc}

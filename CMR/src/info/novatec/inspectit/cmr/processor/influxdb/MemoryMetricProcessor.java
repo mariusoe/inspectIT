@@ -1,7 +1,7 @@
 package info.novatec.inspectit.cmr.processor.influxdb;
 
-import info.novatec.inspectit.cmr.influxdb.InfluxDBService;
 import info.novatec.inspectit.cmr.processor.AbstractCmrDataProcessor;
+import info.novatec.inspectit.cmr.tsdb.InfluxDBService;
 import info.novatec.inspectit.communication.DefaultData;
 import info.novatec.inspectit.communication.data.MemoryInformationData;
 import info.novatec.inspectit.spring.logger.Log;

@@ -1,4 +1,4 @@
-package info.novatec.inspectit.cmr.influxdb;
+package info.novatec.inspectit.cmr.tsdb;
 
 import info.novatec.inspectit.spring.logger.Log;
 
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class InfluxDBService implements InitializingBean {
+public class InfluxDBService implements InitializingBean, ITimeSeriesDatabase {
 
 	/**
 	 * After this duration, the batch have to be flushed.
@@ -120,13 +120,10 @@ public class InfluxDBService implements InitializingBean {
 	}
 
 	/**
-	 * Queries the database for a single value. Only the first field will be returned!
-	 *
-	 * @param query
-	 *            query to execute
-	 * @return the found object or <code>null</code> if the result was empty
+	 * {@inheritDoc}
 	 */
-	public Object querySingle(String query) {
+	@Override
+	public Object queryObject(String query) {
 		QueryResult queryResult = query(query);
 		if (queryResult.hasError()) {
 			log.warn("Query [{}] failed - Error: {}", query, queryResult.getError());
@@ -141,15 +138,11 @@ public class InfluxDBService implements InitializingBean {
 	}
 
 	/**
-	 * Queries the database for a single double value. Only the first field will be returned!
-	 * Basically, this is a wrapper of the {@link #querySingle(String)} method.
-	 *
-	 * @param query
-	 *            query to execute
-	 * @return the found double or <code>Double.NaN</code> if the result was empty
+	 * {@inheritDoc}
 	 */
-	public double querySingleDouble(String query) {
-		Object resultObject = querySingle(query);
+	@Override
+	public double queryDouble(String query) {
+		Object resultObject = queryObject(query);
 
 		if (resultObject == null) {
 			return Double.NaN;
@@ -163,15 +156,11 @@ public class InfluxDBService implements InitializingBean {
 	}
 
 	/**
-	 * Queries the database for a single boolean value. Only the first field will be returned!
-	 * Basically, this is a wrapper of the {@link #querySingle(String)} method.
-	 *
-	 * @param query
-	 *            query to execute
-	 * @return the found boolean or <code>false</code> if the result was empty
+	 * {@inheritDoc}
 	 */
-	public boolean querySingleBoolean(String query) {
-		Object resultObject = querySingle(query);
+	@Override
+	public boolean queryBoolean(String query) {
+		Object resultObject = queryObject(query);
 
 		if (resultObject == null) {
 			return false;

@@ -317,7 +317,7 @@
 	</section>
 	<section name="InfluxDB">
 		<properties>
-			<string-property name="Host" default-value="127.0.0.1" server-restart-required="true" logical-name="influxdb.host" advanced="false"></string-property>
+			<string-property name="Host" default-value="192.168.56.101" server-restart-required="true" logical-name="influxdb.host" advanced="false"></string-property>
 			<long-property name="Port" default-value="8086" server-restart-required="true" logical-name="influxdb.port" advanced="false" description="The port used for communicating with agents.">
 				<validators>
 					<isPositive />
@@ -336,6 +336,7 @@
 					<isPositive />
 				</validators>
 			</long-property>
+			<string-property name="DetectionStrategies" default-value="info.novatec.inspectit.cmr.anomaly.strategy.impl.SimpleStrategy#info.novatec.inspectit.cmr.anomaly.strategy.impl.DummyStrategy" server-restart-required="true" logical-name="anomaly.detectionStrategies" advanced="true"></string-property>
 		</properties>
 	</section>
 </cmr-configuration>

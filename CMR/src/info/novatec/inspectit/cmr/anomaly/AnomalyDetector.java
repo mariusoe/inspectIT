@@ -1,86 +1,94 @@
 package info.novatec.inspectit.cmr.anomaly;
 
 import info.novatec.inspectit.cmr.anomaly.strategy.AbstractAnomalyDetectionStrategy;
-import info.novatec.inspectit.cmr.anomaly.strategy.impl.SimpleStrategy;
-import info.novatec.inspectit.cmr.influxdb.InfluxDBService;
+import info.novatec.inspectit.cmr.tsdb.ITimeSeriesDatabase;
 import info.novatec.inspectit.cmr.util.Converter;
-import info.novatec.inspectit.spring.logger.Log;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.slf4j.LoggerFactory;
 
 /**
+ * This class executes the anomaly detection and functions as a manager.
  *
  * @author Marius Oehler
  *
  */
-@Component
-public class AnomalyDetector implements InitializingBean, Runnable {
+public class AnomalyDetector {
 
 	/**
 	 * Logger for the class.
 	 */
-	@Log
-	Logger log;
+	private final Logger log;
 
 	/**
-	 * {@link ExecutorService} for sending keep alive messages.
+	 * List consisting of loaded {@link AbstractAnomalyDetectionStrategy}.
 	 */
-	@Autowired
-	@Resource(name = "scheduledExecutorService")
-	ScheduledExecutorService executorService;
+	private final List<AbstractAnomalyDetectionStrategy> detectionStrategyList;
 
 	/**
-	 * The used {@link AbstractAnomalyDetectionStrategy}.
+	 * Constructor.
+	 *
+	 * @param log
+	 *            the logger to use
+	 * @param timeSeriesDatabase
+	 *            the time series database to use.
+	 * @param detectionStrategies
+	 *            the implemented detection strategies.
 	 */
-	private AbstractAnomalyDetectionStrategy detectionStrategy;
+	public AnomalyDetector(Logger log, ITimeSeriesDatabase timeSeriesDatabase, String detectionStrategies) {
+		if (log == null) {
+			log = LoggerFactory.getLogger(getClass());
+		}
+		if (timeSeriesDatabase == null) {
+			throw new IllegalArgumentException("timeSeriesDatabase cannot be NULL.");
+		}
+		if (detectionStrategies == null) {
+			throw new IllegalArgumentException("strategyPath cannot be NULL.");
+		}
 
-	/**
-	 * The rate of the execution of the anomaly detector.
-	 */
-	@Value("${anomaly.analyzeRate}")
-	private long analyzeRate;
+		this.log = log;
 
-	/**
-	 * Instance of the {@link InfluxDBService}.
-	 */
-	@Autowired
-	InfluxDBService influxDb;
+		detectionStrategyList = new ArrayList<>();
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		executorService.scheduleAtFixedRate(this, analyzeRate, analyzeRate, TimeUnit.MILLISECONDS);
+		// load detection strategies
+		for (String detectionStrategy : detectionStrategies.split("#")) {
+			try {
+				AbstractAnomalyDetectionStrategy strategy = (AbstractAnomalyDetectionStrategy) Class.forName(detectionStrategy).newInstance();
+				strategy.initialization(timeSeriesDatabase);
+				detectionStrategyList.add(strategy);
 
-		detectionStrategy = new SimpleStrategy(influxDb);
-
-		if (log.isInfoEnabled()) {
-			log.info("|-Anomaly Detector active...");
-			log.info("||-Anomaly Detector will be executed in a rate of {}ms...", analyzeRate);
+			} catch (ClassNotFoundException e) {
+				if (log.isWarnEnabled()) {
+					log.warn(String.format("The detection strategy {} could not be loaded!", detectionStrategy));
+				}
+			} catch (InstantiationException | IllegalAccessException e) {
+				if (log.isWarnEnabled()) {
+					log.error(String.format("The detection strategy {} could not be instantiated!", detectionStrategy));
+				}
+			}
 		}
 	}
 
-	@Override
-	public void run() {
+	/**
+	 * Starts the anomaly detection.
+	 *
+	 * @param startTime
+	 *            The start time of the anomaly detection. In most cases, this is the current time.
+	 */
+	public void execute(long startTime) {
 		if (log.isInfoEnabled()) {
-			log.info("Run anomaly detection. Detection strategy: {}", detectionStrategy.getStrategyName());
+			log.info("Starting anomaly detection.");
 		}
 
-		long startTime = System.nanoTime();
+		for (AbstractAnomalyDetectionStrategy strategy : detectionStrategyList) {
+			if (log.isInfoEnabled()) {
+				log.info("Executing detection strategy: {}", strategy.getStrategyName());
+			}
 
-		// try to prevent a crash of the executor service
-		try {
-			detectionStrategy.execute();
-		} catch (Exception e) {
-			log.error("Exception during anomaly detection!", e);
+			strategy.execute(startTime);
 		}
 
 		long totalDuration = System.nanoTime() - startTime;

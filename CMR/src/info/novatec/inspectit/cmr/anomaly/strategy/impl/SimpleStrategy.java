@@ -7,7 +7,6 @@ import info.novatec.inspectit.cmr.anomaly.strategy.AbstractAnomalyDetectionStrat
 import info.novatec.inspectit.cmr.anomaly.strategy.DetectionResult;
 import info.novatec.inspectit.cmr.anomaly.strategy.DetectionResult.Status;
 import info.novatec.inspectit.cmr.anomaly.utils.AnomalyUtils;
-import info.novatec.inspectit.cmr.influxdb.InfluxDBService;
 
 import java.util.concurrent.TimeUnit;
 
@@ -43,14 +42,6 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 	private long lastProblemTime = 0;
 
 	/**
-	 * @param influxDb
-	 *            the InfluxDB service
-	 */
-	public SimpleStrategy(InfluxDBService influxDb) {
-		super(influxDb);
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -73,7 +64,7 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 	@Override
 	protected DetectionResult onAnalysis() {
 		// requesting data
-		double currentData = influx.querySingleDouble("select mean(total_cpu_usage) from cpu_information where time > now() - 5s group by time(5s) LIMIT 1");
+		double currentData = influx.queryDouble("select mean(total_cpu_usage) from cpu_information where time > now() - 5s group by time(5s) LIMIT 1");
 
 		if (Double.isNaN(currentData)) {
 			log.debug("Cannot query current data.");
@@ -83,7 +74,7 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 			Builder dataBuilder = Point.measurement("anomaly_meta").time(currentTime, TimeUnit.MILLISECONDS);
 
 			// requesting data for ewma
-			double latestEwma = influx.querySingleDouble("select LAST(ewma) from anomaly_meta where time > now() - 30s");
+			double latestEwma = influx.queryDouble("select LAST(ewma) from anomaly_meta where time > now() - 30s");
 			if (Double.isNaN(latestEwma)) {
 				latestEwma = currentData;
 			}
@@ -95,11 +86,11 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 			DetectionResult detectionResult = DetectionResult.make(Status.UNKNOWN);
 
 			// calculating alerting tube
-			double dynamicStdDev = influx.querySingleDouble("SELECT STDDEV(total_cpu_usage) FROM cpu_information WHERE time > now() - 600s");
+			double dynamicStdDev = influx.queryDouble("SELECT STDDEV(total_cpu_usage) FROM cpu_information WHERE time > now() - 600s");
 			if (!Double.isNaN(dynamicStdDev)) {
 				dataBuilder.field("stddev", dynamicStdDev);
 
-				double latestStdDevEwma = influx.querySingleDouble("SELECT LAST(ewma_stddev) FROM anomaly_meta WHERE time > now() - 30s");
+				double latestStdDevEwma = influx.queryDouble("SELECT LAST(ewma_stddev) FROM anomaly_meta WHERE time > now() - 30s");
 				if (Double.isNaN(latestStdDevEwma)) {
 					latestStdDevEwma = dynamicStdDev;
 				}
@@ -110,7 +101,7 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 
 				// ############## check for an anomaly
 
-				boolean problemIsActive = influx.querySingleBoolean("SELECT LAST(problem) FROM anomaly_problems");
+				boolean problemIsActive = influx.queryBoolean("SELECT LAST(problem) FROM anomaly_problems");
 
 				if (Math.abs(newEwma - currentData) > newStdDevEwma) {
 					lastProblemTime = currentTime;

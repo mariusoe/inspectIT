@@ -1,6 +1,9 @@
 package info.novatec.inspectit.cmr.anomaly.strategy;
 
-import info.novatec.inspectit.cmr.influxdb.InfluxDBService;
+import info.novatec.inspectit.cmr.tsdb.ITimeSeriesDatabase;
+import info.novatec.inspectit.cmr.tsdb.InfluxDBService;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,16 +17,9 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractAnomalyDetectionStrategy {
 
 	/**
-	 * Placeholder class for the Java keyword void.
-	 *
+	 * Lock to prevent parallel executions.
 	 */
-	public static final class Void {
-		/**
-		 * Hidden constructor.
-		 */
-		private Void() {
-		}
-	}
+	private final AtomicBoolean isExecuting = new AtomicBoolean(false);
 
 	/**
 	 * Logger for the class.
@@ -36,23 +32,54 @@ public abstract class AbstractAnomalyDetectionStrategy {
 	protected InfluxDBService influx;
 
 	/**
-	 * Constructor.
-	 *
-	 * @param influxDb
-	 *            the influx db service
+	 * The time series database to use.
 	 */
-	public AbstractAnomalyDetectionStrategy(InfluxDBService influxDb) {
-		super();
-		influx = influxDb;
+	protected ITimeSeriesDatabase timeSeriesDatabase;
+
+	/**
+	 * The starting time of the current execution.
+	 */
+	private long startTime;
+
+	/**
+	 * The time of the latest execution.
+	 */
+	private long lastExecutionTime;
+
+	/**
+	 * Initializes all necessary variables.
+	 *
+	 * @param timeSeriesDatabase
+	 *            the time series database to use
+	 */
+	public void initialization(ITimeSeriesDatabase timeSeriesDatabase) {
+		this.timeSeriesDatabase = timeSeriesDatabase;
 	}
 
 	/**
 	 * Starts the anomaly detection.
+	 *
+	 * @param startTime
+	 *            the starting time of the detection
 	 */
-	public void execute() {
-		onPreExecution();
-		DetectionResult detectionResult = onAnalysis();
-		onPostExecution(detectionResult);
+	public void execute(long startTime) {
+		if (isExecuting.compareAndSet(false, true)) {
+			try {
+				// different values because startTime can be different (e.g. in the past)
+				this.startTime = startTime;
+				lastExecutionTime = System.currentTimeMillis();
+
+				onPreExecution();
+				DetectionResult detectionResult = onAnalysis();
+				onPostExecution(detectionResult);
+			} finally {
+				isExecuting.set(false);
+			}
+		} else {
+			if (log.isInfoEnabled()) {
+				log.info("The detection strategy is running and cannot be started again before the previous run has been ended.");
+			}
+		}
 	}
 
 	/**
@@ -61,6 +88,15 @@ public abstract class AbstractAnomalyDetectionStrategy {
 	 * @return the name
 	 */
 	public abstract String getStrategyName();
+
+	/**
+	 * Returns the minimum duration between two executions of this strategy. Default: 0
+	 *
+	 * @return the minimum interval in milliseconds
+	 */
+	public long getExecutionInterval() {
+		return 0;
+	}
 
 	/**
 	 * Will be executed before the {@link #onAnalysis()}.
@@ -88,5 +124,23 @@ public abstract class AbstractAnomalyDetectionStrategy {
 		if (log.isInfoEnabled()) {
 			log.info("Result of the anomaly detection: {}", detectionResult);
 		}
+	}
+
+	/**
+	 * Gets {@link #startTime}.
+	 *
+	 * @return {@link #startTime}
+	 */
+	protected long getStartTime() {
+		return startTime;
+	}
+
+	/**
+	 * Gets {@link #lastExecutionTime}.
+	 *
+	 * @return {@link #lastExecutionTime}
+	 */
+	public long getLastExecutionTime() {
+		return lastExecutionTime;
 	}
 }
