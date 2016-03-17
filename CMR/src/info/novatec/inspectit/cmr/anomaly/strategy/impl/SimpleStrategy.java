@@ -3,10 +3,10 @@
  */
 package info.novatec.inspectit.cmr.anomaly.strategy.impl;
 
-import info.novatec.inspectit.cmr.anomaly.AnomalyUtils;
 import info.novatec.inspectit.cmr.anomaly.strategy.AbstractAnomalyDetectionStrategy;
 import info.novatec.inspectit.cmr.anomaly.strategy.DetectionResult;
 import info.novatec.inspectit.cmr.anomaly.strategy.DetectionResult.Status;
+import info.novatec.inspectit.cmr.anomaly.utils.AnomalyUtils;
 import info.novatec.inspectit.cmr.influxdb.InfluxDBService;
 
 import java.util.concurrent.TimeUnit;
@@ -33,6 +33,16 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 	private double ewmaDecayFactor;
 
 	/**
+	 * The system has to be "normal" for this time to reset its state to normal. [miliseconds]
+	 */
+	private long cooldownDuration;
+
+	/**
+	 * The time when the last problem occured.
+	 */
+	private long lastProblemTime = 0;
+
+	/**
 	 * @param influxDb
 	 *            the InfluxDB service
 	 */
@@ -54,6 +64,7 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 	@Override
 	protected void onPreExecution() {
 		ewmaDecayFactor = 0.1D;
+		cooldownDuration = 30000;
 	}
 
 	/**
@@ -81,6 +92,8 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 			double newEwma = AnomalyUtils.calculateExponentialMovingAverage(ewmaDecayFactor, latestEwma, currentData);
 			dataBuilder.field("ewma", newEwma);
 
+			DetectionResult detectionResult = DetectionResult.make(Status.UNKNOWN);
+
 			// calculating alerting tube
 			double dynamicStdDev = influx.querySingleDouble("SELECT STDDEV(total_cpu_usage) FROM cpu_information WHERE time > now() - 600s");
 			if (!Double.isNaN(dynamicStdDev)) {
@@ -99,7 +112,9 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 
 				boolean problemIsActive = influx.querySingleBoolean("SELECT LAST(problem) FROM anomaly_problems");
 
-				if (Math.abs(newEwma - currentData) > dynamicStdDev) {
+				if (Math.abs(newEwma - currentData) > newStdDevEwma) {
+					lastProblemTime = currentTime;
+
 					if (!problemIsActive) {
 						// problem detected
 						Builder problemBuilder = Point.measurement("anomaly_problems").time(currentTime, TimeUnit.MILLISECONDS);
@@ -109,8 +124,10 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 
 						influx.write(problemBuilder.build());
 					}
+
+					detectionResult = DetectionResult.make(Status.CRITICAL);
 				} else {
-					if (problemIsActive) {
+					if (problemIsActive && currentTime - lastProblemTime > cooldownDuration) {
 						// problem is over
 						Builder problemBuilder = Point.measurement("anomaly_problems").time(currentTime, TimeUnit.MILLISECONDS);
 
@@ -119,12 +136,13 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 
 						influx.write(problemBuilder.build());
 					}
+					detectionResult = DetectionResult.make(Status.NORMAL);
 				}
 
 			}
 
 			influx.write(dataBuilder.build());
-			return DetectionResult.make(Status.NORMAL);
+			return detectionResult;
 		}
 	}
 }

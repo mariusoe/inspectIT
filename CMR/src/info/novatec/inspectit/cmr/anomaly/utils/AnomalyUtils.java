@@ -1,7 +1,7 @@
 /**
  *
  */
-package info.novatec.inspectit.cmr.anomaly;
+package info.novatec.inspectit.cmr.anomaly.utils;
 
 /**
  * Utility class which provides useful methods for the anomaly detection.
