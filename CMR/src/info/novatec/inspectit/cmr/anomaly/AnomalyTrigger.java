@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class AnomalyScheduler implements InitializingBean, Runnable {
+public class AnomalyTrigger implements InitializingBean, Runnable {
 
 	/**
 	 * Logger for the class.
@@ -83,15 +83,31 @@ public class AnomalyScheduler implements InitializingBean, Runnable {
 	 */
 	@Override
 	public void run() {
-		if (log.isInfoEnabled()) {
-			log.info("Triggering anomaly detector.");
-		}
+		if (true) {
+			log.info("<<TEST>> Triggering anomaly detector.");
 
-		// try to prevent a crash of the executor service
-		try {
-			anomalyDetector.execute(System.currentTimeMillis());
-		} catch (Exception e) {
-			log.error("Exception during anomaly detection!", e);
+			influxDb.disableBatching();
+
+			long time = System.currentTimeMillis() - 3600 * 1000;
+			time -= time % 2500;
+
+			while (time < System.currentTimeMillis()) {
+				anomalyDetector.execute(time);
+				time += 2500;
+			}
+
+			System.exit(0);
+		} else {
+			if (log.isInfoEnabled()) {
+				log.info("Triggering anomaly detector.");
+			}
+
+			// try to prevent a crash of the executor service
+			try {
+				anomalyDetector.execute(System.currentTimeMillis());
+			} catch (Exception e) {
+				log.error("Exception during anomaly detection!", e);
+			}
 		}
 	}
 

@@ -46,7 +46,7 @@ public class AnomalyDetector {
 			throw new IllegalArgumentException("timeSeriesDatabase cannot be NULL.");
 		}
 		if (detectionStrategies == null) {
-			throw new IllegalArgumentException("strategyPath cannot be NULL.");
+			throw new IllegalArgumentException("detectionStrategies cannot be NULL.");
 		}
 
 		this.log = log;
@@ -70,6 +70,11 @@ public class AnomalyDetector {
 				}
 			}
 		}
+
+		log.info("|-Following anomaly detection strategies are registered:");
+		for (AbstractAnomalyDetectionStrategy strategy : detectionStrategyList) {
+			log.info("||-" + strategy.getStrategyName() + " (Interval: " + strategy.getExecutionInterval() + " ms)");
+		}
 	}
 
 	/**
@@ -83,12 +88,23 @@ public class AnomalyDetector {
 			log.info("Starting anomaly detection.");
 		}
 
+		long currentTime = System.currentTimeMillis();
+
 		for (AbstractAnomalyDetectionStrategy strategy : detectionStrategyList) {
 			if (log.isInfoEnabled()) {
 				log.info("Executing detection strategy: {}", strategy.getStrategyName());
 			}
 
-			strategy.execute(startTime);
+			long nextExecutionTime = strategy.getLastExecutionTime() + strategy.getExecutionInterval();
+			if (currentTime >= nextExecutionTime) {
+				try {
+					strategy.execute(startTime);
+				} catch (Exception e) {
+					if (log.isErrorEnabled()) {
+						log.error("The detection strategy {} failed.." + strategy.getStrategyName(), e);
+					}
+				}
+			}
 		}
 
 		long totalDuration = System.nanoTime() - startTime;

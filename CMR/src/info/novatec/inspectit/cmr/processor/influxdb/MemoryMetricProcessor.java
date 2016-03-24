@@ -54,6 +54,6 @@ public class MemoryMetricProcessor extends AbstractCmrDataProcessor {
 				.field("total_free_swap_space", data.getTotalFreeSwapSpace()).field("total_used_heap_size", data.getTotalUsedHeapMemorySize())
 				.field("total_used_non_heap_size", data.getTotalUsedNonHeapMemorySize()).build();
 
-		influxDb.write(point);
+		influxDb.insert(point);
 	}
 }

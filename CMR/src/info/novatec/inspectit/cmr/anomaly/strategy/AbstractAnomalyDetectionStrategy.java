@@ -1,7 +1,6 @@
 package info.novatec.inspectit.cmr.anomaly.strategy;
 
 import info.novatec.inspectit.cmr.tsdb.ITimeSeriesDatabase;
-import info.novatec.inspectit.cmr.tsdb.InfluxDBService;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -17,19 +16,14 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractAnomalyDetectionStrategy {
 
 	/**
-	 * Lock to prevent parallel executions.
-	 */
-	private final AtomicBoolean isExecuting = new AtomicBoolean(false);
-
-	/**
 	 * Logger for the class.
 	 */
 	private final Logger log = LoggerFactory.getLogger(AbstractAnomalyDetectionStrategy.class);
 
 	/**
-	 * Instance of the {@link InfluxDBService}.
+	 * Determines whether the strategy is running. Lock to prevent parallel executions.
 	 */
-	protected InfluxDBService influx;
+	private final AtomicBoolean isExecuting = new AtomicBoolean(false);
 
 	/**
 	 * The time series database to use.
@@ -39,12 +33,31 @@ public abstract class AbstractAnomalyDetectionStrategy {
 	/**
 	 * The starting time of the current execution.
 	 */
-	private long startTime;
+	private long time;
 
 	/**
 	 * The time of the latest execution.
 	 */
 	private long lastExecutionTime;
+
+	/**
+	 * The time which was used in the last execution.
+	 */
+	private long lastTime = -1;
+
+	/**
+	 * The actual logic to analyze the data.
+	 *
+	 * @return the detection result
+	 */
+	protected abstract DetectionResult onAnalysis();
+
+	/**
+	 * Returns the name of this detection strategy.
+	 *
+	 * @return the name
+	 */
+	public abstract String getStrategyName();
 
 	/**
 	 * Initializes all necessary variables.
@@ -59,20 +72,21 @@ public abstract class AbstractAnomalyDetectionStrategy {
 	/**
 	 * Starts the anomaly detection.
 	 *
-	 * @param startTime
-	 *            the starting time of the detection
+	 * @param time
+	 *            the time to use as current time in the detection
 	 */
-	public void execute(long startTime) {
+	public void execute(long time) {
 		if (isExecuting.compareAndSet(false, true)) {
 			try {
-				// different values because startTime can be different (e.g. in the past)
-				this.startTime = startTime;
-				lastExecutionTime = System.currentTimeMillis();
+				this.time = time;
 
 				onPreExecution();
 				DetectionResult detectionResult = onAnalysis();
 				onPostExecution(detectionResult);
 			} finally {
+				lastExecutionTime = System.currentTimeMillis();
+				lastTime = time;
+
 				isExecuting.set(false);
 			}
 		} else {
@@ -83,14 +97,7 @@ public abstract class AbstractAnomalyDetectionStrategy {
 	}
 
 	/**
-	 * Returns the name of this detection strategy.
-	 *
-	 * @return the name
-	 */
-	public abstract String getStrategyName();
-
-	/**
-	 * Returns the minimum duration between two executions of this strategy. Default: 0
+	 * Returns the minimum duration [ms] between two executions of this strategy. Default: 0
 	 *
 	 * @return the minimum interval in milliseconds
 	 */
@@ -104,13 +111,6 @@ public abstract class AbstractAnomalyDetectionStrategy {
 	protected void onPreExecution() {
 		log.info("onPreExecution");
 	}
-
-	/**
-	 * The actual logic to analyze the data.
-	 *
-	 * @return the detection result
-	 */
-	protected abstract DetectionResult onAnalysis();
 
 	/**
 	 * Will be executed after the {@link #onAnalysis()}.
@@ -127,12 +127,12 @@ public abstract class AbstractAnomalyDetectionStrategy {
 	}
 
 	/**
-	 * Gets {@link #startTime}.
+	 * Gets {@link #time}.
 	 *
-	 * @return {@link #startTime}
+	 * @return {@link #time}
 	 */
-	protected long getStartTime() {
-		return startTime;
+	protected long getTime() {
+		return time;
 	}
 
 	/**
@@ -142,5 +142,14 @@ public abstract class AbstractAnomalyDetectionStrategy {
 	 */
 	public long getLastExecutionTime() {
 		return lastExecutionTime;
+	}
+
+	/**
+	 * Gets {@link #deltaTime}.
+	 *
+	 * @return {@link #deltaTime}
+	 */
+	protected long getDeltaTime() {
+		return time - lastTime;
 	}
 }

@@ -51,6 +51,6 @@ public class ExceptionProcessor extends AbstractCmrDataProcessor {
 		Point point = Point.measurement("exceptions").time(data.getTimeStamp().getTime(), TimeUnit.MILLISECONDS).tag("platform_ident", String.valueOf(data.getPlatformIdent()))
 				.field("error_message", data.getErrorMessage()).field("throwable_type", data.getThrowableType()).build();
 
-		influxDb.write(point);
+		influxDb.insert(point);
 	}
 }

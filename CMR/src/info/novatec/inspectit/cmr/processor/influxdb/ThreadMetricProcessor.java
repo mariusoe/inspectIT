@@ -51,6 +51,6 @@ public class ThreadMetricProcessor extends AbstractCmrDataProcessor {
 		Point point = Point.measurement("thread_information").time(data.getTimeStamp().getTime(), TimeUnit.MILLISECONDS).tag("platform_ident", String.valueOf(data.getPlatformIdent()))
 				.field("thread_count", data.getTotalThreadCount()).field("daemon_thread_count", data.getTotalDaemonThreadCount()).build();
 
-		influxDb.write(point);
+		influxDb.insert(point);
 	}
 }

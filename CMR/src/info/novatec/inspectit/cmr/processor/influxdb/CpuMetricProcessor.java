@@ -51,7 +51,7 @@ public class CpuMetricProcessor extends AbstractCmrDataProcessor {
 		Point point = Point.measurement("cpu_information").time(data.getTimeStamp().getTime(), TimeUnit.MILLISECONDS).tag("platform_ident", String.valueOf(data.getPlatformIdent()))
 				.field("process_cpu_time", data.getProcessCpuTime()).field("total_cpu_usage", data.getTotalCpuUsage()).build();
 
-		influxDb.write(point);
+		influxDb.insert(point);
 	}
 
 }

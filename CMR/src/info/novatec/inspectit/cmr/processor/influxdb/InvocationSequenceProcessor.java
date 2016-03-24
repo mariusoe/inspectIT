@@ -53,6 +53,6 @@ public class InvocationSequenceProcessor extends AbstractCmrDataProcessor {
 		Point point = Point.measurement("invocation_sequences").time(data.getTimeStamp().getTime(), TimeUnit.MILLISECONDS).tag("platform_ident", String.valueOf(data.getPlatformIdent()))
 				.field("duration", data.getDuration()).field("child_count", data.getChildCount()).build();
 
-		influxDb.write(point);
+		influxDb.insert(point);
 	}
 }

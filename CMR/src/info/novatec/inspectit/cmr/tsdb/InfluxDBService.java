@@ -87,34 +87,27 @@ public class InfluxDBService implements InitializingBean, ITimeSeriesDatabase {
 		// Flush every BATCH_BUFFER_SIZE Points, at least every BATCH_FLUSH_TIMER
 		influxDB.enableBatch(BATCH_BUFFER_SIZE, BATCH_FLUSH_TIMER, TimeUnit.MILLISECONDS);
 
-		// Create database if it not exists
-		// influxDB.createDatabase(database);
-
 		if (log.isInfoEnabled()) {
 			log.info("|-InfluxDB Service active...");
 		}
 	}
 
 	/**
-	 * Inserts the given {@link Point} into the database.
-	 *
-	 * @param dataPoint
-	 *            {@link Point} to insert
+	 * {@inheritDoc}
 	 */
-	public void write(Point dataPoint) {
+	@Override
+	public void insert(Point dataPoint) {
 		if (log.isInfoEnabled()) {
 			log.info("Write data to InfluxDB: {}", dataPoint.toString());
 		}
+
 		influxDB.write(database, retentionPolicy, dataPoint);
 	}
 
 	/**
-	 * Executes the given query against the connected InfluxDb.
-	 *
-	 * @param query
-	 *            the query to execute
-	 * @return the result of the query
+	 * {@inheritDoc}
 	 */
+	@Override
 	public QueryResult query(String query) {
 		return influxDB.query(new Query(query, database));
 	}
@@ -171,5 +164,21 @@ public class InfluxDBService implements InitializingBean, ITimeSeriesDatabase {
 		} else {
 			return Boolean.parseBoolean(resultObject.toString());
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isBatching() {
+		return influxDB.isBatchEnabled();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void disableBatching() {
+		influxDB.disableBatch();
 	}
 }
