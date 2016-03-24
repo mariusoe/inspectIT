@@ -27,14 +27,14 @@ import org.slf4j.LoggerFactory;
 public class FixedThresholdStrategy extends AbstractAnomalyDetectionStrategy {
 
 	/**
+	 * The threshold in milliseconds.
+	 */
+	private static final double THRESHOLD = 2000;
+
+	/**
 	 * Logger for the class.
 	 */
 	private final Logger log = LoggerFactory.getLogger(FixedThresholdStrategy.class);
-
-	/**
-	 * The threshold in milliseconds.
-	 */
-	private final double threshold = 2000;
 
 	/**
 	 * {@inheritDoc}
@@ -56,7 +56,7 @@ public class FixedThresholdStrategy extends AbstractAnomalyDetectionStrategy {
 		List<List<Object>> dataList;
 		try {
 			dataList = result.getResults().get(0).getSeries().get(0).getValues();
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			if (log.isDebugEnabled()) {
 				log.debug("No data found.");
 			}
@@ -69,7 +69,7 @@ public class FixedThresholdStrategy extends AbstractAnomalyDetectionStrategy {
 			Date date = AnomalyUtils.parseInfluxTimeString(data.get(0).toString());
 			date.setTime(date.getTime() + 3600000); // fix timezone
 
-			if (threshold < value) {
+			if (THRESHOLD < value) {
 				if (detectionResult == null) {
 					detectionResult = DetectionResult.make(Status.CRITICAL);
 				}
