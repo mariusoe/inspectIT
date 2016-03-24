@@ -97,8 +97,8 @@ public class InfluxDBService implements InitializingBean, ITimeSeriesDatabase {
 	 */
 	@Override
 	public void insert(Point dataPoint) {
-		if (log.isInfoEnabled()) {
-			log.info("Write data to InfluxDB: {}", dataPoint.toString());
+		if (log.isDebugEnabled()) {
+			log.debug("Write data to InfluxDB: {}", dataPoint.toString());
 		}
 
 		influxDB.write(database, retentionPolicy, dataPoint);

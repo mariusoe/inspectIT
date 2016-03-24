@@ -84,15 +84,15 @@ public class AnomalyDetector {
 	 *            The start time of the anomaly detection. In most cases, this is the current time.
 	 */
 	public void execute(long startTime) {
-		if (log.isInfoEnabled()) {
-			log.info("Starting anomaly detection.");
+		if (log.isDebugEnabled()) {
+			log.debug("Starting anomaly detection.");
 		}
 
 		long currentTime = System.currentTimeMillis();
 
 		for (AbstractAnomalyDetectionStrategy strategy : detectionStrategyList) {
-			if (log.isInfoEnabled()) {
-				log.info("Executing detection strategy: {}", strategy.getStrategyName());
+			if (log.isDebugEnabled()) {
+				log.debug("Executing detection strategy: {}", strategy.getStrategyName());
 			}
 
 			long nextExecutionTime = strategy.getLastExecutionTime() + strategy.getExecutionInterval();
@@ -109,8 +109,8 @@ public class AnomalyDetector {
 
 		long totalDuration = System.nanoTime() - startTime;
 
-		if (log.isInfoEnabled()) {
-			log.info("Anomaly detection took " + Converter.nanoToMilliseconds(totalDuration) + " ms");
+		if (log.isDebugEnabled()) {
+			log.debug("Anomaly detection took " + Converter.nanoToMilliseconds(totalDuration) + " ms");
 		}
 	}
 }

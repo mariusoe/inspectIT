@@ -336,7 +336,7 @@
 					<isPositive />
 				</validators>
 			</long-property>
-			<string-property name="DetectionStrategies" default-value="info.novatec.inspectit.cmr.anomaly.strategy.impl.SimpleStrategy#info.novatec.inspectit.cmr.anomaly.strategy.impl.DummyStrategy" server-restart-required="true" logical-name="anomaly.detectionStrategies" advanced="true"></string-property>
+			<string-property name="DetectionStrategies" default-value="info.novatec.inspectit.cmr.anomaly.strategy.impl.SimpleStrategy#info.novatec.inspectit.cmr.anomaly.strategy.impl.DummyStrategy#info.novatec.inspectit.cmr.anomaly.strategy.impl.FixedThresholdStrategy" server-restart-required="true" logical-name="anomaly.detectionStrategies" advanced="true"></string-property>
 		</properties>
 	</section>
 </cmr-configuration>

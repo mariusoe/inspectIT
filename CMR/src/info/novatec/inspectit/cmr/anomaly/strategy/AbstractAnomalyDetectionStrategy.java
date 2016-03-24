@@ -1,5 +1,6 @@
 package info.novatec.inspectit.cmr.anomaly.strategy;
 
+import info.novatec.inspectit.cmr.anomaly.utils.QueryHelper;
 import info.novatec.inspectit.cmr.tsdb.ITimeSeriesDatabase;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,6 +30,11 @@ public abstract class AbstractAnomalyDetectionStrategy {
 	 * The time series database to use.
 	 */
 	protected ITimeSeriesDatabase timeSeriesDatabase;
+
+	/**
+	 * Helper for easily querying of the time series database.
+	 */
+	protected QueryHelper queryHelper;
 
 	/**
 	 * The starting time of the current execution.
@@ -67,6 +73,7 @@ public abstract class AbstractAnomalyDetectionStrategy {
 	 */
 	public void initialization(ITimeSeriesDatabase timeSeriesDatabase) {
 		this.timeSeriesDatabase = timeSeriesDatabase;
+		this.queryHelper = new QueryHelper(timeSeriesDatabase);
 	}
 
 	/**
@@ -78,8 +85,12 @@ public abstract class AbstractAnomalyDetectionStrategy {
 	public void execute(long time) {
 		if (isExecuting.compareAndSet(false, true)) {
 			try {
+				// update variables
 				this.time = time;
 
+				queryHelper.setCurrentTime(time);
+
+				// execution of the actual strategy logic
 				onPreExecution();
 				DetectionResult detectionResult = onAnalysis();
 				onPostExecution(detectionResult);
@@ -109,7 +120,9 @@ public abstract class AbstractAnomalyDetectionStrategy {
 	 * Will be executed before the {@link #onAnalysis()}.
 	 */
 	protected void onPreExecution() {
-		log.info("onPreExecution");
+		if (log.isDebugEnabled()) {
+			log.debug("onPreExecution");
+		}
 	}
 
 	/**
@@ -119,7 +132,9 @@ public abstract class AbstractAnomalyDetectionStrategy {
 	 *            the result of the current analysis
 	 */
 	protected void onPostExecution(DetectionResult detectionResult) {
-		log.info("onPostExecution");
+		if (log.isDebugEnabled()) {
+			log.debug("onPostExecution");
+		}
 
 		if (log.isInfoEnabled()) {
 			log.info("Result of the anomaly detection: {}", detectionResult);
@@ -147,9 +162,22 @@ public abstract class AbstractAnomalyDetectionStrategy {
 	/**
 	 * Gets {@link #deltaTime}.
 	 *
-	 * @return {@link #deltaTime}
+	 * @return {@link #deltaTime} or -1 if the strategy was never called before
 	 */
 	protected long getDeltaTime() {
+		if (lastTime < 0) {
+			return -1;
+		}
 		return time - lastTime;
 	}
+
+	/**
+	 * Gets {@link #lastTime}.
+	 *
+	 * @return {@link #lastTime} or -1 if the strategy was never called before
+	 */
+	protected long getLastTime() {
+		return lastTime;
+	}
+
 }

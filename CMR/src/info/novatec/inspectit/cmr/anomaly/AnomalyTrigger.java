@@ -86,7 +86,9 @@ public class AnomalyTrigger implements InitializingBean, Runnable {
 		if (true) {
 			log.info("<<TEST>> Triggering anomaly detector.");
 
-			influxDb.disableBatching();
+			if (influxDb.isBatching()) {
+				influxDb.disableBatching();
+			}
 
 			long time = System.currentTimeMillis() - 3600 * 1000;
 			time -= time % 2500;

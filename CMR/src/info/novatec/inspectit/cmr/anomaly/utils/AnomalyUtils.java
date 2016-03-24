@@ -56,7 +56,7 @@ public final class AnomalyUtils {
 				// date string containing milliseconds
 
 				String[] split = dateString.split("\\.");
-				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 				Date date = dateFormat.parse(split[0]);
 
 				long millis = Long.parseLong(split[1].substring(0, split[1].length() - 1));
@@ -67,7 +67,7 @@ public final class AnomalyUtils {
 			} else {
 				// date string without milliseconds
 
-				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 				return dateFormat.parse(dateString);
 			}
 		} catch (Exception e) {
