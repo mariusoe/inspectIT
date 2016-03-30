@@ -136,8 +136,8 @@ public abstract class AbstractAnomalyDetectionStrategy {
 			log.debug("onPostExecution");
 		}
 
-		if (log.isInfoEnabled()) {
-			log.info("Result of the anomaly detection: {}", detectionResult);
+		if (log.isDebugEnabled()) {
+			log.debug("Result of the anomaly detection: {}", detectionResult);
 		}
 	}
 

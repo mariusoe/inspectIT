@@ -3,6 +3,7 @@
  */
 package info.novatec.inspectit.cmr.anomaly;
 
+import info.novatec.inspectit.cmr.anomaly.strategy.AbstractAnomalyDetectionStrategy;
 import info.novatec.inspectit.cmr.tsdb.InfluxDBService;
 import info.novatec.inspectit.spring.logger.Log;
 
@@ -53,10 +54,10 @@ public class AnomalyTrigger implements InitializingBean, Runnable {
 	private long analyzeRate;
 
 	/**
-	 * The implemented detection strategies.
+	 * The implemented detection strategy classes.
 	 */
 	@Value("${anomaly.detectionStrategies}")
-	private String detectionStrategies;
+	private String[] detectionStrategies;
 
 	/**
 	 * The anomaly detector.
@@ -70,7 +71,27 @@ public class AnomalyTrigger implements InitializingBean, Runnable {
 	public void afterPropertiesSet() throws Exception {
 		executorService.scheduleAtFixedRate(this, analyzeRate, analyzeRate, TimeUnit.MILLISECONDS);
 
-		anomalyDetector = new AnomalyDetector(log, influxDb, detectionStrategies);
+		AbstractAnomalyDetectionStrategy[] strategies = new AbstractAnomalyDetectionStrategy[detectionStrategies.length];
+
+		// instanziate detection strategies
+		for (int i = 0; i < detectionStrategies.length; i++) {
+			try {
+				AbstractAnomalyDetectionStrategy strategy = (AbstractAnomalyDetectionStrategy) Class.forName(detectionStrategies[i]).newInstance();
+				strategy.initialization(influxDb);
+				strategies[i] = strategy;
+			} catch (ClassNotFoundException e) {
+				if (log.isWarnEnabled()) {
+					log.error(String.format("The detection strategy class '{}' was not found!", detectionStrategies[i]));
+				}
+			} catch (InstantiationException | IllegalAccessException e) {
+				if (log.isWarnEnabled()) {
+					log.error(String.format("The detection strategy '{}' could not be instantiated!", detectionStrategies[i]));
+				}
+			}
+		}
+
+		// anomaly detector
+		anomalyDetector = new AnomalyDetector(strategies);
 
 		if (log.isInfoEnabled()) {
 			log.info("|-AnomalyScheduler active...");

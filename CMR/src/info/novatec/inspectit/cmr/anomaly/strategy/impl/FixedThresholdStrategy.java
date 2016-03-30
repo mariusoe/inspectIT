@@ -67,7 +67,6 @@ public class FixedThresholdStrategy extends AbstractAnomalyDetectionStrategy {
 		for (List<Object> data : dataList) {
 			double value = (double) data.get(1);
 			Date date = AnomalyUtils.parseInfluxTimeString(data.get(0).toString());
-			date.setTime(date.getTime() + 3600000); // fix timezone
 
 			if (THRESHOLD < value) {
 				if (detectionResult == null) {

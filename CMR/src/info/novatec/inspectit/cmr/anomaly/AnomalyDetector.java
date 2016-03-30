@@ -1,11 +1,7 @@
 package info.novatec.inspectit.cmr.anomaly;
 
 import info.novatec.inspectit.cmr.anomaly.strategy.AbstractAnomalyDetectionStrategy;
-import info.novatec.inspectit.cmr.tsdb.ITimeSeriesDatabase;
 import info.novatec.inspectit.cmr.util.Converter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,58 +17,29 @@ public class AnomalyDetector {
 	/**
 	 * Logger for the class.
 	 */
-	private final Logger log;
+	private final Logger log = LoggerFactory.getLogger(AnomalyDetector.class);;
 
 	/**
 	 * List consisting of loaded {@link AbstractAnomalyDetectionStrategy}.
 	 */
-	private final List<AbstractAnomalyDetectionStrategy> detectionStrategyList;
+	private final AbstractAnomalyDetectionStrategy[] detectionStrategies;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param log
-	 *            the logger to use
-	 * @param timeSeriesDatabase
-	 *            the time series database to use.
 	 * @param detectionStrategies
 	 *            the implemented detection strategies.
 	 */
-	public AnomalyDetector(Logger log, ITimeSeriesDatabase timeSeriesDatabase, String detectionStrategies) {
-		if (log == null) {
-			log = LoggerFactory.getLogger(getClass());
-		}
-		if (timeSeriesDatabase == null) {
-			throw new IllegalArgumentException("timeSeriesDatabase cannot be NULL.");
-		}
+	@SafeVarargs
+	public AnomalyDetector(AbstractAnomalyDetectionStrategy... detectionStrategies) {
 		if (detectionStrategies == null) {
 			throw new IllegalArgumentException("detectionStrategies cannot be NULL.");
 		}
 
-		this.log = log;
-
-		detectionStrategyList = new ArrayList<>();
-
-		// load detection strategies
-		for (String detectionStrategy : detectionStrategies.split("#")) {
-			try {
-				AbstractAnomalyDetectionStrategy strategy = (AbstractAnomalyDetectionStrategy) Class.forName(detectionStrategy).newInstance();
-				strategy.initialization(timeSeriesDatabase);
-				detectionStrategyList.add(strategy);
-
-			} catch (ClassNotFoundException e) {
-				if (log.isWarnEnabled()) {
-					log.warn(String.format("The detection strategy {} could not be loaded!", detectionStrategy));
-				}
-			} catch (InstantiationException | IllegalAccessException e) {
-				if (log.isWarnEnabled()) {
-					log.error(String.format("The detection strategy {} could not be instantiated!", detectionStrategy));
-				}
-			}
-		}
+		this.detectionStrategies = detectionStrategies;
 
 		log.info("|-Following anomaly detection strategies are registered:");
-		for (AbstractAnomalyDetectionStrategy strategy : detectionStrategyList) {
+		for (AbstractAnomalyDetectionStrategy strategy : detectionStrategies) {
 			log.info("||-" + strategy.getStrategyName() + " (Interval: " + strategy.getExecutionInterval() + " ms)");
 		}
 	}
@@ -90,7 +57,7 @@ public class AnomalyDetector {
 
 		long currentTime = System.currentTimeMillis();
 
-		for (AbstractAnomalyDetectionStrategy strategy : detectionStrategyList) {
+		for (AbstractAnomalyDetectionStrategy strategy : detectionStrategies) {
 			if (log.isDebugEnabled()) {
 				log.debug("Executing detection strategy: {}", strategy.getStrategyName());
 			}

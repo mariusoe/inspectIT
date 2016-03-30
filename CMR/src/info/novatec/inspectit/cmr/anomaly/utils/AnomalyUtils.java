@@ -5,6 +5,7 @@ package info.novatec.inspectit.cmr.anomaly.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.influxdb.dto.Point;
 
@@ -37,6 +38,22 @@ public final class AnomalyUtils {
 		return decayFactor * newDataValue + (1 - decayFactor) * currentAverage;
 	}
 
+	/**
+	 * Calculates the an exponentially weighted moving average based on the given data in a certain
+	 * time span. Basically, the {@link #calculateExponentialMovingAverage(double, double, double)}
+	 * method is used. The decay factor is calculated with the following equation: 1 - e^( -(1000 /
+	 * timeDelta) / timeConstant )
+	 *
+	 * @param timeConstant
+	 *            the time constant to use
+	 * @param deltaTime
+	 *            the time delta to use
+	 * @param currentAverage
+	 *            the current (old) exponential moving average
+	 * @param newDataValue
+	 *            the new data value which will influence the current average
+	 * @return the new exponentially weighted moving average
+	 */
 	public static double calculateExponentialMovingAverage(double timeConstant, double deltaTime, double currentAverage, double newDataValue) {
 		double decayFactor = 1 - Math.exp(-(1000 / deltaTime) / timeConstant);
 		return calculateExponentialMovingAverage(decayFactor, currentAverage, newDataValue);
@@ -57,6 +74,7 @@ public final class AnomalyUtils {
 
 				String[] split = dateString.split("\\.");
 				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+				dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 				Date date = dateFormat.parse(split[0]);
 
 				long millis = Long.parseLong(split[1].substring(0, split[1].length() - 1));
