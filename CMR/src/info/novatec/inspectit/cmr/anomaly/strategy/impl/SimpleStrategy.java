@@ -132,6 +132,17 @@ public class SimpleStrategy extends AbstractAnomalyDetectionStrategy {
 			if (!Double.isNaN(distanceStddev)) {
 				double outDistance = Math.max(Math.abs(distanceCurrentEwma) - 3 * distanceStddev, 0);
 				dataBuilder.addField("outDistance", outDistance);
+
+				if (currentData == 0 || outDistance == 0) {
+					dataBuilder.addField("outDistanceRation", 0);
+				} else {
+					double outDistanceRation = 1 / Math.max(currentData, 0) * Math.abs(outDistance);
+					outDistanceRation = (outDistance - newEwma) / newEwma;
+					if (outDistanceRation < 0) {
+						System.out.println();
+					}
+					dataBuilder.addField("outDistanceRation", outDistanceRation);
+				}
 			}
 
 			DetectionResult detectionResult = DetectionResult.make(Status.UNKNOWN);

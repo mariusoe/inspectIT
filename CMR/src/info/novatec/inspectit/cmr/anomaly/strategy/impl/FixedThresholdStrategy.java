@@ -7,16 +7,14 @@ import info.novatec.inspectit.cmr.anomaly.strategy.AbstractAnomalyDetectionStrat
 import info.novatec.inspectit.cmr.anomaly.strategy.DetectionResult;
 import info.novatec.inspectit.cmr.anomaly.strategy.DetectionResult.Status;
 import info.novatec.inspectit.cmr.anomaly.utils.AnomalyUtils;
+import info.novatec.inspectit.cmr.tsdb.DataPoint;
+import info.novatec.inspectit.cmr.tsdb.TimeSeries;
 
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Point.Builder;
-import org.influxdb.dto.QueryResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Strategy to detect values above a certain threshold.
@@ -32,16 +30,11 @@ public class FixedThresholdStrategy extends AbstractAnomalyDetectionStrategy {
 	private static final double THRESHOLD = 2000;
 
 	/**
-	 * Logger for the class.
-	 */
-	private final Logger log = LoggerFactory.getLogger(FixedThresholdStrategy.class);
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	protected DetectionResult onAnalysis() {
-		QueryResult result;
+		TimeSeries result;
 		if (getLastTime() < 0) {
 			// first call
 			result = queryHelper.query("total_cpu_usage", "cpu_information");
@@ -53,18 +46,7 @@ public class FixedThresholdStrategy extends AbstractAnomalyDetectionStrategy {
 
 		DetectionResult detectionResult = null;
 
-		List<List<Object>> dataList;
-		try {
-			dataList = result.getResults().get(0).getSeries().get(0).getValues();
-		} catch (Exception e) {
-			if (log.isDebugEnabled()) {
-				log.debug("No data found.");
-			}
-
-			return DetectionResult.make(Status.UNKNOWN);
-		}
-
-		for (List<Object> data : dataList) {
+		for (DataPoint data : result.getData()) {
 			double value = (double) data.get(1);
 			Date date = AnomalyUtils.parseInfluxTimeString(data.get(0).toString());
 

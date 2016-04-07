@@ -4,7 +4,6 @@
 package info.novatec.inspectit.cmr.tsdb;
 
 import org.influxdb.dto.Point;
-import org.influxdb.dto.QueryResult;
 
 /**
  * Interface for time series database adapters.
@@ -21,8 +20,7 @@ public interface ITimeSeriesDatabase {
 	 *            the query to execute
 	 * @return the result of the query
 	 */
-	// TODO: replace QueryResult class
-	QueryResult query(String query);
+	TimeSeries query(String query);
 
 	/**
 	 * Queries the database for a single value. Only the first field will be returned!

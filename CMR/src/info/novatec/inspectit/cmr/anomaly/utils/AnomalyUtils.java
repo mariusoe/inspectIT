@@ -55,8 +55,21 @@ public final class AnomalyUtils {
 	 * @return the new exponentially weighted moving average
 	 */
 	public static double calculateExponentialMovingAverage(double timeConstant, double deltaTime, double currentAverage, double newDataValue) {
-		double decayFactor = 1 - Math.exp(-(1000 / deltaTime) / timeConstant);
+		double decayFactor = calculateSmoothingFactor(deltaTime, timeConstant);
 		return calculateExponentialMovingAverage(decayFactor, currentAverage, newDataValue);
+	}
+
+	/**
+	 * Calculates the smoothing factor used by exponential smoothing.
+	 *
+	 * @param timeConstant
+	 *            the time constant to use
+	 * @param deltaTime
+	 *            the time delta to use
+	 * @return the calculated smoothing factor
+	 */
+	public static double calculateSmoothingFactor(double timeConstant, double deltaTime) {
+		return 1 - Math.exp(-(1000 / deltaTime) / timeConstant);
 	}
 
 	/**

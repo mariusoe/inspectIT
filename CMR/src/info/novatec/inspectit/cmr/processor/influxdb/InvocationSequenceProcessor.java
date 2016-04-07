@@ -6,6 +6,7 @@ package info.novatec.inspectit.cmr.processor.influxdb;
 import info.novatec.inspectit.cmr.processor.AbstractCmrDataProcessor;
 import info.novatec.inspectit.cmr.tsdb.InfluxDBService;
 import info.novatec.inspectit.communication.DefaultData;
+import info.novatec.inspectit.communication.data.HttpTimerData;
 import info.novatec.inspectit.communication.data.InvocationSequenceData;
 import info.novatec.inspectit.spring.logger.Log;
 
@@ -14,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManager;
 
 import org.influxdb.dto.Point;
+import org.influxdb.dto.Point.Builder;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -50,9 +52,16 @@ public class InvocationSequenceProcessor extends AbstractCmrDataProcessor {
 	protected void processData(DefaultData defaultData, EntityManager entityManager) {
 		InvocationSequenceData data = (InvocationSequenceData) defaultData;
 
-		Point point = Point.measurement("invocation_sequences").time(data.getTimeStamp().getTime(), TimeUnit.MILLISECONDS).tag("platform_ident", String.valueOf(data.getPlatformIdent()))
-				.field("duration", data.getDuration()).field("child_count", data.getChildCount()).build();
+		Builder builder = Point.measurement("invocation_sequences").time(data.getTimeStamp().getTime(), TimeUnit.MILLISECONDS).tag("platform_ident", String.valueOf(data.getPlatformIdent()))
+				.field("duration", data.getDuration()).field("child_count", data.getChildCount());
 
-		influxDb.insert(point);
+		if (data.getTimerData() != null && data.getTimerData() instanceof HttpTimerData) {
+			String useCase = ((HttpTimerData) data.getTimerData()).getHttpInfo().getInspectItTaggingHeaderValue();
+			if (useCase != null) {
+				builder.tag("useCase", useCase);
+			}
+		}
+
+		influxDb.insert(builder.build());
 	}
 }

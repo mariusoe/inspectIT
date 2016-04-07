@@ -2,6 +2,9 @@ package info.novatec.inspectit.cmr.tsdb;
 
 import info.novatec.inspectit.spring.logger.Log;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.influxdb.InfluxDB;
@@ -9,6 +12,8 @@ import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
+import org.influxdb.dto.QueryResult.Result;
+import org.influxdb.dto.QueryResult.Series;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -108,8 +113,8 @@ public class InfluxDBService implements InitializingBean, ITimeSeriesDatabase {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public QueryResult query(String query) {
-		return influxDB.query(new Query(query, database));
+	public TimeSeries query(String query) {
+		return convertQueryResult(influxDB.query(new Query(query, database)));
 	}
 
 	/**
@@ -117,16 +122,11 @@ public class InfluxDBService implements InitializingBean, ITimeSeriesDatabase {
 	 */
 	@Override
 	public Object queryObject(String query) {
-		QueryResult queryResult = query(query);
-		if (queryResult.hasError()) {
-			log.warn("Query [{}] failed - Error: {}", query, queryResult.getError());
+		TimeSeries series = query(query);
+		if (series == null || !series.hasData()) {
 			return null;
 		} else {
-			try {
-				return queryResult.getResults().get(0).getSeries().get(0).getValues().get(0).get(1);
-			} catch (NullPointerException e) {
-				return null;
-			}
+			return series.getFirst().get(1);
 		}
 	}
 
@@ -180,5 +180,42 @@ public class InfluxDBService implements InitializingBean, ITimeSeriesDatabase {
 	@Override
 	public void disableBatching() {
 		influxDB.disableBatch();
+	}
+
+	/**
+	 * Converts the given InfluxDB's specific {@link QueryResult} into a {@link TimeSeries} object.
+	 *
+	 * @param queryResult
+	 *            object to convert
+	 * @return a {@link TimeSeries} object
+	 */
+	private TimeSeries convertQueryResult(QueryResult queryResult) {
+		if (queryResult.hasError()) {
+			log.warn("Query failed - Error: {}", queryResult.getError());
+			return null;
+		} else {
+			if (queryResult.getResults() != null && !queryResult.getResults().isEmpty()) {
+				Result result = queryResult.getResults().get(0);
+				if (result != null) {
+					if (result.hasError()) {
+						throw new RuntimeException(queryResult.getError());
+					} else {
+						if (result.getSeries() != null && !result.getSeries().isEmpty()) {
+							Series series = result.getSeries().get(0);
+
+							List<DataPoint> dataList = new ArrayList<>();
+
+							for (List<Object> data : series.getValues()) {
+								dataList.add(new DataPoint(data));
+							}
+
+							return new TimeSeries(series.getColumns(), Collections.unmodifiableList(dataList));
+						}
+					}
+				}
+
+			}
+		}
+		return null;
 	}
 }

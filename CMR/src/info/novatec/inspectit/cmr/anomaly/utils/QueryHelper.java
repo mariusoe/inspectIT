@@ -4,6 +4,7 @@
 package info.novatec.inspectit.cmr.anomaly.utils;
 
 import info.novatec.inspectit.cmr.tsdb.ITimeSeriesDatabase;
+import info.novatec.inspectit.cmr.tsdb.TimeSeries;
 
 import java.util.concurrent.TimeUnit;
 
@@ -111,7 +112,7 @@ public class QueryHelper {
 	 *            the measurement of the field
 	 * @return the resulting {@link QueryResult}
 	 */
-	public QueryResult query(String field, String measurement) {
+	public TimeSeries query(String field, String measurement) {
 		return database.query("SELECT " + field + " FROM " + measurement + " WHERE " + timeFilterNow());
 	}
 
@@ -128,7 +129,7 @@ public class QueryHelper {
 	 *            the time unit of the timeSpan
 	 * @return the resulting {@link QueryResult}
 	 */
-	public QueryResult query(String field, String measurement, long timeSpan, TimeUnit timeUnit) {
+	public TimeSeries query(String field, String measurement, long timeSpan, TimeUnit timeUnit) {
 		return database.query("SELECT " + field + " FROM " + measurement + " WHERE " + timeFilter(timeSpan, timeUnit));
 	}
 

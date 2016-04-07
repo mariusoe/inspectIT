@@ -90,7 +90,7 @@ public abstract class AbstractAnomalyDetectionStrategy {
 
 				queryHelper.setCurrentTime(time);
 
-				// execution of the actual strategy logic
+				// --- execution of the actual strategy logic
 				onPreExecution();
 				DetectionResult detectionResult = onAnalysis();
 				onPostExecution(detectionResult);
