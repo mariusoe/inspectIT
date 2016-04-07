@@ -7,7 +7,6 @@ import info.novatec.inspectit.cmr.anomaly.strategy.AbstractAnomalyDetectionStrat
 import info.novatec.inspectit.cmr.anomaly.strategy.DetectionResult;
 import info.novatec.inspectit.cmr.anomaly.strategy.DetectionResult.Status;
 import info.novatec.inspectit.cmr.anomaly.utils.processor.IStatisticProcessor;
-import info.novatec.inspectit.cmr.anomaly.utils.processor.impl.Derivative;
 import info.novatec.inspectit.cmr.anomaly.utils.processor.impl.ExponentialSmoothing;
 
 import java.util.concurrent.TimeUnit;
@@ -19,27 +18,12 @@ import org.influxdb.dto.Point.Builder;
  * @author Marius Oehler
  *
  */
-public class DerivationScoreStrategy extends AbstractAnomalyDetectionStrategy {
+public class ThreeSigmaBreakoutScoreStrategy extends AbstractAnomalyDetectionStrategy {
 
 	/**
 	 * Smoothed raw data.
 	 */
-	private final IStatisticProcessor dataSmoothed = new ExponentialSmoothing(10D);
-
-	/**
-	 * The derivation of the smoothed data.
-	 */
-	private final IStatisticProcessor dataDerivation = new Derivative();
-
-	/**
-	 * Smoothed derivation.
-	 */
-	private final IStatisticProcessor derivativeSmoothed = new ExponentialSmoothing(15D);
-
-	/**
-	 * Smoothed squared derivation.
-	 */
-	private final IStatisticProcessor derivativeSquaredSmoothed = new ExponentialSmoothing(30D);
+	private final IStatisticProcessor dataSmoothed = new ExponentialSmoothing(2D);
 
 	/**
 	 * Specifies whether the analysis is in the first run.
@@ -52,6 +36,7 @@ public class DerivationScoreStrategy extends AbstractAnomalyDetectionStrategy {
 	@Override
 	protected DetectionResult onAnalysis() {
 		double currentData = queryHelper.queryDouble("MEAN(\"total_cpu_usage\")", "cpu_information", 5L, TimeUnit.SECONDS);
+		double maxData = queryHelper.queryDouble("MAX(\"total_cpu_usage\")", "cpu_information", 5L, TimeUnit.SECONDS);
 
 		if (Double.isNaN(currentData)) {
 			return DetectionResult.make(Status.UNKNOWN);
@@ -60,25 +45,15 @@ public class DerivationScoreStrategy extends AbstractAnomalyDetectionStrategy {
 		// builder
 		Builder builder = Point.measurement("anomaly_meta").time(getTime(), TimeUnit.MILLISECONDS);
 
-		// smoothing
-		dataSmoothed.push(getTime(), currentData);
-		builder.addField("dataSmoothed", dataSmoothed.getValue());
-
-		// derivation
-		dataDerivation.push(getTime(), dataSmoothed.getValue());
-		builder.addField("dataDerivation", dataDerivation.getValue());
-
 		if (!first) {
-			double derivativeSmoothedStddev = Math.sqrt(derivativeSquaredSmoothed.getValue() - derivativeSmoothed.getValue() * derivativeSmoothed.getValue());
+			double stddev = queryHelper.queryDouble("STDDEV(\"total_cpu_usage\")", "cpu_information", 5L, TimeUnit.MINUTES);
+			double threshold = 3 * stddev + dataSmoothed.getValue();
 
-			builder.addField("derivativeSmoothed", derivativeSmoothed.getValue());
-			builder.addField("derivativeSmoothedStddev", derivativeSmoothedStddev);
+			builder.addField("stddev", stddev);
 
-			double threshold = 3 * derivativeSmoothedStddev;
-
-			if (dataDerivation.getValue() > threshold) {
+			if (maxData > threshold) {
 				// SCORING
-				double value = Math.abs(dataDerivation.getValue());
+				double value = Math.abs(maxData);
 
 				double relativeChange = (value - threshold) / threshold;
 
@@ -94,9 +69,9 @@ public class DerivationScoreStrategy extends AbstractAnomalyDetectionStrategy {
 			}
 		}
 
-		// smoothed derivative
-		derivativeSmoothed.push(getTime(), dataDerivation.getValue());
-		derivativeSquaredSmoothed.push(getTime(), dataDerivation.getValue() * dataDerivation.getValue());
+		// smoothing
+		dataSmoothed.push(getTime(), currentData);
+		builder.addField("dataSmoothed", dataSmoothed.getValue());
 
 		// finalize
 		timeSeriesDatabase.insert(builder.build());
