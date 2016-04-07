@@ -13,9 +13,6 @@ import info.novatec.inspectit.cmr.tsdb.TimeSeries;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import org.influxdb.dto.Point;
-import org.influxdb.dto.Point.Builder;
-
 /**
  * Strategy to detect values above a certain threshold.
  *
@@ -56,21 +53,13 @@ public class FixedThresholdStrategy extends AbstractAnomalyDetectionStrategy {
 				}
 
 				if (!problemIsActive) {
-					Builder problemBuilder = Point.measurement("anomaly_problems").time(date.getTime(), TimeUnit.MILLISECONDS);
-
-					problemBuilder.tag("type", "fixedThreshold").addField("problem", true);
-
-					timeSeriesDatabase.insert(problemBuilder.build());
+					problemBegins(date.getTime(), "fixedThreshold");
 				}
 
 				problemIsActive = true;
 			} else {
 				if (problemIsActive) {
-					Builder problemBuilder = Point.measurement("anomaly_problems").time(date.getTime(), TimeUnit.MILLISECONDS);
-
-					problemBuilder.tag("type", "fixedThreshold").addField("problem", false);
-
-					timeSeriesDatabase.insert(problemBuilder.build());
+					problemEnds(date.getTime(), "fixedThreshold");
 				}
 
 				problemIsActive = false;

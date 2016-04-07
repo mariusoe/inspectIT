@@ -3,8 +3,11 @@ package info.novatec.inspectit.cmr.anomaly.strategy;
 import info.novatec.inspectit.cmr.anomaly.utils.QueryHelper;
 import info.novatec.inspectit.cmr.tsdb.ITimeSeriesDatabase;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.influxdb.dto.Point;
+import org.influxdb.dto.Point.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,4 +183,21 @@ public abstract class AbstractAnomalyDetectionStrategy {
 		return lastTime;
 	}
 
+	protected void problemBegins(long currentTime, String problemType) {
+		insertProblem(currentTime, problemType, true);
+	}
+
+	protected void problemEnds(long currentTime, String problemType) {
+		insertProblem(currentTime, problemType, false);
+	}
+
+	private void insertProblem(long time, String description, boolean starts) {
+		Builder builder = Point.measurement("anomaly_annotations").time(time, TimeUnit.MILLISECONDS).tag("type", "PROBLEM").tag("description", description).addField("problem", starts);
+		timeSeriesDatabase.insert(builder.build());
+	}
+
+	protected void insertWarning(long time, String description) {
+		Builder builder = Point.measurement("anomaly_annotations").time(time, TimeUnit.MILLISECONDS).tag("type", "WARNING").tag("description", description).addField("warning", true);
+		timeSeriesDatabase.insert(builder.build());
+	}
 }
