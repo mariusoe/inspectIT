@@ -10,6 +10,7 @@ import info.novatec.inspectit.cmr.anomaly.utils.processor.IStatisticProcessor;
 import info.novatec.inspectit.cmr.anomaly.utils.processor.impl.Derivative;
 import info.novatec.inspectit.cmr.anomaly.utils.processor.impl.DoubleExponentialSmoothing;
 import info.novatec.inspectit.cmr.anomaly.utils.processor.impl.ExponentialSmoothing;
+import info.novatec.inspectit.cmr.anomaly.utils.processor.impl.HoltWintersSmoothing;
 import info.novatec.inspectit.cmr.anomaly.utils.processor.impl.MovingAverage;
 
 import java.util.concurrent.TimeUnit;
@@ -39,6 +40,11 @@ public class StatisticsTestStrategy extends AbstractAnomalyDetectionStrategy {
 	private final IStatisticProcessor doubleExponentialSmoothing = new DoubleExponentialSmoothing(5D, 0.2D);
 
 	/**
+	 * An exponential weighted moving average (double exponential smoothing).
+	 */
+	private final IStatisticProcessor holtWintersSmoothing = new HoltWintersSmoothing(5D, 0.2D, 0.2D, 120L, 5L, TimeUnit.SECONDS);
+
+	/**
 	 * The derivative (derivation).
 	 */
 	private final IStatisticProcessor derivative = new Derivative();
@@ -48,7 +54,9 @@ public class StatisticsTestStrategy extends AbstractAnomalyDetectionStrategy {
 	 */
 	@Override
 	protected DetectionResult onAnalysis() {
-		double currentData = queryHelper.queryDouble("MEAN(\"total_cpu_usage\")", "cpu_information", 5L, TimeUnit.SECONDS);
+		((HoltWintersSmoothing) holtWintersSmoothing).setQueryHelper(queryHelper);
+
+		double currentData = queryHelper.queryDouble("MEAN(\"duration\")", "invocation_sequences", 5L, TimeUnit.SECONDS);
 
 		if (Double.isNaN(currentData)) {
 			return DetectionResult.make(Status.UNKNOWN);
@@ -68,6 +76,13 @@ public class StatisticsTestStrategy extends AbstractAnomalyDetectionStrategy {
 		// double exponential smoothing
 		doubleExponentialSmoothing.push(getTime(), currentData);
 		builder.addField("doubleExponentialSmoothing", doubleExponentialSmoothing.getValue());
+
+		// holt-weinters smoothing
+		holtWintersSmoothing.push(getTime(), currentData);
+		builder.addField("holtWintersSmoothing", holtWintersSmoothing.getValue());
+
+		// holt-weinters smoothing
+		builder.addField("season", ((HoltWintersSmoothing) holtWintersSmoothing).getCurrentSeason());
 
 		// derivative
 		derivative.push(getTime(), currentData);

@@ -49,8 +49,16 @@ public class ThreadMetricProcessor extends AbstractCmrDataProcessor {
 		ThreadInformationData data = (ThreadInformationData) defaultData;
 
 		Point point = Point.measurement("thread_information").time(data.getTimeStamp().getTime(), TimeUnit.MILLISECONDS).tag("platform_ident", String.valueOf(data.getPlatformIdent()))
-				.field("thread_count", data.getTotalThreadCount()).field("daemon_thread_count", data.getTotalDaemonThreadCount()).build();
+				.addField("thread_count", data.getTotalThreadCount()).addField("daemon_thread_count", data.getTotalDaemonThreadCount()).build();
 
 		influxDb.insert(point);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected boolean isMonitoringProcessor() {
+		return true;
 	}
 }

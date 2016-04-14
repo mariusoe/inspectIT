@@ -35,8 +35,8 @@ public class ThreeSigmaBreakoutScoreStrategy extends AbstractAnomalyDetectionStr
 	 */
 	@Override
 	protected DetectionResult onAnalysis() {
-		double currentData = queryHelper.queryDouble("MEAN(\"total_cpu_usage\")", "cpu_information", 5L, TimeUnit.SECONDS);
-		double maxData = queryHelper.queryDouble("MAX(\"total_cpu_usage\")", "cpu_information", 5L, TimeUnit.SECONDS);
+		double currentData = queryHelper.queryDouble("MEAN(\"duration\")", "invocation_sequences", 5L, TimeUnit.SECONDS);
+		double maxData = queryHelper.queryDouble("MAX(\"duration\")", "invocation_sequences", 5L, TimeUnit.SECONDS);
 
 		if (Double.isNaN(currentData)) {
 			return DetectionResult.make(Status.UNKNOWN);
@@ -46,7 +46,7 @@ public class ThreeSigmaBreakoutScoreStrategy extends AbstractAnomalyDetectionStr
 		Builder builder = Point.measurement("anomaly_meta").time(getTime(), TimeUnit.MILLISECONDS);
 
 		if (!first) {
-			double stddev = queryHelper.queryDouble("STDDEV(\"total_cpu_usage\")", "cpu_information", 5L, TimeUnit.MINUTES);
+			double stddev = queryHelper.queryDouble("STDDEV(\"duration\")", "invocation_sequences", 5L, TimeUnit.MINUTES);
 			double threshold = 3 * stddev + dataSmoothed.getValue();
 
 			builder.addField("stddev", stddev);

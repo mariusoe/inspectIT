@@ -59,7 +59,7 @@
 		<dependency org="com.mchange" name="mchange-commons-java" rev="0.2.10" conf="prod->default" />
 
 		<!-- InfluxDB -->
-		<dependency org="org.influxdb" name="influxdb-java" rev="2.0" conf="prod->default" transitive="true" />
+		<dependency org="org.influxdb" name="influxdb-java" rev="2.2" conf="prod->default" transitive="true" />
 		<dependency org="com.google.guava" name="guava" rev="18.0" conf="prod->default" />
 		<dependency org="com.google.code.gson" name="gson" rev="2.3.1" conf="prod->default" />
 		<dependency org="com.squareup.retrofit" name="retrofit" rev="1.9.0" conf="prod->default" />

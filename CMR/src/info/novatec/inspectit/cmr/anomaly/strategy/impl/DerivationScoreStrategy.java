@@ -24,7 +24,7 @@ public class DerivationScoreStrategy extends AbstractAnomalyDetectionStrategy {
 	/**
 	 * Smoothed raw data.
 	 */
-	private final IStatisticProcessor dataSmoothed = new ExponentialSmoothing(10D);
+	private final IStatisticProcessor dataSmoothed = new ExponentialSmoothing(1D);
 
 	/**
 	 * The derivation of the smoothed data.
@@ -34,12 +34,12 @@ public class DerivationScoreStrategy extends AbstractAnomalyDetectionStrategy {
 	/**
 	 * Smoothed derivation.
 	 */
-	private final IStatisticProcessor derivativeSmoothed = new ExponentialSmoothing(15D);
+	private final IStatisticProcessor derivativeSmoothed = new ExponentialSmoothing(10D);
 
 	/**
 	 * Smoothed squared derivation.
 	 */
-	private final IStatisticProcessor derivativeSquaredSmoothed = new ExponentialSmoothing(30D);
+	private final IStatisticProcessor derivativeSquaredSmoothed = new ExponentialSmoothing(20D);
 
 	/**
 	 * Specifies whether the analysis is in the first run.
@@ -51,7 +51,7 @@ public class DerivationScoreStrategy extends AbstractAnomalyDetectionStrategy {
 	 */
 	@Override
 	protected DetectionResult onAnalysis() {
-		double currentData = queryHelper.queryDouble("MEAN(\"total_cpu_usage\")", "cpu_information", 5L, TimeUnit.SECONDS);
+		double currentData = queryHelper.queryDouble("MEAN(\"duration\")", "invocation_sequences", 5L, TimeUnit.SECONDS);
 
 		if (Double.isNaN(currentData)) {
 			return DetectionResult.make(Status.UNKNOWN);

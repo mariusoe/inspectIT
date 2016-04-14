@@ -53,7 +53,7 @@ public class InvocationSequenceProcessor extends AbstractCmrDataProcessor {
 		InvocationSequenceData data = (InvocationSequenceData) defaultData;
 
 		Builder builder = Point.measurement("invocation_sequences").time(data.getTimeStamp().getTime(), TimeUnit.MILLISECONDS).tag("platform_ident", String.valueOf(data.getPlatformIdent()))
-				.field("duration", data.getDuration()).field("child_count", data.getChildCount());
+				.addField("duration", data.getDuration()).addField("child_count", data.getChildCount());
 
 		if (data.getTimerData() != null && data.getTimerData() instanceof HttpTimerData) {
 			String useCase = ((HttpTimerData) data.getTimerData()).getHttpInfo().getInspectItTaggingHeaderValue();
@@ -63,5 +63,13 @@ public class InvocationSequenceProcessor extends AbstractCmrDataProcessor {
 		}
 
 		influxDb.insert(builder.build());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected boolean isMonitoringProcessor() {
+		return true;
 	}
 }

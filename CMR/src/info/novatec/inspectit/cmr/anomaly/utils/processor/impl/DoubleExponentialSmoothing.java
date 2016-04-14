@@ -6,11 +6,19 @@ package info.novatec.inspectit.cmr.anomaly.utils.processor.impl;
 import info.novatec.inspectit.cmr.anomaly.utils.AnomalyUtils;
 import info.novatec.inspectit.cmr.anomaly.utils.processor.IStatisticProcessor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Marius Oehler
  *
  */
 public class DoubleExponentialSmoothing implements IStatisticProcessor {
+
+	/**
+	 * Logger for the class.
+	 */
+	private final Logger log = LoggerFactory.getLogger(DoubleExponentialSmoothing.class);
 
 	/**
 	 * The time constant.
@@ -77,6 +85,8 @@ public class DoubleExponentialSmoothing implements IStatisticProcessor {
 
 			lastTime = currentTime;
 		}
+
+		// log.info("st=" + currentValue + "; bt=" + currentTrend);
 
 		pushCount++;
 	}

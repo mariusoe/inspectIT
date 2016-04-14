@@ -99,12 +99,14 @@ public class AnomalyTrigger implements InitializingBean, Runnable {
 		}
 	}
 
+	private boolean test = true;
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void run() {
-		if (true) {
+		if (false) {
 			log.info("<<TEST>> Triggering anomaly detector.");
 
 			if (influxDb.isBatching()) {
@@ -112,14 +114,14 @@ public class AnomalyTrigger implements InitializingBean, Runnable {
 			}
 
 			long time = System.currentTimeMillis() - 3600 * 1000;
-			time -= time % 2500;
+			time -= time % 5000;
 
-			while (time < System.currentTimeMillis()) {
+			while (time < System.currentTimeMillis() - 5000) {
 				anomalyDetector.execute(time);
-				time += 2500;
+				time += 5000;
 			}
 
-			System.exit(0);
+			test = false;
 		} else {
 			if (log.isInfoEnabled()) {
 				log.info("Triggering anomaly detector.");
