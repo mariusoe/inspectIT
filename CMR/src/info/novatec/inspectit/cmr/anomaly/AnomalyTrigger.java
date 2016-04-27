@@ -106,7 +106,7 @@ public class AnomalyTrigger implements InitializingBean, Runnable {
 	 */
 	@Override
 	public void run() {
-		if (false) {
+		if (test) {
 			log.info("<<TEST>> Triggering anomaly detector.");
 
 			if (influxDb.isBatching()) {
@@ -123,8 +123,8 @@ public class AnomalyTrigger implements InitializingBean, Runnable {
 
 			test = false;
 		} else {
-			if (log.isInfoEnabled()) {
-				log.info("Triggering anomaly detector.");
+			if (log.isDebugEnabled()) {
+				log.debug("Triggering anomaly detector.");
 			}
 
 			// try to prevent a crash of the executor service

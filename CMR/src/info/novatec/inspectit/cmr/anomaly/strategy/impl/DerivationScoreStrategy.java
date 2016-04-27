@@ -110,7 +110,7 @@ public class DerivationScoreStrategy extends AbstractAnomalyDetectionStrategy {
 	 */
 	@Override
 	public String getStrategyName() {
-		return "StrategyTwo";
+		return "DerivationScoreStrategy";
 	}
 
 }
