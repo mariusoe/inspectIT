@@ -315,4 +315,28 @@
 			</group-property>
 		</properties>
 	</section>
+	<section name="InfluxDB">
+		<properties>
+			<string-property name="Host" default-value="192.168.56.101" server-restart-required="true" logical-name="influxdb.host" advanced="false"></string-property>
+			<long-property name="Port" default-value="8086" server-restart-required="true" logical-name="influxdb.port" advanced="false" description="The port used for communicating with agents.">
+				<validators>
+					<isPositive />
+				</validators>
+			</long-property>
+			<string-property name="Username" default-value="inspectit" server-restart-required="true" logical-name="influxdb.user" advanced="false"></string-property>
+			<string-property name="Password" default-value="password" server-restart-required="true" logical-name="influxdb.passwd" advanced="false"></string-property>
+			<string-property name="Database" default-value="inspectit" server-restart-required="true" logical-name="influxdb.database" advanced="false"></string-property>
+			<string-property name="RetentionPolicy" default-value="default" server-restart-required="true" logical-name="influxdb.retentionPolicy" advanced="true"></string-property>
+		</properties>
+	</section>
+	<section name="AnomalyDetection">
+		<properties>
+			<long-property name="AnalyzeRate" default-value="2500" server-restart-required="true" logical-name="anomaly.analyzeRate" advanced="false" description="The rate of the execution of the anomaly detector.">
+				<validators>
+					<isPositive />
+				</validators>
+			</long-property>
+			<string-property name="DetectionStrategies" default-value="rocks.inspectit.server.anomaly.strategy.impl.DerivationScoreStrategy" server-restart-required="true" logical-name="anomaly.detectionStrategies" advanced="true"></string-property>
+		</properties>
+	</section>
 </cmr-configuration>
