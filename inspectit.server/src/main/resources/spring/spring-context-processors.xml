@@ -4,6 +4,15 @@
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
+	<!-- InfluxDB -->
+	<!-- <bean id="cpuMetricProcessor" class="rocks.inspectit.server.processor.impl.tsdb.CpuMetricProcessor" />
+	<bean id="memoryMetricProcessor" class="rocks.inspectit.server.processor.impl.tsdb.MemoryMetricProcessor" />
+	<bean id="exceptionProcessor" class="rocks.inspectit.server.processor.impl.tsdb.ExceptionProcessor" />
+	<bean id="threadMetricProcessor" class="rocks.inspectit.server.processor.impl.tsdb.ThreadMetricProcessor" />
+	<bean id="invocationSequenceProcessor" class="rocks.inspectit.server.processor.impl.tsdb.InvocationSequenceProcessor" />-->
+	
+	<bean id="anomalyPipeProcessor" class="rocks.inspectit.server.processor.impl.AnomalyPipeProcessor" />
+
 	<bean id="cacheIdGeneratorCmrProcessor" class="rocks.inspectit.server.processor.impl.CacheIdGeneratorCmrProcessor" />
 	<bean id="bufferInserterCmrProcessor" class="rocks.inspectit.server.processor.impl.BufferInserterCmrProcessor" />
 	<bean id="exceptionMessageCmrProcessor" class="rocks.inspectit.server.processor.impl.ExceptionMessageCmrProcessor" />
@@ -46,6 +55,7 @@
 		<ref bean="sqlExclusiveTimeCmrProcessor" />
 		<ref bean="timerDataChartingCmrProcessor" />
 		<ref bean="invocationModifierCmrProcessor" />
+		<ref bean="anomalyPipeProcessor" />
 		<ref bean="recorderCmrProcessor" /> <!-- Must be last when all are processed -->
 	</util:list>
 	
