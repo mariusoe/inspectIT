@@ -315,4 +315,108 @@
 			</group-property>
 		</properties>
 	</section>
+	
+	<section name="Monitoring">
+		<properties>
+		
+			<group-property name="Anomaly Detection">
+				<properties>
+					<boolean-property name="Execute Anomaly Detection" default-value="false" server-restart-required="true" logical-name="anomaly.isActive" advanced="false" description="If the anomaly detection should be executed."></boolean-property>
+					
+					<string-property name="Warm-Up Duration [s]" default-value="600" server-restart-required="true" logical-name="anomaly.settings.warmupDuration" advanced="false"></string-property>
+					
+					<string-property name="Anomaly Threshold" default-value="0.5" server-restart-required="false" logical-name="anomaly.settings.alerting.threshold" advanced="false"></string-property>
+					<long-property name="Min. Anomaly Duration [s]" default-value="30" server-restart-required="false" logical-name="anomaly.settings.alerting.minDuration" advanced="false"></long-property>
+					
+					<string-property name="Season Length [h]" default-value="24" server-restart-required="true" logical-name="anomaly.settings.forecast.seasonalDuration" advanced="false"></string-property>
+					
+					<string-property name="Score Threshold" default-value="0.25" server-restart-required="false" logical-name="anomaly.settings.scoreThreshold" advanced="true"></string-property>
+					<long-property name="Error-Rate Window Size [s]" default-value="10" server-restart-required="true" logical-name="anomaly.settings.errorRateWindowSize" advanced="true"></long-property>
+					
+					<long-property name="Confidence Band Update Interval [s]" default-value="5" server-restart-required="true" logical-name="anomaly.settings.confidenceBandUpdateInterval" advanced="true"></long-property>
+					
+					<string-property name="Forecast Smoothing Factor" default-value="0.1" server-restart-required="false" logical-name="anomaly.settings.forecast.smoothingFactor" advanced="true"></string-property>
+					<string-property name="Forecast Trend Smoothing Factor" default-value="0.1" server-restart-required="false" logical-name="anomaly.settings.forecast.trendSmoothingFactor" advanced="true"></string-property>
+					
+				</properties>
+				<group-validators>
+				</group-validators>
+			</group-property>
+		
+			<group-property name="InfluxDB">
+				<properties>
+					<string-property name="Host" default-value="192.168.56.101" server-restart-required="true" logical-name="influxdb.host" advanced="false"></string-property>
+					<long-property name="Port" default-value="8086" server-restart-required="true" logical-name="influxdb.port" advanced="false" description="The port used for communicating with agents.">
+						<validators>
+							<isPositive />
+						</validators>
+					</long-property>
+					<string-property name="Username" default-value="inspectit" server-restart-required="true" logical-name="influxdb.user" advanced="false"></string-property>
+					<string-property name="Password" default-value="password" server-restart-required="true" logical-name="influxdb.passwd" advanced="false"></string-property>
+					<string-property name="Database" default-value="inspectit" server-restart-required="true" logical-name="influxdb.database" advanced="false"></string-property>
+					<string-property name="RetentionPolicy" default-value="default" server-restart-required="true" logical-name="influxdb.retentionPolicy" advanced="true"></string-property>
+				</properties>
+				<group-validators>
+				</group-validators>
+			</group-property>
+			
+			<group-property name="Grafana Dashboard Injection">
+				<properties>
+					<boolean-property name="Dashboard Injection" default-value="false" server-restart-required="false" logical-name="anomaly.grafana.injection" advanced="false"></boolean-property>
+				
+					<string-property name="Grafana Server URL" default-value="http://127.0.0.1:3000" server-restart-required="false" logical-name="anomaly.grafana.serverUrl" advanced="false"></string-property>
+					<string-property name="Grafana Username" default-value="admin" server-restart-required="false" logical-name="anomaly.grafana.username" advanced="false"></string-property>
+					<string-property name="Grafana Password" default-value="admin" server-restart-required="false" logical-name="anomaly.grafana.password" advanced="false"></string-property>
+				</properties>
+				<group-validators>
+				</group-validators>
+			</group-property>
+			
+		</properties>
+	</section>
+	
+	<section name="Alerting">
+		<properties>
+		
+			<long-property name="Notification Interval [ms]" default-value="60000" server-restart-required="false" logical-name="anomaly.settings.alerting.notificationInterval" advanced="false"></long-property>
+			
+			<group-property name="Gitter">
+				<properties>
+					<boolean-property name="Enabled" default-value="false" server-restart-required="false" logical-name="anomaly.alerting.gitter.enabled" advanced="false" description="Using Gitter as alerting channel."></boolean-property>
+				
+					<string-property name="OAuth Key" default-value="" server-restart-required="true" logical-name="anomaly.alerting.gitter.oauthKey" advanced="false"></string-property>
+					<string-property name="OAuth Secret" default-value="" server-restart-required="true" logical-name="anomaly.alerting.gitter.oauthSecret" advanced="false"></string-property>
+					<string-property name="OAuth Redirect URL" default-value="" server-restart-required="true" logical-name="anomaly.alerting.gitter.oauthRedirectUrl" advanced="false"></string-property>
+					<string-property name="OAuth Code" default-value="" server-restart-required="true" logical-name="anomaly.alerting.gitter.oauthCode" advanced="false"></string-property>
+					<string-property name="Room URI" default-value="" server-restart-required="false" logical-name="anomaly.alerting.gitter.roomUri" advanced="false"></string-property>
+				</properties>
+				<group-validators>
+				</group-validators>
+			</group-property>
+			
+			<group-property name="eMail">
+				<properties>
+					<boolean-property name="Enabled" default-value="false" server-restart-required="false" logical-name="anomaly.alerting.email.enabled" advanced="false"></boolean-property>
+					
+					<boolean-property name="Test eMail" default-value="false" server-restart-required="false" logical-name="anomaly.alerting.email.testMail" advanced="false" description="Send a test eMail at startup."></boolean-property>
+				
+					<string-property name="SMTP Server" default-value="" server-restart-required="false" logical-name="anomaly.alerting.email.smtpHost" advanced="false"></string-property>
+					<long-property name="SMTP Port" default-value="465" server-restart-required="false" logical-name="anomaly.alerting.email.smtpPort" advanced="false">
+						<validators>
+							<isPositive />
+						</validators>
+					</long-property>
+					<boolean-property name="Use SSL" default-value="true" server-restart-required="false" logical-name="anomaly.alerting.email.useTSL" advanced="false"></boolean-property>
+					<string-property name="Username" default-value="" server-restart-required="false" logical-name="anomaly.alerting.email.username" advanced="false"></string-property>
+					<string-property name="Passwort" default-value="" server-restart-required="false" logical-name="anomaly.alerting.email.password" advanced="false"></string-property>
+					<string-property name="eMail-Address From" default-value="" server-restart-required="false" logical-name="anomaly.alerting.email.emailFrom" advanced="false" description="This eMail address is used to send the alert-email."></string-property>
+					<string-property name="eMail-Address Target" default-value="" server-restart-required="false" logical-name="anomaly.alerting.email.emailTo" advanced="false" description="This eMail address receives alert eMails."></string-property>
+				</properties>
+				<group-validators>
+				</group-validators>
+			</group-property>
+			
+		</properties>
+	</section>
+	
 </cmr-configuration>

@@ -1,0 +1,11 @@
+{
+    "name": "inspectit-influx",
+    "type": "influxdb",
+    "access": "direct",
+    "url": "http://localhost:8086",
+    "password": "inspectit",
+    "user": "inspectit",
+    "database": "inspectit",
+    "basicAuth": false,
+    "basicAuthUser": ""
+  }
