@@ -19,7 +19,7 @@ public class AnomalyDetector {
 	/**
 	 * Logger for the class.
 	 */
-	private final Logger log = LoggerFactory.getLogger(AnomalyDetector.class);;
+	private final Logger log = LoggerFactory.getLogger(AnomalyDetector.class);
 
 	/**
 	 * Collection consisting of loaded {@link AbstractAnomalyDetectionStrategy}.
