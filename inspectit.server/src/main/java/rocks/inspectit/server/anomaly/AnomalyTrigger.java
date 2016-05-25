@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.strategy.AbstractAnomalyDetectionStrategy;
 import rocks.inspectit.server.tsdb.InfluxDBService;
@@ -28,7 +27,7 @@ import rocks.inspectit.shared.all.spring.logger.Log;
  * @author Marius Oehler
  *
  */
-@Component
+// @Component
 public class AnomalyTrigger implements InitializingBean, Runnable {
 
 	/**

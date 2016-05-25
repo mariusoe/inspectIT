@@ -10,6 +10,8 @@
 	<bean id="exceptionProcessor" class="rocks.inspectit.server.processor.impl.tsdb.ExceptionProcessor" />
 	<bean id="threadMetricProcessor" class="rocks.inspectit.server.processor.impl.tsdb.ThreadMetricProcessor" />
 	<bean id="invocationSequenceProcessor" class="rocks.inspectit.server.processor.impl.tsdb.InvocationSequenceProcessor" />
+	
+	<bean id="anomalyPipeProcessor" class="rocks.inspectit.server.processor.impl.AnomalyPipeProcessor" />
 
 	<bean id="cacheIdGeneratorCmrProcessor" class="rocks.inspectit.server.processor.impl.CacheIdGeneratorCmrProcessor" />
 	<bean id="bufferInserterCmrProcessor" class="rocks.inspectit.server.processor.impl.BufferInserterCmrProcessor" />
