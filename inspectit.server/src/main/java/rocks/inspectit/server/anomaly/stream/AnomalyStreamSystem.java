@@ -13,10 +13,12 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import rocks.inspectit.server.anomaly.stream.comp.IResultProcessor;
-import rocks.inspectit.server.anomaly.stream.comp.IStreamProcessor;
+import rocks.inspectit.server.anomaly.stream.comp.AbstractResultProcessor;
+import rocks.inspectit.server.anomaly.stream.comp.AbstractStreamProcessor;
 import rocks.inspectit.server.anomaly.stream.comp.impl.BaselineStreamProcessor;
-import rocks.inspectit.server.anomaly.stream.comp.impl.ResultProcessor;
+import rocks.inspectit.server.anomaly.stream.comp.impl.ErrorRateCalculator;
+import rocks.inspectit.server.anomaly.stream.comp.impl.TSDBWriter;
+import rocks.inspectit.server.tsdb.InfluxDBService;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 import rocks.inspectit.shared.all.spring.logger.Log;
 
@@ -40,15 +42,18 @@ public class AnomalyStreamSystem implements InitializingBean {
 	@Resource(name = "scheduledExecutorService")
 	ScheduledExecutorService executorService;
 
-	/**
-	 *
-	 */
-	private IStreamProcessor<InvocationSequenceData> streamProcessor;
+	@Autowired
+	InfluxDBService influx;
 
 	/**
 	 *
 	 */
-	private IResultProcessor<InvocationSequenceData> resultProcessor;
+	private AbstractStreamProcessor<InvocationSequenceData> streamProcessor;
+
+	/**
+	 *
+	 */
+	private AbstractResultProcessor<InvocationSequenceData> resultProcessor;
 
 	/**
 	 * {@inheritDoc}
@@ -56,15 +61,17 @@ public class AnomalyStreamSystem implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
-		resultProcessor = new ResultProcessor();
-		streamProcessor = new BaselineStreamProcessor(10000, resultProcessor, executorService);
+		resultProcessor = new TSDBWriter(influx);
+		resultProcessor.setNextProcessor(new ErrorRateCalculator(influx));
+
+		streamProcessor = new BaselineStreamProcessor(influx, 10000, resultProcessor, executorService);
 
 		if (log.isInfoEnabled()) {
 			log.info("|-AnomalyStreamSystem initialized...");
 		}
 	}
 
-	public IStreamProcessor<InvocationSequenceData> getStream() {
+	public AbstractStreamProcessor<InvocationSequenceData> getStream() {
 		return streamProcessor;
 	}
 }

@@ -14,7 +14,8 @@ import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.SwapCache;
 import rocks.inspectit.server.anomaly.stream.SwapCache.InternalData;
 import rocks.inspectit.server.anomaly.stream.comp.AbstractResultProcessor;
-import rocks.inspectit.server.anomaly.stream.comp.AbstractStreamProcessor;
+import rocks.inspectit.server.anomaly.stream.comp.ForkStreamProcessor;
+import rocks.inspectit.server.anomaly.stream.comp.IStreamProcessor;
 import rocks.inspectit.server.anomaly.utils.AnomalyUtils;
 import rocks.inspectit.server.tsdb.InfluxDBService;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
@@ -23,12 +24,12 @@ import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
  * @author Marius Oehler
  *
  */
-public class BaselineStreamProcessor extends AbstractStreamProcessor<InvocationSequenceData> {
+public class BaselineStreamProcessor2 extends ForkStreamProcessor<InvocationSequenceData> {
 
 	/**
 	 * Logger for the class.
 	 */
-	private final Logger log = LoggerFactory.getLogger(BaselineStreamProcessor.class);
+	private final Logger log = LoggerFactory.getLogger(BaselineStreamProcessor2.class);
 
 	private final SwapCache swapCache;
 
@@ -46,11 +47,18 @@ public class BaselineStreamProcessor extends AbstractStreamProcessor<InvocationS
 	private final AbstractResultProcessor<InvocationSequenceData> resultProcessor;
 
 	/**
+	 *
+	 */
+	public BaselineStreamProcessor2(IStreamProcessor<InvocationSequenceData> nextProcessorA, IStreamProcessor<InvocationSequenceData> nextProcessorB) {
+		super(nextProcessorA, nextProcessorB);
+	}
+
+	/**
 	 * @param influx
 	 * @param executorService
 	 *
 	 */
-	public BaselineStreamProcessor(InfluxDBService influx, int cacheSize, AbstractResultProcessor<InvocationSequenceData> resultProcessor, ScheduledExecutorService executorService) {
+	public BaselineStreamProcessor2(InfluxDBService influx, int cacheSize, AbstractResultProcessor<InvocationSequenceData> resultProcessor, ScheduledExecutorService executorService) {
 		this.influx = influx;
 		this.resultProcessor = resultProcessor;
 		swapCache = new SwapCache(cacheSize);
