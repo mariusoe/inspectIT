@@ -7,8 +7,18 @@ package rocks.inspectit.server.anomaly.stream.comp;
  * @author Marius Oehler
  *
  */
-public interface IStreamProcessor<I> {
+public abstract class IStreamProcessor<I> {
 
-	void process(I item);
+	/**
+	 *
+	 */
+	public IStreamProcessor(IStreamProcessor<I> nextProcessorA, IStreamProcessor<I> nextProcessorB) {
+	}
+
+	public void process(I item) {
+		processImpl(item);
+	}
+
+	public abstract boolean processImpl(I item);
 
 }
