@@ -6,11 +6,9 @@ package rocks.inspectit.server.anomaly.stream.comp.impl;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.influxdb.dto.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.SwapCache;
 import rocks.inspectit.server.anomaly.stream.SwapCache.InternalData;
 import rocks.inspectit.server.anomaly.stream.comp.AbstractResultProcessor;
@@ -67,13 +65,13 @@ public class BaselineStreamProcessor extends AbstractStreamProcessor<InvocationS
 		// store duration
 		swapCache.push(item.getDuration());
 
-		if (item.getDuration() > SharedStreamProperties.getThreeSigmaThreshold()) {
-
-			resultProcessor.problem(item);
-
-		} else {
-			resultProcessor.okay(item);
-		}
+		// if (item.getDuration() > SharedStreamProperties.getThreeSigmaThreshold()) {
+		//
+		// resultProcessor.problem(item);
+		//
+		// } else {
+		// resultProcessor.okay(item);
+		// }
 	}
 
 	/**
@@ -140,12 +138,15 @@ public class BaselineStreamProcessor extends AbstractStreamProcessor<InvocationS
 
 				stddev = Math.sqrt(movingAverageSquared - movingAverage * movingAverage);
 
-				SharedStreamProperties.setThreeSigmaThreshold(movingAverage + 3 * stddev);
+				// SharedStreamProperties.setThreeSigmaThreshold(movingAverage + 3 * stddev);
 
 				// System.out.println(movingAverage);
 
-				influx.insert(Point.measurement("status").addField("threshold", SharedStreamProperties.getThreeSigmaThreshold()).addField("movingAverage", movingAverage)
-						.addField("movingAverageSquared", movingAverageSquared).addField("stddev", stddev).build());
+				// influx.insert(Point.measurement("status").addField("threshold",
+				// SharedStreamProperties.getThreeSigmaThreshold()).addField("movingAverage",
+				// movingAverage)
+				// .addField("movingAverageSquared", movingAverageSquared).addField("stddev",
+				// stddev).build());
 			} else {
 				if (log.isDebugEnabled()) {
 					log.debug("no data to calculate new baseline");

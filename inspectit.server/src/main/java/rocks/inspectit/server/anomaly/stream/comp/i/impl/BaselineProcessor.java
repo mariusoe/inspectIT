@@ -1,7 +1,7 @@
 /**
  *
  */
-package rocks.inspectit.server.anomaly.stream.comp.impl;
+package rocks.inspectit.server.anomaly.stream.comp.i.impl;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -13,23 +13,21 @@ import org.slf4j.LoggerFactory;
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.SwapCache;
 import rocks.inspectit.server.anomaly.stream.SwapCache.InternalData;
-import rocks.inspectit.server.anomaly.stream.comp.AbstractResultProcessor;
-import rocks.inspectit.server.anomaly.stream.comp.ForkStreamProcessor;
-import rocks.inspectit.server.anomaly.stream.comp.IStreamProcessor;
+import rocks.inspectit.server.anomaly.stream.comp.i.AbstractSingleStream;
+import rocks.inspectit.server.anomaly.stream.comp.i.ISingleInputStream;
 import rocks.inspectit.server.anomaly.utils.AnomalyUtils;
-import rocks.inspectit.server.tsdb.InfluxDBService;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 
 /**
  * @author Marius Oehler
  *
  */
-public class BaselineStreamProcessor2 extends ForkStreamProcessor<InvocationSequenceData> {
+public class BaselineProcessor extends AbstractSingleStream<InvocationSequenceData, InvocationSequenceData> {
 
 	/**
 	 * Logger for the class.
 	 */
-	private final Logger log = LoggerFactory.getLogger(BaselineStreamProcessor2.class);
+	private final Logger log = LoggerFactory.getLogger(BaselineProcessor.class);
 
 	private final SwapCache swapCache;
 
@@ -39,31 +37,15 @@ public class BaselineStreamProcessor2 extends ForkStreamProcessor<InvocationSequ
 
 	private final BaselineUpdater baselineUpdater;
 
-	private final InfluxDBService influx;
-
-	/**
-	 * The result processor.
-	 */
-	private final AbstractResultProcessor<InvocationSequenceData> resultProcessor;
-
 	/**
 	 *
 	 */
-	public BaselineStreamProcessor2(IStreamProcessor<InvocationSequenceData> nextProcessorA, IStreamProcessor<InvocationSequenceData> nextProcessorB) {
-		super(nextProcessorA, nextProcessorB);
-	}
-
-	/**
-	 * @param influx
-	 * @param executorService
-	 *
-	 */
-	public BaselineStreamProcessor2(InfluxDBService influx, int cacheSize, AbstractResultProcessor<InvocationSequenceData> resultProcessor, ScheduledExecutorService executorService) {
-		this.influx = influx;
-		this.resultProcessor = resultProcessor;
-		swapCache = new SwapCache(cacheSize);
+	public BaselineProcessor(ISingleInputStream<InvocationSequenceData> nextStream, int cacheSize, ScheduledExecutorService executorService) {
+		super(nextStream);
 
 		baselineUpdater = new BaselineUpdater();
+		swapCache = new SwapCache(cacheSize);
+
 		executorService.scheduleAtFixedRate(baselineUpdater, 5000, 5000, TimeUnit.MILLISECONDS);
 	}
 
@@ -71,17 +53,11 @@ public class BaselineStreamProcessor2 extends ForkStreamProcessor<InvocationSequ
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void processImpl(InvocationSequenceData item) {
+	public void process(InvocationSequenceData item) {
 		// store duration
 		swapCache.push(item.getDuration());
 
-		if (item.getDuration() > SharedStreamProperties.getThreeSigmaThreshold()) {
-
-			resultProcessor.problem(item);
-
-		} else {
-			resultProcessor.okay(item);
-		}
+		next(item);
 	}
 
 	/**
@@ -148,12 +124,16 @@ public class BaselineStreamProcessor2 extends ForkStreamProcessor<InvocationSequ
 
 				stddev = Math.sqrt(movingAverageSquared - movingAverage * movingAverage);
 
-				SharedStreamProperties.setThreeSigmaThreshold(movingAverage + 3 * stddev);
+				SharedStreamProperties.setUpperThreeSigmaThreshold(movingAverage + 3 * stddev);
+				SharedStreamProperties.setLowerThreeSigmaThreshold(movingAverage - 3 * stddev);
+				SharedStreamProperties.setStddev(stddev);
 
 				// System.out.println(movingAverage);
 
-				influx.insert(Point.measurement("status").addField("threshold", SharedStreamProperties.getThreeSigmaThreshold()).addField("movingAverage", movingAverage)
-						.addField("movingAverageSquared", movingAverageSquared).addField("stddev", stddev).build());
+				SharedStreamProperties.getInfluxService()
+						.insert(Point.measurement("status").addField("threshold_upper", SharedStreamProperties.getUpperThreeSigmaThreshold())
+								.addField("threshold_lower", SharedStreamProperties.getLowerThreeSigmaThreshold()).addField("movingAverage", movingAverage)
+								.addField("movingAverageSquared", movingAverageSquared).addField("stddev", stddev).build());
 			} else {
 				if (log.isDebugEnabled()) {
 					log.debug("no data to calculate new baseline");
