@@ -17,9 +17,30 @@ public class SharedStreamProperties {
 
 	private static double stddev = 0;
 
+	private static boolean baselineAvailable = false;
+
 	private static InfluxDBService influxService;
 
 	private SharedStreamProperties() {
+	}
+
+	/**
+	 * Gets {@link #baselineAvailable}.
+	 *
+	 * @return {@link #baselineAvailable}
+	 */
+	public static boolean isBaselineAvailable() {
+		return baselineAvailable;
+	}
+
+	/**
+	 * Sets {@link #baselineAvailable}.
+	 *
+	 * @param baselineAvailable
+	 *            New value for {@link #baselineAvailable}
+	 */
+	public static void setBaselineAvailable(boolean baselineAvailable) {
+		SharedStreamProperties.baselineAvailable = baselineAvailable;
 	}
 
 	/**

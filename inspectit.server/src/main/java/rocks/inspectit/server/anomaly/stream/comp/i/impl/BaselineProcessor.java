@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.SwapCache;
 import rocks.inspectit.server.anomaly.stream.SwapCache.InternalData;
-import rocks.inspectit.server.anomaly.stream.comp.i.AbstractSingleStream;
-import rocks.inspectit.server.anomaly.stream.comp.i.ISingleInputStream;
+import rocks.inspectit.server.anomaly.stream.comp.i.AbstractDualStream;
+import rocks.inspectit.server.anomaly.stream.comp.i.IDoubleInputStream;
 import rocks.inspectit.server.anomaly.utils.AnomalyUtils;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 
@@ -22,7 +22,7 @@ import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
  * @author Marius Oehler
  *
  */
-public class BaselineProcessor extends AbstractSingleStream<InvocationSequenceData, InvocationSequenceData> {
+public class BaselineProcessor extends AbstractDualStream<InvocationSequenceData, InvocationSequenceData> {
 
 	/**
 	 * Logger for the class.
@@ -31,8 +31,8 @@ public class BaselineProcessor extends AbstractSingleStream<InvocationSequenceDa
 
 	private final SwapCache swapCache;
 
-	private double movingAverage = 0;
-	private double movingAverageSquared = 0;
+	private double movingAverage = Double.NaN;
+	private double movingAverageSquared = Double.NaN;
 	private double stddev = 0;
 
 	private final BaselineUpdater baselineUpdater;
@@ -40,7 +40,7 @@ public class BaselineProcessor extends AbstractSingleStream<InvocationSequenceDa
 	/**
 	 *
 	 */
-	public BaselineProcessor(ISingleInputStream<InvocationSequenceData> nextStream, int cacheSize, ScheduledExecutorService executorService) {
+	public BaselineProcessor(IDoubleInputStream<InvocationSequenceData> nextStream, int cacheSize, ScheduledExecutorService executorService) {
 		super(nextStream);
 
 		baselineUpdater = new BaselineUpdater();
@@ -53,11 +53,19 @@ public class BaselineProcessor extends AbstractSingleStream<InvocationSequenceDa
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void process(InvocationSequenceData item) {
+	public void processA(InvocationSequenceData item) {
 		// store duration
 		swapCache.push(item.getDuration());
 
-		next(item);
+		nextA(item);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void processB(InvocationSequenceData item) {
+		nextB(item);
 	}
 
 	/**
@@ -127,6 +135,7 @@ public class BaselineProcessor extends AbstractSingleStream<InvocationSequenceDa
 				SharedStreamProperties.setUpperThreeSigmaThreshold(movingAverage + 3 * stddev);
 				SharedStreamProperties.setLowerThreeSigmaThreshold(movingAverage - 3 * stddev);
 				SharedStreamProperties.setStddev(stddev);
+				SharedStreamProperties.setBaselineAvailable(true);
 
 				// System.out.println(movingAverage);
 
