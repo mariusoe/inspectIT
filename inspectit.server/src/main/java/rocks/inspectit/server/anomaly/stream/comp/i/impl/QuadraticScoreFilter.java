@@ -29,6 +29,11 @@ public class QuadraticScoreFilter extends AbstractForkStream<InvocationSequenceD
 	 */
 	@Override
 	public void process(InvocationSequenceData item) {
+		if (!SharedStreamProperties.isBaselineAvailable()) {
+			nextA(item);
+			return;
+		}
+
 		double upperThreshold = SharedStreamProperties.getUpperThreeSigmaThreshold();
 		double lowerThreshold = SharedStreamProperties.getLowerThreeSigmaThreshold();
 
@@ -40,9 +45,9 @@ public class QuadraticScoreFilter extends AbstractForkStream<InvocationSequenceD
 		if (SharedStreamProperties.getStddev() != 0) {
 			double percentageError;
 			if (item.getDuration() > upperThreshold) {
-				percentageError = (item.getDuration() - upperThreshold) / SharedStreamProperties.getStddev();
+				percentageError = (item.getDuration() - upperThreshold) / upperThreshold;
 			} else {
-				percentageError = (item.getDuration() - lowerThreshold) / SharedStreamProperties.getStddev();
+				percentageError = (item.getDuration() - lowerThreshold) / lowerThreshold;
 			}
 
 			double score = percentageError * percentageError;
@@ -54,6 +59,8 @@ public class QuadraticScoreFilter extends AbstractForkStream<InvocationSequenceD
 			} else {
 				nextB(item);
 			}
+		} else {
+			nextA(item);
 		}
 	}
 

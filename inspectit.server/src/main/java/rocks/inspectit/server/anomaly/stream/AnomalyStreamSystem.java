@@ -61,9 +61,11 @@ public class AnomalyStreamSystem implements InitializingBean {
 
 		TimeSeriesDatabaseWriter tsdbWriter = new TimeSeriesDatabaseWriter(errorRateCalculator);
 
-		QuadraticScoreFilter scoreFilter = new QuadraticScoreFilter(tsdbWriter);
+		BaselineProcessor processor = new BaselineProcessor(tsdbWriter, 10000, executorService);
 
-		streamProcessor = new BaselineProcessor(scoreFilter, 10000, executorService);
+		QuadraticScoreFilter scoreFilter = new QuadraticScoreFilter(processor);
+
+		streamProcessor = scoreFilter;
 
 		// resultProcessor = new TSDBWriter(influx);
 		// resultProcessor.setNextProcessor(new ErrorRateCalculator(influx));
