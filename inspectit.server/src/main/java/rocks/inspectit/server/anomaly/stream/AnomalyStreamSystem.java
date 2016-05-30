@@ -14,18 +14,15 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 
-import rocks.inspectit.server.anomaly.stream.comp.i.ISingleInputStream;
-import rocks.inspectit.server.anomaly.stream.comp.i.impl.BaselineProcessor;
-import rocks.inspectit.server.anomaly.stream.comp.i.impl.ErrorRateCalculator;
-import rocks.inspectit.server.anomaly.stream.comp.i.impl.QuadraticScoreFilter;
-import rocks.inspectit.server.anomaly.stream.comp.i.impl.TimeSeriesDatabaseWriter;
-import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEvent;
+import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.ItemRateComponent;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventFactory;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventHandler;
-import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventProducer;
+import rocks.inspectit.server.anomaly.stream.disruptor.events.InvocationSequenceEvent;
+import rocks.inspectit.server.anomaly.stream.sink.IDataSink;
+import rocks.inspectit.server.anomaly.stream.sink.InvocationSequenceSink;
 import rocks.inspectit.server.tsdb.InfluxDBService;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 import rocks.inspectit.shared.all.spring.logger.Log;
@@ -56,9 +53,27 @@ public class AnomalyStreamSystem implements InitializingBean {
 	/**
 	 *
 	 */
-	private ISingleInputStream<InvocationSequenceData> streamProcessor;
+	private IDataSink<InvocationSequenceData> invocationSequenceSink;
 
-	private InvocationSequenceEventProducer producer;
+	private Disruptor<InvocationSequenceEvent> disruptor;
+
+	private final int BUFFER_SIZE = 1024;
+
+	private ISingleInputComponent<InvocationSequenceData> streamEntryComponent;
+
+	private void initDisruptor() {
+		InvocationSequenceEventFactory eventFactory = new InvocationSequenceEventFactory();
+
+		disruptor = new Disruptor<>(eventFactory, BUFFER_SIZE, Executors.defaultThreadFactory());
+
+		InvocationSequenceEventHandler eventHandler = new InvocationSequenceEventHandler(streamEntryComponent);
+		disruptor.handleEventsWith(eventHandler);
+
+		// Start the Disruptor, starts all threads running
+		disruptor.start();
+
+		invocationSequenceSink = new InvocationSequenceSink(disruptor.getRingBuffer());
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -67,37 +82,21 @@ public class AnomalyStreamSystem implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		SharedStreamProperties.setInfluxService(influx);
 
-		ErrorRateCalculator errorRateCalculator = new ErrorRateCalculator(null);
+		// ErrorRateCalculator errorRateCalculator = new ErrorRateCalculator(null);
+		//
+		// TimeSeriesDatabaseWriter tsdbWriter = new TimeSeriesDatabaseWriter(errorRateCalculator);
+		//
+		// BaselineProcessor processor = new BaselineProcessor(tsdbWriter, 10000, executorService);
+		//
+		// QuadraticScoreFilter scoreFilter = new QuadraticScoreFilter(processor);
+		//
+		// streamProcessor = scoreFilter;
 
-		TimeSeriesDatabaseWriter tsdbWriter = new TimeSeriesDatabaseWriter(errorRateCalculator);
-
-		BaselineProcessor processor = new BaselineProcessor(tsdbWriter, 10000, executorService);
-
-		QuadraticScoreFilter scoreFilter = new QuadraticScoreFilter(processor);
-
-		streamProcessor = scoreFilter;
+		streamEntryComponent = new ItemRateComponent(null);
 
 		// #################
 
-		InvocationSequenceEventFactory eventFactory = new InvocationSequenceEventFactory();
-
-		// Specify the size of the ring buffer, must be power of 2.
-		int bufferSize = 1024;
-
-		// Construct the Disruptor
-		Disruptor<InvocationSequenceEvent> disruptor = new Disruptor<>(eventFactory, bufferSize, Executors.defaultThreadFactory());
-
-		InvocationSequenceEventHandler eventHandler = new InvocationSequenceEventHandler();
-
-		disruptor.handleEventsWith(eventHandler);
-
-		// Start the Disruptor, starts all threads running
-		disruptor.start();
-
-		// Get the ring buffer from the Disruptor to be used for publishing.
-		RingBuffer<InvocationSequenceEvent> ringBuffer = disruptor.getRingBuffer();
-
-		producer = new InvocationSequenceEventProducer(ringBuffer);
+		initDisruptor();
 
 		// resultProcessor = new TSDBWriter(influx);
 		// resultProcessor.setNextProcessor(new ErrorRateCalculator(influx));
@@ -111,10 +110,6 @@ public class AnomalyStreamSystem implements InitializingBean {
 	}
 
 	public void process(InvocationSequenceData data) {
-		producer.onData(data);
-	}
-
-	public ISingleInputStream<InvocationSequenceData> getStream() {
-		return streamProcessor;
+		invocationSequenceSink.process(data);
 	}
 }
