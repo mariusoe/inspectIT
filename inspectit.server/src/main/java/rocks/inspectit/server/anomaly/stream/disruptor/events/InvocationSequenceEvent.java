@@ -1,7 +1,7 @@
 /**
  *
  */
-package rocks.inspectit.server.anomaly.stream.disruptor;
+package rocks.inspectit.server.anomaly.stream.disruptor.events;
 
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 

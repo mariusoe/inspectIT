@@ -63,7 +63,7 @@ public class SimulatorClient extends Thread {
 
 				os.writeObject(data);
 
-				Thread.sleep(250);
+				// Thread.sleep(250);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

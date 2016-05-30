@@ -11,6 +11,10 @@ import rocks.inspectit.server.tsdb.InfluxDBService;
  */
 public class SharedStreamProperties {
 
+	private static double confidenceBandUpper = Double.NaN;
+
+	private static double confidenceBandLower = Double.NaN;
+
 	private static double upperThreeSigmaThreshold = 0;
 
 	private static double lowerThreeSigmaThreshold = 0;
@@ -50,6 +54,44 @@ public class SharedStreamProperties {
 	 */
 	public static double getUpperThreeSigmaThreshold() {
 		return upperThreeSigmaThreshold;
+	}
+
+	/**
+	 * Gets {@link #confidenceBandUpper}.
+	 * 
+	 * @return {@link #confidenceBandUpper}
+	 */
+	public static double getConfidenceBandUpper() {
+		return confidenceBandUpper;
+	}
+
+	/**
+	 * Sets {@link #confidenceBandUpper}.
+	 * 
+	 * @param confidenceBandUpper
+	 *            New value for {@link #confidenceBandUpper}
+	 */
+	public static void setConfidenceBandUpper(double confidenceBandUpper) {
+		SharedStreamProperties.confidenceBandUpper = confidenceBandUpper;
+	}
+
+	/**
+	 * Gets {@link #confidenceBandLower}.
+	 * 
+	 * @return {@link #confidenceBandLower}
+	 */
+	public static double getConfidenceBandLower() {
+		return confidenceBandLower;
+	}
+
+	/**
+	 * Sets {@link #confidenceBandLower}.
+	 * 
+	 * @param confidenceBandLower
+	 *            New value for {@link #confidenceBandLower}
+	 */
+	public static void setConfidenceBandLower(double confidenceBandLower) {
+		SharedStreamProperties.confidenceBandLower = confidenceBandLower;
 	}
 
 	/**
