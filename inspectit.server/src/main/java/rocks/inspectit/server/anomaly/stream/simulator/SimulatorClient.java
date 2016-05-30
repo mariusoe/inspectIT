@@ -19,7 +19,9 @@ public class SimulatorClient extends Thread {
 	double errorRate = 0.01D;
 
 	/**
-	 * @param args @throws Exception @throws
+	 * @param args
+	 * @throws Exception
+	 * 			@throws
 	 */
 	public static void main(String[] args) throws Exception {
 		System.out.println("- Start SimulatorClient -");

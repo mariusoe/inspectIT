@@ -76,7 +76,7 @@ public class StreamSimulationInterface implements InitializingBean, Runnable {
 					while (true) {
 						Object object = ois.readObject();
 
-						streamSystem.getStream().process((InvocationSequenceData) object);
+						streamSystem.process((InvocationSequenceData) object);
 					}
 				} catch (Exception e) {
 					if (log.isInfoEnabled()) {
