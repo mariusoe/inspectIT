@@ -193,7 +193,8 @@ dependencies {
 		'com.google.guava:guava:18.0',
 		'com.squareup.retrofit:retrofit:1.9.0',
 		'com.squareup.okhttp:okhttp:2.4.0',
-		'com.squareup.okio:okio:1.4.0'
+		'com.squareup.okio:okio:1.4.0',
+		'com.lmax:disruptor:3.3.4'
 	)
 		
 	serverTest (
