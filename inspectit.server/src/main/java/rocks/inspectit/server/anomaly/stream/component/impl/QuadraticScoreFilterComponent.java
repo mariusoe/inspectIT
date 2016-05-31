@@ -3,10 +3,15 @@
  */
 package rocks.inspectit.server.anomaly.stream.component.impl;
 
+import org.influxdb.dto.Point;
+
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.component.AbstractForkStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
+import rocks.inspectit.server.anomaly.stream.component.IDoubleInputComponent;
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
+import rocks.inspectit.server.anomaly.stream.transfer.ITransferFunction;
+import rocks.inspectit.server.anomaly.stream.transfer.TransferFunction;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 
 /**
@@ -15,46 +20,7 @@ import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
  */
 public class QuadraticScoreFilterComponent extends AbstractForkStreamComponent<InvocationSequenceData> {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	// @Override
-	// public void process(InvocationSequenceData item) {
-	// if (Double.isNaN(SharedStreamProperties.getConfidenceBandLower()) ||
-	// Double.isNaN(SharedStreamProperties.getConfidenceBandUpper())) {
-	// return;
-	// }
-	//
-	// double upperThreshold = SharedStreamProperties.getUpperThreeSigmaThreshold();
-	// double lowerThreshold = SharedStreamProperties.getLowerThreeSigmaThreshold();
-	//
-	// if (item.getDuration() > lowerThreshold && item.getDuration() < upperThreshold) {
-	// nextA(item);
-	// return;
-	// }
-	//
-	// if (SharedStreamProperties.getStddev() != 0) {
-	// double percentageError;
-	// if (item.getDuration() > upperThreshold) {
-	// percentageError = (item.getDuration() - upperThreshold) / upperThreshold;
-	// } else {
-	// percentageError = (item.getDuration() - lowerThreshold) / lowerThreshold;
-	// }
-	//
-	// double score = percentageError * percentageError;
-	//
-	// SharedStreamProperties.getInfluxService().insert(Point.measurement("status").addField("pScore",
-	// score).build());
-	//
-	// if (score < 0.3D) {
-	// nextA(item);
-	// } else {
-	// nextB(item);
-	// }
-	// } else {
-	// nextA(item);
-	// }
-	// }
+	private final ITransferFunction transferFunction = TransferFunction.QUADRATIC;
 
 	/**
 	 * @param nextComponentOne
@@ -62,6 +28,13 @@ public class QuadraticScoreFilterComponent extends AbstractForkStreamComponent<I
 	 */
 	public QuadraticScoreFilterComponent(ISingleInputComponent<InvocationSequenceData> nextComponentOne, ISingleInputComponent<InvocationSequenceData> nextComponentTwo) {
 		super(nextComponentOne, nextComponentTwo);
+	}
+
+	/**
+	 * @param nextComponent
+	 */
+	public QuadraticScoreFilterComponent(IDoubleInputComponent<InvocationSequenceData> nextComponent) {
+		super(nextComponent);
 	}
 
 	/**
@@ -77,7 +50,27 @@ public class QuadraticScoreFilterComponent extends AbstractForkStreamComponent<I
 			return EFlowControl.CONTINUE_ONE;
 		}
 
-		return null;
+		if (!Double.isNaN(SharedStreamProperties.getStandardDeviation())) {
+			double percentageError;
+			if (item.getDuration() > SharedStreamProperties.getConfidenceBandUpper()) {
+				percentageError = (item.getDuration() - SharedStreamProperties.getConfidenceBandUpper()) / SharedStreamProperties.getConfidenceBandUpper();
+			} else {
+				percentageError = (item.getDuration() - SharedStreamProperties.getConfidenceBandLower()) / SharedStreamProperties.getConfidenceBandLower();
+			}
+
+			double score = transferFunction.transfer(percentageError);
+
+			SharedStreamProperties.getInfluxService().insert(Point.measurement("status").addField("pScore", score).build());
+
+			if (score < 0.3D) {
+				return EFlowControl.CONTINUE_ONE;
+			} else {
+				return EFlowControl.CONTINUE_TWO;
+			}
+		} else {
+			return EFlowControl.CONTINUE_ONE;
+		}
+
 	}
 
 }

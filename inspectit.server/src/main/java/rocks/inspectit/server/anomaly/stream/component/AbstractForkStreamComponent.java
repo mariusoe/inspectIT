@@ -13,12 +13,24 @@ public abstract class AbstractForkStreamComponent<I> implements ISingleInputComp
 
 	private final ISingleInputComponent<I> nextComponentTwo;
 
+	private final IDoubleInputComponent<I> nextComponent;
+
+	/**
+	 * @param nextComponent
+	 */
+	public AbstractForkStreamComponent(IDoubleInputComponent<I> nextComponent) {
+		this.nextComponent = nextComponent;
+		nextComponentOne = null;
+		nextComponentTwo = null;
+	}
+
 	/**
 	 * @param nextComponent
 	 */
 	public AbstractForkStreamComponent(ISingleInputComponent<I> nextComponentOne, ISingleInputComponent<I> nextComponentTwo) {
 		this.nextComponentOne = nextComponentOne;
 		this.nextComponentTwo = nextComponentTwo;
+		nextComponent = null;
 	}
 
 	/**
@@ -28,10 +40,18 @@ public abstract class AbstractForkStreamComponent<I> implements ISingleInputComp
 	public void process(I item) {
 		EFlowControl flowControl = processImpl(item);
 
-		if (flowControl == EFlowControl.CONTINUE_ONE && nextComponentOne != null) {
-			nextComponentOne.process(item);
-		} else if (flowControl == EFlowControl.CONTINUE_TWO && nextComponentTwo != null) {
-			nextComponentTwo.process(item);
+		if (nextComponent != null) {
+			if (flowControl == EFlowControl.CONTINUE_ONE) {
+				nextComponent.processOne(item);
+			} else if (flowControl == EFlowControl.CONTINUE_TWO) {
+				nextComponent.processTwo(item);
+			}
+		} else {
+			if (flowControl == EFlowControl.CONTINUE_ONE && nextComponentOne != null) {
+				nextComponentOne.process(item);
+			} else if (flowControl == EFlowControl.CONTINUE_TWO && nextComponentTwo != null) {
+				nextComponentTwo.process(item);
+			}
 		}
 	}
 

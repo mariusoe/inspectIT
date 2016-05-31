@@ -20,8 +20,7 @@ public class SimulatorClient extends Thread {
 
 	/**
 	 * @param args
-	 * @throws Exception
-	 * 			@throws
+	 * 			@throws Exception @throws
 	 */
 	public static void main(String[] args) throws Exception {
 		System.out.println("- Start SimulatorClient -");
@@ -42,28 +41,35 @@ public class SimulatorClient extends Thread {
 		}
 	}
 
+	long counter = 0;
+
+	double waveLength = 30000;
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void run() {
+
 		try {
 			Socket socket = new Socket("127.0.0.1", 5000);
 
 			ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
 
 			while (true) {
+				double sin = Math.sin(2 * Math.PI / (waveLength) * counter++);
+
 				InvocationSequenceData data = new InvocationSequenceData();
-				data.setDuration(50D + Math.random() * 20);
+				data.setDuration(50D + 20 * sin + Math.random() * 50);
 				data.setChildCount(1);
 
 				if (Math.random() < errorRate) {
-					data.setDuration(100 + Math.random() * 100);
+					data.setDuration(100 + 20 * sin + Math.random() * 100);
 				}
 
 				os.writeObject(data);
 
-				// Thread.sleep(250);
+				Thread.sleep(10);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
