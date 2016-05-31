@@ -35,7 +35,7 @@ public abstract class AbstractJoinStreamComponent<I> implements IDoubleInputComp
 	 */
 	@Override
 	public void processTwo(I item) {
-		EFlowControl flowControl = processOneTwo(item);
+		EFlowControl flowControl = processTwoImpl(item);
 
 		if (flowControl != EFlowControl.BREAK && nextComponent != null) {
 			nextComponent.process(item);
@@ -44,5 +44,5 @@ public abstract class AbstractJoinStreamComponent<I> implements IDoubleInputComp
 
 	protected abstract EFlowControl processOneImpl(I item);
 
-	protected abstract EFlowControl processOneTwo(I item);
+	protected abstract EFlowControl processTwoImpl(I item);
 }

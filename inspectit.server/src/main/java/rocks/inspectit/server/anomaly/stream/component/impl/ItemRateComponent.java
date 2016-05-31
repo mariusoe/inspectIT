@@ -22,11 +22,14 @@ public class ItemRateComponent extends AbstractSingleStreamComponent<InvocationS
 
 	private final long interval = 5000L;
 
+	private final String prefix;
+
 	/**
 	 * @param nextComponent
 	 */
-	public ItemRateComponent(ISingleInputComponent<InvocationSequenceData> nextComponent) {
+	public ItemRateComponent(ISingleInputComponent<InvocationSequenceData> nextComponent, String prefix) {
 		super(nextComponent);
+		this.prefix = prefix;
 
 		Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this, interval, interval, TimeUnit.MILLISECONDS);
 	}
@@ -49,7 +52,7 @@ public class ItemRateComponent extends AbstractSingleStreamComponent<InvocationS
 		double rate = counter.get() / (interval / 1000D);
 		counter.set(0);
 
-		System.out.println(rate + " items/second");
+		System.out.println(prefix + ": " + rate + " items/second");
 	}
 
 }

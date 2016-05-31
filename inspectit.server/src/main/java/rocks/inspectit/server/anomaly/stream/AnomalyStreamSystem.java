@@ -17,7 +17,11 @@ import org.springframework.stereotype.Component;
 import com.lmax.disruptor.dsl.Disruptor;
 
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.ConfidenceBandComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.ItemRateComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.PercentageRateComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.QuadraticScoreFilterComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.TSDBWriterComponent;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventFactory;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventHandler;
 import rocks.inspectit.server.anomaly.stream.disruptor.events.InvocationSequenceEvent;
@@ -91,8 +95,16 @@ public class AnomalyStreamSystem implements InitializingBean {
 		// QuadraticScoreFilter scoreFilter = new QuadraticScoreFilter(processor);
 		//
 		// streamProcessor = scoreFilter;
+		TSDBWriterComponent problemWriterComponent = new TSDBWriterComponent(null, "problem");
+		TSDBWriterComponent normalWriterComponent = new TSDBWriterComponent(null, "normal");
 
-		streamEntryComponent = new ItemRateComponent(null);
+		ConfidenceBandComponent confidenceBandComponent = new ConfidenceBandComponent(normalWriterComponent, 10000, executorService);
+
+		PercentageRateComponent pErrorRateComponent = new PercentageRateComponent(confidenceBandComponent, problemWriterComponent, executorService);
+
+		QuadraticScoreFilterComponent scoreFilterComponent = new QuadraticScoreFilterComponent(pErrorRateComponent);
+
+		streamEntryComponent = new ItemRateComponent(scoreFilterComponent, "total throughput");
 
 		// #################
 
