@@ -37,6 +37,24 @@ public abstract class AbstractForkStreamComponent<I> implements ISingleInputComp
 	 * {@inheritDoc}
 	 */
 	@Override
+	public void print(String prefix, boolean isTail) {
+		System.out.println(prefix + (isTail ? "└── " : "├── ") + getClass().getSimpleName());
+		if (nextComponent == null) {
+			if (nextComponentOne != null) {
+				nextComponentOne.print(prefix + (isTail ? "    " : "│   "), false);
+			}
+			if (nextComponentTwo != null) {
+				nextComponentTwo.print(prefix + (isTail ? "    " : "│   "), true);
+			}
+		} else {
+			nextComponent.print(prefix + (isTail ? "    " : "│   "), true, true);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void process(I item) {
 		EFlowControl flowControl = processImpl(item);
 

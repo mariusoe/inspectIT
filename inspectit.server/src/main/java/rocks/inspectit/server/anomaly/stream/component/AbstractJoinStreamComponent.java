@@ -22,6 +22,18 @@ public abstract class AbstractJoinStreamComponent<I> implements IDoubleInputComp
 	 * {@inheritDoc}
 	 */
 	@Override
+	public void print(String prefix, boolean isTail, boolean doubleInput) {
+		String line = doubleInput ? "==" : "──";
+		System.out.println(prefix + (isTail ? "└" + line + " " : "├" + line + " ") + getClass().getSimpleName());
+		if (nextComponent != null) {
+			nextComponent.print(prefix + (isTail ? "    " : "│   "), true);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void processOne(I item) {
 		EFlowControl flowControl = processOneImpl(item);
 

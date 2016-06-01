@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import com.lmax.disruptor.dsl.Disruptor;
 
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
-import rocks.inspectit.server.anomaly.stream.component.impl.ConfidenceBandComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.InvocationSequenceFilterComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.ItemRateComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.PercentageRateComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.QuadraticScoreFilterComponent;
@@ -87,40 +87,28 @@ public class AnomalyStreamSystem implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		SharedStreamProperties.setInfluxService(influx);
 
-		// ErrorRateCalculator errorRateCalculator = new ErrorRateCalculator(null);
-		//
-		// TimeSeriesDatabaseWriter tsdbWriter = new TimeSeriesDatabaseWriter(errorRateCalculator);
-		//
-		// BaselineProcessor processor = new BaselineProcessor(tsdbWriter, 10000, executorService);
-		//
-		// QuadraticScoreFilter scoreFilter = new QuadraticScoreFilter(processor);
-		//
-		// streamProcessor = scoreFilter;
+		// # # # # # # # # # # # # # # # # # # # # #
+		// # init stream
 		TSDBWriterComponent problemWriterComponent = new TSDBWriterComponent(null, "problem");
 		TSDBWriterComponent normalWriterComponent = new TSDBWriterComponent(null, "normal");
 
-		ConfidenceBandComponent confidenceBandComponent = new ConfidenceBandComponent(normalWriterComponent, 10000, executorService);
-
-		RHoltWintersComponent wintersComponent = new RHoltWintersComponent(confidenceBandComponent, executorService);
+		RHoltWintersComponent wintersComponent = new RHoltWintersComponent(normalWriterComponent, executorService);
 
 		PercentageRateComponent pErrorRateComponent = new PercentageRateComponent(wintersComponent, problemWriterComponent, executorService);
 
 		QuadraticScoreFilterComponent scoreFilterComponent = new QuadraticScoreFilterComponent(pErrorRateComponent);
 
-		streamEntryComponent = new ItemRateComponent(scoreFilterComponent, "total throughput");
+		ItemRateComponent rateComponent = new ItemRateComponent(scoreFilterComponent, "total throughput");
 
-		// #################
+		streamEntryComponent = new InvocationSequenceFilterComponent(rateComponent);
+		// #
+		// # # # # # # # # # # # # # # # # # # # # #
 
 		initDisruptor();
 
-		// resultProcessor = new TSDBWriter(influx);
-		// resultProcessor.setNextProcessor(new ErrorRateCalculator(influx));
-		//
-		// streamProcessor = new BaselineStreamProcessor(influx, 10000, resultProcessor,
-		// executorService);
-
 		if (log.isInfoEnabled()) {
 			log.info("|-AnomalyStreamSystem initialized...");
+			streamEntryComponent.print("| ", true);
 		}
 	}
 

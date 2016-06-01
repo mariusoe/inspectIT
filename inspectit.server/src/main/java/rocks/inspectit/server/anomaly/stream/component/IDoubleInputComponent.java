@@ -13,4 +13,5 @@ public interface IDoubleInputComponent<I> extends IStreamComponent<I> {
 
 	void processTwo(I item);
 
+	void print(String prefix, boolean isTail, boolean doubleInput);
 }

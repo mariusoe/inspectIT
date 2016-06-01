@@ -10,4 +10,6 @@ package rocks.inspectit.server.anomaly.stream.component;
 public interface ISingleInputComponent<I> extends IStreamComponent<I> {
 
 	void process(I item);
+
+	void print(String prefix, boolean isTail);
 }
