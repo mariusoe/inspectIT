@@ -40,4 +40,23 @@ public final class StatisticUtils {
 
 		return sum / dataList.size();
 	}
+
+	public static double mean(double[] data) {
+		return mean(data, data.length);
+	}
+
+	public static double mean(double[] data, int elements) {
+		if (elements <= 0 || elements > data.length) {
+			return Double.NaN;
+		}
+
+		double mean = 0D;
+
+		for (int i = 0; i < elements; i++) {
+			mean += data[i];
+		}
+
+		return mean / elements;
+	}
+
 }

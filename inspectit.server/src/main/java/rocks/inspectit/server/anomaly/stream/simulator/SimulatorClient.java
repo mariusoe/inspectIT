@@ -67,6 +67,7 @@ public class SimulatorClient extends Thread {
 					data.setDuration(100 + 20 * sin + Math.random() * 100);
 				}
 
+				// System.out.print((int) data.getDuration() + ",");
 				os.writeObject(data);
 
 				Thread.sleep(10);
