@@ -5,7 +5,9 @@ package rocks.inspectit.server.anomaly.utils;
 
 import java.awt.Point;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.TimeZone;
 
 /**
@@ -105,4 +107,13 @@ public final class AnomalyUtils {
 		}
 	}
 
+	public static double[] toDoubleArray(Collection<Double> collection) {
+		double[] returnArray = new double[collection.size()];
+		int index = 0;
+		Iterator<Double> iterator = collection.iterator();
+		while (iterator.hasNext()) {
+			returnArray[index++] = iterator.next().doubleValue();
+		}
+		return returnArray;
+	}
 }

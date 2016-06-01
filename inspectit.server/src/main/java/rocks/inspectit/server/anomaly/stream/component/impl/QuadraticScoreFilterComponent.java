@@ -5,6 +5,7 @@ package rocks.inspectit.server.anomaly.stream.component.impl;
 
 import org.influxdb.dto.Point;
 
+import rocks.inspectit.server.anomaly.stream.ConfidenceBand;
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.component.AbstractForkStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
@@ -42,34 +43,55 @@ public class QuadraticScoreFilterComponent extends AbstractForkStreamComponent<I
 	 */
 	@Override
 	protected EFlowControl processImpl(InvocationSequenceData item) {
-		if (Double.isNaN(SharedStreamProperties.getConfidenceBandLower()) || Double.isNaN(SharedStreamProperties.getConfidenceBandUpper())) {
+		ConfidenceBand confidenceBand = SharedStreamProperties.getConfidenceBand();
+		if (confidenceBand == null) {
 			return EFlowControl.CONTINUE_ONE;
 		}
 
-		if (item.getDuration() > SharedStreamProperties.getConfidenceBandLower() && item.getDuration() < SharedStreamProperties.getConfidenceBandUpper()) {
+		if (confidenceBand.isInside(item.getDuration())) {
 			return EFlowControl.CONTINUE_ONE;
 		}
 
-		if (!Double.isNaN(SharedStreamProperties.getStandardDeviation())) {
-			double percentageError;
-			if (item.getDuration() > SharedStreamProperties.getConfidenceBandUpper()) {
-				percentageError = (item.getDuration() - SharedStreamProperties.getConfidenceBandUpper()) / SharedStreamProperties.getConfidenceBandUpper();
-			} else {
-				percentageError = (item.getDuration() - SharedStreamProperties.getConfidenceBandLower()) / SharedStreamProperties.getConfidenceBandLower();
-			}
+		double confidenceSize = SharedStreamProperties.getConfidenceBand().getWidth() / 2;
+		if (confidenceSize <= 0) {
+			return EFlowControl.CONTINUE_ONE;
+		}
 
-			double score = transferFunction.transfer(percentageError);
+		double percentageError = confidenceBand.distanceToBand(item.getDuration()) / confidenceSize;
 
-			SharedStreamProperties.getInfluxService().insert(Point.measurement("status").addField("pScore", score).build());
+		double score = transferFunction.transfer(percentageError);
 
-			if (score < 0.3D) {
-				return EFlowControl.CONTINUE_ONE;
-			} else {
-				return EFlowControl.CONTINUE_TWO;
-			}
+		SharedStreamProperties.getInfluxService().insert(Point.measurement("status").addField("pScore", score).build());
+
+		if (score < .3D) {
+			return EFlowControl.CONTINUE_ONE;
 		} else {
-			return EFlowControl.CONTINUE_ONE;
+			return EFlowControl.CONTINUE_TWO;
 		}
+
+		// if (!Double.isNaN(SharedStreamProperties.getStandardDeviation())) {
+		// double percentageError;
+		// if (item.getDuration() > SharedStreamProperties.getConfidenceBandUpper()) {
+		// percentageError = (item.getDuration() - SharedStreamProperties.getConfidenceBandUpper())
+		// / SharedStreamProperties.getConfidenceBandUpper();
+		// } else {
+		// percentageError = (item.getDuration() - SharedStreamProperties.getConfidenceBandLower())
+		// / SharedStreamProperties.getConfidenceBandLower();
+		// }
+		//
+		// double score = transferFunction.transfer(percentageError);
+		//
+		// SharedStreamProperties.getInfluxService().insert(Point.measurement("status").addField("pScore",
+		// score).build());
+		//
+		// if (score < 0.3D) {
+		// return EFlowControl.CONTINUE_ONE;
+		// } else {
+		// return EFlowControl.CONTINUE_TWO;
+		// }
+		// } else {
+		// return EFlowControl.CONTINUE_ONE;
+		// }
 
 	}
 

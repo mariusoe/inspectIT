@@ -21,6 +21,7 @@ import rocks.inspectit.server.anomaly.stream.component.impl.ConfidenceBandCompon
 import rocks.inspectit.server.anomaly.stream.component.impl.ItemRateComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.PercentageRateComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.QuadraticScoreFilterComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.RHoltWintersComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.TSDBWriterComponent;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventFactory;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventHandler;
@@ -100,7 +101,9 @@ public class AnomalyStreamSystem implements InitializingBean {
 
 		ConfidenceBandComponent confidenceBandComponent = new ConfidenceBandComponent(normalWriterComponent, 10000, executorService);
 
-		PercentageRateComponent pErrorRateComponent = new PercentageRateComponent(confidenceBandComponent, problemWriterComponent, executorService);
+		RHoltWintersComponent wintersComponent = new RHoltWintersComponent(confidenceBandComponent, executorService);
+
+		PercentageRateComponent pErrorRateComponent = new PercentageRateComponent(wintersComponent, problemWriterComponent, executorService);
 
 		QuadraticScoreFilterComponent scoreFilterComponent = new QuadraticScoreFilterComponent(pErrorRateComponent);
 

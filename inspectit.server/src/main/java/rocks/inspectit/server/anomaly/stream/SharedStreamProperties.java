@@ -19,6 +19,27 @@ public class SharedStreamProperties {
 
 	private static InfluxDBService influxService;
 
+	private static ConfidenceBand confidenceBand;
+
+	/**
+	 * Gets {@link #confidenceBand}.
+	 *
+	 * @return {@link #confidenceBand}
+	 */
+	public static ConfidenceBand getConfidenceBand() {
+		return confidenceBand;
+	}
+
+	/**
+	 * Sets {@link #confidenceBand}.
+	 *
+	 * @param confidenceBand
+	 *            New value for {@link #confidenceBand}
+	 */
+	public static void setConfidenceBand(ConfidenceBand confidenceBand) {
+		SharedStreamProperties.confidenceBand = confidenceBand;
+	}
+
 	private SharedStreamProperties() {
 	}
 
@@ -81,7 +102,7 @@ public class SharedStreamProperties {
 
 	/**
 	 * Gets {@link #standardDeviation}.
-	 * 
+	 *
 	 * @return {@link #standardDeviation}
 	 */
 	public static double getStandardDeviation() {
@@ -90,7 +111,7 @@ public class SharedStreamProperties {
 
 	/**
 	 * Sets {@link #standardDeviation}.
-	 * 
+	 *
 	 * @param standardDeviation
 	 *            New value for {@link #standardDeviation}
 	 */
