@@ -60,7 +60,7 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 		swapCache = new SwapCache(10000);
 		historyQueue = new LinkedList<Double>();
 		residualHistory = new LinkedList<ResidualContainer>();
-		historyLimit = 720; // = 3600s at 5sec interval
+		historyLimit = 60; // 720=1h | 60=5m
 
 		// connect to R
 		rConnection = new RConnection("localhost");
@@ -131,24 +131,26 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 
 		long start = System.currentTimeMillis();
 		double nextMean = forecastMean();
-		System.out.println("duration: " + (System.currentTimeMillis() - start) + "ms");
+		if (!Double.isNaN(nextMean)) {
+			System.out.println("duration: " + (System.currentTimeMillis() - start) + "ms");
 
-		double stdDeviation = calculateStandardDeviation();
+			double stdDeviation = calculateStandardDeviation();
 
-		double lowerConfidenceLevel = nextMean - 3 * stdDeviation;
-		double upperConfidenceLevel = nextMean + 3 * stdDeviation;
+			double lowerConfidenceLevel = nextMean - 3 * stdDeviation;
+			double upperConfidenceLevel = nextMean + 3 * stdDeviation;
 
-		// store result in shared properties
-		ConfidenceBand confidenceBand = new ConfidenceBand(nextMean, upperConfidenceLevel, lowerConfidenceLevel);
-		SharedStreamProperties.setConfidenceBand(confidenceBand);
+			// store result in shared properties
+			ConfidenceBand confidenceBand = new ConfidenceBand(nextMean, upperConfidenceLevel, lowerConfidenceLevel);
+			SharedStreamProperties.setConfidenceBand(confidenceBand);
 
-		// build influx point
-		Builder builder = Point.measurement("R");
-		builder.addField("mean", nextMean);
-		builder.addField("lowerConfidenceLevel", lowerConfidenceLevel);
-		builder.addField("upperConfidenceLevel", upperConfidenceLevel);
+			// build influx point
+			Builder builder = Point.measurement("R");
+			builder.addField("mean", nextMean);
+			builder.addField("lowerConfidenceLevel", lowerConfidenceLevel);
+			builder.addField("upperConfidenceLevel", upperConfidenceLevel);
 
-		SharedStreamProperties.getInfluxService().insert(builder.build());
+			SharedStreamProperties.getInfluxService().insert(builder.build());
+		}
 	}
 
 	/**
@@ -172,7 +174,7 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 	 *
 	 */
 	private double forecastMean() {
-		if (historyQueue.isEmpty()) {
+		if (historyQueue.size() <= 5) {
 			return Double.NaN;
 		}
 
@@ -180,8 +182,6 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 			// load data into R
 			double[] dataArray = AnomalyUtils.toDoubleArray(historyQueue);
 			rConnection.assign("data", dataArray);
-			// rConnection.eval("data <- c(data, newData)");
-			// System.out.println("size in r: " + rConnection.eval("length(data)").asInteger());
 
 			// forecast
 			REXP result = rConnection.eval("try(fcast <- holt(data, h=1, level=c(95,99.7)), silent=TRUE)");

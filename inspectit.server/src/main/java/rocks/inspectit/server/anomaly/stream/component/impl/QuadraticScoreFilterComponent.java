@@ -68,31 +68,6 @@ public class QuadraticScoreFilterComponent extends AbstractForkStreamComponent<I
 		} else {
 			return EFlowControl.CONTINUE_TWO;
 		}
-
-		// if (!Double.isNaN(SharedStreamProperties.getStandardDeviation())) {
-		// double percentageError;
-		// if (item.getDuration() > SharedStreamProperties.getConfidenceBandUpper()) {
-		// percentageError = (item.getDuration() - SharedStreamProperties.getConfidenceBandUpper())
-		// / SharedStreamProperties.getConfidenceBandUpper();
-		// } else {
-		// percentageError = (item.getDuration() - SharedStreamProperties.getConfidenceBandLower())
-		// / SharedStreamProperties.getConfidenceBandLower();
-		// }
-		//
-		// double score = transferFunction.transfer(percentageError);
-		//
-		// SharedStreamProperties.getInfluxService().insert(Point.measurement("status").addField("pScore",
-		// score).build());
-		//
-		// if (score < 0.3D) {
-		// return EFlowControl.CONTINUE_ONE;
-		// } else {
-		// return EFlowControl.CONTINUE_TWO;
-		// }
-		// } else {
-		// return EFlowControl.CONTINUE_ONE;
-		// }
-
 	}
 
 }
