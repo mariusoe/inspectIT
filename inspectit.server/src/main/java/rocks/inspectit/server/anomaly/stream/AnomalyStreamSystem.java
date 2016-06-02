@@ -85,6 +85,8 @@ public class AnomalyStreamSystem implements InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		log.info("|-Initializing AnomalyStreamSystem...");
+
 		SharedStreamProperties.setInfluxService(influx);
 
 		// # # # # # # # # # # # # # # # # # # # # #
@@ -107,11 +109,14 @@ public class AnomalyStreamSystem implements InitializingBean {
 		// #
 		// # # # # # # # # # # # # # # # # # # # # #
 
+		log.info("||-Created following AnomalyStream:");
+		streamEntryComponent.print("|| ", true);
+
 		initDisruptor();
 
 		if (log.isInfoEnabled()) {
 			log.info("|-AnomalyStreamSystem initialized...");
-			streamEntryComponent.print("| ", true);
+
 		}
 	}
 

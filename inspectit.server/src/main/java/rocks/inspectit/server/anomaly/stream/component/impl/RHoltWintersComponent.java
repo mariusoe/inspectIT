@@ -64,13 +64,13 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 
 		try {
 			String rVersionString = rConnection.eval("R.version.string").asString();
-			log.info("connected to R version: {}", rVersionString);
+			log.info("||-Connected to Rserve [{}]", rVersionString);
 
 			// load library
 			REXP loadResult = rConnection.eval("library(\"forecast\")");
 			rConnection.eval("data <- c()");
 			if (loadResult == null) {
-				log.warn("forecast library could not be loaded..");
+				log.warn("||-forecast library could not be loaded..");
 			}
 		} catch (REXPMismatchException e) {
 			log.error(e.getMessage());

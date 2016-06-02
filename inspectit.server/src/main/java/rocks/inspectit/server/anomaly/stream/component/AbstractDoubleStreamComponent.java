@@ -3,11 +3,19 @@
  */
 package rocks.inspectit.server.anomaly.stream.component;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Marius Oehler
  *
  */
 public abstract class AbstractDoubleStreamComponent<I> implements IDoubleInputComponent<I> {
+
+	/**
+	 * Logger for the class.
+	 */
+	private final Logger log = LoggerFactory.getLogger(AbstractDoubleStreamComponent.class);
 
 	private final ISingleInputComponent<I> nextComponentOne;
 
@@ -27,7 +35,7 @@ public abstract class AbstractDoubleStreamComponent<I> implements IDoubleInputCo
 	@Override
 	public void print(String prefix, boolean isTail, boolean doubleInput) {
 		String line = doubleInput ? "==" : "──";
-		System.out.println(prefix + (isTail ? "└" + line + " " : "├" + line + " ") + getClass().getSimpleName());
+		log.info(prefix + (isTail ? "└" + line + " " : "├" + line + " ") + getClass().getSimpleName());
 		if (nextComponentOne != null) {
 			nextComponentOne.print(prefix + (isTail ? "    " : "│   "), false);
 		}
