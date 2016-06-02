@@ -45,8 +45,6 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 
 	private final LinkedList<Double> historyQueue;
 
-	private final LinkedList<ResidualContainer> residualHistory;
-
 	private final int historyLimit;
 
 	/**
@@ -59,7 +57,6 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 		// init fields
 		swapCache = new SwapCache(10000);
 		historyQueue = new LinkedList<Double>();
-		residualHistory = new LinkedList<ResidualContainer>();
 		historyLimit = 60; // 720=1h | 60=5m
 
 		// connect to R
@@ -114,18 +111,6 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 			historyQueue.removeFirst();
 		}
 
-		// calculate residuals of recent data
-		ResidualContainer container = new ResidualContainer();
-		for (int i = 0; i < data.getIndex().get(); i++) {
-			container.sum += Math.pow(data.getData()[i] - mean, 2);
-		}
-		container.count = data.getIndex().get();
-
-		residualHistory.add(container);
-		if (residualHistory.size() > historyLimit) {
-			residualHistory.removeFirst();
-		}
-
 		// reset cache
 		data.reset();
 
@@ -134,7 +119,7 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 		if (!Double.isNaN(nextMean)) {
 			System.out.println("duration: " + (System.currentTimeMillis() - start) + "ms");
 
-			double stdDeviation = calculateStandardDeviation();
+			double stdDeviation = SharedStreamProperties.getStandardDeviation();
 
 			double lowerConfidenceLevel = nextMean - 3 * stdDeviation;
 			double upperConfidenceLevel = nextMean + 3 * stdDeviation;
@@ -145,28 +130,12 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 
 			// build influx point
 			Builder builder = Point.measurement("R");
-			builder.addField("mean", nextMean);
+			builder.addField("meanR", nextMean);
 			builder.addField("lowerConfidenceLevel", lowerConfidenceLevel);
 			builder.addField("upperConfidenceLevel", upperConfidenceLevel);
 
 			SharedStreamProperties.getInfluxService().insert(builder.build());
 		}
-	}
-
-	/**
-	 *
-	 */
-	private double calculateStandardDeviation() {
-		double sum = 0D;
-		int count = 0;
-		for (ResidualContainer rContainer : residualHistory) {
-			sum += rContainer.sum;
-			count += rContainer.count;
-		}
-
-		double variance = sum / count;
-
-		return Math.sqrt(variance);
 	}
 
 	/**
@@ -194,11 +163,5 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 			log.error("error while forecasting. ", e);
 			return Double.NaN;
 		}
-	}
-
-	private class ResidualContainer {
-		double sum = 0D;
-
-		int count = 0;
 	}
 }

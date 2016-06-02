@@ -17,11 +17,11 @@ import org.springframework.stereotype.Component;
 import com.lmax.disruptor.dsl.Disruptor;
 
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
-import rocks.inspectit.server.anomaly.stream.component.impl.InvocationSequenceFilterComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.ItemRateComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.PercentageRateComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.QuadraticScoreFilterComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.RHoltWintersComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.StandardDeviationComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.TSDBWriterComponent;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventFactory;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventHandler;
@@ -94,13 +94,16 @@ public class AnomalyStreamSystem implements InitializingBean {
 
 		RHoltWintersComponent wintersComponent = new RHoltWintersComponent(normalWriterComponent, executorService);
 
-		PercentageRateComponent pErrorRateComponent = new PercentageRateComponent(wintersComponent, problemWriterComponent, executorService);
+		// ConfidenceBandComponent bandComponent = new ConfidenceBandComponent(wintersComponent,
+		// 10000, executorService);
+		StandardDeviationComponent stddevComponent = new StandardDeviationComponent(wintersComponent, executorService);
 
+		PercentageRateComponent pErrorRateComponent = new PercentageRateComponent(stddevComponent, problemWriterComponent, executorService);
 		QuadraticScoreFilterComponent scoreFilterComponent = new QuadraticScoreFilterComponent(pErrorRateComponent);
 
 		ItemRateComponent rateComponent = new ItemRateComponent(scoreFilterComponent, "total throughput");
 
-		streamEntryComponent = new InvocationSequenceFilterComponent(rateComponent);
+		streamEntryComponent = rateComponent;
 		// #
 		// # # # # # # # # # # # # # # # # # # # # #
 

@@ -18,10 +18,11 @@ public class SimulatorClient extends Thread {
 
 	double errorRate = 0.01D;
 
+	boolean anomaly = false;
+
 	/**
 	 * @param args
-	 * @throws Exception
-	 * 			@throws
+	 * 			@throws Exception @throws
 	 */
 	public static void main(String[] args) throws Exception {
 		System.out.println("- Start SimulatorClient -");
@@ -35,7 +36,12 @@ public class SimulatorClient extends Thread {
 			System.out.print("> enter new error-rate: ");
 
 			try {
-				client.errorRate = Double.parseDouble(br.readLine());
+				double rate = Double.parseDouble(br.readLine());
+				if (rate < 0) {
+					client.anomaly = true;
+				} else {
+					client.errorRate = rate;
+				}
 			} catch (NumberFormatException nfe) {
 				System.err.println("Invalid Format!");
 			}
@@ -44,7 +50,7 @@ public class SimulatorClient extends Thread {
 
 	long counter = 0;
 
-	double waveLength = 300000;
+	double waveLength = 30000;
 
 	/**
 	 * {@inheritDoc}
@@ -61,27 +67,28 @@ public class SimulatorClient extends Thread {
 				double sin = Math.sin(2 * Math.PI / (waveLength) * counter++);
 
 				InvocationSequenceData data = new InvocationSequenceData();
-				data.setDuration(50D + 20 * sin + Math.random() * 50);
+				data.setDuration(50D + 10 * sin + Math.random() * 50);
 				data.setChildCount(1);
 
 				if (Math.random() < errorRate) {
-					data.setDuration(100 + 20 * sin + Math.random() * 100);
+					data.setDuration(250 + 10 * sin + Math.random() * 100);
 				}
 
 				// System.out.print((int) data.getDuration() + ",");
 				os.writeObject(data);
 
 				// random anomaly
-				if (Math.random() < 0.00001D) {
+				if (anomaly) {
+					anomaly = false;
 					for (int i = 0; i < 2000; i++) {
 						InvocationSequenceData d = new InvocationSequenceData();
-						d.setDuration(800D + Math.random() * 200D);
+						d.setDuration(400D + Math.random() * 200D);
 						os.writeObject(d);
-						Thread.sleep(1);
+						Thread.sleep(10);
 					}
 				}
 
-				Thread.sleep(1);
+				Thread.sleep(10);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

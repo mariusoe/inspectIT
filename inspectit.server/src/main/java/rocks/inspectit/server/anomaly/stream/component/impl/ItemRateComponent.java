@@ -7,6 +7,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.influxdb.dto.Point;
+
+import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
@@ -51,6 +54,8 @@ public class ItemRateComponent extends AbstractSingleStreamComponent<InvocationS
 	public void run() {
 		double rate = counter.get() / (interval / 1000D);
 		counter.set(0);
+
+		SharedStreamProperties.getInfluxService().insert(Point.measurement("status").addField("requestRate", rate).build());
 
 		System.out.println(prefix + ": " + rate + " items/second");
 	}
