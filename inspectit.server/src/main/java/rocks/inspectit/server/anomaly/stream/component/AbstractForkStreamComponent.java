@@ -3,11 +3,19 @@
  */
 package rocks.inspectit.server.anomaly.stream.component;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Marius Oehler
  *
  */
 public abstract class AbstractForkStreamComponent<I> implements ISingleInputComponent<I> {
+
+	/**
+	 * Logger for the class.
+	 */
+	private final Logger log = LoggerFactory.getLogger(AbstractForkStreamComponent.class);
 
 	private final ISingleInputComponent<I> nextComponentOne;
 
@@ -38,7 +46,7 @@ public abstract class AbstractForkStreamComponent<I> implements ISingleInputComp
 	 */
 	@Override
 	public void print(String prefix, boolean isTail) {
-		System.out.println(prefix + (isTail ? "└── " : "├── ") + getClass().getSimpleName());
+		log.info(prefix + (isTail ? "└── " : "├── ") + getClass().getSimpleName());
 		if (nextComponent == null) {
 			if (nextComponentOne != null) {
 				nextComponentOne.print(prefix + (isTail ? "    " : "│   "), false);
