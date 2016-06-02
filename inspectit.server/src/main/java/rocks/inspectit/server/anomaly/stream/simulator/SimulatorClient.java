@@ -20,7 +20,8 @@ public class SimulatorClient extends Thread {
 
 	/**
 	 * @param args
-	 * 			@throws Exception @throws
+	 * @throws Exception
+	 * 			@throws
 	 */
 	public static void main(String[] args) throws Exception {
 		System.out.println("- Start SimulatorClient -");
@@ -43,7 +44,7 @@ public class SimulatorClient extends Thread {
 
 	long counter = 0;
 
-	double waveLength = 30000;
+	double waveLength = 300000;
 
 	/**
 	 * {@inheritDoc}
@@ -70,7 +71,17 @@ public class SimulatorClient extends Thread {
 				// System.out.print((int) data.getDuration() + ",");
 				os.writeObject(data);
 
-				Thread.sleep(10);
+				// random anomaly
+				if (Math.random() < 0.00001D) {
+					for (int i = 0; i < 2000; i++) {
+						InvocationSequenceData d = new InvocationSequenceData();
+						d.setDuration(800D + Math.random() * 200D);
+						os.writeObject(d);
+						Thread.sleep(1);
+					}
+				}
+
+				Thread.sleep(1);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
