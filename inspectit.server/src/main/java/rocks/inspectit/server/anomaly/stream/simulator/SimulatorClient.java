@@ -22,7 +22,8 @@ public class SimulatorClient extends Thread {
 
 	/**
 	 * @param args
-	 * 			@throws Exception @throws
+	 * @throws Exception
+	 * 			@throws
 	 */
 	public static void main(String[] args) throws Exception {
 		System.out.println("- Start SimulatorClient -");
@@ -50,7 +51,7 @@ public class SimulatorClient extends Thread {
 
 	long counter = 0;
 
-	double waveLength = 30000;
+	double waveLength = 300000;
 
 	/**
 	 * {@inheritDoc}
@@ -88,7 +89,7 @@ public class SimulatorClient extends Thread {
 					}
 				}
 
-				Thread.sleep(10);
+				// Thread.sleep(1);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

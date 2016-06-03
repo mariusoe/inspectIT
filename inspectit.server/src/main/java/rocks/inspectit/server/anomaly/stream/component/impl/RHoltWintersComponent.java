@@ -55,7 +55,7 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 		super(nextComponent);
 
 		// init fields
-		swapCache = new SwapCache(10000);
+		swapCache = new SwapCache(100000);
 		historyQueue = new LinkedList<Double>();
 		historyLimit = 60; // 720=1h | 60=5m
 
