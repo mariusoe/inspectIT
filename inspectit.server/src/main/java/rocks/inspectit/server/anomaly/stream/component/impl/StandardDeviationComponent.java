@@ -37,7 +37,7 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 	public StandardDeviationComponent(ISingleInputComponent<InvocationSequenceData> nextComponent, ScheduledExecutorService executorService) {
 		super(nextComponent);
 
-		swapCache = new SwapCache(10000);
+		swapCache = new SwapCache(100000);
 		residualHistory = new LinkedList<ResidualContainer>();
 
 		executorService.scheduleAtFixedRate(this, 5, 5, TimeUnit.SECONDS);
