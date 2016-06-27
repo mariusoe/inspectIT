@@ -1,24 +1,121 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<business-context xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="3" xsi:noNamespaceSchemaLocation="schema\ciSchema.xsd">
+<business-context xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="5" xsi:noNamespaceSchemaLocation="schema\ciSchema.xsd">
     <applications>
-        <applicaction id="-1585624782" name="test" revision="2">
-            <or id="2568041589592247500" advanced="true">
+        <applicaction id="1475954255" name="DVDStore" description="Demo Application" revision="4">
+            <or id="-4290286540479508725" advanced="false">
                 <operands>
-                    <string-matching matching-type="equals" snippet="d" search-in-trace="false" max-search-depth="-1" id="7149006152130773897" advanced="false">
-                        <http-uri/>
-                    </string-matching>
-                    <string-matching matching-type="equals" snippet="s" search-in-trace="false" max-search-depth="-1" id="193045001473641789" advanced="false">
+                    <string-matching matching-type="contains" snippet="/dvdstore/" search-in-trace="false" max-search-depth="-1" id="-7017878953451437370" advanced="false">
                         <http-uri/>
                     </string-matching>
                 </operands>
             </or>
             <business-transactions>
-                <business-transaction id="1276463144" name="abc">
-                    <name-extraction id="-1597243771532521622" regularExpression="(.*)" targetNamePattern="(1)" max-search-depth="-1" search-in-trace="false">
-                        <http-parameter-value parameter-name="k"/>
-                    </name-extraction>
-                    <or id="-144708896032405508" advanced="false">
-                        <operands/>
+                <business-transaction id="767836784" name="Login">
+                    <or id="-3355015102457756827" advanced="false">
+                        <operands>
+                            <string-matching matching-type="equals" snippet="LoginForm" search-in-trace="false" max-search-depth="-1" id="1247923427491925858" advanced="false">
+<http-parameter-value parameter-name="LoginForm"/>
+                            </string-matching>
+                        </operands>
+                    </or>
+                </business-transaction>
+                <business-transaction id="640631221" name="Logout">
+                    <or id="-4068061738469735315" advanced="false">
+                        <operands>
+                            <string-matching matching-type="equals" snippet="LogoutForm" search-in-trace="false" max-search-depth="-1" id="2089111818880110391" advanced="false">
+<http-parameter-value parameter-name="LogoutForm"/>
+                            </string-matching>
+                        </operands>
+                    </or>
+                </business-transaction>
+                <business-transaction id="-2114434900" name="Search">
+                    <or id="401929480866580686" advanced="false">
+                        <operands>
+                            <string-matching matching-type="equals" snippet="SearchForm" search-in-trace="false" max-search-depth="-1" id="-4584310166876962678" advanced="false">
+<http-parameter-value parameter-name="SearchForm"/>
+                            </string-matching>
+                        </operands>
+                    </or>
+                </business-transaction>
+                <business-transaction id="-393196119" name="Purchase">
+                    <or id="8383985752559078190" advanced="false">
+                        <operands>
+                            <string-matching matching-type="equals" snippet="Purchase" search-in-trace="false" max-search-depth="-1" id="1761966311053345301" advanced="false">
+<http-parameter-value parameter-name="cartdetails:purchaseaction:PurchaseActionForm:PurchaseButton"/>
+                            </string-matching>
+                        </operands>
+                    </or>
+                </business-transaction>
+                <business-transaction id="-1754053452" name="Add to Cart">
+                    <or id="3973075977352268864" advanced="false">
+                        <operands>
+                            <string-matching matching-type="equals" snippet="dvd.xhtml:search.addToCart&quot;" search-in-trace="false" max-search-depth="-1" id="7034912871146998567" advanced="false">
+<http-parameter-value parameter-name="actionMethod"/>
+                            </string-matching>
+                        </operands>
+                    </or>
+                </business-transaction>
+                <business-transaction id="-2053552704" name="Browse">
+                    <or id="8649393733894425033" advanced="false">
+                        <operands>
+                            <string-matching matching-type="contains" snippet="/browse" search-in-trace="false" max-search-depth="-1" id="-9139762463499925375" advanced="false">
+<http-uri/>
+                            </string-matching>
+                        </operands>
+                    </or>
+                </business-transaction>
+                <business-transaction id="1635598777" name="Latest Orders">
+                    <or id="-5148052592396121447" advanced="false">
+                        <operands>
+                            <string-matching matching-type="contains" snippet="latestorders" search-in-trace="false" max-search-depth="-1" id="8010606429371649158" advanced="false">
+<http-uri/>
+                            </string-matching>
+                        </operands>
+                    </or>
+                </business-transaction>
+                <business-transaction id="-1295298889" name="Own Orders">
+                    <or id="-1313339911742864608" advanced="false">
+                        <operands>
+                            <string-matching matching-type="contains" snippet="showorders" search-in-trace="false" max-search-depth="-1" id="7836117803694768220" advanced="false">
+<http-uri/>
+                            </string-matching>
+                        </operands>
+                    </or>
+                </business-transaction>
+                <business-transaction id="518278852" name="Show Cart">
+                    <or id="-7277468853538043315" advanced="false">
+                        <operands>
+                            <string-matching matching-type="contains" snippet="checkout" search-in-trace="false" max-search-depth="-1" id="-943766426189804254" advanced="false">
+<http-uri/>
+                            </string-matching>
+                        </operands>
+                    </or>
+                </business-transaction>
+                <business-transaction id="2005614729" name="Show DVD">
+                    <or id="2703458352988311236" advanced="false">
+                        <operands>
+                            <string-matching matching-type="starts-with" snippet="/dvdstore/dvd/" search-in-trace="false" max-search-depth="-1" id="-1658634122456970830" advanced="false">
+<http-uri/>
+                            </string-matching>
+                        </operands>
+                    </or>
+                </business-transaction>
+                <business-transaction id="-1798224779" name="Confirmation">
+                    <or id="6750772250556255837" advanced="false">
+                        <operands>
+                            <string-matching matching-type="contains" snippet="confirm" search-in-trace="false" max-search-depth="-1" id="-7485855864174393311" advanced="false">
+<http-uri/>
+                            </string-matching>
+                        </operands>
+                    </or>
+                </business-transaction>
+                <business-transaction id="1652179721" name="Home">
+                    <or id="-6346992617474667123" advanced="false">
+                        <operands>
+                            <string-matching matching-type="starts-with" snippet="/dvdstore/home" search-in-trace="false" max-search-depth="-1" id="8524703539428936122" advanced="false">
+<http-uri/>
+                            </string-matching>
+                        </operands>
                     </or>
                 </business-transaction>
             </business-transactions>

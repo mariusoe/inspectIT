@@ -3,16 +3,23 @@
  */
 package rocks.inspectit.server.anomaly.stream.component.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
-import rocks.inspectit.server.anomaly.stream.SwapCache;
-import rocks.inspectit.server.anomaly.stream.SwapCache.InternalData;
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
+import rocks.inspectit.server.anomaly.stream.object.InvocationStreamObject;
+import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.server.anomaly.utils.StatisticUtils;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 
@@ -27,9 +34,9 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 	 */
 	private static final int historyLimit = 720;
 
-	private final SwapCache swapCache;
+	private final Map<String, LinkedList<ResidualContainer>> residualHistoryMap;
 
-	private final LinkedList<ResidualContainer> residualHistory;
+	private Queue<InvocationStreamObject> intervalQueue;
 
 	/**
 	 * @param nextComponent
@@ -37,8 +44,8 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 	public StandardDeviationComponent(ISingleInputComponent<InvocationSequenceData> nextComponent, ScheduledExecutorService executorService) {
 		super(nextComponent);
 
-		swapCache = new SwapCache(100000);
-		residualHistory = new LinkedList<ResidualContainer>();
+		residualHistoryMap = new HashMap<>();
+		intervalQueue = new ConcurrentLinkedQueue<InvocationStreamObject>();
 
 		executorService.scheduleAtFixedRate(this, 5, 5, TimeUnit.SECONDS);
 	}
@@ -47,8 +54,8 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected EFlowControl processImpl(InvocationSequenceData item) {
-		swapCache.push(item.getDuration());
+	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> item) {
+		intervalQueue.add((InvocationStreamObject) item);
 
 		return EFlowControl.CONTINUE;
 	}
@@ -58,28 +65,54 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 	 */
 	@Override
 	public void run() {
-		swapCache.swap();
+		Queue<InvocationStreamObject> queue = intervalQueue;
+		intervalQueue = new ConcurrentLinkedQueue<InvocationStreamObject>();
 
-		InternalData data = swapCache.getInactive();
-		double mean = StatisticUtils.mean(data.getData(), data.getIndex().get());
+		Map<String, ArrayList<InvocationStreamObject>> invocationStreamMap = new HashMap<>();
+
+		for (InvocationStreamObject iso : queue) {
+			if (!invocationStreamMap.containsKey(iso.getBusinessTransaction())) {
+				invocationStreamMap.put(iso.getBusinessTransaction(), new ArrayList<InvocationStreamObject>());
+			}
+
+			invocationStreamMap.get(iso.getBusinessTransaction()).add(iso);
+		}
+
+		for (Entry<String, ArrayList<InvocationStreamObject>> entry : invocationStreamMap.entrySet()) {
+			calculateStandardDeviation(entry.getKey(), entry.getValue());
+		}
+	}
+
+	private void calculateStandardDeviation(String businessTransaction, List<InvocationStreamObject> invocationList) {
+		double[] durationArray = new double[invocationList.size()];
+
+		for (int i = 0; i < invocationList.size(); i++) {
+			durationArray[i] = invocationList.get(i).getData().getDuration();
+		}
+
+		double mean = StatisticUtils.mean(durationArray);
 
 		// calculate residuals of recent data
 		ResidualContainer container = new ResidualContainer();
-		for (int i = 0; i < data.getIndex().get(); i++) {
-			container.sum += Math.pow(data.getData()[i] - mean, 2);
+		for (double duration : durationArray) {
+			container.sum += Math.pow(duration - mean, 2);
 		}
-		container.count = data.getIndex().get();
-		data.reset();
+		container.count = durationArray.length;
 
-		residualHistory.add(container);
-		if (residualHistory.size() > historyLimit) {
-			residualHistory.removeFirst();
+		if (!residualHistoryMap.containsKey(businessTransaction)) {
+			residualHistoryMap.put(businessTransaction, new LinkedList<ResidualContainer>());
+		}
+		LinkedList<ResidualContainer> residualList = residualHistoryMap.get(businessTransaction);
+
+		residualList.add(container);
+		if (residualList.size() > historyLimit) {
+			residualList.removeFirst();
 		}
 
 		// calculate stddev
 		double sum = 0D;
 		int count = 0;
-		for (ResidualContainer rContainer : residualHistory) {
+		for (ResidualContainer rContainer : residualList) {
 			sum += rContainer.sum;
 			count += rContainer.count;
 		}
@@ -88,7 +121,7 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 
 		double stdDeviation = Math.sqrt(variance);
 
-		SharedStreamProperties.setStandardDeviation(stdDeviation);
+		SharedStreamProperties.getStreamStatistic(businessTransaction).setStandardDeviation(stdDeviation);
 	}
 
 	private class ResidualContainer {

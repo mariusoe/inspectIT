@@ -3,16 +3,22 @@
  */
 package rocks.inspectit.server.anomaly.stream.component.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.influxdb.dto.Point;
+import org.influxdb.dto.Point.Builder;
 
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
+import rocks.inspectit.server.anomaly.stream.object.InvocationStreamObject;
+import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 
 /**
@@ -21,7 +27,7 @@ import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
  */
 public class ItemRateComponent extends AbstractSingleStreamComponent<InvocationSequenceData> implements Runnable {
 
-	private final AtomicLong counter = new AtomicLong(0L);
+	private final Map<String, AtomicLong> counterMap = new HashMap<>();
 
 	private final long interval = 5000L;
 
@@ -41,8 +47,14 @@ public class ItemRateComponent extends AbstractSingleStreamComponent<InvocationS
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected EFlowControl processImpl(InvocationSequenceData item) {
-		counter.incrementAndGet();
+	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> streamObject) {
+		InvocationStreamObject invocationStreamObject = (InvocationStreamObject) streamObject;
+
+		if (!counterMap.containsKey(invocationStreamObject.getBusinessTransaction())) {
+			counterMap.put(invocationStreamObject.getBusinessTransaction(), new AtomicLong(0L));
+		}
+
+		counterMap.get(invocationStreamObject.getBusinessTransaction()).incrementAndGet();
 
 		return EFlowControl.CONTINUE;
 	}
@@ -52,12 +64,20 @@ public class ItemRateComponent extends AbstractSingleStreamComponent<InvocationS
 	 */
 	@Override
 	public void run() {
-		double rate = counter.get() / (interval / 1000D);
-		counter.set(0);
+		System.out.println(prefix);
 
-		SharedStreamProperties.getInfluxService().insert(Point.measurement("status").addField("requestRate", rate).build());
+		for (Entry<String, AtomicLong> entry : counterMap.entrySet()) {
+			long count = entry.getValue().getAndSet(0L);
 
-		System.out.println(prefix + ": " + rate + " items/second");
+			double rate = count / (interval / 1000D);
+
+			Builder builder = Point.measurement("status");
+			builder.addField("requestRate", rate);
+
+			SharedStreamProperties.getInfluxService().insert(builder.build());
+
+			System.out.println("|-" + entry.getKey() + ": " + rate + " items/second");
+		}
 	}
 
 }

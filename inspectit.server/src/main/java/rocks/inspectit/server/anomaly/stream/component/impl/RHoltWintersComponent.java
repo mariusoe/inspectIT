@@ -3,7 +3,14 @@
  */
 package rocks.inspectit.server.anomaly.stream.component.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -19,11 +26,12 @@ import org.slf4j.LoggerFactory;
 
 import rocks.inspectit.server.anomaly.stream.ConfidenceBand;
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
-import rocks.inspectit.server.anomaly.stream.SwapCache;
-import rocks.inspectit.server.anomaly.stream.SwapCache.InternalData;
+import rocks.inspectit.server.anomaly.stream.StreamStatistics;
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
+import rocks.inspectit.server.anomaly.stream.object.InvocationStreamObject;
+import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.server.anomaly.utils.AnomalyUtils;
 import rocks.inspectit.server.anomaly.utils.StatisticUtils;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
@@ -39,13 +47,13 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 	 */
 	private final Logger log = LoggerFactory.getLogger(RHoltWintersComponent.class);
 
-	private final SwapCache swapCache;
-
 	private final RConnection rConnection;
 
-	private final LinkedList<Double> historyQueue;
+	private final Map<String, LinkedList<Double>> historyListMap;
 
 	private final int historyLimit;
+
+	private Queue<InvocationStreamObject> intervalQueue;
 
 	/**
 	 * @param nextComponent
@@ -55,9 +63,9 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 		super(nextComponent);
 
 		// init fields
-		swapCache = new SwapCache(100000);
-		historyQueue = new LinkedList<Double>();
+		historyListMap = new HashMap<>();
 		historyLimit = 60; // 720=1h | 60=5m
+		intervalQueue = new ConcurrentLinkedQueue<InvocationStreamObject>();
 
 		// connect to R
 		rConnection = new RConnection("localhost");
@@ -84,8 +92,8 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected EFlowControl processImpl(InvocationSequenceData item) {
-		swapCache.push(item.getDuration());
+	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> item) {
+		intervalQueue.add((InvocationStreamObject) item);
 
 		return EFlowControl.CONTINUE;
 	}
@@ -95,44 +103,70 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 	 */
 	@Override
 	public void run() {
-		swapCache.swap();
+		Queue<InvocationStreamObject> queue = intervalQueue;
+		intervalQueue = new ConcurrentLinkedQueue<InvocationStreamObject>();
 
-		if (swapCache.getInactive().getIndex().get() == 0) {
+		if (queue.isEmpty()) {
 			return;
 		}
 
-		// calculate mean and reset cache
-		InternalData data = swapCache.getInactive();
+		Map<String, ArrayList<InvocationStreamObject>> invocationStreamMap = new HashMap<>();
 
-		// calculate mean of recent data
-		double mean = StatisticUtils.mean(data.getData(), data.getIndex().get());
-		historyQueue.add(mean);
-		if (historyQueue.size() > historyLimit) {
-			historyQueue.removeFirst();
+		for (InvocationStreamObject iso : queue) {
+			if (!invocationStreamMap.containsKey(iso.getBusinessTransaction())) {
+				invocationStreamMap.put(iso.getBusinessTransaction(), new ArrayList<InvocationStreamObject>());
+			}
+
+			invocationStreamMap.get(iso.getBusinessTransaction()).add(iso);
 		}
 
-		// reset cache
-		data.reset();
+		for (Entry<String, ArrayList<InvocationStreamObject>> entry : invocationStreamMap.entrySet()) {
+			calcualate(entry.getKey(), entry.getValue());
+		}
+	}
+
+	private void calcualate(String businessTransaction, List<InvocationStreamObject> invocationList) {
+		double[] durationArray = new double[invocationList.size()];
+
+		for (int i = 0; i < invocationList.size(); i++) {
+			durationArray[i] = invocationList.get(i).getData().getDuration();
+		}
+
+		// calculate mean of recent data
+		double mean = StatisticUtils.mean(durationArray);
+
+		if (!historyListMap.containsKey(businessTransaction)) {
+			historyListMap.put(businessTransaction, new LinkedList<Double>());
+		}
+		LinkedList<Double> historyList = historyListMap.get(businessTransaction);
+		historyList.add(mean);
+		if (historyList.size() > historyLimit) {
+			historyList.removeFirst();
+		}
 
 		long start = System.currentTimeMillis();
-		double nextMean = forecastMean();
+		double nextMean = Math.max(0D, forecastMean(historyList));
+
+		StreamStatistics streamStatistics = SharedStreamProperties.getStreamStatistic(businessTransaction);
+
 		if (!Double.isNaN(nextMean)) {
 			System.out.println("duration: " + (System.currentTimeMillis() - start) + "ms");
 
-			double stdDeviation = SharedStreamProperties.getStandardDeviation();
+			double stdDeviation = streamStatistics.getStandardDeviation();
 
-			double lowerConfidenceLevel = nextMean - 3 * stdDeviation;
+			double lowerConfidenceLevel = Math.max(0D, nextMean - 3 * stdDeviation);
 			double upperConfidenceLevel = nextMean + 3 * stdDeviation;
 
 			// store result in shared properties
 			ConfidenceBand confidenceBand = new ConfidenceBand(nextMean, upperConfidenceLevel, lowerConfidenceLevel);
-			SharedStreamProperties.setConfidenceBand(confidenceBand);
+			streamStatistics.setConfidenceBand(confidenceBand);
 
 			// build influx point
-			Builder builder = Point.measurement("R");
-			builder.addField("meanR", nextMean);
+			Builder builder = Point.measurement("statistics");
+			builder.addField("mean", nextMean);
 			builder.addField("lowerConfidenceLevel", lowerConfidenceLevel);
 			builder.addField("upperConfidenceLevel", upperConfidenceLevel);
+			builder.tag("businessTransaction", businessTransaction);
 
 			SharedStreamProperties.getInfluxService().insert(builder.build());
 		}
@@ -142,14 +176,14 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 	 * @param data
 	 *
 	 */
-	private double forecastMean() {
-		if (historyQueue.size() <= 5) {
+	private double forecastMean(List<Double> dataList) {
+		if (dataList.size() <= 5) {
 			return Double.NaN;
 		}
 
 		try {
 			// load data into R
-			double[] dataArray = AnomalyUtils.toDoubleArray(historyQueue);
+			double[] dataArray = AnomalyUtils.toDoubleArray(dataList);
 			rConnection.assign("data", dataArray);
 
 			// forecast

@@ -3,16 +3,21 @@
  */
 package rocks.inspectit.server.anomaly.stream.component.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.influxdb.dto.Point;
+import org.influxdb.dto.Point.Builder;
 
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.component.AbstractDoubleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
+import rocks.inspectit.server.anomaly.stream.object.InvocationStreamObject;
+import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 
 /**
@@ -21,8 +26,7 @@ import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
  */
 public class PercentageRateComponent extends AbstractDoubleStreamComponent<InvocationSequenceData> implements Runnable {
 
-	private final AtomicLong totalCounter = new AtomicLong(0);
-	private final AtomicLong errorCounter = new AtomicLong(0);
+	private final Map<String, CounterPair> counterMap = new HashMap<>();
 
 	/**
 	 * @param nextComponentOne
@@ -40,8 +44,14 @@ public class PercentageRateComponent extends AbstractDoubleStreamComponent<Invoc
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected EFlowControl processOneImpl(InvocationSequenceData item) {
-		totalCounter.incrementAndGet();
+	protected EFlowControl processOneImpl(StreamObject<InvocationSequenceData> streamObject) {
+		InvocationStreamObject invocationStreamObject = (InvocationStreamObject) streamObject;
+
+		if (!counterMap.containsKey(invocationStreamObject.getBusinessTransaction())) {
+			counterMap.put(invocationStreamObject.getBusinessTransaction(), new CounterPair());
+		}
+
+		counterMap.get(invocationStreamObject.getBusinessTransaction()).totalCounter.incrementAndGet();
 
 		return EFlowControl.CONTINUE_ONE;
 	}
@@ -50,9 +60,15 @@ public class PercentageRateComponent extends AbstractDoubleStreamComponent<Invoc
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected EFlowControl processOneTwo(InvocationSequenceData item) {
-		totalCounter.incrementAndGet();
-		errorCounter.incrementAndGet();
+	protected EFlowControl processOneTwo(StreamObject<InvocationSequenceData> streamObject) {
+		InvocationStreamObject invocationStreamObject = (InvocationStreamObject) streamObject;
+
+		if (!counterMap.containsKey(invocationStreamObject.getBusinessTransaction())) {
+			counterMap.put(invocationStreamObject.getBusinessTransaction(), new CounterPair());
+		}
+
+		counterMap.get(invocationStreamObject.getBusinessTransaction()).totalCounter.incrementAndGet();
+		counterMap.get(invocationStreamObject.getBusinessTransaction()).errorCounter.incrementAndGet();
 
 		return EFlowControl.CONTINUE_TWO;
 	}
@@ -62,14 +78,26 @@ public class PercentageRateComponent extends AbstractDoubleStreamComponent<Invoc
 	 */
 	@Override
 	public void run() {
-		long errorCount = errorCounter.getAndSet(0);
-		long totalCount = totalCounter.getAndSet(0);
+		for (String businessTransaction : counterMap.keySet()) {
 
-		double rate = 0;
-		if (totalCount > 0) {
-			rate = 1D / totalCount * errorCount;
+			CounterPair counterPair = counterMap.get(businessTransaction);
+			counterMap.put(businessTransaction, new CounterPair());
+
+			double rate = 0;
+			if (counterPair.totalCounter.get() > 0) {
+				rate = 1D / counterPair.totalCounter.get() * counterPair.errorCounter.get();
+			}
+
+			Builder builder = Point.measurement("statistics");
+			builder.addField("errorRate", rate);
+			builder.tag("buisnessTransaction", businessTransaction);
+
+			SharedStreamProperties.getInfluxService().insert(builder.build());
 		}
-		SharedStreamProperties.getInfluxService().insert(Point.measurement("status").addField("errorRate", rate).build());
 	}
 
+	class CounterPair {
+		AtomicLong totalCounter = new AtomicLong(0L);
+		AtomicLong errorCounter = new AtomicLong(0L);
+	}
 }

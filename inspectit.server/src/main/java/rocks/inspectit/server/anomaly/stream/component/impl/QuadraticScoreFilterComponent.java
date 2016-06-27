@@ -7,10 +7,13 @@ import org.influxdb.dto.Point;
 
 import rocks.inspectit.server.anomaly.stream.ConfidenceBand;
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
+import rocks.inspectit.server.anomaly.stream.StreamStatistics;
 import rocks.inspectit.server.anomaly.stream.component.AbstractForkStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
 import rocks.inspectit.server.anomaly.stream.component.IDoubleInputComponent;
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
+import rocks.inspectit.server.anomaly.stream.object.InvocationStreamObject;
+import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.server.anomaly.stream.transfer.ITransferFunction;
 import rocks.inspectit.server.anomaly.stream.transfer.TransferFunction;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
@@ -42,22 +45,25 @@ public class QuadraticScoreFilterComponent extends AbstractForkStreamComponent<I
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected EFlowControl processImpl(InvocationSequenceData item) {
-		ConfidenceBand confidenceBand = SharedStreamProperties.getConfidenceBand();
+	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> item) {
+		InvocationStreamObject invocationStreamObject = (InvocationStreamObject) item;
+		StreamStatistics streamStatistic = SharedStreamProperties.getStreamStatistic(invocationStreamObject.getBusinessTransaction());
+
+		ConfidenceBand confidenceBand = streamStatistic.getConfidenceBand();
 		if (confidenceBand == null) {
 			return EFlowControl.CONTINUE_ONE;
 		}
 
-		if (confidenceBand.isInside(item.getDuration())) {
+		if (confidenceBand.isInside(item.getData().getDuration())) {
 			return EFlowControl.CONTINUE_ONE;
 		}
 
-		double confidenceSize = SharedStreamProperties.getConfidenceBand().getWidth() / 2;
+		double confidenceSize = streamStatistic.getConfidenceBand().getWidth() / 2;
 		if (confidenceSize <= 0) {
 			return EFlowControl.CONTINUE_ONE;
 		}
 
-		double percentageError = confidenceBand.distanceToBand(item.getDuration()) / confidenceSize;
+		double percentageError = confidenceBand.distanceToBand(item.getData().getDuration()) / confidenceSize;
 
 		double score = transferFunction.transfer(percentageError);
 

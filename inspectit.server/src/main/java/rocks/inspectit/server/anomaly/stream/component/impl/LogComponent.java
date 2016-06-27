@@ -6,6 +6,7 @@ package rocks.inspectit.server.anomaly.stream.component.impl;
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
+import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 
 /**
@@ -25,7 +26,7 @@ public class LogComponent extends AbstractSingleStreamComponent<InvocationSequen
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected EFlowControl processImpl(InvocationSequenceData item) {
+	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> item) {
 		System.out.println(item);
 
 		return EFlowControl.CONTINUE;

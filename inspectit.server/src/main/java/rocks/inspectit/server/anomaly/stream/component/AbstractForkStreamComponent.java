@@ -6,6 +6,8 @@ package rocks.inspectit.server.anomaly.stream.component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import rocks.inspectit.server.anomaly.stream.object.StreamObject;
+
 /**
  * @author Marius Oehler
  *
@@ -63,7 +65,7 @@ public abstract class AbstractForkStreamComponent<I> implements ISingleInputComp
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void process(I item) {
+	public void process(StreamObject<I> item) {
 		EFlowControl flowControl = processImpl(item);
 
 		if (nextComponent != null) {
@@ -81,5 +83,5 @@ public abstract class AbstractForkStreamComponent<I> implements ISingleInputComp
 		}
 	}
 
-	protected abstract EFlowControl processImpl(I item);
+	protected abstract EFlowControl processImpl(StreamObject<I> item);
 }
