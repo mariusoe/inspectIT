@@ -17,13 +17,14 @@ import org.springframework.stereotype.Component;
 import com.lmax.disruptor.dsl.Disruptor;
 
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.BusinessTransactionInjectorComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.ItemRateComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.PercentageRateComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.QuadraticScoreFilterComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.RHoltWintersComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.StandardDeviationComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.TSDBWriterComponent;
-import rocks.inspectit.server.anomaly.stream.component.impl.WeightedStandardDeviationComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.WarmUpFilterComponent;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventFactory;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventHandler;
 import rocks.inspectit.server.anomaly.stream.disruptor.events.InvocationSequenceEvent;
@@ -32,6 +33,7 @@ import rocks.inspectit.server.anomaly.stream.sink.InvocationSequenceSink;
 import rocks.inspectit.server.tsdb.InfluxDBService;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 import rocks.inspectit.shared.all.spring.logger.Log;
+import rocks.inspectit.shared.cs.cmr.service.IBusinessContextManagementService;
 
 /**
  * @author Marius Oehler
@@ -55,6 +57,9 @@ public class AnomalyStreamSystem implements InitializingBean {
 
 	@Autowired
 	InfluxDBService influx;
+
+	@Autowired
+	IBusinessContextManagementService businessService;
 
 	/**
 	 *
@@ -102,11 +107,16 @@ public class AnomalyStreamSystem implements InitializingBean {
 		StandardDeviationComponent stddevComponent = new StandardDeviationComponent(wintersComponent, executorService);
 
 		PercentageRateComponent pErrorRateComponent = new PercentageRateComponent(stddevComponent, problemWriterComponent, executorService);
+
 		QuadraticScoreFilterComponent scoreFilterComponent = new QuadraticScoreFilterComponent(pErrorRateComponent);
 
 		ItemRateComponent rateComponent = new ItemRateComponent(scoreFilterComponent, "total throughput");
 
-		streamEntryComponent = rateComponent;
+		BusinessTransactionInjectorComponent businessTransactionInjector = new BusinessTransactionInjectorComponent(rateComponent, businessService);
+
+		WarmUpFilterComponent warmUpFilter = new WarmUpFilterComponent(businessTransactionInjector);
+
+		streamEntryComponent = warmUpFilter;
 		// #
 		// # # # # # # # # # # # # # # # # # # # # #
 

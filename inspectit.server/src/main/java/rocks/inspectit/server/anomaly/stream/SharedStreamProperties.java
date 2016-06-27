@@ -3,6 +3,9 @@
  */
 package rocks.inspectit.server.anomaly.stream;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import rocks.inspectit.server.tsdb.InfluxDBService;
 
 /**
@@ -13,47 +16,7 @@ public class SharedStreamProperties {
 
 	private static InfluxDBService influxService;
 
-	private static ConfidenceBand confidenceBand;
-
-	private static double standardDeviation;
-
-	/**
-	 * Gets {@link #standardDeviation}.
-	 *
-	 * @return {@link #standardDeviation}
-	 */
-	public static double getStandardDeviation() {
-		return standardDeviation;
-	}
-
-	/**
-	 * Sets {@link #standardDeviation}.
-	 *
-	 * @param standardDeviation
-	 *            New value for {@link #standardDeviation}
-	 */
-	public static void setStandardDeviation(double standardDeviation) {
-		SharedStreamProperties.standardDeviation = standardDeviation;
-	}
-
-	/**
-	 * Gets {@link #confidenceBand}.
-	 *
-	 * @return {@link #confidenceBand}
-	 */
-	public static ConfidenceBand getConfidenceBand() {
-		return confidenceBand;
-	}
-
-	/**
-	 * Sets {@link #confidenceBand}.
-	 *
-	 * @param confidenceBand
-	 *            New value for {@link #confidenceBand}
-	 */
-	public static void setConfidenceBand(ConfidenceBand confidenceBand) {
-		SharedStreamProperties.confidenceBand = confidenceBand;
-	}
+	private static Map<String, StreamStatistics> streamStatisticMap = new HashMap<>();
 
 	private SharedStreamProperties() {
 	}
@@ -75,6 +38,17 @@ public class SharedStreamProperties {
 	 */
 	public static void setInfluxService(InfluxDBService influxService) {
 		SharedStreamProperties.influxService = influxService;
+	}
+
+	public static StreamStatistics getStreamStatistic(String businessTransaction) {
+		if (!streamStatisticMap.containsKey(businessTransaction)) {
+			synchronized (streamStatisticMap) {
+				if (!streamStatisticMap.containsKey(businessTransaction)) {
+					streamStatisticMap.put(businessTransaction, new StreamStatistics());
+				}
+			}
+		}
+		return streamStatisticMap.get(businessTransaction);
 	}
 
 }

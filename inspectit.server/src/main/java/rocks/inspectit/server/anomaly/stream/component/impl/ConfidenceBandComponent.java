@@ -6,16 +6,11 @@ package rocks.inspectit.server.anomaly.stream.component.impl;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.influxdb.dto.Point;
-import org.influxdb.dto.Point.Builder;
-
-import rocks.inspectit.server.anomaly.stream.ConfidenceBand;
-import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.SwapCache;
-import rocks.inspectit.server.anomaly.stream.SwapCache.InternalData;
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
+import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.server.anomaly.utils.processor.impl.ExponentialSmoothing;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 
@@ -41,8 +36,8 @@ public class ConfidenceBandComponent extends AbstractSingleStreamComponent<Invoc
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected EFlowControl processImpl(InvocationSequenceData item) {
-		swapCache.push(item.getDuration());
+	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> item) {
+		swapCache.push(item.getData().getDuration());
 
 		return EFlowControl.CONTINUE;
 	}
@@ -73,67 +68,68 @@ public class ConfidenceBandComponent extends AbstractSingleStreamComponent<Invoc
 		}
 
 		private void update() {
-
-			// swap cache
-			swapCache.swap();
-
-			InternalData cacheData = swapCache.getInactive();
-
-			// calculate new baseline
-			int currentIndex = cacheData.getIndex().get();
-			if (currentIndex > 0) {
-				double intervalMean = 0;
-
-				for (int i = 0; i < currentIndex; i++) {
-					intervalMean += cacheData.getData()[i];
-				}
-				// index = amount data
-				intervalMean /= currentIndex;
-
-				des.push(System.currentTimeMillis(), intervalMean);
-				desSquared.push(System.currentTimeMillis(), intervalMean * intervalMean);
-
-				// calculate and set new baseline
-				// if (Double.isNaN(movingAverage) || Double.isNaN(movingAverageSquared)) {
-				// movingAverage = intervalMean;
-				// movingAverageSquared = intervalMean * intervalMean;
-				// } else {
-				// movingAverage =
-				// AnomalyUtils.calculateExponentialMovingAverage(baselineDecayFactor,
-				// movingAverage, intervalMean);
-				// movingAverageSquared =
-				// AnomalyUtils.calculateExponentialMovingAverage(baselineDecayFactor,
-				// movingAverageSquared, Math.pow(intervalMean, 2));
-				// }
-
-				// double stddev = Math.sqrt(movingAverageSquared - Math.pow(movingAverage, 2));
-
-				double stddev = Math.sqrt(desSquared.getValue() - Math.pow(des.getValue(), 2));
-				if (Double.isNaN(stddev)) {
-					stddev = 0D;
-				}
-
-				// hack
-				stddev = SharedStreamProperties.getStandardDeviation();
-
-				if (!Double.isNaN(stddev)) {
-					// store result in shared properties
-					ConfidenceBand confidenceBand = new ConfidenceBand(des.getValue(), des.getValue() + 3 * stddev, des.getValue() - 3 * stddev);
-					SharedStreamProperties.setConfidenceBand(confidenceBand);
-
-					// build influx point
-					Builder builder = Point.measurement("R");
-					builder.addField("mean", des.getValue());
-					builder.addField("lowerConfidenceLevel", des.getValue() - 3 * stddev);
-					builder.addField("upperConfidenceLevel", des.getValue() + 3 * stddev);
-
-					SharedStreamProperties.getInfluxService().insert(builder.build());
-				}
-			} else {
-			}
-
-			// reset old cache data
-			cacheData.reset();
+			//
+			// // swap cache
+			// swapCache.swap();
+			//
+			// InternalData cacheData = swapCache.getInactive();
+			//
+			// // calculate new baseline
+			// int currentIndex = cacheData.getIndex().get();
+			// if (currentIndex > 0) {
+			// double intervalMean = 0;
+			//
+			// for (int i = 0; i < currentIndex; i++) {
+			// intervalMean += cacheData.getData()[i];
+			// }
+			// // index = amount data
+			// intervalMean /= currentIndex;
+			//
+			// des.push(System.currentTimeMillis(), intervalMean);
+			// desSquared.push(System.currentTimeMillis(), intervalMean * intervalMean);
+			//
+			// // calculate and set new baseline
+			// // if (Double.isNaN(movingAverage) || Double.isNaN(movingAverageSquared)) {
+			// // movingAverage = intervalMean;
+			// // movingAverageSquared = intervalMean * intervalMean;
+			// // } else {
+			// // movingAverage =
+			// // AnomalyUtils.calculateExponentialMovingAverage(baselineDecayFactor,
+			// // movingAverage, intervalMean);
+			// // movingAverageSquared =
+			// // AnomalyUtils.calculateExponentialMovingAverage(baselineDecayFactor,
+			// // movingAverageSquared, Math.pow(intervalMean, 2));
+			// // }
+			//
+			// // double stddev = Math.sqrt(movingAverageSquared - Math.pow(movingAverage, 2));
+			//
+			// double stddev = Math.sqrt(desSquared.getValue() - Math.pow(des.getValue(), 2));
+			// if (Double.isNaN(stddev)) {
+			// stddev = 0D;
+			// }
+			//
+			// // hack
+			// stddev = SharedStreamProperties.getStandardDeviation();
+			//
+			// if (!Double.isNaN(stddev)) {
+			// // store result in shared properties
+			// ConfidenceBand confidenceBand = new ConfidenceBand(des.getValue(), des.getValue() + 3
+			// * stddev, des.getValue() - 3 * stddev);
+			// SharedStreamProperties.setConfidenceBand(confidenceBand);
+			//
+			// // build influx point
+			// Builder builder = Point.measurement("R");
+			// builder.addField("mean", des.getValue());
+			// builder.addField("lowerConfidenceLevel", des.getValue() - 3 * stddev);
+			// builder.addField("upperConfidenceLevel", des.getValue() + 3 * stddev);
+			//
+			// SharedStreamProperties.getInfluxService().insert(builder.build());
+			// }
+			// } else {
+			// }
+			//
+			// // reset old cache data
+			// cacheData.reset();
 		}
 	}
 }

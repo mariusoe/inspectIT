@@ -6,6 +6,8 @@ package rocks.inspectit.server.anomaly.stream.component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import rocks.inspectit.server.anomaly.stream.object.StreamObject;
+
 /**
  * @author Marius Oehler
  *
@@ -48,7 +50,7 @@ public abstract class AbstractDoubleStreamComponent<I> implements IDoubleInputCo
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void processOne(I item) {
+	public void processOne(StreamObject<I> item) {
 		EFlowControl flowControl = processOneImpl(item);
 
 		if (flowControl == EFlowControl.CONTINUE_ONE && nextComponentOne != null) {
@@ -62,7 +64,7 @@ public abstract class AbstractDoubleStreamComponent<I> implements IDoubleInputCo
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void processTwo(I item) {
+	public void processTwo(StreamObject<I> item) {
 		EFlowControl flowControl = processOneTwo(item);
 
 		if (flowControl == EFlowControl.CONTINUE_ONE) {
@@ -72,7 +74,7 @@ public abstract class AbstractDoubleStreamComponent<I> implements IDoubleInputCo
 		}
 	}
 
-	protected abstract EFlowControl processOneImpl(I item);
+	protected abstract EFlowControl processOneImpl(StreamObject<I> item);
 
-	protected abstract EFlowControl processOneTwo(I item);
+	protected abstract EFlowControl processOneTwo(StreamObject<I> item);
 }

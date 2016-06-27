@@ -6,6 +6,7 @@ package rocks.inspectit.server.anomaly.stream.component.impl;
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
+import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 
 /**
@@ -27,7 +28,7 @@ public class ItemCountComponent extends AbstractSingleStreamComponent<Invocation
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected EFlowControl processImpl(InvocationSequenceData item) {
+	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> item) {
 		counter++;
 
 		return EFlowControl.CONTINUE;
@@ -35,7 +36,7 @@ public class ItemCountComponent extends AbstractSingleStreamComponent<Invocation
 
 	/**
 	 * Gets {@link #counter}.
-	 * 
+	 *
 	 * @return {@link #counter}
 	 */
 	public long getCounter() {
