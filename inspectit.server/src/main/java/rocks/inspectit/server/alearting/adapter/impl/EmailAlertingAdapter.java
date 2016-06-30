@@ -3,6 +3,8 @@
  */
 package rocks.inspectit.server.alearting.adapter.impl;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
@@ -35,7 +37,7 @@ public class EmailAlertingAdapter implements IAlertAdapter {
 	 * Whether a test mail should be send at startup.
 	 */
 	@Value("${anomaly.alerting.email.testMail}")
-	private boolean sendTestMail;
+	private boolean sendingTestMail;
 
 	/**
 	 * SMTP host.
@@ -82,15 +84,31 @@ public class EmailAlertingAdapter implements IAlertAdapter {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
-	public boolean connect() {
-		if (sendTestMail) {
-			if (log.isInfoEnabled()) {
-				log.info("||-Sending a test email using the EmailAlertingAdapter.");
+	@PostConstruct
+	public void afterPropertiesSet() {
+		if (sendingTestMail) {
+			sendTestMail();
+		} else {
+			if (enabled) {
+				if (log.isInfoEnabled()) {
+					log.info("||-Email alerting is enabled.");
+				}
+			} else {
+				if (log.isInfoEnabled()) {
+					log.info("||-Email alerting is disabled.");
+				}
 			}
-			sendMessage("Hello, this is inspectIT and the eMail alert for occuring anomalies was activated.", true);
 		}
-		return true;
+	}
+
+	/**
+	 * Sends a test email.
+	 */
+	private void sendTestMail() {
+		if (log.isInfoEnabled()) {
+			log.info("||-Sending a test email using the EmailAlertingAdapter.");
+		}
+		sendMessage("Hello, this is a test email from inspectIT.", true);
 	}
 
 	/**

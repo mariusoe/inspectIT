@@ -12,13 +12,6 @@ package rocks.inspectit.server.alearting.adapter;
 public interface IAlertAdapter {
 
 	/**
-	 * Connects the adapter.
-	 *
-	 * @return Returns true if the adapter has been successfully connected.
-	 */
-	boolean connect();
-
-	/**
 	 * Sends the given message if the adapter is enabled.
 	 *
 	 * @param message

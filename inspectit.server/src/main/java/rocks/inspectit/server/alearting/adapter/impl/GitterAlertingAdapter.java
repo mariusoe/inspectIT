@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -106,28 +108,33 @@ public final class GitterAlertingAdapter implements IAlertAdapter {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	@PostConstruct
 	public boolean connect() {
-		oauthAccessToken = getAccessToken();
+		if (enabled) {
+			oauthAccessToken = getAccessToken();
 
-		if (oauthAccessToken == null) {
-			return false;
+			if (oauthAccessToken == null) {
+				return false;
+			}
+
+			if (log.isInfoEnabled()) {
+				log.info("||-Gitter client has been succesfully authenticated");
+			}
+
+			gitterClient = new SyncGitterApiClient.Builder().withAccountToken(oauthAccessToken).build();
+
+			currentUser = gitterClient.getCurrentUser();
+
+			if (log.isInfoEnabled()) {
+				log.info("||-Connected to Gitter with user {} ({})", currentUser.displayName, currentUser.username);
+			}
+
+			joinRoom(roomUri);
+		} else {
+			if (log.isInfoEnabled()) {
+				log.info("||-Gitter alerting is disabled.");
+			}
 		}
-
-		if (log.isInfoEnabled()) {
-			log.info("||-Gitter client has been succesfully authenticated");
-		}
-
-		gitterClient = new SyncGitterApiClient.Builder().withAccountToken(oauthAccessToken).build();
-
-		currentUser = gitterClient.getCurrentUser();
-
-		if (log.isInfoEnabled()) {
-			log.info("||-Connected to Gitter with user {} ({})", currentUser.displayName, currentUser.username);
-		}
-
-		joinRoom(roomUri);
-
 		return true;
 	}
 
