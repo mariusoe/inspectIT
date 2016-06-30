@@ -80,4 +80,11 @@
 		<property name="uncaughtExceptionHandler" ref="forkJoinPoolExceptionHandler" />
 	</bean>
 	
+	<!-- Alerting -->
+	
+	<bean name="gitterAlertingAdapter" class="rocks.inspectit.server.alearting.adapter.impl.GitterAlertingAdapter" scope="prototype"/>
+	
+	<bean name="alertingAdapterFactory" class="rocks.inspectit.server.alearting.AlertingAdapterFactory">
+	    <lookup-method bean="gitterAlertingAdapter" name="createGitterAdapter" />
+	</bean>
 </beans>

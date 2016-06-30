@@ -9,14 +9,19 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import javax.annotation.Resource;
 
+import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.lmax.disruptor.dsl.Disruptor;
 
+import rocks.inspectit.server.alearting.AlertingAdapterFactory;
+import rocks.inspectit.server.alearting.adapter.IAlertAdapter;
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.BusinessTransactionAlertingComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.BusinessTransactionInjectorComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.ItemRateComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.PercentageRateComponent;
@@ -61,6 +66,12 @@ public class AnomalyStreamSystem implements InitializingBean {
 	@Autowired
 	IBusinessContextManagementService businessService;
 
+	@Value("${anomaly.isActive}")
+	boolean anomalyDectectionIsActive;
+
+	@Autowired
+	AlertingAdapterFactory alertingAdapterFactory;
+
 	/**
 	 *
 	 */
@@ -91,22 +102,53 @@ public class AnomalyStreamSystem implements InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		log.info("|-Initializing AnomalyStreamSystem...");
+		if (anomalyDectectionIsActive) {
+			log.info("|-Initializing AnomalyStreamSystem...");
 
-		SharedStreamProperties.setInfluxService(influx);
+			IAlertAdapter gitterAdapter = alertingAdapterFactory.createGitterAdapter();
+			gitterAdapter.connect();
 
-		// # # # # # # # # # # # # # # # # # # # # #
-		// # init stream
+			gitterAdapter.sendMessage("===================================");
+			gitterAdapter.sendMessage("AnomalyDetection has been started");
+			gitterAdapter.sendMessage("===================================");
+
+			SharedStreamProperties.setInfluxService(influx);
+			SharedStreamProperties.setAlertingComponent(gitterAdapter);
+
+			// init stream
+			streamEntryComponent = initStream();
+
+			log.info("||-Created following AnomalyStream:");
+			streamEntryComponent.print("|| ", true);
+
+			initDisruptor();
+
+			if (log.isInfoEnabled()) {
+				log.info("|-AnomalyStreamSystem initialized...");
+			}
+		} else {
+			log.info("|-AnomalyDetection is not enabled");
+		}
+	}
+
+	private ISingleInputComponent<InvocationSequenceData> initStream() {
 		TSDBWriterComponent problemWriterComponent = new TSDBWriterComponent(null, "problem");
 		TSDBWriterComponent normalWriterComponent = new TSDBWriterComponent(null, "normal");
 
-		RHoltWintersComponent wintersComponent = new RHoltWintersComponent(normalWriterComponent, executorService);
+		RHoltWintersComponent wintersComponent;
+		try {
+			wintersComponent = new RHoltWintersComponent(normalWriterComponent, executorService);
+		} catch (RserveException e) {
+			return null;
+		}
 
 		// ConfidenceBandComponent bandComponent = new ConfidenceBandComponent(wintersComponent,
 		// 10000, executorService);
 		StandardDeviationComponent stddevComponent = new StandardDeviationComponent(wintersComponent, executorService);
 
-		PercentageRateComponent pErrorRateComponent = new PercentageRateComponent(stddevComponent, problemWriterComponent, executorService);
+		BusinessTransactionAlertingComponent alertingComponent = new BusinessTransactionAlertingComponent(null);
+
+		PercentageRateComponent pErrorRateComponent = new PercentageRateComponent(stddevComponent, problemWriterComponent, alertingComponent, executorService);
 
 		QuadraticScoreFilterComponent scoreFilterComponent = new QuadraticScoreFilterComponent(pErrorRateComponent);
 
@@ -116,19 +158,7 @@ public class AnomalyStreamSystem implements InitializingBean {
 
 		WarmUpFilterComponent warmUpFilter = new WarmUpFilterComponent(businessTransactionInjector);
 
-		streamEntryComponent = warmUpFilter;
-		// #
-		// # # # # # # # # # # # # # # # # # # # # #
-
-		log.info("||-Created following AnomalyStream:");
-		streamEntryComponent.print("|| ", true);
-
-		initDisruptor();
-
-		if (log.isInfoEnabled()) {
-			log.info("|-AnomalyStreamSystem initialized...");
-
-		}
+		return warmUpFilter;
 	}
 
 	public void process(InvocationSequenceData data) {

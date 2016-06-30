@@ -19,6 +19,7 @@ import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
 import rocks.inspectit.server.anomaly.stream.object.InvocationStreamObject;
 import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
+import rocks.inspectit.shared.all.util.Pair;
 
 /**
  * @author Marius Oehler
@@ -28,16 +29,22 @@ public class PercentageRateComponent extends AbstractDoubleStreamComponent<Invoc
 
 	private final Map<String, CounterPair> counterMap = new HashMap<>();
 
+	private final long interval = 10;
+
+	private final ISingleInputComponent<Pair<String, Double>> rateComponent;
+
 	/**
 	 * @param nextComponentOne
 	 * @param nextComponentTwo
 	 * @param executorService
 	 */
 	public PercentageRateComponent(ISingleInputComponent<InvocationSequenceData> nextComponentOne, ISingleInputComponent<InvocationSequenceData> nextComponentTwo,
-			ScheduledExecutorService executorService) {
+			ISingleInputComponent<Pair<String, Double>> rateComponent, ScheduledExecutorService executorService) {
 		super(nextComponentOne, nextComponentTwo);
 
-		executorService.scheduleAtFixedRate(this, 5000, 5000, TimeUnit.MILLISECONDS);
+		this.rateComponent = rateComponent;
+
+		executorService.scheduleAtFixedRate(this, interval, interval, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -93,6 +100,9 @@ public class PercentageRateComponent extends AbstractDoubleStreamComponent<Invoc
 			builder.tag("buisnessTransaction", businessTransaction);
 
 			SharedStreamProperties.getInfluxService().insert(builder.build());
+
+			StreamObject<Pair<String, Double>> object = new StreamObject<Pair<String, Double>>(new Pair<String, Double>(businessTransaction, rate));
+			rateComponent.process(object);
 		}
 	}
 

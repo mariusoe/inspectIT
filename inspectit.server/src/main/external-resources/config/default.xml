@@ -331,12 +331,21 @@
 	</section>
 	<section name="AnomalyDetection">
 		<properties>
-			<long-property name="AnalyzeRate" default-value="2500" server-restart-required="true" logical-name="anomaly.analyzeRate" advanced="false" description="The rate of the execution of the anomaly detector.">
-				<validators>
-					<isPositive />
-				</validators>
-			</long-property>
-			<string-property name="DetectionStrategies" default-value="rocks.inspectit.server.anomaly.strategy.impl.DerivationScoreStrategy" server-restart-required="true" logical-name="anomaly.detectionStrategies" advanced="true"></string-property>
+			<boolean-property name="Is active" default-value="false" server-restart-required="true" logical-name="anomaly.isActive" advanced="false" description="If the anomaly detection should be executed."></boolean-property>
+			
+			<group-property name="Alerting Gitter" description="Expansion rate defines how much the calculated object heap sizes in buffer will be increased, as the safty for available heap space not to be exhausted. ">
+				<properties>
+					<boolean-property name="Status" default-value="false" server-restart-required="false" logical-name="anomaly.alerting.gitter.status" advanced="false" description="Using Gitter as alerting channel."></boolean-property>
+				
+					<string-property name="OAuth Key" default-value="" server-restart-required="true" logical-name="anomaly.alerting.gitter.oauthKey" advanced="false"></string-property>
+					<string-property name="OAuth Secret" default-value="" server-restart-required="true" logical-name="anomaly.alerting.gitter.oauthSecret" advanced="false"></string-property>
+					<string-property name="OAuth Redirect URL" default-value="" server-restart-required="true" logical-name="anomaly.alerting.gitter.oauthRedirectUrl" advanced="false"></string-property>
+					<string-property name="OAuth Code" default-value="" server-restart-required="true" logical-name="anomaly.alerting.gitter.oauthCode" advanced="false"></string-property>
+					<string-property name="Room URI" default-value="" server-restart-required="false" logical-name="anomaly.alerting.gitter.roomUri" advanced="false"></string-property>
+				</properties>
+				<group-validators>
+				</group-validators>
+			</group-property>
 		</properties>
 	</section>
 </cmr-configuration>

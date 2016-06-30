@@ -6,6 +6,7 @@ package rocks.inspectit.server.anomaly.stream;
 import java.util.HashMap;
 import java.util.Map;
 
+import rocks.inspectit.server.alearting.adapter.IAlertAdapter;
 import rocks.inspectit.server.tsdb.InfluxDBService;
 
 /**
@@ -15,6 +16,27 @@ import rocks.inspectit.server.tsdb.InfluxDBService;
 public class SharedStreamProperties {
 
 	private static InfluxDBService influxService;
+
+	private static IAlertAdapter alertingComponent;
+
+	/**
+	 * Gets {@link #alertingComponent}.
+	 *
+	 * @return {@link #alertingComponent}
+	 */
+	public static IAlertAdapter getAlertingComponent() {
+		return alertingComponent;
+	}
+
+	/**
+	 * Sets {@link #alertingComponent}.
+	 *
+	 * @param alertingComponent
+	 *            New value for {@link #alertingComponent}
+	 */
+	public static void setAlertingComponent(IAlertAdapter alertingComponent) {
+		SharedStreamProperties.alertingComponent = alertingComponent;
+	}
 
 	private static Map<String, StreamStatistics> streamStatisticMap = new HashMap<>();
 

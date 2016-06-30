@@ -5,6 +5,7 @@
  * @author Ivan Senic
  */
 repositories {
+	jcenter()
 	mavenCentral()
 	maven {
 		name 'Nexus@NT'
@@ -194,7 +195,9 @@ dependencies {
 		'com.squareup.okio:okio:1.4.0',
 		'com.lmax:disruptor:3.3.4',
 		'org.rosuda.REngine:Rserve:1.8.1',
-		'org.rosuda.REngine:REngine:2.1.0'
+		'org.rosuda.REngine:REngine:2.1.0',
+		'com.github.amatkivskiy:gitter.sdk.core:1.5',
+		'com.github.amatkivskiy:gitter.sdk.sync:1.5.1'
 	)
 		
 	serverTest (
