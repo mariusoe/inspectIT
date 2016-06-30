@@ -18,4 +18,9 @@ public abstract class AlertingAdapterFactory {
 	 */
 	public abstract IAlertAdapter createGitterAdapter();
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public abstract IAlertAdapter createEmailAdapter();
+
 }

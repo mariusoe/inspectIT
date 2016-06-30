@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.amatkivskiy.gitter.sdk.credentials.GitterDeveloperCredentials;
@@ -21,6 +20,7 @@ import com.amatkivskiy.gitter.sdk.sync.client.SyncGitterAuthenticationClient;
 
 import rocks.inspectit.server.alearting.adapter.IAlertAdapter;
 import rocks.inspectit.shared.all.cmr.property.spring.PropertyUpdate;
+import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
  * Alerting adapter for Gitter.
@@ -33,13 +33,14 @@ public final class GitterAlertingAdapter implements IAlertAdapter {
 	/**
 	 * Logger for the class.
 	 */
-	private final Logger log = LoggerFactory.getLogger(GitterAlertingAdapter.class);
+	@Log
+	private Logger log;
 
 	/**
 	 * Specifies whether Gitter alerting is enabled.
 	 */
-	@Value("${anomaly.alerting.gitter.status}")
-	private boolean isEnabled;
+	@Value("${anomaly.alerting.gitter.enabled}")
+	private boolean enabled;
 
 	/**
 	 * The OAuth key.
@@ -77,7 +78,7 @@ public final class GitterAlertingAdapter implements IAlertAdapter {
 	private String oauthAccessToken;
 
 	/**
-	 * The if of the current room.
+	 * The id of the current room.
 	 */
 	private String roomId;
 
@@ -107,19 +108,11 @@ public final class GitterAlertingAdapter implements IAlertAdapter {
 	 */
 	@Override
 	public boolean connect() {
-		// init gitter client
-		GitterDeveloperCredentials.init(new SimpleGitterCredentialsProvider(oauthKey, oauthSecret, oauthRedirectUrl));
-		SyncGitterAuthenticationClient authenticationClient = new SyncGitterAuthenticationClient.Builder().build();
+		oauthAccessToken = getAccessToken();
 
-		AccessTokenResponse accessTokenResponse;
-		try {
-			accessTokenResponse = authenticationClient.getAccessToken(oauthCode);
-		} catch (Exception e) {
-			log.error("||-Could not connected to Gitter. ", e);
+		if (oauthAccessToken == null) {
 			return false;
 		}
-
-		oauthAccessToken = accessTokenResponse.accessToken;
 
 		if (log.isInfoEnabled()) {
 			log.info("||-Gitter client has been succesfully authenticated");
@@ -136,6 +129,28 @@ public final class GitterAlertingAdapter implements IAlertAdapter {
 		joinRoom(roomUri);
 
 		return true;
+	}
+
+	/**
+	 * Exchange the OAuth code for an access token.
+	 *
+	 * @return The access token.
+	 */
+	private String getAccessToken() {
+		GitterDeveloperCredentials.init(new SimpleGitterCredentialsProvider(oauthKey, oauthSecret, oauthRedirectUrl));
+		SyncGitterAuthenticationClient authenticationClient = new SyncGitterAuthenticationClient.Builder().build();
+
+		AccessTokenResponse accessTokenResponse;
+		try {
+			accessTokenResponse = authenticationClient.getAccessToken(oauthCode);
+		} catch (Exception e) {
+			if (log.isErrorEnabled()) {
+				log.error("||-Could not connected to Gitter. ", e);
+			}
+			return null;
+		}
+
+		return accessTokenResponse.accessToken;
 	}
 
 	/**
@@ -179,7 +194,7 @@ public final class GitterAlertingAdapter implements IAlertAdapter {
 	 */
 	@Override
 	public void sendMessage(String message) {
-		if (isEnabled) {
+		if (enabled) {
 			if (log.isDebugEnabled()) {
 				log.debug("Send Gitter alert message");
 			}
@@ -200,5 +215,21 @@ public final class GitterAlertingAdapter implements IAlertAdapter {
 		gitterClient.leaveRoom(roomId, currentUser.id);
 
 		joinRoom(roomUri);
+	}
+
+	/**
+	 * Is called when the roomUri is changed.
+	 */
+	@PropertyUpdate(properties = { "anomaly.alerting.gitter.enabled" })
+	private void onEnabled() {
+		if (enabled) {
+			if (gitterClient == null) {
+				connect();
+			}
+		} else {
+			if (gitterClient != null) {
+				gitterClient = null;
+			}
+		}
 	}
 }

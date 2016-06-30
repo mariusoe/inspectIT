@@ -83,8 +83,13 @@
 	<!-- Alerting -->
 	
 	<bean name="gitterAlertingAdapter" class="rocks.inspectit.server.alearting.adapter.impl.GitterAlertingAdapter" scope="prototype"/>
+	<bean name="emailAlertingAdapter" class="rocks.inspectit.server.alearting.adapter.impl.EmailAlertingAdapter" scope="prototype"/>
 	
 	<bean name="alertingAdapterFactory" class="rocks.inspectit.server.alearting.AlertingAdapterFactory">
 	    <lookup-method bean="gitterAlertingAdapter" name="createGitterAdapter" />
+	    <lookup-method bean="emailAlertingAdapter" name="createEmailAdapter" />
 	</bean>
+	
+	<bean name="grafanaDashboardInjector" class="rocks.inspectit.server.anomaly.GrafanaDashboardInjector" />
+	
 </beans>

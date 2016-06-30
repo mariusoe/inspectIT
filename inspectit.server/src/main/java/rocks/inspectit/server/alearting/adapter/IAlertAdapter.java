@@ -19,11 +19,10 @@ public interface IAlertAdapter {
 	boolean connect();
 
 	/**
-	 * Sends the given message.
+	 * Sends the given message if the adapter is enabled.
 	 *
 	 * @param message
 	 *            the message to send
 	 */
 	void sendMessage(String message);
-
 }

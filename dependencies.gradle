@@ -197,7 +197,9 @@ dependencies {
 		'org.rosuda.REngine:Rserve:1.8.1',
 		'org.rosuda.REngine:REngine:2.1.0',
 		'com.github.amatkivskiy:gitter.sdk.core:1.5',
-		'com.github.amatkivskiy:gitter.sdk.sync:1.5.1'
+		'com.github.amatkivskiy:gitter.sdk.sync:1.5.1',
+		'org.apache.commons:commons-email:1.4',
+		'javax.mail:mail:1.4'
 	)
 		
 	serverTest (

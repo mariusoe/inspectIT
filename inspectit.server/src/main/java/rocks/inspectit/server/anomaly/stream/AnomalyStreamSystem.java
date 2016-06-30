@@ -108,6 +108,9 @@ public class AnomalyStreamSystem implements InitializingBean {
 			IAlertAdapter gitterAdapter = alertingAdapterFactory.createGitterAdapter();
 			gitterAdapter.connect();
 
+			IAlertAdapter emailAdapter = alertingAdapterFactory.createEmailAdapter();
+			emailAdapter.connect();
+
 			gitterAdapter.sendMessage("===================================");
 			gitterAdapter.sendMessage("AnomalyDetection has been started");
 			gitterAdapter.sendMessage("===================================");

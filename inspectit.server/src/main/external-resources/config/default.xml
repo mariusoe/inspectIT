@@ -315,27 +315,55 @@
 			</group-property>
 		</properties>
 	</section>
-	<section name="InfluxDB">
+	
+	<section name="Monitoring">
 		<properties>
-			<string-property name="Host" default-value="192.168.56.101" server-restart-required="true" logical-name="influxdb.host" advanced="false"></string-property>
-			<long-property name="Port" default-value="8086" server-restart-required="true" logical-name="influxdb.port" advanced="false" description="The port used for communicating with agents.">
-				<validators>
-					<isPositive />
-				</validators>
-			</long-property>
-			<string-property name="Username" default-value="inspectit" server-restart-required="true" logical-name="influxdb.user" advanced="false"></string-property>
-			<string-property name="Password" default-value="password" server-restart-required="true" logical-name="influxdb.passwd" advanced="false"></string-property>
-			<string-property name="Database" default-value="inspectit" server-restart-required="true" logical-name="influxdb.database" advanced="false"></string-property>
-			<string-property name="RetentionPolicy" default-value="default" server-restart-required="true" logical-name="influxdb.retentionPolicy" advanced="true"></string-property>
+		
+			<group-property name="Anomaly Detection">
+				<properties>
+					<boolean-property name="Execute Anomaly Detection" default-value="false" server-restart-required="true" logical-name="anomaly.isActive" advanced="false" description="If the anomaly detection should be executed."></boolean-property>
+				</properties>
+				<group-validators>
+				</group-validators>
+			</group-property>
+		
+			<group-property name="InfluxDB">
+				<properties>
+					<string-property name="Host" default-value="192.168.56.101" server-restart-required="true" logical-name="influxdb.host" advanced="false"></string-property>
+					<long-property name="Port" default-value="8086" server-restart-required="true" logical-name="influxdb.port" advanced="false" description="The port used for communicating with agents.">
+						<validators>
+							<isPositive />
+						</validators>
+					</long-property>
+					<string-property name="Username" default-value="inspectit" server-restart-required="true" logical-name="influxdb.user" advanced="false"></string-property>
+					<string-property name="Password" default-value="password" server-restart-required="true" logical-name="influxdb.passwd" advanced="false"></string-property>
+					<string-property name="Database" default-value="inspectit" server-restart-required="true" logical-name="influxdb.database" advanced="false"></string-property>
+					<string-property name="RetentionPolicy" default-value="default" server-restart-required="true" logical-name="influxdb.retentionPolicy" advanced="true"></string-property>
+				</properties>
+				<group-validators>
+				</group-validators>
+			</group-property>
+			
+			<group-property name="Grafana Dashboard Injection">
+				<properties>
+					<boolean-property name="Dashboard Injection" default-value="false" server-restart-required="false" logical-name="anomaly.grafana.injection" advanced="false"></boolean-property>
+				
+					<string-property name="Grafana API Key" default-value="" server-restart-required="false" logical-name="anomaly.grafana.apiKey" advanced="false"></string-property>
+					<string-property name="Grafana Server URL" default-value="http://127.0.0.1:3000" server-restart-required="false" logical-name="anomaly.grafana.serverUrl" advanced="false"></string-property>
+				</properties>
+				<group-validators>
+				</group-validators>
+			</group-property>
+			
 		</properties>
 	</section>
-	<section name="AnomalyDetection">
+	
+	<section name="Alerting">
 		<properties>
-			<boolean-property name="Is active" default-value="false" server-restart-required="true" logical-name="anomaly.isActive" advanced="false" description="If the anomaly detection should be executed."></boolean-property>
 			
-			<group-property name="Alerting Gitter" description="Expansion rate defines how much the calculated object heap sizes in buffer will be increased, as the safty for available heap space not to be exhausted. ">
+			<group-property name="Gitter">
 				<properties>
-					<boolean-property name="Status" default-value="false" server-restart-required="false" logical-name="anomaly.alerting.gitter.status" advanced="false" description="Using Gitter as alerting channel."></boolean-property>
+					<boolean-property name="Enabled" default-value="false" server-restart-required="false" logical-name="anomaly.alerting.gitter.enabled" advanced="false" description="Using Gitter as alerting channel."></boolean-property>
 				
 					<string-property name="OAuth Key" default-value="" server-restart-required="true" logical-name="anomaly.alerting.gitter.oauthKey" advanced="false"></string-property>
 					<string-property name="OAuth Secret" default-value="" server-restart-required="true" logical-name="anomaly.alerting.gitter.oauthSecret" advanced="false"></string-property>
@@ -346,6 +374,30 @@
 				<group-validators>
 				</group-validators>
 			</group-property>
+			
+			<group-property name="eMail">
+				<properties>
+					<boolean-property name="Enabled" default-value="false" server-restart-required="false" logical-name="anomaly.alerting.email.enabled" advanced="false"></boolean-property>
+					
+					<boolean-property name="Test eMail" default-value="false" server-restart-required="false" logical-name="anomaly.alerting.email.testMail" advanced="false" description="Send a test eMail at startup."></boolean-property>
+				
+					<string-property name="SMTP Server" default-value="" server-restart-required="false" logical-name="anomaly.alerting.email.smtpHost" advanced="false"></string-property>
+					<long-property name="SMTP Port" default-value="465" server-restart-required="false" logical-name="anomaly.alerting.email.smtpPort" advanced="false">
+						<validators>
+							<isPositive />
+						</validators>
+					</long-property>
+					<boolean-property name="Use SSL" default-value="true" server-restart-required="false" logical-name="anomaly.alerting.email.useTSL" advanced="false"></boolean-property>
+					<string-property name="Username" default-value="" server-restart-required="false" logical-name="anomaly.alerting.email.username" advanced="false"></string-property>
+					<string-property name="Passwort" default-value="" server-restart-required="false" logical-name="anomaly.alerting.email.password" advanced="false"></string-property>
+					<string-property name="eMail-Address From" default-value="" server-restart-required="false" logical-name="anomaly.alerting.email.emailFrom" advanced="false" description="This eMail address is used to send the alert-email."></string-property>
+					<string-property name="eMail-Address Target" default-value="" server-restart-required="false" logical-name="anomaly.alerting.email.emailTo" advanced="false" description="This eMail address receives alert eMails."></string-property>
+				</properties>
+				<group-validators>
+				</group-validators>
+			</group-property>
+			
 		</properties>
 	</section>
+	
 </cmr-configuration>
