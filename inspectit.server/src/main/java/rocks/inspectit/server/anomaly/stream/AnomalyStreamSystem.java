@@ -72,6 +72,9 @@ public class AnomalyStreamSystem implements InitializingBean {
 	@Autowired
 	AlertingAdapterFactory alertingAdapterFactory;
 
+	@Autowired
+	StreamComponentFactory streamComponentFactory;
+
 	/**
 	 *
 	 */
@@ -83,6 +86,7 @@ public class AnomalyStreamSystem implements InitializingBean {
 
 	private ISingleInputComponent<InvocationSequenceData> streamEntryComponent;
 
+	@SuppressWarnings("unchecked")
 	private void initDisruptor() {
 		InvocationSequenceEventFactory eventFactory = new InvocationSequenceEventFactory();
 
@@ -105,9 +109,8 @@ public class AnomalyStreamSystem implements InitializingBean {
 		if (anomalyDectectionIsActive) {
 			log.info("|-Initializing AnomalyStreamSystem...");
 
-			IAlertAdapter gitterAdapter = alertingAdapterFactory.createGitterAdapter();
-
-			IAlertAdapter emailAdapter = alertingAdapterFactory.createEmailAdapter();
+			IAlertAdapter gitterAdapter = alertingAdapterFactory.getGitterAdapter();
+			IAlertAdapter emailAdapter = alertingAdapterFactory.getEmailAdapter();
 
 			gitterAdapter.sendMessage("===================================");
 			gitterAdapter.sendMessage("AnomalyDetection has been started");

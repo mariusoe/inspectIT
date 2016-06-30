@@ -81,15 +81,22 @@
 	</bean>
 	
 	<!-- Alerting -->
+
+	<bean name="grafanaDashboardInjector" class="rocks.inspectit.server.anomaly.GrafanaDashboardInjector" />
 	
-	<bean name="gitterAlertingAdapter" class="rocks.inspectit.server.alearting.adapter.impl.GitterAlertingAdapter" scope="prototype"/>
-	<bean name="emailAlertingAdapter" class="rocks.inspectit.server.alearting.adapter.impl.EmailAlertingAdapter" scope="prototype"/>
+	<bean name="gitterAlertingAdapter" class="rocks.inspectit.server.alearting.adapter.impl.GitterAlertingAdapter"/>
+	<bean name="emailAlertingAdapter" class="rocks.inspectit.server.alearting.adapter.impl.EmailAlertingAdapter"/>
 	
 	<bean name="alertingAdapterFactory" class="rocks.inspectit.server.alearting.AlertingAdapterFactory">
-	    <lookup-method bean="gitterAlertingAdapter" name="createGitterAdapter" />
-	    <lookup-method bean="emailAlertingAdapter" name="createEmailAdapter" />
+	    <lookup-method bean="gitterAlertingAdapter" name="getGitterAdapter" />
+	    <lookup-method bean="emailAlertingAdapter" name="getEmailAdapter" />
 	</bean>
-	
-	<bean name="grafanaDashboardInjector" class="rocks.inspectit.server.anomaly.GrafanaDashboardInjector" />
+
+	<!-- Stream Components -->
+	<bean name="warmUpFilterComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.WarmUpFilterComponent" scope="prototype"/>
+
+	<bean name="streamComponentFactory" class="rocks.inspectit.server.anomaly.stream.StreamComponentFactory">
+	    <lookup-method bean="warmUpFilterComponent" name="createWarmUpFilter" />
+	</bean>	
 	
 </beans>
