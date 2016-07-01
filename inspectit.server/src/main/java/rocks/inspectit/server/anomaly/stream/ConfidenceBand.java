@@ -62,6 +62,6 @@ public class ConfidenceBand {
 	}
 
 	public double distanceToBand(double value) {
-		return Math.abs(value - mean) - getWidth() / 2;
+		return Math.max(0, Math.abs(value - mean) - getWidth() / 2);
 	}
 }

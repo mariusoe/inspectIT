@@ -19,9 +19,35 @@ public abstract class AbstractDoubleStreamComponent<I> implements IDoubleInputCo
 	 */
 	private final Logger log = LoggerFactory.getLogger(AbstractDoubleStreamComponent.class);
 
-	private final ISingleInputComponent<I> nextComponentOne;
+	private ISingleInputComponent<I> nextComponentOne;
 
-	private final ISingleInputComponent<I> nextComponentTwo;
+	private ISingleInputComponent<I> nextComponentTwo;
+
+	/**
+	 *
+	 */
+	public AbstractDoubleStreamComponent() {
+	}
+
+	/**
+	 * Sets {@link #nextComponentOne}.
+	 *
+	 * @param nextComponentOne
+	 *            New value for {@link #nextComponentOne}
+	 */
+	public void setNextComponentOne(ISingleInputComponent<I> nextComponentOne) {
+		this.nextComponentOne = nextComponentOne;
+	}
+
+	/**
+	 * Sets {@link #nextComponentTwo}.
+	 *
+	 * @param nextComponentTwo
+	 *            New value for {@link #nextComponentTwo}
+	 */
+	public void setNextComponentTwo(ISingleInputComponent<I> nextComponentTwo) {
+		this.nextComponentTwo = nextComponentTwo;
+	}
 
 	/**
 	 * @param nextComponent

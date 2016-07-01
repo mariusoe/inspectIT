@@ -19,12 +19,28 @@ public abstract class AbstractSingleStreamComponent<I> implements ISingleInputCo
 	 */
 	private final Logger log = LoggerFactory.getLogger(AbstractSingleStreamComponent.class);
 
-	private final ISingleInputComponent<I> nextComponent;
+	private ISingleInputComponent<I> nextComponent;
 
 	/**
-	 * @param nextComponent
+	 *
 	 */
-	public AbstractSingleStreamComponent(ISingleInputComponent<I> nextComponent) {
+	public AbstractSingleStreamComponent() {
+	}
+
+	/**
+	 *
+	 */
+	public AbstractSingleStreamComponent(ISingleInputComponent<I> next) {
+		nextComponent = next;
+	}
+
+	/**
+	 * Sets {@link #nextComponent}.
+	 *
+	 * @param nextComponent
+	 *            New value for {@link #nextComponent}
+	 */
+	public void setNextComponent(ISingleInputComponent<I> nextComponent) {
 		this.nextComponent = nextComponent;
 	}
 

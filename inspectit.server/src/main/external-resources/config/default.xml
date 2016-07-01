@@ -322,6 +322,17 @@
 			<group-property name="Anomaly Detection">
 				<properties>
 					<boolean-property name="Execute Anomaly Detection" default-value="false" server-restart-required="true" logical-name="anomaly.isActive" advanced="false" description="If the anomaly detection should be executed."></boolean-property>
+					
+					<string-property name="Warm-Up Count" default-value="20" server-restart-required="true" logical-name="anomaly.settings.warmupCount" advanced="false"></string-property>
+					<string-property name="Score Threshold" default-value="0.25" server-restart-required="false" logical-name="anomaly.settings.scoreThreshold" advanced="false"></string-property>
+					<long-property name="Error-Rate Window Size [s]" default-value="10" server-restart-required="true" logical-name="anomaly.settings.errorRateWindowSize" advanced="false"></long-property>
+					
+					<string-property name="Alerting - Threshold" default-value="0.5" server-restart-required="false" logical-name="anomaly.settings.alerting.threshold" advanced="false"></string-property>
+					<long-property name="Alerting - Min. Anomaly Duration [ms]" default-value="30000" server-restart-required="false" logical-name="anomaly.settings.alerting.minDuration" advanced="false"></long-property>
+					<long-property name="Alerting - Notification Interval [ms]" default-value="60000" server-restart-required="false" logical-name="anomaly.settings.alerting.notificationInterval" advanced="false"></long-property>
+					
+					<long-property name="Confidence Band Update Interval [s]" default-value="5" server-restart-required="true" logical-name="anomaly.settings.confidenceBandUpdateInterval" advanced="false"></long-property>
+					<long-property name="Confidence Band History Size" default-value="720" server-restart-required="true" logical-name="anomaly.settings.confidenceBandHistorySize" advanced="false"></long-property>
 				</properties>
 				<group-validators>
 				</group-validators>

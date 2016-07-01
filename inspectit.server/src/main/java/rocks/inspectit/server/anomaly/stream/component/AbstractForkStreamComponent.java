@@ -19,28 +19,34 @@ public abstract class AbstractForkStreamComponent<I> implements ISingleInputComp
 	 */
 	private final Logger log = LoggerFactory.getLogger(AbstractForkStreamComponent.class);
 
-	private final ISingleInputComponent<I> nextComponentOne;
+	private ISingleInputComponent<I> nextComponentOne;
 
-	private final ISingleInputComponent<I> nextComponentTwo;
+	private ISingleInputComponent<I> nextComponentTwo;
 
-	private final IDoubleInputComponent<I> nextComponent;
+	private IDoubleInputComponent<I> nextComponent;
 
 	/**
+	 * Sets {@link #nextComponent}.
+	 *
 	 * @param nextComponent
+	 *            New value for {@link #nextComponent}
 	 */
-	public AbstractForkStreamComponent(IDoubleInputComponent<I> nextComponent) {
+	public void setNextComponent(IDoubleInputComponent<I> nextComponent) {
+		this.nextComponentOne = null;
+		this.nextComponentTwo = null;
 		this.nextComponent = nextComponent;
-		nextComponentOne = null;
-		nextComponentTwo = null;
 	}
 
 	/**
+	 * Sets {@link #nextComponent}.
+	 *
 	 * @param nextComponent
+	 *            New value for {@link #nextComponent}
 	 */
-	public AbstractForkStreamComponent(ISingleInputComponent<I> nextComponentOne, ISingleInputComponent<I> nextComponentTwo) {
+	public void setNextComponent(ISingleInputComponent<I> nextComponentOne, ISingleInputComponent<I> nextComponentTwo) {
+		this.nextComponent = null;
 		this.nextComponentOne = nextComponentOne;
 		this.nextComponentTwo = nextComponentTwo;
-		nextComponent = null;
 	}
 
 	/**

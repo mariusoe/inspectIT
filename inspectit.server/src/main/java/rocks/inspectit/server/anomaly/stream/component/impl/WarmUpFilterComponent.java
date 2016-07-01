@@ -5,11 +5,14 @@ package rocks.inspectit.server.anomaly.stream.component.impl;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
-import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
 import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
+import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
  * @author Marius Oehler
@@ -17,17 +20,27 @@ import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
  */
 public class WarmUpFilterComponent extends AbstractSingleStreamComponent<InvocationSequenceData> {
 
+	/**
+	 * Logger for the class.
+	 */
+	@Log
+	private Logger log;
+
 	private final AtomicLong counter = new AtomicLong(0L);
 
-	private final long warmupCount = 20;
+	@Value("${anomaly.settings.warmupCount}")
+	private long warmupCount;
 
 	private boolean isWarmingUp = true;
 
 	/**
-	 * @param nextComponent
+	 * Sets {@link #warmupCount}.
+	 *
+	 * @param warmupCount
+	 *            New value for {@link #warmupCount}
 	 */
-	public WarmUpFilterComponent(ISingleInputComponent<InvocationSequenceData> nextComponent) {
-		super(nextComponent);
+	public void setWarmupCount(long warmupCount) {
+		this.warmupCount = warmupCount;
 	}
 
 	/**
@@ -38,6 +51,9 @@ public class WarmUpFilterComponent extends AbstractSingleStreamComponent<Invocat
 		if (isWarmingUp) {
 			if (counter.incrementAndGet() > warmupCount) {
 				isWarmingUp = false;
+				if (log.isInfoEnabled()) {
+					log.info("Warm-up phase has finished..");
+				}
 			}
 			return EFlowControl.BREAK;
 		} else {

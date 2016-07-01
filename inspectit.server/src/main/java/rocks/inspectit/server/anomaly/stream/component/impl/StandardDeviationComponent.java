@@ -11,14 +11,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
-import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
-import rocks.inspectit.server.anomaly.stream.object.InvocationStreamObject;
 import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.server.anomaly.utils.StatisticUtils;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
@@ -29,25 +33,28 @@ import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
  */
 public class StandardDeviationComponent extends AbstractSingleStreamComponent<InvocationSequenceData> implements Runnable {
 
+	@Value("${anomaly.settings.confidenceBandHistorySize}")
+	private int historyLimit;
+
+	private final Map<String, LinkedList<ResidualContainer>> residualHistoryMap = new HashMap<>();
+
+	private Queue<StreamObject<InvocationSequenceData>> intervalQueue = new ConcurrentLinkedQueue<StreamObject<InvocationSequenceData>>();
+
+	@Value("${anomaly.settings.confidenceBandUpdateInterval}")
+	private long updateInterval;
+
 	/**
-	 *
+	 * {@link ExecutorService} for sending keep alive messages.
 	 */
-	private static final int historyLimit = 720;
+	@Autowired
+	@Resource(name = "scheduledExecutorService")
+	private ScheduledExecutorService executorService;
 
-	private final Map<String, LinkedList<ResidualContainer>> residualHistoryMap;
+	@Autowired
+	private SharedStreamProperties streamProperties;
 
-	private Queue<InvocationStreamObject> intervalQueue;
-
-	/**
-	 * @param nextComponent
-	 */
-	public StandardDeviationComponent(ISingleInputComponent<InvocationSequenceData> nextComponent, ScheduledExecutorService executorService) {
-		super(nextComponent);
-
-		residualHistoryMap = new HashMap<>();
-		intervalQueue = new ConcurrentLinkedQueue<InvocationStreamObject>();
-
-		executorService.scheduleAtFixedRate(this, 5, 5, TimeUnit.SECONDS);
+	public void start() {
+		executorService.scheduleAtFixedRate(this, updateInterval, updateInterval, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -55,7 +62,7 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 	 */
 	@Override
 	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> item) {
-		intervalQueue.add((InvocationStreamObject) item);
+		intervalQueue.add(item);
 
 		return EFlowControl.CONTINUE;
 	}
@@ -65,25 +72,25 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 	 */
 	@Override
 	public void run() {
-		Queue<InvocationStreamObject> queue = intervalQueue;
-		intervalQueue = new ConcurrentLinkedQueue<InvocationStreamObject>();
+		Queue<StreamObject<InvocationSequenceData>> queue = intervalQueue;
+		intervalQueue = new ConcurrentLinkedQueue<StreamObject<InvocationSequenceData>>();
 
-		Map<String, ArrayList<InvocationStreamObject>> invocationStreamMap = new HashMap<>();
+		Map<String, ArrayList<StreamObject<InvocationSequenceData>>> invocationStreamMap = new HashMap<>();
 
-		for (InvocationStreamObject iso : queue) {
-			if (!invocationStreamMap.containsKey(iso.getBusinessTransaction())) {
-				invocationStreamMap.put(iso.getBusinessTransaction(), new ArrayList<InvocationStreamObject>());
+		for (StreamObject<InvocationSequenceData> iso : queue) {
+			if (!invocationStreamMap.containsKey(iso.getContext().getBusinessTransaction())) {
+				invocationStreamMap.put(iso.getContext().getBusinessTransaction(), new ArrayList<StreamObject<InvocationSequenceData>>());
 			}
 
-			invocationStreamMap.get(iso.getBusinessTransaction()).add(iso);
+			invocationStreamMap.get(iso.getContext().getBusinessTransaction()).add(iso);
 		}
 
-		for (Entry<String, ArrayList<InvocationStreamObject>> entry : invocationStreamMap.entrySet()) {
+		for (Entry<String, ArrayList<StreamObject<InvocationSequenceData>>> entry : invocationStreamMap.entrySet()) {
 			calculateStandardDeviation(entry.getKey(), entry.getValue());
 		}
 	}
 
-	private void calculateStandardDeviation(String businessTransaction, List<InvocationStreamObject> invocationList) {
+	private void calculateStandardDeviation(String businessTransaction, List<StreamObject<InvocationSequenceData>> invocationList) {
 		double[] durationArray = new double[invocationList.size()];
 
 		for (int i = 0; i < invocationList.size(); i++) {
@@ -121,7 +128,7 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 
 		double stdDeviation = Math.sqrt(variance);
 
-		SharedStreamProperties.getStreamStatistic(businessTransaction).setStandardDeviation(stdDeviation);
+		streamProperties.getStreamContext(businessTransaction).setStandardDeviation(stdDeviation);
 	}
 
 	private class ResidualContainer {

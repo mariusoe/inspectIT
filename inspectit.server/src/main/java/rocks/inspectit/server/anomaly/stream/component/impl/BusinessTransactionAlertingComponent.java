@@ -6,12 +6,12 @@ package rocks.inspectit.server.anomaly.stream.component.impl;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+
+import org.springframework.beans.factory.annotation.Value;
 
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
-import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
 import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.shared.all.util.Pair;
 
@@ -21,24 +21,18 @@ import rocks.inspectit.shared.all.util.Pair;
  */
 public class BusinessTransactionAlertingComponent extends AbstractSingleStreamComponent<Pair<String, Double>> {
 
-	private final Map<String, AnomalyInformation> anomalyMap;
+	private final Map<String, AnomalyInformation> anomalyMap = new HashMap<>();
 
-	private final double alertThreshold = 0.5D;
+	@Value("${anomaly.settings.alerting.threshold}")
+	private double threshold;
 
-	private final long alertDuration = TimeUnit.SECONDS.toMillis(30);
+	@Value("${anomaly.settings.alerting.minDuration}")
+	private long minDuration;
 
-	private final long anomalyAlertInterval = TimeUnit.SECONDS.toMillis(60);
+	@Value("${anomaly.settings.alerting.notificationInterval}")
+	private long notificationInterval;
 
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");
-
-	/**
-	 * @param nextComponent
-	 */
-	public BusinessTransactionAlertingComponent(ISingleInputComponent<Pair<String, Double>> nextComponent) {
-		super(nextComponent);
-
-		anomalyMap = new HashMap<>();
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -50,13 +44,13 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 
 		long currentTime = System.currentTimeMillis();
 
-		if (errorRate > alertThreshold) {
+		if (errorRate > threshold) {
 			if (!anomalyMap.containsKey(businessTransaction)) {
 				anomalyMap.put(businessTransaction, new AnomalyInformation());
 			} else {
 				AnomalyInformation anomalyInformation = anomalyMap.get(businessTransaction);
 
-				if (currentTime - anomalyInformation.startTime > alertDuration) {
+				if (currentTime - anomalyInformation.startTime > minDuration) {
 					anomalyDetected(businessTransaction, errorRate);
 				}
 			}
@@ -94,7 +88,7 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 		double errorRatePercentage = ((int) (errorRate * 10000)) / 100D;
 
 		if (anomalyInformation.isActive) {
-			if (currentTime - anomalyInformation.lastAlert > anomalyAlertInterval) {
+			if (currentTime - anomalyInformation.lastAlert > notificationInterval) {
 				StringBuilder builder = new StringBuilder();
 				builder.append("Anomaly in business transaction '");
 				builder.append(businessTransaction);

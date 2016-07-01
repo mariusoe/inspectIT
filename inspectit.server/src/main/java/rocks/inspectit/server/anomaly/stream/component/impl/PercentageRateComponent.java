@@ -5,19 +5,23 @@ package rocks.inspectit.server.anomaly.stream.component.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.annotation.Resource;
+
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Point.Builder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
-import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.component.AbstractDoubleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
-import rocks.inspectit.server.anomaly.stream.object.InvocationStreamObject;
 import rocks.inspectit.server.anomaly.stream.object.StreamObject;
+import rocks.inspectit.server.tsdb.InfluxDBService;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 import rocks.inspectit.shared.all.util.Pair;
 
@@ -29,22 +33,33 @@ public class PercentageRateComponent extends AbstractDoubleStreamComponent<Invoc
 
 	private final Map<String, CounterPair> counterMap = new HashMap<>();
 
-	private final long interval = 10;
+	@Value("${anomaly.settings.errorRateWindowSize}")
+	private long interval;
 
-	private final ISingleInputComponent<Pair<String, Double>> rateComponent;
+	private ISingleInputComponent<Pair<String, Double>> triggerComponent;
+
+	@Autowired
+	private InfluxDBService influxService;
 
 	/**
-	 * @param nextComponentOne
-	 * @param nextComponentTwo
-	 * @param executorService
+	 * {@link ExecutorService} for sending keep alive messages.
 	 */
-	public PercentageRateComponent(ISingleInputComponent<InvocationSequenceData> nextComponentOne, ISingleInputComponent<InvocationSequenceData> nextComponentTwo,
-			ISingleInputComponent<Pair<String, Double>> rateComponent, ScheduledExecutorService executorService) {
-		super(nextComponentOne, nextComponentTwo);
+	@Autowired
+	@Resource(name = "scheduledExecutorService")
+	private ScheduledExecutorService executorService;
 
-		this.rateComponent = rateComponent;
-
+	public void start() {
 		executorService.scheduleAtFixedRate(this, interval, interval, TimeUnit.SECONDS);
+	}
+
+	/**
+	 * Sets {@link #triggerComponent}.
+	 *
+	 * @param triggerComponent
+	 *            New value for {@link #triggerComponent}
+	 */
+	public void setTriggerComponent(ISingleInputComponent<Pair<String, Double>> triggerComponent) {
+		this.triggerComponent = triggerComponent;
 	}
 
 	/**
@@ -52,13 +67,11 @@ public class PercentageRateComponent extends AbstractDoubleStreamComponent<Invoc
 	 */
 	@Override
 	protected EFlowControl processOneImpl(StreamObject<InvocationSequenceData> streamObject) {
-		InvocationStreamObject invocationStreamObject = (InvocationStreamObject) streamObject;
-
-		if (!counterMap.containsKey(invocationStreamObject.getBusinessTransaction())) {
-			counterMap.put(invocationStreamObject.getBusinessTransaction(), new CounterPair());
+		if (!counterMap.containsKey(streamObject.getContext().getBusinessTransaction())) {
+			counterMap.put(streamObject.getContext().getBusinessTransaction(), new CounterPair());
 		}
 
-		counterMap.get(invocationStreamObject.getBusinessTransaction()).totalCounter.incrementAndGet();
+		counterMap.get(streamObject.getContext().getBusinessTransaction()).totalCounter.incrementAndGet();
 
 		return EFlowControl.CONTINUE_ONE;
 	}
@@ -68,14 +81,12 @@ public class PercentageRateComponent extends AbstractDoubleStreamComponent<Invoc
 	 */
 	@Override
 	protected EFlowControl processOneTwo(StreamObject<InvocationSequenceData> streamObject) {
-		InvocationStreamObject invocationStreamObject = (InvocationStreamObject) streamObject;
-
-		if (!counterMap.containsKey(invocationStreamObject.getBusinessTransaction())) {
-			counterMap.put(invocationStreamObject.getBusinessTransaction(), new CounterPair());
+		if (!counterMap.containsKey(streamObject.getContext().getBusinessTransaction())) {
+			counterMap.put(streamObject.getContext().getBusinessTransaction(), new CounterPair());
 		}
 
-		counterMap.get(invocationStreamObject.getBusinessTransaction()).totalCounter.incrementAndGet();
-		counterMap.get(invocationStreamObject.getBusinessTransaction()).errorCounter.incrementAndGet();
+		counterMap.get(streamObject.getContext().getBusinessTransaction()).totalCounter.incrementAndGet();
+		counterMap.get(streamObject.getContext().getBusinessTransaction()).errorCounter.incrementAndGet();
 
 		return EFlowControl.CONTINUE_TWO;
 	}
@@ -99,10 +110,10 @@ public class PercentageRateComponent extends AbstractDoubleStreamComponent<Invoc
 			builder.addField("errorRate", rate);
 			builder.tag("buisnessTransaction", businessTransaction);
 
-			SharedStreamProperties.getInfluxService().insert(builder.build());
+			influxService.insert(builder.build());
 
 			StreamObject<Pair<String, Double>> object = new StreamObject<Pair<String, Double>>(new Pair<String, Double>(businessTransaction, rate));
-			rateComponent.process(object);
+			triggerComponent.process(object);
 		}
 	}
 

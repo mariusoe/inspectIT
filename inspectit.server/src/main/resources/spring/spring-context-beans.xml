@@ -93,10 +93,30 @@
 	</bean>
 
 	<!-- Stream Components -->
+	<bean name="sharedStreamProperties" class="rocks.inspectit.server.anomaly.stream.SharedStreamProperties" />
+	
 	<bean name="warmUpFilterComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.WarmUpFilterComponent" scope="prototype"/>
-
+	<bean name="businessTransactionInjectorComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.BusinessTransactionContextInjectorComponent" scope="prototype"/>
+	<bean name="quadraticScoreFilterComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.QuadraticScoreFilterComponent" scope="prototype"/>
+	<bean name="businessTransactionAlertingComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.BusinessTransactionAlertingComponent" scope="prototype"/>
+	<bean name="percentageRateComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.PercentageRateComponent" scope="prototype"/>
+	<bean name="tsdbWriterComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.TSDBWriterComponent" scope="prototype"/>
+	<bean name="standardDeviationComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.StandardDeviationComponent" scope="prototype"/>
+	<bean name="rHoltWintersComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.RHoltWintersComponent" scope="prototype"/>
+	<bean name="confidenceBandComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.ConfidenceBandComponent" scope="prototype"/>
+	<bean name="weightedStandardDeviationComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.WeightedStandardDeviationComponent" scope="prototype"/>
+	
 	<bean name="streamComponentFactory" class="rocks.inspectit.server.anomaly.stream.StreamComponentFactory">
 	    <lookup-method bean="warmUpFilterComponent" name="createWarmUpFilter" />
+	    <lookup-method bean="businessTransactionInjectorComponent" name="createBusinessTransactionInjector" />
+	    <lookup-method bean="quadraticScoreFilterComponent" name="createQuadraticScoreFilter" />
+	    <lookup-method bean="businessTransactionAlertingComponent" name="createBusinessTransactionAlerting" />
+	    <lookup-method bean="percentageRateComponent" name="createPercentageRate" />
+	    <lookup-method bean="tsdbWriterComponent" name="createTSDBWriter" />
+	    <lookup-method bean="standardDeviationComponent" name="createStandardDeviation" />
+	    <lookup-method bean="rHoltWintersComponent" name="createRHoltWinters" />
+	    <lookup-method bean="confidenceBandComponent" name="createConfidenceBand" />
+	    <lookup-method bean="weightedStandardDeviationComponent" name="createWeightedStandardDeviation" />
 	</bean>	
 	
 </beans>

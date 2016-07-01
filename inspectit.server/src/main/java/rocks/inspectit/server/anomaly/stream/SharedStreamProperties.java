@@ -3,19 +3,19 @@
  */
 package rocks.inspectit.server.anomaly.stream;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import rocks.inspectit.server.alearting.adapter.IAlertAdapter;
-import rocks.inspectit.server.tsdb.InfluxDBService;
+import rocks.inspectit.server.anomaly.stream.object.StreamContext;
 
 /**
  * @author Marius Oehler
  *
  */
 public class SharedStreamProperties {
-
-	private static InfluxDBService influxService;
 
 	private static IAlertAdapter alertingComponent;
 
@@ -38,39 +38,25 @@ public class SharedStreamProperties {
 		SharedStreamProperties.alertingComponent = alertingComponent;
 	}
 
-	private static Map<String, StreamStatistics> streamStatisticMap = new HashMap<>();
+	private final Map<String, StreamContext> streamContextMap = new HashMap<>();
 
 	private SharedStreamProperties() {
 	}
 
 	/**
-	 * Gets {@link #influxService}.
+	 * Gets {@link #streamContextMap}.
 	 *
-	 * @return {@link #influxService}
+	 * @return {@link #streamContextMap}
 	 */
-	public static InfluxDBService getInfluxService() {
-		return influxService;
+	public Map<String, StreamContext> getStreamContextMap() {
+		return streamContextMap;
 	}
 
-	/**
-	 * Sets {@link #influxService}.
-	 *
-	 * @param influxService
-	 *            New value for {@link #influxService}
-	 */
-	public static void setInfluxService(InfluxDBService influxService) {
-		SharedStreamProperties.influxService = influxService;
+	public List<String> getBusinessTransactions() {
+		return new ArrayList<String>(streamContextMap.keySet());
 	}
 
-	public static StreamStatistics getStreamStatistic(String businessTransaction) {
-		if (!streamStatisticMap.containsKey(businessTransaction)) {
-			synchronized (streamStatisticMap) {
-				if (!streamStatisticMap.containsKey(businessTransaction)) {
-					streamStatisticMap.put(businessTransaction, new StreamStatistics());
-				}
-			}
-		}
-		return streamStatisticMap.get(businessTransaction);
+	public StreamContext getStreamContext(String businessTransaction) {
+		return streamContextMap.get(businessTransaction);
 	}
-
 }

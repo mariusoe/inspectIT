@@ -3,13 +3,8 @@
  */
 package rocks.inspectit.server.anomaly.stream;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
-import javax.annotation.Resource;
-
-import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,23 +17,20 @@ import rocks.inspectit.server.alearting.AlertingAdapterFactory;
 import rocks.inspectit.server.alearting.adapter.IAlertAdapter;
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.BusinessTransactionAlertingComponent;
-import rocks.inspectit.server.anomaly.stream.component.impl.BusinessTransactionInjectorComponent;
-import rocks.inspectit.server.anomaly.stream.component.impl.ItemRateComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.BusinessTransactionContextInjectorComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.ConfidenceBandComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.PercentageRateComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.QuadraticScoreFilterComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.RHoltWintersComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.StandardDeviationComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.TSDBWriterComponent;
-import rocks.inspectit.server.anomaly.stream.component.impl.WarmUpFilterComponent;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventFactory;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventHandler;
 import rocks.inspectit.server.anomaly.stream.disruptor.events.InvocationSequenceEvent;
 import rocks.inspectit.server.anomaly.stream.sink.IDataSink;
 import rocks.inspectit.server.anomaly.stream.sink.InvocationSequenceSink;
-import rocks.inspectit.server.tsdb.InfluxDBService;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 import rocks.inspectit.shared.all.spring.logger.Log;
-import rocks.inspectit.shared.cs.cmr.service.IBusinessContextManagementService;
 
 /**
  * @author Marius Oehler
@@ -52,19 +44,6 @@ public class AnomalyStreamSystem implements InitializingBean {
 	 */
 	@Log
 	Logger log;
-
-	/**
-	 * {@link ExecutorService} for sending keep alive messages.
-	 */
-	@Autowired
-	@Resource(name = "scheduledExecutorService")
-	ScheduledExecutorService executorService;
-
-	@Autowired
-	InfluxDBService influx;
-
-	@Autowired
-	IBusinessContextManagementService businessService;
 
 	@Value("${anomaly.isActive}")
 	boolean anomalyDectectionIsActive;
@@ -116,7 +95,6 @@ public class AnomalyStreamSystem implements InitializingBean {
 			gitterAdapter.sendMessage("AnomalyDetection has been started");
 			gitterAdapter.sendMessage("===================================");
 
-			SharedStreamProperties.setInfluxService(influx);
 			SharedStreamProperties.setAlertingComponent(gitterAdapter);
 
 			// init stream
@@ -136,33 +114,59 @@ public class AnomalyStreamSystem implements InitializingBean {
 	}
 
 	private ISingleInputComponent<InvocationSequenceData> initStream() {
-		TSDBWriterComponent problemWriterComponent = new TSDBWriterComponent(null, "problem");
-		TSDBWriterComponent normalWriterComponent = new TSDBWriterComponent(null, "normal");
+		// tsdb writer for normal requests
+		TSDBWriterComponent normalWriter = streamComponentFactory.createTSDBWriter();
+		normalWriter.setDataTypeTag("normal");
 
-		RHoltWintersComponent wintersComponent;
-		try {
-			wintersComponent = new RHoltWintersComponent(normalWriterComponent, executorService);
-		} catch (RserveException e) {
-			return null;
-		}
+		// tsdbwriter for slow request
+		TSDBWriterComponent problemWriter = streamComponentFactory.createTSDBWriter();
+		problemWriter.setDataTypeTag("problem");
 
-		// ConfidenceBandComponent bandComponent = new ConfidenceBandComponent(wintersComponent,
-		// 10000, executorService);
-		StandardDeviationComponent stddevComponent = new StandardDeviationComponent(wintersComponent, executorService);
+		// calculating the confidence band
+		ConfidenceBandComponent confidenceBand = streamComponentFactory.createConfidenceBand();
+		confidenceBand.setNextComponent(normalWriter);
+		confidenceBand.start();
 
-		BusinessTransactionAlertingComponent alertingComponent = new BusinessTransactionAlertingComponent(null);
+		// cb calculation using R and HoltWinters method
+		RHoltWintersComponent holtWinters = streamComponentFactory.createRHoltWinters();
+		holtWinters.setNextComponent(confidenceBand);
+		holtWinters.start();
 
-		PercentageRateComponent pErrorRateComponent = new PercentageRateComponent(stddevComponent, problemWriterComponent, alertingComponent, executorService);
+		// weighted standard deviation calculation
+		// WeightedStandardDeviationComponent standardDeviation =
+		// streamComponentFactory.createWeightedStandardDeviation();
+		// standardDeviation.setNextComponent(holtWinters);
+		// standardDeviation.start();
 
-		QuadraticScoreFilterComponent scoreFilterComponent = new QuadraticScoreFilterComponent(pErrorRateComponent);
+		// standard deviation calculation
+		StandardDeviationComponent standardDeviation = streamComponentFactory.createStandardDeviation();
+		standardDeviation.setNextComponent(holtWinters);
+		standardDeviation.start();
 
-		ItemRateComponent rateComponent = new ItemRateComponent(scoreFilterComponent, "total throughput");
+		// alerting
+		BusinessTransactionAlertingComponent businessTransactionAlerting = streamComponentFactory.createBusinessTransactionAlerting();
 
-		BusinessTransactionInjectorComponent businessTransactionInjector = new BusinessTransactionInjectorComponent(rateComponent, businessService);
+		// calculating slow request rate
+		PercentageRateComponent percentageRate = streamComponentFactory.createPercentageRate();
+		percentageRate.setNextComponentOne(standardDeviation);
+		percentageRate.setNextComponentTwo(problemWriter);
+		percentageRate.setTriggerComponent(businessTransactionAlerting);
+		percentageRate.start();
 
-		WarmUpFilterComponent warmUpFilter = new WarmUpFilterComponent(businessTransactionInjector);
+		// determine whether data is normal or slow
+		QuadraticScoreFilterComponent quadraticScoreFilter = streamComponentFactory.createQuadraticScoreFilter();
+		quadraticScoreFilter.setNextComponent(percentageRate);
 
-		return warmUpFilter;
+		// business transaction injection
+		BusinessTransactionContextInjectorComponent businessTransactionInjector = streamComponentFactory.createBusinessTransactionInjector();
+		businessTransactionInjector.setNextComponent(quadraticScoreFilter);
+
+		// warmup filter
+		// WarmUpFilterComponent warmUpFilter = streamComponentFactory.createWarmUpFilter();
+		// warmUpFilter.setNextComponent(businessTransactionInjector);
+
+		// set entry point
+		return businessTransactionInjector;
 	}
 
 	public void process(InvocationSequenceData data) {

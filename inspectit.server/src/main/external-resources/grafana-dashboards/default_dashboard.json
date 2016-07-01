@@ -663,7 +663,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "alias": "error rate",
+              "alias": "slow request rate",
               "dsType": "influxdb",
               "groupBy": [
                 {
@@ -708,7 +708,7 @@
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Error Rate",
+          "title": "Slow Request Rate",
           "tooltip": {
             "msResolution": false,
             "shared": true,
@@ -984,7 +984,7 @@
           ],
           "targets": [
             {
-              "alias": "error rate (last hour) - avg",
+              "alias": "slow request rate (last hour) - avg",
               "dsType": "influxdb",
               "groupBy": [
                 {
@@ -1027,7 +1027,7 @@
               ]
             },
             {
-              "alias": "error rate (last hour) - peak",
+              "alias": "slow request rate (last hour) - peak",
               "dsType": "influxdb",
               "groupBy": [
                 {

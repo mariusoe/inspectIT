@@ -5,13 +5,12 @@ package rocks.inspectit.server.anomaly.stream.component.impl;
 
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Point.Builder;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
-import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
-import rocks.inspectit.server.anomaly.stream.object.InvocationStreamObject;
 import rocks.inspectit.server.anomaly.stream.object.StreamObject;
+import rocks.inspectit.server.tsdb.InfluxDBService;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 
 /**
@@ -20,16 +19,19 @@ import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
  */
 public class TSDBWriterComponent extends AbstractSingleStreamComponent<InvocationSequenceData> {
 
-	private final String type;
+	@Autowired
+	private InfluxDBService influxService;
+
+	private String dataTypeTag;
 
 	/**
-	 * @param nextComponent
-	 * @param businessService2
-	 * @param businessContextManagementService
+	 * Sets {@link #dataTypeTag}.
+	 *
+	 * @param dataTypeTag
+	 *            New value for {@link #dataTypeTag}
 	 */
-	public TSDBWriterComponent(ISingleInputComponent<InvocationSequenceData> nextComponent, String type) {
-		super(nextComponent);
-		this.type = type;
+	public void setDataTypeTag(String dataTypeTag) {
+		this.dataTypeTag = dataTypeTag;
 	}
 
 	/**
@@ -37,14 +39,12 @@ public class TSDBWriterComponent extends AbstractSingleStreamComponent<Invocatio
 	 */
 	@Override
 	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> streamObject) {
-		InvocationStreamObject invocationStreamObject = (InvocationStreamObject) streamObject;
-
 		Builder builder = Point.measurement("stream");
 		builder.addField("duration", streamObject.getData().getDuration());
-		builder.tag("businessTransaction", invocationStreamObject.getBusinessTransaction());
-		builder.tag("type", type);
+		builder.tag("businessTransaction", streamObject.getContext().getBusinessTransaction());
+		builder.tag("type", dataTypeTag);
 
-		SharedStreamProperties.getInfluxService().insert(builder.build());
+		influxService.insert(builder.build());
 
 		return EFlowControl.CONTINUE;
 	}

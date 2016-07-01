@@ -7,7 +7,7 @@ import com.lmax.disruptor.EventHandler;
 
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
 import rocks.inspectit.server.anomaly.stream.disruptor.events.InvocationSequenceEvent;
-import rocks.inspectit.server.anomaly.stream.object.InvocationStreamObject;
+import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 
 /**
@@ -30,7 +30,7 @@ public class InvocationSequenceEventHandler implements EventHandler<InvocationSe
 	 */
 	@Override
 	public void onEvent(InvocationSequenceEvent event, long sequence, boolean endOfBatch) throws Exception {
-		InvocationStreamObject streamObject = new InvocationStreamObject(event.getData());
+		StreamObject<InvocationSequenceData> streamObject = new StreamObject<>(event.getData());
 		streamEntryComponent.process(streamObject);
 	}
 

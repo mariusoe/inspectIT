@@ -11,30 +11,30 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.influxdb.dto.Point;
-import org.influxdb.dto.Point.Builder;
+import javax.annotation.Resource;
+
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
-import rocks.inspectit.server.anomaly.stream.ConfidenceBand;
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
-import rocks.inspectit.server.anomaly.stream.StreamStatistics;
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
-import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
-import rocks.inspectit.server.anomaly.stream.object.InvocationStreamObject;
+import rocks.inspectit.server.anomaly.stream.object.StreamContext;
 import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.server.anomaly.utils.AnomalyUtils;
 import rocks.inspectit.server.anomaly.utils.StatisticUtils;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
+import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
  * @author Marius Oehler
@@ -45,32 +45,36 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 	/**
 	 * Logger for the class.
 	 */
-	private final Logger log = LoggerFactory.getLogger(RHoltWintersComponent.class);
+	@Log
+	private Logger log;
 
-	private final RConnection rConnection;
+	private RConnection rConnection;
 
-	private final Map<String, LinkedList<Double>> historyListMap;
+	private final Map<String, LinkedList<Double>> historyListMap = new HashMap<>();
 
-	private final int historyLimit;
+	private Queue<StreamObject<InvocationSequenceData>> intervalQueue = new ConcurrentLinkedQueue<StreamObject<InvocationSequenceData>>();
 
-	private Queue<InvocationStreamObject> intervalQueue;
+	@Value("${anomaly.settings.confidenceBandHistorySize}")
+	private int historyLimit;
+
+	@Value("${anomaly.settings.confidenceBandUpdateInterval}")
+	private long updateInterval;
+
+	@Autowired
+	private SharedStreamProperties streamProperties;
 
 	/**
-	 * @param nextComponent
-	 * @throws RserveException
+	 * {@link ExecutorService} for sending keep alive messages.
 	 */
-	public RHoltWintersComponent(ISingleInputComponent<InvocationSequenceData> nextComponent, ScheduledExecutorService executor) throws RserveException {
-		super(nextComponent);
+	@Autowired
+	@Resource(name = "scheduledExecutorService")
+	private ScheduledExecutorService executorService;
 
-		// init fields
-		historyListMap = new HashMap<>();
-		historyLimit = 60; // 720=1h | 60=5m
-		intervalQueue = new ConcurrentLinkedQueue<InvocationStreamObject>();
-
+	public void start() {
 		// connect to R
-		rConnection = new RConnection("localhost");
-
 		try {
+			rConnection = new RConnection("localhost");
+
 			String rVersionString = rConnection.eval("R.version.string").asString();
 			log.info("||-Connected to Rserve [{}]", rVersionString);
 
@@ -80,12 +84,17 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 			if (loadResult == null) {
 				log.warn("||-forecast library could not be loaded..");
 			}
-		} catch (REXPMismatchException e) {
-			log.error(e.getMessage());
-		}
 
-		// schedule component
-		executor.scheduleAtFixedRate(this, 5, 5, TimeUnit.SECONDS);
+			executorService.scheduleAtFixedRate(this, updateInterval, updateInterval, TimeUnit.SECONDS);
+		} catch (RserveException e) {
+			if (log.isErrorEnabled()) {
+				log.error("Cannot connect to Rserve.", e);
+			}
+		} catch (REXPMismatchException e) {
+			if (log.isErrorEnabled()) {
+				log.error("R error.", e);
+			}
+		}
 	}
 
 	/**
@@ -93,7 +102,7 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 	 */
 	@Override
 	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> item) {
-		intervalQueue.add((InvocationStreamObject) item);
+		intervalQueue.add(item);
 
 		return EFlowControl.CONTINUE;
 	}
@@ -103,29 +112,29 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 	 */
 	@Override
 	public void run() {
-		Queue<InvocationStreamObject> queue = intervalQueue;
-		intervalQueue = new ConcurrentLinkedQueue<InvocationStreamObject>();
+		Queue<StreamObject<InvocationSequenceData>> queue = intervalQueue;
+		intervalQueue = new ConcurrentLinkedQueue<StreamObject<InvocationSequenceData>>();
 
 		if (queue.isEmpty()) {
 			return;
 		}
 
-		Map<String, ArrayList<InvocationStreamObject>> invocationStreamMap = new HashMap<>();
+		Map<String, ArrayList<StreamObject<InvocationSequenceData>>> invocationStreamMap = new HashMap<>();
 
-		for (InvocationStreamObject iso : queue) {
-			if (!invocationStreamMap.containsKey(iso.getBusinessTransaction())) {
-				invocationStreamMap.put(iso.getBusinessTransaction(), new ArrayList<InvocationStreamObject>());
+		for (StreamObject<InvocationSequenceData> iso : queue) {
+			if (!invocationStreamMap.containsKey(iso.getContext().getBusinessTransaction())) {
+				invocationStreamMap.put(iso.getContext().getBusinessTransaction(), new ArrayList<StreamObject<InvocationSequenceData>>());
 			}
 
-			invocationStreamMap.get(iso.getBusinessTransaction()).add(iso);
+			invocationStreamMap.get(iso.getContext().getBusinessTransaction()).add(iso);
 		}
 
-		for (Entry<String, ArrayList<InvocationStreamObject>> entry : invocationStreamMap.entrySet()) {
+		for (Entry<String, ArrayList<StreamObject<InvocationSequenceData>>> entry : invocationStreamMap.entrySet()) {
 			calcualate(entry.getKey(), entry.getValue());
 		}
 	}
 
-	private void calcualate(String businessTransaction, List<InvocationStreamObject> invocationList) {
+	private void calcualate(String businessTransaction, List<StreamObject<InvocationSequenceData>> invocationList) {
 		double[] durationArray = new double[invocationList.size()];
 
 		for (int i = 0; i < invocationList.size(); i++) {
@@ -144,31 +153,12 @@ public class RHoltWintersComponent extends AbstractSingleStreamComponent<Invocat
 			historyList.removeFirst();
 		}
 
-		long start = System.currentTimeMillis();
 		double nextMean = Math.max(0D, forecastMean(historyList));
 
-		StreamStatistics streamStatistics = SharedStreamProperties.getStreamStatistic(businessTransaction);
+		StreamContext context = streamProperties.getStreamContext(businessTransaction);
 
 		if (!Double.isNaN(nextMean)) {
-			System.out.println("duration: " + (System.currentTimeMillis() - start) + "ms");
-
-			double stdDeviation = streamStatistics.getStandardDeviation();
-
-			double lowerConfidenceLevel = Math.max(0D, nextMean - 3 * stdDeviation);
-			double upperConfidenceLevel = nextMean + 3 * stdDeviation;
-
-			// store result in shared properties
-			ConfidenceBand confidenceBand = new ConfidenceBand(nextMean, upperConfidenceLevel, lowerConfidenceLevel);
-			streamStatistics.setConfidenceBand(confidenceBand);
-
-			// build influx point
-			Builder builder = Point.measurement("statistics");
-			builder.addField("mean", nextMean);
-			builder.addField("lowerConfidenceLevel", lowerConfidenceLevel);
-			builder.addField("upperConfidenceLevel", upperConfidenceLevel);
-			builder.tag("businessTransaction", businessTransaction);
-
-			SharedStreamProperties.getInfluxService().insert(builder.build());
+			context.setCurrentMean(nextMean);
 		}
 	}
 

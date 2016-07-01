@@ -145,7 +145,7 @@ public class EmailAlertingAdapter implements IAlertAdapter {
 				email.send();
 			} catch (EmailException e) {
 				if (log.isErrorEnabled()) {
-					log.error("Couldn't send the alrting email. ", e);
+					log.error("Couldn't send the alerting email. ", e);
 				}
 			}
 		}
