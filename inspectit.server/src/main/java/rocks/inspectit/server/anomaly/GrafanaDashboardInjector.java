@@ -11,13 +11,15 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
-import org.testng.reporters.Files;
+
+import com.google.common.io.Files;
 
 import rocks.inspectit.shared.all.cmr.property.spring.PropertyUpdate;
 import rocks.inspectit.shared.all.spring.logger.Log;
@@ -173,7 +175,7 @@ public final class GrafanaDashboardInjector {
 	private void sendDatasource(File datasourceFile) {
 		String datasourceJson;
 		try {
-			datasourceJson = Files.readFile(datasourceFile);
+			datasourceJson = Files.toString(datasourceFile, Charset.forName("UTF-8"));
 		} catch (IOException e) {
 			if (log.isErrorEnabled()) {
 				log.error("||-Couldn't load the Grafana datasource from file '" + datasourceFile.getName() + "'.", e);
@@ -250,7 +252,7 @@ public final class GrafanaDashboardInjector {
 	private void sendDashboard(File dashboardFile) {
 		String dashboardJson;
 		try {
-			dashboardJson = Files.readFile(dashboardFile);
+			dashboardJson = Files.toString(dashboardFile, Charset.forName("UTF-8"));
 		} catch (IOException e) {
 			if (log.isErrorEnabled()) {
 				log.error("||-Couldn't load the Grafana dashboard from file '" + dashboardFile.getName() + "'.", e);
