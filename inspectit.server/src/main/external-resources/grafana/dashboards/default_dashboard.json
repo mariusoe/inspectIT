@@ -23,7 +23,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": null,
+          "datasource": "inspectit-influx",
           "editable": true,
           "error": false,
           "format": "none",
@@ -114,7 +114,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(229, 151, 151, 0.9)"
           ],
-          "datasource": null,
+          "datasource": "inspectit-influx",
           "editable": true,
           "error": false,
           "format": "none",
@@ -205,7 +205,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": null,
+          "datasource": "inspectit-influx",
           "editable": true,
           "error": false,
           "format": "none",
@@ -311,7 +311,7 @@
             "slow requests": "#E24D42"
           },
           "bars": false,
-          "datasource": null,
+          "datasource": "inspectit-influx",
           "editable": true,
           "error": false,
           "fill": 0,
@@ -628,7 +628,7 @@
         {
           "aliasColors": {},
           "bars": false,
-          "datasource": null,
+          "datasource": "inspectit-influx",
           "editable": true,
           "error": false,
           "fill": 1,
@@ -939,7 +939,8 @@
           ],
           "title": "",
           "transform": "timeseries_aggregations",
-          "type": "table"
+          "type": "table",
+          "datasource": "inspectit-influx"
         },
         {
           "columns": [
@@ -1072,7 +1073,8 @@
           ],
           "title": "",
           "transform": "timeseries_aggregations",
-          "type": "table"
+          "type": "table",
+          "datasource": "inspectit-influx"
         }
       ],
       "title": "New row"
@@ -1115,7 +1117,7 @@
           "text": "Browse",
           "value": "Browse"
         },
-        "datasource": null,
+        "datasource": "inspectit-influx",
         "hide": 0,
         "includeAll": false,
         "multi": false,

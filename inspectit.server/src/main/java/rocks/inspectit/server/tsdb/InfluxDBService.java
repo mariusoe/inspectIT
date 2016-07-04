@@ -92,9 +92,28 @@ public class InfluxDBService implements InitializingBean, ITimeSeriesDatabase {
 		// Flush every BATCH_BUFFER_SIZE Points, at least every BATCH_FLUSH_TIMER
 		influxDB.enableBatch(BATCH_BUFFER_SIZE, BATCH_FLUSH_TIMER, TimeUnit.MILLISECONDS);
 
+		if (!datbaseExists()) {
+			influxDB.createDatabase(database);
+		}
+
 		if (log.isInfoEnabled()) {
 			log.info("|-InfluxDB Service active...");
 		}
+	}
+
+	/**
+	 * Checks whether the specified database exists.
+	 *
+	 * @return Returns true if the database exists
+	 */
+	private boolean datbaseExists() {
+		List<String> databases = influxDB.describeDatabases();
+		for (String databaseName : databases) {
+			if (databaseName.equals(database)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

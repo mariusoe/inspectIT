@@ -37,9 +37,29 @@ public final class GrafanaDashboardInjector {
 	private Logger log;
 
 	/**
+	 * Folder where all grafana files are located.
+	 */
+	private static final String DEFAULT_GRAFANA_DIRECTORY = "grafana";
+
+	/**
 	 * Folder where all dashboards are located.
 	 */
-	private static final String DEFAULT_DASHBOARD_DIRECTORY = "grafana-dashboards";
+	private static final String DEFAULT_DASHBOARD_DIRECTORY = DEFAULT_GRAFANA_DIRECTORY + "/dashboards";
+
+	/**
+	 * Folder where all datasources are located.
+	 */
+	private static final String DEFAULT_DATASOURCE_DIRECTORY = DEFAULT_GRAFANA_DIRECTORY + "/datasources";
+
+	/**
+	 * API URL to the Grafana dashboard API.
+	 */
+	private static final String GRAFANA_DASHBOARD_API = "/api/dashboards/db";
+
+	/**
+	 * API URL to the Grafana datasource API.
+	 */
+	private static final String GRAFANA_DATASOURCE_API = "/api/datasources";
 
 	/**
 	 * Grafana API key.
@@ -70,7 +90,7 @@ public final class GrafanaDashboardInjector {
 	 */
 	@PostConstruct
 	public void afterPropertiesSet() {
-		injectDashboards();
+		inject();
 	}
 
 	/**
@@ -78,13 +98,13 @@ public final class GrafanaDashboardInjector {
 	 */
 	@PropertyUpdate(properties = { "anomaly.grafana.apiKey", "anomaly.grafana.serverUrl" })
 	private void onPropertiesUpdate() {
-		injectDashboards();
+		inject();
 	}
 
 	/**
 	 * Injection of the dashboards to the specified Grafana server.
 	 */
-	private void injectDashboards() {
+	private void inject() {
 		if (!isEnabled) {
 			if (log.isDebugEnabled()) {
 				log.debug("|-Injection of Grafana dashboards is disabled");
@@ -92,6 +112,24 @@ public final class GrafanaDashboardInjector {
 			return;
 		}
 
+		// injecting datasources
+		if (log.isInfoEnabled()) {
+			log.info("|-Injecting Grafana datasources to Grafana on server {}...", serverUrl);
+		}
+
+		try {
+			File datasourceDirectory = ResourcesPathResolver.getResourceFile(DEFAULT_DATASOURCE_DIRECTORY);
+
+			for (File datasourceFile : datasourceDirectory.listFiles()) {
+				sendDatasource(datasourceFile);
+			}
+		} catch (IOException e) {
+			if (log.isErrorEnabled()) {
+				log.error("||-Couldn't load the predefined Grafana datasources.", e);
+			}
+		}
+
+		// injecting dashboards
 		if (log.isInfoEnabled()) {
 			log.info("|-Injecting Grafana dashboards to Grafana on server {}...", serverUrl);
 		}
@@ -110,10 +148,87 @@ public final class GrafanaDashboardInjector {
 	}
 
 	/**
+	 * Reads the Gafana datasource form the specified file and sends it to Grafana.
+	 *
+	 * @param datasourceFile
+	 *            the file containing the datasource Json object
+	 */
+	private void sendDatasource(File datasourceFile) {
+		String datasourceJson;
+		try {
+			datasourceJson = Files.readFile(datasourceFile);
+		} catch (IOException e) {
+			if (log.isErrorEnabled()) {
+				log.error("||-Couldn't load the Grafana datasource from file '" + datasourceFile.getName() + "'.", e);
+			}
+			return;
+		}
+
+		try {
+			HttpURLConnection connection = (HttpURLConnection) new URL(serverUrl + GRAFANA_DATASOURCE_API).openConnection();
+			connection.setDoOutput(true);
+
+			// query is your body
+			connection.addRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Content-Length", Integer.toString(datasourceJson.length()));
+			connection.addRequestProperty("Authorization", "Bearer " + apiKey);
+
+			connection.getOutputStream().write(datasourceJson.getBytes("UTF8"));
+
+			int responseCode = connection.getResponseCode();
+
+			switch (responseCode) {
+			case 200:
+				if (log.isInfoEnabled()) {
+					log.info("||-Grafana datasource was injected into Grafana.");
+				}
+				break;
+			case 400:
+				if (log.isErrorEnabled()) {
+					log.error("||-Grafana datasource couldn't be injected. The datasource Json is not valid.");
+				}
+				break;
+			case 401:
+				if (log.isErrorEnabled()) {
+					log.error("||-Authorization against Grafana failed.");
+				}
+				break;
+			case 500:
+				if (log.isInfoEnabled()) {
+					log.info("||-Grafana datasource from file {} already exists.", datasourceFile.getName());
+				}
+				break;
+			default:
+				BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(connection.getInputStream())));
+
+				StringBuffer buffer = new StringBuffer();
+				String inputLine = "";
+				while ((inputLine = reader.readLine()) != null) {
+					buffer.append(inputLine);
+				}
+
+				if (log.isErrorEnabled()) {
+					log.error("||-An unknown error occured: {}", buffer.toString());
+				}
+				break;
+			}
+
+		} catch (MalformedURLException e) {
+			if (log.isErrorEnabled()) {
+				log.error("||-The Grafana server URL is not valid.", e);
+			}
+		} catch (IOException e) {
+			if (log.isErrorEnabled()) {
+				log.error("||-Couldn't send the dashboard to the Grafana server.", e);
+			}
+		}
+	}
+
+	/**
 	 * Reads the Grafana dashboard of the specified file and sends it to the server.
 	 *
 	 * @param dashboardFile
-	 *            the file containing the dashboard JSON object
+	 *            the file containing the dashboard Json object
 	 */
 	private void sendDashboard(File dashboardFile) {
 		String dashboardJson;
@@ -130,7 +245,7 @@ public final class GrafanaDashboardInjector {
 		String wrappedDashboard = "{\"dashboard\": " + dashboardJson + ",\"overwrite\": false}";
 
 		try {
-			HttpURLConnection connection = (HttpURLConnection) new URL(serverUrl + "/api/dashboards/db").openConnection();
+			HttpURLConnection connection = (HttpURLConnection) new URL(serverUrl + GRAFANA_DASHBOARD_API).openConnection();
 			connection.setDoOutput(true);
 
 			// query is your body
@@ -145,7 +260,7 @@ public final class GrafanaDashboardInjector {
 			switch (responseCode) {
 			case 200:
 				if (log.isInfoEnabled()) {
-					log.info("||-Grafana dashboards were injected into Grafana.");
+					log.info("||-Grafana dashboard was injected into Grafana.");
 				}
 				break;
 			case 400:
