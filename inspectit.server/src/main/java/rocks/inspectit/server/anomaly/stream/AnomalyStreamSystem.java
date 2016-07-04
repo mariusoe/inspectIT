@@ -19,9 +19,9 @@ import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.BusinessTransactionAlertingComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.BusinessTransactionContextInjectorComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.ConfidenceBandComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.ForecastComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.PercentageRateComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.QuadraticScoreFilterComponent;
-import rocks.inspectit.server.anomaly.stream.component.impl.RHoltWintersComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.StandardDeviationComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.TSDBWriterComponent;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventFactory;
@@ -128,9 +128,13 @@ public class AnomalyStreamSystem implements InitializingBean {
 		confidenceBand.start();
 
 		// cb calculation using R and HoltWinters method
-		RHoltWintersComponent holtWinters = streamComponentFactory.createRHoltWinters();
-		holtWinters.setNextComponent(confidenceBand);
-		holtWinters.start();
+		// RHoltWintersComponent holtWinters = streamComponentFactory.createRHoltWinters();
+		// holtWinters.setNextComponent(confidenceBand);
+		// holtWinters.start();
+
+		ForecastComponent forecastComponent = streamComponentFactory.createForecastComponent();
+		forecastComponent.setNextComponent(confidenceBand);
+		forecastComponent.start();
 
 		// weighted standard deviation calculation
 		// WeightedStandardDeviationComponent standardDeviation =
@@ -140,7 +144,7 @@ public class AnomalyStreamSystem implements InitializingBean {
 
 		// standard deviation calculation
 		StandardDeviationComponent standardDeviation = streamComponentFactory.createStandardDeviation();
-		standardDeviation.setNextComponent(holtWinters);
+		standardDeviation.setNextComponent(forecastComponent);
 		standardDeviation.start();
 
 		// alerting

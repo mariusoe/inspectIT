@@ -6,6 +6,7 @@ package rocks.inspectit.server.anomaly.stream;
 import rocks.inspectit.server.anomaly.stream.component.impl.BusinessTransactionAlertingComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.BusinessTransactionContextInjectorComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.ConfidenceBandComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.ForecastComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.PercentageRateComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.QuadraticScoreFilterComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.RHoltWintersComponent;
@@ -39,4 +40,6 @@ public abstract class StreamComponentFactory {
 	public abstract ConfidenceBandComponent createConfidenceBand();
 
 	public abstract WeightedStandardDeviationComponent createWeightedStandardDeviation();
+
+	public abstract ForecastComponent createForecastComponent();
 }

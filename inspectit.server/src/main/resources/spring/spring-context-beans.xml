@@ -105,6 +105,7 @@
 	<bean name="rHoltWintersComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.RHoltWintersComponent" scope="prototype"/>
 	<bean name="confidenceBandComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.ConfidenceBandComponent" scope="prototype"/>
 	<bean name="weightedStandardDeviationComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.WeightedStandardDeviationComponent" scope="prototype"/>
+	<bean name="forecastComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.ForecastComponent" scope="prototype"/>
 	
 	<bean name="streamComponentFactory" class="rocks.inspectit.server.anomaly.stream.StreamComponentFactory">
 	    <lookup-method bean="warmUpFilterComponent" name="createWarmUpFilter" />
@@ -117,6 +118,16 @@
 	    <lookup-method bean="rHoltWintersComponent" name="createRHoltWinters" />
 	    <lookup-method bean="confidenceBandComponent" name="createConfidenceBand" />
 	    <lookup-method bean="weightedStandardDeviationComponent" name="createWeightedStandardDeviation" />
+	    <lookup-method bean="forecastComponent" name="createForecastComponent" />
+	</bean>	
+	
+	<!-- Forecasting -->
+	<bean name="holtWintersForecast" class="rocks.inspectit.server.anomaly.forecast.HoltWintersForecast" scope="prototype"/>
+	<bean name="doubleExponentialSmoothing" class="rocks.inspectit.server.anomaly.forecast.DoubleExponentialSmoothing" scope="prototype"/>
+
+	<bean name="forecastFactory" class="rocks.inspectit.server.anomaly.forecast.ForecastFactory">
+	    <lookup-method bean="holtWintersForecast" name="createHoltWinters" />
+	    <lookup-method bean="doubleExponentialSmoothing" name="createDoubleExponentialSmoothing" />
 	</bean>	
 	
 </beans>
