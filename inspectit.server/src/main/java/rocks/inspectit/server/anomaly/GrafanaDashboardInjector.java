@@ -14,6 +14,7 @@ import java.net.URL;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.testng.reporters.Files;
@@ -62,10 +63,16 @@ public final class GrafanaDashboardInjector {
 	private static final String GRAFANA_DATASOURCE_API = "/api/datasources";
 
 	/**
-	 * Grafana API key.
+	 * Grafana username.
 	 */
-	@Value("${anomaly.grafana.apiKey}")
-	private String apiKey;
+	@Value("${anomaly.grafana.username}")
+	private String username;
+
+	/**
+	 * Grafana password.
+	 */
+	@Value("${anomaly.grafana.password}")
+	private String password;
 
 	/**
 	 * Grafana server URL.
@@ -99,6 +106,16 @@ public final class GrafanaDashboardInjector {
 	@PropertyUpdate(properties = { "anomaly.grafana.apiKey", "anomaly.grafana.serverUrl" })
 	private void onPropertiesUpdate() {
 		inject();
+	}
+
+	/**
+	 * Returns a Basic authentication string.
+	 *
+	 * @return base64 encode credentials
+	 */
+	private String getHttpAuthentication() {
+		String authenticationString = username + ":" + password;
+		return new String(Base64.encodeBase64(authenticationString.getBytes()));
 	}
 
 	/**
@@ -171,7 +188,7 @@ public final class GrafanaDashboardInjector {
 			// query is your body
 			connection.addRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Content-Length", Integer.toString(datasourceJson.length()));
-			connection.addRequestProperty("Authorization", "Bearer " + apiKey);
+			connection.addRequestProperty("Authorization", "Basic " + getHttpAuthentication());
 
 			connection.getOutputStream().write(datasourceJson.getBytes("UTF8"));
 
@@ -251,7 +268,7 @@ public final class GrafanaDashboardInjector {
 			// query is your body
 			connection.addRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Content-Length", Integer.toString(wrappedDashboard.length()));
-			connection.addRequestProperty("Authorization", "Bearer " + apiKey);
+			connection.addRequestProperty("Authorization", "Basic " + getHttpAuthentication());
 
 			connection.getOutputStream().write(wrappedDashboard.getBytes("UTF8"));
 

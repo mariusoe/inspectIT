@@ -359,8 +359,9 @@
 				<properties>
 					<boolean-property name="Dashboard Injection" default-value="false" server-restart-required="false" logical-name="anomaly.grafana.injection" advanced="false"></boolean-property>
 				
-					<string-property name="Grafana API Key" default-value="" server-restart-required="false" logical-name="anomaly.grafana.apiKey" advanced="false"></string-property>
 					<string-property name="Grafana Server URL" default-value="http://127.0.0.1:3000" server-restart-required="false" logical-name="anomaly.grafana.serverUrl" advanced="false"></string-property>
+					<string-property name="Grafana Username" default-value="admin" server-restart-required="false" logical-name="anomaly.grafana.username" advanced="false"></string-property>
+					<string-property name="Grafana Password" default-value="admin" server-restart-required="false" logical-name="anomaly.grafana.password" advanced="false"></string-property>
 				</properties>
 				<group-validators>
 				</group-validators>
