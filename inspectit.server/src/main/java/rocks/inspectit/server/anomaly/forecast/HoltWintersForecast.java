@@ -9,11 +9,41 @@ import org.springframework.beans.factory.annotation.Value;
 import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
+ * Forecasting using the Holt-Winter algorithm. This implementation is based on an implementation by
+ * Nishant Chandra [https://github.com/cmdrkeene/holt_winters/blob/master/ext/holtWinters.java]
+ * which was released under the license "Apache License, Version 2.0" in 2011.
+ *
+ * The calculations are based on the following equations:
+ *
+ * St[i] (smoothed value) = alpha * y[i] / It[i - period] + (1.0 - alpha) * (St[i - 1] + Bt[i - 1])
+ *
+ * Bt[i] (trend value) = beta * (St[i] - St[i - 1]) + (1 - beta) * Bt[i - 1]
+ *
+ * It[i] (seasonal indices) = gamma * y[i] / St[i] + (1.0 - gamma) * It[i - period]
+ *
+ * Ft[i + m] (forecast) = (St[i] + (m * Bt[i])) * It[i - period + m]
+ *
  * @author Marius Oehler
  *
  */
 public class HoltWintersForecast {
 
+	/**
+	 * This exception will be thrown if an untrained instance of {@link HoltWintersForecast} is
+	 * used.
+	 *
+	 * @author Marius Oehler
+	 *
+	 */
+	class UntrainedHoltWintersException extends RuntimeException {
+
+		private static final long serialVersionUID = -5119819955712036572L;
+
+	}
+
+	/**
+	 * The logger.
+	 */
 	@Log
 	private Logger log;
 
@@ -35,241 +65,152 @@ public class HoltWintersForecast {
 	@Value("${anomaly.settings.forecast.seasonalSmoothingFactor}")
 	private double seasonalSmoothingFactor;
 
-	private long counter = 0L;
+	/**
+	 * The current seasonal index.
+	 */
+	private int seasonalIndex;
 
 	/**
 	 * The season length.
 	 */
 	@Value("${anomaly.settings.forecast.seasonLength}")
-	private long seasonLength;
-
-	public double forecast(double[] y) {
-		double[] forecast = forecast(y, smoothingFactor, trendSmoothingFactor, seasonalSmoothingFactor, (int) seasonLength, 1, true);
-
-		return forecast[forecast.length - 1];
-	}
+	private int seasonalLength;
 
 	/**
-	 * This method is the entry point. It calculates the initial values and returns the forecast for
-	 * the m periods.
-	 *
-	 * @param y
-	 *            - Time series data.
-	 * @param alpha
-	 *            - Exponential smoothing coefficients for level, trend, seasonal components.
-	 * @param beta
-	 *            - Exponential smoothing coefficients for level, trend, seasonal components.
-	 * @param gamma
-	 *            - Exponential smoothing coefficients for level, trend, seasonal components.
-	 * @param perdiod
-	 *            - A complete season's data consists of L periods. And we need to estimate the
-	 *            trend factor from one period to the next. To accomplish this, it is advisable to
-	 *            use two complete seasons; that is, 2L periods.
-	 * @param m
-	 *            - Extrapolated future data points.
-	 * @param debug
-	 *            - Print debug values. Useful for testing.
-	 *
-	 *            4 quarterly 7 weekly. 12 monthly
+	 * Marker for first training stage. Enables seasonal indices smoothing.
 	 */
-	public double[] forecast(double[] y, double alpha, double beta, double gamma, int period, int m, boolean debug) {
-
-		if (y == null) {
-			return null;
-		}
-
-		int seasons = y.length / period;
-		double a0 = calculateInitialLevel(y, period);
-		double b0 = calculateInitialTrend(y, period);
-		seasonalIndices = calculateSeasonalIndices(y, period, seasons);
-
-		// if (log.isInfoEnabled()) {
-		// log.info(String.format("Total observations: %d, Seasons %d, Periods %d", y.length,
-		// seasons, period));
-		// log.info("Initial level value a0: " + a0);
-		// log.info("Initial trend value b0: " + b0);
-		// printArray("Seasonal Indices: ", seasonalIndices);
-		// }
-
-		double[] forecast = calculateHoltWinters(y, a0, b0, alpha, beta, gamma, seasonalIndices, period, m, debug);
-
-		// if (log.isInfoEnabled()) {
-		// printArray("Forecast", forecast);
-		// }
-
-		return forecast;
-	}
+	private boolean trainedFirstStage = false;
 
 	/**
-	 * This method realizes the Holt-Winters equations.
-	 *
-	 * @param y
-	 * @param a0
-	 * @param b0
-	 * @param alpha
-	 * @param beta
-	 * @param gamma
-	 * @param initialSeasonalIndices
-	 * @param period
-	 * @param m
-	 * @param debug
-	 * @return - Forecast for m periods.
+	 * Marker for second training stage. Enables forecasting.
 	 */
-	private double[] calculateHoltWinters(double[] y, double a0, double b0, double alpha, double beta, double gamma, double[] initialSeasonalIndices, int period, int m, boolean debug) {
+	private boolean trainedSecondStage = false;
 
-		double[] St = new double[y.length];
-		double[] Bt = new double[y.length];
-		double[] It = new double[y.length];
-		double[] Ft = new double[y.length + m];
+	/**
+	 * Indicates whether the model has been trained.
+	 */
+	private boolean trained = false;
 
-		// Initialize base values
-		St[1] = a0;
-		Bt[1] = b0;
-
-		for (int i = 0; i < period; i++) {
-			It[i] = initialSeasonalIndices[i];
-		}
-
-		Ft[m] = (St[0] + (m * Bt[0])) * It[0];// This is actually 0 since Bt[0] = 0
-		Ft[m + 1] = (St[1] + (m * Bt[1])) * It[1];// Forecast starts from period + 2
-
-		// Start calculations
-		for (int i = 2; i < y.length; i++) {
-
-			// Calculate overall smoothing
-			if ((i - period) >= 0) {
-				St[i] = alpha * y[i] / It[i - period] + (1.0 - alpha) * (St[i - 1] + Bt[i - 1]);
-			} else {
-				St[i] = alpha * y[i] + (1.0 - alpha) * (St[i - 1] + Bt[i - 1]);
-			}
-
-			// Calculate trend smoothing
-			Bt[i] = gamma * (St[i] - St[i - 1]) + (1 - gamma) * Bt[i - 1];
-
-			// Calculate seasonal smoothing
-			if ((i - period) >= 0) {
-				It[i] = beta * y[i] / St[i] + (1.0 - beta) * It[i - period];
-			}
-
-			// Calculate forecast
-			if (((i + m) >= period)) {
-				Ft[i + m] = (St[i] + (m * Bt[i])) * It[i - period + m];
-			}
-
-			smoothedValue = St[i];
-			trend = Bt[i];
-			counter++;
-
-			// if (log.isInfoEnabled()) {
-			System.out.println(String.format("i = %d, y = %f, S = %f, Bt = %f, It = %f, F = %f", i, y[i], St[i], Bt[i], It[i], Ft[i]));
-			// }
-		}
-
-		return Ft;
-	}
-
-	double smoothedValue;
-
-	double trend;
-
+	/**
+	 * The seasonal indices.
+	 */
 	private double[] seasonalIndices;
 
-	public void push(double value) {
-		counter++;
-		int m = 1;
+	/**
+	 * The smoothed value.
+	 */
+	private double smoothedValue;
 
-		double previousValue = value;
-		double previousSeasonalIndex = seasonalIndices[(int) (counter % seasonLength)];
+	/**
+	 * The trend value.
+	 */
+	private double trendValue;
 
-		// Calculate overall smoothing
-		if ((counter - seasonLength) >= 0) {
-			smoothedValue = smoothingFactor * value / previousSeasonalIndex + (1.0 - smoothingFactor) * (previousValue + trend);
-		} else {
-			smoothedValue = smoothingFactor * value + (1.0 - smoothingFactor) * (previousValue + trend);
-		}
+	/**
+	 * The forecasted value.
+	 */
+	private double forecastedValue = Double.NaN;
 
-		// Calculate trend smoothing
-		trend = trendSmoothingFactor * (smoothedValue - previousValue) + (1 - trendSmoothingFactor) * trend;
+	/**
+	 * The mean squared error sum.
+	 */
+	private double meanSquaredErrorSum = 0D;
 
-		// Calculate seasonal smoothing
-		if ((counter - seasonLength) >= 0) {
-			seasonalIndices[(int) (counter % seasonLength)] = seasonalSmoothingFactor * value / smoothedValue + (seasonalSmoothingFactor) * previousSeasonalIndex;
-		}
+	/**
+	 * Counter how many error sums have been added.
+	 */
+	private long meanSquaredErrorCounter = 0L;
 
-		// Calculate forecast
-		// if (((counter + m) >= seasonLength)) {
-		// Ft[i + m] = (value + (m * trend) * It[i - seasonLength + m];
-		// }
-
-		// if (log.isInfoEnabled()) {
-		System.out.println(String.format("i = %d, y = %f, S = %f, Bt = %f, It = %f, F = %f", counter, value, value, trend, seasonalIndices[(int) (counter % seasonLength)], forecastValue()));
-		// }
+	/**
+	 * Constructor.
+	 */
+	public HoltWintersForecast() {
 	}
 
-	public double forecastValue() {
-		return (smoothedValue + trend * seasonalIndices[(int) ((counter + 1) % seasonLength)]);
+	/**
+	 * Constructor.
+	 *
+	 * @param smoothingFactor
+	 *            the used value smoothing factor
+	 * @param trendSmoothingFactor
+	 *            the used trend smoothing factor
+	 * @param seasonalSmoothingFactor
+	 *            the used seasonal index smoothing factor
+	 * @param seasonLength
+	 *            the length of a season
+	 */
+	public HoltWintersForecast(double smoothingFactor, double trendSmoothingFactor, double seasonalSmoothingFactor, int seasonLength) {
+		this.smoothingFactor = smoothingFactor;
+		this.trendSmoothingFactor = trendSmoothingFactor;
+		this.seasonalSmoothingFactor = seasonalSmoothingFactor;
+		this.seasonalLength = seasonLength;
 	}
 
 	/**
 	 * See: http://robjhyndman.com/researchtips/hw-initialization/ 1st period's average can be
-	 * taken. But y[0] works better.
-	 *
-	 * @return - Initial Level value i.e. St[1]
+	 * taken. But data[0] works better.
+	 **
+	 * @param data
+	 *            the input data
+	 * @return initial level value i.e. St[1]
 	 */
-	private double calculateInitialLevel(double[] y, int period) {
-
+	private double calculateInitialLevel(double[] data) {
 		/**
-		 * double sum = 0; for (int i = 0; i < period; i++) { sum += y[i]; }
+		 * double sum = 0; for (int i = 0; i < seasonLength; i++) { sum += y[i]; }
 		 *
-		 * return sum / period;
+		 * return sum / seasonLength;
 		 **/
-		return y[0];
+		return data[0];
 	}
 
 	/**
-	 * See: http://www.itl.nist.gov/div898/handbook/pmc/section4/pmc435.htm
-	 *
-	 * @return - Initial trend - Bt[1]
+	 * See: http://www.itl.nist.gov/div898/handbook/pmc/section4/pmc435.htm for more information.
+	 **
+	 * @param data
+	 *            the input data
+	 * @return initial trend - Bt[1]
 	 */
-	private double calculateInitialTrend(double[] y, int period) {
-
+	private double calculateInitialTrend(double[] data) {
 		double sum = 0;
 
-		for (int i = 0; i < period; i++) {
-			sum += (y[period + i] - y[i]);
+		for (int i = 0; i < seasonalLength; i++) {
+			sum += (data[seasonalLength + i] - data[i]);
 		}
 
-		return sum / (period * period);
+		return sum / (seasonalLength * seasonalLength);
 	}
 
 	/**
-	 * See: http://www.itl.nist.gov/div898/handbook/pmc/section4/pmc435.htm
+	 * See: http://www.itl.nist.gov/div898/handbook/pmc/section4/pmc435.htm for more information.
 	 *
-	 * @return - Seasonal Indices.
+	 * @param data
+	 *            the input data
+	 * @return seasonal indices
 	 */
-	private double[] calculateSeasonalIndices(double[] y, int period, int seasons) {
+	private double[] calculateSeasonalIndices(double[] data) {
+		int seasons = data.length / seasonalLength;
 
 		double[] seasonalAverage = new double[seasons];
-		double[] seasonalIndices = new double[period];
+		double[] seasonalIndices = new double[seasonalLength];
 
-		double[] averagedObservations = new double[y.length];
+		double[] averagedObservations = new double[data.length];
 
 		for (int i = 0; i < seasons; i++) {
-			for (int j = 0; j < period; j++) {
-				seasonalAverage[i] += y[(i * period) + j];
+			for (int j = 0; j < seasonalLength; j++) {
+				seasonalAverage[i] += data[(i * seasonalLength) + j];
 			}
-			seasonalAverage[i] /= period;
+			seasonalAverage[i] /= seasonalLength;
 		}
 
 		for (int i = 0; i < seasons; i++) {
-			for (int j = 0; j < period; j++) {
-				averagedObservations[(i * period) + j] = y[(i * period) + j] / seasonalAverage[i];
+			for (int j = 0; j < seasonalLength; j++) {
+				averagedObservations[(i * seasonalLength) + j] = data[(i * seasonalLength) + j] / seasonalAverage[i];
 			}
 		}
 
-		for (int i = 0; i < period; i++) {
+		for (int i = 0; i < seasonalLength; i++) {
 			for (int j = 0; j < seasons; j++) {
-				seasonalIndices[i] += averagedObservations[(j * period) + i];
+				seasonalIndices[i] += averagedObservations[(j * seasonalLength) + i];
 			}
 			seasonalIndices[i] /= seasons;
 		}
@@ -278,19 +219,127 @@ public class HoltWintersForecast {
 	}
 
 	/**
-	 * Utility method to pring array values.
+	 * Adds a new value to the model.
 	 *
-	 * @param description
-	 * @param data
+	 * @param newValue
+	 *            the new value
+	 * @exception UntrainedHoltWintersException
+	 *                is thrown if the model has not been trained
 	 */
-	private void printArray(String description, double[] data) {
+	public void fit(double newValue) {
+		fit(newValue, false);
+	}
 
-		log.info(String.format("******************* %s *********************", description));
+	/**
+	 * Adds a new value to the model.
+	 *
+	 * @param newValue
+	 *            the new value
+	 * @param force
+	 *            adds the value even the model has not been trained
+	 */
+	private void fit(double newValue, boolean force) {
+		if (!trained && !force) {
+			throw new UntrainedHoltWintersException();
+		}
+		final int m = 1;
 
-		for (double element : data) {
-			log.info(Double.toString(element));
+		if (!Double.isNaN(forecastedValue)) {
+			meanSquaredErrorSum += Math.pow(forecastedValue - newValue, 2);
+			meanSquaredErrorCounter++;
 		}
 
-		log.info(String.format("*****************************************************************", description));
+		double previousSmoothedValue = smoothedValue;
+
+		// Calculate overall smoothing
+		if (trainedFirstStage) {
+			smoothedValue = smoothingFactor * newValue / seasonalIndices[seasonalIndex] + (1.0 - smoothingFactor) * (previousSmoothedValue + trendValue);
+		} else {
+			smoothedValue = smoothingFactor * newValue + (1.0 - smoothingFactor) * (previousSmoothedValue + trendValue);
+		}
+
+		// Calculate trend smoothing
+		trendValue = trendSmoothingFactor * (smoothedValue - previousSmoothedValue) + (1 - trendSmoothingFactor) * trendValue;
+
+		// Calculate seasonal smoothing
+		if (trainedFirstStage) {
+			seasonalIndices[seasonalIndex] = seasonalSmoothingFactor * newValue / smoothedValue + (1.0 - seasonalSmoothingFactor) * seasonalIndices[seasonalIndex];
+		}
+
+		if (log.isDebugEnabled()) {
+			log.debug("New value is {} and its forecast has been {}", newValue, forecastedValue);
+		}
+
+		// Calculate forecast
+		if (trainedSecondStage) {
+			int nextSeasonalIndex = (seasonalIndex + 1) % seasonalLength;
+			forecastedValue = (smoothedValue + (m * trendValue)) * seasonalIndices[nextSeasonalIndex];
+		}
+
+		seasonalIndex = (seasonalIndex + 1) % seasonalLength;
+	}
+
+	/**
+	 * Returns a forecast for the next value.
+	 *
+	 * @return the forecasted value
+	 */
+	public double forecast() {
+		return forecastedValue;
+	}
+
+	/**
+	 * Returns the root mean squared error of the model.
+	 *
+	 * @return the RMSE
+	 */
+	public double getRootMeanSquaredError() {
+		return Math.sqrt(meanSquaredErrorSum / meanSquaredErrorCounter);
+	}
+
+	/**
+	 * Gets {@link #seasonalIndex}.
+	 *
+	 * @return {@link #seasonalIndex}
+	 */
+	public int getSeasonIndex() {
+		return seasonalIndex;
+	}
+
+	/**
+	 * Trains the model with the given input data.
+	 *
+	 * @param inputData
+	 *            the input data
+	 */
+	public void train(double[] inputData) {
+		if (inputData == null || inputData.length < 2 * seasonalLength) {
+			throw new IllegalArgumentException(String.format("Training data has to contain at least %d data elements (2 times the season length).", 2 * seasonalLength));
+		}
+
+		// Initialize base values
+		smoothedValue = calculateInitialLevel(inputData);
+		trendValue = calculateInitialTrend(inputData);
+		seasonalIndices = calculateSeasonalIndices(inputData);
+
+		// this is necessary, because we have a trend after two elements
+		seasonalIndex = 2;
+
+		// Start calculations and skip first two elements
+		for (int i = 2; i < inputData.length; i++) {
+			// forecasting is enabled, now
+			if (i - seasonalLength >= 0) {
+				trainedFirstStage = true;
+			}
+
+			// forecasting is enabled, now
+			if (i + 1 > seasonalLength) {
+				trainedSecondStage = true;
+			}
+
+			fit(inputData[i], true);
+		}
+
+		trained = true;
 	}
 }
