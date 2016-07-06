@@ -50,19 +50,16 @@ public class HoltWintersForecast {
 	/**
 	 * The trend smoothing factor.
 	 */
-	@Value("${anomaly.settings.forecast.smoothingFactor}")
 	private double smoothingFactor;
 
 	/**
 	 * The trend smoothing factor.
 	 */
-	@Value("${anomaly.settings.forecast.trendSmoothingFactor}")
 	private double trendSmoothingFactor;
 
 	/**
 	 * The seasonal smoothing factor.
 	 */
-	@Value("${anomaly.settings.forecast.seasonalSmoothingFactor}")
 	private double seasonalSmoothingFactor;
 
 	/**
@@ -304,6 +301,36 @@ public class HoltWintersForecast {
 	 */
 	public int getSeasonIndex() {
 		return seasonalIndex;
+	}
+
+	/**
+	 * Sets {@link #seasonalSmoothingFactor}.
+	 *
+	 * @param seasonalSmoothingFactor
+	 *            New value for {@link #seasonalSmoothingFactor}
+	 */
+	public void setSeasonalSmoothingFactor(double seasonalSmoothingFactor) {
+		this.seasonalSmoothingFactor = seasonalSmoothingFactor;
+	}
+
+	/**
+	 * Sets {@link #smoothingFactor}.
+	 *
+	 * @param smoothingFactor
+	 *            New value for {@link #smoothingFactor}
+	 */
+	public void setSmoothingFactor(double smoothingFactor) {
+		this.smoothingFactor = smoothingFactor;
+	}
+
+	/**
+	 * Sets {@link #trendSmoothingFactor}.
+	 *
+	 * @param trendSmoothingFactor
+	 *            New value for {@link #trendSmoothingFactor}
+	 */
+	public void setTrendSmoothingFactor(double trendSmoothingFactor) {
+		this.trendSmoothingFactor = trendSmoothingFactor;
 	}
 
 	/**

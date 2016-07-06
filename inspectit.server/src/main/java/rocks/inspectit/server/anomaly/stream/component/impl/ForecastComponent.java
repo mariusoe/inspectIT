@@ -54,6 +54,8 @@ public class ForecastComponent extends AbstractSingleStreamComponent<InvocationS
 	@Autowired
 	private ForecastFactory forecastFactory;
 
+	private int holtWintersRecalculation = 10;
+
 	/**
 	 * The season length.
 	 */
@@ -117,6 +119,8 @@ public class ForecastComponent extends AbstractSingleStreamComponent<InvocationS
 	 * @param dataList
 	 */
 	private void calcualate(String businessTransaction, ArrayList<StreamObject<InvocationSequenceData>> dataList) {
+		String logPrefix = "[" + businessTransaction + "] ";
+
 		StreamContext context = streamProperties.getStreamContext(businessTransaction);
 
 		double[] valueArray = new double[dataList.size()];
@@ -132,7 +136,7 @@ public class ForecastComponent extends AbstractSingleStreamComponent<InvocationS
 		if (context.getDataHistory().size() <= 2 * seasonLength) {
 			if (context.getDoubleExponentialSmoothing() == null) {
 				if (log.isInfoEnabled()) {
-					log.info("Using double exponential smoothing forecasting until enough data has been collected for HoltWinters.");
+					log.info(logPrefix + "Using double exponential smoothing forecasting until enough data has been collected for HoltWinters.");
 				}
 				context.setDoubleExponentialSmoothing(forecastFactory.createDoubleExponentialSmoothing());
 			}
@@ -142,16 +146,96 @@ public class ForecastComponent extends AbstractSingleStreamComponent<InvocationS
 		} else {
 			if (context.getHoltWintersForecast() == null) {
 				if (log.isInfoEnabled()) {
-					log.info("Switching forecasting alogirthm to HoltWinters.");
+					log.info(logPrefix + "Switching forecasting alogirthm to HoltWinters.");
 				}
-				context.setHoltWintersForecast(forecastFactory.createHoltWinters());
+
+				updateHoltWintersForecastInstance(context);
+			} else if (holtWintersRecalculation > 0 && context.getHoltWintersForecast().getSeasonIndex() == 0) {
+				if (log.isInfoEnabled()) {
+					log.info(logPrefix + "Recalculate parameter for HoltWinters forecasting.");
+				}
+
+				updateHoltWintersForecastInstance(context);
+
+				holtWintersRecalculation--;
 			}
 
 			HoltWintersForecast holtWinters = context.getHoltWintersForecast();
 
-			forecastValue = holtWinters.forecast(ArrayUtils.toPrimitive(context.getDataHistory().toArray(new Double[0])));
+			// add new value and forecast next
+			holtWinters.fit(mean);
+			forecastValue = holtWinters.forecast();
 		}
 
 		context.setCurrentMean(forecastValue);
+	}
+
+	/**
+	 * Finding the best parameter based on the current data and creates a new
+	 * {@link HoltWintersForecast} instance using the calculated parameter.
+	 *
+	 * @param context
+	 *            the current stream context
+	 */
+	private void updateHoltWintersForecastInstance(StreamContext context) {
+		// find best parameter
+		Double[] historyData = context.getDataHistory().toArray(new Double[0]);
+		double[] parameter = bruteForceParameterDetermination(ArrayUtils.toPrimitive(historyData));
+
+		if (log.isInfoEnabled()) {
+			log.info("[{}] |-Found parameter for HoltWinters: alpha={}, beta={}, gamma={} producing a RMSE of {}", context.getBusinessTransaction(), parameter[1], parameter[2], parameter[3],
+					parameter[0]);
+		}
+
+		// create the instance and set the parameter
+		HoltWintersForecast holtWinters = forecastFactory.createHoltWinters();
+		holtWinters.setSmoothingFactor(parameter[1]);
+		holtWinters.setTrendSmoothingFactor(parameter[2]);
+		holtWinters.setSeasonalSmoothingFactor(parameter[3]);
+
+		holtWinters.train(ArrayUtils.toPrimitive(historyData));
+
+		context.setHoltWintersForecast(holtWinters);
+	}
+
+	/**
+	 * Tries to find the best parameter for the HoltWinter algorithms to fit the given data. This
+	 * approach is a work around. A better solution would be to use an algorithm like LBFGS.
+	 *
+	 * @param data
+	 *            the data
+	 * @return array containing the minimal RSME, smoothing factor, trend smoothing factor and
+	 *         seasonal smoothing factor
+	 */
+	private double[] bruteForceParameterDetermination(double[] data) {
+		double stepSize = 0.05D;
+
+		double minRMSE = Double.MAX_VALUE;
+		double alpha = 0;
+		double beta = 0;
+		double gamma = 0;
+
+		for (double x = 0; x <= 1; x += stepSize) {
+			for (double y = 0; y <= 1; y += stepSize) {
+				for (double z = 0; z <= 1; z += stepSize) {
+					HoltWintersForecast holtWinters = forecastFactory.createHoltWinters();
+					holtWinters.setSmoothingFactor(x);
+					holtWinters.setTrendSmoothingFactor(y);
+					holtWinters.setSeasonalSmoothingFactor(z);
+
+					holtWinters.train(data);
+
+					if (holtWinters.getRootMeanSquaredError() < minRMSE) {
+						minRMSE = holtWinters.getRootMeanSquaredError();
+
+						alpha = x;
+						beta = y;
+						gamma = z;
+					}
+				}
+			}
+		}
+
+		return new double[] { minRMSE, alpha, beta, gamma };
 	}
 }

@@ -334,9 +334,8 @@
 					<long-property name="Confidence Band Update Interval [s]" default-value="5" server-restart-required="true" logical-name="anomaly.settings.confidenceBandUpdateInterval" advanced="false"></long-property>
 					<long-property name="Confidence Band History Size" default-value="720" server-restart-required="true" logical-name="anomaly.settings.confidenceBandHistorySize" advanced="false"></long-property>
 					
-					<string-property name="Forecast Smoothing Factor" default-value="0.1" server-restart-required="false" logical-name="anomaly.settings.forecast.smoothingFactor" advanced="false"></string-property>
+					<string-property name="Forecast Smoothing Factor" default-value="0.5" server-restart-required="false" logical-name="anomaly.settings.forecast.smoothingFactor" advanced="false"></string-property>
 					<string-property name="Forecast Trend Smoothing Factor" default-value="0.1" server-restart-required="false" logical-name="anomaly.settings.forecast.trendSmoothingFactor" advanced="false"></string-property>
-					<string-property name="Forecast Seasonal Smoothing Factor" default-value="0.1" server-restart-required="false" logical-name="anomaly.settings.forecast.seasonalSmoothingFactor" advanced="false"></string-property>
 					<string-property name="Forecast Season Length" default-value="20" server-restart-required="false" logical-name="anomaly.settings.forecast.seasonLength" advanced="false"></string-property>
 				</properties>
 				<group-validators>
