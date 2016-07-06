@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
+import rocks.inspectit.server.anomaly.stream.object.StreamContext;
 import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.server.anomaly.utils.StatisticUtils;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
@@ -91,6 +92,13 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 	}
 
 	private void calculateStandardDeviation(String businessTransaction, List<StreamObject<InvocationSequenceData>> invocationList) {
+		StreamContext context = streamProperties.getStreamContext(businessTransaction);
+
+		if (!context.isAnomalyActive()) {
+			// only active if an anomaly is active
+			return;
+		}
+
 		double[] durationArray = new double[invocationList.size()];
 
 		for (int i = 0; i < invocationList.size(); i++) {
@@ -128,7 +136,7 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 
 		double stdDeviation = Math.sqrt(variance);
 
-		streamProperties.getStreamContext(businessTransaction).setStandardDeviation(stdDeviation);
+		context.setStandardDeviation(stdDeviation);
 	}
 
 	private class ResidualContainer {

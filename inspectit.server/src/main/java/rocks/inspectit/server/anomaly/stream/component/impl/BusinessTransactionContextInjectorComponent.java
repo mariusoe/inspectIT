@@ -45,6 +45,7 @@ public class BusinessTransactionContextInjectorComponent extends AbstractSingleS
 
 		if (!streamProperties.getStreamContextMap().containsKey(businessTransaction)) {
 			StreamContext context = new StreamContext();
+			context.setStartTime(System.currentTimeMillis());
 			context.setBusinessTransaction(businessTransaction);
 
 			streamProperties.getStreamContextMap().put(businessTransaction, context);

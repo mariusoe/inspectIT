@@ -13,11 +13,32 @@ public class StreamObject<I> {
 
 	private StreamContext context;
 
+	private HealthTag healthTag = HealthTag.UNKNOWN;
+
 	/**
 	 * @param data
 	 */
 	public StreamObject(I data) {
 		this.data = data;
+	}
+
+	/**
+	 * Gets {@link #healthTag}.
+	 *
+	 * @return {@link #healthTag}
+	 */
+	public HealthTag getHealthTag() {
+		return healthTag;
+	}
+
+	/**
+	 * Sets {@link #healthTag}.
+	 *
+	 * @param healthTag
+	 *            New value for {@link #healthTag}
+	 */
+	public void setHealthTag(HealthTag healthTag) {
+		this.healthTag = healthTag;
 	}
 
 	/**

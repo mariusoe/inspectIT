@@ -95,7 +95,6 @@
 	<!-- Stream Components -->
 	<bean name="sharedStreamProperties" class="rocks.inspectit.server.anomaly.stream.SharedStreamProperties" />
 	
-	<bean name="warmUpFilterComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.WarmUpFilterComponent" scope="prototype"/>
 	<bean name="businessTransactionInjectorComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.BusinessTransactionContextInjectorComponent" scope="prototype"/>
 	<bean name="quadraticScoreFilterComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.QuadraticScoreFilterComponent" scope="prototype"/>
 	<bean name="businessTransactionAlertingComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.BusinessTransactionAlertingComponent" scope="prototype"/>
@@ -108,7 +107,6 @@
 	<bean name="forecastComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.ForecastComponent" scope="prototype"/>
 	
 	<bean name="streamComponentFactory" class="rocks.inspectit.server.anomaly.stream.StreamComponentFactory">
-	    <lookup-method bean="warmUpFilterComponent" name="createWarmUpFilter" />
 	    <lookup-method bean="businessTransactionInjectorComponent" name="createBusinessTransactionInjector" />
 	    <lookup-method bean="quadraticScoreFilterComponent" name="createQuadraticScoreFilter" />
 	    <lookup-method bean="businessTransactionAlertingComponent" name="createBusinessTransactionAlerting" />

@@ -12,7 +12,6 @@ import rocks.inspectit.server.anomaly.stream.component.impl.QuadraticScoreFilter
 import rocks.inspectit.server.anomaly.stream.component.impl.RHoltWintersComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.StandardDeviationComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.TSDBWriterComponent;
-import rocks.inspectit.server.anomaly.stream.component.impl.WarmUpFilterComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.WeightedStandardDeviationComponent;
 
 /**
@@ -20,8 +19,6 @@ import rocks.inspectit.server.anomaly.stream.component.impl.WeightedStandardDevi
  *
  */
 public abstract class StreamComponentFactory {
-
-	public abstract WarmUpFilterComponent createWarmUpFilter();
 
 	public abstract BusinessTransactionContextInjectorComponent createBusinessTransactionInjector();
 

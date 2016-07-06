@@ -24,6 +24,7 @@ import rocks.inspectit.server.anomaly.stream.component.impl.PercentageRateCompon
 import rocks.inspectit.server.anomaly.stream.component.impl.QuadraticScoreFilterComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.StandardDeviationComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.TSDBWriterComponent;
+import rocks.inspectit.server.anomaly.stream.component.impl.WeightedStandardDeviationComponent;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventFactory;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventHandler;
 import rocks.inspectit.server.anomaly.stream.disruptor.events.InvocationSequenceEvent;
@@ -114,33 +115,17 @@ public class AnomalyStreamSystem implements InitializingBean {
 	}
 
 	private ISingleInputComponent<InvocationSequenceData> initStream() {
-		// tsdb writer for normal requests
-		TSDBWriterComponent normalWriter = streamComponentFactory.createTSDBWriter();
-		normalWriter.setDataTypeTag("normal");
-
-		// tsdbwriter for slow request
-		TSDBWriterComponent problemWriter = streamComponentFactory.createTSDBWriter();
-		problemWriter.setDataTypeTag("problem");
+		// tsdb writer
+		TSDBWriterComponent tsdbWriter = streamComponentFactory.createTSDBWriter();
 
 		// calculating the confidence band
 		ConfidenceBandComponent confidenceBand = streamComponentFactory.createConfidenceBand();
-		confidenceBand.setNextComponent(normalWriter);
+		confidenceBand.setNextComponent(tsdbWriter);
 		confidenceBand.start();
-
-		// cb calculation using R and HoltWinters method
-		// RHoltWintersComponent holtWinters = streamComponentFactory.createRHoltWinters();
-		// holtWinters.setNextComponent(confidenceBand);
-		// holtWinters.start();
 
 		ForecastComponent forecastComponent = streamComponentFactory.createForecastComponent();
 		forecastComponent.setNextComponent(confidenceBand);
 		forecastComponent.start();
-
-		// weighted standard deviation calculation
-		// WeightedStandardDeviationComponent standardDeviation =
-		// streamComponentFactory.createWeightedStandardDeviation();
-		// standardDeviation.setNextComponent(holtWinters);
-		// standardDeviation.start();
 
 		// standard deviation calculation
 		StandardDeviationComponent standardDeviation = streamComponentFactory.createStandardDeviation();
@@ -153,7 +138,7 @@ public class AnomalyStreamSystem implements InitializingBean {
 		// calculating slow request rate
 		PercentageRateComponent percentageRate = streamComponentFactory.createPercentageRate();
 		percentageRate.setNextComponentOne(standardDeviation);
-		percentageRate.setNextComponentTwo(problemWriter);
+		percentageRate.setNextComponentTwo(tsdbWriter);
 		percentageRate.setTriggerComponent(businessTransactionAlerting);
 		percentageRate.start();
 
@@ -161,13 +146,12 @@ public class AnomalyStreamSystem implements InitializingBean {
 		QuadraticScoreFilterComponent quadraticScoreFilter = streamComponentFactory.createQuadraticScoreFilter();
 		quadraticScoreFilter.setNextComponent(percentageRate);
 
+		WeightedStandardDeviationComponent weightedStandardDeviation = streamComponentFactory.createWeightedStandardDeviation();
+		weightedStandardDeviation.setNextComponent(quadraticScoreFilter);
+
 		// business transaction injection
 		BusinessTransactionContextInjectorComponent businessTransactionInjector = streamComponentFactory.createBusinessTransactionInjector();
-		businessTransactionInjector.setNextComponent(quadraticScoreFilter);
-
-		// warmup filter
-		// WarmUpFilterComponent warmUpFilter = streamComponentFactory.createWarmUpFilter();
-		// warmUpFilter.setNextComponent(businessTransactionInjector);
+		businessTransactionInjector.setNextComponent(weightedStandardDeviation);
 
 		// set entry point
 		return businessTransactionInjector;

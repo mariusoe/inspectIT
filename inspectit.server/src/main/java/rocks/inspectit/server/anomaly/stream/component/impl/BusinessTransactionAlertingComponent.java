@@ -7,11 +7,13 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
+import rocks.inspectit.server.anomaly.stream.object.StreamContext;
 import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.shared.all.util.Pair;
 
@@ -31,6 +33,9 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 
 	@Value("${anomaly.settings.alerting.notificationInterval}")
 	private long notificationInterval;
+
+	@Autowired
+	private SharedStreamProperties streamProperties;
 
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");
 
@@ -73,6 +78,9 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 	 * @param businessTransaction
 	 */
 	private void anomalyEnded(String businessTransaction) {
+		StreamContext context = streamProperties.getStreamContext(businessTransaction);
+		context.setAnomalyActive(false);
+
 		StringBuilder builder = new StringBuilder();
 		builder.append("Anomaly in business transaction '");
 		builder.append(businessTransaction);
@@ -82,6 +90,9 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 	}
 
 	private void anomalyDetected(String businessTransaction, double errorRate) {
+		StreamContext context = streamProperties.getStreamContext(businessTransaction);
+		context.setAnomalyActive(true);
+
 		AnomalyInformation anomalyInformation = anomalyMap.get(businessTransaction);
 
 		long currentTime = System.currentTimeMillis();

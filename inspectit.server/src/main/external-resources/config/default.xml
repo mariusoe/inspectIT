@@ -323,7 +323,7 @@
 				<properties>
 					<boolean-property name="Execute Anomaly Detection" default-value="false" server-restart-required="true" logical-name="anomaly.isActive" advanced="false" description="If the anomaly detection should be executed."></boolean-property>
 					
-					<string-property name="Warm-Up Count" default-value="20" server-restart-required="true" logical-name="anomaly.settings.warmupCount" advanced="false"></string-property>
+					<string-property name="Warm-Up Duration [s]" default-value="60" server-restart-required="true" logical-name="anomaly.settings.warmupDuration" advanced="false"></string-property>
 					<string-property name="Score Threshold" default-value="0.25" server-restart-required="false" logical-name="anomaly.settings.scoreThreshold" advanced="false"></string-property>
 					<long-property name="Error-Rate Window Size [s]" default-value="10" server-restart-required="true" logical-name="anomaly.settings.errorRateWindowSize" advanced="false"></long-property>
 					

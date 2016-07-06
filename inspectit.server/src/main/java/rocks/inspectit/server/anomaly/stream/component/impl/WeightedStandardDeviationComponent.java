@@ -95,14 +95,18 @@ public class WeightedStandardDeviationComponent extends AbstractSingleStreamComp
 	}
 
 	private void calculateStandardDeviation(String businessTransaction, ArrayList<StreamObject<InvocationSequenceData>> items) {
-		StreamContext streamContext = streamProperties.getStreamContext(businessTransaction);
+		StreamContext context = streamProperties.getStreamContext(businessTransaction);
 
-		ConfidenceBand confidenceBand = streamContext.getConfidenceBand();
+		if (context.isAnomalyActive()) {
+			// do nothing if anomaly is active
+			return;
+		}
+
+		ConfidenceBand confidenceBand = context.getConfidenceBand();
 
 		if (confidenceBand != null) {
 			ResidualContainer container = new ResidualContainer();
 
-			// TODO: 0 check
 			double confidenceSize = confidenceBand.getWidth() / 2;
 
 			for (StreamObject<InvocationSequenceData> iso : items) {
@@ -140,7 +144,7 @@ public class WeightedStandardDeviationComponent extends AbstractSingleStreamComp
 			double variance = valSum / weightSum;
 			double standardDeviation = Math.sqrt(variance);
 
-			streamContext.setStandardDeviation(standardDeviation);
+			context.setStandardDeviation(standardDeviation);
 		}
 
 	}

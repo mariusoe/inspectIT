@@ -3,9 +3,8 @@
  */
 package rocks.inspectit.server.anomaly.stream.component.impl;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.influxdb.dto.Point;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -18,6 +17,7 @@ import rocks.inspectit.server.anomaly.stream.transfer.ITransferFunction;
 import rocks.inspectit.server.anomaly.stream.transfer.TransferFunction;
 import rocks.inspectit.server.tsdb.InfluxDBService;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
+import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
  * @author Marius Oehler
@@ -25,15 +25,16 @@ import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
  */
 public class QuadraticScoreFilterComponent extends AbstractForkStreamComponent<InvocationSequenceData> {
 
+	@Log
+	private Logger log;
+
 	private final ITransferFunction transferFunction = TransferFunction.QUADRATIC;
 
 	@Value("${anomaly.settings.scoreThreshold}")
 	private double scoreThreshold;
 
-	@Value("${anomaly.settings.warmupCount}")
-	private long warmupCount;
-
-	private final AtomicLong counter = new AtomicLong(0L);
+	@Value("${anomaly.settings.warmupDuration}")
+	private long warmupDuration;
 
 	@Autowired
 	private InfluxDBService influxService;
@@ -45,7 +46,15 @@ public class QuadraticScoreFilterComponent extends AbstractForkStreamComponent<I
 	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> streamObject) {
 		StreamContext context = streamObject.getContext();
 
-		if (context.getRequestCount() < warmupCount) {
+		if (context.isWarmUp()) {
+			long warmupEndTime = context.getStartTime() + warmupDuration * 1000L;
+			if (warmupEndTime < System.currentTimeMillis()) {
+				context.setWarmUp(false);
+				if (log.isInfoEnabled()) {
+					log.info("[{}] Warm-up finished.", context.getBusinessTransaction());
+				}
+			}
+
 			return EFlowControl.CONTINUE_ONE;
 		}
 

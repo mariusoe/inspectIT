@@ -31,6 +31,69 @@ public class StreamContext {
 
 	private HoltWintersForecast holtWintersForecast;
 
+	private long startTime;
+
+	private boolean warmUp = true;
+
+	private boolean anomalyActive = false;
+
+	/**
+	 * Gets {@link #anomalyActive}.
+	 *
+	 * @return {@link #anomalyActive}
+	 */
+	public boolean isAnomalyActive() {
+		return anomalyActive;
+	}
+
+	/**
+	 * Sets {@link #anomalyActive}.
+	 *
+	 * @param anomalyActive
+	 *            New value for {@link #anomalyActive}
+	 */
+	public void setAnomalyActive(boolean anomalyActive) {
+		this.anomalyActive = anomalyActive;
+	}
+
+	/**
+	 * Gets {@link #warmUp}.
+	 *
+	 * @return {@link #warmUp}
+	 */
+	public boolean isWarmUp() {
+		return warmUp;
+	}
+
+	/**
+	 * Sets {@link #warmUp}.
+	 *
+	 * @param warmUp
+	 *            New value for {@link #warmUp}
+	 */
+	public void setWarmUp(boolean warmUp) {
+		this.warmUp = warmUp;
+	}
+
+	/**
+	 * Gets {@link #startTime}.
+	 *
+	 * @return {@link #startTime}
+	 */
+	public long getStartTime() {
+		return startTime;
+	}
+
+	/**
+	 * Sets {@link #startTime}.
+	 *
+	 * @param startTime
+	 *            New value for {@link #startTime}
+	 */
+	public void setStartTime(long startTime) {
+		this.startTime = startTime;
+	}
+
 	/**
 	 * Gets {@link #holtWintersForecast}.
 	 *

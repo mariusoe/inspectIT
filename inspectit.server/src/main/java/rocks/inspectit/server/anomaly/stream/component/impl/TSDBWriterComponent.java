@@ -22,27 +22,33 @@ public class TSDBWriterComponent extends AbstractSingleStreamComponent<Invocatio
 	@Autowired
 	private InfluxDBService influxService;
 
-	private String dataTypeTag;
-
-	/**
-	 * Sets {@link #dataTypeTag}.
-	 *
-	 * @param dataTypeTag
-	 *            New value for {@link #dataTypeTag}
-	 */
-	public void setDataTypeTag(String dataTypeTag) {
-		this.dataTypeTag = dataTypeTag;
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> streamObject) {
+		String typeTag;
+		switch (streamObject.getHealthTag()) {
+		case FAST:
+			typeTag = "fast";
+			break;
+		case OK:
+			typeTag = "normal";
+			break;
+		case SLOW:
+			typeTag = "slow";
+			break;
+		case UNKNOWN:
+		default:
+			typeTag = "unknown";
+			break;
+
+		}
+
 		Builder builder = Point.measurement("stream");
 		builder.addField("duration", streamObject.getData().getDuration());
 		builder.tag("businessTransaction", streamObject.getContext().getBusinessTransaction());
-		builder.tag("type", dataTypeTag);
+		builder.tag("type", typeTag);
 
 		influxService.insert(builder.build());
 

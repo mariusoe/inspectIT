@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import rocks.inspectit.server.anomaly.stream.component.AbstractDoubleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
 import rocks.inspectit.server.anomaly.stream.component.ISingleInputComponent;
+import rocks.inspectit.server.anomaly.stream.object.HealthTag;
 import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.server.tsdb.InfluxDBService;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
@@ -73,6 +74,8 @@ public class PercentageRateComponent extends AbstractDoubleStreamComponent<Invoc
 
 		counterMap.get(streamObject.getContext().getBusinessTransaction()).totalCounter.incrementAndGet();
 
+		streamObject.setHealthTag(HealthTag.OK);
+
 		return EFlowControl.CONTINUE_ONE;
 	}
 
@@ -87,6 +90,12 @@ public class PercentageRateComponent extends AbstractDoubleStreamComponent<Invoc
 
 		counterMap.get(streamObject.getContext().getBusinessTransaction()).totalCounter.incrementAndGet();
 		counterMap.get(streamObject.getContext().getBusinessTransaction()).errorCounter.incrementAndGet();
+
+		if (streamObject.getData().getDuration() < streamObject.getContext().getCurrentMean()) {
+			streamObject.setHealthTag(HealthTag.SLOW);
+		} else {
+			streamObject.setHealthTag(HealthTag.FAST);
+		}
 
 		return EFlowControl.CONTINUE_TWO;
 	}
