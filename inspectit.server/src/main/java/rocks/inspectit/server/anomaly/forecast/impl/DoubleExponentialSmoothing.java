@@ -1,18 +1,19 @@
 /**
  *
  */
-package rocks.inspectit.server.anomaly.forecast;
+package rocks.inspectit.server.anomaly.forecast.impl;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 
+import rocks.inspectit.server.anomaly.forecast.IForecast;
 import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
  * @author Marius Oehler
  *
  */
-public class DoubleExponentialSmoothing {
+public class DoubleExponentialSmoothing implements IForecast {
 
 	/**
 	 * Logger for the class.
@@ -42,7 +43,8 @@ public class DoubleExponentialSmoothing {
 	 */
 	private double trend = Double.NaN;
 
-	public void push(double newValue) {
+	@Override
+	public void fit(double newValue) {
 		if (Double.isNaN(value)) {
 			value = newValue;
 		} else if (Double.isNaN(trend)) {
@@ -56,6 +58,7 @@ public class DoubleExponentialSmoothing {
 		}
 	}
 
+	@Override
 	public double forecast() {
 		if (Double.isNaN(trend)) {
 			return value;

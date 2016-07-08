@@ -1,10 +1,13 @@
 /**
  *
  */
-package rocks.inspectit.server.anomaly.forecast;
+package rocks.inspectit.server.anomaly.forecast.impl;
 
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 
+import rocks.inspectit.server.anomaly.forecast.ForecastFactory;
+import rocks.inspectit.server.anomaly.forecast.IForecast;
 import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
@@ -25,7 +28,7 @@ import rocks.inspectit.shared.all.spring.logger.Log;
  * @author Marius Oehler
  *
  */
-public class HoltWintersForecast {
+public class HoltWintersForecast implements IForecast {
 
 	/**
 	 * This exception will be thrown if an untrained instance of {@link HoltWintersForecast} is
@@ -69,6 +72,7 @@ public class HoltWintersForecast {
 	/**
 	 * The season length (number of elements).
 	 */
+	@Value("#{${anomaly.settings.forecast.seasonalDuration} * 3600 / ${anomaly.settings.confidenceBandUpdateInterval}}")
 	private int seasonalLength;
 
 	/**
@@ -115,6 +119,12 @@ public class HoltWintersForecast {
 	 * Counter how many error sums have been added.
 	 */
 	private long meanSquaredErrorCounter = 0L;
+
+	@Value("${anomaly.settings.confidenceBandUpdateInterval}")
+	private long updateInterval;
+
+	@Value("${anomaly.settings.forecast.seasonalDuration}")
+	private long seasonalDuration;
 
 	/**
 	 * Constructor.
@@ -221,6 +231,7 @@ public class HoltWintersForecast {
 	 * @exception UntrainedHoltWintersException
 	 *                is thrown if the model has not been trained
 	 */
+	@Override
 	public void fit(double newValue) {
 		fit(newValue, false);
 	}
@@ -279,6 +290,7 @@ public class HoltWintersForecast {
 	 *
 	 * @return the forecasted value
 	 */
+	@Override
 	public double forecast() {
 		return forecastedValue;
 	}
@@ -332,16 +344,6 @@ public class HoltWintersForecast {
 	}
 
 	/**
-	 * Sets {@link #seasonalLength}.
-	 *
-	 * @param seasonalLength
-	 *            New value for {@link #seasonalLength}
-	 */
-	public void setSeasonalLength(int seasonalLength) {
-		this.seasonalLength = seasonalLength;
-	}
-
-	/**
 	 * Trains the model with the given input data.
 	 *
 	 * @param inputData
@@ -385,5 +387,48 @@ public class HoltWintersForecast {
 	public String toString() {
 		return String.format("HoltWintersForecast [valueSmoothing=%f, trendSmoothing=%f, seasonalSmoothing=%f, seasonalLength=%d, currentRSME=%f]", smoothingFactor, trendSmoothingFactor,
 				seasonalSmoothingFactor, seasonalLength, getRootMeanSquaredError());
+	}
+
+	/**
+	 * Tries to find the best parameter for the HoltWinter algorithms to fit the given data. This
+	 * approach is a work around. A better solution would be to use an algorithm like LBFGS.
+	 *
+	 * @param factory
+	 *            instance of {@link ForecastFactory}
+	 * @param data
+	 *            the data
+	 * @return array containing the minimal RSME, smoothing factor, trend smoothing factor and
+	 *         seasonal smoothing factor
+	 */
+	public static double[] bruteForceParameterDetermination(ForecastFactory factory, double[] data) {
+		double stepSize = 0.05D;
+
+		double minRMSE = Double.MAX_VALUE;
+		double alpha = 0;
+		double beta = 0;
+		double gamma = 0;
+
+		for (double x = 0; x <= 1; x += stepSize) {
+			for (double y = 0; y <= 1; y += stepSize) {
+				for (double z = 0; z <= 1; z += stepSize) {
+					HoltWintersForecast holtWinters = factory.createHoltWinters();
+					holtWinters.setSmoothingFactor(x);
+					holtWinters.setTrendSmoothingFactor(y);
+					holtWinters.setSeasonalSmoothingFactor(z);
+
+					holtWinters.train(data);
+
+					if (holtWinters.getRootMeanSquaredError() < minRMSE) {
+						minRMSE = holtWinters.getRootMeanSquaredError();
+
+						alpha = x;
+						beta = y;
+						gamma = z;
+					}
+				}
+			}
+		}
+
+		return new double[] { minRMSE, alpha, beta, gamma };
 	}
 }

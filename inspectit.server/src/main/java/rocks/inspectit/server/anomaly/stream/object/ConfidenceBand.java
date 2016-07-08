@@ -1,7 +1,7 @@
 /**
  *
  */
-package rocks.inspectit.server.anomaly.stream;
+package rocks.inspectit.server.anomaly.stream.object;
 
 /**
  * @author Marius Oehler

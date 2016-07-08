@@ -8,9 +8,9 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import rocks.inspectit.server.anomaly.stream.ConfidenceBand;
 import rocks.inspectit.server.anomaly.stream.component.AbstractForkStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
+import rocks.inspectit.server.anomaly.stream.object.ConfidenceBand;
 import rocks.inspectit.server.anomaly.stream.object.StreamContext;
 import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.server.anomaly.stream.transfer.ITransferFunction;

@@ -3,6 +3,9 @@
  */
 package rocks.inspectit.server.anomaly.forecast;
 
+import rocks.inspectit.server.anomaly.forecast.impl.DoubleExponentialSmoothing;
+import rocks.inspectit.server.anomaly.forecast.impl.HoltWintersForecast;
+
 /**
  * @author Marius Oehler
  *

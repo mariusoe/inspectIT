@@ -43,6 +43,14 @@ public class SharedStreamProperties {
 	private SharedStreamProperties() {
 	}
 
+	public List<String> getBusinessTransactions() {
+		return new ArrayList<String>(streamContextMap.keySet());
+	}
+
+	public StreamContext getStreamContext(String businessTransaction) {
+		return streamContextMap.get(businessTransaction);
+	}
+
 	/**
 	 * Gets {@link #streamContextMap}.
 	 *
@@ -50,13 +58,5 @@ public class SharedStreamProperties {
 	 */
 	public Map<String, StreamContext> getStreamContextMap() {
 		return streamContextMap;
-	}
-
-	public List<String> getBusinessTransactions() {
-		return new ArrayList<String>(streamContextMap.keySet());
-	}
-
-	public StreamContext getStreamContext(String businessTransaction) {
-		return streamContextMap.get(businessTransaction);
 	}
 }

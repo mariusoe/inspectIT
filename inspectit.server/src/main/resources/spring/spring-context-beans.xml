@@ -116,8 +116,8 @@
 	</bean>	
 	
 	<!-- Forecasting -->
-	<bean name="holtWintersForecast" class="rocks.inspectit.server.anomaly.forecast.HoltWintersForecast" scope="prototype"/>
-	<bean name="doubleExponentialSmoothing" class="rocks.inspectit.server.anomaly.forecast.DoubleExponentialSmoothing" scope="prototype"/>
+	<bean name="holtWintersForecast" class="rocks.inspectit.server.anomaly.forecast.impl.HoltWintersForecast" scope="prototype"/>
+	<bean name="doubleExponentialSmoothing" class="rocks.inspectit.server.anomaly.forecast.impl.DoubleExponentialSmoothing" scope="prototype"/>
 
 	<bean name="forecastFactory" class="rocks.inspectit.server.anomaly.forecast.ForecastFactory">
 	    <lookup-method bean="holtWintersForecast" name="createHoltWinters" />

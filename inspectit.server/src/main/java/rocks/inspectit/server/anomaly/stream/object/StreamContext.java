@@ -9,9 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
-import rocks.inspectit.server.anomaly.forecast.DoubleExponentialSmoothing;
-import rocks.inspectit.server.anomaly.forecast.HoltWintersForecast;
-import rocks.inspectit.server.anomaly.stream.ConfidenceBand;
+import rocks.inspectit.server.anomaly.forecast.IForecast;
 
 /**
  * @author Marius Oehler
@@ -27,10 +25,6 @@ public class StreamContext {
 
 	private final List<Double> dataHistory = new ArrayList<>();
 
-	private DoubleExponentialSmoothing doubleExponentialSmoothing;
-
-	private HoltWintersForecast holtWintersForecast;
-
 	private long startTime;
 
 	private boolean warmUp = true;
@@ -38,6 +32,27 @@ public class StreamContext {
 	private boolean anomalyActive = false;
 
 	private final SummaryStatistics standardDeviationStatistics = new SummaryStatistics();
+
+	private IForecast forecaster;
+
+	/**
+	 * Gets {@link #forecaster}.
+	 *
+	 * @return {@link #forecaster}
+	 */
+	public IForecast getForecaster() {
+		return forecaster;
+	}
+
+	/**
+	 * Sets {@link #forecaster}.
+	 *
+	 * @param forecaster
+	 *            New value for {@link #forecaster}
+	 */
+	public void setForecaster(IForecast forecaster) {
+		this.forecaster = forecaster;
+	}
 
 	/**
 	 * Gets {@link #standardDeviationStatistics}.
@@ -103,44 +118,6 @@ public class StreamContext {
 	 */
 	public void setStartTime(long startTime) {
 		this.startTime = startTime;
-	}
-
-	/**
-	 * Gets {@link #holtWintersForecast}.
-	 *
-	 * @return {@link #holtWintersForecast}
-	 */
-	public HoltWintersForecast getHoltWintersForecast() {
-		return holtWintersForecast;
-	}
-
-	/**
-	 * Sets {@link #holtWintersForecast}.
-	 *
-	 * @param holtWintersForecast
-	 *            New value for {@link #holtWintersForecast}
-	 */
-	public void setHoltWintersForecast(HoltWintersForecast holtWintersForecast) {
-		this.holtWintersForecast = holtWintersForecast;
-	}
-
-	/**
-	 * Gets {@link #doubleExponentialSmoothing}.
-	 *
-	 * @return {@link #doubleExponentialSmoothing}
-	 */
-	public DoubleExponentialSmoothing getDoubleExponentialSmoothing() {
-		return doubleExponentialSmoothing;
-	}
-
-	/**
-	 * Sets {@link #doubleExponentialSmoothing}.
-	 *
-	 * @param doubleExponentialSmoothing
-	 *            New value for {@link #doubleExponentialSmoothing}
-	 */
-	public void setDoubleExponentialSmoothing(DoubleExponentialSmoothing doubleExponentialSmoothing) {
-		this.doubleExponentialSmoothing = doubleExponentialSmoothing;
 	}
 
 	/**

@@ -9,6 +9,8 @@ import static org.hamcrest.Matchers.is;
 
 import org.testng.annotations.Test;
 
+import rocks.inspectit.server.anomaly.stream.object.ConfidenceBand;
+
 /**
  * @author Marius Oehler
  *
