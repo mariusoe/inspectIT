@@ -92,9 +92,9 @@ public class PercentageRateComponent extends AbstractDoubleStreamComponent<Invoc
 		counterMap.get(streamObject.getContext().getBusinessTransaction()).errorCounter.incrementAndGet();
 
 		if (streamObject.getData().getDuration() < streamObject.getContext().getCurrentMean()) {
-			streamObject.setHealthTag(HealthTag.SLOW);
-		} else {
 			streamObject.setHealthTag(HealthTag.FAST);
+		} else {
+			streamObject.setHealthTag(HealthTag.SLOW);
 		}
 
 		return EFlowControl.CONTINUE_TWO;

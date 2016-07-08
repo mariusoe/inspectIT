@@ -199,7 +199,8 @@ dependencies {
 		'com.github.amatkivskiy:gitter.sdk.core:1.5',
 		'com.github.amatkivskiy:gitter.sdk.sync:1.5.1',
 		'org.apache.commons:commons-email:1.4',
-		'javax.mail:mail:1.4'
+		'javax.mail:mail:1.4',
+		'org.apache.commons:commons-math3:3.6.1'
 	)
 		
 	serverTest (

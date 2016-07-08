@@ -24,7 +24,6 @@ import rocks.inspectit.server.anomaly.stream.component.impl.PercentageRateCompon
 import rocks.inspectit.server.anomaly.stream.component.impl.QuadraticScoreFilterComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.StandardDeviationComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.TSDBWriterComponent;
-import rocks.inspectit.server.anomaly.stream.component.impl.WeightedStandardDeviationComponent;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventFactory;
 import rocks.inspectit.server.anomaly.stream.disruptor.InvocationSequenceEventHandler;
 import rocks.inspectit.server.anomaly.stream.disruptor.events.InvocationSequenceEvent;
@@ -146,12 +145,9 @@ public class AnomalyStreamSystem implements InitializingBean {
 		QuadraticScoreFilterComponent quadraticScoreFilter = streamComponentFactory.createQuadraticScoreFilter();
 		quadraticScoreFilter.setNextComponent(percentageRate);
 
-		WeightedStandardDeviationComponent weightedStandardDeviation = streamComponentFactory.createWeightedStandardDeviation();
-		weightedStandardDeviation.setNextComponent(quadraticScoreFilter);
-
 		// business transaction injection
 		BusinessTransactionContextInjectorComponent businessTransactionInjector = streamComponentFactory.createBusinessTransactionInjector();
-		businessTransactionInjector.setNextComponent(weightedStandardDeviation);
+		businessTransactionInjector.setNextComponent(quadraticScoreFilter);
 
 		// set entry point
 		return businessTransactionInjector;

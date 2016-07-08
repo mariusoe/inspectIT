@@ -54,6 +54,7 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 				anomalyMap.put(businessTransaction, new AnomalyInformation());
 			} else {
 				AnomalyInformation anomalyInformation = anomalyMap.get(businessTransaction);
+				anomalyInformation.lastAnomalousBehavior = currentTime;
 
 				if (currentTime - anomalyInformation.startTime > minDuration) {
 					anomalyDetected(businessTransaction, errorRate);
@@ -63,7 +64,7 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 			if (anomalyMap.containsKey(businessTransaction)) {
 				AnomalyInformation anomalyInformation = anomalyMap.get(businessTransaction);
 
-				if (anomalyInformation.isActive) {
+				if (anomalyInformation.isActive && currentTime - anomalyInformation.lastAnomalousBehavior > minDuration) {
 					anomalyEnded(businessTransaction);
 				}
 
@@ -99,7 +100,7 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 		double errorRatePercentage = ((int) (errorRate * 10000)) / 100D;
 
 		if (anomalyInformation.isActive) {
-			if (currentTime - anomalyInformation.lastAlert > notificationInterval) {
+			if (notificationInterval > 0 && currentTime - anomalyInformation.lastAlert > notificationInterval) {
 				StringBuilder builder = new StringBuilder();
 				builder.append("Anomaly in business transaction '");
 				builder.append(businessTransaction);
@@ -130,6 +131,8 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 
 	private class AnomalyInformation {
 		long startTime = System.currentTimeMillis();
+
+		long lastAnomalousBehavior;
 
 		boolean isActive = false;
 

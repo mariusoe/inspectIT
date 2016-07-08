@@ -13,13 +13,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import rocks.inspectit.server.anomaly.forecast.DoubleExponentialSmoothing;
 import rocks.inspectit.server.anomaly.forecast.ForecastFactory;
 import rocks.inspectit.server.anomaly.forecast.HoltWintersForecast;
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
@@ -48,6 +52,14 @@ public class ForecastComponent extends AbstractSingleStreamComponent<InvocationS
 	@Value("${anomaly.settings.confidenceBandUpdateInterval}")
 	private long updateInterval;
 
+	/**
+	 * The season length.
+	 */
+	@Value("${anomaly.settings.forecast.seasonalDuration}")
+	private long seasonalDuration;
+
+	private int seasonalLength;
+
 	@Autowired
 	private SharedStreamProperties streamProperties;
 
@@ -56,11 +68,12 @@ public class ForecastComponent extends AbstractSingleStreamComponent<InvocationS
 
 	private int holtWintersRecalculation = 10;
 
-	/**
-	 * The season length.
-	 */
-	@Value("${anomaly.settings.forecast.seasonLength}")
-	private long seasonLength;
+	private final int initializationCount = 20;
+
+	@PostConstruct
+	private void init() {
+		seasonalLength = (int) (TimeUnit.HOURS.toSeconds(seasonalDuration) / updateInterval);
+	}
 
 	/**
 	 * {@link ExecutorService} for sending keep alive messages.
@@ -131,14 +144,19 @@ public class ForecastComponent extends AbstractSingleStreamComponent<InvocationS
 		double mean = StatisticUtils.mean(valueArray);
 		context.getDataHistory().add(mean);
 
+		if (context.isWarmUp()) {
+			return;
+		}
+
 		double forecastValue;
 
-		if (context.getDataHistory().size() <= 2 * seasonLength) {
+		if (context.getDataHistory().size() <= 2 * seasonalLength) {
 			if (context.getDoubleExponentialSmoothing() == null) {
 				if (log.isInfoEnabled()) {
 					log.info(logPrefix + "Using double exponential smoothing forecasting until enough data has been collected for HoltWinters.");
 				}
-				context.setDoubleExponentialSmoothing(forecastFactory.createDoubleExponentialSmoothing());
+
+				initDoubleExponentialSmoothing(context);
 			}
 
 			context.getDoubleExponentialSmoothing().push(mean);
@@ -149,13 +167,13 @@ public class ForecastComponent extends AbstractSingleStreamComponent<InvocationS
 					log.info(logPrefix + "Switching forecasting alogirthm to HoltWinters.");
 				}
 
-				updateHoltWintersForecastInstance(context);
+				updateHoltWintersForecast(context);
 			} else if (holtWintersRecalculation > 0 && context.getHoltWintersForecast().getSeasonIndex() == 0) {
 				if (log.isInfoEnabled()) {
 					log.info(logPrefix + "Recalculate parameter for HoltWinters forecasting.");
 				}
 
-				updateHoltWintersForecastInstance(context);
+				updateHoltWintersForecast(context);
 
 				holtWintersRecalculation--;
 			}
@@ -170,6 +188,25 @@ public class ForecastComponent extends AbstractSingleStreamComponent<InvocationS
 		context.setCurrentMean(forecastValue);
 	}
 
+	private void initDoubleExponentialSmoothing(StreamContext context) {
+		DoubleExponentialSmoothing exponentialSmoothing = forecastFactory.createDoubleExponentialSmoothing();
+
+		double[] primitiveHistoryData = ArrayUtils.toPrimitive(context.getDataHistory().toArray(new Double[0]));
+
+		DescriptiveStatistics statistics = new DescriptiveStatistics(primitiveHistoryData);
+		double median = new Median().evaluate(primitiveHistoryData);
+
+		for (double dataElement : primitiveHistoryData) {
+			if (Math.abs(dataElement - statistics.getMean()) < 3 * statistics.getStandardDeviation()) {
+				exponentialSmoothing.push(dataElement);
+			} else {
+				exponentialSmoothing.push(median);
+			}
+		}
+
+		context.setDoubleExponentialSmoothing(exponentialSmoothing);
+	}
+
 	/**
 	 * Finding the best parameter based on the current data and creates a new
 	 * {@link HoltWintersForecast} instance using the calculated parameter.
@@ -177,25 +214,35 @@ public class ForecastComponent extends AbstractSingleStreamComponent<InvocationS
 	 * @param context
 	 *            the current stream context
 	 */
-	private void updateHoltWintersForecastInstance(StreamContext context) {
+	private void updateHoltWintersForecast(StreamContext context) {
 		// find best parameter
 		Double[] historyData = context.getDataHistory().toArray(new Double[0]);
 		double[] parameter = bruteForceParameterDetermination(ArrayUtils.toPrimitive(historyData));
 
 		if (log.isInfoEnabled()) {
-			log.info("[{}] |-Found parameter for HoltWinters: alpha={}, beta={}, gamma={} producing a RMSE of {}", context.getBusinessTransaction(), parameter[1], parameter[2], parameter[3],
-					parameter[0]);
+			log.info("[{}] |-New HoltWinters parameter: alpha={}, beta={}, gamma={} producing a RMSE of {}", context.getBusinessTransaction(), parameter[1], parameter[2], parameter[3], parameter[0]);
 		}
 
 		// create the instance and set the parameter
-		HoltWintersForecast holtWinters = forecastFactory.createHoltWinters();
-		holtWinters.setSmoothingFactor(parameter[1]);
-		holtWinters.setTrendSmoothingFactor(parameter[2]);
-		holtWinters.setSeasonalSmoothingFactor(parameter[3]);
-
+		HoltWintersForecast holtWinters = createHoltWinters(parameter[1], parameter[2], parameter[3]);
 		holtWinters.train(ArrayUtils.toPrimitive(historyData));
 
 		context.setHoltWintersForecast(holtWinters);
+	}
+
+	private HoltWintersForecast createHoltWinters(double alpha, double beta, double gamma) {
+		HoltWintersForecast holtWinters = forecastFactory.createHoltWinters();
+		holtWinters.setSmoothingFactor(alpha);
+		holtWinters.setTrendSmoothingFactor(beta);
+		holtWinters.setSeasonalSmoothingFactor(gamma);
+
+		holtWinters.setSeasonalLength(seasonalLength);
+
+		if (log.isInfoEnabled()) {
+			log.info("Created forecast instance: {}", holtWinters);
+		}
+
+		return holtWinters;
 	}
 
 	/**
@@ -218,11 +265,7 @@ public class ForecastComponent extends AbstractSingleStreamComponent<InvocationS
 		for (double x = 0; x <= 1; x += stepSize) {
 			for (double y = 0; y <= 1; y += stepSize) {
 				for (double z = 0; z <= 1; z += stepSize) {
-					HoltWintersForecast holtWinters = forecastFactory.createHoltWinters();
-					holtWinters.setSmoothingFactor(x);
-					holtWinters.setTrendSmoothingFactor(y);
-					holtWinters.setSeasonalSmoothingFactor(z);
-
+					HoltWintersForecast holtWinters = createHoltWinters(x, y, z);
 					holtWinters.train(data);
 
 					if (holtWinters.getRootMeanSquaredError() < minRMSE) {

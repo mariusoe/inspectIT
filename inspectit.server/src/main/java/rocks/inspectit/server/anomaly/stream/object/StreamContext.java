@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+
 import rocks.inspectit.server.anomaly.forecast.DoubleExponentialSmoothing;
 import rocks.inspectit.server.anomaly.forecast.HoltWintersForecast;
 import rocks.inspectit.server.anomaly.stream.ConfidenceBand;
@@ -23,7 +25,7 @@ public class StreamContext {
 
 	private double standardDeviation;
 
-	private double currentMean;
+	private double currentMean = Double.NaN;
 
 	private final List<Double> dataHistory = new ArrayList<>();
 
@@ -36,6 +38,17 @@ public class StreamContext {
 	private boolean warmUp = true;
 
 	private boolean anomalyActive = false;
+
+	private final SummaryStatistics statistics = new SummaryStatistics();
+
+	/**
+	 * Gets {@link #statistics}.
+	 *
+	 * @return {@link #statistics}
+	 */
+	public SummaryStatistics getStatistics() {
+		return statistics;
+	}
 
 	/**
 	 * Gets {@link #anomalyActive}.

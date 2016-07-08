@@ -5,7 +5,6 @@ package rocks.inspectit.server.anomaly.stream.component.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -27,6 +27,7 @@ import rocks.inspectit.server.anomaly.stream.object.StreamContext;
 import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.server.anomaly.utils.StatisticUtils;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
+import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
  * @author Marius Oehler
@@ -34,10 +35,11 @@ import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
  */
 public class StandardDeviationComponent extends AbstractSingleStreamComponent<InvocationSequenceData> implements Runnable {
 
+	@Log
+	private Logger log;
+
 	@Value("${anomaly.settings.confidenceBandHistorySize}")
 	private int historyLimit;
-
-	private final Map<String, LinkedList<ResidualContainer>> residualHistoryMap = new HashMap<>();
 
 	private Queue<StreamObject<InvocationSequenceData>> intervalQueue = new ConcurrentLinkedQueue<StreamObject<InvocationSequenceData>>();
 
@@ -63,7 +65,9 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 	 */
 	@Override
 	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> item) {
-		intervalQueue.add(item);
+		if (!item.getContext().isAnomalyActive()) {
+			intervalQueue.add(item);
+		}
 
 		return EFlowControl.CONTINUE;
 	}
@@ -94,54 +98,21 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 	private void calculateStandardDeviation(String businessTransaction, List<StreamObject<InvocationSequenceData>> invocationList) {
 		StreamContext context = streamProperties.getStreamContext(businessTransaction);
 
-		if (!context.isAnomalyActive()) {
-			// only active if an anomaly is active
-			return;
-		}
-
 		double[] durationArray = new double[invocationList.size()];
-
 		for (int i = 0; i < invocationList.size(); i++) {
 			durationArray[i] = invocationList.get(i).getData().getDuration();
 		}
 
 		double mean = StatisticUtils.mean(durationArray);
 
-		// calculate residuals of recent data
-		ResidualContainer container = new ResidualContainer();
 		for (double duration : durationArray) {
-			container.sum += Math.pow(duration - mean, 2);
-		}
-		container.count = durationArray.length;
-
-		if (!residualHistoryMap.containsKey(businessTransaction)) {
-			residualHistoryMap.put(businessTransaction, new LinkedList<ResidualContainer>());
-		}
-		LinkedList<ResidualContainer> residualList = residualHistoryMap.get(businessTransaction);
-
-		residualList.add(container);
-		if (residualList.size() > historyLimit) {
-			residualList.removeFirst();
+			context.getStatistics().addValue(duration - mean);
 		}
 
-		// calculate stddev
-		double sum = 0D;
-		int count = 0;
-		for (ResidualContainer rContainer : residualList) {
-			sum += rContainer.sum;
-			count += rContainer.count;
+		context.setStandardDeviation(context.getStatistics().getStandardDeviation());
+
+		if (log.isDebugEnabled()) {
+			log.debug("[{}] New standard deviation is {}", businessTransaction, context.getStatistics().getStandardDeviation());
 		}
-
-		double variance = sum / count;
-
-		double stdDeviation = Math.sqrt(variance);
-
-		context.setStandardDeviation(stdDeviation);
-	}
-
-	private class ResidualContainer {
-		double sum = 0D;
-
-		int count = 0;
 	}
 }

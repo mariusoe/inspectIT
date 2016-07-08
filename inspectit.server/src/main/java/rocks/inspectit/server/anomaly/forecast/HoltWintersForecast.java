@@ -4,7 +4,6 @@
 package rocks.inspectit.server.anomaly.forecast;
 
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
 
 import rocks.inspectit.shared.all.spring.logger.Log;
 
@@ -68,9 +67,8 @@ public class HoltWintersForecast {
 	private int seasonalIndex;
 
 	/**
-	 * The season length.
+	 * The season length (number of elements).
 	 */
-	@Value("${anomaly.settings.forecast.seasonLength}")
 	private int seasonalLength;
 
 	/**
@@ -334,6 +332,16 @@ public class HoltWintersForecast {
 	}
 
 	/**
+	 * Sets {@link #seasonalLength}.
+	 *
+	 * @param seasonalLength
+	 *            New value for {@link #seasonalLength}
+	 */
+	public void setSeasonalLength(int seasonalLength) {
+		this.seasonalLength = seasonalLength;
+	}
+
+	/**
 	 * Trains the model with the given input data.
 	 *
 	 * @param inputData
@@ -368,5 +376,14 @@ public class HoltWintersForecast {
 		}
 
 		trained = true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return String.format("HoltWintersForecast [valueSmoothing=%f, trendSmoothing=%f, seasonalSmoothing=%f, seasonalLength=%d, currentRSME=%f]", smoothingFactor, trendSmoothingFactor,
+				seasonalSmoothingFactor, seasonalLength, getRootMeanSquaredError());
 	}
 }
