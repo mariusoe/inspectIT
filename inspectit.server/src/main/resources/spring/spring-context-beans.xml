@@ -103,7 +103,6 @@
 	<bean name="standardDeviationComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.StandardDeviationComponent" scope="prototype"/>
 	<bean name="rHoltWintersComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.RHoltWintersComponent" scope="prototype"/>
 	<bean name="confidenceBandComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.ConfidenceBandComponent" scope="prototype"/>
-	<bean name="weightedStandardDeviationComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.WeightedStandardDeviationComponent" scope="prototype"/>
 	<bean name="forecastComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.ForecastComponent" scope="prototype"/>
 	
 	<bean name="streamComponentFactory" class="rocks.inspectit.server.anomaly.stream.StreamComponentFactory">
@@ -115,7 +114,6 @@
 	    <lookup-method bean="standardDeviationComponent" name="createStandardDeviation" />
 	    <lookup-method bean="rHoltWintersComponent" name="createRHoltWinters" />
 	    <lookup-method bean="confidenceBandComponent" name="createConfidenceBand" />
-	    <lookup-method bean="weightedStandardDeviationComponent" name="createWeightedStandardDeviation" />
 	    <lookup-method bean="forecastComponent" name="createForecastComponent" />
 	</bean>	
 	

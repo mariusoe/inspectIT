@@ -64,7 +64,7 @@ public class ConfidenceBandComponent extends AbstractSingleStreamComponent<Invoc
 
 			double currentMean = context.getCurrentMean();
 			if (!Double.isNaN(currentMean)) {
-				double stdDeviation = context.getStandardDeviation();
+				double stdDeviation = context.getStandardDeviationStatistics().getStandardDeviation();
 
 				double lowerConfidenceLevel = Math.max(0D, currentMean - 3 * stdDeviation);
 				double upperConfidenceLevel = currentMean + 3 * stdDeviation;

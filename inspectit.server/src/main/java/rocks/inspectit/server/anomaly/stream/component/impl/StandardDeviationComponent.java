@@ -106,13 +106,11 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 		double mean = StatisticUtils.mean(durationArray);
 
 		for (double duration : durationArray) {
-			context.getStatistics().addValue(duration - mean);
+			context.getStandardDeviationStatistics().addValue(duration - mean);
 		}
 
-		context.setStandardDeviation(context.getStatistics().getStandardDeviation());
-
 		if (log.isDebugEnabled()) {
-			log.debug("[{}] New standard deviation is {}", businessTransaction, context.getStatistics().getStandardDeviation());
+			log.debug("[{}] New standard deviation is {}", businessTransaction, context.getStandardDeviationStatistics().getStandardDeviation());
 		}
 	}
 }

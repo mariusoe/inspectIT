@@ -12,7 +12,6 @@ import rocks.inspectit.server.anomaly.stream.component.impl.QuadraticScoreFilter
 import rocks.inspectit.server.anomaly.stream.component.impl.RHoltWintersComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.StandardDeviationComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.TSDBWriterComponent;
-import rocks.inspectit.server.anomaly.stream.component.impl.WeightedStandardDeviationComponent;
 
 /**
  * @author Marius Oehler
@@ -35,8 +34,6 @@ public abstract class StreamComponentFactory {
 	public abstract RHoltWintersComponent createRHoltWinters();
 
 	public abstract ConfidenceBandComponent createConfidenceBand();
-
-	public abstract WeightedStandardDeviationComponent createWeightedStandardDeviation();
 
 	public abstract ForecastComponent createForecastComponent();
 }

@@ -23,8 +23,6 @@ public class StreamContext {
 
 	private ConfidenceBand confidenceBand;
 
-	private double standardDeviation;
-
 	private double currentMean = Double.NaN;
 
 	private final List<Double> dataHistory = new ArrayList<>();
@@ -39,15 +37,15 @@ public class StreamContext {
 
 	private boolean anomalyActive = false;
 
-	private final SummaryStatistics statistics = new SummaryStatistics();
+	private final SummaryStatistics standardDeviationStatistics = new SummaryStatistics();
 
 	/**
-	 * Gets {@link #statistics}.
+	 * Gets {@link #standardDeviationStatistics}.
 	 *
-	 * @return {@link #statistics}
+	 * @return {@link #standardDeviationStatistics}
 	 */
-	public SummaryStatistics getStatistics() {
-		return statistics;
+	public SummaryStatistics getStandardDeviationStatistics() {
+		return standardDeviationStatistics;
 	}
 
 	/**
@@ -190,25 +188,6 @@ public class StreamContext {
 	 */
 	public void setConfidenceBand(ConfidenceBand confidenceBand) {
 		this.confidenceBand = confidenceBand;
-	}
-
-	/**
-	 * Gets {@link #standardDeviation}.
-	 *
-	 * @return {@link #standardDeviation}
-	 */
-	public double getStandardDeviation() {
-		return standardDeviation;
-	}
-
-	/**
-	 * Sets {@link #standardDeviation}.
-	 *
-	 * @param standardDeviation
-	 *            New value for {@link #standardDeviation}
-	 */
-	public void setStandardDeviation(double standardDeviation) {
-		this.standardDeviation = standardDeviation;
 	}
 
 	public void incrementRequestCount() {
