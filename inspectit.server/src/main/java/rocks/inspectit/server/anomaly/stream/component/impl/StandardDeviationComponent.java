@@ -38,9 +38,6 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 	@Log
 	private Logger log;
 
-	@Value("${anomaly.settings.confidenceBandHistorySize}")
-	private int historyLimit;
-
 	private Queue<StreamObject<InvocationSequenceData>> intervalQueue = new ConcurrentLinkedQueue<StreamObject<InvocationSequenceData>>();
 
 	@Value("${anomaly.settings.confidenceBandUpdateInterval}")

@@ -9,7 +9,6 @@ import rocks.inspectit.server.anomaly.stream.component.impl.ConfidenceBandCompon
 import rocks.inspectit.server.anomaly.stream.component.impl.ForecastComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.PercentageRateComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.QuadraticScoreFilterComponent;
-import rocks.inspectit.server.anomaly.stream.component.impl.RHoltWintersComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.StandardDeviationComponent;
 import rocks.inspectit.server.anomaly.stream.component.impl.TSDBWriterComponent;
 
@@ -30,8 +29,6 @@ public abstract class StreamComponentFactory {
 	public abstract TSDBWriterComponent createTSDBWriter();
 
 	public abstract StandardDeviationComponent createStandardDeviation();
-
-	public abstract RHoltWintersComponent createRHoltWinters();
 
 	public abstract ConfidenceBandComponent createConfidenceBand();
 

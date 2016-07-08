@@ -334,9 +334,8 @@
 					<long-property name="Error-Rate Window Size [s]" default-value="10" server-restart-required="true" logical-name="anomaly.settings.errorRateWindowSize" advanced="true"></long-property>
 					
 					<long-property name="Confidence Band Update Interval [s]" default-value="5" server-restart-required="true" logical-name="anomaly.settings.confidenceBandUpdateInterval" advanced="true"></long-property>
-					<long-property name="Confidence Band History Size" default-value="720" server-restart-required="true" logical-name="anomaly.settings.confidenceBandHistorySize" advanced="true"></long-property>
 					
-					<string-property name="Forecast Smoothing Factor" default-value="0.5" server-restart-required="false" logical-name="anomaly.settings.forecast.smoothingFactor" advanced="true"></string-property>
+					<string-property name="Forecast Smoothing Factor" default-value="0.1" server-restart-required="false" logical-name="anomaly.settings.forecast.smoothingFactor" advanced="true"></string-property>
 					<string-property name="Forecast Trend Smoothing Factor" default-value="0.1" server-restart-required="false" logical-name="anomaly.settings.forecast.trendSmoothingFactor" advanced="true"></string-property>
 					
 				</properties>

@@ -101,7 +101,6 @@
 	<bean name="percentageRateComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.PercentageRateComponent" scope="prototype"/>
 	<bean name="tsdbWriterComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.TSDBWriterComponent" scope="prototype"/>
 	<bean name="standardDeviationComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.StandardDeviationComponent" scope="prototype"/>
-	<bean name="rHoltWintersComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.RHoltWintersComponent" scope="prototype"/>
 	<bean name="confidenceBandComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.ConfidenceBandComponent" scope="prototype"/>
 	<bean name="forecastComponent" class="rocks.inspectit.server.anomaly.stream.component.impl.ForecastComponent" scope="prototype"/>
 	
@@ -112,7 +111,6 @@
 	    <lookup-method bean="percentageRateComponent" name="createPercentageRate" />
 	    <lookup-method bean="tsdbWriterComponent" name="createTSDBWriter" />
 	    <lookup-method bean="standardDeviationComponent" name="createStandardDeviation" />
-	    <lookup-method bean="rHoltWintersComponent" name="createRHoltWinters" />
 	    <lookup-method bean="confidenceBandComponent" name="createConfidenceBand" />
 	    <lookup-method bean="forecastComponent" name="createForecastComponent" />
 	</bean>	
