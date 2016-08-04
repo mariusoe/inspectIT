@@ -323,10 +323,10 @@
 				<properties>
 					<boolean-property name="Execute Anomaly Detection" default-value="false" server-restart-required="true" logical-name="anomaly.isActive" advanced="false" description="If the anomaly detection should be executed."></boolean-property>
 					
-					<string-property name="Warm-Up Duration [s]" default-value="60" server-restart-required="true" logical-name="anomaly.settings.warmupDuration" advanced="false"></string-property>
+					<string-property name="Warm-Up Duration [s]" default-value="600" server-restart-required="true" logical-name="anomaly.settings.warmupDuration" advanced="false"></string-property>
 					
 					<string-property name="Anomaly Threshold" default-value="0.5" server-restart-required="false" logical-name="anomaly.settings.alerting.threshold" advanced="false"></string-property>
-					<long-property name="Min. Anomaly Duration [ms]" default-value="30000" server-restart-required="false" logical-name="anomaly.settings.alerting.minDuration" advanced="false"></long-property>
+					<long-property name="Min. Anomaly Duration [s]" default-value="30" server-restart-required="false" logical-name="anomaly.settings.alerting.minDuration" advanced="false"></long-property>
 					
 					<string-property name="Season Length [h]" default-value="24" server-restart-required="true" logical-name="anomaly.settings.forecast.seasonalDuration" advanced="false"></string-property>
 					

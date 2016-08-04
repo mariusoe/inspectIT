@@ -93,7 +93,7 @@ public class ForecastComponent extends AbstractSingleStreamComponent<InvocationS
 		double mean = StatisticUtils.mean(valueArray);
 		context.getDataHistory().add(mean);
 
-		if (context.isWarmUp()) {
+		if (context.isWarmingUp()) {
 			return;
 		}
 

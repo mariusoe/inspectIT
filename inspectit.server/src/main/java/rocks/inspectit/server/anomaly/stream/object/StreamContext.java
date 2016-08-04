@@ -27,7 +27,7 @@ public class StreamContext {
 
 	private long startTime;
 
-	private boolean warmUp = true;
+	private boolean warmingUp = true;
 
 	private boolean anomalyActive = false;
 
@@ -83,22 +83,22 @@ public class StreamContext {
 	}
 
 	/**
-	 * Gets {@link #warmUp}.
+	 * Gets {@link #warmingUp}.
 	 *
-	 * @return {@link #warmUp}
+	 * @return {@link #warmingUp}
 	 */
-	public boolean isWarmUp() {
-		return warmUp;
+	public boolean isWarmingUp() {
+		return warmingUp;
 	}
 
 	/**
-	 * Sets {@link #warmUp}.
+	 * Sets {@link #warmingUp}.
 	 *
 	 * @param warmUp
-	 *            New value for {@link #warmUp}
+	 *            New value for {@link #warmingUp}
 	 */
-	public void setWarmUp(boolean warmUp) {
-		this.warmUp = warmUp;
+	public void setWarmingUp(boolean warmUp) {
+		this.warmingUp = warmUp;
 	}
 
 	/**

@@ -46,10 +46,10 @@ public class QuadraticScoreFilterComponent extends AbstractForkStreamComponent<I
 	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> streamObject) {
 		StreamContext context = streamObject.getContext();
 
-		if (context.isWarmUp()) {
+		if (context.isWarmingUp()) {
 			long warmupEndTime = context.getStartTime() + warmupDuration * 1000L;
 			if (warmupEndTime < System.currentTimeMillis()) {
-				context.setWarmUp(false);
+				context.setWarmingUp(false);
 				if (log.isInfoEnabled()) {
 					log.info("[{}] Warm-up finished.", context.getBusinessTransaction());
 				}

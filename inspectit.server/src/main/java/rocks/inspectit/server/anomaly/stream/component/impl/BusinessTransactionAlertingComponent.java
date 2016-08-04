@@ -6,6 +6,7 @@ package rocks.inspectit.server.anomaly.stream.component.impl;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,7 +57,7 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 				AnomalyInformation anomalyInformation = anomalyMap.get(businessTransaction);
 				anomalyInformation.lastAnomalousBehavior = currentTime;
 
-				if (currentTime - anomalyInformation.startTime > minDuration) {
+				if (currentTime - anomalyInformation.startTime > TimeUnit.SECONDS.toMillis(minDuration)) {
 					anomalyDetected(businessTransaction, errorRate);
 				}
 			}
@@ -64,7 +65,7 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 			if (anomalyMap.containsKey(businessTransaction)) {
 				AnomalyInformation anomalyInformation = anomalyMap.get(businessTransaction);
 
-				if (anomalyInformation.isActive && currentTime - anomalyInformation.lastAnomalousBehavior > minDuration) {
+				if (anomalyInformation.isActive && currentTime - anomalyInformation.lastAnomalousBehavior > TimeUnit.SECONDS.toMillis(minDuration)) {
 					anomalyEnded(businessTransaction);
 				}
 
