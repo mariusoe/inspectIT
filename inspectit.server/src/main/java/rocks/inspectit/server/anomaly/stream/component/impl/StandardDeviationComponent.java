@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
+import rocks.inspectit.server.anomaly.stream.object.HealthTag;
 import rocks.inspectit.server.anomaly.stream.object.StreamContext;
 import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.server.anomaly.utils.StatisticUtils;
@@ -62,7 +63,7 @@ public class StandardDeviationComponent extends AbstractSingleStreamComponent<In
 	 */
 	@Override
 	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> item) {
-		if (!item.getContext().isAnomalyActive()) {
+		if (!item.getContext().isAnomalyActive() || item.getHealthTag() == HealthTag.OK) {
 			intervalQueue.add(item);
 		}
 

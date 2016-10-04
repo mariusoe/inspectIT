@@ -28,6 +28,7 @@ import rocks.inspectit.server.anomaly.forecast.impl.HoltWintersForecast;
 import rocks.inspectit.server.anomaly.stream.SharedStreamProperties;
 import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamComponent;
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
+import rocks.inspectit.server.anomaly.stream.object.HealthTag;
 import rocks.inspectit.server.anomaly.stream.object.StreamContext;
 import rocks.inspectit.server.anomaly.stream.object.StreamObject;
 import rocks.inspectit.server.anomaly.stream.utils.StreamUtils;
@@ -139,6 +140,11 @@ public class ForecastComponent extends AbstractSingleStreamComponent<InvocationS
 		DescriptiveStatistics statistics = new DescriptiveStatistics(primitiveHistoryData);
 		double median = new Median().evaluate(primitiveHistoryData);
 
+		// trend elimination
+		exponentialSmoothing.fit(median);
+		exponentialSmoothing.fit(median);
+		exponentialSmoothing.fit(median);
+
 		for (double dataElement : primitiveHistoryData) {
 			if (Math.abs(dataElement - statistics.getMean()) < 3 * statistics.getStandardDeviation()) {
 				exponentialSmoothing.fit(dataElement);
@@ -155,7 +161,9 @@ public class ForecastComponent extends AbstractSingleStreamComponent<InvocationS
 	 */
 	@Override
 	protected EFlowControl processImpl(StreamObject<InvocationSequenceData> item) {
-		intervalQueue.add(item);
+		if (!item.getContext().isAnomalyActive() || item.getHealthTag() == HealthTag.OK) {
+			intervalQueue.add(item);
+		}
 
 		return EFlowControl.CONTINUE;
 	}

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -16,6 +17,7 @@ import rocks.inspectit.server.anomaly.stream.component.AbstractSingleStreamCompo
 import rocks.inspectit.server.anomaly.stream.component.EFlowControl;
 import rocks.inspectit.server.anomaly.stream.object.StreamContext;
 import rocks.inspectit.server.anomaly.stream.object.StreamObject;
+import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.all.util.Pair;
 
 /**
@@ -23,6 +25,9 @@ import rocks.inspectit.shared.all.util.Pair;
  *
  */
 public class BusinessTransactionAlertingComponent extends AbstractSingleStreamComponent<Pair<String, Double>> {
+
+	@Log
+	private Logger log;
 
 	private final Map<String, AnomalyInformation> anomalyMap = new HashMap<>();
 
@@ -34,6 +39,9 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 
 	@Value("${anomaly.settings.alerting.notificationInterval}")
 	private long notificationInterval;
+
+	@Value("${anomaly.settings.errorRateWindowSize}")
+	private long errorWindowSize;
 
 	@Autowired
 	private SharedStreamProperties streamProperties;
@@ -68,8 +76,6 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 				if (anomalyInformation.isActive && currentTime - anomalyInformation.lastAnomalousBehavior > TimeUnit.SECONDS.toMillis(minDuration)) {
 					anomalyEnded(businessTransaction);
 				}
-
-				anomalyMap.remove(businessTransaction);
 			}
 		}
 
@@ -88,7 +94,10 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 		builder.append(businessTransaction);
 		builder.append("' has ended.");
 
-		SharedStreamProperties.getAlertingComponent().sendMessage(builder.toString());
+		log.info(builder.toString());
+		// SharedStreamProperties.getAlertingComponent().sendMessage(builder.toString());
+
+		anomalyMap.remove(businessTransaction);
 	}
 
 	private void anomalyDetected(String businessTransaction, double errorRate) {
@@ -109,7 +118,8 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 				builder.append(errorRatePercentage);
 				builder.append(" percent.");
 
-				SharedStreamProperties.getAlertingComponent().sendMessage(builder.toString());
+				// SharedStreamProperties.getAlertingComponent().sendMessage(builder.toString());
+				log.info(builder.toString());
 
 				anomalyInformation.lastAlert = currentTime;
 			}
@@ -118,12 +128,13 @@ public class BusinessTransactionAlertingComponent extends AbstractSingleStreamCo
 			builder.append("Business transaction '");
 			builder.append(businessTransaction);
 			builder.append("' shows an anomalous behavior. Anomaly started at ");
-			builder.append(dateFormat.format(anomalyInformation.startTime));
-			builder.append(" at has an error rate of ");
+			builder.append(dateFormat.format(anomalyInformation.startTime - errorWindowSize));
+			builder.append(" and has an error rate of ");
 			builder.append(errorRatePercentage);
 			builder.append(" percent.");
 
-			SharedStreamProperties.getAlertingComponent().sendMessage(builder.toString());
+			// SharedStreamProperties.getAlertingComponent().sendMessage(builder.toString());
+			log.info(builder.toString());
 
 			anomalyInformation.isActive = true;
 			anomalyInformation.lastAlert = currentTime;
