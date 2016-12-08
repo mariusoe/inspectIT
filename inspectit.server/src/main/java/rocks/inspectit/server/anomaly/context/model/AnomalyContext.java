@@ -8,9 +8,9 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import rocks.inspectit.server.anomaly.context.matcher.IAnomalyContextMatcher;
 import rocks.inspectit.server.anomaly.data.AnalyzableData;
-import rocks.inspectit.server.anomaly.processor.analyzer.IAnalyzeProcessor;
-import rocks.inspectit.server.anomaly.processor.baseline.IBaselineProcessor;
-import rocks.inspectit.server.anomaly.processor.classifier.IClassifyProcessor;
+import rocks.inspectit.server.anomaly.processor.analyzer.AbstractAnalyzeProcessor;
+import rocks.inspectit.server.anomaly.processor.baseline.AbstractBaselineProcessor;
+import rocks.inspectit.server.anomaly.processor.classifier.AbstractClassifyProcessor;
 
 /**
  * @author Marius Oehler
@@ -30,11 +30,11 @@ public class AnomalyContext {
 
 	private Collection<IAnomalyContextMatcher> contextMatcher = new ArrayList<>(0);
 
-	private IBaselineProcessor baselineProcessor;
+	private AbstractBaselineProcessor baselineProcessor;
 
-	private IClassifyProcessor classifyProcessor;
+	private AbstractClassifyProcessor classifyProcessor;
 
-	private IAnalyzeProcessor analyzeProcessor;
+	private AbstractAnalyzeProcessor analyzeProcessor;
 
 	/**
 	 * Gets {@link #confidenceBand}.
@@ -79,7 +79,7 @@ public class AnomalyContext {
 	 *
 	 * @return {@link #baselineProcessor}
 	 */
-	public IBaselineProcessor getBaselineProcessor() {
+	public AbstractBaselineProcessor getBaselineProcessor() {
 		return this.baselineProcessor;
 	}
 
@@ -89,7 +89,7 @@ public class AnomalyContext {
 	 * @param baselineProcessor
 	 *            New value for {@link #baselineProcessor}
 	 */
-	public void setBaselineProcessor(IBaselineProcessor baselineProcessor) {
+	public void setBaselineProcessor(AbstractBaselineProcessor baselineProcessor) {
 		this.baselineProcessor = baselineProcessor;
 	}
 
@@ -98,7 +98,7 @@ public class AnomalyContext {
 	 *
 	 * @return {@link #classifyProcessor}
 	 */
-	public IClassifyProcessor getClassifyProcessor() {
+	public AbstractClassifyProcessor getClassifyProcessor() {
 		return this.classifyProcessor;
 	}
 
@@ -108,7 +108,7 @@ public class AnomalyContext {
 	 * @param classifyProcessor
 	 *            New value for {@link #classifyProcessor}
 	 */
-	public void setClassifyProcessor(IClassifyProcessor classifyProcessor) {
+	public void setClassifyProcessor(AbstractClassifyProcessor classifyProcessor) {
 		this.classifyProcessor = classifyProcessor;
 	}
 
@@ -117,7 +117,7 @@ public class AnomalyContext {
 	 *
 	 * @return {@link #analyzeProcessor}
 	 */
-	public IAnalyzeProcessor getAnalyzeProcessor() {
+	public AbstractAnalyzeProcessor getAnalyzeProcessor() {
 		return analyzeProcessor;
 	}
 
@@ -127,7 +127,7 @@ public class AnomalyContext {
 	 * @param analyzeProcessor
 	 *            New value for {@link #analyzeProcessor}
 	 */
-	public void setAnalyzeProcessor(IAnalyzeProcessor analyzeProcessor) {
+	public void setAnalyzeProcessor(AbstractAnalyzeProcessor analyzeProcessor) {
 		this.analyzeProcessor = analyzeProcessor;
 	}
 

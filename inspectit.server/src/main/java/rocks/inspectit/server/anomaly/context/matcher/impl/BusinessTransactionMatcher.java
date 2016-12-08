@@ -40,15 +40,20 @@ public class BusinessTransactionMatcher implements IAnomalyContextMatcher {
 	@Override
 	public boolean matches(DefaultData defaultData) {
 		if (defaultData instanceof InvocationSequenceData) {
+			if (businessService == null) {
+				if (CMR.getBeanFactory() == null) {
+					return false;
+				}
+				businessService = CMR.getBeanFactory().getBean(IBusinessContextManagementService.class);
+			}
 			InvocationSequenceData invocationSequence = ((InvocationSequenceData) defaultData);
 			BusinessTransactionData btxData = businessService.getBusinessTransactionForId(invocationSequence.getApplicationId(), invocationSequence.getBusinessTransactionId());
-			String btxName = btxData.getName();
 
-			if (StringUtils.isEmpty(btxName)) {
+			if ((btxData == null) || StringUtils.isEmpty(btxData.getName())) {
 				return false;
 			}
 
-			return btxPattern.equals(btxName);
+			return btxPattern.equals(btxData.getName());
 		}
 
 		return false;
@@ -59,8 +64,7 @@ public class BusinessTransactionMatcher implements IAnomalyContextMatcher {
 	 */
 	@Override
 	public IAnomalyContextMatcher createCopy() {
-		BusinessTransactionMatcher copy = CMR.getBeanFactory().getBean(getClass());
-		copy.btxPattern = btxPattern;
+		BusinessTransactionMatcher copy = new BusinessTransactionMatcher(btxPattern);
 		return copy;
 	}
 }

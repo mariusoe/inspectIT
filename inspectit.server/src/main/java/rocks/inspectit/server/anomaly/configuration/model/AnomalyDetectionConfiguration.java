@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import rocks.inspectit.server.anomaly.context.matcher.IAnomalyContextMatcher;
-import rocks.inspectit.server.anomaly.processor.analyzer.IAnalyzeProcessor;
-import rocks.inspectit.server.anomaly.processor.baseline.IBaselineProcessor;
-import rocks.inspectit.server.anomaly.processor.classifier.IClassifyProcessor;
+import rocks.inspectit.server.anomaly.processor.analyzer.AbstractAnalyzeProcessor;
+import rocks.inspectit.server.anomaly.processor.baseline.AbstractBaselineProcessor;
+import rocks.inspectit.server.anomaly.processor.classifier.AbstractClassifyProcessor;
 
 /**
  * @author Marius Oehler
@@ -14,11 +14,11 @@ import rocks.inspectit.server.anomaly.processor.classifier.IClassifyProcessor;
  */
 public class AnomalyDetectionConfiguration {
 
-	private IBaselineProcessorConfiguration<? extends IBaselineProcessor> baselineProcessorConfiguration;
+	private IBaselineProcessorConfiguration<? extends AbstractBaselineProcessor<?>> baselineProcessorConfiguration;
 
-	private IAnalyzeProcessorConfiguration<? extends IAnalyzeProcessor> analyzeProcessorConfiguration;
+	private IAnalyzeProcessorConfiguration<? extends AbstractAnalyzeProcessor<?>> analyzeProcessorConfiguration;
 
-	private IClassifyProcessorConfiguration<? extends IClassifyProcessor> classifyProcessorConfiguration;
+	private IClassifyProcessorConfiguration<? extends AbstractClassifyProcessor<?>> classifyProcessorConfiguration;
 
 	private Collection<IAnomalyContextMatcher> contextMatcher = new ArrayList<>(0);
 
@@ -46,7 +46,7 @@ public class AnomalyDetectionConfiguration {
 	 *
 	 * @return {@link #baselineProcessorConfiguration}
 	 */
-	public IBaselineProcessorConfiguration<? extends IBaselineProcessor> getBaselineProcessorConfiguration() {
+	public IBaselineProcessorConfiguration<? extends AbstractBaselineProcessor<?>> getBaselineProcessorConfiguration() {
 		return this.baselineProcessorConfiguration;
 	}
 
@@ -56,7 +56,7 @@ public class AnomalyDetectionConfiguration {
 	 * @param baselineProcessorConfiguration
 	 *            New value for {@link #baselineProcessorConfiguration}
 	 */
-	public void setBaselineProcessorConfiguration(IBaselineProcessorConfiguration<? extends IBaselineProcessor> baselineProcessorConfiguration) {
+	public void setBaselineProcessorConfiguration(IBaselineProcessorConfiguration<? extends AbstractBaselineProcessor<?>> baselineProcessorConfiguration) {
 		this.baselineProcessorConfiguration = baselineProcessorConfiguration;
 	}
 
@@ -65,7 +65,7 @@ public class AnomalyDetectionConfiguration {
 	 *
 	 * @return {@link #analyzeProcessorConfiguration}
 	 */
-	public IAnalyzeProcessorConfiguration<? extends IAnalyzeProcessor> getAnalyzeProcessorConfiguration() {
+	public IAnalyzeProcessorConfiguration<? extends AbstractAnalyzeProcessor<?>> getAnalyzeProcessorConfiguration() {
 		return this.analyzeProcessorConfiguration;
 	}
 
@@ -75,7 +75,7 @@ public class AnomalyDetectionConfiguration {
 	 * @param analyzeProcessorConfiguration
 	 *            New value for {@link #analyzeProcessorConfiguration}
 	 */
-	public void setAnalyzeProcessorConfiguration(IAnalyzeProcessorConfiguration<? extends IAnalyzeProcessor> analyzeProcessorConfiguration) {
+	public void setAnalyzeProcessorConfiguration(IAnalyzeProcessorConfiguration<? extends AbstractAnalyzeProcessor<?>> analyzeProcessorConfiguration) {
 		this.analyzeProcessorConfiguration = analyzeProcessorConfiguration;
 	}
 
@@ -84,7 +84,7 @@ public class AnomalyDetectionConfiguration {
 	 *
 	 * @return {@link #classifyProcessorConfiguration}
 	 */
-	public IClassifyProcessorConfiguration<? extends IClassifyProcessor> getClassifyProcessorConfiguration() {
+	public IClassifyProcessorConfiguration<? extends AbstractClassifyProcessor<?>> getClassifyProcessorConfiguration() {
 		return this.classifyProcessorConfiguration;
 	}
 
@@ -94,7 +94,7 @@ public class AnomalyDetectionConfiguration {
 	 * @param classifyProcessorConfiguration
 	 *            New value for {@link #classifyProcessorConfiguration}
 	 */
-	public void setClassifyProcessorConfiguration(IClassifyProcessorConfiguration<? extends IClassifyProcessor> classifyProcessorConfiguration) {
+	public void setClassifyProcessorConfiguration(IClassifyProcessorConfiguration<? extends AbstractClassifyProcessor<?>> classifyProcessorConfiguration) {
 		this.classifyProcessorConfiguration = classifyProcessorConfiguration;
 	}
 

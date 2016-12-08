@@ -11,21 +11,27 @@ import rocks.inspectit.server.anomaly.context.AnomalyContextManager;
 import rocks.inspectit.server.anomaly.context.model.AnomalyContext;
 import rocks.inspectit.server.anomaly.data.AnalyzableData;
 import rocks.inspectit.server.anomaly.data.HealthStatus;
-import rocks.inspectit.server.anomaly.processor.classifier.IClassifyProcessor;
+import rocks.inspectit.server.anomaly.processor.analyzer.AbstractAnalyzeProcessor;
+import rocks.inspectit.server.anomaly.processor.classifier.AbstractClassifyProcessor;
 import rocks.inspectit.server.processor.AbstractCmrDataProcessor;
 import rocks.inspectit.shared.all.communication.DefaultData;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
+import rocks.inspectit.shared.all.communication.data.cmr.ApplicationData;
+import rocks.inspectit.shared.all.communication.data.cmr.BusinessTransactionData;
 import rocks.inspectit.shared.all.spring.logger.Log;
+import rocks.inspectit.shared.cs.ci.business.impl.ApplicationDefinition;
+import rocks.inspectit.shared.cs.ci.business.impl.BusinessTransactionDefinition;
+import rocks.inspectit.shared.cs.cmr.service.IBusinessContextRegistryService;
 
 public class AnomalyDetectionProcessor extends AbstractCmrDataProcessor {
 
 	@Log
 	private Logger log;
 
-	private final AnalyzableDataFactory analyzableDataFactory = new AnalyzableDataFactory();
-
 	@Autowired
 	private AnomalyContextManager contextManager;
+
+	private final AnalyzableDataFactory analyzableDataFactory = new AnalyzableDataFactory();
 
 	/**
 	 * {@inheritDoc}
@@ -50,12 +56,13 @@ public class AnomalyDetectionProcessor extends AbstractCmrDataProcessor {
 
 		context.getIntervalBuffer().add(analyzable);
 
-		IClassifyProcessor classifyProcessor = context.getClassifyProcessor();
+		AbstractClassifyProcessor<?> classifyProcessor = context.getClassifyProcessor();
 		if (classifyProcessor != null) {
 			classifyProcessor.classify(context, analyzable);
 
 			if ((analyzable.getHealthStatus() == HealthStatus.CRITICAL) && (context.getAnalyzeProcessor() != null)) {
-				context.getAnalyzeProcessor().analyze(analyzable);
+				AbstractAnalyzeProcessor<?> analyzeProcessor = context.getAnalyzeProcessor();
+				analyzeProcessor.analyze(analyzable);
 			}
 		}
 	}
@@ -68,22 +75,35 @@ public class AnomalyDetectionProcessor extends AbstractCmrDataProcessor {
 		return analyzableDataFactory.isAnalyzable(defaultData);
 	}
 
+	@Autowired
+	IBusinessContextRegistryService btxRegistry;
+
 	@PostConstruct
 	public void test() {
+		ApplicationDefinition app = new ApplicationDefinition("textApp");
+		ApplicationData appData = btxRegistry.registerApplication(app);
+
+		BusinessTransactionDefinition definition = new BusinessTransactionDefinition();
+		BusinessTransactionData transaction = btxRegistry.registerBusinessTransaction(appData, definition, "testTransaction");
+
+		final int appId = transaction.getApplication().getId();
+		final int btxId = transaction.getId();
+
 		new Thread() {
 			@Override
 			public void run() {
-				try {
-					sleep(1000);
+				while (true) {
+					try {
+						sleep(500);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 
 					InvocationSequenceData data = new InvocationSequenceData();
-					data.setDuration(2);
+					data.setBusinessTransactionId(btxId);
+					data.setApplicationId(appId);
+					data.setDuration(Math.random() * 20);
 					process(data, null);
-					data.setDuration(0);
-					process(data, null);
-
-				} catch (InterruptedException e) {
-					e.printStackTrace();
 				}
 			};
 		}.start();

@@ -6,21 +6,32 @@ import rocks.inspectit.server.anomaly.configuration.model.IClassifyProcessorConf
 import rocks.inspectit.server.anomaly.context.model.AnomalyContext;
 import rocks.inspectit.server.anomaly.data.AnalyzableData;
 import rocks.inspectit.server.anomaly.data.HealthStatus;
-import rocks.inspectit.server.anomaly.processor.classifier.IClassifyProcessor;
+import rocks.inspectit.server.anomaly.processor.classifier.AbstractClassifyProcessor;
 
 /**
  * @author Marius Oehler
  *
  */
-public class DummyClassifyProcessor implements IClassifyProcessor {
+public class DummyClassifyProcessor extends AbstractClassifyProcessor<DummyClassifyProcessor.Configuration> {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setConfiguration(IClassifyProcessorConfiguration<?> configuration) {
-		// TODO Auto-generated method stub
+	public static class Configuration implements IClassifyProcessorConfiguration<DummyClassifyProcessor> {
 
+		private double threshold;
+
+		/**
+		 * @param threshold
+		 */
+		public Configuration(double threshold) {
+			this.threshold = threshold;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Class<DummyClassifyProcessor> getProcessorClass() {
+			return DummyClassifyProcessor.class;
+		}
 	}
 
 	/**
@@ -28,12 +39,13 @@ public class DummyClassifyProcessor implements IClassifyProcessor {
 	 */
 	@Override
 	public void classify(AnomalyContext context, AnalyzableData<?> analyzable) {
-		if (analyzable.getValue() > 1) {
+		if (analyzable.getValue() < configuration.threshold) {
 			analyzable.setHealthStatus(HealthStatus.GOOD);
 		} else {
 			analyzable.setHealthStatus(HealthStatus.CRITICAL);
 		}
 
+		System.out.println("classified " + analyzable.getValue() + " as " + analyzable.getHealthStatus());
 	}
 
 	/**

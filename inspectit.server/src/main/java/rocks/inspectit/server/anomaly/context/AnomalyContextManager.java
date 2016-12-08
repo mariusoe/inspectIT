@@ -15,9 +15,9 @@ import rocks.inspectit.server.anomaly.configuration.model.IBaselineProcessorConf
 import rocks.inspectit.server.anomaly.configuration.model.IClassifyProcessorConfiguration;
 import rocks.inspectit.server.anomaly.context.matcher.IAnomalyContextMatcher;
 import rocks.inspectit.server.anomaly.context.model.AnomalyContext;
-import rocks.inspectit.server.anomaly.processor.analyzer.IAnalyzeProcessor;
-import rocks.inspectit.server.anomaly.processor.baseline.IBaselineProcessor;
-import rocks.inspectit.server.anomaly.processor.classifier.IClassifyProcessor;
+import rocks.inspectit.server.anomaly.processor.analyzer.AbstractAnalyzeProcessor;
+import rocks.inspectit.server.anomaly.processor.baseline.AbstractBaselineProcessor;
+import rocks.inspectit.server.anomaly.processor.classifier.AbstractClassifyProcessor;
 import rocks.inspectit.shared.all.communication.DefaultData;
 
 /**
@@ -53,18 +53,18 @@ public class AnomalyContextManager {
 		BeanFactory beanFactory = CMR.getBeanFactory();
 
 		// create analyze processor
-		IAnalyzeProcessorConfiguration<? extends IAnalyzeProcessor> analyzeProcessorConfiguration = configuration.getAnalyzeProcessorConfiguration();
-		IAnalyzeProcessor analyzeProcessor = beanFactory.getBean(analyzeProcessorConfiguration.getProcessorClass());
+		IAnalyzeProcessorConfiguration<? extends AbstractAnalyzeProcessor> analyzeProcessorConfiguration = configuration.getAnalyzeProcessorConfiguration();
+		AbstractAnalyzeProcessor analyzeProcessor = beanFactory.getBean(analyzeProcessorConfiguration.getProcessorClass());
 		analyzeProcessor.setConfiguration(configuration.getAnalyzeProcessorConfiguration());
 
 		// create baseline processor
-		IBaselineProcessorConfiguration<? extends IBaselineProcessor> baselineProcessorConfiguration = configuration.getBaselineProcessorConfiguration();
-		IBaselineProcessor baselineProcessor = beanFactory.getBean(baselineProcessorConfiguration.getProcessorClass());
+		IBaselineProcessorConfiguration<? extends AbstractBaselineProcessor> baselineProcessorConfiguration = configuration.getBaselineProcessorConfiguration();
+		AbstractBaselineProcessor baselineProcessor = beanFactory.getBean(baselineProcessorConfiguration.getProcessorClass());
 		baselineProcessor.setConfiguration(baselineProcessorConfiguration);
 
 		// create classify processor
-		IClassifyProcessorConfiguration<? extends IClassifyProcessor> classifyProcessorConfiguration = configuration.getClassifyProcessorConfiguration();
-		IClassifyProcessor classifyProcessor = beanFactory.getBean(classifyProcessorConfiguration.getProcessorClass());
+		IClassifyProcessorConfiguration<? extends AbstractClassifyProcessor> classifyProcessorConfiguration = configuration.getClassifyProcessorConfiguration();
+		AbstractClassifyProcessor classifyProcessor = beanFactory.getBean(classifyProcessorConfiguration.getProcessorClass());
 		classifyProcessor.setConfiguration(classifyProcessorConfiguration);
 
 		// create new anomaly context

@@ -65,7 +65,7 @@
 	<!-- Loggers are defined from down here -->
 
 	<!-- set log levels - for more verbose logging change 'info' to 'debug' -->
-	<root level="info">
+	<root level="debug">
 		<appender-ref ref="stdout" />
 		<appender-ref ref="file" />
 		<appender-ref ref="exceptions" />
