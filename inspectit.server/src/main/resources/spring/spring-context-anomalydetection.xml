@@ -4,9 +4,16 @@
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
+	<!-- ANOMALY PROCESSORS -->
+	<!-- Analyzer -->
 	<bean id="dummyAnalyzeProcessor" class="rocks.inspectit.server.anomaly.processor.analyzer.impl.DummyAnalyzeProcessor" />
+	
+	<!-- Baseline -->
 	<bean id="dummyBaselineProcessor" class="rocks.inspectit.server.anomaly.processor.baseline.impl.DummyBaselineProcessor" />
+	
+	<!-- Classifier -->
 	<bean id="dummyClassifyProcessor" class="rocks.inspectit.server.anomaly.processor.classifier.impl.DummyClassifyProcessor" />
 
-
+	<!-- MATCHER -->
+	<bean id="businessTransactionMatcher" class="rocks.inspectit.server.anomaly.context.matcher.impl.BusinessTransactionMatcher" scope="prototype" />
 </beans>

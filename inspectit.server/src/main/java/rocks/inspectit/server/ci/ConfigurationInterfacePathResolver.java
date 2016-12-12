@@ -13,6 +13,7 @@ import rocks.inspectit.shared.all.util.ResourcesPathResolver;
 import rocks.inspectit.shared.cs.ci.AlertingDefinition;
 import rocks.inspectit.shared.cs.ci.Environment;
 import rocks.inspectit.shared.cs.ci.Profile;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfiguration;
 
 /**
  * Class that knows how to resolve paths related to the configuration interface.
@@ -67,6 +68,8 @@ public class ConfigurationInterfacePathResolver {
 	 * Migration folder name.
 	 */
 	private static final String MIGRATION_FOLDER = "migration";
+
+	private static final String ANOMALY_DETECTION_CONFIGURATION_FOLDER = "anomaly-configuration";
 
 	/**
 	 * Used with {@link ResourcesPathResolver} to get the file of the ci dir.
@@ -183,6 +186,10 @@ public class ConfigurationInterfacePathResolver {
 		return getDefaultCiPath().resolve(ALERTING_DEFINITIONS_FOLDER);
 	}
 
+	public Path getAnomalyDetectionConfigurationPath() {
+		return getDefaultCiPath().resolve(ANOMALY_DETECTION_CONFIGURATION_FOLDER);
+	}
+
 	/**
 	 * Returns path pointing to the alerting definition file.
 	 *
@@ -194,6 +201,11 @@ public class ConfigurationInterfacePathResolver {
 		String secureDefinitionName = removeIllegalFilenameCharacters(alertingDefinition.getName());
 		String fileName = alertingDefinition.getId() + "-" + secureDefinitionName + ".xml";
 		return getAlertingDefinitionsPath().resolve(fileName);
+	}
+
+	public Path getAnomalyDetectionConfigurationFilePath(AnomalyDetectionConfiguration anomalyDetectionConfiguration) {
+		String fileName = anomalyDetectionConfiguration.getId() + ".xml";
+		return getAnomalyDetectionConfigurationPath().resolve(fileName);
 	}
 
 	/**

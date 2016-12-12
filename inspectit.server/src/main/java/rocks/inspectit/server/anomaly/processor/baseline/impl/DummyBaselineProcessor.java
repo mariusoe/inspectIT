@@ -1,25 +1,15 @@
 package rocks.inspectit.server.anomaly.processor.baseline.impl;
 
-import rocks.inspectit.server.anomaly.configuration.model.IBaselineProcessorConfiguration;
 import rocks.inspectit.server.anomaly.context.model.AnomalyContext;
 import rocks.inspectit.server.anomaly.processor.baseline.AbstractBaselineProcessor;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.processor.baseline.DummyBaselineProcessorConfiguration;
 
 /**
  * @author Marius Oehler
  *
  */
-public class DummyBaselineProcessor extends AbstractBaselineProcessor<DummyBaselineProcessor.Configuration> {
+public class DummyBaselineProcessor extends AbstractBaselineProcessor<DummyBaselineProcessorConfiguration> {
 
-	public static class Configuration implements IBaselineProcessorConfiguration<DummyBaselineProcessor> {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Class<DummyBaselineProcessor> getProcessorClass() {
-			return DummyBaselineProcessor.class;
-		}
-	}
 
 	/**
 	 * {@inheritDoc}

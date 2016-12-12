@@ -6,7 +6,7 @@ import java.util.LinkedList;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
-import rocks.inspectit.server.anomaly.context.matcher.IAnomalyContextMatcher;
+import rocks.inspectit.server.anomaly.context.matcher.AbstractAnomalyContextMatcher;
 import rocks.inspectit.server.anomaly.data.AnalyzableData;
 import rocks.inspectit.server.anomaly.processor.analyzer.AbstractAnalyzeProcessor;
 import rocks.inspectit.server.anomaly.processor.baseline.AbstractBaselineProcessor;
@@ -28,7 +28,7 @@ public class AnomalyContext {
 
 	private Collection<AnalyzableData<?>> intervalBuffer = new LinkedList<>();
 
-	private Collection<IAnomalyContextMatcher> contextMatcher = new ArrayList<>(0);
+	private Collection<AbstractAnomalyContextMatcher> contextMatcher = new ArrayList<>(0);
 
 	private AbstractBaselineProcessor baselineProcessor;
 
@@ -173,7 +173,7 @@ public class AnomalyContext {
 	 *
 	 * @return {@link #contextMatcher}
 	 */
-	public Collection<IAnomalyContextMatcher> getContextMatcher() {
+	public Collection<AbstractAnomalyContextMatcher> getContextMatcher() {
 		return this.contextMatcher;
 	}
 

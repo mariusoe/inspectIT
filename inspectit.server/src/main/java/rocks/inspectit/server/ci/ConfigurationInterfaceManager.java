@@ -47,6 +47,7 @@ import rocks.inspectit.shared.cs.ci.AlertingDefinition;
 import rocks.inspectit.shared.cs.ci.BusinessContextDefinition;
 import rocks.inspectit.shared.cs.ci.Environment;
 import rocks.inspectit.shared.cs.ci.Profile;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfiguration;
 import rocks.inspectit.shared.cs.ci.export.ConfigurationInterfaceImportData;
 import rocks.inspectit.shared.cs.jaxb.ISchemaVersionAware;
 import rocks.inspectit.shared.cs.jaxb.JAXBTransformator;
@@ -685,6 +686,14 @@ public class ConfigurationInterfaceManager {
 				ConfigurationInterfaceImportData.class);
 	}
 
+	public AnomalyDetectionConfiguration createAnomalyDetectionConfiguration(AnomalyDetectionConfiguration anomalyDetectionConfiguration) throws JAXBException, IOException {
+		anomalyDetectionConfiguration.setId(getRandomUUIDString());
+
+		saveAnomalyDetectionConfiguration(anomalyDetectionConfiguration);
+
+		return anomalyDetectionConfiguration;
+	}
+
 	/**
 	 * Internal process of updating the profile.
 	 *
@@ -909,6 +918,11 @@ public class ConfigurationInterfaceManager {
 	 */
 	private void saveAlertingDefinition(AlertingDefinition alertingDefinition) throws JAXBException, IOException {
 		transformator.marshall(pathResolver.getAlertingDefinitionFilePath(alertingDefinition), alertingDefinition, getRelativeToSchemaPath(pathResolver.getDefaultCiPath()).toString());
+	}
+
+	private void saveAnomalyDetectionConfiguration(AnomalyDetectionConfiguration anomalyDetectionConfiguration) throws JAXBException, IOException {
+		transformator.marshall(pathResolver.getAnomalyDetectionConfigurationFilePath(anomalyDetectionConfiguration), anomalyDetectionConfiguration,
+				getRelativeToSchemaPath(pathResolver.getDefaultCiPath()).toString());
 	}
 
 	/**

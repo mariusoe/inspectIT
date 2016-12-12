@@ -1,19 +1,21 @@
 package rocks.inspectit.server.anomaly.configuration;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.annotation.PostConstruct;
+import javax.xml.bind.JAXBException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import rocks.inspectit.server.anomaly.configuration.model.AnomalyDetectionConfiguration;
-import rocks.inspectit.server.anomaly.context.matcher.IAnomalyContextMatcher;
-import rocks.inspectit.server.anomaly.context.matcher.impl.BusinessTransactionMatcher;
-import rocks.inspectit.server.anomaly.processor.analyzer.impl.DummyAnalyzeProcessor;
-import rocks.inspectit.server.anomaly.processor.baseline.impl.DummyBaselineProcessor;
-import rocks.inspectit.server.anomaly.processor.classifier.impl.DummyClassifyProcessor;
-import rocks.inspectit.shared.all.communication.DefaultData;
+import rocks.inspectit.server.ci.ConfigurationInterfaceManager;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfiguration;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.matcher.impl.BusinessTransactionMatcherConfiguration;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.processor.analyze.DummyAnalyzeProcessorConfiguration;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.processor.baseline.DummyBaselineProcessorConfiguration;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.processor.classify.DummyClassifyProcessorConfiguration;
 
 /**
  * @author Marius Oehler
@@ -24,27 +26,36 @@ public class AnomalyDetectionConfigurationProvider {
 
 	private Collection<AnomalyDetectionConfiguration> configurations = new ArrayList<>();
 
+	@Autowired
+	ConfigurationInterfaceManager config;
+
 	@PostConstruct
 	public void DUMMY() {
 		// TODO
+		BusinessTransactionMatcherConfiguration matcherConfiguration = new BusinessTransactionMatcherConfiguration();
+		matcherConfiguration.setBuisnessTransactionPattern("testTransaction");
+
+		DummyClassifyProcessorConfiguration dummyClassifyProcessorConfiguration = new DummyClassifyProcessorConfiguration();
+		dummyClassifyProcessorConfiguration.setThreshold(15D);
+
 		AnomalyDetectionConfiguration detectionConfiguration = new AnomalyDetectionConfiguration();
-		detectionConfiguration.getContextMatcher().add(new BusinessTransactionMatcher("testTransaction"));
-		detectionConfiguration.setAnalyzeProcessorConfiguration(new DummyAnalyzeProcessor.Configuration());
-		detectionConfiguration.setBaselineProcessorConfiguration(new DummyBaselineProcessor.Configuration());
-		detectionConfiguration.setClassifyProcessorConfiguration(new DummyClassifyProcessor.Configuration(15D));
+		detectionConfiguration.getContextMatcher().add(matcherConfiguration);
+		detectionConfiguration.setAnalyzeProcessorConfiguration(new DummyAnalyzeProcessorConfiguration());
+		detectionConfiguration.setBaselineProcessorConfiguration(new DummyBaselineProcessorConfiguration());
+		detectionConfiguration.setClassifyProcessorConfiguration(dummyClassifyProcessorConfiguration);
 		configurations.add(detectionConfiguration);
+
+		try {
+			config.createAnomalyDetectionConfiguration(detectionConfiguration);
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public AnomalyDetectionConfiguration getConfiguration(DefaultData defaultData) {
-		for (AnomalyDetectionConfiguration configuration : configurations) {
-			for (IAnomalyContextMatcher matcher : configuration.getContextMatcher()) {
-				if (matcher.matches(defaultData)) {
-					return configuration;
-				}
-			}
-		}
-
-		return null;
+	public Collection<AnomalyDetectionConfiguration> getConfigurations() {
+		return new ArrayList<>(configurations);
 	}
 
 }
