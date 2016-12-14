@@ -22,6 +22,8 @@ public abstract class AnalyzableData<E extends DefaultData> {
 
 	public abstract double getValue();
 
+	public abstract String getValueDescription();
+
 	public E getData() {
 		return data;
 	}
@@ -32,5 +34,16 @@ public abstract class AnalyzableData<E extends DefaultData> {
 
 	public void setHealthStatus(HealthStatus healthStatus) {
 		this.healthStatus = healthStatus;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("AnalyzableData[dataType=").append(data.getClass().getSimpleName()).append("; description=").append(getValueDescription()).append("; value=").append(getValue())
+				.append("; health=").append(healthStatus).append(']');
+		return buffer.toString();
 	}
 }

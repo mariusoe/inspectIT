@@ -1,4 +1,4 @@
-package rocks.inspectit.server.anomaly.configuration;
+package rocks.inspectit.server.anomaly;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.ci.ConfigurationInterfaceManager;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfiguration;
-import rocks.inspectit.shared.cs.ci.anomaly.configuration.matcher.impl.BusinessTransactionMatcherConfiguration;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.matcher.impl.MachineMatcherConfiguration;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.processor.analyze.DummyAnalyzeProcessorConfiguration;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.processor.baseline.DummyBaselineProcessorConfiguration;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.processor.classify.DummyClassifyProcessorConfiguration;
@@ -32,8 +32,11 @@ public class AnomalyDetectionConfigurationProvider {
 	@PostConstruct
 	public void DUMMY() {
 		// TODO
-		BusinessTransactionMatcherConfiguration matcherConfiguration = new BusinessTransactionMatcherConfiguration();
-		matcherConfiguration.setBuisnessTransactionPattern("testTransaction");
+		// BusinessTransactionMatcherConfiguration matcherConfiguration = new
+		// BusinessTransactionMatcherConfiguration();
+		// matcherConfiguration.setBuisnessTransactionPattern("testTransaction");
+		MachineMatcherConfiguration matcherConfiguration = new MachineMatcherConfiguration();
+		matcherConfiguration.setAgentName("TicketMonster");
 
 		DummyClassifyProcessorConfiguration dummyClassifyProcessorConfiguration = new DummyClassifyProcessorConfiguration();
 		dummyClassifyProcessorConfiguration.setThreshold(15D);

@@ -1,7 +1,7 @@
 package rocks.inspectit.server.anomaly;
 
 import rocks.inspectit.server.anomaly.data.AnalyzableData;
-import rocks.inspectit.server.anomaly.data.AnalyzableInvocationSequenceData;
+import rocks.inspectit.server.anomaly.data.impl.AnalyzableInvocationSequenceData;
 import rocks.inspectit.shared.all.communication.DefaultData;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 

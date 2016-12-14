@@ -6,6 +6,7 @@ import java.util.Collection;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.matcher.AbstractContextMatcherConfiguration;
@@ -23,16 +24,16 @@ public class AnomalyDetectionConfiguration implements Serializable {
 
 	private String id;
 
-	// @XmlAttribute(name = "analyze-processor")
+	@XmlElement(name = "analyze-processor")
 	private AbstractAnalyzeProcessorConfiguration analyzeProcessorConfiguration;
 
-	// @XmlAttribute(name = "baseline-processor")
+	@XmlElement(name = "baseline-processor")
 	private AbstractBaselineProcessorConfiguration baselineProcessorConfiguration;
 
-	// @XmlAttribute(name = "classify-processor")
+	@XmlElement(name = "classify-processor")
 	private AbstractClassifyProcessorConfiguration classifyProcessorConfiguration;
 
-	// @XmlAttribute(name = "context-matcher")
+	@XmlElement(name = "context-matcher")
 	private Collection<AbstractContextMatcherConfiguration> contextMatcher = new ArrayList<>(0);
 
 	/**

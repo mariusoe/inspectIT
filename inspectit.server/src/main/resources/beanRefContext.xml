@@ -9,7 +9,6 @@
 				<value>spring/spring-context-beans.xml</value>
 				<value>spring/spring-context-jetty.xml</value>
 				<value>spring/spring-context-processors.xml</value>
-				<value>spring/spring-context-anomalydetection.xml</value>
 			</list>
 		</constructor-arg>
 	</bean>

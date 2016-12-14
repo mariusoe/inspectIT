@@ -1,6 +1,9 @@
 package rocks.inspectit.server.anomaly.processor.analyzer.impl;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.data.AnalyzableData;
 import rocks.inspectit.server.anomaly.processor.analyzer.AbstractAnalyzeProcessor;
@@ -10,7 +13,9 @@ import rocks.inspectit.shared.cs.ci.anomaly.configuration.processor.analyze.Dumm
  * @author Marius Oehler
  *
  */
-@XmlRootElement
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Lazy
 public class DummyAnalyzeProcessor extends AbstractAnalyzeProcessor<DummyAnalyzeProcessorConfiguration> {
 
 	/**
@@ -18,7 +23,7 @@ public class DummyAnalyzeProcessor extends AbstractAnalyzeProcessor<DummyAnalyze
 	 */
 	@Override
 	public void analyze(AnalyzableData<?> analyzable) {
-		// TODO Auto-generated method stub
+		System.out.println("analyze: " + analyzable);
 	}
 
 }

@@ -10,8 +10,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import rocks.inspectit.server.CMR;
-import rocks.inspectit.server.anomaly.configuration.AnomalyDetectionConfigurationProvider;
+import rocks.inspectit.server.anomaly.AnomalyDetectionConfigurationProvider;
 import rocks.inspectit.server.anomaly.context.matcher.AbstractAnomalyContextMatcher;
 import rocks.inspectit.server.anomaly.context.model.AnomalyContext;
 import rocks.inspectit.server.anomaly.processor.analyzer.AbstractAnalyzeProcessor;
@@ -37,6 +36,9 @@ public class AnomalyContextManager {
 
 	@Autowired
 	private AnomalyDetectionConfigurationProvider anomalyConfigurationProvider;
+
+	@Autowired
+	private BeanFactory beanFactory;
 
 	private final Collection<AnomalyContext> anomalyContexts = new CopyOnWriteArrayList<>();
 
@@ -73,11 +75,6 @@ public class AnomalyContextManager {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private AnomalyContext createcreateAnomalyContext(DefaultData defaultData, AnomalyDetectionConfiguration configuration) throws BeansException, ClassNotFoundException {
-		BeanFactory beanFactory = CMR.getBeanFactory();
-		if (beanFactory == null) {
-			return null;
-		}
-
 		AnomalyContext context = new AnomalyContext();
 
 		// create matcher and check if the context matches the data
@@ -114,6 +111,7 @@ public class AnomalyContextManager {
 		classifyProcessor.setConfiguration(classifyProcessorConfiguration);
 
 		// create new anomaly context
+		context.setId(configuration.getId());
 		context.setAnalyzeProcessor(analyzeProcessor);
 		context.setBaselineProcessor(baselineProcessor);
 		context.setClassifyProcessor(classifyProcessor);

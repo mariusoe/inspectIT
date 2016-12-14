@@ -88,7 +88,7 @@ public class InfluxDBDaoTest extends TestBase {
 
 		@Test
 		public void insertPoint() {
-			influxDao.active = true;
+			influxDao.monitoringActive = true;
 			influxDao.propertiesUpdated();
 
 			influxDao.insert(dataPoint);
@@ -111,7 +111,7 @@ public class InfluxDBDaoTest extends TestBase {
 
 		@Test
 		public void insertNull() {
-			influxDao.active = true;
+			influxDao.monitoringActive = true;
 			influxDao.propertiesUpdated();
 
 			influxDao.insert(null);
@@ -147,7 +147,7 @@ public class InfluxDBDaoTest extends TestBase {
 
 		@Test
 		public void executeQuery() {
-			influxDao.active = true;
+			influxDao.monitoringActive = true;
 			influxDao.propertiesUpdated();
 
 			influxDao.query("myQuery");
@@ -172,7 +172,7 @@ public class InfluxDBDaoTest extends TestBase {
 
 		@Test
 		public void executeNullQuery() {
-			influxDao.active = true;
+			influxDao.monitoringActive = true;
 			influxDao.propertiesUpdated();
 
 			influxDao.query(null);
@@ -233,7 +233,7 @@ public class InfluxDBDaoTest extends TestBase {
 
 		@Test
 		public void enableInflux() {
-			influxDao.active = true;
+			influxDao.monitoringActive = true;
 
 			influxDao.propertiesUpdated();
 
@@ -255,7 +255,7 @@ public class InfluxDBDaoTest extends TestBase {
 		@Test
 		@SuppressWarnings("unchecked")
 		public void enableInfluxButNotAvailable() {
-			influxDao.active = true;
+			influxDao.monitoringActive = true;
 			when(influxDb.ping()).thenThrow(Exception.class);
 
 			influxDao.propertiesUpdated();
@@ -275,7 +275,7 @@ public class InfluxDBDaoTest extends TestBase {
 
 		@Test
 		public void enableInfluxDatabaseExists() {
-			influxDao.active = true;
+			influxDao.monitoringActive = true;
 			when(influxDb.describeDatabases()).thenReturn(Arrays.asList(influxDao.database));
 
 			influxDao.propertiesUpdated();
@@ -298,10 +298,10 @@ public class InfluxDBDaoTest extends TestBase {
 		public void disableInfluxConnectionOngoing() {
 			when(future.isDone()).thenReturn(false);
 			when(influxDb.isBatchEnabled()).thenReturn(false, true);
-			influxDao.active = true;
+			influxDao.monitoringActive = true;
 			influxDao.propertiesUpdated();
 
-			influxDao.active = false;
+			influxDao.monitoringActive = false;
 			influxDao.propertiesUpdated();
 
 			assertThat(influxDao.isConnected(), is(false));
@@ -325,10 +325,10 @@ public class InfluxDBDaoTest extends TestBase {
 		public void disableInflux() {
 			when(future.isDone()).thenReturn(true);
 			when(influxDb.isBatchEnabled()).thenReturn(false, true);
-			influxDao.active = true;
+			influxDao.monitoringActive = true;
 			influxDao.propertiesUpdated();
 
-			influxDao.active = false;
+			influxDao.monitoringActive = false;
 			influxDao.propertiesUpdated();
 
 			assertThat(influxDao.isConnected(), is(false));
@@ -349,7 +349,7 @@ public class InfluxDBDaoTest extends TestBase {
 
 		@Test
 		public void clientFactoryReturnsNull() {
-			influxDao.active = true;
+			influxDao.monitoringActive = true;
 			when(clientFactory.createClient()).thenReturn(null);
 
 			influxDao.propertiesUpdated();
@@ -365,7 +365,7 @@ public class InfluxDBDaoTest extends TestBase {
 		@Test
 		@SuppressWarnings("unchecked")
 		public void clientFactoryThrowsException() {
-			influxDao.active = true;
+			influxDao.monitoringActive = true;
 			when(clientFactory.createClient()).thenThrow(Exception.class);
 
 			influxDao.propertiesUpdated();

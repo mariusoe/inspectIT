@@ -1,5 +1,6 @@
-package rocks.inspectit.server.anomaly.data;
+package rocks.inspectit.server.anomaly.data.impl;
 
+import rocks.inspectit.server.anomaly.data.AnalyzableData;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 
 /**
@@ -21,5 +22,13 @@ public class AnalyzableInvocationSequenceData extends AnalyzableData<InvocationS
 	@Override
 	public double getValue() {
 		return data.getDuration();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getValueDescription() {
+		return "Duration";
 	}
 }

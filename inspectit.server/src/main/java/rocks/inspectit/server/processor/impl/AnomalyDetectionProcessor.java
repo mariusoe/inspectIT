@@ -5,6 +5,7 @@ import javax.persistence.EntityManager;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import rocks.inspectit.server.anomaly.AnalyzableDataFactory;
 import rocks.inspectit.server.anomaly.context.AnomalyContextManager;
@@ -32,6 +33,9 @@ public class AnomalyDetectionProcessor extends AbstractCmrDataProcessor {
 	private AnomalyContextManager contextManager;
 
 	private final AnalyzableDataFactory analyzableDataFactory = new AnalyzableDataFactory();
+
+	@Value("${anomaly.active}")
+	boolean anomalyDetectionActive;
 
 	/**
 	 * {@inheritDoc}
@@ -72,7 +76,7 @@ public class AnomalyDetectionProcessor extends AbstractCmrDataProcessor {
 	 */
 	@Override
 	public boolean canBeProcessed(DefaultData defaultData) {
-		return analyzableDataFactory.isAnalyzable(defaultData);
+		return anomalyDetectionActive && analyzableDataFactory.isAnalyzable(defaultData);
 	}
 
 	@Autowired

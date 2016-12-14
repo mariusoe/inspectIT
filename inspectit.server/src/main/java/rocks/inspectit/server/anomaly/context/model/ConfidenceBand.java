@@ -22,8 +22,7 @@ public class ConfidenceBand {
 	}
 
 	public boolean isInside(double value) {
-		// TODO
-		throw new NotImplementedException("TODO");
+		return (lowerBound < value) && (value <= upperBound);
 	}
 
 	public double distanceToBoundary(double value) {
@@ -49,4 +48,11 @@ public class ConfidenceBand {
 		return this.lowerBound;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return "Confidence-Band[lower=" + lowerBound + " upper=" + upperBound + "]";
+	}
 }

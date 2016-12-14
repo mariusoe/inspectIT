@@ -60,8 +60,8 @@ public class InfluxDBDao implements InfluxAvailabilityListener {
 	/**
 	 * Activation state of this service.
 	 */
-	@Value("${influxdb.active}")
-	boolean active;
+	@Value("${monitoring.active}")
+	boolean monitoringActive;
 
 	/**
 	 * Database to use.
@@ -159,11 +159,11 @@ public class InfluxDBDao implements InfluxAvailabilityListener {
 	 * Connects to the InfluxDB if the feature has been enabled.
 	 */
 	@PostConstruct
-	@PropertyUpdate(properties = { "influxdb.host", "influxdb.port", "influxdb.user", "influxdb.passwd", "influxdb.database", "influxdb.active" })
+	@PropertyUpdate(properties = { "influxdb.host", "influxdb.port", "influxdb.user", "influxdb.passwd", "influxdb.database", "monitoring.active" })
 	public void propertiesUpdated() {
 		reset();
 
-		if (active) {
+		if (monitoringActive) {
 			connectingFuture = scheduledExecutorService.submit(connectingTask);
 		}
 	}

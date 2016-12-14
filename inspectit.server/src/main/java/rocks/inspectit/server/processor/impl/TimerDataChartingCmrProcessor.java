@@ -56,8 +56,8 @@ public class TimerDataChartingCmrProcessor extends AbstractCmrDataProcessor {
 	 * If writing to the influxDB is active. In that case we will not persist anything to the
 	 * relational database.
 	 */
-	@Value("${influxdb.active}")
-	boolean influxActive;
+	@Value("${monitoring.active}")
+	boolean monitoringActive;
 
 	/**
 	 * {@link SerializationManager} for cloning.
@@ -89,7 +89,7 @@ public class TimerDataChartingCmrProcessor extends AbstractCmrDataProcessor {
 	 */
 	@Override
 	public boolean canBeProcessed(DefaultData defaultData) {
-		return !influxActive && (defaultData instanceof TimerData) && ((TimerData) defaultData).isCharting();
+		return !monitoringActive && (defaultData instanceof TimerData) && ((TimerData) defaultData).isCharting();
 	}
 
 	/**

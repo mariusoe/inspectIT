@@ -18,6 +18,8 @@ import rocks.inspectit.server.anomaly.processor.classifier.AbstractClassifyProce
  */
 public class AnomalyContext {
 
+	private String id;
+
 	private AnomalyStatus status = AnomalyStatus.UNKOWN;
 
 	private double baseline = Double.NaN;
@@ -35,6 +37,25 @@ public class AnomalyContext {
 	private AbstractClassifyProcessor classifyProcessor;
 
 	private AbstractAnalyzeProcessor analyzeProcessor;
+
+	/**
+	 * Gets {@link #id}.
+	 * 
+	 * @return {@link #id}
+	 */
+	public String getId() {
+		return this.id;
+	}
+
+	/**
+	 * Sets {@link #id}.
+	 * 
+	 * @param id
+	 *            New value for {@link #id}
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	/**
 	 * Gets {@link #confidenceBand}.

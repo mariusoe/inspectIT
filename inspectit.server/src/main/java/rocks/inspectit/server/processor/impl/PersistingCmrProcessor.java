@@ -22,8 +22,8 @@ public class PersistingCmrProcessor extends AbstractCmrDataProcessor {
 	 * If writing to the influxDB is active. In that case we will not persist anything to the
 	 * relational database.
 	 */
-	@Value("${influxdb.active}")
-	boolean influxActive;
+	@Value("${monitoring.active}")
+	boolean monitoringActive;
 
 	/**
 	 * List of classes that should be saved by this simple saver.
@@ -57,7 +57,7 @@ public class PersistingCmrProcessor extends AbstractCmrDataProcessor {
 	 */
 	@Override
 	public boolean canBeProcessed(DefaultData defaultData) {
-		if (!influxActive && (null != defaultData)) {
+		if (!monitoringActive && (null != defaultData)) {
 			return classes.contains(defaultData.getClass());
 		}
 		return false;
