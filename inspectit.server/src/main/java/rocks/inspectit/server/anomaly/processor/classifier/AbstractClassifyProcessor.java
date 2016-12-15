@@ -12,6 +12,4 @@ import rocks.inspectit.shared.cs.ci.anomaly.configuration.processor.AbstractClas
 public abstract class AbstractClassifyProcessor<E extends AbstractClassifyProcessorConfiguration> extends AbstractProcessor<E> {
 
 	public abstract void classify(AnomalyContext context, AnalyzableData<?> analyzable);
-
-	public abstract double[] getBoundaries(AnomalyContext context);
 }

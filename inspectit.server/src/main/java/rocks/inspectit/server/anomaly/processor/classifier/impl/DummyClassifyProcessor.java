@@ -1,6 +1,5 @@
 package rocks.inspectit.server.anomaly.processor.classifier.impl;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
@@ -40,14 +39,4 @@ public class DummyClassifyProcessor extends AbstractClassifyProcessor<DummyClass
 			analyzable.setHealthStatus(HealthStatus.CRITICAL);
 		}
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public double[] getBoundaries(AnomalyContext context) {
-		// TODO
-		throw new NotImplementedException("TODO");
-	}
-
 }

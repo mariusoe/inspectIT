@@ -8,7 +8,9 @@ public enum AnomalyContextMatcher {
 
 	BUSINESS_TRANSACTION_MATCHER("rocks.inspectit.server.anomaly.context.matcher.impl.BusinessTransactionMatcher"),
 
-	MACHINE_MATCHER("rocks.inspectit.server.anomaly.context.matcher.impl.MachineMatcher");
+	MACHINE_MATCHER("rocks.inspectit.server.anomaly.context.matcher.impl.MachineMatcher"),
+
+	MATCH_EVERYTHING_MATCHER("rocks.inspectit.server.anomaly.context.matcher.impl.MatchEverythingMatcher");
 
 	private String fqn;
 
