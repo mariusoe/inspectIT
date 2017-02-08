@@ -10,9 +10,10 @@ import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.shared.all.util.ResourcesPathResolver;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
 import rocks.inspectit.shared.cs.ci.Environment;
 import rocks.inspectit.shared.cs.ci.Profile;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionGroupConfiguration;
 
 /**
  * Class that knows how to resolve paths related to the configuration interface.
@@ -62,6 +63,8 @@ public class ConfigurationInterfacePathResolver {
 	 * Sub-folder for saving alert thresholds.
 	 */
 	private static final String ALERTING_DEFINITIONS_FOLDER = "alerting";
+
+	private static final String ANOMALY_DETECTION_CONFIGURATION_FOLDER = "anomaly-detection";
 
 	/**
 	 * Migration folder name.
@@ -194,6 +197,17 @@ public class ConfigurationInterfacePathResolver {
 		String secureDefinitionName = removeIllegalFilenameCharacters(alertingDefinition.getName());
 		String fileName = alertingDefinition.getId() + "-" + secureDefinitionName + ".xml";
 		return getAlertingDefinitionsPath().resolve(fileName);
+	}
+
+	public Path getAnomalyDetectionConfigurationsPath() {
+		return getDefaultCiPath().resolve(ANOMALY_DETECTION_CONFIGURATION_FOLDER);
+	}
+
+	public Path getAnomalyDetectionConfigurationFilePath(AnomalyDetectionGroupConfiguration configurationGroup) {
+		// String secureDefinitionName =
+		// removeIllegalFilenameCharacters(alertingDefinition.getName());
+		String fileName = configurationGroup.getGroupId() + ".xml";
+		return getAnomalyDetectionConfigurationsPath().resolve(fileName);
 	}
 
 	/**

@@ -2,7 +2,7 @@ package rocks.inspectit.ui.rcp.ci.listener;
 
 import java.util.EventListener;
 
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 import rocks.inspectit.ui.rcp.repository.CmrRepositoryDefinition;
 
 /**

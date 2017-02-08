@@ -12,7 +12,7 @@ import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.server.influx.util.InfluxQueryFactory;
 import rocks.inspectit.server.influx.util.QueryResultWrapper;
 import rocks.inspectit.shared.all.spring.logger.Log;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 
 /**
  * The threshold checker component. It is used to check the status of a given threshold defined by

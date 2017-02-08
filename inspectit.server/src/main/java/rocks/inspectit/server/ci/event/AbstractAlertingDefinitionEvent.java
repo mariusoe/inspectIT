@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.springframework.context.ApplicationEvent;
 
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 
 /**
  * Base class for all events related to {@link AlertingDefinition}.

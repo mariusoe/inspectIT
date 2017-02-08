@@ -10,8 +10,8 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition.ThresholdType;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition.ThresholdType;
 import rocks.inspectit.ui.rcp.InspectIT;
 import rocks.inspectit.ui.rcp.InspectITImages;
 import rocks.inspectit.ui.rcp.ci.wizard.page.AlertDetailsWizardPage;

@@ -1,6 +1,6 @@
 package rocks.inspectit.ui.rcp.provider;
 
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 
 /**
  * Interface for {@link AlertingDefinition} provider. Note that this interface extends the

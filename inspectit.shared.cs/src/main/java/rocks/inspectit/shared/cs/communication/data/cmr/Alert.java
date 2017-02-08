@@ -2,7 +2,7 @@ package rocks.inspectit.shared.cs.communication.data.cmr;
 
 import java.util.UUID;
 
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 
 /**
  * Represents a detected alert.

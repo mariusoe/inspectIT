@@ -19,11 +19,11 @@ import rocks.inspectit.shared.all.communication.DefaultData;
 public class PersistingCmrProcessor extends AbstractCmrDataProcessor {
 
 	/**
-	 * If writing to the influxDB is active. In that case we will not persist anything to the
-	 * relational database.
+	 * If this value is true, we will not persist anything to the relational database but writing to
+	 * the InfluxDB.
 	 */
-	@Value("${influxdb.active}")
-	boolean influxActive;
+	@Value("${influxdb.writeData}")
+	boolean writeInInflux;
 
 	/**
 	 * List of classes that should be saved by this simple saver.
@@ -57,7 +57,7 @@ public class PersistingCmrProcessor extends AbstractCmrDataProcessor {
 	 */
 	@Override
 	public boolean canBeProcessed(DefaultData defaultData) {
-		if (!influxActive && (null != defaultData)) {
+		if (!writeInInflux && (null != defaultData)) {
 			return classes.contains(defaultData.getClass());
 		}
 		return false;

@@ -32,8 +32,8 @@ import rocks.inspectit.server.alerting.state.AlertingState;
 import rocks.inspectit.server.influx.constants.Series;
 import rocks.inspectit.server.template.AlertEMailTemplateType.Placeholders;
 import rocks.inspectit.shared.all.testbase.TestBase;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition.ThresholdType;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition.ThresholdType;
 import rocks.inspectit.shared.cs.communication.data.cmr.Alert;
 import rocks.inspectit.shared.cs.communication.data.cmr.AlertClosingReason;
 

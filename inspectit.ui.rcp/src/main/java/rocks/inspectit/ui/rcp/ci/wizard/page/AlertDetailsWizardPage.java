@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Text;
 
 import rocks.inspectit.shared.all.util.EMailUtils;
 import rocks.inspectit.shared.all.util.Pair;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition.ThresholdType;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition.ThresholdType;
 import rocks.inspectit.ui.rcp.InspectIT;
 import rocks.inspectit.ui.rcp.InspectITImages;
 import rocks.inspectit.ui.rcp.util.LineNumbersStyleListener;

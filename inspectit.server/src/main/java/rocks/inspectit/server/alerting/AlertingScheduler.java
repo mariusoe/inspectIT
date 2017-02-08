@@ -22,7 +22,7 @@ import rocks.inspectit.server.alerting.state.AlertingState;
 import rocks.inspectit.server.ci.event.AbstractAlertingDefinitionEvent;
 import rocks.inspectit.shared.all.cmr.property.spring.PropertyUpdate;
 import rocks.inspectit.shared.all.spring.logger.Log;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 import rocks.inspectit.shared.cs.communication.data.cmr.AlertClosingReason;
 
 /**

@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 
 import rocks.inspectit.server.influx.constants.Series;
 import rocks.inspectit.shared.all.testbase.TestBase;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 import rocks.inspectit.shared.cs.communication.data.cmr.Alert;
 
 /**
@@ -42,7 +42,7 @@ public class AlertRegistryTest extends TestBase {
 
 	/**
 	 * Tests the
-	 * {@link AlertRegistry#registerAlert(rocks.inspectit.shared.cs.ci.AlertingDefinition, long)}
+	 * {@link AlertRegistry#registerAlert(rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition, long)}
 	 * method.
 	 *
 	 * @author Alexander Wert

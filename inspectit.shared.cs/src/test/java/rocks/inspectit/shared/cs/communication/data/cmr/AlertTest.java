@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.testng.annotations.Test;
 
 import rocks.inspectit.shared.all.testbase.TestBase;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 import rocks.inspectit.shared.cs.communication.data.cmr.Alert;
 
 /**

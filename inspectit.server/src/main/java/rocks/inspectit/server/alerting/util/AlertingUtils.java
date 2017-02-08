@@ -1,7 +1,7 @@
 package rocks.inspectit.server.alerting.util;
 
 import rocks.inspectit.server.influx.constants.Series;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 
 /**
  * This class provides utility functions for alerting purposes.

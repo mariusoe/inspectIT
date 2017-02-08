@@ -5,7 +5,7 @@ import org.eclipse.core.runtime.Assert;
 
 import com.google.common.base.Objects;
 
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 import rocks.inspectit.ui.rcp.model.Leaf;
 import rocks.inspectit.ui.rcp.provider.IAlertDefinitionProvider;
 import rocks.inspectit.ui.rcp.repository.CmrRepositoryDefinition;

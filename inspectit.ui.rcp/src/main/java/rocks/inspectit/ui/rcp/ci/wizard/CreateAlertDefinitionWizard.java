@@ -3,7 +3,7 @@ package rocks.inspectit.ui.rcp.ci.wizard;
 import java.util.List;
 
 import rocks.inspectit.shared.all.exception.BusinessException;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 import rocks.inspectit.ui.rcp.InspectIT;
 import rocks.inspectit.ui.rcp.ci.wizard.page.AlertDetailsWizardPage;
 import rocks.inspectit.ui.rcp.ci.wizard.page.AlertSourceDefinitionWizardPage;

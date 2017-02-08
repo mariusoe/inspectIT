@@ -36,7 +36,7 @@ import rocks.inspectit.server.ci.event.AbstractAlertingDefinitionEvent.AlertingD
 import rocks.inspectit.server.ci.event.AbstractAlertingDefinitionEvent.AlertingDefinitionLoadedEvent;
 import rocks.inspectit.server.ci.event.AbstractAlertingDefinitionEvent.AlertingDefinitionUpdateEvent;
 import rocks.inspectit.shared.all.testbase.TestBase;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 import rocks.inspectit.shared.cs.communication.data.cmr.Alert;
 import rocks.inspectit.shared.cs.communication.data.cmr.AlertClosingReason;
 

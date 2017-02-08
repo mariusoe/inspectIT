@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 
 import org.influxdb.dto.Point.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
 
 import rocks.inspectit.server.influx.builder.DefaultDataPointBuilder;
@@ -33,6 +34,13 @@ public class InfluxProcessor extends AbstractCmrDataProcessor {
 	 * {@link InfluxDBDao} to write to.
 	 */
 	private InfluxDBDao influxDbDao;
+
+	/**
+	 * If this value is true, we will not persist anything to the relational database but writing to
+	 * the InfluxDB.
+	 */
+	@Value("${influxdb.writeData}")
+	boolean writeData;
 
 	/**
 	 * Map of all builders.
@@ -75,7 +83,7 @@ public class InfluxProcessor extends AbstractCmrDataProcessor {
 	 */
 	@Override
 	public boolean canBeProcessed(DefaultData defaultData) {
-		return influxDbDao.isConnected() && builderMap.containsKey(defaultData.getClass()) && isValidData(defaultData);
+		return writeData && influxDbDao.isConnected() && builderMap.containsKey(defaultData.getClass()) && isValidData(defaultData);
 	}
 
 	/**

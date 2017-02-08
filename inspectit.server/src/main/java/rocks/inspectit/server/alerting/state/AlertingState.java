@@ -1,6 +1,6 @@
 package rocks.inspectit.server.alerting.state;
 
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 import rocks.inspectit.shared.cs.communication.data.cmr.Alert;
 
 /**

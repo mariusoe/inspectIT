@@ -35,6 +35,7 @@ import rocks.inspectit.server.ci.event.AgentMappingsUpdateEvent;
 import rocks.inspectit.server.ci.event.BusinessContextDefinitionUpdateEvent;
 import rocks.inspectit.server.ci.event.EnvironmentUpdateEvent;
 import rocks.inspectit.server.ci.event.ProfileUpdateEvent;
+import rocks.inspectit.server.ci.manager.ConfigurationInterfaceAnomalyManager;
 import rocks.inspectit.server.util.CollectionSubtractUtils;
 import rocks.inspectit.shared.all.exception.BusinessException;
 import rocks.inspectit.shared.all.exception.enumeration.AlertErrorCodeEnum;
@@ -43,10 +44,10 @@ import rocks.inspectit.shared.all.serializer.impl.SerializationManager;
 import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.cs.ci.AgentMapping;
 import rocks.inspectit.shared.cs.ci.AgentMappings;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
 import rocks.inspectit.shared.cs.ci.BusinessContextDefinition;
 import rocks.inspectit.shared.cs.ci.Environment;
 import rocks.inspectit.shared.cs.ci.Profile;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 import rocks.inspectit.shared.cs.ci.export.ConfigurationInterfaceImportData;
 import rocks.inspectit.shared.cs.jaxb.ISchemaVersionAware;
 import rocks.inspectit.shared.cs.jaxb.JAXBTransformator;
@@ -115,6 +116,9 @@ public class ConfigurationInterfaceManager {
 	 * Business context definition.
 	 */
 	private final AtomicReference<BusinessContextDefinition> businessContextDefinitionReference = new AtomicReference<>();
+
+	@Autowired
+	private ConfigurationInterfaceAnomalyManager anomalyManager;
 
 	/**
 	 * Returns all existing profiles.
@@ -911,6 +915,8 @@ public class ConfigurationInterfaceManager {
 		transformator.marshall(pathResolver.getAlertingDefinitionFilePath(alertingDefinition), alertingDefinition, getRelativeToSchemaPath(pathResolver.getDefaultCiPath()).toString());
 	}
 
+
+
 	/**
 	 * Returns given path relative to schema part.
 	 *
@@ -947,6 +953,7 @@ public class ConfigurationInterfaceManager {
 		loadAgentMappings();
 		loadBusinessContextDefinition();
 		loadExistingAlertingDefinitions();
+		anomalyManager.loadExistingAnomalyDetectionGroupConfigurations();
 	}
 
 	/**

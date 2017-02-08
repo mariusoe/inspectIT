@@ -275,7 +275,7 @@ public class CmrDataProcessorsTest {
 		verify(entityManager, times(1)).persist(timerData);
 
 		// no when influx is active
-		processor.influxActive = true;
+		processor.writeInInflux = true;
 		processor.process(timerData, entityManager);
 		verifyNoMoreInteractions(entityManager);
 	}
@@ -303,7 +303,7 @@ public class CmrDataProcessorsTest {
 		verify(entityManager, times(1)).persist(systemInformationData);
 
 		// also when influx is active
-		processor.influxActive = true;
+		processor.writeInInflux = true;
 		processor.process(systemInformationData, entityManager);
 		verify(entityManager, times(2)).persist(systemInformationData);
 	}
@@ -399,7 +399,7 @@ public class CmrDataProcessorsTest {
 		TimerDataChartingCmrProcessor processor = new TimerDataChartingCmrProcessor();
 		processor.timerDataAggregator = timerDataAggregator;
 		processor.serializationManager = serializationManager;
-		processor.influxActive = true;
+		processor.writeInInflux = true;
 
 		// don't write
 		TimerData timerData = new TimerData();
