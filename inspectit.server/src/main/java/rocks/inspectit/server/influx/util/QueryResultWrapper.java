@@ -147,7 +147,11 @@ public class QueryResultWrapper {
 	 * @return the object of at the specified location as a {@link Double}.
 	 */
 	public Double getDouble(int rowIndex, int columnIndex) {
-		String value = get(rowIndex, columnIndex).toString();
+		Object object = get(rowIndex, columnIndex);
+		if (object == null) {
+			return Double.NaN;
+		}
+		String value = object.toString();
 		if (NumberUtils.isNumber(value)) {
 			return NumberUtils.toDouble(value);
 		} else {

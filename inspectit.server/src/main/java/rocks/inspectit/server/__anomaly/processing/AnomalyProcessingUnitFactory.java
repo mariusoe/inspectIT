@@ -1,4 +1,4 @@
-package rocks.inspectit.server.anomaly.processing;
+package rocks.inspectit.server.__anomaly.processing;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;

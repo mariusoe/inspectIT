@@ -1,17 +1,17 @@
 package rocks.inspectit.server.anomaly.processing;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.PostConstruct;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import rocks.inspectit.shared.all.communication.DefaultData;
+import com.google.common.collect.ImmutableMap;
+
+import rocks.inspectit.server.anomaly.valuesource.impl.InfluxValueSource;
+import rocks.inspectit.server.anomaly.valuesource.impl.InfluxValueSource.Function;
 import rocks.inspectit.shared.all.spring.logger.Log;
-import rocks.inspectit.shared.cs.anomaly.classification.HealthState;
-import rocks.inspectit.shared.cs.anomaly.configuration.AnomalyDetectionConfiguration;
-import rocks.inspectit.shared.cs.anomaly.extractor.IValueExtractor;
-import rocks.inspectit.shared.cs.anomaly.selector.AbstractDataSelector;
 
 /**
  * @author Marius Oehler
@@ -23,70 +23,36 @@ public class AnomalyProcessingUnit {
 	@Log
 	private Logger log;
 
-	private List<AbstractDataSelector<DefaultData, ?>> dataSelectors = new ArrayList<>();
+	@Autowired
+	InfluxValueSource valueSource;
 
-	private IValueExtractor<DefaultData> valueExtractor;
+	private AnomalyProcessingContext context = new AnomalyProcessingContext();
 
-	private AnomalyDetectionConfiguration configuration;
+	@PostConstruct
+	private void postConstruct() {
+		valueSource.setAggregationWindowLength(60);
+		valueSource.setMeasurement("data");
+		valueSource.setFunction(Function.MEAN);
+		valueSource.setTagMap(ImmutableMap.of("generated", "yes"));
 
-	/**
-	 * Sets {@link #configuration}.
-	 *
-	 * @param configuration
-	 *            New value for {@link #configuration}
-	 */
-	public void setConfiguration(AnomalyDetectionConfiguration configuration) {
-		this.configuration = configuration;
+		initialize();
 	}
 
-	/**
-	 * Gets {@link #configuration}.
-	 *
-	 * @return {@link #configuration}
-	 */
-	public AnomalyDetectionConfiguration getConfiguration() {
-		return this.configuration;
+	private void initialize() {
+		NaN beim ersten Aufruf
+		double[] values = valueSource.getValues(24);
+		DescriptiveStatistics statistics = new DescriptiveStatistics(values);
+
+		context.setMean(statistics.getMean());
 	}
 
-	/**
-	 * Gets {@link #dataSelectors}.
-	 *
-	 * @return {@link #dataSelectors}
-	 */
-	public List<AbstractDataSelector<DefaultData, ?>> getDataSelectors() {
-		return this.dataSelectors;
-	}
-
-	public boolean select(DefaultData data) {
-		if (!valueExtractor.getDataClass().isInstance(data)) {
-			return false;
+	public void process() {
+		try {
+			double value = valueSource.getValue();
+			log.info("InfluxValueSource: {} - is larger than mean: {}", value, value > context.getMean());
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
-		// logical operators AND OR
-		for (AbstractDataSelector<DefaultData, ?> dataSelector : dataSelectors) {
-			if (dataSelector.select(data)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public HealthState process(DefaultData defaultData) {
-		double value = valueExtractor.extractValue(defaultData);
-
-		log.info("Config '{}' is value: {}", configuration.getUuid(), value);
-
-		return HealthState.UNKNOWN;
-	}
-
-	/**
-	 * Sets {@link #valueExtractor}.
-	 *
-	 * @param valueExtractor
-	 *            New value for {@link #valueExtractor}
-	 */
-	public void setValueExtractor(IValueExtractor<DefaultData> valueExtractor) {
-		this.valueExtractor = valueExtractor;
 	}
 
 }
