@@ -1,6 +1,7 @@
 package rocks.inspectit.server.anomaly;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -27,13 +28,26 @@ public class AnomalyProcessor implements Runnable {
 	BeanFactory beanFactory;
 
 
-	private List<AnomalyProcessingUnit> processingUnits;
+	private List<AnomalyProcessingUnit> processingUnits = new ArrayList<>();
 
 	@PostConstruct
 	public void PostConstruct() {
-		processingUnits = new ArrayList<>();
+		createProcessingUnits();
+	}
 
-		processingUnits.add(createProcessingUnit());
+	private void createProcessingUnits() {
+		// load configurations
+		List<AnomalyDetectionConfiguration> configurations = Collections.singletonList(AnomalyDetectionConfiguration.getTestDefinition());
+
+		for (AnomalyDetectionConfiguration configuration : configurations) {
+			processingUnits.add(createProcessingUnit(configuration));
+		}
+	}
+
+	private AnomalyProcessingUnit createProcessingUnit(AnomalyDetectionConfiguration configuration) {
+		AnomalyProcessingUnit processingUnit = beanFactory.getBean(AnomalyProcessingUnit.class);
+
+		return processingUnit;
 	}
 
 	/**
@@ -44,9 +58,5 @@ public class AnomalyProcessor implements Runnable {
 		for (AnomalyProcessingUnit processingUnit : processingUnits) {
 			processingUnit.process();
 		}
-	}
-
-	private AnomalyProcessingUnit createProcessingUnit() {
-		return beanFactory.getBean(AnomalyProcessingUnit.class);
 	}
 }

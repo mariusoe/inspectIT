@@ -40,7 +40,9 @@ public class AnomalyDetectionSystem {
 		if (log.isInfoEnabled()) {
 			log.info("|-Initialized Anomaly Detection System...");
 		}
+	}
 
-		executorService.scheduleAtFixedRate(anomalyProcessor, 0, detectionInterval, TimeUnit.MILLISECONDS);
+	public void start() {
+		executorService.scheduleAtFixedRate(anomalyProcessor, 5000, detectionInterval, TimeUnit.MILLISECONDS);
 	}
 }

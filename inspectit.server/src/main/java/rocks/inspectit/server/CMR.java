@@ -22,6 +22,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
+import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
 import rocks.inspectit.server.util.Converter;
 import rocks.inspectit.shared.all.minlog.MinlogToSLF4JLogger;
 import rocks.inspectit.shared.all.util.ResourcesPathResolver;
@@ -108,6 +109,8 @@ public final class CMR {
 			LOGGER.info("Starting CMR in version " + versionService.getVersionAsString()
 			+ ". Please note that inspectIT does not provide any guarantee on backwards compatibility. Only if the version match exactly we ensure that the components are compatible.");
 		}
+
+		beanFactory.getBean(AnomalyDetectionSystem.class).start();
 	}
 
 	/**

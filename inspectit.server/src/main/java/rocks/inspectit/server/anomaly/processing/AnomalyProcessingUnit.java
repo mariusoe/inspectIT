@@ -1,16 +1,17 @@
 package rocks.inspectit.server.anomaly.processing;
 
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.influxdb.dto.Point;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.ImmutableMap;
-
-import rocks.inspectit.server.anomaly.valuesource.impl.InfluxValueSource;
-import rocks.inspectit.server.anomaly.valuesource.impl.InfluxValueSource.Function;
+import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
+import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
@@ -24,35 +25,97 @@ public class AnomalyProcessingUnit {
 	private Logger log;
 
 	@Autowired
-	InfluxValueSource valueSource;
+	InfluxDBDao influx;
+
+	private AbstractMetricProvider<?> metricProvider;
 
 	private AnomalyProcessingContext context = new AnomalyProcessingContext();
 
+	private long initializationWindowSize = TimeUnit.DAYS.toSeconds(7);
+
+	private long aggreagationWindowSize = TimeUnit.MINUTES.toSeconds(15);
+
 	@PostConstruct
 	private void postConstruct() {
-		valueSource.setAggregationWindowLength(60);
-		valueSource.setMeasurement("data");
-		valueSource.setFunction(Function.MEAN);
-		valueSource.setTagMap(ImmutableMap.of("generated", "yes"));
+
+		context.getStats().setWindowSize((int) (TimeUnit.HOURS.toSeconds(2) / aggreagationWindowSize));
 
 		initialize();
 	}
 
 	private void initialize() {
-		NaN beim ersten Aufruf
-		double[] values = valueSource.getValues(24);
-		DescriptiveStatistics statistics = new DescriptiveStatistics(values);
+		influx.query("DROP MEASUREMENT test");
 
-		context.setMean(statistics.getMean());
+		long initWindow = TimeUnit.DAYS.toSeconds(5);
+
+		// double[] values = null;
+		// while (values == null) {
+		// values = valueSource.getValues((int) (initWindow / aggreagationWindowSize));
+		// }
+
+		long current = System.currentTimeMillis();
+		long utc = current - (initWindow * 1000L);
+		utc -= utc % (aggreagationWindowSize * 1000L);
+
+		// for (double value : values) {
+		while (utc < current) {
+			process(utc);
+			utc += aggreagationWindowSize * 1000;
+		}
+
+		// double[] parameter = forecastFactory.bruteForceParameterDetermination(values);
+		// hwForecast = forecastFactory.createHoltWinters();
+		// hwForecast.setSmoothingFactor(parameter[1]);
+		// hwForecast.setTrendSmoothingFactor(parameter[2]);
+		// hwForecast.setSeasonalSmoothingFactor(parameter[3]);
+		//
+		// double[] train = ArrayUtils.subarray(values, 0, 192);
+		// double[] val = ArrayUtils.subarray(values, 192, values.length);
+		//
+		// hwForecast.train(train);
+		//
+		// utc += windowSizeInSeconds * 1000L * 192L;
+		//
+		// for (double value : val) {
+		// utc += windowSizeInSeconds * 1000L;
+		//
+		// try {
+		// hwForecast.fit(value);
+		// } catch (Exception e) {
+		// }
+		// double forecast = hwForecast.forecast();
+		// if (!Double.isNaN(forecast)) {
+		// influx.insert(Point.measurement("test").time(utc,
+		// TimeUnit.MILLISECONDS).addField("forecast", forecast).build());
+		// }
+		// }
+
+	}
+
+	private void process(long time) {
+
+		double value = metricProvider.getValue(time, 15, TimeUnit.MINUTES);
+
+		context.getStats().addValue(value);
+
+		double mean = context.getStats().getMean();
+		double deviation = metricProvider.getStandardDeviation(time, 2, TimeUnit.HOURS);
+		double perc = metricProvider.getPercentile(95, time, 2, TimeUnit.HOURS);
+
+		System.out.println(new Date(time) + " " + mean);
+		influx.insert(Point.measurement("test").time(time, TimeUnit.MILLISECONDS).addField("mean", mean).addField("dev", deviation).addField("95th", perc).build());
+
 	}
 
 	public void process() {
-		try {
-			double value = valueSource.getValue();
-			log.info("InfluxValueSource: {} - is larger than mean: {}", value, value > context.getMean());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		process(System.currentTimeMillis());
+	}
+
+	/**
+	 * @param metricProvider
+	 */
+	public void setMetricProvider(AbstractMetricProvider<?> metricProvider) {
+		this.metricProvider = metricProvider;
 	}
 
 }
