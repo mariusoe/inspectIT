@@ -11,6 +11,12 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
+import rocks.inspectit.server.anomaly.baseline.BaselineFactory;
+import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
+import rocks.inspectit.server.anomaly.classification.ClassifierFactory;
+import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
+import rocks.inspectit.server.anomaly.metric.MetricProviderFactory;
 import rocks.inspectit.server.anomaly.processing.AnomalyProcessingUnit;
 import rocks.inspectit.shared.all.spring.logger.Log;
 
@@ -27,6 +33,14 @@ public class AnomalyProcessor implements Runnable {
 	@Autowired
 	BeanFactory beanFactory;
 
+	@Autowired
+	MetricProviderFactory metricProviderFactory;
+
+	@Autowired
+	BaselineFactory baselineFactory;
+
+	@Autowired
+	ClassifierFactory classifierFactory;
 
 	private List<AnomalyProcessingUnit> processingUnits = new ArrayList<>();
 
@@ -46,8 +60,27 @@ public class AnomalyProcessor implements Runnable {
 
 	private AnomalyProcessingUnit createProcessingUnit(AnomalyDetectionConfiguration configuration) {
 		AnomalyProcessingUnit processingUnit = beanFactory.getBean(AnomalyProcessingUnit.class);
+		processingUnit.setConfiguration(configuration);
+
+		AbstractMetricProvider<?> metricProvider = metricProviderFactory.getMetricProvider(configuration.getMetricDefinition());
+		processingUnit.setMetricProvider(metricProvider);
+
+		AbstractBaseline<?> baseline = baselineFactory.getBaseline(configuration.getBaselineDefinition());
+		processingUnit.setBaseline(baseline);
+
+		AbstractClassifier<?> classifier = classifierFactory.createClassifier(configuration.getClassifierDefinition());
+		processingUnit.setClassifier(classifier);
 
 		return processingUnit;
+	}
+
+	/**
+	 *
+	 */
+	public void initialize() {
+		for (AnomalyProcessingUnit processingUnit : processingUnits) {
+			processingUnit.initialize();
+		}
 	}
 
 	/**

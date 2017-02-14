@@ -1,6 +1,9 @@
 package rocks.inspectit.server.anomaly.processing;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import rocks.inspectit.server.anomaly.AnomalyDetectionConfiguration;
+import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
+import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
+import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 
 /**
  * @author Marius Oehler
@@ -8,67 +11,163 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
  */
 public class AnomalyProcessingContext {
 
-	private double mean;
+	private AnomalyDetectionConfiguration configuration;
 
-	private DescriptiveStatistics stats = new DescriptiveStatistics();
+	private AbstractBaseline<?> baseline;
 
-	private double standardDeviation;
+	private AbstractMetricProvider<?> metricProvider;
+
+	private int iterationCounter = 0;
+
+	private AbstractClassifier<?> classifier;
 
 	/**
-	 * Gets {@link #standardDeviation}.
+	 * Gets {@link #classifier}.
 	 *
-	 * @return {@link #standardDeviation}
+	 * @return {@link #classifier}
 	 */
-	public double getStandardDeviation() {
-		return this.standardDeviation;
+	public AbstractClassifier<?> getClassifier() {
+		return this.classifier;
 	}
 
 	/**
-	 * Sets {@link #standardDeviation}.
+	 * Gets {@link #configuration}.
 	 *
-	 * @param standardDeviation
-	 *            New value for {@link #standardDeviation}
+	 * @return {@link #configuration}
 	 */
-	public void setStandardDeviation(double standardDeviation) {
-		this.standardDeviation = standardDeviation;
+	public AnomalyDetectionConfiguration getConfiguration() {
+		return this.configuration;
 	}
 
 	/**
-	 * Gets {@link #mean}.
+	 * Sets {@link #configuration}.
 	 *
-	 * @return {@link #mean}
+	 * @param configuration
+	 *            New value for {@link #configuration}
 	 */
-	public double getMean() {
-		return this.mean;
+	public void setConfiguration(AnomalyDetectionConfiguration configuration) {
+		this.configuration = configuration;
 	}
 
 	/**
-	 * Sets {@link #mean}.
+	 * Gets {@link #baseline}.
 	 *
-	 * @param mean
-	 *            New value for {@link #mean}
+	 * @return {@link #baseline}
 	 */
-	public void setMean(double mean) {
-		this.mean = mean;
+	public AbstractBaseline<?> getBaseline() {
+		return this.baseline;
 	}
 
 	/**
-	 * Gets {@link #stats}.
+	 * Sets {@link #baseline}.
 	 *
-	 * @return {@link #stats}
+	 * @param baseline
+	 *            New value for {@link #baseline}
 	 */
-	public DescriptiveStatistics getStats() {
-		return this.stats;
+	public void setBaseline(AbstractBaseline<?> baseline) {
+		this.baseline = baseline;
 	}
 
 	/**
-	 * Sets {@link #stats}.
+	 * Gets {@link #metricProvider}.
 	 *
-	 * @param stats
-	 *            New value for {@link #stats}
+	 * @return {@link #metricProvider}
 	 */
-	public void setStats(DescriptiveStatistics stats) {
-		this.stats = stats;
+	public AbstractMetricProvider<?> getMetricProvider() {
+		return this.metricProvider;
 	}
+
+	/**
+	 * Sets {@link #metricProvider}.
+	 *
+	 * @param metricProvider
+	 *            New value for {@link #metricProvider}
+	 */
+	public void setMetricProvider(AbstractMetricProvider<?> metricProvider) {
+		this.metricProvider = metricProvider;
+	}
+
+	/**
+	 * Gets {@link #iterationCounter}.
+	 *
+	 * @return {@link #iterationCounter}
+	 */
+	public int getIterationCounter() {
+		return this.iterationCounter;
+	}
+
+	public void incrementInterationCounter() {
+		iterationCounter++;
+	}
+
+	/**
+	 * @param classifier
+	 */
+	public void setClassifier(AbstractClassifier<?> classifier) {
+		this.classifier = classifier;
+	}
+
+	// private double mean;
+	//
+	// private DescriptiveStatistics stats = new DescriptiveStatistics();
+	//
+	// private double standardDeviation;
+	//
+	// /**
+	// * Gets {@link #standardDeviation}.
+	// *
+	// * @return {@link #standardDeviation}
+	// */
+	// public double getStandardDeviation() {
+	// return this.standardDeviation;
+	// }
+	//
+	// /**
+	// * Sets {@link #standardDeviation}.
+	// *
+	// * @param standardDeviation
+	// * New value for {@link #standardDeviation}
+	// */
+	// public void setStandardDeviation(double standardDeviation) {
+	// this.standardDeviation = standardDeviation;
+	// }
+	//
+	// /**
+	// * Gets {@link #mean}.
+	// *
+	// * @return {@link #mean}
+	// */
+	// public double getMean() {
+	// return this.mean;
+	// }
+	//
+	// /**
+	// * Sets {@link #mean}.
+	// *
+	// * @param mean
+	// * New value for {@link #mean}
+	// */
+	// public void setMean(double mean) {
+	// this.mean = mean;
+	// }
+	//
+	// /**
+	// * Gets {@link #stats}.
+	// *
+	// * @return {@link #stats}
+	// */
+	// public DescriptiveStatistics getStats() {
+	// return this.stats;
+	// }
+	//
+	// /**
+	// * Sets {@link #stats}.
+	// *
+	// * @param stats
+	// * New value for {@link #stats}
+	// */
+	// public void setStats(DescriptiveStatistics stats) {
+	// this.stats = stats;
+	// }
 
 }

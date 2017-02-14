@@ -20,6 +20,11 @@ import rocks.inspectit.shared.all.spring.logger.Log;
 @Component
 public class AnomalyDetectionSystem {
 
+	/**
+	 * Interval in seconds.
+	 */
+	public static final long PROCESSING_INTERVAL_S = 15L;
+
 	@Log
 	private Logger log;
 
@@ -30,7 +35,6 @@ public class AnomalyDetectionSystem {
 	@Resource(name = "scheduledExecutorService")
 	ScheduledExecutorService executorService;
 
-	private long detectionInterval = 1000;
 
 	@Autowired
 	private AnomalyProcessor anomalyProcessor;
@@ -43,6 +47,8 @@ public class AnomalyDetectionSystem {
 	}
 
 	public void start() {
-		executorService.scheduleAtFixedRate(anomalyProcessor, 5000, detectionInterval, TimeUnit.MILLISECONDS);
+		anomalyProcessor.initialize();
+
+		executorService.scheduleAtFixedRate(anomalyProcessor, 0, PROCESSING_INTERVAL_S, TimeUnit.MILLISECONDS);
 	}
 }

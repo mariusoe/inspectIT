@@ -18,7 +18,7 @@ public class MetricProviderFactory {
 	@Autowired
 	private BeanFactory beanFactory;
 
-	public AbstractMetricProvider getMetricProvider(AbstractMetricDefinition metricDefinition) {
+	public AbstractMetricProvider<?> getMetricProvider(AbstractMetricDefinition metricDefinition) {
 		if (metricDefinition instanceof InfluxDBMetricDefinition) {
 			InfluxDBMetricProvider metricProvider = beanFactory.getBean(InfluxDBMetricProvider.class);
 			metricProvider.setMetricDefinition((InfluxDBMetricDefinition) metricDefinition);

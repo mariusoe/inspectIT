@@ -1,15 +1,19 @@
 package rocks.inspectit.server.anomaly.processing;
 
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
 import org.influxdb.dto.Point;
+import org.influxdb.dto.Point.Builder;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import rocks.inspectit.server.anomaly.AnomalyDetectionConfiguration;
+import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
+import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
+import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.spring.logger.Log;
@@ -27,26 +31,35 @@ public class AnomalyProcessingUnit {
 	@Autowired
 	InfluxDBDao influx;
 
-	private AbstractMetricProvider<?> metricProvider;
-
 	private AnomalyProcessingContext context = new AnomalyProcessingContext();
 
-	private long initializationWindowSize = TimeUnit.DAYS.toSeconds(7);
-
-	private long aggreagationWindowSize = TimeUnit.MINUTES.toSeconds(15);
+	// private long initializationWindowSize = TimeUnit.DAYS.toSeconds(7);
+	//
+	// private long aggreagationWindowSize = TimeUnit.MINUTES.toSeconds(15);
 
 	@PostConstruct
 	private void postConstruct() {
 
-		context.getStats().setWindowSize((int) (TimeUnit.HOURS.toSeconds(2) / aggreagationWindowSize));
-
-		initialize();
+		// context.getStats().setWindowSize((int) (TimeUnit.HOURS.toSeconds(2) /
+		// aggreagationWindowSize));
 	}
 
-	private void initialize() {
-		influx.query("DROP MEASUREMENT test");
+	/**
+	 * Sets {@link #configuration}.
+	 *
+	 * @param configuration
+	 *            New value for {@link #configuration}
+	 */
+	public void setConfiguration(AnomalyDetectionConfiguration configuration) {
+		context.setConfiguration(configuration);
+	}
 
-		long initWindow = TimeUnit.DAYS.toSeconds(5);
+	public void initialize() {
+		log.info("start init");
+
+		influx.query("DROP MEASUREMENT baseline");
+
+		long initWindow = TimeUnit.DAYS.toSeconds(7);
 
 		// double[] values = null;
 		// while (values == null) {
@@ -55,12 +68,12 @@ public class AnomalyProcessingUnit {
 
 		long current = System.currentTimeMillis();
 		long utc = current - (initWindow * 1000L);
-		utc -= utc % (aggreagationWindowSize * 1000L);
+		utc -= utc % (AnomalyDetectionSystem.PROCESSING_INTERVAL_S * 1000L);
 
 		// for (double value : values) {
 		while (utc < current) {
 			process(utc);
-			utc += aggreagationWindowSize * 1000;
+			utc += AnomalyDetectionSystem.PROCESSING_INTERVAL_S * 1000;
 		}
 
 		// double[] parameter = forecastFactory.bruteForceParameterDetermination(values);
@@ -89,33 +102,77 @@ public class AnomalyProcessingUnit {
 		// TimeUnit.MILLISECONDS).addField("forecast", forecast).build());
 		// }
 		// }
+		log.info("done init");
 
 	}
 
 	private void process(long time) {
+		log.debug("iteration {}", context.getIterationCounter());
 
-		double value = metricProvider.getValue(time, 15, TimeUnit.MINUTES);
+		if ((context.getIterationCounter() % context.getConfiguration().getIntervalBaselineProcessing()) == 0) {
+			processBaseline(time);
+		}
 
-		context.getStats().addValue(value);
+		if ((context.getIterationCounter() % context.getConfiguration().getIntervalDataProcessing()) == 0) {
+			processData(time);
+		}
 
-		double mean = context.getStats().getMean();
-		double deviation = metricProvider.getStandardDeviation(time, 2, TimeUnit.HOURS);
-		double perc = metricProvider.getPercentile(95, time, 2, TimeUnit.HOURS);
+		// double value = metricProvider.getValue(time, 15, TimeUnit.MINUTES);
+		//
+		// context.getStats().addValue(value);
+		//
+		// double mean = context.getStats().getMean();
+		// double deviation = metricProvider.getStandardDeviation(time, 2, TimeUnit.HOURS);
+		// double perc = metricProvider.getPercentile(95, time, 2, TimeUnit.HOURS);
+		//
+		// System.out.println(new Date(time) + " " + mean);
+		// influx.insert(Point.measurement("test").time(time,
+		// TimeUnit.MILLISECONDS).addField("mean", mean).addField("dev", deviation).addField("95th",
+		// perc).build());
 
-		System.out.println(new Date(time) + " " + mean);
-		influx.insert(Point.measurement("test").time(time, TimeUnit.MILLISECONDS).addField("mean", mean).addField("dev", deviation).addField("95th", perc).build());
+		context.incrementInterationCounter();
+	}
 
+	private void processData(long time) {
+		log.debug("Process data at time {}", time);
+		context.getClassifier().process(context, time);
+	}
+
+	private void processBaseline(long time) {
+		log.debug("Process baseline at time {}", time);
+		context.getBaseline().process(context, time);
+
+		Builder builder = Point.measurement("baseline").time(time, TimeUnit.MILLISECONDS);
+		builder.addField("baseline", context.getBaseline().getBaseline());
+		builder.tag("configuration-id", context.getConfiguration().getId());
+
+		influx.insert(builder.build());
 	}
 
 	public void process() {
-		process(System.currentTimeMillis());
+		long time = System.currentTimeMillis();
+		process(time);
 	}
 
 	/**
 	 * @param metricProvider
 	 */
 	public void setMetricProvider(AbstractMetricProvider<?> metricProvider) {
-		this.metricProvider = metricProvider;
+		context.setMetricProvider(metricProvider);
+	}
+
+	/**
+	 * @param baseline
+	 */
+	public void setBaseline(AbstractBaseline<?> baseline) {
+		context.setBaseline(baseline);
+	}
+
+	/**
+	 * @param classifier
+	 */
+	public void setClassifier(AbstractClassifier<?> classifier) {
+		context.setClassifier(classifier);
 	}
 
 }
