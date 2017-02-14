@@ -12,12 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
-import rocks.inspectit.server.anomaly.baseline.BaselineFactory;
-import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
-import rocks.inspectit.server.anomaly.classification.ClassifierFactory;
+import rocks.inspectit.server.anomaly.configuration.AnomalyDetectionConfiguration;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
-import rocks.inspectit.server.anomaly.metric.MetricProviderFactory;
 import rocks.inspectit.server.anomaly.processing.AnomalyProcessingUnit;
+import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
 import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
@@ -34,13 +32,7 @@ public class AnomalyProcessor implements Runnable {
 	BeanFactory beanFactory;
 
 	@Autowired
-	MetricProviderFactory metricProviderFactory;
-
-	@Autowired
-	BaselineFactory baselineFactory;
-
-	@Autowired
-	ClassifierFactory classifierFactory;
+	DefinitionAwareFactory definitionAwareFactory;
 
 	private List<AnomalyProcessingUnit> processingUnits = new ArrayList<>();
 
@@ -62,13 +54,13 @@ public class AnomalyProcessor implements Runnable {
 		AnomalyProcessingUnit processingUnit = beanFactory.getBean(AnomalyProcessingUnit.class);
 		processingUnit.setConfiguration(configuration);
 
-		AbstractMetricProvider<?> metricProvider = metricProviderFactory.getMetricProvider(configuration.getMetricDefinition());
+		AbstractMetricProvider<?> metricProvider = definitionAwareFactory.createMetricProvider(configuration.getMetricDefinition());
 		processingUnit.setMetricProvider(metricProvider);
 
-		AbstractBaseline<?> baseline = baselineFactory.getBaseline(configuration.getBaselineDefinition());
+		AbstractBaseline<?> baseline = definitionAwareFactory.createBaseline(configuration.getBaselineDefinition());
 		processingUnit.setBaseline(baseline);
 
-		AbstractClassifier<?> classifier = classifierFactory.createClassifier(configuration.getClassifierDefinition());
+		AbstractThreshold<?> classifier = definitionAwareFactory.createClassifier(configuration.getClassifierDefinition());
 		processingUnit.setClassifier(classifier);
 
 		return processingUnit;
@@ -88,8 +80,12 @@ public class AnomalyProcessor implements Runnable {
 	 */
 	@Override
 	public void run() {
-		for (AnomalyProcessingUnit processingUnit : processingUnits) {
-			processingUnit.process();
+		try {
+			for (AnomalyProcessingUnit processingUnit : processingUnits) {
+				processingUnit.process();
+			}
+		} catch (Exception e) {
+			log.error("Unexpected exception.", e);
 		}
 	}
 }

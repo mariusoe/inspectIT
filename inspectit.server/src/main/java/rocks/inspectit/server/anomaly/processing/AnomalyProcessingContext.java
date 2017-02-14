@@ -1,9 +1,9 @@
 package rocks.inspectit.server.anomaly.processing;
 
-import rocks.inspectit.server.anomaly.AnomalyDetectionConfiguration;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
-import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
+import rocks.inspectit.server.anomaly.configuration.AnomalyDetectionConfiguration;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
+import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
 
 /**
  * @author Marius Oehler
@@ -19,14 +19,14 @@ public class AnomalyProcessingContext {
 
 	private int iterationCounter = 0;
 
-	private AbstractClassifier<?> classifier;
+	private AbstractThreshold<?> classifier;
 
 	/**
 	 * Gets {@link #classifier}.
 	 *
 	 * @return {@link #classifier}
 	 */
-	public AbstractClassifier<?> getClassifier() {
+	public AbstractThreshold<?> getThreshold() {
 		return this.classifier;
 	}
 
@@ -103,8 +103,12 @@ public class AnomalyProcessingContext {
 	/**
 	 * @param classifier
 	 */
-	public void setClassifier(AbstractClassifier<?> classifier) {
+	public void setClassifier(AbstractThreshold<?> classifier) {
 		this.classifier = classifier;
+	}
+
+	public boolean isWarmedUp() {
+		return configuration.getWarmupLength() < iterationCounter;
 	}
 
 	// private double mean;

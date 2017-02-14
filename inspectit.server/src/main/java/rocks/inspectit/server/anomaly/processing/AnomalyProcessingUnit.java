@@ -10,11 +10,12 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import rocks.inspectit.server.anomaly.AnomalyDetectionConfiguration;
 import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
-import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
+import rocks.inspectit.server.anomaly.configuration.AnomalyDetectionConfiguration;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
+import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
+import rocks.inspectit.server.anomaly.threshold.AbstractThreshold.ThresholdType;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.spring.logger.Log;
 
@@ -57,9 +58,9 @@ public class AnomalyProcessingUnit {
 	public void initialize() {
 		log.info("start init");
 
-		influx.query("DROP MEASUREMENT baseline");
+		influx.query("DROP MEASUREMENT inspectit_anomaly");
 
-		long initWindow = TimeUnit.DAYS.toSeconds(7);
+		long initWindow = TimeUnit.HOURS.toSeconds(24 * 7);
 
 		// double[] values = null;
 		// while (values == null) {
@@ -135,18 +136,38 @@ public class AnomalyProcessingUnit {
 
 	private void processData(long time) {
 		log.debug("Process data at time {}", time);
-		context.getClassifier().process(context, time);
 	}
 
 	private void processBaseline(long time) {
 		log.debug("Process baseline at time {}", time);
+
 		context.getBaseline().process(context, time);
+		context.getThreshold().process(context, time);
 
-		Builder builder = Point.measurement("baseline").time(time, TimeUnit.MILLISECONDS);
-		builder.addField("baseline", context.getBaseline().getBaseline());
-		builder.tag("configuration-id", context.getConfiguration().getId());
+		double baseline = context.getBaseline().getBaseline();
+		double thresholdCritical = context.getThreshold().getThreshold(context, ThresholdType.UPPER_CRITICAL);
+		double thresholdWarning = context.getThreshold().getThreshold(context, ThresholdType.UPPER_WARNING);
 
-		influx.insert(builder.build());
+		Builder builder = Point.measurement("inspectit_anomaly").time(time, TimeUnit.MILLISECONDS);
+		builder.tag("configuration_id", context.getConfiguration().getId());
+
+		boolean builderIsEmpty = true;
+		if (!Double.isNaN(baseline)) {
+			builderIsEmpty = false;
+			builder.addField("baseline", baseline);
+		}
+		if (!Double.isNaN(thresholdCritical)) {
+			builderIsEmpty = false;
+			builder.addField("upper_critical", thresholdCritical);
+		}
+		if (!Double.isNaN(thresholdWarning)) {
+			builderIsEmpty = false;
+			builder.addField("upper_warning", thresholdWarning);
+		}
+
+		if (!builderIsEmpty) {
+			influx.insert(builder.build());
+		}
 	}
 
 	public void process() {
@@ -171,7 +192,7 @@ public class AnomalyProcessingUnit {
 	/**
 	 * @param classifier
 	 */
-	public void setClassifier(AbstractClassifier<?> classifier) {
+	public void setClassifier(AbstractThreshold<?> classifier) {
 		context.setClassifier(classifier);
 	}
 

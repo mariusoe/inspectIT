@@ -49,6 +49,6 @@ public class AnomalyDetectionSystem {
 	public void start() {
 		anomalyProcessor.initialize();
 
-		executorService.scheduleAtFixedRate(anomalyProcessor, 0, PROCESSING_INTERVAL_S, TimeUnit.MILLISECONDS);
+		executorService.scheduleAtFixedRate(anomalyProcessor, 0, PROCESSING_INTERVAL_S, TimeUnit.SECONDS);
 	}
 }

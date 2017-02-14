@@ -1,16 +1,16 @@
-package rocks.inspectit.server.anomaly;
+package rocks.inspectit.server.anomaly.configuration;
 
 import java.util.UUID;
 
 import com.google.common.collect.ImmutableMap;
 
-import rocks.inspectit.server.anomaly.baseline.BaselineDefinition;
-import rocks.inspectit.server.anomaly.baseline.impl.MovingAverageBaselineDefinition;
-import rocks.inspectit.server.anomaly.classification.IClassifierDefinition;
-import rocks.inspectit.server.anomaly.classification.stddev.StandardDeviationClassifierDefinition;
-import rocks.inspectit.server.anomaly.metric.definition.AbstractMetricDefinition;
-import rocks.inspectit.server.anomaly.metric.definition.InfluxDBMetricDefinition;
-import rocks.inspectit.server.anomaly.metric.definition.InfluxDBMetricDefinition.Function;
+import rocks.inspectit.server.anomaly.definition.baseline.BaselineDefinition;
+import rocks.inspectit.server.anomaly.definition.baseline.MovingAverageBaselineDefinition;
+import rocks.inspectit.server.anomaly.definition.metric.InfluxDBMetricDefinition;
+import rocks.inspectit.server.anomaly.definition.metric.InfluxDBMetricDefinition.Function;
+import rocks.inspectit.server.anomaly.definition.metric.MetricDefinition;
+import rocks.inspectit.server.anomaly.definition.threshold.StandardDeviationThresholdDefinition;
+import rocks.inspectit.server.anomaly.definition.threshold.ThresholdDefinition;
 
 /**
  * @author Marius Oehler
@@ -22,30 +22,46 @@ public class AnomalyDetectionConfiguration {
 		AnomalyDetectionConfiguration configuration = new AnomalyDetectionConfiguration();
 
 		InfluxDBMetricDefinition metricDefinition = new InfluxDBMetricDefinition();
-		metricDefinition.setMeasurement("data");
+		metricDefinition.setMeasurement("businessTransactions");
 		metricDefinition.setFunction(Function.MEAN);
-		metricDefinition.setField("value");
+		metricDefinition.setField("duration");
 		metricDefinition.setTagMap(ImmutableMap.of("generated", "yes"));
 
 		MovingAverageBaselineDefinition baselineDefinition = new MovingAverageBaselineDefinition();
-		baselineDefinition.setWindowSize(24);
+		baselineDefinition.setWindowSize(24); // * 5min = 2h
+		baselineDefinition.setExcludeCriticalData(true);
+		// ExponentialMovingAverageBaselineDefinition baselineDefinition = new
+		// ExponentialMovingAverageBaselineDefinition();
+		// baselineDefinition.setSmoothingFactor(0.05D);
+		// baselineDefinition.setTrendSmoothingFactor(0.1D);
+		// baselineDefinition.setExcludeCriticalData(true);
 
-		StandardDeviationClassifierDefinition classifierDefinition = new StandardDeviationClassifierDefinition();
-		configuration.setClassifierDefinition(classifierDefinition);
+		StandardDeviationThresholdDefinition thresholdDefinition = new StandardDeviationThresholdDefinition();
+		thresholdDefinition.setWindowSize(36);// * 5min = 3h
+		thresholdDefinition.setSigmaAmountCritical(5);
+		thresholdDefinition.setSigmaAmountWarning(3);
+		thresholdDefinition.setUseResiduals(false);
+		thresholdDefinition.setExcludeCriticalData(false);
+		thresholdDefinition.setExponentialSmoothed(true);
+		thresholdDefinition.setSmoothingFactor(0.1D);
 
 		configuration.setMetricDefinition(metricDefinition);
 		configuration.setBaselineDefinition(baselineDefinition);
+		configuration.setThresholdDefinition(thresholdDefinition);
 
 		return configuration;
 	}
 
 	private String id = UUID.randomUUID().toString();
 
-	private AbstractMetricDefinition metricDefinition;
+	private MetricDefinition metricDefinition;
 
 	private BaselineDefinition baselineDefinition;
 
-	private IClassifierDefinition classifierDefinition;
+	private ThresholdDefinition classifierDefinition;
+
+	// = 15s * 240 = 1h
+	private int warmupLength = 240;
 
 	// 1 = 15s
 	private int intervalDataProcessing = 1;
@@ -54,11 +70,30 @@ public class AnomalyDetectionConfiguration {
 	private int intervalBaselineProcessing = 20;
 
 	/**
+	 * Gets {@link #warmupLength}.
+	 *
+	 * @return {@link #warmupLength}
+	 */
+	public int getWarmupLength() {
+		return this.warmupLength;
+	}
+
+	/**
+	 * Sets {@link #warmupLength}.
+	 *
+	 * @param warmupLength
+	 *            New value for {@link #warmupLength}
+	 */
+	public void setWarmupLength(int warmupLength) {
+		this.warmupLength = warmupLength;
+	}
+
+	/**
 	 * Gets {@link #classifierDefinition}.
 	 *
 	 * @return {@link #classifierDefinition}
 	 */
-	public IClassifierDefinition getClassifierDefinition() {
+	public ThresholdDefinition getClassifierDefinition() {
 		return this.classifierDefinition;
 	}
 
@@ -68,7 +103,7 @@ public class AnomalyDetectionConfiguration {
 	 * @param classifierDefinition
 	 *            New value for {@link #classifierDefinition}
 	 */
-	public void setClassifierDefinition(IClassifierDefinition classifierDefinition) {
+	public void setThresholdDefinition(ThresholdDefinition classifierDefinition) {
 		this.classifierDefinition = classifierDefinition;
 	}
 
@@ -105,7 +140,7 @@ public class AnomalyDetectionConfiguration {
 	 *
 	 * @return {@link #metricDefinition}
 	 */
-	public AbstractMetricDefinition getMetricDefinition() {
+	public MetricDefinition getMetricDefinition() {
 		return this.metricDefinition;
 	}
 
@@ -115,7 +150,7 @@ public class AnomalyDetectionConfiguration {
 	 * @param metricDefinition
 	 *            New value for {@link #metricDefinition}
 	 */
-	public void setMetricDefinition(AbstractMetricDefinition metricDefinition) {
+	public void setMetricDefinition(MetricDefinition metricDefinition) {
 		this.metricDefinition = metricDefinition;
 	}
 

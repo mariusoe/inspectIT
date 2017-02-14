@@ -1,4 +1,4 @@
-package rocks.inspectit.server.anomaly.metric.definition;
+package rocks.inspectit.server.anomaly.definition.metric;
 
 import java.util.Map;
 
@@ -6,7 +6,7 @@ import java.util.Map;
  * @author Marius Oehler
  *
  */
-public class InfluxDBMetricDefinition extends AbstractMetricDefinition {
+public class InfluxDBMetricDefinition extends MetricDefinition {
 
 	public enum Function {
 		MEAN, MIN, MAX, MEDIAN;

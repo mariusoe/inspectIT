@@ -83,7 +83,7 @@ public final class CMR {
 
 		LOGGER.info("CMR started in " + Converter.nanoToMilliseconds(System.nanoTime() - startTime) + " ms");
 
-		beanFactory.getBean(DummyAgent.class).start();
+		// beanFactory.getBean(DummyAgent.class).start();
 	}
 
 	/**

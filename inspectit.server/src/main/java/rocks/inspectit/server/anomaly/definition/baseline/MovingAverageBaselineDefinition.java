@@ -1,12 +1,10 @@
-package rocks.inspectit.server.anomaly.baseline.impl;
-
-import rocks.inspectit.server.anomaly.baseline.BaselineDefinition;
+package rocks.inspectit.server.anomaly.definition.baseline;
 
 /**
  * @author Marius Oehler
  *
  */
-public class MovingAverageBaselineDefinition implements BaselineDefinition {
+public class MovingAverageBaselineDefinition extends BaselineDefinition {
 
 	/**
 	 * The window size (number of elements) of this moving average.
