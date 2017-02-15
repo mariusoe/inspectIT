@@ -9,7 +9,7 @@ import java.util.Map;
 public class InfluxDBMetricDefinition extends MetricDefinition {
 
 	public enum Function {
-		MEAN, MIN, MAX, MEDIAN;
+		MEAN, MEDIAN;
 	};
 
 	private String measurement;

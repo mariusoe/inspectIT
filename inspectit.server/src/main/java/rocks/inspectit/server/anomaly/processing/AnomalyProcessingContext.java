@@ -1,6 +1,8 @@
 package rocks.inspectit.server.anomaly.processing;
 
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
+import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
+import rocks.inspectit.server.anomaly.classification.HealthStatus;
 import rocks.inspectit.server.anomaly.configuration.AnomalyDetectionConfiguration;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
@@ -19,15 +21,47 @@ public class AnomalyProcessingContext {
 
 	private int iterationCounter = 0;
 
-	private AbstractThreshold<?> classifier;
+	private AbstractThreshold<?> threshold;
+
+	private AbstractClassifier<?> classifier;
+
+	private HealthStatus healthStatus = HealthStatus.UNKNOWN;
+
+	/**
+	 * Gets {@link #healthStatus}.
+	 *
+	 * @return {@link #healthStatus}
+	 */
+	public HealthStatus getHealthStatus() {
+		return this.healthStatus;
+	}
+
+	/**
+	 * Sets {@link #healthStatus}.
+	 *
+	 * @param healthStatus
+	 *            New value for {@link #healthStatus}
+	 */
+	public void setHealthStatus(HealthStatus healthStatus) {
+		this.healthStatus = healthStatus;
+	}
 
 	/**
 	 * Gets {@link #classifier}.
 	 *
 	 * @return {@link #classifier}
 	 */
-	public AbstractThreshold<?> getThreshold() {
+	public AbstractClassifier<?> getClassifier() {
 		return this.classifier;
+	}
+
+	/**
+	 * Gets {@link #threshold}.
+	 *
+	 * @return {@link #threshold}
+	 */
+	public AbstractThreshold<?> getThreshold() {
+		return this.threshold;
 	}
 
 	/**
@@ -101,14 +135,21 @@ public class AnomalyProcessingContext {
 	}
 
 	/**
-	 * @param classifier
+	 * @param threshold
 	 */
-	public void setClassifier(AbstractThreshold<?> classifier) {
-		this.classifier = classifier;
+	public void setThreshold(AbstractThreshold<?> threshold) {
+		this.threshold = threshold;
 	}
 
 	public boolean isWarmedUp() {
 		return configuration.getWarmupLength() < iterationCounter;
+	}
+
+	/**
+	 * @param classifier
+	 */
+	public void setClassifier(AbstractClassifier<?> classifier) {
+		this.classifier = classifier;
 	}
 
 	// private double mean;

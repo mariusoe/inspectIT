@@ -26,4 +26,8 @@ public abstract class AbstractMetricProvider<E extends MetricDefinition> extends
 	public abstract double getPercentile(double percentile, long time, long timeWindow, TimeUnit unit);
 
 	public abstract double[] getRawValues(long time, long timeWindow, TimeUnit unit);
+
+	public abstract long getCount(long time, long timeWindow, TimeUnit unit);
+
+	public abstract long getCount(MetricFilter filter, long time, long timeWindow, TimeUnit unit);
 }

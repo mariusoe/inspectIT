@@ -7,5 +7,4 @@ import rocks.inspectit.server.anomaly.definition.AbstractDefinition;
  *
  */
 public abstract class MetricDefinition extends AbstractDefinition {
-
 }

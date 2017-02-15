@@ -7,15 +7,26 @@ import org.springframework.stereotype.Component;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.baseline.impl.ExponentialMovingAverageBaseline;
 import rocks.inspectit.server.anomaly.baseline.impl.MovingAverageBaseline;
+import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
+import rocks.inspectit.server.anomaly.classification.impl.HardClassifier;
+import rocks.inspectit.server.anomaly.classification.impl.PercentageClassifier;
 import rocks.inspectit.server.anomaly.definition.AbstractDefinition;
 import rocks.inspectit.server.anomaly.definition.AbstractDefinitionAware;
 import rocks.inspectit.server.anomaly.definition.baseline.ExponentialMovingAverageBaselineDefinition;
 import rocks.inspectit.server.anomaly.definition.baseline.MovingAverageBaselineDefinition;
+import rocks.inspectit.server.anomaly.definition.classification.HardClassifierDefinition;
+import rocks.inspectit.server.anomaly.definition.classification.PercentageClassifierDefinition;
 import rocks.inspectit.server.anomaly.definition.metric.InfluxDBMetricDefinition;
+import rocks.inspectit.server.anomaly.definition.threshold.FixedThresholdDefinition;
+import rocks.inspectit.server.anomaly.definition.threshold.PercentageDerivationThresholdDefinition;
+import rocks.inspectit.server.anomaly.definition.threshold.PercentileThresholdDefinition;
 import rocks.inspectit.server.anomaly.definition.threshold.StandardDeviationThresholdDefinition;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.anomaly.metric.impl.InfluxDBMetricProvider;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
+import rocks.inspectit.server.anomaly.threshold.impl.FixedThreshold;
+import rocks.inspectit.server.anomaly.threshold.impl.PercentageDerivationThreshold;
+import rocks.inspectit.server.anomaly.threshold.impl.PercentileThreshold;
 import rocks.inspectit.server.anomaly.threshold.impl.StandardDeviationThreshold;
 
 /**
@@ -45,9 +56,15 @@ public class DefinitionAwareFactory {
 		}
 	}
 
-	public AbstractThreshold<?> createClassifier(AbstractDefinition definition) {
+	public AbstractThreshold<?> createThreshold(AbstractDefinition definition) {
 		if (definition instanceof StandardDeviationThresholdDefinition) {
 			return create(StandardDeviationThreshold.class, definition);
+		} else if (definition instanceof PercentileThresholdDefinition) {
+			return create(PercentileThreshold.class, definition);
+		} else if (definition instanceof FixedThresholdDefinition) {
+			return create(FixedThreshold.class, definition);
+		} else if (definition instanceof PercentageDerivationThresholdDefinition) {
+			return create(PercentageDerivationThreshold.class, definition);
 		} else {
 			throw new UnsupportedThresholdException(definition.getClass());
 		}
@@ -58,6 +75,30 @@ public class DefinitionAwareFactory {
 			return create(InfluxDBMetricProvider.class, definition);
 		} else {
 			throw new UnsupportedMetricProviderException(definition.getClass());
+		}
+	}
+
+	public AbstractClassifier<?> createClassifier(AbstractDefinition definition) {
+		if (definition instanceof PercentageClassifierDefinition) {
+			return create(PercentageClassifier.class, definition);
+		} else if (definition instanceof HardClassifierDefinition) {
+			return create(HardClassifier.class, definition);
+		} else {
+			throw new UnsupportedClassifierException(definition.getClass());
+		}
+	}
+
+	public static class UnsupportedClassifierException extends RuntimeException {
+		/**
+		 * Generated UUID.
+		 */
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * @param message
+		 */
+		public UnsupportedClassifierException(Class<?> clazz) {
+			super("Unsupported classifier for definition of type '" + clazz.getSimpleName() + "'.");
 		}
 	}
 

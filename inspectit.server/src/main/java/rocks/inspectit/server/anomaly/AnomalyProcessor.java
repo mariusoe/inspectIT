@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
+import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
 import rocks.inspectit.server.anomaly.configuration.AnomalyDetectionConfiguration;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.anomaly.processing.AnomalyProcessingUnit;
@@ -60,9 +61,11 @@ public class AnomalyProcessor implements Runnable {
 		AbstractBaseline<?> baseline = definitionAwareFactory.createBaseline(configuration.getBaselineDefinition());
 		processingUnit.setBaseline(baseline);
 
-		AbstractThreshold<?> classifier = definitionAwareFactory.createClassifier(configuration.getClassifierDefinition());
-		processingUnit.setClassifier(classifier);
+		AbstractThreshold<?> threshold = definitionAwareFactory.createThreshold(configuration.getThresholdDefinition());
+		processingUnit.setThreshold(threshold);
 
+		AbstractClassifier<?> classifier = definitionAwareFactory.createClassifier(configuration.getClassifierDefinition());
+		processingUnit.setClassifier(classifier);
 		return processingUnit;
 	}
 

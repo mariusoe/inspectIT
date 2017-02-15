@@ -60,7 +60,7 @@ public class InfluxDBMetricProvider extends AbstractMetricProvider<InfluxDBMetri
 	@Override
 	public double getValue(MetricFilter filter, long time, long timeWindow, TimeUnit unit) {
 		String select = getDefinition().getFunction().name() + "(\"" + getDefinition().getField() + "\")";
-		return getSingleValue(select, filter, time, timeWindow, unit);
+		return getDoubleValue(select, filter, time, timeWindow, unit);
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class InfluxDBMetricProvider extends AbstractMetricProvider<InfluxDBMetri
 	@Override
 	public double getStandardDeviation(MetricFilter filter, long time, long timeWindow, TimeUnit unit) {
 		String select = "STDDEV(\"" + getDefinition().getField() + "\")";
-		return getSingleValue(select, filter, time, timeWindow, unit);
+		return getDoubleValue(select, filter, time, timeWindow, unit);
 	}
 
 	/**
@@ -94,10 +94,68 @@ public class InfluxDBMetricProvider extends AbstractMetricProvider<InfluxDBMetri
 	@Override
 	public double getPercentile(double percentile, long time, long timeWindow, TimeUnit unit) {
 		String select = "PERCENTILE(\"" + getDefinition().getField() + "\", " + percentile + ")";
-		return getSingleValue(select, null, time, timeWindow, unit);
+		return getDoubleValue(select, null, time, timeWindow, unit);
 	}
 
-	private double getSingleValue(String select, MetricFilter filter, long time, long timeWindow, TimeUnit unit) {
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getCount(long time, long timeWindow, TimeUnit unit) {
+		return getCount(null, time, timeWindow, unit);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getCount(MetricFilter filter, long time, long timeWindow, TimeUnit unit) {
+		String select = "COUNT(\"" + getDefinition().getField() + "\")";
+		return getLongValue(select, filter, time, timeWindow, unit);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double[] getRawValues(long time, long timeWindow, TimeUnit unit) {
+		String select = "\"" + getDefinition().getField() + "\"";
+		QueryResultWrapper queryResult = query(select, null, time, timeWindow, unit);
+
+		if (queryResult.isEmpty()) {
+			return new double[0];
+		}
+
+		double[] result = new double[queryResult.getRowCount()];
+
+		for (int i = 0; i < queryResult.getRowCount(); i++) {
+			result[i] = queryResult.getDouble(i, 1);
+		}
+
+		return result;
+	}
+
+	private double getDoubleValue(String select, MetricFilter filter, long time, long timeWindow, TimeUnit unit) {
+		QueryResultWrapper queryResult = query(select, filter, time, timeWindow, unit);
+
+		if (queryResult.isEmpty()) {
+			return Double.NaN;
+		}
+
+		return queryResult.getDouble(0, 1);
+	}
+
+	private long getLongValue(String select, MetricFilter filter, long time, long timeWindow, TimeUnit unit) {
+		QueryResultWrapper queryResult = query(select, filter, time, timeWindow, unit);
+
+		if (queryResult.isEmpty()) {
+			return 0;
+		}
+
+		return queryResult.getDouble(0, 1).longValue();
+	}
+
+	private QueryResultWrapper query(String select, MetricFilter filter, long time, long timeWindow, TimeUnit unit) {
 		StringBuilder queryBuilder = new StringBuilder();
 		queryBuilder.append("SELECT ").append(select).append(" FROM ").append(getDefinition().getMeasurement());
 
@@ -122,51 +180,6 @@ public class InfluxDBMetricProvider extends AbstractMetricProvider<InfluxDBMetri
 			}
 		}
 
-		QueryResultWrapper queryResult = new QueryResultWrapper(influx.query(queryBuilder.toString()));
-
-		if (queryResult.isEmpty()) {
-			return Double.NaN;
-		}
-
-		return queryResult.getDouble(0, 1);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public double[] getRawValues(long time, long timeWindow, TimeUnit unit) {
-		StringBuilder queryBuilder = new StringBuilder();
-		queryBuilder.append("SELECT \"").append(getDefinition().getField()).append("\" FROM ").append(getDefinition().getMeasurement());
-
-		if (time < 0) {
-			queryBuilder.append(" WHERE time > now() - ").append(unit.toSeconds(timeWindow)).append('s');
-		} else {
-			queryBuilder.append(" WHERE time <= ").append(time).append("ms AND time > ").append(time - unit.toMillis(timeWindow)).append("ms");
-		}
-
-		if (MapUtils.isNotEmpty(getDefinition().getTagMap())) {
-			for (Entry<String, String> entry : getDefinition().getTagMap().entrySet()) {
-				queryBuilder.append(" AND \"").append(entry.getKey()).append("\" = '").append(entry.getValue()).append('\'');
-			}
-		}
-
-		queryBuilder.append(" ORDER BY time ASC");
-
-		QueryResultWrapper queryResult = new QueryResultWrapper(influx.query(queryBuilder.toString()));
-
-		log.info("queried {} elements", queryResult.getRowCount());
-
-		if (queryResult.isEmpty()) {
-			return new double[0];
-		}
-
-		double[] result = new double[queryResult.getRowCount()];
-
-		for (int i = 0; i < queryResult.getRowCount(); i++) {
-			result[i] = queryResult.getDouble(i, 1);
-		}
-
-		return result;
+		return new QueryResultWrapper(influx.query(queryBuilder.toString()));
 	}
 }

@@ -16,5 +16,7 @@ public abstract class AbstractThreshold<E extends ThresholdDefinition> extends A
 
 	public abstract void process(AnomalyProcessingContext context, long time);
 
+	public abstract boolean providesThreshold(ThresholdType type);
+
 	public abstract double getThreshold(AnomalyProcessingContext context, ThresholdType type);
 }

@@ -6,76 +6,50 @@ package rocks.inspectit.server.anomaly.definition.threshold;
  */
 public class StandardDeviationThresholdDefinition extends ThresholdDefinition {
 
-	/**
-	 * The window size (number of elements) used to calculate the standard deviation.
-	 */
-	private int windowSize;
+	private boolean excludeCriticalData;
+
+	private boolean excludeWarningData;
 
 	private int sigmaAmountCritical;
 
 	private int sigmaAmountWarning;
 
-	private boolean useResiduals;
-
-	private boolean exponentialSmoothed;
-
-	private double smoothingFactor;
-
 	/**
-	 * Gets {@link #smoothingFactor}.
+	 * Gets {@link #excludeWarningData}.
 	 *
-	 * @return {@link #smoothingFactor}
+	 * @return {@link #excludeWarningData}
 	 */
-	public double getSmoothingFactor() {
-		return this.smoothingFactor;
+	public boolean isExcludeWarningData() {
+		return this.excludeWarningData;
 	}
 
 	/**
-	 * Sets {@link #smoothingFactor}.
+	 * Sets {@link #excludeWarningData}.
 	 *
-	 * @param smoothingFactor
-	 *            New value for {@link #smoothingFactor}
+	 * @param excludeWarningData
+	 *            New value for {@link #excludeWarningData}
 	 */
-	public void setSmoothingFactor(double smoothingFactor) {
-		this.smoothingFactor = smoothingFactor;
+	public void setExcludeWarningData(boolean excludeWarningData) {
+		this.excludeWarningData = excludeWarningData;
 	}
 
 	/**
-	 * Gets {@link #exponentialSmoothed}.
+	 * Gets {@link #excludeCriticalData}.
 	 *
-	 * @return {@link #exponentialSmoothed}
+	 * @return {@link #excludeCriticalData}
 	 */
-	public boolean isExponentialSmoothed() {
-		return this.exponentialSmoothed;
+	public boolean isExcludeCriticalData() {
+		return this.excludeCriticalData;
 	}
 
 	/**
-	 * Sets {@link #exponentialSmoothed}.
+	 * Sets {@link #excludeCriticalData}.
 	 *
-	 * @param exponentialSmoothed
-	 *            New value for {@link #exponentialSmoothed}
+	 * @param excludeCriticalData
+	 *            New value for {@link #excludeCriticalData}
 	 */
-	public void setExponentialSmoothed(boolean exponentialSmoothed) {
-		this.exponentialSmoothed = exponentialSmoothed;
-	}
-
-	/**
-	 * Gets {@link #useResiduals}.
-	 *
-	 * @return {@link #useResiduals}
-	 */
-	public boolean isUseResiduals() {
-		return this.useResiduals;
-	}
-
-	/**
-	 * Sets {@link #useResiduals}.
-	 *
-	 * @param useResiduals
-	 *            New value for {@link #useResiduals}
-	 */
-	public void setUseResiduals(boolean useResiduals) {
-		this.useResiduals = useResiduals;
+	public void setExcludeCriticalData(boolean excludeCriticalData) {
+		this.excludeCriticalData = excludeCriticalData;
 	}
 
 	/**
@@ -115,24 +89,4 @@ public class StandardDeviationThresholdDefinition extends ThresholdDefinition {
 	public void setSigmaAmountWarning(int sigmaAmountWarning) {
 		this.sigmaAmountWarning = sigmaAmountWarning;
 	}
-
-	/**
-	 * Gets {@link #windowSize}.
-	 *
-	 * @return {@link #windowSize}
-	 */
-	public int getWindowSize() {
-		return this.windowSize;
-	}
-
-	/**
-	 * Sets {@link #windowSize}.
-	 *
-	 * @param windowSize
-	 *            New value for {@link #windowSize}
-	 */
-	public void setWindowSize(int windowSize) {
-		this.windowSize = windowSize;
-	}
-
 }

@@ -10,6 +10,18 @@ public class MetricFilter {
 
 	private double lowerLimit = Double.NaN;
 
+	public MetricFilter() {
+	}
+
+	/**
+	 * @param upperLimit
+	 * @param lowerLimit
+	 */
+	public MetricFilter(double upperLimit, double lowerLimit) {
+		this.upperLimit = upperLimit;
+		this.lowerLimit = lowerLimit;
+	}
+
 	/**
 	 * Gets {@link #upperLimit}.
 	 *
