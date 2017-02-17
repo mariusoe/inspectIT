@@ -3,10 +3,10 @@ package rocks.inspectit.server.anomaly.threshold.impl;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import rocks.inspectit.server.anomaly.definition.threshold.FixedThresholdDefinition;
-import rocks.inspectit.server.anomaly.processing.AnomalyProcessingContext;
+import rocks.inspectit.server.anomaly.processing.ProcessingContext;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
 import rocks.inspectit.server.anomaly.threshold.UnsupportedThresholdTypeException;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.FixedThresholdDefinition;
 
 /**
  * @author Marius Oehler
@@ -20,7 +20,7 @@ public class FixedThreshold extends AbstractThreshold<FixedThresholdDefinition> 
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void process(AnomalyProcessingContext context, long time) {
+	public void process(ProcessingContext context, long time) {
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class FixedThreshold extends AbstractThreshold<FixedThresholdDefinition> 
 	 * {@inheritDoc}
 	 */
 	@Override
-	public double getThreshold(AnomalyProcessingContext context, ThresholdType type) {
+	public double getThreshold(ProcessingContext context, ThresholdType type) {
 		switch (type) {
 		case UPPER_CRITICAL:
 			return getDefinition().getUpperCriticalThreshold();

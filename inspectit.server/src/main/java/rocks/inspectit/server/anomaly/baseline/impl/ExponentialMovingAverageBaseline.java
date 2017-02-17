@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
-import rocks.inspectit.server.anomaly.definition.baseline.ExponentialMovingAverageBaselineDefinition;
 import rocks.inspectit.server.anomaly.metric.MetricFilter;
-import rocks.inspectit.server.anomaly.processing.AnomalyProcessingContext;
+import rocks.inspectit.server.anomaly.processing.ProcessingContext;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold.ThresholdType;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.ExponentialMovingAverageBaselineDefinition;
 
 /**
  * @author Marius Oehler
@@ -28,12 +28,17 @@ public class ExponentialMovingAverageBaseline extends AbstractBaseline<Exponenti
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void process(AnomalyProcessingContext context, long time) {
+	public void process(ProcessingContext context, long time) {
 		long aggregationWindow = context.getConfiguration().getIntervalLongProcessing() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S;
 
 		MetricFilter filter = new MetricFilter();
-		if (context.isWarmedUp() && getDefinition().isExcludeCriticalData()) {
-			filter.setUpperLimit(context.getThreshold().getThreshold(context, ThresholdType.UPPER_CRITICAL));
+		if (context.isWarmedUp()) {
+			// TODO check for thd
+			if (getDefinition().isExcludeWarningData()) {
+				filter.setUpperLimit(context.getThreshold().getThreshold(context, ThresholdType.UPPER_WARNING));
+			} else if (getDefinition().isExcludeCriticalData()) {
+				filter.setUpperLimit(context.getThreshold().getThreshold(context, ThresholdType.UPPER_CRITICAL));
+			}
 		}
 
 		double value = context.getMetricProvider().getValue(filter, time, aggregationWindow, TimeUnit.SECONDS);

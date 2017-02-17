@@ -1,4 +1,4 @@
-package rocks.inspectit.server.anomaly.definition;
+package rocks.inspectit.shared.cs.ci.anomaly.definition;
 
 /**
  * @author Marius Oehler

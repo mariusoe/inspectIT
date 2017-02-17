@@ -1,6 +1,6 @@
-package rocks.inspectit.server.anomaly.definition.threshold;
+package rocks.inspectit.shared.cs.ci.anomaly.definition.threshold;
 
-import rocks.inspectit.server.anomaly.definition.AbstractDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.AbstractDefinition;
 
 /**
  * @author Marius Oehler

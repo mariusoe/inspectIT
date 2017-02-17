@@ -37,7 +37,7 @@ public class AnomalyDetectionSystem {
 
 
 	@Autowired
-	private AnomalyProcessor anomalyProcessor;
+	private AnomalyProcessorController anomalyProcessor;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -49,6 +49,6 @@ public class AnomalyDetectionSystem {
 	public void start() {
 		anomalyProcessor.initialize();
 
-		executorService.scheduleAtFixedRate(anomalyProcessor, 0, PROCESSING_INTERVAL_S, TimeUnit.SECONDS);
+		executorService.scheduleAtFixedRate(anomalyProcessor, PROCESSING_INTERVAL_S, PROCESSING_INTERVAL_S, TimeUnit.SECONDS);
 	}
 }

@@ -1,11 +1,17 @@
-package rocks.inspectit.server.anomaly.definition.metric;
+package rocks.inspectit.shared.cs.ci.anomaly.definition.metric;
 
 import java.util.Map;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Marius Oehler
  *
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "anomaly-influx-metric")
 public class InfluxDBMetricDefinition extends MetricDefinition {
 
 	public enum Function {

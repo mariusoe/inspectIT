@@ -1,4 +1,4 @@
-package rocks.inspectit.server.anomaly.classification;
+package rocks.inspectit.server.anomaly;
 
 /**
  * @author Marius Oehler

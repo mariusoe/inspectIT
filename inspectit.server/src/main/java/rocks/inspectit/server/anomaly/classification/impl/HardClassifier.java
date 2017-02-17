@@ -6,11 +6,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
+import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
-import rocks.inspectit.server.anomaly.classification.HealthStatus;
-import rocks.inspectit.server.anomaly.definition.classification.HardClassifierDefinition;
-import rocks.inspectit.server.anomaly.processing.AnomalyProcessingContext;
+import rocks.inspectit.server.anomaly.processing.ProcessingContext;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold.ThresholdType;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.HardClassifierDefinition;
 
 /**
  * @author Marius Oehler
@@ -24,7 +24,7 @@ public class HardClassifier extends AbstractClassifier<HardClassifierDefinition>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public HealthStatus classify(AnomalyProcessingContext context, long time) {
+	public HealthStatus classify(ProcessingContext context, long time) {
 		if (!context.isWarmedUp()) {
 			return HealthStatus.UNKNOWN;
 		}
@@ -34,6 +34,10 @@ public class HardClassifier extends AbstractClassifier<HardClassifierDefinition>
 		double value = context.getMetricProvider().getValue(time, timeWindow, TimeUnit.SECONDS);
 
 		// TODO check if thresholds are provided
+
+		if (Double.isNaN(value)) {
+			return HealthStatus.UNKNOWN;
+		}
 
 		if ((context.getThreshold().getThreshold(context, ThresholdType.LOWER_CRITICAL) > value) || (context.getThreshold().getThreshold(context, ThresholdType.UPPER_CRITICAL) < value)) {
 			return HealthStatus.CRITICAL;

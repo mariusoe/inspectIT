@@ -1,9 +1,15 @@
-package rocks.inspectit.server.anomaly.definition.threshold;
+package rocks.inspectit.shared.cs.ci.anomaly.definition.threshold;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Marius Oehler
  *
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "anomaly-standard-deviation-threshold")
 public class StandardDeviationThresholdDefinition extends ThresholdDefinition {
 
 	private boolean excludeCriticalData;

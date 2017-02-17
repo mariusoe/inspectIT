@@ -1,17 +1,17 @@
 package rocks.inspectit.server.anomaly.processing;
 
+import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
-import rocks.inspectit.server.anomaly.classification.HealthStatus;
-import rocks.inspectit.server.anomaly.configuration.AnomalyDetectionConfiguration;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfiguration;
 
 /**
  * @author Marius Oehler
  *
  */
-public class AnomalyProcessingContext {
+public class ProcessingContext {
 
 	private AnomalyDetectionConfiguration configuration;
 
@@ -26,6 +26,7 @@ public class AnomalyProcessingContext {
 	private AbstractClassifier<?> classifier;
 
 	private HealthStatus healthStatus = HealthStatus.UNKNOWN;
+
 
 	/**
 	 * Gets {@link #healthStatus}.

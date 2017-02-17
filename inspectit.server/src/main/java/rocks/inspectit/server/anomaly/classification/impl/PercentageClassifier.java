@@ -7,13 +7,13 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
+import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
-import rocks.inspectit.server.anomaly.classification.HealthStatus;
-import rocks.inspectit.server.anomaly.definition.classification.PercentageClassifierDefinition;
 import rocks.inspectit.server.anomaly.metric.MetricFilter;
-import rocks.inspectit.server.anomaly.processing.AnomalyProcessingContext;
+import rocks.inspectit.server.anomaly.processing.ProcessingContext;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold.ThresholdType;
 import rocks.inspectit.shared.all.spring.logger.Log;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.PercentageClassifierDefinition;
 
 /**
  * @author Marius Oehler
@@ -30,7 +30,7 @@ public class PercentageClassifier extends AbstractClassifier<PercentageClassifie
 	 * {@inheritDoc}
 	 */
 	@Override
-	public HealthStatus classify(AnomalyProcessingContext context, long time) {
+	public HealthStatus classify(ProcessingContext context, long time) {
 		if (!context.isWarmedUp()) {
 			return HealthStatus.UNKNOWN;
 		}

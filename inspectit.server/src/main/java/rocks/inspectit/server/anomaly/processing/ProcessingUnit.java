@@ -8,25 +8,26 @@ import org.influxdb.dto.Point;
 import org.influxdb.dto.Point.Builder;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
+import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
-import rocks.inspectit.server.anomaly.classification.HealthStatus;
-import rocks.inspectit.server.anomaly.configuration.AnomalyDetectionConfiguration;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold.ThresholdType;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.spring.logger.Log;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfiguration;
 
 /**
  * @author Marius Oehler
  *
  */
 @Component
-public class AnomalyProcessingUnit {
+@Scope("prototype")
+public class ProcessingUnit implements IAnomalyProcessor {
 
 	@Log
 	private Logger log;
@@ -34,7 +35,9 @@ public class AnomalyProcessingUnit {
 	@Autowired
 	InfluxDBDao influx;
 
-	private AnomalyProcessingContext context = new AnomalyProcessingContext();
+	private ProcessingContext context = new ProcessingContext();
+
+	private String groupId;
 
 	@PostConstruct
 	private void postConstruct() {
@@ -50,31 +53,19 @@ public class AnomalyProcessingUnit {
 		context.setConfiguration(configuration);
 	}
 
-	private long alignTime(long time, long align, TimeUnit unit) {
-		return time - (time % unit.toMillis(align));
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void initialize(long time) {
+		process(time);
 	}
 
-	public void initialize() {
-		log.info("start init");
-
-		influx.query("DROP MEASUREMENT inspectit_anomaly");
-
-		long currentTime = System.currentTimeMillis();
-		long time = currentTime - context.getConfiguration().getTimeTravelDuration(TimeUnit.MILLISECONDS);
-
-		time = alignTime(time, AnomalyDetectionSystem.PROCESSING_INTERVAL_S, TimeUnit.SECONDS);
-
-		while (time < currentTime) {
-			process(time);
-
-			time += TimeUnit.SECONDS.toMillis(AnomalyDetectionSystem.PROCESSING_INTERVAL_S);
-		}
-
-		log.info("done init");
-
-	}
-
-	private void process(long time) {
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void process(long time) {
 		log.debug("iteration {}", context.getIterationCounter());
 
 		if ((context.getIterationCounter() % context.getConfiguration().getIntervalLongProcessing()) == 0) {
@@ -83,6 +74,17 @@ public class AnomalyProcessingUnit {
 
 		if ((context.getIterationCounter() % context.getConfiguration().getIntervalShortProcessing()) == 0) {
 			processShort(time);
+		}
+
+		// ###########
+		Builder builder = preparePointBuilder(time);
+		// ###########
+
+		builder.tag("health_status", context.getHealthStatus().toString());
+
+		// ###########
+		if (builder != null) {
+			influx.insert(builder.build());
 		}
 
 		context.incrementInterationCounter();
@@ -101,15 +103,12 @@ public class AnomalyProcessingUnit {
 
 		context.getBaseline().process(context, time);
 		context.getThreshold().process(context, time);
-
-		writeData(time);
 	}
 
-	private void writeData(long time) {
+	private Builder preparePointBuilder(long time) {
 		Builder builder = Point.measurement("inspectit_anomaly").time(time, TimeUnit.MILLISECONDS);
 		builder.tag("configuration_id", context.getConfiguration().getId());
-
-		builder.tag("health_status", context.getHealthStatus().toString());
+		builder.tag("configuration_group_id", groupId);
 
 		boolean builderIsEmpty = true;
 
@@ -129,14 +128,11 @@ public class AnomalyProcessingUnit {
 			}
 		}
 
-		if (!builderIsEmpty) {
-			influx.insert(builder.build());
+		if (builderIsEmpty) {
+			return null;
+		} else {
+			return builder;
 		}
-	}
-
-	public void process() {
-		long time = System.currentTimeMillis();
-		process(time);
 	}
 
 	/**
@@ -167,4 +163,21 @@ public class AnomalyProcessingUnit {
 		context.setClassifier(classifier);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public HealthStatus getHealthStatus() {
+		return context.getHealthStatus();
+	}
+
+	/**
+	 * Sets {@link #groupId}.
+	 *
+	 * @param groupId
+	 *            New value for {@link #groupId}
+	 */
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
 }

@@ -47,6 +47,7 @@ import rocks.inspectit.shared.cs.ci.AlertingDefinition;
 import rocks.inspectit.shared.cs.ci.BusinessContextDefinition;
 import rocks.inspectit.shared.cs.ci.Environment;
 import rocks.inspectit.shared.cs.ci.Profile;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfigurationGroup;
 import rocks.inspectit.shared.cs.ci.export.ConfigurationInterfaceImportData;
 import rocks.inspectit.shared.cs.jaxb.ISchemaVersionAware;
 import rocks.inspectit.shared.cs.jaxb.JAXBTransformator;
@@ -623,6 +624,28 @@ public class ConfigurationInterfaceManager {
 		}
 	}
 
+	// ************************************************************
+	// ************************************************************
+	// ************************************************************
+
+	public AnomalyDetectionConfigurationGroup createAnomalyDetectionConfigurationGroup(AnomalyDetectionConfigurationGroup configurationGroup) throws JAXBException, IOException {
+		// alertingDefinition.setId(getRandomUUIDString());
+		// alertingDefinition.setCreatedDate(new Date());
+
+		// existingAlertingDefinitions.put(alertingDefinition.getId(), alertingDefinition);
+		saveAnomalyDetectionConfigurationGroup(configurationGroup);
+
+		// eventPublisher.publishEvent(new
+		// AbstractAlertingDefinitionEvent.AlertingDefinitionCreatedEvent(this,
+		// alertingDefinition));
+
+		return configurationGroup;
+	}
+
+	// ************************************************************
+	// ************************************************************
+	// ************************************************************
+
 	/**
 	 * Returns the bytes for the given import data consisted out of given environments and profiles.
 	 * These bytes can be saved directly to export file.
@@ -909,6 +932,10 @@ public class ConfigurationInterfaceManager {
 	 */
 	private void saveAlertingDefinition(AlertingDefinition alertingDefinition) throws JAXBException, IOException {
 		transformator.marshall(pathResolver.getAlertingDefinitionFilePath(alertingDefinition), alertingDefinition, getRelativeToSchemaPath(pathResolver.getDefaultCiPath()).toString());
+	}
+
+	private void saveAnomalyDetectionConfigurationGroup(AnomalyDetectionConfigurationGroup configurationGroup) throws JAXBException, IOException {
+		transformator.marshall(pathResolver.getAnomalyDetectionConfigurationFilePath(configurationGroup), configurationGroup, getRelativeToSchemaPath(pathResolver.getDefaultCiPath()).toString());
 	}
 
 	/**

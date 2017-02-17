@@ -1,0 +1,39 @@
+!configurationGroup
+configurations: 
+- !rocks.inspectit.shared.cs.anomaly.configuration.AnomalyDetectionConfiguration
+   id: e7d9caad-130c-40d5-81b6-d96785491832
+   baselineDefinition: !exponentialMovingAverageBaseline
+      excludeCriticalData: true
+      excludeWarningData: true
+      smoothingFactor: 0.05
+      trendSmoothingFactor: 0.01
+   classifierDefinition: !rocks.inspectit.shared.cs.anomaly.definition.classification.HardClassifierDefinition {}
+   metricDefinition: !rocks.inspectit.shared.cs.anomaly.definition.metric.InfluxDBMetricDefinition
+      field: duration
+      function: MEAN
+      measurement: businessTransactions
+      tagMap: !com.google.common.collect.SingletonImmutableBiMap
+         generated: yes
+   thresholdDefinition: !standardDeviationThreshold
+      excludeCriticalData: true
+      exponentialSmoothed: true
+      sigmaAmountCritical: 4
+      sigmaAmountWarning: 3
+      smoothingFactor: 0.01
+      windowSize: 24
+- !rocks.inspectit.shared.cs.anomaly.configuration.AnomalyDetectionConfiguration
+   id: ee4039ef-845e-4dc7-9f47-0f85341271a2
+   baselineDefinition: !rocks.inspectit.shared.cs.anomaly.definition.baseline.MovingAverageBaselineDefinition
+      excludeCriticalData: true
+      windowSize: 24
+   classifierDefinition: !rocks.inspectit.shared.cs.anomaly.definition.classification.HardClassifierDefinition {}
+   metricDefinition: !rocks.inspectit.shared.cs.anomaly.definition.metric.InfluxDBMetricDefinition
+      field: duration
+      function: MEAN
+      measurement: businessTransactions
+      tagMap: !com.google.common.collect.SingletonImmutableBiMap
+         generated: yes
+   thresholdDefinition: !rocks.inspectit.shared.cs.anomaly.definition.threshold.FixedThresholdDefinition
+      lowerCriticalThreshold: 45.0
+groupId: 0fec65e8-78e9-4eb9-a611-72354248c66e
+timeTravelDuration: 604800

@@ -203,7 +203,7 @@ dependencies {
 		'javax.activation:activation:1.1.1',
 		'javax.mail:mail:1.4',
 		
-		'org.apache.commons:commons-math3:3.6.1'
+		'org.apache.commons:commons-math3:3.6.1',
 	)
 		
 	serverTest (

@@ -9,6 +9,28 @@
 
   <xs:element name="and" type="andExpression"/>
 
+  <xs:element name="anomaly-configuration" type="anomalyDetectionConfiguration"/>
+
+  <xs:element name="anomaly-configuration-group" type="anomalyDetectionConfigurationGroup"/>
+
+  <xs:element name="anomaly-exponential-moving-average-baseline" type="exponentialMovingAverageBaselineDefinition"/>
+
+  <xs:element name="anomaly-fixed-threshold" type="fixedThresholdDefinition"/>
+
+  <xs:element name="anomaly-hard-classifier" type="hardClassifierDefinition"/>
+
+  <xs:element name="anomaly-influx-metric" type="influxDBMetricDefinition"/>
+
+  <xs:element name="anomaly-moving-average-baseline" type="movingAverageBaselineDefinition"/>
+
+  <xs:element name="anomaly-percentage-classifier" type="percentageClassifierDefinition"/>
+
+  <xs:element name="anomaly-percentage-derivation-threshold" type="percentageDerivationThresholdDefinition"/>
+
+  <xs:element name="anomaly-percentile-threshold" type="percentileThresholdDefinition"/>
+
+  <xs:element name="anomaly-standard-deviation-threshold" type="standardDeviationThresholdDefinition"/>
+
   <xs:element name="applicaction" type="applicationDefinition"/>
 
   <xs:element name="boolean" type="booleanExpression"/>
@@ -824,6 +846,198 @@
     <xs:attribute name="domain" type="xs:string" use="required"/>
   </xs:complexType>
 
+  <xs:complexType name="anomalyDetectionConfiguration">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="metricDefinition" type="metricDefinition" minOccurs="0"/>
+      <xs:element name="baselineDefinition" type="baselineDefinition" minOccurs="0"/>
+      <xs:element name="thresholdDefinition" type="thresholdDefinition" minOccurs="0"/>
+      <xs:element name="classifierDefinition" type="classifierDefinition" minOccurs="0"/>
+      <xs:element name="warmupLength" type="xs:int"/>
+      <xs:element name="intervalShortProcessing" type="xs:int"/>
+      <xs:element name="intervalLongProcessing" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="metricDefinition" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="abstractDefinition">
+        <xs:sequence>
+          <xs:element name="isAggregated" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="abstractDefinition" abstract="true">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="exponentialMovingAverageBaselineDefinition">
+    <xs:complexContent>
+      <xs:extension base="baselineDefinition">
+        <xs:sequence>
+          <xs:element name="smoothingFactor" type="xs:double"/>
+          <xs:element name="trendSmoothingFactor" type="xs:double"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="baselineDefinition" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="abstractDefinition">
+        <xs:sequence>
+          <xs:element name="excludeCriticalData" type="xs:boolean"/>
+          <xs:element name="excludeWarningData" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="movingAverageBaselineDefinition">
+    <xs:complexContent>
+      <xs:extension base="baselineDefinition">
+        <xs:sequence>
+          <xs:element name="windowSize" type="xs:int"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="hardClassifierDefinition">
+    <xs:complexContent>
+      <xs:extension base="classifierDefinition">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="classifierDefinition">
+    <xs:complexContent>
+      <xs:extension base="abstractDefinition">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="percentageClassifierDefinition">
+    <xs:complexContent>
+      <xs:extension base="classifierDefinition">
+        <xs:sequence>
+          <xs:element name="percentageWarningLevel" type="xs:double"/>
+          <xs:element name="percentageCriticalLevel" type="xs:double"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="influxDBMetricDefinition">
+    <xs:complexContent>
+      <xs:extension base="metricDefinition">
+        <xs:sequence>
+          <xs:element name="measurement" type="xs:string" minOccurs="0"/>
+          <xs:element name="tagMap">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="key" minOccurs="0" type="xs:string"/>
+                      <xs:element name="value" minOccurs="0" type="xs:string"/>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="function" type="function" minOccurs="0"/>
+          <xs:element name="field" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="fixedThresholdDefinition">
+    <xs:complexContent>
+      <xs:extension base="thresholdDefinition">
+        <xs:sequence>
+          <xs:element name="upperCriticalThreshold" type="xs:double"/>
+          <xs:element name="upperWarningThreshold" type="xs:double"/>
+          <xs:element name="lowerWarningThreshold" type="xs:double"/>
+          <xs:element name="lowerCriticalThreshold" type="xs:double"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="thresholdDefinition" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="abstractDefinition">
+        <xs:sequence>
+          <xs:element name="windowSize" type="xs:int"/>
+          <xs:element name="exponentialSmoothed" type="xs:boolean"/>
+          <xs:element name="smoothingFactor" type="xs:double"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="percentageDerivationThresholdDefinition">
+    <xs:complexContent>
+      <xs:extension base="thresholdDefinition">
+        <xs:sequence>
+          <xs:element name="percentageDerivationCritical" type="xs:double"/>
+          <xs:element name="percentageDerivationWarning" type="xs:double"/>
+          <xs:element name="excludeCriticalData" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="percentileThresholdDefinition">
+    <xs:complexContent>
+      <xs:extension base="thresholdDefinition">
+        <xs:sequence>
+          <xs:element name="upperCriticalPercentile" type="xs:double"/>
+          <xs:element name="upperWarningPercentile" type="xs:double"/>
+          <xs:element name="lowerWarningPercentile" type="xs:double"/>
+          <xs:element name="lowerCriticalPercentile" type="xs:double"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="standardDeviationThresholdDefinition">
+    <xs:complexContent>
+      <xs:extension base="thresholdDefinition">
+        <xs:sequence>
+          <xs:element name="excludeCriticalData" type="xs:boolean"/>
+          <xs:element name="excludeWarningData" type="xs:boolean"/>
+          <xs:element name="sigmaAmountCritical" type="xs:int"/>
+          <xs:element name="sigmaAmountWarning" type="xs:int"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="anomalyDetectionConfigurationGroup">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="groupId" type="xs:string" minOccurs="0"/>
+      <xs:element name="mode" type="mode" minOccurs="0"/>
+      <xs:element name="configurationGroups" type="anomalyDetectionConfigurationGroup" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="configurations" type="anomalyDetectionConfiguration" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="timeTravelDuration" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="abstractDefinitionAware" abstract="true">
+    <xs:sequence>
+      <xs:element name="definition" type="abstractDefinition" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
   <xs:complexType name="configurationInterfaceImportData">
     <xs:sequence>
       <xs:element name="profiles" minOccurs="0">
@@ -857,6 +1071,20 @@
       <xs:enumeration value="equals"/>
       <xs:enumeration value="regex"/>
       <xs:enumeration value="starts-with"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="function">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="MEAN"/>
+      <xs:enumeration value="MEDIAN"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="mode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="HIGHEST"/>
+      <xs:enumeration value="LOWEST"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

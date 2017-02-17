@@ -2,8 +2,8 @@ package rocks.inspectit.server.anomaly.metric;
 
 import java.util.concurrent.TimeUnit;
 
-import rocks.inspectit.server.anomaly.definition.AbstractDefinitionAware;
-import rocks.inspectit.server.anomaly.definition.metric.MetricDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.AbstractDefinitionAware;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.metric.MetricDefinition;
 
 /**
  * @author Marius Oehler

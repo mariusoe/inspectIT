@@ -8,12 +8,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
-import rocks.inspectit.server.anomaly.definition.threshold.StandardDeviationThresholdDefinition;
 import rocks.inspectit.server.anomaly.metric.MetricFilter;
-import rocks.inspectit.server.anomaly.processing.AnomalyProcessingContext;
+import rocks.inspectit.server.anomaly.processing.ProcessingContext;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
 import rocks.inspectit.server.anomaly.threshold.UnsupportedThresholdTypeException;
 import rocks.inspectit.shared.all.spring.logger.Log;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.StandardDeviationThresholdDefinition;
 
 /**
  * @author Marius Oehler
@@ -38,7 +38,7 @@ public class StandardDeviationThreshold extends AbstractThreshold<StandardDeviat
 		statistics.setWindowSize(getDefinition().getWindowSize());
 	}
 
-	private MetricFilter getMetricFilter(AnomalyProcessingContext context) {
+	private MetricFilter getMetricFilter(ProcessingContext context) {
 		MetricFilter filter = new MetricFilter();
 
 		if (getDefinition().isExcludeWarningData()) {
@@ -66,7 +66,7 @@ public class StandardDeviationThreshold extends AbstractThreshold<StandardDeviat
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void process(AnomalyProcessingContext context, long time) {
+	public void process(ProcessingContext context, long time) {
 		long aggregationWindow = AnomalyDetectionSystem.PROCESSING_INTERVAL_S * context.getConfiguration().getIntervalLongProcessing();
 
 		MetricFilter filter = getMetricFilter(context);
@@ -88,7 +88,7 @@ public class StandardDeviationThreshold extends AbstractThreshold<StandardDeviat
 	 * {@inheritDoc}
 	 */
 	@Override
-	public double getThreshold(AnomalyProcessingContext context, ThresholdType type) {
+	public double getThreshold(ProcessingContext context, ThresholdType type) {
 		switch (type) {
 		case LOWER_CRITICAL:
 			double lowerCritical = context.getBaseline().getBaseline() - (standardDeviation * getDefinition().getSigmaAmountCritical());

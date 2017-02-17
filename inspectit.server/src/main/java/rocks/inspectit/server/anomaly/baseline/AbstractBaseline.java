@@ -1,8 +1,8 @@
 package rocks.inspectit.server.anomaly.baseline;
 
-import rocks.inspectit.server.anomaly.definition.AbstractDefinitionAware;
-import rocks.inspectit.server.anomaly.definition.baseline.BaselineDefinition;
-import rocks.inspectit.server.anomaly.processing.AnomalyProcessingContext;
+import rocks.inspectit.server.anomaly.processing.ProcessingContext;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.AbstractDefinitionAware;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.BaselineDefinition;
 
 /**
  * @author Marius Oehler
@@ -10,7 +10,7 @@ import rocks.inspectit.server.anomaly.processing.AnomalyProcessingContext;
  */
 public abstract class AbstractBaseline<E extends BaselineDefinition> extends AbstractDefinitionAware<E> {
 
-	public abstract void process(AnomalyProcessingContext context, long time);
+	public abstract void process(ProcessingContext context, long time);
 
 	public abstract double getBaseline();
 }

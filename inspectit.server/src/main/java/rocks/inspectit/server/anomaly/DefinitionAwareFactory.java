@@ -10,17 +10,6 @@ import rocks.inspectit.server.anomaly.baseline.impl.MovingAverageBaseline;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
 import rocks.inspectit.server.anomaly.classification.impl.HardClassifier;
 import rocks.inspectit.server.anomaly.classification.impl.PercentageClassifier;
-import rocks.inspectit.server.anomaly.definition.AbstractDefinition;
-import rocks.inspectit.server.anomaly.definition.AbstractDefinitionAware;
-import rocks.inspectit.server.anomaly.definition.baseline.ExponentialMovingAverageBaselineDefinition;
-import rocks.inspectit.server.anomaly.definition.baseline.MovingAverageBaselineDefinition;
-import rocks.inspectit.server.anomaly.definition.classification.HardClassifierDefinition;
-import rocks.inspectit.server.anomaly.definition.classification.PercentageClassifierDefinition;
-import rocks.inspectit.server.anomaly.definition.metric.InfluxDBMetricDefinition;
-import rocks.inspectit.server.anomaly.definition.threshold.FixedThresholdDefinition;
-import rocks.inspectit.server.anomaly.definition.threshold.PercentageDerivationThresholdDefinition;
-import rocks.inspectit.server.anomaly.definition.threshold.PercentileThresholdDefinition;
-import rocks.inspectit.server.anomaly.definition.threshold.StandardDeviationThresholdDefinition;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.anomaly.metric.impl.InfluxDBMetricProvider;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
@@ -28,6 +17,17 @@ import rocks.inspectit.server.anomaly.threshold.impl.FixedThreshold;
 import rocks.inspectit.server.anomaly.threshold.impl.PercentageDerivationThreshold;
 import rocks.inspectit.server.anomaly.threshold.impl.PercentileThreshold;
 import rocks.inspectit.server.anomaly.threshold.impl.StandardDeviationThreshold;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.AbstractDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.AbstractDefinitionAware;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.ExponentialMovingAverageBaselineDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.MovingAverageBaselineDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.HardClassifierDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.PercentageClassifierDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.metric.InfluxDBMetricDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.FixedThresholdDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.PercentageDerivationThresholdDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.PercentileThresholdDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.StandardDeviationThresholdDefinition;
 
 /**
  * @author Marius Oehler
