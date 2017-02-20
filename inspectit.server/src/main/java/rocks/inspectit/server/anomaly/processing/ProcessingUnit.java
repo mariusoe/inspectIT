@@ -80,7 +80,7 @@ public class ProcessingUnit implements IAnomalyProcessor {
 		Builder builder = preparePointBuilder(time);
 		// ###########
 
-		builder.tag("health_status", context.getHealthStatus().toString());
+
 
 		// ###########
 		if (builder != null) {
@@ -109,6 +109,7 @@ public class ProcessingUnit implements IAnomalyProcessor {
 		Builder builder = Point.measurement("inspectit_anomaly").time(time, TimeUnit.MILLISECONDS);
 		builder.tag("configuration_id", context.getConfiguration().getId());
 		builder.tag("configuration_group_id", groupId);
+		builder.tag("health_status", context.getHealthStatus().toString());
 
 		boolean builderIsEmpty = true;
 

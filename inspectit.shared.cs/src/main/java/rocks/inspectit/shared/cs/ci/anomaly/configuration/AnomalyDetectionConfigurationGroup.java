@@ -12,8 +12,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.common.collect.ImmutableMap;
 
-import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.ExponentialMovingAverageBaselineDefinition;
-import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.MovingAverageBaselineDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.HoltWintersBaselineDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.NonBaselineDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.HardClassifierDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.metric.InfluxDBMetricDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.metric.InfluxDBMetricDefinition.Function;
@@ -44,11 +44,18 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		// baselineDefinition.setWindowSize(24); // * 5min = 2h
 		// baselineDefinition.setExcludeCriticalData(true);
 
-		ExponentialMovingAverageBaselineDefinition baselineDefinition = new ExponentialMovingAverageBaselineDefinition();
-		baselineDefinition.setSmoothingFactor(0.05D);
-		baselineDefinition.setTrendSmoothingFactor(0.01D);
-		baselineDefinition.setExcludeCriticalData(true);
-		baselineDefinition.setExcludeWarningData(true);
+		// ExponentialMovingAverageBaselineDefinition baselineDefinition = new
+		// ExponentialMovingAverageBaselineDefinition();
+		// baselineDefinition.setSmoothingFactor(0.05D);
+		// baselineDefinition.setTrendSmoothingFactor(0.01D);
+		// baselineDefinition.setExcludeCriticalData(true);
+		// baselineDefinition.setExcludeWarningData(true);
+
+		HoltWintersBaselineDefinition baselineDefinition = new HoltWintersBaselineDefinition();
+		baselineDefinition.setSmoothingFactor(0.1D);
+		baselineDefinition.setTrendSmoothingFactor(0.1D);
+		baselineDefinition.setSeasonalSmoothingFactor(0.1D);
+		baselineDefinition.setSeasonalLength(288);
 
 		// #####################################
 
@@ -108,9 +115,7 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		metricDefinitionTwo.setFunction(Function.MEAN);
 		metricDefinitionTwo.setField("duration");
 
-		MovingAverageBaselineDefinition baselineDefinitionTwo = new MovingAverageBaselineDefinition();
-		baselineDefinitionTwo.setWindowSize(24); // * 5min = 2h
-		baselineDefinitionTwo.setExcludeCriticalData(false);
+		NonBaselineDefinition baselineDefinitionTwo = new NonBaselineDefinition();
 
 		FixedThresholdDefinition thresholdDefinitionTwo = new FixedThresholdDefinition();
 		thresholdDefinitionTwo.setUpperWarningThreshold(100);

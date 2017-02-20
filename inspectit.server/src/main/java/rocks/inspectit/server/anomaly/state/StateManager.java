@@ -60,7 +60,10 @@ public class StateManager {
 
 		HealthTransition healthTransition = getHealthTransition(continuousHealth, healthStatus);
 
+		writeAnomalyState(time, unitGroup, healthTransition);
+	}
 
+	private void writeAnomalyState(long time, ProcessingUnitGroup unitGroup, HealthTransition healthTransition) {
 		Builder builder = Point.measurement("inspectit_anomaly_status");
 
 		long timeDelta = 0L;
@@ -82,6 +85,7 @@ public class StateManager {
 
 		builder.time(time - timeDelta, TimeUnit.MILLISECONDS);
 		builder.tag("event", healthTransition.toString());
+		builder.tag("configuration_group_id", unitGroup.getConfigurationGroup().getGroupId());
 
 		influx.insert(builder.build());
 	}

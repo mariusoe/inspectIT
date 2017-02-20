@@ -6,7 +6,9 @@ import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.baseline.impl.ExponentialMovingAverageBaseline;
+import rocks.inspectit.server.anomaly.baseline.impl.HoltWintersBaseline;
 import rocks.inspectit.server.anomaly.baseline.impl.MovingAverageBaseline;
+import rocks.inspectit.server.anomaly.baseline.impl.NonBaseline;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
 import rocks.inspectit.server.anomaly.classification.impl.HardClassifier;
 import rocks.inspectit.server.anomaly.classification.impl.PercentageClassifier;
@@ -20,7 +22,9 @@ import rocks.inspectit.server.anomaly.threshold.impl.StandardDeviationThreshold;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.AbstractDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.AbstractDefinitionAware;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.ExponentialMovingAverageBaselineDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.HoltWintersBaselineDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.MovingAverageBaselineDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.NonBaselineDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.HardClassifierDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.PercentageClassifierDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.metric.InfluxDBMetricDefinition;
@@ -51,6 +55,10 @@ public class DefinitionAwareFactory {
 			return create(MovingAverageBaseline.class, definition);
 		} else if (definition instanceof ExponentialMovingAverageBaselineDefinition) {
 			return create(ExponentialMovingAverageBaseline.class, definition);
+		} else if (definition instanceof NonBaselineDefinition) {
+			return create(NonBaseline.class, definition);
+		} else if (definition instanceof HoltWintersBaselineDefinition) {
+			return create(HoltWintersBaseline.class, definition);
 		} else {
 			throw new UnsupportedBaselineException(definition.getClass());
 		}
