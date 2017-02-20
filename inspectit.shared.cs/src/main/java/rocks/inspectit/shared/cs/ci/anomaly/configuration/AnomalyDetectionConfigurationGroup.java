@@ -107,14 +107,14 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		metricDefinitionTwo.setMeasurement("businessTransactions");
 		metricDefinitionTwo.setFunction(Function.MEAN);
 		metricDefinitionTwo.setField("duration");
-		metricDefinitionTwo.setTagMap(ImmutableMap.of("generated", "yes"));
 
 		MovingAverageBaselineDefinition baselineDefinitionTwo = new MovingAverageBaselineDefinition();
 		baselineDefinitionTwo.setWindowSize(24); // * 5min = 2h
-		baselineDefinitionTwo.setExcludeCriticalData(true);
+		baselineDefinitionTwo.setExcludeCriticalData(false);
 
 		FixedThresholdDefinition thresholdDefinitionTwo = new FixedThresholdDefinition();
-		thresholdDefinitionTwo.setLowerCriticalThreshold(45);
+		thresholdDefinitionTwo.setUpperWarningThreshold(100);
+		thresholdDefinitionTwo.setUpperCriticalThreshold(125);
 
 		HardClassifierDefinition classifierDefinitionTwo = new HardClassifierDefinition();
 
@@ -128,31 +128,76 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 
 		AnomalyDetectionConfigurationGroup configurationGroup = new AnomalyDetectionConfigurationGroup();
 		configurationGroup.setName("test-configuration");
-		configurationGroup.setMode(Mode.HIGHEST);
+		configurationGroup.setMode(Mode.WORST);
 		configurationGroup.getConfigurations().add(configuration);
 		configurationGroup.getConfigurations().add(configurationTwo);
 		configurationGroup.setTimeTravelDuration(7, TimeUnit.DAYS);
+
+		configurationGroup.setAnomalyStartCount(2);
+		configurationGroup.setAnomalyEndCount(8);
 
 		return configurationGroup;
 	}
 
 	public enum Mode {
-		HIGHEST,
+		WORST,
 
-		LOWEST;
+		BEST;
 	}
 
 	private String name;
 
 	private String groupId = UUID.randomUUID().toString();
 
-	private Mode mode = Mode.HIGHEST;
+	private Mode mode = Mode.WORST;
 
 	private List<AnomalyDetectionConfigurationGroup> configurationGroups = new ArrayList<>();
 
 	private List<AnomalyDetectionConfiguration> configurations = new ArrayList<>();
 
 	private long timeTravelDuration;
+
+	private int anomalyStartCount;
+
+	private int anomalyEndCount;
+
+	/**
+	 * Gets {@link #anomalyEndCount}.
+	 *
+	 * @return {@link #anomalyEndCount}
+	 */
+	public int getAnomalyEndCount() {
+		return this.anomalyEndCount;
+	}
+
+	/**
+	 * Sets {@link #anomalyEndCount}.
+	 *
+	 * @param anomalyEndCount
+	 *            New value for {@link #anomalyEndCount}
+	 */
+	public void setAnomalyEndCount(int anomalyEndCount) {
+		this.anomalyEndCount = anomalyEndCount;
+	}
+
+	/**
+	 * Gets {@link #anomalyStartCount}.
+	 *
+	 * @return {@link #anomalyStartCount}
+	 */
+	public int getAnomalyStartCount() {
+		return this.anomalyStartCount;
+	}
+
+	/**
+	 * Sets {@link #anomalyStartCount}.
+	 *
+	 * @param anomalyStartCount
+	 *            New value for {@link #anomalyStartCount}
+	 */
+	public void setAnomalyStartCount(int anomalyStartCount) {
+		this.anomalyStartCount = anomalyStartCount;
+	}
 
 	/**
 	 * Gets {@link #name}.

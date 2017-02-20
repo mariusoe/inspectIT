@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.HealthStatus;
+import rocks.inspectit.server.anomaly.processing.health.BestHealthDeclaration;
+import rocks.inspectit.server.anomaly.processing.health.WorstHealthDeclaration;
 import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfigurationGroup;
 
@@ -26,43 +28,27 @@ public class ProcessingUnitGroup implements IAnomalyProcessor {
 
 	private AnomalyDetectionConfigurationGroup configurationGroup;
 
+	private HealthStatus currentHealthStatus = HealthStatus.UNKNOWN;
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public HealthStatus getHealthStatus() {
+		return currentHealthStatus;
+	}
+
+	private void updateHealthStatus() {
 		switch (configurationGroup.getMode()) {
-		case HIGHEST:
-			return healthOnce();
-		case LOWEST:
-			return healthAll();
+		case WORST:
+			currentHealthStatus = WorstHealthDeclaration.INSTANCE.declareHelthStatus(processors);
+			break;
+		case BEST:
+			currentHealthStatus = BestHealthDeclaration.INSTANCE.declareHelthStatus(processors);
+			break;
 		default:
 			throw new RuntimeException("Unknown mode for health");
 		}
-	}
-
-	private HealthStatus healthOnce() {
-		HealthStatus status = HealthStatus.UNKNOWN;
-
-		for (IAnomalyProcessor processor : processors) {
-			if (processor.getHealthStatus().ordinal() > status.ordinal()) {
-				status = processor.getHealthStatus();
-			}
-		}
-
-		return status;
-	}
-
-	private HealthStatus healthAll() {
-		HealthStatus status = HealthStatus.UNKNOWN;
-
-		for (IAnomalyProcessor processor : processors) {
-			if ((status == HealthStatus.UNKNOWN) || (processor.getHealthStatus().ordinal() < status.ordinal())) {
-				status = processor.getHealthStatus();
-			}
-		}
-
-		return status;
 	}
 
 	/**
@@ -92,6 +78,8 @@ public class ProcessingUnitGroup implements IAnomalyProcessor {
 		for (IAnomalyProcessor processor : processors) {
 			processor.process(time);
 		}
+
+		updateHealthStatus();
 	}
 
 	/**
@@ -102,6 +90,8 @@ public class ProcessingUnitGroup implements IAnomalyProcessor {
 		for (IAnomalyProcessor processor : processors) {
 			processor.initialize(time);
 		}
+
+		updateHealthStatus();
 	}
 
 	/**
@@ -111,21 +101,5 @@ public class ProcessingUnitGroup implements IAnomalyProcessor {
 	 */
 	public List<IAnomalyProcessor> getProcessors() {
 		return this.processors;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		StringBuilder b = new StringBuilder();
-
-		for (int i = 0; i < processors.size(); i++) {
-			b.append("\t processor ").append(i).append(": ").append(processors.get(i).getHealthStatus());
-		}
-
-		b.append("\t total: ").append(getHealthStatus());
-
-		return b.toString();
 	}
 }

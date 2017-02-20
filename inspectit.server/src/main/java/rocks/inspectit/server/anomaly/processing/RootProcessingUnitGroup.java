@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
 import rocks.inspectit.server.anomaly.HealthStatus;
+import rocks.inspectit.server.anomaly.state.StateManager;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.spring.logger.Log;
 
@@ -28,15 +29,20 @@ public class RootProcessingUnitGroup extends ProcessingUnitGroup {
 	@Autowired
 	InfluxDBDao influx;
 
+	@Autowired
+	StateManager stateManager;
+
 	public void process() {
 		long time = System.currentTimeMillis();
 		super.process(time);
+		stateManager.update(time, this);
 		writeGroupHealth(time);
 	}
 
 	public void initialize() {
 		influx.query("DROP MEASUREMENT inspectit_anomaly");
 		influx.query("DROP MEASUREMENT inspectit_anomaly_groups");
+		influx.query("DROP MEASUREMENT inspectit_anomaly_status");
 
 		log.info("start init of group");
 
@@ -49,7 +55,9 @@ public class RootProcessingUnitGroup extends ProcessingUnitGroup {
 
 
 			super.initialize(time);
+			stateManager.update(time, this);
 			writeGroupHealth(time);
+
 
 			time += TimeUnit.SECONDS.toMillis(AnomalyDetectionSystem.PROCESSING_INTERVAL_S);
 		}
@@ -63,6 +71,10 @@ public class RootProcessingUnitGroup extends ProcessingUnitGroup {
 		builder.tag("name", getConfigurationGroup().getName());
 
 		builder.tag("health_status", getHealthStatus().toString());
+
+		// if (healthTransition != HealthTransition.NO_CHANGE) {
+		// builder.tag("health_transition", healthTransition.toString());
+		// }
 
 		builder.addField("unknown", (getHealthStatus() == HealthStatus.UNKNOWN) ? 1 : 0);
 		builder.addField("normal", (getHealthStatus() == HealthStatus.NORMAL) ? 1 : 0);

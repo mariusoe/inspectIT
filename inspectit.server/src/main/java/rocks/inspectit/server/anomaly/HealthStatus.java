@@ -5,7 +5,7 @@ package rocks.inspectit.server.anomaly;
  *
  */
 public enum HealthStatus {
-
+	// have to be ordered
 	UNKNOWN, NORMAL, WARNING, CRITICAL;
 
 }
