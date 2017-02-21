@@ -30,6 +30,8 @@ public class InfluxDBMetricProvider extends AbstractMetricProvider<InfluxDBMetri
 	@Autowired
 	private InfluxDBDao influx;
 
+	private double currentValue = Double.NaN;
+
 	/**
 	 * {@inheritDoc}
 	 */

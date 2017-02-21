@@ -18,6 +18,7 @@ import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.HardClassi
 import rocks.inspectit.shared.cs.ci.anomaly.definition.metric.InfluxDBMetricDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.metric.InfluxDBMetricDefinition.Function;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.FixedThresholdDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.PercentageDerivationThresholdDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.StandardDeviationThresholdDefinition;
 
 /**
@@ -33,7 +34,7 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 
 		InfluxDBMetricDefinition metricDefinition = new InfluxDBMetricDefinition();
 		metricDefinition.setMeasurement("businessTransactions");
-		metricDefinition.setFunction(Function.MEAN);
+		metricDefinition.setFunction(Function.COUNT);
 		metricDefinition.setField("duration");
 		metricDefinition.setTagMap(ImmutableMap.of("generated", "yes"));
 
@@ -63,14 +64,15 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 
 		// #####################################
 
-		StandardDeviationThresholdDefinition thresholdDefinition = new StandardDeviationThresholdDefinition();
-		thresholdDefinition.setWindowSize(24);
-		thresholdDefinition.setSigmaAmountCritical(4);
-		thresholdDefinition.setSigmaAmountWarning(3);
-		thresholdDefinition.setExcludeCriticalData(true);
-		thresholdDefinition.setExcludeWarningData(false);
-		thresholdDefinition.setExponentialSmoothed(true);
-		thresholdDefinition.setSmoothingFactor(0.01D);
+		// StandardDeviationThresholdDefinition thresholdDefinition = new
+		// StandardDeviationThresholdDefinition();
+		// thresholdDefinition.setWindowSize(24);
+		// thresholdDefinition.setSigmaAmountCritical(4);
+		// thresholdDefinition.setSigmaAmountWarning(3);
+		// thresholdDefinition.setExcludeCriticalData(true);
+		// thresholdDefinition.setExcludeWarningData(false);
+		// thresholdDefinition.setExponentialSmoothed(true);
+		// thresholdDefinition.setSmoothingFactor(0.01D);
 
 		// PercentileThresholdDefinition thresholdDefinition = new PercentileThresholdDefinition();
 		// thresholdDefinition.setUpperCriticalPercentile(99);
@@ -86,11 +88,10 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		// thresholdDefinition.setUpperWarningThreshold(150D);
 		// thresholdDefinition.setLowerCriticalThreshold(50);
 
-		// PercentageDerivationThresholdDefinition thresholdDefinition = new
-		// PercentageDerivationThresholdDefinition();
-		// thresholdDefinition.setPercentageDerivationWarning(0.05D);
-		// thresholdDefinition.setPercentageDerivationCritical(0.2D);
-		// thresholdDefinition.setWindowSize(6);
+		PercentageDerivationThresholdDefinition thresholdDefinition = new PercentageDerivationThresholdDefinition();
+		thresholdDefinition.setPercentageDerivationWarning(0.25D);
+		thresholdDefinition.setPercentageDerivationCritical(0.50D);
+		thresholdDefinition.setWindowSize(6);
 
 		// #####################################
 
@@ -107,6 +108,7 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		configuration.setBaselineDefinition(baselineDefinition);
 		configuration.setThresholdDefinition(thresholdDefinition);
 		configuration.setClassifierDefinition(classifierDefinition);
+		configuration.setOperateOnAggregation(true);
 
 		// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 		// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -135,11 +137,42 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 		// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
+		AnomalyDetectionConfiguration configurationThree = new AnomalyDetectionConfiguration();
+
+		InfluxDBMetricDefinition metricDefinitionThree = new InfluxDBMetricDefinition();
+		metricDefinitionThree.setMeasurement("businessTransactions");
+		metricDefinitionThree.setFunction(Function.MEAN);
+		metricDefinitionThree.setField("duration");
+
+		HistoricalBaselineDefinition baselineDefinitionThree = new HistoricalBaselineDefinition();
+		baselineDefinitionThree.setSeasonLength(288);
+		baselineDefinitionThree.setSmoothingFactor(0.1D);
+
+		StandardDeviationThresholdDefinition thresholdDefinitionThree = new StandardDeviationThresholdDefinition();
+		thresholdDefinitionThree.setWindowSize(24);
+		thresholdDefinitionThree.setSigmaAmountCritical(4);
+		thresholdDefinitionThree.setSigmaAmountWarning(3);
+		thresholdDefinitionThree.setExcludeCriticalData(true);
+		thresholdDefinitionThree.setExcludeWarningData(false);
+		thresholdDefinitionThree.setExponentialSmoothed(true);
+		thresholdDefinitionThree.setSmoothingFactor(0.01D);
+
+		HardClassifierDefinition classifierDefinitionThree = new HardClassifierDefinition();
+
+		configurationThree.setMetricDefinition(metricDefinitionThree);
+		configurationThree.setBaselineDefinition(baselineDefinitionThree);
+		configurationThree.setClassifierDefinition(classifierDefinitionThree);
+		configurationThree.setThresholdDefinition(thresholdDefinitionThree);
+
+		// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+		// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
 		AnomalyDetectionConfigurationGroup configurationGroup = new AnomalyDetectionConfigurationGroup();
 		configurationGroup.setName("test-configuration");
 		configurationGroup.setMode(Mode.WORST);
 		configurationGroup.getConfigurations().add(configuration);
 		configurationGroup.getConfigurations().add(configurationTwo);
+		configurationGroup.getConfigurations().add(configurationThree);
 		configurationGroup.setTimeTravelDuration(7, TimeUnit.DAYS);
 
 		configurationGroup.setAnomalyStartCount(2);

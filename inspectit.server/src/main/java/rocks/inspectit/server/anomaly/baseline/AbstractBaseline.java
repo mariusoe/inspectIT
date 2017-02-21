@@ -20,28 +20,37 @@ public abstract class AbstractBaseline<E extends BaselineDefinition> extends Abs
 	public abstract double getBaseline();
 
 	public double getValue(ProcessingContext context, long time) {
-		long aggregationWindow = context.getConfiguration().getIntervalLongProcessing() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S;
-
-		MetricFilter filter = new MetricFilter();
-
-		if (getDefinition().isExcludeWarningData()) {
-			if (context.getThreshold().providesThreshold(ThresholdType.UPPER_WARNING)) {
-				filter.setUpperLimit(context.getThreshold().getThreshold(context, ThresholdType.UPPER_WARNING));
+		if (context.getConfiguration().isOperateOnAggregation()) {
+			if (context.getValueStatistics().getN() > 0) {
+				return context.getValueStatistics().getMean();
+			} else {
+				return Double.NaN;
 			}
-			if (context.getThreshold().providesThreshold(ThresholdType.LOWER_WARNING)) {
-				filter.setLowerLimit(context.getThreshold().getThreshold(context, ThresholdType.LOWER_WARNING));
+		} else {
+			int intervalLength = context.getConfiguration().getIntervalShortProcessing() * context.getConfiguration().getIntervalLongProcessingMultiplier();
+			long aggregationWindow = intervalLength * AnomalyDetectionSystem.PROCESSING_INTERVAL_S;
+
+			MetricFilter filter = new MetricFilter();
+
+			if (getDefinition().isExcludeWarningData()) {
+				if (context.getThreshold().providesThreshold(ThresholdType.UPPER_WARNING)) {
+					filter.setUpperLimit(context.getThreshold().getThreshold(context, ThresholdType.UPPER_WARNING));
+				}
+				if (context.getThreshold().providesThreshold(ThresholdType.LOWER_WARNING)) {
+					filter.setLowerLimit(context.getThreshold().getThreshold(context, ThresholdType.LOWER_WARNING));
+				}
 			}
+
+			if (getDefinition().isExcludeCriticalData()) {
+				if (context.getThreshold().providesThreshold(ThresholdType.UPPER_CRITICAL) && Double.isNaN(filter.getUpperLimit())) {
+					filter.setUpperLimit(context.getThreshold().getThreshold(context, ThresholdType.UPPER_CRITICAL));
+				}
+				if (context.getThreshold().providesThreshold(ThresholdType.LOWER_CRITICAL) && Double.isNaN(filter.getUpperLimit())) {
+					filter.setLowerLimit(context.getThreshold().getThreshold(context, ThresholdType.LOWER_CRITICAL));
+				}
+			}
+
+			return context.getMetricProvider().getValue(filter, time, aggregationWindow, TimeUnit.SECONDS);
 		}
-
-		if (getDefinition().isExcludeCriticalData()) {
-			if (context.getThreshold().providesThreshold(ThresholdType.UPPER_CRITICAL) && Double.isNaN(filter.getUpperLimit())) {
-				filter.setUpperLimit(context.getThreshold().getThreshold(context, ThresholdType.UPPER_CRITICAL));
-			}
-			if (context.getThreshold().providesThreshold(ThresholdType.LOWER_CRITICAL) && Double.isNaN(filter.getUpperLimit())) {
-				filter.setLowerLimit(context.getThreshold().getThreshold(context, ThresholdType.LOWER_CRITICAL));
-			}
-		}
-
-		return context.getMetricProvider().getValue(filter, time, aggregationWindow, TimeUnit.SECONDS);
 	}
 }

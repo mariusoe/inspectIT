@@ -29,7 +29,8 @@ public class PercentileThreshold extends AbstractThreshold<PercentileThresholdDe
 	 */
 	@Override
 	public void process(ProcessingContext context, long time) {
-		long timeWindow = AnomalyDetectionSystem.PROCESSING_INTERVAL_S * context.getConfiguration().getIntervalLongProcessing();
+		int intervalLength = context.getConfiguration().getIntervalShortProcessing() * context.getConfiguration().getIntervalLongProcessingMultiplier();
+		long timeWindow = AnomalyDetectionSystem.PROCESSING_INTERVAL_S * intervalLength;
 
 		if (!Double.isNaN(getDefinition().getUpperCriticalPercentile())) {
 			double value = context.getMetricProvider().getPercentile(getDefinition().getUpperCriticalPercentile(), time, timeWindow, TimeUnit.SECONDS);

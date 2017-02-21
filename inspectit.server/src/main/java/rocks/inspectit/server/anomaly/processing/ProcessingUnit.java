@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
 import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
@@ -66,28 +67,34 @@ public class ProcessingUnit implements IAnomalyProcessor {
 	 */
 	@Override
 	public void process(long time) {
-		log.debug("iteration {}", context.getIterationCounter());
+		int shortInterval = context.getConfiguration().getIntervalShortProcessing();
+		int longInterval = context.getConfiguration().getIntervalShortProcessing() * context.getConfiguration().getIntervalLongProcessingMultiplier();
 
-		if ((context.getIterationCounter() % context.getConfiguration().getIntervalLongProcessing()) == 0) {
-			processLong(time);
-		}
+		if ((context.getIterationCounter() % shortInterval) == 0) {
+			context.getValueStatistics().addValue(getCurrentValue(time));
 
-		if ((context.getIterationCounter() % context.getConfiguration().getIntervalShortProcessing()) == 0) {
+			if ((context.getIterationCounter() % longInterval) == 0) {
+				processLong(time);
+			}
+
 			processShort(time);
-		}
 
-		// ###########
-		Builder builder = preparePointBuilder(time);
-		// ###########
+			// ###########
+			Builder builder = preparePointBuilder(time);
+			// ###########
 
-
-
-		// ###########
-		if (builder != null) {
-			influx.insert(builder.build());
+			if (builder != null) {
+				influx.insert(builder.build());
+			}
 		}
 
 		context.incrementInterationCounter();
+	}
+
+	private double getCurrentValue(long time) {
+		long timeWindow = context.getConfiguration().getIntervalShortProcessing() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S;
+
+		return context.getMetricProvider().getValue(time, timeWindow, TimeUnit.SECONDS);
 	}
 
 	private void processShort(long time) {
@@ -112,6 +119,10 @@ public class ProcessingUnit implements IAnomalyProcessor {
 		builder.tag("health_status", context.getHealthStatus().toString());
 
 		boolean builderIsEmpty = true;
+
+		if (!Double.isNaN(context.getCurrentValue())) {
+			builder.addField("value", context.getCurrentValue());
+		}
 
 		double baseline = context.getBaseline().getBaseline();
 		if (!Double.isNaN(baseline)) {

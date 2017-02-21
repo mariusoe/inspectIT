@@ -1,18 +1,11 @@
 package rocks.inspectit.server.anomaly.baseline.impl;
 
-import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.slf4j.Logger;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
-import rocks.inspectit.server.anomaly.metric.MetricFilter;
 import rocks.inspectit.server.anomaly.processing.ProcessingContext;
-import rocks.inspectit.server.anomaly.threshold.AbstractThreshold.ThresholdType;
-import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.MovingAverageBaselineDefinition;
 
 /**
@@ -22,9 +15,6 @@ import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.MovingAverageBas
 @Component
 @Scope("prototype")
 public class MovingAverageBaseline extends AbstractBaseline<MovingAverageBaselineDefinition> {
-
-	@Log
-	private Logger log;
 
 	private DescriptiveStatistics statistics = new DescriptiveStatistics();
 
@@ -41,15 +31,7 @@ public class MovingAverageBaseline extends AbstractBaseline<MovingAverageBaselin
 	 */
 	@Override
 	public void process(ProcessingContext context, long time) {
-		long aggregationWindow = context.getConfiguration().getIntervalLongProcessing() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S;
-
-		MetricFilter filter = new MetricFilter();
-		if (getDefinition().isExcludeCriticalData()) {
-			filter.setUpperLimit(context.getThreshold().getThreshold(context, ThresholdType.UPPER_CRITICAL));
-			filter.setLowerLimit(context.getThreshold().getThreshold(context, ThresholdType.LOWER_CRITICAL));
-		}
-
-		double value = context.getMetricProvider().getValue(filter, time, aggregationWindow, TimeUnit.SECONDS);
+		double value = getValue(context, time);
 
 		if (!Double.isNaN(value)) {
 			statistics.addValue(value);

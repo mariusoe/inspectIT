@@ -21,6 +21,8 @@ public class HistoricalBaseline extends AbstractBaseline<HistoricalBaselineDefin
 
 	private int currentIndex = 0;
 
+	// private double currentValue = Double.NaN;
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -32,6 +34,13 @@ public class HistoricalBaseline extends AbstractBaseline<HistoricalBaselineDefin
 			nextIndex();
 			return;
 		}
+
+		// if (Double.isNaN(currentValue)) {
+		// currentValue = value;
+		// } else {
+		// currentValue = (getDefinition().getSmoothingFactor() * value) + ((1 -
+		// getDefinition().getSmoothingFactor()) * currentValue);
+		// }
 
 		if (Double.isNaN(valueStore[currentIndex])) {
 			valueStore[currentIndex] = value;
@@ -55,7 +64,11 @@ public class HistoricalBaseline extends AbstractBaseline<HistoricalBaselineDefin
 
 		// return previous baseline if one exists
 		if (Double.isNaN(baseline)) {
-			baseline = valueStore[(currentIndex - 1) % getDefinition().getSeasonLength()];
+			int targetIndex = (currentIndex - 1) % getDefinition().getSeasonLength();
+			if (targetIndex < 0) {
+				targetIndex += getDefinition().getSeasonLength();
+			}
+			baseline = valueStore[targetIndex];
 		}
 
 		return baseline;

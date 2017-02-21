@@ -18,6 +18,7 @@ public class NonBaseline extends AbstractBaseline<NonBaselineDefinition> {
 	 */
 	@Override
 	public void process(ProcessingContext context, long time) {
+		// nothing to do here
 	}
 
 	/**
@@ -33,5 +34,6 @@ public class NonBaseline extends AbstractBaseline<NonBaselineDefinition> {
 	 */
 	@Override
 	protected void onDefinitionUpdate() {
+		// nothing to do here
 	}
 }

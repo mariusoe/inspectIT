@@ -30,6 +30,8 @@ public class AnomalyDetectionConfiguration implements Serializable {
 
 	private ClassifierDefinition classifierDefinition;
 
+	private boolean operateOnAggregation = false;
+
 	// = 15s * 240 = 1h
 	private int warmupLength = 240;
 
@@ -37,7 +39,26 @@ public class AnomalyDetectionConfiguration implements Serializable {
 	private int intervalShortProcessing = 1;
 
 	// 20 = 15s * 20 = 5min
-	private int intervalLongProcessing = 20;
+	private int intervalLongProcessingMultiplier = 20;
+
+	/**
+	 * Gets {@link #operateOnAggregation}.
+	 * 
+	 * @return {@link #operateOnAggregation}
+	 */
+	public boolean isOperateOnAggregation() {
+		return this.operateOnAggregation;
+	}
+
+	/**
+	 * Sets {@link #operateOnAggregation}.
+	 * 
+	 * @param operateOnAggregation
+	 *            New value for {@link #operateOnAggregation}
+	 */
+	public void setOperateOnAggregation(boolean operateOnAggregation) {
+		this.operateOnAggregation = operateOnAggregation;
+	}
 
 	/**
 	 * Gets {@link #classifierDefinition}.
@@ -153,15 +174,6 @@ public class AnomalyDetectionConfiguration implements Serializable {
 	}
 
 	/**
-	 * Gets {@link #intervalLongProcessing}.
-	 *
-	 * @return {@link #intervalLongProcessing}
-	 */
-	public int getIntervalLongProcessing() {
-		return this.intervalLongProcessing;
-	}
-
-	/**
 	 * Sets {@link #intervalShortProcessing}.
 	 *
 	 * @param intervalShortProcessing
@@ -172,13 +184,21 @@ public class AnomalyDetectionConfiguration implements Serializable {
 	}
 
 	/**
-	 * Sets {@link #intervalLongProcessing}.
+	 * Gets {@link #intervalLongProcessingMultiplier}.
 	 *
-	 * @param intervalLongProcessing
-	 *            New value for {@link #intervalLongProcessing}
+	 * @return {@link #intervalLongProcessingMultiplier}
 	 */
-	public void setIntervalLongProcessing(int intervalLongProcessing) {
-		this.intervalLongProcessing = intervalLongProcessing;
+	public int getIntervalLongProcessingMultiplier() {
+		return this.intervalLongProcessingMultiplier;
 	}
 
+	/**
+	 * Sets {@link #intervalLongProcessingMultiplier}.
+	 *
+	 * @param intervalLongProcessingMultiplier
+	 *            New value for {@link #intervalLongProcessingMultiplier}
+	 */
+	public void setIntervalLongProcessingMultiplier(int intervalLongProcessingMultiplier) {
+		this.intervalLongProcessingMultiplier = intervalLongProcessingMultiplier;
+	}
 }

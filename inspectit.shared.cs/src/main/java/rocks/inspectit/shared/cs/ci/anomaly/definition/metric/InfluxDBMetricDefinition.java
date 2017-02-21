@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class InfluxDBMetricDefinition extends MetricDefinition {
 
 	public enum Function {
-		MEAN, MEDIAN;
+		MEAN, MEDIAN, COUNT;
 	};
 
 	private String measurement;

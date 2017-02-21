@@ -1,11 +1,8 @@
 package rocks.inspectit.server.anomaly.classification.impl;
 
-import java.util.concurrent.TimeUnit;
-
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
 import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
 import rocks.inspectit.server.anomaly.processing.ProcessingContext;
@@ -29,9 +26,7 @@ public class HardClassifier extends AbstractClassifier<HardClassifierDefinition>
 			return HealthStatus.UNKNOWN;
 		}
 
-		long timeWindow = context.getConfiguration().getIntervalShortProcessing() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S;
-
-		double value = context.getMetricProvider().getValue(time, timeWindow, TimeUnit.SECONDS);
+		double value = context.getCurrentValue();
 
 		// TODO check if thresholds are provided
 
