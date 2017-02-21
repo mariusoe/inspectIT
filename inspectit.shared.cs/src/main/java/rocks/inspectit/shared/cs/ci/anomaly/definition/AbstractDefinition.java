@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.ExponentialMovingAverageBaselineDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.HistoricalBaselineDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.HoltWintersBaselineDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.MovingAverageBaselineDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.NonBaselineDefinition;
@@ -25,7 +26,7 @@ import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.StandardDeviati
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso({ ExponentialMovingAverageBaselineDefinition.class, MovingAverageBaselineDefinition.class, HardClassifierDefinition.class, PercentageClassifierDefinition.class,
 	InfluxDBMetricDefinition.class, FixedThresholdDefinition.class, PercentageDerivationThresholdDefinition.class, PercentileThresholdDefinition.class,
-		StandardDeviationThresholdDefinition.class, NonBaselineDefinition.class, HoltWintersBaselineDefinition.class })
+	StandardDeviationThresholdDefinition.class, NonBaselineDefinition.class, HoltWintersBaselineDefinition.class, HistoricalBaselineDefinition.class })
 public abstract class AbstractDefinition implements Serializable {
 
 }

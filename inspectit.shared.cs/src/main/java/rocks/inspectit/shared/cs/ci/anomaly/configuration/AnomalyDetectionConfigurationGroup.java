@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.common.collect.ImmutableMap;
 
-import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.HoltWintersBaselineDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.HistoricalBaselineDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.NonBaselineDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.HardClassifierDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.metric.InfluxDBMetricDefinition;
@@ -51,11 +51,15 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		// baselineDefinition.setExcludeCriticalData(true);
 		// baselineDefinition.setExcludeWarningData(true);
 
-		HoltWintersBaselineDefinition baselineDefinition = new HoltWintersBaselineDefinition();
+		// HoltWintersBaselineDefinition baselineDefinition = new HoltWintersBaselineDefinition();
+		// baselineDefinition.setSmoothingFactor(0.01D);
+		// baselineDefinition.setTrendSmoothingFactor(0.05D);
+		// baselineDefinition.setSeasonalSmoothingFactor(0.1D);
+		// baselineDefinition.setSeasonalLength(288);
+
+		HistoricalBaselineDefinition baselineDefinition = new HistoricalBaselineDefinition();
+		baselineDefinition.setSeasonLength(288);
 		baselineDefinition.setSmoothingFactor(0.1D);
-		baselineDefinition.setTrendSmoothingFactor(0.1D);
-		baselineDefinition.setSeasonalSmoothingFactor(0.1D);
-		baselineDefinition.setSeasonalLength(288);
 
 		// #####################################
 

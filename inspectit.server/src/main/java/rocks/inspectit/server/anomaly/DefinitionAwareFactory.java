@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.baseline.impl.ExponentialMovingAverageBaseline;
+import rocks.inspectit.server.anomaly.baseline.impl.HistoricalBaseline;
 import rocks.inspectit.server.anomaly.baseline.impl.HoltWintersBaseline;
 import rocks.inspectit.server.anomaly.baseline.impl.MovingAverageBaseline;
 import rocks.inspectit.server.anomaly.baseline.impl.NonBaseline;
@@ -22,6 +23,7 @@ import rocks.inspectit.server.anomaly.threshold.impl.StandardDeviationThreshold;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.AbstractDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.AbstractDefinitionAware;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.ExponentialMovingAverageBaselineDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.HistoricalBaselineDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.HoltWintersBaselineDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.MovingAverageBaselineDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.NonBaselineDefinition;
@@ -59,6 +61,8 @@ public class DefinitionAwareFactory {
 			return create(NonBaseline.class, definition);
 		} else if (definition instanceof HoltWintersBaselineDefinition) {
 			return create(HoltWintersBaseline.class, definition);
+		} else if (definition instanceof HistoricalBaselineDefinition) {
+			return create(HistoricalBaseline.class, definition);
 		} else {
 			throw new UnsupportedBaselineException(definition.getClass());
 		}
