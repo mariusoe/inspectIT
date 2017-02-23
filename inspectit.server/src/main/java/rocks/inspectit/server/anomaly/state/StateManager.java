@@ -14,6 +14,7 @@ import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.constants.Measurements;
 import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroup;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
+import rocks.inspectit.shared.all.util.Pair;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.anomaly.AnomalyDefinition;
 
 /**
@@ -43,21 +44,28 @@ public class StateManager {
 		if (context == null) {
 			context = initialize(unitGroup);
 		}
-
 		context.addHealthStatus(unitGroup.getHealthStatus());
 
-		HealthStatus continuousHealth = context.getContinuousHealthStauts();
-		HealthStatus healthStatus;
-		if ((continuousHealth == HealthStatus.UNKNOWN) || (continuousHealth == HealthStatus.NORMAL)) {
-			healthStatus = context.getLowestHealthStatus(anomalyDefinition.getStartCount());
-		} else {
-			healthStatus = context.getHighestHealthStatus(anomalyDefinition.getEndCount());
-		}
-		context.setContinuousHealthStauts(healthStatus);
+		Pair<HealthStatus, HealthStatus> healthStatus = updateHealthStatus(context, anomalyDefinition);
 
-		HealthTransition healthTransition = getHealthTransition(continuousHealth, healthStatus);
+		HealthTransition healthTransition = getHealthTransition(healthStatus.getFirst(), healthStatus.getSecond());
 
 		writeAnomalyState(time, unitGroup, healthTransition);
+	}
+
+	private Pair<HealthStatus, HealthStatus> updateHealthStatus(StateContext context, AnomalyDefinition anomalyDefinition) {
+		HealthStatus currentHealthStatus = context.getHealthStauts();
+
+		HealthStatus nextHealthStatus;
+		if ((currentHealthStatus == HealthStatus.UNKNOWN) || (currentHealthStatus == HealthStatus.NORMAL)) {
+			nextHealthStatus = context.getLowestHealthStatus(anomalyDefinition.getStartCount());
+		} else {
+			nextHealthStatus = context.getHighestHealthStatus(anomalyDefinition.getEndCount());
+		}
+
+		context.setHealthStauts(nextHealthStatus);
+
+		return new Pair<HealthStatus, HealthStatus>(currentHealthStatus, nextHealthStatus);
 	}
 
 	private StateContext initialize(ProcessingUnitGroup unitGroup) {

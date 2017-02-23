@@ -212,7 +212,7 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		configurationGroup.setMode(Mode.WORST);
 		// configurationGroup.getConfigurations().add(configuration); // pct
 		// configurationGroup.getConfigurations().add(configurationTwo); // fixed
-		configurationGroup.getConfigurations().add(configurationThree); // stddev
+		// configurationGroup.getConfigurations().add(configurationThree); // stddev
 		configurationGroup.getConfigurations().add(configurationFour); // stddev
 		configurationGroup.setTimeTravelDuration(7, TimeUnit.DAYS);
 

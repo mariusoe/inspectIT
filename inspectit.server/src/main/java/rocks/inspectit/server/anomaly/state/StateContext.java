@@ -18,7 +18,26 @@ public class StateContext {
 
 	private int maxHealthListSize = 1;
 
-	private HealthStatus continuousHealthStauts = HealthStatus.UNKNOWN;
+	private HealthStatus healthStauts = HealthStatus.UNKNOWN;
+
+	/**
+	 * Gets {@link #healthStauts}.
+	 * 
+	 * @return {@link #healthStauts}
+	 */
+	public HealthStatus getHealthStauts() {
+		return this.healthStauts;
+	}
+
+	/**
+	 * Sets {@link #healthStauts}.
+	 * 
+	 * @param healthStauts
+	 *            New value for {@link #healthStauts}
+	 */
+	public void setHealthStauts(HealthStatus healthStauts) {
+		this.healthStauts = healthStauts;
+	}
 
 	public HealthStatus getLowestHealthStatus(int elements) {
 		HealthStatus returnStatus = HealthStatus.UNKNOWN;
@@ -52,24 +71,6 @@ public class StateContext {
 		return returnStatus;
 	}
 
-	/**
-	 * Gets {@link #continuousHealthStauts}.
-	 *
-	 * @return {@link #continuousHealthStauts}
-	 */
-	public HealthStatus getContinuousHealthStauts() {
-		return this.continuousHealthStauts;
-	}
-
-	/**
-	 * Sets {@link #continuousHealthStauts}.
-	 *
-	 * @param continuousHealthStauts
-	 *            New value for {@link #continuousHealthStauts}
-	 */
-	public void setContinuousHealthStauts(HealthStatus continuousHealthStauts) {
-		this.continuousHealthStauts = continuousHealthStauts;
-	}
 
 	public void addHealthStatus(HealthStatus status) {
 		healthList.add(status);

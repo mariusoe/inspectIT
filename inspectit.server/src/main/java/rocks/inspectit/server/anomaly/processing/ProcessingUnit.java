@@ -104,6 +104,7 @@ public class ProcessingUnit implements IAnomalyProcessor {
 		boolean builderIsEmpty = true;
 
 		if (!Double.isNaN(context.getMetricProvider().getValue())) {
+			builderIsEmpty = false;
 			builder.addField(Measurements.Data.FIELD_METRIC_AGGREGATION, context.getMetricProvider().getValue());
 		}
 
