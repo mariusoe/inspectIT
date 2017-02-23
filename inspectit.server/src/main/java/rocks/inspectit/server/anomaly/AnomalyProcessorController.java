@@ -1,10 +1,12 @@
 package rocks.inspectit.server.anomaly;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.BeanFactory;
@@ -57,13 +59,13 @@ public class AnomalyProcessorController implements Runnable {
 		// load configurations
 		List<AnomalyDetectionConfigurationGroup> configurationGroups = Collections.singletonList(AnomalyDetectionConfigurationGroup.getTestConfiguration());
 
-		// try {
-		// ciManager.createAnomalyDetectionConfigurationGroup(configurationGroups.get(0));
-		// } catch (JAXBException e) {
-		// e.printStackTrace();
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
+		try {
+			ciManager.createAnomalyDetectionConfigurationGroup(configurationGroups.get(0));
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		for (AnomalyDetectionConfigurationGroup groupConfiguration : configurationGroups) {
 			RootProcessingUnitGroup unitGroup = createProcessingUnitGroup(groupConfiguration);

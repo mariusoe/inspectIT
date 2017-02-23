@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
 import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
+import rocks.inspectit.server.anomaly.constants.Measurements;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold.ThresholdType;
@@ -71,7 +71,7 @@ public class ProcessingUnit implements IAnomalyProcessor {
 		int longInterval = context.getConfiguration().getIntervalShortProcessing() * context.getConfiguration().getIntervalLongProcessingMultiplier();
 
 		if ((context.getIterationCounter() % shortInterval) == 0) {
-			context.getValueStatistics().addValue(getCurrentValue(time));
+			context.getMetricProvider().next(context, time);
 
 			if ((context.getIterationCounter() % longInterval) == 0) {
 				processLong(time);
@@ -79,55 +79,38 @@ public class ProcessingUnit implements IAnomalyProcessor {
 
 			processShort(time);
 
-			// ###########
-			Builder builder = preparePointBuilder(time);
-			// ###########
-
-			if (builder != null) {
-				influx.insert(builder.build());
-			}
+			writeData(time);
 		}
 
 		context.incrementInterationCounter();
 	}
 
-	private double getCurrentValue(long time) {
-		long timeWindow = context.getConfiguration().getIntervalShortProcessing() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S;
-
-		return context.getMetricProvider().getValue(time, timeWindow, TimeUnit.SECONDS);
-	}
-
 	private void processShort(long time) {
-		log.debug("Process data at time {}", time);
-
 		HealthStatus status = context.getClassifier().classify(context, time);
-
 		context.setHealthStatus(status);
 	}
 
 	private void processLong(long time) {
-		log.debug("Process baseline at time {}", time);
-
 		context.getBaseline().process(context, time);
 		context.getThreshold().process(context, time);
 	}
 
-	private Builder preparePointBuilder(long time) {
-		Builder builder = Point.measurement("inspectit_anomaly").time(time, TimeUnit.MILLISECONDS);
-		builder.tag("configuration_id", context.getConfiguration().getId());
-		builder.tag("configuration_group_id", groupId);
-		builder.tag("health_status", context.getHealthStatus().toString());
+	private void writeData(long time) {
+		Builder builder = Point.measurement(Measurements.Data.NAME).time(time, TimeUnit.MILLISECONDS);
+		builder.tag(Measurements.Data.TAG_CONFIGURATION_ID, context.getConfiguration().getId());
+		builder.tag(Measurements.Data.TAG_CONFIGURATION_GROUP_ID, groupId);
+		builder.tag(Measurements.Data.TAG_HEALTH_STATUS, context.getHealthStatus().toString());
 
 		boolean builderIsEmpty = true;
 
-		if (!Double.isNaN(context.getCurrentValue())) {
-			builder.addField("value", context.getCurrentValue());
+		if (!Double.isNaN(context.getMetricProvider().getValue())) {
+			builder.addField(Measurements.Data.FIELD_METRIC_AGGREGATION, context.getMetricProvider().getValue());
 		}
 
 		double baseline = context.getBaseline().getBaseline();
 		if (!Double.isNaN(baseline)) {
 			builderIsEmpty = false;
-			builder.addField("baseline", baseline);
+			builder.addField(Measurements.Data.FIELD_BASELINE, baseline);
 		}
 
 		for (ThresholdType type : ThresholdType.values()) {
@@ -135,15 +118,31 @@ public class ProcessingUnit implements IAnomalyProcessor {
 				double threshold = context.getThreshold().getThreshold(context, type);
 				if (!Double.isNaN(threshold)) {
 					builderIsEmpty = false;
-					builder.addField(type.toString(), threshold);
+
+					String columnName;
+					switch (type) {
+					case LOWER_CRITICAL:
+						columnName = Measurements.Data.FIELD_LOWER_CRITICAL;
+						break;
+					case LOWER_WARNING:
+						columnName = Measurements.Data.FIELD_LOWER_WARNING;
+						break;
+					case UPPER_CRITICAL:
+						columnName = Measurements.Data.FIELD_UPPER_CRITICAL;
+						break;
+					case UPPER_WARNING:
+						columnName = Measurements.Data.FIELD_UPPER_WARNING;
+						break;
+					default:
+						continue;
+					}
+					builder.addField(columnName, threshold);
 				}
 			}
 		}
 
-		if (builderIsEmpty) {
-			return null;
-		} else {
-			return builder;
+		if (!builderIsEmpty) {
+			influx.insert(builder.build());
 		}
 	}
 

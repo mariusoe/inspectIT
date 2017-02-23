@@ -30,8 +30,6 @@ public class AnomalyDetectionConfiguration implements Serializable {
 
 	private ClassifierDefinition classifierDefinition;
 
-	private boolean operateOnAggregation = false;
-
 	// = 15s * 240 = 1h
 	private int warmupLength = 240;
 
@@ -40,25 +38,6 @@ public class AnomalyDetectionConfiguration implements Serializable {
 
 	// 20 = 15s * 20 = 5min
 	private int intervalLongProcessingMultiplier = 20;
-
-	/**
-	 * Gets {@link #operateOnAggregation}.
-	 * 
-	 * @return {@link #operateOnAggregation}
-	 */
-	public boolean isOperateOnAggregation() {
-		return this.operateOnAggregation;
-	}
-
-	/**
-	 * Sets {@link #operateOnAggregation}.
-	 * 
-	 * @param operateOnAggregation
-	 *            New value for {@link #operateOnAggregation}
-	 */
-	public void setOperateOnAggregation(boolean operateOnAggregation) {
-		this.operateOnAggregation = operateOnAggregation;
-	}
 
 	/**
 	 * Gets {@link #classifierDefinition}.
@@ -77,6 +56,7 @@ public class AnomalyDetectionConfiguration implements Serializable {
 	 */
 	public void setClassifierDefinition(ClassifierDefinition classifierDefinition) {
 		this.classifierDefinition = classifierDefinition;
+		this.classifierDefinition.setParentConfiguration(this);
 	}
 
 	/**
@@ -115,6 +95,7 @@ public class AnomalyDetectionConfiguration implements Serializable {
 	 */
 	public void setThresholdDefinition(ThresholdDefinition trhesholdDefinition) {
 		this.thresholdDefinition = trhesholdDefinition;
+		this.thresholdDefinition.setParentConfiguration(this);
 	}
 
 	/**
@@ -143,6 +124,7 @@ public class AnomalyDetectionConfiguration implements Serializable {
 	 */
 	public void setBaselineDefinition(BaselineDefinition baselineDefinition) {
 		this.baselineDefinition = baselineDefinition;
+		this.baselineDefinition.setParentConfiguration(this);
 	}
 
 	/**
@@ -162,6 +144,7 @@ public class AnomalyDetectionConfiguration implements Serializable {
 	 */
 	public void setMetricDefinition(MetricDefinition metricDefinition) {
 		this.metricDefinition = metricDefinition;
+		this.metricDefinition.setParentConfiguration(this);
 	}
 
 	/**

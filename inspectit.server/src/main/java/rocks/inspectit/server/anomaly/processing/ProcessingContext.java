@@ -1,7 +1,5 @@
 package rocks.inspectit.server.anomaly.processing;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-
 import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
@@ -28,25 +26,6 @@ public class ProcessingContext {
 	private AbstractClassifier<?> classifier;
 
 	private HealthStatus healthStatus = HealthStatus.UNKNOWN;
-
-	private DescriptiveStatistics valueStatistics;
-
-	public double getCurrentValue() {
-		if (valueStatistics.getN() <= 0) {
-			return Double.NaN;
-		}
-
-		return valueStatistics.getElement((int) (valueStatistics.getN() - 1));
-	}
-
-	/**
-	 * Gets {@link #valueStatistics}.
-	 *
-	 * @return {@link #valueStatistics}
-	 */
-	public DescriptiveStatistics getValueStatistics() {
-		return this.valueStatistics;
-	}
 
 	/**
 	 * Gets {@link #healthStatus}.
@@ -102,8 +81,6 @@ public class ProcessingContext {
 	 */
 	public void setConfiguration(AnomalyDetectionConfiguration configuration) {
 		this.configuration = configuration;
-
-		valueStatistics = new DescriptiveStatistics(configuration.getIntervalLongProcessingMultiplier());
 	}
 
 	/**

@@ -27,7 +27,7 @@ public class HoltWintersBaseline extends AbstractBaseline<HoltWintersBaselineDef
 	 */
 	@Override
 	public void process(ProcessingContext context, long time) {
-		double value = getValue(context, time);
+		double value = context.getMetricProvider().getIntervalValue();
 
 		if (Double.isNaN(value)) {
 			return;

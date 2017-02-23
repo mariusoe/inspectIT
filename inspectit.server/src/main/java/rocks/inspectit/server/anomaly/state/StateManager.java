@@ -11,8 +11,10 @@ import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
 import rocks.inspectit.server.anomaly.HealthStatus;
+import rocks.inspectit.server.anomaly.constants.Measurements;
 import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroup;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.anomaly.AnomalyDefinition;
 
 /**
  * @author Marius Oehler
@@ -35,16 +37,11 @@ public class StateManager {
 	 * @param rootProcessingUnitGroup
 	 */
 	public void update(long time, ProcessingUnitGroup unitGroup) {
-
 		StateContext context = contextMap.get(unitGroup.getConfigurationGroup().getGroupId());
+		AnomalyDefinition anomalyDefinition = unitGroup.getConfigurationGroup().getAnomalyDefinition();
 
 		if (context == null) {
-			int contextHealthListSize = Math.max(unitGroup.getConfigurationGroup().getAnomalyStartCount(), unitGroup.getConfigurationGroup().getAnomalyEndCount());
-
-			context = new StateContext();
-			context.setMaxHealthListSize(contextHealthListSize);
-
-			contextMap.put(unitGroup.getConfigurationGroup().getGroupId(), context);
+			context = initialize(unitGroup);
 		}
 
 		context.addHealthStatus(unitGroup.getHealthStatus());
@@ -52,9 +49,9 @@ public class StateManager {
 		HealthStatus continuousHealth = context.getContinuousHealthStauts();
 		HealthStatus healthStatus;
 		if ((continuousHealth == HealthStatus.UNKNOWN) || (continuousHealth == HealthStatus.NORMAL)) {
-			healthStatus = context.getLowestHealthStatus(unitGroup.getConfigurationGroup().getAnomalyStartCount());
+			healthStatus = context.getLowestHealthStatus(anomalyDefinition.getStartCount());
 		} else {
-			healthStatus = context.getHighestHealthStatus(unitGroup.getConfigurationGroup().getAnomalyEndCount());
+			healthStatus = context.getHighestHealthStatus(anomalyDefinition.getEndCount());
 		}
 		context.setContinuousHealthStauts(healthStatus);
 
@@ -63,20 +60,31 @@ public class StateManager {
 		writeAnomalyState(time, unitGroup, healthTransition);
 	}
 
+	private StateContext initialize(ProcessingUnitGroup unitGroup) {
+		int contextHealthListSize = Math.max(unitGroup.getConfigurationGroup().getAnomalyDefinition().getStartCount(), unitGroup.getConfigurationGroup().getAnomalyDefinition().getEndCount());
+
+		StateContext context = new StateContext();
+		context.setMaxHealthListSize(contextHealthListSize);
+
+		contextMap.put(unitGroup.getConfigurationGroup().getGroupId(), context);
+
+		return context;
+	}
+
 	private void writeAnomalyState(long time, ProcessingUnitGroup unitGroup, HealthTransition healthTransition) {
-		Builder builder = Point.measurement("inspectit_anomaly_status");
+		Builder builder = Point.measurement(Measurements.Anomalies.NAME);
 
 		long timeDelta = 0L;
 		switch (healthTransition) {
 		case BEGIN:
 		case DOWNGRADE:
 		case UPGRADE:
-			timeDelta = TimeUnit.SECONDS.toMillis(unitGroup.getConfigurationGroup().getAnomalyStartCount() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S);
-			builder.addField("anomaly_active", 1);
+			timeDelta = TimeUnit.SECONDS.toMillis(unitGroup.getConfigurationGroup().getAnomalyDefinition().getStartCount() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S);
+			builder.addField(Measurements.Anomalies.FIELD_ANOMALY_ACTIVE, 1);
 			break;
 		case END:
-			timeDelta = TimeUnit.SECONDS.toMillis(unitGroup.getConfigurationGroup().getAnomalyEndCount() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S);
-			builder.addField("anomaly_active", 0);
+			timeDelta = TimeUnit.SECONDS.toMillis(unitGroup.getConfigurationGroup().getAnomalyDefinition().getEndCount() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S);
+			builder.addField(Measurements.Anomalies.FIELD_ANOMALY_ACTIVE, 0);
 			break;
 		case NO_CHANGE:
 		default:
@@ -84,8 +92,8 @@ public class StateManager {
 		}
 
 		builder.time(time - timeDelta, TimeUnit.MILLISECONDS);
-		builder.tag("event", healthTransition.toString());
-		builder.tag("configuration_group_id", unitGroup.getConfigurationGroup().getGroupId());
+		builder.tag(Measurements.Anomalies.TAG_EVENT, healthTransition.toString());
+		builder.tag(Measurements.Anomalies.TAG_CONFIGURATION_GROUP_ID, unitGroup.getConfigurationGroup().getGroupId());
 
 		influx.insert(builder.build());
 	}

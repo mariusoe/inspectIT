@@ -67,17 +67,12 @@ public class StandardDeviationThreshold extends AbstractThreshold<StandardDeviat
 	 */
 	@Override
 	public void process(ProcessingContext context, long time) {
-		double value;
-		if (context.getConfiguration().isOperateOnAggregation()) {
-			value = context.getValueStatistics().getStandardDeviation();
-		} else {
+		int intervalLength = context.getConfiguration().getIntervalShortProcessing() * context.getConfiguration().getIntervalLongProcessingMultiplier();
+		long aggregationWindow = AnomalyDetectionSystem.PROCESSING_INTERVAL_S * intervalLength;
 
-			int intervalLength = context.getConfiguration().getIntervalShortProcessing() * context.getConfiguration().getIntervalLongProcessingMultiplier();
-			long aggregationWindow = AnomalyDetectionSystem.PROCESSING_INTERVAL_S * intervalLength;
+		MetricFilter filter = getMetricFilter(context);
 
-			MetricFilter filter = getMetricFilter(context);
-			value = context.getMetricProvider().getStandardDeviation(filter, time, aggregationWindow, TimeUnit.SECONDS);
-		}
+		double value = context.getMetricProvider().getStandardDeviation(filter, time, aggregationWindow, TimeUnit.SECONDS);
 
 		if (!Double.isNaN(value)) {
 			statistics.addValue(value);

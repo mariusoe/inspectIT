@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.common.collect.ImmutableMap;
 
+import rocks.inspectit.shared.cs.ci.anomaly.definition.anomaly.AnomalyDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.HistoricalBaselineDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.NonBaselineDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.HardClassifierDefinition;
@@ -37,6 +38,7 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		metricDefinition.setFunction(Function.COUNT);
 		metricDefinition.setField("duration");
 		metricDefinition.setTagMap(ImmutableMap.of("generated", "yes"));
+		metricDefinition.setDefaultValue(0);
 
 		// #####################################
 
@@ -108,7 +110,6 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		configuration.setBaselineDefinition(baselineDefinition);
 		configuration.setThresholdDefinition(thresholdDefinition);
 		configuration.setClassifierDefinition(classifierDefinition);
-		configuration.setOperateOnAggregation(true);
 
 		// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 		// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -143,10 +144,14 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		metricDefinitionThree.setMeasurement("businessTransactions");
 		metricDefinitionThree.setFunction(Function.MEAN);
 		metricDefinitionThree.setField("duration");
+		metricDefinitionThree.setOpperateOnAggregation(false);
 
 		HistoricalBaselineDefinition baselineDefinitionThree = new HistoricalBaselineDefinition();
 		baselineDefinitionThree.setSeasonLength(288);
 		baselineDefinitionThree.setSmoothingFactor(0.1D);
+		baselineDefinitionThree.setSmoothValue(true);
+		baselineDefinitionThree.setValueSoothingFactor(0.1D);
+		baselineDefinitionThree.setTrendSmoothingFactor(0.25D);
 
 		StandardDeviationThresholdDefinition thresholdDefinitionThree = new StandardDeviationThresholdDefinition();
 		thresholdDefinitionThree.setWindowSize(24);
@@ -167,16 +172,51 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 		// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
+		AnomalyDetectionConfiguration configurationFour = new AnomalyDetectionConfiguration();
+
+		InfluxDBMetricDefinition metricDefinitionFour = new InfluxDBMetricDefinition();
+		metricDefinitionFour.setMeasurement("businessTransactions");
+		metricDefinitionFour.setFunction(Function.MEAN);
+		metricDefinitionFour.setField("duration");
+		metricDefinitionFour.setOpperateOnAggregation(false);
+
+		HistoricalBaselineDefinition baselineDefinitionFour = new HistoricalBaselineDefinition();
+		baselineDefinitionFour.setSeasonLength(288);
+		baselineDefinitionFour.setSmoothingFactor(0.1D);
+
+		StandardDeviationThresholdDefinition thresholdDefinitionFour = new StandardDeviationThresholdDefinition();
+		thresholdDefinitionFour.setWindowSize(24);
+		thresholdDefinitionFour.setSigmaAmountCritical(4);
+		thresholdDefinitionFour.setSigmaAmountWarning(3);
+		thresholdDefinitionFour.setExcludeCriticalData(true);
+		thresholdDefinitionFour.setExcludeWarningData(false);
+		thresholdDefinitionFour.setExponentialSmoothed(true);
+		thresholdDefinitionFour.setSmoothingFactor(0.01D);
+
+		HardClassifierDefinition classifierDefinitionFour = new HardClassifierDefinition();
+
+		configurationFour.setMetricDefinition(metricDefinitionFour);
+		configurationFour.setBaselineDefinition(baselineDefinitionFour);
+		configurationFour.setClassifierDefinition(classifierDefinitionFour);
+		configurationFour.setThresholdDefinition(thresholdDefinitionFour);
+
+		// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+		// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+		AnomalyDefinition anomalyDefinition = new AnomalyDefinition();
+		anomalyDefinition.setStartCount(2);
+		anomalyDefinition.setEndCount(8);
+
 		AnomalyDetectionConfigurationGroup configurationGroup = new AnomalyDetectionConfigurationGroup();
 		configurationGroup.setName("test-configuration");
 		configurationGroup.setMode(Mode.WORST);
-		configurationGroup.getConfigurations().add(configuration);
-		configurationGroup.getConfigurations().add(configurationTwo);
-		configurationGroup.getConfigurations().add(configurationThree);
+		// configurationGroup.getConfigurations().add(configuration); // pct
+		// configurationGroup.getConfigurations().add(configurationTwo); // fixed
+		configurationGroup.getConfigurations().add(configurationThree); // stddev
+		configurationGroup.getConfigurations().add(configurationFour); // stddev
 		configurationGroup.setTimeTravelDuration(7, TimeUnit.DAYS);
 
-		configurationGroup.setAnomalyStartCount(2);
-		configurationGroup.setAnomalyEndCount(8);
+		configurationGroup.setAnomalyDefinition(anomalyDefinition);
 
 		return configurationGroup;
 	}
@@ -199,46 +239,25 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 
 	private long timeTravelDuration;
 
-	private int anomalyStartCount;
-
-	private int anomalyEndCount;
+	private AnomalyDefinition anomalyDefinition;
 
 	/**
-	 * Gets {@link #anomalyEndCount}.
+	 * Sets {@link #anomalyDefinition}.
 	 *
-	 * @return {@link #anomalyEndCount}
+	 * @param anomalyDefinition
+	 *            New value for {@link #anomalyDefinition}
 	 */
-	public int getAnomalyEndCount() {
-		return this.anomalyEndCount;
+	public void setAnomalyDefinition(AnomalyDefinition anomalyDefinition) {
+		this.anomalyDefinition = anomalyDefinition;
 	}
 
 	/**
-	 * Sets {@link #anomalyEndCount}.
+	 * Gets {@link #anomalyDefinition}.
 	 *
-	 * @param anomalyEndCount
-	 *            New value for {@link #anomalyEndCount}
+	 * @return {@link #anomalyDefinition}
 	 */
-	public void setAnomalyEndCount(int anomalyEndCount) {
-		this.anomalyEndCount = anomalyEndCount;
-	}
-
-	/**
-	 * Gets {@link #anomalyStartCount}.
-	 *
-	 * @return {@link #anomalyStartCount}
-	 */
-	public int getAnomalyStartCount() {
-		return this.anomalyStartCount;
-	}
-
-	/**
-	 * Sets {@link #anomalyStartCount}.
-	 *
-	 * @param anomalyStartCount
-	 *            New value for {@link #anomalyStartCount}
-	 */
-	public void setAnomalyStartCount(int anomalyStartCount) {
-		this.anomalyStartCount = anomalyStartCount;
+	public AnomalyDefinition getAnomalyDefinition() {
+		return this.anomalyDefinition;
 	}
 
 	/**

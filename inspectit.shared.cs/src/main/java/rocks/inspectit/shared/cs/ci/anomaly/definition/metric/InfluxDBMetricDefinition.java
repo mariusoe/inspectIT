@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class InfluxDBMetricDefinition extends MetricDefinition {
 
 	public enum Function {
-		MEAN, MEDIAN, COUNT;
+		MEAN, MEDIAN, COUNT, SUM, MAX, MIN;
 	};
 
 	private String measurement;
@@ -25,6 +25,27 @@ public class InfluxDBMetricDefinition extends MetricDefinition {
 	private Function function;
 
 	private String field;
+
+	private boolean opperateOnAggregation = false;
+
+	/**
+	 * Gets {@link #opperateOnAggregation}.
+	 *
+	 * @return {@link #opperateOnAggregation}
+	 */
+	public boolean isOpperateOnAggregation() {
+		return this.opperateOnAggregation;
+	}
+
+	/**
+	 * Sets {@link #opperateOnAggregation}.
+	 *
+	 * @param opperateOnAggregation
+	 *            New value for {@link #opperateOnAggregation}
+	 */
+	public void setOpperateOnAggregation(boolean opperateOnAggregation) {
+		this.opperateOnAggregation = opperateOnAggregation;
+	}
 
 	/**
 	 * Gets {@link #field}.

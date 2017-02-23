@@ -31,7 +31,7 @@ public class MovingAverageBaseline extends AbstractBaseline<MovingAverageBaselin
 	 */
 	@Override
 	public void process(ProcessingContext context, long time) {
-		double value = getValue(context, time);
+		double value = context.getMetricProvider().getIntervalValue();
 
 		if (!Double.isNaN(value)) {
 			statistics.addValue(value);

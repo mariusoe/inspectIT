@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
 import rocks.inspectit.server.anomaly.HealthStatus;
+import rocks.inspectit.server.anomaly.constants.Measurements;
 import rocks.inspectit.server.anomaly.state.StateManager;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.spring.logger.Log;
@@ -40,11 +41,16 @@ public class RootProcessingUnitGroup extends ProcessingUnitGroup {
 	}
 
 	public void initialize() {
-		influx.query("DROP MEASUREMENT inspectit_anomaly");
-		influx.query("DROP MEASUREMENT inspectit_anomaly_groups");
-		influx.query("DROP MEASUREMENT inspectit_anomaly_status");
+		log.info("██╗███╗   ██╗███████╗██████╗ ███████╗ ██████╗████████╗██╗████████╗");
+		log.info("██║████╗  ██║██╔════╝██╔══██╗██╔════╝██╔════╝╚══██╔══╝██║╚══██╔══╝");
+		log.info("██║██╔██╗ ██║███████╗██████╔╝█████╗  ██║        ██║   ██║   ██║");
+		log.info("██║██║╚██╗██║╚════██║██╔═══╝ ██╔══╝  ██║        ██║   ██║   ██║");
+		log.info("██║██║ ╚████║███████║██║     ███████╗╚██████╗   ██║   ██║   ██║");
+		log.info("╚═╝╚═╝  ╚═══╝╚══════╝╚═╝     ╚══════╝ ╚═════╝   ╚═╝   ╚═╝   ╚═╝");
 
-		log.info("start init of group");
+		log.info("Started initilazation of anomaly detection system..");
+
+		dropMeasurements();
 
 		long currentTime = System.currentTimeMillis();
 		long time = currentTime - getConfigurationGroup().getTimeTravelDuration(TimeUnit.MILLISECONDS);
@@ -53,33 +59,33 @@ public class RootProcessingUnitGroup extends ProcessingUnitGroup {
 
 		while (time < currentTime) {
 
-
 			super.initialize(time);
 			stateManager.update(time, this);
 			writeGroupHealth(time);
 
-
 			time += TimeUnit.SECONDS.toMillis(AnomalyDetectionSystem.PROCESSING_INTERVAL_S);
 		}
 
-		log.info("done init");
+		log.info("Initilazation of anomaly detection system is done.");
+	}
+
+	private void dropMeasurements() {
+		influx.query("DROP MEASUREMENT " + Measurements.Anomalies.NAME);
+		influx.query("DROP MEASUREMENT " + Measurements.Data.NAME);
+		influx.query("DROP MEASUREMENT " + Measurements.ProcessingUnitGroupStatistics.NAME);
 	}
 
 	private void writeGroupHealth(long time) {
-		Builder builder = Point.measurement("inspectit_anomaly_groups").time(time, TimeUnit.MILLISECONDS);
-		builder.tag("configuration_group_id", getConfigurationGroup().getGroupId());
+		Builder builder = Point.measurement(Measurements.ProcessingUnitGroupStatistics.NAME).time(time, TimeUnit.MILLISECONDS);
+		builder.tag(Measurements.ProcessingUnitGroupStatistics.TAG_CONFIGURATION_GROUP_ID, getConfigurationGroup().getGroupId());
 		builder.tag("name", getConfigurationGroup().getName());
 
-		builder.tag("health_status", getHealthStatus().toString());
+		builder.tag(Measurements.ProcessingUnitGroupStatistics.TAG_HEALTH_STATUS, getHealthStatus().toString());
 
-		// if (healthTransition != HealthTransition.NO_CHANGE) {
-		// builder.tag("health_transition", healthTransition.toString());
-		// }
-
-		builder.addField("unknown", (getHealthStatus() == HealthStatus.UNKNOWN) ? 1 : 0);
-		builder.addField("normal", (getHealthStatus() == HealthStatus.NORMAL) ? 1 : 0);
-		builder.addField("warning", (getHealthStatus() == HealthStatus.WARNING) ? 1 : 0);
-		builder.addField("critical", (getHealthStatus() == HealthStatus.CRITICAL) ? 1 : 0);
+		builder.addField(Measurements.ProcessingUnitGroupStatistics.FIELD_UNKNOWN, (getHealthStatus() == HealthStatus.UNKNOWN) ? 1 : 0);
+		builder.addField(Measurements.ProcessingUnitGroupStatistics.FIELD_NORMAL, (getHealthStatus() == HealthStatus.NORMAL) ? 1 : 0);
+		builder.addField(Measurements.ProcessingUnitGroupStatistics.FIELD_WARNING, (getHealthStatus() == HealthStatus.WARNING) ? 1 : 0);
+		builder.addField(Measurements.ProcessingUnitGroupStatistics.FIELD_CRITICAL, (getHealthStatus() == HealthStatus.CRITICAL) ? 1 : 0);
 
 		influx.insert(builder.build());
 	}

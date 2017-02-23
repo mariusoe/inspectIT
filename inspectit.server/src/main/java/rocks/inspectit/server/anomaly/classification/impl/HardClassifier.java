@@ -26,7 +26,7 @@ public class HardClassifier extends AbstractClassifier<HardClassifierDefinition>
 			return HealthStatus.UNKNOWN;
 		}
 
-		double value = context.getCurrentValue();
+		double value = context.getMetricProvider().getValue();
 
 		// TODO check if thresholds are provided
 

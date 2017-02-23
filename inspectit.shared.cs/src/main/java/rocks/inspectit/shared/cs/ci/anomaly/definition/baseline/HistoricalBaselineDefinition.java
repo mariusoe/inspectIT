@@ -16,6 +16,69 @@ public class HistoricalBaselineDefinition extends BaselineDefinition {
 
 	private double smoothingFactor;
 
+	private boolean smoothValue;
+
+	private double valueSoothingFactor;
+
+	private double trendSmoothingFactor;
+
+	/**
+	 * Gets {@link #smoothValue}.
+	 *
+	 * @return {@link #smoothValue}
+	 */
+	public boolean isSmoothValue() {
+		return this.smoothValue;
+	}
+
+	/**
+	 * Sets {@link #smoothValue}.
+	 *
+	 * @param smoothValue
+	 *            New value for {@link #smoothValue}
+	 */
+	public void setSmoothValue(boolean smoothValue) {
+		this.smoothValue = smoothValue;
+	}
+
+	/**
+	 * Gets {@link #valueSoothingFactor}.
+	 *
+	 * @return {@link #valueSoothingFactor}
+	 */
+	public double getValueSmoothingFactor() {
+		return this.valueSoothingFactor;
+	}
+
+	/**
+	 * Sets {@link #valueSoothingFactor}.
+	 *
+	 * @param valueSoothingFactor
+	 *            New value for {@link #valueSoothingFactor}
+	 */
+	public void setValueSoothingFactor(double valueSoothingFactor) {
+		this.valueSoothingFactor = valueSoothingFactor;
+	}
+
+	/**
+	 * Gets {@link #trendSmoothingFactor}.
+	 *
+	 * @return {@link #trendSmoothingFactor}
+	 */
+	public double getTrendSmoothingFactor() {
+		return this.trendSmoothingFactor;
+	}
+
+	/**
+	 * Sets {@link #trendSmoothingFactor}.
+	 *
+	 * @param trendSmoothingFactor
+	 *            New value for {@link #trendSmoothingFactor}
+	 */
+	public void setTrendSmoothingFactor(double trendSmoothingFactor) {
+		this.trendSmoothingFactor = trendSmoothingFactor;
+	}
+
 	/**
 	 * Gets {@link #seasonLength}.
 	 *

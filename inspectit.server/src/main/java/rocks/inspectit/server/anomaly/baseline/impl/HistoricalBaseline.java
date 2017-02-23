@@ -21,26 +21,21 @@ public class HistoricalBaseline extends AbstractBaseline<HistoricalBaselineDefin
 
 	private int currentIndex = 0;
 
-	// private double currentValue = Double.NaN;
+	private double currentValue = Double.NaN;
+
+	private double trendValue = Double.NaN;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void process(ProcessingContext context, long time) {
-		double value = getValue(context, time);
+		double value = getValue(context);
 
 		if (Double.isNaN(value)) {
 			nextIndex();
 			return;
 		}
-
-		// if (Double.isNaN(currentValue)) {
-		// currentValue = value;
-		// } else {
-		// currentValue = (getDefinition().getSmoothingFactor() * value) + ((1 -
-		// getDefinition().getSmoothingFactor()) * currentValue);
-		// }
 
 		if (Double.isNaN(valueStore[currentIndex])) {
 			valueStore[currentIndex] = value;
@@ -49,6 +44,26 @@ public class HistoricalBaseline extends AbstractBaseline<HistoricalBaselineDefin
 		}
 
 		nextIndex();
+	}
+
+	private double getValue(ProcessingContext context) {
+		double value = context.getMetricProvider().getIntervalValue();
+		if (getDefinition().isSmoothValue()) {
+			if (Double.isNaN(currentValue)) {
+				currentValue = value;
+			} else if (Double.isNaN(trendValue)) {
+				trendValue = value - currentValue;
+				currentValue = value;
+			} else {
+				double nextValue;
+				nextValue = (getDefinition().getValueSmoothingFactor() * value) + ((1 - getDefinition().getValueSmoothingFactor()) * (currentValue + trendValue));
+				trendValue = (getDefinition().getTrendSmoothingFactor() * (nextValue - currentValue)) + ((1 - getDefinition().getTrendSmoothingFactor()) * trendValue);
+				currentValue = nextValue;
+			}
+			return currentValue;
+		} else {
+			return value;
+		}
 	}
 
 	private void nextIndex() {
