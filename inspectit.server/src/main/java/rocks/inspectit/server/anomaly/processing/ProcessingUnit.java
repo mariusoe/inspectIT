@@ -2,8 +2,6 @@ package rocks.inspectit.server.anomaly.processing;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Point.Builder;
 import org.slf4j.Logger;
@@ -36,21 +34,15 @@ public class ProcessingUnit implements IAnomalyProcessor {
 	@Autowired
 	InfluxDBDao influx;
 
-	private ProcessingContext context = new ProcessingContext();
-
-	private String groupId;
-
-	@PostConstruct
-	private void postConstruct() {
-	}
+	private final ProcessingContext context;
 
 	/**
-	 * Sets {@link #configuration}.
-	 *
-	 * @param configuration
-	 *            New value for {@link #configuration}
+	 * @param groupContext
 	 */
-	public void setConfiguration(AnomalyDetectionConfiguration configuration) {
+	@Autowired
+	public ProcessingUnit(ProcessingGroupContext groupContext, AnomalyDetectionConfiguration configuration) {
+		context = new ProcessingContext();
+		context.setGroupContext(groupContext);
 		context.setConfiguration(configuration);
 	}
 
@@ -98,7 +90,7 @@ public class ProcessingUnit implements IAnomalyProcessor {
 	private void writeData(long time) {
 		Builder builder = Point.measurement(Measurements.Data.NAME).time(time, TimeUnit.MILLISECONDS);
 		builder.tag(Measurements.Data.TAG_CONFIGURATION_ID, context.getConfiguration().getId());
-		builder.tag(Measurements.Data.TAG_CONFIGURATION_GROUP_ID, groupId);
+		builder.tag(Measurements.Data.TAG_CONFIGURATION_GROUP_ID, context.getGroupContext().getGroupId());
 		builder.tag(Measurements.Data.TAG_HEALTH_STATUS, context.getHealthStatus().toString());
 
 		boolean builderIsEmpty = true;
@@ -181,15 +173,5 @@ public class ProcessingUnit implements IAnomalyProcessor {
 	@Override
 	public HealthStatus getHealthStatus() {
 		return context.getHealthStatus();
-	}
-
-	/**
-	 * Sets {@link #groupId}.
-	 *
-	 * @param groupId
-	 *            New value for {@link #groupId}
-	 */
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
 	}
 }

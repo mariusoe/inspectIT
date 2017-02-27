@@ -2,6 +2,7 @@ package rocks.inspectit.server.anomaly.state;
 
 import java.util.LinkedList;
 
+import rocks.inspectit.server.anomaly.Anomaly;
 import rocks.inspectit.server.anomaly.HealthStatus;
 
 /**
@@ -20,9 +21,30 @@ public class StateContext {
 
 	private HealthStatus healthStauts = HealthStatus.UNKNOWN;
 
+	private Anomaly currentAnomaly;
+
+	/**
+	 * Gets {@link #currentAnomaly}.
+	 * 
+	 * @return {@link #currentAnomaly}
+	 */
+	public Anomaly getCurrentAnomaly() {
+		return this.currentAnomaly;
+	}
+
+	/**
+	 * Sets {@link #currentAnomaly}.
+	 * 
+	 * @param currentAnomaly
+	 *            New value for {@link #currentAnomaly}
+	 */
+	public void setCurrentAnomaly(Anomaly currentAnomaly) {
+		this.currentAnomaly = currentAnomaly;
+	}
+
 	/**
 	 * Gets {@link #healthStauts}.
-	 * 
+	 *
 	 * @return {@link #healthStauts}
 	 */
 	public HealthStatus getHealthStauts() {
@@ -31,7 +53,7 @@ public class StateContext {
 
 	/**
 	 * Sets {@link #healthStauts}.
-	 * 
+	 *
 	 * @param healthStauts
 	 *            New value for {@link #healthStauts}
 	 */
@@ -70,7 +92,6 @@ public class StateContext {
 
 		return returnStatus;
 	}
-
 
 	public void addHealthStatus(HealthStatus status) {
 		healthList.add(status);

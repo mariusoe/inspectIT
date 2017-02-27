@@ -36,7 +36,7 @@
 	</section>
 	<section name="Database">
 		<properties>
-			<boolean-property name="Write Data to influxDB" default-value="false" server-restart-required="false" logical-name="influxdb.active" advanced="false"
+			<boolean-property name="Write Data to influxDB" default-value="false" server-restart-required="false" logical-name="influxdb.writeData" advanced="false"
 				description="If activated, all long term data (business transaction timings, resource utilizations, etc.) will be written to an influxDB. Otherwise data will be written to relational database." />
 			<group-property name="JDBC" description="Defines JDBC properties to be used if relational database is used for string data.">
 				<properties>
@@ -66,6 +66,8 @@
 			</group-property>
 			<group-property name="influxDB" description="Defines properties to be used if influxDB is used for storing long term data.">
 				<properties>
+				<boolean-property name="Connect InfluxDB" default-value="false" server-restart-required="false" logical-name="influxdb.active" advanced="false"
+				description="If activated, the CMR connects itself to the specified InfluxDB." />
 					<string-property name="Host" default-value="localhost" server-restart-required="false" logical-name="influxdb.host" advanced="false" description="The hostname/IP of the influxDB instance.">
 						<validators>
 							<isNotEmpty />

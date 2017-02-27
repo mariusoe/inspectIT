@@ -11,11 +11,11 @@
 
   <xs:element name="anomaly-configuration" type="anomalyDetectionConfiguration"/>
 
-  <xs:element name="anomaly-configuration-group" type="anomalyDetectionConfigurationGroup"/>
-
   <xs:element name="anomaly-exponential-moving-average-baseline" type="exponentialMovingAverageBaselineDefinition"/>
 
   <xs:element name="anomaly-fixed-threshold" type="fixedThresholdDefinition"/>
+
+  <xs:element name="anomaly-group-configuration" type="anomalyDetectionGroupConfiguration"/>
 
   <xs:element name="anomaly-hard-classifier" type="hardClassifierDefinition"/>
 
@@ -1063,15 +1063,32 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="anomalyDetectionConfigurationGroup">
+  <xs:complexType name="logNotificationDefinition">
+    <xs:complexContent>
+      <xs:extension base="notificationDefinition">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="notificationDefinition">
+    <xs:complexContent>
+      <xs:extension base="abstractDefinition">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="anomalyDetectionGroupConfiguration">
     <xs:sequence>
       <xs:element name="name" type="xs:string" minOccurs="0"/>
       <xs:element name="groupId" type="xs:string" minOccurs="0"/>
       <xs:element name="mode" type="mode" minOccurs="0"/>
-      <xs:element name="configurationGroups" type="anomalyDetectionConfigurationGroup" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="configurationGroups" type="anomalyDetectionGroupConfiguration" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="configurations" type="anomalyDetectionConfiguration" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="timeTravelDuration" type="xs:long"/>
       <xs:element name="anomalyDefinition" type="anomalyDefinition" minOccurs="0"/>
+      <xs:element name="notificationDefinition" type="notificationDefinition" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 

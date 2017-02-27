@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.DefinitionAwareFactory;
+import rocks.inspectit.server.anomaly.processing.ProcessingGroupContext;
 import rocks.inspectit.server.anomaly.state.StateManager.HealthTransition;
 import rocks.inspectit.shared.all.spring.logger.Log;
-import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfigurationGroup;
 
 /**
  * @author Marius Oehler
@@ -22,21 +22,21 @@ public class NotificationService {
 	@Autowired
 	private DefinitionAwareFactory factory;
 
-	public void handleHealthTransition(HealthTransition transition, AnomalyDetectionConfigurationGroup configurationGroup) {
-		AbstractNotifier<?> notifier = factory.createNotifier(configurationGroup.getNotificationDefinition());
+	public void handleHealthTransition(HealthTransition transition, ProcessingGroupContext groupContext) {
+		AbstractNotifier<?> notifier = factory.createNotifier(groupContext.getGroupConfiguration().getNotificationDefinition());
 
 		switch (transition) {
 		case BEGIN:
-			notifier.onStart(configurationGroup);
+			notifier.onStart(groupContext.getStateContext().getCurrentAnomaly());
 			break;
 		case DOWNGRADE:
-			notifier.onDowngrade(configurationGroup);
+			notifier.onDowngrade(groupContext.getStateContext().getCurrentAnomaly());
 			break;
 		case END:
-			notifier.onEnd(configurationGroup);
+			notifier.onEnd(groupContext.getStateContext().getCurrentAnomaly());
 			break;
 		case UPGRADE:
-			notifier.onUpgrade(configurationGroup);
+			notifier.onUpgrade(groupContext.getStateContext().getCurrentAnomaly());
 			break;
 		case NO_CHANGE:
 		default:

@@ -15,7 +15,7 @@ import rocks.inspectit.server.anomaly.constants.Measurements;
 import rocks.inspectit.server.anomaly.state.StateManager;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.spring.logger.Log;
-import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfigurationGroup;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionGroupConfiguration;
 
 /**
  * @author Marius Oehler
@@ -34,21 +34,17 @@ public class RootProcessingUnitGroup extends ProcessingUnitGroup {
 	@Autowired
 	StateManager stateManager;
 
-	private final ProcessingGroupContext groupContext;
-
 	@Autowired
-	public RootProcessingUnitGroup(AnomalyDetectionConfigurationGroup configurationGroup) {
+	public RootProcessingUnitGroup(AnomalyDetectionGroupConfiguration configurationGroup) {
 		super(configurationGroup);
-
-		groupContext = new ProcessingGroupContext();
-		groupContext.setGroupId(configurationGroup.getGroupId());
 	}
 
 
 	public void process() {
 		long time = System.currentTimeMillis();
+
 		super.process(time);
-		stateManager.update(time, this);
+		stateManager.update(time, getGroupContext());
 		writeGroupHealth(time);
 	}
 
@@ -72,11 +68,15 @@ public class RootProcessingUnitGroup extends ProcessingUnitGroup {
 		while (time < currentTime) {
 
 			super.initialize(time);
-			stateManager.update(time, this);
+
+			stateManager.update(time, getGroupContext());
 			writeGroupHealth(time);
+			getGroupContext().setGroupHealthStatus(getHealthStatus());
 
 			time += TimeUnit.SECONDS.toMillis(AnomalyDetectionSystem.PROCESSING_INTERVAL_S);
 		}
+
+		getGroupContext().setInitialized(true);
 
 		log.info("Initilazation of anomaly detection system is done.");
 	}

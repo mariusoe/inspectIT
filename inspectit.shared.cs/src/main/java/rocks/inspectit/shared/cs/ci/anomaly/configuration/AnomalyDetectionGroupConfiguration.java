@@ -29,10 +29,10 @@ import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.StandardDeviati
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "anomaly-configuration-group")
-public class AnomalyDetectionConfigurationGroup implements Serializable {
+@XmlRootElement(name = "anomaly-group-configuration")
+public class AnomalyDetectionGroupConfiguration implements Serializable {
 
-	public static AnomalyDetectionConfigurationGroup getTestConfiguration() {
+	public static AnomalyDetectionGroupConfiguration getTestConfiguration() {
 		AnomalyDetectionConfiguration configuration = new AnomalyDetectionConfiguration();
 
 		InfluxDBMetricDefinition metricDefinition = new InfluxDBMetricDefinition();
@@ -189,7 +189,7 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		StandardDeviationThresholdDefinition thresholdDefinitionFour = new StandardDeviationThresholdDefinition();
 		thresholdDefinitionFour.setWindowSize(24);
 		thresholdDefinitionFour.setSigmaAmountCritical(4);
-		thresholdDefinitionFour.setSigmaAmountWarning(3);
+		thresholdDefinitionFour.setSigmaAmountWarning(2);
 		thresholdDefinitionFour.setExcludeCriticalData(true);
 		thresholdDefinitionFour.setExcludeWarningData(false);
 		thresholdDefinitionFour.setExponentialSmoothed(true);
@@ -211,7 +211,7 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 
 		LogNotificationDefinition notificationDefinition = new LogNotificationDefinition();
 
-		AnomalyDetectionConfigurationGroup configurationGroup = new AnomalyDetectionConfigurationGroup();
+		AnomalyDetectionGroupConfiguration configurationGroup = new AnomalyDetectionGroupConfiguration();
 		configurationGroup.setName("test-configuration");
 		configurationGroup.setMode(Mode.WORST);
 		// configurationGroup.getConfigurations().add(configuration); // pct
@@ -219,6 +219,8 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		// configurationGroup.getConfigurations().add(configurationThree); // stddev
 		configurationGroup.getConfigurations().add(configurationFour); // stddev
 		configurationGroup.setTimeTravelDuration(7, TimeUnit.DAYS);
+		configurationGroup.setFaultSuppressionFactor(10D);
+		configurationGroup.setBusinessTransaction("shopping-cart");
 
 		configurationGroup.setAnomalyDefinition(anomalyDefinition);
 		configurationGroup.setNotificationDefinition(notificationDefinition);
@@ -234,11 +236,13 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 
 	private String name;
 
+	private String businessTransaction;
+
 	private String groupId = UUID.randomUUID().toString();
 
 	private Mode mode = Mode.WORST;
 
-	private List<AnomalyDetectionConfigurationGroup> configurationGroups = new ArrayList<>();
+	private List<AnomalyDetectionGroupConfiguration> configurationGroups = new ArrayList<>();
 
 	private List<AnomalyDetectionConfiguration> configurations = new ArrayList<>();
 
@@ -247,6 +251,46 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 	private AnomalyDefinition anomalyDefinition;
 
 	private NotificationDefinition notificationDefinition;
+
+	private double faultSuppressionFactor;
+
+	/**
+	 * Gets {@link #businessTransaction}.
+	 *
+	 * @return {@link #businessTransaction}
+	 */
+	public String getBusinessTransaction() {
+		return this.businessTransaction;
+	}
+
+	/**
+	 * Sets {@link #businessTransaction}.
+	 *
+	 * @param businessTransaction
+	 *            New value for {@link #businessTransaction}
+	 */
+	public void setBusinessTransaction(String businessTransaction) {
+		this.businessTransaction = businessTransaction;
+	}
+
+	/**
+	 * Gets {@link #faultSuppressionFactor}.
+	 *
+	 * @return {@link #faultSuppressionFactor}
+	 */
+	public double getFaultSuppressionFactor() {
+		return this.faultSuppressionFactor;
+	}
+
+	/**
+	 * Sets {@link #faultSuppressionFactor}.
+	 *
+	 * @param faultSuppressionFactor
+	 *            New value for {@link #faultSuppressionFactor}
+	 */
+	public void setFaultSuppressionFactor(double faultSuppressionFactor) {
+		this.faultSuppressionFactor = faultSuppressionFactor;
+	}
 
 	/**
 	 * Gets {@link #notificationDefinition}.
@@ -367,7 +411,7 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 	 *
 	 * @return {@link #configurationGroups}
 	 */
-	public List<AnomalyDetectionConfigurationGroup> getConfigurationGroups() {
+	public List<AnomalyDetectionGroupConfiguration> getConfigurationGroups() {
 		return this.configurationGroups;
 	}
 

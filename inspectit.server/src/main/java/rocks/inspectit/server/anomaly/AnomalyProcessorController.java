@@ -1,12 +1,10 @@
 package rocks.inspectit.server.anomaly;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.BeanFactory;
@@ -16,6 +14,7 @@ import org.springframework.stereotype.Component;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
+import rocks.inspectit.server.anomaly.processing.ProcessingGroupContext;
 import rocks.inspectit.server.anomaly.processing.ProcessingUnit;
 import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroup;
 import rocks.inspectit.server.anomaly.processing.RootProcessingUnitGroup;
@@ -24,7 +23,7 @@ import rocks.inspectit.server.ci.ConfigurationInterfaceManager;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfiguration;
-import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfigurationGroup;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionGroupConfiguration;
 
 /**
  * @author Marius Oehler
@@ -57,37 +56,36 @@ public class AnomalyProcessorController implements Runnable {
 
 	private void createProcessingUnitGroups() {
 		// load configurations
-		List<AnomalyDetectionConfigurationGroup> configurationGroups = Collections.singletonList(AnomalyDetectionConfigurationGroup.getTestConfiguration());
+		List<AnomalyDetectionGroupConfiguration> configurationGroups = Collections.singletonList(AnomalyDetectionGroupConfiguration.getTestConfiguration());
 
-		try {
-			ciManager.createAnomalyDetectionConfigurationGroup(configurationGroups.get(0));
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// try {
+		// ciManager.createAnomalyDetectionConfigurationGroup(configurationGroups.get(0));
+		// } catch (JAXBException e) {
+		// e.printStackTrace();
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
 
-		for (AnomalyDetectionConfigurationGroup groupConfiguration : configurationGroups) {
+		for (AnomalyDetectionGroupConfiguration groupConfiguration : configurationGroups) {
 			RootProcessingUnitGroup unitGroup = (RootProcessingUnitGroup) createProcessingUnitGroup(groupConfiguration, true);
 			processingUnitGroups.add(unitGroup);
 		}
 	}
 
-	private ProcessingUnitGroup createProcessingUnitGroup(AnomalyDetectionConfigurationGroup groupConfiguration, boolean isRoot) {
+	private ProcessingUnitGroup createProcessingUnitGroup(AnomalyDetectionGroupConfiguration groupConfiguration, boolean isRoot) {
 		ProcessingUnitGroup processingUnitGroup = null;
 		if (isRoot) {
-			processingUnitGroup = (ProcessingUnitGroup) beanFactory.getBean(RootProcessingUnitGroup.class.getSimpleName(), groupConfiguration);
+			processingUnitGroup = (ProcessingUnitGroup) beanFactory.getBean("rootProcessingUnitGroup", groupConfiguration);
 		} else {
-			processingUnitGroup = (ProcessingUnitGroup) beanFactory.getBean(ProcessingUnitGroup.class.getSimpleName(), groupConfiguration);
+			processingUnitGroup = (ProcessingUnitGroup) beanFactory.getBean("processingUnitGroup", groupConfiguration);
 		}
 
 		for (AnomalyDetectionConfiguration configuration : groupConfiguration.getConfigurations()) {
-			ProcessingUnit processingUnit = createProcessingUnit(configuration);
-			processingUnit.setGroupId(groupConfiguration.getGroupId());
+			ProcessingUnit processingUnit = createProcessingUnit(processingUnitGroup.getGroupContext(), configuration);
 			processingUnitGroup.getProcessors().add(processingUnit);
 		}
 
-		for (AnomalyDetectionConfigurationGroup innerGroupConfiguration : groupConfiguration.getConfigurationGroups()) {
+		for (AnomalyDetectionGroupConfiguration innerGroupConfiguration : groupConfiguration.getConfigurationGroups()) {
 			ProcessingUnitGroup innerProcessingUnitGroup = createProcessingUnitGroup(innerGroupConfiguration, false);
 			processingUnitGroup.getProcessors().add(innerProcessingUnitGroup);
 		}
@@ -95,9 +93,8 @@ public class AnomalyProcessorController implements Runnable {
 		return processingUnitGroup;
 	}
 
-	private ProcessingUnit createProcessingUnit(AnomalyDetectionConfiguration configuration) {
-		ProcessingUnit processingUnit = beanFactory.getBean(ProcessingUnit.class);
-		processingUnit.setConfiguration(configuration);
+	private ProcessingUnit createProcessingUnit(ProcessingGroupContext groupContext, AnomalyDetectionConfiguration configuration) {
+		ProcessingUnit processingUnit = (ProcessingUnit) beanFactory.getBean("processingUnit", groupContext, configuration);
 
 		AbstractMetricProvider<?> metricProvider = definitionAwareFactory.createMetricProvider(configuration.getMetricDefinition());
 		processingUnit.setMetricProvider(metricProvider);

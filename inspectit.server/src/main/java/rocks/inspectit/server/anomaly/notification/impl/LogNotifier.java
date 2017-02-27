@@ -3,9 +3,9 @@ package rocks.inspectit.server.anomaly.notification.impl;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
+import rocks.inspectit.server.anomaly.Anomaly;
 import rocks.inspectit.server.anomaly.notification.AbstractNotifier;
 import rocks.inspectit.shared.all.spring.logger.Log;
-import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfigurationGroup;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.notification.LogNotificationDefinition;
 
 /**
@@ -22,32 +22,32 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onStart(AnomalyDetectionConfigurationGroup configurationGroup) {
-		log.info("Anomaly started for " + configurationGroup.getGroupId());
+	public void onStart(Anomaly anomaly) {
+		log.info("Anomaly started for {} [{}] ", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getGroupId());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onUpgrade(AnomalyDetectionConfigurationGroup configurationGroup) {
-		log.info("Anomaly is upgraded for " + configurationGroup.getGroupId());
+	public void onUpgrade(Anomaly anomaly) {
+		log.info("Anomaly upgraded for {} [{}] ", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getGroupId());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onDowngrade(AnomalyDetectionConfigurationGroup configurationGroup) {
-		log.info("Anomaly is downgraded for " + configurationGroup.getGroupId());
+	public void onDowngrade(Anomaly anomaly) {
+		log.info("Anomaly downgraded for {} [{}] ", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getGroupId());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onEnd(AnomalyDetectionConfigurationGroup configurationGroup) {
-		log.info("Anomaly ended for " + configurationGroup.getGroupId());
+	public void onEnd(Anomaly anomaly) {
+		log.info("Anomaly ended: {}", anomaly.toString());
 	}
 
 	/**

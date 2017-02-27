@@ -1,7 +1,5 @@
 package rocks.inspectit.server.anomaly.state;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.influxdb.dto.Point;
@@ -9,12 +7,15 @@ import org.influxdb.dto.Point.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import rocks.inspectit.server.anomaly.Anomaly;
 import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
+import rocks.inspectit.server.anomaly.AnomalyRegistry;
 import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.constants.Measurements;
 import rocks.inspectit.server.anomaly.notification.NotificationService;
-import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroup;
+import rocks.inspectit.server.anomaly.processing.ProcessingGroupContext;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
+import rocks.inspectit.shared.all.serializer.impl.SerializationManager;
 import rocks.inspectit.shared.all.util.Pair;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.anomaly.AnomalyDefinition;
 
@@ -32,31 +33,67 @@ public class StateManager {
 	@Autowired
 	InfluxDBDao influx;
 
-	private Map<String, StateContext> contextMap = new HashMap<>();
-
 	@Autowired
 	private NotificationService notificationService;
+
+	@Autowired
+	private AnomalyRegistry anomalyRegistration;
+
+	@Autowired
+	private SerializationManager serializationManager;
 
 	/**
 	 * @param time
 	 * @param rootProcessingUnitGroup
 	 */
-	public void update(long time, ProcessingUnitGroup unitGroup) {
-		StateContext context = contextMap.get(unitGroup.getConfigurationGroup().getGroupId());
-		AnomalyDefinition anomalyDefinition = unitGroup.getConfigurationGroup().getAnomalyDefinition();
+	public void update(long time, ProcessingGroupContext groupContext) {
+		AnomalyDefinition anomalyDefinition = groupContext.getGroupConfiguration().getAnomalyDefinition();
 
-		if (context == null) {
-			context = initialize(unitGroup);
+		if (groupContext.getStateContext() == null) {
+			initialize(groupContext);
 		}
-		context.addHealthStatus(unitGroup.getHealthStatus());
+		groupContext.getStateContext().addHealthStatus(groupContext.getGroupHealthStatus());
 
-		Pair<HealthStatus, HealthStatus> healthStatus = updateHealthStatus(context, anomalyDefinition);
+		Pair<HealthStatus, HealthStatus> healthStatus = updateHealthStatus(groupContext.getStateContext(), anomalyDefinition);
 
 		HealthTransition healthTransition = getHealthTransition(healthStatus.getFirst(), healthStatus.getSecond());
 
-		writeAnomalyState(time, unitGroup, healthTransition);
+		writeAnomalyState(time, groupContext, healthTransition);
 
-		notificationService.handleHealthTransition(healthTransition, unitGroup.getConfigurationGroup());
+		switch (healthTransition) {
+		case BEGIN:
+			startAnomaly(time, groupContext);
+			break;
+		case DOWNGRADE:
+		case UPGRADE:
+			groupContext.getStateContext().getCurrentAnomaly().getHealthTransitionLog().put(time, healthTransition);
+			break;
+		case END:
+			endAnomaly(time, groupContext);
+			break;
+		case NO_CHANGE:
+		default:
+			break;
+		}
+
+		if (healthStatus.getSecond() == HealthStatus.CRITICAL) {
+			groupContext.getStateContext().getCurrentAnomaly().setCritical(true);
+		}
+
+		notificationService.handleHealthTransition(healthTransition, groupContext);
+	}
+
+	private Anomaly startAnomaly(long time, ProcessingGroupContext groupContext) {
+		Anomaly anomaly = anomalyRegistration.startAnomaly(time);
+		anomaly.setGroupConfiguration(serializationManager.copy(groupContext.getGroupConfiguration()));
+
+		groupContext.getStateContext().setCurrentAnomaly(anomaly);
+
+		return anomaly;
+	}
+
+	private void endAnomaly(long time, ProcessingGroupContext groupContext) {
+		anomalyRegistration.endAnomaly(time, groupContext.getStateContext().getCurrentAnomaly());
 	}
 
 	private Pair<HealthStatus, HealthStatus> updateHealthStatus(StateContext context, AnomalyDefinition anomalyDefinition) {
@@ -74,30 +111,28 @@ public class StateManager {
 		return new Pair<HealthStatus, HealthStatus>(currentHealthStatus, nextHealthStatus);
 	}
 
-	private StateContext initialize(ProcessingUnitGroup unitGroup) {
-		int contextHealthListSize = Math.max(unitGroup.getConfigurationGroup().getAnomalyDefinition().getStartCount(), unitGroup.getConfigurationGroup().getAnomalyDefinition().getEndCount());
+	private void initialize(ProcessingGroupContext groupContext) {
+		int contextHealthListSize = Math.max(groupContext.getGroupConfiguration().getAnomalyDefinition().getStartCount(), groupContext.getGroupConfiguration().getAnomalyDefinition().getEndCount());
 
 		StateContext context = new StateContext();
 		context.setMaxHealthListSize(contextHealthListSize);
 
-		contextMap.put(unitGroup.getConfigurationGroup().getGroupId(), context);
-
-		return context;
+		groupContext.setStateContext(context);
 	}
 
-	private void writeAnomalyState(long time, ProcessingUnitGroup unitGroup, HealthTransition healthTransition) {
+	private void writeAnomalyState(long time, ProcessingGroupContext groupContext, HealthTransition healthTransition) {
 		Builder builder = Point.measurement(Measurements.Anomalies.NAME);
 
 		long timeDelta = 0L;
 		switch (healthTransition) {
 		case BEGIN:
-		case DOWNGRADE:
-		case UPGRADE:
-			timeDelta = TimeUnit.SECONDS.toMillis(unitGroup.getConfigurationGroup().getAnomalyDefinition().getStartCount() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S);
+			timeDelta = TimeUnit.SECONDS.toMillis(groupContext.getGroupConfiguration().getAnomalyDefinition().getStartCount() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S);
 			builder.addField(Measurements.Anomalies.FIELD_ANOMALY_ACTIVE, 1);
 			break;
+		case DOWNGRADE:
+		case UPGRADE:
 		case END:
-			timeDelta = TimeUnit.SECONDS.toMillis(unitGroup.getConfigurationGroup().getAnomalyDefinition().getEndCount() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S);
+			timeDelta = TimeUnit.SECONDS.toMillis(groupContext.getGroupConfiguration().getAnomalyDefinition().getEndCount() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S);
 			builder.addField(Measurements.Anomalies.FIELD_ANOMALY_ACTIVE, 0);
 			break;
 		case NO_CHANGE:
@@ -107,7 +142,7 @@ public class StateManager {
 
 		builder.time(time - timeDelta, TimeUnit.MILLISECONDS);
 		builder.tag(Measurements.Anomalies.TAG_EVENT, healthTransition.toString());
-		builder.tag(Measurements.Anomalies.TAG_CONFIGURATION_GROUP_ID, unitGroup.getConfigurationGroup().getGroupId());
+		builder.tag(Measurements.Anomalies.TAG_CONFIGURATION_GROUP_ID, groupContext.getGroupConfiguration().getGroupId());
 
 		influx.insert(builder.build());
 	}

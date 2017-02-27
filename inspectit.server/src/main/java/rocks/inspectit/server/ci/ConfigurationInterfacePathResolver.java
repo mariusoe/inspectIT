@@ -13,7 +13,7 @@ import rocks.inspectit.shared.all.util.ResourcesPathResolver;
 import rocks.inspectit.shared.cs.ci.Environment;
 import rocks.inspectit.shared.cs.ci.Profile;
 import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
-import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfigurationGroup;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionGroupConfiguration;
 
 /**
  * Class that knows how to resolve paths related to the configuration interface.
@@ -203,7 +203,7 @@ public class ConfigurationInterfacePathResolver {
 		return getDefaultCiPath().resolve(ANOMALY_DETECTION_CONFIGURATION_FOLDER);
 	}
 
-	public Path getAnomalyDetectionConfigurationFilePath(AnomalyDetectionConfigurationGroup configurationGroup) {
+	public Path getAnomalyDetectionConfigurationFilePath(AnomalyDetectionGroupConfiguration configurationGroup) {
 		// String secureDefinitionName =
 		// removeIllegalFilenameCharacters(alertingDefinition.getName());
 		String fileName = configurationGroup.getGroupId() + ".xml";

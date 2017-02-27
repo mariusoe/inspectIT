@@ -12,7 +12,7 @@ import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.processing.health.BestHealthDeclaration;
 import rocks.inspectit.server.anomaly.processing.health.WorstHealthDeclaration;
 import rocks.inspectit.shared.all.spring.logger.Log;
-import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfigurationGroup;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionGroupConfiguration;
 
 /**
  * @author Marius Oehler
@@ -27,13 +27,28 @@ public class ProcessingUnitGroup implements IAnomalyProcessor {
 
 	private List<IAnomalyProcessor> processors = new ArrayList<>();
 
-	private final AnomalyDetectionConfigurationGroup configurationGroup;
+	private final AnomalyDetectionGroupConfiguration configurationGroup;
 
 	private HealthStatus currentHealthStatus = HealthStatus.UNKNOWN;
 
+	private final ProcessingGroupContext groupContext;
+
 	@Autowired
-	public ProcessingUnitGroup(AnomalyDetectionConfigurationGroup configurationGroup) {
+	public ProcessingUnitGroup(AnomalyDetectionGroupConfiguration configurationGroup) {
 		this.configurationGroup = configurationGroup;
+
+		groupContext = new ProcessingGroupContext();
+		groupContext.setGroupId(configurationGroup.getGroupId());
+		groupContext.setGroupConfiguration(configurationGroup);
+	}
+
+	/**
+	 * Gets {@link #groupContext}.
+	 *
+	 * @return {@link #groupContext}
+	 */
+	public ProcessingGroupContext getGroupContext() {
+		return this.groupContext;
 	}
 
 	/**
@@ -62,7 +77,7 @@ public class ProcessingUnitGroup implements IAnomalyProcessor {
 	 *
 	 * @return {@link #configurationGroup}
 	 */
-	public AnomalyDetectionConfigurationGroup getConfigurationGroup() {
+	public AnomalyDetectionGroupConfiguration getConfigurationGroup() {
 		return this.configurationGroup;
 	}
 

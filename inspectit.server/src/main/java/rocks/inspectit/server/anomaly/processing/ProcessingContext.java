@@ -27,6 +27,27 @@ public class ProcessingContext {
 
 	private HealthStatus healthStatus = HealthStatus.UNKNOWN;
 
+	private ProcessingGroupContext groupContext;
+
+	/**
+	 * Gets {@link #groupContext}.
+	 * 
+	 * @return {@link #groupContext}
+	 */
+	public ProcessingGroupContext getGroupContext() {
+		return this.groupContext;
+	}
+
+	/**
+	 * Sets {@link #groupContext}.
+	 * 
+	 * @param groupContext
+	 *            New value for {@link #groupContext}
+	 */
+	public void setGroupContext(ProcessingGroupContext groupContext) {
+		this.groupContext = groupContext;
+	}
+
 	/**
 	 * Gets {@link #healthStatus}.
 	 *

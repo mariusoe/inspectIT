@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.processing.ProcessingContext;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.HistoricalBaselineDefinition;
@@ -40,7 +41,11 @@ public class HistoricalBaseline extends AbstractBaseline<HistoricalBaselineDefin
 		if (Double.isNaN(valueStore[currentIndex])) {
 			valueStore[currentIndex] = value;
 		} else {
-			valueStore[currentIndex] = (getDefinition().getSmoothingFactor() * value) + ((1 - getDefinition().getSmoothingFactor()) * valueStore[currentIndex]);
+			double smoothingFactor = getDefinition().getSmoothingFactor();
+			if (context.getGroupContext().getGroupHealthStatus() != HealthStatus.NORMAL) {
+				smoothingFactor /= context.getGroupContext().getGroupConfiguration().getFaultSuppressionFactor();
+			}
+			valueStore[currentIndex] = (smoothingFactor * value) + ((1 - smoothingFactor) * valueStore[currentIndex]);
 		}
 
 		nextIndex();
@@ -48,7 +53,18 @@ public class HistoricalBaseline extends AbstractBaseline<HistoricalBaselineDefin
 
 	private double getValue(ProcessingContext context) {
 		double value = context.getMetricProvider().getIntervalValue();
-		if (getDefinition().isSmoothValue()) {
+		if (isFirstSeasons(context)) {
+			if (Double.isNaN(currentValue)) {
+				currentValue = value;
+			} else {
+				double smoothingFactor = 0.1D;
+				if (context.getGroupContext().getGroupHealthStatus() != HealthStatus.NORMAL) {
+					smoothingFactor /= context.getGroupContext().getGroupConfiguration().getFaultSuppressionFactor();
+				}
+				currentValue = (smoothingFactor * value) + ((1 - smoothingFactor) * currentValue);
+			}
+			return currentValue;
+		} else if (getDefinition().isSmoothValue()) {
 			if (Double.isNaN(currentValue)) {
 				currentValue = value;
 			} else if (Double.isNaN(trendValue)) {
@@ -64,6 +80,10 @@ public class HistoricalBaseline extends AbstractBaseline<HistoricalBaselineDefin
 		} else {
 			return value;
 		}
+	}
+
+	private boolean isFirstSeasons(ProcessingContext context) {
+		return context.getIterationCounter() < (getDefinition().getSeasonLength() * context.getConfiguration().getIntervalLongProcessingMultiplier());
 	}
 
 	private void nextIndex() {
