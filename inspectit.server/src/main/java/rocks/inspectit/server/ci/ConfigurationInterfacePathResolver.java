@@ -10,9 +10,9 @@ import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.shared.all.util.ResourcesPathResolver;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
 import rocks.inspectit.shared.cs.ci.Environment;
 import rocks.inspectit.shared.cs.ci.Profile;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfigurationGroup;
 
 /**

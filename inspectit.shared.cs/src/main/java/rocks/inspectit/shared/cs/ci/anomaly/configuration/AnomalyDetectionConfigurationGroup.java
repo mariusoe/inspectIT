@@ -18,6 +18,8 @@ import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.NonBaselineDefin
 import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.HardClassifierDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.metric.InfluxDBMetricDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.metric.InfluxDBMetricDefinition.Function;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.notification.LogNotificationDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.notification.NotificationDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.FixedThresholdDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.PercentageDerivationThresholdDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.StandardDeviationThresholdDefinition;
@@ -207,6 +209,8 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		anomalyDefinition.setStartCount(2);
 		anomalyDefinition.setEndCount(8);
 
+		LogNotificationDefinition notificationDefinition = new LogNotificationDefinition();
+
 		AnomalyDetectionConfigurationGroup configurationGroup = new AnomalyDetectionConfigurationGroup();
 		configurationGroup.setName("test-configuration");
 		configurationGroup.setMode(Mode.WORST);
@@ -217,6 +221,7 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 		configurationGroup.setTimeTravelDuration(7, TimeUnit.DAYS);
 
 		configurationGroup.setAnomalyDefinition(anomalyDefinition);
+		configurationGroup.setNotificationDefinition(notificationDefinition);
 
 		return configurationGroup;
 	}
@@ -240,6 +245,27 @@ public class AnomalyDetectionConfigurationGroup implements Serializable {
 	private long timeTravelDuration;
 
 	private AnomalyDefinition anomalyDefinition;
+
+	private NotificationDefinition notificationDefinition;
+
+	/**
+	 * Gets {@link #notificationDefinition}.
+	 *
+	 * @return {@link #notificationDefinition}
+	 */
+	public NotificationDefinition getNotificationDefinition() {
+		return this.notificationDefinition;
+	}
+
+	/**
+	 * Sets {@link #notificationDefinition}.
+	 *
+	 * @param notificationDefinition
+	 *            New value for {@link #notificationDefinition}
+	 */
+	public void setNotificationDefinition(NotificationDefinition notificationDefinition) {
+		this.notificationDefinition = notificationDefinition;
+	}
 
 	/**
 	 * Sets {@link #anomalyDefinition}.

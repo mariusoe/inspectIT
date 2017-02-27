@@ -26,8 +26,8 @@ import rocks.inspectit.server.ci.ConfigurationInterfaceManager;
 import rocks.inspectit.shared.all.exception.BusinessException;
 import rocks.inspectit.shared.all.exception.TechnicalException;
 import rocks.inspectit.shared.all.testbase.TestBase;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
 import rocks.inspectit.shared.cs.ci.BusinessContextDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 import rocks.inspectit.shared.cs.ci.business.impl.ApplicationDefinition;
 
 /**

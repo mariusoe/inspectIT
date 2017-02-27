@@ -68,15 +68,18 @@ public class AnomalyProcessorController implements Runnable {
 		}
 
 		for (AnomalyDetectionConfigurationGroup groupConfiguration : configurationGroups) {
-			RootProcessingUnitGroup unitGroup = createProcessingUnitGroup(groupConfiguration);
-
+			RootProcessingUnitGroup unitGroup = (RootProcessingUnitGroup) createProcessingUnitGroup(groupConfiguration, true);
 			processingUnitGroups.add(unitGroup);
 		}
 	}
 
-	private RootProcessingUnitGroup createProcessingUnitGroup(AnomalyDetectionConfigurationGroup groupConfiguration) {
-		RootProcessingUnitGroup processingUnitGroup = beanFactory.getBean(RootProcessingUnitGroup.class);
-		processingUnitGroup.setConfigurationGroup(groupConfiguration);
+	private ProcessingUnitGroup createProcessingUnitGroup(AnomalyDetectionConfigurationGroup groupConfiguration, boolean isRoot) {
+		ProcessingUnitGroup processingUnitGroup = null;
+		if (isRoot) {
+			processingUnitGroup = (ProcessingUnitGroup) beanFactory.getBean(RootProcessingUnitGroup.class.getSimpleName(), groupConfiguration);
+		} else {
+			processingUnitGroup = (ProcessingUnitGroup) beanFactory.getBean(ProcessingUnitGroup.class.getSimpleName(), groupConfiguration);
+		}
 
 		for (AnomalyDetectionConfiguration configuration : groupConfiguration.getConfigurations()) {
 			ProcessingUnit processingUnit = createProcessingUnit(configuration);
@@ -85,7 +88,7 @@ public class AnomalyProcessorController implements Runnable {
 		}
 
 		for (AnomalyDetectionConfigurationGroup innerGroupConfiguration : groupConfiguration.getConfigurationGroups()) {
-			ProcessingUnitGroup innerProcessingUnitGroup = createProcessingUnitGroup(innerGroupConfiguration);
+			ProcessingUnitGroup innerProcessingUnitGroup = createProcessingUnitGroup(innerGroupConfiguration, false);
 			processingUnitGroup.getProcessors().add(innerProcessingUnitGroup);
 		}
 

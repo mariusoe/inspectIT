@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import rocks.inspectit.server.alerting.action.AlertingActionService;
 import rocks.inspectit.server.alerting.state.AlertingState;
 import rocks.inspectit.shared.all.spring.logger.Log;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 
 /**
  * This component handles the management of the lifecycle of the alerts. It is responsible for

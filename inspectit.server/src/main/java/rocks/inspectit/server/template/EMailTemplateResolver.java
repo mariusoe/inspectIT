@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import rocks.inspectit.server.alerting.state.AlertingState;
 import rocks.inspectit.server.alerting.util.AlertingUtils;
 import rocks.inspectit.server.template.AlertEMailTemplateType.Placeholders;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 import rocks.inspectit.shared.cs.communication.data.cmr.Alert;
 
 /**

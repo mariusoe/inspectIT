@@ -24,6 +24,7 @@ Require-Bundle: rocks.inspectit.shared.all,
  org.springframework.spring-expression;bundle-version="3.2.16",
  org.springframework.spring-web;bundle-version="3.2.16"
 Export-Package: rocks.inspectit.shared.cs.ci,
+ rocks.inspectit.shared.cs.ci.alerting,
  rocks.inspectit.shared.cs.ci.anomaly.configuration,
  rocks.inspectit.shared.cs.ci.anomaly.definition,
  rocks.inspectit.shared.cs.ci.anomaly.definition.baseline,

@@ -16,6 +16,7 @@ import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.NonBaselineDefin
 import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.HardClassifierDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.PercentageClassifierDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.metric.InfluxDBMetricDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.notification.LogNotificationDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.FixedThresholdDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.PercentageDerivationThresholdDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.PercentileThresholdDefinition;
@@ -28,7 +29,7 @@ import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.StandardDeviati
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso({ ExponentialMovingAverageBaselineDefinition.class, MovingAverageBaselineDefinition.class, HardClassifierDefinition.class, PercentageClassifierDefinition.class,
 	InfluxDBMetricDefinition.class, FixedThresholdDefinition.class, PercentageDerivationThresholdDefinition.class, PercentileThresholdDefinition.class, StandardDeviationThresholdDefinition.class,
-	NonBaselineDefinition.class, HoltWintersBaselineDefinition.class, HistoricalBaselineDefinition.class })
+		NonBaselineDefinition.class, HoltWintersBaselineDefinition.class, HistoricalBaselineDefinition.class, LogNotificationDefinition.class })
 public abstract class AbstractDefinition implements Serializable {
 
 	@XmlTransient

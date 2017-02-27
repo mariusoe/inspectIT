@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
 import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.constants.Measurements;
+import rocks.inspectit.server.anomaly.notification.NotificationService;
 import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroup;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.util.Pair;
@@ -33,6 +34,9 @@ public class StateManager {
 
 	private Map<String, StateContext> contextMap = new HashMap<>();
 
+	@Autowired
+	private NotificationService notificationService;
+
 	/**
 	 * @param time
 	 * @param rootProcessingUnitGroup
@@ -51,6 +55,8 @@ public class StateManager {
 		HealthTransition healthTransition = getHealthTransition(healthStatus.getFirst(), healthStatus.getSecond());
 
 		writeAnomalyState(time, unitGroup, healthTransition);
+
+		notificationService.handleHealthTransition(healthTransition, unitGroup.getConfigurationGroup());
 	}
 
 	private Pair<HealthStatus, HealthStatus> updateHealthStatus(StateContext context, AnomalyDefinition anomalyDefinition) {

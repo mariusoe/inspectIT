@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 
 import rocks.inspectit.server.influx.constants.Series;
 import rocks.inspectit.shared.all.testbase.TestBase;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 
 /**
  * Testing the functionality of {@link AlertingUtils}.

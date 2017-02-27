@@ -63,6 +63,10 @@
 
   <xs:element name="field-capture" type="fieldContextCapture"/>
 
+  <xs:element name="historical-baseline" type="historicalBaselineDefinition"/>
+
+  <xs:element name="holt-winters-baseline" type="holtWintersBaselineDefinition"/>
+
   <xs:element name="host" type="hostValueSource"/>
 
   <xs:element name="http-parameter-value" type="httpParameterValueSource"/>
@@ -94,6 +98,8 @@
   <xs:element name="method-signature" type="methodSignatureValueSource"/>
 
   <xs:element name="name-extraction" type="nameExtractionExpression"/>
+
+  <xs:element name="non-baseline" type="nonBaselineDefinition"/>
 
   <xs:element name="not" type="notExpression"/>
 
@@ -167,41 +173,6 @@
           <xs:element ref="agent-mapping" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="revision" type="xs:int"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="alertingDefinition">
-    <xs:complexContent>
-      <xs:extension base="abstractCiData">
-        <xs:sequence>
-          <xs:element name="tags">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
-                  <xs:complexType>
-                    <xs:sequence>
-                      <xs:element name="key" minOccurs="0" type="xs:string"/>
-                      <xs:element name="value" minOccurs="0" type="xs:string"/>
-                    </xs:sequence>
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-          <xs:element name="notification-email-addresses" minOccurs="0">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element name="notification-email-address" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute name="threshold" type="xs:double"/>
-        <xs:attribute name="field" type="xs:string"/>
-        <xs:attribute name="threshold-type" type="thresholdType"/>
-        <xs:attribute name="measurement" type="xs:string"/>
-        <xs:attribute name="timerange" type="xs:long"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -846,6 +817,41 @@
     <xs:attribute name="domain" type="xs:string" use="required"/>
   </xs:complexType>
 
+  <xs:complexType name="alertingDefinition">
+    <xs:complexContent>
+      <xs:extension base="abstractCiData">
+        <xs:sequence>
+          <xs:element name="tags">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="key" minOccurs="0" type="xs:string"/>
+                      <xs:element name="value" minOccurs="0" type="xs:string"/>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="notification-email-addresses" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="notification-email-address" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="threshold" type="xs:double"/>
+        <xs:attribute name="field" type="xs:string"/>
+        <xs:attribute name="threshold-type" type="thresholdType"/>
+        <xs:attribute name="measurement" type="xs:string"/>
+        <xs:attribute name="timerange" type="xs:long"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="anomalyDetectionConfiguration">
     <xs:sequence>
       <xs:element name="id" type="xs:string" minOccurs="0"/>
@@ -855,7 +861,7 @@
       <xs:element name="classifierDefinition" type="classifierDefinition" minOccurs="0"/>
       <xs:element name="warmupLength" type="xs:int"/>
       <xs:element name="intervalShortProcessing" type="xs:int"/>
-      <xs:element name="intervalLongProcessing" type="xs:int"/>
+      <xs:element name="intervalLongProcessingMultiplier" type="xs:int"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -863,7 +869,7 @@
     <xs:complexContent>
       <xs:extension base="abstractDefinition">
         <xs:sequence>
-          <xs:element name="isAggregated" type="xs:boolean"/>
+          <xs:element name="defaultValue" type="xs:double"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -953,6 +959,7 @@
           </xs:element>
           <xs:element name="function" type="function" minOccurs="0"/>
           <xs:element name="field" type="xs:string" minOccurs="0"/>
+          <xs:element name="opperateOnAggregation" type="xs:boolean"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -1021,6 +1028,41 @@
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="nonBaselineDefinition">
+    <xs:complexContent>
+      <xs:extension base="baselineDefinition">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="holtWintersBaselineDefinition">
+    <xs:complexContent>
+      <xs:extension base="baselineDefinition">
+        <xs:sequence>
+          <xs:element name="smoothingFactor" type="xs:double"/>
+          <xs:element name="trendSmoothingFactor" type="xs:double"/>
+          <xs:element name="seasonalSmoothingFactor" type="xs:double"/>
+          <xs:element name="seasonalLength" type="xs:int"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="historicalBaselineDefinition">
+    <xs:complexContent>
+      <xs:extension base="baselineDefinition">
+        <xs:sequence>
+          <xs:element name="seasonLength" type="xs:int"/>
+          <xs:element name="smoothingFactor" type="xs:double"/>
+          <xs:element name="smoothValue" type="xs:boolean"/>
+          <xs:element name="valueSoothingFactor" type="xs:double"/>
+          <xs:element name="trendSmoothingFactor" type="xs:double"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="anomalyDetectionConfigurationGroup">
     <xs:sequence>
       <xs:element name="name" type="xs:string" minOccurs="0"/>
@@ -1029,6 +1071,14 @@
       <xs:element name="configurationGroups" type="anomalyDetectionConfigurationGroup" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="configurations" type="anomalyDetectionConfiguration" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="timeTravelDuration" type="xs:long"/>
+      <xs:element name="anomalyDefinition" type="anomalyDefinition" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="anomalyDefinition">
+    <xs:sequence>
+      <xs:element name="endCount" type="xs:int"/>
+      <xs:element name="startCount" type="xs:int"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -1057,13 +1107,6 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:simpleType name="thresholdType">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="LOWER_THRESHOLD"/>
-      <xs:enumeration value="UPPER_THRESHOLD"/>
-    </xs:restriction>
-  </xs:simpleType>
-
   <xs:simpleType name="patternMatchingType">
     <xs:restriction base="xs:string">
       <xs:enumeration value="contains"/>
@@ -1074,17 +1117,28 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:simpleType name="thresholdType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="LOWER_THRESHOLD"/>
+      <xs:enumeration value="UPPER_THRESHOLD"/>
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:simpleType name="function">
     <xs:restriction base="xs:string">
+      <xs:enumeration value="COUNT"/>
+      <xs:enumeration value="MAX"/>
       <xs:enumeration value="MEAN"/>
       <xs:enumeration value="MEDIAN"/>
+      <xs:enumeration value="MIN"/>
+      <xs:enumeration value="SUM"/>
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="mode">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="HIGHEST"/>
-      <xs:enumeration value="LOWEST"/>
+      <xs:enumeration value="BEST"/>
+      <xs:enumeration value="WORST"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

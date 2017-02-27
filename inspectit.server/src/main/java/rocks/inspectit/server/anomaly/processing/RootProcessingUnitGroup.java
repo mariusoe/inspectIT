@@ -15,6 +15,7 @@ import rocks.inspectit.server.anomaly.constants.Measurements;
 import rocks.inspectit.server.anomaly.state.StateManager;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.spring.logger.Log;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfigurationGroup;
 
 /**
  * @author Marius Oehler
@@ -32,6 +33,17 @@ public class RootProcessingUnitGroup extends ProcessingUnitGroup {
 
 	@Autowired
 	StateManager stateManager;
+
+	private final ProcessingGroupContext groupContext;
+
+	@Autowired
+	public RootProcessingUnitGroup(AnomalyDetectionConfigurationGroup configurationGroup) {
+		super(configurationGroup);
+
+		groupContext = new ProcessingGroupContext();
+		groupContext.setGroupId(configurationGroup.getGroupId());
+	}
+
 
 	public void process() {
 		long time = System.currentTimeMillis();

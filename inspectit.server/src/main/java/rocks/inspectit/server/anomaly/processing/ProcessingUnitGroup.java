@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -26,9 +27,14 @@ public class ProcessingUnitGroup implements IAnomalyProcessor {
 
 	private List<IAnomalyProcessor> processors = new ArrayList<>();
 
-	private AnomalyDetectionConfigurationGroup configurationGroup;
+	private final AnomalyDetectionConfigurationGroup configurationGroup;
 
 	private HealthStatus currentHealthStatus = HealthStatus.UNKNOWN;
+
+	@Autowired
+	public ProcessingUnitGroup(AnomalyDetectionConfigurationGroup configurationGroup) {
+		this.configurationGroup = configurationGroup;
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -58,16 +64,6 @@ public class ProcessingUnitGroup implements IAnomalyProcessor {
 	 */
 	public AnomalyDetectionConfigurationGroup getConfigurationGroup() {
 		return this.configurationGroup;
-	}
-
-	/**
-	 * Sets {@link #configurationGroup}.
-	 *
-	 * @param configurationGroup
-	 *            New value for {@link #configurationGroup}
-	 */
-	public void setConfigurationGroup(AnomalyDetectionConfigurationGroup configurationGroup) {
-		this.configurationGroup = configurationGroup;
 	}
 
 	/**

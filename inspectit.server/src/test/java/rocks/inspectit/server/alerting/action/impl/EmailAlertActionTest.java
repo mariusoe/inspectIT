@@ -28,7 +28,7 @@ import rocks.inspectit.server.mail.EMailSender;
 import rocks.inspectit.server.template.AlertEMailTemplateType;
 import rocks.inspectit.server.template.EMailTemplateResolver;
 import rocks.inspectit.shared.all.testbase.TestBase;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
 
 /**
  *

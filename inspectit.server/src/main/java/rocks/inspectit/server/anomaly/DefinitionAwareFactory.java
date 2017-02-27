@@ -15,6 +15,8 @@ import rocks.inspectit.server.anomaly.classification.impl.HardClassifier;
 import rocks.inspectit.server.anomaly.classification.impl.PercentageClassifier;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.anomaly.metric.impl.InfluxDBMetricProvider;
+import rocks.inspectit.server.anomaly.notification.AbstractNotifier;
+import rocks.inspectit.server.anomaly.notification.impl.LogNotifier;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
 import rocks.inspectit.server.anomaly.threshold.impl.FixedThreshold;
 import rocks.inspectit.server.anomaly.threshold.impl.PercentageDerivationThreshold;
@@ -30,6 +32,7 @@ import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.NonBaselineDefin
 import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.HardClassifierDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.PercentageClassifierDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.metric.InfluxDBMetricDefinition;
+import rocks.inspectit.shared.cs.ci.anomaly.definition.notification.LogNotificationDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.FixedThresholdDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.PercentageDerivationThresholdDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.PercentileThresholdDefinition;
@@ -97,6 +100,28 @@ public class DefinitionAwareFactory {
 			return create(HardClassifier.class, definition);
 		} else {
 			throw new UnsupportedClassifierException(definition.getClass());
+		}
+	}
+
+	public AbstractNotifier<?> createNotifier(AbstractDefinition definition) {
+		if (definition instanceof LogNotificationDefinition) {
+			return create(LogNotifier.class, definition);
+		} else {
+			throw new UnsupportedNotifierException(definition.getClass());
+		}
+	}
+
+	public static class UnsupportedNotifierException extends RuntimeException {
+		/**
+		 * Generated UUID.
+		 */
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * @param message
+		 */
+		public UnsupportedNotifierException(Class<?> clazz) {
+			super("Unsupported notifier for definition of type '" + clazz.getSimpleName() + "'.");
 		}
 	}
 

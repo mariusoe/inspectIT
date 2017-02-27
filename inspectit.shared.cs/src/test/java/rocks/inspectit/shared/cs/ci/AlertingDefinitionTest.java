@@ -22,7 +22,8 @@ import org.testng.annotations.Test;
 import com.google.common.collect.ImmutableMap;
 
 import rocks.inspectit.shared.all.testbase.TestBase;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition.ThresholdType;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition.ThresholdType;
 
 /**
  * @author Marius Oehler

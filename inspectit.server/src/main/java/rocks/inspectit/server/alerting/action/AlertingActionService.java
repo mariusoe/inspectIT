@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import rocks.inspectit.server.alerting.AlertRegistry;
 import rocks.inspectit.server.alerting.state.AlertingState;
 import rocks.inspectit.shared.all.spring.logger.Log;
-import rocks.inspectit.shared.cs.ci.AlertingDefinition.ThresholdType;
+import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition.ThresholdType;
 import rocks.inspectit.shared.cs.communication.data.cmr.Alert;
 import rocks.inspectit.shared.cs.communication.data.cmr.AlertClosingReason;
 

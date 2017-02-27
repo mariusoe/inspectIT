@@ -1,4 +1,4 @@
-package rocks.inspectit.shared.cs.ci;
+package rocks.inspectit.shared.cs.ci.alerting;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import rocks.inspectit.shared.all.util.EMailUtils;
+import rocks.inspectit.shared.cs.ci.AbstractCiData;
 
 /**
  * XML element which represents a threshold used for alerting purpose.
