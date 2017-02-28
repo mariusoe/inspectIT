@@ -239,11 +239,9 @@ public class AnomalyDetectionGroupConfiguration implements Serializable {
 
 	private Date createdDate;
 
-	private String id = UUID.randomUUID().toString();
+	private String groupId = UUID.randomUUID().toString();
 
 	private Mode mode = Mode.WORST;
-
-	private List<AnomalyDetectionGroupConfiguration> configurationGroups = new ArrayList<>();
 
 	private List<AnomalyDetectionConfiguration> configurations = new ArrayList<>();
 
@@ -370,22 +368,22 @@ public class AnomalyDetectionGroupConfiguration implements Serializable {
 	}
 
 	/**
-	 * Gets {@link #id}.
+	 * Gets {@link #groupId}.
 	 *
-	 * @return {@link #id}
+	 * @return {@link #groupId}
 	 */
-	public String getId() {
-		return this.id;
+	public String getGroupId() {
+		return this.groupId;
 	}
 
 	/**
-	 * Sets {@link #id}.
+	 * Sets {@link #groupId}.
 	 *
 	 * @param id
-	 *            New value for {@link #id}
+	 *            New value for {@link #groupId}
 	 */
-	public void setId(String id) {
-		this.id = id;
+	public void setGroupId(String id) {
+		this.groupId = id;
 	}
 
 	/**
@@ -424,15 +422,6 @@ public class AnomalyDetectionGroupConfiguration implements Serializable {
 	 */
 	public void setMode(Mode mode) {
 		this.mode = mode;
-	}
-
-	/**
-	 * Gets {@link #configurationGroups}.
-	 *
-	 * @return {@link #configurationGroups}
-	 */
-	public List<AnomalyDetectionGroupConfiguration> getConfigurationGroups() {
-		return this.configurationGroups;
 	}
 
 	/**

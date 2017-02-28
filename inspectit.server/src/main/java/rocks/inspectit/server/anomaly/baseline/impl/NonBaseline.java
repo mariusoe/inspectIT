@@ -3,7 +3,7 @@ package rocks.inspectit.server.anomaly.baseline.impl;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
-import rocks.inspectit.server.anomaly.processing.ProcessingContext;
+import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.NonBaselineDefinition;
 
 /**
@@ -17,7 +17,7 @@ public class NonBaseline extends AbstractBaseline<NonBaselineDefinition> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void process(ProcessingContext context, long time) {
+	public void process(ProcessingUnitContext context, long time) {
 		// nothing to do here
 	}
 

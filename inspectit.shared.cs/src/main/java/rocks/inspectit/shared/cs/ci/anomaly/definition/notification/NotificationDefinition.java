@@ -8,24 +8,25 @@ import rocks.inspectit.shared.cs.ci.anomaly.definition.AbstractDefinition;
  */
 public class NotificationDefinition extends AbstractDefinition {
 
-	private boolean notifyOnlyCritical = false;
+	private boolean ignoreWarnings = false;
 
 	/**
-	 * Gets {@link #notifyOnlyCritical}.
+	 * Gets {@link #ignoreWarnings}.
 	 *
-	 * @return {@link #notifyOnlyCritical}
+	 * @return {@link #ignoreWarnings}
 	 */
-	public boolean isNotifyOnlyCritical() {
-		return this.notifyOnlyCritical;
+	public boolean isIgnoreWarnings() {
+		return this.ignoreWarnings;
 	}
 
 	/**
-	 * Sets {@link #notifyOnlyCritical}.
+	 * Sets {@link #ignoreWarnings}.
 	 *
-	 * @param notifyOnlyCritical
-	 *            New value for {@link #notifyOnlyCritical}
+	 * @param ignoreWarnings
+	 *            New value for {@link #ignoreWarnings}
 	 */
-	public void setNotifyOnlyCritical(boolean notifyOnlyCritical) {
-		this.notifyOnlyCritical = notifyOnlyCritical;
+	public void setIgnoreWarnings(boolean ignoreWarnings) {
+		this.ignoreWarnings = ignoreWarnings;
 	}
+
 }

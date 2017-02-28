@@ -3,7 +3,7 @@ package rocks.inspectit.server.anomaly.processing.health;
 import java.util.List;
 
 import rocks.inspectit.server.anomaly.HealthStatus;
-import rocks.inspectit.server.anomaly.processing.IAnomalyProcessor;
+import rocks.inspectit.server.anomaly.processing.ProcessingUnit;
 
 /**
  * @author Marius Oehler
@@ -20,10 +20,10 @@ public class WorstHealthDeclaration implements IHealthDeclaration {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public HealthStatus declareHelthStatus(List<IAnomalyProcessor> processors) {
+	public HealthStatus declareHelthStatus(List<ProcessingUnit> processors) {
 		HealthStatus status = HealthStatus.UNKNOWN;
 
-		for (IAnomalyProcessor processor : processors) {
+		for (ProcessingUnit processor : processors) {
 			if (processor.getHealthStatus().ordinal() > status.ordinal()) {
 				status = processor.getHealthStatus();
 			}

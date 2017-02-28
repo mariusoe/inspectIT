@@ -2,7 +2,7 @@ package rocks.inspectit.server.anomaly.metric;
 
 import java.util.concurrent.TimeUnit;
 
-import rocks.inspectit.server.anomaly.processing.ProcessingContext;
+import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.AbstractDefinitionAware;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.metric.MetricDefinition;
 
@@ -12,7 +12,7 @@ import rocks.inspectit.shared.cs.ci.anomaly.definition.metric.MetricDefinition;
  */
 public abstract class AbstractMetricProvider<E extends MetricDefinition> extends AbstractDefinitionAware<E> {
 
-	public abstract void next(ProcessingContext context, long time);
+	public abstract void next(ProcessingUnitContext context, long time);
 
 	public abstract double getValue();
 

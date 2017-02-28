@@ -10,7 +10,7 @@ import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
 import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
 import rocks.inspectit.server.anomaly.metric.MetricFilter;
-import rocks.inspectit.server.anomaly.processing.ProcessingContext;
+import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold.ThresholdType;
 import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.PercentageClassifierDefinition;
@@ -30,7 +30,7 @@ public class PercentageClassifier extends AbstractClassifier<PercentageClassifie
 	 * {@inheritDoc}
 	 */
 	@Override
-	public HealthStatus classify(ProcessingContext context, long time) {
+	public HealthStatus classify(ProcessingUnitContext context, long time) {
 		if (!context.isWarmedUp()) {
 			return HealthStatus.UNKNOWN;
 		}

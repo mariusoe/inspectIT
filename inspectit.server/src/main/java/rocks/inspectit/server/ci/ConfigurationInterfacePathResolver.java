@@ -206,7 +206,7 @@ public class ConfigurationInterfacePathResolver {
 	public Path getAnomalyDetectionConfigurationFilePath(AnomalyDetectionGroupConfiguration configurationGroup) {
 		// String secureDefinitionName =
 		// removeIllegalFilenameCharacters(alertingDefinition.getName());
-		String fileName = configurationGroup.getId() + ".xml";
+		String fileName = configurationGroup.getGroupId() + ".xml";
 		return getAnomalyDetectionConfigurationsPath().resolve(fileName);
 	}
 

@@ -18,7 +18,6 @@ import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold.ThresholdType;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.spring.logger.Log;
-import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfiguration;
 
 /**
  * @author Marius Oehler
@@ -26,7 +25,7 @@ import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfig
  */
 @Component
 @Scope("prototype")
-public class ProcessingUnit implements IAnomalyProcessor {
+public class ProcessingUnit {
 
 	@Log
 	private Logger log;
@@ -34,30 +33,20 @@ public class ProcessingUnit implements IAnomalyProcessor {
 	@Autowired
 	InfluxDBDao influx;
 
-	private final ProcessingContext context;
+	private final ProcessingUnitContext context;
 
 	/**
 	 * @param groupContext
 	 */
 	@Autowired
-	public ProcessingUnit(ProcessingGroupContext groupContext, AnomalyDetectionConfiguration configuration) {
-		context = new ProcessingContext();
-		context.setGroupContext(groupContext);
-		context.setConfiguration(configuration);
+	public ProcessingUnit(ProcessingUnitContext unitContext) {
+		context = unitContext;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public void initialize(long time) {
 		process(time);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public void process(long time) {
 		int shortInterval = context.getConfiguration().getIntervalShortProcessing();
 		int longInterval = context.getConfiguration().getIntervalShortProcessing() * context.getConfiguration().getIntervalLongProcessingMultiplier();
@@ -167,10 +156,6 @@ public class ProcessingUnit implements IAnomalyProcessor {
 		context.setClassifier(classifier);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public HealthStatus getHealthStatus() {
 		return context.getHealthStatus();
 	}

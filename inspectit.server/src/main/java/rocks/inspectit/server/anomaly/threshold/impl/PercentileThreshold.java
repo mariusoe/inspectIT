@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
-import rocks.inspectit.server.anomaly.processing.ProcessingContext;
+import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
 import rocks.inspectit.server.anomaly.threshold.UnsupportedThresholdTypeException;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.threshold.PercentileThresholdDefinition;
@@ -28,7 +28,7 @@ public class PercentileThreshold extends AbstractThreshold<PercentileThresholdDe
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void process(ProcessingContext context, long time) {
+	public void process(ProcessingUnitContext context, long time) {
 		int intervalLength = context.getConfiguration().getIntervalShortProcessing() * context.getConfiguration().getIntervalLongProcessingMultiplier();
 		long timeWindow = AnomalyDetectionSystem.PROCESSING_INTERVAL_SECONDS * intervalLength;
 
@@ -53,7 +53,7 @@ public class PercentileThreshold extends AbstractThreshold<PercentileThresholdDe
 		}
 	}
 
-	private void addValue(ProcessingContext context, double value, int percentileIndex) {
+	private void addValue(ProcessingUnitContext context, double value, int percentileIndex) {
 		if (!Double.isNaN(value)) {
 			percentileStatistics[percentileIndex].addValue(value);
 
@@ -86,7 +86,7 @@ public class PercentileThreshold extends AbstractThreshold<PercentileThresholdDe
 	 * {@inheritDoc}
 	 */
 	@Override
-	public double getThreshold(ProcessingContext context, ThresholdType type) {
+	public double getThreshold(ProcessingUnitContext context, ThresholdType type) {
 		switch (type) {
 		case UPPER_CRITICAL:
 			return percentiles[0];

@@ -1079,7 +1079,7 @@
     <xs:complexContent>
       <xs:extension base="abstractDefinition">
         <xs:sequence>
-          <xs:element name="notifyOnlyCritical" type="xs:boolean"/>
+          <xs:element name="ignoreWarnings" type="xs:boolean"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -1090,9 +1090,8 @@
       <xs:element name="name" type="xs:string" minOccurs="0"/>
       <xs:element name="businessTransaction" type="xs:string" minOccurs="0"/>
       <xs:element name="createdDate" type="xs:dateTime" minOccurs="0"/>
-      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="groupId" type="xs:string" minOccurs="0"/>
       <xs:element name="mode" type="mode" minOccurs="0"/>
-      <xs:element name="configurationGroups" type="anomalyDetectionGroupConfiguration" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="configurations" type="anomalyDetectionConfiguration" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="timeTravelDuration" type="xs:long"/>
       <xs:element name="anomalyDefinition" type="anomalyDefinition" minOccurs="0"/>

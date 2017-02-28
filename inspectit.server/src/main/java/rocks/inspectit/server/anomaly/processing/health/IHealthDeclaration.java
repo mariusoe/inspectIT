@@ -3,7 +3,7 @@ package rocks.inspectit.server.anomaly.processing.health;
 import java.util.List;
 
 import rocks.inspectit.server.anomaly.HealthStatus;
-import rocks.inspectit.server.anomaly.processing.IAnomalyProcessor;
+import rocks.inspectit.server.anomaly.processing.ProcessingUnit;
 
 /**
  * @author Marius Oehler
@@ -11,5 +11,5 @@ import rocks.inspectit.server.anomaly.processing.IAnomalyProcessor;
  */
 public interface IHealthDeclaration {
 
-	HealthStatus declareHelthStatus(List<IAnomalyProcessor> processors);
+	HealthStatus declareHelthStatus(List<ProcessingUnit> processors);
 }

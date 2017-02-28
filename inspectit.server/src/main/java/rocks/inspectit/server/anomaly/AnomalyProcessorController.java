@@ -14,18 +14,16 @@ import com.google.common.collect.ImmutableList;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
-import rocks.inspectit.server.anomaly.processing.ProcessingGroupContext;
 import rocks.inspectit.server.anomaly.processing.ProcessingUnit;
+import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
 import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroup;
-import rocks.inspectit.server.anomaly.processing.RootProcessingUnitGroup;
+import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroupContext;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
 import rocks.inspectit.server.ci.event.AbstractAnomalyConfigurationEvent;
 import rocks.inspectit.server.ci.event.AbstractAnomalyConfigurationEvent.AnomalyDetectionGroupConfigurationCreatedEvent;
 import rocks.inspectit.server.ci.event.AbstractAnomalyConfigurationEvent.AnomalyDetectionGroupConfigurationsLoadedEvent;
-import rocks.inspectit.server.ci.manager.ConfigurationInterfaceAnomalyManager;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.spring.logger.Log;
-import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfiguration;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionGroupConfiguration;
 
 /**
@@ -48,67 +46,59 @@ public class AnomalyProcessorController implements Runnable, ApplicationListener
 	InfluxDBDao influx;
 
 	@Autowired
-	ConfigurationInterfaceAnomalyManager ciAnomalyManager;
+	ContextFactory contextFactory;
 
-	private List<RootProcessingUnitGroup> processingUnitGroups = new ArrayList<>();
+	private List<ProcessingUnitGroup> processingUnitGroups = new ArrayList<>();
+
+	// @PostConstruct
+	// public void test() {
+	// try {
+	// ciAnomalyManager.createAnomalyDetectionConfigurationGroup(AnomalyDetectionGroupConfiguration.getTestConfiguration());
+	// } catch (JAXBException | IOException e) {
+	// e.printStackTrace();
+	// }
+	// }
 
 	private void createProcessingUnitGroups(List<AnomalyDetectionGroupConfiguration> groupConfigurations) {
-		// try {
-		// ciAnomalyManager.createAnomalyDetectionConfigurationGroup(AnomalyDetectionGroupConfiguration.getTestConfiguration());
-		// } catch (JAXBException | IOException e) {
-		// e.printStackTrace();
-		// }
-
-		for (AnomalyDetectionGroupConfiguration groupConfiguration : ciAnomalyManager.getAnomalyDetectionGroupConfigurations()) {
-			RootProcessingUnitGroup unitGroup = (RootProcessingUnitGroup) createProcessingUnitGroup(groupConfiguration, true);
+		for (AnomalyDetectionGroupConfiguration groupConfiguration : groupConfigurations) {
+			ProcessingUnitGroup unitGroup = createProcessingUnitGroup(groupConfiguration);
 			processingUnitGroups.add(unitGroup);
 		}
 	}
 
-	private ProcessingUnitGroup createProcessingUnitGroup(AnomalyDetectionGroupConfiguration groupConfiguration, boolean isRoot) {
-		ProcessingUnitGroup processingUnitGroup = null;
-		if (isRoot) {
-			processingUnitGroup = (ProcessingUnitGroup) beanFactory.getBean("rootProcessingUnitGroup", groupConfiguration);
-		} else {
-			processingUnitGroup = (ProcessingUnitGroup) beanFactory.getBean("processingUnitGroup", groupConfiguration);
-		}
+	private ProcessingUnitGroup createProcessingUnitGroup(AnomalyDetectionGroupConfiguration groupConfiguration) {
+		ProcessingUnitGroupContext groupContext = contextFactory.createProcessingGroupContext(groupConfiguration);
 
-		for (AnomalyDetectionConfiguration configuration : groupConfiguration.getConfigurations()) {
-			ProcessingUnit processingUnit = createProcessingUnit(processingUnitGroup.getGroupContext(), configuration);
-			processingUnitGroup.getProcessors().add(processingUnit);
-		}
+		ProcessingUnitGroup processingUnitGroup = (ProcessingUnitGroup) beanFactory.getBean("processingUnitGroup", groupContext);
 
-		for (AnomalyDetectionGroupConfiguration innerGroupConfiguration : groupConfiguration.getConfigurationGroups()) {
-			ProcessingUnitGroup innerProcessingUnitGroup = createProcessingUnitGroup(innerGroupConfiguration, false);
-			processingUnitGroup.getProcessors().add(innerProcessingUnitGroup);
+		for (ProcessingUnitContext unitContext : groupContext.getProcessingUnitContexts()) {
+			ProcessingUnit processingUnit = createProcessingUnit(unitContext);
+			processingUnitGroup.getProcessingUnits().add(processingUnit);
 		}
 
 		return processingUnitGroup;
 	}
 
-	private ProcessingUnit createProcessingUnit(ProcessingGroupContext groupContext, AnomalyDetectionConfiguration configuration) {
-		ProcessingUnit processingUnit = (ProcessingUnit) beanFactory.getBean("processingUnit", groupContext, configuration);
+	private ProcessingUnit createProcessingUnit(ProcessingUnitContext unitContext) {
+		ProcessingUnit processingUnit = (ProcessingUnit) beanFactory.getBean("processingUnit", unitContext);
 
-		AbstractMetricProvider<?> metricProvider = definitionAwareFactory.createMetricProvider(configuration.getMetricDefinition());
+		AbstractMetricProvider<?> metricProvider = definitionAwareFactory.createMetricProvider(unitContext.getConfiguration().getMetricDefinition());
 		processingUnit.setMetricProvider(metricProvider);
 
-		AbstractBaseline<?> baseline = definitionAwareFactory.createBaseline(configuration.getBaselineDefinition());
+		AbstractBaseline<?> baseline = definitionAwareFactory.createBaseline(unitContext.getConfiguration().getBaselineDefinition());
 		processingUnit.setBaseline(baseline);
 
-		AbstractThreshold<?> threshold = definitionAwareFactory.createThreshold(configuration.getThresholdDefinition());
+		AbstractThreshold<?> threshold = definitionAwareFactory.createThreshold(unitContext.getConfiguration().getThresholdDefinition());
 		processingUnit.setThreshold(threshold);
 
-		AbstractClassifier<?> classifier = definitionAwareFactory.createClassifier(configuration.getClassifierDefinition());
+		AbstractClassifier<?> classifier = definitionAwareFactory.createClassifier(unitContext.getConfiguration().getClassifierDefinition());
 		processingUnit.setClassifier(classifier);
 
 		return processingUnit;
 	}
 
-	/**
-	 *
-	 */
 	public void initialize() {
-		for (RootProcessingUnitGroup unitGroup : processingUnitGroups) {
+		for (ProcessingUnitGroup unitGroup : processingUnitGroups) {
 			unitGroup.initialize();
 		}
 	}
@@ -118,7 +108,7 @@ public class AnomalyProcessorController implements Runnable, ApplicationListener
 	 */
 	@Override
 	public void run() {
-		for (RootProcessingUnitGroup unitGroup : processingUnitGroups) {
+		for (ProcessingUnitGroup unitGroup : processingUnitGroups) {
 			try {
 				unitGroup.process();
 			} catch (Exception e) {

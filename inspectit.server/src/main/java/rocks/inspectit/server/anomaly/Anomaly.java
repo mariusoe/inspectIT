@@ -31,9 +31,30 @@ public class Anomaly {
 
 	private AnomalyDetectionGroupConfiguration groupConfiguration;
 
+	private int parallelCriticalProcessingUnits = 0;
+
 	protected Anomaly(long startTime) {
 		id = UUID.randomUUID().toString();
 		this.startTime = startTime;
+	}
+
+	/**
+	 * Gets {@link #parallelCriticalProcessingUnits}.
+	 *
+	 * @return {@link #parallelCriticalProcessingUnits}
+	 */
+	public int getParallelCriticalProcessingUnits() {
+		return this.parallelCriticalProcessingUnits;
+	}
+
+	/**
+	 * Sets {@link #parallelCriticalProcessingUnits}.
+	 *
+	 * @param parallelCriticalProcessingUnits
+	 *            New value for {@link #parallelCriticalProcessingUnits}
+	 */
+	public void setParallelCriticalProcessingUnits(int parallelCriticalProcessingUnits) {
+		this.parallelCriticalProcessingUnits = parallelCriticalProcessingUnits;
 	}
 
 	/**
@@ -51,7 +72,7 @@ public class Anomaly {
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this).omitNullValues().add("startTime", startTime).add("endTime", endTime).add("isCritical", critical).add("healthTransitions", healthTransitionLog.size())
-				.add("relatedGroupId", groupConfiguration.getId()).add("businessTransaction", groupConfiguration.getBusinessTransaction()).toString();
+				.add("relatedGroupId", groupConfiguration.getGroupId()).add("businessTransaction", groupConfiguration.getBusinessTransaction()).toString();
 	}
 
 	/**

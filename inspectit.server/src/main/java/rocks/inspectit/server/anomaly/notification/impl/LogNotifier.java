@@ -26,7 +26,7 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 	 */
 	@Override
 	public void onStart(Anomaly anomaly) {
-		if (getDefinition().isNotifyOnlyCritical() && !anomaly.isCritical()) {
+		if (getDefinition().isIgnoreWarnings() && !anomaly.isCritical()) {
 			return;
 		}
 		if (getDefinition().isPrintBegin() && log.isInfoEnabled()) {
@@ -39,11 +39,11 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 	 */
 	@Override
 	public void onUpgrade(Anomaly anomaly) {
-		if (getDefinition().isNotifyOnlyCritical() && !anomaly.isCritical()) {
+		if (getDefinition().isIgnoreWarnings() && !anomaly.isCritical()) {
 			return;
 		}
 		if (getDefinition().isPrintTransitions() && log.isInfoEnabled()) {
-			log.info("Anomaly upgraded for {} [{}] ", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getId());
+			log.info("Anomaly upgraded for {} [{}] ", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getGroupId());
 		}
 	}
 
@@ -52,11 +52,11 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 	 */
 	@Override
 	public void onDowngrade(Anomaly anomaly) {
-		if (getDefinition().isNotifyOnlyCritical() && !anomaly.isCritical()) {
+		if (getDefinition().isIgnoreWarnings() && !anomaly.isCritical()) {
 			return;
 		}
 		if (getDefinition().isPrintTransitions() && log.isInfoEnabled()) {
-			log.info("Anomaly downgraded for {} [{}] ", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getId());
+			log.info("Anomaly downgraded for {} [{}] ", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getGroupId());
 		}
 	}
 
@@ -65,18 +65,18 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 	 */
 	@Override
 	public void onEnd(Anomaly anomaly) {
-		if (getDefinition().isNotifyOnlyCritical() && !anomaly.isCritical()) {
+		if (getDefinition().isIgnoreWarnings() && !anomaly.isCritical()) {
 			return;
 		}
 
 		if (getDefinition().isPrintEnd() && log.isInfoEnabled()) {
 			log.info("[Anomaly] The anomaly detected by detection group '{}' (btx: {}) has ended.", anomaly.getGroupConfiguration().getName(),
 					anomaly.getGroupConfiguration().getBusinessTransaction());
-
 			log.info("          |- started: {}", new Date(anomaly.getStartTime()));
 			log.info("          |- ended: {}", new Date(anomaly.getEndTime()));
 			log.info("          |- duration: {}", DurationFormatUtils.formatDurationHMS(anomaly.getEndTime() - anomaly.getStartTime()));
 			log.info("          |- was critical: {}", anomaly.isCritical());
+			log.info("          |- parallel critical: {}/{}", anomaly.getParallelCriticalProcessingUnits(), anomaly.getGroupConfiguration().getConfigurations().size());
 		}
 	}
 

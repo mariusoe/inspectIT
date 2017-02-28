@@ -49,7 +49,7 @@ public class ConfigurationInterfaceAnomalyManager extends AbstractConfigurationI
 	public AnomalyDetectionGroupConfiguration createAnomalyDetectionConfigurationGroup(AnomalyDetectionGroupConfiguration groupConfiguration) throws JAXBException, IOException {
 		groupConfiguration.setCreatedDate(new Date());
 
-		existingGroupConfigurations.put(groupConfiguration.getId(), groupConfiguration);
+		existingGroupConfigurations.put(groupConfiguration.getGroupId(), groupConfiguration);
 		saveAnomalyDetectionConfigurationGroup(groupConfiguration);
 
 		eventPublisher.publishEvent(new AnomalyDetectionGroupConfigurationCreatedEvent(this, groupConfiguration));
@@ -88,7 +88,7 @@ public class ConfigurationInterfaceAnomalyManager extends AbstractConfigurationI
 						try {
 							AnomalyDetectionGroupConfiguration groupConfiguration = transformator.unmarshall(file, pathResolver.getSchemaPath(),
 									ISchemaVersionAware.ConfigurationInterface.SCHEMA_VERSION, pathResolver.getMigrationPath(), AnomalyDetectionGroupConfiguration.class);
-							existingGroupConfigurations.put(groupConfiguration.getId(), groupConfiguration);
+							existingGroupConfigurations.put(groupConfiguration.getGroupId(), groupConfiguration);
 						} catch (JAXBException | SAXException e) {
 							log.error("Error reading existing anomaly detection configuration file. File path: " + file.toString() + ".", e);
 						}

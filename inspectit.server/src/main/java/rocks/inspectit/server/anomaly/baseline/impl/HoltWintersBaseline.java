@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
-import rocks.inspectit.server.anomaly.processing.ProcessingContext;
+import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
 import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.HoltWintersBaselineDefinition;
 
@@ -26,7 +26,7 @@ public class HoltWintersBaseline extends AbstractBaseline<HoltWintersBaselineDef
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void process(ProcessingContext context, long time) {
+	public void process(ProcessingUnitContext context, long time) {
 		double value = context.getMetricProvider().getIntervalValue();
 
 		if (Double.isNaN(value)) {

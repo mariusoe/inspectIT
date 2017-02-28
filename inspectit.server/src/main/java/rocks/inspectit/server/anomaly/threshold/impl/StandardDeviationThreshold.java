@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
 import rocks.inspectit.server.anomaly.metric.MetricFilter;
-import rocks.inspectit.server.anomaly.processing.ProcessingContext;
+import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
 import rocks.inspectit.server.anomaly.threshold.UnsupportedThresholdTypeException;
 import rocks.inspectit.shared.all.spring.logger.Log;
@@ -38,7 +38,7 @@ public class StandardDeviationThreshold extends AbstractThreshold<StandardDeviat
 		statistics.setWindowSize(getDefinition().getWindowSize());
 	}
 
-	private MetricFilter getMetricFilter(ProcessingContext context) {
+	private MetricFilter getMetricFilter(ProcessingUnitContext context) {
 		MetricFilter filter = new MetricFilter();
 
 		if (getDefinition().isExcludeWarningData()) {
@@ -66,7 +66,7 @@ public class StandardDeviationThreshold extends AbstractThreshold<StandardDeviat
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void process(ProcessingContext context, long time) {
+	public void process(ProcessingUnitContext context, long time) {
 		int intervalLength = context.getConfiguration().getIntervalShortProcessing() * context.getConfiguration().getIntervalLongProcessingMultiplier();
 		long aggregationWindow = AnomalyDetectionSystem.PROCESSING_INTERVAL_SECONDS * intervalLength;
 
@@ -89,7 +89,7 @@ public class StandardDeviationThreshold extends AbstractThreshold<StandardDeviat
 	 * {@inheritDoc}
 	 */
 	@Override
-	public double getThreshold(ProcessingContext context, ThresholdType type) {
+	public double getThreshold(ProcessingUnitContext context, ThresholdType type) {
 		switch (type) {
 		case LOWER_CRITICAL:
 			double lowerCritical = context.getBaseline().getBaseline() - (standardDeviation * getDefinition().getSigmaAmountCritical());

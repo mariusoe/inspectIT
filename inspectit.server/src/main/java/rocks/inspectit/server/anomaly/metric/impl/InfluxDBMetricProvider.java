@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.anomaly.metric.MetricFilter;
-import rocks.inspectit.server.anomaly.processing.ProcessingContext;
+import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.server.influx.util.QueryResultWrapper;
 import rocks.inspectit.shared.all.spring.logger.Log;
@@ -42,7 +42,7 @@ public class InfluxDBMetricProvider extends AbstractMetricProvider<InfluxDBMetri
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void next(ProcessingContext context, long time) {
+	public void next(ProcessingUnitContext context, long time) {
 		if (lastTime <= 0L) {
 			initialize(context, time);
 			return;
@@ -63,7 +63,7 @@ public class InfluxDBMetricProvider extends AbstractMetricProvider<InfluxDBMetri
 		valueStatistics.addValue(currentValue);
 	}
 
-	private void initialize(ProcessingContext context, long time) {
+	private void initialize(ProcessingUnitContext context, long time) {
 		valueStatistics.setWindowSize(context.getConfiguration().getIntervalLongProcessingMultiplier());
 		lastTime = time;
 	}
