@@ -126,13 +126,13 @@ public class StateManager {
 		long timeDelta = 0L;
 		switch (healthTransition) {
 		case BEGIN:
-			timeDelta = TimeUnit.SECONDS.toMillis(groupContext.getGroupConfiguration().getAnomalyDefinition().getStartCount() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S);
+			timeDelta = TimeUnit.SECONDS.toMillis(groupContext.getGroupConfiguration().getAnomalyDefinition().getStartCount() * AnomalyDetectionSystem.PROCESSING_INTERVAL_SECONDS);
 			builder.addField(Measurements.Anomalies.FIELD_ANOMALY_ACTIVE, 1);
 			break;
 		case DOWNGRADE:
 		case UPGRADE:
 		case END:
-			timeDelta = TimeUnit.SECONDS.toMillis(groupContext.getGroupConfiguration().getAnomalyDefinition().getEndCount() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S);
+			timeDelta = TimeUnit.SECONDS.toMillis(groupContext.getGroupConfiguration().getAnomalyDefinition().getEndCount() * AnomalyDetectionSystem.PROCESSING_INTERVAL_SECONDS);
 			builder.addField(Measurements.Anomalies.FIELD_ANOMALY_ACTIVE, 0);
 			break;
 		case NO_CHANGE:
@@ -142,7 +142,7 @@ public class StateManager {
 
 		builder.time(time - timeDelta, TimeUnit.MILLISECONDS);
 		builder.tag(Measurements.Anomalies.TAG_EVENT, healthTransition.toString());
-		builder.tag(Measurements.Anomalies.TAG_CONFIGURATION_GROUP_ID, groupContext.getGroupConfiguration().getGroupId());
+		builder.tag(Measurements.Anomalies.TAG_CONFIGURATION_GROUP_ID, groupContext.getGroupConfiguration().getId());
 
 		influx.insert(builder.build());
 	}

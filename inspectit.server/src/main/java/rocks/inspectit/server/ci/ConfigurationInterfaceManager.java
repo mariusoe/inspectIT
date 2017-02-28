@@ -35,6 +35,7 @@ import rocks.inspectit.server.ci.event.AgentMappingsUpdateEvent;
 import rocks.inspectit.server.ci.event.BusinessContextDefinitionUpdateEvent;
 import rocks.inspectit.server.ci.event.EnvironmentUpdateEvent;
 import rocks.inspectit.server.ci.event.ProfileUpdateEvent;
+import rocks.inspectit.server.ci.manager.ConfigurationInterfaceAnomalyManager;
 import rocks.inspectit.server.util.CollectionSubtractUtils;
 import rocks.inspectit.shared.all.exception.BusinessException;
 import rocks.inspectit.shared.all.exception.enumeration.AlertErrorCodeEnum;
@@ -47,7 +48,6 @@ import rocks.inspectit.shared.cs.ci.BusinessContextDefinition;
 import rocks.inspectit.shared.cs.ci.Environment;
 import rocks.inspectit.shared.cs.ci.Profile;
 import rocks.inspectit.shared.cs.ci.alerting.AlertingDefinition;
-import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionGroupConfiguration;
 import rocks.inspectit.shared.cs.ci.export.ConfigurationInterfaceImportData;
 import rocks.inspectit.shared.cs.jaxb.ISchemaVersionAware;
 import rocks.inspectit.shared.cs.jaxb.JAXBTransformator;
@@ -116,6 +116,9 @@ public class ConfigurationInterfaceManager {
 	 * Business context definition.
 	 */
 	private final AtomicReference<BusinessContextDefinition> businessContextDefinitionReference = new AtomicReference<>();
+
+	@Autowired
+	private ConfigurationInterfaceAnomalyManager anomalyManager;
 
 	/**
 	 * Returns all existing profiles.
@@ -624,28 +627,6 @@ public class ConfigurationInterfaceManager {
 		}
 	}
 
-	// ************************************************************
-	// ************************************************************
-	// ************************************************************
-
-	public AnomalyDetectionGroupConfiguration createAnomalyDetectionConfigurationGroup(AnomalyDetectionGroupConfiguration configurationGroup) throws JAXBException, IOException {
-		// alertingDefinition.setId(getRandomUUIDString());
-		// alertingDefinition.setCreatedDate(new Date());
-
-		// existingAlertingDefinitions.put(alertingDefinition.getId(), alertingDefinition);
-		saveAnomalyDetectionConfigurationGroup(configurationGroup);
-
-		// eventPublisher.publishEvent(new
-		// AbstractAlertingDefinitionEvent.AlertingDefinitionCreatedEvent(this,
-		// alertingDefinition));
-
-		return configurationGroup;
-	}
-
-	// ************************************************************
-	// ************************************************************
-	// ************************************************************
-
 	/**
 	 * Returns the bytes for the given import data consisted out of given environments and profiles.
 	 * These bytes can be saved directly to export file.
@@ -934,9 +915,7 @@ public class ConfigurationInterfaceManager {
 		transformator.marshall(pathResolver.getAlertingDefinitionFilePath(alertingDefinition), alertingDefinition, getRelativeToSchemaPath(pathResolver.getDefaultCiPath()).toString());
 	}
 
-	private void saveAnomalyDetectionConfigurationGroup(AnomalyDetectionGroupConfiguration configurationGroup) throws JAXBException, IOException {
-		transformator.marshall(pathResolver.getAnomalyDetectionConfigurationFilePath(configurationGroup), configurationGroup, getRelativeToSchemaPath(pathResolver.getDefaultCiPath()).toString());
-	}
+
 
 	/**
 	 * Returns given path relative to schema part.
@@ -974,6 +953,7 @@ public class ConfigurationInterfaceManager {
 		loadAgentMappings();
 		loadBusinessContextDefinition();
 		loadExistingAlertingDefinitions();
+		anomalyManager.loadExistingAnomalyDetectionGroupConfigurations();
 	}
 
 	/**

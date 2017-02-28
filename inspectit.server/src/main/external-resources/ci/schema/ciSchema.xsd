@@ -942,8 +942,7 @@
     <xs:complexContent>
       <xs:extension base="metricDefinition">
         <xs:sequence>
-          <xs:element name="measurement" type="xs:string" minOccurs="0"/>
-          <xs:element name="tagMap">
+          <xs:element name="tags">
             <xs:complexType>
               <xs:sequence>
                 <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
@@ -957,10 +956,11 @@
               </xs:sequence>
             </xs:complexType>
           </xs:element>
-          <xs:element name="function" type="function" minOccurs="0"/>
-          <xs:element name="field" type="xs:string" minOccurs="0"/>
-          <xs:element name="opperateOnAggregation" type="xs:boolean"/>
         </xs:sequence>
+        <xs:attribute name="measurement" type="xs:string"/>
+        <xs:attribute name="function" type="function"/>
+        <xs:attribute name="field" type="xs:string"/>
+        <xs:attribute name="opperateOnAggregation" type="xs:boolean" use="required"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1066,7 +1066,11 @@
   <xs:complexType name="logNotificationDefinition">
     <xs:complexContent>
       <xs:extension base="notificationDefinition">
-        <xs:sequence/>
+        <xs:sequence>
+          <xs:element name="printBegin" type="xs:boolean"/>
+          <xs:element name="printEnd" type="xs:boolean"/>
+          <xs:element name="printTransitions" type="xs:boolean"/>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1082,19 +1086,24 @@
   <xs:complexType name="anomalyDetectionGroupConfiguration">
     <xs:sequence>
       <xs:element name="name" type="xs:string" minOccurs="0"/>
-      <xs:element name="groupId" type="xs:string" minOccurs="0"/>
+      <xs:element name="businessTransaction" type="xs:string" minOccurs="0"/>
+      <xs:element name="createdDate" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
       <xs:element name="mode" type="mode" minOccurs="0"/>
       <xs:element name="configurationGroups" type="anomalyDetectionGroupConfiguration" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="configurations" type="anomalyDetectionConfiguration" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="timeTravelDuration" type="xs:long"/>
       <xs:element name="anomalyDefinition" type="anomalyDefinition" minOccurs="0"/>
       <xs:element name="notificationDefinition" type="notificationDefinition" minOccurs="0"/>
+      <xs:element name="faultSuppressionFactor" type="xs:double"/>
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="anomalyDefinition">
     <xs:sequence>
       <xs:element name="endCount" type="xs:int"/>
+      <xs:element name="notifyOnCritical" type="xs:boolean"/>
+      <xs:element name="notifyOnWarning" type="xs:boolean"/>
       <xs:element name="startCount" type="xs:int"/>
     </xs:sequence>
   </xs:complexType>

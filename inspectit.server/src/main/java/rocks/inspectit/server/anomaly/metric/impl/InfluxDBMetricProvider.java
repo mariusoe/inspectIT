@@ -224,8 +224,8 @@ public class InfluxDBMetricProvider extends AbstractMetricProvider<InfluxDBMetri
 
 		queryBuilder.append(" WHERE time > ").append(fromTime).append("ms AND time <= ").append(toTime).append("ms");
 
-		if (MapUtils.isNotEmpty(getDefinition().getTagMap())) {
-			for (Entry<String, String> entry : getDefinition().getTagMap().entrySet()) {
+		if (MapUtils.isNotEmpty(getDefinition().getTags())) {
+			for (Entry<String, String> entry : getDefinition().getTags().entrySet()) {
 				queryBuilder.append(" AND \"").append(entry.getKey()).append("\" = '").append(entry.getValue()).append('\'');
 			}
 		}

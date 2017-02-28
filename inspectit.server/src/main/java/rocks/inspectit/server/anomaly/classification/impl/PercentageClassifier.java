@@ -35,7 +35,7 @@ public class PercentageClassifier extends AbstractClassifier<PercentageClassifie
 			return HealthStatus.UNKNOWN;
 		}
 
-		long timeWindow = context.getConfiguration().getIntervalShortProcessing() * AnomalyDetectionSystem.PROCESSING_INTERVAL_S;
+		long timeWindow = context.getConfiguration().getIntervalShortProcessing() * AnomalyDetectionSystem.PROCESSING_INTERVAL_SECONDS;
 
 		long totalCount = context.getMetricProvider().getCount(time, timeWindow, TimeUnit.SECONDS);
 

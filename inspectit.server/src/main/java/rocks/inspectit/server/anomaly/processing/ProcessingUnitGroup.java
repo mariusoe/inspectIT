@@ -38,7 +38,7 @@ public class ProcessingUnitGroup implements IAnomalyProcessor {
 		this.configurationGroup = configurationGroup;
 
 		groupContext = new ProcessingGroupContext();
-		groupContext.setGroupId(configurationGroup.getGroupId());
+		groupContext.setGroupId(configurationGroup.getId());
 		groupContext.setGroupConfiguration(configurationGroup);
 	}
 

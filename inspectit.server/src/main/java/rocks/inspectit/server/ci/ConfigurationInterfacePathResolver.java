@@ -199,15 +199,15 @@ public class ConfigurationInterfacePathResolver {
 		return getAlertingDefinitionsPath().resolve(fileName);
 	}
 
-	public Path getAnomalyDetectionConfigurationPath() {
+	public Path getAnomalyDetectionConfigurationsPath() {
 		return getDefaultCiPath().resolve(ANOMALY_DETECTION_CONFIGURATION_FOLDER);
 	}
 
 	public Path getAnomalyDetectionConfigurationFilePath(AnomalyDetectionGroupConfiguration configurationGroup) {
 		// String secureDefinitionName =
 		// removeIllegalFilenameCharacters(alertingDefinition.getName());
-		String fileName = configurationGroup.getGroupId() + ".xml";
-		return getAnomalyDetectionConfigurationPath().resolve(fileName);
+		String fileName = configurationGroup.getId() + ".xml";
+		return getAnomalyDetectionConfigurationsPath().resolve(fileName);
 	}
 
 	/**

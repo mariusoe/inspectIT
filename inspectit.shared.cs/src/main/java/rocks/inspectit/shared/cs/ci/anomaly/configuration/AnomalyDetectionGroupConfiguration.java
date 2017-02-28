@@ -2,6 +2,7 @@ package rocks.inspectit.shared.cs.ci.anomaly.configuration;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -9,8 +10,6 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import com.google.common.collect.ImmutableMap;
 
 import rocks.inspectit.shared.cs.ci.anomaly.definition.anomaly.AnomalyDefinition;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.HistoricalBaselineDefinition;
@@ -39,7 +38,7 @@ public class AnomalyDetectionGroupConfiguration implements Serializable {
 		metricDefinition.setMeasurement("businessTransactions");
 		metricDefinition.setFunction(Function.COUNT);
 		metricDefinition.setField("duration");
-		metricDefinition.setTagMap(ImmutableMap.of("generated", "yes"));
+		metricDefinition.getTags().put("generated", "yes");
 		metricDefinition.setDefaultValue(0);
 
 		// #####################################
@@ -238,7 +237,9 @@ public class AnomalyDetectionGroupConfiguration implements Serializable {
 
 	private String businessTransaction;
 
-	private String groupId = UUID.randomUUID().toString();
+	private Date createdDate;
+
+	private String id = UUID.randomUUID().toString();
 
 	private Mode mode = Mode.WORST;
 
@@ -253,6 +254,25 @@ public class AnomalyDetectionGroupConfiguration implements Serializable {
 	private NotificationDefinition notificationDefinition;
 
 	private double faultSuppressionFactor;
+
+	/**
+	 * Gets {@link #createdDate}.
+	 *
+	 * @return {@link #createdDate}
+	 */
+	public Date getCreatedDate() {
+		return this.createdDate;
+	}
+
+	/**
+	 * Sets {@link #createdDate}.
+	 *
+	 * @param createdDate
+	 *            New value for {@link #createdDate}
+	 */
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
 
 	/**
 	 * Gets {@link #businessTransaction}.
@@ -350,22 +370,22 @@ public class AnomalyDetectionGroupConfiguration implements Serializable {
 	}
 
 	/**
-	 * Gets {@link #groupId}.
+	 * Gets {@link #id}.
 	 *
-	 * @return {@link #groupId}
+	 * @return {@link #id}
 	 */
-	public String getGroupId() {
-		return this.groupId;
+	public String getId() {
+		return this.id;
 	}
 
 	/**
-	 * Sets {@link #groupId}.
+	 * Sets {@link #id}.
 	 *
 	 * @param id
-	 *            New value for {@link #groupId}
+	 *            New value for {@link #id}
 	 */
-	public void setGroupId(String id) {
-		this.groupId = id;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	/**

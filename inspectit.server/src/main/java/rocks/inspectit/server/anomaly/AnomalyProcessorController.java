@@ -1,7 +1,6 @@
 package rocks.inspectit.server.anomaly;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -19,7 +18,7 @@ import rocks.inspectit.server.anomaly.processing.ProcessingUnit;
 import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroup;
 import rocks.inspectit.server.anomaly.processing.RootProcessingUnitGroup;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
-import rocks.inspectit.server.ci.ConfigurationInterfaceManager;
+import rocks.inspectit.server.ci.manager.ConfigurationInterfaceAnomalyManager;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfiguration;
@@ -45,7 +44,7 @@ public class AnomalyProcessorController implements Runnable {
 	InfluxDBDao influx;
 
 	@Autowired
-	ConfigurationInterfaceManager ciManager;
+	ConfigurationInterfaceAnomalyManager ciAnomalyManager;
 
 	private List<RootProcessingUnitGroup> processingUnitGroups = new ArrayList<>();
 
@@ -55,18 +54,13 @@ public class AnomalyProcessorController implements Runnable {
 	}
 
 	private void createProcessingUnitGroups() {
-		// load configurations
-		List<AnomalyDetectionGroupConfiguration> configurationGroups = Collections.singletonList(AnomalyDetectionGroupConfiguration.getTestConfiguration());
-
 		// try {
-		// ciManager.createAnomalyDetectionConfigurationGroup(configurationGroups.get(0));
-		// } catch (JAXBException e) {
-		// e.printStackTrace();
-		// } catch (IOException e) {
+		// ciAnomalyManager.createAnomalyDetectionConfigurationGroup(AnomalyDetectionGroupConfiguration.getTestConfiguration());
+		// } catch (JAXBException | IOException e) {
 		// e.printStackTrace();
 		// }
 
-		for (AnomalyDetectionGroupConfiguration groupConfiguration : configurationGroups) {
+		for (AnomalyDetectionGroupConfiguration groupConfiguration : ciAnomalyManager.getAnomalyDetectionGroupConfigurations()) {
 			RootProcessingUnitGroup unitGroup = (RootProcessingUnitGroup) createProcessingUnitGroup(groupConfiguration, true);
 			processingUnitGroups.add(unitGroup);
 		}

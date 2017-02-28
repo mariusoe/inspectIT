@@ -47,7 +47,7 @@ public class Anomaly {
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this).omitNullValues().add("startTime", startTime).add("endTime", endTime).add("isCritical", critical).add("healthTransitions", healthTransitionLog.size())
-				.add("relatedGroupId", groupConfiguration.getGroupId()).add("businessTransaction", groupConfiguration.getBusinessTransaction()).toString();
+				.add("relatedGroupId", groupConfiguration.getId()).add("businessTransaction", groupConfiguration.getBusinessTransaction()).toString();
 	}
 
 	/**
@@ -124,5 +124,4 @@ public class Anomaly {
 	public void setCritical(boolean critical) {
 		this.critical = critical;
 	}
-
 }

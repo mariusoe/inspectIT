@@ -49,13 +49,6 @@ public class RootProcessingUnitGroup extends ProcessingUnitGroup {
 	}
 
 	public void initialize() {
-		log.info("██╗███╗   ██╗███████╗██████╗ ███████╗ ██████╗████████╗██╗████████╗");
-		log.info("██║████╗  ██║██╔════╝██╔══██╗██╔════╝██╔════╝╚══██╔══╝██║╚══██╔══╝");
-		log.info("██║██╔██╗ ██║███████╗██████╔╝█████╗  ██║        ██║   ██║   ██║");
-		log.info("██║██║╚██╗██║╚════██║██╔═══╝ ██╔══╝  ██║        ██║   ██║   ██║");
-		log.info("██║██║ ╚████║███████║██║     ███████╗╚██████╗   ██║   ██║   ██║");
-		log.info("╚═╝╚═╝  ╚═══╝╚══════╝╚═╝     ╚══════╝ ╚═════╝   ╚═╝   ╚═╝   ╚═╝");
-
 		log.info("Started initilazation of anomaly detection system..");
 
 		dropMeasurements();
@@ -63,7 +56,7 @@ public class RootProcessingUnitGroup extends ProcessingUnitGroup {
 		long currentTime = System.currentTimeMillis();
 		long time = currentTime - getConfigurationGroup().getTimeTravelDuration(TimeUnit.MILLISECONDS);
 
-		time = alignTime(time, AnomalyDetectionSystem.PROCESSING_INTERVAL_S, TimeUnit.SECONDS);
+		time = alignTime(time, AnomalyDetectionSystem.PROCESSING_INTERVAL_SECONDS, TimeUnit.SECONDS);
 
 		while (time < currentTime) {
 
@@ -73,7 +66,7 @@ public class RootProcessingUnitGroup extends ProcessingUnitGroup {
 			writeGroupHealth(time);
 			getGroupContext().setGroupHealthStatus(getHealthStatus());
 
-			time += TimeUnit.SECONDS.toMillis(AnomalyDetectionSystem.PROCESSING_INTERVAL_S);
+			time += TimeUnit.SECONDS.toMillis(AnomalyDetectionSystem.PROCESSING_INTERVAL_SECONDS);
 		}
 
 		getGroupContext().setInitialized(true);
@@ -89,7 +82,7 @@ public class RootProcessingUnitGroup extends ProcessingUnitGroup {
 
 	private void writeGroupHealth(long time) {
 		Builder builder = Point.measurement(Measurements.ProcessingUnitGroupStatistics.NAME).time(time, TimeUnit.MILLISECONDS);
-		builder.tag(Measurements.ProcessingUnitGroupStatistics.TAG_CONFIGURATION_GROUP_ID, getConfigurationGroup().getGroupId());
+		builder.tag(Measurements.ProcessingUnitGroupStatistics.TAG_CONFIGURATION_GROUP_ID, getConfigurationGroup().getId());
 		builder.tag("name", getConfigurationGroup().getName());
 
 		builder.tag(Measurements.ProcessingUnitGroupStatistics.TAG_HEALTH_STATUS, getHealthStatus().toString());

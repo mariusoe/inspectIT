@@ -1,5 +1,8 @@
 package rocks.inspectit.server.anomaly.notification.impl;
 
+import java.util.Date;
+
+import org.apache.commons.lang.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +26,9 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 	 */
 	@Override
 	public void onStart(Anomaly anomaly) {
-		log.info("Anomaly started for {} [{}] ", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getGroupId());
+		if (getDefinition().isPrintBegin() && log.isInfoEnabled()) {
+			log.info("[Anomaly] The detection group '{}' (btx: {}) detected an anomaly.", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getBusinessTransaction());
+		}
 	}
 
 	/**
@@ -31,7 +36,9 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 	 */
 	@Override
 	public void onUpgrade(Anomaly anomaly) {
-		log.info("Anomaly upgraded for {} [{}] ", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getGroupId());
+		if (getDefinition().isPrintTransitions() && log.isInfoEnabled()) {
+			log.info("Anomaly upgraded for {} [{}] ", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getId());
+		}
 	}
 
 	/**
@@ -39,7 +46,9 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 	 */
 	@Override
 	public void onDowngrade(Anomaly anomaly) {
-		log.info("Anomaly downgraded for {} [{}] ", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getGroupId());
+		if (getDefinition().isPrintTransitions() && log.isInfoEnabled()) {
+			log.info("Anomaly downgraded for {} [{}] ", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getId());
+		}
 	}
 
 	/**
@@ -47,7 +56,15 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 	 */
 	@Override
 	public void onEnd(Anomaly anomaly) {
-		log.info("Anomaly ended: {}", anomaly.toString());
+		if (getDefinition().isPrintEnd() && log.isInfoEnabled()) {
+			log.info("[Anomaly] The anomaly detected by detection group '{}' (btx: {}) has ended.", anomaly.getGroupConfiguration().getName(),
+					anomaly.getGroupConfiguration().getBusinessTransaction());
+
+			log.info("          |- started: {}", new Date(anomaly.getStartTime()));
+			log.info("          |- ended: {}", new Date(anomaly.getEndTime()));
+			log.info("          |- duration: {}", DurationFormatUtils.formatDurationHMS(anomaly.getEndTime() - anomaly.getStartTime()));
+			log.info("          |- was critical: {}", anomaly.isCritical());
+		}
 	}
 
 	/**

@@ -1,9 +1,12 @@
 package rocks.inspectit.shared.cs.ci.anomaly.definition.metric;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -18,14 +21,19 @@ public class InfluxDBMetricDefinition extends MetricDefinition {
 		MEAN, MEDIAN, COUNT, SUM, MAX, MIN;
 	};
 
+	@XmlAttribute(name = "measurement")
 	private String measurement;
 
-	private Map<String, String> tagMap;
+	@XmlElementWrapper(name = "tags")
+	private Map<String, String> tags = new HashMap<>();
 
+	@XmlAttribute(name = "function")
 	private Function function;
 
+	@XmlAttribute(name = "field")
 	private String field;
 
+	@XmlAttribute(name = "opperateOnAggregation")
 	private boolean opperateOnAggregation = false;
 
 	/**
@@ -86,22 +94,12 @@ public class InfluxDBMetricDefinition extends MetricDefinition {
 	}
 
 	/**
-	 * Gets {@link #tagMap}.
+	 * Gets {@link #tags}.
 	 *
-	 * @return {@link #tagMap}
+	 * @return {@link #tags}
 	 */
-	public Map<String, String> getTagMap() {
-		return this.tagMap;
-	}
-
-	/**
-	 * Sets {@link #tagMap}.
-	 *
-	 * @param tagMap
-	 *            New value for {@link #tagMap}
-	 */
-	public void setTagMap(Map<String, String> tagMap) {
-		this.tagMap = tagMap;
+	public Map<String, String> getTags() {
+		return this.tags;
 	}
 
 	/**

@@ -9,8 +9,10 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import rocks.inspectit.server.event.CmrStartedEvent;
 import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
@@ -18,13 +20,16 @@ import rocks.inspectit.shared.all.spring.logger.Log;
  *
  */
 @Component
-public class AnomalyDetectionSystem {
+public class AnomalyDetectionSystem implements ApplicationListener<CmrStartedEvent> {
 
 	/**
 	 * Interval in seconds.
 	 */
-	public static final long PROCESSING_INTERVAL_S = 15L;
+	public static final long PROCESSING_INTERVAL_SECONDS = 15L;
 
+	/**
+	 * Logger of this class.
+	 */
 	@Log
 	private Logger log;
 
@@ -35,9 +40,8 @@ public class AnomalyDetectionSystem {
 	@Resource(name = "scheduledExecutorService")
 	ScheduledExecutorService executorService;
 
-
 	@Autowired
-	private AnomalyProcessorController anomalyProcessor;
+	private AnomalyProcessorController anomalyProcessorController;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -46,9 +50,21 @@ public class AnomalyDetectionSystem {
 		}
 	}
 
-	public void start() {
-		anomalyProcessor.initialize();
+	private void start() {
+		anomalyProcessorController.initialize();
 
-		executorService.scheduleAtFixedRate(anomalyProcessor, PROCESSING_INTERVAL_S, PROCESSING_INTERVAL_S, TimeUnit.SECONDS);
+		executorService.scheduleAtFixedRate(anomalyProcessorController, PROCESSING_INTERVAL_SECONDS, PROCESSING_INTERVAL_SECONDS, TimeUnit.SECONDS);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void onApplicationEvent(CmrStartedEvent event) {
+		if (log.isInfoEnabled()) {
+			log.info("Start anomaly detection system..");
+		}
+
+		start();
 	}
 }
