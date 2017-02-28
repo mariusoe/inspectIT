@@ -20,6 +20,8 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
+import rocks.inspectit.server.ci.event.AbstractAnomalyConfigurationEvent.AnomalyDetectionGroupConfigurationCreatedEvent;
+import rocks.inspectit.server.ci.event.AbstractAnomalyConfigurationEvent.AnomalyDetectionGroupConfigurationsLoadedEvent;
 import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionGroupConfiguration;
 import rocks.inspectit.shared.cs.jaxb.ISchemaVersionAware;
@@ -37,10 +39,6 @@ public class ConfigurationInterfaceAnomalyManager extends AbstractConfigurationI
 
 	private ConcurrentHashMap<String, AnomalyDetectionGroupConfiguration> existingGroupConfigurations;
 
-	// ************************************************************
-	// ************************************************************
-	// ************************************************************
-
 	public List<AnomalyDetectionGroupConfiguration> getAnomalyDetectionGroupConfigurations() {
 		if (MapUtils.isEmpty(existingGroupConfigurations)) {
 			return Collections.emptyList();
@@ -49,22 +47,15 @@ public class ConfigurationInterfaceAnomalyManager extends AbstractConfigurationI
 	}
 
 	public AnomalyDetectionGroupConfiguration createAnomalyDetectionConfigurationGroup(AnomalyDetectionGroupConfiguration groupConfiguration) throws JAXBException, IOException {
-		// alertingDefinition.setId(getRandomUUIDString());
 		groupConfiguration.setCreatedDate(new Date());
 
-		// existingAlertingDefinitions.put(alertingDefinition.getId(), alertingDefinition);
+		existingGroupConfigurations.put(groupConfiguration.getId(), groupConfiguration);
 		saveAnomalyDetectionConfigurationGroup(groupConfiguration);
 
-		// eventPublisher.publishEvent(new
-		// AbstractAlertingDefinitionEvent.AlertingDefinitionCreatedEvent(this,
-		// alertingDefinition));
+		eventPublisher.publishEvent(new AnomalyDetectionGroupConfigurationCreatedEvent(this, groupConfiguration));
 
 		return groupConfiguration;
 	}
-
-	// ************************************************************
-	// ************************************************************
-	// ************************************************************
 
 	private void saveAnomalyDetectionConfigurationGroup(AnomalyDetectionGroupConfiguration configurationGroup) throws JAXBException, IOException {
 		transformator.marshall(pathResolver.getAnomalyDetectionConfigurationFilePath(configurationGroup), configurationGroup, getRelativeToSchemaPath(pathResolver.getDefaultCiPath()).toString());
@@ -111,10 +102,8 @@ public class ConfigurationInterfaceAnomalyManager extends AbstractConfigurationI
 
 		if (MapUtils.isEmpty(existingGroupConfigurations)) {
 			log.info("No anomaly detection configurations are in the default path.");
+		} else {
+			eventPublisher.publishEvent(new AnomalyDetectionGroupConfigurationsLoadedEvent(this, new ArrayList<>(existingGroupConfigurations.values())));
 		}
-
-		// eventPublisher.publishEvent(new
-		// AbstractAlertingDefinitionEvent.AlertingDefinitionLoadedEvent(this, new
-		// ArrayList<>(existingAlertingDefinitions.values())));
 	}
 }

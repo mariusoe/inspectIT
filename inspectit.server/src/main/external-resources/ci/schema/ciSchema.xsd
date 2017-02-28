@@ -1078,7 +1078,9 @@
   <xs:complexType name="notificationDefinition">
     <xs:complexContent>
       <xs:extension base="abstractDefinition">
-        <xs:sequence/>
+        <xs:sequence>
+          <xs:element name="notifyOnlyCritical" type="xs:boolean"/>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

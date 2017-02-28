@@ -26,6 +26,9 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 	 */
 	@Override
 	public void onStart(Anomaly anomaly) {
+		if (getDefinition().isNotifyOnlyCritical() && !anomaly.isCritical()) {
+			return;
+		}
 		if (getDefinition().isPrintBegin() && log.isInfoEnabled()) {
 			log.info("[Anomaly] The detection group '{}' (btx: {}) detected an anomaly.", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getBusinessTransaction());
 		}
@@ -36,6 +39,9 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 	 */
 	@Override
 	public void onUpgrade(Anomaly anomaly) {
+		if (getDefinition().isNotifyOnlyCritical() && !anomaly.isCritical()) {
+			return;
+		}
 		if (getDefinition().isPrintTransitions() && log.isInfoEnabled()) {
 			log.info("Anomaly upgraded for {} [{}] ", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getId());
 		}
@@ -46,6 +52,9 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 	 */
 	@Override
 	public void onDowngrade(Anomaly anomaly) {
+		if (getDefinition().isNotifyOnlyCritical() && !anomaly.isCritical()) {
+			return;
+		}
 		if (getDefinition().isPrintTransitions() && log.isInfoEnabled()) {
 			log.info("Anomaly downgraded for {} [{}] ", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getId());
 		}
@@ -56,6 +65,10 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 	 */
 	@Override
 	public void onEnd(Anomaly anomaly) {
+		if (getDefinition().isNotifyOnlyCritical() && !anomaly.isCritical()) {
+			return;
+		}
+
 		if (getDefinition().isPrintEnd() && log.isInfoEnabled()) {
 			log.info("[Anomaly] The anomaly detected by detection group '{}' (btx: {}) has ended.", anomaly.getGroupConfiguration().getName(),
 					anomaly.getGroupConfiguration().getBusinessTransaction());

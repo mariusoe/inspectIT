@@ -3,12 +3,13 @@ package rocks.inspectit.server.anomaly;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+
+import com.google.common.collect.ImmutableList;
 
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
@@ -18,6 +19,9 @@ import rocks.inspectit.server.anomaly.processing.ProcessingUnit;
 import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroup;
 import rocks.inspectit.server.anomaly.processing.RootProcessingUnitGroup;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
+import rocks.inspectit.server.ci.event.AbstractAnomalyConfigurationEvent;
+import rocks.inspectit.server.ci.event.AbstractAnomalyConfigurationEvent.AnomalyDetectionGroupConfigurationCreatedEvent;
+import rocks.inspectit.server.ci.event.AbstractAnomalyConfigurationEvent.AnomalyDetectionGroupConfigurationsLoadedEvent;
 import rocks.inspectit.server.ci.manager.ConfigurationInterfaceAnomalyManager;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.spring.logger.Log;
@@ -29,7 +33,7 @@ import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionGroupC
  *
  */
 @Component
-public class AnomalyProcessorController implements Runnable {
+public class AnomalyProcessorController implements Runnable, ApplicationListener<AbstractAnomalyConfigurationEvent> {
 
 	@Log
 	private Logger log;
@@ -48,12 +52,7 @@ public class AnomalyProcessorController implements Runnable {
 
 	private List<RootProcessingUnitGroup> processingUnitGroups = new ArrayList<>();
 
-	@PostConstruct
-	public void PostConstruct() {
-		createProcessingUnitGroups();
-	}
-
-	private void createProcessingUnitGroups() {
+	private void createProcessingUnitGroups(List<AnomalyDetectionGroupConfiguration> groupConfigurations) {
 		// try {
 		// ciAnomalyManager.createAnomalyDetectionConfigurationGroup(AnomalyDetectionGroupConfiguration.getTestConfiguration());
 		// } catch (JAXBException | IOException e) {
@@ -125,6 +124,25 @@ public class AnomalyProcessorController implements Runnable {
 			} catch (Exception e) {
 				log.error("Unexpected exception.", e);
 			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void onApplicationEvent(AbstractAnomalyConfigurationEvent event) {
+		if (event instanceof AnomalyDetectionGroupConfigurationCreatedEvent) {
+			AnomalyDetectionGroupConfigurationCreatedEvent createdEvent = (AnomalyDetectionGroupConfigurationCreatedEvent) event;
+
+			// create and init
+			createProcessingUnitGroups(ImmutableList.of(createdEvent.getGroupConfiguration()));
+
+		} else if (event instanceof AnomalyDetectionGroupConfigurationsLoadedEvent) {
+			AnomalyDetectionGroupConfigurationsLoadedEvent loadedEvent = (AnomalyDetectionGroupConfigurationsLoadedEvent) event;
+
+			// create and init
+			createProcessingUnitGroups(loadedEvent.getGroupConfigurations());
 		}
 	}
 }

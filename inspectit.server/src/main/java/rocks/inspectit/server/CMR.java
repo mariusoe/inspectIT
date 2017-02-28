@@ -91,6 +91,9 @@ public final class CMR {
 		startRepository();
 
 		LOGGER.info("CMR started in " + Converter.nanoToMilliseconds(System.nanoTime() - startTime) + " ms");
+		LOGGER.info("==============================================");
+
+		((ConfigurableApplicationContext) beanFactory).publishEvent(new CmrStartedEvent());
 	}
 
 	/**
@@ -116,10 +119,6 @@ public final class CMR {
 			LOGGER.info("Starting CMR in version " + versionService.getVersionAsString()
 			+ ". Please note that inspectIT does not provide any guarantee on backwards compatibility. Only if the version match exactly we ensure that the components are compatible.");
 		}
-
-		LOGGER.info("==============================================");
-
-		((ConfigurableApplicationContext) beanFactory).publishEvent(new CmrStartedEvent());
 	}
 
 	/**

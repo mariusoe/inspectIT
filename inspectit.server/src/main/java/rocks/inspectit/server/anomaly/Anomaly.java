@@ -4,6 +4,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.collections4.map.LinkedMap;
+
 import com.google.common.base.MoreObjects;
 
 import rocks.inspectit.server.anomaly.state.StateManager.HealthTransition;
@@ -24,6 +26,8 @@ public class Anomaly {
 	private boolean critical;
 
 	private final Map<Long, HealthTransition> healthTransitionLog = new LinkedHashMap<>();
+
+	private final LinkedMap<Long, Double> violationValues = new LinkedMap<>();
 
 	private AnomalyDetectionGroupConfiguration groupConfiguration;
 
@@ -76,6 +80,15 @@ public class Anomaly {
 	 */
 	public Map<Long, HealthTransition> getHealthTransitionLog() {
 		return this.healthTransitionLog;
+	}
+
+	/**
+	 * Gets {@link #violationValues}.
+	 *
+	 * @return {@link #violationValues}
+	 */
+	public LinkedMap<Long, Double> getViolationValues() {
+		return this.violationValues;
 	}
 
 	/**

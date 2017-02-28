@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 
 import rocks.inspectit.server.ci.ConfigurationInterfacePathResolver;
 import rocks.inspectit.shared.cs.jaxb.JAXBTransformator;
@@ -24,6 +25,12 @@ public abstract class AbstractConfigurationInterfaceManager {
 	 */
 	@Autowired
 	protected ConfigurationInterfacePathResolver pathResolver;
+
+	/**
+	 * Spring {@link ApplicationEventPublisher} for publishing the events.
+	 */
+	@Autowired
+	protected ApplicationEventPublisher eventPublisher;
 
 	/**
 	 * Returns given path relative to schema part.
