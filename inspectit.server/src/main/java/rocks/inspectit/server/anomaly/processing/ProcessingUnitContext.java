@@ -5,6 +5,7 @@ import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
+import rocks.inspectit.server.anomaly.threshold.AbstractThreshold.ThresholdType;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfiguration;
 
 /**
@@ -29,9 +30,30 @@ public class ProcessingUnitContext {
 
 	private ProcessingUnitGroupContext processingGroupContext;
 
+	private ThresholdType violatedThreshold = null;
+
+	/**
+	 * Gets {@link #violatedThreshold}.
+	 *
+	 * @return {@link #violatedThreshold}
+	 */
+	public ThresholdType getViolatedThreshold() {
+		return this.violatedThreshold;
+	}
+
+	/**
+	 * Sets {@link #violatedThreshold}.
+	 *
+	 * @param violatedThreshold
+	 *            New value for {@link #violatedThreshold}
+	 */
+	public void setViolatedThreshold(ThresholdType violatedThreshold) {
+		this.violatedThreshold = violatedThreshold;
+	}
+
 	/**
 	 * Gets {@link #processingGroupContext}.
-	 * 
+	 *
 	 * @return {@link #processingGroupContext}
 	 */
 	public ProcessingUnitGroupContext getGroupContext() {
@@ -40,7 +62,7 @@ public class ProcessingUnitContext {
 
 	/**
 	 * Sets {@link #processingGroupContext}.
-	 * 
+	 *
 	 * @param groupContext
 	 *            New value for {@link #processingGroupContext}
 	 */

@@ -31,17 +31,29 @@ public class HardClassifier extends AbstractClassifier<HardClassifierDefinition>
 		// TODO check if thresholds are provided
 
 		if (Double.isNaN(value)) {
+			context.setViolatedThreshold(null);
 			return HealthStatus.UNKNOWN;
 		}
 
-		if ((context.getThreshold().getThreshold(context, ThresholdType.LOWER_CRITICAL) > value) || (context.getThreshold().getThreshold(context, ThresholdType.UPPER_CRITICAL) < value)) {
+		if (context.getThreshold().getThreshold(context, ThresholdType.LOWER_CRITICAL) > value) {
+			context.setViolatedThreshold(ThresholdType.LOWER_CRITICAL);
+			return HealthStatus.CRITICAL;
+		}
+		if (context.getThreshold().getThreshold(context, ThresholdType.UPPER_CRITICAL) < value) {
+			context.setViolatedThreshold(ThresholdType.UPPER_CRITICAL);
 			return HealthStatus.CRITICAL;
 		}
 
-		if ((context.getThreshold().getThreshold(context, ThresholdType.LOWER_WARNING) > value) || (context.getThreshold().getThreshold(context, ThresholdType.UPPER_WARNING) < value)) {
+		if (context.getThreshold().getThreshold(context, ThresholdType.LOWER_WARNING) > value) {
+			context.setViolatedThreshold(ThresholdType.LOWER_WARNING);
+			return HealthStatus.WARNING;
+		}
+		if (context.getThreshold().getThreshold(context, ThresholdType.UPPER_WARNING) < value) {
+			context.setViolatedThreshold(ThresholdType.UPPER_WARNING);
 			return HealthStatus.WARNING;
 		}
 
+		context.setViolatedThreshold(null);
 		return HealthStatus.NORMAL;
 	}
 

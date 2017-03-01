@@ -77,6 +77,8 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 			log.info("          |- duration: {}", DurationFormatUtils.formatDurationHMS(anomaly.getEndTime() - anomaly.getStartTime()));
 			log.info("          |- was critical: {}", anomaly.isCritical());
 			log.info("          |- parallel critical: {}/{}", anomaly.getParallelCriticalProcessingUnits(), anomaly.getGroupConfiguration().getConfigurations().size());
+			log.info("          |- max value: {}", anomaly.getMaxValue());
+			log.info("          |- max violation: {} [{} {}]", anomaly.getMaxViolationValue(), anomaly.getMaxViolationDelta(), anomaly.getMaxViolationThresholdType());
 		}
 	}
 

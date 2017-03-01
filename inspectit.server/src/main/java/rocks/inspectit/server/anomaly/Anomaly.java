@@ -9,6 +9,7 @@ import org.apache.commons.collections4.map.LinkedMap;
 import com.google.common.base.MoreObjects;
 
 import rocks.inspectit.server.anomaly.state.StateManager.HealthTransition;
+import rocks.inspectit.server.anomaly.threshold.AbstractThreshold.ThresholdType;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionGroupConfiguration;
 
 /**
@@ -33,9 +34,114 @@ public class Anomaly {
 
 	private int parallelCriticalProcessingUnits = 0;
 
+	private double maxViolationValue = Double.NaN;
+
+	private double maxViolationDelta = Double.NaN;
+
+	private ThresholdType maxViolationThresholdType = null;
+
+	private long maxViolationTime;
+
+	private double maxValue = Double.NaN;
+
 	protected Anomaly(long startTime) {
 		id = UUID.randomUUID().toString();
 		this.startTime = startTime;
+	}
+
+	/**
+	 * Gets {@link #maxViolationTime}.
+	 *
+	 * @return {@link #maxViolationTime}
+	 */
+	public long getMaxViolationTime() {
+		return this.maxViolationTime;
+	}
+
+	/**
+	 * Sets {@link #maxViolationTime}.
+	 *
+	 * @param maxViolationTime
+	 *            New value for {@link #maxViolationTime}
+	 */
+	public void setMaxViolationTime(long maxViolationTime) {
+		this.maxViolationTime = maxViolationTime;
+	}
+
+	/**
+	 * Gets {@link #maxViolationThresholdType}.
+	 *
+	 * @return {@link #maxViolationThresholdType}
+	 */
+	public ThresholdType getMaxViolationThresholdType() {
+		return this.maxViolationThresholdType;
+	}
+
+	/**
+	 * Sets {@link #maxViolationThresholdType}.
+	 *
+	 * @param maxViolationThresholdType
+	 *            New value for {@link #maxViolationThresholdType}
+	 */
+	public void setMaxViolationThresholdType(ThresholdType maxViolationThresholdType) {
+		this.maxViolationThresholdType = maxViolationThresholdType;
+	}
+
+	/**
+	 * Gets {@link #maxViolationDelta}.
+	 *
+	 * @return {@link #maxViolationDelta}
+	 */
+	public double getMaxViolationDelta() {
+		return this.maxViolationDelta;
+	}
+
+	/**
+	 * Sets {@link #maxViolationDelta}.
+	 *
+	 * @param maxViolationDelta
+	 *            New value for {@link #maxViolationDelta}
+	 */
+	public void setMaxViolationDelta(double maxViolationDelta) {
+		this.maxViolationDelta = maxViolationDelta;
+	}
+
+	/**
+	 * Gets {@link #maxViolationValue}.
+	 *
+	 * @return {@link #maxViolationValue}
+	 */
+	public double getMaxViolationValue() {
+		return this.maxViolationValue;
+	}
+
+	/**
+	 * Sets {@link #maxViolationValue}.
+	 *
+	 * @param maxViolationValue
+	 *            New value for {@link #maxViolationValue}
+	 */
+	public void setMaxViolationValue(double maxViolationValue) {
+		this.maxViolationValue = maxViolationValue;
+	}
+
+	/**
+	 * Gets {@link #maxValue}.
+	 *
+	 * @return {@link #maxValue}
+	 */
+	public double getMaxValue() {
+		return this.maxValue;
+	}
+
+	/**
+	 * Sets {@link #maxValue}.
+	 *
+	 * @param maxValue
+	 *            New value for {@link #maxValue}
+	 */
+	public void setMaxValue(double maxValue) {
+		this.maxValue = maxValue;
 	}
 
 	/**

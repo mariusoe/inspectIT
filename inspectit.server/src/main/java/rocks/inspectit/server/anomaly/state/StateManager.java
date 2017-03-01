@@ -51,19 +51,53 @@ public class StateManager {
 		writeAnomalyState(time, groupContext, healthTransition);
 
 		handleHealthTransition(time, groupContext, healthTransition);
+		Anomaly currentAnomaly = groupContext.getAnomalyStateContext().getCurrentAnomaly();
 
-		if (nextAnomalyHealthStatus == HealthStatus.CRITICAL) {
-			groupContext.getAnomalyStateContext().getCurrentAnomaly().setCritical(true);
-		}
-
-		if (groupContext.getAnomalyStateContext().getCurrentAnomaly() != null) {
-			int amountCriticalUnits = 0;
-			for (ProcessingUnitContext unitContext : groupContext.getProcessingUnitContexts()) {
-				if (unitContext.getHealthStatus() == HealthStatus.CRITICAL) {
-					amountCriticalUnits++;
-				}
+		if (currentAnomaly != null) {
+			if (nextAnomalyHealthStatus == HealthStatus.CRITICAL) {
+				currentAnomaly.setCritical(true);
 			}
-			groupContext.getAnomalyStateContext().getCurrentAnomaly().setParallelCriticalProcessingUnits(amountCriticalUnits);
+
+			updateParallelCriticalUnitsAmount(time, groupContext);
+			updateMaxViolationValue(time, groupContext);
+		}
+	}
+
+	private void updateParallelCriticalUnitsAmount(long time, ProcessingUnitGroupContext groupContext) {
+		Anomaly currentAnomaly = groupContext.getAnomalyStateContext().getCurrentAnomaly();
+		int amountCriticalUnits = 0;
+
+		for (ProcessingUnitContext unitContext : groupContext.getProcessingUnitContexts()) {
+			if (unitContext.getHealthStatus() == HealthStatus.CRITICAL) {
+				amountCriticalUnits++;
+			}
+		}
+		if (currentAnomaly.getParallelCriticalProcessingUnits() < amountCriticalUnits) {
+			currentAnomaly.setParallelCriticalProcessingUnits(amountCriticalUnits);
+		}
+	}
+
+	private void updateMaxViolationValue(long time, ProcessingUnitGroupContext groupContext) {
+		Anomaly currentAnomaly = groupContext.getAnomalyStateContext().getCurrentAnomaly();
+
+		for (ProcessingUnitContext unitContext : groupContext.getProcessingUnitContexts()) {
+			if (unitContext.getViolatedThreshold() == null) {
+				continue;
+			}
+
+			double value = unitContext.getMetricProvider().getValue();
+			double violationDelta = value - unitContext.getThreshold().getThreshold(unitContext, unitContext.getViolatedThreshold());
+
+			if (Double.isNaN(currentAnomaly.getMaxValue()) || (currentAnomaly.getMaxValue() < value)) {
+				currentAnomaly.setMaxValue(value);
+			}
+
+			if (Double.isNaN(currentAnomaly.getMaxViolationDelta()) || (Math.abs(currentAnomaly.getMaxViolationDelta()) < Math.abs(violationDelta))) {
+				currentAnomaly.setMaxViolationDelta(violationDelta);
+				currentAnomaly.setMaxViolationValue(value);
+				currentAnomaly.setMaxViolationThresholdType(unitContext.getViolatedThreshold());
+				currentAnomaly.setMaxViolationTime(time);
+			}
 		}
 	}
 
