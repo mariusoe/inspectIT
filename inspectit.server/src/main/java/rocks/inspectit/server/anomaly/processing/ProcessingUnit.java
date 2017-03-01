@@ -1,9 +1,5 @@
 package rocks.inspectit.server.anomaly.processing;
 
-import java.util.concurrent.TimeUnit;
-
-import org.influxdb.dto.Point;
-import org.influxdb.dto.Point.Builder;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -12,11 +8,8 @@ import org.springframework.stereotype.Component;
 import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
-import rocks.inspectit.server.anomaly.constants.Measurements;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
-import rocks.inspectit.server.anomaly.threshold.AbstractThreshold.ThresholdType;
-import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
@@ -30,9 +23,6 @@ public class ProcessingUnit {
 	@Log
 	private Logger log;
 
-	@Autowired
-	InfluxDBDao influx;
-
 	private final ProcessingUnitContext context;
 
 	/**
@@ -41,6 +31,15 @@ public class ProcessingUnit {
 	@Autowired
 	public ProcessingUnit(ProcessingUnitContext unitContext) {
 		context = unitContext;
+	}
+
+	/**
+	 * Gets {@link #context}.
+	 *
+	 * @return {@link #context}
+	 */
+	public ProcessingUnitContext getContext() {
+		return this.context;
 	}
 
 	public void initialize(long time) {
@@ -59,8 +58,6 @@ public class ProcessingUnit {
 			}
 
 			processShort(time);
-
-			writeData(time);
 		}
 
 		context.incrementInterationCounter();
@@ -74,58 +71,6 @@ public class ProcessingUnit {
 	private void processLong(long time) {
 		context.getBaseline().process(context, time);
 		context.getThreshold().process(context, time);
-	}
-
-	private void writeData(long time) {
-		Builder builder = Point.measurement(Measurements.Data.NAME).time(time, TimeUnit.MILLISECONDS);
-		builder.tag(Measurements.Data.TAG_CONFIGURATION_ID, context.getConfiguration().getId());
-		builder.tag(Measurements.Data.TAG_CONFIGURATION_GROUP_ID, context.getGroupContext().getGroupId());
-		builder.tag(Measurements.Data.TAG_HEALTH_STATUS, context.getHealthStatus().toString());
-
-		boolean builderIsEmpty = true;
-
-		if (!Double.isNaN(context.getMetricProvider().getValue())) {
-			builderIsEmpty = false;
-			builder.addField(Measurements.Data.FIELD_METRIC_AGGREGATION, context.getMetricProvider().getValue());
-		}
-
-		double baseline = context.getBaseline().getBaseline();
-		if (!Double.isNaN(baseline)) {
-			builderIsEmpty = false;
-			builder.addField(Measurements.Data.FIELD_BASELINE, baseline);
-		}
-
-		for (ThresholdType type : ThresholdType.values()) {
-			if (context.getThreshold().providesThreshold(type)) {
-				double threshold = context.getThreshold().getThreshold(context, type);
-				if (!Double.isNaN(threshold)) {
-					builderIsEmpty = false;
-
-					String columnName;
-					switch (type) {
-					case LOWER_CRITICAL:
-						columnName = Measurements.Data.FIELD_LOWER_CRITICAL;
-						break;
-					case LOWER_WARNING:
-						columnName = Measurements.Data.FIELD_LOWER_WARNING;
-						break;
-					case UPPER_CRITICAL:
-						columnName = Measurements.Data.FIELD_UPPER_CRITICAL;
-						break;
-					case UPPER_WARNING:
-						columnName = Measurements.Data.FIELD_UPPER_WARNING;
-						break;
-					default:
-						continue;
-					}
-					builder.addField(columnName, threshold);
-				}
-			}
-		}
-
-		if (!builderIsEmpty) {
-			influx.insert(builder.build());
-		}
 	}
 
 	/**

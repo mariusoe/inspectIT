@@ -1,5 +1,6 @@
 package rocks.inspectit.server.anomaly.state;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.influxdb.dto.Point;
@@ -12,9 +13,9 @@ import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
 import rocks.inspectit.server.anomaly.AnomalyRegistry;
 import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.constants.Measurements;
-import rocks.inspectit.server.anomaly.notification.NotificationService;
 import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
 import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroupContext;
+import rocks.inspectit.server.anomaly.state.listener.NotificationService;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.serializer.impl.SerializationManager;
 
@@ -41,6 +42,9 @@ public class StateManager {
 	@Autowired
 	private SerializationManager serializationManager;
 
+	@Autowired
+	private List<IAnomalyStateListener> anomalyStateListeners;
+
 	public void update(long time, ProcessingUnitGroupContext groupContext) {
 		groupContext.getAnomalyStateContext().addHealthStatus(groupContext.getHealthStatus());
 
@@ -51,10 +55,12 @@ public class StateManager {
 		writeAnomalyState(time, groupContext, healthTransition);
 
 		handleHealthTransition(time, groupContext, healthTransition);
-		Anomaly currentAnomaly = groupContext.getAnomalyStateContext().getCurrentAnomaly();
+	}
 
+	private void updateAnomaly(long time, ProcessingUnitGroupContext groupContext) {
+		Anomaly currentAnomaly = groupContext.getAnomalyStateContext().getCurrentAnomaly();
 		if (currentAnomaly != null) {
-			if (nextAnomalyHealthStatus == HealthStatus.CRITICAL) {
+			if (groupContext.getAnomalyStateContext().getAnomalyHealthStauts() == HealthStatus.CRITICAL) {
 				currentAnomaly.setCritical(true);
 			}
 
@@ -107,21 +113,37 @@ public class StateManager {
 			Anomaly newAnomaly = anomalyRegistration.startAnomaly(time);
 			newAnomaly.setGroupConfiguration(serializationManager.copy(groupContext.getGroupConfiguration()));
 			groupContext.getAnomalyStateContext().setCurrentAnomaly(newAnomaly);
+			updateAnomaly(time, groupContext);
 
-			notificationService.handleHealthTransition(healthTransition, groupContext);
+			for (IAnomalyStateListener listener : anomalyStateListeners) {
+				listener.onStart(groupContext);
+			}
 
 			break;
 		case DOWNGRADE:
+			groupContext.getAnomalyStateContext().getCurrentAnomaly().getHealthTransitionLog().put(time, healthTransition);
+			updateAnomaly(time, groupContext);
+
+			for (IAnomalyStateListener listener : anomalyStateListeners) {
+				listener.onUpgrade(groupContext);
+			}
+
+			break;
 		case UPGRADE:
 			groupContext.getAnomalyStateContext().getCurrentAnomaly().getHealthTransitionLog().put(time, healthTransition);
+			updateAnomaly(time, groupContext);
 
-			notificationService.handleHealthTransition(healthTransition, groupContext);
+			for (IAnomalyStateListener listener : anomalyStateListeners) {
+				listener.onDowngrade(groupContext);
+			}
 
 			break;
 		case END:
 			anomalyRegistration.endAnomaly(time, groupContext.getAnomalyStateContext().getCurrentAnomaly());
 
-			notificationService.handleHealthTransition(healthTransition, groupContext);
+			for (IAnomalyStateListener listener : anomalyStateListeners) {
+				listener.onEnd(groupContext);
+			}
 
 			groupContext.getAnomalyStateContext().setCurrentAnomaly(null);
 

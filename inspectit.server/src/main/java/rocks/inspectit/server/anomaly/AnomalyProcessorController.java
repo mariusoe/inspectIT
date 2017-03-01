@@ -2,6 +2,10 @@ package rocks.inspectit.server.anomaly;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.BeanFactory;
@@ -50,6 +54,19 @@ public class AnomalyProcessorController implements Runnable, ApplicationListener
 
 	private List<ProcessingUnitGroup> processingUnitGroups = new ArrayList<>();
 
+	private ExecutorService executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+		@Override
+		public Thread newThread(Runnable r) {
+			Thread thread = new Thread(r);
+			thread.setName("anomaly-worker");
+			thread.setDaemon(true);
+			return thread;
+		}
+	});
+
+	// @Autowired
+	// private ConfigurationInterfaceAnomalyManager ciAnomalyManager;
+	//
 	// @PostConstruct
 	// public void test() {
 	// try {
@@ -98,9 +115,23 @@ public class AnomalyProcessorController implements Runnable, ApplicationListener
 	}
 
 	public void initialize() {
-		for (ProcessingUnitGroup unitGroup : processingUnitGroups) {
-			unitGroup.initialize();
-		}
+		executorService.submit(new Callable<Void>() {
+			@Override
+			public Void call() throws Exception {
+				if (log.isInfoEnabled()) {
+					log.info("Starting initialization of the existing anomaly processing unit groups..");
+				}
+
+				for (ProcessingUnitGroup unitGroup : processingUnitGroups) {
+					unitGroup.initialize();
+				}
+
+				if (log.isInfoEnabled()) {
+					log.info("Initilazation of anomaly detection system has been finished.");
+				}
+				return null;
+			}
+		});
 	}
 
 	/**

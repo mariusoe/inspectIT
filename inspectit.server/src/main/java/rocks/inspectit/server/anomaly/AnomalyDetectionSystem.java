@@ -62,7 +62,7 @@ public class AnomalyDetectionSystem implements ApplicationListener<CmrStartedEve
 	@Override
 	public void onApplicationEvent(CmrStartedEvent event) {
 		if (log.isInfoEnabled()) {
-			log.info("Start anomaly detection system..");
+			log.info("Starting the anomaly detection system..");
 		}
 
 		start();

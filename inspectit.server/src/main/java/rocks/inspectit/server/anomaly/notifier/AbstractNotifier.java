@@ -1,4 +1,4 @@
-package rocks.inspectit.server.anomaly.notification;
+package rocks.inspectit.server.anomaly.notifier;
 
 import rocks.inspectit.server.anomaly.Anomaly;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.AbstractDefinitionAware;

@@ -1,4 +1,4 @@
-package rocks.inspectit.server.anomaly.notification.impl;
+package rocks.inspectit.server.anomaly.notifier.impl;
 
 import java.util.Date;
 
@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.Anomaly;
-import rocks.inspectit.server.anomaly.notification.AbstractNotifier;
+import rocks.inspectit.server.anomaly.notifier.AbstractNotifier;
 import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.notification.LogNotificationDefinition;
 
@@ -79,6 +79,7 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 			log.info("          |- parallel critical: {}/{}", anomaly.getParallelCriticalProcessingUnits(), anomaly.getGroupConfiguration().getConfigurations().size());
 			log.info("          |- max value: {}", anomaly.getMaxValue());
 			log.info("          |- max violation: {} [{} {}]", anomaly.getMaxViolationValue(), anomaly.getMaxViolationDelta(), anomaly.getMaxViolationThresholdType());
+			log.info("          |- max violation date: {}", new Date(anomaly.getMaxViolationTime()));
 		}
 	}
 

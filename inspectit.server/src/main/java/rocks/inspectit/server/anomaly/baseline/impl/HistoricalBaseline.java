@@ -54,6 +54,9 @@ public class HistoricalBaseline extends AbstractBaseline<HistoricalBaselineDefin
 	private double getValue(ProcessingUnitContext context) {
 		double value = context.getMetricProvider().getIntervalValue();
 		if (isFirstSeasons(context)) {
+			if ((context.getGroupContext().getHealthStatus() == HealthStatus.WARNING) || (context.getGroupContext().getHealthStatus() == HealthStatus.CRITICAL)) {
+				return currentValue;
+			}
 			if (Double.isNaN(currentValue)) {
 				currentValue = value;
 			} else {

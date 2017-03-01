@@ -1095,8 +1095,9 @@
       <xs:element name="configurations" type="anomalyDetectionConfiguration" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="timeTravelDuration" type="xs:long"/>
       <xs:element name="anomalyDefinition" type="anomalyDefinition" minOccurs="0"/>
-      <xs:element name="notificationDefinition" type="notificationDefinition" minOccurs="0"/>
+      <xs:element name="notificationDefinitions" type="notificationDefinition" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="faultSuppressionFactor" type="xs:double"/>
+      <xs:element name="recordDataDuringAnomaly" type="xs:boolean"/>
     </xs:sequence>
   </xs:complexType>
 

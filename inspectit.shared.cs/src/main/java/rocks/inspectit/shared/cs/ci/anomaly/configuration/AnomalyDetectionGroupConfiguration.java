@@ -222,7 +222,7 @@ public class AnomalyDetectionGroupConfiguration implements Serializable {
 		configurationGroup.setBusinessTransaction("shopping-cart");
 
 		configurationGroup.setAnomalyDefinition(anomalyDefinition);
-		configurationGroup.setNotificationDefinition(notificationDefinition);
+		configurationGroup.getNotificationDefinitions().add(notificationDefinition);
 
 		return configurationGroup;
 	}
@@ -243,15 +243,45 @@ public class AnomalyDetectionGroupConfiguration implements Serializable {
 
 	private Mode mode = Mode.WORST;
 
-	private List<AnomalyDetectionConfiguration> configurations = new ArrayList<>();
+	private final List<AnomalyDetectionConfiguration> configurations = new ArrayList<>();
 
 	private long timeTravelDuration;
 
 	private AnomalyDefinition anomalyDefinition;
 
-	private NotificationDefinition notificationDefinition;
+	private final List<NotificationDefinition> notificationDefinitions = new ArrayList<>();
 
 	private double faultSuppressionFactor;
+
+	private boolean recordDataDuringAnomaly = true;
+
+	/**
+	 * Gets {@link #recordDataDuringAnomaly}.
+	 *
+	 * @return {@link #recordDataDuringAnomaly}
+	 */
+	public boolean isRecordDataDuringAnomaly() {
+		return this.recordDataDuringAnomaly;
+	}
+
+	/**
+	 * Sets {@link #recordDataDuringAnomaly}.
+	 *
+	 * @param recordDataDuringAnomaly
+	 *            New value for {@link #recordDataDuringAnomaly}
+	 */
+	public void setRecordDataDuringAnomaly(boolean recordDataDuringAnomaly) {
+		this.recordDataDuringAnomaly = recordDataDuringAnomaly;
+	}
+
+	/**
+	 * Gets {@link #notificationDefinitions}.
+	 *
+	 * @return {@link #notificationDefinitions}
+	 */
+	public List<NotificationDefinition> getNotificationDefinitions() {
+		return this.notificationDefinitions;
+	}
 
 	/**
 	 * Gets {@link #createdDate}.
@@ -308,25 +338,6 @@ public class AnomalyDetectionGroupConfiguration implements Serializable {
 	 */
 	public void setFaultSuppressionFactor(double faultSuppressionFactor) {
 		this.faultSuppressionFactor = faultSuppressionFactor;
-	}
-
-	/**
-	 * Gets {@link #notificationDefinition}.
-	 *
-	 * @return {@link #notificationDefinition}
-	 */
-	public NotificationDefinition getNotificationDefinition() {
-		return this.notificationDefinition;
-	}
-
-	/**
-	 * Sets {@link #notificationDefinition}.
-	 *
-	 * @param notificationDefinition
-	 *            New value for {@link #notificationDefinition}
-	 */
-	public void setNotificationDefinition(NotificationDefinition notificationDefinition) {
-		this.notificationDefinition = notificationDefinition;
 	}
 
 	/**

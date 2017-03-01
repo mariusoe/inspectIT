@@ -54,4 +54,8 @@ public interface Measurements {
 
 		String FIELD_METRIC_AGGREGATION = "metric_aggregation";
 	}
+
+	interface PreviewData extends Data {
+		String NAME = MEASUREMENT_PREFIX + "preview_data";
+	}
 }

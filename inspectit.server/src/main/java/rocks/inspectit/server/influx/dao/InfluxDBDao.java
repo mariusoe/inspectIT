@@ -42,7 +42,7 @@ public class InfluxDBDao implements InfluxAvailabilityListener, IExternalService
 	/**
 	 * After this duration, the batch have to be flushed.
 	 */
-	static final int BATCH_FLUSH_TIMER = 10;
+	static final int BATCH_FLUSH_TIMER = 2500;
 
 	/**
 	 * Size of the {@link Point} buffer.
@@ -205,6 +205,7 @@ public class InfluxDBDao implements InfluxAvailabilityListener, IExternalService
 			}
 		} else {
 			enableBatching();
+			influxDB.enableGzip();
 
 			connected = isAvailable();
 
@@ -264,7 +265,7 @@ public class InfluxDBDao implements InfluxAvailabilityListener, IExternalService
 	 */
 	private void enableBatching() {
 		if ((null != influxDB) && !influxDB.isBatchEnabled()) {
-			influxDB.enableBatch(BATCH_BUFFER_SIZE, BATCH_FLUSH_TIMER, TimeUnit.SECONDS);
+			influxDB.enableBatch(BATCH_BUFFER_SIZE, BATCH_FLUSH_TIMER, TimeUnit.MILLISECONDS);
 		}
 	}
 
