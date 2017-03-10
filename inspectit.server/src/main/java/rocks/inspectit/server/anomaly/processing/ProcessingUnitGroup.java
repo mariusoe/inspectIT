@@ -19,6 +19,7 @@ import rocks.inspectit.server.anomaly.processing.health.WorstHealthDeclaration;
 import rocks.inspectit.server.anomaly.state.StateManager;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold.ThresholdType;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
+import rocks.inspectit.server.influx.util.InfluxUtils;
 import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
@@ -83,7 +84,7 @@ public class ProcessingUnitGroup {
 
 		for (ProcessingUnit processor : processingUnits) {
 			processor.process(time);
-			writeProcessingUnitData(time, processor.getContext(), Measurements.Data.NAME);
+			writeProcessingUnitData(time, processor.getContext(), false);
 		}
 
 		updateHealthStatus();
@@ -107,8 +108,8 @@ public class ProcessingUnitGroup {
 		while (time < currentTime) {
 
 			for (ProcessingUnit processor : processingUnits) {
-				processor.initialize(time);
-				writeProcessingUnitData(time, processor.getContext(), Measurements.PreviewData.NAME);
+				processor.process(time);
+				writeProcessingUnitData(time, processor.getContext(), true);
 			}
 
 			updateHealthStatus();
@@ -126,22 +127,21 @@ public class ProcessingUnitGroup {
 		}
 	}
 
-	private void writeProcessingUnitData(long time, ProcessingUnitContext unitContext, String measurement) {
+	private void writeProcessingUnitData(long time, ProcessingUnitContext unitContext, boolean initializing) {
+		String measurement;
+		if (initializing) {
+			measurement = Measurements.PreviewData.NAME;
+		} else {
+			measurement = Measurements.Data.NAME;
+		}
+
 		Builder builder = Point.measurement(measurement).time(time, TimeUnit.MILLISECONDS);
 		builder.tag(Measurements.Data.TAG_CONFIGURATION_ID, unitContext.getConfiguration().getId());
 		builder.tag(Measurements.Data.TAG_CONFIGURATION_GROUP_ID, unitContext.getGroupContext().getGroupId());
 		builder.tag(Measurements.Data.TAG_HEALTH_STATUS, groupContext.getHealthStatus().toString());
 
-		boolean builderIsEmpty = true;
-
-		if (!Double.isNaN(unitContext.getMetricProvider().getValue())) {
-			builderIsEmpty = false;
-			builder.addField(Measurements.Data.FIELD_METRIC_AGGREGATION, unitContext.getMetricProvider().getValue());
-		}
-
 		double baseline = unitContext.getBaseline().getBaseline();
 		if (!Double.isNaN(baseline)) {
-			builderIsEmpty = false;
 			builder.addField(Measurements.Data.FIELD_BASELINE, baseline);
 		}
 
@@ -149,8 +149,6 @@ public class ProcessingUnitGroup {
 			if (unitContext.getThreshold().providesThreshold(type)) {
 				double threshold = unitContext.getThreshold().getThreshold(unitContext, type);
 				if (!Double.isNaN(threshold)) {
-					builderIsEmpty = false;
-
 					String columnName;
 					switch (type) {
 					case LOWER_CRITICAL:
@@ -173,16 +171,29 @@ public class ProcessingUnitGroup {
 			}
 		}
 
-		if (!builderIsEmpty) {
-			influx.insert(builder.build());
+		if (!Double.isNaN(unitContext.getMetricProvider().getValue())) {
+			if (initializing) {
+				Builder builderData = Point.measurement(Measurements.Data.NAME).time(time, TimeUnit.MILLISECONDS);
+				builderData.tag(Measurements.Data.TAG_CONFIGURATION_ID, unitContext.getConfiguration().getId());
+				builderData.tag(Measurements.Data.TAG_CONFIGURATION_GROUP_ID, unitContext.getGroupContext().getGroupId());
+				builderData.addField(Measurements.Data.FIELD_METRIC_AGGREGATION, unitContext.getMetricProvider().getValue());
+				influx.insert(builderData.build());
+			} else {
+				builder.addField(Measurements.Data.FIELD_METRIC_AGGREGATION, unitContext.getMetricProvider().getValue());
+			}
+		}
+
+		Point point = InfluxUtils.build(builder);
+		if (point != null) {
+			influx.insert(point);
 		}
 	}
 
 	private void dropMeasurements() {
 		influx.query("DROP MEASUREMENT " + Measurements.Anomalies.NAME);
-		// influx.query("DROP MEASUREMENT " + Measurements.Data.NAME);
-		influx.query("DROP MEASUREMENT " + Measurements.ProcessingUnitGroupStatistics.NAME);
+		influx.query("DROP MEASUREMENT " + Measurements.Data.NAME);
 		influx.query("DROP MEASUREMENT " + Measurements.PreviewData.NAME);
+		influx.query("DROP MEASUREMENT " + Measurements.ProcessingUnitGroupStatistics.NAME);
 	}
 
 	private void writeGroupHealth(long time) {

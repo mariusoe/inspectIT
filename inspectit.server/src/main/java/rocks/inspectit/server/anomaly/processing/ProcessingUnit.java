@@ -42,10 +42,6 @@ public class ProcessingUnit {
 		return this.context;
 	}
 
-	public void initialize(long time) {
-		process(time);
-	}
-
 	public void process(long time) {
 		int shortInterval = context.getConfiguration().getIntervalShortProcessing();
 		int longInterval = context.getConfiguration().getIntervalShortProcessing() * context.getConfiguration().getIntervalLongProcessingMultiplier();

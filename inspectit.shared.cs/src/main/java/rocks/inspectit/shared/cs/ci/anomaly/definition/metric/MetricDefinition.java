@@ -12,7 +12,7 @@ public abstract class MetricDefinition extends AbstractDefinition {
 
 	/**
 	 * Gets {@link #defaultValue}.
-	 * 
+	 *
 	 * @return {@link #defaultValue}
 	 */
 	public double getDefaultValue() {
@@ -21,11 +21,15 @@ public abstract class MetricDefinition extends AbstractDefinition {
 
 	/**
 	 * Sets {@link #defaultValue}.
-	 * 
+	 *
 	 * @param defaultValue
 	 *            New value for {@link #defaultValue}
 	 */
 	public void setDefaultValue(double defaultValue) {
 		this.defaultValue = defaultValue;
 	}
+
+	public abstract boolean isBusinessTransactionRelated();
+
+	public abstract String getBusinessTransactionName();
 }

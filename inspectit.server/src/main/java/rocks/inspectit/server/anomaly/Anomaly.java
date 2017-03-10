@@ -10,6 +10,7 @@ import com.google.common.base.MoreObjects;
 
 import rocks.inspectit.server.anomaly.state.StateManager.HealthTransition;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold.ThresholdType;
+import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfiguration;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionGroupConfiguration;
 
 /**
@@ -178,7 +179,30 @@ public class Anomaly {
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this).omitNullValues().add("startTime", startTime).add("endTime", endTime).add("isCritical", critical).add("healthTransitions", healthTransitionLog.size())
-				.add("relatedGroupId", groupConfiguration.getGroupId()).add("businessTransaction", groupConfiguration.getBusinessTransaction()).toString();
+				.add("relatedGroupId", groupConfiguration.getGroupId()).toString();
+	}
+
+	public boolean isBusinessTransactionRelated() {
+		for (AnomalyDetectionConfiguration adc : groupConfiguration.getConfigurations()) {
+			if (!adc.getMetricDefinition().isBusinessTransactionRelated()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public String getBusinessTransactionName() {
+		String btxName = null;
+		for (AnomalyDetectionConfiguration adc : groupConfiguration.getConfigurations()) {
+			if (btxName == null) {
+				btxName = adc.getMetricDefinition().getBusinessTransactionName();
+			} else {
+				if (!btxName.equals(adc.getMetricDefinition().getBusinessTransactionName())) {
+					throw new RuntimeException("not unique");
+				}
+			}
+		}
+		return btxName;
 	}
 
 	/**

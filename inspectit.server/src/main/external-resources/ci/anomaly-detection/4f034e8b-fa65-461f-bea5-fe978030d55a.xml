@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<anomaly-group-configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\..\schema\ciSchema.xsd">
+    <name>test-configuration</name>
+    <createdDate>2017-03-09T16:06:06.211+01:00</createdDate>
+    <groupId>4f034e8b-fa65-461f-bea5-fe978030d55a</groupId>
+    <mode>WORST</mode>
+    <configurations>
+        <id>db971ce2-f9ef-4fd7-9eda-a758d293ef1a</id>
+        <metricDefinition xsi:type="influxDBMetricDefinition" measurement="businessTransactions" function="MEAN" field="duration" opperateOnAggregation="false">
+            <defaultValue>NaN</defaultValue>
+            <tags>
+                <entry>
+                    <key>businessTxName</key>
+                    <value>shoppingcart</value>
+                </entry>
+            </tags>
+        </metricDefinition>
+        <baselineDefinition xsi:type="historicalBaselineDefinition">
+            <excludeCriticalData>false</excludeCriticalData>
+            <excludeWarningData>false</excludeWarningData>
+            <seasonLength>288</seasonLength>
+            <smoothingFactor>0.1</smoothingFactor>
+            <smoothValue>false</smoothValue>
+            <valueSoothingFactor>0.0</valueSoothingFactor>
+            <trendSmoothingFactor>0.0</trendSmoothingFactor>
+        </baselineDefinition>
+        <thresholdDefinition xsi:type="standardDeviationThresholdDefinition">
+            <windowSize>24</windowSize>
+            <exponentialSmoothed>true</exponentialSmoothed>
+            <smoothingFactor>0.01</smoothingFactor>
+            <excludeCriticalData>true</excludeCriticalData>
+            <excludeWarningData>false</excludeWarningData>
+            <sigmaAmountCritical>4</sigmaAmountCritical>
+            <sigmaAmountWarning>2</sigmaAmountWarning>
+        </thresholdDefinition>
+        <classifierDefinition xsi:type="hardClassifierDefinition"/>
+        <warmupLength>240</warmupLength>
+        <intervalShortProcessing>1</intervalShortProcessing>
+        <intervalLongProcessingMultiplier>20</intervalLongProcessingMultiplier>
+    </configurations>
+    <timeTravelDuration>604800</timeTravelDuration>
+    <anomalyDefinition>
+        <endCount>8</endCount>
+        <notifyOnCritical>true</notifyOnCritical>
+        <notifyOnWarning>true</notifyOnWarning>
+        <startCount>2</startCount>
+    </anomalyDefinition>
+    <notificationDefinitions xsi:type="logNotificationDefinition">
+        <ignoreWarnings>false</ignoreWarnings>
+        <printBegin>true</printBegin>
+        <printEnd>true</printEnd>
+        <printTransitions>true</printTransitions>
+    </notificationDefinitions>
+    <faultSuppressionFactor>10.0</faultSuppressionFactor>
+    <recordDataDuringAnomaly>true</recordDataDuringAnomaly>
+</anomaly-group-configuration>

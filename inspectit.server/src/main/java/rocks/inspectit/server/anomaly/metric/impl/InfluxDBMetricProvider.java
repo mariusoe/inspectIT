@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import rocks.inspectit.server.anomaly.constants.Measurements;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.anomaly.metric.MetricFilter;
 import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
@@ -146,15 +147,14 @@ public class InfluxDBMetricProvider extends AbstractMetricProvider<InfluxDBMetri
 		QueryResultWrapper queryResult;
 
 		if (getDefinition().isOpperateOnAggregation()) {
-			select = "STDDEV(\"value\")";
-			from = "inspectit_anomaly";
+			select = "STDDEV(\"" + Measurements.Data.FIELD_METRIC_AGGREGATION + "\")";
+			from = Measurements.Data.NAME;
 			queryResult = query(select, from, getDefinition().getParentConfiguration().getId(), filter, time - unit.toMillis(timeWindow), time);
 		} else {
 			select = "STDDEV(\"" + getDefinition().getField() + "\")";
 			from = getDefinition().getMeasurement();
 			queryResult = query(select, from, null, filter, time - unit.toMillis(timeWindow), time);
 		}
-
 
 		if (queryResult.isEmpty()) {
 			return Double.NaN;

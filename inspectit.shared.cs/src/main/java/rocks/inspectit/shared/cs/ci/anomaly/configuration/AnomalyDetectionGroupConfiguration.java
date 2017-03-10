@@ -180,6 +180,7 @@ public class AnomalyDetectionGroupConfiguration implements Serializable {
 		metricDefinitionFour.setFunction(Function.MEAN);
 		metricDefinitionFour.setField("duration");
 		metricDefinitionFour.setOpperateOnAggregation(false);
+		metricDefinitionFour.getTags().put("businessTxName", "shoppingcart");
 
 		HistoricalBaselineDefinition baselineDefinitionFour = new HistoricalBaselineDefinition();
 		baselineDefinitionFour.setSeasonLength(288);
@@ -219,7 +220,6 @@ public class AnomalyDetectionGroupConfiguration implements Serializable {
 		configurationGroup.getConfigurations().add(configurationFour); // stddev
 		configurationGroup.setTimeTravelDuration(7, TimeUnit.DAYS);
 		configurationGroup.setFaultSuppressionFactor(10D);
-		configurationGroup.setBusinessTransaction("shopping-cart");
 
 		configurationGroup.setAnomalyDefinition(anomalyDefinition);
 		configurationGroup.getNotificationDefinitions().add(notificationDefinition);
@@ -234,8 +234,6 @@ public class AnomalyDetectionGroupConfiguration implements Serializable {
 	}
 
 	private String name;
-
-	private String businessTransaction;
 
 	private Date createdDate;
 
@@ -300,25 +298,6 @@ public class AnomalyDetectionGroupConfiguration implements Serializable {
 	 */
 	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
-	}
-
-	/**
-	 * Gets {@link #businessTransaction}.
-	 *
-	 * @return {@link #businessTransaction}
-	 */
-	public String getBusinessTransaction() {
-		return this.businessTransaction;
-	}
-
-	/**
-	 * Sets {@link #businessTransaction}.
-	 *
-	 * @param businessTransaction
-	 *            New value for {@link #businessTransaction}
-	 */
-	public void setBusinessTransaction(String businessTransaction) {
-		this.businessTransaction = businessTransaction;
 	}
 
 	/**

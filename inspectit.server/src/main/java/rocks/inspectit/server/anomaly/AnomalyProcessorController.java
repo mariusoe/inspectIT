@@ -26,7 +26,6 @@ import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
 import rocks.inspectit.server.ci.event.AbstractAnomalyConfigurationEvent;
 import rocks.inspectit.server.ci.event.AbstractAnomalyConfigurationEvent.AnomalyDetectionGroupConfigurationCreatedEvent;
 import rocks.inspectit.server.ci.event.AbstractAnomalyConfigurationEvent.AnomalyDetectionGroupConfigurationsLoadedEvent;
-import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionGroupConfiguration;
 
@@ -45,9 +44,6 @@ public class AnomalyProcessorController implements Runnable, ApplicationListener
 
 	@Autowired
 	DefinitionAwareFactory definitionAwareFactory;
-
-	@Autowired
-	InfluxDBDao influx;
 
 	@Autowired
 	ContextFactory contextFactory;
@@ -140,6 +136,13 @@ public class AnomalyProcessorController implements Runnable, ApplicationListener
 	@Override
 	public void run() {
 		for (ProcessingUnitGroup unitGroup : processingUnitGroups) {
+			if (!unitGroup.getGroupContext().isInitialized()) {
+				if (log.isTraceEnabled()) {
+					log.trace("Skip processing unit group '{}'. It has not been initialized, yet.", unitGroup.getGroupContext().getGroupConfiguration().getName());
+				}
+				continue;
+			}
+
 			try {
 				unitGroup.process();
 			} catch (Exception e) {

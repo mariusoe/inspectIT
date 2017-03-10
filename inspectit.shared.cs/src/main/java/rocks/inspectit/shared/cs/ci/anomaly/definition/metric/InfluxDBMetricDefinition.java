@@ -9,6 +9,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+
+
 /**
  * @author Marius Oehler
  *
@@ -121,4 +123,21 @@ public class InfluxDBMetricDefinition extends MetricDefinition {
 		this.function = function;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isBusinessTransactionRelated() {
+		// TODO
+		return getTags().containsKey("businessTxName");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getBusinessTransactionName() {
+		// TODO
+		return getTags().get("businessTxName");
+	}
 }

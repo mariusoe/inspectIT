@@ -30,7 +30,13 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 			return;
 		}
 		if (getDefinition().isPrintBegin() && log.isInfoEnabled()) {
-			log.info("[Anomaly] The detection group '{}' (btx: {}) detected an anomaly.", anomaly.getGroupConfiguration().getName(), anomaly.getGroupConfiguration().getBusinessTransaction());
+			String btxString;
+			if (anomaly.isBusinessTransactionRelated()) {
+				btxString = " (btx: " + anomaly.getBusinessTransactionName() + ")";
+			} else {
+				btxString = "";
+			}
+			log.info("[Anomaly] The detection group '{}'{} detected an anomaly.", anomaly.getGroupConfiguration().getName(), btxString);
 		}
 	}
 
@@ -70,8 +76,14 @@ public class LogNotifier extends AbstractNotifier<LogNotificationDefinition> {
 		}
 
 		if (getDefinition().isPrintEnd() && log.isInfoEnabled()) {
-			log.info("[Anomaly] The anomaly detected by detection group '{}' (btx: {}) has ended.", anomaly.getGroupConfiguration().getName(),
-					anomaly.getGroupConfiguration().getBusinessTransaction());
+			String btxString;
+			if (anomaly.isBusinessTransactionRelated()) {
+				btxString = " (btx: " + anomaly.getBusinessTransactionName() + ")";
+			} else {
+				btxString = "";
+			}
+
+			log.info("[Anomaly] The anomaly detected by detection group '{}'{} has ended.", anomaly.getGroupConfiguration().getName(), btxString);
 			log.info("          |- started: {}", new Date(anomaly.getStartTime()));
 			log.info("          |- ended: {}", new Date(anomaly.getEndTime()));
 			log.info("          |- duration: {}", DurationFormatUtils.formatDurationHMS(anomaly.getEndTime() - anomaly.getStartTime()));

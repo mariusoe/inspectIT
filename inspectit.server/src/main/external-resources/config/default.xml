@@ -404,4 +404,9 @@
 			</long-property>
 		</properties>
 	</section>
+	<section name="Anomaly Detection System [Experimental]">
+		<properties>
+			<boolean-property name="ADS enabled" default-value="false" server-restart-required="false" logical-name="ads.enabled" advanced="true" description="If activated, the anomaly detection system is active and executes the specified anomaly detection." />
+		</properties>
+	</section>
 </cmr-configuration>
