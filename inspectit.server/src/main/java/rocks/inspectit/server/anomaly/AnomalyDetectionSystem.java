@@ -56,14 +56,15 @@ public class AnomalyDetectionSystem implements ApplicationListener<CmrStartedEve
 
 	@PostConstruct
 	public void postConstruct() {
-		if (log.isInfoEnabled()) {
-			log.info("|-Initialized Anomaly Detection System...");
-		}
 	}
 
 	@PropertyUpdate(properties = { "ads.enabled" })
 	private void start() {
 		if (enabled) {
+			if (log.isInfoEnabled()) {
+				log.info("|-Initialized Anomaly Detection System...");
+			}
+
 			anomalyProcessorController.initialize();
 
 			this.controllerFuture = executorService.scheduleAtFixedRate(anomalyProcessorController, PROCESSING_INTERVAL_SECONDS, PROCESSING_INTERVAL_SECONDS, TimeUnit.SECONDS);
