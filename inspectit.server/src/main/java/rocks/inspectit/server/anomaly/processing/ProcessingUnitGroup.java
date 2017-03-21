@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
 import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.constants.Measurements;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitContext;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitGroupContext;
 import rocks.inspectit.server.anomaly.processing.health.BestHealthDeclaration;
 import rocks.inspectit.server.anomaly.processing.health.WorstHealthDeclaration;
 import rocks.inspectit.server.anomaly.state.StateManager;

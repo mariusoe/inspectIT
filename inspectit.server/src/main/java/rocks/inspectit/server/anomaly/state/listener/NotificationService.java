@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.DefinitionAwareFactory;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitGroupContext;
 import rocks.inspectit.server.anomaly.notifier.AbstractNotifier;
-import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroupContext;
 import rocks.inspectit.server.anomaly.state.IAnomalyStateListener;
 import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.notification.NotificationDefinition;

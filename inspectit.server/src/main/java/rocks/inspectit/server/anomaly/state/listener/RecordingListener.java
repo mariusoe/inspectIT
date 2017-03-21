@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroupContext;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitGroupContext;
 import rocks.inspectit.server.anomaly.state.IAnomalyStateListener;
 import rocks.inspectit.shared.all.communication.DefaultData;
 import rocks.inspectit.shared.all.communication.data.ClassLoadingInformationData;

@@ -1,7 +1,7 @@
 package rocks.inspectit.server.anomaly.classification;
 
 import rocks.inspectit.server.anomaly.HealthStatus;
-import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitContext;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.AbstractDefinitionAware;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.ClassifierDefinition;
 

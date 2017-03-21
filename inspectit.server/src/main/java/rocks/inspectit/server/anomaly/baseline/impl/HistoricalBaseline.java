@@ -1,14 +1,11 @@
 package rocks.inspectit.server.anomaly.baseline.impl;
 
-import java.util.Arrays;
-
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
-import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
-import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.HistoricalBaselineDefinition;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitContext;
 
 /**
  * @author Marius Oehler
@@ -16,21 +13,13 @@ import rocks.inspectit.shared.cs.ci.anomaly.definition.baseline.HistoricalBaseli
  */
 @Component
 @Scope("prototype")
-public class HistoricalBaseline extends AbstractBaseline<HistoricalBaselineDefinition> {
-
-	private double[] valueStore;
-
-	private int currentIndex = 0;
-
-	private double currentValue = Double.NaN;
-
-	private double trendValue = Double.NaN;
+public class HistoricalBaseline extends AbstractBaseline<HistoricalBaselineContext> {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void process(ProcessingUnitContext context, long time) {
+	public void process(HistoricalBaselineContext context, long time) {
 		double value = getValue(context);
 
 		if (Double.isNaN(value)) {
@@ -111,14 +100,4 @@ public class HistoricalBaseline extends AbstractBaseline<HistoricalBaselineDefin
 
 		return baseline;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void onDefinitionUpdate() {
-		valueStore = new double[getDefinition().getSeasonLength()];
-		Arrays.fill(valueStore, Double.NaN);
-	}
-
 }

@@ -8,8 +8,6 @@ public abstract class AbstractDefinitionAware<E extends AbstractDefinition> {
 
 	protected E definition;
 
-	protected abstract void onDefinitionUpdate();
-
 	/**
 	 * Gets {@link #definition}.
 	 *
@@ -27,7 +25,6 @@ public abstract class AbstractDefinitionAware<E extends AbstractDefinition> {
 	 */
 	public void setDefinition(E definition) {
 		this.definition = definition;
-		onDefinitionUpdate();
 	}
 
 }

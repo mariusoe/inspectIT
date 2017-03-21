@@ -1,6 +1,6 @@
 package rocks.inspectit.server.anomaly.state;
 
-import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroupContext;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitGroupContext;
 
 /**
  * @author Marius Oehler

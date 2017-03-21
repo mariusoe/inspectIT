@@ -1,4 +1,4 @@
-package rocks.inspectit.server.anomaly.processing;
+package rocks.inspectit.server.anomaly.context;
 
 import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;

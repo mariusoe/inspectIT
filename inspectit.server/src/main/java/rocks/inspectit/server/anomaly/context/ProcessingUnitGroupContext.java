@@ -1,9 +1,10 @@
-package rocks.inspectit.server.anomaly.processing;
+package rocks.inspectit.server.anomaly.context;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import rocks.inspectit.server.anomaly.HealthStatus;
+import rocks.inspectit.server.anomaly.processing.ProcessingUnit;
 import rocks.inspectit.server.anomaly.state.AnomalyStateContext;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionGroupConfiguration;
 

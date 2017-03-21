@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.AnomalyDetectionSystem;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitContext;
 import rocks.inspectit.server.anomaly.metric.MetricFilter;
-import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
 import rocks.inspectit.server.anomaly.threshold.UnsupportedThresholdTypeException;
 import rocks.inspectit.shared.all.spring.logger.Log;

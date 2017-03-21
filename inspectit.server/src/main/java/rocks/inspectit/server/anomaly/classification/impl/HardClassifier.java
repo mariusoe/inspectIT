@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
-import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitContext;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold.ThresholdType;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.classification.HardClassifierDefinition;
 
@@ -56,12 +56,4 @@ public class HardClassifier extends AbstractClassifier<HardClassifierDefinition>
 		context.setViolatedThreshold(null);
 		return HealthStatus.NORMAL;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void onDefinitionUpdate() {
-	}
-
 }

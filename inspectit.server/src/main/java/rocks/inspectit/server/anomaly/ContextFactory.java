@@ -2,8 +2,8 @@ package rocks.inspectit.server.anomaly;
 
 import org.springframework.stereotype.Component;
 
-import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
-import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroupContext;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitContext;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitGroupContext;
 import rocks.inspectit.server.anomaly.state.AnomalyStateContext;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionConfiguration;
 import rocks.inspectit.shared.cs.ci.anomaly.configuration.AnomalyDetectionGroupConfiguration;

@@ -2,7 +2,7 @@ package rocks.inspectit.server.anomaly.metric;
 
 import java.util.concurrent.TimeUnit;
 
-import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitContext;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.AbstractDefinitionAware;
 import rocks.inspectit.shared.cs.ci.anomaly.definition.metric.MetricDefinition;
 

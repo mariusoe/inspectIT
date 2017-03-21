@@ -17,11 +17,11 @@ import com.google.common.collect.ImmutableList;
 
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitContext;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitGroupContext;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.anomaly.processing.ProcessingUnit;
-import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
 import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroup;
-import rocks.inspectit.server.anomaly.processing.ProcessingUnitGroupContext;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
 import rocks.inspectit.server.ci.event.AbstractAnomalyConfigurationEvent;
 import rocks.inspectit.server.ci.event.AbstractAnomalyConfigurationEvent.AnomalyDetectionGroupConfigurationCreatedEvent;

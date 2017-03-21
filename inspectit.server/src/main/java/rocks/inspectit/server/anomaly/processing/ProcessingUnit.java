@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import rocks.inspectit.server.anomaly.HealthStatus;
 import rocks.inspectit.server.anomaly.baseline.AbstractBaseline;
 import rocks.inspectit.server.anomaly.classification.AbstractClassifier;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitContext;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.anomaly.threshold.AbstractThreshold;
 import rocks.inspectit.shared.all.spring.logger.Log;

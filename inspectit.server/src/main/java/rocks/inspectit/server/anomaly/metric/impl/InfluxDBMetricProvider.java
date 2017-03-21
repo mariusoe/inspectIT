@@ -11,9 +11,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.anomaly.constants.Measurements;
+import rocks.inspectit.server.anomaly.context.ProcessingUnitContext;
 import rocks.inspectit.server.anomaly.metric.AbstractMetricProvider;
 import rocks.inspectit.server.anomaly.metric.MetricFilter;
-import rocks.inspectit.server.anomaly.processing.ProcessingUnitContext;
 import rocks.inspectit.server.influx.dao.InfluxDBDao;
 import rocks.inspectit.server.influx.util.QueryResultWrapper;
 import rocks.inspectit.shared.all.spring.logger.Log;
