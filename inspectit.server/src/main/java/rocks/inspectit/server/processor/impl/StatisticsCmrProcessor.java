@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,7 +35,7 @@ public class StatisticsCmrProcessor extends AbstractCmrDataProcessor implements 
 	@Resource(name = "scheduledExecutorService")
 	private ScheduledExecutorService scheduledExecutorService;
 
-	private Map<Long, AtomicLong> dataCounter = new HashMap<>();
+	private Map<Long, Map<Class<?>, AtomicLong>> dataCounter = new HashMap<>();
 
 	private long totalDataCount = 0L;
 
@@ -50,11 +51,18 @@ public class StatisticsCmrProcessor extends AbstractCmrDataProcessor implements 
 	 */
 	@Override
 	protected void processData(DefaultData defaultData, EntityManager entityManager) {
-		AtomicLong counter = dataCounter.get(defaultData.getPlatformIdent());
+		Map<Class<?>, AtomicLong> agentMap = dataCounter.get(defaultData.getPlatformIdent());
+		if (agentMap == null) {
+			agentMap = new HashMap<>();
+			dataCounter.put(defaultData.getPlatformIdent(), agentMap);
+		}
+
+		AtomicLong counter = agentMap.get(defaultData.getClass());
 		if (counter == null) {
 			counter = new AtomicLong(0L);
-			dataCounter.put(defaultData.getPlatformIdent(), counter);
+			agentMap.put(defaultData.getClass(), counter);
 		}
+
 		counter.incrementAndGet();
 	}
 
@@ -85,17 +93,30 @@ public class StatisticsCmrProcessor extends AbstractCmrDataProcessor implements 
 	 */
 	@Override
 	public void run() {
-		writeLine("* * * *  * * * * * * * * * * *  * * *");
+		writeLine(new Date() + " * * * *  * * * * * * * * * * *  * * *");
 
 		long oldTotalDataCount = totalDataCount;
 
-		for (Entry<Long, AtomicLong> entry : dataCounter.entrySet()) {
-			long count = entry.getValue().getAndSet(0L);
+		double agentRate, rate;
+		long count, agentCount;
 
-			totalDataCount += count;
-			double rate = ((double) count / intervalMs) * 1000D;
+		for (Entry<Long, Map<Class<?>, AtomicLong>> entry : dataCounter.entrySet()) {
+			writeLine("> agent '" + entry.getKey());
 
-			writeLine("> agent '" + entry.getKey() + "'\trate: " + rate + " e/s");
+			agentCount = 0L;
+
+			for (Entry<Class<?>, AtomicLong> innerEntry : entry.getValue().entrySet()) {
+				count = innerEntry.getValue().getAndSet(0L);
+
+				totalDataCount += count;
+				agentCount += count;
+				rate = ((double) count / intervalMs) * 1000D;
+
+				writeLine(">> '" + innerEntry.getKey().getSimpleName() + "'\t\t#:" + count + " rate:" + rate + " e/s");
+			}
+
+			agentRate = ((double) agentCount / intervalMs) * 1000D;
+			writeLine(">> == total:" + agentCount + "\trate:" + agentRate + "e/s");
 		}
 
 		double cmrRate = ((double) (totalDataCount - oldTotalDataCount) / intervalMs) * 1000D;
