@@ -151,6 +151,7 @@ public class HttpHookTest extends AbstractLogSupport {
 	public void oneRecordThatIsHttpReadingDataNoCropping() {
 		final String uri = "URI";
 		final String method = "GET";
+		final String remoteAddress = "1.1.1.1";
 
 		final String param1 = "p1";
 		final String param2 = "p2";
@@ -195,6 +196,7 @@ public class HttpHookTest extends AbstractLogSupport {
 		HttpTimerData tmp = new HttpTimerData(null, platformId, sensorTypeId, methodId);
 		tmp.getHttpInfo().setRequestMethod(method);
 		tmp.getHttpInfo().setUri(uri);
+		tmp.getHttpInfo().setRemoteAddress(remoteAddress);
 		Map<String, String> attributeMap = new HashMap<String, String>();
 		MapUtils.putAll(attributeMap, new Object[][] { { att1, att1Value }, { att2, att2Value } });
 		tmp.setAttributes(attributeMap);
@@ -220,6 +222,7 @@ public class HttpHookTest extends AbstractLogSupport {
 
 		when(httpServletRequest.getMethod()).thenReturn(method);
 		when(httpServletRequest.getRequestURI()).thenReturn(uri);
+		when(httpServletRequest.getRemoteAddr()).thenReturn(remoteAddress);
 		when(httpServletRequest.getParameterMap()).thenReturn(parameterMap);
 		when(httpServletRequest.getAttributeNames()).thenReturn(attributes);
 		Mockito.when(httpServletRequest.getAttribute(att1)).thenReturn(att1Value);

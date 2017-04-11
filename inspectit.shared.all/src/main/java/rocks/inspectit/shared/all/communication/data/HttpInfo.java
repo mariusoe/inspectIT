@@ -84,6 +84,18 @@ public class HttpInfo implements Sizeable, Serializable {
 	private String queryString;
 
 	/**
+	 * The remote address of the client.
+	 */
+	@Column
+	private String remoteAddress;
+
+	/**
+	 * The country code of the remote address.
+	 */
+	@Column
+	private String countryCode;
+
+	/**
 	 * The request method.
 	 */
 	private String requestMethod = UNDEFINED;
@@ -294,6 +306,25 @@ public class HttpInfo implements Sizeable, Serializable {
 	}
 
 	/**
+	 * Gets {@link #remoteAddress}.
+	 * 
+	 * @return {@link #remoteAddress}
+	 */
+	public String getRemoteAddress() {
+		return remoteAddress;
+	}
+
+	/**
+	 * Sets {@link #remoteAddress}.
+	 * 
+	 * @param remoteAddress
+	 *            New value for {@link #remoteAddress}
+	 */
+	public void setRemoteAddress(String remoteAddress) {
+		this.remoteAddress = remoteAddress;
+	}
+
+	/**
 	 * Returns the URL.
 	 *
 	 * @return the URL
@@ -312,6 +343,25 @@ public class HttpInfo implements Sizeable, Serializable {
 			builder.append('?').append(queryString);
 		}
 		return builder.toString();
+	}
+
+	/**
+	 * Gets {@link #countryCode}.
+	 * 
+	 * @return {@link #countryCode}
+	 */
+	public String getCountryCode() {
+		return this.countryCode;
+	}
+
+	/**
+	 * Sets {@link #countryCode}.
+	 * 
+	 * @param countryCode
+	 *            New value for {@link #countryCode}
+	 */
+	public void setCountryCode(String countryCode) {
+		this.countryCode = countryCode;
 	}
 
 	/**

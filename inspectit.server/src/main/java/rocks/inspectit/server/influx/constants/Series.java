@@ -57,6 +57,11 @@ public interface Series {
 		 */
 		String TAG_BUSINESS_TRANSACTION_NAME = "businessTxName";
 
+		/**
+		 * Country code name tag.
+		 */
+		String TAG_COUNTRY_CODE = "countryCode";
+
 	}
 
 	/**

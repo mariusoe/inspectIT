@@ -67,6 +67,8 @@ class HttpInformationExtractor {
 		SERVLET_GET_SESSION("getSession", new Class[] { boolean.class }),
 		/** Reads the request method. */
 		SERVLET_GET_METHOD("getMethod", (Class<?>[]) null),
+		/** Gets the remote address. */
+		SERVLET_GET_REMOTE_ADDRESS("getRemoteAddr", (Class<?>[]) null),
 		/** Gets all attribute names in the session. */
 		SESSION_GET_ATTRIBUTE_NAMES("getAttributeNames", (Class<?>[]) null),
 		/** Gets the value of a session attribute. */
@@ -362,6 +364,31 @@ class HttpInformationExtractor {
 	}
 
 	/**
+	 * Reads the remote address from the HttpServletRequest object.
+	 *
+	 * @param httpServletRequestClass
+	 *            the <code>Class</code> object representing the class of the given
+	 *            <code>HttpServletRequest</code>
+	 * @param httpServletRequest
+	 *            the object realizing the <code> HttpServletRequest </code> interface.
+	 * @return remote address if available. If response status cannot be retrieved, this method
+	 *         returns null.
+	 */
+	public String getRemoteAddress(Class<?> httpServletRequestClass, Object httpServletRequest) {
+		Method getStatusMethod = retrieveMethod(HttpMethods.SERVLET_GET_REMOTE_ADDRESS, httpServletRequestClass);
+		if (null == getStatusMethod) {
+			return null;
+		}
+		try {
+			return (String) getStatusMethod.invoke(httpServletRequest);
+		} catch (Exception e) {
+			LOG.error("Invocation of to get response status on given object failed.", e);
+		}
+
+		return null;
+	}
+
+	/**
 	 * Reads the response status from the HttpServletResponse object.
 	 *
 	 * @param httpServletResponseClass
@@ -373,6 +400,7 @@ class HttpInformationExtractor {
 	 *         method returns 0.
 	 */
 	public int getResponseStatus(Class<?> httpServletResponseClass, Object httpServletResponse) {
+
 		Method getStatusMethod = retrieveMethod(HttpMethods.RESPONSE_GET_STATUS, httpServletResponseClass);
 		if (null == getStatusMethod) {
 			return 0;

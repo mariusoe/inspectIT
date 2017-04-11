@@ -9,3 +9,5 @@ class: rocks.inspectit.shared.all.communication.data.HttpInfo
 6: serverName
 7: serverPort
 8: queryString
+9: remoteAddress
+10: countryCode

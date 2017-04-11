@@ -402,4 +402,9 @@
 			</long-property>
 		</properties>
 	</section>
+	<section name="Privacy">
+		<properties>
+			<boolean-property name="Store IP addresses of HTTP calls" default-value="false" server-restart-required="false" logical-name="privacy.storeIps" advanced="false" description="If activated, the IP addresses of the remote host which sent a captured HTTP requests is stored in the HTTP data." />
+		</properties>
+	</section>
 </cmr-configuration>
