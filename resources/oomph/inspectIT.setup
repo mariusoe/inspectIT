@@ -117,16 +117,6 @@
   </setupTask>
   <setupTask
       xsi:type="setup.p2:P2Task"
-      label="ECLEmma"
-      licenseConfirmationDisabled="true">
-    <requirement
-        name="com.mountainminds.eclemma.feature.feature.group"/>
-    <repository
-        url="http://update.eclemma.org/"/>
-    <description>Install the tools needed in the IDE to work with the source code for ${scope.project.label}</description>
-  </setupTask>
-  <setupTask
-      xsi:type="setup.p2:P2Task"
       label="Buildship"
       licenseConfirmationDisabled="true">
     <requirement
