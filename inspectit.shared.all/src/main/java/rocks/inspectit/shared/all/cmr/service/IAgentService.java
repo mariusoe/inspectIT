@@ -98,4 +98,6 @@ public interface IAgentService {
 	 * @return List of {@link IAgentMessage}s.
 	 */
 	List<IAgentMessage<?>> fetchAgentMessages(long platformId);
+
+	void pushThreadDump(long platformId, String threadDump);
 }

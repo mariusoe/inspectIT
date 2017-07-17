@@ -21,6 +21,7 @@ import rocks.inspectit.shared.all.instrumentation.config.impl.AgentConfig;
 import rocks.inspectit.shared.all.instrumentation.config.impl.InstrumentationDefinition;
 import rocks.inspectit.shared.all.instrumentation.config.impl.JmxAttributeDescriptor;
 import rocks.inspectit.shared.all.spring.logger.Log;
+import rocks.inspectit.shared.cs.cmr.service.IThreadDumpService;
 
 /**
  * Service for agent communication with the CMR.
@@ -48,6 +49,9 @@ public class AgentService implements IAgentService {
 	 */
 	@Autowired
 	AgentMessageProvider messageProvider;
+
+	@Autowired
+	IThreadDumpService threadDumpService;
 
 	/**
 	 * {@inheritDoc}
@@ -116,4 +120,11 @@ public class AgentService implements IAgentService {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void pushThreadDump(long platformId, String threadDump) {
+		threadDumpService.storeThreadDump(platformId, threadDump);
+	}
 }

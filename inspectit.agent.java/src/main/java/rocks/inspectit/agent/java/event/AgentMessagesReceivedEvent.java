@@ -1,5 +1,6 @@
 package rocks.inspectit.agent.java.event;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -50,4 +51,24 @@ public class AgentMessagesReceivedEvent extends ApplicationEvent {
 		return this.agentMessages;
 	}
 
+	public boolean containsMessageType(Class<? extends IAgentMessage<?>> messageType) {
+		for (IAgentMessage<?> message : agentMessages) {
+			if (messageType.isInstance(message)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public <E> List<E> getAgentMessages(Class<E> clazz) {
+		LinkedList<E> list = new LinkedList<E>();
+
+		for (IAgentMessage<?> agentMesage : agentMessages) {
+			if (clazz.isInstance(agentMesage)) {
+				list.add((E) agentMesage);
+			}
+		}
+
+		return list;
+	}
 }

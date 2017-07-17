@@ -84,8 +84,42 @@ public class TreeModelManager {
 			components.add(getJmxSensorTree(platformIdent, repositoryDefinition));
 			components.add(getExceptionSensorTree(platformIdent, repositoryDefinition));
 			components.add(getSystemOverviewTree(platformIdent, repositoryDefinition));
+			components.add(getThreadDumpTree(platformIdent, repositoryDefinition));
 		}
 		return components.toArray();
+	}
+
+	private Component getThreadDumpTree(PlatformIdent platformIdent, RepositoryDefinition definition) {
+		Composite jmxDataComposite = new Composite();
+		jmxDataComposite.setName("Thread Dumps");
+		jmxDataComposite.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_BEAN));
+		jmxDataComposite.setTooltip("With these views, requested thread-dumps can be viewed.");
+
+		Component showAll = new Leaf();
+		showAll.setName("Show All");
+		showAll.setImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SHOW_ALL));
+
+		InputDefinition inputDefinition = new InputDefinition();
+		inputDefinition.setRepositoryDefinition(definition);
+		inputDefinition.setId(SensorTypeEnum.THREAD_DUMP);
+
+		IdDefinition idDefinition = new IdDefinition();
+		idDefinition.setPlatformId(platformIdent.getId());
+
+		EditorPropertiesData editorPropertiesData = new EditorPropertiesData();
+		editorPropertiesData.setSensorImage(SensorTypeEnum.THREAD_DUMP.getImage());
+		editorPropertiesData.setSensorName("Thread Dumps");
+		editorPropertiesData.setViewImage(InspectIT.getDefault().getImage(InspectITImages.IMG_SHOW_ALL));
+		editorPropertiesData.setViewName("Show All");
+		inputDefinition.setEditorPropertiesData(editorPropertiesData);
+
+		inputDefinition.setIdDefinition(idDefinition);
+		showAll.setInputDefinition(inputDefinition);
+
+		jmxDataComposite.addChild(showAll);
+
+		return jmxDataComposite;
+
 	}
 
 	/**

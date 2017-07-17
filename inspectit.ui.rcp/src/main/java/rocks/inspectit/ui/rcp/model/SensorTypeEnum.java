@@ -128,7 +128,9 @@ public enum SensorTypeEnum {
 	/** Tracing details view. */
 	TRACING_DETAILS(AbstractRemoteSensorConfig.class.getName() + "#deatils", InspectITImages.IMG_REMOTE, false),
 	/** End User Monitoring. */
-	END_USER_MONITORING(EUMInstrumentationSensorConfig.CLASS_NAME, InspectITImages.IMG_ASSIGNEE_LABEL_ICON, false);
+	END_USER_MONITORING(EUMInstrumentationSensorConfig.CLASS_NAME, InspectITImages.IMG_ASSIGNEE_LABEL_ICON, false),
+	/** Thread dumps. */
+	THREAD_DUMP("Thread Dumps", InspectITImages.IMG_ASSIGNEE_LABEL_ICON, false);
 
 	/**
 	 * The LOOKUP map which is used to get an element of the enumeration when passing the full

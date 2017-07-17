@@ -39,6 +39,7 @@
 		<lookup-method name="getAlertAccessService" bean="alertAccessService" />
 		<lookup-method name="getAgentInstrumentationService" bean="agentInstrumentationService" />
 		<lookup-method name="getSpanService" bean="spanService" />
+		<lookup-method name="getThreadDumpService" bean="threadDumpService"/>
 	</bean>
 
 	<!-- CmrManagementService -->
@@ -423,6 +424,30 @@
 		<property name="defaultValueOnError" value="true" />
 	</bean>
 	<!-- SpanService End -->
+	
+	<!-- ThreadDumpService -->
+	<bean id="threadDumpService" class="org.springframework.aop.framework.ProxyFactoryBean" scope="prototype" lazy-init="true">
+		<property name="proxyInterfaces">
+			<list>
+				<value>rocks.inspectit.shared.cs.cmr.service.IThreadDumpService</value>
+				<value>rocks.inspectit.ui.rcp.repository.service.cmr.ICmrService</value>
+			</list>
+		</property>
+		<property name="target" ref="threadDumpServiceTarget" />
+		<property name="interceptorNames">
+			<list>
+				<value>serviceMethodInterceptor</value>
+				<value>interfaceInterceptor</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="threadDumpServiceTarget" class="rocks.inspectit.ui.rcp.repository.service.cmr.CmrService" scope="prototype" lazy-init="true">
+		<property name="serviceInterface" value="rocks.inspectit.shared.cs.cmr.service.IThreadDumpService" />
+		<property name="serviceName" value="ThreadDumpService" />
+		<property name="defaultValueOnError" value="true" />
+	</bean>
+	<!-- ThreadDumpService End -->
 	
 	<bean id="loggerPostProcessor" class="rocks.inspectit.shared.all.spring.logger.LoggerPostProcessor" />
 

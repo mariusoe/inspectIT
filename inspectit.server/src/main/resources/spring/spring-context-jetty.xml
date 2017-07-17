@@ -283,6 +283,21 @@
 		<property name="pathSpec" value="/remoting/SpanService" />
 	</bean>
 	<!-- END -->
+	
+	<!-- Thread Dump Service -->
+	<bean name="threadDumpRequestHandlerServlet" class="org.springframework.web.context.support.HttpRequestHandlerServlet">
+	</bean>
+
+	<bean id="threadDumpServletHolder" class="org.mortbay.jetty.servlet.ServletHolder">
+		<property name="name" value="threadDumpServiceExporter" />
+		<property name="servlet" ref="threadDumpRequestHandlerServlet" />
+	</bean>
+
+	<bean id="threadDumpServiceMapping" class="org.mortbay.jetty.servlet.ServletMapping">
+		<property name="servletName" value="threadDumpServiceExporter" />
+		<property name="pathSpec" value="/remoting/ThreadDumpService" />
+	</bean>
+	<!-- END -->
 
 	<!-- DEFAULT SERVER FOR STATIC CONTENT -->
 	<bean id="defaultServlet" class="org.mortbay.jetty.servlet.DefaultServlet" />
@@ -400,6 +415,7 @@
 				<ref bean="alertAccessServletHolder" />
 				<ref bean="agentInstrumentationServletHolder" />
 				<ref bean="spanServletHolder" />
+				<ref bean="threadDumpServletHolder" />
 				<ref bean="defaultServletHolder" />
 				<ref bean="uploadServletHolder" />
 				<ref bean="springDispatcherServletHolder" />
@@ -423,6 +439,7 @@
 				<ref bean="alertAccessServiceMapping" />
 				<ref bean="agentInstrumentationServiceMapping" />
 				<ref bean="spanServiceMapping" />
+				<ref bean="threadDumpServiceMapping" />
 				<ref bean="defaultServletMapping" />
 				<ref bean="uploadServletMapping" />
 				<ref bean="springDispatcherServletMapping" />

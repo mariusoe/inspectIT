@@ -550,4 +550,36 @@ public class KryoNetConnection implements IConnection {
 	public Object getReconnectionMonitor() {
 		return reconnectionMonitor;
 	}
+
+	@Override
+	public void pushThreadDump(final long platformIdent, final String threadDump) throws ServerUnavailableException {
+		if (!isConnected()) {
+			throw new ServerUnavailableException();
+		}
+
+		// make call
+		FailFastRemoteMethodCall<IAgentService, Void> call = new FailFastRemoteMethodCall<IAgentService, Void>(agentService) {
+			@Override
+			protected Void performRemoteCall(IAgentService service) throws Exception {
+				agentService.pushThreadDump(platformIdent, threadDump);
+				return null;
+			}
+		};
+
+		try {
+			call.makeCall();
+		} catch (ExecutionException executionException) {
+			if (log.isTraceEnabled()) {
+				log.trace("pushThreadDump(long,ThreadInfo[])", executionException);
+			}
+
+			// otherwise we log and return null as it's unexpected exception for us
+			log.error("Could not push thread dump", executionException);
+		} catch (ServerUnavailableException e) {
+			if (!e.isServerTimeout()) {
+				disconnectClient();
+			}
+			throw e;
+		}
+	}
 }

@@ -20,6 +20,7 @@ import rocks.inspectit.shared.cs.cmr.service.IServerStatusService;
 import rocks.inspectit.shared.cs.cmr.service.IServerStatusService.ServerStatus;
 import rocks.inspectit.shared.cs.cmr.service.ISqlDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IStorageService;
+import rocks.inspectit.shared.cs.cmr.service.IThreadDumpService;
 import rocks.inspectit.shared.cs.cmr.service.ITimerDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.cache.CachedDataService;
 import rocks.inspectit.shared.cs.cmr.service.cache.CachedSpanService;
@@ -214,6 +215,8 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	 */
 	private final IStorageService storageService;
 
+	private final IThreadDumpService threadDumpService;
+
 	/**
 	 * The configuration interface service.
 	 */
@@ -290,6 +293,7 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 		storageService = cmrServiceProvider.getStorageService(this);
 		configurationInterfaceService = cmrServiceProvider.getConfigurationInterfaceService(this);
 		jmxDataAccessService = cmrServiceProvider.getJmxDataAccessService(this);
+		threadDumpService = cmrServiceProvider.getThreadDumpService(this);
 		businessContextManagementService = cmrServiceProvider.getBusinessContextManagementService(this);
 		influxDBService = cmrServiceProvider.getInfluxDBService(this);
 		alertAccessService = cmrServiceProvider.getAlertAccessService(this);
@@ -412,6 +416,14 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	@Override
 	public CachedSpanService getSpanService() {
 		return spanService;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public IThreadDumpService getThreaDumpService() {
+		return threadDumpService;
 	}
 
 	/**

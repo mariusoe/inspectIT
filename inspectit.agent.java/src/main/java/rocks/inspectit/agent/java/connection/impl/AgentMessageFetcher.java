@@ -34,7 +34,7 @@ public class AgentMessageFetcher implements Runnable {
 	/**
 	 * The interval in seconds of fetching the available {@link IAgentMessage}s.
 	 */
-	private static final long FETCH_INTERVAL_SECONDS = 30L;
+	private static final long FETCH_INTERVAL_SECONDS = 15L;
 
 	/**
 	 * The logger of the class.

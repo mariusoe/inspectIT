@@ -1,15 +1,26 @@
 package rocks.inspectit.ui.rcp.editor;
 
+import java.util.List;
+import java.util.Set;
+
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import rocks.inspectit.ui.rcp.InspectIT;
 import rocks.inspectit.ui.rcp.InspectITImages;
 import rocks.inspectit.ui.rcp.editor.banner.InfluxBannerSubView;
+import rocks.inspectit.ui.rcp.editor.banner.ThreadDumpSubView;
 import rocks.inspectit.ui.rcp.editor.composite.GridCompositeSubView;
 import rocks.inspectit.ui.rcp.editor.composite.SashCompositeSubView;
 import rocks.inspectit.ui.rcp.editor.composite.TabbedCompositeSubView;
 import rocks.inspectit.ui.rcp.editor.graph.GraphSubView;
+import rocks.inspectit.ui.rcp.editor.preferences.PreferenceId;
+import rocks.inspectit.ui.rcp.editor.preferences.PreferenceEventCallback.PreferenceEvent;
+import rocks.inspectit.ui.rcp.editor.root.AbstractRootEditor;
 import rocks.inspectit.ui.rcp.editor.table.TableSubView;
 import rocks.inspectit.ui.rcp.editor.table.input.AggregatedTimerSummaryInputController;
 import rocks.inspectit.ui.rcp.editor.table.input.AlertInvocInputController;
@@ -257,6 +268,8 @@ public final class SubViewFactory {
 			traceDetailsView.addSubView(new TreeSubView(new TraceDetailsTreeInputController()), 1);
 			traceDetailsView.addSubView(invocTabbedSubView2, 2);
 			return traceDetailsView;
+		case THREAD_DUMP:
+			return new ThreadDumpSubView();
 		default:
 			throw new IllegalArgumentException("Could not create sub-view. Not supported: " + sensorTypeEnum.toString());
 		}
@@ -275,7 +288,7 @@ public final class SubViewFactory {
 
 	/**
 	 * Wraps the given {@link ISubView} inside an {@link InfluxBannerSubView}.
-	 * 
+	 *
 	 * @param subView
 	 *            the view to wrap
 	 * @return An {@link InfluxBannerSubView} which wraps the given {@link ISubView}

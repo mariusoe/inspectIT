@@ -9,6 +9,7 @@ import rocks.inspectit.shared.cs.cmr.service.IInvocationDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IJmxDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.ISpanService;
 import rocks.inspectit.shared.cs.cmr.service.ISqlDataAccessService;
+import rocks.inspectit.shared.cs.cmr.service.IThreadDumpService;
 import rocks.inspectit.shared.cs.cmr.service.ITimerDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.cache.CachedSpanService;
 
@@ -110,4 +111,6 @@ public interface RepositoryDefinition {
 	 * @return Returns the {@link CachedSpanService}.
 	 */
 	ISpanService getSpanService();
+
+	IThreadDumpService getThreaDumpService();
 }

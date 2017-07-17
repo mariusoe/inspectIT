@@ -22,6 +22,7 @@ import rocks.inspectit.shared.cs.cmr.service.IHttpTimerDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IInvocationDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IJmxDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.ISqlDataAccessService;
+import rocks.inspectit.shared.cs.cmr.service.IThreadDumpService;
 import rocks.inspectit.shared.cs.cmr.service.ITimerDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.cache.CachedDataService;
 import rocks.inspectit.shared.cs.cmr.service.cache.CachedSpanService;
@@ -220,6 +221,14 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	@Override
 	public CachedSpanService getSpanService() {
 		return spanService;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public IThreadDumpService getThreaDumpService() {
+		return null;
 	}
 
 	/**

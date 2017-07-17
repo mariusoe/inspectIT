@@ -171,4 +171,6 @@ public interface IConnection {
 	 * @return {@link Object} which acts as monitor
 	 */
 	Object getReconnectionMonitor();
+
+	void pushThreadDump(final long platformIdent, final String threadInfos) throws ServerUnavailableException;
 }

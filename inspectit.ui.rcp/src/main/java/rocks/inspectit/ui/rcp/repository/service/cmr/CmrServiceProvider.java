@@ -15,6 +15,7 @@ import rocks.inspectit.shared.cs.cmr.service.IServerStatusService;
 import rocks.inspectit.shared.cs.cmr.service.ISpanService;
 import rocks.inspectit.shared.cs.cmr.service.ISqlDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IStorageService;
+import rocks.inspectit.shared.cs.cmr.service.IThreadDumpService;
 import rocks.inspectit.shared.cs.cmr.service.ITimerDataAccessService;
 import rocks.inspectit.ui.rcp.repository.CmrRepositoryDefinition;
 
@@ -348,4 +349,11 @@ public abstract class CmrServiceProvider {
 	 */
 	protected abstract ISpanService getSpanService();
 
+	public IThreadDumpService getThreadDumpService(CmrRepositoryDefinition cmrRepositoryDefinition) {
+		IThreadDumpService threadDumpService = getThreadDumpService();
+		((ICmrService) threadDumpService).initService(cmrRepositoryDefinition);
+		return threadDumpService;
+	}
+
+	protected abstract IThreadDumpService getThreadDumpService();
 }
