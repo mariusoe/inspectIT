@@ -1,0 +1,55 @@
+# Java Gradle CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-java/ for more details
+#
+version: 3
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/openjdk:8-jdk
+      
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+
+    working_directory: ~/repo
+
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+    
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v2-dependencies-{{ checksum "dependencies.gradle" }}
+          # fallback to using the latest cache if no exact match is found
+          - v2-dependencies-
+
+      - run: gradle release
+
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v2-dependencies-{{ checksum "dependencies.gradle" }}
+
+      - store_artifacts:
+          path: ~/repo/inspectit.agent.java/build/release/packages/
+          destination: inspectit-agent
+
+      - store_artifacts:
+          path: ~/repo/inspectit.agent.java.sdk/build/release/packages/
+          destination: inspectit-agent-sdk
+
+      - store_artifacts:
+          path: ~/repo/inspectit.server/build/release/packages/
+          destination: inspectit-server
+
+      - store_artifacts:
+          path: ~/repo/inspectit.ui.rcp/build/release/packages/
+          destination: inspectit-ui
