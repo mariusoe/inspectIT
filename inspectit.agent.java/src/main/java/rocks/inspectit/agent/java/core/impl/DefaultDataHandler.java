@@ -1,8 +1,10 @@
 package rocks.inspectit.agent.java.core.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,8 +13,12 @@ import com.lmax.disruptor.EventHandler;
 
 import rocks.inspectit.agent.java.connection.IConnection;
 import rocks.inspectit.agent.java.connection.ServerUnavailableException;
+import rocks.inspectit.agent.java.elastic.ElasticUtil;
+import rocks.inspectit.agent.java.elastic.model.ElasticData;
 import rocks.inspectit.agent.java.stats.AgentStatisticsLogger;
 import rocks.inspectit.shared.all.communication.DefaultData;
+import rocks.inspectit.shared.all.communication.data.HttpTimerData;
+import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
@@ -54,6 +60,9 @@ public class DefaultDataHandler implements EventHandler<DefaultDataWrapper> {
 	 */
 	private boolean sendingExceptionNotice = false;
 
+	@Autowired
+	private ElasticUtil elasticUtil;
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -62,6 +71,19 @@ public class DefaultDataHandler implements EventHandler<DefaultDataWrapper> {
 		defaultDatas.add(defaultDataWrapper.getDefaultData());
 
 		if (endOfBatch) {
+
+			// Send Invocation Sequences to Elastic APM
+			List<InvocationSequenceData> invocSequences = extractInvocSequences();
+			if (CollectionUtils.isNotEmpty(invocSequences)) {
+				ElasticData elasticData = elasticUtil.createElasticData();
+
+				for (InvocationSequenceData isData : invocSequences) {
+					elasticUtil.add(elasticData, isData);
+				}
+
+				elasticUtil.send(elasticData);
+			}
+
 			try {
 				if (connection.isConnected()) {
 					connection.sendDataObjects(defaultDatas);
@@ -84,4 +106,18 @@ public class DefaultDataHandler implements EventHandler<DefaultDataWrapper> {
 		}
 	}
 
+	private List<InvocationSequenceData> extractInvocSequences() {
+		List<InvocationSequenceData> invocSequences = new ArrayList<InvocationSequenceData>();
+
+		for (Iterator<DefaultData> iterator = defaultDatas.iterator(); iterator.hasNext();) {
+			DefaultData data = iterator.next();
+			// only requests
+			if ((data instanceof InvocationSequenceData) && (((InvocationSequenceData) data).getTimerData() instanceof HttpTimerData)) {
+				invocSequences.add((InvocationSequenceData) data);
+				iterator.remove();
+			}
+		}
+
+		return invocSequences;
+	}
 }

@@ -183,6 +183,7 @@ dependencies {
 		'ch.qos.logback:logback-classic:1.1.7',
 		'piccolo:piccolo:1.0.3',
 		'com.lmax:disruptor:3.3.6',
+		'com.google.code.gson:gson:2.8.2',
 		
 		// javax.annotation-api needed as we use them, but they are removed in java 9 from java.base module
 		// currently only to support starting agent with Java 9, but needed if we want to start 

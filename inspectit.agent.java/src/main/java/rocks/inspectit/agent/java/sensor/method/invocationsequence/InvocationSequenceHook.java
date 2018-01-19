@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +14,7 @@ import rocks.inspectit.agent.java.config.IPropertyAccessor;
 import rocks.inspectit.agent.java.config.impl.RegisteredSensorConfig;
 import rocks.inspectit.agent.java.core.ICoreService;
 import rocks.inspectit.agent.java.core.IPlatformManager;
+import rocks.inspectit.agent.java.elastic.MethodNameMapper;
 import rocks.inspectit.agent.java.hooking.IConstructorHook;
 import rocks.inspectit.agent.java.hooking.IMethodHook;
 import rocks.inspectit.agent.java.sdk.opentracing.internal.impl.SpanContextImpl;
@@ -218,6 +220,11 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 		}
 	}
 
+	private String shortType(String type) {
+		String[] split = type.split("\\.");
+		return split[split.length - 1];
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -238,6 +245,28 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 				for (ParameterContentData contentData : parameterContentData) {
 					contentData.setContent(strConstraint.crop(contentData.getContent()));
 				}
+			}
+
+			// Stores a mapping for the Elastic APM prototype to resolve method ids.
+			if (!MethodNameMapper.exists(methodId)) {
+				StringBuilder builder = new StringBuilder();
+
+				builder.append(rsc.getTargetClassFqn()).append('.').append(rsc.getTargetMethodName()).append('(');
+				for (int i = 0; i < rsc.getParameterTypes().size(); i++) {
+					if (i != 0) {
+						builder.append(", ");
+					}
+					builder.append(shortType(rsc.getParameterTypes().get(i)));
+				}
+				builder.append("):");
+
+				if (StringUtils.isEmpty(rsc.getReturnType())) {
+					builder.append("void");
+				} else {
+					builder.append(shortType(rsc.getReturnType()));
+				}
+
+				MethodNameMapper.put(methodId, builder.toString());
 			}
 
 			if ((methodId == invocationStartId.get().longValue()) && (0 == invocationStartIdCount.get().longValue())) {
@@ -337,7 +366,7 @@ public class InvocationSequenceHook implements IMethodHook, IConstructorHook, IC
 	 * <li>running remote sensor that provided no span
 	 * <li>having invocation sensor without any other sensor on the method
 	 * </ul>
-	 * 
+	 *
 	 * @param invocationSequenceData
 	 *            {@link InvocationSequenceData} to check.
 	 *
