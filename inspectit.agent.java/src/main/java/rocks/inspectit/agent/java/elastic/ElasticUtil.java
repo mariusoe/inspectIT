@@ -89,6 +89,10 @@ public class ElasticUtil {
 				http.setRequestMethod("POST");
 				http.setDoOutput(true);
 
+				if (elasticToken != null) {
+					http.setRequestProperty("Authorization", "Bearer " + elasticToken);
+				}
+
 				byte[] out = json.getBytes(Charset.forName("UTF-8"));
 				int length = out.length;
 
