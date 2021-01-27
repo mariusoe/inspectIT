@@ -1,0 +1,18 @@
+language: java
+dist: trusty
+sudo: required
+
+jdk:
+  - oraclejdk8
+
+before_install:
+  - ./gradlew inspectit.agent.java:analyze
+  - ./gradlew inspectit.agent.java.sdk:analyze
+  - ./gradlew inspectit.server.diagnosis:analyze
+  - ./gradlew inspectit.shared.all:analyze
+  - ./gradlew inspectit.shared.cs:analyze
+  - ./gradlew inspectit.ui.rcp:analyze
+  
+install:
+  - ./gradlew release
+  
